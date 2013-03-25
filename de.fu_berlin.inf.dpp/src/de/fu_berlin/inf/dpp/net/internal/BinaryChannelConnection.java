@@ -67,7 +67,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
         this.peer = peer;
         this.binaryChannel = channel;
         this.receiveThread = new ReceiverThread(binaryChannel);
-        this.receiveThread.setName("Binary-Channel-" + peer.getName());
+        this.receiveThread.setName("BinaryChannel-" + peer.getName());
         this.receiveThread.start();
     }
 

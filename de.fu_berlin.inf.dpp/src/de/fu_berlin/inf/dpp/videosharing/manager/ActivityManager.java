@@ -55,7 +55,7 @@ public class ActivityManager implements Disposable {
         this.videoSharingSession = videoSharingSession;
         this.objectIn = objectIn;
         activityReceiverThread = Utils.runSafeAsync(
-            "VideoSharing-ActivityReceiver", log, receiver);
+            "VideoSharingActivityReceiver", log, receiver);
     }
 
     protected class ActivityManagerReceiver implements Runnable {

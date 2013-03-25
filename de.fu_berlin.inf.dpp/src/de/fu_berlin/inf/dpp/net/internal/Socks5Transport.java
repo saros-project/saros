@@ -114,7 +114,7 @@ public class Socks5Transport extends ByteStreamTransport {
             + "cancelling response connection as it is not needed");
 
         Thread waitToCloseResponse = new Thread(
-            "close_unneeded_response_connection") {
+            "CloseUnneededResponseConnection") {
 
             @Override
             public void run() {
@@ -578,7 +578,7 @@ public class Socks5Transport extends ByteStreamTransport {
         IByteStreamConnectionListener listener) {
         super.prepareXMPPConnection(connection, listener);
         executorService = Executors.newCachedThreadPool(new NamedThreadFactory(
-            "SOCKS5-Connection-Response-"));
+            "SOCKS5ConnectionResponse-"));
     }
 
     @Override

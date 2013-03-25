@@ -31,7 +31,7 @@ public class SoundPlayer {
             return;
         } else {
 
-            Utils.runSafeAsync(log, new Runnable() {
+            Utils.runSafeAsync("SoundPlayer", log, new Runnable() {
                 @Override
                 public void run() {
 

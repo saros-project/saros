@@ -1301,7 +1301,7 @@ public final class SarosSession implements ISarosSession, Disposable {
          * we can remove the user that is not responding
          */
 
-        Utils.runSafeAsync(log, new Runnable() {
+        Utils.runSafeAsync("SynchronizeUserlistTimer", log, new Runnable() {
 
             @Override
             public void run() {

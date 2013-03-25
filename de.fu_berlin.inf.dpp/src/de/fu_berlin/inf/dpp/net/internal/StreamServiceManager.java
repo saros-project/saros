@@ -233,10 +233,9 @@ public class StreamServiceManager implements Startable {
 
     protected void startThreads() {
         sender = new PacketSender();
-        Utils.runSafeAsync("StreamServiceManagers-senderThread", log, sender);
+        Utils.runSafeAsync("StreamServiceManagerSender", log, sender);
         receiver = new PacketReceiver();
-        Utils.runSafeAsync("StreamServiceManagers-receiverThread", log,
-            receiver);
+        Utils.runSafeAsync("StreamServiceManagerReceiver", log, receiver);
         stopSessionExecutor = Executors.newScheduledThreadPool(5,
             new NamedThreadFactory("StreamSessionStopper-"));
 
@@ -407,7 +406,7 @@ public class StreamServiceManager implements Startable {
                 TimeUnit.SECONDS);
             session.shutdown = stopThread;
         } else {
-            new Thread(stopThread).start();
+            new Thread(stopThread, "StopStreamSession").start();
         }
 
         if (session.sessionListener != null)

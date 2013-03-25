@@ -82,8 +82,8 @@ public final class StunServiceImpl implements IStunService {
                 stunInetAddress, stunPort, timeout));
 
             discoveryThreads.add(discoveryThread);
-            discoveryThread.setName("STUN-Discovery-"
-                + address.getHostAddress());
+            discoveryThread
+                .setName("StunDiscovery-" + address.getHostAddress());
             discoveryThread.start();
         }
 
@@ -267,6 +267,7 @@ public final class StunServiceImpl implements IStunService {
                     }
                 });
 
+                senderThread.setName("StunSender-" + localAddress);
                 senderThread.start();
 
                 DatagramPacket response = new DatagramPacket(

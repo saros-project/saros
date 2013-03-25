@@ -229,26 +229,27 @@ public final class StopManager extends AbstractActivityProvider implements
         final LinkedList<Thread> threads = new LinkedList<Thread>();
 
         for (final User user : users) {
-            threads.add(Utils.runSafeAsync(log, new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        if (monitor.isCanceled())
-                            return;
+            threads.add(Utils.runSafeAsync("BlockUser-" + user + "-" + cause,
+                log, new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            if (monitor.isCanceled())
+                                return;
 
-                        StartHandle startHandle = stop(user, cause, monitor);
-                        resultingHandles.add(startHandle);
-                        log.debug("Added " + startHandle
-                            + " to resulting handles.");
-                    } catch (CancellationException e) {
-                        log.debug("Buddy canceled the Stopping");
-                        monitor.setCanceled(true);
-                    } catch (InterruptedException e) {
-                        log.debug("Canceling because of an InterruptedException");
-                        monitor.setCanceled(true);
+                            StartHandle startHandle = stop(user, cause, monitor);
+                            resultingHandles.add(startHandle);
+                            log.debug("Added " + startHandle
+                                + " to resulting handles.");
+                        } catch (CancellationException e) {
+                            log.debug("Buddy canceled the Stopping");
+                            monitor.setCanceled(true);
+                        } catch (InterruptedException e) {
+                            log.debug("Canceling because of an InterruptedException");
+                            monitor.setCanceled(true);
+                        }
                     }
-                }
-            }));
+                }));
         }
 
         /**

@@ -91,7 +91,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
          * ever wants to count the number of declined dialogs, threading
          * problems must be newly considered.
          */
-        Utils.runSafeAsync(log, new Runnable() {
+        Utils.runSafeAsync("ShowFeedbackDialog", log, new Runnable() {
 
             @Override
             public void run() {

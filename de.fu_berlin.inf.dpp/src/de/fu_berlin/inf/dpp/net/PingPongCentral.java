@@ -144,7 +144,7 @@ public class PingPongCentral extends AbstractActivityProvider implements
     }
 
     protected ScheduledExecutorService scheduler = Executors
-        .newScheduledThreadPool(1, new NamedThreadFactory("PingPongScheduler"));
+        .newScheduledThreadPool(1, new NamedThreadFactory("PingPongScheduler-"));
 
     protected AtomicReference<ScheduledFuture<?>> pingPongHandle = new AtomicReference<ScheduledFuture<?>>(
         null);

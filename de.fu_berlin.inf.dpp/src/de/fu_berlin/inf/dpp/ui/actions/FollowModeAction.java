@@ -95,19 +95,20 @@ public class FollowModeAction extends Action implements Disposable {
                  * As a HACK, we run this action 1s after the listener was
                  * called.
                  */
-                Utils.runSafeAsync(log, Utils.delay(1000, new Runnable() {
-                    @Override
-                    public void run() {
-                        SWTUtils.runSafeSWTAsync(log, new Runnable() {
-                            @Override
-                            public void run() {
-                                if (sessionManager.getSarosSession() != null) {
-                                    FollowModeAction.this.run();
+                Utils.runSafeAsync("DelayFollow", log,
+                    Utils.delay(1000, new Runnable() {
+                        @Override
+                        public void run() {
+                            SWTUtils.runSafeSWTAsync(log, new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (sessionManager.getSarosSession() != null) {
+                                        FollowModeAction.this.run();
+                                    }
                                 }
-                            }
-                        });
-                    }
-                }));
+                            });
+                        }
+                    }));
 
             }
         }

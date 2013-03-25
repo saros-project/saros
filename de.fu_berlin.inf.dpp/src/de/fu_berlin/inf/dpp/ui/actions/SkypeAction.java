@@ -104,7 +104,7 @@ public class SkypeAction extends Action implements Disposable {
                     .getSelectionRetriever(JID.class).getSelection();
 
                 if (participants.size() == 1) {
-                    Utils.runSafeAsync("SkypeAction-", log, new Runnable() { //$NON-NLS-1$
+                    Utils.runSafeAsync("SkypeAction", log, new Runnable() { //$NON-NLS-1$
                             @Override
                             public void run() {
                                 SWTUtils.runSafeSWTSync(log, new Runnable() {
@@ -117,14 +117,15 @@ public class SkypeAction extends Action implements Disposable {
                                     .getSkypeURL(participants.get(0)
                                         .getBareJID());
                                 if (skypeURL != null) {
-                                    SWTUtils.runSafeSWTSync(log, new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            URLHyperlink link = new URLHyperlink(
-                                                new Region(0, 0), skypeURL);
-                                            link.open();
-                                        }
-                                    });
+                                    SWTUtils.runSafeSWTSync(log,
+                                        new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                URLHyperlink link = new URLHyperlink(
+                                                    new Region(0, 0), skypeURL);
+                                                link.open();
+                                            }
+                                        });
                                 }
 
                             }

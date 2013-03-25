@@ -351,27 +351,29 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
         gatewayInfo.pack();
 
         // do not block during discovery
-        Utils.runSafeAsync(null, new Runnable() {
+        Utils.runSafeAsync("SettingsWizardDiscoverGateway", null,
+            new Runnable() {
 
-            @Override
-            public void run() {
-                upnpService.discoverGateways();
+                @Override
+                public void run() {
+                    upnpService.discoverGateways();
 
-                // GUI work from SWT thread
-                SWTUtils.runSafeSWTAsync(null, new Runnable() {
+                    // GUI work from SWT thread
+                    SWTUtils.runSafeSWTAsync(null, new Runnable() {
 
-                    @Override
-                    public void run() {
-                        if (ConfigurationSettingsWizardPage.this.getControl()
-                            .isDisposed())
-                            return;
+                        @Override
+                        public void run() {
+                            if (ConfigurationSettingsWizardPage.this
+                                .getControl().isDisposed())
+                                return;
 
-                        populateGatewaySelectionControls(upnpService,
-                            gatewaysCombo, gatewayInfo, setupPortmappingButton);
-                    }
-                });
-            }
-        });
+                            populateGatewaySelectionControls(upnpService,
+                                gatewaysCombo, gatewayInfo,
+                                setupPortmappingButton);
+                        }
+                    });
+                }
+            });
     }
 
     protected void updatePageCompletion() {

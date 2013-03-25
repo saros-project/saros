@@ -99,7 +99,7 @@ public abstract class StreamJob extends Job {
         @Override
         public void sessionStopped() {
             StreamJob.this.stopped = true;
-            Utils.runSafeAsync(log, new Runnable() {
+            Utils.runSafeAsync("StreamSessionStopper", log, new Runnable() {
                 @Override
                 public void run() {
                     StreamJob.this.cancel();

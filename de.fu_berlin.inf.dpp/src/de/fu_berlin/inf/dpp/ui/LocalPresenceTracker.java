@@ -12,6 +12,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * This class is responsible of setting the presence of Saros to away if the
@@ -97,22 +98,21 @@ public class LocalPresenceTracker {
         if ((awayAnnouncer != null && awayAnnouncer.isAlive()))
             return;
 
-        awayAnnouncer = new Thread(new Runnable() {
+        awayAnnouncer = Utils.runSafeAsync("AwayAnnouncer", log,
+            new Runnable() {
 
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(delay);
-                    announceAway();
-                } catch (InterruptedException e) {
-                    return;
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(delay);
+                        announceAway();
+                    } catch (InterruptedException e) {
+                        return;
+                    } catch (Exception e) {
+                        log.error(e.getMessage(), e);
+                    }
                 }
-            }
-        });
-
-        awayAnnouncer.start();
+            });
     }
 
     private synchronized void announceAway() {

@@ -153,7 +153,7 @@ public class JoinSessionWizard extends Wizard {
 
     @Override
     public boolean performCancel() {
-        Utils.runSafeAsync(log, new Runnable() {
+        Utils.runSafeAsync("CancelJoinSessionWizard", log, new Runnable() {
             @Override
             public void run() {
                 process.localCancel(null, CancelOption.NOTIFY_PEER);

@@ -503,195 +503,205 @@ public class ActivitySequencer implements Startable {
 
         started = true;
 
-        activitySendThread = new Thread(Utils.wrapSafe(log, new Runnable() {
-            @Override
-            public void run() {
-                try {
+        activitySendThread = Utils.runSafeAsync("ActivitySender", log,
+            new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        boolean abort = false;
+                        while (!abort)
+                            abort = flushTask();
+                    } catch (InterruptedException e) {
+                        log.error("Flush got interrupted.", e);
+                    }
+                }
+
+                private boolean flushTask() throws InterruptedException {
+
+                    List<DataObjectQueueItem> activities = new ArrayList<DataObjectQueueItem>(
+                        outgoingQueue.size());
+
+                    activities.add(outgoingQueue.take());
+
+                    // If there was more than one ADO waiting, get the rest now.
+                    outgoingQueue.drainTo(activities);
+
                     boolean abort = false;
-                    while (!abort)
-                        abort = flushTask();
-                } catch (InterruptedException e) {
-                    log.error("Flush got interrupted.", e);
-                }
-            }
 
-            private boolean flushTask() throws InterruptedException {
+                    int idx = activities.indexOf(POISON);
 
-                List<DataObjectQueueItem> activities = new ArrayList<DataObjectQueueItem>(
-                    outgoingQueue.size());
+                    if (idx != -1) {
+                        abort = true;
 
-                activities.add(outgoingQueue.take());
+                        /*
+                         * remove the poison pill and all activities after the
+                         * pill
+                         */
+                        while (activities.size() != idx)
+                            activities.remove(idx);
+                    }
 
-                // If there was more than one ADO waiting, get the rest now.
-                outgoingQueue.drainTo(activities);
+                    Map<User, List<IActivityDataObject>> toSend = AutoHashMap
+                        .getListHashMap();
 
-                boolean abort = false;
+                    boolean doFlushQueues = false;
+                    for (DataObjectQueueItem item : activities) {
+                        if (item.activityDataObject == null) {
+                            doFlushQueues = true;
+                        } else
+                            for (User recipient : item.recipients) {
+                                toSend.get(recipient).add(
+                                    item.activityDataObject);
+                            }
+                    }
 
-                int idx = activities.indexOf(POISON);
+                    for (Entry<User, List<IActivityDataObject>> e : toSend
+                        .entrySet()) {
+                        sendActivities(e.getKey(), optimize(e.getValue()),
+                            false);
+                    }
 
-                if (idx != -1) {
-                    abort = true;
+                    if (doFlushQueues)
+                        flushQueues();
 
-                    /* remove the poison pill and all activities after the pill */
-                    while (activities.size() != idx)
-                        activities.remove(idx);
-                }
-
-                Map<User, List<IActivityDataObject>> toSend = AutoHashMap
-                    .getListHashMap();
-
-                boolean doFlushQueues = false;
-                for (DataObjectQueueItem item : activities) {
-                    if (item.activityDataObject == null) {
-                        doFlushQueues = true;
-                    } else
-                        for (User recipient : item.recipients) {
-                            toSend.get(recipient).add(item.activityDataObject);
+                    /*
+                     * Periodically execQueues() because waiting
+                     * activityDataObjects might have timed-out
+                     */
+                    dispatchThread.executeAsDispatch(new Runnable() {
+                        @Override
+                        public void run() {
+                            execQueue();
                         }
+                    });
+
+                    return abort;
                 }
 
-                for (Entry<User, List<IActivityDataObject>> e : toSend
-                    .entrySet()) {
-                    sendActivities(e.getKey(), optimize(e.getValue()), false);
-                }
-
-                if (doFlushQueues)
-                    flushQueues();
-
-                /*
-                 * Periodically execQueues() because waiting activityDataObjects
-                 * might have timed-out
+                /**
+                 * Sends given activityDataObjects to given recipient.
+                 * 
+                 * @private because this method must not be called from
+                 *          somewhere else than this TimerTask.
+                 * 
+                 * @throws IllegalArgumentException
+                 *             if the recipient is the local user or the
+                 *             activityDataObjects contain <code>null</code>.
                  */
-                dispatchThread.executeAsDispatch(new Runnable() {
-                    @Override
-                    public void run() {
-                        execQueue();
+                private void sendActivities(User recipient,
+                    List<IActivityDataObject> activityDataObjects,
+                    boolean dontQueue) {
+
+                    if (recipient.isLocal()) {
+                        throw new IllegalArgumentException(
+                            "Sending a message to the local user is not supported");
                     }
-                });
 
-                return abort;
-            }
-
-            /**
-             * Sends given activityDataObjects to given recipient.
-             * 
-             * @private because this method must not be called from somewhere
-             *          else than this TimerTask.
-             * 
-             * @throws IllegalArgumentException
-             *             if the recipient is the local user or the
-             *             activityDataObjects contain <code>null</code>.
-             */
-            private void sendActivities(User recipient,
-                List<IActivityDataObject> activityDataObjects, boolean dontQueue) {
-
-                if (recipient.isLocal()) {
-                    throw new IllegalArgumentException(
-                        "Sending a message to the local user is not supported");
-                }
-
-                if (activityDataObjects.contains(null)) {
-                    throw new IllegalArgumentException(
-                        "Cannot send a null activityDataObject");
-                }
-
-                // Handle long time queue
-                List<IActivityDataObject> userqueue = queuedOutgoingActivitiesOfUsers
-                    .get(recipient);
-
-                if (isActivityQueuingSuiteable(recipient, activityDataObjects)
-                    && dontQueue == false) {
-                    // if new activities can be queued, do so
-                    if (userqueue == null) {
-                        userqueue = Collections
-                            .synchronizedList(new LinkedList<IActivityDataObject>());
+                    if (activityDataObjects.contains(null)) {
+                        throw new IllegalArgumentException(
+                            "Cannot send a null activityDataObject");
                     }
-                    userqueue.addAll(activityDataObjects);
-                    queuedOutgoingActivitiesOfUsers.put(recipient, userqueue);
 
-                    log.debug("Adding " + activityDataObjects.size()
-                        + " activities to queue: "
-                        + activityDataObjects.toString());
-                    return;
-                } else if (userqueue != null) {
-                    // send queued activities and new activities, clearing the
-                    // queue
-                    log.debug("Flushing activity queue, sending "
-                        + userqueue.size() + " old and "
-                        + activityDataObjects.size() + " new activities");
+                    // Handle long time queue
+                    List<IActivityDataObject> userqueue = queuedOutgoingActivitiesOfUsers
+                        .get(recipient);
 
-                    queuedOutgoingActivitiesOfUsers.remove(recipient);
-                    userqueue.addAll(activityDataObjects);
-                    activityDataObjects = userqueue;
+                    if (isActivityQueuingSuiteable(recipient,
+                        activityDataObjects) && dontQueue == false) {
+                        // if new activities can be queued, do so
+                        if (userqueue == null) {
+                            userqueue = Collections
+                                .synchronizedList(new LinkedList<IActivityDataObject>());
+                        }
+                        userqueue.addAll(activityDataObjects);
+                        queuedOutgoingActivitiesOfUsers.put(recipient,
+                            userqueue);
+
+                        log.debug("Adding " + activityDataObjects.size()
+                            + " activities to queue: "
+                            + activityDataObjects.toString());
+                        return;
+                    } else if (userqueue != null) {
+                        // send queued activities and new activities, clearing
+                        // the
+                        // queue
+                        log.debug("Flushing activity queue, sending "
+                            + userqueue.size() + " old and "
+                            + activityDataObjects.size() + " new activities");
+
+                        queuedOutgoingActivitiesOfUsers.remove(recipient);
+                        userqueue.addAll(activityDataObjects);
+                        activityDataObjects = userqueue;
+                    }
+
+                    // Don't send activities to peers that are not in the
+                    // session
+                    // (anymore)
+                    if (!recipient.isInSarosSession()) {
+                        log.warn("Activities for peer not in session are dropped.");
+                        return;
+                    }
+
+                    JID recipientJID = recipient.getJID();
+
+                    List<TimedActivityDataObject> timedActivities = createTimedActivities(
+                        recipientJID, activityDataObjects);
+
+                    log.trace("Sending " + timedActivities.size()
+                        + " activities to " + recipientJID + ": "
+                        + timedActivities);
+
+                    sendTimedActivities(recipientJID, timedActivities);
                 }
 
-                // Don't send activities to peers that are not in the session
-                // (anymore)
-                if (!recipient.isInSarosSession()) {
-                    log.warn("Activities for peer not in session are dropped.");
-                    return;
+                /**
+                 * During a project transmission over IBB to the same recipient
+                 * as these timedActivities, activities that are not
+                 * time-critical will be queued and send as bundles to reduce
+                 * message traffic (which in extreme situation could crash IBB
+                 * connection)
+                 * 
+                 * @param recipient
+                 *            {@link JID} of the user to send activities to
+                 * @return true if the queued activities can stay queued, false
+                 *         if they need to be send
+                 */
+                boolean isActivityQueuingSuiteable(User recipient,
+                    List<IActivityDataObject> usersActivities) {
+
+                    JID recipientJID = recipient.getJID();
+
+                    if (projectExchangeProcesses
+                        .getProjectExchangeProcess(recipientJID) instanceof OutgoingProjectNegotiation
+                        && transferManager.getTransferMode(recipientJID) == NetTransferMode.IBB) {
+
+                        if (!preferenceUtils.isNeedsBasedSyncEnabled().equals(
+                            "false"))
+                            return false;
+
+                        // if timedActivities have non-time-critical activities
+                        // only, lets queue them
+                        if (ActivityUtils
+                            .containsQueueableActivitiesOnly(usersActivities))
+                            return true;
+                    }
+                    return false;
                 }
 
-                JID recipientJID = recipient.getJID();
+                /**
+                 * Sends all queued activities
+                 */
+                void flushQueues() {
 
-                List<TimedActivityDataObject> timedActivities = createTimedActivities(
-                    recipientJID, activityDataObjects);
-
-                log.trace("Sending " + timedActivities.size()
-                    + " activities to " + recipientJID + ": " + timedActivities);
-
-                sendTimedActivities(recipientJID, timedActivities);
-            }
-
-            /**
-             * During a project transmission over IBB to the same recipient as
-             * these timedActivities, activities that are not time-critical will
-             * be queued and send as bundles to reduce message traffic (which in
-             * extreme situation could crash IBB connection)
-             * 
-             * @param recipient
-             *            {@link JID} of the user to send activities to
-             * @return true if the queued activities can stay queued, false if
-             *         they need to be send
-             */
-            boolean isActivityQueuingSuiteable(User recipient,
-                List<IActivityDataObject> usersActivities) {
-
-                JID recipientJID = recipient.getJID();
-
-                if (projectExchangeProcesses
-                    .getProjectExchangeProcess(recipientJID) instanceof OutgoingProjectNegotiation
-                    && transferManager.getTransferMode(recipientJID) == NetTransferMode.IBB) {
-
-                    if (!preferenceUtils.isNeedsBasedSyncEnabled().equals(
-                        "false"))
-                        return false;
-
-                    // if timedActivities have non-time-critical activities
-                    // only, lets queue them
-                    if (ActivityUtils
-                        .containsQueueableActivitiesOnly(usersActivities))
-                        return true;
+                    for (User user : queuedOutgoingActivitiesOfUsers.keySet()) {
+                        List<IActivityDataObject> userQueue = queuedOutgoingActivitiesOfUsers
+                            .get(user);
+                        sendActivities(user, userQueue, true);
+                    }
+                    queuedOutgoingActivitiesOfUsers.clear();
                 }
-                return false;
-            }
+            });
 
-            /**
-             * Sends all queued activities
-             */
-            void flushQueues() {
-
-                for (User user : queuedOutgoingActivitiesOfUsers.keySet()) {
-                    List<IActivityDataObject> userQueue = queuedOutgoingActivitiesOfUsers
-                        .get(user);
-                    sendActivities(user, userQueue, true);
-                }
-                queuedOutgoingActivitiesOfUsers.clear();
-            }
-        }));
-
-        activitySendThread.setName("Activity-Sender");
-        activitySendThread.start();
     }
 
     /**

@@ -214,8 +214,8 @@ public class VideoSharing {
             @Override
             public VideoPlayerView call() throws Exception {
                 sarosUI.createVideoPlayerView();
-                IViewPart view = SWTUtils
-                    .findView(VideoPlayerView.class.getName());
+                IViewPart view = SWTUtils.findView(VideoPlayerView.class
+                    .getName());
                 if (view instanceof VideoPlayerView) {
                     VideoPlayerView playerView = (VideoPlayerView) view;
                     return playerView;
@@ -510,7 +510,7 @@ public class VideoSharing {
 
             decoder.startDecoder();
 
-            errorThread = Utils.runSafeAsync("VideoSharing-ErrorReceiver", log,
+            errorThread = Utils.runSafeAsync("VideoSharingErrorReceiver", log,
                 new Runnable() {
                     @Override
                     public void run() {

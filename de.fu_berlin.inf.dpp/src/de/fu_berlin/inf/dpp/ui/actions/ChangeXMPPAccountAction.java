@@ -165,7 +165,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
         if (account != null)
             accountService.setAccountActive(account);
 
-        Utils.runSafeAsync("ConnectAction-", log, new Runnable() {
+        Utils.runSafeAsync("ConnectAction", log, new Runnable() {
             @Override
             public void run() {
                 try {
@@ -182,7 +182,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
     }
 
     protected void disconnect() {
-        Utils.runSafeAsync("DisconnectAction-", log, new Runnable() {
+        Utils.runSafeAsync("DisconnectAction", log, new Runnable() {
             @Override
             public void run() {
                 try {

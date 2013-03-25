@@ -365,7 +365,7 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
 
         @Override
         public void run() {
-            Utils.runSafeAsync(log, new Runnable() {
+            Utils.runSafeAsync("VideoChangeSourceAction", log, new Runnable() {
                 @Override
                 public void run() {
                     VideoSharingSession session = VideoPlayerView.this.videoSharingSessionObservable
@@ -399,7 +399,7 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
 
         @Override
         public void run() {
-            Utils.runSafeAsync(log, new Runnable() {
+            Utils.runSafeAsync("VideoStopSession", log, new Runnable() {
                 @Override
                 public void run() {
                     VideoSharingSession session = VideoPlayerView.this.videoSharingSessionObservable
@@ -433,7 +433,7 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
 
         @Override
         public void run() {
-            Utils.runSafeAsync(log, new Runnable() {
+            Utils.runSafeAsync("VideoPauseAction", log, new Runnable() {
                 @Override
                 public void run() {
                     VideoSharingSession session = VideoPlayerView.this.videoSharingSessionObservable

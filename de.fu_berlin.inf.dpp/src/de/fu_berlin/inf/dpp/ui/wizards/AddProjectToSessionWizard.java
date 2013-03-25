@@ -343,7 +343,7 @@ public class AddProjectToSessionWizard extends Wizard {
                 Messages.AddProjectToSessionWizard_leave_session_text, false)) {
                 return false;
             }
-            Utils.runSafeAsync(log, new Runnable() {
+            Utils.runSafeAsync("CancelAddProjectWizard", log, new Runnable() {
                 @Override
                 public void run() {
                     process.localCancel(null, CancelOption.NOTIFY_PEER);

@@ -25,6 +25,7 @@ import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -69,7 +70,8 @@ public class DiscoveryManager implements Disposable {
      * Queues incoming calls that check Saros support by going to the discovery
      * server. Max number of concurrent threads = 3.
      */
-    ExecutorService supportExecutor = Executors.newFixedThreadPool(3);
+    ExecutorService supportExecutor = Executors.newFixedThreadPool(3,
+        new NamedThreadFactory("DiscoveryExecuter-"));
 
     /**
      * This RosterListener closure is added to the RosterTracker to get
@@ -313,7 +315,7 @@ public class DiscoveryManager implements Disposable {
             supportExecutor.execute(new Runnable() {
                 @Override
                 public void run() {
-                    Utils.runSafeAsync(log, new Runnable() {
+                    Utils.runSafeAsync("GetSarosSupport", log, new Runnable() {
                         @Override
                         public void run() {
                             isSarosSupported(buddy);

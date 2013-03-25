@@ -144,7 +144,7 @@ public class SkypeManager implements IConnectionListener {
             return this.skypeNames.get(rqJID);
         }
 
-        Utils.runSafeAsync(log, new Runnable() {
+        Utils.runSafeAsync("GetSkypeURL", log, new Runnable() {
             @Override
             public void run() {
                 getSkypeURL(rqJID);

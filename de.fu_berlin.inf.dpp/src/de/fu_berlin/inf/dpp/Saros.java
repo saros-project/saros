@@ -336,7 +336,7 @@ public class Saros extends AbstractUIPlugin {
 
         try {
             Thread shutdownThread = Utils.runSafeAsync(
-                "Saros-Shutdown-Process", log, new Runnable() { //$NON-NLS-1$
+                "ShutdownProcess", log, new Runnable() { //$NON-NLS-1$
                     @Override
                     public void run() {
 
@@ -615,7 +615,7 @@ public class Saros extends AbstractUIPlugin {
      * @nonBlocking
      */
     public void asyncConnect() {
-        Utils.runSafeAsync("Saros-AsyncConnect-", log, new Runnable() { //$NON-NLS-1$
+        Utils.runSafeAsync("AsyncConnect", log, new Runnable() { //$NON-NLS-1$
                 @Override
                 public void run() {
                     connect(false);

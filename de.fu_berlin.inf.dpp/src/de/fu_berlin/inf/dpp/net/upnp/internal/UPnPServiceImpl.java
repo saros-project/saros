@@ -173,7 +173,7 @@ public class UPnPServiceImpl implements IUPnPService {
         if (blocked)
             discoverGateways();
         else
-            Utils.runSafeAsync("Saros UPnP discovery", log, new Runnable() {
+            Utils.runSafeAsync("UPnPDiscovery", log, new Runnable() {
                 @Override
                 public void run() {
                     discoverGateways();
@@ -467,7 +467,7 @@ public class UPnPServiceImpl implements IUPnPService {
         if (prefStore == null)
             return;
 
-        Utils.runSafeAsync(null, new Runnable() {
+        Utils.runSafeAsync("UPnPInfo", null, new Runnable() {
 
             @Override
             public void run() {

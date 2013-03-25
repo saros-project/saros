@@ -145,7 +145,7 @@ public class CollaborationUtils {
         if (!reallyLeave)
             return;
 
-        Utils.runSafeAsync(log, new Runnable() {
+        Utils.runSafeAsync("StopSession", log, new Runnable() {
             @Override
             public void run() {
                 sarosSessionManager.stopSarosSession();
@@ -180,7 +180,7 @@ public class CollaborationUtils {
         if (projectResources.isEmpty())
             return;
 
-        Utils.runSafeAsync(log, new Runnable() {
+        Utils.runSafeAsync("AddResourceToSession", log, new Runnable() {
             @Override
             public void run() {
 
@@ -217,7 +217,7 @@ public class CollaborationUtils {
             return;
         }
 
-        Utils.runSafeAsync(log, new Runnable() {
+        Utils.runSafeAsync("AddBuddyToSession", log, new Runnable() {
             @Override
             public void run() {
 

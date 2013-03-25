@@ -352,7 +352,7 @@ public class SarosNet {
                 }
 
                 if (stunService != null) {
-                    Utils.runSafeAsync(LOG, new Runnable() {
+                    Utils.runSafeAsync("StunAddProxys", LOG, new Runnable() {
                         @Override
                         public void run() {
                             Collection<InetSocketAddress> addresses = stunService

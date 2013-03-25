@@ -251,13 +251,13 @@ public class AudioServiceManager {
         if (recordDeviceOk) {
             audioSenderRunnable = new AudioSenderRunnable(
                 session.getOutputStream(0), this, preferenceUtils);
-            Utils.runSafeAsync("Audio-Sender", log, audioSenderRunnable);
+            Utils.runSafeAsync("AudioSender", log, audioSenderRunnable);
         }
 
         if (playbackDeviceOk) {
             audioReceiverRunnable = new AudioReceiverRunnable(
                 session.getInputStream(0), this, preferenceUtils);
-            Utils.runSafeAsync("Audio-Receiver", log, audioReceiverRunnable);
+            Utils.runSafeAsync("AudioReceiver", log, audioReceiverRunnable);
         }
     }
 

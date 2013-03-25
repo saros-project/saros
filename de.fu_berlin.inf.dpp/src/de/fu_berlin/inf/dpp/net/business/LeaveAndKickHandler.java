@@ -163,7 +163,7 @@ public class LeaveAndKickHandler {
                 for (User remoteSessionUser : currentRemoteSessionUsers)
                     session.removeUser(remoteSessionUser);
 
-                Utils.runSafeAsync(log, new Runnable() {
+                Utils.runSafeAsync("LeaveSession", log, new Runnable() {
                     @Override
                     public void run() {
                         sessionManager.stopSarosSession();
