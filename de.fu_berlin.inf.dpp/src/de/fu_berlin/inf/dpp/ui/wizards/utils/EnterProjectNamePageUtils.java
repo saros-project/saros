@@ -6,16 +6,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 
 public class EnterProjectNamePageUtils {
-
-    private static final Logger log = Logger
-        .getLogger(EnterProjectNamePageUtils.class);
 
     static PreferenceUtils preferenceUtils;
 
@@ -129,20 +125,12 @@ public class EnterProjectNamePageUtils {
      * 
      * @param projectName
      * 
-     * @return <code>true</code> if automatically reuse of existing project is
-     *         selected in preferences and the project with the given name
-     *         exists or is already partial shared, <code>false</code> otherwise
+     * @return <code>true</code> if the project is already partial shared,
+     *         <code>false</code> otherwise
      */
     public static boolean autoUpdateProject(String projectID, String projectName) {
-        if (preferenceUtils == null) {
-            log.warn("preferenceUtils is null");
-            return false;
-        }
-        if (preferenceUtils.isAutoReuseExisting()
-            && ResourcesPlugin.getWorkspace().getRoot().getProject(projectName)
-                .exists()) {
-            return true;
-        } else if (alreadySharedProjectIDs.contains(projectID)) {
+
+        if (alreadySharedProjectIDs.contains(projectID)) {
             return true;
         } else {
             alreadySharedProjectIDs.add(projectID);

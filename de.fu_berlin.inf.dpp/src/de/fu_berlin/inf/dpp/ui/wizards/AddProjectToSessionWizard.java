@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.wizards;
 
+import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -21,10 +21,15 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
@@ -49,7 +54,6 @@ import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
-import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard.OverwriteErrorDialog;
 import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.EnterProjectNamePage;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -86,6 +90,26 @@ public class AddProjectToSessionWizard extends Wizard {
     @Inject
     private ISarosSessionManager sessionManager;
 
+    private static class OverwriteErrorDialog extends ErrorDialog {
+
+        public OverwriteErrorDialog(Shell parentShell, String dialogTitle,
+            String dialogMessage, IStatus status) {
+            super(parentShell, dialogTitle, dialogMessage, status, IStatus.OK
+                | IStatus.INFO | IStatus.WARNING | IStatus.ERROR);
+        }
+
+        @Override
+        protected void createButtonsForButtonBar(Composite parent) {
+            super.createButtonsForButtonBar(parent);
+            Button ok = getButton(IDialogConstants.OK_ID);
+            ok.setText(Messages.JoinSessionWizard_yes);
+            Button no = createButton(parent, IDialogConstants.CANCEL_ID,
+                Messages.JoinSessionWizard_no, true);
+            no.moveBelow(ok);
+            no.setFocus();
+        }
+    }
+
     public AddProjectToSessionWizard(IncomingProjectNegotiation process,
         JID peer, List<FileList> fileLists, Map<String, String> projectNames) {
 
@@ -97,6 +121,7 @@ public class AddProjectToSessionWizard extends Wizard {
         this.remoteProjectNames = projectNames;
         setWindowTitle(Messages.AddProjectToSessionWizard_title);
         setHelpAvailable(true);
+        setNeedsProgressMonitor(true);
 
         process.setProjectInvitationUI(this);
 
@@ -115,7 +140,7 @@ public class AddProjectToSessionWizard extends Wizard {
     @Override
     public boolean performFinish() {
 
-        Map<String, IProject> sources = new HashMap<String, IProject>();
+        final Map<String, IProject> sources = new HashMap<String, IProject>();
         final Map<String, String> projectNames = new HashMap<String, String>();
         final Map<String, Boolean> skipProjectSyncing = new HashMap<String, Boolean>();
         final boolean useVersionControl = namePage.useVersionControl();
@@ -201,57 +226,44 @@ public class AddProjectToSessionWizard extends Wizard {
          * are supposed to be overwritten based on the synchronization options
          * and if there are differences between the remote and local project.
          */
-        Map<String, FileListDiff> projectsToOverrideWithDiff = new HashMap<String, FileListDiff>();
-        for (Map.Entry<String, IProject> entry : sources.entrySet()) {
+        final Map<String, FileListDiff> modifiedResources = new HashMap<String, FileListDiff>();
+        final Map<String, IProject> modifiedProjects = new HashMap<String, IProject>();
 
-            String projectID = entry.getKey();
-            IProject project = entry.getValue();
+        modifiedProjects.putAll(getModifiedProjects(sources));
 
-            if (namePage.overwriteResources(projectID)
-                && !preferenceUtils.isAutoReuseExisting()) {
-                FileListDiff diff;
-
-                if (!project.isOpen()) {
+        try {
+            getContainer().run(true, false, new IRunnableWithProgress() {
+                @Override
+                public void run(IProgressMonitor monitor)
+                    throws InvocationTargetException, InterruptedException {
                     try {
-                        project.open(null);
-                    } catch (CoreException e) {
-                        log.debug(
-                            "An error occur while opening the source file", e);
+                        modifiedResources.putAll(calculateModifiedResources(
+                            modifiedProjects, monitor));
+                    } catch (Exception e) {
+                        throw new InvocationTargetException(e);
                     }
                 }
+            });
+        } catch (Exception e) {
+            Throwable cause = e.getCause();
 
-                try {
-                    FileList remoteFileList = this.process
-                        .getRemoteFileList(projectID);
-                    if (sessionManager.getSarosSession().isShared(project)) {
-                        FileList sharedFileList = FileListFactory
-                            .createFileList(project, sessionManager
-                                .getSarosSession().getSharedResources(project),
-                                checksumCache, true, null);
-                        remoteFileList.getPaths().addAll(
-                            sharedFileList.getPaths());
-                    }
-
-                    diff = FileListDiff.diff(FileListFactory.createFileList(
-                        project, null, checksumCache, true, null),
-                        remoteFileList);
-                } catch (CoreException e) {
-                    MessageDialog.openError(getShell(),
-                        "Error computing FileList",
-                        "Could not compute local FileList: " + e.getMessage());
-                    return false;
-                }
-                if (this.process.isPartialRemoteProject(projectID))
-                    diff.clearRemovedPaths();
-
-                if (!diff.getRemovedPaths().isEmpty()
-                    || !diff.getAlteredPaths().isEmpty()) {
-                    projectsToOverrideWithDiff.put(project.getName(), diff);
-                }
-
+            if (cause instanceof CoreException) {
+                MessageDialog.openError(getShell(),
+                    "Error computing file list",
+                    "Could not compute local file list: " + cause.getMessage());
+            } else {
+                MessageDialog
+                    .openError(
+                        getShell(),
+                        "Error computing file list",
+                        "Internal error while computing local file list: "
+                            + (cause == null ? e.getMessage() : cause
+                                .getMessage()));
             }
+
+            return false;
         }
-        if (!confirmOverwritingResources(projectsToOverrideWithDiff))
+        if (!confirmOverwritingResources(modifiedResources))
             return false;
 
         /*
@@ -343,69 +355,39 @@ public class AddProjectToSessionWizard extends Wizard {
     }
 
     public boolean confirmOverwritingResources(
-        final Map<String, FileListDiff> everyThing) {
-        try {
-            return SWTUtils.runSWTSync(new Callable<Boolean>() {
-                @Override
-                public Boolean call() {
+        final Map<String, FileListDiff> modifiedResources) {
 
-                    String message = Messages.AddProjectToSessionWizard_synchronize_projects;
+        String message = Messages.AddProjectToSessionWizard_synchronize_projects;
 
-                    String PID = Saros.SAROS;
-                    MultiStatus info = new MultiStatus(PID, 1, message, null);
-                    for (String projectName : everyThing.keySet()) {
-                        FileListDiff diff = everyThing.get(projectName);
-                        info.add(new Status(
-                            IStatus.INFO,
-                            PID,
-                            1,
-                            MessageFormat
-                                .format(
-                                    Messages.AddProjectToSessionWizard_files_affected,
-                                    projectName), null));
-                        for (IPath path : diff.getRemovedPaths()) {
-                            info.add(new Status(
-                                IStatus.WARNING,
-                                PID,
-                                1,
-                                MessageFormat
-                                    .format(
-                                        Messages.AddProjectToSessionWizard_file_toRemove,
-                                        path.toOSString()), null));
-                        }
-                        for (IPath path : diff.getAlteredPaths()) {
-                            info.add(new Status(
-                                IStatus.WARNING,
-                                PID,
-                                1,
-                                MessageFormat
-                                    .format(
-                                        Messages.AddProjectToSessionWizard_file_overwritten,
-                                        path.toOSString()), null));
-                        }
-                        for (IPath path : diff.getAddedPaths()) {
-                            info.add(new Status(
-                                IStatus.INFO,
-                                PID,
-                                1,
-                                MessageFormat
-                                    .format(
-                                        Messages.AddProjectToSessionWizard_file_added,
-                                        path.toOSString()), null));
-                        }
-                        info.add(new Status(IStatus.INFO, PID, 1, "", null)); //$NON-NLS-1$
-                    }
-                    return new OverwriteErrorDialog(
-                        getShell(),
-                        Messages.AddProjectToSessionWizard_delete_local_changes,
-                        null, info).open() == IDialogConstants.OK_ID;
-                }
-            });
-        } catch (Exception e) {
-            log.error(
-                "An error ocurred while trying to open the confirm dialog.", e); //$NON-NLS-1$
-            return false;
+        String PID = Saros.SAROS;
+        MultiStatus info = new MultiStatus(PID, 1, message, null);
+        for (String projectName : modifiedResources.keySet()) {
+            FileListDiff diff = modifiedResources.get(projectName);
+            info.add(new Status(IStatus.INFO, PID, 1,
+                MessageFormat.format(
+                    Messages.AddProjectToSessionWizard_files_affected,
+                    projectName), null));
+            for (IPath path : diff.getRemovedPaths()) {
+                info.add(new Status(IStatus.WARNING, PID, 1, MessageFormat
+                    .format(Messages.AddProjectToSessionWizard_file_toRemove,
+                        path.toOSString()), null));
+            }
+            for (IPath path : diff.getAlteredPaths()) {
+                info.add(new Status(IStatus.WARNING, PID, 1, MessageFormat
+                    .format(
+                        Messages.AddProjectToSessionWizard_file_overwritten,
+                        path.toOSString()), null));
+            }
+            for (IPath path : diff.getAddedPaths()) {
+                info.add(new Status(IStatus.INFO, PID, 1, MessageFormat.format(
+                    Messages.AddProjectToSessionWizard_file_added,
+                    path.toOSString()), null));
+            }
+            info.add(new Status(IStatus.INFO, PID, 1, "", null)); //$NON-NLS-1$
         }
+        return new OverwriteErrorDialog(getShell(),
+            Messages.AddProjectToSessionWizard_delete_local_changes, null, info)
+            .open() == IDialogConstants.OK_ID;
     }
 
     public void showCancelMessage(JID jid, String errorMsg,
@@ -473,5 +455,77 @@ public class AddProjectToSessionWizard extends Wizard {
             }
         }
         return openEditors;
+    }
+
+    /**
+     * Returns all modified resources (either changed or deleted) for the
+     * current project mapping.
+     */
+    private Map<String, FileListDiff> calculateModifiedResources(
+        Map<String, IProject> projectMapping, IProgressMonitor monitor)
+        throws CoreException {
+        Map<String, FileListDiff> modifiedResources = new HashMap<String, FileListDiff>();
+
+        SubMonitor subMonitor = SubMonitor.convert(monitor,
+            "Searching for files that will be modified...",
+            projectMapping.size() * 2);
+
+        for (Map.Entry<String, IProject> entry : projectMapping.entrySet()) {
+
+            String projectID = entry.getKey();
+            IProject project = entry.getValue();
+
+            FileListDiff diff;
+
+            if (!project.isOpen())
+                project.open(null);
+
+            FileList remoteFileList = this.process.getRemoteFileList(projectID);
+
+            if (sessionManager.getSarosSession().isShared(project)) {
+                FileList sharedFileList = FileListFactory.createFileList(
+                    project, sessionManager.getSarosSession()
+                        .getSharedResources(project), checksumCache, true,
+                    subMonitor.newChild(1, SubMonitor.SUPPRESS_ALL_LABELS));
+
+                // FIXME FileList objects should be immutable after creation
+                remoteFileList.getPaths().addAll(sharedFileList.getPaths());
+            } else
+                subMonitor.worked(1);
+
+            diff = FileListDiff.diff(FileListFactory.createFileList(project,
+                null, checksumCache, true,
+                subMonitor.newChild(1, SubMonitor.SUPPRESS_ALL_LABELS)),
+                remoteFileList);
+
+            if (process.isPartialRemoteProject(projectID))
+                diff.clearRemovedPaths();
+
+            if (!diff.getRemovedPaths().isEmpty()
+                || !diff.getAlteredPaths().isEmpty()) {
+                modifiedResources.put(project.getName(), diff);
+            }
+        }
+        return modifiedResources;
+    }
+
+    /**
+     * Returns a project mapping that contains all projects that will be
+     * modified on synchronization.
+     * 
+     * @SWT must be called in the SWT thread context
+     */
+    private Map<String, IProject> getModifiedProjects(
+        Map<String, IProject> projectMapping) {
+        Map<String, IProject> modifiedProjects = new HashMap<String, IProject>();
+
+        for (Map.Entry<String, IProject> entry : projectMapping.entrySet()) {
+            if (!namePage.overwriteResources(entry.getKey()))
+                continue;
+
+            modifiedProjects.put(entry.getKey(), entry.getValue());
+        }
+
+        return modifiedProjects;
     }
 }

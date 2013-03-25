@@ -67,8 +67,6 @@ public class PreferenceConstants {
 
     public static final String ENABLE_BALLOON_NOTIFICATION = "enable_balloon_notification";
 
-    public static final String AUTO_REUSE_PROJECT = "AUTO_REUSE_PROJECT";
-
     /** Preference of the InvitationDialog */
     public static final String AUTO_CLOSE_DIALOG = "invitation.dialog.auto.close";
 

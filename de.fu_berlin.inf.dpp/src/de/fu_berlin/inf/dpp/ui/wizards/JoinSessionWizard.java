@@ -24,13 +24,10 @@ import java.text.MessageFormat;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 import org.picocontainer.annotations.Inject;
@@ -66,30 +63,6 @@ import de.fu_berlin.inf.dpp.util.VersionManager;
 public class JoinSessionWizard extends Wizard {
 
     private static final Logger log = Logger.getLogger(JoinSessionWizard.class);
-
-    /*
-     * FIXME: this class is only used by the AddProjectToSessionWizard class and
-     * is misplaced here
-     */
-    public static class OverwriteErrorDialog extends ErrorDialog {
-
-        public OverwriteErrorDialog(Shell parentShell, String dialogTitle,
-            String dialogMessage, IStatus status) {
-            super(parentShell, dialogTitle, dialogMessage, status, IStatus.OK
-                | IStatus.INFO | IStatus.WARNING | IStatus.ERROR);
-        }
-
-        @Override
-        protected void createButtonsForButtonBar(Composite parent) {
-            super.createButtonsForButtonBar(parent);
-            Button ok = getButton(IDialogConstants.OK_ID);
-            ok.setText(Messages.JoinSessionWizard_yes);
-            Button no = createButton(parent, IDialogConstants.CANCEL_ID,
-                Messages.JoinSessionWizard_no, true);
-            no.moveBelow(ok);
-            no.setFocus();
-        }
-    }
 
     private boolean accepted = false;
 

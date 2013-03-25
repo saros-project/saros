@@ -27,11 +27,6 @@ public class PreferenceUtils {
         return preferenceStore.getBoolean(PreferenceConstants.DEBUG);
     }
 
-    public boolean isAutoReuseExisting() {
-        return preferenceStore
-            .getBoolean(PreferenceConstants.AUTO_REUSE_PROJECT);
-    }
-
     /**
      * Returns Saros's XMPP/Jabber server dns address.
      * 
