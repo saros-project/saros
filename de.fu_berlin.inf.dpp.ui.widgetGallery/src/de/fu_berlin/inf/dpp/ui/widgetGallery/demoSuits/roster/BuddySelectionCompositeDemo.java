@@ -20,30 +20,30 @@ public class BuddySelectionCompositeDemo extends AbstractDemo {
     protected BuddySelectionComposite buddySelectionComposite;
 
     protected ISelectionListener selectionListener = new ISelectionListener() {
-	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-	    buddySelectionComposite
-		    .setSelectedBuddies(SelectionRetrieverFactory
-			    .getSelectionRetriever(JID.class)
-			    .getOverallSelection());
-	}
+        @Override
+        public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+            buddySelectionComposite
+                .setSelectedBuddies(SelectionRetrieverFactory
+                    .getSelectionRetriever(JID.class).getOverallSelection());
+        }
     };
 
     @Override
     public void createDemo(Composite parent) {
-	parent.setLayout(new GridLayout(1, false));
+        parent.setLayout(new GridLayout(1, false));
 
-	buddySelectionComposite = new BuddySelectionComposite(parent,
-		SWT.BORDER, true);
-	buddySelectionComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
-		true, true));
-	SelectionUtils.getSelectionService().addSelectionListener(
-		selectionListener);
+        buddySelectionComposite = new BuddySelectionComposite(parent,
+            SWT.BORDER, true);
+        buddySelectionComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
+            true, true));
+        SelectionUtils.getSelectionService().addSelectionListener(
+            selectionListener);
     }
 
     @Override
     public void dispose() {
-	SelectionUtils.getSelectionService().removeSelectionListener(
-		selectionListener);
-	super.dispose();
+        SelectionUtils.getSelectionService().removeSelectionListener(
+            selectionListener);
+        super.dispose();
     }
 }

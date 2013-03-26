@@ -16,30 +16,31 @@ public class EmptyTextDemo extends AbstractDemo {
 
     protected Text createTextControl(final Composite parent, String emptyText) {
 
-	Text textControl = new Text(parent, SWT.BORDER | SWT.MULTI);
-	new EmptyText(textControl, emptyText);
+        Text textControl = new Text(parent, SWT.BORDER | SWT.MULTI);
+        new EmptyText(textControl, emptyText);
 
-	return textControl;
+        return textControl;
     }
 
+    @Override
     public void createDemo(Composite parent) {
-	parent.setLayout(new GridLayout(2, false));
+        parent.setLayout(new GridLayout(2, false));
 
-	String[] emptyTexts = new String[] { "Optional", "Please type here...",
-		"Multline Text\n...\n...\n..." };
+        String[] emptyTexts = new String[] { "Optional", "Please type here...",
+            "Multline Text\n...\n...\n..." };
 
-	for (int i = 0; i < emptyTexts.length; i++) {
-	    Label label = new Label(parent, SWT.NONE);
-	    label.setText("Default text: " + emptyTexts[i]
-		    + ((i == emptyTexts.length - 1) ? "\nGridData.FILL" : ""));
-	    label.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false,
-		    false));
+        for (int i = 0; i < emptyTexts.length; i++) {
+            Label label = new Label(parent, SWT.NONE);
+            label.setText("Default text: " + emptyTexts[i]
+                + ((i == emptyTexts.length - 1) ? "\nGridData.FILL" : ""));
+            label.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false,
+                false));
 
-	    Text textControl = createTextControl(parent, emptyTexts[i]);
-	    textControl
-		    .setLayoutData((i == emptyTexts.length - 1) ? new GridData(
-			    SWT.FILL, SWT.FILL, true, true) : new GridData(
-			    SWT.FILL, SWT.CENTER, true, false));
-	}
+            Text textControl = createTextControl(parent, emptyTexts[i]);
+            textControl
+                .setLayoutData((i == emptyTexts.length - 1) ? new GridData(
+                    SWT.FILL, SWT.FILL, true, true) : new GridData(SWT.FILL,
+                    SWT.CENTER, true, false));
+        }
     }
 }

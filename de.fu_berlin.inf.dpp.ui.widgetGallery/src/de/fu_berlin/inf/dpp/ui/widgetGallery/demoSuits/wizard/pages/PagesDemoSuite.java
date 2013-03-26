@@ -7,9 +7,9 @@ import de.fu_berlin.inf.dpp.ui.widgetGallery.demoExplorer.DemoSuite;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
 
 @DemoSuite({ CreateXMPPAccountDemo.class, CreateXMPPAccountDemo2.class,
-	EnterXMPPAccountDemo.class, GeneralSettingsDemo.class,
-	ConfigurationDoneDemo.class, AddBuddyDemo.class,
-	ProjectSelectionDemo.class, BuddySelectionDemo.class })
+    EnterXMPPAccountDemo.class, GeneralSettingsDemo.class,
+    ConfigurationDoneDemo.class, AddBuddyDemo.class,
+    ProjectSelectionDemo.class, BuddySelectionDemo.class })
 @Demo
 public class PagesDemoSuite extends AbstractDemo {
     @Override

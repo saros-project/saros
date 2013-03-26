@@ -13,10 +13,10 @@ import de.fu_berlin.inf.nebula.utils.LayoutUtils;
 public class ExplanationCompositeDemo extends AbstractDemo {
     @Override
     public void createDemo(Composite parent) {
-	ExplanationComposite expl = new ExplanationComposite(parent, SWT.NONE,
-		SWT.ICON_INFORMATION);
-	expl.setLayout(LayoutUtils.createGridLayout());
-	Button explContent_hide = new Button(expl, SWT.PUSH);
-	explContent_hide.setText("I'm a button explanation.");
+        ExplanationComposite expl = new ExplanationComposite(parent, SWT.NONE,
+            SWT.ICON_INFORMATION);
+        expl.setLayout(LayoutUtils.createGridLayout());
+        Button explContent_hide = new Button(expl, SWT.PUSH);
+        explContent_hide.setText("I'm a button explanation.");
     }
 }

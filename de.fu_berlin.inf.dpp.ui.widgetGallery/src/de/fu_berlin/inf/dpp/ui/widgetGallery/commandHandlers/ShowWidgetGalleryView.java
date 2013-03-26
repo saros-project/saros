@@ -13,16 +13,16 @@ public class ShowWidgetGalleryView extends AbstractHandler {
 
     protected final Logger log = Logger.getLogger(ShowWidgetGalleryView.class);
 
+    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-	try {
-	    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-		    .getActivePage().showView(WidgetGalleryView.ID);
-	} catch (PartInitException e) {
-	    log.error(
-		    "Error showing " + WidgetGalleryView.class.getSimpleName(),
-		    e);
-	}
-	return null;
+        try {
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                .getActivePage().showView(WidgetGalleryView.ID);
+        } catch (PartInitException e) {
+            log.error(
+                "Error showing " + WidgetGalleryView.class.getSimpleName(), e);
+        }
+        return null;
     }
 
 }

@@ -31,66 +31,68 @@ public class WidgetGalleryView extends ViewPart {
     protected Composite content;
     protected AbstractDemo currentDemo;
 
+    @Override
     public void createPartControl(final Composite parent) {
-	parent.setLayout(GridLayoutFactory.fillDefaults().spacing(0, 0)
-		.create());
+        parent.setLayout(GridLayoutFactory.fillDefaults().spacing(0, 0)
+            .create());
 
-	this.getSite().setSelectionProvider(selectionProviderIntermediate);
+        this.getSite().setSelectionProvider(selectionProviderIntermediate);
 
-	// createBanner(parent);
+        // createBanner(parent);
 
-	SashForm sashForm = new SashForm(parent, SWT.HORIZONTAL | SWT.FLAT);
-	sashForm.setLayoutData(GridDataFactory.fillDefaults().grab(true, true)
-		.create());
-	sashForm.setLayout(new FillLayout());
+        SashForm sashForm = new SashForm(parent, SWT.HORIZONTAL | SWT.FLAT);
+        sashForm.setLayoutData(GridDataFactory.fillDefaults().grab(true, true)
+            .create());
+        sashForm.setLayout(new FillLayout());
 
-	createDemoExplorer(sashForm);
-	createDemoArea(sashForm);
-	sashForm.setSashWidth(5);
-	sashForm.setBackground(parent.getDisplay().getSystemColor(
-		SWT.COLOR_GRAY));
-	sashForm.setWeights(new int[] { 30, 70 });
+        createDemoExplorer(sashForm);
+        createDemoArea(sashForm);
+        sashForm.setSashWidth(5);
+        sashForm.setBackground(parent.getDisplay().getSystemColor(
+            SWT.COLOR_GRAY));
+        sashForm.setWeights(new int[] { 30, 70 });
 
-	openDemo();
+        openDemo();
     }
 
     protected void createBanner(final Composite parent) {
-	BannerComposite bannerComposite = new BannerComposite(parent, SWT.NONE);
-	bannerComposite.setLayoutData(GridDataFactory.fillDefaults()
-		.grab(true, false).create());
-	bannerComposite.setContent(new IllustratedText(
-		ImageManager.WIDGET_GALLERY_32, "Saros Widget Gallery"));
+        BannerComposite bannerComposite = new BannerComposite(parent, SWT.NONE);
+        bannerComposite.setLayoutData(GridDataFactory.fillDefaults()
+            .grab(true, false).create());
+        bannerComposite.setContent(new IllustratedText(
+            ImageManager.WIDGET_GALLERY_32, "Saros Widget Gallery"));
     }
 
     protected DemoExplorer createDemoExplorer(SashForm sashForm) {
-	demoExplorer = new DemoExplorer(sashForm, SWT.NONE);
-	demoExplorer.getViewer().addSelectionChangedListener(
-		new ISelectionChangedListener() {
-		    public void selectionChanged(SelectionChangedEvent event) {
-			openDemo();
-		    }
-		});
-	return demoExplorer;
+        demoExplorer = new DemoExplorer(sashForm, SWT.NONE);
+        demoExplorer.getViewer().addSelectionChangedListener(
+            new ISelectionChangedListener() {
+                @Override
+                public void selectionChanged(SelectionChangedEvent event) {
+                    openDemo();
+                }
+            });
+        return demoExplorer;
     }
 
     protected void createDemoArea(SashForm sashForm) {
-	demoComposite = new Composite(sashForm, SWT.NONE);
-	demoComposite.setLayout(GridLayoutFactory.fillDefaults().spacing(0, 0)
-		.create());
+        demoComposite = new Composite(sashForm, SWT.NONE);
+        demoComposite.setLayout(GridLayoutFactory.fillDefaults().spacing(0, 0)
+            .create());
 
-	/*
-	 * Headline
-	 */
-	Composite headline = createHeadline(demoComposite);
-	headline.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true,
-		false));
+        /*
+         * Headline
+         */
+        Composite headline = createHeadline(demoComposite);
+        headline.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true,
+            false));
 
-	/*
-	 * Content
-	 */
-	this.content = new Composite(demoComposite, SWT.NONE);
-	this.content
-		.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        /*
+         * Content
+         */
+        this.content = new Composite(demoComposite, SWT.NONE);
+        this.content
+            .setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     }
 
     /**
@@ -100,41 +102,41 @@ public class WidgetGalleryView extends ViewPart {
      * @return
      */
     public Composite createHeadline(Composite composite) {
-	demoBannerComposite = new DemoBannerComposite(composite, SWT.NONE);
-	demoBannerComposite.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING,
-		true, false));
+        demoBannerComposite = new DemoBannerComposite(composite, SWT.NONE);
+        demoBannerComposite.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING,
+            true, false));
 
-	return demoBannerComposite;
+        return demoBannerComposite;
     }
 
     public void openDemo() {
-	DemoElement demoElement = demoExplorer.getSelectedDemoElement();
-	if (demoElement == null)
-	    return;
+        DemoElement demoElement = demoExplorer.getSelectedDemoElement();
+        if (demoElement == null)
+            return;
 
-	Demo meta = demoElement.getDemo().getAnnotation(Demo.class);
-	String title = (meta != null && !meta.value().isEmpty()) ? meta.value()
-		: "Demo: " + demoElement.getStyledText().toString();
-	demoBannerComposite.setContent(new IllustratedText(ImageManager.DEMO,
-		title));
-	demoComposite.layout();
+        Demo meta = demoElement.getDemo().getAnnotation(Demo.class);
+        String title = (meta != null && !meta.value().isEmpty()) ? meta.value()
+            : "Demo: " + demoElement.getStyledText().toString();
+        demoBannerComposite.setContent(new IllustratedText(ImageManager.DEMO,
+            title));
+        demoComposite.layout();
 
-	if (currentDemo != null)
-	    currentDemo.dispose();
-	CompositeUtils.emptyComposite(content);
+        if (currentDemo != null)
+            currentDemo.dispose();
+        CompositeUtils.emptyComposite(content);
 
-	try {
-	    currentDemo = demoElement.getDemo().newInstance();
-	    currentDemo.createPartControls(content);
-	} catch (InstantiationException e) {
-	    e.printStackTrace();
-	} catch (IllegalAccessException e) {
-	    e.printStackTrace();
-	}
+        try {
+            currentDemo = demoElement.getDemo().newInstance();
+            currentDemo.createPartControls(content);
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void setFocus() {
-	// do nothing
+        // do nothing
     }
 }

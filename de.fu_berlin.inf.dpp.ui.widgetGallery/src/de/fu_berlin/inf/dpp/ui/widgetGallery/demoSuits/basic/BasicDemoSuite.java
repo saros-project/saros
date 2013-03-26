@@ -8,7 +8,7 @@ import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.basic.illustrated.Illustr
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.basic.rounded.RoundedCompositeDemoSuite;
 
 @DemoSuite({ RoundedCompositeDemoSuite.class,
-	IllustratedCompositeDemoSuite.class })
+    IllustratedCompositeDemoSuite.class })
 public class BasicDemoSuite extends AbstractDemo {
 
     @Override

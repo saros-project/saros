@@ -10,7 +10,7 @@ import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.instruction.explanatory.E
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.instruction.note.NoteCompositeDemoSuite;
 
 @DemoSuite({ ExplanationDemoSuite.class, NoteCompositeDemoSuite.class,
-	ExplanatoryDemoSuite.class })
+    ExplanatoryDemoSuite.class })
 @Demo
 public class InstructionDemoSuite extends AbstractDemo {
     @Override

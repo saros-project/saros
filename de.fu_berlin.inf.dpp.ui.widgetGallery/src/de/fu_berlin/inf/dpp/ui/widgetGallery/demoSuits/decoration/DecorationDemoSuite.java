@@ -12,7 +12,7 @@ public class DecorationDemoSuite extends AbstractDemo {
 
     @Override
     public void createDemo(Composite parent) {
-	// TODO Auto-generated method stub
+        // TODO Auto-generated method stub
 
     }
 }

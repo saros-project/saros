@@ -10,6 +10,6 @@ import de.fu_berlin.inf.dpp.ui.wizards.pages.AddBuddyWizardPage;
 public class AddBuddyDemo extends WizardPageDemo {
     @Override
     public IWizardPage getWizardPage() {
-	return new AddBuddyWizardPage();
+        return new AddBuddyWizardPage();
     }
 }

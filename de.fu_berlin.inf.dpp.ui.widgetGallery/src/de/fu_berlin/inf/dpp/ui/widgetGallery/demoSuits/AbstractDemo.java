@@ -27,44 +27,45 @@ public abstract class AbstractDemo {
      */
     protected EmptyText console;
     protected static final SimpleDateFormat consoleDateFormat = new SimpleDateFormat(
-	    "HH:mm:ss");
+        "HH:mm:ss");
 
     protected int consoleHeight = 150;
 
     public void createPartControls(Composite composite) {
-	this.composite = composite;
-	this.composite.setLayout(GridLayoutFactory.fillDefaults().spacing(0, 0)
-		.create());
+        this.composite = composite;
+        this.composite.setLayout(GridLayoutFactory.fillDefaults().spacing(0, 0)
+            .create());
 
-	this.content = new Composite(this.composite, SWT.NONE);
-	this.content
-		.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        this.content = new Composite(this.composite, SWT.NONE);
+        this.content
+            .setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-	Text console = new Text(this.composite, SWT.V_SCROLL | SWT.BORDER
-		| SWT.MULTI);
-	console.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-	this.console = new EmptyText(console, "Debug Console");
-	this.hideConsole();
+        Text console = new Text(this.composite, SWT.V_SCROLL | SWT.BORDER
+            | SWT.MULTI);
+        console
+            .setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+        this.console = new EmptyText(console, "Debug Console");
+        this.hideConsole();
 
-	recreateDemo();
+        recreateDemo();
     }
 
     /**
      * Shows the console
      */
     public void showConsole() {
-	((GridData) this.console.getControl().getLayoutData()).heightHint = consoleHeight;
-	this.console.getControl().setVisible(true);
-	this.composite.layout();
+        ((GridData) this.console.getControl().getLayoutData()).heightHint = consoleHeight;
+        this.console.getControl().setVisible(true);
+        this.composite.layout();
     }
 
     /**
      * Hides the console
      */
     public void hideConsole() {
-	((GridData) this.console.getControl().getLayoutData()).heightHint = 0;
-	this.console.getControl().setVisible(false);
-	this.composite.layout();
+        ((GridData) this.console.getControl().getLayoutData()).heightHint = 0;
+        this.console.getControl().setVisible(false);
+        this.composite.layout();
     }
 
     /**
@@ -73,13 +74,13 @@ public abstract class AbstractDemo {
      * @param message
      */
     public void addConsoleMessage(String message) {
-	final String newLine = consoleDateFormat.format(new Date()) + " "
-		+ message + "\n";
-	String oldText = console.getText();
-	String newText = oldText + newLine;
-	console.setText(newText);
-	console.getControl().setSelection(newText.length());
-	this.showConsole();
+        final String newLine = consoleDateFormat.format(new Date()) + " "
+            + message + "\n";
+        String oldText = console.getText();
+        String newText = oldText + newLine;
+        console.setText(newText);
+        console.getControl().setSelection(newText.length());
+        this.showConsole();
     }
 
     /**
@@ -97,9 +98,9 @@ public abstract class AbstractDemo {
      * Recreates the demo. Especially useful if debug mode is enabled.
      */
     public void recreateDemo() {
-	CompositeUtils.emptyComposite(this.content);
-	this.content.setLayout(new FillLayout());
-	createDemo(this.content);
-	this.content.layout();
+        CompositeUtils.emptyComposite(this.content);
+        this.content.setLayout(new FillLayout());
+        createDemo(this.content);
+        this.content.layout();
     }
 }

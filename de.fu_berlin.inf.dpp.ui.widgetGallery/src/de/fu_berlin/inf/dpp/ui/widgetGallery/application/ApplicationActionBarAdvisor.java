@@ -11,10 +11,12 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         super(configurer);
     }
 
+    @Override
     protected void makeActions(IWorkbenchWindow window) {
     }
 
+    @Override
     protected void fillMenuBar(IMenuManager menuBar) {
     }
-    
+
 }

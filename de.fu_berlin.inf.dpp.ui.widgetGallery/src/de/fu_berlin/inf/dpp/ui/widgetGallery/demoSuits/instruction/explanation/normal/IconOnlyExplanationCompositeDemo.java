@@ -11,6 +11,6 @@ import de.fu_berlin.inf.nebula.explanation.ExplanationComposite;
 public class IconOnlyExplanationCompositeDemo extends AbstractDemo {
     @Override
     public void createDemo(Composite parent) {
-	new ExplanationComposite(parent, SWT.NONE, SWT.ICON_INFORMATION);
+        new ExplanationComposite(parent, SWT.NONE, SWT.ICON_INFORMATION);
     }
 }

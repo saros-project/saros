@@ -10,6 +10,6 @@ import de.fu_berlin.inf.dpp.ui.wizards.pages.EnterXMPPAccountWizardPage;
 public class EnterXMPPAccountDemo extends WizardPageDemo {
     @Override
     public IWizardPage getWizardPage() {
-	return new EnterXMPPAccountWizardPage();
+        return new EnterXMPPAccountWizardPage();
     }
 }

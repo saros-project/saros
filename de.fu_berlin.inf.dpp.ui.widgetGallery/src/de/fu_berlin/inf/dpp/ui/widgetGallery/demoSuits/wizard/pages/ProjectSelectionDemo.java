@@ -10,6 +10,6 @@ import de.fu_berlin.inf.dpp.ui.wizards.pages.ProjectSelectionWizardPage;
 public class ProjectSelectionDemo extends WizardPageDemo {
     @Override
     public IWizardPage getWizardPage() {
-	return new ProjectSelectionWizardPage();
+        return new ProjectSelectionWizardPage();
     }
 }

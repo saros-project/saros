@@ -20,30 +20,31 @@ public class BaseProjectSelectionCompositeDemo extends AbstractDemo {
     protected BaseProjectSelectionComposite baseProjectSelectionComposite;
 
     protected ISelectionListener selectionListener = new ISelectionListener() {
-	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-	    baseProjectSelectionComposite
-		    .setSelectedProjects(SelectionRetrieverFactory
-			    .getSelectionRetriever(IProject.class)
-			    .getOverallSelection());
-	}
+        @Override
+        public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+            baseProjectSelectionComposite
+                .setSelectedProjects(SelectionRetrieverFactory
+                    .getSelectionRetriever(IProject.class)
+                    .getOverallSelection());
+        }
     };
 
     @Override
     public void createDemo(Composite parent) {
-	parent.setLayout(new GridLayout(1, false));
+        parent.setLayout(new GridLayout(1, false));
 
-	baseProjectSelectionComposite = new BaseProjectSelectionComposite(
-		parent, SWT.BORDER);
-	baseProjectSelectionComposite.setLayoutData(new GridData(SWT.FILL,
-		SWT.FILL, true, true));
-	SelectionUtils.getSelectionService().addSelectionListener(
-		selectionListener);
+        baseProjectSelectionComposite = new BaseProjectSelectionComposite(
+            parent, SWT.BORDER);
+        baseProjectSelectionComposite.setLayoutData(new GridData(SWT.FILL,
+            SWT.FILL, true, true));
+        SelectionUtils.getSelectionService().addSelectionListener(
+            selectionListener);
     }
 
     @Override
     public void dispose() {
-	SelectionUtils.getSelectionService().removeSelectionListener(
-		selectionListener);
-	super.dispose();
+        SelectionUtils.getSelectionService().removeSelectionListener(
+            selectionListener);
+        super.dispose();
     }
 }

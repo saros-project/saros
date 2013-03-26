@@ -7,8 +7,8 @@ import de.fu_berlin.inf.dpp.ui.widgetGallery.demoExplorer.DemoSuite;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
 
 @DemoSuite({ ListExplanationCompositeDemo.class,
-	IntroductoryTextOnlyListExplanationCompositeDemo.class,
-	ItemsOnlyListExplanationCompositeDemo.class })
+    IntroductoryTextOnlyListExplanationCompositeDemo.class,
+    ItemsOnlyListExplanationCompositeDemo.class })
 @Demo
 public class ListExplanationDemoSuite extends AbstractDemo {
 

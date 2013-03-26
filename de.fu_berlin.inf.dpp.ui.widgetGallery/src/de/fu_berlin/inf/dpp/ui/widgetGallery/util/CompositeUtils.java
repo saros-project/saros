@@ -5,11 +5,11 @@ import org.eclipse.swt.widgets.Control;
 
 public class CompositeUtils {
     public static void emptyComposite(Composite composite) {
-	Control[] children = composite.getChildren();
-	for (Control child : children) {
-	    if (!child.isDisposed()) {
-		child.dispose();
-	    }
-	}
+        Control[] children = composite.getChildren();
+        for (Control child : children) {
+            if (!child.isDisposed()) {
+                child.dispose();
+            }
+        }
     }
 }

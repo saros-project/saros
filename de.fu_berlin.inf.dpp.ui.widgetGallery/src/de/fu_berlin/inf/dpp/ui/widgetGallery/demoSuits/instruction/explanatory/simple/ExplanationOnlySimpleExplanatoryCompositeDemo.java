@@ -14,30 +14,33 @@ import de.fu_berlin.inf.nebula.explanation.explanatory.SimpleExplanatoryComposit
 
 @Demo
 public class ExplanationOnlySimpleExplanatoryCompositeDemo extends AbstractDemo {
+    @Override
     public void createDemo(Composite parent) {
-	final SimpleExplanatoryComposite explanatoryComposite = new SimpleExplanatoryComposite(
-		parent, SWT.NONE);
+        final SimpleExplanatoryComposite explanatoryComposite = new SimpleExplanatoryComposite(
+            parent, SWT.NONE);
 
-	Button contentControl = new Button(explanatoryComposite, SWT.NONE);
-	explanatoryComposite.setContentControl(contentControl);
-	contentControl.setText("Show the simple explanation...");
-	contentControl.addSelectionListener(new SelectionAdapter() {
+        Button contentControl = new Button(explanatoryComposite, SWT.NONE);
+        explanatoryComposite.setContentControl(contentControl);
+        contentControl.setText("Show the simple explanation...");
+        contentControl.addSelectionListener(new SelectionAdapter() {
 
-	    public void widgetSelected(SelectionEvent e) {
-		String text = "I tell you how to use this composite.\n"
-			+ "This message closes in 5 seconds.";
-		SimpleExplanation expl = new SimpleExplanation(null, text);
-		explanatoryComposite.showExplanation(expl);
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                String text = "I tell you how to use this composite.\n"
+                    + "This message closes in 5 seconds.";
+                SimpleExplanation expl = new SimpleExplanation(null, text);
+                explanatoryComposite.showExplanation(expl);
 
-		Display.getCurrent().timerExec(5000, new Runnable() {
+                Display.getCurrent().timerExec(5000, new Runnable() {
 
-		    public void run() {
-			explanatoryComposite.hideExplanation();
-		    }
+                    @Override
+                    public void run() {
+                        explanatoryComposite.hideExplanation();
+                    }
 
-		});
-	    }
+                });
+            }
 
-	});
+        });
     }
 }

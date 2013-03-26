@@ -9,8 +9,8 @@ import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.instruction.explanatory.l
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.instruction.explanatory.normal.NormalExplanatoryDemoSuite;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.instruction.explanatory.simple.SimpleExplanatoryDemoSuite;
 
-@DemoSuite({ SimpleExplanatoryDemoSuite.class,
-	ListExplanatoryDemoSuite.class, NormalExplanatoryDemoSuite.class })
+@DemoSuite({ SimpleExplanatoryDemoSuite.class, ListExplanatoryDemoSuite.class,
+    NormalExplanatoryDemoSuite.class })
 @Demo
 public class ExplanatoryDemoSuite extends AbstractDemo {
     @Override

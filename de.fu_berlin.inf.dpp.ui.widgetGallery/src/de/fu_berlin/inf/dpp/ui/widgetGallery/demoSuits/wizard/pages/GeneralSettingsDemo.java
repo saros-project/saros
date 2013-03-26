@@ -10,6 +10,6 @@ import de.fu_berlin.inf.dpp.ui.wizards.pages.ConfigurationSettingsWizardPage;
 public class GeneralSettingsDemo extends WizardPageDemo {
     @Override
     public IWizardPage getWizardPage() {
-	return new ConfigurationSettingsWizardPage();
+        return new ConfigurationSettingsWizardPage();
     }
 }

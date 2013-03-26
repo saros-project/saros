@@ -10,6 +10,6 @@ import de.fu_berlin.inf.dpp.ui.wizards.pages.BuddySelectionWizardPage;
 public class BuddySelectionDemo extends WizardPageDemo {
     @Override
     public IWizardPage getWizardPage() {
-	return new BuddySelectionWizardPage();
+        return new BuddySelectionWizardPage();
     }
 }

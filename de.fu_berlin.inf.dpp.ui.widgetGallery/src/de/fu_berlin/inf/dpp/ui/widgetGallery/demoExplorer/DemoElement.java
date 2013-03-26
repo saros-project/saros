@@ -18,56 +18,56 @@ public class DemoElement extends TreeElement {
     protected Class<? extends AbstractDemo> demo;
 
     public DemoElement(Class<? extends AbstractDemo> demo) {
-	this.demo = demo;
+        this.demo = demo;
     }
 
     @Override
     public StyledString getStyledText() {
-	StyledString styledString = new StyledString();
+        StyledString styledString = new StyledString();
 
-	String name = demo.getSimpleName().replaceAll("(Demo|DemoSuite)$", "");
-	String spacedName = name.replaceAll("([a-z])([A-Z])", "$1 $2");
-	styledString.append(spacedName);
+        String name = demo.getSimpleName().replaceAll("(Demo|DemoSuite)$", "");
+        String spacedName = name.replaceAll("([a-z])([A-Z])", "$1 $2");
+        styledString.append(spacedName);
 
-	return styledString;
+        return styledString;
     }
 
     @Override
     public Image getImage() {
-	if (this.demo.getAnnotation(DemoSuite.class) != null)
-	    return ImageManager.DEMO_SUITE;
-	if (this.demo.getAnnotation(Demo.class) != null)
-	    return ImageManager.DEMO;
-	return null;
+        if (this.demo.getAnnotation(DemoSuite.class) != null)
+            return ImageManager.DEMO_SUITE;
+        if (this.demo.getAnnotation(Demo.class) != null)
+            return ImageManager.DEMO;
+        return null;
     }
 
     public Class<? extends AbstractDemo> getDemo() {
-	return this.demo;
+        return this.demo;
     }
 
     @Override
     public int hashCode() {
-	final int prime = 31;
-	int result = 1;
-	result = prime * result + ((demo == null) ? 0 : demo.hashCode());
-	return result;
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((demo == null) ? 0 : demo.hashCode());
+        return result;
     }
 
     @Override
     public boolean equals(Object obj) {
-	if (this == obj)
-	    return true;
-	if (obj == null)
-	    return false;
-	if (getClass() != obj.getClass())
-	    return false;
-	DemoElement other = (DemoElement) obj;
-	if (demo == null) {
-	    if (other.demo != null)
-		return false;
-	} else if (!demo.equals(other.demo))
-	    return false;
-	return true;
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        DemoElement other = (DemoElement) obj;
+        if (demo == null) {
+            if (other.demo != null)
+                return false;
+        } else if (!demo.equals(other.demo))
+            return false;
+        return true;
     }
 
 }

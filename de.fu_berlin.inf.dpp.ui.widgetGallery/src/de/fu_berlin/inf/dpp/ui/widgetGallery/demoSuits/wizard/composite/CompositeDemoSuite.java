@@ -7,7 +7,7 @@ import de.fu_berlin.inf.dpp.ui.widgetGallery.demoExplorer.DemoSuite;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
 
 @DemoSuite({ EnterXMPPAccountCompositeDemo.class,
-	SummaryItemCompositeDemo.class })
+    SummaryItemCompositeDemo.class })
 @Demo
 public class CompositeDemoSuite extends AbstractDemo {
     @Override

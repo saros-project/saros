@@ -13,10 +13,10 @@ import de.fu_berlin.inf.nebula.explanation.ExplanationComposite;
 public class ExplanationOnlyExplanationCompositeDemo extends AbstractDemo {
     @Override
     public void createDemo(Composite parent) {
-	final ExplanationComposite expl = new ExplanationComposite(parent,
-		SWT.NONE, null);
-	expl.setLayout(new FillLayout());
-	Button explContent_hide = new Button(expl, SWT.PUSH);
-	explContent_hide.setText("I'm a button explanation.");
+        final ExplanationComposite expl = new ExplanationComposite(parent,
+            SWT.NONE, null);
+        expl.setLayout(new FillLayout());
+        Button explContent_hide = new Button(expl, SWT.PUSH);
+        explContent_hide.setText("I'm a button explanation.");
     }
 }

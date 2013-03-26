@@ -10,7 +10,8 @@ import de.fu_berlin.inf.dpp.ui.model.TreeContentProvider;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
 
 /**
- * {@link IContentProvider} for use in conjunction with a {@link AbstractDemo} input.
+ * {@link IContentProvider} for use in conjunction with a {@link AbstractDemo}
+ * input.
  * <p>
  * Automatically keeps track of changes of buddies.
  * 
@@ -22,28 +23,28 @@ public class DemoContentProvider extends TreeContentProvider {
     protected Class<? extends AbstractDemo> demo;
 
     public DemoContentProvider() {
-	super();
+        super();
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-	this.viewer = viewer;
+        this.viewer = viewer;
 
-	if (oldInput instanceof Class<?>) {
-	}
+        if (oldInput instanceof Class<?>) {
+        }
 
-	if (newInput instanceof Class<?>) {
-	    this.demo = (Class<? extends AbstractDemo>) newInput;
-	} else {
-	    this.demo = null;
-	}
+        if (newInput instanceof Class<?>) {
+            this.demo = (Class<? extends AbstractDemo>) newInput;
+        } else {
+            this.demo = null;
+        }
     }
 
     @Override
     public void dispose() {
-	if (this.demo != null) {
-	}
+        if (this.demo != null) {
+        }
     }
 
     /**
@@ -53,32 +54,32 @@ public class DemoContentProvider extends TreeContentProvider {
     @SuppressWarnings("unchecked")
     @Override
     public Object[] getElements(Object inputElement) {
-	try {
-	    Class<? extends AbstractDemo> demo = (Class<? extends AbstractDemo>) inputElement;
-	    List<Object> elements = new ArrayList<Object>();
+        try {
+            Class<? extends AbstractDemo> demo = (Class<? extends AbstractDemo>) inputElement;
+            List<Object> elements = new ArrayList<Object>();
 
-	    DemoSuite demoSuite = demo.getAnnotation(DemoSuite.class);
-	    if (demoSuite != null) {
-		for (Class<? extends AbstractDemo> subDemo : demoSuite.value())
-		    elements.add(new DemoElement(subDemo));
-	    }
+            DemoSuite demoSuite = demo.getAnnotation(DemoSuite.class);
+            if (demoSuite != null) {
+                for (Class<? extends AbstractDemo> subDemo : demoSuite.value())
+                    elements.add(new DemoElement(subDemo));
+            }
 
-	    return elements.toArray();
-	} catch (Exception e) {
-	    return new Object[0];
-	}
+            return elements.toArray();
+        } catch (Exception e) {
+            return new Object[0];
+        }
     }
 
     @Override
     public boolean hasChildren(Object element) {
-	return getChildren(element).length != 0;
+        return getChildren(element).length != 0;
     }
 
     @Override
     public Object[] getChildren(Object parentElement) {
-	if (parentElement instanceof DemoElement) {
-	    return this.getElements(((DemoElement) parentElement).getDemo());
-	}
-	return new Object[0];
+        if (parentElement instanceof DemoElement) {
+            return this.getElements(((DemoElement) parentElement).getDemo());
+        }
+        return new Object[0];
     }
 }

@@ -13,13 +13,14 @@ public class RefreshDemo extends AbstractHandler {
 
     protected final Logger log = Logger.getLogger(ShowWidgetGalleryView.class);
 
+    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-	IWorkbenchPart part = HandlerUtil.getActivePart(event);
-	if (part instanceof WidgetGalleryView) {
-	    WidgetGalleryView view = (WidgetGalleryView) part;
-	    view.openDemo();
-	}
-	return null;
+        IWorkbenchPart part = HandlerUtil.getActivePart(event);
+        if (part instanceof WidgetGalleryView) {
+            WidgetGalleryView view = (WidgetGalleryView) part;
+            view.openDemo();
+        }
+        return null;
     }
 
 }

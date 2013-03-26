@@ -21,21 +21,21 @@ public class JIDComboDemo extends AbstractDemo {
 
     @Override
     public void createDemo(Composite parent) {
-	parent.setLayout(LayoutUtils.createGridLayout());
+        parent.setLayout(LayoutUtils.createGridLayout());
 
-	Combo combo = new Combo(parent, SWT.BORDER);
-	combo.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, true));
+        Combo combo = new Combo(parent, SWT.BORDER);
+        combo.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, true));
 
-	new JIDCombo(combo);
+        new JIDCombo(combo);
 
-	showXMPPAccounts();
+        showXMPPAccounts();
     }
 
     protected void showXMPPAccounts() {
-	SarosPluginContext.initComponent(this);
-	addConsoleMessage("XMPPAccounts:");
-	for (XMPPAccount xmppAccount : xmppAccountStore.getAllAccounts()) {
-	    addConsoleMessage("- " + xmppAccount.toString());
-	}
+        SarosPluginContext.initComponent(this);
+        addConsoleMessage("XMPPAccounts:");
+        for (XMPPAccount xmppAccount : xmppAccountStore.getAllAccounts()) {
+            addConsoleMessage("- " + xmppAccount.toString());
+        }
     }
 }

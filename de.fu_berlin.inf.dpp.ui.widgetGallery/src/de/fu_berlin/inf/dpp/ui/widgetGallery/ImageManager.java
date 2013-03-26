@@ -25,8 +25,8 @@ public class ImageManager {
      *         free up memory
      */
     public static Image getImage(String path) {
-	return new Image(Display.getDefault(), getImageDescriptor(path)
-		.getImageData());
+        return new Image(Display.getDefault(), getImageDescriptor(path)
+            .getImageData());
     }
 
     /**
@@ -38,8 +38,8 @@ public class ImageManager {
      * @return the image descriptor
      */
     public static ImageDescriptor getImageDescriptor(String path) {
-	return AbstractUIPlugin.imageDescriptorFromPlugin(Activator.PLUGIN_ID,
-		path);
+        return AbstractUIPlugin.imageDescriptorFromPlugin(Activator.PLUGIN_ID,
+            path);
     }
 
 }

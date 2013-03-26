@@ -10,7 +10,7 @@ import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.wizard.pages.PagesDemoSui
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.wizard.wizards.AllWizardsDemo;
 
 @DemoSuite({ CompositeDemoSuite.class, PagesDemoSuite.class,
-	AllWizardsDemo.class })
+    AllWizardsDemo.class })
 @Demo
 public class WizardDemoSuite extends AbstractDemo {
     @Override

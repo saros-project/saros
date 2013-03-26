@@ -7,9 +7,9 @@ import de.fu_berlin.inf.dpp.ui.widgetGallery.demoExplorer.DemoSuite;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
 
 @DemoSuite({ SimpleExplanationCompositeDemo.class,
-	ExplanationOnlySimpleExplanationCompositeDemo.class,
-	IconOnlySimpleExplanationCompositeDemo.class,
-	HugeSimpleExplanationCompositeDemo.class })
+    ExplanationOnlySimpleExplanationCompositeDemo.class,
+    IconOnlySimpleExplanationCompositeDemo.class,
+    HugeSimpleExplanationCompositeDemo.class })
 @Demo
 public class SimpleExplanationDemoSuite extends AbstractDemo {
 

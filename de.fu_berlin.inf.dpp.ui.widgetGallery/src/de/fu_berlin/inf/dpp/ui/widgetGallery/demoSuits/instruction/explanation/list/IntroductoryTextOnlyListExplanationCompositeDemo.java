@@ -10,13 +10,13 @@ import de.fu_berlin.inf.nebula.explanation.ListExplanationComposite.ListExplanat
 
 @Demo
 public class IntroductoryTextOnlyListExplanationCompositeDemo extends
-	AbstractDemo {
+    AbstractDemo {
     @Override
     public void createDemo(Composite parent) {
-	ListExplanationComposite listExplanationComposite = new ListExplanationComposite(
-		parent, SWT.NONE);
-	ListExplanation listItemExplanation = new ListExplanation(
-		SWT.ICON_INFORMATION, "I'm the introductory text...");
-	listExplanationComposite.setExplanation(listItemExplanation);
+        ListExplanationComposite listExplanationComposite = new ListExplanationComposite(
+            parent, SWT.NONE);
+        ListExplanation listItemExplanation = new ListExplanation(
+            SWT.ICON_INFORMATION, "I'm the introductory text...");
+        listExplanationComposite.setExplanation(listItemExplanation);
     }
 }

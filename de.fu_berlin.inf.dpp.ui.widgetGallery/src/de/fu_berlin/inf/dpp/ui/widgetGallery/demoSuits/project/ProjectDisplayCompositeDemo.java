@@ -14,9 +14,9 @@ public class ProjectDisplayCompositeDemo extends AbstractDemo {
 
     @Override
     public void createDemo(Composite parent) {
-	parent.setLayout(new FillLayout());
+        parent.setLayout(new FillLayout());
 
-	projectDisplayComposite = new ProjectDisplayComposite(parent,
-		SWT.BORDER);
+        projectDisplayComposite = new ProjectDisplayComposite(parent,
+            SWT.BORDER);
     }
 }

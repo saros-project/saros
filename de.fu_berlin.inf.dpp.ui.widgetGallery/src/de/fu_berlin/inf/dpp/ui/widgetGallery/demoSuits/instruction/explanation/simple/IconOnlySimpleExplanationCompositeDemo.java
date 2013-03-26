@@ -12,10 +12,10 @@ import de.fu_berlin.inf.nebula.explanation.SimpleExplanationComposite.SimpleExpl
 public class IconOnlySimpleExplanationCompositeDemo extends AbstractDemo {
     @Override
     public void createDemo(Composite parent) {
-	SimpleExplanationComposite simpleExplanationComposite = new SimpleExplanationComposite(
-		parent, SWT.NONE);
-	SimpleExplanation simpleExplanation = new SimpleExplanation(
-		SWT.ICON_INFORMATION);
-	simpleExplanationComposite.setExplanation(simpleExplanation);
+        SimpleExplanationComposite simpleExplanationComposite = new SimpleExplanationComposite(
+            parent, SWT.NONE);
+        SimpleExplanation simpleExplanation = new SimpleExplanation(
+            SWT.ICON_INFORMATION);
+        simpleExplanationComposite.setExplanation(simpleExplanation);
     }
 }

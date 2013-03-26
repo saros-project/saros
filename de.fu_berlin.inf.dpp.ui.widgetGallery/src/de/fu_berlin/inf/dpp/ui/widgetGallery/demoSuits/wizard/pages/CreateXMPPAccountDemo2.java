@@ -10,6 +10,6 @@ import de.fu_berlin.inf.dpp.ui.wizards.pages.CreateXMPPAccountWizardPage;
 public class CreateXMPPAccountDemo2 extends WizardPageDemo {
     @Override
     public IWizardPage getWizardPage() {
-	return new CreateXMPPAccountWizardPage(false);
+        return new CreateXMPPAccountWizardPage(false);
     }
 }

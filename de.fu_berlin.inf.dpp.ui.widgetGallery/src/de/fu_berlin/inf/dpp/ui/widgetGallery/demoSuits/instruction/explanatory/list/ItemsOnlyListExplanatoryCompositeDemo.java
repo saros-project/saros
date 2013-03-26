@@ -14,29 +14,32 @@ import de.fu_berlin.inf.nebula.explanation.explanatory.ListExplanatoryComposite;
 
 @Demo
 public class ItemsOnlyListExplanatoryCompositeDemo extends AbstractDemo {
+    @Override
     public void createDemo(Composite parent) {
-	final ListExplanatoryComposite explanatoryComposite = new ListExplanatoryComposite(
-		parent, SWT.NONE);
+        final ListExplanatoryComposite explanatoryComposite = new ListExplanatoryComposite(
+            parent, SWT.NONE);
 
-	Button contentControl = new Button(explanatoryComposite, SWT.NONE);
-	explanatoryComposite.setContentControl(contentControl);
-	contentControl.setText("Show the list explanation...");
-	contentControl.addSelectionListener(new SelectionAdapter() {
+        Button contentControl = new Button(explanatoryComposite, SWT.NONE);
+        explanatoryComposite.setContentControl(contentControl);
+        contentControl.setText("Show the list explanation...");
+        contentControl.addSelectionListener(new SelectionAdapter() {
 
-	    public void widgetSelected(SelectionEvent e) {
-		ListExplanation expl = new ListExplanation((String) null,
-			"List item #1", "List item #2", "List item #3");
-		explanatoryComposite.showExplanation(expl);
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                ListExplanation expl = new ListExplanation((String) null,
+                    "List item #1", "List item #2", "List item #3");
+                explanatoryComposite.showExplanation(expl);
 
-		Display.getCurrent().timerExec(5000, new Runnable() {
+                Display.getCurrent().timerExec(5000, new Runnable() {
 
-		    public void run() {
-			explanatoryComposite.hideExplanation();
-		    }
+                    @Override
+                    public void run() {
+                        explanatoryComposite.hideExplanation();
+                    }
 
-		});
-	    }
+                });
+            }
 
-	});
+        });
     }
 }
