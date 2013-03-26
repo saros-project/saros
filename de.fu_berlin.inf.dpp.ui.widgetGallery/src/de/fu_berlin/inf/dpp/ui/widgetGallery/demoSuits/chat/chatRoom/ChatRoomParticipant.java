@@ -10,8 +10,12 @@ import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 
+import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChat;
+import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferences;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.ChatControl;
-import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.ChatControlAdapter;
+import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.CharacterEnteredEvent;
+import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.ChatClearedEvent;
+import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.IChatControlListener;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.MessageEnteredEvent;
 
 public class ChatRoomParticipant {
@@ -50,8 +54,12 @@ public class ChatRoomParticipant {
 			String username = usernames[i];
 			String password = passwords[i];
 
-			ChatControl chatControl = new ChatControl(parent, SWT.BORDER,
-					colorDisplayBackground, colorInputBackground, 2);
+			MUCSessionPreferences preferences = new MUCSessionPreferences(
+					server, "demo", "");
+
+			ChatControl chatControl = new ChatControl(null, new MultiUserChat(
+					connection, preferences), parent, SWT.BORDER,
+					colorDisplayBackground, 2);
 
 			String nickname = nicknames[i];
 
@@ -85,11 +93,23 @@ public class ChatRoomParticipant {
 		this.username = username;
 		this.password = password;
 		this.chatControl = chatControl;
-		this.chatControl.addChatControlListener(new ChatControlAdapter() {
-			@Override
+		this.chatControl.addChatControlListener(new IChatControlListener() {
+
+			public void chatCleared(ChatClearedEvent event) {
+				// TODO Auto-generated method stub
+
+			}
+
+			public void characterEntered(CharacterEnteredEvent event) {
+				// TODO Auto-generated method stub
+
+			}
+
 			public void messageEntered(MessageEnteredEvent event) {
 				sendMessage(event.getEnteredMessage());
+
 			}
+
 		});
 
 		this.user = user;
