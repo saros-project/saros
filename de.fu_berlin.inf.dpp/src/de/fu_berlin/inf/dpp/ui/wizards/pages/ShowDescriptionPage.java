@@ -12,6 +12,7 @@ import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.util.VersionManager;
+import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
 /**
  * A wizard page that displays the name of the inviter and the description
@@ -35,10 +36,10 @@ public class ShowDescriptionPage extends WizardPage {
          * Show compatibility issues and inform the user what to do (but the
          * user can always proceed).
          */
-        VersionManager.VersionInfo vInfo = invProcess.getVersionInfo();
+        VersionInfo remoteVersion = invProcess.getRemoteVersionInfo();
 
-        String remoteSarosVersion = vInfo.version.toString();
-        switch (vInfo.compatibility) {
+        String remoteSarosVersion = remoteVersion.version.toString();
+        switch (remoteVersion.compatibility) {
 
         case TOO_NEW:
             setMessage(MessageFormat.format(

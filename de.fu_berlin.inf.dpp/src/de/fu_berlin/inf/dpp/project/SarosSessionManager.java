@@ -73,7 +73,6 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.util.Utils;
-import de.fu_berlin.inf.dpp.util.VersionManager;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
 /**
@@ -102,10 +101,6 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     @Inject
     private SessionIDObservable sessionID;
-
-    @Inject
-    // FIXME dependency of other classes
-    private VersionManager versionManager;
 
     @Inject
     private PreferenceUtils preferenceUtils;
@@ -354,9 +349,8 @@ public class SarosSessionManager implements ISarosSessionManager {
             this.sessionID.setValue(sessionID);
 
             // side effect in InvitationProcessObservable
-            process = new IncomingSessionNegotiation(this, from,
-                versionManager, versionInfo, sessionStart, invitationID,
-                description, sarosContext);
+            process = new IncomingSessionNegotiation(this, from, versionInfo,
+                sessionStart, invitationID, description, sarosContext);
         } finally {
             startStopSessionLock.unlock();
         }

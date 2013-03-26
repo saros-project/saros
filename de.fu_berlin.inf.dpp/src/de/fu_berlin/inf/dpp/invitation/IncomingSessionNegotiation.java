@@ -21,7 +21,6 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
-import de.fu_berlin.inf.dpp.util.VersionManager;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
 /*
@@ -34,11 +33,10 @@ public class IncomingSessionNegotiation extends InvitationProcess {
 
     private ISarosSessionManager sessionManager;
     private JoinSessionWizard inInvitationUI;
-    private VersionManager versionManager;
     private DateTime sessionStart;
     private ISarosSession sarosSession;
 
-    private VersionInfo versionInfo;
+    private VersionInfo remoteVersionInfo;
 
     private boolean running;
 
@@ -49,18 +47,14 @@ public class IncomingSessionNegotiation extends InvitationProcess {
     private PreferenceUtils preferenceUtils;
 
     public IncomingSessionNegotiation(ISarosSessionManager sessionManager,
-        JID from, VersionManager versionManager, VersionInfo remoteVersionInfo,
-        DateTime sessionStart, String invitationID, String description,
-        SarosContext sarosContext) {
+        JID from, VersionInfo remoteVersionInfo, DateTime sessionStart,
+        String invitationID, String description, SarosContext sarosContext) {
 
         super(invitationID, from, description, sarosContext);
 
-        // this call is blocking and should not be done here
-        this.versionInfo = determineVersion(remoteVersionInfo);
         this.sessionStart = sessionStart;
-
         this.sessionManager = sessionManager;
-        this.versionManager = versionManager;
+        this.remoteVersionInfo = remoteVersionInfo;
     }
 
     @Override
@@ -96,8 +90,11 @@ public class IncomingSessionNegotiation extends InvitationProcess {
         return true;
     }
 
-    public VersionInfo getVersionInfo() {
-        return versionInfo;
+    /**
+     * Returns the Saros version of the remote side.
+     */
+    public VersionInfo getRemoteVersionInfo() {
+        return remoteVersionInfo;
     }
 
     public synchronized void setInvitationUI(JoinSessionWizard inInvitationUI) {
@@ -146,22 +143,6 @@ public class IncomingSessionNegotiation extends InvitationProcess {
     @Override
     protected void executeCancellation() {
         sessionManager.stopSarosSession();
-    }
-
-    private VersionInfo determineVersion(VersionInfo remoteVersionInfo) {
-        log.debug(this + " : Determining version");
-        // The host could not determine the compatibility, so we do it.
-        if (remoteVersionInfo.compatibility == null) {
-            remoteVersionInfo.compatibility = versionManager
-                .determineCompatibility(remoteVersionInfo.version.toString());
-            return remoteVersionInfo;
-        }
-
-        // Invert the compatibility information so it applies to our client.
-        remoteVersionInfo.compatibility = remoteVersionInfo.compatibility
-            .invert();
-
-        return remoteVersionInfo;
     }
 
     /**

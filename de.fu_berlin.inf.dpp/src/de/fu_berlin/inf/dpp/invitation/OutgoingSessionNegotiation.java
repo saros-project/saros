@@ -51,7 +51,7 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
 
     private ISarosSession sarosSession;
 
-    private VersionInfo versionInfo;
+    private VersionInfo remoteVersionInfo;
 
     private SarosPacketCollector invitationAcceptedCollector;
     private SarosPacketCollector invitationAcknowledgedCollector;
@@ -209,13 +209,13 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
 
             if (comp == VersionManager.Compatibility.OK) {
                 log.debug(this + " : Saros versions are compatible");
-                this.versionInfo = versionInfo;
+                this.remoteVersionInfo = versionInfo;
             } else {
                 log.debug(this + " : Saros versions are not compatible");
                 if (IGNORE_VERSION_COMPATIBILITY
                     && DialogUtils.confirmVersionConflict(versionInfo, peer,
                         versionManager.getVersion()))
-                    this.versionInfo = versionInfo;
+                    this.remoteVersionInfo = versionInfo;
                 else {
                     throw new LocalCancellationException(
                         "The Saros plugin of "
@@ -249,21 +249,19 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
         log.debug(this + " : sending invitation");
         checkCancellation(CancelOption.DO_NOT_NOTIFY_PEER);
 
-        /*
-         * TODO: this method should get a complete VersionInfo object from the
-         * checkVersion() method.
-         */
-        VersionInfo hostVersionInfo = versionInfo;
-        if (hostVersionInfo == null) {
-            hostVersionInfo = new VersionInfo();
-            hostVersionInfo.compatibility = null;
-        }
+        VersionInfo localVersionInfo = new VersionInfo();
 
-        hostVersionInfo.version = versionManager.getVersion();
+        assert remoteVersionInfo != null;
+
+        localVersionInfo.version = versionManager.getVersion();
+
+        // if remote version is too new we are too old and vice versa
+        localVersionInfo.compatibility = remoteVersionInfo.compatibility
+            .invert();
 
         InvitationOfferingExtension invitationOffering = new InvitationOfferingExtension(
             invitationID, sessionID.getValue(), sarosSession.getSessionStart(),
-            versionInfo, description);
+            localVersionInfo, description);
 
         transmitter.sendMessageToUser(peer,
             InvitationOfferingExtension.PROVIDER.create(invitationOffering));
