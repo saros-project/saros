@@ -4,14 +4,15 @@ import java.io.FileNotFoundException;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.zip.Adler32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -442,6 +443,8 @@ public class FileUtils {
 
     }
 
+    /* FIMXE logic code should not be extracted to Util classes ! */
+
     /**
      * Synchronizing a single file for the given user.
      */
@@ -473,47 +476,70 @@ public class FileUtils {
     }
 
     /**
-     * Calculate the total filesize of all files contained in parameter
-     * resources (and all files in contained folders...)
+     * Calculates the total file count and size for all resources.
      * 
      * @param resources
-     * @return
+     *            collection containing the resources that file sizes and file
+     *            count should be calculated
+     * @param includeMembers
+     *            <code>true</code> to include the members of resources that
+     *            represents a {@linkplain IContainer container}
+     * @param flags
+     *            additional flags on how to process the members of containers
+     * @return a pair containing the {@linkplain Pair#p file size} and
+     *         {@linkplain Pair#v file count} for the given resources
      */
-    public static long getAllFilesSize(List<IResource> resources) {
-        long totalFileSizes = 0;
-        for (IResource res : resources) {
-            switch (res.getType()) {
+    public static Pair<Long, Long> getFileCountAndSize(
+        Collection<? extends IResource> resources, boolean includeMembers,
+        int flags) {
+        long totalFileSize = 0;
+        long totalFileCount = 0;
+
+        Pair<Long, Long> fileCountAndSize = new Pair<Long, Long>(0L, 0L);
+
+        for (IResource resource : resources) {
+            switch (resource.getType()) {
             case IResource.FILE:
-                IFile file = (IFile) res;
+                totalFileCount++;
+
                 try {
-                    long filesize = org.eclipse.core.filesystem.EFS
-                        .getStore(file.getLocationURI()).fetchInfo()
-                        .getLength();
-                    totalFileSizes += filesize;
-                } catch (CoreException e) {
+                    long filesize = EFS.getStore(resource.getLocationURI())
+                        .fetchInfo().getLength();
+
+                    totalFileSize += filesize;
+                } catch (Exception e) {
                     log.warn(
-                        "Failed to retrieve file size of file "
-                            + file.getLocationURI(), e);
+                        "failed to retrieve file size of file "
+                            + resource.getLocationURI(), e);
                 }
                 break;
+            case IResource.PROJECT:
             case IResource.FOLDER:
-                List<IResource> childrenResources = new ArrayList<IResource>();
-                IResource[] members;
+                if (!includeMembers)
+                    break;
+
                 try {
-                    members = ((IFolder) res).members();
-                    for (IResource child : members) {
-                        childrenResources.add(child);
-                    }
-                } catch (CoreException e) {
-                    // TODO Auto-generated catch block
-                    log.warn("Failed to process folder", e);
+                    IContainer container = ((IContainer) resource
+                        .getAdapter(IContainer.class));
+
+                    Pair<Long, Long> subFileCountAndSize = FileUtils
+                        .getFileCountAndSize(
+                            Arrays.asList(container.members(flags)),
+                            includeMembers, flags);
+
+                    totalFileSize += subFileCountAndSize.p;
+                    totalFileCount += subFileCountAndSize.v;
+
+                } catch (Exception e) {
+                    log.warn("failed to process container: " + resource, e);
                 }
-                totalFileSizes += FileUtils.getAllFilesSize(childrenResources);
                 break;
             default:
                 break;
             }
         }
-        return totalFileSizes;
+        fileCountAndSize.p = totalFileSize;
+        fileCountAndSize.v = totalFileCount;
+        return fileCountAndSize;
     }
 }

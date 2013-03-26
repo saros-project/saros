@@ -2,13 +2,10 @@ package de.fu_berlin.inf.dpp.ui.util;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -42,6 +39,8 @@ import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.ui.BalloonNotification;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
+import de.fu_berlin.inf.dpp.util.FileUtils;
+import de.fu_berlin.inf.dpp.util.Pair;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -258,45 +257,25 @@ public class CollaborationUtils {
 
         for (IProject project : projects) {
 
-            long projectSize = 0;
-            long files = 0;
-
-            Deque<IResource> stack = new LinkedList<IResource>();
-
-            if (sarosSession.isCompletelyShared(project))
-                stack.push(project);
-
-            while (!stack.isEmpty()) {
-                IResource resource = stack.pop();
-
-                IContainer container = (IContainer) resource
-                    .getAdapter(IContainer.class);
-
-                if (container != null) {
-                    try {
-                        stack.addAll(Arrays.asList(container.members()));
-                    } catch (CoreException e) {
-                        log.warn("cannot calculate the correct project size", e);
-                    }
-                    continue;
-                }
-
-                IFile file = (IFile) resource.getAdapter(IFile.class);
-                if (file != null) {
-                    projectSize += file.getLocation().toFile().length();
-                    files++;
-                }
-            }
+            Pair<Long, Long> fileCountAndSize;
 
             if (sarosSession.isCompletelyShared(project)) {
+                fileCountAndSize = FileUtils.getFileCountAndSize(
+                    Collections.singletonList(project), true,
+                    IContainer.EXCLUDE_DERIVED);
+
                 result.append(String.format(
                     "\nProject: %s, Files: %d, Size: %s", project.getName(),
-                    files, format(projectSize)));
+                    fileCountAndSize.v, format(fileCountAndSize.p)));
             } else {
+                fileCountAndSize = FileUtils.getFileCountAndSize(
+                    sarosSession.getSharedResources(project), false,
+                    IResource.NONE);
+
                 result.append(String.format(
                     "\nProject: %s, Files: %s, Size: %s", project.getName()
-                        + " " + Messages.CollaborationUtils_partial, "N/A",
-                    "N/A"));
+                        + " " + Messages.CollaborationUtils_partial,
+                    fileCountAndSize.v, format(fileCountAndSize.p)));
             }
         }
 
