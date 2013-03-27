@@ -96,45 +96,43 @@ public class ProjectSelectionWizardPage extends WizardPage {
          * INSTANTLY instead of waiting up to XX seconds with flickering cursor
          * until the selection was applied.
          */
-        Runnable takeOverPerspectiveSelection = new Runnable() {
+        final Runnable takeOverPerspectiveSelection = new Runnable() {
             @Override
             public void run() {
-                SWTUtils.runSafeSWTAsync(log, new Runnable() {
-                    @Override
-                    public void run() {
-                        List<IResource> selection = SelectionRetrieverFactory
-                            .getSelectionRetriever(IResource.class)
-                            .getSelection();
+                List<IResource> selection = SelectionRetrieverFactory
+                    .getSelectionRetriever(IResource.class).getSelection();
+                resourceSelectionComposite.setSelectedResources(selection);
+                resourceSelectionComposite
+                    .addResourceSelectionListener(resourceSelectionListener);
+                /*
+                 * If nothing is selected and only one project exists in the
+                 * workspace, select it in the Wizard.
+                 */
+                if (selection.size() == 0) {
+                    if (resourceSelectionComposite.getProjectsCount() == 1) {
+                        selection = resourceSelectionComposite.getResources();
                         resourceSelectionComposite
                             .setSelectedResources(selection);
-                        resourceSelectionComposite
-                            .addResourceSelectionListener(resourceSelectionListener);
-                        /*
-                         * If nothing is selected and only one project exists in
-                         * the workspace, select it in the Wizard.
-                         */
-                        if (selection.size() == 0) {
-                            if (resourceSelectionComposite.getProjectsCount() == 1) {
-                                selection = resourceSelectionComposite
-                                    .getResources();
-                                resourceSelectionComposite
-                                    .setSelectedResources(selection);
-                            }
-                        }
-                        /*
-                         * Add the current automatically appliedselection to the
-                         * undo-stack, so the user can undo it, and undo/redo
-                         * works properly.
-                         */
-                        resourceSelectionComposite.rememberSelection();
-                        setPageComplete(selection.size() > 0);
                     }
-                });
+                }
+                /*
+                 * Add the current automatically appliedselection to the
+                 * undo-stack, so the user can undo it, and undo/redo works
+                 * properly.
+                 */
+                resourceSelectionComposite.rememberSelection();
+                setPageComplete(selection.size() > 0);
             }
         };
 
-        BusyIndicator.showWhile(Display.getDefault(),
-            takeOverPerspectiveSelection);
+        SWTUtils.runSafeSWTAsync(log, new Runnable() {
+
+            @Override
+            public void run() {
+                BusyIndicator.showWhile(Display.getDefault(),
+                    takeOverPerspectiveSelection);
+            }
+        });
     }
 
     @Override
