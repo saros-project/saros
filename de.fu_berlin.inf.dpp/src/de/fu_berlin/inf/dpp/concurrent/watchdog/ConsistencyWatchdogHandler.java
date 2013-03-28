@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net.business;
+package de.fu_berlin.inf.dpp.concurrent.watchdog;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -30,7 +30,6 @@ import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivityReceiver;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
-import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
