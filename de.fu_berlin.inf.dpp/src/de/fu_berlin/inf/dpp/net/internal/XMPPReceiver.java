@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Message;
@@ -18,9 +19,12 @@ import org.xmlpull.mxp1.MXParser;
 import org.xmlpull.v1.XmlPullParser;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.net.ConnectionState;
+import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
+import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector.CancelHook;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
@@ -30,21 +34,51 @@ public class XMPPReceiver implements IReceiver {
 
     private static final Logger LOG = Logger.getLogger(XMPPReceiver.class);
 
-    private IncomingTransferObjectExtensionProvider incomingExtProv;
+    private final IncomingTransferObjectExtensionProvider incomingExtProv;
 
-    private DispatchThreadContext dispatchThreadContext;
+    private final DispatchThreadContext dispatchThreadContext;
 
     private Map<PacketListener, PacketFilter> listeners = Collections
         .synchronizedMap(new HashMap<PacketListener, PacketFilter>());
 
     private XmlPullParser parser;
 
+    private final PacketListener smackPacketListener = new PacketListener() {
+
+        @Override
+        public void processPacket(Packet packet) {
+            XMPPReceiver.this.processPacket(packet);
+        }
+    };
+
+    private final IConnectionListener connectionListener = new IConnectionListener() {
+
+        @Override
+        public void connectionStateChanged(Connection connection,
+            ConnectionState state) {
+
+            switch (state) {
+            case CONNECTING:
+                connection.addPacketListener(smackPacketListener, null);
+                //$FALL-THROUGH$
+            case CONNECTED:
+                break;
+            default:
+                if (connection != null)
+                    connection.removePacketListener(smackPacketListener);
+            }
+        }
+    };
+
     public XMPPReceiver(DispatchThreadContext dispatchThreadContext,
+        SarosNet sarosNet,
         IncomingTransferObjectExtensionProvider incomingExtProv) {
 
         this.dispatchThreadContext = dispatchThreadContext;
         this.incomingExtProv = incomingExtProv;
         this.parser = new MXParser();
+
+        sarosNet.addListener(connectionListener);
     }
 
     @Override

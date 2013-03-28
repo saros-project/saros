@@ -27,7 +27,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.jivesoftware.smack.Connection;
-import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
@@ -417,18 +416,8 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         return connection == null || !connection.isConnected();
     }
 
-    private synchronized void prepareConnection(final Connection connection) {
-
+    private synchronized void prepareConnection(Connection connection) {
         this.connection = connection;
-
-        // FIXME: move to XMMPReceiver
-        this.connection.addPacketListener(new PacketListener() {
-
-            @Override
-            public void processPacket(final Packet packet) {
-                receiver.processPacket(packet);
-            }
-        }, null);
     }
 
     private synchronized void disposeConnection() {
