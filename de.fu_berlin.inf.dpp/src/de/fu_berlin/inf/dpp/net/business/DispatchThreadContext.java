@@ -21,8 +21,8 @@ public class DispatchThreadContext {
         .getLogger(DispatchThreadContext.class);
 
     protected ExecutorService dispatch = Executors
-        .newSingleThreadExecutor(new NamedThreadFactory(
-            "XMPPTransmitterDispatch-"));
+        .newSingleThreadExecutor(new NamedThreadFactory("DispatchContext",
+            false));
 
     /**
      * Execute the given runnable as if it was received via the network
