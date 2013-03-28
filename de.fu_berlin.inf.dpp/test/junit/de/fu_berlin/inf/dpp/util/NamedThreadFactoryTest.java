@@ -1,74 +1,48 @@
 package de.fu_berlin.inf.dpp.util;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
 /**
  * 
- * @author Lindner, Andreas und Marcus
- * 
+ * @author Lindner
  */
 
 public class NamedThreadFactoryTest {
-    @Test
-    public void nullNameShouldExceptWhenCreated() {
-        NamedThreadFactory factory = new NamedThreadFactory(null);
 
-        Thread t1 = factory.newThread(new Runnable() {
-            @Override
-            public void run() { /**/
-            }
-        });
-        Thread t2 = factory.newThread(new Runnable() {
-            @Override
-            public void run() { /**/
-            }
-        });
+    private final Runnable dummy = new Runnable() {
+        @Override
+        public void run() {
+            // NOP
+        }
+    };
 
-        assertTrue(t1.getName().equals("null0"));
-        assertTrue(t2.getName().equals("null1"));
-
-        // TODO: check some other things? maybe unwanted behavior, class has to
-        // be changed!?
+    @Test(expected = NullPointerException.class)
+    public void testNullName() {
+        new NamedThreadFactory(null);
     }
 
     @Test
-    public void emptyNameShouldWork() {
+    public void testEmptyName() {
         NamedThreadFactory factory = new NamedThreadFactory("");
 
-        Thread t1 = factory.newThread(new Runnable() {
-            @Override
-            public void run() { /**/
-            }
-        });
-        Thread t2 = factory.newThread(new Runnable() {
-            @Override
-            public void run() { /**/
-            }
-        });
+        Thread t1 = factory.newThread(dummy);
+        Thread t2 = factory.newThread(dummy);
 
-        assertTrue(t1.getName().equals("0"));
-        assertTrue(t2.getName().equals("1"));
+        assertEquals("0", t1.getName());
+        assertEquals("1", t2.getName());
     }
 
     @Test
-    public void anyOtherNameShouldWork() {
+    public void testName() {
         String name = "anyname";
         NamedThreadFactory factory = new NamedThreadFactory(name);
 
-        Thread t1 = factory.newThread(new Runnable() {
-            @Override
-            public void run() { /**/
-            }
-        });
-        Thread t2 = factory.newThread(new Runnable() {
-            @Override
-            public void run() { /**/
-            }
-        });
+        Thread t1 = factory.newThread(dummy);
+        Thread t2 = factory.newThread(dummy);
 
-        assertTrue(t1.getName().equals(name + "0"));
-        assertTrue(t2.getName().equals(name + "1"));
+        assertEquals(name + "0", t1.getName());
+        assertEquals(name + "1", t2.getName());
     }
 }

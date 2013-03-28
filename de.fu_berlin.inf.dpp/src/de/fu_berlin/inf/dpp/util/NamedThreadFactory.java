@@ -5,18 +5,49 @@ import java.util.concurrent.ThreadFactory;
 
 /**
  * Thread Factory which assigns a given name + consecutive number to created
- * threads.
+ * threads if desired.
  */
-public class NamedThreadFactory implements ThreadFactory {
+public final class NamedThreadFactory implements ThreadFactory {
 
-    ThreadFactory defaultFactory = Executors.defaultThreadFactory();
+    private ThreadFactory defaultFactory = Executors.defaultThreadFactory();
 
-    int count = 0;
+    private int count = 0;
 
-    String name;
+    private final String name;
+    private final boolean suffix;
 
+    /**
+     * Creates a new {@link ThreadFactory} that will assign created threads the
+     * given name including a number suffix for each newly created thread.
+     * 
+     * @param name
+     *            the name to assign to new threads
+     * 
+     * @throws NullPointerException
+     *             if name is <code>null</code>
+     */
     public NamedThreadFactory(String name) {
+        this(name, true);
+    }
+
+    /**
+     * Creates a new {@link ThreadFactory} that will assign created threads the
+     * given name including a number suffix for each newly created thread.
+     * 
+     * @param name
+     *            the name to assign to new threads
+     * @param suffix
+     *            if <code>true</code> the name will be suffixed by a number
+     * 
+     * @throws NullPointerException
+     *             if name is <code>null</code>
+     */
+    public NamedThreadFactory(String name, boolean suffix) {
+        if (name == null)
+            throw new NullPointerException("name is null");
+
         this.name = name;
+        this.suffix = suffix;
     }
 
     @Override
@@ -24,11 +55,14 @@ public class NamedThreadFactory implements ThreadFactory {
 
         Thread result = defaultFactory.newThread(r);
 
-        int i;
+        String threadName = name;
+
         synchronized (this) {
-            i = count++;
+            if (suffix)
+                threadName = threadName.concat(String.valueOf(count++));
         }
-        result.setName(name + i);
+
+        result.setName(threadName);
 
         return result;
     }
