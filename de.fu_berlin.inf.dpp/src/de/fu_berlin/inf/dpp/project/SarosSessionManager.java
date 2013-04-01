@@ -72,7 +72,6 @@ import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
-import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
 /**
@@ -441,9 +440,8 @@ public class SarosSessionManager implements ISarosSessionManager {
 
         public OutgoingInvitationJob(OutgoingSessionNegotiation process) {
             super(MessageFormat.format(
-                Messages.SarosSessionManager_inviting_user, User
-                    .getHumanReadableName(getSarosSession().getSaros()
-                        .getSarosNet(), process.getPeer())));
+                Messages.SarosSessionManager_inviting_user,
+                User.getHumanReadableName(sarosNet, process.getPeer())));
             this.process = process;
             this.peer = process.getPeer().getBase();
 
@@ -656,17 +654,8 @@ public class SarosSessionManager implements ISarosSessionManager {
         protected IStatus run(IProgressMonitor monitor) {
             try {
                 ProjectNegotiation.Status status = process.start(monitor);
-
-                ISarosSession session = getSarosSession();
-                SarosNet sarosNet = null;
-                String peerName;
-                if (session != null) {
-                    sarosNet = session.getSaros().getSarosNet();
-                    peerName = User.getHumanReadableName(sarosNet,
-                        new JID(peer));
-                } else {
-                    peerName = Utils.prefix(new JID(peer));
-                }
+                String peerName = User.getHumanReadableName(sarosNet, new JID(
+                    peer));
 
                 String message;
 
