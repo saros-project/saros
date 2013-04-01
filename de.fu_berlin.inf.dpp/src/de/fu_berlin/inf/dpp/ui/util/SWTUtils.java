@@ -15,6 +15,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
+import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 public class SWTUtils {
@@ -103,20 +104,7 @@ public class SWTUtils {
      * Crude check whether we are on the SWT thread
      */
     public static boolean isSWT() {
-        if (Display.getCurrent() != null) {
-            return true;
-        }
-        try {
-            boolean platformSWT = PlatformUI.getWorkbench().getDisplay()
-                .getThread() == Thread.currentThread();
-            if (platformSWT) {
-                log.warn("Running in PlatformSWT Thread"
-                    + " which is not found with Display.getCurrent()");
-            }
-            return platformSWT;
-        } catch (SWTException e) {
-            return false;
-        }
+        return Display.getCurrent() != null;
     }
 
     /**
@@ -147,11 +135,13 @@ public class SWTUtils {
      */
     public static void runSafeSWTAsync(final Logger log, final Runnable runnable) {
         try {
-            Display.getDefault().asyncExec(Utils.wrapSafe(log, runnable));
+            getDisplay().asyncExec(Utils.wrapSafe(log, runnable));
         } catch (SWTException e) {
-            if (!PlatformUI.getWorkbench().isClosing()) {
+            if (!PlatformUI.getWorkbench().isClosing())
                 throw e;
-            }
+
+            log.warn("gui code was executed after workbench shutdown",
+                new StackTrace());
         }
     }
 
@@ -194,11 +184,25 @@ public class SWTUtils {
 
     public static void runSafeSWTSync(final Logger log, final Runnable runnable) {
         try {
-            Display.getDefault().syncExec(Utils.wrapSafe(log, runnable));
+            getDisplay().syncExec(Utils.wrapSafe(log, runnable));
         } catch (SWTException e) {
-            if (!PlatformUI.getWorkbench().isClosing()) {
+            if (!PlatformUI.getWorkbench().isClosing())
                 throw e;
-            }
+
+            log.warn("gui code was executed after workbench shutdown",
+                new StackTrace());
         }
+    }
+
+    /**
+     * Returns the display of the current workbench. Should be used instead of
+     * {@link Display#getDefault()}.
+     * 
+     * @see IWorkbench#getDisplay()
+     * 
+     * @return the display of the current workbench
+     */
+    public static Display getDisplay() {
+        return PlatformUI.getWorkbench().getDisplay();
     }
 }
