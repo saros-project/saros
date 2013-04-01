@@ -140,8 +140,8 @@ public class SWTUtils {
             if (!PlatformUI.getWorkbench().isClosing())
                 throw e;
 
-            log.warn("gui code was executed after workbench shutdown",
-                new StackTrace());
+            log.warn("could not execute runnable " + runnable
+                + ", UI thread is not available", new StackTrace());
         }
     }
 
@@ -189,8 +189,8 @@ public class SWTUtils {
             if (!PlatformUI.getWorkbench().isClosing())
                 throw e;
 
-            log.warn("gui code was executed after workbench shutdown",
-                new StackTrace());
+            log.warn("could not execute runnable " + runnable
+                + ", UI thread is not available", new StackTrace());
         }
     }
 
