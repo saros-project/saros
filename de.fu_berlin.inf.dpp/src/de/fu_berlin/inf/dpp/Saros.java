@@ -497,6 +497,13 @@ public class Saros extends AbstractUIPlugin {
         return sarosVersion;
     }
 
+    /**
+     * @deprecated inject {@link SarosNet} and not {@link Saros} to obtain a
+     *             reference
+     * 
+     * @return
+     */
+    @Deprecated
     public SarosNet getSarosNet() {
         return sarosNet;
     }
