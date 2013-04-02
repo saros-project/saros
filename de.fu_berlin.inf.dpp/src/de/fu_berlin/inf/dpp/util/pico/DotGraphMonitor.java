@@ -48,8 +48,7 @@ import de.fu_berlin.inf.dpp.util.Pair;
  * 
  * @author oezbek
  */
-public final class DotGraphMonitor extends AbstractComponentMonitor implements
-    ComponentMonitor {
+public final class DotGraphMonitor extends AbstractComponentMonitor {
 
     private static final long serialVersionUID = 7368290879876948459L;
 
@@ -94,8 +93,9 @@ public final class DotGraphMonitor extends AbstractComponentMonitor implements
     }
 
     @Override
-    public void invoking(PicoContainer container,
-        ComponentAdapter<?> componentAdapter, Member member, Object instance) {
+    public void invoked(PicoContainer container,
+        ComponentAdapter<?> componentAdapter, Member member, Object instance,
+        long duration, Object[] args, Object retVal) {
 
         if (!(componentAdapter instanceof Injector<?>))
             return;
@@ -106,11 +106,26 @@ public final class DotGraphMonitor extends AbstractComponentMonitor implements
             allInstantiated.put(instance, i);
         }
 
+        Class<?> clazz = null;
+
         if (member instanceof Field) {
             Field f = (Field) member;
-            i.fieldInjected.add(f.getType());
+            f.setAccessible(true);
+            try {
+                Object object = f.get(instance);
+                if (object != null)
+                    clazz = object.getClass();
+                else
+                    clazz = f.getType();
+            } catch (Exception e) {
+                clazz = f.getType();
+            }
+
+            i.fieldInjected.add(clazz);
         }
-        super.invoking(container, componentAdapter, member, instance);
+
+        super.invoked(container, componentAdapter, member, instance, duration,
+            args, retVal);
     }
 
     public String getClassDependencyGraph() {
@@ -142,18 +157,20 @@ public final class DotGraphMonitor extends AbstractComponentMonitor implements
 
         HashMap<String, String> colors = new HashMap<String, String>();
         colors.put("core", "red");
-        colors.put("net", "blue");
-        colors.put("util", "aquamarine");
-        colors.put("misc", "aquamarine");
+        colors.put("session", "crimson");
         colors.put("observables", "darkolivegreen1");
+        colors.put("net", "blue");
+        colors.put("util", "thistle1");
+        colors.put("misc", "aquamarine");
+        colors.put("undo", "gold1");
         colors.put("logging", "yellow");
         colors.put("consistency", "green");
         colors.put("ui", "gold1");
-        colors.put("undo", "gold1");
-        colors.put("action", "gold1");
-        colors.put("prefs", "blueviolet");
+        colors.put("action", "coral");
         colors.put("integration", "deeppink");
         colors.put("feedback", "blueviolet");
+        colors.put("prefs", "blueviolet");
+        colors.put("eclipse", "darkviolet");
         colors.put("pico", "black");
 
         int i = 0;
