@@ -52,14 +52,14 @@ public class ConsistencyWatchdogHandler implements Startable {
 
     protected final ISarosSession sarosSession;
 
-    protected IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
+    protected final IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
         @Override
         public void receive(ChecksumErrorActivity checksumError) {
             startRecovery(checksumError);
         }
     };
 
-    protected AbstractActivityProvider activityProvider = new AbstractActivityProvider() {
+    protected final AbstractActivityProvider activityProvider = new AbstractActivityProvider() {
         @Override
         public void exec(IActivity activity) {
             if (!sarosSession.isHost())
@@ -98,7 +98,8 @@ public class ConsistencyWatchdogHandler implements Startable {
 
         log.debug("Received Checksum Error: " + checksumError);
 
-        SWTUtils.runSafeSWTSync(log, new Runnable() {
+        // execute async so outstanding activities could be dispatched
+        SWTUtils.runSafeSWTAsync(log, new Runnable() {
             @Override
             public void run() {
 
@@ -118,33 +119,29 @@ public class ConsistencyWatchdogHandler implements Startable {
                     // " has to be synchronized with project host. Please wait until the inconsistencies are resolved."
                 };
 
-                // Run async, so we can continue to receive messages over the
-                // network...
-                SWTUtils.runSafeSWTAsync(log, new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            dialog.run(true, true, new IRunnableWithProgress() {
-                                @Override
-                                public void run(IProgressMonitor monitor) {
-                                    runRecovery(checksumError,
-                                        SubMonitor.convert(monitor));
-                                }
-                            });
-                        } catch (InvocationTargetException e) {
-                            try {
-                                throw e.getCause();
-                            } catch (CancellationException c) {
-                                log.info("Recovery was cancelled by local user");
-                            } catch (Throwable t) {
-                                log.error("Internal Error: ", t);
-                            }
-                        } catch (InterruptedException e) {
-                            log.error("Code not designed to be interruptable",
-                                e);
+                try {
+                    /*
+                     * run in a modal context otherwise we would block again the
+                     * dispatching of activities
+                     */
+                    dialog.run(true, true, new IRunnableWithProgress() {
+                        @Override
+                        public void run(IProgressMonitor monitor) {
+                            runRecovery(checksumError,
+                                SubMonitor.convert(monitor));
                         }
+                    });
+                } catch (InvocationTargetException e) {
+                    try {
+                        throw e.getCause();
+                    } catch (CancellationException c) {
+                        log.info("Recovery was cancelled by local user");
+                    } catch (Throwable t) {
+                        log.error("Internal Error: ", t);
                     }
-                });
+                } catch (InterruptedException e) {
+                    log.error("Code not designed to be interruptable", e);
+                }
             }
         });
     }
@@ -202,8 +199,6 @@ public class ConsistencyWatchdogHandler implements Startable {
      */
     protected void recoverFiles(ChecksumErrorActivity checksumError,
         SubMonitor progress) {
-
-        ISarosSession sarosSession = this.sarosSession;
 
         progress
             .beginTask("Sending files", checksumError.getPaths().size() + 1);
