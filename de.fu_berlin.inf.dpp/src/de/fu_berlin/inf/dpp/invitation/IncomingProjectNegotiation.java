@@ -204,6 +204,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             for (Entry<String, IProject> entry : localProjects.entrySet()) {
                 sarosSession.addProjectOwnership(entry.getKey(),
                     entry.getValue(), jid);
+                sarosSession.enableQueuing(entry.getKey());
             }
 
             transmitter.sendToSessionUser(peer, FileListExtension.PROVIDER
@@ -243,6 +244,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         } catch (Exception e) {
             exception = e;
         } finally {
+            sarosSession.disableQueuing();
 
             if (fileTransferManager != null)
                 fileTransferManager

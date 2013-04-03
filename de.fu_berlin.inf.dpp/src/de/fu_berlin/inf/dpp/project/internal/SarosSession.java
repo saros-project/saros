@@ -65,10 +65,10 @@ import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
+import de.fu_berlin.inf.dpp.activities.business.NOPActivity;
 import de.fu_berlin.inf.dpp.activities.business.PermissionActivity;
 import de.fu_berlin.inf.dpp.activities.business.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.business.ViewportActivity;
-import de.fu_berlin.inf.dpp.activities.serializable.EditorActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
@@ -117,7 +117,6 @@ import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.ArrayUtils;
 import de.fu_berlin.inf.dpp.util.FileUtils;
-import de.fu_berlin.inf.dpp.util.MappedList;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -173,8 +172,6 @@ public final class SarosSession implements ISarosSession, Disposable {
 
     private final CopyOnWriteArrayList<IActivityProvider> activityProviders = new CopyOnWriteArrayList<IActivityProvider>();
 
-    private final MappedList<String, IActivityDataObject> queuedActivities = new MappedList<String, IActivityDataObject>();
-
     /* Instance fields */
     private User localUser;
 
@@ -193,6 +190,8 @@ public final class SarosSession implements ISarosSession, Disposable {
     private List<IResource> selectedResources = new ArrayList<IResource>();
 
     private MutablePicoContainer sessionContainer;
+
+    private final ActivityQueuer activityQueuer;
 
     private final IActivityListener activityListener = new IActivityListener() {
 
@@ -234,6 +233,7 @@ public final class SarosSession implements ISarosSession, Disposable {
 
         sarosContext.initComponent(this);
 
+        this.activityQueuer = new ActivityQueuer();
         this.sarosContext = sarosContext;
         this.sessionStart = sessionStart;
 
@@ -333,7 +333,6 @@ public final class SarosSession implements ISarosSession, Disposable {
                 projectMapper.addResourceMapping(project, null);
             }
         }
-        execQueuedActivities(projectID);
     }
 
     @Override
@@ -743,22 +742,20 @@ public final class SarosSession implements ISarosSession, Disposable {
 
     @Override
     public void exec(List<IActivityDataObject> activityDataObjects) {
-        // Convert me
-        List<IActivity> activities = convertAndQueueProjectActivities(activityDataObjects);
+        List<IActivityDataObject> dataObjects = activityQueuer
+            .process(activityDataObjects);
+        List<IActivity> activities = convertActivities(dataObjects);
         activityHandler.handleIncomingActivities(activities);
     }
 
-    private List<IActivity> convertAndQueueProjectActivities(
+    private List<IActivity> convertActivities(
         List<IActivityDataObject> activityDataObjects) {
         List<IActivity> result = new ArrayList<IActivity>(
             activityDataObjects.size());
 
         for (IActivityDataObject dataObject : activityDataObjects) {
             try {
-                if (!hadToBeQueued(dataObject)) {
-                    result.add(dataObject.getActivity(this));
-                }
-
+                result.add(dataObject.getActivity(this));
             } catch (IllegalArgumentException e) {
                 log.warn("DataObject could not be attached to SarosSession: " //$NON-NLS-1$
                     + dataObject, e);
@@ -766,68 +763,6 @@ public final class SarosSession implements ISarosSession, Disposable {
         }
 
         return result;
-    }
-
-    String lastID;
-
-    /**
-     * 
-     * @param dataObject
-     * @return <code>true</code> if this activity can be executed now
-     */
-    private boolean hadToBeQueued(IActivityDataObject dataObject) {
-        if (!(dataObject instanceof EditorActivityDataObject))
-            return false;
-
-        String projectID = ((EditorActivityDataObject) dataObject)
-            .getProjectID();
-
-        /*
-         * some activities (e.g. EditorActivity) can return null for projectID
-         */
-        IProject project;
-        if (projectID != null) {
-            lastID = projectID;
-            project = getProject(projectID);
-        } else {
-            project = getProject(lastID);
-        }
-        /*
-         * If we don't have that shared project, but will have it in future we
-         * will queue the activity.
-         * 
-         * When the project negotiation is done the method
-         * execQueuedActivities() will be executed
-         */
-        if (project == null) {
-            log.info("Activity " + dataObject.toString() + " for Project "
-                + projectID + " was queued.");
-            if (!queuedActivities.containsValue(dataObject)) {
-                if (projectID == null) {
-                    queuedActivities.put(lastID, dataObject);
-                } else {
-                    queuedActivities.put(projectID, dataObject);
-                }
-            }
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Execute activities queued in the SarosSession. At the moment these can
-     * only be activities which belong to a specific project. Therefore we need
-     * the <code><b>projectID</b></code> to identify the now executable
-     * activities
-     */
-    protected void execQueuedActivities(String projectID) {
-        List<IActivityDataObject> list = queuedActivities.remove(projectID);
-        if (list == null) {
-            return;
-        }
-        log.info("All activities for project \"" + projectID //$NON-NLS-1$
-            + "\" will be executed now"); //$NON-NLS-1$
-        exec(list);
     }
 
     /**
@@ -1393,6 +1328,18 @@ public final class SarosSession implements ISarosSession, Disposable {
     public Set<Integer> getAvailableColors() {
         return sessionContainer.getComponent(ChangeColorManager.class)
             .getAvailableColors();
+    }
+
+    @Override
+    public void enableQueuing(String projectId) {
+        activityQueuer.enableQueuing(projectId);
+    }
+
+    @Override
+    public void disableQueuing() {
+        activityQueuer.disableQueuing();
+        // send us a dummy activity to ensure the queues get flushed
+        sendActivity(localUser, new NOPActivity(localUser, localUser, 0));
     }
 
     private void initializeSessionContainer(ISarosContext context) {

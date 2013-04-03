@@ -325,4 +325,13 @@ public class SarosSessionStub implements ISarosSession {
     public Set<Integer> getAvailableColors() {
         throw new RuntimeException("Unexpected call to Stub");
     }
-}
+
+    @Override
+    public void enableQueuing(String projectId) {
+        throw new RuntimeException("Unexpected call to Stub");
+    }
+
+    @Override
+    public void disableQueuing() {
+        throw new RuntimeException("Unexpected call to Stub");
+    }}

@@ -32,7 +32,9 @@ import org.joda.time.DateTime;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.Permission;
+import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
@@ -451,4 +453,24 @@ public interface ISarosSession {
      *             limit
      */
     public void changeColor(int colorID);
+
+    /**
+     * FOR INTERNAL USE ONLY !
+     * 
+     * Starts queuing project related activities (e.g {@link FileActivity} or
+     * {@link JupiterActivity}) for a shared project.
+     * 
+     * @param projectId
+     *            the id of the project for which project related activities
+     *            should be queued
+     */
+    public void enableQueuing(String projectId);
+
+    /**
+     * FOR INTERNAL USE ONLY !
+     * 
+     * Disables queuing for all shared projects and flushes all queued
+     * activities.
+     */
+    public void disableQueuing();
 }

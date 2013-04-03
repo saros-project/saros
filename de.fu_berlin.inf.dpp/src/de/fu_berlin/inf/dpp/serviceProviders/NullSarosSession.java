@@ -330,4 +330,15 @@ public class NullSarosSession implements ISarosSession {
         log.warn("unexpected method call");
         return null;
     }
+
+    @Override
+    public void enableQueuing(String projectId) {
+        log.warn("unexpected method call");
+    }
+
+    @Override
+    public void disableQueuing() {
+        log.warn("unexpected method call");
+    }
+
 }
