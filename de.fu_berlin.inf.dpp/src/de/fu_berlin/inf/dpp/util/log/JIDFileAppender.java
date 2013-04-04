@@ -20,6 +20,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -58,12 +59,12 @@ public class JIDFileAppender extends FileAppender {
      * Dependencies
      */
     @Inject
-    protected Saros saros;
+    protected SarosNet sarosNet;
 
     @Override
     public synchronized void append(LoggingEvent event) {
 
-        if (saros == null && Saros.isInitialized()) {
+        if (sarosNet == null && Saros.isInitialized()) {
             initialize();
         }
 
@@ -97,10 +98,10 @@ public class JIDFileAppender extends FileAppender {
     protected void initialize() {
         SarosPluginContext.initComponent(this);
 
-        saros.getSarosNet().addListener(listener);
+        sarosNet.addListener(listener);
 
         // If already connected use the current JID.
-        setJID(saros.getSarosNet().getMyJID());
+        setJID(sarosNet.getMyJID());
     }
 
     protected synchronized void setJID(@Nullable JID newJID) {
@@ -124,7 +125,7 @@ public class JIDFileAppender extends FileAppender {
 
         // log4j config changed, we are out
         if (fileNameBackup == null) {
-            saros.getSarosNet().removeListener(listener);
+            sarosNet.removeListener(listener);
             return;
         }
 

@@ -18,11 +18,11 @@ import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.RosterGroup;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.ui.model.TreeLabelProvider;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterComparator;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterContentProvider;
@@ -51,7 +51,7 @@ import de.fu_berlin.inf.nebula.utils.ViewerUtils;
 public class BuddyDisplayComposite extends ViewerComposite {
 
     @Inject
-    protected Saros saros;
+    protected SarosNet sarosNet;
 
     protected IConnectionListener connectionListener = new IConnectionListener() {
         @Override
@@ -59,7 +59,7 @@ public class BuddyDisplayComposite extends ViewerComposite {
             ConnectionState newState) {
             switch (newState) {
             case CONNECTED:
-                ViewerUtils.setInput(viewer, saros.getSarosNet().getRoster());
+                ViewerUtils.setInput(viewer, sarosNet.getRoster());
                 ViewerUtils.expandAll(viewer);
                 break;
             case NOT_CONNECTED:
@@ -83,16 +83,16 @@ public class BuddyDisplayComposite extends ViewerComposite {
         super.setLayout(LayoutUtils.createGridLayout());
         this.viewer.getControl()
             .setLayoutData(LayoutUtils.createFillGridData());
-        this.viewer.setInput(saros.getSarosNet().getRoster());
+        this.viewer.setInput(sarosNet.getRoster());
         ViewerUtils.expandAll(this.viewer);
 
-        saros.getSarosNet().addListener(connectionListener);
+        sarosNet.addListener(connectionListener);
 
         this.addDisposeListener(new DisposeListener() {
             @Override
             public void widgetDisposed(DisposeEvent e) {
-                if (saros.getSarosNet() != null) {
-                    saros.getSarosNet().removeListener(connectionListener);
+                if (sarosNet != null) {
+                    sarosNet.removeListener(connectionListener);
                 }
             }
         });

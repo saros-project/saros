@@ -30,7 +30,6 @@ import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.Roster;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
@@ -38,6 +37,7 @@ import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
@@ -82,7 +82,7 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
         .getLogger(BuddySessionDisplayComposite.class);
 
     @Inject
-    private Saros saros;
+    private SarosNet sarosNet;
 
     @Inject
     private ISarosSessionManager sarosSessionManager;
@@ -210,7 +210,7 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
         updateViewer();
         ViewerUtils.expandAll(viewer);
 
-        saros.getSarosNet().addListener(connectionListener);
+        sarosNet.addListener(connectionListener);
         this.sarosSessionManager.addSarosSessionListener(sarosSessionListener);
 
         ISarosSession session = sarosSessionManager.getSarosSession();
@@ -247,8 +247,8 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
                     sarosSessionManager
                         .removeSarosSessionListener(sarosSessionListener);
                 }
-                if (saros.getSarosNet() != null) {
-                    saros.getSarosNet().removeListener(connectionListener);
+                if (sarosNet != null) {
+                    sarosNet.removeListener(connectionListener);
                 }
 
                 ISarosSession session = currentSession;
@@ -451,8 +451,8 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
     }
 
     private void updateViewer() {
-        if (saros.getSarosNet().getRoster() != null)
-            cachedRoster = saros.getSarosNet().getRoster();
+        if (sarosNet.getRoster() != null)
+            cachedRoster = sarosNet.getRoster();
         ViewerUtils.setInput(viewer, new RosterSessionInput(cachedRoster,
             sarosSessionManager.getSarosSession()));
     }

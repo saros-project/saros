@@ -19,6 +19,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManager.CacheMissException;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
@@ -36,7 +37,7 @@ import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactor
 public class ProjectShareBuddies extends ContributionItem {
 
     @Inject
-    protected Saros saros;
+    protected SarosNet sarosNet;
 
     @Inject
     protected ISarosSessionManager sarosSessionManager;
@@ -55,7 +56,7 @@ public class ProjectShareBuddies extends ContributionItem {
 
     @Override
     public void fill(Menu menu, int index) {
-        if (!saros.getSarosNet().isConnected())
+        if (!sarosNet.isConnected())
             return;
 
         final List<IResource> selectedResources = SelectionRetrieverFactory
@@ -89,8 +90,8 @@ public class ProjectShareBuddies extends ContributionItem {
      * @return
      */
     protected RosterEntry[] getSortedRosterEntries() {
-        RosterEntry[] rosterEntries = saros.getSarosNet().getRoster()
-            .getEntries().toArray(new RosterEntry[0]);
+        RosterEntry[] rosterEntries = sarosNet.getRoster().getEntries()
+            .toArray(new RosterEntry[0]);
         Arrays.sort(rosterEntries, new Comparator<RosterEntry>() {
             @Override
             public int compare(RosterEntry o1, RosterEntry o2) {
@@ -118,8 +119,8 @@ public class ProjectShareBuddies extends ContributionItem {
         /*
          * The model knows how to display roster entries best.
          */
-        RosterEntryElement rosterEntryElement = new RosterEntryElement(saros
-            .getSarosNet().getRoster(), new JID(rosterEntry.getUser()));
+        RosterEntryElement rosterEntryElement = new RosterEntryElement(
+            sarosNet.getRoster(), new JID(rosterEntry.getUser()));
 
         MenuItem menuItem = new MenuItem(parentMenu, SWT.NONE, index);
         menuItem.setText(rosterEntryElement.getStyledText().toString());

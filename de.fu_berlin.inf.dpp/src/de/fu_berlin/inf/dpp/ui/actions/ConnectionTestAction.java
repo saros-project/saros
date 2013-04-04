@@ -42,12 +42,12 @@ import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPException;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.internal.ConnectionTestManager;
 import de.fu_berlin.inf.dpp.net.internal.ConnectionTestManager.TestResult;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
@@ -83,7 +83,7 @@ public class ConnectionTestAction extends Action {
     };
 
     @Inject
-    protected Saros saros;
+    protected SarosNet sarosNet;
 
     @Inject
     protected ConnectionTestManager connectionTestManager;
@@ -96,7 +96,7 @@ public class ConnectionTestAction extends Action {
 
         SarosPluginContext.initComponent(this);
 
-        saros.getSarosNet().addListener(connectionListener);
+        sarosNet.addListener(connectionListener);
         SelectionUtils.getSelectionService().addSelectionListener(
             selectionListener);
         updateEnablement();
@@ -106,8 +106,7 @@ public class ConnectionTestAction extends Action {
         try {
             List<JID> buddies = SelectionRetrieverFactory
                 .getSelectionRetriever(JID.class).getSelection();
-            this.setEnabled(saros.getSarosNet().isConnected()
-                && buddies.size() == 1);
+            this.setEnabled(sarosNet.isConnected() && buddies.size() == 1);
         } catch (NullPointerException e) {
             this.setEnabled(false);
         } catch (Exception e) {
@@ -179,6 +178,6 @@ public class ConnectionTestAction extends Action {
     public void dispose() {
         SelectionUtils.getSelectionService().removeSelectionListener(
             selectionListener);
-        saros.getSarosNet().removeListener(connectionListener);
+        sarosNet.removeListener(connectionListener);
     }
 }

@@ -25,10 +25,10 @@ import org.eclipse.swt.graphics.ImageData;
 import org.jivesoftware.smack.Connection;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
+import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
@@ -36,7 +36,7 @@ import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 public class NewContactAction extends Action {
 
     @Inject
-    protected Saros saros;
+    protected SarosNet sarosNet;
 
     public NewContactAction() {
         setToolTipText(Messages.NewContactAction_tooltip);
@@ -49,7 +49,7 @@ public class NewContactAction extends Action {
 
         SarosPluginContext.initComponent(this);
 
-        saros.getSarosNet().addListener(new IConnectionListener() {
+        sarosNet.addListener(new IConnectionListener() {
             @Override
             public void connectionStateChanged(Connection connection,
                 ConnectionState newState) {
@@ -65,6 +65,6 @@ public class NewContactAction extends Action {
     }
 
     protected void updateEnablement() {
-        setEnabled(saros.getSarosNet().isConnected());
+        setEnabled(sarosNet.isConnected());
     }
 }

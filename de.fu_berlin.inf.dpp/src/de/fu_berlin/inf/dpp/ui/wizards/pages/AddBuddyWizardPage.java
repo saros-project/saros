@@ -14,9 +14,9 @@ import org.eclipse.swt.widgets.Text;
 import org.jivesoftware.smack.Roster;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.widgets.decoration.EmptyText;
 import de.fu_berlin.inf.dpp.ui.widgets.decoration.JIDCombo;
@@ -43,7 +43,7 @@ public class AddBuddyWizardPage extends WizardPage {
     public static final String DESCRIPTION = "Enter the XMPP/Jabber ID of the buddy you want to add."; //$NON-NLS-1$
 
     @Inject
-    protected Saros saros;
+    protected SarosNet sarosNet;
 
     protected JIDCombo jidCombo;
 
@@ -133,7 +133,7 @@ public class AddBuddyWizardPage extends WizardPage {
     }
 
     protected void updatePageCompletion() {
-        JID ownJid = saros.getSarosNet().getMyJID();
+        JID ownJid = sarosNet.getMyJID();
         JID foreignJid = this.getBuddy();
 
         if (foreignJid.isValid() && !foreignJid.equals(ownJid)
@@ -144,7 +144,7 @@ public class AddBuddyWizardPage extends WizardPage {
 
             wasJIDValid = true;
 
-            Roster roster = saros.getSarosNet().getRoster();
+            Roster roster = sarosNet.getRoster();
             if (roster != null && roster.contains(foreignJid.getBase())) {
                 setMessage(Messages.roster_alreadyadded_errorMessage
                     + "\n" + Messages.wizard_finish_noeffect, //$NON-NLS-1$

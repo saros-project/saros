@@ -5,14 +5,15 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.widgets.Composite;
 import org.jivesoftware.smack.Connection;
+import org.osgi.framework.Version;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
@@ -26,7 +27,11 @@ public class ConnectionStateComposite extends Composite {
         .getLogger(ConnectionStateComposite.class);
 
     @Inject
-    protected Saros saros;
+    protected SarosNet sarosNet;
+
+    @Inject
+    protected/* BUG IN PICO cannot resolve bindings in child containers */// @SarosVersion
+    Version version;
 
     @Inject
     protected XMPPAccountStore accountStore;
@@ -58,20 +63,20 @@ public class ConnectionStateComposite extends Composite {
         stateLabel.setLayoutData(LayoutUtils.createFillHGrabGridData());
         FontUtils.makeBold(stateLabel);
 
-        updateLabel(saros.getSarosNet().getConnectionState());
+        updateLabel(sarosNet.getConnectionState());
         this.stateLabel.setForeground(getDisplay().getSystemColor(
             SWT.COLOR_WHITE));
         this.stateLabel.setBackground(getDisplay().getSystemColor(
             SWT.COLOR_DARK_GRAY));
         this.setBackground(getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
 
-        saros.getSarosNet().addListener(connectionListener);
+        sarosNet.addListener(connectionListener);
     }
 
     @Override
     public void dispose() {
         super.dispose();
-        saros.getSarosNet().removeListener(connectionListener);
+        sarosNet.removeListener(connectionListener);
     }
 
     protected void updateLabel(ConnectionState newState) {
@@ -88,7 +93,7 @@ public class ConnectionStateComposite extends Composite {
 
             if (newState == ConnectionState.CONNECTED) {
                 stateLabel.setToolTipText(String.format(CONNECTED_TOOLTIP,
-                    saros.getVersion()));
+                    version));
             } else {
                 stateLabel.setToolTipText(null);
             }
@@ -110,7 +115,7 @@ public class ConnectionStateComposite extends Composite {
         switch (state) {
         case NOT_CONNECTED:
             // FIXME: fix SarosNet if no ERROR is reported !!!
-            e = saros.getSarosNet().getConnectionError();
+            e = sarosNet.getConnectionError();
             if (e != null
                 && e.toString().equalsIgnoreCase("stream:error (text)")) {
                 // the same user logged in via xmpp on another server/host
@@ -121,14 +126,14 @@ public class ConnectionStateComposite extends Composite {
         case CONNECTING:
             return Messages.ConnectionStateComposite_connecting;
         case CONNECTED:
-            JID jid = new JID(saros.getSarosNet().getConnection().getUser());
+            JID jid = new JID(sarosNet.getConnection().getUser());
             String displayText = jid.getBase()
                 + Messages.ConnectionStateComposite_connected;
             return displayText;
         case DISCONNECTING:
             return Messages.ConnectionStateComposite_disconnecting;
         case ERROR:
-            e = saros.getSarosNet().getConnectionError();
+            e = sarosNet.getConnectionError();
             if (e == null) {
                 return Messages.ConnectionStateComposite_error;
             } else if (e.toString().equalsIgnoreCase("stream:error (conflict)")) { //$NON-NLS-1$
