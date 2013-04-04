@@ -191,6 +191,12 @@ public final class SarosSession implements ISarosSession, Disposable {
 
     private MutablePicoContainer sessionContainer;
 
+    private StopManager stopManager;
+
+    private ChangeColorManager changeColorManager;
+
+    private ActivitySequencer activitySequencer;
+
     private final ActivityQueuer activityQueuer;
 
     private final IActivityListener activityListener = new IActivityListener() {
@@ -395,7 +401,7 @@ public final class SarosSession implements ISarosSession, Disposable {
 
     @Override
     public ActivitySequencer getSequencer() {
-        return sessionContainer.getComponent(ActivitySequencer.class);
+        return activitySequencer;
     }
 
     /**
@@ -1311,7 +1317,7 @@ public final class SarosSession implements ISarosSession, Disposable {
 
     @Override
     public StopManager getStopManager() {
-        return sessionContainer.getComponent(StopManager.class);
+        return stopManager;
     }
 
     @Override
@@ -1320,14 +1326,12 @@ public final class SarosSession implements ISarosSession, Disposable {
             throw new IllegalArgumentException("color id '" + colorID
                 + "'  must be in range of 0 <= id < " + MAX_USERCOLORS);
 
-        sessionContainer.getComponent(ChangeColorManager.class).changeColorID(
-            colorID);
+        changeColorManager.changeColorID(colorID);
     }
 
     @Override
     public Set<Integer> getAvailableColors() {
-        return sessionContainer.getComponent(ChangeColorManager.class)
-            .getAvailableColors();
+        return changeColorManager.getAvailableColors();
     }
 
     @Override
@@ -1399,6 +1403,14 @@ public final class SarosSession implements ISarosSession, Disposable {
             .getComponent(ConcurrentDocumentClient.class);
 
         activityHandler = sessionContainer.getComponent(ActivityHandler.class);
+
+        stopManager = sessionContainer.getComponent(StopManager.class);
+
+        changeColorManager = sessionContainer
+            .getComponent(ChangeColorManager.class);
+
+        activitySequencer = sessionContainer
+            .getComponent(ActivitySequencer.class);
 
         // ensure that the container uses caching
         assert sessionContainer.getComponent(ActivityHandler.class) == sessionContainer
