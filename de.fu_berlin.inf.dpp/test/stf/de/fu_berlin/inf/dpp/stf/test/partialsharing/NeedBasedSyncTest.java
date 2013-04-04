@@ -8,6 +8,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -26,6 +27,12 @@ public class NeedBasedSyncTest extends StfTestCase {
         ALICE.superBot().menuBar().saros().preferences()
             .setNeedBasedActivated(true);
 
+    }
+
+    @AfterClass
+    public static void disableNeedBased() throws Exception {
+        ALICE.superBot().menuBar().saros().preferences()
+            .setNeedBasedActivated(false);
     }
 
     @Before
@@ -245,10 +252,10 @@ public class NeedBasedSyncTest extends StfTestCase {
         BOB.superBot().confirmShellNewSharedFile(Constants.BACKUP);
 
         assertTrue(BOB.superBot().views().packageExplorerView()
-            .selectProject("foo").exists("file2_BACKUP"));
+            .selectProject("foo").exists("file2.BACKUP"));
 
         String contentBobFile2After = BOB.superBot().views()
-            .packageExplorerView().getFileContent("foo/file2_BACKUP");
+            .packageExplorerView().getFileContent("foo/file2.BACKUP");
 
         assertEquals(contentBobFile2Before, contentBobFile2After);
 

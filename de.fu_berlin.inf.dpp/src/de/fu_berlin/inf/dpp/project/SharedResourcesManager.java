@@ -42,7 +42,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.IJobManager;
@@ -210,7 +209,6 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
     }
 
     protected void handlePostChange(IResourceChangeEvent event) {
-        assert sarosSession != null;
 
         if (!sarosSession.hasWriteAccess()) {
             return;
@@ -462,11 +460,6 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
 
     protected void exec(FileActivity activity) throws CoreException {
 
-        if (this.sarosSession == null) {
-            log.warn("Project has ended for FileActivity " + activity);
-            return;
-        }
-
         SPath path = activity.getPath();
         IFile file = path.getFile();
 
@@ -496,7 +489,7 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
         FileActivity.Type type = activity.getType();
         if (type == FileActivity.Type.Created) {
             // TODO The progress should be reported to the user.
-            SubMonitor monitor = SubMonitor.convert(new NullProgressMonitor());
+            IProgressMonitor monitor = new NullProgressMonitor();
             boolean needBased = activity.isNeedBased();
 
             if (needBased) {
@@ -509,26 +502,33 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
                         log.debug("Checksum could not be generated.", e1);
                     }
                 }
-                // check if there is already that file in workspace or the files
-                // even completely match
-                if (file.exists() && !remoteChecksum.equals(localChecksum)) {
-                    editorManager.closeEditor(path);
-                    // ask the user what to do
-                    if (CollaborationUtils.needBasedFileHandlingDialog(activity
-                        .getSource().getHumanReadableName(), file.getName(),
-                        true)) {
-                        // TRUE: backup/rename and than overwrite
-                        try {
+
+                if (wasOpenedEditor
+                /*
+                 * FIMXE ALWAYS ASK THE USER IF WE OVERWRITE / MODIFY FILES EVEN
+                 * IF THE CONTENT IS THE SAME !
+                 */
+                || (file.exists() && !remoteChecksum.equals(localChecksum))) {
+
+                    boolean backupFile = CollaborationUtils
+                        .needBasedFileHandlingDialog(activity.getSource()
+                            .getHumanReadableName(), file.getName(), true);
+
+                    try {
+                        if (wasOpenedEditor) {
                             editorManager.saveLazy(path);
-                            FileUtils.backupFile(file, monitor);
-                        } catch (FileNotFoundException e) {
-                            log.error(
-                                "File could not be found, despite existing: "
-                                    + path, e);
+                            editorManager.closeEditor(path);
                         }
+
+                        if (backupFile)
+                            FileUtils.backupFile(file, monitor);
+
+                    } catch (FileNotFoundException e) {
+                        log.error("File could not be found, despite existing: "
+                            + path, e);
                     }
                 } else {
-                    editorManager.closeEditor(path);
+                    // WTF ? this only pops up a balloon notification
                     CollaborationUtils.needBasedFileHandlingDialog(activity
                         .getSource().getHumanReadableName(), file.getName(),
                         false);

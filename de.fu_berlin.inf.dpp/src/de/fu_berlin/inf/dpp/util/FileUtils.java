@@ -16,6 +16,7 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRunnable;
@@ -148,7 +149,8 @@ public class FileUtils {
     }
 
     /**
-     * Move the file to the same location, with a trailed "_BACKUP" on file
+     * Move the file to the same location, adding the file extension "BACKUP" or
+     * "_BACKUP_X" on file name where X is a number that matches a not used file
      * name.
      * 
      * @param file
@@ -158,12 +160,30 @@ public class FileUtils {
      * @throws CoreException
      * @throws FileNotFoundException
      */
-    public static void backupFile(IFile file, SubMonitor monitor)
+    public static void backupFile(IFile file, IProgressMonitor monitor)
         throws CoreException, FileNotFoundException {
+
         if (!file.exists())
             throw new FileNotFoundException();
-        IPath newPath = new Path(file.getName().concat("_BACKUP"));
-        file.move(newPath, true, monitor);
+
+        IProject project = file.getProject();
+
+        IPath originalBackupPath = file.getProjectRelativePath()
+            .addFileExtension("BACKUP");
+
+        IPath backupPath = originalBackupPath;
+
+        for (int i = 0; i < 1000; i++) {
+            if (!project.exists(backupPath))
+                break;
+
+            backupPath = originalBackupPath.removeFileExtension()
+                .addFileExtension("BACKUP_" + i);
+        }
+
+        file.move(
+            file.getFullPath().removeLastSegments(1)
+                .append(backupPath.lastSegment()), true, monitor);
     }
 
     /**
