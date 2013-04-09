@@ -47,8 +47,6 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
 
     private static final Random INVITATION_ID_GENERATOR = new Random();
 
-    private static final Object SESSION_JOIN_LOCK = new Object();
-
     private ISarosSession sarosSession;
 
     private VersionInfo remoteVersionInfo;
@@ -412,7 +410,7 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
 
         User user = new User(sarosSession, peer, colorID, favoriteColorID);
 
-        synchronized (SESSION_JOIN_LOCK) {
+        synchronized (CancelableProcess.SHARED_LOCK) {
 
             sarosSession.addUser(user);
             log.debug(this + " : added " + Utils.prefix(peer)

@@ -260,30 +260,43 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         MappedList<String, IPath> projectFilesToSend, IProgressMonitor monitor)
         throws IOException, SarosCancellationException {
 
+        Collection<User> usersToStop;
+
         /*
-         * STOP users
+         * Make sure that all users are fully registered, otherwise failures
+         * might occur while a user is currently joining and has not fully
+         * initialized yet.
          * 
-         * TODO: stop all users. If we stop users which are currently joining,
-         * it can cause a deadlock, because the StopManager does not answer if
-         * someone is already stopped.
+         * See also OutgoingSessionNegotiation#completeInvitation
          */
-        Collection<User> usersToStop = new ArrayList<User>(
-            sarosSession.getParticipants());
+
+        synchronized (CancelableProcess.SHARED_LOCK) {
+            usersToStop = new ArrayList<User>(sarosSession.getParticipants());
+        }
 
         log.debug(this + " : stopping users " + usersToStop);
-        // TODO: startHandles outside of sync block?
+
         List<StartHandle> startHandles;
 
         monitor.beginTask("Locking the session...", IProgressMonitor.UNKNOWN);
 
-        synchronized (sarosSession) {
-            try {
-                startHandles = sarosSession.getStopManager().stop(usersToStop,
-                    "Synchronizing invitation", monitor);
-            } catch (CancellationException e) {
-                checkCancellation(CancelOption.NOTIFY_PEER);
-                return null;
-            }
+        /*
+         * FIMXE the StopManager should use a timeout as it can happen that a
+         * user leaves the session during the stop request. Currently it is up
+         * to the user to press the cancel button because the StopManager did
+         * not check if the user already left the session.
+         * 
+         * Stefan Rossbach: The StopManager should not check for the absence of
+         * a user and so either retry again or just stop the sharing (which
+         * currently would lead to a broken session because we have no proper
+         * cancellation logic !
+         */
+        try {
+            startHandles = sarosSession.getStopManager().stop(usersToStop,
+                "Synchronizing invitation", monitor);
+        } catch (CancellationException e) {
+            checkCancellation(CancelOption.NOTIFY_PEER);
+            return null;
         }
 
         monitor.done();
