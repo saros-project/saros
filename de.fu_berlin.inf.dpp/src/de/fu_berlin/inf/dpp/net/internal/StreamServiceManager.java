@@ -1377,7 +1377,7 @@ public class StreamServiceManager implements Startable {
                 final User from = sarosSession.getUser(transferDescription
                     .getSender());
                 if (from == null) {
-                    log.warn("Buddy left, discarding packet!");
+                    log.warn("user left, discarding packet!");
                     return;
                 }
 

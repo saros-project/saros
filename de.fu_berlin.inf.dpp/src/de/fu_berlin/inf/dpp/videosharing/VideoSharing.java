@@ -703,8 +703,9 @@ public class VideoSharing {
 
         /**
          * Reports an error during the session, disposes it and reports to the
-         * local and buddy. Only the first one in this session will be reported,
-         * subsequent errors (which may occur while disposing) will be ignored.
+         * local and remote user. Only the first one in this session will be
+         * reported, subsequent errors (which may occur while disposing) will be
+         * ignored.
          * 
          * @param e
          */

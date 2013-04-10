@@ -239,13 +239,13 @@ public final class StopManager extends AbstractActivityProvider implements
 
                             StartHandle startHandle = stop(user, cause, monitor);
                             resultingHandles.add(startHandle);
-                            log.debug("Added " + startHandle
+                            log.debug("added " + startHandle
                                 + " to resulting handles.");
                         } catch (CancellationException e) {
-                            log.debug("Buddy canceled the Stopping");
+                            log.debug("user canceled the stopping");
                             monitor.setCanceled(true);
                         } catch (InterruptedException e) {
-                            log.debug("Canceling because of an InterruptedException");
+                            log.debug("canceling because of an InterruptedException");
                             monitor.setCanceled(true);
                         }
                     }

@@ -154,9 +154,9 @@ public class SendFileJob extends StreamJob {
      * @throws IOException
      *             Error while reading file or writing to stream.
      * @throws RemoteCancellationException
-     *             buddy canceled.
+     *             remote user canceled the operation
      * @throws SarosCancellationException
-     *             Local user canceled monitor.
+     *             local user canceled the operation
      */
     protected void send(StreamSession session, File file, SubMonitor monitor)
         throws RemoteCancellationException, IOException,

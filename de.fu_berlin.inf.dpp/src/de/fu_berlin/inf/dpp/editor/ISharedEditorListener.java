@@ -92,7 +92,7 @@ public interface ISharedEditorListener {
 
     /**
      * Is fired after a text selection is executed locally when received by a
-     * buddy.
+     * user.
      * 
      * @param selection
      *            The text selection made as a {@link TextSelectionActivity}

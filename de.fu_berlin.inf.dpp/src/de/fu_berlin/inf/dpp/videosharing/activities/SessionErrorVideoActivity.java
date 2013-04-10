@@ -20,7 +20,7 @@
 package de.fu_berlin.inf.dpp.videosharing.activities;
 
 /**
- * Carries an exception to the buddy for information.
+ * Carries an exception to the user for information.
  * 
  * @author s-lau
  */

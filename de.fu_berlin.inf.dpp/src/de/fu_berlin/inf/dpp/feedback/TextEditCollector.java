@@ -58,13 +58,13 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * The threshold was chosen to be 16 due to some testing. The characters within
  * a textEditActivity heavily depends on the connection speed. When a the local
  * user fires several textEdits within a short interval he might see those edits
- * as several single edits with a few characters but a buddy will most likely
- * get less textEditActivities containing a bunch of characters. The manual
- * tests results were: When "typing" (rather thrashing the keyboard) as fast as
- * one could, the buddy received text edits with up to 20 characters. As this
- * typing speed is beyond human capabilities, I've decided to set the threshold
- * to 16 which will most likely prevent getting false positives (e.g. a really
- * fast typer is typing instead of a paste). Unfortunately, this relatively high
+ * as several single edits with a few characters but a user will most likely get
+ * less textEditActivities containing a bunch of characters. The manual tests
+ * results were: When "typing" (rather thrashing the keyboard) as fast as one
+ * could, the user received text edits with up to 20 characters. As this typing
+ * speed is beyond human capabilities, I've decided to set the threshold to 16
+ * which will most likely prevent getting false positives (e.g. a really fast
+ * typer is typing instead of a paste). Unfortunately, this relatively high
  * threshold will cause the collector to slip some true pastes as well. (E.g. an
  * auto completion of a comment block)
  * 
@@ -110,7 +110,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * 1);
  * 
  * TODO: synchronize the numbers the buddies get with the other collectors (E.g.
- * Alice as buddy should appear as user.2 in all statistic fields.
+ * Alice as user should appear as user.2 in all statistic fields.
  * 
  * @author Lisa Dohrmann, Moritz von Hoffen
  */
@@ -285,7 +285,7 @@ public class TextEditCollector extends AbstractStatisticCollector {
         // iterate through the map and write written char count to session data
         for (Map.Entry<JID, Integer> entry : remoteCharCount.entrySet()) {
             JID currentId = entry.getKey();
-            // get character count for this buddy
+            // get character count for this user
             Integer charCount = entry.getValue();
             // write the count to the session data
             data.setRemoteUserCharCount(userNumber, charCount);

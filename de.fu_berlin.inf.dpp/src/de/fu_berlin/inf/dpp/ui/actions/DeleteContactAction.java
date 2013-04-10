@@ -175,7 +175,7 @@ public class DeleteContactAction extends Action implements Disposable {
                 RosterUtils.removeFromRoster(sarosNet.getConnection(),
                     rosterEntry);
             } catch (XMPPException e) {
-                log.error("Could not delete buddy " + toString(rosterEntry) //$NON-NLS-1$
+                log.error("could not delete contact " + toString(rosterEntry) //$NON-NLS-1$
                     + ":", e); //$NON-NLS-1$
             }
         }

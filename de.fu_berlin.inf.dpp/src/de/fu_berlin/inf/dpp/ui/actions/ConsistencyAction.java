@@ -145,7 +145,7 @@ public class ConsistencyAction extends Action {
 
             @Override
             public void run() {
-                log.debug("Buddy activated CW recovery."); //$NON-NLS-1$
+                log.debug("user activated CW recovery."); //$NON-NLS-1$
 
                 Shell dialogShell = EditorAPI.getShell();
                 if (dialogShell == null)

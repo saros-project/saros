@@ -312,7 +312,6 @@ public class SkypeManager implements IConnectionListener {
             return null;
         }
 
-        // Request the time from a buddy.
         IQ request = skypeProvider.createIQ(null);
 
         request.setType(IQ.Type.GET);

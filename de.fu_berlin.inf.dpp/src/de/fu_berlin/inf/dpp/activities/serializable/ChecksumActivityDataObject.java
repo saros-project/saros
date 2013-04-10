@@ -23,10 +23,9 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
  * To indicate that a file is missing on the host NON_EXISTING_DOC is used.
  * 
  * A checksum also may contain a JupiterTimestamp to indicate at which point of
- * time the checksum was created. A buddy can use this information to see
- * whether the checksum can be used to check for consistency or whether the
- * local user has already written additional text which invalidates the
- * checksum.
+ * time the checksum was created. A user can use this information to see whether
+ * the checksum can be used to check for consistency or whether the local user
+ * has already written additional text which invalidates the checksum.
  */
 @XStreamAlias("checksumActivity")
 public class ChecksumActivityDataObject extends

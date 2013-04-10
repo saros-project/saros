@@ -31,7 +31,7 @@ import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactor
 
 /**
  * This class fills a {@link Menu} with {@link MenuItem}s.<br/>
- * Each {@link MenuItem} represents a Saros enabled buddy.<br/>
+ * Each {@link MenuItem} represents a Saros enabled contact.<br/>
  * A click leads to a shared project invitation.
  */
 public class ProjectShareBuddies extends ContributionItem {

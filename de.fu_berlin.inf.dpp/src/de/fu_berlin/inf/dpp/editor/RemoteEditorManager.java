@@ -74,8 +74,8 @@ public class RemoteEditorManager {
     }
 
     /**
-     * This class represents the state of the editors, viewports, selection of
-     * one buddy.
+     * This class represents the state of the editors, viewports and selection
+     * of a user.
      */
     public static class RemoteEditorState {
 
@@ -92,7 +92,7 @@ public class RemoteEditorManager {
         public void setSelection(SPath path, ITextSelection selection) {
 
             if (!openEditors.containsKey(path)) {
-                log.warn("Received selection from buddy [" + this.user
+                log.warn("received selection from user [" + this.user
                     + "] for editor which was never activated: " + path);
                 return;
             }
@@ -232,7 +232,7 @@ public class RemoteEditorManager {
         }
 
         /**
-         * Returns a snapshot copy of the editors open for the buddy represented
+         * Returns a snapshot copy of the editors open for the user represented
          * by this RemoteEditorState.
          */
         public Set<SPath> getRemoteOpenEditors() {
@@ -321,7 +321,7 @@ public class RemoteEditorManager {
 
     /**
      * Returns a snapshot copy of all paths representing the editors which are
-     * currently opened by the given buddy of this shared session (i.e. not our
+     * currently opened by the given user of this shared session (i.e. not our
      * own).
      * 
      * If no editors are opened by the given user an empty set is being

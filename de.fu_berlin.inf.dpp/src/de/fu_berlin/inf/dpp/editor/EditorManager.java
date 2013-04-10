@@ -655,8 +655,8 @@ public class EditorManager extends AbstractActivityProvider {
             return;
 
         if (sarosSession == null) {
-            log.error("Shared Project has ended, but text edits"
-                + " are received from local buddy.");
+            log.error("session has ended but text edits"
+                + " are received from local user");
             return;
         }
 
@@ -744,8 +744,8 @@ public class EditorManager extends AbstractActivityProvider {
 
         User sender = activity.getSource();
         if (!sender.isInSarosSession()) {
-            log.warn("Trying to execute activityDataObject for unknown buddy: "
-                + activity);
+            log.warn("skipping execution of activity " + activity
+                + " for user " + sender + " who is not in the current session");
             return;
         }
 
@@ -1436,7 +1436,7 @@ public class EditorManager extends AbstractActivityProvider {
         if (!provider.canSaveDocument(input)) {
             /*
              * This happens when a file which is already saved is saved again by
-             * a buddy
+             * a user.
              */
             log.debug(".saveText File " + file.getName()
                 + " does not need to be saved");
@@ -1486,7 +1486,7 @@ public class EditorManager extends AbstractActivityProvider {
             }
 
             if (monitor.isCanceled()) {
-                log.warn("Saving was canceled by buddy: " + path);
+                log.warn("saving was canceled by user: " + path);
             }
 
             dirtyStateListener.enabled = true;
@@ -1644,7 +1644,7 @@ public class EditorManager extends AbstractActivityProvider {
      */
     public void setFollowing(User newFollowedUser) {
         assert newFollowedUser == null
-            || !newFollowedUser.equals(sarosSession.getLocalUser()) : "Local buddy cannot follow himself!";
+            || !newFollowedUser.equals(sarosSession.getLocalUser()) : "local user cannot follow himself!";
 
         User oldFollowedUser = this.followedUser;
         this.followedUser = newFollowedUser;

@@ -97,7 +97,7 @@ public class ActivitiesHandler {
         if (session == null || session.getUser(fromJID) == null) {
             log.warn("Rcvd (" + String.format("%03d", timedActivities.size())
                 + ") " + Utils.prefix(fromJID)
-                + " but buddy is no participant: " + timedActivities);
+                + " but user is no participant: " + timedActivities);
             return;
         } else {
             String msg = "Rcvd ("

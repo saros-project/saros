@@ -174,7 +174,7 @@ public class ConcurrentDocumentServer implements Startable {
             User to = sarosSession.getUser(jid);
 
             if (to == null) {
-                log.error("Unknown buddy in transformation result: "
+                log.error("unknown user in transformation result: "
                     + Utils.prefix(jid));
                 continue;
             }
@@ -227,7 +227,7 @@ public class ConcurrentDocumentServer implements Startable {
             User to = sarosSession.getUser(jid);
 
             if (to == null) {
-                log.error("Unknown buddy in transformation result: "
+                log.error("unknown user in transformation result: "
                     + Utils.prefix(jid));
                 continue;
             }

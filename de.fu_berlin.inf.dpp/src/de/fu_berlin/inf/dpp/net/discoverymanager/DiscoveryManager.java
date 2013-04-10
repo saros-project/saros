@@ -95,10 +95,10 @@ public class DiscoveryManager implements Disposable {
             DiscoverInfoWrapper infoWrapper = cache.remove(rjid);
             if (infoWrapper != null) {
                 if (infoWrapper.isAvailable()) {
-                    log.debug("Clearing cache entry of buddy " + rjid + ": "
+                    log.debug("clearing cache entry of contact " + rjid + ": "
                         + infoWrapper.item.getChildElementXML());
                 } else {
-                    log.debug("Clearing cache entry of buddy " + rjid
+                    log.debug("clearing cache entry of contact " + rjid
                         + " but cache entry is empty (a discovery is "
                         + "still running or the last one failed)");
                 }
@@ -308,9 +308,9 @@ public class DiscoveryManager implements Disposable {
      * 
      * @nonblocking This method start a new ASync thread.
      */
-    public void cacheSarosSupport(final JID buddy) {
+    public void cacheSarosSupport(final JID contact) {
         try {
-            isSupportedNonBlock(buddy, Saros.NAMESPACE);
+            isSupportedNonBlock(contact, Saros.NAMESPACE);
         } catch (CacheMissException e) {
             supportExecutor.execute(new Runnable() {
                 @Override
@@ -318,7 +318,7 @@ public class DiscoveryManager implements Disposable {
                     Utils.runSafeAsync("GetSarosSupport", log, new Runnable() {
                         @Override
                         public void run() {
-                            isSarosSupported(buddy);
+                            isSarosSupported(contact);
                         }
                     });
                 }

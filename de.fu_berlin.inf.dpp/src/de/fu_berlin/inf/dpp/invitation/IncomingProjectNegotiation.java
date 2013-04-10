@@ -154,8 +154,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * @param projectNames
      *            In this parameter the names of the projects are stored. They
      *            key is the session wide <code><b>projectID</b></code> and the
-     *            value is the name of the project in the workspace of the
-     *            invited buddy (given from the {@link EnterProjectNamePage})
+     *            value is the name of the project in the workspace of the local
+     *            user (given from the {@link EnterProjectNamePage})
      */
     public Status accept(Map<String, String> projectNames,
         IProgressMonitor monitor, Map<String, Boolean> skipSyncs,

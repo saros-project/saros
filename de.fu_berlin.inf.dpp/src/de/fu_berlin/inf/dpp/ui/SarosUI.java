@@ -253,7 +253,7 @@ public class SarosUI {
                             progress);
 
                     } catch (CancellationException e) {
-                        log.warn("Permission change failed because buddy canceled the permission change"); //$NON-NLS-1$
+                        log.warn("permission change failed because user canceled the permission change"); //$NON-NLS-1$
                         SWTUtils.runSafeSWTSync(log, new Runnable() {
                             @Override
                             public void run() {

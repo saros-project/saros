@@ -9,9 +9,9 @@ import de.fu_berlin.inf.dpp.net.JID;
  */
 public class IncomingSubscriptionEvent {
     /**
-     * The buddy who sent the subscription request
+     * The contact who sent the subscription request
      */
-    protected JID buddy;
+    protected JID contact;
 
     /**
      * If set to true the throwing {@link SubscriptionManager} will
@@ -19,15 +19,15 @@ public class IncomingSubscriptionEvent {
      */
     public boolean autoSubscribe = false;
 
-    public IncomingSubscriptionEvent(JID buddy) {
+    public IncomingSubscriptionEvent(JID contact) {
         super();
-        this.buddy = buddy;
+        this.contact = contact;
     }
 
     /**
-     * Gets the buddy who send the subscription request.
+     * Gets the contact who send the subscription request.
      */
     public JID getBuddy() {
-        return buddy;
+        return contact;
     }
 }

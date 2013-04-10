@@ -147,7 +147,7 @@ public class AudioServiceManager {
     /**
      * Invite a target user to a new VoIP Session
      * 
-     * @blocking until the buddy accepts or rejects the call
+     * @blocking until the user accepts or rejects the call
      */
     public IStatus invite(final User target, SubMonitor monitor) {
 

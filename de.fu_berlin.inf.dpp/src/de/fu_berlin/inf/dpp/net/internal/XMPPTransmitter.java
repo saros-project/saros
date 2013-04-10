@@ -146,10 +146,10 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
                 jid = new JID(result.getFrom());
                 if (!fromUserJIDs.remove(jid)) {
-                    log.warn("Buddy list confirmation from unknown buddy: "
+                    log.warn("user list confirmation from unknown user: "
                         + Utils.prefix(jid));
                 } else {
-                    log.debug("Buddy list confirmation from: "
+                    log.debug("user list confirmation from: "
                         + Utils.prefix(jid));
                 }
                 /*
@@ -303,14 +303,14 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     }
 
     /**
-     * Sends a message to a buddy
+     * Sends a message to a user.
      * 
      * @param jid
-     *            buddy the message is send to
+     *            user the message is send to
      * @param extension
      *            extension that is send
      * @param sessionMembersOnly
-     *            if true extension is only send if the buddy is in the same
+     *            if true extension is only send if the user is in the same
      *            session
      */
     private void sendMessageToUser(JID jid, PacketExtension extension,

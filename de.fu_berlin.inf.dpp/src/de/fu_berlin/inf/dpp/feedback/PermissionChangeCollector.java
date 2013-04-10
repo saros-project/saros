@@ -105,7 +105,7 @@ public class PermissionChangeCollector extends AbstractStatisticCollector {
 
             assert count == permissions.size();
         } else {
-            log.warn("The permission of the buddy couldn't be determined");
+            log.warn("the permission of the user could not be determined");
             data.setPermission(0, "none");
         }
 

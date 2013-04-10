@@ -51,7 +51,7 @@ public class CancelInviteHandler {
             .getInvitationProcess(sender, invitationID);
 
         if (invitationProcess == null) {
-            log.warn("Inv[unkown buddy]: Received invitation cancel message for unknown invitation process. Ignoring...");
+            log.warn("Inv[unkown user]: Received invitation cancel message for unknown invitation process. Ignoring...");
             return;
         }
 

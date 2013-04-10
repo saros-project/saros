@@ -457,14 +457,14 @@ public final class SarosSession implements ISarosSession {
     @Override
     public void setPermission(final User user, final Permission permission) {
 
-        assert SWTUtils.isSWT() : "Must be called from SWT Thread"; //$NON-NLS-1$
+        assert SWTUtils.isSWT() : "Must be called from SWT Thread";
 
         if (user == null || permission == null)
             throw new IllegalArgumentException();
 
         user.setPermission(permission);
 
-        log.info("Buddy " + user + " is now a " + permission); //$NON-NLS-1$ //$NON-NLS-2$
+        log.info("user " + user + " is now a " + permission);
 
         listenerDispatch.permissionChanged(user);
     }
@@ -522,8 +522,8 @@ public final class SarosSession implements ISarosSession {
         JID jid = user.getJID();
 
         if (participants.putIfAbsent(jid, user) != null) {
-            log.error("Buddy " + Utils.prefix(jid) //$NON-NLS-1$
-                + " added twice to SarosSession", new StackTrace()); //$NON-NLS-1$
+            log.error("user " + Utils.prefix(jid)
+                + " added twice to SarosSession", new StackTrace());
             throw new IllegalArgumentException();
         }
 
@@ -545,14 +545,14 @@ public final class SarosSession implements ISarosSession {
             }
         }));
 
-        log.info("Buddy " + Utils.prefix(jid) + " joined session."); //$NON-NLS-1$ //$NON-NLS-2$
+        log.info("user " + Utils.prefix(jid) + " joined session");
     }
 
     @Override
     public void removeUser(User user) {
         JID jid = user.getJID();
         if (participants.remove(jid) == null) {
-            log.warn("Tried to remove buddy who was not in participants:"
+            log.warn("tried to remove user who was not in participants:"
                 + Utils.prefix(jid));
             return;
         }
@@ -566,7 +566,7 @@ public final class SarosSession implements ISarosSession {
         // prevent idling connection when not needed anymore.
         transferManager.closeConnection(jid);
 
-        log.info("Buddy " + Utils.prefix(jid) + " left session"); //$NON-NLS-1$ //$NON-NLS-2$
+        log.info("user " + Utils.prefix(jid) + " left session");
     }
 
     @Override

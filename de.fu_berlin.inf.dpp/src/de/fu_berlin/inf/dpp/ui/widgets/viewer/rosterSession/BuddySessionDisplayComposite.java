@@ -260,9 +260,6 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
         /*
          * Double click on a session participant in Saros view jumps to position
          * of clicked user.
-         * 
-         * Double click on a buddy in the roster adds its JID (bare component
-         * part) to the active chat tab input
          */
         final Control control = getViewer().getControl();
         control.addMouseListener(new MouseAdapter() {
@@ -389,7 +386,7 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
             public boolean select(Viewer viewer, Object parentElement,
                 Object element) {
                 /*
-                 * Don't show buddies in the buddylist that are part of the
+                 * Don't show contacts in the contact list that are part of the
                  * session
                  */
                 if (element instanceof RosterEntryElement) {

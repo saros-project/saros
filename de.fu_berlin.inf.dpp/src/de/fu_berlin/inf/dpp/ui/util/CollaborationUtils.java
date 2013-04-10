@@ -213,11 +213,11 @@ public class CollaborationUtils {
             .getSarosSession();
 
         if (sarosSession == null) {
-            log.warn("cannot add buddies to a non-running session");
+            log.warn("cannot add contacts to a non-running session");
             return;
         }
 
-        Utils.runSafeAsync("AddBuddyToSession", log, new Runnable() {
+        Utils.runSafeAsync("AddContactToSession", log, new Runnable() {
             @Override
             public void run() {
 

@@ -106,7 +106,7 @@ public class ActivitySequencer implements Startable {
     protected Map<User, List<IActivityDataObject>> queuedOutgoingActivitiesOfUsers;
 
     /**
-     * A priority queue for timed activityDataObjects. For each buddy there is
+     * A priority queue for timed activityDataObjects. For each user there is
      * one ActivityQueue, in which received events from those are stored.<br>
      * TODO "Timestamps" are treated more like consecutive sequence numbers, so
      * maybe all names and documentation should be changed to reflect this.

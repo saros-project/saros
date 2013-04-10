@@ -50,7 +50,7 @@ public abstract class StreamService {
     public abstract void startSession(StreamSession newSession);
 
     /**
-     * buddy requests a session
+     * User requests a session.
      * 
      * @param from
      *            {@link User} to start a session with

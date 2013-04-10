@@ -121,8 +121,8 @@ public class LeaveAndKickHandler {
 
         final User user = sarosSession.getUser(from);
         if (user == null) {
-            log.warn("Received leave message from buddy who"
-                + " is not part of our shared project session: " + from);
+            log.warn("received leave message from user who"
+                + " is not part of the current session: " + from);
             return;
         }
 

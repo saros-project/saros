@@ -14,7 +14,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * A TransferDescription contains all necessary information for dealing with
- * FileTransfers to a buddy via Jingle, IBB or Chat.
+ * FileTransfers to a user via Socks5 or IBB.
  * 
  * Instances of this class may not be reused but should be treated as value
  * objects, otherwise serialization will fail.
