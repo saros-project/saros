@@ -26,7 +26,7 @@ public class MenuSarosByAliceBobCarlTest extends StfTestCase {
         Util.setUpSessionWithJavaProjectAndClass(Constants.PROJECT1,
             Constants.PKG1, Constants.CLS1, ALICE, BOB);
         assertFalse(CARL.superBot().views().sarosView().isInSession());
-        Util.inviteBuddies(Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT,
+        Util.addTestersToSession(Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT,
             ALICE, CARL);
 
         CARL.superBot().views().packageExplorerView()

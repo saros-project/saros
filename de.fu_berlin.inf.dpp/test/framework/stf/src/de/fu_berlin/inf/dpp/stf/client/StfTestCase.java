@@ -127,7 +127,7 @@ public abstract class StfTestCase {
     /**
      * Calls
      * <ol>
-     * <li>reset all buddy names by calling
+     * <li>reset all contact names by calling
      * {@linkplain #initTesters(AbstractTester, AbstractTester...)}</li>
      * <li>{@linkplain #setUpWorkbench()}</li>
      * <li>{@linkplain #setUpSaros()}</li>
@@ -186,8 +186,8 @@ public abstract class StfTestCase {
      * Tries to reset Saros to a stable state for the given tester(s). It does
      * that be performing the following actions
      * <ol>
-     * <li>reset all buddy names by calling
-     * {@linkplain #resetBuddyNames(AbstractTester)}</li>
+     * <li>reset all contact names by calling
+     * {@linkplain #resetNicknames(AbstractTester)}</li>
      * <li>disconnect from the current session</li>
      * <li>delete the contents of the workspace</li>
      * </ol>
@@ -293,12 +293,12 @@ public abstract class StfTestCase {
     }
 
     /**
-     * Brings Saros to a original state before beginning your tests
+     * Brings Saros to a original state before beginning your tests.
      * <ul>
      * <li>make automaticReminder disable</li>
      * <li>open sarosViews</li>
      * <li>connect</li>
-     * <li>check buddy lists, if all active testers are in contact</li>
+     * <li>ensured that all testers are available in each testers contact list</li>
      * </ul>
      * 
      * @throws Exception
@@ -329,8 +329,8 @@ public abstract class StfTestCase {
         }
         for (AbstractTester tester : currentTesters) {
             try {
-                resetBuddyNames(tester);
-                resetBuddies(tester);
+                resetNicknames(tester);
+                resetContacts(tester);
             } catch (Exception e) {
                 if (exception != null)
                     exception = e;
@@ -342,7 +342,7 @@ public abstract class StfTestCase {
     }
 
     /**
-     * Resets the workbench for every active tester to their original state
+     * Resets the workbench for every active tester to their original state.
      * 
      * @see IRemoteWorkbenchBot#resetWorkbench()
      * @throws Exception
@@ -356,7 +356,7 @@ public abstract class StfTestCase {
     }
 
     /**
-     * Closes all editors for all active testers
+     * Closes all editors for all active testers.
      * 
      * @see IRemoteWorkbenchBot#closeAllShells()
      * @throws Exception
@@ -369,7 +369,7 @@ public abstract class StfTestCase {
     }
 
     /**
-     * Closes all shells for all active testers
+     * Closes all shells for all active testers.
      * 
      * @see IRemoteWorkbenchBot#closeAllShells()
      * @throws Exception
@@ -403,8 +403,8 @@ public abstract class StfTestCase {
     }
 
     /**
-     * Resets the buddy names for all active testers to their original by
-     * sequentially calling {@link #resetBuddyNames(AbstractTester)}
+     * Resets the nicknames in the contact list for all active testers by
+     * sequentially calling {@link #resetNicknames(AbstractTester)}.
      * 
      * @throws IllegalStateException
      *             if one of the current testers is not connected
@@ -412,14 +412,14 @@ public abstract class StfTestCase {
      *             for any other (internal) failure
      */
 
-    public static void resetBuddyNames() throws Exception {
+    public static void resetNicknames() throws Exception {
         for (AbstractTester tester : currentTesters)
-            resetBuddyNames(tester);
+            resetNicknames(tester);
     }
 
     /**
-     * Resets the names of all buddies for the tester to their original states
-     * as defined in the configuration file
+     * Resets the nicknames of all contacts in the contact list of the tester to
+     * their original states (base JID) as defined in the configuration file.
      * 
      * @param tester
      *            the tester
@@ -429,7 +429,7 @@ public abstract class StfTestCase {
      *             for any other (internal) failure
      */
 
-    public static void resetBuddyNames(AbstractTester tester) throws Exception {
+    public static void resetNicknames(AbstractTester tester) throws Exception {
 
         if (!tester.superBot().views().sarosView().isConnected())
             throw new IllegalStateException(tester + " is not connected");
@@ -448,39 +448,39 @@ public abstract class StfTestCase {
     }
 
     /**
-     * Resets the buddies for all active testers to their original by
-     * sequentially calling {@link #resetBuddies(AbstractTester)}
+     * Resets the contacts for all active testers to their original by
+     * sequentially calling {@link #resetContacts(AbstractTester)}
      * 
      * @throws IllegalStateException
      *             if one of the current testers is not connected
      * @throws Exception
      *             for any other (internal) failure
      * */
-    public static void resetBuddies() throws Exception {
+    public static void resetContacts() throws Exception {
         for (AbstractTester tester : currentTesters)
-            resetBuddies(tester);
+            resetContacts(tester);
     }
 
     /**
-     * Resets the buddies of the tester to their original states as defined in
-     * the configuration file. E.g if the test case included ALICE, BOB and
-     * CARL, and ALICE removed BOB from her roster then after the method returns
-     * ALICE will have BOB again in her roster and also BOB will have ALICE back
-     * in his roster.
+     * Resets the contacts of the tester to their original states as defined in
+     * the configuration file. E.g if the test case included ALICE, BOB and CARL
+     * and ALICE removed BOB from her contact list then after the method returns
+     * ALICE will have BOB again in her contact list and also BOB will have
+     * ALICE back in his contact list.
      * 
      * @param tester
      *            the tester
      * @throws IllegalStateException
-     *             if the tester or one of its buddies is not connected
+     *             if one of the current testers is not connected
      * @throws Exception
      *             for any other (internal) failure
      */
 
-    public static void resetBuddies(AbstractTester tester) throws Exception {
+    public static void resetContacts(AbstractTester tester) throws Exception {
         for (int i = 0; i < currentTesters.size(); i++) {
             if (tester == currentTesters.get(i))
                 continue;
-            Util.addBuddiesToContactList(tester, currentTesters.get(i));
+            Util.addTestersToContactList(tester, currentTesters.get(i));
         }
     }
 
@@ -520,7 +520,7 @@ public abstract class StfTestCase {
     }
 
     /**
-     * Stops the current session for all participants. The host is leaving the
+     * Stops the current session for all testers. The host is leaving the
      * session first.
      * 
      * 
@@ -547,11 +547,12 @@ public abstract class StfTestCase {
     }
 
     /**
-     * Define the leave session with the following steps.
+     * Stops the current session for all testers. The host is the last one who
+     * is leaving the session.
      * <ol>
-     * <li>All invitees leave the session first.(concurrently)</li>
-     * <li>Host waits until all invitees are no longer in the session.</li>
-     * <li>Host leaves the session</li>
+     * <li>All non-host session users leave the session first.(concurrently)</li>
+     * <li>Host waits until all remote users are no longer in the session.</li>
+     * <li>Host leaves the session.</li>
      * </ol>
      * 
      * @param host

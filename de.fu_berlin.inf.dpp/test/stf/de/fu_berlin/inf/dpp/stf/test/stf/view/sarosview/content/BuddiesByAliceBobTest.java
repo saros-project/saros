@@ -38,8 +38,8 @@ public class BuddiesByAliceBobTest extends StfTestCase {
     @After
     public void afterEveryTest() throws Exception {
         clearWorkspaces();
-        resetBuddies();
-        resetBuddyNames();
+        resetContacts();
+        resetNicknames();
     }
 
     @Test
@@ -88,10 +88,10 @@ public class BuddiesByAliceBobTest extends StfTestCase {
 
     @Test
     public void addBuddy() throws Exception {
-        Util.removeBuddiesFromContactList(ALICE, BOB);
+        Util.removeTestersFromContactList(ALICE, BOB);
         assertFalse(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
         assertFalse(BOB.superBot().views().sarosView().hasBuddy(ALICE.getJID()));
-        Util.addBuddiesToContactList(ALICE, BOB);
+        Util.addTestersToContactList(ALICE, BOB);
         assertTrue(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
         assertTrue(BOB.superBot().views().sarosView().hasBuddy(ALICE.getJID()));
     }
@@ -112,7 +112,7 @@ public class BuddiesByAliceBobTest extends StfTestCase {
     @Test
     public void deleteBuddy() throws Exception {
         assertTrue(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
-        Util.removeBuddiesFromContactList(ALICE, BOB);
+        Util.removeTestersFromContactList(ALICE, BOB);
         assertFalse(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
         assertFalse(BOB.superBot().views().sarosView().hasBuddy(ALICE.getJID()));
         Thread.sleep(5000);

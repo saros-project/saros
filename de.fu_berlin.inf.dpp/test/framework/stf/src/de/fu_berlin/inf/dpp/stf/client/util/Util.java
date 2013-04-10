@@ -399,65 +399,66 @@ public class Util {
     }
 
     /**
-     * Adds buddies to the contact list of the tester. All buddies will have the
+     * Adds testers to the contact list of the tester. All testers will have the
      * tester added to their contact list as well.
      * 
      * @param tester
-     *            the tester who wants to add buddies to his contact list e.g
+     *            the tester who wants to add testers to his contact list e.g
      *            ALICE
-     * @param buddies
-     *            the buddies to add, e.g BOB, CARL
+     * @param testers
+     *            the testers to add, e.g BOB, CARL
      * @throws IllegalStateException
-     *             if the tester or one of the buddies is not connected
+     *             if the tester or one of the testers is not connected
      * @throws Exception
      *             for any other (internal) failure
      * 
      */
-    public static void addBuddiesToContactList(AbstractTester tester,
-        AbstractTester... buddies) throws Exception {
+    public static void addTestersToContactList(AbstractTester tester,
+        AbstractTester... testers) throws Exception {
 
-        assertStates(true, null, tester, buddies);
+        assertStates(true, null, tester, testers);
 
-        for (AbstractTester peer : buddies) {
-            if (!tester.superBot().views().sarosView().hasBuddy(peer.getJID())) {
+        for (AbstractTester contact : testers) {
+            if (!tester.superBot().views().sarosView()
+                .hasBuddy(contact.getJID())) {
                 tester.superBot().views().sarosView()
-                    .addNewBuddy(peer.getJID());
-                peer.superBot().confirmShellRequestOfSubscriptionReceived();
+                    .addNewBuddy(contact.getJID());
+                contact.superBot().confirmShellRequestOfSubscriptionReceived();
             }
         }
     }
 
     /**
-     * Removes the given buddies from the contact list of the tester. All
-     * buddies will have the tester removed from their contact list as well.
+     * Removes the given testers from the contact list of the tester. All
+     * testers will have the tester removed from their contact list as well.
      * 
      * @param tester
-     *            the tester who wants to remove buddies from his contact list
+     *            the tester who wants to remove testers from his contact list
      *            e.g ALICE
-     * @param buddies
-     *            the buddies to remove, e.g BOB, CARL
+     * @param testers
+     *            the testers to remove, e.g BOB, CARL
      * @throws IllegalStateException
-     *             if the tester or one of the buddies is not connected
+     *             if the tester or one of the testers is not connected
      * @throws Exception
      *             for any other (internal) failure
      * 
      */
-    public static void removeBuddiesFromContactList(AbstractTester tester,
-        AbstractTester... buddies) throws Exception {
+    public static void removeTestersFromContactList(AbstractTester tester,
+        AbstractTester... testers) throws Exception {
 
-        assertStates(true, null, tester, buddies);
+        assertStates(true, null, tester, testers);
 
-        for (AbstractTester deletedBuddy : buddies) {
+        for (AbstractTester contact : testers) {
 
             if (!tester.superBot().views().sarosView()
-                .hasBuddy(deletedBuddy.getJID()))
+                .hasBuddy(contact.getJID()))
                 continue;
 
-            boolean isInRemoteContactList = deletedBuddy.superBot().views()
+            boolean isInRemoteContactList = contact.superBot().views()
                 .sarosView().hasBuddy(tester.getJID());
 
-            tester.superBot().views().sarosView()
-                .selectBuddy(deletedBuddy.getJID()).delete();
+            tester.superBot().views().sarosView().selectBuddy(contact.getJID())
+                .delete();
 
             if (!isInRemoteContactList)
                 continue;
@@ -473,7 +474,7 @@ public class Util {
                      * subscription state is received.
                      */
 
-                    deletedBuddy.superBot().views().sarosView()
+                    contact.superBot().views().sarosView()
                         .selectBuddy(tester.getJID()).delete();
 
                     break;
@@ -486,7 +487,7 @@ public class Util {
     }
 
     /**
-     * Adds buddies to the current session.
+     * Adds testers to the current session.
      * 
      * @NOTE there is no guarantee that the project and its files are already
      *       shared after this method returns
@@ -499,7 +500,7 @@ public class Util {
      * @param inviter
      *            the test who must be host of the current session
      * @param invitees
-     *            the buddies you want to invite to your session
+     *            the testers you want to invite to your session
      * @throws IllegalStateException
      *             if the inviter or one of the invitees is not connected, one
      *             of the invitee is already in a session or the inviter is not
@@ -507,7 +508,7 @@ public class Util {
      * @throws Exception
      *             for any other (internal) failure
      */
-    public static void inviteBuddies(final String projectName,
+    public static void addTestersToSession(final String projectName,
         final TypeOfCreateProject projectType, AbstractTester inviter,
         AbstractTester... invitees) throws Exception {
 
@@ -580,12 +581,13 @@ public class Util {
     }
 
     /**
-     * Grants write access to the given participants
+     * Grants write access to the given testers.
      * 
      * @param host
      *            the host of the current session, e.g ALICE
-     * @param participants
-     *            the participants to grant write access to, e.g BOB, CARL
+     * @param testers
+     *            testers that are in the current session and should gain write
+     *            access, e.g BOB, CARL
      * @throws IllegalStateException
      *             if the host or one of the participants is not connected or is
      *             not in a session or the host is not host of the current
@@ -594,15 +596,15 @@ public class Util {
      *             for any other (internal) failure
      */
     public static void grantWriteAccess(AbstractTester host,
-        AbstractTester... participants) throws Exception {
+        AbstractTester... testers) throws Exception {
 
-        assertStates(true, true, host, participants);
+        assertStates(true, true, host, testers);
 
         if (!host.superBot().views().sarosView().isHost())
             throw new IllegalStateException(host
                 + " is not host of the current session");
 
-        for (AbstractTester tester : participants) {
+        for (AbstractTester tester : testers) {
             if (tester.superBot().views().sarosView().isInSession()
                 && host.superBot().views().sarosView()
                     .selectParticipant(tester.getJID()).hasReadOnlyAccess()) {
@@ -613,23 +615,23 @@ public class Util {
     }
 
     /**
-     * Stops the follow mode feature for all given participants.
+     * Stops the follow mode feature for all given testers.
      * 
-     * @param participants
-     *            a list of participants where follow mode should been stopped
+     * @param testers
+     *            testers that are currently in the a session where follow mode
+     *            should been stopped
      * @throws IllegalStateException
-     *             if tone of the participants is not connected or not in a
-     *             session
+     *             if one of the testers is not connected or not in a session
      * @throws Exception
      *             for any other (internal) failure
      */
 
-    public static void stopFollowModeSequentially(
-        AbstractTester... participants) throws Exception {
+    public static void stopFollowModeSequentially(AbstractTester... testers)
+        throws Exception {
 
-        assertStates(true, true, participants);
+        assertStates(true, true, testers);
 
-        for (AbstractTester tester : participants) {
+        for (AbstractTester tester : testers) {
             if (tester.superBot().views().sarosView().isInSession()
                 && tester.superBot().views().sarosView().isFollowing()) {
                 JID followedBuddyJID = tester.superBot().views().sarosView()
@@ -642,24 +644,24 @@ public class Util {
 
     /**
      * Stops the follow mode feature. This is done concurrently for all given
-     * participants.
+     * testers.
      * 
-     * @param participants
-     *            a list of participants where follow mode should been stopped
+     * @param testers
+     *            testers that are currently in the a session where follow mode
+     *            should been stopped
      * @throws IllegalStateException
-     *             if tone of the participants is not connected or not in a
-     *             session
+     *             if one of the testers is not connected or not in a session
      * @throws Exception
      *             for any other (internal) failure
      */
-    public static void stopFollowModeConcurrently(
-        AbstractTester... participants) throws Exception {
+    public static void stopFollowModeConcurrently(AbstractTester... testers)
+        throws Exception {
 
-        assertStates(true, true, participants);
+        assertStates(true, true, testers);
 
         List<Callable<Void>> stopFollowTasks = new ArrayList<Callable<Void>>();
-        for (int i = 0; i < participants.length; i++) {
-            final AbstractTester tester = participants[i];
+        for (int i = 0; i < testers.length; i++) {
+            final AbstractTester tester = testers[i];
             stopFollowTasks.add(new Callable<Void>() {
                 @Override
                 public Void call() throws Exception {
@@ -675,10 +677,10 @@ public class Util {
     }
 
     /**
-     * Rebuilds a session if necessary with the given participants. If the
-     * project does not exists on the inviter side an empty non Java Project
-     * will be created. Participants that are already (in a different) session
-     * will not be invited.
+     * Rebuilds a session if necessary with the given testers. If the project
+     * does not exists on the inviter side an empty non Java Project will be
+     * created. Participants that are already (in a different) session will not
+     * be invited.
      * 
      * @NOTE there is no guarantee that the project and its files are already
      *       shared after this method returns

@@ -33,7 +33,7 @@ public class HandleContactsTest extends StfTestCase {
 
     @After
     public void afterEveryTest() throws Exception {
-        resetBuddies();
+        resetContacts();
     }
 
     // FIXME these testAddContact assumes that testRemoveContact succeeds
@@ -56,7 +56,7 @@ public class HandleContactsTest extends StfTestCase {
     public void testBobRemoveBuddyAlice() throws Exception {
         assertTrue(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
         assertTrue(BOB.superBot().views().sarosView().hasBuddy(ALICE.getJID()));
-        Util.removeBuddiesFromContactList(BOB, ALICE);
+        Util.removeTestersFromContactList(BOB, ALICE);
         assertFalse(BOB.superBot().views().sarosView().hasBuddy(ALICE.getJID()));
         assertFalse(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
     }
@@ -78,7 +78,7 @@ public class HandleContactsTest extends StfTestCase {
     public void testAliceRemoveBuddyBob() throws Exception {
         assertTrue(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
         assertTrue(BOB.superBot().views().sarosView().hasBuddy(ALICE.getJID()));
-        Util.removeBuddiesFromContactList(ALICE, BOB);
+        Util.removeTestersFromContactList(ALICE, BOB);
         assertFalse(BOB.superBot().views().sarosView().hasBuddy(ALICE.getJID()));
         assertFalse(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
     }
@@ -98,8 +98,8 @@ public class HandleContactsTest extends StfTestCase {
      */
     @Test
     public void testAliceAddBuddyBob() throws Exception {
-        Util.removeBuddiesFromContactList(ALICE, BOB);
-        Util.addBuddiesToContactList(ALICE, BOB);
+        Util.removeTestersFromContactList(ALICE, BOB);
+        Util.addTestersToContactList(ALICE, BOB);
         assertTrue(BOB.superBot().views().sarosView().hasBuddy(ALICE.getJID()));
         assertTrue(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
     }
@@ -119,8 +119,8 @@ public class HandleContactsTest extends StfTestCase {
      */
     @Test
     public void testBobAddBuddyAlice() throws Exception {
-        Util.removeBuddiesFromContactList(BOB, ALICE);
-        Util.addBuddiesToContactList(BOB, ALICE);
+        Util.removeTestersFromContactList(BOB, ALICE);
+        Util.addTestersToContactList(BOB, ALICE);
         assertTrue(BOB.superBot().views().sarosView().hasBuddy(ALICE.getJID()));
         assertTrue(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
     }
