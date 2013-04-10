@@ -84,37 +84,6 @@ public class ShareProjectUsingExistingProjectTest extends StfTestCase {
     }
 
     @Test
-    public void shareProjectUsingExistProjectWithCopyAfterCancelLocalChange()
-        throws Exception {
-        assertFalse(BOB.superBot().views().packageExplorerView()
-            .selectPkg(Constants.PROJECT1, Constants.PKG1)
-            .existsWithRegex(Pattern.quote(Constants.CLS1_SUFFIX) + ".*"));
-        assertTrue(BOB.superBot().views().packageExplorerView()
-            .selectPkg(Constants.PROJECT1, Constants.PKG1)
-            .existsWithRegex(Pattern.quote(Constants.CLS2) + ".*"));
-
-        Util.buildSessionSequentially(
-            Constants.PROJECT1,
-            TypeOfCreateProject.EXIST_PROJECT_WITH_COPY_AFTER_CANCEL_LOCAL_CHANGE,
-            ALICE, BOB);
-
-        assertTrue(BOB.superBot().views().packageExplorerView().tree()
-            .existsWithRegex(Pattern.quote(Constants.PROJECT1) + ".*"));
-
-        assertTrue(BOB.superBot().views().packageExplorerView()
-            .selectPkg(Constants.PROJECT1, Constants.PKG1)
-            .existsWithRegex(Pattern.quote(Constants.CLS2) + ".*"));
-
-        assertTrue(BOB.superBot().views().packageExplorerView().tree()
-            .existsWithRegex(Pattern.quote(Constants.PROJECT1_COPY) + ".*"));
-
-        assertTrue(BOB.superBot().views().packageExplorerView()
-            .selectPkg(Constants.PROJECT1_COPY, Constants.PKG1)
-            .existsWithRegex(Pattern.quote(Constants.CLS1) + ".*"));
-
-    }
-
-    @Test
     public void testShareProjectUsingExistingProjectWithCopy() throws Exception {
         Util.buildSessionSequentially(Constants.PROJECT1,
             TypeOfCreateProject.EXIST_PROJECT_WITH_COPY, ALICE, BOB);

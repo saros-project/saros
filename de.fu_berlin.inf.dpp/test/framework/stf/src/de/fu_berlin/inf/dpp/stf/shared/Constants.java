@@ -4,7 +4,7 @@ package de.fu_berlin.inf.dpp.stf.shared;
 
 public interface Constants {
     public enum TypeOfCreateProject {
-        NEW_PROJECT, EXIST_PROJECT, EXIST_PROJECT_WITH_COPY, EXIST_PROJECT_WITH_COPY_AFTER_CANCEL_LOCAL_CHANGE
+        NEW_PROJECT, EXIST_PROJECT, EXIST_PROJECT_WITH_COPY
     }
 
     public enum TypeOfShareProject {

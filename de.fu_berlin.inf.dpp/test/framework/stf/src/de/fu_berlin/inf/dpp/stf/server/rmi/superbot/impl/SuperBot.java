@@ -121,37 +121,6 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
     }
 
     @Override
-    public void confirmShellAddProjectUsingExistProjectWithCopyAfterCancelLocalChange(
-        String projectName) throws RemoteException {
-
-        SWTBot bot = new SWTBot();
-        bot.waitUntil(Conditions.shellIsActive(SHELL_ADD_PROJECT),
-            SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
-
-        SWTBotShell shell = bot.shell(SHELL_ADD_PROJECT);
-        shell.activate();
-
-        shell.bot().radio("Use existing project").click();
-        shell.bot().textWithLabel("Project name", 1).setText(projectName);
-        shell.bot().button(FINISH).click();
-
-        bot.sleep(2000);
-
-        for (SWTBotShell currentShell : bot.shells()) {
-            if (currentShell.getText().equals(
-                SHELL_WARNING_LOCAL_CHANGES_DELETED)
-                || currentShell.getText().equals(SHELL_SAVE_RESOURCE)) {
-                currentShell.activate();
-                currentShell.bot().button(NO).click();
-                currentShell.bot().waitUntil(
-                    Conditions.shellCloses(currentShell));
-            }
-        }
-
-        confirmShellAddProjectUsingExistProjectWithCopy(projectName);
-    }
-
-    @Override
     public void confirmShellAddProjectUsingExistProjectWithCopy(
         String projectName) throws RemoteException {
 
@@ -189,11 +158,6 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
             break;
         case EXIST_PROJECT_WITH_COPY:
             confirmShellAddProjectUsingExistProjectWithCopy(projectName);
-            break;
-        case EXIST_PROJECT_WITH_COPY_AFTER_CANCEL_LOCAL_CHANGE:
-            confirmShellAddProjectUsingExistProjectWithCopyAfterCancelLocalChange(projectName);
-            break;
-        default:
             break;
         }
     }
@@ -454,8 +418,6 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
                     "Create copy for working distributed. New project name:")
                 .click();
             break;
-        case EXIST_PROJECT_WITH_COPY_AFTER_CANCEL_LOCAL_CHANGE:
-            throw new UnsupportedOperationException("not yet implemented");
         }
 
         shell.bot().button(FINISH).click();

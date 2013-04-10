@@ -57,16 +57,6 @@ public interface ISuperBot extends Remote {
     /**
      * The shell with the title {@link StfRemoteObject#SHELL_ADD_PROJECT} should
      * be appeared by the invitees' side during sharing session. This method
-     * confirm the shell using an existed project.
-     * 
-     * @throws RemoteException
-     */
-    public void confirmShellAddProjectUsingExistProjectWithCopyAfterCancelLocalChange(
-        String projectName) throws RemoteException;
-
-    /**
-     * The shell with the title {@link StfRemoteObject#SHELL_ADD_PROJECT} should
-     * be appeared by the invitees' side during sharing session. This method
      * confirm the shell using an existed project with copy.
      * 
      * @throws RemoteException
