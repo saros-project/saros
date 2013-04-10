@@ -179,13 +179,12 @@ public interface ISarosSession {
     public ActivitySequencer getSequencer();
 
     /**
-     * Activates sending of activityDataObjects. The reason that this isn't done
-     * automatically are unit tests.
+     * FOR INTERNAL USE ONLY !
      */
     public void start();
 
     /**
-     * Deactivates sending of activityDataObjects.
+     * FOR INTERNAL USE ONLY !
      */
     public void stop();
 
@@ -436,11 +435,6 @@ public interface ISarosSession {
      * @return
      */
     public StopManager getStopManager();
-
-    /**
-     * Return if the session has been stopped
-     */
-    public boolean isStopped();
 
     /**
      * Changes the color for the current session.

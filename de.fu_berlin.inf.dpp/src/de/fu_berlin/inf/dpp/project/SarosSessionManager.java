@@ -290,14 +290,12 @@ public class SarosSessionManager implements ISarosSessionManager {
             transmitter.sendLeaveMessage(sarosSession);
 
             log.debug("Leave message sent.");
-            if (!sarosSession.isStopped()) {
-                try {
-                    sarosSession.stop();
-                } catch (RuntimeException e) {
-                    log.error("Error stopping project: ", e);
-                }
+
+            try {
+                sarosSession.stop();
+            } catch (RuntimeException e) {
+                log.error("Error stopping project: ", e);
             }
-            sarosSession.dispose();
 
             sarosSessionObservable.setValue(null);
 

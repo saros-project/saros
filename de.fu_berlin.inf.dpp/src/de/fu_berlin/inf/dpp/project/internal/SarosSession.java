@@ -49,7 +49,6 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.joda.time.DateTime;
-import org.picocontainer.Disposable;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.annotations.Inject;
 
@@ -124,7 +123,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * TODO Review if SarosSession, ConcurrentDocumentManager, ActivitySequencer all
  * honor start() and stop() semantics.
  */
-public final class SarosSession implements ISarosSession, Disposable {
+public final class SarosSession implements ISarosSession {
 
     private static final Logger log = Logger.getLogger(SarosSession.class);
 
@@ -196,6 +195,9 @@ public final class SarosSession implements ISarosSession, Disposable {
     private ChangeColorManager changeColorManager;
 
     private ActivitySequencer activitySequencer;
+
+    private boolean started = false;
+    private boolean stopped = false;
 
     private final ActivityQueuer activityQueuer;
 
@@ -626,49 +628,29 @@ public final class SarosSession implements ISarosSession, Disposable {
         return projectMapper.getProjects();
     }
 
+    // FIMXE synchronization
     @Override
     public void start() {
-        if (!stopped) {
+        if (started || stopped) {
             throw new IllegalStateException();
         }
 
+        started = true;
         sessionContainer.start();
-        stopped = false;
 
     }
 
-    // TODO Review sendRequest for InterruptedException and remove this flag.
-    boolean stopped = true;
-
-    @Override
-    public boolean isStopped() {
-        return stopped;
-    }
-
-    /**
-     * Stops the associated activityDataObject sequencer.
-     * 
-     * @throws IllegalStateException
-     *             if the shared project is already stopped.
-     */
+    // FIMXE synchronization
     @Override
     public void stop() {
-        if (stopped) {
+        if (!started || stopped) {
             throw new IllegalStateException();
         }
 
-        sessionContainer.stop();
         stopped = true;
-    }
-
-    @Override
-    public void dispose() {
-        /*
-         * BUG in Pico Container 2.7 ... lifecycle will throw already disposed
-         * exception ... found no bug entry on http://jira.codehaus.org
-         */
-        // sessionContainer.dispose();
         sarosContext.removeChildContainer(sessionContainer);
+        sessionContainer.stop();
+        sessionContainer.dispose();
     }
 
     /**

@@ -307,11 +307,6 @@ public class SarosSessionStub implements ISarosSession {
     }
 
     @Override
-    public boolean isStopped() {
-        throw new RuntimeException("Unexpected call to Stub");
-    }
-
-    @Override
     public void kickUser(User user) {
         throw new RuntimeException("Unexpected call to Stub");
     }
@@ -334,4 +329,5 @@ public class SarosSessionStub implements ISarosSession {
     @Override
     public void disableQueuing() {
         throw new RuntimeException("Unexpected call to Stub");
-    }}
+    }
+}

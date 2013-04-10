@@ -310,12 +310,6 @@ public class NullSarosSession implements ISarosSession {
     }
 
     @Override
-    public boolean isStopped() {
-        log.warn("unexpected method call");
-        return true;
-    }
-
-    @Override
     public void kickUser(User user) {
         log.warn("unexpected method call");
     }

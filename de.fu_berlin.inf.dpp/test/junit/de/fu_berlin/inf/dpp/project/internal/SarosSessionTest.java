@@ -172,7 +172,6 @@ public class SarosSessionTest {
 
     @After
     public void tearDown() {
-
         container.stop();
         container.dispose();
     }
@@ -285,8 +284,6 @@ public class SarosSessionTest {
         Assert.assertTrue(editorListeners.isEmpty());
         Assert.assertEquals(0, session.getActivityProviderCount());
         Assert.assertTrue(workspaceListeners.isEmpty());
-
-        session.dispose();
 
         PowerMock.verifyAll();
     }
