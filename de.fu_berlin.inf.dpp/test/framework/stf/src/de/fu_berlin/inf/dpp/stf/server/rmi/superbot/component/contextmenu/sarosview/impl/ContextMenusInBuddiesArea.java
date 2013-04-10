@@ -74,7 +74,7 @@ public final class ContextMenusInBuddiesArea extends ContextMenusInSarosView
 
     @Override
     public void addBuddy(JID jid) throws RemoteException {
-        if (!sarosView.hasBuddy(jid)) {
+        if (!sarosView.isInContactList(jid)) {
             getTreeItem().select();
             ContextMenuHelper.clickContextMenu(tree, "Add Buddy...");
             SuperBot.getInstance().confirmShellAddBuddy(jid);

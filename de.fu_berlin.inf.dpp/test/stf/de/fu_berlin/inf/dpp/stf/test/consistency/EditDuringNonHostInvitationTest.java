@@ -39,7 +39,7 @@ public class EditDuringNonHostInvitationTest extends StfTestCase {
             .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1,
                 Constants.CLS1);
 
-        BOB.superBot().views().sarosView().selectBuddy(CARL.getJID())
+        BOB.superBot().views().sarosView().selectContact(CARL.getJID())
             .addToSarosSession();
 
         ALICE.superBot().views().packageExplorerView()

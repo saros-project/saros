@@ -57,11 +57,11 @@ public class EditorByAliceBobTest extends StfTestCase {
     @Test
     public void waitUntilBobsJavaEditorIsOpen() throws RemoteException {
 
-        BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
+        BOB.superBot().views().sarosView().selectUser(ALICE.getJID())
             .followParticipant();
 
         assertTrue(BOB.superBot().views().sarosView()
-            .selectParticipant(ALICE.getJID()).isFollowing());
+            .selectUser(ALICE.getJID()).isFollowing());
 
         BOB.remoteBot().waitUntilEditorOpen(Constants.CLS1_SUFFIX);
         assertTrue(BOB.remoteBot().editor(Constants.CLS1_SUFFIX).isActive());
@@ -70,11 +70,11 @@ public class EditorByAliceBobTest extends StfTestCase {
     @Test
     public void waitUntilBobsJavaEditorIsActive() throws RemoteException {
 
-        BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
+        BOB.superBot().views().sarosView().selectUser(ALICE.getJID())
             .followParticipant();
 
         assertTrue(BOB.superBot().views().sarosView()
-            .selectParticipant(ALICE.getJID()).isFollowing());
+            .selectUser(ALICE.getJID()).isFollowing());
 
         BOB.remoteBot().editor(Constants.CLS1_SUFFIX).waitUntilIsActive();
 
@@ -101,11 +101,11 @@ public class EditorByAliceBobTest extends StfTestCase {
     @Test
     public void waitUntilBobsJavaEditorIsClosed() throws RemoteException {
 
-        BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
+        BOB.superBot().views().sarosView().selectUser(ALICE.getJID())
             .followParticipant();
 
         assertTrue(BOB.superBot().views().sarosView()
-            .selectParticipant(ALICE.getJID()).isFollowing());
+            .selectUser(ALICE.getJID()).isFollowing());
 
         BOB.remoteBot().editor(Constants.CLS1_SUFFIX).waitUntilIsActive();
 

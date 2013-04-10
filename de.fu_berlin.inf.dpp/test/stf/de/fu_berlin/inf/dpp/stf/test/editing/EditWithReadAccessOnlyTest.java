@@ -39,10 +39,10 @@ public class EditWithReadAccessOnlyTest extends StfTestCase {
         String aliceEditorText = ALICE.remoteBot().editor("HelloWorld.java")
             .getText();
 
-        ALICE.superBot().views().sarosView().selectParticipant(BOB.getJID())
+        ALICE.superBot().views().sarosView().selectUser(BOB.getJID())
             .restrictToReadOnlyAccess();
 
-        ALICE.superBot().views().sarosView().selectParticipant(BOB.getJID())
+        ALICE.superBot().views().sarosView().selectUser(BOB.getJID())
             .waitUntilHasReadOnlyAccess();
 
         BOB.remoteBot().editor("HelloWorld.java").typeText("1234567890");

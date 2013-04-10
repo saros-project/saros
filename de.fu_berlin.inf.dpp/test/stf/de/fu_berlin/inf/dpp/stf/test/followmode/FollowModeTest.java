@@ -38,11 +38,11 @@ public class FollowModeTest extends StfTestCase {
 
         ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).save();
 
-        BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
+        BOB.superBot().views().sarosView().selectUser(ALICE.getJID())
             .followParticipant();
         BOB.remoteBot().editor(Constants.CLS1_SUFFIX).waitUntilIsActive();
         assertTrue(BOB.superBot().views().sarosView()
-            .selectParticipant(ALICE.getJID()).isFollowing());
+            .selectUser(ALICE.getJID()).isFollowing());
         assertTrue(BOB.remoteBot().editor(Constants.CLS1_SUFFIX).isActive());
 
         String clsContentOfAlice = ALICE
@@ -74,7 +74,7 @@ public class FollowModeTest extends StfTestCase {
         BOB.remoteBot().editor(Constants.CLS2_SUFFIX).waitUntilIsActive();
         assertTrue(BOB.remoteBot().editor(Constants.CLS2_SUFFIX).isActive());
 
-        ALICE.superBot().views().sarosView().selectParticipant(BOB.getJID())
+        ALICE.superBot().views().sarosView().selectUser(BOB.getJID())
             .followParticipant();
 
         BOB.remoteBot().editor(Constants.CLS1_SUFFIX).show();
@@ -82,7 +82,7 @@ public class FollowModeTest extends StfTestCase {
         ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).waitUntilIsActive();
 
         assertTrue(ALICE.superBot().views().sarosView()
-            .selectParticipant(BOB.getJID()).isFollowing());
+            .selectUser(BOB.getJID()).isFollowing());
 
         assertTrue(ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).isActive());
 

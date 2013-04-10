@@ -439,9 +439,9 @@ public abstract class StfTestCase {
                 continue;
 
             if (tester.superBot().views().sarosView()
-                .hasBuddy(currentTesters.get(i).getJID())) {
+                .isInContactList(currentTesters.get(i).getJID())) {
                 tester.superBot().views().sarosView()
-                    .selectBuddy(currentTesters.get(i).getJID())
+                    .selectContact(currentTesters.get(i).getJID())
                     .rename(currentTesters.get(i).getBaseJid());
             }
         }

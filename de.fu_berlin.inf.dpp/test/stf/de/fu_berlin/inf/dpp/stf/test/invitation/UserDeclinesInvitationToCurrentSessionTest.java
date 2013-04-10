@@ -31,7 +31,7 @@ public class UserDeclinesInvitationToCurrentSessionTest extends StfTestCase {
         BOB.superBot().views().packageExplorerView()
             .waitUntilResourceIsShared("foo");
 
-        ALICE.superBot().views().sarosView().selectBuddy(CARL.getJID())
+        ALICE.superBot().views().sarosView().selectContact(CARL.getJID())
             .addToSarosSession();
 
         IRemoteBotShell shell = CARL.remoteBot()

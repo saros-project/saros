@@ -35,7 +35,7 @@ public class SimpleFollowModeITest extends StfTestCase {
         ALICE.superBot().views().packageExplorerView()
             .selectFile("foo", "readme.txt").open();
 
-        BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
+        BOB.superBot().views().sarosView().selectUser(ALICE.getJID())
             .followParticipant();
 
         ALICE.remoteBot().editor("readme.txt").typeText("123456789");

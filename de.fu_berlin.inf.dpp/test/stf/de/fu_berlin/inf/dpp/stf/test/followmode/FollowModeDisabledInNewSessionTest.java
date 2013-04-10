@@ -30,10 +30,10 @@ public class FollowModeDisabledInNewSessionTest extends StfTestCase {
         ALICE.superBot().views().packageExplorerView()
             .selectFile("foo", "readme.txt").open();
 
-        BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
+        BOB.superBot().views().sarosView().selectUser(ALICE.getJID())
             .followParticipant();
 
-        BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
+        BOB.superBot().views().sarosView().selectUser(ALICE.getJID())
             .waitUntilIsFollowing();
 
         ALICE.superBot().internal().createFile("foo", "info.txt", "info");
@@ -61,7 +61,7 @@ public class FollowModeDisabledInNewSessionTest extends StfTestCase {
             .synchronizeOnActivityQueue(BOB.getJID(), 60 * 1000);
 
         assertFalse("BOB is following ALICE", BOB.superBot().views()
-            .sarosView().selectParticipant(ALICE.getJID()).isFollowing());
+            .sarosView().selectUser(ALICE.getJID()).isFollowing());
 
         assertTrue("editor changed", BOB.remoteBot().editor("readme.txt")
             .isActive());

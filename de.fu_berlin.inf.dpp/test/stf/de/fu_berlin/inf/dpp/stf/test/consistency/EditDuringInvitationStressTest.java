@@ -51,7 +51,7 @@ public class EditDuringInvitationStressTest extends StfTestCase {
 
         openTestClasses(BOB);
 
-        ALICE.superBot().views().sarosView().selectBuddy(CARL.getJID())
+        ALICE.superBot().views().sarosView().selectContact(CARL.getJID())
             .addToSarosSession();
 
         CARL.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);

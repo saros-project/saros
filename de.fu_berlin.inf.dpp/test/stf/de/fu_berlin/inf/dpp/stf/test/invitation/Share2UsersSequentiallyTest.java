@@ -60,10 +60,10 @@ public class Share2UsersSequentiallyTest extends StfTestCase {
                 Constants.CLS1);
 
         assertFalse(ALICE.superBot().views().sarosView()
-            .selectParticipant(BOB.getJID()).hasReadOnlyAccess());
+            .selectUser(BOB.getJID()).hasReadOnlyAccess());
 
         assertTrue(ALICE.superBot().views().sarosView()
-            .selectParticipant(BOB.getJID()).hasWriteAccess());
+            .selectUser(BOB.getJID()).hasWriteAccess());
 
         leaveSessionPeersFirst(ALICE);
 

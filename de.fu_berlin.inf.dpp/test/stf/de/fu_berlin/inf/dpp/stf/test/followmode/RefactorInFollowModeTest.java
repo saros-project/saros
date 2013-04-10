@@ -57,7 +57,7 @@ public class RefactorInFollowModeTest extends StfTestCase {
         ALICE.superBot().views().packageExplorerView()
             .selectClass("foo", "bar", "HelloWorld").open();
 
-        BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
+        BOB.superBot().views().sarosView().selectUser(ALICE.getJID())
             .followParticipant();
 
         List<Integer> viewPortBeforeRefactor = BOB.remoteBot()

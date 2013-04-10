@@ -108,7 +108,7 @@ public class ChatViewTest extends StfTestCase {
 
     @Test
     public void testMultipleOpenedChatRooms() throws Exception {
-        ALICE.superBot().views().sarosView().selectParticipant(BOB.getJID())
+        ALICE.superBot().views().sarosView().selectUser(BOB.getJID())
             .openChat();
 
         ALICE.superBot().views().sarosView()

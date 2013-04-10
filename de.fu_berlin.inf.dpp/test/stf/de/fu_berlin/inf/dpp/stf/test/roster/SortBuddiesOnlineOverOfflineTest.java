@@ -29,7 +29,7 @@ public class SortBuddiesOnlineOverOfflineTest extends StfTestCase {
         Thread.sleep(1000);
 
         List<String> buddies = ALICE.superBot().views().sarosView()
-            .getAllBuddies();
+            .getContacts();
 
         assertTrue("corrupted size on roster", buddies.size() >= 2);
         assertEquals(BOB.getBaseJid(), buddies.get(0));
@@ -43,7 +43,7 @@ public class SortBuddiesOnlineOverOfflineTest extends StfTestCase {
         // wait for roster update
         Thread.sleep(1000);
 
-        buddies = ALICE.superBot().views().sarosView().getAllBuddies();
+        buddies = ALICE.superBot().views().sarosView().getContacts();
 
         assertTrue("corrupted size on roster", buddies.size() >= 2);
         assertEquals(CARL.getBaseJid(), buddies.get(0));
@@ -57,7 +57,7 @@ public class SortBuddiesOnlineOverOfflineTest extends StfTestCase {
         // wait for roster update
         Thread.sleep(1000);
 
-        buddies = ALICE.superBot().views().sarosView().getAllBuddies();
+        buddies = ALICE.superBot().views().sarosView().getContacts();
 
         assertTrue("corrupted size on roster", buddies.size() >= 2);
         assertEquals(BOB.getBaseJid(), buddies.get(0));
@@ -71,7 +71,7 @@ public class SortBuddiesOnlineOverOfflineTest extends StfTestCase {
         // wait for roster update
         Thread.sleep(1000);
 
-        buddies = ALICE.superBot().views().sarosView().getAllBuddies();
+        buddies = ALICE.superBot().views().sarosView().getContacts();
 
         assertTrue("corrupted size on roster", buddies.size() >= 2);
         checkBuddiesOrder(buddies, 0);

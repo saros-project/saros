@@ -87,7 +87,7 @@ public class ChatViewFunctionsTest extends StfTestCase {
         BOB.superBot().views().packageExplorerView()
             .waitUntilResourceIsShared("foo/src/bar/test2.java");
 
-        BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
+        BOB.superBot().views().sarosView().selectUser(ALICE.getJID())
             .followParticipant();
 
         BOB.superBot().views().sarosView()
@@ -142,7 +142,7 @@ public class ChatViewFunctionsTest extends StfTestCase {
                 .selectChatroom(Constants.CHATROOM_TAB_LABEL).getTitle());
 
         // Alice opens new single user chat with Bob and sends a message
-        ALICE.superBot().views().sarosView().selectParticipant(BOB.getJID())
+        ALICE.superBot().views().sarosView().selectUser(BOB.getJID())
             .openChat();
 
         assertTrue(

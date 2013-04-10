@@ -77,15 +77,15 @@ public class Share3UsersConcurrentlyTest extends StfTestCase {
 
         assertTrue(CARL.superBot().views().sarosView().isInSession());
         assertFalse(ALICE.superBot().views().sarosView()
-            .selectParticipant(CARL.getJID()).hasReadOnlyAccess());
+            .selectUser(CARL.getJID()).hasReadOnlyAccess());
         assertTrue(ALICE.superBot().views().sarosView()
-            .selectParticipant(CARL.getJID()).hasWriteAccess());
+            .selectUser(CARL.getJID()).hasWriteAccess());
 
         assertTrue(BOB.superBot().views().sarosView().isInSession());
         assertFalse(ALICE.superBot().views().sarosView()
-            .selectParticipant(BOB.getJID()).hasReadOnlyAccess());
+            .selectUser(BOB.getJID()).hasReadOnlyAccess());
         assertTrue(ALICE.superBot().views().sarosView()
-            .selectParticipant(BOB.getJID()).hasWriteAccess());
+            .selectUser(BOB.getJID()).hasWriteAccess());
 
         assertTrue(ALICE.superBot().views().sarosView().isInSession());
 

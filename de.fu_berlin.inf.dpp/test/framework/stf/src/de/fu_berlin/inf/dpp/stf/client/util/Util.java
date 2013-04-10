@@ -394,7 +394,7 @@ public class Util {
 
         for (AbstractTester tester : participants)
             tester.superBot().views().sarosView()
-                .selectParticipant(followedParticipant.getJID())
+                .selectUser(followedParticipant.getJID())
                 .followParticipant();
     }
 
@@ -420,9 +420,9 @@ public class Util {
 
         for (AbstractTester contact : testers) {
             if (!tester.superBot().views().sarosView()
-                .hasBuddy(contact.getJID())) {
+                .isInContactList(contact.getJID())) {
                 tester.superBot().views().sarosView()
-                    .addNewBuddy(contact.getJID());
+                    .addContact(contact.getJID());
                 contact.superBot().confirmShellRequestOfSubscriptionReceived();
             }
         }
@@ -451,13 +451,13 @@ public class Util {
         for (AbstractTester contact : testers) {
 
             if (!tester.superBot().views().sarosView()
-                .hasBuddy(contact.getJID()))
+                .isInContactList(contact.getJID()))
                 continue;
 
             boolean isInRemoteContactList = contact.superBot().views()
-                .sarosView().hasBuddy(tester.getJID());
+                .sarosView().isInContactList(tester.getJID());
 
-            tester.superBot().views().sarosView().selectBuddy(contact.getJID())
+            tester.superBot().views().sarosView().selectContact(contact.getJID())
                 .delete();
 
             if (!isInRemoteContactList)
@@ -475,7 +475,7 @@ public class Util {
                      */
 
                     contact.superBot().views().sarosView()
-                        .selectBuddy(tester.getJID()).delete();
+                        .selectContact(tester.getJID()).delete();
 
                     break;
                 } catch (Exception e) {
@@ -607,9 +607,9 @@ public class Util {
         for (AbstractTester tester : testers) {
             if (tester.superBot().views().sarosView().isInSession()
                 && host.superBot().views().sarosView()
-                    .selectParticipant(tester.getJID()).hasReadOnlyAccess()) {
+                    .selectUser(tester.getJID()).hasReadOnlyAccess()) {
                 host.superBot().views().sarosView()
-                    .selectParticipant(tester.getJID()).grantWriteAccess();
+                    .selectUser(tester.getJID()).grantWriteAccess();
             }
         }
     }
@@ -635,9 +635,9 @@ public class Util {
             if (tester.superBot().views().sarosView().isInSession()
                 && tester.superBot().views().sarosView().isFollowing()) {
                 JID followedBuddyJID = tester.superBot().views().sarosView()
-                    .getFollowedBuddy();
+                    .getFollowedUser();
                 tester.superBot().views().sarosView()
-                    .selectParticipant(followedBuddyJID).stopFollowing();
+                    .selectUser(followedBuddyJID).stopFollowing();
             }
         }
     }
@@ -666,9 +666,9 @@ public class Util {
                 @Override
                 public Void call() throws Exception {
                     JID followedBuddyJID = tester.superBot().views()
-                        .sarosView().getFollowedBuddy();
+                        .sarosView().getFollowedUser();
                     tester.superBot().views().sarosView()
-                        .selectParticipant(followedBuddyJID).stopFollowing();
+                        .selectUser(followedBuddyJID).stopFollowing();
                     return null;
                 }
             });

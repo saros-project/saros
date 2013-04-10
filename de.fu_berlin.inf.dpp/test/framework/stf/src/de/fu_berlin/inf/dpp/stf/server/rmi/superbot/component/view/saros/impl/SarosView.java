@@ -124,8 +124,8 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     }
 
     @Override
-    public void addNewBuddy(JID jid) throws RemoteException {
-        if (!hasBuddy(jid)) {
+    public void addContact(JID jid) throws RemoteException {
+        if (!isInContactList(jid)) {
             clickToolbarButtonWithTooltip(TB_ADD_A_NEW_BUDDY);
             SuperBot.getInstance().confirmShellAddBuddy(jid);
         }
@@ -134,29 +134,25 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     }
 
     @Override
-    public void shareYourScreenWithSelectedBuddy(JID jidOfPeer)
-        throws RemoteException {
-        selectParticipant(jidOfPeer, "you cannot share a screen with youself");
+    public void shareYourScreenWithUser(JID jid) throws RemoteException {
+        selectParticipant(jid, "you cannot share a screen with youself");
         clickToolbarButtonWithTooltip(TB_SHARE_SCREEN_WITH_BUDDY);
     }
 
-    public void stopSessionWithBuddy(JID jidOfPeer) throws RemoteException {
-        selectParticipant(jidOfPeer,
-            "you cannot stop a screen session with youself");
+    public void stopSessionWithBuddy(JID jid) throws RemoteException {
+        selectParticipant(jid, "you cannot stop a screen session with youself");
         clickToolbarButtonWithTooltip(TB_STOP_SESSION_WITH_BUDDY);
     }
 
     @Override
-    public void sendFileToSelectedBuddy(JID jidOfPeer) throws RemoteException {
-        selectParticipant(jidOfPeer, "you cannot send a file to youself");
+    public void sendFileToUser(JID jid) throws RemoteException {
+        selectParticipant(jid, "you cannot send a file to youself");
         clickToolbarButtonWithTooltip(TB_SEND_A_FILE_TO_SELECTED_BUDDY);
     }
 
     @Override
-    public void startAVoIPSessionWithSelectedBuddy(JID jidOfPeer)
-        throws RemoteException {
-        selectParticipant(jidOfPeer,
-            "you cannot start a VoIP session with youself");
+    public void startVoIPSessionWithUser(JID jid) throws RemoteException {
+        selectParticipant(jid, "you cannot start a VoIP session with youself");
         clickToolbarButtonWithTooltip(TB_START_VOIP_SESSION);
         if (RemoteWorkbenchBot.getInstance().shell(SHELL_ERROR_IN_SAROS_PLUGIN)
             .isActive()) {
@@ -219,14 +215,14 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     }
 
     @Override
-    public IContextMenusInBuddiesArea selectBuddy(JID buddyJID)
+    public IContextMenusInBuddiesArea selectContact(JID jid)
         throws RemoteException {
-        if (getNickname(buddyJID) == null) {
+        if (getNickname(jid) == null) {
             throw new RuntimeException("no buddy exists with the JID: "
-                + buddyJID.getBase());
+                + jid.getBase());
         }
         initBuddiesContextMenuWrapper(Pattern.quote(NODE_BUDDIES),
-            Pattern.quote(getNickname(buddyJID)) + ".*");
+            Pattern.quote(getNickname(jid)) + ".*");
         return ContextMenusInBuddiesArea.getInstance();
     }
 
@@ -248,11 +244,11 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     }
 
     @Override
-    public IContextMenusInSessionArea selectParticipant(final JID participantJID)
+    public IContextMenusInSessionArea selectUser(final JID participantJID)
         throws RemoteException {
         if (!isInSession())
             throw new IllegalStateException("you are not in a session");
-        String participantLabel = getParticipantLabel(participantJID);
+        String participantLabel = getLabelName(participantJID);
         initSessionContextMenuWrapper(Pattern.quote(NODE_SESSION), ".*"
             + Pattern.quote(participantLabel) + ".*");
         ContextMenusInSessionArea.getInstance().setParticipantJID(
@@ -276,26 +272,26 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     }
 
     @Override
-    public String getNickname(JID buddyJID) throws RemoteException {
+    public String getNickname(JID jid) throws RemoteException {
         Roster roster = getSarosNet().getRoster();
 
         if (roster == null)
             throw new IllegalStateException("not connected to a xmpp server");
 
-        if (roster.getEntry(buddyJID.getBase()) == null)
+        if (roster.getEntry(jid.getBase()) == null)
             return null;
-        if (roster.getEntry(buddyJID.getBase()).getName() == null)
-            return buddyJID.getBase();
+        if (roster.getEntry(jid.getBase()).getName() == null)
+            return jid.getBase();
         else
-            return roster.getEntry(buddyJID.getBase()).getName();
+            return roster.getEntry(jid.getBase()).getName();
     }
 
     @Override
-    public boolean hasNickName(JID buddyJID) throws RemoteException {
+    public boolean hasNickName(JID jid) throws RemoteException {
         try {
-            if (getNickname(buddyJID) == null)
+            if (getNickname(jid) == null)
                 return false;
-            if (!getNickname(buddyJID).equals(buddyJID.getBase()))
+            if (!getNickname(jid).equals(jid.getBase()))
                 return true;
             return false;
         } catch (Exception e) {
@@ -305,7 +301,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     }
 
     @Override
-    public List<String> getAllBuddies() throws RemoteException {
+    public List<String> getContacts() throws RemoteException {
         SWTBotTreeItem items = tree.getTreeItem(NODE_BUDDIES);
         List<String> buddies = new ArrayList<String>();
 
@@ -316,9 +312,9 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     }
 
     @Override
-    public boolean hasBuddy(JID buddyJID) throws RemoteException {
+    public boolean isInContactList(JID jid) throws RemoteException {
         try {
-            String nickName = getNickname(buddyJID);
+            String nickName = getNickname(jid);
             if (nickName == null)
                 return false;
 
@@ -335,9 +331,9 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     }
 
     @Override
-    public boolean existsParticipant(JID participantJID) throws RemoteException {
+    public boolean existsUser(JID jid) throws RemoteException {
         try {
-            String participantLabel = getParticipantLabel(participantJID);
+            String participantLabel = getLabelName(jid);
 
             participantLabel = ".*" + Pattern.quote(participantLabel) + ".*";
             for (String label : tree.getTreeItem(NODE_SESSION).getNodes())
@@ -349,22 +345,6 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
             log.error(e.getMessage(), e);
             return false;
         }
-    }
-
-    @Override
-    public String getParticipantLabel(JID participantJID)
-        throws RemoteException {
-        String contactLabel;
-
-        if (SuperBot.getInstance().views().sarosView()
-            .hasNickName(participantJID)) {
-
-            contactLabel = SuperBot.getInstance().views().sarosView()
-                .getNickname(participantJID);
-        } else {
-            contactLabel = participantJID.getName();
-        }
-        return contactLabel;
     }
 
     @Override
@@ -397,7 +377,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
 
             for (String participant : participants) {
                 if (participant.contains(HOST_INDICATION)) {
-                    if (participant.contains(getParticipantLabel(SuperBot
+                    if (participant.contains(getLabelName(SuperBot
                         .getInstance().getJID()))) {
                         return true;
                     }
@@ -414,11 +394,11 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     @Override
     public boolean isFollowing() throws RemoteException {
         try {
-            JID followedBuddy = getFollowedBuddy();
+            JID followedBuddy = getFollowedUser();
             if (followedBuddy == null)
                 return false;
 
-            return selectParticipant(followedBuddy).isFollowing();
+            return selectUser(followedBuddy).isFollowing();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return false;
@@ -426,18 +406,13 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     }
 
     @Override
-    public List<String> getAllParticipants() throws RemoteException {
+    public List<String> getUsers() throws RemoteException {
         return tree.getTreeItem(NODE_SESSION).getNodes();
 
     }
 
     @Override
-    public JID getJID() {
-        return SuperBot.getInstance().getJID();
-    }
-
-    @Override
-    public JID getFollowedBuddy() {
+    public JID getFollowedUser() {
         if (getEditorManager().getFollowedUser() != null)
             return getEditorManager().getFollowedUser().getJID();
         else
@@ -560,12 +535,6 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     }
 
     @Override
-    public void waitUntilIsInviteeNotInSession(ISuperBot sarosBot)
-        throws RemoteException {
-        sarosBot.views().sarosView().waitUntilIsNotInSession();
-    }
-
-    @Override
     public void waitUntilAllPeersLeaveSession(
         final List<JID> jidsOfAllParticipants) throws RemoteException {
 
@@ -617,6 +586,19 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
      * 
      **************************************************************/
 
+    private String getLabelName(JID jid) throws RemoteException {
+        String contactLabel;
+
+        if (SuperBot.getInstance().views().sarosView().hasNickName(jid)) {
+
+            contactLabel = SuperBot.getInstance().views().sarosView()
+                .getNickname(jid);
+        } else {
+            contactLabel = jid.getName();
+        }
+        return contactLabel;
+    }
+
     private boolean isToolbarButtonEnabled(String tooltip) {
 
         try {
@@ -642,7 +624,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         if (SuperBot.getInstance().getJID().equals(jidOfSelectedUser)) {
             throw new RuntimeException(message);
         }
-        selectParticipant(jidOfSelectedUser);
+        selectUser(jidOfSelectedUser);
     }
 
     private void setViewWithTree(SWTBotView view) {

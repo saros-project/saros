@@ -44,10 +44,10 @@ public class BuddiesByAliceBobTest extends StfTestCase {
 
     @Test
     public void testAddExistingBuddy() throws RemoteException {
-        assertTrue(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
+        assertTrue(ALICE.superBot().views().sarosView().isInContactList(BOB.getJID()));
         ALICE.superBot().views().sarosView().selectBuddies()
             .addBuddy(BOB.getJID());
-        assertTrue(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
+        assertTrue(ALICE.superBot().views().sarosView().isInContactList(BOB.getJID()));
     }
 
     /**
@@ -71,17 +71,17 @@ public class BuddiesByAliceBobTest extends StfTestCase {
      */
     @Test
     public void renameBuddy() throws RemoteException {
-        assertTrue(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
-        ALICE.superBot().views().sarosView().selectBuddy(BOB.getJID())
+        assertTrue(ALICE.superBot().views().sarosView().isInContactList(BOB.getJID()));
+        ALICE.superBot().views().sarosView().selectContact(BOB.getJID())
             .rename(BOB.getName());
 
-        assertTrue(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
+        assertTrue(ALICE.superBot().views().sarosView().isInContactList(BOB.getJID()));
         assertTrue(ALICE.superBot().views().sarosView()
             .getNickname(BOB.getJID()).equals(BOB.getName()));
 
-        ALICE.superBot().views().sarosView().selectBuddy(BOB.getJID())
+        ALICE.superBot().views().sarosView().selectContact(BOB.getJID())
             .rename("new name");
-        assertTrue(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
+        assertTrue(ALICE.superBot().views().sarosView().isInContactList(BOB.getJID()));
         assertTrue(ALICE.superBot().views().sarosView()
             .getNickname(BOB.getJID()).equals("new name"));
     }
@@ -89,11 +89,11 @@ public class BuddiesByAliceBobTest extends StfTestCase {
     @Test
     public void addBuddy() throws Exception {
         Util.removeTestersFromContactList(ALICE, BOB);
-        assertFalse(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
-        assertFalse(BOB.superBot().views().sarosView().hasBuddy(ALICE.getJID()));
+        assertFalse(ALICE.superBot().views().sarosView().isInContactList(BOB.getJID()));
+        assertFalse(BOB.superBot().views().sarosView().isInContactList(ALICE.getJID()));
         Util.addTestersToContactList(ALICE, BOB);
-        assertTrue(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
-        assertTrue(BOB.superBot().views().sarosView().hasBuddy(ALICE.getJID()));
+        assertTrue(ALICE.superBot().views().sarosView().isInContactList(BOB.getJID()));
+        assertTrue(BOB.superBot().views().sarosView().isInContactList(ALICE.getJID()));
     }
 
     /**
@@ -111,10 +111,10 @@ public class BuddiesByAliceBobTest extends StfTestCase {
      */
     @Test
     public void deleteBuddy() throws Exception {
-        assertTrue(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
+        assertTrue(ALICE.superBot().views().sarosView().isInContactList(BOB.getJID()));
         Util.removeTestersFromContactList(ALICE, BOB);
-        assertFalse(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
-        assertFalse(BOB.superBot().views().sarosView().hasBuddy(ALICE.getJID()));
+        assertFalse(ALICE.superBot().views().sarosView().isInContactList(BOB.getJID()));
+        assertFalse(BOB.superBot().views().sarosView().isInContactList(ALICE.getJID()));
         Thread.sleep(5000);
     }
 
@@ -128,7 +128,7 @@ public class BuddiesByAliceBobTest extends StfTestCase {
             .newC()
             .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1,
                 Constants.CLS1);
-        ALICE.superBot().views().sarosView().selectBuddy(BOB.getJID())
+        ALICE.superBot().views().sarosView().selectContact(BOB.getJID())
             .workTogetherOn().project(Constants.PROJECT1);
         BOB.superBot().confirmShellSessionInvitationAndShellAddProject(
             Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT);
@@ -148,7 +148,7 @@ public class BuddiesByAliceBobTest extends StfTestCase {
     public void workTogetherOnMultiProject() throws RemoteException {
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .javaProject(Constants.PROJECT1);
-        ALICE.superBot().views().sarosView().selectBuddy(BOB.getJID())
+        ALICE.superBot().views().sarosView().selectContact(BOB.getJID())
             .workTogetherOn()
             .multipleProjects(Constants.PROJECT1, BOB.getJID());
         BOB.superBot().confirmShellSessionInvitationAndShellAddProject(

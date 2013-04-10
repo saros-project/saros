@@ -63,16 +63,16 @@ public class NeedBasedSyncTest extends StfTestCase {
         CARL.superBot().views().packageExplorerView()
             .waitUntilResourceIsShared("foo/file2");
 
-        BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
+        BOB.superBot().views().sarosView().selectUser(ALICE.getJID())
             .followParticipant();
 
-        CARL.superBot().views().sarosView().selectParticipant(ALICE.getJID())
+        CARL.superBot().views().sarosView().selectUser(ALICE.getJID())
             .followParticipant();
 
-        BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
+        BOB.superBot().views().sarosView().selectUser(ALICE.getJID())
             .waitUntilIsFollowing();
 
-        CARL.superBot().views().sarosView().selectParticipant(ALICE.getJID())
+        CARL.superBot().views().sarosView().selectUser(ALICE.getJID())
             .waitUntilIsFollowing();
 
         ALICE.superBot().views().packageExplorerView()

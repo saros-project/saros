@@ -46,10 +46,10 @@ public class CreatingNewFileTest extends StfTestCase {
         BOB.superBot().views().packageExplorerView()
             .waitUntilResourceIsShared("foo/readme.txt");
 
-        CARL.superBot().views().sarosView().selectParticipant(ALICE.getJID())
+        CARL.superBot().views().sarosView().selectUser(ALICE.getJID())
             .restrictToReadOnlyAccess();
 
-        CARL.superBot().views().sarosView().selectParticipant(ALICE.getJID())
+        CARL.superBot().views().sarosView().selectUser(ALICE.getJID())
             .waitUntilHasReadOnlyAccess();
 
         // Lin's fault not mine !
@@ -58,9 +58,9 @@ public class CreatingNewFileTest extends StfTestCase {
 
         // ALICE.superBot().views().sarosView().selectParticipant(ALICE.getJID()).waitUntilHasReadOnlyAccess();
 
-        CARL.superBot().views().sarosView().selectParticipant(ALICE.getJID())
+        CARL.superBot().views().sarosView().selectUser(ALICE.getJID())
             .followParticipant();
-        BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
+        BOB.superBot().views().sarosView().selectUser(ALICE.getJID())
             .followParticipant();
 
         assertTrue(CARL.superBot().views().sarosView().isFollowing());

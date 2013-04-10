@@ -30,7 +30,7 @@ public class RecoveryWhileTypingTest extends StfTestCase {
         BOB.superBot().views().packageExplorerView()
             .waitUntilResourceIsShared("foo/readme.txt");
 
-        ALICE.superBot().views().sarosView().selectParticipant(BOB.getJID())
+        ALICE.superBot().views().sarosView().selectUser(BOB.getJID())
             .restrictToReadOnlyAccess();
 
         ALICE.superBot().views().packageExplorerView()

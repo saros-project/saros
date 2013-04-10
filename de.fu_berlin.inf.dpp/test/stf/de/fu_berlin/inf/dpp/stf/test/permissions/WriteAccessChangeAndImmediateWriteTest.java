@@ -51,7 +51,7 @@ public class WriteAccessChangeAndImmediateWriteTest extends StfTestCase {
             .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1,
                 Constants.CLS1);
 
-        ALICE.superBot().views().sarosView().selectParticipant(BOB.getJID())
+        ALICE.superBot().views().sarosView().selectUser(BOB.getJID())
             .restrictToReadOnlyAccess();
         BOB.superBot().views().packageExplorerView()
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
@@ -65,7 +65,7 @@ public class WriteAccessChangeAndImmediateWriteTest extends StfTestCase {
             .isEnabled());
         BOB.superBot().views().sarosView().resolveInconsistency();
 
-        ALICE.superBot().views().sarosView().selectParticipant(BOB.getJID())
+        ALICE.superBot().views().sarosView().selectUser(BOB.getJID())
             .grantWriteAccess();
         BOB.remoteBot().editor(Constants.CLS1_SUFFIX)
             .setTextFromFile(Constants.CP2);

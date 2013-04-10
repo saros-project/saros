@@ -45,7 +45,7 @@ public class InviteBuddiesByAliceBobCarlTest extends StfTestCase {
 
         assertFalse(CARL.superBot().views().sarosView().isInSession());
 
-        ALICE.superBot().views().sarosView().selectBuddy(CARL.getJID())
+        ALICE.superBot().views().sarosView().selectContact(CARL.getJID())
             .addToSarosSession();
 
         CARL.superBot().confirmShellSessionInvitationAndShellAddProject(

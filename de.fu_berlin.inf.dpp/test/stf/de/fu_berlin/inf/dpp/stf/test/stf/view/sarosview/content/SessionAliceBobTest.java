@@ -54,43 +54,43 @@ public class SessionAliceBobTest extends StfTestCase {
     @Test
     public void testRestrictToReadOnlyAccess() throws RemoteException {
         assertTrue(ALICE.superBot().views().sarosView()
-            .selectParticipant(BOB.getJID()).hasWriteAccess());
+            .selectUser(BOB.getJID()).hasWriteAccess());
         assertFalse(ALICE.superBot().views().sarosView()
-            .selectParticipant(BOB.getJID()).hasReadOnlyAccess());
-        ALICE.superBot().views().sarosView().selectParticipant(BOB.getJID())
+            .selectUser(BOB.getJID()).hasReadOnlyAccess());
+        ALICE.superBot().views().sarosView().selectUser(BOB.getJID())
             .restrictToReadOnlyAccess();
-        ALICE.superBot().views().sarosView().selectParticipant(BOB.getJID())
+        ALICE.superBot().views().sarosView().selectUser(BOB.getJID())
             .waitUntilHasReadOnlyAccess();
         assertFalse(ALICE.superBot().views().sarosView()
-            .selectParticipant(BOB.getJID()).hasWriteAccess());
+            .selectUser(BOB.getJID()).hasWriteAccess());
         assertTrue(ALICE.superBot().views().sarosView()
-            .selectParticipant(BOB.getJID()).hasReadOnlyAccess());
+            .selectUser(BOB.getJID()).hasReadOnlyAccess());
     }
 
     @Test
     public void testGrantWriteAccess() throws RemoteException {
         assertTrue(ALICE.superBot().views().sarosView()
-            .selectParticipant(BOB.getJID()).hasWriteAccess());
-        ALICE.superBot().views().sarosView().selectParticipant(BOB.getJID())
+            .selectUser(BOB.getJID()).hasWriteAccess());
+        ALICE.superBot().views().sarosView().selectUser(BOB.getJID())
             .restrictToReadOnlyAccess();
-        ALICE.superBot().views().sarosView().selectParticipant(BOB.getJID())
+        ALICE.superBot().views().sarosView().selectUser(BOB.getJID())
             .waitUntilHasReadOnlyAccess();
         assertFalse(ALICE.superBot().views().sarosView()
-            .selectParticipant(BOB.getJID()).hasWriteAccess());
-        ALICE.superBot().views().sarosView().selectParticipant(BOB.getJID())
+            .selectUser(BOB.getJID()).hasWriteAccess());
+        ALICE.superBot().views().sarosView().selectUser(BOB.getJID())
             .grantWriteAccess();
-        ALICE.superBot().views().sarosView().selectParticipant(BOB.getJID())
+        ALICE.superBot().views().sarosView().selectUser(BOB.getJID())
             .waitUntilHasWriteAccess();
         assertFalse(ALICE.superBot().views().sarosView()
-            .selectParticipant(BOB.getJID()).hasReadOnlyAccess());
+            .selectUser(BOB.getJID()).hasReadOnlyAccess());
     }
 
     @Test
     public void testFollowMode() throws Exception {
         assertFalse(ALICE.superBot().views().sarosView()
-            .selectParticipant(BOB.getJID()).isFollowing());
+            .selectUser(BOB.getJID()).isFollowing());
         assertFalse(BOB.superBot().views().sarosView()
-            .selectParticipant(ALICE.getJID()).isFollowing());
+            .selectUser(ALICE.getJID()).isFollowing());
 
         ALICE.superBot().views().packageExplorerView()
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
@@ -99,20 +99,20 @@ public class SessionAliceBobTest extends StfTestCase {
         // wait for the activity to reach BOB
         Thread.sleep(2000);
 
-        BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
+        BOB.superBot().views().sarosView().selectUser(ALICE.getJID())
             .followParticipant();
 
         assertTrue(BOB.superBot().views().sarosView()
-            .selectParticipant(ALICE.getJID()).isFollowing());
+            .selectUser(ALICE.getJID()).isFollowing());
 
         BOB.remoteBot().waitUntilEditorOpen(Constants.CLS1_SUFFIX);
         assertTrue(BOB.remoteBot().isEditorOpen(Constants.CLS1_SUFFIX));
 
-        ALICE.superBot().views().sarosView().selectParticipant(BOB.getJID())
+        ALICE.superBot().views().sarosView().selectUser(BOB.getJID())
             .followParticipant();
 
         assertTrue(ALICE.superBot().views().sarosView()
-            .selectParticipant(BOB.getJID()).isFollowing());
+            .selectUser(BOB.getJID()).isFollowing());
 
         BOB.remoteBot().editor(Constants.CLS1 + SUFFIX_JAVA).closeWithSave();
         ALICE.remoteBot().waitUntilEditorClosed(Constants.CLS1_SUFFIX);
@@ -122,9 +122,9 @@ public class SessionAliceBobTest extends StfTestCase {
     @Test
     public void testStopFollowing() throws Exception {
         assertFalse(ALICE.superBot().views().sarosView()
-            .selectParticipant(BOB.getJID()).isFollowing());
+            .selectUser(BOB.getJID()).isFollowing());
         assertFalse(BOB.superBot().views().sarosView()
-            .selectParticipant(ALICE.getJID()).isFollowing());
+            .selectUser(ALICE.getJID()).isFollowing());
 
         ALICE.superBot().views().packageExplorerView()
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
@@ -133,15 +133,15 @@ public class SessionAliceBobTest extends StfTestCase {
         // wait for the activity to reach BOB
         Thread.sleep(2000);
 
-        BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
+        BOB.superBot().views().sarosView().selectUser(ALICE.getJID())
             .followParticipant();
         assertTrue(BOB.superBot().views().sarosView()
-            .selectParticipant(ALICE.getJID()).isFollowing());
+            .selectUser(ALICE.getJID()).isFollowing());
 
-        BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
+        BOB.superBot().views().sarosView().selectUser(ALICE.getJID())
             .stopFollowing();
         assertFalse(BOB.superBot().views().sarosView()
-            .selectParticipant(ALICE.getJID()).isFollowing());
+            .selectUser(ALICE.getJID()).isFollowing());
 
     }
 
@@ -168,7 +168,7 @@ public class SessionAliceBobTest extends StfTestCase {
 
         assertFalse(BOB.remoteBot().isEditorOpen(Constants.CLS2_SUFFIX));
 
-        BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
+        BOB.superBot().views().sarosView().selectUser(ALICE.getJID())
             .jumpToPositionOfSelectedBuddy();
 
         Thread.sleep(500);
@@ -187,7 +187,7 @@ public class SessionAliceBobTest extends StfTestCase {
 
         Thread.sleep(500);
 
-        BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
+        BOB.superBot().views().sarosView().selectUser(ALICE.getJID())
             .jumpToPositionOfSelectedBuddy();
 
         assertTrue(BOB.remoteBot().editor(Constants.CLS1_SUFFIX).isActive());
@@ -200,7 +200,7 @@ public class SessionAliceBobTest extends StfTestCase {
             .open();
         String editorTextOfAlice = ALICE.remoteBot()
             .editor(Constants.CLS1_SUFFIX).getText();
-        ALICE.superBot().views().sarosView().selectParticipant(BOB.getJID())
+        ALICE.superBot().views().sarosView().selectUser(BOB.getJID())
             .restrictToReadOnlyAccess();
 
         BOB.superBot().views().packageExplorerView()
