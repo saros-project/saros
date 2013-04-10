@@ -39,7 +39,7 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
  * There is one user who is the host, all others are clients.
  * 
  * There is one local user representing the person in front of the current
- * eclipse instance, all others are buddies.
+ * eclipse instance, all others are remote users.
  * 
  * The public and mutable properties are the {@link User.Permission}, time since
  * going off-line, connection state, away information and whether this user is
@@ -221,8 +221,8 @@ public class User {
 
     /**
      * Returns true if this User object identifies the user which is using the
-     * local Eclipse instance as opposed to the buddies in different Eclipse
-     * instances.
+     * local Eclipse instance as opposed to the remote users in different
+     * Eclipse instances.
      */
     public boolean isLocal() {
         return this.equals(sarosSession.getLocalUser());

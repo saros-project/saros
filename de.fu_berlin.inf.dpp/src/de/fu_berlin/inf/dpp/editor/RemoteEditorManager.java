@@ -25,8 +25,8 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
  * This class contains the state of the editors, viewports and selections of all
- * buddies as we believe it to be by listening to the activityDataObjects we
- * receive.
+ * remote users as we believe it to be by listening to the activityDataObjects
+ * we receive.
  */
 public class RemoteEditorManager {
 
@@ -307,7 +307,7 @@ public class RemoteEditorManager {
 
     /**
      * Returns a set of all paths representing the editors which are currently
-     * opened by the buddies of this shared session (i.e. not our own).
+     * opened by the remote users of this shared session (i.e. not our own).
      * 
      * If no editors are opened an empty set is being returned.
      */

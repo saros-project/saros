@@ -41,17 +41,25 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
+ * <p>
  * A collector class that collects local text edit activityDataObjects and
  * compares them in relation to parallelism or rather concurrency with remote
- * text events.<br>
+ * text events.
+ * </p>
+ * <p>
  * It is measured how many characters the local user wrote in a session
  * (whitespaces are omitted, because Eclipse produces many of them automatically
  * e.g. when a new line is started), how many text edit activityDataObjects he
  * produced (which can be different to the number of characters he wrote, e.g.
  * when copy&paste or Eclipse's method generation was used) and how concurrent
- * the local user's writing was to buddies using different sample intervals. <br>
+ * the local user's writing was to remote users using different sample
+ * intervals.
+ * </p>
+ * <p>
  * Furthermore, it accumulates the characters edited for all remote
- * participants. <br>
+ * participants.
+ * </p>
+ * <p>
  * A little addition was made to track possible paste / auto generations. If a
  * single text edit activity produces more than a certain number
  * (pasteThreshold) of characters, it will be counted as possible paste action.
@@ -67,19 +75,23 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * typer is typing instead of a paste). Unfortunately, this relatively high
  * threshold will cause the collector to slip some true pastes as well. (E.g. an
  * auto completion of a comment block)
- * 
+ * </p>
+ * <p>
  * NOTE: Text edit activityDataObjects that are triggered by Eclipse (e.g. when
  * restoring an editor) are counted as well. And refactorings can produce quite
  * a large number of characters that are counted. <br>
- * <br>
+ * </p>
+ * <p>
  * Fixed: The number of non parallel edits was set to 100% if there are no
  * concurrent edits, which is fine. But if there are no edits at all, the non
  * parallel edits are still set to 100% even though this should rather be 0%.
+ * </p>
+ * <p>
  * Example:<br>
  * The percent numbers (for all intervals + non-parallel) should add up to
  * (nearly) 100, slight rounding errors are possible. The counted chars for all
- * intervals and non-parallel edits should add up to textedits.chars<br>
- * <br>
+ * intervals and non-parallel edits should add up to textedits.chars
+ * </p>
  * <code>
  * textedits.chars=5 <br>
  * textedits.count=5 <br>
@@ -109,7 +121,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * null) { currentPasteCount = 0; } possiblePastes.put(id, currentPasteCount +
  * 1);
  * 
- * TODO: synchronize the numbers the buddies get with the other collectors (E.g.
+ * TODO: synchronize the numbers the users get with the other collectors (E.g.
  * Alice as user should appear as user.2 in all statistic fields.
  * 
  * @author Lisa Dohrmann, Moritz von Hoffen
@@ -277,8 +289,8 @@ public class TextEditCollector extends AbstractStatisticCollector {
     protected void processGatheredData() {
 
         /*
-         * a variable to distinguish between buddies and assign a number to each
-         * of these buddies.
+         * a variable to distinguish between users and assign a number to each
+         * of these users.
          */
         int userNumber = 1;
 

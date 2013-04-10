@@ -27,7 +27,7 @@ public class IncomingSubscriptionEvent {
     /**
      * Gets the contact who send the subscription request.
      */
-    public JID getBuddy() {
+    public JID getContact() {
         return contact;
     }
 }

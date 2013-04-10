@@ -97,7 +97,7 @@ public class AddBuddyWizard extends Wizard {
         final SubscriptionManagerListener subscriptionManagerListener = new SubscriptionManagerListener() {
             @Override
             public void subscriptionReceived(IncomingSubscriptionEvent event) {
-                if (jid.equals(event.getBuddy()))
+                if (jid.equals(event.getContact()))
                     event.autoSubscribe = true;
                 subscriptionManager.removeSubscriptionManagerListener(this);
             }

@@ -21,8 +21,8 @@ public class ProjectExchangeInfo {
     /**
      * 
      * @param projectID
-     *            session wide ID of the project. This ID is the same on all
-     *            clients/buddies
+     *            Session wide ID of the project. This ID is the same for all
+     *            users.
      * @param projectName
      *            Name of the project on inviter side.
      * @param fileList

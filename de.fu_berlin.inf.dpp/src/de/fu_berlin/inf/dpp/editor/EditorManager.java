@@ -1820,7 +1820,7 @@ public class EditorManager extends AbstractActivityProvider {
 
     /**
      * Returns the set of paths representing the editors which are currently
-     * opened by the buddies and the local user.
+     * opened by all users.
      * 
      * Returns an empty set if no editors are opened.
      */

@@ -226,7 +226,7 @@ public class SkypeManager implements IConnectionListener {
     }
 
     /**
-     * Send the given Skype user name to all our buddies that are currently
+     * Send the given Skype user name to all our contacts that are currently
      * available.
      * 
      * TODO SS only send to those, that we know use Saros.
@@ -278,7 +278,7 @@ public class SkypeManager implements IConnectionListener {
     }
 
     /**
-     * Request the skype name of all known buddies and caches the results.
+     * Request the skype name of all known contacts and caches the results.
      * 
      * @param connection
      */
