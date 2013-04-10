@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.net.business;
 
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
@@ -8,17 +10,20 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.IReceiver;
+import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension.UserListEntry;
+import de.fu_berlin.inf.dpp.net.internal.extensions.UserListReceivedExtension;
+import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Business Logic for handling Invitation requests
  */
+
+// FIXME move into session scope
 @Component(module = "net")
 public class UserListHandler {
 
@@ -26,10 +31,13 @@ public class UserListHandler {
         .getName());
 
     @Inject
-    private XMPPTransmitter transmitter;
+    private ITransmitter transmitter;
 
     @Inject
     private ISarosSessionManager sessionManager;
+
+    @Inject
+    private SessionIDObservable sessionID;
 
     public UserListHandler(IReceiver receiver) {
         // TODO SessionID-Filter
@@ -39,14 +47,13 @@ public class UserListHandler {
             public void processPacket(Packet packet) {
                 JID fromJID = new JID(packet.getFrom());
 
-                log.debug("Inv" + Utils.prefix(fromJID) + ": Received userList");
+                log.debug("received user list from " + fromJID);
+
                 UserListExtension userListInfo = UserListExtension.PROVIDER
                     .getPayload(packet);
 
                 if (userListInfo == null) {
-                    log.warn("Inv" + Utils.prefix(fromJID)
-                        + ": The received userList packet's"
-                        + " payload is null.");
+                    log.warn("user list payload is corrupted");
                     return;
                 }
 
@@ -56,9 +63,8 @@ public class UserListHandler {
                 User fromUser = sarosSession.getUser(fromJID);
 
                 if (fromUser == null) {
-                    log.error("Received userList from buddy who "
-                        + "is not part of our session: "
-                        + Utils.prefix(fromJID));
+                    log.warn("received user list from " + fromJID
+                        + " who is not part of the current session");
                     return;
                 }
 
@@ -84,9 +90,23 @@ public class UserListHandler {
                         user.setPermission(userEntry.permission);
                     }
                 }
-                transmitter.sendUserListConfirmation(fromJID);
+                sendUserListConfirmation(fromJID);
             }
 
         }, UserListExtension.PROVIDER.getPacketFilter());
+    }
+
+    private void sendUserListConfirmation(JID to) {
+        log.debug("sending user list received confirmation to " + to);
+        try {
+            transmitter
+                .sendToSessionUser(to,
+                    UserListReceivedExtension.PROVIDER
+                        .create(new UserListReceivedExtension(sessionID
+                            .getValue())));
+        } catch (IOException e) {
+            log.error("failed to send user list received confirmation to: "
+                + to, e);
+        }
     }
 }

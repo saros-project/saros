@@ -104,14 +104,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         this.receiver = receiver;
     }
 
-    public void sendUserListConfirmation(JID to) {
-        log.trace("Sending buddy list confirmation to " + Utils.prefix(to));
-        sendMessageToUser(to,
-            UserListReceivedExtension.PROVIDER
-                .create(new UserListReceivedExtension(sessionID.getValue())),
-            true);
-    }
-
     // FIXME remove this method !
     private SarosPacketCollector installReceiver(PacketFilter filter) {
         return receiver.createCollector(filter);
