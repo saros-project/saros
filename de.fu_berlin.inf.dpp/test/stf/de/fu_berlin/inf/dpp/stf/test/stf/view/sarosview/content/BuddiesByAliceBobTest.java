@@ -46,7 +46,7 @@ public class BuddiesByAliceBobTest extends StfTestCase {
     public void testAddExistingBuddy() throws RemoteException {
         assertTrue(ALICE.superBot().views().sarosView().isInContactList(BOB.getJID()));
         ALICE.superBot().views().sarosView().selectBuddies()
-            .addBuddy(BOB.getJID());
+            .addContact(BOB.getJID());
         assertTrue(ALICE.superBot().views().sarosView().isInContactList(BOB.getJID()));
     }
 

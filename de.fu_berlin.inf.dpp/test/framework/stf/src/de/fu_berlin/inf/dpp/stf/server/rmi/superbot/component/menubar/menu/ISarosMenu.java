@@ -30,9 +30,10 @@ public interface ISarosMenu extends Remote {
      */
     public void createAccount(JID jid, String password) throws RemoteException;
 
-    public void addBuddy(JID jid) throws RemoteException;
+    public void addContact(JID jid) throws RemoteException;
 
-    public void addBuddies(String... jidOfInvitees) throws RemoteException;
+    public void addContactsToSession(String... jidOfInvitees)
+        throws RemoteException;
 
     public void shareProjects(String projectName, JID... jids)
         throws RemoteException;

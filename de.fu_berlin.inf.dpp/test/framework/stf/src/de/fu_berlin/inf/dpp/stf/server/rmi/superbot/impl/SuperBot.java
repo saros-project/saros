@@ -163,7 +163,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
     }
 
     @Override
-    public void confirmShellEditXMPPJabberAccount(String xmppJabberID,
+    public void confirmShellEditXMPPAccount(String xmppJabberID,
         String newPassword) throws RemoteException {
         SWTBotShell shell = new SWTBot().shell(SHELL_EDIT_XMPP_JABBER_ACCOUNT);
         shell.activate();
@@ -176,7 +176,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
     }
 
     @Override
-    public void confirmShellCreateNewXMPPJabberAccount(JID jid, String password)
+    public void confirmShellCreateNewXMPPAccount(JID jid, String password)
         throws RemoteException {
         SWTBotShell shell = new SWTBot()
             .shell(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
@@ -206,7 +206,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
     }
 
     @Override
-    public void confirmShellAddXMPPJabberAccount(JID jid, String password)
+    public void confirmShellAddXMPPAccount(JID jid, String password)
         throws RemoteException {
 
         SWTBotShell shell = new SWTBot().shell(SHELL_ADD_XMPP_JABBER_ACCOUNT);
@@ -236,7 +236,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
     }
 
     @Override
-    public void confirmShellAddBuddyToSession(String... baseJIDOfinvitees)
+    public void confirmShellAddContactsToSession(String... baseJIDOfinvitees)
         throws RemoteException {
 
         SWTBot bot = new SWTBot();
@@ -263,7 +263,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
     }
 
     @Override
-    public void confirmShellAddBuddy(JID jid) throws RemoteException {
+    public void confirmShellAddContact(JID jid) throws RemoteException {
         SWTBot bot = new SWTBot();
         SWTBotShell shell = bot.shell(SHELL_ADD_BUDDY);
         shell.activate();

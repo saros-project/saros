@@ -16,11 +16,12 @@ public interface ISuperBot extends Remote {
 
     public IInternal internal() throws RemoteException;
 
-    /**********************************************
+    /* *********************************************
      * 
      * finders
      * 
-     **********************************************/
+     * ********************************************
+     */
 
     public IViews views() throws RemoteException;
 
@@ -28,11 +29,12 @@ public interface ISuperBot extends Remote {
 
     public void setJID(JID jid) throws RemoteException;
 
-    /**********************************************
+    /* *********************************************
      * 
      * Shells
      * 
-     **********************************************/
+     * ********************************************
+     */
 
     /**
      * The shell with the title {@link StfRemoteObject#SHELL_ADD_PROJECT} should
@@ -85,7 +87,7 @@ public interface ISuperBot extends Remote {
      * @param newPassword
      * @throws RemoteException
      */
-    public void confirmShellEditXMPPJabberAccount(String newXmppJabberID,
+    public void confirmShellEditXMPPAccount(String newXmppJabberID,
         String newPassword) throws RemoteException;
 
     /**
@@ -95,10 +97,10 @@ public interface ISuperBot extends Remote {
      * @param jid
      *            {@link JID}
      * @param password
-     *            password of the new XMPP/Jabber account
+     *            password of the new XMPP account
      * @throws RemoteException
      */
-    public void confirmShellCreateNewXMPPJabberAccount(JID jid, String password)
+    public void confirmShellCreateNewXMPPAccount(JID jid, String password)
         throws RemoteException;
 
     /**
@@ -108,19 +110,19 @@ public interface ISuperBot extends Remote {
      * @param jid
      *            {@link JID}
      * @param password
-     *            password of the new XMPP/Jabber account
+     *            password of the new XMPP account
      * @throws RemoteException
      */
-    public void confirmShellAddXMPPJabberAccount(JID jid, String password)
+    public void confirmShellAddXMPPAccount(JID jid, String password)
         throws RemoteException;
 
     /**
-     * confirm the shell with title {@link StfRemoteObject#SHELL_ADD_BUDDY}
+     * Confirms the shell with title {@link StfRemoteObject#SHELL_ADD_BUDDY}.
      * 
      * @param baseJIDOfinvitees
      * @throws RemoteException
      */
-    public void confirmShellAddBuddyToSession(String... baseJIDOfinvitees)
+    public void confirmShellAddContactsToSession(String... baseJIDOfinvitees)
         throws RemoteException;
 
     /**
@@ -138,7 +140,7 @@ public interface ISuperBot extends Remote {
      *            {@link JID}
      * @throws RemoteException
      */
-    public void confirmShellAddBuddy(JID jid) throws RemoteException;
+    public void confirmShellAddContact(JID jid) throws RemoteException;
 
     /**
      * confirm the shell with title {@link StfRemoteObject#SHELL_SHARE_PROJECT}

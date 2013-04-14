@@ -135,7 +135,7 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
         ALICE.superBot().views().sarosView()
             .connectWith(ALICE.getJID(), ALICE.getPassword());
         ALICE.remoteBot().menu(MENU_SAROS).menu(MENU_ADD_BUDDY).click();
-        ALICE.superBot().confirmShellAddBuddy(BOB.getJID());
+        ALICE.superBot().confirmShellAddContact(BOB.getJID());
     }
 
     @Test

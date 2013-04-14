@@ -36,9 +36,9 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.impl.ControlBotImpl;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.ISuperBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.IContextMenusInBuddiesArea;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.IContextMenusInContactListArea;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.IContextMenusInSessionArea;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.impl.ContextMenusInBuddiesArea;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.impl.ContextMenusInContactListArea;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.impl.ContextMenusInSessionArea;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.IChatroom;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.ISarosView;
@@ -127,7 +127,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     public void addContact(JID jid) throws RemoteException {
         if (!isInContactList(jid)) {
             clickToolbarButtonWithTooltip(TB_ADD_A_NEW_BUDDY);
-            SuperBot.getInstance().confirmShellAddBuddy(jid);
+            SuperBot.getInstance().confirmShellAddContact(jid);
         }
         // wait for update of the saros session tree
         new SWTBot().sleep(500);
@@ -209,13 +209,13 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
      **********************************************/
 
     @Override
-    public IContextMenusInBuddiesArea selectBuddies() throws RemoteException {
+    public IContextMenusInContactListArea selectBuddies() throws RemoteException {
         initBuddiesContextMenuWrapper(Pattern.quote((NODE_BUDDIES)));
-        return ContextMenusInBuddiesArea.getInstance();
+        return ContextMenusInContactListArea.getInstance();
     }
 
     @Override
-    public IContextMenusInBuddiesArea selectContact(JID jid)
+    public IContextMenusInContactListArea selectContact(JID jid)
         throws RemoteException {
         if (getNickname(jid) == null) {
             throw new RuntimeException("no buddy exists with the JID: "
@@ -223,7 +223,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         }
         initBuddiesContextMenuWrapper(Pattern.quote(NODE_BUDDIES),
             Pattern.quote(getNickname(jid)) + ".*");
-        return ContextMenusInBuddiesArea.getInstance();
+        return ContextMenusInContactListArea.getInstance();
     }
 
     @Override
@@ -639,8 +639,8 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     }
 
     private void initBuddiesContextMenuWrapper(String... treeItemNodes) {
-        ContextMenusInBuddiesArea.getInstance().setTree(tree);
-        ContextMenusInBuddiesArea.getInstance().setTreeItemNodes(treeItemNodes);
-        ContextMenusInBuddiesArea.getInstance().setSarosView(this);
+        ContextMenusInContactListArea.getInstance().setTree(tree);
+        ContextMenusInContactListArea.getInstance().setTreeItemNodes(treeItemNodes);
+        ContextMenusInContactListArea.getInstance().setSarosView(this);
     }
 }

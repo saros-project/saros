@@ -9,7 +9,7 @@ import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.ISuperBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.IContextMenusInBuddiesArea;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.IContextMenusInContactListArea;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.IContextMenusInSessionArea;
 
 /**
@@ -77,13 +77,13 @@ public interface ISarosView extends Remote {
      * 
      * @throws RemoteException
      */
-    public IContextMenusInBuddiesArea selectContact(JID jid)
+    public IContextMenusInContactListArea selectContact(JID jid)
         throws RemoteException;
 
     /**
      * Selects the tree node "Buddies"
      */
-    public IContextMenusInBuddiesArea selectBuddies() throws RemoteException;
+    public IContextMenusInContactListArea selectBuddies() throws RemoteException;
 
     /**
      * Selects the tree node "Session"

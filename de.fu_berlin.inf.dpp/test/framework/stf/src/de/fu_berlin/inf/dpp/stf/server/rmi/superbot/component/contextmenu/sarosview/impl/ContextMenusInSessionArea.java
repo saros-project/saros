@@ -188,7 +188,7 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
             throw e;
         }
 
-        SuperBot.getInstance().confirmShellAddBuddyToSession(jidOfInvitees);
+        SuperBot.getInstance().confirmShellAddContactsToSession(jidOfInvitees);
     }
 
     @Override

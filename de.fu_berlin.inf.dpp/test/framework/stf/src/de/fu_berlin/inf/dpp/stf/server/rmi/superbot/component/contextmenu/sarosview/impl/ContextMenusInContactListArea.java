@@ -9,17 +9,17 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.bot.widget.ContextMenuHelper;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.IContextMenusInBuddiesArea;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.IContextMenusInContactListArea;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.submenu.IWorkTogetherOnContextMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.submenu.impl.WorkTogetherOnContextMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.impl.SuperBot;
 
-public final class ContextMenusInBuddiesArea extends ContextMenusInSarosView
-    implements IContextMenusInBuddiesArea {
+public final class ContextMenusInContactListArea extends ContextMenusInSarosView
+    implements IContextMenusInContactListArea {
 
-    private static final ContextMenusInBuddiesArea INSTANCE = new ContextMenusInBuddiesArea();
+    private static final ContextMenusInContactListArea INSTANCE = new ContextMenusInContactListArea();
 
-    public static ContextMenusInBuddiesArea getInstance() {
+    public static ContextMenusInContactListArea getInstance() {
         return INSTANCE;
     }
 
@@ -36,26 +36,17 @@ public final class ContextMenusInBuddiesArea extends ContextMenusInSarosView
     }
 
     @Override
-    public void rename(String newBuddyName) throws RemoteException {
+    public void rename(String nickname) throws RemoteException {
         getTreeItem().select();
         ContextMenuHelper.clickContextMenu(tree, CM_RENAME);
 
         SWTBotShell shell = new SWTBot().shell(SHELL_SET_NEW_NICKNAME);
         shell.activate();
-        shell.bot().text().setText(newBuddyName);
+        shell.bot().text().setText(nickname);
         shell.bot().button(OK).click();
         shell.bot().waitUntil(Conditions.shellCloses(shell));
         // wait for tree update in saros session view
         new SWTBot().sleep(500);
-    }
-
-    // this method does not operate on the context menu
-    @Override
-    public void addJIDToChat() throws RemoteException {
-        SWTBotTreeItem treeItem = getTreeItem();
-
-        treeItem.select();
-        treeItem.doubleClick();
     }
 
     @Override
@@ -73,11 +64,11 @@ public final class ContextMenusInBuddiesArea extends ContextMenusInSarosView
     }
 
     @Override
-    public void addBuddy(JID jid) throws RemoteException {
+    public void addContact(JID jid) throws RemoteException {
         if (!sarosView.isInContactList(jid)) {
             getTreeItem().select();
             ContextMenuHelper.clickContextMenu(tree, "Add Buddy...");
-            SuperBot.getInstance().confirmShellAddBuddy(jid);
+            SuperBot.getInstance().confirmShellAddContact(jid);
             // wait for tree update in saros session view
             new SWTBot().sleep(500);
         }

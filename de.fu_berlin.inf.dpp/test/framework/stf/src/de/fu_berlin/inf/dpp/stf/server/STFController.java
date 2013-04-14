@@ -60,7 +60,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.impl.RefactorC;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.impl.ShareWithC;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.impl.TeamC;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.impl.ContextMenusInBuddiesArea;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.impl.ContextMenusInContactListArea;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.impl.ContextMenusInSessionArea;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.submenu.impl.WorkTogetherOnContextMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.impl.MenuBar;
@@ -222,7 +222,7 @@ public class STFController {
         exportObject(TeamC.getInstance(), "teamC");
         exportObject(ShareWithC.getInstance(), "shareWithC");
         exportObject(ContextMenusInPEView.getInstance(), "contextMenu");
-        exportObject(ContextMenusInBuddiesArea.getInstance(),
+        exportObject(ContextMenusInContactListArea.getInstance(),
             "buddiesContextMenu");
 
         exportObject(ContextMenusInSessionArea.getInstance(),

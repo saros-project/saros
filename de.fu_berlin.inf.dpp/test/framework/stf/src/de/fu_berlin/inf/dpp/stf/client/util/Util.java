@@ -394,8 +394,7 @@ public class Util {
 
         for (AbstractTester tester : participants)
             tester.superBot().views().sarosView()
-                .selectUser(followedParticipant.getJID())
-                .followParticipant();
+                .selectUser(followedParticipant.getJID()).followParticipant();
     }
 
     /**
@@ -457,8 +456,8 @@ public class Util {
             boolean isInRemoteContactList = contact.superBot().views()
                 .sarosView().isInContactList(tester.getJID());
 
-            tester.superBot().views().sarosView().selectContact(contact.getJID())
-                .delete();
+            tester.superBot().views().sarosView()
+                .selectContact(contact.getJID()).delete();
 
             if (!isInRemoteContactList)
                 continue;
@@ -528,7 +527,7 @@ public class Util {
         }
 
         inviter.superBot().menuBar().saros()
-            .addBuddies(Util.getBaseJID(invitees));
+            .addContactsToSession(Util.getBaseJID(invitees));
 
         List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();
 
@@ -608,8 +607,8 @@ public class Util {
             if (tester.superBot().views().sarosView().isInSession()
                 && host.superBot().views().sarosView()
                     .selectUser(tester.getJID()).hasReadOnlyAccess()) {
-                host.superBot().views().sarosView()
-                    .selectUser(tester.getJID()).grantWriteAccess();
+                host.superBot().views().sarosView().selectUser(tester.getJID())
+                    .grantWriteAccess();
             }
         }
     }

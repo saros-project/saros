@@ -52,7 +52,7 @@ public final class SarosPreferences extends StfRemoteObject implements
             .shell(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
 
         createAccountShell.activate();
-        SuperBot.getInstance().confirmShellCreateNewXMPPJabberAccount(jid,
+        SuperBot.getInstance().confirmShellCreateNewXMPPAccount(jid,
             password);
         createAccountShell.bot().button(NEXT).click();
         createAccountShell.bot().button(FINISH).click();
@@ -72,7 +72,7 @@ public final class SarosPreferences extends StfRemoteObject implements
             .buttonInGroup(BUTTON_ADD_ACCOUNT, GROUP_TITLE_XMPP_JABBER_ACCOUNTS)
             .click();
 
-        SuperBot.getInstance().confirmShellAddXMPPJabberAccount(jid, password);
+        SuperBot.getInstance().confirmShellAddXMPPAccount(jid, password);
 
         shell.bot().button(APPLY).click();
         shell.bot().button(OK).click();
@@ -123,7 +123,7 @@ public final class SarosPreferences extends StfRemoteObject implements
             .bot()
             .buttonInGroup(BUTTON_EDIT_ACCOUNT,
                 GROUP_TITLE_XMPP_JABBER_ACCOUNTS).click();
-        SuperBot.getInstance().confirmShellEditXMPPJabberAccount(
+        SuperBot.getInstance().confirmShellEditXMPPAccount(
             newXmppJabberID, newPassword);
         shell.bot().button(APPLY).click();
         shell.bot().button(OK).click();
