@@ -273,10 +273,9 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
                         break;
                     } else {
 
-                        log.error("could not send packet extension through a direct connection ("
-                            + Utils.formatByte(data.length)
-                            + "): "
-                            + e.getMessage());
+                        log.error(
+                            "could not send packet extension through a direct connection ("
+                                + Utils.formatByte(data.length) + ")", e);
 
                         if (retry == MAX_TRANSFER_RETRIES / 2) {
                             // set bytestream connections prefer IBB
