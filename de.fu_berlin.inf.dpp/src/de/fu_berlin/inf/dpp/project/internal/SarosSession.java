@@ -824,13 +824,14 @@ public final class SarosSession implements ISarosSession {
                 return;
         }
 
-        toSend = true;
+        boolean send = true;
         // handle FileActivities and FolderActivities to update ProjectMapper
         if (activity instanceof FolderActivity
-            || activity instanceof FileActivity)
-            handleFileAndFolderActivities(activity);
+            || activity instanceof FileActivity) {
+            send = handleFileAndFolderActivities(activity);
+        }
 
-        if (!toSend)
+        if (!send)
             return;
 
         try {
@@ -980,23 +981,19 @@ public final class SarosSession implements ISarosSession {
         }
     }
 
-    /*
-     * FIXME: this needs a serious code review as Saros is not a single threaded
-     * application
-     */
-    boolean toSend = true;
-
     /**
      * Method to update the ProjectMapper when changes on shared files oder
      * folders happened.
      * 
      * @param activity
      *            {@link FileActivity} or {@link FolderActivity} to handle
+     * @return <code>true</code> if the activity should be send to the user,
+     *         <code>false</code> otherwise
      */
-    protected void handleFileAndFolderActivities(IActivity activity) {
+    protected boolean handleFileAndFolderActivities(IActivity activity) {
         if (!(activity instanceof FileActivity)
             && !(activity instanceof FolderActivity))
-            return;
+            return true;
 
         if (activity instanceof FileActivity) {
             FileActivity fileActivity = ((FileActivity) activity);
@@ -1005,12 +1002,11 @@ public final class SarosSession implements ISarosSession {
 
             if (isInProjectNegotiation(fileActivity)
                 && !fileActivity.isNeedBased()) {
-                toSend = false;
-                return;
+                return false;
             }
 
             if (file == null)
-                return;
+                return true;
 
             IProject project = file.getProject();
             List<IResource> resources = getSharedResources(project);
@@ -1018,7 +1014,7 @@ public final class SarosSession implements ISarosSession {
             switch (fileActivity.getType()) {
             case Created:
                 if (!file.exists())
-                    return;
+                    return true;
 
                 if (resources != null && !resources.contains(file)) {
                     resources.add(file);
@@ -1027,8 +1023,7 @@ public final class SarosSession implements ISarosSession {
                 break;
             case Removed:
                 if (!isShared(file)) {
-                    toSend = false;
-                    return;
+                    return false;
                 }
                 if (resources != null && resources.contains(file)) {
                     resources.remove(file);
@@ -1038,8 +1033,7 @@ public final class SarosSession implements ISarosSession {
             case Moved:
                 IFile oldFile = fileActivity.getOldPath().getFile();
                 if (oldFile == null || !isShared(oldFile)) {
-                    toSend = false;
-                    return;
+                    return false;
                 }
                 List<IResource> res = getSharedResources(oldFile.getProject());
                 if (res != null) {
@@ -1056,7 +1050,7 @@ public final class SarosSession implements ISarosSession {
             IFolder folder = folderActivity.getPath().getFolder();
 
             if (folder == null)
-                return;
+                return true;
 
             IProject iProject = folder.getProject();
             List<IResource> resources = getSharedResources(iProject);
@@ -1072,8 +1066,7 @@ public final class SarosSession implements ISarosSession {
                     break;
                 case Removed:
                     if (!isShared(folder)) {
-                        toSend = false;
-                        return;
+                        return false;
                     }
                     if (resources.contains(folder)) {
                         resources.remove(folder);
@@ -1082,7 +1075,7 @@ public final class SarosSession implements ISarosSession {
                 }
             }
         }
-        return;
+        return true;
     }
 
     @Override
