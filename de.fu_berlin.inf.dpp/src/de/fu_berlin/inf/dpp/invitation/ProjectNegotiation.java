@@ -223,8 +223,9 @@ public abstract class ProjectNegotiation extends CancelableProcess {
         if (status
             .equals(org.jivesoftware.smackx.filetransfer.FileTransfer.Status.error)) {
             FileTransfer.Error error = transfer.getError();
-            throw new IOException(error == null ? "unkown error"
-                : error.getMessage(), transfer.getException());
+            throw new IOException(
+                error == null ? "unknown SMACK Filetransfer API error"
+                    : error.getMessage(), transfer.getException());
         }
 
         throw new RemoteCancellationException(null);

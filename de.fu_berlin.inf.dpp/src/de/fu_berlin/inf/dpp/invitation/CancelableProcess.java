@@ -251,10 +251,12 @@ abstract class CancelableProcess {
                 : Status.REMOTE_ERROR;
 
         } else if (exception instanceof IOException) {
-            String errorMsg = "Unknown error: " + exception;
+            log.error(this + " I/O error occured", exception);
+
+            String errorMsg = "I/O failure";
 
             if (exception.getMessage() != null)
-                errorMsg = exception.getMessage();
+                errorMsg += ": " + exception.getMessage();
 
             localCancel(errorMsg, CancelOption.NOTIFY_PEER);
             exitStatus = Status.ERROR;
