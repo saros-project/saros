@@ -8,7 +8,7 @@ import java.util.concurrent.CancellationException;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.joda.time.DateTime;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -52,7 +52,7 @@ public class NullSarosSession implements ISarosSession {
 
     @Override
     public void initiatePermissionChange(User user, Permission newPermission,
-        SubMonitor progress) throws CancellationException, InterruptedException {
+        IProgressMonitor progress) throws CancellationException, InterruptedException {
         log.warn("unexpected method call");
     }
 

@@ -26,7 +26,7 @@ import java.util.concurrent.CancellationException;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.joda.time.DateTime;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -77,7 +77,7 @@ public interface ISarosSession {
      * @Throws InterruptedException
      */
     public void initiatePermissionChange(User user, Permission newPermission,
-        SubMonitor progress) throws CancellationException, InterruptedException;
+        IProgressMonitor progress) throws CancellationException, InterruptedException;
 
     /**
      * Set the {@link Permission} of the given user. This is called on incoming

@@ -411,7 +411,7 @@ public final class SarosSession implements ISarosSession {
      */
     @Override
     public void initiatePermissionChange(final User user,
-        final Permission newPermission, SubMonitor progress)
+        final Permission newPermission, IProgressMonitor progress)
         throws CancellationException, InterruptedException {
 
         if (!localUser.isHost()) {
