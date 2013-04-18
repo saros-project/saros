@@ -43,28 +43,26 @@ import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 
 /**
- * A SarosSession consists of one or more shared projects, which are the central
- * concept of this plugin. They are associated with Eclipse projects and make
- * them available for synchronous/real-time collaboration.
+ * A Saros session consists of one or more shared projects, which are the
+ * central concept of the Saros plugin. They are associated with Eclipse
+ * projects and make them available for synchronous/real-time collaboration.
  * 
  * @author rdjemili
  */
 public interface ISarosSession {
 
     /**
-     * @return a list of all users of the current session which includes the
-     *         local user too
+     * @return a list of all users of this session
      */
     public List<User> getUsers();
 
     /**
-     * @return a collection of all remote participants of the current session
+     * @return a list of all remote users of this session
      */
     public List<User> getRemoteUsers();
 
     /**
-     * Initiates a {@link Permission} change. This method is called when the
-     * user wants to change user {@link Permission}s via the UI.
+     * Initiates a {@link Permission} change.
      * 
      * @host This method may only called by the host.
      * @noSWT This method mustn't be called from the SWT UI thread
@@ -77,11 +75,11 @@ public interface ISarosSession {
      * @Throws InterruptedException
      */
     public void initiatePermissionChange(User user, Permission newPermission,
-        IProgressMonitor progress) throws CancellationException, InterruptedException;
+        IProgressMonitor progress) throws CancellationException,
+        InterruptedException;
 
     /**
-     * Set the {@link Permission} of the given user. This is called on incoming
-     * activityDataObjects from the network.
+     * Set the {@link Permission} of the given user.
      * 
      * @swt This method MUST to be called from the SWT UI thread
      * @param user
@@ -92,56 +90,53 @@ public interface ISarosSession {
     public void setPermission(User user, Permission permission);
 
     /**
-     * @return <code>true</code> if the local client is a user with
-     *         {@link Permission#WRITE_ACCESS} of this shared project.
-     *         <code>false</code> otherwise.
+     * @return <code>true</code> if the local user has
+     *         {@link Permission#WRITE_ACCESS write access}, <code>false</code>
+     *         otherwise
      */
     public boolean hasWriteAccess();
 
     /**
-     * The host is the person that initiated this SarosSession and holds all
-     * original files.
+     * Returns the host of this session.
      * 
-     * @immutable This method will always return the same value for a session
+     * @immutable This method will always return the same value for this session
      */
     public User getHost();
 
     /**
-     * @return <code>true</code> if the local client is the host of this shared
-     *         project. <code>false</code> otherwise.
+     * @return <code>true</code> if the local user is the host of this session,
+     *         <code>false</code> otherwise.
      * 
-     * @immutable This method will always return the same value for a session
      */
     public boolean isHost();
 
     /**
-     * Adds the user to the current Saros session. If the session currently
-     * serves as host all other session participants will be noticed about the
-     * new user.
+     * Adds the user to this session. If the session currently serves as host
+     * all other session users will be noticed about the new user.
      * 
      * @param user
-     *            the user that is to be added.
+     *            the user that is to be added
      */
     public void addUser(User user);
 
     /**
-     * Removes the user.
+     * Removes a user from this session.
      * 
      * @param user
-     *            the user that is to be removed.
+     *            the user that is to be removed
      * 
      * @swt Must be called from SWT!
      */
     public void removeUser(User user);
 
     /**
-     * Kicks and removes the user out of the current session.
+     * Kicks and removes the user out of the session.
      * 
      * @param user
      *            the user that should be kicked from the session
      * 
      * @throws IllegalStateException
-     *             if the local user is not the host of the current session
+     *             if the local user is not the host of the session
      * @throws IllegalArgumentException
      *             if the user to kick is the local user
      */
@@ -166,16 +161,18 @@ public interface ISarosSession {
     public void removeListener(ISharedProjectListener listener);
 
     /**
-     * @return the Eclipse projects associated with this shared project. This
-     *         always returns a set non-null set, which contains at least one
-     *         element.
+     * @return the shared projects associated with this session, never
+     *         <code>null</code> but may be empty
      */
     public Set<IProject> getProjects();
 
     /**
      * @return the sequencer that is responsible for sending and receiving
      *         activityDataObjects.
+     * 
+     * @deprecated will be removed, do not use this in new code
      */
+    @Deprecated
     public ActivitySequencer getSequencer();
 
     /**
@@ -189,28 +186,51 @@ public interface ISarosSession {
     public void stop();
 
     /**
+     * <p>
      * Given a resource qualified JID, this method will return the user which
      * has the identical ID including resource.
-     * 
-     * Null is returned if no user is found with this JID (even if there is only
-     * a resource mismatch).
-     * 
+     * </p>
+     * <p>
      * Use getResourceQualifiedJID(JID) in the case if you do not know the
      * RQ-JID.
+     * </p>
+     * 
+     * @return the user with the given fully qualified JID or <code>null</code>
+     *         if not user with such a JID exists in the session
      */
     public User getUser(JID jid);
 
     /**
-     * Given a JID (with resource or not), will return the resource qualified
-     * JID associated with a User in this project or null if no user for the
-     * given JID exists in this SarosSession.
+     * <p>
+     * Returns the resource qualified JID associated with a user of the session.
+     * </p>
+     * 
+     * E.g:
+     * 
+     * <pre>
+     * <code>
+     * JID rqJID = session.getResourceQualifiedJID(new JID("alice@foo.com");
+     * System.out.println(rqJID);
+     * </code>
+     * </pre>
+     * 
+     * <p>
+     * Will print out something like alice@foo.com/Saros*****
+     * </p>
+     * 
+     * @param jid
+     *            the JID to retrieve the resource qualified JID for
+     * 
+     * @return the resource qualified JID or <code>null</code> if no user is
+     *         found with this JID
      */
     public JID getResourceQualifiedJID(JID jid);
 
     /**
-     * Returns the {@link User} who is representing the local eclipse instance
+     * Returns the local user of this session.
      * 
-     * @immutable This method will always return the same value for a session
+     * 
+     * @immutable This method will always return the same value for this session
      */
     public User getLocalUser();
 
@@ -238,7 +258,11 @@ public interface ISarosSession {
 
     /**
      * The Saros Plugin this SarosSession is running in.
+     * 
+     * @deprecated will be removed, do not use this in new code
      */
+
+    @Deprecated
     public Saros getSaros();
 
     /**
@@ -249,7 +273,7 @@ public interface ISarosSession {
     public Set<Integer> getAvailableColors();
 
     /**
-     * Executes the given activityDataObjects locally.
+     * FOR INTERNAL USE ONLY !
      */
     public void exec(List<IActivityDataObject> activityDataObjects);
 
@@ -278,7 +302,7 @@ public interface ISarosSession {
     public void removeActivityProvider(IActivityProvider provider);
 
     /**
-     * Returns a list of all users in this project which have
+     * Returns a list of all users in this session which have
      * {@link Permission#WRITE_ACCESS} right now.
      * 
      * @snapshot This is a snapshot copy. This list does not change if users'
@@ -290,7 +314,7 @@ public interface ISarosSession {
     public List<User> getUsersWithWriteAccess();
 
     /**
-     * Returns a list of all users in this project have
+     * Returns a list of all users in this session have
      * {@link Permission#READONLY_ACCESS} right now.
      * 
      * @snapshot This is a snapshot copy. This list does not change if users'
@@ -319,8 +343,8 @@ public interface ISarosSession {
     public DateTime getSessionStart();
 
     /**
-     * Returns true if the given {@link IResource} is currently shared using
-     * this Saros session.
+     * @return <code>true</code> if the given {@link IResource resource} is
+     *         currently shared in this session, <code>false</code> otherwise
      */
     public boolean isShared(IResource resource);
 
@@ -328,7 +352,7 @@ public interface ISarosSession {
      * Checks if selected project is a complete shared one or partial shared.
      * 
      * @param project
-     * @return true if complete false if partial
+     * @return <code>true</code> if complete, <code>false</code> if partial
      */
     public boolean isCompletelyShared(IProject project);
 
@@ -350,12 +374,18 @@ public interface ISarosSession {
     public SharedProject getSharedProject(IProject project);
 
     /**
-     * Returns the global ID of the <code>project</code>.
+     * Returns the global ID of the project.
+     * 
+     * @return the global ID of the project or <code>null</code> if this project
+     *         is not shared
      */
     public String getProjectID(IProject project);
 
     /**
-     * Returns the project with the given global ID.
+     * Returns the project with the given ID.
+     * 
+     * @return the project with the given ID or <code>null</code> if no project
+     *         with this ID is shared
      */
     public IProject getProject(String projectID);
 
@@ -380,9 +410,9 @@ public interface ISarosSession {
     public List<SharedProject> getSharedProjects();
 
     /**
-     * Returns all resources of session.
+     * Returns all shared resources in this session.
      * 
-     * @return Returns a list of all resources (excluding projects) from current
+     * @return a list of all shared resources (excluding projects) from this
      *         session.
      */
     public List<IResource> getSharedResources();
@@ -395,10 +425,11 @@ public interface ISarosSession {
     public HashMap<IProject, List<IResource>> getProjectResourcesMapping();
 
     /**
-     * Returns project dependent resources, when shared.
+     * Returns the shared resources of the project in this session.
      * 
      * @param project
-     * @return
+     * @return the shared resources or <code>null</code> if this project is not
+     *         or fully shared.
      */
     public List<IResource> getSharedResources(IProject project);
 

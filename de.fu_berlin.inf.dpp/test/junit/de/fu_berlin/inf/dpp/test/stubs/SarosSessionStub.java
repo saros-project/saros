@@ -112,7 +112,8 @@ public class SarosSessionStub implements ISarosSession {
 
     @Override
     public void initiatePermissionChange(User user, Permission newPermission,
-        IProgressMonitor progress) throws CancellationException, InterruptedException {
+        IProgressMonitor progress) throws CancellationException,
+        InterruptedException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }

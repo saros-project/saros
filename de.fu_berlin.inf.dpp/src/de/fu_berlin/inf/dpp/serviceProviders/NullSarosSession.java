@@ -52,7 +52,8 @@ public class NullSarosSession implements ISarosSession {
 
     @Override
     public void initiatePermissionChange(User user, Permission newPermission,
-        IProgressMonitor progress) throws CancellationException, InterruptedException {
+        IProgressMonitor progress) throws CancellationException,
+        InterruptedException {
         log.warn("unexpected method call");
     }
 
