@@ -385,7 +385,7 @@ public interface ISarosSession {
      * @return Returns a list of all resources (excluding projects) from current
      *         session.
      */
-    public List<IResource> getAllSharedResources();
+    public List<IResource> getSharedResources();
 
     /**
      * Returns HashMap with the mapping of shared resources to their project.

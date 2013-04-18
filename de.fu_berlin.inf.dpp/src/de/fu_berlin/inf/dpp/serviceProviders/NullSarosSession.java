@@ -260,7 +260,7 @@ public class NullSarosSession implements ISarosSession {
     }
 
     @Override
-    public List<IResource> getAllSharedResources() {
+    public List<IResource> getSharedResources() {
         log.warn("unexpected method call");
         return null;
     }

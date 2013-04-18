@@ -257,7 +257,7 @@ public class SarosSessionStub implements ISarosSession {
     }
 
     @Override
-    public List<IResource> getAllSharedResources() {
+    public List<IResource> getSharedResources() {
         throw new RuntimeException("Unexpected call to Stub");
     }
 

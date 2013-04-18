@@ -1108,7 +1108,7 @@ public final class SarosSession implements ISarosSession {
     }
 
     @Override
-    public List<IResource> getAllSharedResources() {
+    public List<IResource> getSharedResources() {
         List<IResource> allSharedResources = new ArrayList<IResource>();
         Collection<List<IResource>> resources = projectMapper.getResources();
         for (List<IResource> list : resources) {

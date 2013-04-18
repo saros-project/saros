@@ -303,7 +303,7 @@ public class CollaborationUtils {
         Map<IProject, Set<IResource>> projectsResources = new HashMap<IProject, Set<IResource>>();
 
         if (sarosSession != null)
-            selectedResources.removeAll(sarosSession.getAllSharedResources());
+            selectedResources.removeAll(sarosSession.getSharedResources());
 
         // do not sort LinkedLists which would be a complete overkill
         if (!(selectedResources instanceof RandomAccess))
