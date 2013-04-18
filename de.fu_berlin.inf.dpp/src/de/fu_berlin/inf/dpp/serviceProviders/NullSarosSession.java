@@ -39,7 +39,7 @@ public class NullSarosSession implements ISarosSession {
     private Logger log = Logger.getLogger(NullSarosSession.class);
 
     @Override
-    public List<User> getParticipants() {
+    public List<User> getUsers() {
         log.warn("unexpected method call");
         return null;
     }

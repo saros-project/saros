@@ -155,7 +155,7 @@ public class ConsistencyWatchdogHandler implements Startable {
         try {
 
             startHandles = sarosSession.getStopManager().stop(
-                sarosSession.getParticipants(), "Consistency recovery",
+                sarosSession.getUsers(), "Consistency recovery",
                 progress.newChild(200));
 
             progress.subTask("Sending files to client...");

@@ -184,7 +184,7 @@ public class FollowModeAction extends Action implements Disposable {
         assert sarosSession != null;
 
         if (toFollowUser == null) {
-            for (User user : sarosSession.getParticipants()) {
+            for (User user : sarosSession.getUsers()) {
                 if (user.isRemote() && user.hasWriteAccess()) {
                     if (!user.equals(editorManager.getFollowedUser())) {
                         return user;

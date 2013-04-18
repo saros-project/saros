@@ -50,7 +50,7 @@ public class FollowingActivitiesManager extends AbstractActivityProvider {
                         log.error("FollowModeChanged Event listener got a call without a running session.");
                         return;
                     }
-                    for (User user : sarosSession.getParticipants()) {
+                    for (User user : sarosSession.getUsers()) {
                         if (isFollowed) {
                             fireActivity(user, new StartFollowingActivity(
                                 sarosSession.getLocalUser(), target));

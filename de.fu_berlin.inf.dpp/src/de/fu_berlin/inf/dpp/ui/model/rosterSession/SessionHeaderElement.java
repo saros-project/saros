@@ -59,7 +59,7 @@ public class SessionHeaderElement extends HeaderElement {
             List<UserElement> userElements = new ArrayList<UserElement>();
 
             Collection<User> users = rosterSessionInput.getSarosSession()
-                .getParticipants();
+                .getUsers();
             for (User user : users) {
                 UserElement userElement = new UserElement(user,
                     rosterSessionInput.getRoster());

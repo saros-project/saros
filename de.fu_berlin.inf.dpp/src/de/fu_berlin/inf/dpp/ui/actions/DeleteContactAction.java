@@ -152,7 +152,7 @@ public class DeleteContactAction extends Action implements Disposable {
             String entryJid = rosterEntry.getUser();
 
             if (sarosSession != null) {
-                for (User p : sarosSession.getParticipants()) {
+                for (User p : sarosSession.getUsers()) {
                     String pJid = p.getJID().getBase();
 
                     // If so, stop the deletion from completing

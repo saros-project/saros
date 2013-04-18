@@ -1718,7 +1718,7 @@ public class EditorManager extends AbstractActivityProvider {
                     .getAnnotationModel());
         }
 
-        for (User user : sarosSession.getParticipants()) {
+        for (User user : sarosSession.getUsers()) {
 
             if (user.isLocal()) {
                 continue;

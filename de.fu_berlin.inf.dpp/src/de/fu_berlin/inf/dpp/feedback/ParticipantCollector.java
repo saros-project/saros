@@ -130,8 +130,8 @@ public class ParticipantCollector extends AbstractStatisticCollector {
         timeOfLastEvent = sessionStart;
 
         // add all users to the set and store the number of participants
-        users.addAll(sarosSession.getParticipants());
-        currentNumberOfParticipants = sarosSession.getParticipants().size();
+        users.addAll(sarosSession.getUsers());
+        currentNumberOfParticipants = sarosSession.getUsers().size();
 
         handleUserEvent(currentNumberOfParticipants);
 

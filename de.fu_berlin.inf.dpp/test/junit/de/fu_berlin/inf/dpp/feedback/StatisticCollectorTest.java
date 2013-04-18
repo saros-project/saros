@@ -66,7 +66,7 @@ public class StatisticCollectorTest {
         }).anyTimes();
         session.getLocalUser();
         EasyMock.expectLastCall().andReturn(bob).anyTimes();
-        session.getParticipants();
+        session.getUsers();
         EasyMock.expectLastCall().andReturn(participants).anyTimes();
         session.getHost();
         EasyMock.expectLastCall().andReturn(bob).anyTimes();

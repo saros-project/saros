@@ -128,7 +128,7 @@ public class CollaborationUtils {
         boolean reallyLeave;
 
         if (sarosSession.isHost()) {
-            if (sarosSession.getParticipants().size() == 1) {
+            if (sarosSession.getUsers().size() == 1) {
                 // Do not ask when host is alone...
                 reallyLeave = true;
             } else {
@@ -223,7 +223,7 @@ public class CollaborationUtils {
 
                 Set<JID> participantsToAdd = new HashSet<JID>(buddies);
 
-                for (User user : sarosSession.getParticipants())
+                for (User user : sarosSession.getUsers())
                     participantsToAdd.remove(user.getJID());
 
                 if (participantsToAdd.size() > 0) {

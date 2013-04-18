@@ -344,14 +344,14 @@ public final class SarosSession implements ISarosSession {
     }
 
     @Override
-    public List<User> getParticipants() {
+    public List<User> getUsers() {
         return new ArrayList<User>(participants.values());
     }
 
     @Override
     public List<User> getRemoteUsersWithReadOnlyAccess() {
         List<User> result = new ArrayList<User>();
-        for (User user : getParticipants()) {
+        for (User user : getUsers()) {
             if (user.isLocal())
                 continue;
             if (user.hasReadOnlyAccess())
@@ -363,7 +363,7 @@ public final class SarosSession implements ISarosSession {
     @Override
     public List<User> getUsersWithReadOnlyAccess() {
         List<User> result = new ArrayList<User>();
-        for (User user : getParticipants()) {
+        for (User user : getUsers()) {
             if (user.hasReadOnlyAccess())
                 result.add(user);
         }
@@ -373,7 +373,7 @@ public final class SarosSession implements ISarosSession {
     @Override
     public List<User> getUsersWithWriteAccess() {
         List<User> result = new ArrayList<User>();
-        for (User user : getParticipants()) {
+        for (User user : getUsers()) {
             if (user.hasWriteAccess())
                 result.add(user);
         }
@@ -382,7 +382,7 @@ public final class SarosSession implements ISarosSession {
 
     public List<User> getRemoteUsersWithWriteAccess() {
         List<User> result = new ArrayList<User>();
-        for (User user : getParticipants()) {
+        for (User user : getUsers()) {
             if (user.isLocal())
                 continue;
             if (user.hasWriteAccess())
@@ -394,7 +394,7 @@ public final class SarosSession implements ISarosSession {
     @Override
     public List<User> getRemoteUsers() {
         List<User> result = new ArrayList<User>();
-        for (User user : getParticipants()) {
+        for (User user : getUsers()) {
             if (user.isRemote())
                 result.add(user);
         }
@@ -504,7 +504,7 @@ public final class SarosSession implements ISarosSession {
         if (!hasWriteAccess()) {
             return false;
         }
-        for (User user : getParticipants()) {
+        for (User user : getUsers()) {
             if (user.isRemote() && user.hasWriteAccess()) {
                 return false;
             }
@@ -1187,7 +1187,7 @@ public final class SarosSession implements ISarosSession {
 
         log.debug("synchronizing user list");
 
-        Collection<User> participants = getParticipants();
+        Collection<User> participants = getUsers();
 
         SarosPacketCollector userListConfirmationCollector = transmitter
             .getUserListConfirmationCollector();

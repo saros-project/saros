@@ -74,7 +74,7 @@ public class ChangeColorManager extends AbstractActivityProvider implements
                 return;
             }
 
-            reassignSessionColorIDs(sarosSession.getParticipants(), user, true);
+            reassignSessionColorIDs(sarosSession.getUsers(), user, true);
         }
 
         @Override
@@ -89,7 +89,7 @@ public class ChangeColorManager extends AbstractActivityProvider implements
                 return;
             }
 
-            reassignSessionColorIDs(sarosSession.getParticipants(), user, false);
+            reassignSessionColorIDs(sarosSession.getUsers(), user, false);
         }
     };
 
@@ -131,7 +131,7 @@ public class ChangeColorManager extends AbstractActivityProvider implements
              * Just remove the (maybe not valid) color ids, the host will
              * correct it later
              */
-            for (User user : sarosSession.getParticipants()) {
+            for (User user : sarosSession.getUsers()) {
                 favoriteUserColors.put(user, user.getFavoriteColorID());
                 removeColorIdFromPool(user.getColorID());
             }
@@ -231,7 +231,7 @@ public class ChangeColorManager extends AbstractActivityProvider implements
          * always return a non dirty state during activity execution
          */
 
-        updateColorSet(sarosSession.getParticipants());
+        updateColorSet(sarosSession.getUsers());
 
         editorManager.colorChanged();
         editorManager.refreshAnnotations();

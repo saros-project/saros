@@ -52,10 +52,10 @@ import de.fu_berlin.inf.dpp.synchronize.StopManager;
 public interface ISarosSession {
 
     /**
-     * @return a list of all participants of the current session which includes
-     *         the local user too
+     * @return a list of all users of the current session which includes the
+     *         local user too
      */
-    public List<User> getParticipants();
+    public List<User> getUsers();
 
     /**
      * @return a collection of all remote participants of the current session

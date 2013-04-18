@@ -271,7 +271,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
          */
 
         synchronized (CancelableProcess.SHARED_LOCK) {
-            usersToStop = new ArrayList<User>(sarosSession.getParticipants());
+            usersToStop = new ArrayList<User>(sarosSession.getUsers());
         }
 
         log.debug(this + " : stopping users " + usersToStop);

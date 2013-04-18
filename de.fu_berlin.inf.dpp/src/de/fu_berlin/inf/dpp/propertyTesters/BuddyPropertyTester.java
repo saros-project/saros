@@ -34,7 +34,7 @@ public class BuddyPropertyTester extends PropertyTester {
                 ISarosSession sarosSession = sarosSessionManager
                     .getSarosSession();
                 if (sarosSession != null) {
-                    Collection<User> users = sarosSession.getParticipants();
+                    Collection<User> users = sarosSession.getUsers();
                     for (User user : users) {
                         if (user.getJID().equals(jid)) {
                             return true;

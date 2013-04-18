@@ -177,7 +177,7 @@ public class SarosSessionStub implements ISarosSession {
     }
 
     @Override
-    public List<User> getParticipants() {
+    public List<User> getUsers() {
         throw new RuntimeException("Unexpected call to Stub");
     }
 
