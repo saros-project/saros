@@ -733,10 +733,8 @@ public class Saros extends AbstractUIPlugin {
         String errorMessage = e.getMessage();
 
         if (errorMessage != null) {
-            if (errorMessage.toLowerCase().contains("invalid-authzid")) { //$NON-NLS-1$
-                question = Messages.Saros_connecting_smack_sasl_bug
-                    + Messages.Saros_connecting_modify_account;
-            } else if (errorMessage.toLowerCase().contains("not-authorized") // SASL //$NON-NLS-1$
+            if (errorMessage.toLowerCase().contains("invalid-authzid") //jabber.org got it wrong ... //$NON-NLS-1$
+                || errorMessage.toLowerCase().contains("not-authorized") // SASL //$NON-NLS-1$
                 || errorMessage.toLowerCase().contains("403") // non SASL //$NON-NLS-1$
                 || errorMessage.toLowerCase().contains("401")) { // non SASL //$NON-NLS-1$
 

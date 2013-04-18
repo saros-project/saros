@@ -1,0 +1,55 @@
+Index: SASLAuthentication.java
+===================================================================
+--- SASLAuthentication.java	(wersja 12901)
++++ SASLAuthentication.java	(kopia robocza)
+@@ -587,4 +587,4 @@
+         resourceBinded = false;
+         sessionSupported = false;
+     }
+-}
+\ No newline at end of file
++}
+Index: sasl/SASLMechanism.java
+===================================================================
+--- sasl/SASLMechanism.java	(wersja 12901)
++++ sasl/SASLMechanism.java	(kopia robocza)
+@@ -89,7 +89,7 @@
+ 
+         String[] mechanisms = { getName() };
+         Map<String,String> props = new HashMap<String,String>();
+-        sc = Sasl.createSaslClient(mechanisms, username, "xmpp", host, props, this);
++        sc = Sasl.createSaslClient(mechanisms, null, "xmpp", host, props, this);
+         authenticate();
+     }
+ 
+@@ -106,7 +106,7 @@
+     public void authenticate(String username, String host, CallbackHandler cbh) throws IOException, XMPPException {
+         String[] mechanisms = { getName() };
+         Map<String,String> props = new HashMap<String,String>();
+-        sc = Sasl.createSaslClient(mechanisms, username, "xmpp", host, props, cbh);
++        sc = Sasl.createSaslClient(mechanisms, null, "xmpp", host, props, cbh);
+         authenticate();
+     }
+ 
+Index: sasl/SASLGSSAPIMechanism.java
+===================================================================
+--- sasl/SASLGSSAPIMechanism.java	(wersja 12901)
++++ sasl/SASLGSSAPIMechanism.java	(kopia robocza)
+@@ -63,7 +63,7 @@
+         String[] mechanisms = { getName() };
+         Map props = new HashMap();
+         props.put(Sasl.SERVER_AUTH,"TRUE");
+-        sc = Sasl.createSaslClient(mechanisms, username, "xmpp", host, props, cbh);
++        sc = Sasl.createSaslClient(mechanisms, null, "xmpp", host, props, cbh);
+         authenticate();
+     }
+ 
+@@ -82,7 +82,7 @@
+         String[] mechanisms = { getName() };
+         Map props = new HashMap();
+         props.put(Sasl.SERVER_AUTH,"TRUE");
+-        sc = Sasl.createSaslClient(mechanisms, username, "xmpp", host, props, this);
++        sc = Sasl.createSaslClient(mechanisms, null, "xmpp", host, props, this);
+         authenticate();
+     }
+ 
