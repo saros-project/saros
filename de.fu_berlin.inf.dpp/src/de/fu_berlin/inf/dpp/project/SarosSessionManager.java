@@ -554,8 +554,12 @@ public class SarosSessionManager implements ISarosSessionManager {
 
             // side effect: non shared projects are always partial -.-
             if (!session.isCompletelyShared(project)) {
-                String projectID = String.valueOf(SESSION_ID_GENERATOR
-                    .nextInt(Integer.MAX_VALUE));
+                String projectID = session.getProjectID(project);
+
+                if (projectID == null)
+                    projectID = String.valueOf(SESSION_ID_GENERATOR
+                        .nextInt(Integer.MAX_VALUE));
+
                 session.addSharedResources(project, projectID, resourcesList);
                 projectAdded(projectID);
                 projectsToShare.add(project);
