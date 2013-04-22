@@ -4,6 +4,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
+import org.picocontainer.Disposable;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
@@ -15,7 +16,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * 
  */
 @Component(module = "core")
-public class DispatchThreadContext {
+public class DispatchThreadContext implements Disposable {
 
     private static final Logger log = Logger
         .getLogger(DispatchThreadContext.class);
@@ -41,9 +42,14 @@ public class DispatchThreadContext {
     }
 
     @Override
+    public void dispose() {
+        dispatch.shutdownNow();
+    }
+
+    @Override
     protected void finalize() throws Throwable {
         try {
-            dispatch.shutdownNow();
+            dispose();
         } finally {
             super.finalize();
         }
