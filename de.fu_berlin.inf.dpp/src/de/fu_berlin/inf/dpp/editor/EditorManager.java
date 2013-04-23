@@ -1891,13 +1891,17 @@ public class EditorManager extends AbstractActivityProvider {
      */
     public boolean isOpenEditor(SPath path) {
         if (path == null)
-            throw new IllegalArgumentException();
+            throw new NullPointerException("path is null");
 
-        for (IEditorPart iEditorPart : EditorAPI.getOpenEditors()) {
-            IResource resource = this.editorAPI.getEditorResource(iEditorPart);
-            if (resource.equals(path.getResource())) {
+        for (IEditorPart editorPart : EditorAPI.getOpenEditors()) {
+            IResource resource = editorAPI.getEditorResource(editorPart);
+
+            if (resource == null)
+                continue;
+
+            if (resource.equals(path.getResource()))
                 return true;
-            }
+
         }
         return false;
     }
