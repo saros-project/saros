@@ -41,6 +41,7 @@ import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.SessionStatistic;
 import de.fu_berlin.inf.dpp.feedback.StatisticCollectorTest;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
+import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
@@ -146,6 +147,8 @@ public class SarosSessionTest {
         // Mock in replay state for child classes
         container.addComponent(ITransmitter.class,
             EasyMock.createMock(ITransmitter.class));
+        container.addComponent(IReceiver.class,
+            EasyMock.createMock(IReceiver.class));
         container.addComponent(ISarosSessionManager.class,
             EasyMock.createMock(ISarosSessionManager.class));
         container.addComponent(SarosUI.class,

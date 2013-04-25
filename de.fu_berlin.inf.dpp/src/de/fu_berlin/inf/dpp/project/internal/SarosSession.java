@@ -93,6 +93,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.PingPongCentral;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
+import de.fu_berlin.inf.dpp.net.business.UserListHandler;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.extensions.KickUserExtension;
@@ -1352,6 +1353,7 @@ public final class SarosSession implements ISarosSession {
         sessionContainer.addComponent(ConsistencyWatchdogHandler.class);
         sessionContainer.addComponent(ActivityHandler.class);
         sessionContainer.addComponent(activityCallback);
+        sessionContainer.addComponent(UserListHandler.class);
 
         // Force the creation of the above components.
         sessionContainer.getComponents();

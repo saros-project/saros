@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
-import org.picocontainer.annotations.Inject;
+import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -17,93 +17,121 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension.UserListEn
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListReceivedExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 
 /**
  * Business Logic for handling Invitation requests
  */
 
-// FIXME move into session scope
+// FIMXE move to *project.internal package
+// FIMXE this component uses the network but is not a net component !
 @Component(module = "net")
-public class UserListHandler {
+public class UserListHandler implements Startable {
 
     private static final Logger log = Logger.getLogger(UserListHandler.class
         .getName());
 
-    @Inject
-    private ITransmitter transmitter;
+    private final ITransmitter transmitter;
 
-    @Inject
-    private ISarosSessionManager sessionManager;
+    private final IReceiver receiver;
 
-    @Inject
-    private SessionIDObservable sessionID;
+    private final ISarosSession session;
 
-    public UserListHandler(IReceiver receiver) {
-        // TODO SessionID-Filter
-        receiver.addPacketListener(new PacketListener() {
+    private final SessionIDObservable sessionID;
 
-            @Override
-            public void processPacket(Packet packet) {
-                JID fromJID = new JID(packet.getFrom());
+    private String currentSessionID;
 
-                log.debug("received user list from " + fromJID);
+    private final PacketListener userListListener = new PacketListener() {
 
-                UserListExtension userListInfo = UserListExtension.PROVIDER
-                    .getPayload(packet);
+        @Override
+        public void processPacket(Packet packet) {
+            handleUserListUpdate(packet);
+        }
+    };
 
-                if (userListInfo == null) {
-                    log.warn("user list payload is corrupted");
-                    return;
-                }
+    public UserListHandler(ISarosSession session,
+        SessionIDObservable sessionID, ITransmitter transmitter,
+        IReceiver receiver) {
+        this.session = session;
+        this.sessionID = sessionID;
+        this.transmitter = transmitter;
+        this.receiver = receiver;
+    }
 
-                ISarosSession sarosSession = sessionManager.getSarosSession();
-                assert sarosSession != null;
+    @Override
+    public void start() {
+        currentSessionID = sessionID.getValue();
+        /*
+         * FIXME: add the session ID to the filter so we do not need to handle
+         * it in handeUserListUpdate Should be done when there are major changes
+         * made to the network layer as this change would cause an
+         * incompatibility with older versions.
+         */
+        receiver.addPacketListener(userListListener,
+            UserListExtension.PROVIDER.getPacketFilter());
+    }
 
-                User fromUser = sarosSession.getUser(fromJID);
+    @Override
+    public void stop() {
+        receiver.removePacketListener(userListListener);
+    }
 
-                if (fromUser == null) {
-                    log.warn("received user list from " + fromJID
-                        + " who is not part of the current session");
-                    return;
-                }
+    private void handleUserListUpdate(Packet packet) {
+        JID fromJID = new JID(packet.getFrom());
 
-                // Adding new users
-                User newUser;
-                for (UserListEntry userEntry : userListInfo.userList) {
+        log.debug("received user list from " + fromJID);
 
-                    // Check if we already know this user
-                    User user = sarosSession.getUser(userEntry.jid);
+        UserListExtension userListInfo = UserListExtension.PROVIDER
+            .getPayload(packet);
 
-                    // new session user
-                    if (user == null) {
+        if (userListInfo == null) {
+            log.warn("user list payload is corrupted");
+            return;
+        }
 
-                        newUser = new User(sarosSession, userEntry.jid,
-                            userEntry.colorID, userEntry.favoriteColorID);
+        User fromUser = session.getUser(fromJID);
 
-                        newUser.setPermission(userEntry.permission);
-                        sarosSession.addUser(newUser);
-                    } else {
-                        // User already exists
+        if (!currentSessionID.equals(userListInfo.getSessionID())
+            || fromUser == null) {
+            log.warn("received user list from " + fromJID
+                + " who is not part of the current session");
+            return;
+        }
 
-                        // Update his permission
-                        user.setPermission(userEntry.permission);
-                    }
-                }
-                sendUserListConfirmation(fromJID);
+        /*
+         * TODO: the host should be able to send user lists which will contain
+         * users that currently left the session.
+         * 
+         * Another reason would be: Carls network crashes ... Alice detects this
+         * and would send a "Carl removed from session message" to all other
+         * session users.
+         */
+        for (UserListEntry userEntry : userListInfo.userList) {
+
+            User user = session.getUser(userEntry.jid);
+
+            // new session user
+            if (user == null) {
+
+                user = new User(session, userEntry.jid, userEntry.colorID,
+                    userEntry.favoriteColorID);
+
+                user.setPermission(userEntry.permission);
+                session.addUser(user);
+            } else {
+                // existing session user
+                user.setPermission(userEntry.permission);
             }
+        }
 
-        }, UserListExtension.PROVIDER.getPacketFilter());
+        sendUserListConfirmation(fromJID);
     }
 
     private void sendUserListConfirmation(JID to) {
         log.debug("sending user list received confirmation to " + to);
         try {
-            transmitter
-                .sendToSessionUser(to,
-                    UserListReceivedExtension.PROVIDER
-                        .create(new UserListReceivedExtension(sessionID
-                            .getValue())));
+            transmitter.sendToSessionUser(to,
+                UserListReceivedExtension.PROVIDER
+                    .create(new UserListReceivedExtension(currentSessionID)));
         } catch (IOException e) {
             log.error("failed to send user list received confirmation to: "
                 + to, e);
