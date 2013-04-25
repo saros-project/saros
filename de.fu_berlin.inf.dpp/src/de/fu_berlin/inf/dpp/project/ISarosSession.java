@@ -19,8 +19,8 @@
  */
 package de.fu_berlin.inf.dpp.project;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 
@@ -418,11 +418,11 @@ public interface ISarosSession {
     public List<IResource> getSharedResources();
 
     /**
-     * Returns HashMap with the mapping of shared resources to their project.
+     * Returns a map with the mapping of shared resources to their project.
      * 
      * @return project-->resource mapping
      */
-    public HashMap<IProject, List<IResource>> getProjectResourcesMapping();
+    public Map<IProject, List<IResource>> getProjectResourcesMapping();
 
     /**
      * Returns the shared resources of the project in this session.

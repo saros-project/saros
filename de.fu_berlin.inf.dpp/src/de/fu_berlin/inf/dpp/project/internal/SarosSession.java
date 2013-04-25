@@ -26,9 +26,9 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -182,10 +182,11 @@ public final class SarosSession implements ISarosSession {
 
     private final DateTime sessionStart;
 
-    private final SarosProjectMapper projectMapper = new SarosProjectMapper();
+    private final SarosProjectMapper projectMapper;
 
     private boolean useVersionControl = true;
 
+    // KARL HELD YOU ARE MY WTF GUY !!!
     private List<IResource> selectedResources = new ArrayList<IResource>();
 
     private MutablePicoContainer sessionContainer;
@@ -241,6 +242,7 @@ public final class SarosSession implements ISarosSession {
 
         sarosContext.initComponent(this);
 
+        this.projectMapper = new SarosProjectMapper(this);
         this.activityQueuer = new ActivityQueuer();
         this.sarosContext = sarosContext;
         this.sessionStart = sessionStart;
@@ -326,20 +328,22 @@ public final class SarosSession implements ISarosSession {
                 selectedResources.clear();
             }
         }
+
         if (!projectMapper.isShared(project)) {
-            projectMapper.addMapping(projectID, project, new SharedProject(
-                project, this));
-            projectMapper.addResourceMapping(project, dependentResources);
-            projectMapper.addUserToProjectMapping(getLocalUser().getJID(),
-                project);
+            projectMapper.addProject(projectID, project,
+                dependentResources != null);
+
+            projectMapper.addOwnership(getLocalUser().getJID(), project);
+
+            if (dependentResources != null)
+                projectMapper.addResources(project, dependentResources);
+
         } else {
-            List<IResource> resources = getSharedResources(project);
-            if (resources != null && dependentResources != null) {
-                resources.addAll(dependentResources);
-                projectMapper.addResourceMapping(project, resources);
-            } else if (resources != null && dependentResources == null) {
-                projectMapper.addResourceMapping(project, null);
-            }
+            if (dependentResources == null)
+                // upgrade the project to a completely shared project
+                projectMapper.addProject(projectID, project, false);
+            else
+                projectMapper.addResources(project, dependentResources);
         }
     }
 
@@ -1009,40 +1013,36 @@ public final class SarosSession implements ISarosSession {
                 return true;
 
             IProject project = file.getProject();
-            List<IResource> resources = getSharedResources(project);
 
             switch (fileActivity.getType()) {
             case Created:
                 if (!file.exists())
                     return true;
 
-                if (resources != null && !resources.contains(file)) {
-                    resources.add(file);
-                    projectMapper.addResourceMapping(project, resources);
-                }
+                if (projectMapper.isPartiallyShared(project))
+                    projectMapper.addResources(project,
+                        Collections.singletonList(file));
                 break;
             case Removed:
-                if (!isShared(file)) {
+                if (!isShared(file))
                     return false;
-                }
-                if (resources != null && resources.contains(file)) {
-                    resources.remove(file);
-                    projectMapper.addResourceMapping(project, resources);
-                }
+
+                if (projectMapper.isPartiallyShared(project))
+                    projectMapper.removeResources(project,
+                        Collections.singletonList(file));
+
                 break;
             case Moved:
                 IFile oldFile = fileActivity.getOldPath().getFile();
-                if (oldFile == null || !isShared(oldFile)) {
+                if (oldFile == null || !isShared(oldFile))
                     return false;
+
+                if (projectMapper.isPartiallyShared(project)) {
+                    projectMapper.removeAndAddResources(project,
+                        Collections.singletonList(oldFile),
+                        Collections.singletonList(file));
                 }
-                List<IResource> res = getSharedResources(oldFile.getProject());
-                if (res != null) {
-                    if (res.contains(oldFile))
-                        res.remove(oldFile);
-                    if (!res.contains(file))
-                        res.add(file);
-                    projectMapper.addResourceMapping(project, res);
-                }
+
                 break;
             }
         } else if (activity instanceof FolderActivity) {
@@ -1052,27 +1052,22 @@ public final class SarosSession implements ISarosSession {
             if (folder == null)
                 return true;
 
-            IProject iProject = folder.getProject();
-            List<IResource> resources = getSharedResources(iProject);
+            IProject project = folder.getProject();
 
-            if (resources != null) {
-                switch (folderActivity.getType()) {
-                case Created:
-                    if (!resources.contains(folder)
-                        && isShared(folder.getParent())) {
-                        resources.add(folder);
-                        projectMapper.addResourceMapping(iProject, resources);
-                    }
-                    break;
-                case Removed:
-                    if (!isShared(folder)) {
-                        return false;
-                    }
-                    if (resources.contains(folder)) {
-                        resources.remove(folder);
-                        projectMapper.addResourceMapping(iProject, resources);
-                    }
-                }
+            switch (folderActivity.getType()) {
+            case Created:
+                if (projectMapper.isPartiallyShared(project)
+                    && isShared(folder.getParent()))
+                    projectMapper.addResources(project,
+                        Collections.singletonList(folder));
+                break;
+            case Removed:
+                if (!isShared(folder))
+                    return false;
+
+                if (projectMapper.isPartiallyShared(project))
+                    projectMapper.removeResources(project,
+                        Collections.singletonList(folder));
             }
         }
         return true;
@@ -1102,13 +1097,7 @@ public final class SarosSession implements ISarosSession {
 
     @Override
     public List<IResource> getSharedResources() {
-        List<IResource> allSharedResources = new ArrayList<IResource>();
-        Collection<List<IResource>> resources = projectMapper.getResources();
-        for (List<IResource> list : resources) {
-            if (list != null)
-                allSharedResources.addAll(list);
-        }
-        return allSharedResources;
+        return projectMapper.getPartiallySharedResources();
     }
 
     protected void addMembers(IResource iResource,
@@ -1244,7 +1233,7 @@ public final class SarosSession implements ISarosSession {
     }
 
     @Override
-    public HashMap<IProject, List<IResource>> getProjectResourcesMapping() {
+    public Map<IProject, List<IResource>> getProjectResourcesMapping() {
         return projectMapper.getProjectResourceMapping();
     }
 
@@ -1259,8 +1248,8 @@ public final class SarosSession implements ISarosSession {
     }
 
     private boolean isOwnedProject(IProject iProject) {
-        ArrayList<IProject> ownedProjects = projectMapper
-            .getOwnedProjectIDs(getLocalUser().getJID());
+        List<IProject> ownedProjects = projectMapper
+            .getOwnedProjects(getLocalUser().getJID());
 
         if (ownedProjects == null)
             return false;
@@ -1272,11 +1261,8 @@ public final class SarosSession implements ISarosSession {
     public void addProjectOwnership(String projectID, IProject project,
         JID ownerJID) {
         if (projectMapper.getSharedProject(projectID) == null) {
-            projectMapper.addMapping(projectID, project, new SharedProject(
-                project, this));
-            projectMapper.addResourceMapping(project,
-                new ArrayList<IResource>());
-            projectMapper.addUserToProjectMapping(ownerJID, project);
+            projectMapper.addProject(projectID, project, true);
+            projectMapper.addOwnership(ownerJID, project);
         }
     }
 
@@ -1284,9 +1270,8 @@ public final class SarosSession implements ISarosSession {
     public void removeProjectOwnership(String projectID, IProject project,
         JID ownerJID) {
         if (projectMapper.getSharedProject(projectID) != null) {
-            projectMapper.removeResourceMapping(project);
-            projectMapper.removeMapping(projectID);
-            projectMapper.removeUserToProjectMapping(ownerJID, project);
+            projectMapper.removeOwnership(ownerJID, project);
+            projectMapper.removeProject(projectID);
         }
     }
 
