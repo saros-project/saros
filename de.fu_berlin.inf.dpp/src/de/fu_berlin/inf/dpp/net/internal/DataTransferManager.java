@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
@@ -50,7 +53,7 @@ public class DataTransferManager implements IConnectionListener {
 
     private CopyOnWriteArrayList<IPacketInterceptor> packetInterceptors = new CopyOnWriteArrayList<IPacketInterceptor>();
 
-    private JID currentLocalJID;
+    private volatile JID currentLocalJID;
 
     private Connection connection;
 
@@ -67,7 +70,7 @@ public class DataTransferManager implements IConnectionListener {
     private final Map<JID, ConnectionHolder> connections = Collections
         .synchronizedMap(new HashMap<JID, ConnectionHolder>());
 
-    private final Object connectLock = new Object();
+    private final Lock connectLock = new ReentrantLock();
     /**
      * Collection of {@link JID}s, flagged to prefer IBB transfer mode
      */
@@ -191,11 +194,16 @@ public class DataTransferManager implements IConnectionListener {
     public void sendData(TransferDescription transferData, byte[] payload)
         throws IOException {
 
-        log.trace("sending data ... from " + currentLocalJID + " to "
+        JID connectionJID = currentLocalJID;
+
+        if (connectionJID == null)
+            throw new IOException("not connected to a XMPP server");
+
+        log.trace("sending data ... from " + connectionJID + " to "
             + transferData.getRecipient());
 
         JID recipient = transferData.getRecipient();
-        transferData.setSender(currentLocalJID);
+        transferData.setSender(connectionJID);
 
         IByteStreamConnection connection = connectInternal(recipient);
 
@@ -285,75 +293,76 @@ public class DataTransferManager implements IConnectionListener {
             }
         }
 
-        synchronized (connectLock) {
-            try {
+        connectLock.lock();
 
-                connection = getCurrentConnection(recipient);
+        try {
 
-                if (connection != null)
-                    return connection;
+            connection = getCurrentConnection(recipient);
 
-                ArrayList<ITransport> transportModesToUse = new ArrayList<ITransport>(
-                    availableTransports);
+            if (connection != null)
+                return connection;
 
-                // Move IBB to front for peers preferring IBB
-                synchronized (peersForIBB) {
-                    if (fallbackTransport != null
-                        && peersForIBB.contains(recipient)) {
-                        int ibbIndex = transportModesToUse
-                            .indexOf(fallbackTransport);
-                        if (ibbIndex != -1)
-                            transportModesToUse.remove(ibbIndex);
-                        transportModesToUse.add(0, fallbackTransport);
-                    }
-                }
+            JID connectionJID = currentLocalJID;
 
-                log.debug("currently used IP addresses for Socks5Proxy: "
-                    + Arrays.toString(Socks5Proxy.getSocks5Proxy()
-                        .getLocalAddresses().toArray()));
+            if (connectionJID == null)
+                throw new IOException("not connected to a XMPP server");
 
-                for (ITransport transport : transportModesToUse) {
-                    log.info("establishing connection to "
-                        + recipient.getBase() + " from " + currentLocalJID
-                        + " using " + transport.getNetTransferMode());
-                    try {
-                        connection = transport.connect(recipient);
-                        break;
-                    } catch (IOException e) {
-                        log.error(
-                            Utils.prefix(recipient)
-                                + " failed to connect using "
-                                + transport.toString() + ": " + e.getMessage(),
-                            e);
-                    } catch (InterruptedException e) {
-                        IOException io = new InterruptedIOException(
-                            "connecting cancelled: " + e.getMessage());
-                        io.initCause(e);
-                        throw io;
-                    } catch (Exception e) {
-                        log.error(
-                            Utils.prefix(recipient)
-                                + " failed to connect using "
-                                + transport.toString()
-                                + " because of an unknown error: "
-                                + e.getMessage(), e);
-                    }
-                }
+            ArrayList<ITransport> transportModesToUse = new ArrayList<ITransport>(
+                availableTransports);
 
-                if (connection != null) {
-                    byteStreamConnectionListener.connectionChanged(recipient,
-                        connection, false);
-
-                    return connection;
-                }
-
-                throw new IOException("could not connect to: "
-                    + Utils.prefix(recipient));
-            } finally {
-                synchronized (currentOutgoingConnectionEstablishments) {
-                    currentOutgoingConnectionEstablishments.remove(recipient);
+            // Move IBB to front for peers preferring IBB
+            synchronized (peersForIBB) {
+                if (fallbackTransport != null
+                    && peersForIBB.contains(recipient)) {
+                    int ibbIndex = transportModesToUse
+                        .indexOf(fallbackTransport);
+                    if (ibbIndex != -1)
+                        transportModesToUse.remove(ibbIndex);
+                    transportModesToUse.add(0, fallbackTransport);
                 }
             }
+
+            log.debug("currently used IP addresses for Socks5Proxy: "
+                + Arrays.toString(Socks5Proxy.getSocks5Proxy()
+                    .getLocalAddresses().toArray()));
+
+            for (ITransport transport : transportModesToUse) {
+                log.info("establishing connection to " + recipient.getBase()
+                    + " from " + connectionJID + " using "
+                    + transport.getNetTransferMode());
+                try {
+                    connection = transport.connect(recipient);
+                    break;
+                } catch (IOException e) {
+                    log.error(Utils.prefix(recipient)
+                        + " failed to connect using " + transport.toString()
+                        + ": " + e.getMessage(), e);
+                } catch (InterruptedException e) {
+                    IOException io = new InterruptedIOException(
+                        "connecting cancelled: " + e.getMessage());
+                    io.initCause(e);
+                    throw io;
+                } catch (Exception e) {
+                    log.error(Utils.prefix(recipient)
+                        + " failed to connect using " + transport.toString()
+                        + " because of an unknown error: " + e.getMessage(), e);
+                }
+            }
+
+            if (connection != null) {
+                byteStreamConnectionListener.connectionChanged(recipient,
+                    connection, false);
+
+                return connection;
+            }
+
+            throw new IOException("could not connect to: "
+                + Utils.prefix(recipient));
+        } finally {
+            synchronized (currentOutgoingConnectionEstablishments) {
+                currentOutgoingConnectionEstablishments.remove(recipient);
+            }
+            connectLock.unlock();
         }
     }
 
@@ -388,17 +397,31 @@ public class DataTransferManager implements IConnectionListener {
         this.currentLocalJID = new JID(connection.getUser());
 
         for (ITransport transport : availableTransports) {
-            transport.initialize(connection,
-                byteStreamConnectionListener);
+            transport.initialize(connection, byteStreamConnectionListener);
         }
     }
 
     private void disposeConnection() {
 
-        for (ITransport transport : availableTransports)
-            transport.uninitialize();
+        currentLocalJID = null;
 
-        ArrayList<ConnectionHolder> currentConnections;
+        boolean acquired = false;
+
+        try {
+            acquired = connectLock.tryLock(5000, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            acquired = false;
+        }
+
+        try {
+            for (ITransport transport : availableTransports)
+                transport.uninitialize();
+        } finally {
+            if (acquired)
+                connectLock.unlock();
+        }
+
+        List<ConnectionHolder> currentConnections;
 
         synchronized (connections) {
             currentConnections = new ArrayList<ConnectionHolder>();

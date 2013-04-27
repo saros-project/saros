@@ -437,11 +437,13 @@ public class DataTransferManagerTest {
         connectThread1.start();
 
         // poll thread status
-        while (connectThread1.getState() != Thread.State.BLOCKED
+        while ((connectThread1.getState() != Thread.State.BLOCKED && connectThread1
+            .getState() != Thread.State.WAITING)
             && (System.currentTimeMillis() - currentTime < 1000))
             Thread.yield();
 
-        if (connectThread1.getState() != Thread.State.BLOCKED) {
+        if (connectThread1.getState() != Thread.State.BLOCKED
+            && connectThread1.getState() != Thread.State.WAITING) {
             connectProceed.countDown();
             connectThread0.interrupt();
             connectThread1.interrupt();

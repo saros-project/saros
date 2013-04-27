@@ -18,7 +18,7 @@ public class IBBTransport extends ByteStreamTransport {
     }
 
     @Override
-    protected BytestreamManager getManager(Connection connection) {
+    protected BytestreamManager createManager(Connection connection) {
         return InBandBytestreamManager.getByteStreamManager(connection);
     }
 

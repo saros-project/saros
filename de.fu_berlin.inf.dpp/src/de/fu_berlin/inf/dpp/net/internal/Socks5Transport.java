@@ -470,6 +470,11 @@ public class Socks5Transport extends ByteStreamTransport {
         LOG.debug(prefix() + "establishing new connection to " + peer
             + verboseLocalProxyInfo());
 
+        BytestreamManager manager = getManager();
+
+        if (manager == null)
+            throw new IOException(this + " transport is not initialized");
+
         try {
 
             Exception exception = null;
@@ -560,12 +565,17 @@ public class Socks5Transport extends ByteStreamTransport {
 
         LOG.debug(prefix() + "Start to establish new response connection");
 
+        BytestreamManager manager = getManager();
+
+        if (manager == null)
+            throw new IOException(this + " transport is not initialized");
+
         return manager.establishSession(peer.toString(),
             this.getNextResponseSessionID());
     }
 
     @Override
-    protected BytestreamManager getManager(Connection connection) {
+    protected BytestreamManager createManager(Connection connection) {
         Socks5BytestreamManager socks5ByteStreamManager = Socks5BytestreamManager
             .getBytestreamManager(connection);
         socks5ByteStreamManager
