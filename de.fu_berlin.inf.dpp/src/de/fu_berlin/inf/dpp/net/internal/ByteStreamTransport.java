@@ -67,9 +67,8 @@ public abstract class ByteStreamTransport implements ITransport {
         @Override
         public void incomingBytestreamRequest(BytestreamRequest request) {
 
-            log.info("Received request to establish a "
-                + getNetTransferMode() + " bytestream connection from "
-                + request.getFrom());
+            log.info("Received request to establish a " + getNetTransferMode()
+                + " bytestream connection from " + request.getFrom());
 
             try {
 
@@ -121,11 +120,10 @@ public abstract class ByteStreamTransport implements ITransport {
      * @throws IOException
      */
     protected BinaryChannel acceptRequest(BytestreamRequest request)
-        throws InterruptedException, Exception {
+        throws XMPPException, IOException, InterruptedException {
 
         BytestreamSession session = request.accept();
-        BinaryChannel channel = new BinaryChannel(session,
-            getNetTransferMode());
+        BinaryChannel channel = new BinaryChannel(session, getNetTransferMode());
 
         return channel;
     }

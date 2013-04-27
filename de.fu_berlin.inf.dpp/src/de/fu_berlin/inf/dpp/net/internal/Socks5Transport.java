@@ -371,7 +371,7 @@ public class Socks5Transport extends ByteStreamTransport {
      * @throws IOException
      */
     protected BinaryChannel acceptNewRequest(BytestreamRequest request)
-        throws Exception, InterruptedException {
+        throws XMPPException, IOException, InterruptedException {
         String peer = request.getFrom();
         LOG.debug(prefix() + "receiving request from " + peer
             + verboseLocalProxyInfo());
@@ -442,7 +442,7 @@ public class Socks5Transport extends ByteStreamTransport {
      */
     @Override
     protected BinaryChannel acceptRequest(BytestreamRequest request)
-        throws InterruptedException, Exception {
+        throws XMPPException, IOException, InterruptedException {
 
         ((Socks5BytestreamRequest) request)
             .setTotalConnectTimeout(TOTAL_CONNECT_TIMEOUT);
