@@ -51,7 +51,7 @@ public abstract class ByteStreamTransport implements ITransport {
      * done by DataTransferManager).
      */
     @Override
-    public void disposeXMPPConnection() {
+    public void uninitialize() {
         if (manager != null) {
             manager.removeIncomingBytestreamListener(streamListener);
             manager = null;
@@ -68,7 +68,7 @@ public abstract class ByteStreamTransport implements ITransport {
         public void incomingBytestreamRequest(BytestreamRequest request) {
 
             log.info("Received request to establish a "
-                + getDefaultNetTransferMode() + " bytestream connection from "
+                + getNetTransferMode() + " bytestream connection from "
                 + request.getFrom());
 
             try {
@@ -105,7 +105,7 @@ public abstract class ByteStreamTransport implements ITransport {
         throws XMPPException, IOException, InterruptedException {
         BytestreamSession session = manager.establishSession(peer.toString());
 
-        return new BinaryChannel(session, getDefaultNetTransferMode());
+        return new BinaryChannel(session, getNetTransferMode());
     }
 
     /**
@@ -125,13 +125,13 @@ public abstract class ByteStreamTransport implements ITransport {
 
         BytestreamSession session = request.accept();
         BinaryChannel channel = new BinaryChannel(session,
-            getDefaultNetTransferMode());
+            getNetTransferMode());
 
         return channel;
     }
 
     @Override
-    public void prepareXMPPConnection(Connection connection,
+    public void initialize(Connection connection,
         IByteStreamConnectionListener listener) {
         this.connectionListener = listener;
         manager = getManager(connection);
@@ -140,11 +140,11 @@ public abstract class ByteStreamTransport implements ITransport {
 
     @Override
     public String toString() {
-        return getDefaultNetTransferMode().getXEP();
+        return getNetTransferMode().getXEP();
     }
 
     @Override
-    abstract public NetTransferMode getDefaultNetTransferMode();
+    abstract public NetTransferMode getNetTransferMode();
 
     /**
      * @param connection

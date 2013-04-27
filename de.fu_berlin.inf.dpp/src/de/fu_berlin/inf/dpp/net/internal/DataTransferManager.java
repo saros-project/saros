@@ -315,7 +315,7 @@ public class DataTransferManager implements IConnectionListener {
                 for (ITransport transport : transportModesToUse) {
                     log.info("establishing connection to "
                         + recipient.getBase() + " from " + currentLocalJID
-                        + " using " + transport.getDefaultNetTransferMode());
+                        + " using " + transport.getNetTransferMode());
                     try {
                         connection = transport.connect(recipient);
                         break;
@@ -388,7 +388,7 @@ public class DataTransferManager implements IConnectionListener {
         this.currentLocalJID = new JID(connection.getUser());
 
         for (ITransport transport : availableTransports) {
-            transport.prepareXMPPConnection(connection,
+            transport.initialize(connection,
                 byteStreamConnectionListener);
         }
     }
@@ -396,7 +396,7 @@ public class DataTransferManager implements IConnectionListener {
     private void disposeConnection() {
 
         for (ITransport transport : availableTransports)
-            transport.disposeXMPPConnection();
+            transport.uninitialize();
 
         ArrayList<ConnectionHolder> currentConnections;
 

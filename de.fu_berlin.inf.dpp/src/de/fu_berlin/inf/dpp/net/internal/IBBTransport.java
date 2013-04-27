@@ -23,7 +23,7 @@ public class IBBTransport extends ByteStreamTransport {
     }
 
     @Override
-    public NetTransferMode getDefaultNetTransferMode() {
+    public NetTransferMode getNetTransferMode() {
         return NetTransferMode.IBB;
     }
 

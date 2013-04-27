@@ -9,25 +9,44 @@ import de.fu_berlin.inf.dpp.net.NetTransferMode;
 
 /**
  * This interface is used to define various transport methods (probably only XEP
- * 65 SOCKS5, XEP 47 in-band bytestream and XEP 16x Jingle
+ * 65 SOCKS5, XEP 47 in-band bytestream and XEP 16x Jingle.
  */
 public interface ITransport {
 
     /**
-     * Try to connect to the given user.
+     * Establishes a {@link IByteStreamConnection connection} to the given JID.
      * 
+     * @param jid
+     *            a <b>resource qualified</b> JID to connect to
      * @throws IOException
+     *             if no connection could be established
+     * @throws InterruptedException
+     *             if the connection establishment was interrupted
      */
-    public IByteStreamConnection connect(JID peer) throws IOException,
+    public IByteStreamConnection connect(JID jid) throws IOException,
         InterruptedException;
 
-    public void prepareXMPPConnection(Connection connection,
+    /**
+     * Initializes the transport. After initialization the transport is able to
+     * establish connections via {@link #connect}.
+     * 
+     * @param connection
+     * @param listener
+     */
+    public void initialize(Connection connection,
         IByteStreamConnectionListener listener);
 
-    public void disposeXMPPConnection();
+    /**
+     * Un-initializes the transport. After un-initialization the transport is
+     * not able to establish connections via {@link #connect}.
+     */
+    public void uninitialize();
 
-    @Override
-    public String toString();
-
-    public NetTransferMode getDefaultNetTransferMode();
+    /**
+     * Returns the {@linkplain NetTransferMode transport mode} that the
+     * transport is using to establish connections.
+     * 
+     * @return
+     */
+    public NetTransferMode getNetTransferMode();
 }

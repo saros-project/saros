@@ -47,7 +47,7 @@ public class DataTransferManagerTest {
         public synchronized IByteStreamConnection connect(JID peer)
             throws IOException, InterruptedException {
             ChannelConnection connection = new ChannelConnection(peer,
-                getDefaultNetTransferMode(), listener);
+                getNetTransferMode(), listener);
 
             establishedConnections.add(connection);
             return connection;
@@ -55,27 +55,27 @@ public class DataTransferManagerTest {
 
         public synchronized void announceIncomingRequest(JID peer) {
             ChannelConnection connection = new ChannelConnection(peer,
-                getDefaultNetTransferMode(), listener);
+                getNetTransferMode(), listener);
 
             establishedConnections.add(connection);
             listener.connectionChanged(peer, connection, true);
         }
 
         @Override
-        public void prepareXMPPConnection(Connection connection,
+        public void initialize(Connection connection,
             IByteStreamConnectionListener listener) {
             this.listener = listener;
 
         }
 
         @Override
-        public void disposeXMPPConnection() {
+        public void uninitialize() {
             this.listener = null;
 
         }
 
         @Override
-        public NetTransferMode getDefaultNetTransferMode() {
+        public NetTransferMode getNetTransferMode() {
             return mode;
         }
 
@@ -222,10 +222,10 @@ public class DataTransferManagerTest {
         EasyMock.expect(mainTransport.connect(EasyMock.isA(JID.class)))
             .andThrow(new IOException()).anyTimes();
 
-        EasyMock.expect(mainTransport.getDefaultNetTransferMode())
+        EasyMock.expect(mainTransport.getNetTransferMode())
             .andReturn(NetTransferMode.SOCKS5_DIRECT).anyTimes();
 
-        mainTransport.prepareXMPPConnection(EasyMock.isA(Connection.class),
+        mainTransport.initialize(EasyMock.isA(Connection.class),
             EasyMock.isA(IByteStreamConnectionListener.class));
 
         EasyMock.expectLastCall().once();
