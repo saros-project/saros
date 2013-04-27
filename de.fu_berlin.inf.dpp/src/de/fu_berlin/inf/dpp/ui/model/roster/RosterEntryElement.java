@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.ui.model.roster;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -20,10 +19,8 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManager.CacheMissException;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
@@ -37,8 +34,6 @@ import de.fu_berlin.inf.dpp.ui.model.TreeElement;
  * @author bkahlert
  */
 public class RosterEntryElement extends TreeElement {
-    @Inject
-    protected DataTransferManager dataTransferManager;
 
     @Inject
     protected DiscoveryManager discoveryManager;
@@ -76,8 +71,6 @@ public class RosterEntryElement extends TreeElement {
     public StyledString getStyledText() {
         StyledString styledString = new StyledString();
 
-        final String connected_using = Messages.RosterEntryElement_connected_using;
-
         RosterEntry rosterEntry = this.getRosterEntry();
         styledString.append((rosterEntry == null) ? jid.toString()
             : RosterUtils.getDisplayableName(rosterEntry));
@@ -108,19 +101,6 @@ public class RosterEntryElement extends TreeElement {
                 StyledString.COUNTER_STYLER);
         }
 
-        /*
-         * Append DataTransfer state information if debug mode is enabled.
-         */
-        if (presence.isAvailable()) {
-            final NetTransferMode transferMode = dataTransferManager
-                .getTransferMode(jid);
-
-            if (transferMode != NetTransferMode.NONE) {
-                styledString.append(
-                    " " + MessageFormat.format(connected_using, transferMode), //$NON-NLS-1$
-                    StyledString.QUALIFIER_STYLER);
-            }
-        }
         return styledString;
     }
 

@@ -16,9 +16,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.NetTransferMode;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(SarosPluginContext.class)
@@ -63,23 +60,12 @@ public class RosterComparatorTest {
         EasyMock.expect(mockRoster.getPresence("edna@foo.com"))
             .andReturn(new Presence(Presence.Type.unavailable)).anyTimes();
 
-        DataTransferManager dataTransferManagerMock = EasyMock
-            .createMock(DataTransferManager.class);
-
-        EasyMock
-            .expect(
-                dataTransferManagerMock.getTransferMode(EasyMock.isA(JID.class)))
-            .andReturn(NetTransferMode.NONE).anyTimes();
-
-        PowerMock.replayAll(mockRoster, dataTransferManagerMock);
+        PowerMock.replayAll(mockRoster);
 
         RosterComparator comperator = new RosterComparator();
 
         RosterEntryElement[] elements = RosterEntryElement.createAll(
             mockRoster, jids);
-
-        for (RosterEntryElement element : elements)
-            element.dataTransferManager = dataTransferManagerMock;
 
         comperator.sort(null, elements);
 

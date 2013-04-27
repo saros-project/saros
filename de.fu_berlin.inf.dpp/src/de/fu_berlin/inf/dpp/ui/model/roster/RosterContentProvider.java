@@ -17,13 +17,9 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.net.ITransferModeListener;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManagerListener;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
-import de.fu_berlin.inf.dpp.net.internal.IByteStreamConnection;
 import de.fu_berlin.inf.dpp.ui.model.TreeContentProvider;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.nebula.utils.ViewerUtils;
@@ -40,28 +36,6 @@ public class RosterContentProvider extends TreeContentProvider {
         .getLogger(RosterContentProvider.class);
 
     protected Viewer viewer;
-
-    @Inject
-    protected DataTransferManager dataTransferManager;
-    protected ITransferModeListener transferModeListener = new ITransferModeListener() {
-        @Override
-        public void transferFinished(JID jid, NetTransferMode newMode,
-            boolean incoming, long sizeTransferred, long sizeUncompressed,
-            long transmissionMillisecs) {
-            // do nothing
-        }
-
-        @Override
-        public void connectionChanged(JID jid, IByteStreamConnection connection) {
-            ViewerUtils.update(viewer, new RosterEntryElement(roster, jid),
-                null);
-        }
-
-        @Override
-        public void clear() {
-            ViewerUtils.refresh(viewer, true);
-        }
-    };
 
     @Inject
     protected DiscoveryManager discoveryManager;
@@ -120,8 +94,7 @@ public class RosterContentProvider extends TreeContentProvider {
     public RosterContentProvider() {
         super();
         SarosPluginContext.initComponent(this);
-        this.dataTransferManager.getTransferModeDispatch().add(
-            this.transferModeListener);
+
         this.discoveryManager
             .addDiscoveryManagerListener(this.discoveryManagerListener);
     }
@@ -149,8 +122,6 @@ public class RosterContentProvider extends TreeContentProvider {
         }
         this.discoveryManager
             .removeDiscoveryManagerListener(this.discoveryManagerListener);
-        this.dataTransferManager.getTransferModeDispatch().remove(
-            transferModeListener);
     }
 
     /**
