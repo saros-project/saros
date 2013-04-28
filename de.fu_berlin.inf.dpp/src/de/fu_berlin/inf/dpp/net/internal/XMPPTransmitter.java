@@ -47,7 +47,6 @@ import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.extensions.SarosLeaveExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.SarosPacketExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListReceivedExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.UserListRequestExtension;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -202,13 +201,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
             sendMessageToUser(host.getJID(), extension, true);
         }
-    }
-
-    @Override
-    public void sendUserListRequest(JID user) {
-        sendMessageToUser(user,
-            UserListRequestExtension.PROVIDER
-                .create(new UserListRequestExtension(sessionID.getValue())));
     }
 
     /* Methods to remove from the IFACE END */

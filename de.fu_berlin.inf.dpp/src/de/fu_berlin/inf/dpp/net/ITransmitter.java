@@ -138,6 +138,4 @@ public interface ITransmitter {
     // T payload, long timeout);
 
     public SarosPacketCollector getUserListConfirmationCollector();
-
-    public void sendUserListRequest(JID peer);
 }

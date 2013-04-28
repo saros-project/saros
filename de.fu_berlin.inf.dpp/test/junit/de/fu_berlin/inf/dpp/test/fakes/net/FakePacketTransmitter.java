@@ -92,9 +92,4 @@ class FakePacketTransmitter implements ITransmitter {
     public SarosPacketCollector getUserListConfirmationCollector() {
         return null;
     }
-
-    @Override
-    public void sendUserListRequest(JID peer) {
-        // NOP
-    }
 }
