@@ -42,6 +42,15 @@ public class FileContentNotifierBridge implements IFileContentChangedNotifier,
             stack.addAll(Arrays.asList(delta.getAffectedChildren()));
 
             if (delta.getResource().getType() == IResource.FILE) {
+
+                // TODO check the Eclipse API to ignore more events
+                if (delta.getKind() == IResourceDelta.NO_CHANGE)
+                    continue;
+
+                if ((delta.getKind() == IResourceDelta.CHANGED)
+                    && (delta.getFlags() == IResourceDelta.MARKERS))
+                    continue;
+
                 for (IFileContentChangedListener listener : fileContentChangedListeners)
                     listener.fileContentChanged(delta.getResource()
                         .getFullPath().toPortableString());
