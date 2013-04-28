@@ -39,7 +39,6 @@ import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 
 /**
@@ -165,15 +164,6 @@ public interface ISarosSession {
      *         <code>null</code> but may be empty
      */
     public Set<IProject> getProjects();
-
-    /**
-     * @return the sequencer that is responsible for sending and receiving
-     *         activityDataObjects.
-     * 
-     * @deprecated will be removed, do not use this in new code
-     */
-    @Deprecated
-    public ActivitySequencer getSequencer();
 
     /**
      * FOR INTERNAL USE ONLY !

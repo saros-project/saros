@@ -19,7 +19,6 @@ import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
@@ -102,12 +101,6 @@ public class NullSarosSession implements ISarosSession {
 
     @Override
     public Set<IProject> getProjects() {
-        log.warn("unexpected method call");
-        return null;
-    }
-
-    @Override
-    public ActivitySequencer getSequencer() {
         log.warn("unexpected method call");
         return null;
     }

@@ -19,7 +19,6 @@ import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
@@ -134,11 +133,6 @@ public class SarosSessionStub implements ISarosSession {
 
     @Override
     public DateTime getSessionStart() {
-        throw new RuntimeException("Unexpected call to Stub");
-    }
-
-    @Override
-    public ActivitySequencer getSequencer() {
         throw new RuntimeException("Unexpected call to Stub");
     }
 

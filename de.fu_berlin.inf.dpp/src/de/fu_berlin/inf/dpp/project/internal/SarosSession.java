@@ -403,11 +403,6 @@ public final class SarosSession implements ISarosSession {
         return result;
     }
 
-    @Override
-    public ActivitySequencer getSequencer() {
-        return activitySequencer;
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -567,7 +562,7 @@ public final class SarosSession implements ISarosSession {
             return;
         }
 
-        getSequencer().userLeft(user);
+        activitySequencer.userLeft(user);
 
         // TODO what is to do here if no user with write access exists anymore?
         listenerDispatch.userLeft(user);
@@ -845,7 +840,7 @@ public final class SarosSession implements ISarosSession {
             return;
 
         try {
-            getSequencer().sendActivity(toWhom,
+            activitySequencer.sendActivity(toWhom,
                 activity.getActivityDataObject(this));
         } catch (IllegalArgumentException e) {
             log.warn("Could not convert Activity to DataObject: ", e);
