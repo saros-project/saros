@@ -6,9 +6,7 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
-import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -29,14 +27,19 @@ import de.fu_berlin.inf.dpp.util.Utils;
 @Component(module = "net")
 public class ActivitiesHandler {
 
-    private static final Logger log = Logger.getLogger(ActivitiesHandler.class
+    private static final Logger LOG = Logger.getLogger(ActivitiesHandler.class
         .getName());
 
-    @Inject
-    protected SarosSessionObservable sarosSessionObservable;
+    private final SarosSessionObservable sarosSessionObservable;
+
+    private final SessionIDObservable sessionID;
 
     public ActivitiesHandler(IReceiver receiver,
-        final SessionIDObservable sessionID) {
+        SarosSessionObservable sarosSessionObservable,
+        SessionIDObservable sessionID) {
+
+        this.sarosSessionObservable = sarosSessionObservable;
+        this.sessionID = sessionID;
 
         /**
          * Add a PacketListener for all TimedActivityDataObject packets
@@ -44,93 +47,55 @@ public class ActivitiesHandler {
         receiver.addPacketListener(new PacketListener() {
             @Override
             public void processPacket(Packet packet) {
-                try {
-                    TimedActivities payload = ActivitiesExtension.PROVIDER
-                        .getPayload(packet);
-                    if (payload == null) {
-                        log.warn("Invalid ActivitiesExtensionPacket"
-                            + " does not contain a payload: " + packet);
-                        return;
-                    }
-                    JID from = new JID(packet.getFrom());
-                    List<TimedActivityDataObject> timedActivities = payload
-                        .getTimedActivities();
-
-                    if (!ObjectUtils.equals(sessionID.getValue(),
-                        payload.getSessionID())) {
-                        log.warn("Rcvd ("
-                            + String.format("%03d", timedActivities.size())
-                            + ") " + Utils.prefix(from)
-                            + "from an old/unknown session: " + timedActivities);
-                        return;
-                    }
-
-                    receiveActivities(from, timedActivities);
-
-                } catch (Exception e) {
-                    log.error(
-                        "An internal error occurred while processing packets",
-                        e);
-                }
+                receiveActivities(new JID(packet.getFrom()), packet);
             }
         }, ActivitiesExtension.PROVIDER.getPacketFilter());
     }
 
-    /**
-     * This method is called from all the different transfer methods, when an
-     * activityDataObject arrives. This method puts the activityDataObject into
-     * the ActivitySequencer which will execute it.
-     * 
-     * @param fromJID
-     *            The JID which sent these activityDataObjects (the source in
-     *            the activityDataObjects might be different!)
-     * @param timedActivities
-     *            The received activityDataObjects including sequence numbers.
-     * 
-     * @sarosThread must be called from the Dispatch Thread
-     */
-    public void receiveActivities(JID fromJID,
-        List<TimedActivityDataObject> timedActivities) {
+    private void receiveActivities(JID fromJID, Packet packet) {
+
+        TimedActivities payload = ActivitiesExtension.PROVIDER
+            .getPayload(packet);
+        if (payload == null) {
+            LOG.warn("Invalid ActivitiesExtensionPacket"
+                + " does not contain a payload: " + packet);
+            return;
+        }
+        JID from = new JID(packet.getFrom());
+        List<TimedActivityDataObject> timedActivities = payload
+            .getTimedActivities();
+
+        if (!ObjectUtils.equals(sessionID.getValue(), payload.getSessionID())) {
+            LOG.warn("rcvd (" + String.format("%03d", timedActivities.size())
+                + ") " + Utils.prefix(from) + "from an old/unknown session: "
+                + timedActivities);
+            return;
+        }
 
         final ISarosSession session = sarosSessionObservable.getValue();
 
         if (session == null || session.getUser(fromJID) == null) {
-            log.warn("Rcvd (" + String.format("%03d", timedActivities.size())
+            LOG.warn("rcvd (" + String.format("%03d", timedActivities.size())
                 + ") " + Utils.prefix(fromJID)
                 + " but user is no participant: " + timedActivities);
             return;
         } else {
-            String msg = "Rcvd ("
+            String msg = "rcvd ("
                 + String.format("%03d", timedActivities.size()) + ") "
                 + Utils.prefix(fromJID) + ": " + timedActivities;
 
-            // only log on debug level if there is more than a checksum
             if (ActivityUtils.containsChecksumsOnly(timedActivities))
-                log.trace(msg);
+                LOG.trace(msg);
             else
-                log.debug(msg);
+                LOG.debug(msg);
         }
 
         for (TimedActivityDataObject timedActivity : timedActivities) {
 
-            IActivityDataObject activityDataObject = timedActivity
-                .getActivity();
+            assert timedActivity.getActivity().getSource() != null : "Received activity  without source"
+                + timedActivity.getActivity();
 
-            /*
-             * Some activityDataObjects save space in the message by not setting
-             * the source and the XML parser needs to provide the source
-             */
-            assert activityDataObject.getSource() != null : "Received activityDataObject without source:"
-                + activityDataObject;
-
-            try {
-                // Ask sequencer to execute or queue until missing
-                // activityDataObjects
-                // arrive
-                session.getSequencer().exec(timedActivity);
-            } catch (Exception e) {
-                log.error("Internal error", e);
-            }
+            session.getSequencer().exec(timedActivity);
         }
     }
 
