@@ -1,10 +1,15 @@
 package de.fu_berlin.inf.dpp.net.business;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.smack.packet.PacketExtension;
 import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.User;
@@ -12,6 +17,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension.UserListEntry;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListReceivedExtension;
@@ -29,6 +35,8 @@ public class UserListHandler implements Startable {
 
     private static final Logger log = Logger.getLogger(UserListHandler.class
         .getName());
+
+    private static final long USER_LIST_SYNCHRONIZE_TIMEOUT = 10000L;
 
     private final ITransmitter transmitter;
 
@@ -73,6 +81,92 @@ public class UserListHandler implements Startable {
     @Override
     public void stop() {
         receiver.removePacketListener(userListListener);
+    }
+
+    /**
+     * Synchronizes a user list with the given remote users.
+     * 
+     * @param userList
+     *            collection containing the users to update
+     * 
+     * @param remoteUsers
+     *            the users that will receive the user list
+     * 
+     * @return a list of users that did not reply when synchronizing the user
+     *         list
+     * 
+     * @throws IllegalStateException
+     *             if the local user of the session is not the host
+     */
+    public List<User> synchronizeUserList(Collection<User> userList,
+        Collection<User> remoteUsers) {
+
+        List<User> notReplied = new ArrayList<User>();
+        List<User> awaitReply = new ArrayList<User>(remoteUsers);
+
+        if (!session.isHost())
+            throw new IllegalStateException(
+                "only the host can synchronize the user list");
+
+        SarosPacketCollector collector = receiver
+            .createCollector(UserListReceivedExtension.PROVIDER
+                .getPacketFilter(currentSessionID));
+
+        PacketExtension userListPacket = UserListExtension.PROVIDER
+            .create(new UserListExtension(currentSessionID, userList));
+
+        log.debug("synchronizing user list " + userList + " with user(s) "
+            + remoteUsers);
+
+        try {
+            for (User user : remoteUsers) {
+                try {
+                    transmitter
+                        .sendToSessionUser(user.getJID(), userListPacket);
+                } catch (IOException e) {
+                    log.error("failed to send user list to user: " + user, e);
+                    notReplied.add(user);
+                    awaitReply.remove(user);
+                }
+            }
+
+            long synchronizeStart = System.currentTimeMillis();
+
+            // see BUG #3544930 , the confirmation is useless
+
+            while ((System.currentTimeMillis() - synchronizeStart) < USER_LIST_SYNCHRONIZE_TIMEOUT) {
+
+                if (awaitReply.isEmpty())
+                    break;
+
+                Packet result = collector.nextResult(100);
+
+                if (result == null)
+                    continue;
+
+                JID jid = new JID(result.getFrom());
+
+                if (!remove(awaitReply, jid)) {
+                    log.warn("received user list confirmation from unknown user: "
+                        + jid);
+                } else {
+                    log.debug("received user list confirmation from: " + jid);
+                }
+            }
+
+            notReplied.addAll(awaitReply);
+
+            if (notReplied.isEmpty())
+                log.debug("synchronized user list with user(s) " + remoteUsers);
+            else
+                log.warn("failed to synchronize user list with user(s) "
+                    + notReplied);
+
+            return notReplied;
+
+        } finally {
+            collector.cancel();
+        }
     }
 
     private void handleUserListUpdate(Packet packet) {
@@ -136,5 +230,18 @@ public class UserListHandler implements Startable {
             log.error("failed to send user list received confirmation to: "
                 + to, e);
         }
+    }
+
+    private boolean remove(Collection<User> users, JID jid) {
+        for (Iterator<User> it = users.iterator(); it.hasNext();) {
+            User user = it.next();
+
+            if (user.getJID().strictlyEquals(jid)) {
+                it.remove();
+                return true;
+            }
+        }
+
+        return false;
     }
 }

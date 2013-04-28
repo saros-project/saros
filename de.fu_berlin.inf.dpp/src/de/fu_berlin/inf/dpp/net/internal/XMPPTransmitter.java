@@ -21,13 +21,10 @@ package de.fu_berlin.inf.dpp.net.internal;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.jivesoftware.smack.Connection;
-import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
@@ -36,17 +33,13 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserConnectionState;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
-import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.extensions.SarosLeaveExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.SarosPacketExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.UserListReceivedExtension;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -84,8 +77,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
      */
     public static final int MAX_TRANSFER_RETRIES = 4;
 
-    private final IReceiver receiver;
-
     private final SessionIDObservable sessionID;
 
     private final DataTransferManager dataManager;
@@ -96,70 +87,10 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     private SarosSessionObservable sarosSessionObservable;
 
     public XMPPTransmitter(SessionIDObservable sessionID,
-        DataTransferManager dataManager, SarosNet sarosNet, IReceiver receiver) {
+        DataTransferManager dataManager, SarosNet sarosNet) {
         sarosNet.addListener(this);
         this.dataManager = dataManager;
         this.sessionID = sessionID;
-        this.receiver = receiver;
-    }
-
-    // FIXME remove this method !
-    private SarosPacketCollector installReceiver(PacketFilter filter) {
-        return receiver.createCollector(filter);
-    }
-
-    // FIXME move to XMPPReceiver
-    @Override
-    public SarosPacketCollector getUserListConfirmationCollector() {
-
-        PacketFilter filter = UserListReceivedExtension.PROVIDER
-            .getPacketFilter(sessionID.getValue());
-
-        return installReceiver(filter);
-    }
-
-    // FIXME move to XMPPReceiver
-    @Override
-    public boolean receiveUserListConfirmation(SarosPacketCollector collector,
-        List<User> fromUsers, IProgressMonitor monitor)
-        throws LocalCancellationException {
-
-        if (isConnectionInvalid())
-            return false;
-
-        ArrayList<JID> fromUserJIDs = new ArrayList<JID>();
-        for (User user : fromUsers) {
-            fromUserJIDs.add(user.getJID());
-        }
-        try {
-            Packet result;
-            JID jid;
-            while (fromUserJIDs.size() > 0) {
-                if (monitor.isCanceled())
-                    throw new LocalCancellationException();
-
-                // Wait up to [timeout] milliseconds for a result.
-                result = collector.nextResult(100);
-                if (result == null)
-                    continue;
-
-                jid = new JID(result.getFrom());
-                if (!fromUserJIDs.remove(jid)) {
-                    log.warn("user list confirmation from unknown user: "
-                        + Utils.prefix(jid));
-                } else {
-                    log.debug("user list confirmation from: "
-                        + Utils.prefix(jid));
-                }
-                /*
-                 * TODO: what if a user goes offline during the invitation? The
-                 * confirmation will never arrive!
-                 */
-            }
-            return true;
-        } finally {
-            collector.cancel();
-        }
     }
 
     @Override

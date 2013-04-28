@@ -19,16 +19,11 @@
 package de.fu_berlin.inf.dpp.net;
 
 import java.io.IOException;
-import java.util.List;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.jivesoftware.smack.packet.IQ.Type;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
 
-import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
 import de.fu_berlin.inf.dpp.net.internal.extensions.SarosPacketExtension;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -104,10 +99,6 @@ public interface ITransmitter {
      */
     public void sendMessageToUser(JID jid, PacketExtension extension);
 
-    public boolean receiveUserListConfirmation(SarosPacketCollector collector,
-        List<User> fromUsers, IProgressMonitor monitor)
-        throws LocalCancellationException;
-
     /**
      * Sends a leave message to the participants of given Saros session. See
      * {@link InvitationProcess} for more information when this is supposed be
@@ -117,25 +108,4 @@ public interface ITransmitter {
      *            the Saros session that this join message refers to.
      */
     public void sendLeaveMessage(ISarosSession sarosSession);
-
-    /**
-     * Sends an IQ {@linkplain Type#GET GET} query to the user with given
-     * {@link JID} .
-     * 
-     * Example using provider:
-     * <p>
-     * <code>XStreamExtensionProvider<VersionInfo> versionProvider = new
-     * XStreamExtensionProvider<VersionInfo>( "sarosVersion", VersionInfo.class,
-     * Version.class, Compatibility.class);<br>
-     * sendQuery(jid, versionProvider, 5000);
-     * </code>
-     * </p>
-     * In this example this sends a request to the user with jid and waits 5
-     * seconds for an answer. If it arrives in time, a payload of type T (in
-     * this case VersionInfo) will be returned, else the result is null.
-     */
-    // public <T> T sendQuery(JID jid, XStreamExtensionProvider<T> provider,
-    // T payload, long timeout);
-
-    public SarosPacketCollector getUserListConfirmationCollector();
 }

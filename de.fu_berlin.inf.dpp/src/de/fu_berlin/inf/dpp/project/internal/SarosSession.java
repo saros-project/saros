@@ -26,7 +26,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,6 +33,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -42,12 +42,10 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.jivesoftware.smack.packet.PacketExtension;
 import org.joda.time.DateTime;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.annotations.Inject;
@@ -74,7 +72,6 @@ import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogHandler;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.feedback.DataTransferCollector;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
@@ -92,12 +89,10 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.PingPongCentral;
 import de.fu_berlin.inf.dpp.net.SarosNet;
-import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.business.UserListHandler;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.extensions.KickUserExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceManager;
@@ -198,6 +193,7 @@ public final class SarosSession implements ISarosSession {
 
     private ActivitySequencer activitySequencer;
 
+    private UserListHandler userListHandler;
     private boolean started = false;
     private boolean stopped = false;
 
@@ -540,8 +536,16 @@ public final class SarosSession implements ISarosSession {
          * can produce different results
          */
 
-        if (isHost())
-            synchronizeUserList();
+        if (isHost()) {
+            List<User> timedOutUsers = userListHandler.synchronizeUserList(
+                getUsers(), getRemoteUsers());
+
+            if (!timedOutUsers.isEmpty())
+                // FIXME do not throw a runtime exception here
+                throw new RuntimeException(
+                    "could not synchronize user list, following users did not respond: "
+                        + StringUtils.join(timedOutUsers, ", "));
+        }
 
         synchronizer.syncExec(Utils.wrapSafe(log, new Runnable() {
             @Override
@@ -1163,76 +1167,6 @@ public final class SarosSession implements ISarosSession {
         return projectMapper.getProject(projectID);
     }
 
-    // TODO this needs a major refactor
-    private void synchronizeUserList() {
-
-        final IProgressMonitor monitor = new NullProgressMonitor();
-
-        log.debug("synchronizing user list");
-
-        Collection<User> participants = getUsers();
-
-        SarosPacketCollector userListConfirmationCollector = transmitter
-            .getUserListConfirmationCollector();
-
-        PacketExtension userList = UserListExtension.PROVIDER
-            .create(new UserListExtension(sessionIDObservable.getValue(),
-                participants));
-
-        List<User> remoteUsers = getRemoteUsers();
-
-        if (remoteUsers.isEmpty())
-            return;
-
-        for (Iterator<User> it = remoteUsers.iterator(); it.hasNext();) {
-            User user = it.next();
-            try {
-                transmitter.sendToSessionUser(user.getJID(), userList);
-            } catch (IOException e) {
-                log.error("could not send user list to session user " + user, e);
-                it.remove();
-            }
-        }
-
-        /*
-         * the code below is NOT need IF sendToSessionUser will always use the
-         * stream connection and not the chat !
-         */
-
-        // see BUG #3544930 , the confirmation is useless
-        log.debug("waiting for confirmations");
-
-        /*
-         * FIXME use the direct connection as this will throw an IOException so
-         * we can remove the user that is not responding
-         */
-
-        Utils.runSafeAsync("SynchronizeUserlistTimer", log, new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(15000);
-                } catch (InterruptedException e) {
-                    // NOP
-                } finally {
-                    monitor.setCanceled(true);
-                }
-
-            }
-        });
-
-        try {
-            transmitter.receiveUserListConfirmation(
-                userListConfirmationCollector, remoteUsers, monitor);
-        } catch (LocalCancellationException e) {
-            // HACK for now
-            throw new RuntimeException("synchronizing user list timed out");
-        }
-
-        log.debug("synchronized user list");
-    }
-
     @Override
     public Map<IProject, List<IResource>> getProjectResourcesMapping() {
         return projectMapper.getProjectResourceMapping();
@@ -1373,6 +1307,8 @@ public final class SarosSession implements ISarosSession {
 
         activitySequencer = sessionContainer
             .getComponent(ActivitySequencer.class);
+
+        userListHandler = sessionContainer.getComponent(UserListHandler.class);
 
         // ensure that the container uses caching
         assert sessionContainer.getComponent(ActivityHandler.class) == sessionContainer

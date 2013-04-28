@@ -2,20 +2,15 @@ package de.fu_berlin.inf.dpp.test.fakes.net;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
 
-import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.extensions.SarosPacketExtension;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
@@ -76,20 +71,7 @@ class FakePacketTransmitter implements ITransmitter {
     }
 
     @Override
-    public boolean receiveUserListConfirmation(SarosPacketCollector collector,
-        List<User> fromUsers, IProgressMonitor monitor)
-        throws LocalCancellationException {
-        // NOP
-        return false;
-    }
-
-    @Override
     public void sendLeaveMessage(ISarosSession sarosSession) {
         // NOP
-    }
-
-    @Override
-    public SarosPacketCollector getUserListConfirmationCollector() {
-        return null;
     }
 }
