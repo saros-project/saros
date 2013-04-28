@@ -49,7 +49,6 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.SarosNet;
-import de.fu_berlin.inf.dpp.net.business.ActivitiesHandler;
 import de.fu_berlin.inf.dpp.net.business.CancelInviteHandler;
 import de.fu_berlin.inf.dpp.net.business.CancelProjectSharingHandler;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
@@ -287,7 +286,6 @@ public class SarosContext implements ISarosContext {
         Component.create(CancelProjectSharingHandler.class),
         Component.create(InvitationHandler.class),
         Component.create(LeaveAndKickHandler.class),
-        Component.create(ActivitiesHandler.class),
 
         // FIXME: remove all extensions providers here !
 

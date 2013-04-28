@@ -45,7 +45,6 @@ import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
-import de.fu_berlin.inf.dpp.net.business.ActivitiesHandler;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.TransferModeDispatch;
@@ -170,7 +169,6 @@ public class SarosSessionTest {
         container.addComponent(FeedbackManager.class);
         container.addComponent(FileReplacementInProgressObservable.class);
         container.addComponent(JDTFacade.class);
-        container.addComponent(ActivitiesHandler.class);
     }
 
     @After
