@@ -187,7 +187,7 @@ public class PingPongCentral extends AbstractActivityProvider implements
                 sendPings();
 
             }
-        }, 10, 10, TimeUnit.SECONDS));
+        }, 120, 10, TimeUnit.SECONDS));
     }
 
     public PingPongCentral(ISarosSession session,
