@@ -25,7 +25,7 @@ public abstract class ByteStreamTransport implements ITransport {
     public IByteStreamConnection connect(final JID peer) throws IOException,
         InterruptedException {
 
-        LOG.debug("establishing bytestream session to " + peer);
+        LOG.debug("establishing bytestream connection to " + peer);
 
         try {
             return establishBinaryChannel(peer.toString());
@@ -53,7 +53,7 @@ public abstract class ByteStreamTransport implements ITransport {
         public void incomingBytestreamRequest(BytestreamRequest request) {
 
             LOG.debug("received request to establish a " + getNetTransferMode()
-                + " bytestream session to " + request.getFrom());
+                + " bytestream connection to " + request.getFrom());
 
             try {
 
@@ -63,27 +63,38 @@ public abstract class ByteStreamTransport implements ITransport {
                     return;
 
                 JID peer = new JID(request.getFrom());
-                connectionListener.connectionChanged(peer, connection, true);
+
+                IByteStreamConnectionListener listener = getConnectionListener();
+
+                if (listener == null) {
+                    LOG.warn("closing bytestream connection " + connection
+                        + " because transport " + getNetTransferMode()
+                        + " was uninitilized during connection establishment");
+                    connection.close();
+                    return;
+                }
+
+                listener.connectionChanged(peer, connection, true);
 
             } catch (InterruptedException e) {
                 /*
                  * do not interrupt here as this is called by SMACK and nobody
                  * knows how SMACK handle thread interruption
                  */
-                LOG.warn("interrupted while establishing byte stream session to "
+                LOG.warn("interrupted while establishing bytestream connection to "
                     + request.getFrom());
             } catch (Exception e) {
-                LOG.error("could not establish byte stream session to "
+                LOG.error("could not establish bytestream connection to "
                     + request.getFrom(), e);
             }
         }
     };
 
     /**
-     * Establishes a BinaryChannel to a peer.
+     * Establishes a IByteStreamConnection to a peer.
      * 
      * @param peer
-     * @return BinaryChannel to peer
+     * @return IByteStreamConnection to peer
      * @throws XMPPException
      * @throws IOException
      * @throws InterruptedException
@@ -103,13 +114,13 @@ public abstract class ByteStreamTransport implements ITransport {
     }
 
     /**
-     * Handles a BytestreamRequest requests and returns a BinaryChannel. If null
-     * is returned the request is handled in different manner (i.e. see {#link
-     * Socks5Transport})
+     * Handles a BytestreamRequest requests and returns a IByteStreamConnection.
+     * If null is returned the request is handled in different manner (i.e. see
+     * {#link Socks5Transport})
      * 
      * 
      * @param request
-     * @return BinaryChannel or null if handled in different manner
+     * @return IByteStreamConnection or null if handled in different manner
      * @throws InterruptedException
      * @throws XMPPException
      * @throws IOException
