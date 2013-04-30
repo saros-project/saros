@@ -21,7 +21,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.util.Utils;
 
-public class BinaryChannelTest {
+public class BinaryChannelConnectionTest {
 
     private static final int PIPE_BUFFER_SIZE = 1024 * 1024;
 
@@ -108,25 +108,25 @@ public class BinaryChannelTest {
         final CountDownLatch received = new CountDownLatch(1);
 
         BinaryChannelConnection alice = new BinaryChannelConnection(new JID(
-            "alice@baumeister.de"), new BinaryChannel(aliceSession,
-            NetTransferMode.SOCKS5_DIRECT), new StreamConnectionListener() {
-            @Override
-            public void addIncomingTransferObject(
-                final IncomingTransferObject incomingTransferObject) {
-                // NOP
-            }
-        });
+            "alice@baumeister.de"), aliceSession,
+            NetTransferMode.SOCKS5_DIRECT, new StreamConnectionListener() {
+                @Override
+                public void addIncomingTransferObject(
+                    final IncomingTransferObject incomingTransferObject) {
+                    // NOP
+                }
+            });
 
         BinaryChannelConnection bob = new BinaryChannelConnection(new JID(
-            "bob@baumeister.de"), new BinaryChannel(bobSession,
-            NetTransferMode.SOCKS5_DIRECT), new StreamConnectionListener() {
-            @Override
-            public void addIncomingTransferObject(
-                final IncomingTransferObject incomingTransferObject) {
-                receivedBytes = incomingTransferObject.getPayload();
-                received.countDown();
-            }
-        });
+            "bob@baumeister.de"), bobSession, NetTransferMode.SOCKS5_DIRECT,
+            new StreamConnectionListener() {
+                @Override
+                public void addIncomingTransferObject(
+                    final IncomingTransferObject incomingTransferObject) {
+                    receivedBytes = incomingTransferObject.getPayload();
+                    received.countDown();
+                }
+            });
 
         TransferDescription description = TransferDescription
             .createCustomTransferDescription();
@@ -155,25 +155,25 @@ public class BinaryChannelTest {
         final CountDownLatch received = new CountDownLatch(1);
 
         BinaryChannelConnection alice = new BinaryChannelConnection(new JID(
-            "alice@baumeister.de"), new BinaryChannel(aliceSession,
-            NetTransferMode.SOCKS5_DIRECT), new StreamConnectionListener() {
-            @Override
-            public void addIncomingTransferObject(
-                final IncomingTransferObject incomingTransferObject) {
-                // NOP
-            }
-        });
+            "alice@baumeister.de"), aliceSession,
+            NetTransferMode.SOCKS5_DIRECT, new StreamConnectionListener() {
+                @Override
+                public void addIncomingTransferObject(
+                    final IncomingTransferObject incomingTransferObject) {
+                    // NOP
+                }
+            });
 
         BinaryChannelConnection bob = new BinaryChannelConnection(new JID(
-            "bob@baumeister.de"), new BinaryChannel(bobSession,
-            NetTransferMode.SOCKS5_DIRECT), new StreamConnectionListener() {
-            @Override
-            public void addIncomingTransferObject(
-                final IncomingTransferObject incomingTransferObject) {
-                receivedBytes = incomingTransferObject.getPayload();
-                received.countDown();
-            }
-        });
+            "bob@baumeister.de"), bobSession, NetTransferMode.SOCKS5_DIRECT,
+            new StreamConnectionListener() {
+                @Override
+                public void addIncomingTransferObject(
+                    final IncomingTransferObject incomingTransferObject) {
+                    receivedBytes = incomingTransferObject.getPayload();
+                    received.countDown();
+                }
+            });
 
         TransferDescription description = TransferDescription
             .createCustomTransferDescription();
@@ -212,25 +212,25 @@ public class BinaryChannelTest {
         final CountDownLatch received = new CountDownLatch((int) packetsToSend);
 
         BinaryChannelConnection alice = new BinaryChannelConnection(new JID(
-            "alice@baumeister.de"), new BinaryChannel(aliceSession,
-            NetTransferMode.SOCKS5_DIRECT), new StreamConnectionListener() {
-            @Override
-            public void addIncomingTransferObject(
-                final IncomingTransferObject incomingTransferObject) {
-                // NOP
-            }
-        });
+            "alice@baumeister.de"), aliceSession,
+            NetTransferMode.SOCKS5_DIRECT, new StreamConnectionListener() {
+                @Override
+                public void addIncomingTransferObject(
+                    final IncomingTransferObject incomingTransferObject) {
+                    // NOP
+                }
+            });
 
         BinaryChannelConnection bob = new BinaryChannelConnection(new JID(
-            "bob@baumeister.de"), new BinaryChannel(bobSession,
-            NetTransferMode.SOCKS5_DIRECT), new StreamConnectionListener() {
-            @Override
-            public void addIncomingTransferObject(
-                final IncomingTransferObject incomingTransferObject) {
-                receivedBytes = incomingTransferObject.getPayload();
-                received.countDown();
-            }
-        });
+            "bob@baumeister.de"), bobSession, NetTransferMode.SOCKS5_DIRECT,
+            new StreamConnectionListener() {
+                @Override
+                public void addIncomingTransferObject(
+                    final IncomingTransferObject incomingTransferObject) {
+                    receivedBytes = incomingTransferObject.getPayload();
+                    received.countDown();
+                }
+            });
 
         TransferDescription description = TransferDescription
             .createCustomTransferDescription();

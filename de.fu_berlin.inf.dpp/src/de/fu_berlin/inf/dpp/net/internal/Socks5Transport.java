@@ -30,6 +30,7 @@ import org.jivesoftware.smackx.bytestreams.socks5.Socks5BytestreamRequest;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5BytestreamSession;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -352,7 +353,7 @@ public class Socks5Transport extends ByteStreamTransport {
     }
 
     /**
-     * Accepts a Request and returns an established BinaryChannel.
+     * Accepts a Request and returns an established IByteStreamConnection.
      * 
      * Immediately tries to establish a second session to the requesting peer
      * but also accepts this request to achieve a direct connection although one
@@ -370,11 +371,17 @@ public class Socks5Transport extends ByteStreamTransport {
      * @throws InterruptedException
      * @throws IOException
      */
-    protected BinaryChannel acceptNewRequest(BytestreamRequest request)
+    protected IByteStreamConnection acceptNewRequest(BytestreamRequest request)
         throws XMPPException, IOException, InterruptedException {
         String peer = request.getFrom();
+
         LOG.debug(prefix() + "receiving request from " + peer
             + verboseLocalProxyInfo());
+
+        IByteStreamConnectionListener listener = getConnectionListener();
+
+        if (listener == null)
+            throw new IOException(this + " transport is not initialized");
 
         // start to establish response
         Future<Socks5BytestreamSession> responseFuture = futureToEstablishResponseSession(peer);
@@ -387,8 +394,9 @@ public class Socks5Transport extends ByteStreamTransport {
             if (inSession.isDirect()) {
                 waitToCloseResponse(responseFuture);
                 configureSocks5Socket(inSession);
-                return new BinaryChannel(inSession,
-                    NetTransferMode.SOCKS5_DIRECT);
+
+                return new BinaryChannelConnection(new JID(peer), inSession,
+                    NetTransferMode.SOCKS5_DIRECT, listener);
             } else {
                 LOG.debug(prefix() + "incoming connection is mediated.");
             }
@@ -410,8 +418,9 @@ public class Socks5Transport extends ByteStreamTransport {
                     + "newly established session is direct! Discarding the other.");
                 Utils.closeQuietly(inSession);
                 configureSocks5Socket(outSession);
-                return new BinaryChannel(outSession,
-                    NetTransferMode.SOCKS5_DIRECT);
+
+                return new BinaryChannelConnection(new JID(peer), outSession,
+                    NetTransferMode.SOCKS5_DIRECT, listener);
             }
 
         } catch (IOException e) {
@@ -431,7 +440,9 @@ public class Socks5Transport extends ByteStreamTransport {
 
         BytestreamSession session = testAndGetMediatedBidirectionalBytestream(
             inSession, outSession, true);
-        return new BinaryChannel(session, NetTransferMode.SOCKS5_MEDIATED);
+
+        return new BinaryChannelConnection(new JID(peer), session,
+            NetTransferMode.SOCKS5_MEDIATED, listener);
     }
 
     /**
@@ -441,7 +452,7 @@ public class Socks5Transport extends ByteStreamTransport {
      * see handleResponse() and acceptNewRequest()
      */
     @Override
-    protected BinaryChannel acceptRequest(BytestreamRequest request)
+    protected IByteStreamConnection acceptRequest(BytestreamRequest request)
         throws XMPPException, IOException, InterruptedException {
 
         ((Socks5BytestreamRequest) request)
@@ -460,7 +471,7 @@ public class Socks5Transport extends ByteStreamTransport {
      * See handleResponse().
      */
     @Override
-    protected BinaryChannel establishBinaryChannel(String peer)
+    protected IByteStreamConnection establishBinaryChannel(String peer)
         throws XMPPException, IOException, InterruptedException {
 
         // before establishing, we have to put the exchanger to the map
@@ -471,8 +482,9 @@ public class Socks5Transport extends ByteStreamTransport {
             + verboseLocalProxyInfo());
 
         BytestreamManager manager = getManager();
+        IByteStreamConnectionListener listener = getConnectionListener();
 
-        if (manager == null)
+        if (manager == null || listener == null)
             throw new IOException(this + " transport is not initialized");
 
         try {
@@ -487,8 +499,8 @@ public class Socks5Transport extends ByteStreamTransport {
 
                 if (outSession.isDirect()) {
                     configureSocks5Socket(outSession);
-                    return new BinaryChannel(outSession,
-                        NetTransferMode.SOCKS5_DIRECT);
+                    return new BinaryChannelConnection(new JID(peer),
+                        outSession, NetTransferMode.SOCKS5_DIRECT, listener);
                 }
 
                 LOG.debug(prefix()
@@ -525,8 +537,9 @@ public class Socks5Transport extends ByteStreamTransport {
                         + "response connection is direct! Discarding the other.");
                     Utils.closeQuietly(outSession);
                     configureSocks5Socket(inSession);
-                    return new BinaryChannel(inSession,
-                        NetTransferMode.SOCKS5_DIRECT);
+
+                    return new BinaryChannelConnection(new JID(peer),
+                        inSession, NetTransferMode.SOCKS5_DIRECT, listener);
                 }
 
             } catch (TimeoutException e) {
@@ -545,7 +558,9 @@ public class Socks5Transport extends ByteStreamTransport {
 
             BytestreamSession session = testAndGetMediatedBidirectionalBytestream(
                 inSession, outSession, false);
-            return new BinaryChannel(session, NetTransferMode.SOCKS5_MEDIATED);
+
+            return new BinaryChannelConnection(new JID(peer), session,
+                NetTransferMode.SOCKS5_MEDIATED, listener);
 
         } finally {
             runningConnects.remove(peer);

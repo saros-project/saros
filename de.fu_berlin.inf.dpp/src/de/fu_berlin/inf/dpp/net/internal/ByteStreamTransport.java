@@ -8,7 +8,6 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.bytestreams.BytestreamListener;
 import org.jivesoftware.smackx.bytestreams.BytestreamManager;
 import org.jivesoftware.smackx.bytestreams.BytestreamRequest;
-import org.jivesoftware.smackx.bytestreams.BytestreamSession;
 
 import de.fu_berlin.inf.dpp.net.JID;
 
@@ -29,11 +28,7 @@ public abstract class ByteStreamTransport implements ITransport {
         LOG.debug("establishing bytestream session to " + peer);
 
         try {
-
-            BinaryChannel channel = establishBinaryChannel(peer.toString());
-            return new BinaryChannelConnection(peer, channel,
-                connectionListener);
-
+            return establishBinaryChannel(peer.toString());
         } catch (XMPPException e) {
             throw new IOException(e);
         }
@@ -44,6 +39,7 @@ public abstract class ByteStreamTransport implements ITransport {
         if (manager != null) {
             manager.removeIncomingBytestreamListener(streamListener);
             manager = null;
+            connectionListener = null;
         }
     }
 
@@ -61,15 +57,13 @@ public abstract class ByteStreamTransport implements ITransport {
 
             try {
 
-                BinaryChannel channel = acceptRequest(request);
+                IByteStreamConnection connection = acceptRequest(request);
 
-                if (channel == null)
+                if (connection == null)
                     return;
 
                 JID peer = new JID(request.getFrom());
-                connectionListener.connectionChanged(peer,
-                    new BinaryChannelConnection(peer, channel,
-                        connectionListener), true);
+                connectionListener.connectionChanged(peer, connection, true);
 
             } catch (InterruptedException e) {
                 /*
@@ -94,17 +88,18 @@ public abstract class ByteStreamTransport implements ITransport {
      * @throws IOException
      * @throws InterruptedException
      */
-    protected BinaryChannel establishBinaryChannel(String peer)
+    protected IByteStreamConnection establishBinaryChannel(String peer)
         throws XMPPException, IOException, InterruptedException {
 
         BytestreamManager manager = getManager();
+        IByteStreamConnectionListener listener = getConnectionListener();
 
-        if (manager == null)
+        if (manager == null || listener == null)
             throw new IOException(this + " transport is not initialized");
 
-        BytestreamSession session = manager.establishSession(peer.toString());
-
-        return new BinaryChannel(session, getNetTransferMode());
+        return new BinaryChannelConnection(new JID(peer),
+            manager.establishSession(peer.toString()), getNetTransferMode(),
+            listener);
     }
 
     /**
@@ -119,13 +114,16 @@ public abstract class ByteStreamTransport implements ITransport {
      * @throws XMPPException
      * @throws IOException
      */
-    protected BinaryChannel acceptRequest(BytestreamRequest request)
+    protected IByteStreamConnection acceptRequest(BytestreamRequest request)
         throws XMPPException, IOException, InterruptedException {
 
-        BytestreamSession session = request.accept();
-        BinaryChannel channel = new BinaryChannel(session, getNetTransferMode());
+        IByteStreamConnectionListener listener = getConnectionListener();
 
-        return channel;
+        if (listener == null)
+            throw new IOException(this + " transport is not initialized");
+
+        return new BinaryChannelConnection(new JID(request.getFrom()),
+            request.accept(), getNetTransferMode(), listener);
     }
 
     @Override
@@ -138,6 +136,10 @@ public abstract class ByteStreamTransport implements ITransport {
 
     protected final synchronized BytestreamManager getManager() {
         return manager;
+    }
+
+    protected final synchronized IByteStreamConnectionListener getConnectionListener() {
+        return connectionListener;
     }
 
     /**
