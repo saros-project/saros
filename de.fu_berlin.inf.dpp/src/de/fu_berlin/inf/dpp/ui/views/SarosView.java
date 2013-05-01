@@ -68,6 +68,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterAdapter;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.BalloonNotification;
 import de.fu_berlin.inf.dpp.ui.actions.ChangeColorAction;
@@ -521,34 +522,47 @@ public class SarosView extends ViewPart {
                  */
                 List<JID> buddies = SelectionRetrieverFactory
                     .getSelectionRetriever(JID.class).getSelection();
+
                 if (buddies.size() > 0)
                     return;
 
-                if (participants.size() == 1) {
-                    if (participants.get(0).isLocal()) {
-                        manager.add(changedColorAction);
-                    } else {
-                        boolean debugMode = false;
+                boolean isHost = false;
 
-                        assert (debugMode = true) == true;
-                        if (sarosSessionManager.getSarosSession() != null
-                            && sarosSessionManager.getSarosSession().isHost()) {
-                            manager.add(giveWriteAccessAction);
-                            manager.add(restrictToReadOnlyAccessAction);
+                ISarosSession session = sarosSessionManager.getSarosSession();
 
-                            if (debugMode)
-                                manager.add(kickUserAction);
+                if (session != null)
+                    isHost = session.isHost();
 
-                            manager.add(new Separator());
-                        }
-                        manager.add(followModeAction);
-                        manager.add(jumpToUserWithWriteAccessPositionAction);
-                        manager.add(new Separator());
-                        manager.add(openChatAction);
-                        manager.add(sendFileAction);
-                        manager.add(videoSharingAction);
-                        manager.add(voipAction);
+                if (participants.size() != 1)
+                    return;
+
+                if (participants.get(0).isLocal()) {
+                    manager.add(changedColorAction);
+
+                    if (isHost) {
+                        manager.add(giveWriteAccessAction);
+                        manager.add(restrictToReadOnlyAccessAction);
                     }
+                } else {
+                    boolean debugMode = false;
+
+                    assert (debugMode = true) == true;
+                    if (isHost) {
+                        manager.add(giveWriteAccessAction);
+                        manager.add(restrictToReadOnlyAccessAction);
+
+                        if (debugMode)
+                            manager.add(kickUserAction);
+
+                        manager.add(new Separator());
+                    }
+                    manager.add(followModeAction);
+                    manager.add(jumpToUserWithWriteAccessPositionAction);
+                    manager.add(new Separator());
+                    manager.add(openChatAction);
+                    manager.add(sendFileAction);
+                    manager.add(videoSharingAction);
+                    manager.add(voipAction);
                 }
             }
         });
