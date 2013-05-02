@@ -12,6 +12,7 @@ public class Messages extends NLS {
     public static String Saros_connecting_failed;
     public static String Saros_connecting_modify_account;
     public static String Saros_connecting_unknown_host;
+    public static String Saros_connecting_connect_error;
     public static String Saros_connecting_internal_error;
     public static String Saros_connecting_error_title;
 

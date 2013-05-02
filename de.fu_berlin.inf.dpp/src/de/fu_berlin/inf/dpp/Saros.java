@@ -43,6 +43,7 @@ import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.XMPPError;
 import org.jivesoftware.smack.proxy.ProxyInfo;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -724,9 +725,20 @@ public class Saros extends AbstractUIPlugin {
 
         Throwable cause = e.getWrappedThrowable();
 
-        if (cause instanceof UnknownHostException)
+        XMPPError error = e.getXMPPError();
+
+        if (error != null && error.getCode() == 504
+            && cause instanceof UnknownHostException)
             return Messages.Saros_connecting_unknown_host
-                + Messages.Saros_connecting_modify_account;
+                + Messages.Saros_connecting_modify_account
+                + "\n\nDetailed error:\nSMACK: " + error + "\n" + "Cause: "
+                + cause;
+        else if (error != null && error.getCode() == 502
+            && cause instanceof IOException)
+            return Messages.Saros_connecting_connect_error
+                + Messages.Saros_connecting_modify_account
+                + "\n\nDetailed error:\nSMACK: " + error + "\n" + "Cause: "
+                + cause;
 
         String question = null;
 
