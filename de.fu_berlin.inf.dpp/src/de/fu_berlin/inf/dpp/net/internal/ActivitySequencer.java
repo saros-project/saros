@@ -48,12 +48,9 @@ import de.fu_berlin.inf.dpp.util.AutoHashMap;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
- * The ActivitySequencer is responsible for making sure that activityDataObjects
- * are sent and received in the right order. There is one ActivitySequencer for
- * each session participant.<br>
- * <br>
- * TODO Remove the dependency of this class on the ConcurrentDocumentManager,
- * push all responsibility up a layer into the SarosSession
+ * The ActivitySequencer is responsible for making sure that transformed
+ * {@linkplain IActivityDataObject activities} are sent and received in the
+ * right order.
  * 
  * @author rdjemili
  * @author coezbek
@@ -61,9 +58,13 @@ import de.fu_berlin.inf.dpp.util.Utils;
  */
 public class ActivitySequencer implements Startable {
 
-    private static final Logger log = Logger.getLogger(ActivitySequencer.class
+    private static final Logger LOG = Logger.getLogger(ActivitySequencer.class
         .getName());
 
+    /**
+     * Holder class containing the transformed {@linkplain IActivityDataObject
+     * activity} and the recipients it should be send to.
+     */
     private static class DataObjectQueueItem {
 
         public final List<User> recipients;
@@ -89,18 +90,75 @@ public class ActivitySequencer implements Startable {
         }
     };
 
-    /** Special queue item that termins the processing */
+    private final Runnable outgoingActivitiesQueueFlushTask = new Runnable() {
+
+        @Override
+        public void run() {
+            try {
+                boolean abort = false;
+                while (!abort)
+                    abort = flush();
+            } catch (InterruptedException e) {
+                LOG.error("Flush got interrupted.", e);
+            }
+        }
+
+        private boolean flush() throws InterruptedException {
+
+            List<DataObjectQueueItem> pendingActivities = new ArrayList<DataObjectQueueItem>(
+                outgoingActivitiesQueue.size());
+
+            pendingActivities.add(outgoingActivitiesQueue.take());
+
+            // If there was more than one ADO waiting, get the rest now.
+            outgoingActivitiesQueue.drainTo(pendingActivities);
+
+            boolean abort = false;
+
+            int idx = pendingActivities.indexOf(POISON);
+
+            if (idx != -1) {
+                abort = true;
+
+                /*
+                 * remove the poison pill and all activities after the pill
+                 */
+                while (pendingActivities.size() != idx)
+                    pendingActivities.remove(idx);
+            }
+
+            Map<User, List<IActivityDataObject>> toSend = AutoHashMap
+                .getListHashMap();
+
+            for (DataObjectQueueItem item : pendingActivities) {
+                for (User recipient : item.recipients) {
+                    toSend.get(recipient).add(item.activityDataObject);
+                }
+            }
+
+            for (Entry<User, List<IActivityDataObject>> e : toSend.entrySet()) {
+                sendTimedActivities(
+                    e.getKey(),
+                    createTimedActivities(e.getKey(),
+                        ActivityUtils.optimize(e.getValue())));
+            }
+
+            return abort;
+        }
+    };
+
+    /** Special queue item that terminates the processing */
     private static final DataObjectQueueItem POISON = new DataObjectQueueItem(
         (User) null, null);
 
-    /** Buffer for outgoing activityDataObjects. */
-    private final BlockingQueue<DataObjectQueueItem> outgoingQueue = new LinkedBlockingQueue<DataObjectQueueItem>();
-
-    private final ActivityQueueManager incomingQueues;
-
     /**
-     * Whether this AS currently sends or receives events
+     * Queue (buffer) for outgoing transformed {@linkplain IActivityDataObject
+     * activities} that needs to be send to remote session users.
      */
+    private final BlockingQueue<DataObjectQueueItem> outgoingActivitiesQueue = new LinkedBlockingQueue<DataObjectQueueItem>();
+
+    private final ActivityQueueManager activityQueueManager;
+
     private boolean started = false;
 
     private String currentSessionID;
@@ -132,7 +190,7 @@ public class ActivitySequencer implements Startable {
 
         this.localJID = sarosSession.getLocalUser().getJID();
 
-        this.incomingQueues = new ActivityQueueManager(localJID);
+        this.activityQueueManager = new ActivityQueueManager(localJID);
     }
 
     /**
@@ -164,107 +222,8 @@ public class ActivitySequencer implements Startable {
 
         started = true;
 
-        activitySendThread = Utils.runSafeAsync("ActivitySender", log,
-            new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        boolean abort = false;
-                        while (!abort)
-                            abort = flushTask();
-                    } catch (InterruptedException e) {
-                        log.error("Flush got interrupted.", e);
-                    }
-                }
-
-                private boolean flushTask() throws InterruptedException {
-
-                    List<DataObjectQueueItem> activities = new ArrayList<DataObjectQueueItem>(
-                        outgoingQueue.size());
-
-                    activities.add(outgoingQueue.take());
-
-                    // If there was more than one ADO waiting, get the rest now.
-                    outgoingQueue.drainTo(activities);
-
-                    boolean abort = false;
-
-                    int idx = activities.indexOf(POISON);
-
-                    if (idx != -1) {
-                        abort = true;
-
-                        /*
-                         * remove the poison pill and all activities after the
-                         * pill
-                         */
-                        while (activities.size() != idx)
-                            activities.remove(idx);
-                    }
-
-                    Map<User, List<IActivityDataObject>> toSend = AutoHashMap
-                        .getListHashMap();
-
-                    for (DataObjectQueueItem item : activities) {
-                        for (User recipient : item.recipients) {
-                            toSend.get(recipient).add(item.activityDataObject);
-                        }
-                    }
-
-                    for (Entry<User, List<IActivityDataObject>> e : toSend
-                        .entrySet()) {
-                        sendActivities(e.getKey(),
-                            ActivityUtils.optimize(e.getValue()));
-                    }
-
-                    return abort;
-                }
-
-                /**
-                 * Sends given activityDataObjects to given recipient.
-                 * 
-                 * @private because this method must not be called from
-                 *          somewhere else than this TimerTask.
-                 * 
-                 * @throws IllegalArgumentException
-                 *             if the recipient is the local user or the
-                 *             activityDataObjects contain <code>null</code>.
-                 */
-                private void sendActivities(User recipient,
-                    List<IActivityDataObject> activityDataObjects) {
-
-                    if (recipient.isLocal()) {
-                        throw new IllegalArgumentException(
-                            "Sending a message to the local user is not supported");
-                    }
-
-                    if (activityDataObjects.contains(null)) {
-                        throw new IllegalArgumentException(
-                            "Cannot send a null activityDataObject");
-                    }
-
-                    // Don't send activities to peers that are not in the
-                    // session
-                    // (anymore)
-                    if (!recipient.isInSarosSession()) {
-                        log.warn("Activities for peer not in session are dropped.");
-                        return;
-                    }
-
-                    JID recipientJID = recipient.getJID();
-
-                    List<TimedActivityDataObject> timedActivities = incomingQueues
-                        .createTimedActivities(recipientJID,
-                            activityDataObjects);
-
-                    log.trace("Sending " + timedActivities.size()
-                        + " activities to " + recipientJID + ": "
-                        + timedActivities);
-
-                    sendTimedActivities(recipientJID, timedActivities);
-                }
-            });
-
+        activitySendThread = Utils.runSafeAsync("ActivitySender", LOG,
+            outgoingActivitiesQueueFlushTask);
     }
 
     /**
@@ -289,7 +248,7 @@ public class ActivitySequencer implements Startable {
          */
         while (true) {
             try {
-                outgoingQueue.put(POISON);
+                outgoingActivitiesQueue.put(POISON);
                 activitySendThread.join();
                 break;
             } catch (InterruptedException e) {
@@ -301,90 +260,110 @@ public class ActivitySequencer implements Startable {
         started = false;
     }
 
-    /**
-     * The central entry point for receiving Activities from the Network
-     * component (either via message or data transfer, thus the following is
-     * synchronized on the queue).
-     * 
-     * The activityDataObjects are sorted (in the queue) and executed in order.
-     * 
-     * If an activityDataObject is missing, this method just returns and queues
-     * the given activityDataObject
-     */
-    private void exec(TimedActivityDataObject nextActivity) {
+    private void executeActivity(TimedActivityDataObject activity) {
 
-        assert nextActivity != null;
+        assert activity != null;
 
-        incomingQueues.add(nextActivity);
+        activityQueueManager.add(activity);
 
         if (!started) {
-            log.debug("Received activityDataObject but "
-                + "ActivitySequencer has not yet been started: " + nextActivity);
+            LOG.debug("received activity but "
+                + "ActivitySequencer has not yet been started: " + activity);
             return;
         }
 
-        execQueue();
-    }
-
-    private void execQueue() {
-        List<IActivityDataObject> activityDataObjects = new ArrayList<IActivityDataObject>();
-        for (TimedActivityDataObject timedActivity : incomingQueues
-            .removeActivities()) {
-            activityDataObjects.add(timedActivity.getActivity());
-        }
-        sarosSession.exec(activityDataObjects);
+        flushIncomingQueues();
     }
 
     /**
-     * Sends the given activityDataObject to the given recipients.
+     * Removes all activities that can be executed now from the incoming
+     * activities queues (buffers) and passes them to the upper layer (current
+     * Saros Session).
+     */
+    private void flushIncomingQueues() {
+        List<IActivityDataObject> serializedActivities = new ArrayList<IActivityDataObject>();
+        for (TimedActivityDataObject timedActivity : activityQueueManager
+            .removeActivities()) {
+            serializedActivities.add(timedActivity.getActivity());
+        }
+        sarosSession.exec(serializedActivities);
+    }
+
+    /**
+     * Sends an activity to the given recipients.
      */
     public void sendActivity(List<User> recipients,
-        final IActivityDataObject activityDataObject) {
-        /**
+        final IActivityDataObject activity) {
+
+        /*
          * Short cut all messages directed at local user
          */
+
         ArrayList<User> toSendViaNetwork = new ArrayList<User>();
         for (User user : recipients) {
-            if (user.isLocal()) {
-                log.trace("dispatching activity object " + activityDataObject
-                    + " to the local user: " + user.getJID());
 
-                dispatchThread.executeAsDispatch(new Runnable() {
-                    @Override
-                    public void run() {
-                        sarosSession.exec(Collections
-                            .singletonList(activityDataObject));
-                    }
-                });
-            } else {
+            if (!user.isLocal()) {
                 toSendViaNetwork.add(user);
+                continue;
             }
+
+            LOG.trace("dispatching activity " + activity
+                + " to the local user: " + user.getJID());
+
+            dispatchThread.executeAsDispatch(new Runnable() {
+                @Override
+                public void run() {
+                    sarosSession.exec(Collections.singletonList(activity));
+                }
+            });
         }
 
         if (toSendViaNetwork.isEmpty())
             return;
 
-        outgoingQueue.add(new DataObjectQueueItem(toSendViaNetwork,
-            activityDataObject));
+        // ActivitySender thread is flushing this queue
+        outgoingActivitiesQueue.add(new DataObjectQueueItem(toSendViaNetwork,
+            activity));
     }
 
     /**
-     * Removes queued activityDataObjects for the given user.
+     * Removes the queued activities for the given user.
      * 
      * @param user
      *            the user that left
      */
     public void userLeft(User user) {
-        incomingQueues.removeQueue(user.getJID());
+        activityQueueManager.removeQueue(user.getJID());
     }
 
-    private void sendTimedActivities(JID recipient,
+    private List<TimedActivityDataObject> createTimedActivities(User recipient,
+        List<IActivityDataObject> activityDataObjects) {
+
+        assert !activityDataObjects.contains(null) : "activity must not be null";
+
+        JID recipientJID = recipient.getJID();
+
+        List<TimedActivityDataObject> timedActivities = activityQueueManager
+            .createTimedActivities(recipientJID, activityDataObjects);
+
+        return timedActivities;
+    }
+
+    private void sendTimedActivities(User user,
         List<TimedActivityDataObject> timedActivities) {
 
-        assert !((recipient == null || recipient.equals(sarosSession
-            .getLocalUser().getJID()))) : "recipient may not be null or the local user";
+        assert !user.isLocal() : "recipient must not be the local user";
 
-        assert !((timedActivities == null || timedActivities.size() == 0)) : "TimedActivities may not be null or empty";
+        // FIXME SarosSession must handle this !
+        if (!user.isInSarosSession()) {
+            LOG.warn("activities for peer not in session are dropped.");
+            return;
+        }
+
+        if (timedActivities.size() == 0)
+            return;
+
+        JID recipient = user.getJID();
 
         PacketExtension timedActivitiesPacket = ActivitiesExtension.PROVIDER
             .create(currentSessionID, timedActivities);
@@ -394,15 +373,14 @@ public class ActivitySequencer implements Startable {
 
         // only log on debug level if there is more than a checksum
         if (ActivityUtils.containsChecksumsOnly(timedActivities))
-            log.trace(msg);
+            LOG.trace(msg);
         else
-            log.debug(msg);
+            LOG.debug(msg);
 
         try {
             transmitter.sendToSessionUser(recipient, timedActivitiesPacket);
         } catch (IOException e) {
-            log.error("failed to sent activityDataObjects: " + timedActivities,
-                e);
+            LOG.error("failed to sent timed activities: " + timedActivities, e);
         }
     }
 
@@ -412,7 +390,7 @@ public class ActivitySequencer implements Startable {
             .getPayload(timedActivitiesPacket);
 
         if (payload == null) {
-            log.warn("activities packet payload is corrupted");
+            LOG.warn("timed activities packet payload is corrupted");
             return;
         }
 
@@ -427,7 +405,7 @@ public class ActivitySequencer implements Startable {
          */
         if (!currentSessionID.equals(payload.getSessionID())
             || sarosSession.getUser(from) == null) {
-            log.warn("received activities from user " + from
+            LOG.warn("received timed activities from user " + from
                 + " who is not part of the current session");
             return;
         }
@@ -436,16 +414,16 @@ public class ActivitySequencer implements Startable {
             + ") " + from + ": " + timedActivities;
 
         if (ActivityUtils.containsChecksumsOnly(timedActivities))
-            log.trace(msg);
+            LOG.trace(msg);
         else
-            log.debug(msg);
+            LOG.debug(msg);
 
         for (TimedActivityDataObject timedActivity : timedActivities) {
 
             assert timedActivity.getActivity().getSource() != null : "received activity without source"
                 + timedActivity.getActivity();
 
-            exec(timedActivity);
+            executeActivity(timedActivity);
         }
     }
 }
