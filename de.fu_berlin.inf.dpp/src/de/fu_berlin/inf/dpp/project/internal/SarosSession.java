@@ -89,7 +89,6 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.PingPongCentral;
 import de.fu_berlin.inf.dpp.net.SarosNet;
-import de.fu_berlin.inf.dpp.net.business.ActivitiesHandler;
 import de.fu_berlin.inf.dpp.net.business.UserListHandler;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
@@ -1283,8 +1282,6 @@ public final class SarosSession implements ISarosSession {
         sessionContainer.addComponent(ConsistencyWatchdogHandler.class);
         // transforming - thread access
         sessionContainer.addComponent(ActivityHandler.class);
-        // receiving from the network - forwarding to ActivitySequencer
-        sessionContainer.addComponent(ActivitiesHandler.class);
         sessionContainer.addComponent(activityCallback);
         sessionContainer.addComponent(UserListHandler.class);
 

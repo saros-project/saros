@@ -29,11 +29,14 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
+import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
+import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
@@ -78,6 +81,14 @@ public class ActivitySequencer implements Startable {
         }
     }
 
+    private final PacketListener activitiesPacketListener = new PacketListener() {
+
+        @Override
+        public void processPacket(Packet packet) {
+            receiveTimedActivities(packet);
+        }
+    };
+
     /** Special queue item that termins the processing */
     private static final DataObjectQueueItem POISON = new DataObjectQueueItem(
         (User) null, null);
@@ -92,6 +103,8 @@ public class ActivitySequencer implements Startable {
      */
     private boolean started = false;
 
+    private String currentSessionID;
+
     private Thread activitySendThread;
 
     private final ISarosSession sarosSession;
@@ -100,18 +113,21 @@ public class ActivitySequencer implements Startable {
 
     private final ITransmitter transmitter;
 
+    private final IReceiver receiver;
+
     private final JID localJID;
 
     private final DispatchThreadContext dispatchThread;
 
     public ActivitySequencer(final ISarosSession sarosSession,
-        final ITransmitter transmitter,
+        final ITransmitter transmitter, final IReceiver receiver,
         final DispatchThreadContext threadContext,
         final SessionIDObservable sessionIDObservable) {
 
         this.dispatchThread = threadContext;
         this.sarosSession = sarosSession;
         this.transmitter = transmitter;
+        this.receiver = receiver;
         this.sessionIDObservable = sessionIDObservable;
 
         this.localJID = sarosSession.getLocalUser().getJID();
@@ -142,6 +158,11 @@ public class ActivitySequencer implements Startable {
         if (started) {
             throw new IllegalStateException();
         }
+
+        currentSessionID = sessionIDObservable.getValue();
+        // FIXME: sessionID filter
+        receiver.addPacketListener(activitiesPacketListener,
+            ActivitiesExtension.PROVIDER.getPacketFilter());
 
         started = true;
 
@@ -258,6 +279,8 @@ public class ActivitySequencer implements Startable {
         if (!started) {
             throw new IllegalStateException();
         }
+
+        receiver.removePacketListener(activitiesPacketListener);
 
         /**
          * Try to poison the flush task using the "Poison Pill" as known from
@@ -415,6 +438,49 @@ public class ActivitySequencer implements Startable {
         } catch (IOException e) {
             log.error("Failed to sent activityDataObjects: " + timedActivities,
                 e);
+        }
+    }
+
+    private void receiveTimedActivities(Packet packet) {
+
+        TimedActivities payload = ActivitiesExtension.PROVIDER
+            .getPayload(packet);
+
+        if (payload == null) {
+            log.warn("activities packet payload is corrupted");
+            return;
+        }
+
+        JID from = new JID(packet.getFrom());
+
+        List<TimedActivityDataObject> timedActivities = payload
+            .getTimedActivities();
+
+        /*
+         * FIXME the session.getUser() should not be handled here but in the
+         * SarosSession class
+         */
+        if (!currentSessionID.equals(payload.getSessionID())
+            || sarosSession.getUser(from) == null) {
+            log.warn("received activities from user " + from
+                + " who is not part of the current session");
+            return;
+        }
+
+        String msg = "rcvd (" + String.format("%03d", timedActivities.size())
+            + ") " + from + ": " + timedActivities;
+
+        if (ActivityUtils.containsChecksumsOnly(timedActivities))
+            log.trace(msg);
+        else
+            log.debug(msg);
+
+        for (TimedActivityDataObject timedActivity : timedActivities) {
+
+            assert timedActivity.getActivity().getSource() != null : "received activity without source"
+                + timedActivity.getActivity();
+
+            exec(timedActivity);
         }
     }
 }
