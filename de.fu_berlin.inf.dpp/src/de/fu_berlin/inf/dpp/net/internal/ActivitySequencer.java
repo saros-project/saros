@@ -143,21 +143,19 @@ public class ActivitySequencer implements Startable {
     }
 
     /**
-     * Start periodical flushing and sending of outgoing activityDataObjects and
-     * checking for received activityDataObjects that are queued for too long.
+     * Starts the sequencer. After the sequencer is started activities can be
+     * send and received.
      * 
      * @throws IllegalStateException
-     *             if this method is called on an already started
-     *             {@link ActivitySequencer}
+     *             if the sequencer is already started
      * 
      * @see #stop()
      */
     @Override
     public void start() {
 
-        if (started) {
+        if (started)
             throw new IllegalStateException();
-        }
 
         currentSessionID = sessionIDObservable.getValue();
         // FIXME: sessionID filter
@@ -255,8 +253,9 @@ public class ActivitySequencer implements Startable {
 
                     JID recipientJID = recipient.getJID();
 
-                    List<TimedActivityDataObject> timedActivities = createTimedActivities(
-                        recipientJID, activityDataObjects);
+                    List<TimedActivityDataObject> timedActivities = incomingQueues
+                        .createTimedActivities(recipientJID,
+                            activityDataObjects);
 
                     log.trace("Sending " + timedActivities.size()
                         + " activities to " + recipientJID + ": "
@@ -269,20 +268,22 @@ public class ActivitySequencer implements Startable {
     }
 
     /**
-     * Stop periodical flushing and sending of outgoing activityDataObjects and
-     * checking for received activityDataObjects that are queued for too long.
+     * Stops the sequencer. After the sequencer is stopped activities can no
+     * longer be send and received.
      * 
+     * @throws IllegalStateException
+     *             if the sequencer is already stopped
      * @see #start()
      */
     @Override
     public void stop() {
-        if (!started) {
+
+        if (!started)
             throw new IllegalStateException();
-        }
 
         receiver.removePacketListener(activitiesPacketListener);
 
-        /**
+        /*
          * Try to poison the flush task using the "Poison Pill" as known from
          * the Java Concurrency in Practice book.
          */
@@ -310,7 +311,7 @@ public class ActivitySequencer implements Startable {
      * If an activityDataObject is missing, this method just returns and queues
      * the given activityDataObject
      */
-    public void exec(TimedActivityDataObject nextActivity) {
+    private void exec(TimedActivityDataObject nextActivity) {
 
         assert nextActivity != null;
 
@@ -325,10 +326,7 @@ public class ActivitySequencer implements Startable {
         execQueue();
     }
 
-    /**
-     * executes all activityDataObjects that are currently in the queue
-     */
-    protected void execQueue() {
+    private void execQueue() {
         List<IActivityDataObject> activityDataObjects = new ArrayList<IActivityDataObject>();
         for (TimedActivityDataObject timedActivity : incomingQueues
             .removeActivities()) {
@@ -363,44 +361,18 @@ public class ActivitySequencer implements Startable {
             }
         }
 
-        if (toSendViaNetwork.isEmpty()) {
+        if (toSendViaNetwork.isEmpty())
             return;
-        }
-        this.outgoingQueue.add(new DataObjectQueueItem(toSendViaNetwork,
+
+        outgoingQueue.add(new DataObjectQueueItem(toSendViaNetwork,
             activityDataObject));
     }
 
     /**
-     * Create {@link TimedActivityDataObject}s for the given recipient and
-     * activityDataObjects and add them to the history of activityDataObjects
-     * for the recipient.
-     * 
-     * This operation is thread safe, i.e. it is guaranteed that all
-     * activityDataObjects get increasing, consecutive sequencer numbers, even
-     * if this method is called from different threads concurrently.
-     */
-    protected List<TimedActivityDataObject> createTimedActivities(
-        JID recipient, List<IActivityDataObject> activityDataObjects) {
-        return incomingQueues.createTimedActivities(recipient,
-            activityDataObjects);
-    }
-
-    /**
-     * Get a {@link Map} that maps the {@link JID} of users with queued
-     * activityDataObjects to the first missing sequence number.
-     */
-    public Map<JID, Integer> getExpectedSequenceNumbers() {
-        return incomingQueues.getExpectedSequenceNumbers();
-    }
-
-    /**
-     * Removes queued activityDataObjects from given user.
-     * 
-     * TODO Maybe remove outgoing activityDataObjects from
-     * {@link #outgoingQueue} too!?
+     * Removes queued activityDataObjects for the given user.
      * 
      * @param user
-     *            the user that left.
+     *            the user that left
      */
     public void userLeft(User user) {
         incomingQueues.removeQueue(user.getJID());
@@ -409,22 +381,15 @@ public class ActivitySequencer implements Startable {
     private void sendTimedActivities(JID recipient,
         List<TimedActivityDataObject> timedActivities) {
 
-        if (recipient == null
-            || recipient.equals(sarosSession.getLocalUser().getJID())) {
-            throw new IllegalArgumentException(
-                "Recipient may not be null or equal to the local user");
-        }
-        if (timedActivities == null || timedActivities.size() == 0) {
-            throw new IllegalArgumentException(
-                "TimedActivities may not be null or empty");
-        }
+        assert !((recipient == null || recipient.equals(sarosSession
+            .getLocalUser().getJID()))) : "recipient may not be null or the local user";
 
-        String sID = sessionIDObservable.getValue();
+        assert !((timedActivities == null || timedActivities.size() == 0)) : "TimedActivities may not be null or empty";
 
-        PacketExtension extensionToSend = ActivitiesExtension.PROVIDER.create(
-            sID, timedActivities);
+        PacketExtension timedActivitiesPacket = ActivitiesExtension.PROVIDER
+            .create(currentSessionID, timedActivities);
 
-        String msg = "Sent (" + String.format("%03d", timedActivities.size())
+        String msg = "send (" + String.format("%03d", timedActivities.size())
             + ") " + Utils.prefix(recipient) + timedActivities;
 
         // only log on debug level if there is more than a checksum
@@ -434,24 +399,24 @@ public class ActivitySequencer implements Startable {
             log.debug(msg);
 
         try {
-            transmitter.sendToSessionUser(recipient, extensionToSend);
+            transmitter.sendToSessionUser(recipient, timedActivitiesPacket);
         } catch (IOException e) {
-            log.error("Failed to sent activityDataObjects: " + timedActivities,
+            log.error("failed to sent activityDataObjects: " + timedActivities,
                 e);
         }
     }
 
-    private void receiveTimedActivities(Packet packet) {
+    private void receiveTimedActivities(Packet timedActivitiesPacket) {
 
         TimedActivities payload = ActivitiesExtension.PROVIDER
-            .getPayload(packet);
+            .getPayload(timedActivitiesPacket);
 
         if (payload == null) {
             log.warn("activities packet payload is corrupted");
             return;
         }
 
-        JID from = new JID(packet.getFrom());
+        JID from = new JID(timedActivitiesPacket.getFrom());
 
         List<TimedActivityDataObject> timedActivities = payload
             .getTimedActivities();
