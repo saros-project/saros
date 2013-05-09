@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
@@ -179,12 +180,17 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
         @Override
         public void sessionEnded(final ISarosSession session) {
+
+            final CountDownLatch mucDestroyed = new CountDownLatch(1);
+
             SWTUtils.runSafeSWTAsync(log, new Runnable() {
                 @Override
                 public void run() {
 
                     if (sessionChat != null)
                         multiUserChatService.destroyChat(sessionChat);
+
+                    mucDestroyed.countDown();
 
                     isSessionRunning = false;
                     isSessionHost = false;
@@ -198,6 +204,22 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
                         sessionChatErrorTab.dispose();
                 }
             });
+
+            /*
+             * It is possible that the session was stopped by disconnecting from
+             * the server. As we run async. it is possible that destroyChat will
+             * wait for an acknowledge packet but this will never be received
+             * because the connection is closed in the meantime. This will
+             * produce a GUI freeze (currently 30 seconds, see Smack Packet
+             * Timeout). So we wait here to ensure that the connection is not
+             * closed until the chat is destroyed. See also SarosSessionManager
+             * class.
+             */
+            try {
+                mucDestroyed.await(5000, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
     };
 
