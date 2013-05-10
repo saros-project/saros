@@ -5,9 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
@@ -46,6 +44,8 @@ import de.fu_berlin.inf.dpp.concurrent.watchdog.SessionViewOpener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.colorstorage.ColorIDSetStorage;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
+import de.fu_berlin.inf.dpp.net.IReceiver;
+import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.SarosNet;
@@ -77,8 +77,10 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.SarosLeaveExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListReceivedExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListRequestExtension;
+import de.fu_berlin.inf.dpp.net.stun.IStunService;
 import de.fu_berlin.inf.dpp.net.stun.internal.StunServiceImpl;
 import de.fu_berlin.inf.dpp.net.subscriptionmanager.SubscriptionManager;
+import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.net.upnp.internal.UPnPServiceImpl;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
@@ -89,11 +91,13 @@ import de.fu_berlin.inf.dpp.observables.VideoSessionObservable;
 import de.fu_berlin.inf.dpp.observables.VoIPSessionObservable;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.project.IChecksumCache;
 import de.fu_berlin.inf.dpp.project.SarosRosterListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ChecksumCacheImpl;
 import de.fu_berlin.inf.dpp.project.internal.FileContentNotifierBridge;
 import de.fu_berlin.inf.dpp.project.internal.FollowingActivitiesManager;
+import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.synchronize.internal.SWTSynchronizer;
 import de.fu_berlin.inf.dpp.ui.LocalPresenceTracker;
 import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
@@ -174,27 +178,12 @@ public class SarosContext implements ISarosContext {
             return new Component(clazz, clazz, instance);
         }
 
-        public static <T> Component create(Object bindKey, Class<T> clazz,
-            T instance) {
-            return new Component(bindKey, clazz, instance);
-        }
-
         public Object getBindKey() {
             return bindKey;
         }
 
         public Object getImplementation() {
             return instance != null ? instance : clazz;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            return ((obj instanceof Component) && ((Component) obj).bindKey == this.bindKey);
-        }
-
-        @Override
-        public int hashCode() {
-            return bindKey.hashCode();
         }
     }
 
@@ -263,11 +252,11 @@ public class SarosContext implements ISarosContext {
         Component.create(SarosRosterListener.class),
         Component.create(SkypeManager.class),
         Component.create(StreamServiceManager.class),
-        Component.create(StunServiceImpl.class),
+        Component.create(IStunService.class, StunServiceImpl.class),
         Component.create(SubscriptionManager.class),
-        Component.create(UPnPServiceImpl.class),
-        Component.create(XMPPReceiver.class),
-        Component.create(XMPPTransmitter.class),
+        Component.create(IUPnPService.class, UPnPServiceImpl.class),
+        Component.create(IReceiver.class, XMPPReceiver.class),
+        Component.create(ITransmitter.class, XMPPTransmitter.class),
 
         // Observables
         Component.create(FileReplacementInProgressObservable.class),
@@ -302,14 +291,14 @@ public class SarosContext implements ISarosContext {
         Component.create(VideoSharingService.class),
 
         // Cache support
-        Component.create(ChecksumCacheImpl.class, new ChecksumCacheImpl(
+        Component.create(IChecksumCache.class, new ChecksumCacheImpl(
             new FileContentNotifierBridge())),
 
         // Version support
         Component.create(VersionManager.class),
 
         // SWT EDT support
-        Component.create(SWTSynchronizer.class)
+        Component.create(UISynchronizer.class, SWTSynchronizer.class)
 
     };
 
@@ -395,10 +384,7 @@ public class SarosContext implements ISarosContext {
 
         container.addComponent(Preferences.class, saros.getConfigPrefs());
 
-        Set<Component> contextComponents = new HashSet<Component>(
-            Arrays.asList(COMPONENTS));
-
-        for (Component component : contextComponents)
+        for (Component component : Arrays.asList(COMPONENTS))
             container.addComponent(component.getBindKey(),
                 component.getImplementation());
 
