@@ -31,7 +31,6 @@ import org.jivesoftware.smack.packet.PacketExtension;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.User.UserConnectionState;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
@@ -43,7 +42,6 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.SarosPacketExtension;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -93,6 +91,8 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         this.sessionID = sessionID;
     }
 
+    /* Methods to remove from the IFACE START */
+
     @Override
     public void sendLeaveMessage(ISarosSession sarosSession) {
 
@@ -121,7 +121,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         remoteUsers.remove(host);
 
         for (User user : remoteUsers)
-            sendMessageToUser(user.getJID(), extension, true);
+            sendMessageToUser(user.getJID(), extension);
 
         if (!sarosSession.isHost() && hostPresent) {
             try {
@@ -130,7 +130,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
                 Thread.currentThread().interrupt();
             }
 
-            sendMessageToUser(host.getJID(), extension, true);
+            sendMessageToUser(host.getJID(), extension);
         }
     }
 
@@ -174,7 +174,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
                 && data.length < MAX_XMPP_MESSAGE_SIZE
                 && ALLOW_CHAT_TRANSFER_FALLBACK) {
 
-                sendMessageToUser(recipient, extension, true);
+                sendMessageToUser(recipient, extension);
                 break;
 
             } else {
@@ -192,7 +192,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
                     if (data.length < MAX_XMPP_MESSAGE_SIZE
                         && ALLOW_CHAT_TRANSFER_FALLBACK) {
                         log.warn("could not send packet extension through a direct connection, falling back to chat transfer");
-                        sendMessageToUser(recipient, extension, true);
+                        sendMessageToUser(recipient, extension);
                         break;
                     } else {
 
@@ -221,77 +221,9 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
     @Override
     public void sendMessageToUser(JID jid, PacketExtension extension) {
-        sendMessageToUser(jid, extension, false);
-    }
-
-    /**
-     * Sends a message to a user.
-     * 
-     * @param jid
-     *            user the message is send to
-     * @param extension
-     *            extension that is send
-     * @param sessionMembersOnly
-     *            if true extension is only send if the user is in the same
-     *            session
-     */
-    private void sendMessageToUser(JID jid, PacketExtension extension,
-        boolean sessionMembersOnly) {
         Message message = new Message();
         message.addExtension(extension);
         message.setTo(jid.toString());
-        sendMessageToUser(jid, message, sessionMembersOnly);
-    }
-
-    /**
-     * Sends the given {@link Message} to the given {@link JID}. The recipient
-     * has to be in the session or the message will not be sent.
-     * 
-     * @param sessionMembersOnly
-     * 
-     */
-    private void sendMessageToUser(JID jid, Message message,
-        boolean sessionMembersOnly) {
-
-        final ISarosSession session = sarosSessionObservable.getValue();
-
-        if (sessionMembersOnly) {
-            if (session == null) {
-                log.warn("could not send message because session has ended");
-                return;
-            }
-
-            final User participant = session.getUser(jid);
-
-            if (participant == null) {
-                log.warn("could not send message to participant "
-                    + Utils.prefix(jid)
-                    + ", because he/she is no longer part of the current session");
-                return;
-            }
-
-            /*
-             * FIXME: it is possible that a user goes to invisible state ! Once
-             * again. Sending data over a state less protocol is not the best
-             * design decision !!!
-             * 
-             * FIXME: the network layer should not handle the state of the
-             * current Saros session !!!
-             */
-            if (participant.getConnectionState() == UserConnectionState.OFFLINE) {
-                // FIXME: let the method handle the synchronization, not the
-                // caller !
-                SWTUtils.runSafeSWTAsync(log, new Runnable() {
-                    @Override
-                    public void run() {
-                        log.info("removing participant " + participant
-                            + " from the session because he/she is offline");
-                        session.removeUser(participant);
-                    }
-                });
-                return;
-            }
-        }
 
         assert jid.toString().equals(message.getTo());
 
