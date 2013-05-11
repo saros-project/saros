@@ -20,7 +20,6 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -63,17 +62,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
     private static final boolean ALLOW_CHAT_TRANSFER_FALLBACK = Boolean
         .getBoolean("de.fu_berlin.inf.dpp.net.transmitter.ALLOW_CHAT_TRANSFER_FALLBACK");
-
-    /*
-     * Stefan Rossbach: remove this retry "myth". Only fallback once, and if the
-     * fallback to IBB fails just give up.
-     */
-
-    /**
-     * Maximum retry attempts to send an activity. Retry attempts will switch to
-     * prefer IBB on MAX_TRANSFER_RETRIES/2.
-     */
-    public static final int MAX_TRANSFER_RETRIES = 4;
 
     private final SessionIDObservable sessionID;
 
@@ -158,65 +146,40 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             .setExtensionVersion(SarosPacketExtension.VERSION)
             .setSessionID(currentSessionID);
 
-        byte[] data = null;
+        byte[] data = extension.toXML().getBytes("UTF-8");
 
-        try {
-            data = extension.toXML().getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new IOException(
-                "corrupt JVM installation - UTF-8 charset is not supported", e);
+        if (!dataManager.getTransferMode(recipient).isP2P()
+            && data.length < MAX_XMPP_MESSAGE_SIZE
+            && ALLOW_CHAT_TRANSFER_FALLBACK) {
+
+            sendMessageToUser(recipient, extension);
+            return;
         }
 
-        int retry = 0;
-        do {
+        if (data.length > PACKET_EXTENSION_COMPRESS_THRESHOLD)
+            transferDescription.setCompressContent(true);
 
-            if (!dataManager.getTransferMode(recipient).isP2P()
-                && data.length < MAX_XMPP_MESSAGE_SIZE
-                && ALLOW_CHAT_TRANSFER_FALLBACK) {
+        try {
+            // recipient is included in the transfer description
+            dataManager.sendData(transferDescription, data);
+            return;
+        } catch (IOException e) {
+            log.error(
+                "could not send packet extension through a direct connection ("
+                    + Utils.formatByte(data.length) + ")", e);
+        }
 
-                sendMessageToUser(recipient, extension);
-                break;
+        if (data.length < MAX_XMPP_MESSAGE_SIZE && ALLOW_CHAT_TRANSFER_FALLBACK) {
+            log.warn("sending packet extension through chat");
+            sendMessageToUser(recipient, extension);
+            return;
+        }
 
-            } else {
-                try {
+        log.info("enabling fallback mode for recipient: " + recipient);
 
-                    if (data.length > PACKET_EXTENSION_COMPRESS_THRESHOLD)
-                        transferDescription.setCompressContent(true);
+        dataManager.setFallbackConnectionMode(recipient);
+        dataManager.sendData(transferDescription, data);
 
-                    // recipient is included in the transfer description
-                    dataManager.sendData(transferDescription, data);
-                    break;
-
-                } catch (IOException e) {
-                    // else send by chat if applicable
-                    if (data.length < MAX_XMPP_MESSAGE_SIZE
-                        && ALLOW_CHAT_TRANSFER_FALLBACK) {
-                        log.warn("could not send packet extension through a direct connection, falling back to chat transfer");
-                        sendMessageToUser(recipient, extension);
-                        break;
-                    } else {
-
-                        log.error(
-                            "could not send packet extension through a direct connection ("
-                                + Utils.formatByte(data.length) + ")", e);
-
-                        if (retry == MAX_TRANSFER_RETRIES / 2) {
-                            // set bytestream connections prefer IBB
-                            log.info("enabling fallback mode for recipient: "
-                                + recipient);
-                            dataManager.setFallbackConnectionMode(recipient);
-                        }
-
-                        if (retry < MAX_TRANSFER_RETRIES) {
-                            log.info("Transfer retry #" + retry + "...");
-                            continue;
-                        }
-                        throw e;
-
-                    }
-                }
-            }
-        } while (++retry <= MAX_TRANSFER_RETRIES);
     }
 
     @Override
