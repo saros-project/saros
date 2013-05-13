@@ -95,8 +95,6 @@ public abstract class InvitationProcess extends CancelableProcess {
 
         peerNickname = nickname == null ? peer.getBareJID().toString()
             : nickname;
-
-        this.invitationProcesses.addInvitationProcess(this);
     }
 
     public JID getPeer() {

@@ -55,6 +55,8 @@ public class IncomingSessionNegotiation extends InvitationProcess {
         this.sessionStart = sessionStart;
         this.sessionManager = sessionManager;
         this.remoteVersionInfo = remoteVersionInfo;
+        // FIMXE move to SarosSessionManager
+        this.invitationProcesses.addInvitationProcess(this);
     }
 
     @Override

@@ -117,6 +117,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         this.projectInfos = projectInfos;
         this.localProjects = new HashMap<String, IProject>();
         this.jid = peer;
+        // FIMXE move to SarosSessionManager
+        this.projectExchangeProcesses.addProjectExchangeProcess(this);
     }
 
     @Override

@@ -81,6 +81,8 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
             description, sarosContext);
 
         this.sarosSession = sarosSession;
+        // FIMXE move to SarosSessionManager
+        this.invitationProcesses.addInvitationProcess(this);
     }
 
     /**

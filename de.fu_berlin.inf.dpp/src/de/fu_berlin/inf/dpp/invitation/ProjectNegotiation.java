@@ -81,8 +81,6 @@ public abstract class ProjectNegotiation extends CancelableProcess {
         sessionID = sarosContext.getComponent(SessionIDObservable.class)
             .getValue();
 
-        projectExchangeProcesses.addProjectExchangeProcess(this);
-
         Connection connection = sarosNet.getConnection();
 
         if (connection != null)

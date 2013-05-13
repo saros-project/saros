@@ -88,6 +88,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         this.processID = String.valueOf(INVITATION_RAND.nextLong());
         this.sarosSession = sarosSession;
         this.projects = projects;
+        // FIMXE move to SarosSessionManager
+        this.projectExchangeProcesses.addProjectExchangeProcess(this);
     }
 
     public Status start(IProgressMonitor monitor) {
