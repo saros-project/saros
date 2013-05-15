@@ -68,8 +68,6 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
     private final static Random INVITATION_RAND = new Random();
 
-    private boolean useVersionControl;
-
     @Inject
     private EditorManager editorManager;
 
@@ -475,7 +473,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
                 FileList projectFileList = FileListFactory.createFileList(
                     project, sarosSession.getSharedResources(project),
-                    checksumCache, useVersionControl, subMonitor.newChild(1));
+                    checksumCache, sarosSession.useVersionControl(),
+                    subMonitor.newChild(1));
 
                 projectFileList.setProjectID(projectID);
                 boolean partial = !sarosSession.isCompletelyShared(project);
