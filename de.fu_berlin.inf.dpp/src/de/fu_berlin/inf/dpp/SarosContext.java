@@ -208,7 +208,7 @@ public class SarosContext implements ISarosContext {
      */
     private Saros saros;
 
-    private static final Component[] COMPONENTS = new Component[] {
+    private final Component[] components = new Component[] {
         // Thread Context
         Component.create(DispatchThreadContext.class),
 
@@ -384,7 +384,7 @@ public class SarosContext implements ISarosContext {
 
         container.addComponent(Preferences.class, saros.getConfigPrefs());
 
-        for (Component component : Arrays.asList(COMPONENTS))
+        for (Component component : Arrays.asList(components))
             container.addComponent(component.getBindKey(),
                 component.getImplementation());
 
