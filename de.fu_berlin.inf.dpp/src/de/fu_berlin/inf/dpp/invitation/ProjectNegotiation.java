@@ -13,7 +13,7 @@ import org.jivesoftware.smackx.filetransfer.FileTransfer;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.SarosContext;
+import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
@@ -73,7 +73,7 @@ public abstract class ProjectNegotiation extends CancelableProcess {
     @Inject
     protected ISarosSessionManager sessionManager;
 
-    public ProjectNegotiation(JID peer, SarosContext sarosContext) {
+    public ProjectNegotiation(JID peer, ISarosContext sarosContext) {
         this.peer = peer;
 
         sarosContext.initComponent(this);

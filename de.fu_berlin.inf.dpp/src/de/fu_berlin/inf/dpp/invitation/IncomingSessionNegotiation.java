@@ -6,7 +6,7 @@ import org.jivesoftware.smack.packet.Packet;
 import org.joda.time.DateTime;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.SarosContext;
+import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
@@ -48,7 +48,7 @@ public class IncomingSessionNegotiation extends InvitationProcess {
 
     public IncomingSessionNegotiation(ISarosSessionManager sessionManager,
         JID from, VersionInfo remoteVersionInfo, DateTime sessionStart,
-        String invitationID, String description, SarosContext sarosContext) {
+        String invitationID, String description, ISarosContext sarosContext) {
 
         super(invitationID, from, description, sarosContext);
 

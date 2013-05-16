@@ -25,7 +25,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.FileListFactory;
-import de.fu_berlin.inf.dpp.SarosContext;
+import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.activities.SPath;
@@ -80,7 +80,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     private SarosPacketCollector remoteFileListResponseCollector;
 
     public OutgoingProjectNegotiation(JID to, ISarosSession sarosSession,
-        List<IProject> projects, SarosContext sarosContext) {
+        List<IProject> projects, ISarosContext sarosContext) {
         super(to, sarosContext);
 
         this.processID = String.valueOf(INVITATION_RAND.nextLong());

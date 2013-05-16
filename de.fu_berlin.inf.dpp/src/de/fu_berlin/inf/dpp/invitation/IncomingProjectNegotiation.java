@@ -46,8 +46,8 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.FileListDiff;
 import de.fu_berlin.inf.dpp.FileListFactory;
+import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
@@ -109,7 +109,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     public IncomingProjectNegotiation(ISarosSession sarosSession, JID peer,
         String processID, List<ProjectExchangeInfo> projectInfos,
-        SarosContext sarosContext) {
+        ISarosContext sarosContext) {
         super(peer, sarosContext);
 
         this.sarosSession = sarosSession;

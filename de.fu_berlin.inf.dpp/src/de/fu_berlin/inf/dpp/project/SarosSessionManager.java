@@ -45,8 +45,8 @@ import org.joda.time.DateTime;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.FileList;
+import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -105,7 +105,7 @@ public class SarosSessionManager implements ISarosSessionManager {
     private PreferenceUtils preferenceUtils;
 
     @Inject
-    private SarosContext sarosContext;
+    private ISarosContext sarosContext;
 
     @Inject
     private SarosUI sarosUI;

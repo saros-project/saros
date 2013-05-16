@@ -8,8 +8,8 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
@@ -75,7 +75,7 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
     private int favoriteColorID = UserColorID.UNKNOWN;
 
     public OutgoingSessionNegotiation(JID peer, ISarosSession sarosSession,
-        String description, SarosContext sarosContext) {
+        String description, ISarosContext sarosContext) {
 
         super(String.valueOf(INVITATION_ID_GENERATOR.nextLong()), peer,
             description, sarosContext);

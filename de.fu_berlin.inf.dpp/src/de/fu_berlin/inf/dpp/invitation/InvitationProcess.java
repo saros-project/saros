@@ -24,7 +24,7 @@ import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.SarosContext;
+import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferencesNegotiatingManager;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
@@ -84,7 +84,7 @@ public abstract class InvitationProcess extends CancelableProcess {
     protected final String peerNickname;
 
     public InvitationProcess(String invitationID, JID peer, String description,
-        SarosContext sarosContext) {
+        ISarosContext sarosContext) {
         this.invitationID = invitationID;
         this.peer = peer;
         this.description = description;
