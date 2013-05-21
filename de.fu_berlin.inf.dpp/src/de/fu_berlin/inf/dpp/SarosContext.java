@@ -56,7 +56,6 @@ import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.business.InvitationHandler;
 import de.fu_berlin.inf.dpp.net.business.LeaveAndKickHandler;
 import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManager;
-import de.fu_berlin.inf.dpp.net.internal.ConnectionTestManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.IBBTransport;
 import de.fu_berlin.inf.dpp.net.internal.ITransport;
@@ -250,7 +249,6 @@ public class SarosContext implements ISarosContext {
         Component.create(MUCNegotiationManager.class),
 
         // Network
-        Component.create(ConnectionTestManager.class),
         Component.create(DataTransferManager.class),
         Component.create(DiscoveryManager.class),
 

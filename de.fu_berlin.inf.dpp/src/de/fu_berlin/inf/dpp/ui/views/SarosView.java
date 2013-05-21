@@ -73,7 +73,6 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.BalloonNotification;
 import de.fu_berlin.inf.dpp.ui.actions.ChangeColorAction;
 import de.fu_berlin.inf.dpp.ui.actions.ChangeXMPPAccountAction;
-import de.fu_berlin.inf.dpp.ui.actions.ConnectionTestAction;
 import de.fu_berlin.inf.dpp.ui.actions.ConsistencyAction;
 import de.fu_berlin.inf.dpp.ui.actions.DeleteContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.FollowModeAction;
@@ -431,7 +430,6 @@ public class SarosView extends ViewPart {
 
         final RenameContactAction renameContactAction = new RenameContactAction();
         final DeleteContactAction deleteContactAction = new DeleteContactAction();
-        final ConnectionTestAction connectionTestAction = new ConnectionTestAction();
         menuManager.addMenuListener(new IMenuListener() {
             @Override
             public void menuAboutToShow(final IMenuManager manager) {
@@ -455,7 +453,6 @@ public class SarosView extends ViewPart {
 
                 manager.add(skypeAction);
                 manager.add(new Separator());
-                manager.add(connectionTestAction);
                 manager.add(openChatAction);
                 manager.add(renameContactAction);
                 manager.add(deleteContactAction);
