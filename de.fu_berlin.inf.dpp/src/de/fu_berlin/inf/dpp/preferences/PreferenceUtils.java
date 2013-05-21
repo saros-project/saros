@@ -124,10 +124,6 @@ public class PreferenceUtils {
         return preferenceStore.getBoolean(PreferenceConstants.CONCURRENT_UNDO);
     }
 
-    public boolean isPingPongActivated() {
-        return preferenceStore.getBoolean(PreferenceConstants.PING_PONG);
-    }
-
     public boolean useVersionControl() {
         return !preferenceStore
             .getBoolean(PreferenceConstants.DISABLE_VERSION_CONTROL);

@@ -40,8 +40,6 @@ public interface IActivityReceiver {
 
     void receive(ChecksumActivity checksumActivity);
 
-    void receive(PingPongActivity pingPongActivity);
-
     void receive(ChecksumErrorActivity checksumErrorActivity);
 
     void receive(ProgressActivity progressActivity);

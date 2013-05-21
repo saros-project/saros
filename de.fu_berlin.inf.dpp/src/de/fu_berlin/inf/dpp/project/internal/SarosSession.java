@@ -87,7 +87,6 @@ import de.fu_berlin.inf.dpp.feedback.VoIPCollector;
 import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.PingPongCentral;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.business.UserListHandler;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
@@ -1252,7 +1251,6 @@ public final class SarosSession implements ISarosSession {
         sessionContainer.addComponent(ConcurrentDocumentServer.class);
 
         // Classes belonging to a session
-        sessionContainer.addComponent(PingPongCentral.class);
 
         // Core Managers
         sessionContainer.addComponent(ChangeColorManager.class);

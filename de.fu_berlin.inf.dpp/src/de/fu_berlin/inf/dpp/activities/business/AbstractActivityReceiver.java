@@ -60,11 +60,6 @@ public class AbstractActivityReceiver implements IActivityReceiver {
     }
 
     @Override
-    public void receive(PingPongActivity pingPongActivity) {
-        // do nothing
-    }
-
-    @Override
     public void receive(ChecksumActivity checksumActivity) {
         // do nothing
     }

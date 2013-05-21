@@ -64,9 +64,6 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
             Messages.AdvancedPreferencePage_enable_balloon_notifications,
             getFieldEditorParent()));
 
-        addField(new BooleanFieldEditor(PreferenceConstants.PING_PONG,
-            Messages.AdvancedPreferencePage_ping_pong, getFieldEditorParent()));
-
         if (debugMode) {
             addField(new BooleanFieldEditor(PreferenceConstants.DEBUG,
                 Messages.AdvancedPreferencePage_show_xmpp_debug,
