@@ -31,8 +31,6 @@ public class PreferenceConstants {
 
     public static final String ACCOUNT_DATA = "account_data";
 
-    public static final String DEFAULT_XMPP_PORT = "default_xmpp_port";
-
     public static final String ENCRYPT_ACCOUNT = "encrypt_account";
 
     public static final String AUTO_CONNECT = "autoconnect";
@@ -67,9 +65,6 @@ public class PreferenceConstants {
 
     public static final String ENABLE_BALLOON_NOTIFICATION = "enable_balloon_notification";
 
-    /** Preference of the InvitationDialog */
-    public static final String AUTO_CLOSE_DIALOG = "invitation.dialog.auto.close";
-
     public static final String SKIP_SYNC_SELECTABLE = "invitation.dialog.skip.enabled";
 
     public static final String DISABLE_VERSION_CONTROL = "disable_version_control";
@@ -95,14 +90,6 @@ public class PreferenceConstants {
 
     /** Can be set and read by the ErrorLogManager */
     public static final String ERROR_LOG_ALLOW_SUBMISSION_FULL = "error.log.allow.submission.full";
-
-    /** Is used for early startup in StartupSaros */
-    public static final String NEW_WORKSPACE = "eclipse.new.workspace";
-
-    /*
-     * Getting Started Tutorial
-     */
-    public static final String GETTING_STARTED_FINISHED = "getting_started.finished";
 
     /*
      * Global preferences, not initialized i.e. no default values

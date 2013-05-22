@@ -61,7 +61,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
     }
 
     private static void setPreferences(PreferenceHolderWrapper prefs) {
-        prefs.setValue(PreferenceConstants.GETTING_STARTED_FINISHED, false);
 
         prefs.setValue(PreferenceConstants.ENCRYPT_ACCOUNT, false);
         prefs.setValue(PreferenceConstants.AUTO_CONNECT, true);
@@ -82,22 +81,12 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         prefs.setValue(PreferenceConstants.CONCURRENT_UNDO, false);
         prefs.setValue(PreferenceConstants.DISABLE_VERSION_CONTROL, false);
 
-        // XMPP
-
-        prefs.setValue(PreferenceConstants.DEFAULT_XMPP_PORT, 5222);
-
         // Advanced Preferences
         prefs.setValue(PreferenceConstants.SKIP_SYNC_SELECTABLE, false);
         prefs.setValue(PreferenceConstants.ENABLE_BALLOON_NOTIFICATION, true);
 
-        // InvitationDialog
-        prefs.setValue(PreferenceConstants.AUTO_CLOSE_DIALOG, true);
         prefs.setValue(
             PreferenceConstants.BUDDYSELECTION_FILTERNONSAROSBUDDIES, true);
-
-        // its a new workspace per default, is set to false after first start in
-        // earlyStartup()
-        prefs.setValue(PreferenceConstants.NEW_WORKSPACE, true);
 
         // Initialize Feedback Preferences
         prefs.setValue(PreferenceConstants.FEEDBACK_SURVEY_DISABLED,
