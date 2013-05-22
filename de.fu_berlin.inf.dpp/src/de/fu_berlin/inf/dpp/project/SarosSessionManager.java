@@ -59,9 +59,9 @@ import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
+import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
-import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
@@ -72,6 +72,7 @@ import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
+import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
 /**
@@ -92,29 +93,22 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     private static final long NEGOTIATION_PROCESS_TIMEOUT = 10000L;
 
-    @Inject
-    private SarosSessionObservable sarosSessionObservable;
+    private final SarosSessionObservable sarosSessionObservable;
 
-    @Inject
-    private XMPPTransmitter transmitter;
+    private final ITransmitter transmitter;
 
-    @Inject
-    private SessionIDObservable sessionID;
+    private final SessionIDObservable sessionID;
 
-    @Inject
-    private PreferenceUtils preferenceUtils;
+    private final PreferenceUtils preferenceUtils;
 
-    @Inject
     private ISarosContext sarosContext;
 
     @Inject
     private SarosUI sarosUI;
 
-    @Inject
-    private InvitationProcessObservable currentSessionNegotiations;
+    private final InvitationProcessObservable currentSessionNegotiations;
 
-    @Inject
-    private ProjectNegotiationObservable currentProjectNeogtiations;
+    private final ProjectNegotiationObservable currentProjectNeogtiations;
 
     private SarosNet sarosNet;
 
@@ -123,6 +117,8 @@ public class SarosSessionManager implements ISarosSessionManager {
     private final Lock startStopSessionLock = new ReentrantLock();
 
     private volatile boolean sessionStartup = false;
+
+    private volatile boolean sessionShutdown = false;
 
     private final IConnectionListener listener = new IConnectionListener() {
         @Override
@@ -135,8 +131,19 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
     };
 
-    public SarosSessionManager(SarosNet sarosNet) {
+    public SarosSessionManager(SarosNet sarosNet, ITransmitter transmitter,
+        SarosSessionObservable sarosSessionObservable,
+        SessionIDObservable sessionID,
+        InvitationProcessObservable currentSessionNegotiations,
+        ProjectNegotiationObservable currentProjectNeogtiations,
+        PreferenceUtils preferenceUtils) {
         this.sarosNet = sarosNet;
+        this.transmitter = transmitter;
+        this.sarosSessionObservable = sarosSessionObservable;
+        this.sessionID = sessionID;
+        this.currentSessionNegotiations = currentSessionNegotiations;
+        this.currentProjectNeogtiations = currentProjectNeogtiations;
+        this.preferenceUtils = preferenceUtils;
         this.sarosNet.addListener(listener);
     }
 
@@ -172,6 +179,19 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
 
         try {
+
+            if (sessionShutdown)
+                throw new IllegalStateException(
+                    "cannot start the session from the same thread context that is currently about to stop the session: "
+                        + Thread.currentThread().getName());
+
+            if (sessionStartup) {
+                log.warn(
+                    "recursive execution detected, ignoring session start request",
+                    new StackTrace());
+                return;
+            }
+
             if (sarosSessionObservable.getValue() != null) {
                 log.warn("could not start a new session because a session has already been started");
                 return;
@@ -266,6 +286,18 @@ public class SarosSessionManager implements ISarosSessionManager {
 
         try {
 
+            if (sessionStartup)
+                throw new IllegalStateException(
+                    "cannot stop the session from the same thread context that is currently about to start the session: "
+                        + Thread.currentThread().getName());
+
+            if (sessionShutdown) {
+                log.warn(
+                    "recursive execution detected, ignoring session stop request",
+                    new StackTrace());
+                return;
+            }
+
             SarosSession sarosSession = (SarosSession) sarosSessionObservable
                 .getValue();
 
@@ -274,10 +306,7 @@ public class SarosSessionManager implements ISarosSessionManager {
                 return;
             }
 
-            if (sessionStartup)
-                throw new IllegalStateException(
-                    "cannot stop the session from the same thread context that is currently about to start the session: "
-                        + Thread.currentThread().getName());
+            sessionShutdown = true;
 
             log.debug("terminating all running negotiation processes");
 
@@ -305,6 +334,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
             log.info("session stopped");
         } finally {
+            sessionShutdown = false;
             startStopSessionLock.unlock();
         }
     }
