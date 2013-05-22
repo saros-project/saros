@@ -460,135 +460,156 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
 
     protected void exec(FileActivity activity) throws CoreException {
 
+        if (activity.isRecovery()) {
+            handleFileRecovery(activity);
+            return;
+        }
+
+        if (activity.isNeedBased()) {
+            handleNeedBased(activity);
+            return;
+        }
+
+        // TODO check if we should open / close existing editors here too
+        switch (activity.getType()) {
+        case Created:
+            handleFileCreation(activity);
+            break;
+        case Removed:
+            handleFileDeletion(activity);
+            break;
+        case Moved:
+            handleFileMove(activity);
+            break;
+        }
+    }
+
+    private void handleFileRecovery(FileActivity activity) throws CoreException {
         SPath path = activity.getPath();
         IFile file = path.getFile();
 
         boolean wasOpenedEditor = editorManager.isOpenEditor(path);
 
-        if (activity.isRecovery()) {
+        log.debug("performing recovery for file: "
+            + activity.getPath().getFullPath());
 
-            log.debug("performing recovery for file: "
-                + activity.getPath().getFullPath());
-
-            try {
-                if (file.exists())
-                    editorManager.saveLazy(path);
-            } catch (FileNotFoundException e) {
-                log.error(e);
-                return;
-            }
-
-            if (wasOpenedEditor)
-                editorManager.closeEditor(path);
-
-            wasOpenedEditor &= activity.getType() != Type.Removed;
-
-        }
-
-        // Create or remove file
-        FileActivity.Type type = activity.getType();
-        if (type == FileActivity.Type.Created) {
-            // TODO The progress should be reported to the user.
-            IProgressMonitor monitor = new NullProgressMonitor();
-            boolean needBased = activity.isNeedBased();
-
-            if (needBased) {
-                Long remoteChecksum = activity.getChecksum();
-                Long localChecksum = null;
-                if (file.exists()) {
-                    try {
-                        localChecksum = FileUtils.checksum(file);
-                    } catch (IOException e1) {
-                        log.debug("Checksum could not be generated.", e1);
-                    }
-                }
-
-                if (wasOpenedEditor
-                /*
-                 * FIMXE ALWAYS ASK THE USER IF WE OVERWRITE / MODIFY FILES EVEN
-                 * IF THE CONTENT IS THE SAME !
-                 */
-                || (file.exists() && !remoteChecksum.equals(localChecksum))) {
-
-                    boolean backupFile = CollaborationUtils
-                        .needBasedFileHandlingDialog(activity.getSource()
-                            .getHumanReadableName(), file.getName(), true);
-
-                    try {
-                        if (wasOpenedEditor) {
-                            editorManager.saveLazy(path);
-                            editorManager.closeEditor(path);
-                        }
-
-                        if (backupFile)
-                            FileUtils.backupFile(file, monitor);
-
-                    } catch (FileNotFoundException e) {
-                        log.error("File could not be found, despite existing: "
-                            + path, e);
-                    }
-                } else {
-                    // WTF ? this only pops up a balloon notification
-                    CollaborationUtils.needBasedFileHandlingDialog(activity
-                        .getSource().getHumanReadableName(), file.getName(),
-                        false);
-                }
-            }
-
-            try {
-                FileUtils.writeFile(
-                    new ByteArrayInputStream(activity.getContents()), file,
-                    monitor);
-
-                if (needBased) {
-                    if (wasOpenedEditor)
-                        editorManager.openEditor(path);
-
-                    sarosSession.getConcurrentDocumentClient().reset(path);
-                }
-            } catch (Exception e) {
-                log.error("Could not write file: " + file);
-            }
-        } else if (type == FileActivity.Type.Removed) {
+        try {
             if (file.exists())
-                FileUtils.delete(file);
-        } else if (type == FileActivity.Type.Moved) {
+                editorManager.saveLazy(path);
 
-            IPath newFilePath = activity.getPath().getFile().getFullPath();
+        } catch (FileNotFoundException e) {
+            log.warn("file " + file + " no longer exists");
+        }
 
-            IResource oldResource = activity.getOldPath().getFile();
+        if (wasOpenedEditor)
+            editorManager.closeEditor(path);
 
-            if (oldResource == null) {
-                log.error(".exec Old File is not availible while moving "
-                    + activity.getOldPath());
-            } else {
-                FileUtils.mkdirs(activity.getPath().getFile());
-                FileUtils.move(newFilePath, oldResource);
+        wasOpenedEditor &= activity.getType() != Type.Removed;
+
+        FileActivity.Type type = activity.getType();
+
+        try {
+            if (type == FileActivity.Type.Created)
+                handleFileCreation(activity);
+            else if (type == FileActivity.Type.Removed)
+                handleFileDeletion(activity);
+            else
+                log.warn("performing recovery for type " + type
+                    + " is not supported");
+        } finally {
+            /*
+             * always reset Jupiter or we will get into trouble because the
+             * vector time is already reseted on the host
+             */
+            sarosSession.getConcurrentDocumentClient().reset(path);
+        }
+
+        if (wasOpenedEditor)
+            editorManager.openEditor(path);
+
+        consistencyWatchdogClient.performCheck(path);
+    }
+
+    private void handleNeedBased(FileActivity activity) throws CoreException {
+        IFile file = activity.getPath().getFile();
+        SPath path = activity.getPath();
+
+        boolean wasOpenedEditor = editorManager.isOpenEditor(path);
+
+        Long remoteChecksum = activity.getChecksum();
+        Long localChecksum = null;
+
+        if (file.exists()) {
+            try {
+                localChecksum = FileUtils.checksum(file);
+            } catch (IOException e) {
+                log.warn("could not generate checksum for file: " + file, e);
             }
+        }
 
-            // while moving content of the file changed
-            if (activity.getContents() != null) {
-                try {
-                    FileUtils.writeFile(
-                        new ByteArrayInputStream(activity.getContents()), file,
-                        new NullProgressMonitor());
-                } catch (Exception e) {
-                    log.error("Could not write file: " + file);
+        /*
+         * FIMXE ALWAYS ASK THE USER IF WE OVERWRITE / MODIFY FILES EVEN IF THE
+         * CONTENT IS THE SAME !
+         */
+        if (wasOpenedEditor
+            || (file.exists() && !remoteChecksum.equals(localChecksum))) {
+
+            boolean backupFile = CollaborationUtils
+                .needBasedFileHandlingDialog(activity.getSource()
+                    .getHumanReadableName(), file.getName(), true);
+
+            try {
+                if (wasOpenedEditor) {
+                    editorManager.saveLazy(path);
+                    editorManager.closeEditor(path);
                 }
+
+                if (backupFile)
+                    FileUtils.backupFile(file, new NullProgressMonitor());
+
+            } catch (FileNotFoundException e) {
+                log.error("File could not be found, despite existing: " + path,
+                    e);
             }
+        } else {
+            // WTF ? this only pops up a balloon notification
+            CollaborationUtils.needBasedFileHandlingDialog(activity.getSource()
+                .getHumanReadableName(), file.getName(), false);
         }
 
-        if (activity.isRecovery()) {
+        handleFileCreation(activity);
+        sarosSession.getConcurrentDocumentClient().reset(path);
 
-            // The file contents has been replaced, now reset Jupiter
-            this.sarosSession.getConcurrentDocumentClient().reset(path);
+        if (wasOpenedEditor)
+            editorManager.openEditor(path);
+    }
 
-            this.consistencyWatchdogClient.performCheck(path);
+    private void handleFileMove(FileActivity activity) throws CoreException {
+        IPath newFilePath = activity.getPath().getFile().getFullPath();
+        IResource oldResource = activity.getOldPath().getFile();
 
-            if (wasOpenedEditor)
-                editorManager.openEditor(path);
+        FileUtils.mkdirs(activity.getPath().getFile());
+        FileUtils.move(newFilePath, oldResource);
 
-        }
+        if (activity.getContents() == null)
+            return;
+
+        handleFileCreation(activity);
+    }
+
+    private void handleFileDeletion(FileActivity activity) throws CoreException {
+        IFile file = activity.getPath().getFile();
+
+        if (file.exists())
+            FileUtils.delete(file);
+        else
+            log.warn("could not delete file " + file
+                + " because it does not exist");
+    }
+
+    private void handleFileCreation(FileActivity activity) throws CoreException {
+        FileUtils.writeFile(new ByteArrayInputStream(activity.getContents()),
+            activity.getPath().getFile(), new NullProgressMonitor());
     }
 
     protected void exec(FolderActivity activity) throws CoreException {
@@ -608,7 +629,6 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
                 log.warn("Removing folder failed: " + folder);
             }
         }
-
     }
 
     protected void exec(VCSActivity activity) {
