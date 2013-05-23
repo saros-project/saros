@@ -101,6 +101,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     private final PreferenceUtils preferenceUtils;
 
+    @Inject
     private ISarosContext sarosContext;
 
     @Inject
