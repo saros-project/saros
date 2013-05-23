@@ -50,13 +50,6 @@ public class BinaryChannelConnection implements IByteStreamConnection {
     }
 
     /**
-     * Known error codes that do not need any special debug or error output
-     */
-    private static final String[] ACCEPTED_ERROR_CODES_ON_CLOSURE = {
-        "service-unavailable(503)" /* peer closed stream already (SOCKS5) */,
-        "recipient-unavailable(404)" /* peer is offline (IBB) */};
-
-    /**
      * Max size of data chunks
      */
     private static final int CHUNKSIZE = 32 * 1024 - 1;
@@ -146,9 +139,8 @@ public class BinaryChannelConnection implements IByteStreamConnection {
 
             try {
                 session.close();
-            } catch (IOException e) {
-                if (!isAcceptedOnClosure(e))
-                    log.error("close failed cause: " + e.getMessage(), e);
+            } catch (Exception e) {
+                log.error("failed to gracefully close connection " + this, e);
             } finally {
                 connected = false;
             }
@@ -186,7 +178,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
         throws IOException {
 
         if (!isConnected())
-            throw new IOException("connection is closed");
+            throw new EOFException("connection is closed");
 
         try {
             int fragmentId = nextFragmentId.getAndIncrement() & 0x7FFF;
@@ -354,20 +346,6 @@ public class BinaryChannelConnection implements IByteStreamConnection {
 
             offset += length;
         }
-    }
-
-    /**
-     * See {{@link #ACCEPTED_ERROR_CODES_ON_CLOSURE}
-     * 
-     * @param e
-     * @return whether the error should be logged
-     */
-    private boolean isAcceptedOnClosure(IOException e) {
-        for (String s : ACCEPTED_ERROR_CODES_ON_CLOSURE) {
-            if (e.getMessage().contains(s))
-                return true;
-        }
-        return false;
     }
 
     @Override
