@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.editor.internal;
 
-import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -103,7 +102,11 @@ public class EditorAPI implements IEditorAPI {
                     SarosView
                         .showNotification("Read-Only Notification",
                             "You have only read access and therefore can't perform modifications.");
-                    Toolkit.getDefaultToolkit().beep();
+
+                    Display display = SWTUtils.getDisplay();
+
+                    if (!display.isDisposed())
+                        display.beep();
                 }
             }
         }
