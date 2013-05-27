@@ -32,7 +32,6 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
-import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
@@ -184,61 +183,6 @@ public class FileUtils {
         file.move(
             file.getFullPath().removeLastSegments(1)
                 .append(backupPath.lastSegment()), true, monitor);
-    }
-
-    /**
-     * Unzip the data in the given InputStream as a Zip archive to the given
-     * IContainer.
-     * 
-     * 
-     * @cancelable This long-running operation can be canceled via the given
-     *             progress monitor and will throw a LocalCancellationException
-     *             in this case.
-     */
-    public static boolean writeArchive(InputStream input, IContainer container,
-        SubMonitor monitor) throws CoreException, LocalCancellationException {
-
-        ZipInputStream zip = new ZipInputStream(input);
-
-        monitor.beginTask("Unpacking archive file to workspace", 10);
-        monitor.subTask("Unpacking archive file to workspace");
-
-        long startTime = System.currentTimeMillis();
-
-        try {
-            ZipEntry entry;
-            while ((entry = zip.getNextEntry()) != null) {
-
-                if (monitor.isCanceled())
-                    throw new LocalCancellationException();
-
-                IPath path = Path.fromPortableString(entry.getName());
-                IFile file = container.getFile(path);
-
-                writeFile(new FilterInputStream(zip) {
-                    @Override
-                    public void close() throws IOException {
-                        // prevent the ZipInputStream from being closed
-                    }
-                }, file, monitor.newChild(1));
-
-                monitor.subTask("Unpacked " + path);
-                log.debug("File written to disk: " + path);
-
-                zip.closeEntry();
-            }
-            log.debug(String.format("Unpacked archive in %d s",
-                (System.currentTimeMillis() - startTime) / 1000));
-
-        } catch (IOException e) {
-            log.error("Failed to unpack archive", e);
-            return false;
-        } finally {
-            monitor.subTask("");
-            IOUtils.closeQuietly(zip);
-            monitor.done();
-        }
-        return true;
     }
 
     /**

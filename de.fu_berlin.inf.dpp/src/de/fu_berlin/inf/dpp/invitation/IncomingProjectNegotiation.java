@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,8 @@ import java.util.zip.ZipInputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
@@ -31,7 +34,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -67,11 +72,11 @@ import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.EnterProjectNamePage;
 import de.fu_berlin.inf.dpp.util.ArrayUtils;
-import de.fu_berlin.inf.dpp.util.FileUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
+// MAJOR TODO refactor this class !!!
 public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     private static Logger log = Logger
@@ -352,7 +357,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 currentArchiveMonitor.done();
             }
         } catch (OperationCanceledException e) {
-            throw new LocalCancellationException();
+            throw new LocalCancellationException(null,
+                CancelOption.DO_NOT_NOTIFY_PEER);
         } finally {
             IOUtils.closeQuietly(zipInputStream);
 
@@ -782,13 +788,13 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     /**
      * Have a look at the description of {@link WorkspaceModifyOperation}!
      * 
-     * @throws LocalCancellationException
-     * 
      * @see WorkspaceModifyOperation
      */
     private void writeArchive(final InputStream archiveStream,
-        final IProject project, final SubMonitor subMonitor)
-        throws LocalCancellationException {
+        final IProject project, final IProgressMonitor progressMonitor)
+        throws IOException {
+
+        long startTime = System.currentTimeMillis();
 
         log.debug(this + " : Writing archive to disk...");
         /*
@@ -798,33 +804,107 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
          * the IResourceChangeListener updates inside the WorkspaceRunnable or
          * after it finished!
          */
-        try {
-            ResourcesPlugin.getWorkspace().run(new IWorkspaceRunnable() {
-                @Override
-                public void run(IProgressMonitor monitor) throws CoreException {
-                    try {
-                        FileUtils.writeArchive(archiveStream, project,
-                            SubMonitor.convert(monitor));
-                    } catch (LocalCancellationException e) {
-                        throw new CoreException(
-                            new org.eclipse.core.runtime.Status(IStatus.CANCEL,
-                                Saros.SAROS, null, e));
-                    }
-                }
-            }, subMonitor);
 
-            // TODO: now add the checksums into the cache
-        } catch (CoreException e) {
-            try {
-                throw e.getCause();
-            } catch (LocalCancellationException lc) {
-                throw lc;
-            } catch (Throwable t) {
-                throw new LocalCancellationException(
-                    "An error occurred while writing the archive: "
-                        + t.getMessage(), CancelOption.NOTIFY_PEER);
+        final IWorkspaceRunnable decompressTask = new IWorkspaceRunnable() {
+
+            // TODO extract as much as possible even on some failures
+            @Override
+            public void run(IProgressMonitor monitor) throws CoreException {
+                ZipInputStream zip = new ZipInputStream(archiveStream);
+
+                // TODO calculate size for better progress
+                /*
+                 * see workspace.run why we are not using the passed in monitor
+                 * variable
+                 */
+                SubMonitor subMonitor = SubMonitor.convert(progressMonitor,
+                    "Unpacking archive file to workspace", 1);
+
+                try {
+                    ZipEntry entry;
+                    while ((entry = zip.getNextEntry()) != null) {
+
+                        if (subMonitor.isCanceled())
+                            throw new OperationCanceledException();
+
+                        IPath path = Path.fromPortableString(entry.getName());
+                        IFile file = project.getFile(path);
+
+                        /*
+                         * do not use FileUtils because it will remove read-only
+                         * access which might not what the user want
+                         */
+                        createFoldersForFile(file);
+
+                        InputStream in = new FilterInputStream(zip) {
+                            @Override
+                            public void close() throws IOException {
+                                // prevent the ZipInputStream from being closed
+                            }
+                        };
+
+                        subMonitor.subTask("decompressing: " + path);
+
+                        if (!file.exists())
+                            file.create(in, true, subMonitor.newChild(0,
+                                SubMonitor.SUPPRESS_ALL_LABELS));
+                        else
+                            file.setContents(in, IResource.FORCE, subMonitor
+                                .newChild(0, SubMonitor.SUPPRESS_ALL_LABELS));
+
+                        if (log.isTraceEnabled())
+                            log.trace("file written to disk: " + path);
+
+                        zip.closeEntry();
+                    }
+
+                } catch (IOException e) {
+                    log.error("failed to unpack archive", e);
+                    throw new CoreException(
+                        new org.eclipse.core.runtime.Status(IStatus.ERROR,
+                            Saros.SAROS, "failed to unpack archive", e));
+                } finally {
+                    monitor.subTask("");
+                    IOUtils.closeQuietly(zip);
+                    monitor.done();
+                }
             }
+
+            private void createFoldersForFile(IFile file) throws CoreException {
+                List<IFolder> parents = new ArrayList<IFolder>();
+
+                IContainer parent = file.getParent();
+
+                while (parent != null && parent.getType() == IResource.FOLDER) {
+                    if (parent.exists())
+                        break;
+
+                    parents.add((IFolder) parent);
+                    parent = parent.getParent();
+                }
+
+                Collections.reverse(parents);
+
+                for (IFolder folder : parents)
+                    folder.create(false, true, new NullProgressMonitor());
+            }
+        };
+
+        try {
+            /*
+             * do not use the monitor here because it gets wrapped and would
+             * only display: Operation in progress... as main task
+             */
+            ResourcesPlugin.getWorkspace().run(decompressTask, /* progressMonitor */
+            null);
+        } catch (CoreException e) {
+            throw new IOException(e.getMessage(), e.getCause());
         }
+
+        log.debug(String.format("Unpacked archive in %d s",
+            (System.currentTimeMillis() - startTime) / 1000));
+
+        // TODO: now add the checksums into the cache
     }
 
     @Override
