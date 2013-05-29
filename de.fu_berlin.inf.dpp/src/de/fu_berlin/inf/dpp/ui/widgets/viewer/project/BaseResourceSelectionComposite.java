@@ -1,9 +1,9 @@
 package de.fu_berlin.inf.dpp.ui.widgets.viewer.project;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
@@ -18,7 +18,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -503,66 +502,42 @@ public abstract class BaseResourceSelectionComposite extends
      */
     public void setSelectedResources(List<IResource> resources) {
         CheckboxTreeViewer checkboxTreeViewer = (CheckboxTreeViewer) this.viewer;
-        IStructuredContentProvider structuredContentProvider = (IStructuredContentProvider) checkboxTreeViewer
-            .getContentProvider();
 
-        Object[] allElements = structuredContentProvider
-            .getElements(checkboxTreeViewer.getInput());
-        Object[] checkedElements = checkboxTreeViewer.getCheckedElements();
-
-        List<IResource> allResources = ArrayUtils.getAdaptableObjects(
-            allElements, IResource.class, Platform.getAdapterManager());
-        List<IResource> checkedResources = ArrayUtils.getAdaptableObjects(
-            checkedElements, IResource.class, Platform.getAdapterManager());
-
-        Map<IResource, Boolean> checkStatesChanges = calculateCheckStateDiff(
-            allResources, checkedResources, resources);
+        List<IResource> checkedResourcesBeforeUpdate = ArrayUtils
+            .getAdaptableObjects(checkboxTreeViewer.getCheckedElements(),
+                IResource.class, Platform.getAdapterManager());
 
         /*
          * Does not fire events...
          */
         checkboxTreeViewer.setCheckedElements(resources.toArray());
 
-        for (int i = 0; i < resources.size(); i++) {
+        for (int i = 0; i < resources.size(); i++)
             handleCheckStateChanged(resources.get(i), true);
-        }
 
         /*
          * ... therefore we have to fire them.
          */
-        for (Map.Entry<IResource, Boolean> entry : checkStatesChanges
-            .entrySet())
-            notifyResourceSelectionChanged(entry.getKey(), entry.getValue());
-    }
 
-    /**
-     * Calculates from a given set of {@link IResource}s which {@link IResource}
-     * s change their check state.
-     * 
-     * @param allResources
-     * @param checkedResources
-     *            {@link IResource}s which are already checked
-     * @param resourcesToCheck
-     *            {@link IResource}s which have to be exclusively checked
-     * @return {@link Map} of {@link IResource} that must change their check
-     *         state
-     */
-    protected static Map<IResource, Boolean> calculateCheckStateDiff(
-        List<IResource> allResources, List<IResource> checkedResources,
-        List<IResource> resourcesToCheck) {
+        List<IResource> checkedResourcesAfterUpdate = ArrayUtils
+            .getAdaptableObjects(checkboxTreeViewer.getCheckedElements(),
+                IResource.class, Platform.getAdapterManager());
 
-        Map<IResource, Boolean> checkStatesChanges = new HashMap<IResource, Boolean>();
-        for (IResource resource : allResources) {
-            if (resourcesToCheck.contains(resource)
-                && !checkedResources.contains(resource)) {
-                checkStatesChanges.put(resource, true);
-            } else if (!resourcesToCheck.contains(resource)
-                && checkedResources.contains(resource)) {
-                checkStatesChanges.put(resource, false);
-            }
-        }
+        Set<IResource> checkedResources = new HashSet<IResource>(
+            checkedResourcesAfterUpdate);
 
-        return checkStatesChanges;
+        checkedResources.removeAll(checkedResourcesBeforeUpdate);
+
+        Set<IResource> uncheckedResources = new HashSet<IResource>(
+            checkedResourcesBeforeUpdate);
+
+        uncheckedResources.removeAll(checkedResourcesAfterUpdate);
+
+        for (IResource resource : checkedResources)
+            notifyResourceSelectionChanged(resource, true);
+
+        for (IResource resource : uncheckedResources)
+            notifyResourceSelectionChanged(resource, false);
     }
 
     /**
