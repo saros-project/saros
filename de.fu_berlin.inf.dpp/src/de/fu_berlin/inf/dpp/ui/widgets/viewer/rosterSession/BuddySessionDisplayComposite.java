@@ -413,10 +413,9 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
          * Draw a rounded rectangle indicating the highlighting color that is
          * used for this participant in the current session
          */
-        this.tree.addListener(SWT.EraseItem, new Listener() {
+        this.tree.addListener(SWT.PaintItem, new Listener() {
             @Override
             public void handleEvent(Event event) {
-                event.detail &= ~SWT.HOT;
 
                 if (event.item == null
                     || !(event.item.getData() instanceof UserElement))
@@ -439,8 +438,6 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
                 Color backgroundColor = SarosAnnotation.getUserColor(user);
 
                 PaintUtils.drawRoundedRectangle(gc, bounds, backgroundColor);
-
-                event.detail &= ~SWT.BACKGROUND;
 
                 backgroundColor.dispose();
             }
