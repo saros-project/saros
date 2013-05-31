@@ -14,10 +14,33 @@ import de.fu_berlin.inf.dpp.ui.widgets.decoration.EmptyText;
 @Demo
 public class EmptyTextDemo extends AbstractDemo {
 
-    protected Text createTextControl(final Composite parent, String emptyText) {
+    private Text createTextControl(final Composite parent, String emptyText,
+        boolean multiline) {
 
-        Text textControl = new Text(parent, SWT.BORDER | SWT.MULTI);
+        Text textControl = new Text(parent, SWT.BORDER
+            | ((multiline) ? SWT.MULTI : SWT.SINGLE));
         new EmptyText(textControl, emptyText);
+
+        return textControl;
+    }
+
+    private Label createLabel(Composite parent, String text) {
+        Label label = new Label(parent, SWT.NONE);
+        label.setText("Default text: " + text);
+        label.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false,
+            false));
+
+        return label;
+    }
+
+    private Text createTextEntryField(Composite parent, String defaultText,
+        boolean multiline, int horizontalAlignment, int verticalAlignment,
+        boolean grabExcessHorizontalSpace, boolean grabExcessVerticalSpace) {
+
+        Text textControl = createTextControl(parent, defaultText, multiline);
+        textControl.setLayoutData(new GridData(horizontalAlignment,
+            verticalAlignment, grabExcessHorizontalSpace,
+            grabExcessVerticalSpace));
 
         return textControl;
     }
@@ -26,21 +49,16 @@ public class EmptyTextDemo extends AbstractDemo {
     public void createDemo(Composite parent) {
         parent.setLayout(new GridLayout(2, false));
 
-        String[] emptyTexts = new String[] { "Optional", "Please type here...",
-            "Multline Text\n...\n...\n..." };
+        createLabel(parent, "Optional");
+        createTextEntryField(parent, "Optional", false, SWT.FILL, SWT.CENTER,
+            true, false);
 
-        for (int i = 0; i < emptyTexts.length; i++) {
-            Label label = new Label(parent, SWT.NONE);
-            label.setText("Default text: " + emptyTexts[i]
-                + ((i == emptyTexts.length - 1) ? "\nGridData.FILL" : ""));
-            label.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false,
-                false));
+        createLabel(parent, "Please type here ... ");
+        createTextEntryField(parent, "Please type here ... ", false, SWT.FILL,
+            SWT.CENTER, true, false);
 
-            Text textControl = createTextControl(parent, emptyTexts[i]);
-            textControl
-                .setLayoutData((i == emptyTexts.length - 1) ? new GridData(
-                    SWT.FILL, SWT.FILL, true, true) : new GridData(SWT.FILL,
-                    SWT.CENTER, true, false));
-        }
+        createLabel(parent, "Multline Text\n...\n...\n...\nGridData.FILL");
+        createTextEntryField(parent, "Multline Text\n...\n...\n...", true,
+            SWT.FILL, SWT.FILL, true, true);
     }
 }
