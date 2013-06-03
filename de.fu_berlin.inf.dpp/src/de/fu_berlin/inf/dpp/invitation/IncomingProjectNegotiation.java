@@ -6,14 +6,11 @@ import java.io.FileInputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.Callable;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -24,18 +21,14 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceDescription;
-import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.filetransfer.FileTransferListener;
@@ -47,7 +40,6 @@ import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.FileListDiff;
 import de.fu_berlin.inf.dpp.FileListFactory;
 import de.fu_berlin.inf.dpp.ISarosContext;
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
@@ -63,7 +55,6 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.IChecksumCache;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.EnterProjectNamePage;
 import de.fu_berlin.inf.dpp.util.ArrayUtils;
@@ -455,8 +446,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      */
     private IProject assignLocalProject(final IProject baseProject,
         final String newProjectName, String projectID, final VCSAdapter vcs,
-        final SubMonitor monitor, ProjectExchangeInfo projectInfo)
-        throws LocalCancellationException {
+        final IProgressMonitor monitor, ProjectExchangeInfo projectInfo)
+        throws IOException, LocalCancellationException {
         IProject newLocalProject = baseProject;
         FileList remoteFileList = projectInfo.getFileList();
         // if the baseProject already exists
@@ -504,7 +495,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                     } else {
                         log.error("No Saros session!");
                     }
-                } catch (org.eclipse.core.runtime.OperationCanceledException e) {
+                } catch (OperationCanceledException e) {
                     /*
                      * The exception is thrown if the user canceled the svn
                      * checkout process. We send the remote user a sophisticated
@@ -534,23 +525,18 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 return newLocalProject;
         }
 
+        final CreateProjectTask createProjectTask = new CreateProjectTask(
+            newProjectName, baseProject, monitor);
+
         try {
-            newLocalProject = SWTUtils.runSWTSync(new Callable<IProject>() {
-                @Override
-                public IProject call() throws CoreException,
-                    InterruptedException {
-                    try {
-                        return createNewProject(newProjectName, baseProject);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e.getMessage());
-                    }
-                }
-            });
-        } catch (Exception e) {
-            throw new LocalCancellationException(e.getMessage(),
-                CancelOption.NOTIFY_PEER);
+            ResourcesPlugin.getWorkspace().run(createProjectTask, monitor);
+        } catch (OperationCanceledException e) {
+            throw new LocalCancellationException();
+        } catch (CoreException e) {
+            throw new IOException(e.getMessage(), e.getCause());
         }
-        return newLocalProject;
+
+        return createProjectTask.getProject();
     }
 
     @Override
@@ -608,69 +594,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         }
 
         return true;
-    }
-
-    /**
-     * Creates a new project.
-     * 
-     * @param newProjectName
-     *            the project name of the new project.
-     * @param baseProject
-     *            if not <code>null</code> all files of the baseProject will be
-     *            copied into the new project after having created it.
-     * @return the new project.
-     * @throws Exception
-     * 
-     * @swt Needs to be run from the SWT UI Thread
-     */
-    protected IProject createNewProject(String newProjectName,
-        final IProject baseProject) throws Exception {
-
-        log.debug("Inv" + Utils.prefix(peer) + ": Creating new project...");
-        IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-        final IProject project = workspaceRoot.getProject(newProjectName);
-
-        if (project.exists()) {
-            throw new CoreException(new org.eclipse.core.runtime.Status(
-                IStatus.ERROR, Saros.SAROS, MessageFormat.format(
-                    "Project {0} already exists!", newProjectName)));
-        }
-
-        ProgressMonitorDialog dialog = new ProgressMonitorDialog(EditorAPI
-            .getAWorkbenchWindow().getShell());
-
-        dialog.run(true, true, new IRunnableWithProgress() {
-            @Override
-            public void run(IProgressMonitor monitor)
-                throws InvocationTargetException {
-                try {
-                    SubMonitor subMonitor = SubMonitor.convert(monitor,
-                        "Copy local resources... ", 300);
-
-                    subMonitor.subTask("Clearing History...");
-                    project.clearHistory(subMonitor.newChild(100));
-
-                    subMonitor.subTask("Refreshing Project");
-                    project.refreshLocal(IResource.DEPTH_INFINITE,
-                        subMonitor.newChild(100));
-
-                    if (baseProject == null) {
-                        subMonitor.subTask("Creating Project...");
-                        project.create(subMonitor.newChild(50));
-
-                        subMonitor.subTask("Opening Project...");
-                        project.open(subMonitor.newChild(50));
-                    } else {
-                        subMonitor.subTask("Copying Project...");
-                        baseProject.copy(project.getFullPath(), true,
-                            subMonitor.newChild(100));
-                    }
-                } catch (Exception e) {
-                    throw new RuntimeException(e.getCause());
-                }
-            }
-        });
-        return project;
     }
 
     /**
@@ -783,7 +706,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      */
     private void writeArchive(final InputStream archiveStream,
         final IProject project, final IProgressMonitor monitor)
-        throws IOException {
+        throws LocalCancellationException, IOException {
 
         final DecompressTask decompressTask = new DecompressTask(
             new ZipInputStream(archiveStream), project, monitor);
@@ -800,12 +723,10 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
          */
 
         try {
-            /*
-             * do not use the monitor here because it gets wrapped and would
-             * only display: Operation in progress... as main task
-             */
-            ResourcesPlugin.getWorkspace().run(decompressTask, /* monitor */
-            null);
+            ResourcesPlugin.getWorkspace().run(decompressTask, monitor);
+        } catch (OperationCanceledException e) {
+            throw new LocalCancellationException(null,
+                CancelOption.DO_NOT_NOTIFY_PEER);
         } catch (CoreException e) {
             throw new IOException(e.getMessage(), e.getCause());
         }
