@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
@@ -684,7 +685,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * @param vcs
      *            The VCS adapter of the local project.
      * @param monitor
-     *            The SubMonitor of the dialog.
      * 
      * @return The list of files that we need from the host.
      * @throws LocalCancellationException
@@ -693,39 +693,45 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      */
     private FileList computeRequiredFiles(IProject currentLocalProject,
         FileList remoteFileList, String projectID, boolean skipSync,
-        VCSAdapter vcs, SubMonitor monitor) throws LocalCancellationException,
-        IOException {
-        monitor.beginTask("Compute required Files...", 100);
+        VCSAdapter vcs, IProgressMonitor monitor)
+        throws LocalCancellationException, IOException {
 
-        if (skipSync)
+        if (skipSync) {
+            monitor.done();
             return FileListFactory.createEmptyFileList();
+        }
+
+        SubMonitor subMonitor = SubMonitor.convert(monitor,
+            "Compute required Files...", 1);
 
         FileListDiff filesToSynchronize = null;
         FileList localFileList = null;
+
         try {
             localFileList = FileListFactory.createFileList(currentLocalProject,
-                null, checksumCache, vcs != null, monitor.newChild(1));
+                null, checksumCache, vcs != null, subMonitor.newChild(1));
         } catch (CoreException e) {
-            e.printStackTrace();
-            return FileListFactory.createEmptyFileList();
+            throw new IOException(e.getMessage(), e.getCause());
         }
-        SubMonitor childMonitor = monitor.newChild(5,
-            SubMonitor.SUPPRESS_ALL_LABELS);
+
         filesToSynchronize = computeDiff(localFileList, remoteFileList,
-            currentLocalProject, projectID, childMonitor);
+            currentLocalProject, projectID);
 
         List<IPath> missingFiles = filesToSynchronize.getAddedPaths();
         missingFiles.addAll(filesToSynchronize.getAlteredPaths());
+
+        /*
+         * We send an empty file list to the host as a notification that we do
+         * not need any files.
+         */
+
         if (missingFiles.isEmpty()) {
-            log.debug("Inv" + Utils.prefix(peer)
-                + ": There are no files to synchronize.");
-            /**
-             * We send an empty file list to the host as a notification that we
-             * do not need any files.
-             */
+            log.debug(this + " : there are no files to synchronize.");
+            subMonitor.done();
             return FileListFactory.createEmptyFileList();
         }
 
+        subMonitor.done();
         return FileListFactory.createPathFileList(missingFiles);
     }
 
@@ -740,42 +746,33 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      *            The project in workspace. Every file we need to add/replace is
      *            added to the {@link FileListDiff}
      * @param projectID
-     * @param monitor
-     *            The progress monitor of the dialog.
      * @return A modified FileListDiff which doesn't contain any directories or
      *         files to remove, but just added and altered files.
-     * @throws LocalCancellationException
-     *             If the process is canceled by the user.
      */
     protected FileListDiff computeDiff(FileList localFileList,
-        FileList remoteFileList, IProject currentLocalProject,
-        String projectID, SubMonitor monitor) throws LocalCancellationException {
-        log.debug("Inv" + Utils.prefix(peer) + ": Computing file list diff...");
-
-        monitor.beginTask(null, 100);
+        FileList remoteFileList, IProject currentLocalProject, String projectID)
+        throws IOException {
+        log.debug(this + " : computing file list difference");
 
         try {
-            monitor.subTask("Calculating Diff");
             FileListDiff diff = FileListDiff
                 .diff(localFileList, remoteFileList);
-            monitor.worked(20);
 
-            monitor.subTask("Removing unneeded resources");
-            if (!isPartialRemoteProject(projectID))
+            if (!isPartialRemoteProject(projectID)) {
+                /*
+                 * WTF !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! THIS IS DELETING
+                 * FILES !!!!!!!
+                 */
                 diff = diff.removeUnneededResources(currentLocalProject,
-                    monitor.newChild(40, SubMonitor.SUPPRESS_ALL_LABELS));
+                    new NullProgressMonitor());
+            }
 
-            monitor.subTask("Adding Folders");
             diff = diff.addAllFolders(currentLocalProject,
-                monitor.newChild(40, SubMonitor.SUPPRESS_ALL_LABELS));
+                new NullProgressMonitor());
 
             return diff;
         } catch (CoreException e) {
-            throw new LocalCancellationException(MessageFormat.format(
-                "Could not create diff file list: {0}", e.getMessage()),
-                CancelOption.NOTIFY_PEER);
-        } finally {
-            monitor.done();
+            throw new IOException(e.getMessage(), e.getCause());
         }
     }
 

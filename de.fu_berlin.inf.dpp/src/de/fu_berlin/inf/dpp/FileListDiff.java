@@ -131,8 +131,8 @@ public class FileListDiff {
      * 
      * @throws CoreException
      */
-    public FileListDiff addAllFolders(IProject localProject, SubMonitor monitor)
-        throws CoreException {
+    public FileListDiff addAllFolders(IProject localProject,
+        IProgressMonitor monitor) throws CoreException {
 
         List<IPath> toCheck = this.getAddedPaths();
         monitor.beginTask("Adding folders", toCheck.size());
@@ -171,7 +171,7 @@ public class FileListDiff {
      * @throws CoreException
      */
     public FileListDiff removeUnneededResources(final IProject localProject,
-        final SubMonitor monitor) throws CoreException {
+        final IProgressMonitor monitor) throws CoreException {
         // TODO don't throw CoreException
 
         // TODO Move to FileUtil, refactor FileUtil#delete(IResource).
@@ -187,18 +187,19 @@ public class FileListDiff {
         IWorkspaceRunnable deleteProcedure = new IWorkspaceRunnable() {
             @Override
             public void run(IProgressMonitor progress) throws CoreException {
-                // SubMonitor monitor = (SubMonitor) progress;// doesn't work?
+                SubMonitor subMonitor = SubMonitor.convert(progress);
                 for (IPath path : toDelete) {
-                    monitor.subTask("Deleting " + path.lastSegment());
                     IResource resource = path.hasTrailingSeparator() ? localProject
                         .getFolder(path) : localProject.getFile(path);
 
                     // Check if resource exists because it might have already
                     // been deleted when deleting its folder
                     if (resource.exists()) {
-                        resource.delete(true, monitor.newChild(1));
+                        subMonitor.subTask("Deleting " + path.lastSegment());
+                        resource.delete(true, subMonitor.newChild(1));
                     }
                 }
+                subMonitor.done();
             }
         };
 
