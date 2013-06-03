@@ -433,7 +433,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             transfer.sendFile(archive, transferID);
             monitorFileTransfer(transfer, monitor);
         } catch (XMPPException e) {
-            throw new IOException(e.getMessage(), e.getCause());
+            throw new IOException(e.getMessage(), e);
         }
 
         monitor.done();
@@ -445,15 +445,11 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
      * Method to create list of ProjectExchangeInfo.
      * 
      * @param projectsToShare
-     *            List of projects initially to share
-     * @param monitor
-     *            Show progress
-     * @return
-     * @throws LocalCancellationException
+     *            List of projects to share
      */
     private List<ProjectExchangeInfo> createProjectExchangeInfoList(
         List<IProject> projectsToShare, IProgressMonitor monitor)
-        throws LocalCancellationException {
+        throws IOException, LocalCancellationException {
 
         SubMonitor subMonitor = SubMonitor.convert(monitor,
             Messages.SarosSessionManager_creating_file_list,
@@ -485,8 +481,14 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 pInfos.add(pInfo);
 
             } catch (CoreException e) {
-                throw new LocalCancellationException(e.getMessage(),
-                    CancelOption.DO_NOT_NOTIFY_PEER);
+                /*
+                 * avoid that the error is send to remote side (which is default
+                 * for IOExceptions) at this point because the remote side has
+                 * no existing project negotiation yet
+                 */
+                localCancel(e.getMessage(), CancelOption.DO_NOT_NOTIFY_PEER);
+                // throw to log this error in the CancelableProcess class
+                throw new IOException(e.getMessage(), e);
             }
         }
 
