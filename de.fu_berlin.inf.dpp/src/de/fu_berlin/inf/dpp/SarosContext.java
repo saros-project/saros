@@ -101,7 +101,6 @@ import de.fu_berlin.inf.dpp.project.internal.FileContentNotifierBridge;
 import de.fu_berlin.inf.dpp.project.internal.FollowingActivitiesManager;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.synchronize.internal.SWTSynchronizer;
-import de.fu_berlin.inf.dpp.ui.LocalPresenceTracker;
 import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.eventhandler.HostLeftAloneInSessionHandler;
@@ -220,7 +219,11 @@ public class SarosContext implements ISarosContext {
         Component.create(EditorAPI.class),
         Component.create(EditorManager.class),
         Component.create(JDTFacade.class),
-        Component.create(LocalPresenceTracker.class),
+        // disabled because of privacy violations
+        // see
+        // http://opus.haw-hamburg.de/volltexte/2011/1391/pdf/ba_krassmann_online.pdf
+        // page 47
+        // Component.create(LocalPresenceTracker.class),
         Component.create(MultiUserChatService.class),
         Component.create(SingleUserChatService.class),
         Component.create(PreferenceUtils.class),
