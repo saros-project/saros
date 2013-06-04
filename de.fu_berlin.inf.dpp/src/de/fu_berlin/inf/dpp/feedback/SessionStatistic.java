@@ -102,6 +102,11 @@ public class SessionStatistic {
      */
     protected static final String KEY_SESSION_LOCAL_END = "session.local.end";
 
+    // Keys for shared project informations
+    protected static final String KEY_COMPLETE_SHARED_PROJECTS = "session.shared.project.complete.count";
+    protected static final String KEY_PARTIAL_SHARED_PROJECTS = "session.shared.project.partial.count";
+    protected static final String KEY_PARTIAL_SHARED_PROJECTS_FILES = "session.shared.project.partial.files.count";
+
     // Keys for permission changes
     protected static final String KEY_PERMISSION = "role";
     protected static final String KEY_PERMISSION_READONLY = "role.observer";
@@ -972,5 +977,17 @@ public class SessionStatistic {
      */
     public int getVoIPSessionCount() {
         return Integer.parseInt(data.getProperty(KEY_VOIP_COUNT));
+    }
+
+    public void setSharedProjectStatistic(int completeSharedProjectCount,
+        int partialSharedProjectCount, int partialSharedFileCount) {
+        data.setProperty(KEY_COMPLETE_SHARED_PROJECTS,
+            String.valueOf(completeSharedProjectCount));
+
+        data.setProperty(KEY_PARTIAL_SHARED_PROJECTS,
+            String.valueOf(partialSharedProjectCount));
+
+        data.setProperty(KEY_PARTIAL_SHARED_PROJECTS_FILES,
+            String.valueOf(partialSharedFileCount));
     }
 }
