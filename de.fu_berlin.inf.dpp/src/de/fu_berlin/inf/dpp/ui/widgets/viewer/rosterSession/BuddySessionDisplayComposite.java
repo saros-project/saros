@@ -54,8 +54,6 @@ import de.fu_berlin.inf.dpp.ui.model.rosterSession.RosterSessionComparator;
 import de.fu_berlin.inf.dpp.ui.model.rosterSession.RosterSessionContentProvider;
 import de.fu_berlin.inf.dpp.ui.model.rosterSession.RosterSessionInput;
 import de.fu_berlin.inf.dpp.ui.model.rosterSession.UserElement;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.ViewerComposite;
 import de.fu_berlin.inf.nebula.utils.LayoutUtils;
 import de.fu_berlin.inf.nebula.utils.PaintUtils;
@@ -298,72 +296,38 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
              * Jump to User file+position when doubleclicked on
              * AwarenessTreeItem.
              * 
-             * Also copies the jabber id of the roster entry to the chat (if
-             * there is a chat)
              */
             @Override
             public void mouseDoubleClick(MouseEvent event) {
+
+                if (!(control instanceof Tree))
+                    return;
+
                 TreeItem treeItem = findTreeItemNear(event);
-                if (control instanceof Tree) {
-                    if (treeItem != null) {
 
-                        User user = (User) Platform.getAdapterManager()
-                            .getAdapter(treeItem.getData(), User.class);
-                        if (user != null && !user.isLocal()) {
-                            SarosView sarosView = ((SarosView) SWTUtils
-                                .findView(SarosView.ID));
-                            /*
-                             * toggle follow mode when doubleclicked on user
-                             * element in session tree
-                             */
-                            if (treeItem.getData() instanceof UserElement) {
-                                log.debug("Starting to follow "
-                                    + user
-                                    + " because of dbl click on UserElement in session view");
-                                sarosView.getFollowModeAction()
-                                    .setFollowModeActionStatus(user);
-                                sarosView.getFollowModeAction().run();
-                            } else {
-                                /*
-                                 * jump to editor position of the user if
-                                 * doubleclicked on
-                                 * AwarenessTreeInformationElement
-                                 */
-                                editorManager.jumpToUser(user);
-                            }
-                            return;
-                        }
-                    }
+                if (treeItem == null)
+                    return;
+
+                User user = (User) Platform.getAdapterManager().getAdapter(
+                    treeItem.getData(), User.class);
+
+                if (user == null || user.isLocal())
+                    return;
+
+                /*
+                 * toggle follow mode when doubleclicked on user element in
+                 * session tree
+                 */
+                if (treeItem.getData() instanceof UserElement) {
+                    User followedUser = editorManager.getFollowedUser();
+                    editorManager.setFollowing(user.equals(followedUser) ? null
+                        : user);
                 } else {
-                    log.warn("Control is not instance of Tree.");
-                }
-            }
-
-            /**
-             * This enables/disables the "follow mode action" ICON button in the
-             * icon bar of the Saros view, and registers the user that was
-             * clicked on as target for the follow mode button.
-             */
-            @Override
-            public void mouseDown(MouseEvent event) {
-                if (control instanceof Tree) {
-                    TreeItem treeItem = findTreeItemNear(event);
-
-                    if (treeItem != null) {
-                        User user = (User) Platform.getAdapterManager()
-                            .getAdapter(treeItem.getData(), User.class);
-                        if (user == null) {
-                            return;
-                        }
-                        if (!user.isLocal()) {
-                            SarosView sarosView = ((SarosView) SWTUtils
-                                .findView(SarosView.ID));
-                            sarosView.getFollowModeAction()
-                                .setFollowModeActionStatus(user);
-                        }
-                    }
-                } else {
-                    log.warn("Control is not instance of Tree.");
+                    /*
+                     * jump to editor position of the user if doubleclicked on
+                     * AwarenessTreeInformationElement
+                     */
+                    editorManager.jumpToUser(user);
                 }
             }
         });

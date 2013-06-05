@@ -9,7 +9,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.PlatformUI;
 import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Inject;
 
@@ -25,6 +24,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -47,26 +47,26 @@ public class FollowThisPersonAction extends Action implements Disposable {
     protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
-            updateEnablement();
+            updateActionEnablement();
         }
 
         @Override
         public void sessionEnded(ISarosSession oldSarosSession) {
-            updateEnablement();
+            updateActionEnablement();
         }
     };
 
     protected ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
         @Override
         public void followModeChanged(User user, boolean isFollowed) {
-            updateEnablement();
+            updateActionEnablement();
         }
     };
 
     protected ISelectionListener selectionListener = new ISelectionListener() {
         @Override
         public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-            updateEnablement();
+            updateActionEnablement();
         }
     };
 
@@ -95,6 +95,7 @@ public class FollowThisPersonAction extends Action implements Disposable {
         editorManager.addSharedEditorListener(editorListener);
         SelectionUtils.getSelectionService().addSelectionListener(
             selectionListener);
+
         updateEnablement();
     }
 
@@ -106,53 +107,60 @@ public class FollowThisPersonAction extends Action implements Disposable {
         Utils.runSafeSync(log, new Runnable() {
             @Override
             public void run() {
-                List<User> participants = SelectionRetrieverFactory
+                List<User> users = SelectionRetrieverFactory
                     .getSelectionRetriever(User.class).getSelection();
 
-                if (participants.size() == 1) {
-                    User toFollow;
-                    if (editorManager.getFollowedUser() == participants.get(0)) {
-                        toFollow = null;
-                    } else {
-                        toFollow = participants.get(0);
-                    }
-                    log.info("Following: " + toFollow); //$NON-NLS-1$
-                    editorManager.setFollowing(toFollow);
-                } else {
-                    log.warn("More than one participant selected."); //$NON-NLS-1$
+                if (!canBeExecuted(users)) {
+                    log.warn("could not execute change follow mode action " //$NON-NLS-1$
+                        + "because either no session is running, " //$NON-NLS-1$
+                        + "more than one user is selected or " //$NON-NLS-1$
+                        + "the selected user is the local user"); //$NON-NLS-1$
+                    return;
                 }
 
+                User toFollow = users.get(0).equals(
+                    editorManager.getFollowedUser()) ? null : users.get(0);
+
+                editorManager.setFollowing(toFollow);
+            }
+        });
+    }
+
+    protected void updateActionEnablement() {
+        SWTUtils.runSafeSWTAsync(log, new Runnable() {
+            @Override
+            public void run() {
+                updateEnablement();
             }
         });
     }
 
     protected void updateEnablement() {
-        try {
-            ISarosSession sarosSession = sessionManager.getSarosSession();
-            List<User> participants = SelectionRetrieverFactory
-                .getSelectionRetriever(User.class).getSelection();
 
-            if (sarosSession != null && participants.size() == 1
-                && !participants.get(0).isLocal()) {
-                if (editorManager.getFollowedUser() == participants.get(0)) {
-                    setText(Messages.FollowThisPersonAction_stop_follow_title);
-                    setToolTipText(Messages.FollowThisPersonAction_stop_follow_tooltip);
-                } else {
-                    setText(Messages.FollowThisPersonAction_follow_title);
-                    setToolTipText(Messages.FollowThisPersonAction_follow_tooltip);
-                }
-                setEnabled(true);
-            } else {
-                setText(Messages.FollowThisPersonAction_follow_title);
-                setToolTipText(Messages.FollowThisPersonAction_follow_tooltip);
-                setEnabled(false);
-            }
-        } catch (NullPointerException e) {
-            this.setEnabled(false);
-        } catch (Exception e) {
-            if (!PlatformUI.getWorkbench().isClosing())
-                log.error("Unexcepted error while updating enablement", e); //$NON-NLS-1$
+        List<User> users = SelectionRetrieverFactory.getSelectionRetriever(
+            User.class).getSelection();
+
+        if (!canBeExecuted(users)) {
+            setEnabled(false);
+            return;
         }
+
+        if (users.get(0).equals(editorManager.getFollowedUser())) {
+            setText(Messages.FollowThisPersonAction_stop_follow_title);
+            setToolTipText(Messages.FollowThisPersonAction_stop_follow_tooltip);
+        } else {
+            setText(Messages.FollowThisPersonAction_follow_title);
+            setToolTipText(Messages.FollowThisPersonAction_follow_tooltip);
+        }
+
+        setEnabled(true);
+    }
+
+    protected boolean canBeExecuted(List<User> users) {
+        ISarosSession sarosSession = sessionManager.getSarosSession();
+
+        return sarosSession != null && users.size() == 1
+            && !users.get(0).isLocal();
     }
 
     @Override

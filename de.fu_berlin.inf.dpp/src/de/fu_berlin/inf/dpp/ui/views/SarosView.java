@@ -225,6 +225,8 @@ public class SarosView extends ViewPart {
 
     protected RemoveUserAction kickUserAction;
 
+    protected FollowModeAction followModeAction;
+
     @Inject
     protected Saros saros;
 
@@ -307,54 +309,30 @@ public class SarosView extends ViewPart {
         buddySessionDisplayComposite.setLayoutData(LayoutUtils
             .createFillGridData());
 
-        /*
-         * Double click on a session participant in Saros view jumps to position
-         * of clicked user.
-         * 
-         * Double click on a buddy in the roster adds its JID (bare component
-         * part) to the active chat tab input
-         */
         final Control control = buddySessionDisplayComposite.getViewer()
             .getControl();
+
         control.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseDoubleClick(MouseEvent event) {
-                if (control instanceof Tree) {
-                    TreeItem treeItem = ((Tree) control).getItem(new Point(
-                        event.x, event.y));
-                    if (treeItem != null) {
-                        User user = (User) Platform.getAdapterManager()
-                            .getAdapter(treeItem.getData(), User.class);
 
-                        if (user != null) {
-                            editorManager.jumpToUser(user);
-                            return;
-                        }
+                if (!(control instanceof Tree))
+                    return;
 
-                        RosterEntryElement rosterEntryElement = (RosterEntryElement) Platform
-                            .getAdapterManager().getAdapter(treeItem.getData(),
-                                RosterEntryElement.class);
+                TreeItem treeItem = ((Tree) control).getItem(new Point(event.x,
+                    event.y));
 
-                        chatRooms.openChat(rosterEntryElement.getJID(), true);
-                    }
-                } else {
-                    log.warn("Control is not instance of Tree.");
-                }
-            }
+                if (treeItem == null)
+                    return;
 
-            @Override
-            public void mouseDown(MouseEvent event) {
-                if (control instanceof Tree) {
-                    TreeItem treeItem = ((Tree) control).getItem(new Point(
-                        event.x, event.y));
-                    if (treeItem != null) {
-                        User user = (User) Platform.getAdapterManager()
-                            .getAdapter(treeItem.getData(), User.class);
-                        fmAction.setFollowModeActionStatus(user);
-                    }
-                } else {
-                    log.warn("Control is not instance of Tree.");
-                }
+                RosterEntryElement rosterEntryElement = (RosterEntryElement) Platform
+                    .getAdapterManager().getAdapter(treeItem.getData(),
+                        RosterEntryElement.class);
+
+                if (rosterEntryElement == null)
+                    return;
+
+                chatRooms.openChat(rosterEntryElement.getJID(), true);
             }
         });
 
@@ -425,8 +403,6 @@ public class SarosView extends ViewPart {
         getViewSite().getPage().addPartListener(partListener);
     }
 
-    FollowModeAction fmAction;
-
     protected void addToolBarItems(IToolBarManager toolBar) {
         boolean isDebug = false;
         assert (isDebug = true) == true;
@@ -439,9 +415,9 @@ public class SarosView extends ViewPart {
         if (isDebug)
             toolBar.add(new StoppedAction());
 
+        followModeAction = new FollowModeAction();
+        toolBar.add(followModeAction);
         toolBar.add(new ConsistencyAction());
-        fmAction = new FollowModeAction();
-        toolBar.add(fmAction);
         toolBar.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
         toolBar.add(new LeaveSessionAction());
     }
@@ -603,6 +579,7 @@ public class SarosView extends ViewPart {
         rosterTracker.removeRosterListener(rosterListenerBuddys);
         openChatAction.dispose();
         kickUserAction.dispose();
+        followModeAction.dispose();
     }
 
     /**
@@ -688,16 +665,4 @@ public class SarosView extends ViewPart {
     public void setFocus() {
         // TODO Auto-generated method stub
     }
-
-    /**
-     * TODO: seriously refactor this and references to this, so that the
-     * FollowModeAction implements a Roster/Session-View selection change
-     * listener, and updates itself....
-     * 
-     * @return
-     */
-    public FollowModeAction getFollowModeAction() {
-        return fmAction;
-    }
-
 }

@@ -328,6 +328,8 @@ public class EditorManager extends AbstractActivityProvider {
                 @Override
                 public void run() {
 
+                    setFollowing(null);
+
                     editorAPI.removeEditorPartListener(EditorManager.this);
 
                     /*
