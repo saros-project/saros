@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -71,11 +70,6 @@ public class DataTransferManager implements IConnectionListener {
         .synchronizedMap(new HashMap<JID, ConnectionHolder>());
 
     private final Lock connectLock = new ReentrantLock();
-    /**
-     * Collection of {@link JID}s, flagged to prefer IBB transfer mode
-     */
-    private final Collection<JID> peersForIBB = Collections
-        .synchronizedList(new ArrayList<JID>());
 
     private final Set<JID> currentOutgoingConnectionEstablishments = new HashSet<JID>();
 
@@ -254,7 +248,6 @@ public class DataTransferManager implements IConnectionListener {
      *            {@link IByteStreamConnection}
      */
     public boolean closeConnection(JID peer) {
-        peersForIBB.remove(peer);
         ConnectionHolder holder = connections.remove(peer);
 
         if (holder == null)
@@ -309,18 +302,6 @@ public class DataTransferManager implements IConnectionListener {
 
             ArrayList<ITransport> transportModesToUse = new ArrayList<ITransport>(
                 availableTransports);
-
-            // Move IBB to front for peers preferring IBB
-            synchronized (peersForIBB) {
-                if (fallbackTransport != null
-                    && peersForIBB.contains(recipient)) {
-                    int ibbIndex = transportModesToUse
-                        .indexOf(fallbackTransport);
-                    if (ibbIndex != -1)
-                        transportModesToUse.remove(ibbIndex);
-                    transportModesToUse.add(0, fallbackTransport);
-                }
-            }
 
             log.debug("currently used IP addresses for Socks5Proxy: "
                 + Arrays.toString(Socks5Proxy.getSocks5Proxy()
@@ -465,7 +446,6 @@ public class DataTransferManager implements IConnectionListener {
 
         connections.clear();
         transferModeDispatch.clear();
-        peersForIBB.clear();
 
         connection = null;
     }
@@ -477,26 +457,6 @@ public class DataTransferManager implements IConnectionListener {
             prepareConnection(connection);
         else if (this.connection != null)
             disposeConnection();
-    }
-
-    /*
-     * ------------------------------------------------------------------------
-     * Support for monitoring ongoing transfers
-     * ------------------------------------------------------------------------
-     */
-
-    /**
-     * Flag the specified peer to prefer IBB during a connect during this Saros
-     * session.
-     * 
-     * @param peer
-     *            {@link JID} of the peer to set IBB as preferred transfer mode
-     */
-    public void setFallbackConnectionMode(JID peer) {
-        synchronized (peersForIBB) {
-            if (!peersForIBB.contains(peer))
-                peersForIBB.add(peer);
-        }
     }
 
     /**

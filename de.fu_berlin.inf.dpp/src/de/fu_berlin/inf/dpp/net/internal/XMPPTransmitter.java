@@ -159,11 +159,14 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         if (data.length > PACKET_EXTENSION_COMPRESS_THRESHOLD)
             transferDescription.setCompressContent(true);
 
+        IOException ioe;
+
         try {
             // recipient is included in the transfer description
             dataManager.sendData(transferDescription, data);
             return;
         } catch (IOException e) {
+            ioe = e;
             log.error(
                 "could not send packet extension through a direct connection ("
                     + Utils.formatByte(data.length) + ")", e);
@@ -175,11 +178,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             return;
         }
 
-        log.info("enabling fallback mode for recipient: " + recipient);
-
-        dataManager.setFallbackConnectionMode(recipient);
-        dataManager.sendData(transferDescription, data);
-
+        throw ioe;
     }
 
     @Override

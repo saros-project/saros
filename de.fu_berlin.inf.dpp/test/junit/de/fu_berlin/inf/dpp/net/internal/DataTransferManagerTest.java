@@ -7,7 +7,9 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -90,19 +92,37 @@ public class DataTransferManagerTest {
 
         private CountDownLatch proceed;
 
-        public BlockableTransport(NetTransferMode mode,
+        private volatile boolean isConnecting;
+
+        private Set<JID> jidsToIgnore;
+
+        public BlockableTransport(Set<JID> jidsToIgnore, NetTransferMode mode,
             CountDownLatch acknowledge, CountDownLatch proceed) {
             super(mode);
             this.acknowledge = acknowledge;
             this.proceed = proceed;
+            this.jidsToIgnore = jidsToIgnore;
         }
 
         @Override
         public IByteStreamConnection connect(JID peer) throws IOException,
             InterruptedException {
+
+            if (jidsToIgnore.contains(peer))
+                return super.connect(peer);
+
+            synchronized (this) {
+                if (isConnecting)
+                    throw new IllegalStateException(
+                        "connect must not be called concurrently");
+                isConnecting = true;
+            }
+
             acknowledge.countDown();
             proceed.await();
-            return super.connect(peer);
+            IByteStreamConnection connection = super.connect(peer);
+            isConnecting = false;
+            return connection;
         }
     }
 
@@ -315,81 +335,19 @@ public class DataTransferManagerTest {
 
     }
 
-    @Test
-    public void testForceFallback() throws Exception {
-        ITransport mainTransport = new Transport(NetTransferMode.SOCKS5_DIRECT);
-        ITransport fallbackTransport = new Transport(NetTransferMode.IBB);
-
-        DataTransferManager dtm = new DataTransferManager(sarosNetStub, null,
-            mainTransport, fallbackTransport, null, null);
-
-        connectionListener.getValue().connectionStateChanged(connectionMock,
-            ConnectionState.CONNECTED);
-
-        dtm.setFallbackConnectionMode(new JID("fallback@emergency"));
-
-        dtm.connect(new JID("foo@bar.com"));
-        dtm.connect(new JID("fallback@emergency"));
-
-        assertEquals("fallback mode enabled for the wrong connection",
-            NetTransferMode.SOCKS5_DIRECT,
-            dtm.getTransferMode(new JID("foo@bar.com")));
-
-        assertEquals("fallback mode change failed", NetTransferMode.IBB,
-            dtm.getTransferMode(new JID("fallback@emergency")));
-    }
-
-    @Test
-    public void testClearForceFallback() throws Exception {
-        ITransport mainTransport = new Transport(NetTransferMode.SOCKS5_DIRECT);
-        ITransport fallbackTransport = new Transport(NetTransferMode.IBB);
-
-        DataTransferManager dtm = new DataTransferManager(sarosNetStub, null,
-            mainTransport, fallbackTransport, null, null);
-
-        connectionListener.getValue().connectionStateChanged(connectionMock,
-            ConnectionState.CONNECTED);
-
-        dtm.setFallbackConnectionMode(new JID("fallback@emergency"));
-
-        dtm.connect(new JID("fallback@emergency"));
-
-        assertEquals("fallback mode change failed", NetTransferMode.IBB,
-            dtm.getTransferMode(new JID("fallback@emergency")));
-
-        dtm.closeConnection(new JID("fallback@emergency"));
-
-        dtm.connect(new JID("fallback@emergency"));
-
-        assertEquals(
-            "fallback mode was not cleared after closing the connection",
-            NetTransferMode.SOCKS5_DIRECT,
-            dtm.getTransferMode(new JID("fallback@emergency")));
-
-        dtm.setFallbackConnectionMode(new JID("fallback@emergency"));
-
-        connectionListener.getValue().connectionStateChanged(connectionMock,
-            ConnectionState.NOT_CONNECTED);
-
-        connectionListener.getValue().connectionStateChanged(connectionMock,
-            ConnectionState.CONNECTED);
-
-        dtm.connect(new JID("fallback@emergency"));
-
-        assertEquals(
-            "fallback mode was not cleared after XMPP connection reset",
-            NetTransferMode.SOCKS5_DIRECT,
-            dtm.getTransferMode(new JID("fallback@emergency")));
-    }
-
     @Test(timeout = 30000)
     public void testConcurrentConnections() throws Exception {
 
         final CountDownLatch connectAcknowledge = new CountDownLatch(1);
         final CountDownLatch connectProceed = new CountDownLatch(1);
 
+        Set<JID> nonBlockingConnects = new HashSet<JID>();
+
+        nonBlockingConnects.add(new JID("foo@bar.example"));
+
         BlockableTransport mainTransport = new BlockableTransport(
-            NetTransferMode.SOCKS5_DIRECT, connectAcknowledge, connectProceed);
+            nonBlockingConnects, NetTransferMode.SOCKS5_DIRECT,
+            connectAcknowledge, connectProceed);
 
         Transport fallbackTransport = new Transport(NetTransferMode.IBB);
 
@@ -420,10 +378,10 @@ public class DataTransferManagerTest {
             }
         });
 
-        // connect here so connectThread2 will not block
-        // use fallback to not trigger the blocked transport method
-        dtm.setFallbackConnectionMode(new JID("foo@bar.example"));
         dtm.connect(new JID("foo@bar.example"));
+
+        // side effect ! this JID is no longer ignored
+        nonBlockingConnects.clear();
 
         connectThread0.start();
 
@@ -450,7 +408,7 @@ public class DataTransferManagerTest {
             fail("second connection request must be blocked");
         }
 
-        // This MUST not be blocked
+        // This MUST not block because the connection is already established
         connectThread2.start();
         connectThread2.join(10000);
 
@@ -468,7 +426,7 @@ public class DataTransferManagerTest {
         connectThread1.verify();
 
         assertEquals(
-            "connection caching failed during multiple connection requests", 1,
+            "connection caching failed during multiple connection requests", 2,
             mainTransport.getEstablishedConnections().size());
 
     }
@@ -499,7 +457,8 @@ public class DataTransferManagerTest {
         final CountDownLatch connectProceed = new CountDownLatch(1);
 
         BlockableTransport mainTransport = new BlockableTransport(
-            NetTransferMode.SOCKS5_DIRECT, connectAcknowledge, connectProceed);
+            new HashSet<JID>(), NetTransferMode.SOCKS5_DIRECT,
+            connectAcknowledge, connectProceed);
 
         Transport fallbackTransport = new Transport(NetTransferMode.IBB);
 
