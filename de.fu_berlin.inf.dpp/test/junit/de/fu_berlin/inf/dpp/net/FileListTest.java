@@ -23,6 +23,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -42,7 +45,6 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.FileListDiff;
 import de.fu_berlin.inf.dpp.FileListFactory;
-import de.fu_berlin.inf.dpp.test.stubs.FileStub;
 
 /**
  * TODO [TEST] Add Testcases for non-existing files florianthiel: Does FileList
@@ -64,38 +66,92 @@ public class FileListTest {
         EasyMock.replay(project);
     }
 
-    protected IFile fileInRoot1 = new FileStub(project, "root1", "fileInRoot1");
-    protected IFile fileInRoot2 = new FileStub(project, "root2", "fileInRoot2");
-    protected IFile fileInSubDir1 = new FileStub(project, "subdir/file1",
-        "fileInSubDir1");
-    protected IFile fileInSubDir2 = new FileStub(project, "subdir/file2",
-        "fileInSubDir2");
-    protected IFile fileInSubDir1changed = new FileStub(project,
-        "subdir/file1", "changed fileInSubDir1");
+    private IFile fileInRoot1;
+    private IFile fileInRoot2;
+    private IFile fileInSubDir1;
+    private IFile fileInSubDir2;
+    private IFile fileInSubDir1changed;
 
-    protected List<IResource> threeFileList = new ArrayList<IResource>();
+    private List<IResource> threeFileList = new ArrayList<IResource>();
 
-    protected FileList threeEntryList;
-    protected FileList fourEntryList; // contains one additional entry
+    private FileList threeEntryList;
+    private FileList fourEntryList; // contains one additional entry
     // in respect to threeEntryList
-    protected FileList modifiedFourEntryList; // contains one modified entry in
+    private FileList modifiedFourEntryList; // contains one modified entry in
     // respect to fourEntryList
-    protected FileList emptyFileList;
+    private FileList emptyFileList;
+
+    // needed as the mocks will always return the same input stream instance
+    private static class ResetingInputStream extends InputStream {
+
+        private final String content;
+        private ByteArrayInputStream in;
+
+        public ResetingInputStream(String content) {
+            this.content = content;
+            in = new ByteArrayInputStream(this.content.getBytes());
+        }
+
+        @Override
+        public int read() throws IOException {
+            return in.read();
+        }
+
+        @Override
+        public void close() throws IOException {
+            in = new ByteArrayInputStream(this.content.getBytes());
+        }
+
+    }
+
+    private IFile createFileMock(String path, String content) throws Exception {
+        IPath p = new Path(path);
+        IPath f = new Path(project.getName() + "/" + path);
+
+        IFile fileMock;
+
+        fileMock = EasyMock.createMock(IFile.class);
+
+        EasyMock.expect(fileMock.getProject()).andStubReturn(project);
+        EasyMock.expect(fileMock.getProjectRelativePath()).andStubReturn(p);
+        EasyMock.expect(fileMock.getContents()).andStubReturn(
+            new ResetingInputStream(content));
+        EasyMock.expect(fileMock.isDerived()).andStubReturn(false);
+        EasyMock.expect(fileMock.exists()).andStubReturn(true);
+        EasyMock.expect(fileMock.getType()).andStubReturn(IResource.FILE);
+        EasyMock.expect(fileMock.getName()).andStubReturn(p.lastSegment());
+        EasyMock.expect(fileMock.getFullPath()).andStubReturn(f);
+        EasyMock.replay(fileMock);
+        return fileMock;
+    }
 
     @Before
     public void setUp() throws Exception {
+
+        fileInRoot1 = createFileMock("root1", "fileInRoot1");
+        fileInRoot2 = createFileMock("root2", "fileInRoot2");
+        fileInSubDir1 = createFileMock("subdir/file1", "fileInSubDir1");
+        fileInSubDir2 = createFileMock("subdir/file2", "fileInSubDir2");
+        fileInSubDir1changed = createFileMock("subdir/file1",
+            "changed fileInSubDir1");
+
         List<IResource> resources = new ArrayList<IResource>();
         resources.add(fileInRoot1);
         resources.add(fileInRoot2);
         resources.add(fileInSubDir1);
         threeFileList.addAll(resources);
+
         threeEntryList = FileListFactory.createFileList(null, resources, null,
             false, null);
+
         resources.add(fileInSubDir2);
+
         fourEntryList = FileListFactory.createFileList(null, resources, null,
             false, null);
+
         resources.remove(fileInSubDir1);
         resources.add(fileInSubDir1changed);
+
         modifiedFourEntryList = FileListFactory.createFileList(null, resources,
             null, false, null);
 
