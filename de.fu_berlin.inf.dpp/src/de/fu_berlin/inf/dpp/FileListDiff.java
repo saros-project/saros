@@ -196,7 +196,8 @@ public class FileListDiff {
                     // been deleted when deleting its folder
                     if (resource.exists()) {
                         subMonitor.subTask("Deleting " + path.lastSegment());
-                        resource.delete(true, subMonitor.newChild(1));
+                        resource.delete(IResource.FORCE
+                            | IResource.KEEP_HISTORY, subMonitor.newChild(1));
                     }
                 }
                 subMonitor.done();

@@ -98,7 +98,7 @@ public class DecompressTask implements IWorkspaceRunnable {
                     file.create(uncloseable, true,
                         subMonitor.newChild(0, SubMonitor.SUPPRESS_ALL_LABELS));
                 else
-                    file.setContents(uncloseable, IResource.FORCE,
+                    file.setContents(uncloseable, true, true,
                         subMonitor.newChild(0, SubMonitor.SUPPRESS_ALL_LABELS));
 
                 if (LOG.isTraceEnabled())

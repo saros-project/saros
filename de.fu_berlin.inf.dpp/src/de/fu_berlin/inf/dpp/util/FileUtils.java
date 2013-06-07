@@ -1,14 +1,11 @@
 package de.fu_berlin.inf.dpp.util;
 
 import java.io.FileNotFoundException;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.zip.Adler32;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -25,7 +22,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 
 import de.fu_berlin.inf.dpp.User;
@@ -235,7 +231,7 @@ public class FileUtils {
         IWorkspaceRunnable replaceFileProcedure = new IWorkspaceRunnable() {
             @Override
             public void run(IProgressMonitor monitor) throws CoreException {
-                file.setContents(input, IResource.FORCE, monitor);
+                file.setContents(input, true, true, monitor);
             }
         };
 
@@ -350,7 +346,8 @@ public class FileUtils {
 
                 setReadOnly(resource, false);
 
-                resource.delete(true, monitor);
+                resource.delete(IResource.FORCE | IResource.KEEP_HISTORY,
+                    monitor);
 
                 if (monitor.isCanceled()) {
                     log.warn("Removing resource failed: " + resource);
