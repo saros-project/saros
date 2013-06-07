@@ -19,7 +19,6 @@
  */
 package de.fu_berlin.inf.dpp.project;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -36,17 +35,12 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.ui.progress.IProgressConstants;
 import org.jivesoftware.smack.Connection;
 import org.joda.time.DateTime;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.ISarosContext;
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -68,10 +62,7 @@ import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
-import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
@@ -104,9 +95,6 @@ public class SarosSessionManager implements ISarosSessionManager {
     @Inject
     private ISarosContext sarosContext;
 
-    @Inject
-    private SarosUI sarosUI;
-
     private final InvitationProcessObservable currentSessionNegotiations;
 
     private final ProjectNegotiationObservable currentProjectNeogtiations;
@@ -120,6 +108,8 @@ public class SarosSessionManager implements ISarosSessionManager {
     private volatile boolean sessionStartup = false;
 
     private volatile boolean sessionShutdown = false;
+
+    private volatile INegotiationHandler negotiationHandler;
 
     private final IConnectionListener listener = new IConnectionListener() {
         @Override
@@ -146,6 +136,11 @@ public class SarosSessionManager implements ISarosSessionManager {
         this.currentProjectNeogtiations = currentProjectNeogtiations;
         this.preferenceUtils = preferenceUtils;
         this.sarosNet.addListener(listener);
+    }
+
+    @Override
+    public void setNegotiationHandler(INegotiationHandler handler) {
+        negotiationHandler = handler;
     }
 
     /**
@@ -361,6 +356,13 @@ public class SarosSessionManager implements ISarosSessionManager {
         String invitationID, DateTime sessionStart, VersionInfo versionInfo,
         String description) {
 
+        INegotiationHandler handler = negotiationHandler;
+
+        if (handler == null) {
+            log.warn("could not accept invitation because no handler is installed");
+            return;
+        }
+
         if (!startStopSessionLock.tryLock()) {
             log.warn("could not accept invitation because the current session is about to stop");
             return;
@@ -379,12 +381,13 @@ public class SarosSessionManager implements ISarosSessionManager {
             // side effect in InvitationProcessObservable
             process = new IncomingSessionNegotiation(this, from, versionInfo,
                 sessionStart, invitationID, description, sarosContext);
+
         } finally {
             startStopSessionLock.unlock();
         }
 
-        process.acknowledgeInvitation();
-        sarosUI.showIncomingInvitationUI(process, true);
+        handler.handleIncomingSessionNegotiation(process);
+
     }
 
     /**
@@ -402,6 +405,13 @@ public class SarosSessionManager implements ISarosSessionManager {
     public void incomingProjectReceived(JID from,
         List<ProjectExchangeInfo> projectInfos, String processID) {
 
+        INegotiationHandler handler = negotiationHandler;
+
+        if (handler == null) {
+            log.warn("could not accept project negotiation because no handler is installed");
+            return;
+        }
+
         if (!startStopSessionLock.tryLock()) {
             log.warn("could not accept project negotation because the current session is about to stop");
             return;
@@ -417,12 +427,20 @@ public class SarosSessionManager implements ISarosSessionManager {
             startStopSessionLock.unlock();
         }
 
-        sarosUI.showIncomingProjectUI(process);
+        handler.handleIncomingProjectNegotiation(process);
+
     }
 
     @Override
     public void invite(JID toInvite, String description) {
         ISarosSession sarosSession = sarosSessionObservable.getValue();
+
+        INegotiationHandler handler = negotiationHandler;
+
+        if (handler == null) {
+            log.warn("could not start an invitation because no handler is installed");
+            return;
+        }
 
         if (!startStopSessionLock.tryLock()) {
             log.warn("could not start an invitation because the current session is about to stop");
@@ -435,109 +453,18 @@ public class SarosSessionManager implements ISarosSessionManager {
             // side effect in InvitationProcessObservable
             result = new OutgoingSessionNegotiation(toInvite, sarosSession,
                 description, sarosContext);
+
         } finally {
             startStopSessionLock.unlock();
         }
 
-        OutgoingInvitationJob outgoingInvitationJob = new OutgoingInvitationJob(
-            result);
-
-        outgoingInvitationJob.setPriority(Job.SHORT);
-        outgoingInvitationJob.schedule();
+        handler.handleOutgoingSessionNegotiation(result);
     }
 
     @Override
     public void invite(Collection<JID> jidsToInvite, String description) {
         for (JID jid : jidsToInvite)
             invite(jid, description);
-    }
-
-    /**
-     * 
-     * OutgoingInvitationJob wraps the instance of
-     * {@link OutgoingSessionNegotiation} and cares about handling the
-     * exceptions like local or remote cancellation.
-     * 
-     * It notifies the user about the progress using the Eclipse Jobs API and
-     * interrupts the process if the session closes.
-     * 
-     */
-    private class OutgoingInvitationJob extends Job {
-
-        private OutgoingSessionNegotiation process;
-        private String peer;
-
-        public OutgoingInvitationJob(OutgoingSessionNegotiation process) {
-            super(MessageFormat.format(
-                Messages.SarosSessionManager_inviting_user,
-                User.getHumanReadableName(sarosNet, process.getPeer())));
-            this.process = process;
-            this.peer = process.getPeer().getBase();
-
-            setUser(true);
-            setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.TRUE);
-            setProperty(IProgressConstants.ICON_PROPERTY,
-                ImageManager
-                    .getImageDescriptor("/icons/elcl16/project_share_tsk.png"));
-        }
-
-        @Override
-        protected IStatus run(IProgressMonitor monitor) {
-            try {
-                InvitationProcess.Status status = process.start(monitor);
-
-                switch (status) {
-                case CANCEL:
-                    return Status.CANCEL_STATUS;
-                case ERROR:
-                    return new Status(IStatus.ERROR, Saros.SAROS,
-                        process.getErrorMessage());
-                case OK:
-                    break;
-                case REMOTE_CANCEL:
-                    SarosView
-                        .showNotification(
-                            Messages.SarosSessionManager_canceled_invitation,
-                            MessageFormat
-                                .format(
-                                    Messages.SarosSessionManager_canceled_invitation_text,
-                                    peer));
-
-                    return new Status(
-                        IStatus.CANCEL,
-                        Saros.SAROS,
-                        MessageFormat
-                            .format(
-                                Messages.SarosSessionManager_canceled_invitation_text,
-                                peer));
-
-                case REMOTE_ERROR:
-                    SarosView
-                        .showNotification(
-                            Messages.SarosSessionManager_error_during_invitation,
-                            MessageFormat
-                                .format(
-                                    Messages.SarosSessionManager_error_during_invitation_text,
-                                    peer, process.getErrorMessage()));
-
-                    return new Status(
-                        IStatus.ERROR,
-                        Saros.SAROS,
-                        MessageFormat
-                            .format(
-                                Messages.SarosSessionManager_error_during_invitation_text,
-                                peer, process.getErrorMessage()));
-                }
-            } catch (Exception e) {
-                log.error("This exception is not expected here: ", e);
-                return new Status(IStatus.ERROR, Saros.SAROS, e.getMessage(), e);
-
-            }
-
-            startSharingProjects(process.getPeer());
-
-            return Status.OK_STATUS;
-        }
     }
 
     /**
@@ -602,25 +529,33 @@ public class SarosSessionManager implements ISarosSessionManager {
             return;
         }
 
+        INegotiationHandler handler = negotiationHandler;
+
+        if (handler == null) {
+            log.warn("could not start a project negotiation because no handler is installed");
+            return;
+        }
+
         if (!startStopSessionLock.tryLock()) {
             log.warn("could not start a project negotiation because the current session is about to stop");
             return;
         }
 
+        List<OutgoingProjectNegotiation> negotiations = new ArrayList<OutgoingProjectNegotiation>();
+
         try {
             for (User user : session.getRemoteUsers()) {
 
                 // side effect in ProjectNegotiationObservable
-                OutgoingProjectNegotiation out = new OutgoingProjectNegotiation(
-                    user.getJID(), session, projectsToShare, sarosContext);
-
-                OutgoingProjectJob job = new OutgoingProjectJob(out);
-                job.setPriority(Job.SHORT);
-                job.schedule();
+                negotiations.add(new OutgoingProjectNegotiation(user.getJID(),
+                    session, projectsToShare, sarosContext));
             }
         } finally {
             startStopSessionLock.unlock();
         }
+
+        for (OutgoingProjectNegotiation negotiation : negotiations)
+            handler.handleOutgoingProjectNegotiation(negotiation);
     }
 
     @Override
@@ -637,15 +572,18 @@ public class SarosSessionManager implements ISarosSessionManager {
             return;
         }
 
-        /*
-         * this can trigger a ConcurrentModification exception as the
-         * SarosProjectMapper is completely broken
-         */
         List<IProject> currentSharedProjects = new ArrayList<IProject>(
             session.getProjects());
 
         if (currentSharedProjects.isEmpty())
             return;
+
+        INegotiationHandler handler = negotiationHandler;
+
+        if (handler == null) {
+            log.warn("could not start a project negotiation because no handler is installed");
+            return;
+        }
 
         if (!startStopSessionLock.tryLock()) {
             log.warn("could not start a project negotiation because the current session is about to stop");
@@ -653,6 +591,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
 
         OutgoingProjectNegotiation out;
+
         try {
             // side effect in ProjectNegotiationObservable
             out = new OutgoingProjectNegotiation(user, session,
@@ -660,74 +599,8 @@ public class SarosSessionManager implements ISarosSessionManager {
         } finally {
             startStopSessionLock.unlock();
         }
-        OutgoingProjectJob job = new OutgoingProjectJob(out);
-        job.setPriority(Job.SHORT);
-        job.schedule();
 
-    }
-
-    private class OutgoingProjectJob extends Job {
-
-        private OutgoingProjectNegotiation process;
-        private String peer;
-
-        public OutgoingProjectJob(
-            OutgoingProjectNegotiation outgoingProjectNegotiation) {
-            super(Messages.SarosSessionManager_sharing_project);
-            process = outgoingProjectNegotiation;
-            peer = process.getPeer().getBase();
-
-            setUser(true);
-            setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.TRUE);
-            setProperty(IProgressConstants.ICON_PROPERTY,
-                ImageManager.getImageDescriptor("/icons/invites.png"));
-        }
-
-        @Override
-        protected IStatus run(IProgressMonitor monitor) {
-            try {
-                ProjectNegotiation.Status status = process.start(monitor);
-                String peerName = User.getHumanReadableName(sarosNet, new JID(
-                    peer));
-
-                String message;
-
-                switch (status) {
-                case CANCEL:
-                    return Status.CANCEL_STATUS;
-                case ERROR:
-                    return new Status(IStatus.ERROR, Saros.SAROS,
-                        process.getErrorMessage());
-                case OK:
-                    break;
-                case REMOTE_CANCEL:
-                    message = MessageFormat
-                        .format(
-                            Messages.SarosSessionManager_project_sharing_cancelled_text,
-                            peerName);
-
-                    return new Status(IStatus.ERROR, Saros.SAROS, message);
-
-                case REMOTE_ERROR:
-                    message = MessageFormat
-                        .format(
-                            Messages.SarosSessionManager_sharing_project_cancelled_remotely,
-                            peerName, process.getErrorMessage());
-                    SarosView
-                        .showNotification(
-                            Messages.SarosSessionManager_sharing_project_cancelled_remotely_text,
-                            message);
-
-                    return new Status(IStatus.ERROR, Saros.SAROS, message);
-                }
-            } catch (Exception e) {
-                log.error("This exception is not expected here: ", e);
-                return new Status(IStatus.ERROR, Saros.SAROS, e.getMessage(), e);
-
-            }
-
-            return Status.OK_STATUS;
-        }
+        handler.handleOutgoingProjectNegotiation(out);
     }
 
     @Override

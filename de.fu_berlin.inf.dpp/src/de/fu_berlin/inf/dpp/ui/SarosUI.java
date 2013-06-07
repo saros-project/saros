@@ -20,8 +20,6 @@
 package de.fu_berlin.inf.dpp.ui;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CancellationException;
 
 import org.apache.log4j.Logger;
@@ -40,22 +38,14 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
-import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.Permission;
-import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.invitation.IncomingProjectNegotiation;
-import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.ui.views.VideoPlayerView;
-import de.fu_berlin.inf.dpp.ui.wizards.AddProjectToSessionWizard;
-import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
-import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
 
 /**
  * Some helper functionality to interface with Eclipse.
@@ -67,84 +57,6 @@ public class SarosUI {
 
     public SarosUI() {
 
-    }
-
-    public void showIncomingInvitationUI(
-        final IncomingSessionNegotiation process, boolean openSarosView) {
-
-        if (openSarosView)
-            SWTUtils.runSafeSWTAsync(log, new Runnable() {
-                @Override
-                public void run() {
-                    openSarosView();
-                }
-            });
-
-        // Fixes #2727848: InvitationDialog is opened in the
-        // background
-        SWTUtils.runSafeSWTAsync(log, new Runnable() {
-            @Override
-            public void run() {
-
-                JoinSessionWizard sessionWizard = new JoinSessionWizard(process);
-
-                final WizardDialogAccessable wizardDialog = new WizardDialogAccessable(
-                    EditorAPI.getShell(), sessionWizard);
-
-                // TODO Provide help :-)
-                wizardDialog.setHelpAvailable(false);
-
-                // as we are not interested in the result
-                wizardDialog.setBlockOnOpen(false);
-
-                DialogUtils.openWindow(wizardDialog);
-            }
-        });
-    }
-
-    public void showIncomingProjectUI(final IncomingProjectNegotiation process) {
-        List<ProjectExchangeInfo> pInfos = process.getProjectInfos();
-        final List<FileList> fileLists = new ArrayList<FileList>(pInfos.size());
-
-        for (ProjectExchangeInfo pInfo : pInfos)
-            fileLists.add(pInfo.getFileList());
-
-        SWTUtils.runSafeSWTAsync(log, new Runnable() {
-
-            @Override
-            public void run() {
-                AddProjectToSessionWizard projectWizard = new AddProjectToSessionWizard(
-                    process, process.getPeer(), fileLists, process
-                        .getProjectNames());
-
-                final WizardDialogAccessable wizardDialog = new WizardDialogAccessable(
-                    EditorAPI.getShell(), projectWizard, SWT.MIN | SWT.MAX,
-                    SWT.SYSTEM_MODAL | SWT.APPLICATION_MODAL
-                        | SWT.PRIMARY_MODAL);
-
-                /*
-                 * IMPORTANT: as the dialog is non modal it MUST NOT block on
-                 * open or there is a good chance to crash the whole GUI
-                 * 
-                 * Scenario: A modal dialog is currently open with
-                 * setBlockOnOpen(true) (as most input dialogs are).
-                 * 
-                 * When we now open this wizard with setBlockOnOpen(true) this
-                 * wizard will become the main dispatcher for the SWT Thread. As
-                 * this wizard is non modal you cannot close it because you
-                 * could not access it. Therefore the modal dialog cannot be
-                 * closed as well because it is stuck on the non modal dialog
-                 * which currently serves as main dispatcher !
-                 */
-
-                wizardDialog.setBlockOnOpen(false);
-
-                wizardDialog.setHelpAvailable(false);
-                projectWizard.setWizardDlg(wizardDialog);
-
-                DialogUtils.openWindow(wizardDialog);
-            }
-        });
     }
 
     /**

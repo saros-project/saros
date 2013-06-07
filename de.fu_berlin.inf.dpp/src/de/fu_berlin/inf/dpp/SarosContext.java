@@ -104,6 +104,7 @@ import de.fu_berlin.inf.dpp.synchronize.internal.SWTSynchronizer;
 import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.eventhandler.HostLeftAloneInSessionHandler;
+import de.fu_berlin.inf.dpp.ui.eventhandler.NegotiationHandler;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 import de.fu_berlin.inf.dpp.util.pico.ChildContainer;
@@ -289,6 +290,7 @@ public class SarosContext implements ISarosContext {
 
         // UI handlers
         Component.create(HostLeftAloneInSessionHandler.class),
+        Component.create(NegotiationHandler.class),
 
         // streaming services
         Component.create(FileStreamService.class),
