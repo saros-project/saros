@@ -85,6 +85,15 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
         this.invitationProcesses.addInvitationProcess(this);
     }
 
+    @Override
+    protected void executeCancellation() {
+        // TODO remove the user from the session !
+
+        if (invitationProcesses.getProcesses().size() == 0
+            && sarosSession.getRemoteUsers().isEmpty())
+            sarosSessionManager.stopSarosSession();
+    }
+
     /**
      * @JTourBusStop 5, Invitation Process:
      * 
@@ -108,7 +117,6 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
      *               - Handling incoming shared project resources
      *               (IncomingProjectNegotiation)
      */
-
     public Status start(IProgressMonitor monitor) {
         log.debug(this + " : starting invitation");
 
@@ -126,12 +134,19 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
 
             checkVersion(monitor);
 
-            sendInvitation(monitor);
+            sendInvitationOffer(monitor);
 
-            awaitAcceptation(monitor);
+            awaitAcknowledgement(monitor);
 
-            modifiyAndSendSessionNegotiationData(
-                awaitRemoteSessionNegotiationData(monitor), monitor);
+            awaitAcceptance(monitor);
+
+            InvitationParameterExchangeExtension clientSessionPreferences;
+            clientSessionPreferences = awaitClientSessionPreferences(monitor);
+
+            InvitationParameterExchangeExtension actualSessionParameters;
+            actualSessionParameters = determineSessionParameters(clientSessionPreferences);
+
+            sendSessionParameters(actualSessionParameters, monitor);
 
             awaitCompletion(monitor);
 
@@ -164,8 +179,9 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
 
     /**
      * Performs a discovery request on the remote side and checks for Saros
-     * support. When this method returns the remote JID has been properly
-     * updated to a full resource qualified JID.
+     * support. When this method returns, the remote JID (see
+     * {@link InvitationProcess#peer}) has been properly updated to a full
+     * resource qualified JID.
      */
     private void checkAvailability(IProgressMonitor monitor)
         throws LocalCancellationException {
@@ -189,8 +205,13 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
 
     /**
      * Checks the compatibility of the local Saros version with the remote side.
-     * If the versions are compatible, the invitation continues, otherwise a
-     * confirmation of the user is required (a {@link MessageDialog} pops up).
+     * If the versions are compatible, the invitation continues. Otherwise, the
+     * invitation is cancelled locally.
+     * 
+     * However, if
+     * {@link OutgoingSessionNegotiation#IGNORE_VERSION_COMPATIBILITY} is set to
+     * <code>true</code>, a {@link MessageDialog} pops up, and the user gets the
+     * chance to proceed with the invitation process anyway.
      */
     private void checkVersion(IProgressMonitor monitor)
         throws SarosCancellationException {
@@ -237,12 +258,9 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
     }
 
     /**
-     * Sends an invitation and waits for acknowledgment. The acknowledgment is
-     * auto generated on the remote side and generates a packet reply that is
-     * different as if the remote user manually accepts the invitation.
-     * 
+     * Sends an invitation offer to the client.
      */
-    private void sendInvitation(IProgressMonitor monitor)
+    private void sendInvitationOffer(IProgressMonitor monitor)
         throws SarosCancellationException {
         monitor.setTaskName("Sending invitation...");
 
@@ -265,7 +283,14 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
 
         transmitter.sendMessageToUser(peer,
             InvitationOfferingExtension.PROVIDER.create(invitationOffering));
+    }
 
+    /**
+     * Waits for the client's acknowledgment for the invitation offering. The
+     * acknowledgment is auto-generated on the remote side.
+     */
+    private void awaitAcknowledgement(IProgressMonitor monitor)
+        throws SarosCancellationException {
         log.debug(this + " : waiting for invitation acknowledgement");
 
         monitor.setTaskName("Waiting for " + peerNickname
@@ -276,12 +301,14 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
                 "Received no invitation acknowledgement from " + peerNickname
                     + ".", CancelOption.DO_NOT_NOTIFY_PEER);
         }
+
+        log.debug(this + " : invitation acknowledged");
     }
 
     /**
-     * Waits until the remote side accepted manually the invitation.
+     * Waits until the remote side manually accepts the invitation.
      */
-    private void awaitAcceptation(IProgressMonitor monitor)
+    private void awaitAcceptance(IProgressMonitor monitor)
         throws SarosCancellationException {
 
         log.debug(this + " : waiting for peer to accept the invitation");
@@ -299,38 +326,15 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
     }
 
     /**
-     * Waits until the remote side has completed the invitation which is the
-     * case after the remote side has started its {@link SarosSession}.
+     * Waits for the client's session parameters. They may contain some desired
+     * default values that should be used on session start.
      */
-    private void awaitCompletion(IProgressMonitor monitor)
-        throws SarosCancellationException {
-
-        log.debug(this
-            + " : waiting for remote side to start its Saros session");
-
-        monitor.setTaskName("Waiting for " + peerNickname
-            + " to perform final initialization...");
-
-        if (collectPacket(invitationCompletedCollector, PACKET_TIMEOUT) == null) {
-            throw new LocalCancellationException(
-                "Invitation was not accepted.", CancelOption.NOTIFY_PEER);
-        }
-
-        log.debug(this + " : remote side started its Saros session");
-    }
-
-    /**
-     * Waits for the remote parameters which may contain some desired default
-     * values that should be used on session start.
-     */
-    private InvitationParameterExchangeExtension awaitRemoteSessionNegotiationData(
+    private InvitationParameterExchangeExtension awaitClientSessionPreferences(
         IProgressMonitor monitor) throws SarosCancellationException {
 
-        log.debug(this + " : waiting for remote session negotiation data");
+        log.debug(this + " : waiting for client's session parameters");
 
-        monitor.setTaskName("Waiting for remote session configuration...");
-
-        InvitationParameterExchangeExtension parameters;
+        monitor.setTaskName("Waiting for client's session parameters...");
 
         Packet packet = collectPacket(invitationDataExchangeCollector,
             PACKET_TIMEOUT);
@@ -340,6 +344,7 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
                 + " does not respond. (Timeout)",
                 CancelOption.DO_NOT_NOTIFY_PEER);
 
+        InvitationParameterExchangeExtension parameters;
         parameters = InvitationParameterExchangeExtension.PROVIDER
             .getPayload(packet);
 
@@ -347,23 +352,16 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
             throw new LocalCancellationException(peerNickname
                 + " sent malformed data", CancelOption.DO_NOT_NOTIFY_PEER);
 
-        log.debug(this + " : received remote session negotiation data");
+        log.debug(this + " : received client's session parameters");
 
         return parameters;
     }
 
     /**
-     * Checks and modifies the received remote parameters. The changes will be
-     * send back and must then be used on the remote side to configure the
-     * session environment.
+     * Checks and modifies the received remote parameters.
      */
-    private InvitationParameterExchangeExtension modifiyAndSendSessionNegotiationData(
-        InvitationParameterExchangeExtension remoteParameters,
-        IProgressMonitor monitor) {
-
-        log.debug(this + " : sending updated session negotiation data");
-
-        monitor.setTaskName("Sending local session configuration...");
+    private InvitationParameterExchangeExtension determineSessionParameters(
+        InvitationParameterExchangeExtension remoteParameters) {
 
         InvitationParameterExchangeExtension modifiedParameters = new InvitationParameterExchangeExtension(
             invitationID);
@@ -387,13 +385,46 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
         modifiedParameters.setLocalColorID(colorID);
         modifiedParameters.setLocalFavoriteColorID(favoriteColorID);
 
+        return modifiedParameters;
+    }
+
+    /**
+     * The changes will be send back and must then be used on the remote side to
+     * configure the session environment.
+     */
+    private void sendSessionParameters(
+        InvitationParameterExchangeExtension modifiedParameters,
+        IProgressMonitor monitor) {
+
+        log.debug(this + " : sending updated session negotiation data");
+
+        monitor.setTaskName("Sending local session configuration...");
         transmitter.sendMessageToUser(peer,
             InvitationParameterExchangeExtension.PROVIDER
                 .create(modifiedParameters));
 
         log.debug(this + " : sent updated session negotiation data");
+    }
 
-        return modifiedParameters;
+    /**
+     * Waits until the remote side has completed the invitation. This is the
+     * case after the remote side has started its {@link SarosSession}.
+     */
+    private void awaitCompletion(IProgressMonitor monitor)
+        throws SarosCancellationException {
+
+        log.debug(this
+            + " : waiting for remote side to start its Saros session");
+
+        monitor.setTaskName("Waiting for " + peerNickname
+            + " to perform final initialization...");
+
+        if (collectPacket(invitationCompletedCollector, PACKET_TIMEOUT) == null) {
+            throw new LocalCancellationException(
+                "Invitation was not accepted.", CancelOption.NOTIFY_PEER);
+        }
+
+        log.debug(this + " : remote side started its Saros session");
     }
 
     /**
@@ -403,7 +434,6 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
      * acknowledgment is send to the remote side that the remote user can now
      * start working in this session.
      */
-
     private User completeInvitation(IProgressMonitor monitor) {
 
         log.debug(this + " : synchronizing user list");
@@ -428,22 +458,6 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
         return user;
     }
 
-    @Override
-    protected void executeCancellation() {
-        // TODO remove the user from the session !
-
-        if (invitationProcesses.getProcesses().size() == 0
-            && sarosSession.getRemoteUsers().isEmpty())
-            sarosSessionManager.stopSarosSession();
-    }
-
-    private void deleteCollectors() {
-        invitationAcceptedCollector.cancel();
-        invitationAcknowledgedCollector.cancel();
-        invitationDataExchangeCollector.cancel();
-        invitationCompletedCollector.cancel();
-    }
-
     private void createCollectors() {
         invitationAcceptedCollector = receiver
             .createCollector(InvitationAcceptedExtension.PROVIDER
@@ -460,6 +474,13 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
         invitationCompletedCollector = receiver
             .createCollector(InvitationCompletedExtension.PROVIDER
                 .getPacketFilter(invitationID));
+    }
+
+    private void deleteCollectors() {
+        invitationAcceptedCollector.cancel();
+        invitationAcknowledgedCollector.cancel();
+        invitationDataExchangeCollector.cancel();
+        invitationCompletedCollector.cancel();
     }
 
     @Override
