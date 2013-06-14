@@ -130,6 +130,42 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
         Exception exception = null;
 
         try {
+            /**
+             * @JTourBusStop 6, Invitation Process:
+             * 
+             *               For starting a session, the host does the following
+             *               things (see next JTourBusStops for the
+             *               corresponding steps on the client side):
+             * 
+             *               (1) Check whether Saros is available on the
+             *               client's side (via the DiscoveryManager).
+             * 
+             *               (2) Check whether the client's Saros is compatible
+             *               with own version (via the VersionManager).
+             * 
+             *               (3a) Send a session invitation offering to the
+             *               client.
+             * 
+             *               (3c) Waits until the client automatically responds
+             *               to the offering ("acknowledgement").
+             * 
+             *               (4c) Wait until the remote user manually accepted
+             *               the session invitation ("acceptance").
+             * 
+             *               (5b) Wait for the client's whishlist of the
+             *               session's parameters (e.g. his own favourite
+             *               color).
+             * 
+             *               (6a) Consider these preferences and send the
+             *               settled session parameters back to the client.
+             * 
+             *               (9) Wait until the client signals the session
+             *               invitation is complete.
+             * 
+             *               (10) Formally add client to the session so he will
+             *               receive activities, then send final acknowledgement
+             *               to inform client about this.
+             */
             checkAvailability(monitor);
 
             checkVersion(monitor);

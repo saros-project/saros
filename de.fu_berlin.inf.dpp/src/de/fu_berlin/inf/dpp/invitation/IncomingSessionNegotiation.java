@@ -108,6 +108,20 @@ public class IncomingSessionNegotiation extends InvitationProcess {
         this.inInvitationUI = inInvitationUI;
     }
 
+    /**
+     * @JTourBusStop 7, Invitation Process:
+     * 
+     *               These are the first few steps on the client side during a
+     *               session invitation. The method below is called by the
+     *               NegotiationHandler which (among other things) handles
+     *               incoming SessionInvitations.
+     * 
+     *               (3b) Acknowledge the offer, so the host knows that we
+     *               received his invitation (this method).
+     * 
+     *               (4a) Show dialog for user to decide whether to accept the
+     *               invitation (also called by the NegotiationHandler)
+     */
     public void acknowledgeInvitation() {
         transmitter.sendMessageToUser(peer,
             InvitationAcknowledgedExtension.PROVIDER
@@ -132,6 +146,32 @@ public class IncomingSessionNegotiation extends InvitationProcess {
 
         try {
             checkCancellation(CancelOption.NOTIFY_PEER);
+
+            /**
+             * @JTourBusStop 8, Invitation Process:
+             * 
+             *               These are the next steps on the client side during
+             *               a session invitation. This method is called by
+             *               JoinSessionWizard.finish(), i.e. after the user
+             *               clicked on "Finish".
+             * 
+             *               (4b) Send acceptance to host.
+             * 
+             *               (5a) Create "whishlist" with session's parameters
+             *               (e.g. preferred color) and send it.
+             * 
+             *               (6b) Wait for host's response.
+             * 
+             *               (7) Initialize the session and related components
+             *               (e.g. chat, color management) with the parameters
+             *               as defined by the host.
+             * 
+             *               (8) Start the session accordingly, inform the host
+             *               and wait for his final acknowledgement (which
+             *               indicates, that this client has been successfully
+             *               added to the session and will receive activities
+             *               from now on).
+             */
             sendInvitationAccepted();
 
             InvitationParameterExchangeExtension clientSessionPreferences;
