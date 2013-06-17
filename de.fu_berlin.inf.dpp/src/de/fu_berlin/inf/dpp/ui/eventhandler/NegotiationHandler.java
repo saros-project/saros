@@ -161,7 +161,7 @@ public class NegotiationHandler implements INegotiationHandler {
                 String peerName = User.getHumanReadableName(network, new JID(
                     peer));
 
-                String message;
+                final String message;
 
                 switch (status) {
                 case CANCEL:
@@ -177,7 +177,15 @@ public class NegotiationHandler implements INegotiationHandler {
                             Messages.SarosSessionManager_project_sharing_cancelled_text,
                             peerName);
 
-                    return new Status(IStatus.ERROR, Saros.SAROS, message);
+                    SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
+                        @Override
+                        public void run() {
+                            DialogUtils.openInformationMessageDialog(
+                                EditorAPI.getShell(), message, message);
+                        }
+                    });
+
+                    return new Status(IStatus.CANCEL, Saros.SAROS, message);
 
                 case REMOTE_ERROR:
                     message = MessageFormat
