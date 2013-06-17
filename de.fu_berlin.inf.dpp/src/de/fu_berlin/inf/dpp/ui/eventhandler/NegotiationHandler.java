@@ -270,9 +270,16 @@ public class NegotiationHandler implements INegotiationHandler {
         SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
             @Override
             public void run() {
-
-                process.acknowledgeInvitation();
-
+                /**
+                 * @JTourBusStop 8, Invitation Process:
+                 * 
+                 *               (4a) The SessionManager then hands over the
+                 *               control to the NegotiationHandler (this class)
+                 *               which works on a newly started
+                 *               IncomingSessionNegotiation. This handler opens
+                 *               the JoinSessionWizard, a dialog for the user to
+                 *               decide whether to accept the invitation.
+                 */
                 JoinSessionWizard sessionWizard = new JoinSessionWizard(process);
 
                 final WizardDialogAccessable wizardDialog = new WizardDialogAccessable(

@@ -108,26 +108,6 @@ public class IncomingSessionNegotiation extends InvitationProcess {
         this.inInvitationUI = inInvitationUI;
     }
 
-    /**
-     * @JTourBusStop 7, Invitation Process:
-     * 
-     *               These are the first few steps on the client side during a
-     *               session invitation. The method below is called by the
-     *               NegotiationHandler which (among other things) handles
-     *               incoming SessionInvitations.
-     * 
-     *               (3b) Acknowledge the offer, so the host knows that we
-     *               received his invitation (this method).
-     * 
-     *               (4a) Show dialog for user to decide whether to accept the
-     *               invitation (also called by the NegotiationHandler)
-     */
-    public void acknowledgeInvitation() {
-        transmitter.sendMessageToUser(peer,
-            InvitationAcknowledgedExtension.PROVIDER
-                .create(new InvitationAcknowledgedExtension(invitationID)));
-    }
-
     public Status accept(IProgressMonitor monitor) {
         log.debug(this + " : invitation accepted");
 
@@ -148,12 +128,11 @@ public class IncomingSessionNegotiation extends InvitationProcess {
             checkCancellation(CancelOption.NOTIFY_PEER);
 
             /**
-             * @JTourBusStop 8, Invitation Process:
+             * @JTourBusStop 9, Invitation Process:
              * 
-             *               These are the next steps on the client side during
-             *               a session invitation. This method is called by
-             *               JoinSessionWizard.finish(), i.e. after the user
-             *               clicked on "Finish".
+             *               This method is called by the JoinSessionWizard
+             *               after the user clicked on "Finish" (indicating that
+             *               he is willing to join the session).
              * 
              *               (4b) Send acceptance to host.
              * 

@@ -146,11 +146,17 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
              *               (3a) Send a session invitation offering to the
              *               client.
              * 
+             *               (3b) [client side, see subsequent stops]
+             * 
              *               (3c) Waits until the client automatically responds
              *               to the offering ("acknowledgement").
              * 
+             *               (4a, 4b) [client side, see subsequent stops]
+             * 
              *               (4c) Wait until the remote user manually accepted
              *               the session invitation ("acceptance").
+             * 
+             *               (5a) [client side, see subsequent stops]
              * 
              *               (5b) Wait for the client's whishlist of the
              *               session's parameters (e.g. his own favourite
@@ -158,6 +164,8 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
              * 
              *               (6a) Consider these preferences and send the
              *               settled session parameters back to the client.
+             * 
+             *               (6b, 7, 8) [client side, see subsequent stops]
              * 
              *               (9) Wait until the client signals the session
              *               invitation is complete.

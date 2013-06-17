@@ -12,6 +12,7 @@ import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationAcknowledgedExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationOfferingExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
@@ -65,17 +66,32 @@ public class InvitationHandler {
                     + sessionID + ", " + "version: " + versionInfo.version
                     + ", " + "compability: " + versionInfo.compatibility + "]");
 
+                /**
+                 * @JTourBusStop 7, Invitation Process:
+                 * 
+                 *               (3b) If the invited user (from now on referred
+                 *               to as "client") receives an invitation (and if
+                 *               he is not already in a running session), Saros
+                 *               will send an automatic response to the inviter
+                 *               (host). Afterwards, the control is handed over
+                 *               to the SessionManager.
+                 */
                 if (sessionIDObservable.getValue().equals(
                     SessionIDObservable.NOT_IN_SESSION)) {
-                    sessionManager.invitationReceived(
-                        new JID(packet.getFrom()), sessionID, invitationID,
-                        sessionStartTime, versionInfo, description);
+                    PacketExtension response = InvitationAcknowledgedExtension.PROVIDER
+                        .create(new InvitationAcknowledgedExtension(
+                            invitationID));
+                    transmitter.sendMessageToUser(fromJID, response);
+
+                    sessionManager.invitationReceived(fromJID, sessionID,
+                        invitationID, sessionStartTime, versionInfo,
+                        description);
                 } else {
+                    // TODO This text should be replaced with a cancel ID
                     PacketExtension response = CancelInviteExtension.PROVIDER
                         .create(new CancelInviteExtension(invitationID,
                             "I am already in a Saros session and so cannot accept your invitation."));
-                    transmitter.sendMessageToUser(new JID(packet.getFrom()),
-                        response);
+                    transmitter.sendMessageToUser(fromJID, response);
                 }
             }
         }, InvitationOfferingExtension.PROVIDER.getPacketFilter());
