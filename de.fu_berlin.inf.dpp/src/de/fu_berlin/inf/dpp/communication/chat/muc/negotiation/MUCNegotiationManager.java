@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.communication.chat.muc.negotiation;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
@@ -7,28 +9,31 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.jivesoftware.smack.Connection;
 import org.picocontainer.annotations.Nullable;
 
+import de.fu_berlin.inf.dpp.invitation.hooks.ISessionNegotiationHook;
+import de.fu_berlin.inf.dpp.invitation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 
-/*
- * FIXME this class seems not to transmit anything anymore. This class is only
- * queried for the current configuration. It should be renamed.
- */
-
 /**
- * The CommunicationNegotiatingManager is responsible for transmitting the
- * Communication config of the host to all other participants of the shared
- * project during the Invitation process
+ * The MUCNegotiationManager is responsible for transmitting the Communication
+ * config of the host to all other participants of the shared project during the
+ * Invitation process
  * 
  * @author ologa
  * @author bkahlert
  */
-public class MUCSessionPreferencesNegotiatingManager {
+/*
+ * FIXME This class used to transmit something, but that's not the case anymore.
+ * In the meantime it was queried for the current configuration. Finally, it
+ * provides an invitation hook. The purpose (and the name) of this class need to
+ * be clarified.
+ */
+public class MUCNegotiationManager {
 
     private static final Logger log = Logger
-        .getLogger(MUCSessionPreferencesNegotiatingManager.class);
+        .getLogger(MUCNegotiationManager.class);
 
     protected IPreferenceStore preferences;
 
@@ -42,13 +47,55 @@ public class MUCSessionPreferencesNegotiatingManager {
 
     private Random random = new Random();
 
-    public MUCSessionPreferencesNegotiatingManager(
-        SessionIDObservable sessionID, @Nullable SarosNet sarosNet,
-        IPreferenceStore preferences) {
+    private final ISessionNegotiationHook negotiationHook = new ISessionNegotiationHook() {
+        private static final String HOOK_IDENTIFIER = "multiUserChat";
+        private static final String KEY_SERVICE = "service";
+        private static final String KEY_ROOMNAME = "roomName";
+        private static final String KEY_PASSWORD = "password";
+
+        @Override
+        public Map<String, String> tellClientPreferences() {
+            // Nothing to do
+            return null;
+        }
+
+        @Override
+        public Map<String, String> considerClientPreferences(
+            Map<String, String> input) {
+            // We don't think about the client's preferences. We are the host,
+            // so our settings are settled.
+            MUCSessionPreferences ownPreferences = getOwnPreferences();
+
+            Map<String, String> map = new HashMap<String, String>();
+            map.put(KEY_PASSWORD, ownPreferences.getPassword());
+            map.put(KEY_ROOMNAME, ownPreferences.getRoomName());
+            map.put(KEY_SERVICE, ownPreferences.getService());
+
+            return map;
+        }
+
+        @Override
+        public void applyActualParameters(Map<String, String> settings) {
+            setSessionPreferences(new MUCSessionPreferences(
+                settings.get(KEY_SERVICE), settings.get(KEY_ROOMNAME),
+                settings.get(KEY_PASSWORD)));
+        }
+
+        @Override
+        public String getIdentifier() {
+            return HOOK_IDENTIFIER;
+        }
+    };
+
+    public MUCNegotiationManager(SessionIDObservable sessionID,
+        @Nullable SarosNet sarosNet, IPreferenceStore preferences,
+        SessionNegotiationHookManager hooks) {
         this.sessionID = sessionID;
         this.sarosNet = sarosNet;
         this.preferences = preferences;
         this.password = String.valueOf(random.nextInt());
+
+        hooks.addHook(negotiationHook);
     }
 
     /**
@@ -111,4 +158,5 @@ public class MUCSessionPreferencesNegotiatingManager {
 
         return service;
     }
+
 }

@@ -240,19 +240,15 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-
     // FIXME offer a startSession method for the client and host !
     @Override
-    public ISarosSession joinSession(JID host, int colorID,
-        DateTime sessionStart, JID inviter, int inviterColorID) {
+    public ISarosSession joinSession(JID host, int clientColor,
+        DateTime sessionStart, JID inviter, int hostColor) {
 
         assert getSarosSession() == null;
 
-        SarosSession sarosSession = new SarosSession(host, colorID,
-            sessionStart, sarosContext, inviter, inviterColorID);
+        SarosSession sarosSession = new SarosSession(host, clientColor,
+            sessionStart, sarosContext, inviter, hostColor);
 
         sarosSessionObservable.setValue(sarosSession);
 

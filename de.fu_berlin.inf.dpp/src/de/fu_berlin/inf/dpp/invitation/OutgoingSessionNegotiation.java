@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.invitation;
 
+import java.util.Map;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
@@ -15,6 +16,7 @@ import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
+import de.fu_berlin.inf.dpp.invitation.hooks.ISessionNegotiationHook;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManager;
@@ -27,6 +29,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationParameterExchangeE
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.project.internal.ColorNegotiationHook;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -71,8 +74,10 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
     @Inject
     private ISarosSessionManager sessionManager;
 
-    private int colorID = UserColorID.UNKNOWN;
-    private int favoriteColorID = UserColorID.UNKNOWN;
+    // HACK last residue of the direct conncetion between SessionNegotation and
+    // the color property of users.
+    private int clientColorID = UserColorID.UNKNOWN;
+    private int clientFavoriteColorID = UserColorID.UNKNOWN;
 
     public OutgoingSessionNegotiation(JID peer, ISarosSession sarosSession,
         String description, ISarosContext sarosContext) {
@@ -405,31 +410,35 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
      * Checks and modifies the received remote parameters.
      */
     private InvitationParameterExchangeExtension determineSessionParameters(
-        InvitationParameterExchangeExtension remoteParameters) {
+        InvitationParameterExchangeExtension clientParameters) {
 
-        InvitationParameterExchangeExtension modifiedParameters = new InvitationParameterExchangeExtension(
+        // general purpose
+        InvitationParameterExchangeExtension hostParameters = new InvitationParameterExchangeExtension(
             invitationID);
 
-        modifiedParameters.setRemoteColorID(sarosSession.getLocalUser()
-            .getColorID());
+        hostParameters.setSessionHost(sarosSession.getHost().getJID());
 
-        modifiedParameters.setRemoteFavoriteColorID(sarosSession.getLocalUser()
-            .getFavoriteColorID());
+        // call each hook to do its magic
+        for (ISessionNegotiationHook hook : hookManager.getHooks()) {
+            Map<String, String> preferredSettings = clientParameters
+                .getHookSettings(hook);
+            Map<String, String> actualSettings = hook
+                .considerClientPreferences(preferredSettings);
 
-        modifiedParameters
-            .setMUCPreferences(sarosSession.isHost() ? mucNegotiatingManager
-                .getOwnPreferences() : mucNegotiatingManager
-                .getSessionPreferences());
+            hostParameters.saveHookSettings(hook, actualSettings);
 
-        modifiedParameters.setSessionHost(sarosSession.getHost().getJID());
+            // HACK A User object representing the client needs to access these
+            // to values in completeInvitation(). Color management should work
+            // differently.
+            if (hook instanceof ColorNegotiationHook) {
+                clientColorID = Integer.parseInt(actualSettings
+                    .get(ColorNegotiationHook.KEY_CLIENT_COLOR));
+                clientFavoriteColorID = Integer.parseInt(actualSettings
+                    .get(ColorNegotiationHook.KEY_CLIENT_FAV_COLOR));
+            }
+        }
 
-        colorID = remoteParameters.getLocalColorID();
-        favoriteColorID = remoteParameters.getLocalFavoriteColorID();
-
-        modifiedParameters.setLocalColorID(colorID);
-        modifiedParameters.setLocalFavoriteColorID(favoriteColorID);
-
-        return modifiedParameters;
+        return hostParameters;
     }
 
     /**
@@ -484,13 +493,14 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
 
         monitor.setTaskName("Synchronizing user list...");
 
-        User user = new User(sarosSession, peer, colorID, favoriteColorID);
+        User user = new User(sarosSession, peer, clientColorID,
+            clientFavoriteColorID);
 
         synchronized (CancelableProcess.SHARED_LOCK) {
 
             sarosSession.addUser(user);
             log.debug(this + " : added " + Utils.prefix(peer)
-                + " to the current session, colorID: " + colorID);
+                + " to the current session, colorID: " + clientColorID);
 
             transmitter.sendMessageToUser(peer,
                 InvitationAcknowledgedExtension.PROVIDER

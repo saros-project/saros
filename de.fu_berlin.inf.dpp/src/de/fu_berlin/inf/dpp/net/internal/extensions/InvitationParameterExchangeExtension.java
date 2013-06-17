@@ -19,8 +19,11 @@
  */
 package de.fu_berlin.inf.dpp.net.internal.extensions;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferences;
+import de.fu_berlin.inf.dpp.invitation.hooks.ISessionNegotiationHook;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
@@ -33,51 +36,25 @@ public class InvitationParameterExchangeExtension extends InvitationExtension {
     public static final Provider PROVIDER = new Provider();
 
     private String sessionID;
-    private int localColorID;
-    private int localFavoriteColorID;
-    private int remoteColorID;
-    private int remoteFavoriteColorID;
-    private MUCSessionPreferences mucPreferences;
     private JID sessionHost;
 
-    public int getLocalFavoriteColorID() {
-        return localFavoriteColorID;
-    }
+    /**
+     * Stores the hook-specific settings for transmission. For each hook, these
+     * are reperesented as a <code>Map&lt;String, String&gt;</code>.
+     */
+    /*
+     * Currently, the mapping from "hook" to "setting" is done via the hook's
+     * identifier (a <code>String</code>). An alternative way would be to use
+     * the hook's <code>Class</code>. But this would make Saros compatibility
+     * more fragile, e.g. consider moving/renaming a hook class. An identifier
+     * can mask such changes.
+     */
+    private Map<String, Map<String, String>> hookSettings;
 
-    public void setLocalFavoriteColorID(int localFavoriteColorID) {
-        this.localFavoriteColorID = localFavoriteColorID;
-    }
+    public InvitationParameterExchangeExtension(String invitationID) {
+        super(invitationID);
 
-    public int getRemoteFavoriteColorID() {
-        return remoteFavoriteColorID;
-    }
-
-    public void setRemoteFavoriteColorID(int remoteFavoriteColorID) {
-        this.remoteFavoriteColorID = remoteFavoriteColorID;
-    }
-
-    public int getLocalColorID() {
-        return localColorID;
-    }
-
-    public void setLocalColorID(int localColorID) {
-        this.localColorID = localColorID;
-    }
-
-    public int getRemoteColorID() {
-        return remoteColorID;
-    }
-
-    public void setRemoteColorID(int remoteColorID) {
-        this.remoteColorID = remoteColorID;
-    }
-
-    public MUCSessionPreferences getMUCPreferences() {
-        return mucPreferences;
-    }
-
-    public void setMUCPreferences(MUCSessionPreferences mucPreferences) {
-        this.mucPreferences = mucPreferences;
+        hookSettings = new HashMap<String, Map<String, String>>();
     }
 
     public JID getSessionHost() {
@@ -86,10 +63,6 @@ public class InvitationParameterExchangeExtension extends InvitationExtension {
 
     public void setSessionHost(JID sessionHost) {
         this.sessionHost = sessionHost;
-    }
-
-    public InvitationParameterExchangeExtension(String invitationID) {
-        super(invitationID);
     }
 
     public String getSessionID() {
@@ -103,5 +76,41 @@ public class InvitationParameterExchangeExtension extends InvitationExtension {
             super("invitationParameterExchange",
                 InvitationParameterExchangeExtension.class);
         }
+    }
+
+    /**
+     * Saves the hook-specific settings into this extension.
+     * 
+     * One "secret" of this component is the way how a hook and its settings are
+     * stored (and therefore the way they will be transmitted). Changing this is
+     * likely to break the compatibility with older versions of Saros due to the
+     * change in the invitation process.
+     * 
+     * @param hook
+     *            The hook of which the settings should be transferred between
+     *            client and host.
+     * @param settings
+     *            The settings for <code>hook</code>, represented in the form of
+     *            [Key, Value] pairs. The extension won't be changed if the
+     *            settings are <code>null</code>.
+     */
+    public void saveHookSettings(ISessionNegotiationHook hook,
+        Map<String, String> settings) {
+        if (settings == null)
+            return;
+
+        hookSettings.put(hook.getIdentifier(), settings);
+    }
+
+    /**
+     * Retrieves the hook-specific settings from this extension.
+     * 
+     * @param hook
+     *            The hook of which the settings should be retrieved.
+     * @return The settings for the <code>hook</code> represented as [Key,
+     *         Value] pairs (not <code>null</code>).
+     */
+    public Map<String, String> getHookSettings(ISessionNegotiationHook hook) {
+        return hookSettings.get(hook.getIdentifier());
     }
 }

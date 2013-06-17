@@ -48,13 +48,10 @@ public interface ISarosSessionManager {
      * 
      * @param host
      *            the host of the session.
-     * @param myColorID
-     *            Color ID of the local user
-     * 
      * @return the new Saros session.
      */
-    public ISarosSession joinSession(JID host, int myColorID,
-        DateTime sessionStart, JID inviter, int inviterColorID);
+    public ISarosSession joinSession(JID host, int clientColor,
+        DateTime sessionStart, JID inviter, int hostColor);
 
     /**
      * Leaves the currently active session. If the local user is the host, this

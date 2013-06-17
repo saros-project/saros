@@ -25,10 +25,10 @@ import org.jivesoftware.smack.packet.PacketExtension;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.ISarosContext;
-import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferencesNegotiatingManager;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
+import de.fu_berlin.inf.dpp.invitation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -69,7 +69,7 @@ public abstract class InvitationProcess extends CancelableProcess {
     protected IReceiver receiver;
 
     @Inject
-    protected MUCSessionPreferencesNegotiatingManager mucNegotiatingManager;
+    protected SessionNegotiationHookManager hookManager;
 
     @Inject
     protected ISarosSessionManager sarosSessionManager;

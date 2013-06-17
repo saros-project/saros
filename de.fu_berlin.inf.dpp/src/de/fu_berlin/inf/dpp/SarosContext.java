@@ -34,7 +34,7 @@ import de.fu_berlin.inf.dpp.communication.audio.AudioService;
 import de.fu_berlin.inf.dpp.communication.audio.AudioServiceManager;
 import de.fu_berlin.inf.dpp.communication.audio.MixerManager;
 import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatService;
-import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferencesNegotiatingManager;
+import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCNegotiationManager;
 import de.fu_berlin.inf.dpp.communication.chat.single.SingleUserChatService;
 import de.fu_berlin.inf.dpp.concurrent.undo.UndoManager;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
@@ -44,6 +44,7 @@ import de.fu_berlin.inf.dpp.concurrent.watchdog.SessionViewOpener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.colorstorage.ColorIDSetStorage;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
+import de.fu_berlin.inf.dpp.invitation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
@@ -97,6 +98,7 @@ import de.fu_berlin.inf.dpp.project.IChecksumCache;
 import de.fu_berlin.inf.dpp.project.SarosRosterListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ChecksumCacheImpl;
+import de.fu_berlin.inf.dpp.project.internal.ColorNegotiationHook;
 import de.fu_berlin.inf.dpp.project.internal.FileContentNotifierBridge;
 import de.fu_berlin.inf.dpp.project.internal.FollowingActivitiesManager;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
@@ -236,10 +238,14 @@ public class SarosContext implements ISarosContext {
         Component.create(MixerManager.class),
         Component.create(UndoManager.class),
         Component.create(VideoSharing.class),
-        Component.create(MUCSessionPreferencesNegotiatingManager.class),
         Component.create(RemoteProgressManager.class),
         Component.create(XMPPAccountStore.class),
         Component.create(ColorIDSetStorage.class),
+
+        // Invitation hooks
+        Component.create(SessionNegotiationHookManager.class),
+        Component.create(ColorNegotiationHook.class),
+        Component.create(MUCNegotiationManager.class),
 
         // Network
         Component.create(ConnectionTestManager.class),

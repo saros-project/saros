@@ -1,25 +1,28 @@
 package de.fu_berlin.inf.dpp.invitation;
 
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.jivesoftware.smack.packet.Packet;
 import org.joda.time.DateTime;
-import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.ISarosContext;
+import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
+import de.fu_berlin.inf.dpp.invitation.hooks.ISessionNegotiationHook;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationAcceptedExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationAcknowledgedExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationCompletedExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationParameterExchangeExtension;
-import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.project.internal.ColorNegotiationHook;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
@@ -42,9 +45,6 @@ public class IncomingSessionNegotiation extends InvitationProcess {
 
     private SarosPacketCollector invitationDataExchangeCollector;
     private SarosPacketCollector invitationAcknowledgedCollector;
-
-    @Inject
-    private PreferenceUtils preferenceUtils;
 
     public IncomingSessionNegotiation(ISarosSessionManager sessionManager,
         JID from, VersionInfo remoteVersionInfo, DateTime sessionStart,
@@ -198,8 +198,11 @@ public class IncomingSessionNegotiation extends InvitationProcess {
         InvitationParameterExchangeExtension parameters = new InvitationParameterExchangeExtension(
             invitationID);
 
-        parameters.setLocalColorID(preferenceUtils.getFavoriteColorID());
-        parameters.setLocalFavoriteColorID(parameters.getLocalColorID());
+        for (ISessionNegotiationHook hook : hookManager.getHooks()) {
+            Map<String, String> clientPreferences = hook
+                .tellClientPreferences();
+            parameters.saveHookSettings(hook, clientPreferences);
+        }
 
         return parameters;
     }
@@ -261,12 +264,25 @@ public class IncomingSessionNegotiation extends InvitationProcess {
 
         monitor.setTaskName("Initializing session...");
 
-        mucNegotiatingManager.setSessionPreferences(parameters
-            .getMUCPreferences());
+        // HACK (Part 1/2)
+        int clientColor = UserColorID.UNKNOWN;
+        int hostFavoriteColor = UserColorID.UNKNOWN;
+
+        for (ISessionNegotiationHook hook : hookManager.getHooks()) {
+            Map<String, String> settings = parameters.getHookSettings(hook);
+            hook.applyActualParameters(settings);
+
+            // HACK (Part 2/2)
+            if (hook instanceof ColorNegotiationHook) {
+                clientColor = Integer.parseInt(settings
+                    .get(ColorNegotiationHook.KEY_CLIENT_COLOR));
+                hostFavoriteColor = Integer.parseInt(settings
+                    .get(ColorNegotiationHook.KEY_HOST_FAV_COLOR));
+            }
+        }
 
         sarosSession = sessionManager.joinSession(parameters.getSessionHost(),
-            parameters.getLocalColorID(), sessionStart, peer,
-            parameters.getRemoteFavoriteColorID());
+            clientColor, sessionStart, peer, hostFavoriteColor);
     }
 
     /**

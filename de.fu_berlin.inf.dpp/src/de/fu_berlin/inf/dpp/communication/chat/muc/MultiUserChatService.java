@@ -33,7 +33,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.chat.AbstractChatService;
 import de.fu_berlin.inf.dpp.communication.chat.IChat;
 import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferences;
-import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferencesNegotiatingManager;
+import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCNegotiationManager;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.SarosNet;
@@ -52,7 +52,7 @@ public class MultiUserChatService extends AbstractChatService {
         .getLogger(MultiUserChatService.class);
 
     @Inject
-    MUCSessionPreferencesNegotiatingManager negotiatingManager;
+    MUCNegotiationManager negotiatingManager;
 
     private Set<MultiUserChat> chats = new HashSet<MultiUserChat>();
 
