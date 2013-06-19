@@ -24,7 +24,7 @@ public class ChatRoomParticipant {
         "bob1_fu", "carl1_fu" };
     protected static String[] passwords = new String[] { "dddfffggg",
         "dddfffggg", "dddfffggg" };
-    protected static String[] nicknames = new String[] { "Bj�rn", "Maria",
+    protected static String[] nicknames = new String[] { "Björn", "Maria",
         "Lin" };
     protected static RGB[] colors = new RGB[] { new RGB(141, 206, 231),
         new RGB(191, 187, 130), new RGB(186, 220, 81) };

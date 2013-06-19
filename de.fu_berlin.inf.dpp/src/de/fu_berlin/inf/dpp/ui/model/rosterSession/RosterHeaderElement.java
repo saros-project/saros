@@ -11,7 +11,7 @@ import de.fu_berlin.inf.dpp.ui.model.TreeElement;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterContentProvider;
 
 /**
- * Container {@link TreeElement}�for a {@link Roster}
+ * Container {@link TreeElement} for a {@link Roster}
  * 
  * @author bkahlert
  */

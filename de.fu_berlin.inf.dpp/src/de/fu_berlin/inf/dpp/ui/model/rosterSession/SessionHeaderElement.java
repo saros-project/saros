@@ -15,7 +15,7 @@ import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.model.TreeElement;
 
 /**
- * Container {@link TreeElement}�for a {@link SarosSession}
+ * Container {@link TreeElement} for a {@link SarosSession}
  * 
  * @author bkahlert
  */
