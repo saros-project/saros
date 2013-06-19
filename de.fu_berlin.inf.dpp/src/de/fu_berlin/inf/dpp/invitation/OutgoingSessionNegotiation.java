@@ -26,6 +26,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationAcknowledgedExtens
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationCompletedExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationOfferingExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationParameterExchangeExtension;
+import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
@@ -74,6 +75,9 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
     @Inject
     private ISarosSessionManager sessionManager;
 
+    @Inject
+    private InvitationProcessObservable currentSessionNegotiations;
+
     // HACK last residue of the direct conncetion between SessionNegotation and
     // the color property of users.
     private int clientColorID = UserColorID.UNKNOWN;
@@ -86,15 +90,13 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
             description, sarosContext);
 
         this.sarosSession = sarosSession;
-        // FIMXE move to SarosSessionManager
-        this.invitationProcesses.addInvitationProcess(this);
     }
 
     @Override
     protected void executeCancellation() {
         // TODO remove the user from the session !
 
-        if (invitationProcesses.getProcesses().size() == 0
+        if (currentSessionNegotiations.getProcesses().size() == 0
             && sarosSession.getRemoteUsers().isEmpty())
             sarosSessionManager.stopSarosSession();
     }
@@ -220,7 +222,6 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
         } finally {
             deleteCollectors();
             monitor.done();
-            invitationProcesses.removeInvitationProcess(this);
         }
 
         return terminateProcess(exception);

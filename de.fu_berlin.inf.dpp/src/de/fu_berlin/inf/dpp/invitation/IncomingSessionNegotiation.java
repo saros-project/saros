@@ -55,8 +55,6 @@ public class IncomingSessionNegotiation extends InvitationProcess {
         this.sessionStart = sessionStart;
         this.sessionManager = sessionManager;
         this.remoteVersionInfo = remoteVersionInfo;
-        // FIMXE move to SarosSessionManager
-        this.invitationProcesses.addInvitationProcess(this);
     }
 
     @Override
@@ -67,10 +65,8 @@ public class IncomingSessionNegotiation extends InvitationProcess {
         if (inInvitationUI != null)
             inInvitationUI.cancelWizard(peer, errorMsg, CancelLocation.REMOTE);
 
-        if (!running) {
-            invitationProcesses.removeInvitationProcess(this);
+        if (!running)
             terminateProcess(null);
-        }
 
         return true;
     }
@@ -84,10 +80,8 @@ public class IncomingSessionNegotiation extends InvitationProcess {
         if (inInvitationUI != null)
             inInvitationUI.cancelWizard(peer, errorMsg, CancelLocation.LOCAL);
 
-        if (!running) {
-            invitationProcesses.removeInvitationProcess(this);
+        if (!running)
             terminateProcess(null);
-        }
 
         return true;
     }
@@ -173,7 +167,6 @@ public class IncomingSessionNegotiation extends InvitationProcess {
         } finally {
             monitor.done();
             deleteCollectors();
-            invitationProcesses.removeInvitationProcess(this);
         }
 
         return terminateProcess(exception);

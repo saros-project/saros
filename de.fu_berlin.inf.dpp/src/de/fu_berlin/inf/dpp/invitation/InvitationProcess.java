@@ -36,7 +36,6 @@ import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
-import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -73,9 +72,6 @@ public abstract class InvitationProcess extends CancelableProcess {
 
     @Inject
     protected ISarosSessionManager sarosSessionManager;
-
-    @Inject
-    protected InvitationProcessObservable invitationProcesses;
 
     protected final String invitationID;
     protected final String description;

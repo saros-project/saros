@@ -22,7 +22,6 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelProjectNegotiationExtension;
-import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -40,9 +39,6 @@ public abstract class ProjectNegotiation extends CancelableProcess {
 
     protected String processID;
     protected JID peer;
-
-    @Inject
-    protected ProjectNegotiationObservable projectExchangeProcesses;
 
     @Inject
     protected ITransmitter transmitter;

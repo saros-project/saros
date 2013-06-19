@@ -108,8 +108,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         this.projectInfos = projectInfos;
         this.localProjects = new HashMap<String, IProject>();
         this.jid = peer;
-        // FIMXE move to SarosSessionManager
-        this.projectExchangeProcesses.addProjectExchangeProcess(this);
     }
 
     @Override
@@ -245,8 +243,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
             fileReplacementInProgressObservable.replacementDone();
             monitor.done();
-
-            projectExchangeProcesses.removeProjectExchangeProcess(this);
 
             // Re-enable auto-building...
             if (wasAutobuilding) {
@@ -570,10 +566,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             addIncomingProjectUI.cancelWizard(peer, errorMsg,
                 CancelLocation.REMOTE);
 
-        if (!running) {
-            projectExchangeProcesses.removeProjectExchangeProcess(this);
+        if (!running)
             terminateProcess(null);
-        }
 
         return true;
     }
@@ -588,10 +582,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             addIncomingProjectUI.cancelWizard(peer, errorMsg,
                 CancelLocation.LOCAL);
 
-        if (!running) {
-            projectExchangeProcesses.removeProjectExchangeProcess(this);
+        if (!running)
             terminateProcess(null);
-        }
 
         return true;
     }

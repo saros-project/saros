@@ -42,7 +42,20 @@ abstract class CancelableProcess {
 
     private boolean processTerminated;
 
+    private ProcessListener listener;
+
     private Status exitStatus;
+
+    /**
+     * Sets a {@linkplain ProcessListener process listener} for the current
+     * process.
+     * 
+     * @param listener
+     *            the listener that should be notified
+     */
+    public synchronized final void setProcessListener(ProcessListener listener) {
+        this.listener = listener;
+    }
 
     /**
      * Returns the error message if the exit status of the process was either
@@ -277,6 +290,26 @@ abstract class CancelableProcess {
         }
 
         processTerminated = true;
+
+        // TODO executeCancellation and listener callback outside of sync block
+
+        /*
+         * must notify the listener here or otherwise calling
+         * SessionManager.stopSession in the executeCancellation method will
+         * block because the SessionManager will wait until the process is
+         * terminated (which would not be the case at this moment)
+         */
+
+        if (listener != null) {
+            /*
+             * FIXME NOT so nice hack, but otherwise this had to be done in the
+             * listener if we only use processTerminated(CancelableProcess)
+             */
+            if (this instanceof InvitationProcess)
+                listener.processTerminated((InvitationProcess) this);
+            else if (this instanceof ProjectNegotiation)
+                listener.processTerminated((ProjectNegotiation) this);
+        }
 
         if (exitStatus != Status.OK) {
             errorMessage = generateErrorMessage();
