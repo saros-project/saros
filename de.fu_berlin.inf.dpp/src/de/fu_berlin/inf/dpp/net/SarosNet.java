@@ -15,6 +15,8 @@ import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.keepalive.KeepAliveManager;
+import org.jivesoftware.smack.ping.PingFailedListener;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 import org.picocontainer.annotations.Nullable;
@@ -59,6 +61,16 @@ public class SarosNet {
     private final IUPnPService upnpService;
 
     private int packetReplyTimeout;
+
+    private KeepAliveManager keepAliveManager;
+
+    // Workaround for Smack-441 - can be removed with SMACK API >= 3.3.1
+    private final PingFailedListener dummyListenerToAvoidOOM = new PingFailedListener() {
+        @Override
+        public void pingFailed() {
+            // NOP
+        }
+    };
 
     public SarosNet(@Nullable IUPnPService upnpService,
         @Nullable IStunService stunService) {
@@ -156,7 +168,11 @@ public class SarosNet {
 
         try {
             setConnectionState(ConnectionState.CONNECTING, null);
+
             connection.connect();
+
+            keepAliveManager = KeepAliveManager.getInstanceFor(connection);
+            keepAliveManager.addPingFailedListener(dummyListenerToAvoidOOM);
 
             ServiceDiscoveryManager.getInstanceFor(connection).addFeature(
                 namespace);
@@ -174,6 +190,7 @@ public class SarosNet {
             connection.login(username, password, resource);
 
             localJID = new JID(connection.getUser());
+
             setConnectionState(ConnectionState.CONNECTED, null);
         } catch (IllegalArgumentException e) {
             /*
@@ -258,10 +275,16 @@ public class SarosNet {
         try {
             connection.removeConnectionListener(smackConnectionListener);
             connection.disconnect();
+
+            if (keepAliveManager != null)
+                keepAliveManager
+                    .removePingFailedListener(dummyListenerToAvoidOOM);
+
         } catch (RuntimeException e) {
             LOG.warn("could not disconnect from the current XMPPConnection", e);
         } finally {
             connection = null;
+            keepAliveManager = null;
         }
     }
 
