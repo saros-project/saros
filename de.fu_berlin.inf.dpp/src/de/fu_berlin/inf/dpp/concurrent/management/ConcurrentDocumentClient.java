@@ -14,7 +14,6 @@ import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivityReceiver;
-import de.fu_berlin.inf.dpp.activities.business.ITargetedActivity;
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
@@ -89,17 +88,17 @@ public class ConcurrentDocumentClient implements Startable {
     }
 
     /**
-     * This is called from the shared project when a local activityDataObject
-     * has been caused by user activityDataObject (for instance the user pressed
-     * key 'a')
+     * This is called when an activity has been caused by the local user
      * 
-     * This method transforms the activityDataObject into a list of events to
-     * send to individual users.
+     * (Activity is for instance: the user pressed key 'a')
+     * 
+     * This method transforms the activity into a list of events to send to the
+     * server on the host-side.
      * 
      * @swt Must be called on the SWT Thread to ensure proper synchronization
      * 
-     * @host and @client This is called whenever activityDataObjects are created
-     *       LOCALLY both on the client and on the host
+     * @host and @client This is called whenever activities are created locally
+     *       both on the client and on the host
      */
     public List<QueueItem> transformOutgoing(IActivity activity) {
 
@@ -109,11 +108,18 @@ public class ConcurrentDocumentClient implements Startable {
 
         final List<User> remoteUsersWithReadOnlyAccess = sarosSession
             .getRemoteUsersWithReadOnlyAccess();
-        final List<User> remoteUsers = sarosSession.getRemoteUsers();
+
         if (activity instanceof TextEditActivity) {
             TextEditActivity textEdit = (TextEditActivity) activity;
 
             result.add(new QueueItem(host, jupiterClient.generate(textEdit)));
+
+            /**
+             * TODO This should be changed, as it doesn't seem necessary to stop
+             * the Jupiter-client of ro-clients and in addition this could
+             * possibly lead to duplicate textEdits as we split the same
+             * information into different messages.
+             */
 
             /**
              * This activityDataObject still needs to be sent to all users with
@@ -122,8 +128,7 @@ public class ConcurrentDocumentClient implements Startable {
              */
             if (sarosSession.isHost()
                 && remoteUsersWithReadOnlyAccess.size() > 0) {
-                result.add(new QueueItem(remoteUsersWithReadOnlyAccess,
-                    activity));
+                result.add(new QueueItem(host, activity));
             }
         } else if (activity instanceof ChecksumActivity) {
             ChecksumActivity checksumActivityDataObject = (ChecksumActivity) activity;
@@ -137,6 +142,8 @@ public class ConcurrentDocumentClient implements Startable {
             result.add(new QueueItem(host, jupiterClient
                 .withTimestamp(checksumActivityDataObject)));
 
+            // TODO this should also be done by the server.
+
             if (remoteUsersWithReadOnlyAccess.size() > 0)
                 /**
                  * Send general checksum to all users with
@@ -144,11 +151,12 @@ public class ConcurrentDocumentClient implements Startable {
                  */
                 result.add(new QueueItem(remoteUsersWithReadOnlyAccess,
                     checksumActivityDataObject));
-        } else if (activity instanceof ITargetedActivity) {
-            ITargetedActivity target = (ITargetedActivity) activity;
-            result.add(new QueueItem(target.getRecipients(), activity));
-        } else if (remoteUsers.size() > 0) {
-            result.add(new QueueItem(remoteUsers, activity));
+        } else {
+            /**
+             * Send all other activities to the server on the host-side. The
+             * server is responsible for distributing them to all receivers
+             */
+            result.add(new QueueItem(host, activity));
         }
         return result;
     }

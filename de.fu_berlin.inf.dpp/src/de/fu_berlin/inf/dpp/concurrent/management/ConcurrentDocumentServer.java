@@ -16,7 +16,10 @@ import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivityReceiver;
+import de.fu_berlin.inf.dpp.activities.business.ITargetedActivity;
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
+import de.fu_berlin.inf.dpp.activities.business.ProjectsAddedActivity;
+import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
@@ -109,9 +112,8 @@ public class ConcurrentDocumentServer implements Startable {
     };
 
     /**
-     * Transforms the given activityDataObjects on the server side and returns a
-     * list of activityDataObjects to be executed locally and sent to other
-     * users.
+     * Transforms the given activities on the server side and returns a list of
+     * activities to be executed locally and sent to other users.
      * 
      * @host
      * 
@@ -120,8 +122,7 @@ public class ConcurrentDocumentServer implements Startable {
      *              * @notSWT This method may not be called from SWT, otherwise
      *              a deadlock might occur!!
      */
-    public TransformationResult transformIncoming(
-        List<IActivity> activityDataObjects) {
+    public TransformationResult transformIncoming(List<IActivity> activities) {
 
         assert sarosSession.isHost() : "CDS.transformIncoming must not be called on the client";
 
@@ -130,22 +131,54 @@ public class ConcurrentDocumentServer implements Startable {
         TransformationResult result = new TransformationResult(
             sarosSession.getLocalUser());
 
-        for (IActivity activityDataObject : activityDataObjects) {
-            try {
-                activityDataObject.dispatch(hostReceiver);
+        final List<User> remoteUsers = sarosSession.getRemoteUsers();
+        final List<User> allUsers = sarosSession.getUsers();
+        final List<User> remoteUsersWithReadOnlyAccess = sarosSession
+            .getRemoteUsersWithReadOnlyAccess();
 
-                if (activityDataObject instanceof JupiterActivity) {
-                    result
-                        .addAll(receive((JupiterActivity) activityDataObject));
-                } else if (activityDataObject instanceof ChecksumActivity) {
-                    result
-                        .addAll(withTimestamp((ChecksumActivity) activityDataObject));
+        for (IActivity activity : activities) {
+            try {
+                activity.dispatch(hostReceiver);
+
+                if (activity instanceof JupiterActivity) {
+                    result.addAll(receive((JupiterActivity) activity));
+
+                } else if (activity instanceof ChecksumActivity) {
+                    result.addAll(withTimestamp((ChecksumActivity) activity));
+
+                } else if (activity instanceof TextEditActivity) {
+                    // TODO review (see TODO in
+                    // ConcurrentDocumentServer.transformIncoming)
+                    if (remoteUsersWithReadOnlyAccess.size() > 0)
+                        result.add(new QueueItem(remoteUsersWithReadOnlyAccess,
+                            activity));
+
+                } else if (activity instanceof ITargetedActivity) {
+                    ITargetedActivity target = (ITargetedActivity) activity;
+                    result.add(new QueueItem(target.getRecipients(), activity));
+
+                } else if (remoteUsers.size() > 0
+                    && !(activity instanceof ProjectsAddedActivity)) {
+                    /**
+                     * ProjectsAddedActivities currently break the
+                     * Client-Server-Architecture and therefore must not be send
+                     * to clients as they already have them.
+                     */
+
+                    // We must not send the activity back to the sender
+                    List<User> receivers = new ArrayList<User>();
+                    for (User user : allUsers) {
+                        if (!user.equals(activity.getSource())) {
+                            receivers.add(user);
+                        }
+                    }
+                    result.add(new QueueItem(receivers, activity));
+
                 } else {
-                    result.executeLocally.add(activityDataObject);
+                    result.executeLocally.add(activity);
                 }
             } catch (Exception e) {
-                log.error("Error while receiving activityDataObject: "
-                    + activityDataObject, e);
+                log.error("Error while transforming activity: " + activity, e);
             }
         }
         return result;
