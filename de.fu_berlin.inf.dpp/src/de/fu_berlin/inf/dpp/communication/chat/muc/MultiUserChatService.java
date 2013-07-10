@@ -32,8 +32,8 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.chat.AbstractChatService;
 import de.fu_berlin.inf.dpp.communication.chat.IChat;
-import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferences;
 import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCNegotiationManager;
+import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferences;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.SarosNet;
@@ -153,8 +153,8 @@ public class MultiUserChatService extends AbstractChatService {
      */
     @Override
     public void destroyChat(IChat chat) {
-        log.debug("Leaving multi user chat " + chat.getTitle() + ".");
         assert chat != null;
+        log.debug("Leaving multi user chat " + chat.getTitle() + ".");
 
         chats.remove(chat);
 
