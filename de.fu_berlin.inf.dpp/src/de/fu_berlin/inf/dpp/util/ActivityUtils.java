@@ -10,8 +10,6 @@ import de.fu_berlin.inf.dpp.activities.business.FolderActivity.Type;
 import de.fu_berlin.inf.dpp.activities.serializable.ChecksumActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.FolderActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.JupiterActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.TextEditActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
 import de.fu_berlin.inf.dpp.net.internal.TimedActivityDataObject;
@@ -40,35 +38,6 @@ public class ActivityUtils {
     }
 
     /**
-     * Checks if all {@link IActivityDataObject}s in the given Collection are of
-     * instance {@link ViewportActivityDataObject},
-     * {@link JupiterActivityDataObject},
-     * {@link TextSelectionActivityDataObject}, or
-     * {@link TextEditActivityDataObject} - activities that can be created by
-     * the inviter during a project synchronization and are uncritically to
-     * delay (during an IBB transfer).
-     * 
-     * @param activities
-     *            Collection of {@link IActivityDataObject}s
-     * @return true, if all {@link IActivityDataObject}s are instances of
-     *         mentioned activities, false otherwise
-     */
-    public static boolean containsQueueableActivitiesOnly(
-        List<IActivityDataObject> activities) {
-
-        for (IActivityDataObject a : activities)
-            if (a instanceof ViewportActivityDataObject
-                || a instanceof JupiterActivityDataObject
-                || a instanceof TextSelectionActivityDataObject
-                || a instanceof TextEditActivityDataObject)
-                continue;
-            else
-                return false;
-
-        return true;
-    }
-
-    /**
      * This method tries to reduce the number of activityDataObjects transmitted
      * by removing activityDataObjects that would overwrite each other and
      * joining activityDataObjects that can be send as a single
@@ -85,11 +54,7 @@ public class ActivityUtils {
 
         for (IActivityDataObject activityDataObject : toOptimize) {
 
-            if (activityDataObject instanceof TextEditActivityDataObject) {
-                TextEditActivityDataObject textEdit = (TextEditActivityDataObject) activityDataObject;
-                textEdit = joinTextEdits(result, textEdit);
-                result.add(textEdit);
-            } else if (activityDataObject instanceof TextSelectionActivityDataObject) {
+            if (activityDataObject instanceof TextSelectionActivityDataObject) {
                 selection = (TextSelectionActivityDataObject) activityDataObject;
             } else if (activityDataObject instanceof ViewportActivityDataObject) {
                 ViewportActivityDataObject viewActivity = (ViewportActivityDataObject) activityDataObject;
@@ -153,32 +118,4 @@ public class ActivityUtils {
         if (!dropNew)
             result.add(folderEdit);
     }
-
-    private static TextEditActivityDataObject joinTextEdits(
-        List<IActivityDataObject> result, TextEditActivityDataObject textEdit) {
-        if (result.size() == 0) {
-            return textEdit;
-        }
-
-        IActivityDataObject lastActivity = result.get(result.size() - 1);
-        if (lastActivity instanceof TextEditActivityDataObject) {
-            TextEditActivityDataObject lastTextEdit = (TextEditActivityDataObject) lastActivity;
-
-            if (((lastTextEdit.getSource() == null) || lastTextEdit.getSource()
-                .equals(textEdit.getSource()))
-                && (textEdit.getOffset() == lastTextEdit.getOffset()
-                    + lastTextEdit.getText().length())) {
-                result.remove(lastTextEdit);
-                textEdit = new TextEditActivityDataObject(
-                    lastTextEdit.getSource(),
-                    lastTextEdit.getOffset(),
-                    lastTextEdit.getText() + textEdit.getText(),
-                    lastTextEdit.getReplacedText() + textEdit.getReplacedText(),
-                    lastTextEdit.getPath());
-            }
-        }
-
-        return textEdit;
-    }
-
 }

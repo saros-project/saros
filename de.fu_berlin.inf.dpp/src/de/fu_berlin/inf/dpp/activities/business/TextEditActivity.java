@@ -26,7 +26,6 @@ import org.apache.log4j.Logger;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.TextEditActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
@@ -202,7 +201,6 @@ public class TextEditActivity extends AbstractActivity implements
 
     @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
-        return new TextEditActivityDataObject(source.getJID(), offset, text,
-            replacedText, path.toSPathDataObject(sarosSession));
+        throw new UnsupportedOperationException("no serialization support");
     }
 }

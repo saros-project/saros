@@ -34,7 +34,6 @@ import de.fu_berlin.inf.dpp.activities.serializable.FolderActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.JupiterActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.PermissionActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ProgressActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.TextEditActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.VCSActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
@@ -76,7 +75,6 @@ public class ActivitiesExtension extends SarosPacketExtension {
                 EditorActivityDataObject.class, FileActivityDataObject.class,
                 FolderActivityDataObject.class,
                 PermissionActivityDataObject.class,
-                TextEditActivityDataObject.class,
                 TextSelectionActivityDataObject.class,
                 ViewportActivityDataObject.class,
                 TimedActivityDataObject.class, JupiterActivityDataObject.class,

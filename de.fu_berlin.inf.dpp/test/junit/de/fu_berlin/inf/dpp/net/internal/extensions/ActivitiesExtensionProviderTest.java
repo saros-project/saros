@@ -27,7 +27,6 @@ import de.fu_berlin.inf.dpp.activities.serializable.FolderActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.JupiterActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.PermissionActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.TextEditActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
@@ -68,8 +67,7 @@ public class ActivitiesExtensionProviderTest {
         new FolderActivityDataObject(jid, FolderActivity.Type.Created, path),
         new PermissionActivityDataObject(jid, new JID("user@server"),
             Permission.WRITE_ACCESS),
-        new TextEditActivityDataObject(jid, 23, "foo\r\ntest\n\nbla", "bar",
-            path), new TextSelectionActivityDataObject(jid, 1, 2, path),
+        new TextSelectionActivityDataObject(jid, 1, 2, path),
         new ViewportActivityDataObject(jid, 5, 10, path) };
 
     protected Provider aProvider = ActivitiesExtension.PROVIDER;
@@ -143,14 +141,6 @@ public class ActivitiesExtensionProviderTest {
         assertFalse(marshalled.contains("\n"));
         assertFalse(marshalled.contains("\t"));
         assertFalse(marshalled.contains("  "));
-    }
-
-    @Test
-    public void testLineDelimiters() throws XmlPullParserException, IOException {
-        for (String lineEnding : new String[] { "\n", "\r", "\r\n" }) {
-            assertRoundtrip(new TextEditActivityDataObject(jid, 42, lineEnding,
-                "", path));
-        }
     }
 
     public void assertRoundtrip(Operation op) throws XmlPullParserException,
