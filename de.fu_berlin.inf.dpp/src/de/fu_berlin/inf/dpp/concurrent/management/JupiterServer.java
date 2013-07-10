@@ -65,10 +65,9 @@ public class JupiterServer {
             // Create new local host document client
             docServer.addProxyClient(sarosSession.getHost().getJID());
 
-            /** Add all users with {@link User.Permission#WRITE_ACCESS} */
-            for (User userWithWriteAccess : sarosSession
-                .getUsersWithWriteAccess()) {
-                docServer.addProxyClient(userWithWriteAccess.getJID());
+            /** Add all users */
+            for (User user : sarosSession.getUsers()) {
+                docServer.addProxyClient(user.getJID());
             }
 
             this.concurrentDocuments.put(path, docServer);

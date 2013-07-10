@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
@@ -19,7 +18,6 @@ import de.fu_berlin.inf.dpp.activities.business.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.ITargetedActivity;
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.activities.business.ProjectsAddedActivity;
-import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
@@ -33,9 +31,9 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * The ConcurrentDocumentServer is responsible for coordinating all
  * JupiterActivities.
  * 
- * All users with {@link Permission#WRITE_ACCESS} (also the host!) will send
- * their JupiterActivities to the ConcurrentDocumentServer on the host, which
- * transforms them (using Jupiter) and then sends them to everybody else.
+ * All clients (including the host!) will send their JupiterActivities to the
+ * ConcurrentDocumentServer on the host, which transforms them (using Jupiter)
+ * and then sends them to everybody else.
  * 
  * A ConcurrentDocumentServer exists only on the host!
  */
@@ -76,24 +74,7 @@ public class ConcurrentDocumentServer implements Startable {
 
         @Override
         public void userJoined(User user) {
-            if (user.hasWriteAccess()) {
-                server.addUser(user);
-            }
-        }
-
-        @Override
-        public void permissionChanged(User user) {
-
-            if (user.isHost())
-                return;
-
-            if (user.hasReadOnlyAccess()) {
-                // if restricted to read-only
-                server.removeUser(user);
-            } else {
-                // if user got write access
-                server.addUser(user);
-            }
+            server.addUser(user);
         }
 
         @Override
@@ -119,8 +100,8 @@ public class ConcurrentDocumentServer implements Startable {
      * 
      * @sarosThread Must be executed in the Saros dispatch thread.
      * 
-     *              * @notSWT This method may not be called from SWT, otherwise
-     *              a deadlock might occur!!
+     * @notSWT This method may not be called from SWT, otherwise a deadlock
+     *         might occur!!
      */
     public TransformationResult transformIncoming(List<IActivity> activities) {
 
@@ -133,8 +114,6 @@ public class ConcurrentDocumentServer implements Startable {
 
         final List<User> remoteUsers = sarosSession.getRemoteUsers();
         final List<User> allUsers = sarosSession.getUsers();
-        final List<User> remoteUsersWithReadOnlyAccess = sarosSession
-            .getRemoteUsersWithReadOnlyAccess();
 
         for (IActivity activity : activities) {
             try {
@@ -145,13 +124,6 @@ public class ConcurrentDocumentServer implements Startable {
 
                 } else if (activity instanceof ChecksumActivity) {
                     result.addAll(withTimestamp((ChecksumActivity) activity));
-
-                } else if (activity instanceof TextEditActivity) {
-                    // TODO review (see TODO in
-                    // ConcurrentDocumentServer.transformIncoming)
-                    if (remoteUsersWithReadOnlyAccess.size() > 0)
-                        result.add(new QueueItem(remoteUsersWithReadOnlyAccess,
-                            activity));
 
                 } else if (activity instanceof ITargetedActivity) {
                     ITargetedActivity target = (ITargetedActivity) activity;
