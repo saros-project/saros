@@ -15,9 +15,7 @@ import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivityReceiver;
-import de.fu_berlin.inf.dpp.activities.business.ITargetedActivity;
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
-import de.fu_berlin.inf.dpp.activities.business.ProjectsAddedActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
@@ -42,11 +40,11 @@ public class ConcurrentDocumentServer implements Startable {
     private static Logger log = Logger
         .getLogger(ConcurrentDocumentServer.class);
 
-    protected final ISarosSession sarosSession;
+    private final ISarosSession sarosSession;
 
-    protected JupiterServer server;
+    private final JupiterServer server;
 
-    protected final ISharedProjectListener projectListener;
+    private final ISharedProjectListener projectListener;
 
     public ConcurrentDocumentServer(ISarosSession sarosSession) {
 
@@ -83,7 +81,21 @@ public class ConcurrentDocumentServer implements Startable {
         }
     }
 
-    protected final IActivityReceiver hostReceiver = new AbstractActivityReceiver() {
+    /**
+     * Dispatched the activity to the internal ActivityReceiver. The
+     * ActivityReceiver will remove FileDocuments when the file has been
+     * deleted.
+     * 
+     * @param activity
+     *            Activity to be dispatched
+     */
+    public void checkFileDeleted(IActivity activity) {
+
+        activity.dispatch(hostReceiver);
+
+    }
+
+    private final IActivityReceiver hostReceiver = new AbstractActivityReceiver() {
         @Override
         public void receive(FileActivity fileActivity) {
             if (fileActivity.getType() == FileActivity.Type.Removed) {
@@ -94,7 +106,7 @@ public class ConcurrentDocumentServer implements Startable {
 
     /**
      * Transforms the given activities on the server side and returns a list of
-     * activities to be executed locally and sent to other users.
+     * QueueItems containing the transformed activities and there receivers.
      * 
      * @host
      * 
@@ -102,64 +114,41 @@ public class ConcurrentDocumentServer implements Startable {
      * 
      * @notSWT This method may not be called from SWT, otherwise a deadlock
      *         might occur!!
+     * 
+     * @param activity
+     *            Activity to be transformed
+     * 
+     * @return A list of QueueItems containing the activities and receivers
      */
-    public TransformationResult transformIncoming(List<IActivity> activities) {
+    public List<QueueItem> transformIncoming(IActivity activity) {
 
         assert sarosSession.isHost() : "CDS.transformIncoming must not be called on the client";
 
         assert !SWTUtils.isSWT() : "CDS.transformIncoming must not be called from SWT";
 
-        TransformationResult result = new TransformationResult(
-            sarosSession.getLocalUser());
+        List<QueueItem> result = new ArrayList<QueueItem>();
 
-        final List<User> remoteUsers = sarosSession.getRemoteUsers();
-        final List<User> allUsers = sarosSession.getUsers();
+        try {
+            activity.dispatch(hostReceiver);
 
-        for (IActivity activity : activities) {
-            try {
-                activity.dispatch(hostReceiver);
+            if (activity instanceof JupiterActivity) {
+                result.addAll(receive((JupiterActivity) activity));
 
-                if (activity instanceof JupiterActivity) {
-                    result.addAll(receive((JupiterActivity) activity));
-
-                } else if (activity instanceof ChecksumActivity) {
-                    result.addAll(withTimestamp((ChecksumActivity) activity));
-
-                } else if (activity instanceof ITargetedActivity) {
-                    ITargetedActivity target = (ITargetedActivity) activity;
-                    result.add(new QueueItem(target.getRecipients(), activity));
-
-                } else if (remoteUsers.size() > 0
-                    && !(activity instanceof ProjectsAddedActivity)) {
-                    /**
-                     * ProjectsAddedActivities currently break the
-                     * Client-Server-Architecture and therefore must not be send
-                     * to clients as they already have them.
-                     */
-
-                    // We must not send the activity back to the sender
-                    List<User> receivers = new ArrayList<User>();
-                    for (User user : allUsers) {
-                        if (!user.equals(activity.getSource())) {
-                            receivers.add(user);
-                        }
-                    }
-                    result.add(new QueueItem(receivers, activity));
-
-                } else {
-                    result.executeLocally.add(activity);
-                }
-            } catch (Exception e) {
-                log.error("Error while transforming activity: " + activity, e);
+            } else if (activity instanceof ChecksumActivity) {
+                result.addAll(withTimestamp((ChecksumActivity) activity));
             }
+        } catch (Exception e) {
+            log.error("Error while transforming activity: " + activity, e);
         }
+
         return result;
     }
 
     /**
-     * Does the actual work of transforming a JupiterActivity.
+     * Does the actual work of transforming a clients JupiterActivity into
+     * specific JupiterActivities for every client.
      */
-    protected List<QueueItem> receive(JupiterActivity jupiterActivity) {
+    private List<QueueItem> receive(JupiterActivity jupiterActivity) {
 
         List<QueueItem> result = new ArrayList<QueueItem>();
 
@@ -210,9 +199,9 @@ public class ConcurrentDocumentServer implements Startable {
     }
 
     /**
-     * Does the actual work of transforming a JupiterActivity.
+     * Does the actual work of transforming a ChecksumActivity.
      */
-    protected List<QueueItem> withTimestamp(ChecksumActivity checksumActivity) {
+    private List<QueueItem> withTimestamp(ChecksumActivity checksumActivity) {
 
         List<QueueItem> result = new ArrayList<QueueItem>();
 

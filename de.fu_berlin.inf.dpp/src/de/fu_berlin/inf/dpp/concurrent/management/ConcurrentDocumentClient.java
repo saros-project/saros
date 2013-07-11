@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
@@ -17,7 +16,6 @@ import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.internal.ActivityHandler.QueueItem;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 
 /**
@@ -37,125 +35,119 @@ public class ConcurrentDocumentClient {
     private static Logger log = Logger
         .getLogger(ConcurrentDocumentClient.class);
 
-    protected final ISarosSession sarosSession;
+    private final ISarosSession sarosSession;
 
-    protected final JupiterClient jupiterClient;
-
-    protected final User host; // Cached since it never changes
+    private final JupiterClient jupiterClient;
 
     public ConcurrentDocumentClient(ISarosSession sarosSession) {
 
         this.sarosSession = sarosSession;
-        this.host = sarosSession.getHost();
         this.jupiterClient = new JupiterClient(sarosSession);
     }
 
     /**
-     * This is called when an activity has been caused by the local user
-     * 
-     * (Activity is for instance: the user pressed key 'a')
-     * 
-     * This method transforms the activity into a list of events to send to the
-     * server on the host-side.
+     * This is called when an activity has been caused by the local user This
+     * method checks if an activity has to be transformed into a
+     * Jupiter-specific-activity and transforms it if needed.
      * 
      * @swt Must be called on the SWT Thread to ensure proper synchronization
      * 
      * @host and @client This is called whenever activities are created locally
      *       both on the client and on the host
+     * 
+     * @param activity
+     *            The activity to be transformed
+     * 
+     * @return The transformed activity
+     * 
      */
-    public List<QueueItem> transformOutgoing(IActivity activity) {
+    public IActivity transformToJupiter(IActivity activity) {
 
         assert SWTUtils.isSWT() : "CDC.transformOutgoing must be called on the SWT Thread";
 
-        List<QueueItem> result = new ArrayList<QueueItem>();
-
         if (activity instanceof TextEditActivity) {
+            // Transform textEdit-into jupiterActivities
             TextEditActivity textEdit = (TextEditActivity) activity;
-            result.add(new QueueItem(host, jupiterClient.generate(textEdit)));
+            return jupiterClient.generate(textEdit);
 
         } else if (activity instanceof ChecksumActivity) {
-            ChecksumActivity checksumActivityDataObject = (ChecksumActivity) activity;
+            ChecksumActivity checksumActivity = (ChecksumActivity) activity;
 
             /**
              * Only the host can generate Checksums
              */
             assert sarosSession.isHost();
 
-            // Send Jupiter specific checksum to ConcurrentDocumentServer
-            result.add(new QueueItem(host, jupiterClient
-                .withTimestamp(checksumActivityDataObject)));
+            // Create Jupiter specific checksum
+            return jupiterClient.withTimestamp(checksumActivity);
 
         } else {
-            /**
-             * Send all other activities to the server on the host-side. The
-             * server is responsible for distributing them to all receivers
-             */
-            result.add(new QueueItem(host, activity));
+            return activity;
+
         }
-        return result;
     }
 
     /**
      * This method is called when activities received over the network should be
      * executed locally.
      * 
-     * This method will transform them and return a set of results which can be
-     * executed locally and also QueueItems which must be sent to other users
-     * (which happens mainly on the host).
+     * This method will transform them back from Jupiter-specific activities to
+     * locally executable activities.
      * 
      * @swt Must be called on the SWT Thread to ensure proper synchronization
      * 
      * @host and @client This is called whenever activities are received from
      *       REMOTELY both on the client and on the host
+     * 
+     * @param activity
+     *            The activity to be transformed
+     * 
+     * @return A list of locally executable activities
      */
-    public TransformationResult transformIncoming(List<IActivity> activities) {
+    public List<IActivity> transformFromJupiter(IActivity activity) {
 
         assert SWTUtils.isSWT() : "CDC.transformIncoming must be called on the SWT Thread";
 
-        TransformationResult result = new TransformationResult(
-            sarosSession.getLocalUser());
+        List<IActivity> activities = new ArrayList<IActivity>();
 
-        for (IActivity activity : activities) {
-            try {
-                activity.dispatch(clientReceiver);
+        try {
+            activity.dispatch(clientReceiver);
 
-                if (activity instanceof JupiterActivity) {
-                    result.addAll(receiveActivity((JupiterActivity) activity));
+            if (activity instanceof JupiterActivity) {
+                activities.addAll(receiveActivity((JupiterActivity) activity));
 
-                } else if (activity instanceof ChecksumActivity) {
-                    result.addAll(receiveChecksum((ChecksumActivity) activity));
-
-                } else {
-                    result.executeLocally.add(activity);
-                }
-            } catch (Exception e) {
-                log.error("Error while transforming activity: " + activity, e);
+            } else if (activity instanceof ChecksumActivity) {
+                activities.add(receiveChecksum((ChecksumActivity) activity));
+            } else {
+                activities.add(activity);
             }
+
+        } catch (Exception e) {
+            log.error("Error while transforming activity: " + activity, e);
         }
-        return result;
+        return activities;
     }
 
     /**
      * Will receive an incoming ChecksumActivity and discard it if it is not
      * valid within the current local Jupiter timestamp
      */
-    protected TransformationResult receiveChecksum(ChecksumActivity activity) {
-
-        TransformationResult result = new TransformationResult(
-            sarosSession.getLocalUser());
+    private IActivity receiveChecksum(ChecksumActivity activity) {
 
         try {
             if (jupiterClient.isCurrent(activity))
-                result.executeLocally.add(activity);
+                return activity;
         } catch (TransformationException e) {
             // TODO this should trigger a consistency check
             log.error("Error during transformation of: " + activity, e);
         }
-
-        return result;
+        return activity;
     }
 
-    protected final IActivityReceiver clientReceiver = new AbstractActivityReceiver() {
+    /**
+     * Used to remove JupiterClientDocuments for deleted files
+     */
+    private final IActivityReceiver clientReceiver = new AbstractActivityReceiver() {
         @Override
         public void receive(FileActivity fileActivity) {
             if (fileActivity.getType() == FileActivity.Type.Removed) {
@@ -165,13 +157,13 @@ public class ConcurrentDocumentClient {
     };
 
     /**
+     * Transforms the JupiterActivity back into textEditActivities.
+     * 
      * @client and @host
      */
-    protected TransformationResult receiveActivity(
-        JupiterActivity jupiterActivity) {
+    private List<IActivity> receiveActivity(JupiterActivity jupiterActivity) {
 
-        TransformationResult result = new TransformationResult(
-            sarosSession.getLocalUser());
+        List<IActivity> activities = new ArrayList<IActivity>();
 
         Operation op;
         try {
@@ -179,17 +171,17 @@ public class ConcurrentDocumentClient {
         } catch (TransformationException e) {
             log.error("Error during transformation of: " + jupiterActivity, e);
             // TODO this should trigger a consistency check
-            return result;
+            return activities;
         }
 
         // Transform to TextEdit so it can be executed locally
         for (TextEditActivity textEdit : op.toTextEdit(
             jupiterActivity.getPath(), jupiterActivity.getSource())) {
 
-            result.executeLocally.add(textEdit);
+            activities.add(textEdit);
         }
 
-        return result;
+        return activities;
     }
 
     /**
@@ -210,12 +202,12 @@ public class ConcurrentDocumentClient {
         jupiterClient.reset(path);
     }
 
-    public boolean isCurrent(ChecksumActivity checksumActivityDataObject) {
+    public boolean isCurrent(ChecksumActivity checksumActivity) {
         try {
-            return jupiterClient.isCurrent(checksumActivityDataObject);
+            return jupiterClient.isCurrent(checksumActivity);
         } catch (TransformationException e) {
             log.error("Error during transformation of: "
-                + checksumActivityDataObject, e);
+                + checksumActivity, e);
             // TODO this should trigger a consistency recovery. Difficult :-(
             return false;
         }

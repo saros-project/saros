@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.project.internal;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -12,7 +13,12 @@ import org.eclipse.jface.window.Window;
 import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
+import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.business.ITargetedActivity;
+import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
+import de.fu_berlin.inf.dpp.activities.business.ProjectsAddedActivity;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.concurrent.management.TransformationResult;
@@ -128,12 +134,12 @@ public final class ActivityHandler implements Startable {
      */
     public synchronized void handleIncomingActivities(List<IActivity> activities) {
         if (session.isHost()) {
-            TransformationResult transformed = documentServer
-                .transformIncoming(activities);
 
-            activities = transformed.getLocalActivities();
+            TransformationResult result = directServerActivities(activities);
 
-            for (QueueItem item : transformed.getSendToPeers())
+            activities = result.getLocalActivities();
+
+            for (QueueItem item : result.getSendToPeers())
                 callback.send(item.recipients, item.activity);
         }
 
@@ -174,10 +180,13 @@ public final class ActivityHandler implements Startable {
             @Override
             public void run() {
                 for (IActivity activity : activities) {
-                    for (QueueItem item : documentClient
-                        .transformOutgoing(activity)) {
-                        callback.send(item.recipients, item.activity);
-                    }
+
+                    IActivity transformationResult = documentClient
+                        .transformToJupiter(activity);
+
+                    callback.send(Collections.singletonList(session.getHost()),
+                        transformationResult);
+
                 }
             }
         }));
@@ -264,25 +273,21 @@ public final class ActivityHandler implements Startable {
         Runnable transformingRunnable = new Runnable() {
             @Override
             public void run() {
-                TransformationResult transformed = documentClient
-                    .transformIncoming(activities);
 
-                for (QueueItem item : transformed.getSendToPeers()) {
-                    try {
-                        callback.send(item.recipients, item.activity);
-                    } catch (Exception e) {
-                        LOG.error("failed to send activity: " + item.activity
-                            + " to session user(s): " + item.recipients, e);
+                for (IActivity activity : activities) {
+                    List<IActivity> transformedActivities = new ArrayList<IActivity>();
+                    transformedActivities = documentClient
+                        .transformFromJupiter(activity);
+                    for (IActivity transformedActivity : transformedActivities) {
+                        try {
+                            callback.execute(transformedActivity);
+                        } catch (Exception e) {
+                            LOG.error(
+                                "failed to execute activity: " + activity, e);
+                        }
                     }
                 }
 
-                for (IActivity activity : transformed.executeLocally) {
-                    try {
-                        callback.execute(activity);
-                    } catch (Exception e) {
-                        LOG.error("failed to execute activity: " + activity, e);
-                    }
-                }
             }
         };
 
@@ -294,5 +299,60 @@ public final class ActivityHandler implements Startable {
             synchronizer.syncExec(Utils.wrapSafe(LOG, transformingRunnable));
         else
             synchronizer.asyncExec(Utils.wrapSafe(LOG, transformingRunnable));
+    }
+
+    /**
+     * This method is responsible for directing activities received at the
+     * server to the various clients.
+     * 
+     * @param activities
+     *            A list of incoming activities
+     * @return A number of targeted activities.
+     */
+    private TransformationResult directServerActivities(
+        List<IActivity> activities) {
+
+        TransformationResult result = new TransformationResult(
+            session.getLocalUser());
+
+        final List<User> remoteUsers = session.getRemoteUsers();
+        final List<User> allUsers = session.getUsers();
+
+        for (IActivity activity : activities) {
+
+            if (activity instanceof FileActivity) {
+                documentServer.checkFileDeleted(activity);
+            }
+
+            if (activity instanceof JupiterActivity
+                || activity instanceof ChecksumActivity) {
+
+                result.addAll(documentServer.transformIncoming(activity));
+            } else if (activity instanceof ITargetedActivity) {
+                ITargetedActivity target = (ITargetedActivity) activity;
+                result.add(new QueueItem(target.getRecipients(), activity));
+
+            } else if (remoteUsers.size() > 0
+                && !(activity instanceof ProjectsAddedActivity)) {
+                /**
+                 * ProjectsAddedActivities currently break the
+                 * Client-Server-Architecture and therefore must not be send to
+                 * clients as they already have them.
+                 */
+
+                // We must not send the activity back to the sender
+                List<User> receivers = new ArrayList<User>();
+                for (User user : allUsers) {
+                    if (!user.equals(activity.getSource())) {
+                        receivers.add(user);
+                    }
+                }
+                result.add(new QueueItem(receivers, activity));
+
+            } else {
+                result.executeLocally.add(activity);
+            }
+        }
+        return result;
     }
 }
