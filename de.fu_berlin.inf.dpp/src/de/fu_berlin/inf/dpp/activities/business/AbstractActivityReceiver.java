@@ -85,12 +85,6 @@ public class AbstractActivityReceiver implements IActivityReceiver {
     }
 
     @Override
-    public void receive(ProjectsAddedActivity fileListActivity) {
-        // do nothing
-
-    }
-
-    @Override
     public void receive(StartFollowingActivity startFollowingActivity) {
         // do nothing
 

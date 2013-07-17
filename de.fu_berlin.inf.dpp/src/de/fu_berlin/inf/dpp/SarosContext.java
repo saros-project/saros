@@ -76,6 +76,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationParameterExchangeE
 import de.fu_berlin.inf.dpp.net.internal.extensions.KickUserExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PingExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PongExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.ProjectNegotiationOfferingExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.SarosLeaveExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListReceivedExtension;
@@ -352,6 +353,7 @@ public class SarosContext implements ISarosContext {
             Class.forName(UserListReceivedExtension.class.getName());
             Class.forName(PingExtension.class.getName());
             Class.forName(PongExtension.class.getName());
+            Class.forName(ProjectNegotiationOfferingExtension.class.getName());
 
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);

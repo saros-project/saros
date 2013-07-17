@@ -1256,7 +1256,6 @@ public final class SarosSession implements ISarosSession {
         // Core Managers
         sessionContainer.addComponent(ChangeColorManager.class);
         sessionContainer.addComponent(SharedResourcesManager.class);
-        sessionContainer.addComponent(ProjectsAddedManager.class);
         sessionContainer.addComponent(PermissionManager.class);
         sessionContainer.addComponent(PreferenceManager.class);
 

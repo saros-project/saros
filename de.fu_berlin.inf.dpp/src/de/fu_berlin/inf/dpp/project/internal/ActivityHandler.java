@@ -18,7 +18,6 @@ import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.ITargetedActivity;
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
-import de.fu_berlin.inf.dpp.activities.business.ProjectsAddedActivity;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.concurrent.management.TransformationResult;
@@ -332,13 +331,7 @@ public final class ActivityHandler implements Startable {
                 ITargetedActivity target = (ITargetedActivity) activity;
                 result.add(new QueueItem(target.getRecipients(), activity));
 
-            } else if (remoteUsers.size() > 0
-                && !(activity instanceof ProjectsAddedActivity)) {
-                /**
-                 * ProjectsAddedActivities currently break the
-                 * Client-Server-Architecture and therefore must not be send to
-                 * clients as they already have them.
-                 */
+            } else if (remoteUsers.size() > 0) {
 
                 // We must not send the activity back to the sender
                 List<User> receivers = new ArrayList<User>();

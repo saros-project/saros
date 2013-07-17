@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.net.business;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
@@ -7,6 +9,7 @@ import org.jivesoftware.smack.packet.PacketExtension;
 import org.joda.time.DateTime;
 import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
@@ -14,13 +17,14 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationAcknowledgedExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationOfferingExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.ProjectNegotiationOfferingExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
 /**
- * Business Logic for handling Invitation requests
+ * Business Logic for handling incoming Session- and ProjectNegotiation requests
  */
 @Component(module = "net")
 public class InvitationHandler {
@@ -39,6 +43,11 @@ public class InvitationHandler {
     public InvitationHandler(IReceiver receiver,
         SessionIDObservable sessionIDObservablePar) {
         this.sessionIDObservable = sessionIDObservablePar;
+
+        /**
+         * Adds the packetListener that listens to incoming Session Negotiation
+         * requests to the Receiver
+         */
         receiver.addPacketListener(new PacketListener() {
 
             @Override
@@ -95,5 +104,48 @@ public class InvitationHandler {
                 }
             }
         }, InvitationOfferingExtension.PROVIDER.getPacketFilter());
+
+        /**
+         * Adds the packetListener that listens to incoming Session Negotiation
+         * requests to the Receiver
+         */
+        receiver.addPacketListener(new PacketListener() {
+
+            @Override
+            public void processPacket(Packet packet) {
+                JID fromJID = new JID(packet.getFrom());
+
+                ProjectNegotiationOfferingExtension projectNegotiation = ProjectNegotiationOfferingExtension.PROVIDER
+                    .getPayload(packet);
+
+                if (projectNegotiation == null) {
+                    log.warn("Received Project Negotiation from "
+                        + Utils.prefix(fromJID)
+                        + " that contains malformed payload");
+                    return;
+                }
+
+                String sessionID = projectNegotiation.getSessionID();
+                String processID = projectNegotiation.getProcessID();
+                List<ProjectExchangeInfo> projectInfos = projectNegotiation
+                    .getProjectInfos();
+
+                if (!sessionIDObservable.getValue().equals(sessionID)) {
+                    log.warn("Received Project Negotiation from "
+                        + Utils.prefix(fromJID)
+                        + " that is not in the same session");
+                    return;
+                }
+
+                log.info("Received Project Negotiation from " + fromJID
+                    + " with SessionID: " + sessionID + " and ProcessID: "
+                    + processID);
+
+                sessionManager.incomingProjectReceived(fromJID, projectInfos,
+                    processID);
+
+            }
+
+        }, ProjectNegotiationOfferingExtension.PROVIDER.getPacketFilter());
     }
 }

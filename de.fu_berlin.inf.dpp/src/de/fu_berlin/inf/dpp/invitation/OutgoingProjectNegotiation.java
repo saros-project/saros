@@ -29,7 +29,6 @@ import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.business.ProjectsAddedActivity;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
@@ -39,6 +38,7 @@ import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.extensions.FileListExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.ProjectNegotiationOfferingExtension;
 import de.fu_berlin.inf.dpp.project.IChecksumCache;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.Messages;
@@ -174,15 +174,20 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         // monitor.setTaskName("Sending file list...");
 
         /*
-         * For those who do not get the "magic". This activity is executed in
-         * the remote SarosSession and handled by the ProjectAddedManager which
-         * calls the SarosSessionManager which creates a
-         * IncomingProjectNegotiation instance and pass it to the SarosUI which
-         * finally opens the Wizard on the remote side
+         * The Remote receives this message at the InvitationHandler which calls
+         * the SarosSessionManager which creates a IncomingProjectNegotiation
+         * instance and pass it to the SarosUI which finally opens the Wizard on
+         * the remote side
          */
-        sarosSession.sendActivity(sarosSession.getUser(peer),
-            new ProjectsAddedActivity(sarosSession.getLocalUser(),
-                projectExchangeInfos, processID));
+        ProjectNegotiationOfferingExtension offering = new ProjectNegotiationOfferingExtension(
+            sessionID, projectExchangeInfos, processID);
+        try {
+            transmitter.sendToSessionUser(peer,
+                ProjectNegotiationOfferingExtension.PROVIDER.create(offering));
+        } catch (IOException e) {
+            // TODO cancel negotiation
+            log.error("Failed sending Project Negotiation offering", e);
+        }
     }
 
     /**
