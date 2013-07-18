@@ -202,8 +202,8 @@ public class Saros extends AbstractUIPlugin {
 
             if (sarosProperties == null) {
                 LogLog
-                    .warn("could not initialize Saros properties because the 'saros.properties'" //$NON-NLS-1$
-                        + " file could not be found on the current JAVA class path"); //$NON-NLS-1$
+                    .warn("could not initialize Saros properties because the 'saros.properties'"
+                        + " file could not be found on the current JAVA class path");
             } else {
                 System.getProperties().load(sarosProperties);
                 sarosProperties.close();
@@ -226,7 +226,7 @@ public class Saros extends AbstractUIPlugin {
 
     protected static void checkInitialized() {
         if (plugin == null || !isInitialized()) {
-            LogLog.error("Saros not initialized", new StackTrace()); //$NON-NLS-1$
+            LogLog.error("Saros not initialized", new StackTrace());
             throw new IllegalStateException();
         }
     }
@@ -257,7 +257,7 @@ public class Saros extends AbstractUIPlugin {
         sarosFeatureID = SAROS + "_" + sarosVersion; //$NON-NLS-1$
 
         setupLoggers();
-        log.info("Starting Saros " + sarosVersion + " running:\n" //$NON-NLS-1$ //$NON-NLS-2$
+        log.info("Starting Saros " + sarosVersion + " running:\n"
             + Utils.getPlatformInfo());
 
         // Remove the Bundle if an instance of it was already registered
@@ -330,7 +330,7 @@ public class Saros extends AbstractUIPlugin {
                 .toFile();
             file = new File(file, ".metadata"); //$NON-NLS-1$
             file = new File(file, "saros-" + sarosFeatureID + ".dot"); //$NON-NLS-1$ //$NON-NLS-2$
-            log.info("Saving Saros architecture diagram dot file: " //$NON-NLS-1$
+            log.info("Saving Saros architecture diagram dot file: "
                 + file.getAbsolutePath());
             dotMonitor.save(file);
         }
@@ -368,7 +368,7 @@ public class Saros extends AbstractUIPlugin {
 
             shutdownThread.join(10000);
             if (shutdownThread.isAlive())
-                log.error("could not shutdown Saros gracefully"); //$NON-NLS-1$
+                log.error("could not shutdown Saros gracefully");
 
         } finally {
             super.stop(context);
@@ -419,7 +419,7 @@ public class Saros extends AbstractUIPlugin {
             try {
                 configPrefs.flush();
             } catch (BackingStoreException e) {
-                log.error("Couldn't store global plug-in preferences", e); //$NON-NLS-1$
+                log.error("Couldn't store global plug-in preferences", e);
             }
         }
     }
@@ -448,10 +448,10 @@ public class Saros extends AbstractUIPlugin {
 
                 securePrefs = SecurePreferencesFactory.open(prefURL, null);
             } catch (MalformedURLException e) {
-                log.error("Problem with URL when attempting to access secure preferences: " //$NON-NLS-1$
+                log.error("Problem with URL when attempting to access secure preferences: "
                     + e);
             } catch (IOException e) {
-                log.error("I/O problem when attempting to access secure preferences: " //$NON-NLS-1$
+                log.error("I/O problem when attempting to access secure preferences: "
                     + e);
             } finally {
                 if (securePrefs == null)
@@ -468,7 +468,7 @@ public class Saros extends AbstractUIPlugin {
                 securePrefs.flush();
             }
         } catch (IOException e) {
-            log.error("Exception when trying to store secure preferences: " + e); //$NON-NLS-1$
+            log.error("Exception when trying to store secure preferences: " + e);
         }
     }
 
@@ -709,7 +709,7 @@ public class Saros extends AbstractUIPlugin {
                     connect(failSilently);
             }
         } catch (Exception e) {
-            log.error("internal error while connecting to the XMPP server: " //$NON-NLS-1$
+            log.error("internal error while connecting to the XMPP server: "
                 + e.getMessage(), e);
 
             String errorMessage = MessageFormat.format(

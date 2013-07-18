@@ -234,7 +234,7 @@ public class SharedProject {
         try {
             addAll(project);
         } catch (CoreException e) {
-            log.debug("Couldn't add all members of " + project.getName() + ".", //$NON-NLS-1$ //$NON-NLS-2$
+            log.debug("Couldn't add all members of " + project.getName() + ".",
                 e);
         }
 
@@ -252,7 +252,7 @@ public class SharedProject {
             if (subscriber != null)
                 subscriber.addListener(subscriberChangeListener);
             else
-                log.error("Could not add this SharedProject as an ISubscriberChangeListener."); //$NON-NLS-1$
+                log.error("Could not add this SharedProject as an ISubscriberChangeListener.");
         }
         Set<IPath> paths = resourceMap.keySet();
         for (IPath path : paths) {

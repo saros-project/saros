@@ -719,7 +719,7 @@ public final class SarosSession implements ISarosSession {
             try {
                 result.add(dataObject.getActivity(this));
             } catch (IllegalArgumentException e) {
-                log.warn("DataObject could not be attached to SarosSession: " //$NON-NLS-1$
+                log.warn("DataObject could not be attached to SarosSession: "
                     + dataObject, e);
             }
         }
@@ -1073,7 +1073,7 @@ public final class SarosSession implements ISarosSession {
                     ((IContainer) iResource).members(), IResource.class,
                     Platform.getAdapterManager());
             } catch (CoreException e) {
-                log.debug("Can't get children of Project/Folder. ", e); //$NON-NLS-1$
+                log.debug("Can't get children of Project/Folder. ", e);
             }
             if (childResources != null && (childResources.size() > 0)) {
                 for (IResource childResource : childResources) {

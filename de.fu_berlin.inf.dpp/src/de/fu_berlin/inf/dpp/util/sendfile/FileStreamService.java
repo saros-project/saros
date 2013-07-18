@@ -46,13 +46,13 @@ public class FileStreamService extends StreamService {
             // no action hooked yet
             return false;
 
-        log.info(from + " wants to send us a file."); //$NON-NLS-1$
+        log.info(from + " wants to send us a file.");
 
         final FileDescription description;
         if (file instanceof FileDescription) {
             description = (FileDescription) file;
         } else {
-            log.error("Other party send no FileDescription!"); //$NON-NLS-1$
+            log.error("Other party send no FileDescription!");
             return false;
         }
 
@@ -76,7 +76,7 @@ public class FileStreamService extends StreamService {
         try {
             return SWTUtils.runSWTSync(askUser);
         } catch (Exception e) {
-            log.error("Unexpected exception: ", e); //$NON-NLS-1$
+            log.error("Unexpected exception: ", e);
             return false;
         }
     }
@@ -89,7 +89,7 @@ public class FileStreamService extends StreamService {
             return;
         }
 
-        log.info("Starting FileTransferSession from " //$NON-NLS-1$
+        log.info("Starting FileTransferSession from "
             + newSession.getRemoteJID());
 
         ReceiveFileJob job = new ReceiveFileJob(newSession);

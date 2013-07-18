@@ -60,7 +60,7 @@ public class SendFileJob extends StreamJob {
 
         setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.TRUE);
 
-        log.info("Asking " + user + " to accept our transfer."); //$NON-NLS-1$ //$NON-NLS-2$
+        log.info("Asking " + user + " to accept our transfer.");
         monitor.subTask(MessageFormat.format(
             Messages.SendFileAction_monitor_notifying_text,
             user.getHumanReadableName()));
@@ -86,7 +86,7 @@ public class SendFileJob extends StreamJob {
         } catch (ExecutionException e) {
             monitor.subTask(MessageFormat.format(
                 Messages.SendFileAction_unexpected_error, e.getMessage()));
-            log.error("Unexpected error: ", e); //$NON-NLS-1$
+            log.error("Unexpected error: ", e);
             return new Status(IStatus.ERROR, Saros.SAROS,
                 Messages.SendFileAction_status_could_not_create_session_text, e);
         } catch (InterruptedException e) {
@@ -105,9 +105,9 @@ public class SendFileJob extends StreamJob {
         } catch (IOException e) {
             if (streamException == null) {
                 // plain IOE
-                log.error("Error while sending file: ", e); //$NON-NLS-1$
+                log.error("Error while sending file: ", e);
                 return new Status(IStatus.ERROR, Saros.SAROS,
-                    "Error while sending file", e); //$NON-NLS-1$
+                    "Error while sending file", e);
             } else {
                 // IOE because stream is down
                 if (streamException instanceof ReceiverGoneException) {
@@ -120,7 +120,7 @@ public class SendFileJob extends StreamJob {
                         .subTask(Messages.SendFileAction_monitor_lost_connection_text);
                     return Status.CANCEL_STATUS;
                 }
-                log.error("Unexpected error: ", streamException); //$NON-NLS-1$
+                log.error("Unexpected error: ", streamException);
                 return new Status(IStatus.ERROR, Saros.SAROS,
                     Messages.SendFileAction_status_unexpected_error,
                     streamException);

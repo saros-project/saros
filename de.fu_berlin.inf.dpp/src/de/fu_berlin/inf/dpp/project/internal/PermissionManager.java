@@ -131,8 +131,8 @@ public class PermissionManager extends AbstractActivityProvider implements
             synchronizer.syncExec(Utils.wrapSafe(log, fireActivityrunnable));
 
             if (!startHandle.start())
-                log.error("Didn't unblock. " //$NON-NLS-1$
-                    + "There still exist unstarted StartHandles."); //$NON-NLS-1$
+                log.error("Didn't unblock. "
+                    + "There still exist unstarted StartHandles.");
         }
     }
 }

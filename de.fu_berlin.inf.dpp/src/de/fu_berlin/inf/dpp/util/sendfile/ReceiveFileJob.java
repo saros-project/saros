@@ -51,7 +51,7 @@ public class ReceiveFileJob extends StreamJob {
                 fileDescription = (FileDescription) getStreamSession()
                     .getInitiationDescription();
             } else {
-                log.error("Got no filedescription!"); //$NON-NLS-1$
+                log.error("Got no filedescription!");
                 return new Status(IStatus.ERROR, Saros.SAROS,
                     Messages.SendFileAction_status_cannot_receive_file_text);
             }
@@ -101,7 +101,7 @@ public class ReceiveFileJob extends StreamJob {
                 }
                 if (streamException == null) {
                     // plain IOE
-                    log.error("Error while receiving file: ", e); //$NON-NLS-1$
+                    log.error("Error while receiving file: ", e);
                     return new Status(IStatus.ERROR, Saros.SAROS,
                         Messages.SendFileAction_error_receiving_file_text, e);
                 } else {
@@ -116,7 +116,7 @@ public class ReceiveFileJob extends StreamJob {
                             .subTask(Messages.SendFileAction_monitor_lost_connection_text);
                         return Status.CANCEL_STATUS;
                     }
-                    log.error("Unexpected error: ", streamException); //$NON-NLS-1$
+                    log.error("Unexpected error: ", streamException);
                     return new Status(IStatus.ERROR, Saros.SAROS,
                         Messages.SendFileAction_status_unexpected_error_text,
                         streamException);
@@ -238,7 +238,7 @@ public class ReceiveFileJob extends StreamJob {
             filename = SWTUtils.runSWTSync(getFile);
         } catch (Exception e) {
             // should not happen
-            log.error("Unexpected error: ", e); //$NON-NLS-1$
+            log.error("Unexpected error: ", e);
         } finally {
             monitor.worked(1);
             monitor.done();

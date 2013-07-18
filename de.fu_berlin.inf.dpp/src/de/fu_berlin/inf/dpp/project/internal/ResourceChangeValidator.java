@@ -136,7 +136,7 @@ public class ResourceChangeValidator extends ModelProvider {
         try {
             delta.accept(visitor);
         } catch (CoreException e) {
-            log.error("Could not run visitor: ", e); //$NON-NLS-1$
+            log.error("Could not run visitor: ", e);
         }
 
         if (!sarosSession.hasWriteAccess()
