@@ -65,13 +65,19 @@ public interface ISarosSession {
      * 
      * @host This method may only called by the host.
      * @noSWT This method mustn't be called from the SWT UI thread
-     * @param user
-     *            The user which {@link Permission} has to be changed.
-     * @blocking Returning after the {@link Permission} change is complete
-     * @cancelable
      * 
-     * @Throws CancellationException
-     * @Throws InterruptedException
+     * @blocking Returning after the {@link Permission} change is complete
+     * 
+     * @param user
+     *            The user whose {@link Permission} has to be changed
+     * @param newPermission
+     *            The new {@link Permission} of the user
+     * @param progress
+     *            The Monitor that shows the progress of the Operation
+     * 
+     * 
+     * @throws CancellationException
+     * @throws InterruptedException
      */
     public void initiatePermissionChange(User user, Permission newPermission,
         IProgressMonitor progress) throws CancellationException,

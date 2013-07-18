@@ -63,7 +63,6 @@ import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.activities.business.NOPActivity;
-import de.fu_berlin.inf.dpp.activities.business.PermissionActivity;
 import de.fu_berlin.inf.dpp.activities.business.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.business.ViewportActivity;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
@@ -97,7 +96,6 @@ import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
-import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -105,7 +103,6 @@ import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.Messages;
 import de.fu_berlin.inf.dpp.project.SharedProject;
 import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
-import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
@@ -190,6 +187,8 @@ public final class SarosSession implements ISarosSession {
     private StopManager stopManager;
 
     private ChangeColorManager changeColorManager;
+
+    private PermissionManager permissionManager;
 
     private ActivitySequencer activitySequencer;
 
@@ -414,37 +413,8 @@ public final class SarosSession implements ISarosSession {
             throw new IllegalArgumentException(
                 Messages.SarosSession_only_inviter_can_initate_permission_changes);
         }
-
-        if (user.isHost()) {
-
-            synchronizer.syncExec(Utils.wrapSafe(log, new Runnable() {
-                @Override
-                public void run() {
-                    abuseActivityCreated(new PermissionActivity(getLocalUser(),
-                        user, newPermission));
-
-                    setPermission(user, newPermission);
-                }
-            }));
-
-        } else {
-            StartHandle startHandle = getStopManager().stop(user,
-                Messages.SarosSession_performing_permission_change, progress);
-
-            synchronizer.syncExec(Utils.wrapSafe(log, new Runnable() {
-                @Override
-                public void run() {
-                    abuseActivityCreated(new PermissionActivity(getLocalUser(),
-                        user, newPermission));
-
-                    setPermission(user, newPermission);
-                }
-            }));
-
-            if (!startHandle.start())
-                log.error("Didn't unblock. " //$NON-NLS-1$
-                    + "There still exist unstarted StartHandles."); //$NON-NLS-1$
-        }
+        permissionManager.initiatePermissionChange(user, newPermission,
+            progress, synchronizer);
     }
 
     /**
@@ -755,18 +725,6 @@ public final class SarosSession implements ISarosSession {
         }
 
         return result;
-    }
-
-    /**
-     * TODO: Methods calling this function need to become an IActivityProvider
-     * and use the {@link AbstractActivityProvider#fireActivity} method to send
-     * their activities.
-     * 
-     * @param activity
-     */
-    @Deprecated
-    private void abuseActivityCreated(IActivity activity) {
-        handleActivityCreated(activity);
     }
 
     private void handleActivityCreated(IActivity activity) {
@@ -1299,6 +1257,9 @@ public final class SarosSession implements ISarosSession {
 
         changeColorManager = sessionContainer
             .getComponent(ChangeColorManager.class);
+
+        permissionManager = sessionContainer
+            .getComponent(PermissionManager.class);
 
         activitySequencer = sessionContainer
             .getComponent(ActivitySequencer.class);
