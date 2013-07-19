@@ -85,7 +85,7 @@ public class RemoteWriteAccessManager {
         }
     };
 
-    protected IActivityReceiver activityDataObjectReceiver = new AbstractActivityReceiver() {
+    protected IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
 
         @Override
         public void receive(final EditorActivity editorActivity) {
@@ -117,11 +117,10 @@ public class RemoteWriteAccessManager {
     };
 
     /**
-     * This method is called from the shared project when a new
-     * activityDataObject arrives
+     * This method is called from the shared project when a new Activity arrives
      */
-    public void exec(final IActivity activityDataObject) {
-        activityDataObject.dispatch(activityDataObjectReceiver);
+    public void exec(final IActivity activity) {
+        activity.dispatch(activityReceiver);
     }
 
     public void dispose() {
@@ -143,8 +142,8 @@ public class RemoteWriteAccessManager {
 
     /**
      * Connects a document under the given path as a reaction on a remote
-     * activityDataObject of a user with {@link Permission#WRITE_ACCESS} (e.g.
-     * Activate Editor).
+     * Activity of a user with {@link Permission#WRITE_ACCESS} (e.g. Activate
+     * Editor).
      */
     protected void connectDocumentProvider(SPath path) {
 
@@ -172,8 +171,8 @@ public class RemoteWriteAccessManager {
 
     /**
      * Disconnects a document under the given path as a reaction on a remote
-     * activityDataObject of a user with {@link Permission#WRITE_ACCESS} (e.g.
-     * Close Editor)
+     * Activity of a user with {@link Permission#WRITE_ACCESS} (e.g. Close
+     * Editor)
      */
     protected void disconnectDocumentProvider(final SPath path) {
 

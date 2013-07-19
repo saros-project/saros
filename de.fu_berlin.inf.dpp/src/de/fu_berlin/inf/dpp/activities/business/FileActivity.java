@@ -39,8 +39,8 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
     protected final Long checksum;
 
     /**
-     * Utility method for creating a file activity of type == Created for a
-     * given path.
+     * Utility method for creating a FileActivity of type {@link Type#Created}
+     * for a given path.
      * 
      * This method will make a snapshot copy of the file at this point in time.
      * 
@@ -85,7 +85,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
     }
 
     /**
-     * Builder for moving files.
+     * Builder for moving files (type {@link Type#Moved}).
      * 
      * @param source
      *            JID of the origin user
@@ -96,7 +96,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
      *            path where the file moved from
      * @param contentChange
      *            if true, a snapshot copy is made of the file at the
-     *            destination path and sent as part of the activityDataObject.
+     *            destination path and sent as part of the Activity.
      * @throws IOException
      *             the new content of the file could not be read
      */
@@ -115,7 +115,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
     }
 
     /**
-     * Builder for removing files
+     * Builder for removing files (type {@link Type#Removed})
      * 
      * @param path
      *            the path of the file to remove
@@ -130,17 +130,17 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
      * Generic constructor for {@link FileActivity}s
      * 
      * @param source
-     *            JID the user who is the source (originator) of this
-     *            activityDataObject
+     *            the user who is the source (originator) of this Activity
      * @param newPath
-     *            where to save the data, destination of a move, file to to
-     *            remove depending on type
+     *            where to save the data (if {@link Type#Created}), destination
+     *            of a move (if {@link Type#Moved}), file to remove (if
+     *            {@link Type#Removed})
      * @param oldPath
-     *            if type == Moved, the path from where the file was moved (null
-     *            otherwise)
+     *            if type is {@link Type#Moved}, the path from where the file
+     *            was moved (<code>null</code> otherwise)
      * @param data
-     *            data of the file to be created (only valid for creating and
-     *            moving)
+     *            data of the file to be created (only valid for
+     *            {@link Type#Created} and {@link Type#Moved})
      */
     public FileActivity(User source, Type type, SPath newPath, SPath oldPath,
         byte[] data, Purpose purpose, Long checksum) {
@@ -179,8 +179,8 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
     }
 
     /**
-     * Returns the old/source path in case this activityDataObject represents a
-     * moving of files.
+     * Returns the old/source path in case this Activity represents a moving of
+     * files.
      */
     public SPath getOldPath() {
         return this.oldPath;
@@ -191,9 +191,9 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
     }
 
     /**
-     * @return the contents of this file for incoming file creation
-     *         activityDataObjects ( {@link #getType()} == {@link Type#Created}.
-     *         <code>null</code> otherwise.
+     * @return the contents of this file for incoming file creation Activities (
+     *         if {@link #getType()} == {@link Type#Created}; <code>null</code>
+     *         otherwise.
      */
     public byte[] getContents() {
         return this.data;

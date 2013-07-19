@@ -25,8 +25,8 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
  * This class contains the state of the editors, viewports and selections of all
- * remote users as we believe it to be by listening to the activityDataObjects
- * we receive.
+ * remote users as we believe it to be by listening to the Activities we
+ * receive.
  */
 public class RemoteEditorManager {
 
@@ -172,7 +172,7 @@ public class RemoteEditorManager {
             }
         }
 
-        protected IActivityReceiver activityDataObjectReceiver = new AbstractActivityReceiver() {
+        protected IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
             @Override
             public void receive(EditorActivity editorActivity) {
 
@@ -194,18 +194,17 @@ public class RemoteEditorManager {
             }
 
             @Override
-            public void receive(ViewportActivity viewportActivityDataObject) {
+            public void receive(ViewportActivity viewportActivity) {
 
-                setViewport(viewportActivityDataObject.getPath(),
-                    viewportActivityDataObject.getLineRange());
+                setViewport(viewportActivity.getPath(),
+                    viewportActivity.getLineRange());
             }
 
             @Override
-            public void receive(
-                TextSelectionActivity textSelectionActivityDataObject) {
+            public void receive(TextSelectionActivity textSelectionActivity) {
 
-                setSelection(textSelectionActivityDataObject.getPath(),
-                    textSelectionActivityDataObject.getSelection());
+                setSelection(textSelectionActivity.getPath(),
+                    textSelectionActivity.getSelection());
             }
         };
 
@@ -239,8 +238,8 @@ public class RemoteEditorManager {
             return new HashSet<SPath>(openEditors.keySet());
         }
 
-        public void exec(IActivity activityDataObject) {
-            activityDataObject.dispatch(activityDataObjectReceiver);
+        public void exec(IActivity activity) {
+            activity.dispatch(activityReceiver);
         }
     }
 

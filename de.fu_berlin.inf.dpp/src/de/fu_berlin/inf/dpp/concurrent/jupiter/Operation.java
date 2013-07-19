@@ -8,8 +8,8 @@ import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.ITextOperation;
 
 /**
- * An Operation is a representation of a user activityDataObject for the use by
- * an algorithm like Jupiter.
+ * An Operation is a representation of a user Activity for the use by an
+ * algorithm like Jupiter.
  * 
  * This interface must be implemented by all operations. An operation is
  * application dependent and therefore this interface does not contain any

@@ -28,11 +28,11 @@ import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
- * Activity that for activating, closing, and saving editors. If the
+ * Activity for activating, closing, and saving editors. If the
  * {@link #getPath()} returns <code>null</code> then no resource is currently
  * active.
  * 
- * Saving is not document but editor specific because one editor might perform
+ * Saving is not document- but editor-specific because one editor might perform
  * changes on the document before actually saving while others just save. An
  * example is a Java editor with save actions enabled vs. a plain text editor
  * for the very same document.
@@ -61,7 +61,7 @@ public class EditorActivity extends AbstractActivity implements
         if (path == null) {
             if (type != Type.Activated) {
                 throw new IllegalArgumentException(
-                    "Null path for non-activation type editor activityDataObject given.");
+                    "Null path for non-activation type EditorActivity given.");
             }
         } else {
             if (path.getEditorType() == null) {

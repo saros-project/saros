@@ -15,47 +15,7 @@ package de.fu_berlin.inf.dpp.activities.business;
 public class AbstractActivityReceiver implements IActivityReceiver {
 
     @Override
-    public void receive(ViewportActivity viewportActivity) {
-        // do nothing
-    }
-
-    @Override
-    public void receive(TextSelectionActivity textSelectionActivity) {
-        // do nothing
-    }
-
-    @Override
-    public void receive(TextEditActivity textEditActivity) {
-        // do nothing
-    }
-
-    @Override
-    public void receive(PermissionActivity permissionActivity) {
-        // do nothing
-    }
-
-    @Override
-    public void receive(FolderActivity folderActivity) {
-        // do nothing
-    }
-
-    @Override
-    public void receive(FileActivity fileActivity) {
-        // do nothing
-    }
-
-    @Override
-    public void receive(EditorActivity editorActivity) {
-        // do nothing
-    }
-
-    @Override
-    public void receive(JupiterActivity jupiterActivity) {
-        // do nothing
-    }
-
-    @Override
-    public void receive(StopActivity stopActivity) {
+    public void receive(ChangeColorActivity changeColorActivity) {
         // do nothing
     }
 
@@ -70,35 +30,72 @@ public class AbstractActivityReceiver implements IActivityReceiver {
     }
 
     @Override
+    public void receive(EditorActivity editorActivity) {
+        // do nothing
+    }
+
+    @Override
+    public void receive(FileActivity fileActivity) {
+        // do nothing
+    }
+
+    @Override
+    public void receive(FolderActivity folderActivity) {
+        // do nothing
+    }
+
+    @Override
+    public void receive(JupiterActivity jupiterActivity) {
+        // do nothing
+    }
+
+    @Override
+    public void receive(NOPActivity nopActivity) {
+        // do nothing
+    }
+
+    @Override
+    public void receive(PermissionActivity permissionActivity) {
+        // do nothing
+    }
+
+    @Override
     public void receive(ProgressActivity progressActivity) {
-        // do nothing
-    }
-
-    @Override
-    public void receive(VCSActivity activity) {
-        // do nothing
-    }
-
-    @Override
-    public void receive(ChangeColorActivity changeColorActivity) {
         // do nothing
     }
 
     @Override
     public void receive(StartFollowingActivity startFollowingActivity) {
         // do nothing
+    }
 
+    @Override
+    public void receive(StopActivity stopActivity) {
+        // do nothing
     }
 
     @Override
     public void receive(StopFollowingActivity stopFollowingActivity) {
         // do nothing
-
     }
 
     @Override
-    public void receive(NOPActivity nopActivity) {
+    public void receive(TextEditActivity textEditActivity) {
         // do nothing
+    }
 
+    @Override
+    public void receive(TextSelectionActivity textSelectionActivity) {
+        // do nothing
+    }
+
+    @Override
+    public void receive(VCSActivity vcsActivity) {
+        // do nothing
+    }
+
+    @Override
+    public void receive(ViewportActivity viewportActivity) {
+        // do nothing
     }
 }

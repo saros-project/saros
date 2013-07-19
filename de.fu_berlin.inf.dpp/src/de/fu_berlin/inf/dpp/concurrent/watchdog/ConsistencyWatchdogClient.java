@@ -140,12 +140,10 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
     protected IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
 
         @Override
-        public void receive(ChecksumActivity checksumActivityDataObject) {
+        public void receive(ChecksumActivity checksumActivity) {
+            latestChecksums.put(checksumActivity.getPath(), checksumActivity);
 
-            latestChecksums.put(checksumActivityDataObject.getPath(),
-                checksumActivityDataObject);
-
-            performCheck(checksumActivityDataObject);
+            performCheck(checksumActivity);
         }
 
         @Override
@@ -165,9 +163,9 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
         }
 
         @Override
-        public void receive(FileActivity fileActivityDataObject) {
+        public void receive(FileActivity fileActivity) {
 
-            if (fileActivityDataObject.isRecovery()) {
+            if (fileActivity.isRecovery()) {
                 int currentValue;
                 while ((currentValue = filesRemaining.get()) > 0) {
                     if (filesRemaining.compareAndSet(currentValue,
@@ -184,18 +182,17 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
              * created/deleted via FileActivity)
              */
 
-            switch (fileActivityDataObject.getType()) {
+            switch (fileActivity.getType()) {
             case Created:
             case Removed:
-                latestChecksums.remove(fileActivityDataObject.getPath());
+                latestChecksums.remove(fileActivity.getPath());
                 break;
             case Moved:
-                latestChecksums.remove(fileActivityDataObject.getPath());
-                latestChecksums.remove(fileActivityDataObject.getOldPath());
+                latestChecksums.remove(fileActivity.getPath());
+                latestChecksums.remove(fileActivity.getOldPath());
                 break;
             default:
-                log.error("Unhandled FileActivity.Type: "
-                    + fileActivityDataObject);
+                log.error("Unhandled FileActivity.Type: " + fileActivity);
             }
         }
     };
@@ -351,8 +348,8 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
     }
 
     @Override
-    public void exec(IActivity activityDataObject) {
-        activityDataObject.dispatch(activityReceiver);
+    public void exec(IActivity activity) {
+        activity.dispatch(activityReceiver);
     }
 
     protected boolean isInconsistent(ChecksumActivity checksum) {
@@ -431,9 +428,9 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
             return false;
         }
 
-        ChecksumActivity checksumActivityDataObject = latestChecksums.get(path);
-        if (checksumActivityDataObject != null) {
-            performCheck(checksumActivityDataObject);
+        ChecksumActivity checksumActivity = latestChecksums.get(path);
+        if (checksumActivity != null) {
+            performCheck(checksumActivity);
             return true;
         } else {
             return false;

@@ -11,19 +11,19 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
- * A checksum activityDataObject is used to communicate checksums from the host
- * to the clients.
+ * A ChecksumActivity is used to communicate checksums from the host to the
+ * clients.
  * 
- * A checksum activityDataObject always relates to a certain file (given a path)
- * and contains the hash and length of the file.
+ * A ChecksumActivity always relates to a certain file (given a path) and
+ * contains the hash and length of the file.
  * 
  * To indicate that a file is missing on the host NON_EXISTING_DOC is used.
  * 
- * A checksum activityDataObject also may contain a JupiterTimestamp to indicate
- * at which point of time the checksum was created. A user can use this
- * information to see whether the checksum can be used to check for consistency
- * or whether the local user has already written additional text which
- * invalidates the checksum.
+ * A ChecksumActivity also may contain a {@link Timestamp} to indicate at which
+ * point of time the checksum was created. A user can use this information to
+ * see whether the checksum can be used to check for consistency or whether the
+ * local user has already written additional text which invalidates the
+ * checksum.
  */
 public class ChecksumActivity extends AbstractActivity implements
     IResourceActivity {
@@ -39,7 +39,7 @@ public class ChecksumActivity extends AbstractActivity implements
     protected final Timestamp jupiterTimestamp;
 
     /**
-     * Constructor for a ChecksumActivity with no jupiterTimestamp set (such is
+     * Constructor for a ChecksumActivity with no {@link Timestamp} set (such is
      * used when communicating with users who have
      * {@link Permission#READONLY_ACCESS})
      */
@@ -48,8 +48,8 @@ public class ChecksumActivity extends AbstractActivity implements
     }
 
     /**
-     * Constructor for checksum activities including a Timestamp (for users who
-     * have {@link Permission#WRITE_ACCESS});
+     * Constructor for ChecksumActivities including a {@link Timestamp} (for
+     * users who have {@link Permission#WRITE_ACCESS});
      */
     public ChecksumActivity(User source, SPath path, long hash, long length,
         @Nullable Timestamp jupiterTimestamp) {
@@ -71,8 +71,7 @@ public class ChecksumActivity extends AbstractActivity implements
     }
 
     /**
-     * Returns a new checksum activityDataObject which is identical to this
-     * activityDataObject, but has the timestamp set to the given value.
+     * Returns a copy of the ChecksumActivity with a new {@link Timestamp}.
      */
     public ChecksumActivity withTimestamp(Timestamp jupiterTimestamp) {
         return new ChecksumActivity(source, path, hash, length,

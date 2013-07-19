@@ -26,7 +26,7 @@ import de.fu_berlin.inf.dpp.activities.serializable.PermissionActivityDataObject
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
- * A {@link PermissionActivityDataObject} indicates that a user has a new
+ * A PermissionActivity indicates that a {@link User} has a new
  * {@link Permission}.
  */
 public class PermissionActivity extends AbstractActivity {

@@ -35,7 +35,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
- * An immutable text activityDataObject.
+ * An immutable TextEditActivity.
  * 
  * @author rdjemili
  */
@@ -51,16 +51,15 @@ public class TextEditActivity extends AbstractActivity implements
 
     /**
      * @param offset
-     *            the offset inside the document where this activityDataObject
-     *            happened.
+     *            the offset inside the document where this Activity happened.
      * @param text
      *            the text that was inserted.
      * @param replacedText
-     *            the text that was replaced by this activityDataObject.
+     *            the text that was replaced by this Activity.
      * @param path
-     *            path of the editor where this activityDataObject happened.
+     *            path of the editor where this Activity happened.
      * @param source
-     *            JID of the user that caused this activityDataObject
+     *            JID of the user that caused this Activity
      */
     public TextEditActivity(User source, int offset, String text,
         String replacedText, SPath path) {
@@ -169,12 +168,12 @@ public class TextEditActivity extends AbstractActivity implements
      */
     public Operation toOperation() {
 
-        // delete activityDataObject
+        // delete Activity
         if ((replacedText.length() > 0) && (text.length() == 0)) {
             return new DeleteOperation(offset, replacedText);
         }
 
-        // insert activityDataObject
+        // insert Activity
         if ((replacedText.length() == 0) && (text.length() > 0)) {
             return new InsertOperation(offset, text);
         }

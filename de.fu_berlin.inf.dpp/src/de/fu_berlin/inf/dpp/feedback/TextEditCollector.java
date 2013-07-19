@@ -42,18 +42,16 @@ import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * <p>
- * A collector class that collects local text edit activityDataObjects and
- * compares them in relation to parallelism or rather concurrency with remote
- * text events.
+ * A collector class that collects local TextEditActivitys and compares them in
+ * relation to parallelism or rather concurrency with remote text events.
  * </p>
  * <p>
  * It is measured how many characters the local user wrote in a session
  * (whitespaces are omitted, because Eclipse produces many of them automatically
- * e.g. when a new line is started), how many text edit activityDataObjects he
- * produced (which can be different to the number of characters he wrote, e.g.
- * when copy&paste or Eclipse's method generation was used) and how concurrent
- * the local user's writing was to remote users using different sample
- * intervals.
+ * e.g. when a new line is started), how many TextEditActivitys he produced
+ * (which can be different to the number of characters he wrote, e.g. when
+ * copy&paste or Eclipse's method generation was used) and how concurrent the
+ * local user's writing was to remote users using different sample intervals.
  * </p>
  * <p>
  * Furthermore, it accumulates the characters edited for all remote
@@ -77,9 +75,9 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * auto completion of a comment block)
  * </p>
  * <p>
- * NOTE: Text edit activityDataObjects that are triggered by Eclipse (e.g. when
- * restoring an editor) are counted as well. And refactorings can produce quite
- * a large number of characters that are counted. <br>
+ * NOTE: TextEditActivitys that are triggered by Eclipse (e.g. when restoring an
+ * editor) are counted as well. And refactorings can produce quite a large
+ * number of characters that are counted. <br>
  * </p>
  * <p>
  * Fixed: The number of non parallel edits was set to 100% if there are no
@@ -163,10 +161,10 @@ public class TextEditCollector extends AbstractStatisticCollector {
 
     protected JID localUserJID = null;
 
-    /** List to contain local text activityDataObjects */
+    /** List to contain local {@link EditEvent}s */
     protected List<EditEvent> localEvents = Collections
         .synchronizedList(new ArrayList<EditEvent>());
-    /** List to contain remote text activityDataObjects */
+    /** List to contain remote {@link EditEvent}s */
     protected List<EditEvent> remoteEvents = Collections
         .synchronizedList(new ArrayList<EditEvent>());
 
@@ -238,7 +236,7 @@ public class TextEditCollector extends AbstractStatisticCollector {
                 if (user.isLocal()) {
                     /*
                      * accumulate the written chars of the local user and store
-                     * the time and text length of this activityDataObject
+                     * the time and text length of this Activity
                      */
                     addToCharsWritten(textLength);
                     localEvents.add(event);
@@ -253,7 +251,7 @@ public class TextEditCollector extends AbstractStatisticCollector {
                      * those text edits are remote it needs to be determined,
                      * who made the edit and to increase the appropriate edited
                      * character count. The total text edit count is increased
-                     * by one for each text edit activity received.
+                     * by one for each TextEditActivity received.
                      */
                     remoteEvents.add(event);
                     Integer currentCharCount = remoteCharCount.get(id);

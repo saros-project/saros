@@ -313,24 +313,24 @@ public class UndoManager extends AbstractActivityProvider implements Disposable 
     protected IActivityListener activityListener = new IActivityListener() {
 
         @Override
-        public void activityCreated(final IActivity activityDataObject) {
+        public void activityCreated(final IActivity activity) {
             SWTUtils.runSafeSWTSync(log, new Runnable() {
 
                 @Override
                 public void run() {
-                    activityDataObject.dispatch(activityDataObjectReceiver);
+                    activity.dispatch(activityReceiver);
                 }
             });
         }
     };
 
-    protected IActivityReceiver activityDataObjectReceiver = new AbstractActivityReceiver() {
+    protected IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
 
         /**
-         * @return true if the given activityDataObject was created locally
+         * @return true if the given Activity was created locally
          */
-        protected boolean local(IActivity activityDataObject) {
-            return activityDataObject.getSource().isLocal();
+        protected boolean local(IActivity activity) {
+            return activity.getSource().isLocal();
         }
 
         /**
@@ -338,21 +338,21 @@ public class UndoManager extends AbstractActivityProvider implements Disposable 
          * undo history.
          */
         @Override
-        public void receive(TextEditActivity textEditActivityDataObject) {
+        public void receive(TextEditActivity textEditActivity) {
 
             if (!enabled)
                 return;
 
             /*
-             * When performing an undo/redo there are fired activityDataObjects
-             * which are expected and have to be ignored when coming back.
+             * When performing an undo/redo there are fired Activities which are
+             * expected and have to be ignored when coming back.
              */
-            if (expectedActivities.remove(textEditActivityDataObject))
+            if (expectedActivities.remove(textEditActivity))
                 return;
 
-            Operation operation = textEditActivityDataObject.toOperation();
+            Operation operation = textEditActivity.toOperation();
 
-            if (!local(textEditActivityDataObject)) {
+            if (!local(textEditActivity)) {
                 if (currentLocalCompositeOperation != null)
                     currentLocalCompositeOperation = transformation.transform(
                         currentLocalCompositeOperation, operation,
@@ -362,11 +362,10 @@ public class UndoManager extends AbstractActivityProvider implements Disposable 
                         currentLocalAtomicOperation, operation, Boolean.FALSE);
                 }
                 log.debug("adding remote " + operation + " to history");
-                undoHistory.add(textEditActivityDataObject.getPath(),
-                    Type.REMOTE, operation);
+                undoHistory.add(textEditActivity.getPath(), Type.REMOTE,
+                    operation);
             } else {
-                if (!textEditActivityDataObject.getPath().equals(
-                    currentActiveEditor)) {
+                if (!textEditActivity.getPath().equals(currentActiveEditor)) {
                     log.error("Editor of the local TextEditActivity is not the current "
                         + "active editor. Possibly the current active editor is not"
                         + " up to date.");
@@ -597,8 +596,8 @@ public class UndoManager extends AbstractActivityProvider implements Disposable 
     }
 
     @Override
-    public void exec(IActivity activityDataObject) {
-        activityDataObject.dispatch(activityDataObjectReceiver);
+    public void exec(IActivity activity) {
+        activity.dispatch(activityReceiver);
     }
 
     /**

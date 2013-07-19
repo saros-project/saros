@@ -565,9 +565,9 @@ public class EditorManager extends AbstractActivityProvider {
      * so that all remote parties know that the user is now positioned at the
      * given viewport in the given part.
      * 
-     * A viewport activityDataObject not necessarily indicates that the given
-     * IEditorPart is currently active. If it is (the given IEditorPart matches
-     * the locallyActiveEditor) then the {@link #localViewport} is updated to
+     * A ViewportActivity not necessarily indicates that the given IEditorPart
+     * is currently active. If it is (the given IEditorPart matches the
+     * locallyActiveEditor) then the {@link #localViewport} is updated to
      * reflect this.
      * 
      * 
@@ -750,7 +750,7 @@ public class EditorManager extends AbstractActivityProvider {
         }
 
         // First let the remote managers update itself based on the
-        // activityDataObject
+        // Activity
         remoteEditorManager.exec(activity);
         remoteWriteAccessManager.exec(activity);
 
@@ -878,8 +878,8 @@ public class EditorManager extends AbstractActivityProvider {
                 .getSelection(user);
             /**
              * user with {@link User.Permission#WRITE_ACCESS} selection can be
-             * null if viewport activityDataObject came before the first text
-             * selection activityDataObject.
+             * null if ViewportActivity came before the first
+             * TextSelectActivity.
              */
             if (userWithWriteAccessSelection != null) {
                 /**
@@ -1503,7 +1503,7 @@ public class EditorManager extends AbstractActivityProvider {
     }
 
     /**
-     * Sends an activityDataObject for clients to save the editor of given path.
+     * Sends an Activity for clients to save the editor of given path.
      * 
      * @param path
      *            the project relative path to the resource that the user with

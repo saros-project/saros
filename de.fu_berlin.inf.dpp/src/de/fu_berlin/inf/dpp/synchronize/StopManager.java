@@ -119,7 +119,7 @@ public final class StopManager extends AbstractActivityProvider implements
      *               arrives it will be removed from the set. For incoming lock
      *               requests lockProject(true) will be called.
      */
-    protected IActivityReceiver activityDataObjectReceiver = new AbstractActivityReceiver() {
+    protected IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
         @Override
         public void receive(final StopActivity stopActivity) {
             assert sarosSession != null;
@@ -462,12 +462,9 @@ public final class StopManager extends AbstractActivityProvider implements
      *               class will use the triple dispatch to filter for the
      *               activities the class is interested in.
      */
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public void exec(IActivity activityDataObject) {
-        activityDataObject.dispatch(activityDataObjectReceiver);
+    public void exec(IActivity activity) {
+        activity.dispatch(activityReceiver);
     }
 
     /**
