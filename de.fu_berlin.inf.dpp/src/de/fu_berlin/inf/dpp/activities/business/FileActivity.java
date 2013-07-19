@@ -1,16 +1,16 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
-import org.apache.commons.io.FileUtils;
+import org.eclipse.core.resources.IFile;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.util.FileUtils;
 
 public class FileActivity extends AbstractActivity implements IResourceActivity {
 
@@ -52,33 +52,9 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
     public static FileActivity created(User source, SPath path, Purpose purpose)
         throws IOException {
 
-        // TODO Use Eclipse Method of getting the contents of a file:
-        // IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-        //
-        // IFile file = (IFile) project.findMember(path);
-        // IPath npath = file.getProjectRelativePath();
-        //
-        // InputStream in = null;
-        // byte[] content = null;
-        // try {
-        // in = file.getContents();
-        // content = IOUtils.toByteArray(in);
-        // } catch (CoreException e) {
-        // log.warn(".created() can not get the content of "
-        // + npath.toOSString());
-        // } finally {
-        // IOUtils.closeQuietly(in);
-        // }
-        //
-        // return new FileActivity(source, Type.Created, npath, null,
-        // content,
-        // purpose);
-        Long checksum = de.fu_berlin.inf.dpp.util.FileUtils.checksum(path
-            .getFile());
-
-        File f = new File(path.getFile().getLocation().toOSString());
-
-        byte[] content = FileUtils.readFileToByteArray(f);
+        IFile file = path.getFile();
+        Long checksum = FileUtils.checksum(file);
+        byte[] content = FileUtils.getLocalFileContent(file);
 
         return new FileActivity(source, Type.Created, path, null, content,
             purpose, checksum);
@@ -105,10 +81,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
 
         byte[] content = null;
         if (contentChange) {
-            // TODO File should not be read using JDK methods but must use
-            // Eclipse!
-            File file = new File(destPath.getFile().getLocation().toOSString());
-            content = FileUtils.readFileToByteArray(file);
+            content = FileUtils.getLocalFileContent(destPath.getFile());
         }
         return new FileActivity(source, Type.Moved, destPath, sourcePath,
             content, Purpose.ACTIVITY, null);

@@ -25,6 +25,7 @@ import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -608,8 +609,17 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
     }
 
     private void handleFileCreation(FileActivity activity) throws CoreException {
-        FileUtils.writeFile(new ByteArrayInputStream(activity.getContents()),
-            activity.getPath().getFile(), new NullProgressMonitor());
+        IFile file = activity.getPath().getFile();
+
+        byte[] actualContent = FileUtils.getLocalFileContent(file);
+        byte[] newContent = activity.getContents();
+
+        if (!Arrays.equals(newContent, actualContent)) {
+            FileUtils.writeFile(new ByteArrayInputStream(newContent), file,
+                new NullProgressMonitor());
+        } else {
+            log.info("FileActivity " + activity + " dropped (same content)");
+        }
     }
 
     protected void exec(FolderActivity activity) throws CoreException {

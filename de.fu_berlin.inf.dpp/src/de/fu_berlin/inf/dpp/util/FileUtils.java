@@ -503,4 +503,30 @@ public class FileUtils {
         fileCountAndSize.v = totalFileCount;
         return fileCountAndSize;
     }
+
+    /**
+     * Retrieves the content of a local file
+     * 
+     * @param localFile
+     * @return Byte array of the file contents. Is <code>null</code> if the file
+     *         does not exist or is out of sync, the reference points to no
+     *         file, or the conversion to a byte array failed.
+     */
+    public static byte[] getLocalFileContent(IFile localFile) {
+        InputStream in = null;
+        byte[] content = null;
+        try {
+            in = localFile.getContents();
+            content = IOUtils.toByteArray(in);
+        } catch (CoreException e) {
+            log.warn("could not get content of file " + localFile.getFullPath());
+        } catch (IOException e) {
+            log.warn("could not convert file content to byte array (file: "
+                + localFile.getFullPath() + ")");
+        } finally {
+            IOUtils.closeQuietly(in);
+        }
+        return content;
+    }
+
 }
