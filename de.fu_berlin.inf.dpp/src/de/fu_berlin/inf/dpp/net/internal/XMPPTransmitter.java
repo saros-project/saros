@@ -224,24 +224,20 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         return connection == null || !connection.isConnected();
     }
 
-    private synchronized void prepareConnection(Connection connection) {
-        this.connection = connection;
-    }
-
-    private synchronized void disposeConnection() {
-        if (connection == null) {
-            log.error("disposeConnection() called twice.");
-            return;
-        }
-        connection = null;
-    }
-
     @Override
     public synchronized void connectionStateChanged(Connection connection,
-        ConnectionState newState) {
-        if (newState == ConnectionState.CONNECTED)
-            prepareConnection(connection);
-        else if (this.connection != null)
-            disposeConnection();
+        ConnectionState state) {
+
+        switch (state) {
+        case CONNECTING:
+            this.connection = connection;
+            break;
+        case ERROR:
+        case NOT_CONNECTED:
+            this.connection = null;
+            break;
+        default:
+            break; // NOP
+        }
     }
 }
