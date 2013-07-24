@@ -269,7 +269,7 @@ public class ConsistencyWatchdogHandler implements Startable {
                     checksum.update();
 
                     activityProvider.fireActivity(new ChecksumActivity(user,
-                        path, checksum.getHash(), checksum.getLength()));
+                        path, checksum.getHash(), checksum.getLength(), null));
                 } catch (CoreException e) {
                     log.warn("Could not check checksum of file "
                         + path.toString());

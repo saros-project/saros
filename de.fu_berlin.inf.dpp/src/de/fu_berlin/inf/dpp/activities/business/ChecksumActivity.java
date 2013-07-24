@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.activities.business;
 import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.ChecksumActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
@@ -39,17 +38,22 @@ public class ChecksumActivity extends AbstractActivity implements
     protected final Timestamp jupiterTimestamp;
 
     /**
-     * Constructor for a ChecksumActivity with no {@link Timestamp} set (such is
-     * used when communicating with users who have
-     * {@link Permission#READONLY_ACCESS})
-     */
-    public ChecksumActivity(User source, SPath path, long hash, long length) {
-        this(source, path, hash, length, null);
-    }
-
-    /**
-     * Constructor for ChecksumActivities including a {@link Timestamp} (for
-     * users who have {@link Permission#WRITE_ACCESS});
+     * Constructor for ChecksumActivities. Timestamp can be null.
+     * ChecksumActivities created by the watchdog don't have access to the
+     * JupiterClients and therefore create an Activity without timestamp.
+     * Timestamps will be added later by the ConcurentDocumentClient /-Server
+     * (by creating a new Activity with a timestamp)
+     * 
+     * @param source
+     *            The User that created this activity
+     * @param path
+     *            The SPath pointing to the document
+     * @param hash
+     *            The hashcode of the document
+     * @param length
+     *            The length of the document
+     * @param jupiterTimestamp
+     *            The current jupiterTimestamp for this document (nullable)
      */
     public ChecksumActivity(User source, SPath path, long hash, long length,
         @Nullable Timestamp jupiterTimestamp) {
@@ -67,7 +71,7 @@ public class ChecksumActivity extends AbstractActivity implements
      */
     public static ChecksumActivity missing(User source, SPath path) {
         return new ChecksumActivity(source, path, NON_EXISTING_DOC,
-            NON_EXISTING_DOC);
+            NON_EXISTING_DOC, null);
     }
 
     /**
@@ -147,6 +151,7 @@ public class ChecksumActivity extends AbstractActivity implements
     @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
         return new ChecksumActivityDataObject(source.getJID(),
-            path.toSPathDataObject(sarosSession), hash, length);
+            path.toSPathDataObject(sarosSession), hash, length,
+            jupiterTimestamp);
     }
 }

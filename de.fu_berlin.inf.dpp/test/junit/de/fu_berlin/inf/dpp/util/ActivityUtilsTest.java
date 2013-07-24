@@ -27,7 +27,7 @@ public class ActivityUtilsTest {
 
         for (int i = 5; i > 0; i--) {
             ChecksumActivityDataObject tmp = new ChecksumActivityDataObject(
-                new JID(""), sPath, 0, 0);
+                new JID(""), sPath, 0, 0, null);
 
             TimedActivityDataObject tmp1 = new TimedActivityDataObject(tmp,
                 new JID(""), 0);

@@ -5,7 +5,6 @@ import org.picocontainer.annotations.Nullable;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
@@ -41,18 +40,20 @@ public class ChecksumActivityDataObject extends
     protected Timestamp jupiterTimestamp;
 
     /**
-     * Constructor for a ChecksumActivityDataObject with no jupiterTimestamp set
-     * (such is used when communicating with users who have
-     * {@link Permission#READONLY_ACCESS})
-     */
-    public ChecksumActivityDataObject(JID source,
-        SPathDataObject sPathDataObject, long hash, long length) {
-        this(source, sPathDataObject, hash, length, null);
-    }
-
-    /**
-     * Constructor for checksum activityDataObjects including a Timestamp (for
-     * users who have {@link Permission#WRITE_ACCESS})
+     * Constructor for checksum activityDataObjects. Timestamp can be null.
+     * ChecksumActivity can have a null timestamp and as this class is a
+     * representation of the ChecksumActivity it also allows a timestamp of null
+     * 
+     * @param source
+     *            The User that created this activity
+     * @param sPathDataObject
+     *            The SPath pointing to the document
+     * @param hash
+     *            The hashcode of the document
+     * @param length
+     *            The length of the document
+     * @param jupiterTimestamp
+     *            The current jupiterTimestamp for this document
      */
     public ChecksumActivityDataObject(JID source,
         SPathDataObject sPathDataObject, long hash, long length,
