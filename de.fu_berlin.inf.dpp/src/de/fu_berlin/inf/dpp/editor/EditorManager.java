@@ -248,23 +248,20 @@ public class EditorManager extends AbstractActivityProvider {
 
             // TODO The user should be able to ask us for this state
 
-            // Let the new user know where we are
-            List<User> recipient = Collections.singletonList(user);
-
+            // Send awareness-informations
             User localUser = sarosSession.getLocalUser();
             for (SPath path : getLocallyOpenEditors()) {
-                fireActivity(recipient, new EditorActivity(localUser,
-                    Type.ACTIVATED, path));
+                fireActivity(new EditorActivity(localUser, Type.ACTIVATED, path));
             }
 
-            fireActivity(recipient, new EditorActivity(localUser,
-                Type.ACTIVATED, locallyActiveEditor));
+            fireActivity(new EditorActivity(localUser, Type.ACTIVATED,
+                locallyActiveEditor));
 
             if (locallyActiveEditor == null)
                 return;
             if (localViewport != null) {
-                fireActivity(recipient, new ViewportActivity(localUser,
-                    localViewport, locallyActiveEditor));
+                fireActivity(new ViewportActivity(localUser, localViewport,
+                    locallyActiveEditor));
             } else {
                 log.warn("No viewport for locallyActivateEditor: "
                     + locallyActiveEditor);
@@ -274,8 +271,8 @@ public class EditorManager extends AbstractActivityProvider {
                 int offset = localSelection.getOffset();
                 int length = localSelection.getLength();
 
-                fireActivity(recipient, new TextSelectionActivity(localUser,
-                    offset, length, locallyActiveEditor));
+                fireActivity(new TextSelectionActivity(localUser, offset,
+                    length, locallyActiveEditor));
             } else {
                 log.warn("No selection for locallyActivateEditor: "
                     + locallyActiveEditor);

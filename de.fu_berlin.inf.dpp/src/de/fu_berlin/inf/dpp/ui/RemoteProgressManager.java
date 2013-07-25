@@ -100,7 +100,11 @@ public class RemoteProgressManager {
             if (activities == null)
                 return;
 
-            receive(new ProgressActivity(source, progressID, 0, 0, null,
+            // This Activity is just used as a PoisonPill for the ActivityLoop
+            // of the ProgressMonitor and therefore most values don't have to
+            // be set correctly as this Activity will never be sent over the
+            // Network
+            receive(new ProgressActivity(source, null, progressID, 0, 0, null,
                 ProgressAction.DONE));
         }
 
@@ -285,15 +289,14 @@ public class RemoteProgressManager {
             @Override
             public void beginTask(String name, int totalWorked) {
                 this.totalWorked = totalWorked;
-                activityProvider.fireActivity(recipients, new ProgressActivity(
-                    localUser, progressID, 0, totalWorked, name,
-                    ProgressAction.UPDATE));
+                createProgressActivityForUsers(localUser, recipients,
+                    progressID, 0, totalWorked, name, ProgressAction.UPDATE);
             }
 
             @Override
             public void done() {
-                activityProvider.fireActivity(recipients, new ProgressActivity(
-                    localUser, progressID, 0, 0, null, ProgressAction.DONE));
+                createProgressActivityForUsers(localUser, recipients,
+                    progressID, 0, 0, null, ProgressAction.DONE);
             }
 
             @Override
@@ -315,16 +318,16 @@ public class RemoteProgressManager {
 
             @Override
             public void setTaskName(String name) {
-                activityProvider.fireActivity(recipients, new ProgressActivity(
-                    localUser, progressID, worked, totalWorked, name,
-                    ProgressAction.UPDATE));
+                createProgressActivityForUsers(localUser, recipients,
+                    progressID, worked, totalWorked, name,
+                    ProgressAction.UPDATE);
             }
 
             @Override
             public void subTask(String name) {
-                activityProvider.fireActivity(recipients, new ProgressActivity(
-                    localUser, progressID, worked, totalWorked, name,
-                    ProgressAction.UPDATE));
+                createProgressActivityForUsers(localUser, recipients,
+                    progressID, worked, totalWorked, name,
+                    ProgressAction.UPDATE);
             }
 
             @Override
@@ -336,9 +339,20 @@ public class RemoteProgressManager {
                             .format(
                                 "Worked ({0})is greater than totalWork ({1}). Forgot to call beginTask?",
                                 worked, totalWorked), new StackTrace());
-                activityProvider.fireActivity(recipients, new ProgressActivity(
-                    localUser, progressID, worked, totalWorked, null,
-                    ProgressAction.UPDATE));
+                createProgressActivityForUsers(localUser, recipients,
+                    progressID, worked, totalWorked, null,
+                    ProgressAction.UPDATE);
+            }
+
+            private void createProgressActivityForUsers(User source,
+                List<User> recipients, String progressID, int workCurrent,
+                int workTotal, String taskName, ProgressAction action) {
+                for (User target : recipients) {
+                    activityProvider.fireActivity(new ProgressActivity(source,
+                        target, progressID, workCurrent, workTotal, taskName,
+                        action));
+                }
+
             }
         };
     }
@@ -352,12 +366,12 @@ public class RemoteProgressManager {
      * progress to remote users.
      * 
      * @param session
-     * @param recipients
+     * @param target
      * @param monitor
      * @return
      */
     public IProgressMonitor mirrorLocalProgressMonitorToRemote(
-        final ISarosSession session, final List<User> recipients,
+        final ISarosSession session, final User target,
         final IProgressMonitor monitor) {
 
         return new IProgressMonitor() {
@@ -373,16 +387,16 @@ public class RemoteProgressManager {
 
                 // report to remote monitor!
                 this.totalWorked = totalWorked;
-                activityProvider.fireActivity(recipients, new ProgressActivity(
-                    localUser, progressID, 0, totalWorked, name,
+                activityProvider.fireActivity(new ProgressActivity(localUser,
+                    target, progressID, 0, totalWorked, name,
                     ProgressAction.BEGINTASK));
             }
 
             @Override
             public void done() {
                 monitor.done();
-                activityProvider.fireActivity(recipients, new ProgressActivity(
-                    localUser, progressID, 0, 0, null, ProgressAction.DONE));
+                activityProvider.fireActivity(new ProgressActivity(localUser,
+                    target, progressID, 0, 0, null, ProgressAction.DONE));
             }
 
             /**
@@ -404,8 +418,8 @@ public class RemoteProgressManager {
             @Override
             public void setCanceled(boolean value) {
                 // waldmann: yep this is a TODO
-                activityProvider.fireActivity(recipients, new ProgressActivity(
-                    localUser, progressID, worked, totalWorked, "Cancellation",
+                activityProvider.fireActivity(new ProgressActivity(localUser,
+                    target, progressID, worked, totalWorked, "Cancellation",
                     ProgressAction.CANCEL));
                 monitor.setCanceled(value);
             }
@@ -413,16 +427,16 @@ public class RemoteProgressManager {
             @Override
             public void setTaskName(String name) {
                 monitor.setTaskName(name);
-                activityProvider.fireActivity(recipients, new ProgressActivity(
-                    localUser, progressID, worked, totalWorked, name,
+                activityProvider.fireActivity(new ProgressActivity(localUser,
+                    target, progressID, worked, totalWorked, name,
                     ProgressAction.SETTASKNAME));
             }
 
             @Override
             public void subTask(String name) {
                 monitor.subTask(name);
-                activityProvider.fireActivity(recipients, new ProgressActivity(
-                    localUser, progressID, worked, totalWorked, name,
+                activityProvider.fireActivity(new ProgressActivity(localUser,
+                    target, progressID, worked, totalWorked, name,
                     ProgressAction.SUBTASK));
             }
 
@@ -436,8 +450,8 @@ public class RemoteProgressManager {
                             .format(
                                 "Worked ({0})is greater than totalWork ({1}). Forgot to call beginTask?",
                                 worked, totalWorked), new StackTrace());
-                activityProvider.fireActivity(recipients, new ProgressActivity(
-                    localUser, progressID, worked, totalWorked, null,
+                activityProvider.fireActivity(new ProgressActivity(localUser,
+                    target, progressID, worked, totalWorked, null,
                     ProgressAction.UPDATE));
             }
         };

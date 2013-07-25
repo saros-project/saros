@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.activities.serializable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamConverter;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
@@ -9,6 +10,7 @@ import de.fu_berlin.inf.dpp.activities.business.ProgressActivity;
 import de.fu_berlin.inf.dpp.activities.business.ProgressActivity.ProgressAction;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.util.xstream.JIDConverter;
 
 /**
  * A {@link ProgressActivityDataObject} is used for communicating
@@ -31,9 +33,15 @@ public class ProgressActivityDataObject extends AbstractActivityDataObject {
     @XStreamAsAttribute
     protected ProgressAction action;
 
-    public ProgressActivityDataObject(JID source, String progressID,
-        int workCurrent, int workTotal, String taskName, ProgressAction action) {
+    @XStreamAsAttribute
+    @XStreamConverter(JIDConverter.class)
+    protected JID target;
+
+    public ProgressActivityDataObject(JID source, JID target,
+        String progressID, int workCurrent, int workTotal, String taskName,
+        ProgressAction action) {
         super(source);
+        this.target = target;
         this.progressID = progressID;
         this.workCurrent = workCurrent;
         this.workTotal = workTotal;
@@ -43,20 +51,20 @@ public class ProgressActivityDataObject extends AbstractActivityDataObject {
 
     @Override
     public String toString() {
-        return "Progress(source:" + getSource() + ", id:" + this.progressID
-            + ",work:" + workCurrent + "/" + workTotal + ",task:" + taskName
-            + ",action:" + action + ")";
+        return "Progress(source:" + getSource() + ",target:" + target + ",id:"
+            + this.progressID + ",work:" + workCurrent + "/" + workTotal
+            + ",task:" + taskName + ",action:" + action + ")";
     }
 
     @Override
     public IActivity getActivity(ISarosSession sarosSession) {
 
-        User user = sarosSession.getUser(source);
-        if (user == null)
-            throw new IllegalArgumentException("user " + user
+        User source = sarosSession.getUser(getSource());
+        if (source == null)
+            throw new IllegalArgumentException("user " + getSource()
                 + " is not in the current session");
 
-        return new ProgressActivity(user, progressID, workCurrent, workTotal,
-            taskName, action);
+        return new ProgressActivity(source, sarosSession.getUser(target),
+            progressID, workCurrent, workTotal, taskName, action);
     }
 }

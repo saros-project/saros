@@ -20,7 +20,10 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import org.apache.commons.lang.ObjectUtils;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
@@ -30,18 +33,21 @@ import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
- * A Checksum Error is a notification sent to the host and the peers by a user
- * who wants inconsistencies to be recovered.
+ * A Checksum Error is a notification sent to the host by a user who wants
+ * inconsistencies to be recovered.
  * 
  * The host will reply with a ChecksumError of the same recoveryID after having
  * sent the last FileActivity (with {@link FileActivity#isRecovery()} being set
  * related to this checksum recovery.
  */
-public class ChecksumErrorActivity extends AbstractActivity {
+public class ChecksumErrorActivity extends AbstractActivity implements
+    ITargetedActivity {
 
     protected List<SPath> paths;
 
     protected String recoveryID;
+
+    private User target;
 
     public List<SPath> getPaths() {
         return paths;
@@ -55,9 +61,10 @@ public class ChecksumErrorActivity extends AbstractActivity {
         return recoveryID;
     }
 
-    public ChecksumErrorActivity(User source, List<SPath> paths,
+    public ChecksumErrorActivity(User source, User target, List<SPath> paths,
         String recoveryID) {
         super(source);
+        this.target = target;
         this.paths = paths;
         this.recoveryID = recoveryID;
     }
@@ -75,7 +82,7 @@ public class ChecksumErrorActivity extends AbstractActivity {
                 dataObjectPaths.add(path.toSPathDataObject(sarosSession));
             }
         return new ChecksumErrorActivityDataObject(getSource().getJID(),
-            dataObjectPaths, recoveryID);
+            target.getJID(), dataObjectPaths, recoveryID);
     }
 
     @Override
@@ -85,6 +92,7 @@ public class ChecksumErrorActivity extends AbstractActivity {
         result = prime * result + ((paths == null) ? 0 : paths.hashCode());
         result = prime * result
             + ((recoveryID == null) ? 0 : recoveryID.hashCode());
+        result = prime * result + ((target == null) ? 0 : target.hashCode());
         return result;
     }
 
@@ -107,12 +115,17 @@ public class ChecksumErrorActivity extends AbstractActivity {
                 return false;
         } else if (!recoveryID.equals(other.recoveryID))
             return false;
-        return true;
+        return ObjectUtils.equals(this.target, other.target);
     }
 
     @Override
     public String toString() {
-        return "ChecksumError(src:" + this.getSource() + ", paths:"
-            + this.paths + ", recoveryID:" + recoveryID + ")";
+        return "ChecksumError(src:" + this.getSource() + ", target:" + target
+            + "paths:" + this.paths + ", recoveryID:" + recoveryID + ")";
+    }
+
+    @Override
+    public List<User> getRecipients() {
+        return Collections.singletonList(target);
     }
 }

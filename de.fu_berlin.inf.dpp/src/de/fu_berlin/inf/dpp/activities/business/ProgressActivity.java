@@ -1,5 +1,10 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.commons.lang.ObjectUtils;
+
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ProgressActivityDataObject;
@@ -12,7 +17,10 @@ import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
  * 
  * A {@link ProgressActivity} is managed by the {@link RemoteProgressManager}
  */
-public class ProgressActivity extends AbstractActivity {
+public class ProgressActivity extends AbstractActivity implements
+    ITargetedActivity {
+
+    protected User target;
 
     protected String progressID;
 
@@ -28,9 +36,10 @@ public class ProgressActivity extends AbstractActivity {
         BEGINTASK, SUBTASK, SETTASKNAME, UPDATE, DONE, CANCEL;
     }
 
-    public ProgressActivity(User source, String progressID, int workCurrent,
-        int workTotal, String taskName, ProgressAction action) {
+    public ProgressActivity(User source, User target, String progressID,
+        int workCurrent, int workTotal, String taskName, ProgressAction action) {
         super(source);
+        this.target = target;
         this.progressID = progressID;
         this.workCurrent = workCurrent;
         this.workTotal = workTotal;
@@ -40,16 +49,17 @@ public class ProgressActivity extends AbstractActivity {
 
     @Override
     public String toString() {
-        return "Progress(source:" + getSource() + ", id:" + this.progressID
-            + ",work:" + workCurrent + "/" + workTotal + ",task:" + taskName
-            + ",action:" + action + ")";
+        return "Progress(source:" + getSource() + ",target:" + target + ",id:"
+            + this.progressID + ",work:" + workCurrent + "/" + workTotal
+            + ",task:" + taskName + ",action:" + action + ")";
     }
 
     @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
 
-        return new ProgressActivityDataObject(getSource().getJID(), progressID,
-            workCurrent, workTotal, taskName, action);
+        return new ProgressActivityDataObject(getSource().getJID(),
+            target.getJID(), progressID, workCurrent, workTotal, taskName,
+            action);
     }
 
     @Override
@@ -104,8 +114,10 @@ public class ProgressActivity extends AbstractActivity {
             + ((progressID == null) ? 0 : progressID.hashCode());
         result = prime * result
             + ((taskName == null) ? 0 : taskName.hashCode());
+        result = prime * result + ((target == null) ? 0 : target.hashCode());
         result = prime * result + workCurrent;
         result = prime * result + workTotal;
+
         return result;
     }
 
@@ -137,7 +149,7 @@ public class ProgressActivity extends AbstractActivity {
             return false;
         if (workTotal != other.workTotal)
             return false;
-        return true;
+        return ObjectUtils.equals(this.target, other.target);
     }
 
     /**
@@ -149,5 +161,10 @@ public class ProgressActivity extends AbstractActivity {
      */
     public ProgressAction getAction() {
         return action;
+    }
+
+    @Override
+    public List<User> getRecipients() {
+        return Collections.singletonList(target);
     }
 }

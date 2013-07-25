@@ -24,6 +24,7 @@ import java.util.List;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamConverter;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
@@ -32,6 +33,7 @@ import de.fu_berlin.inf.dpp.activities.business.ChecksumErrorActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.util.xstream.JIDConverter;
 
 /**
  * A Checksum Error is a notification send to the host and peers by a user, who
@@ -41,14 +43,19 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 public class ChecksumErrorActivityDataObject extends AbstractActivityDataObject {
 
     @XStreamAsAttribute
+    @XStreamConverter(JIDConverter.class)
+    protected final JID target;
+
+    @XStreamAsAttribute
     protected String recoveryID;
 
     @XStreamImplicit
     protected List<SPathDataObject> paths;
 
-    public ChecksumErrorActivityDataObject(JID source,
+    public ChecksumErrorActivityDataObject(JID source, JID target,
         List<SPathDataObject> paths, String recoveryID) {
         super(source);
+        this.target = target;
         this.paths = paths;
         this.recoveryID = recoveryID;
     }
@@ -60,8 +67,8 @@ public class ChecksumErrorActivityDataObject extends AbstractActivityDataObject 
             for (SPathDataObject path : this.paths) {
                 sPaths.add(path.toSPath(sarosSession));
             }
-        return new ChecksumErrorActivity(sarosSession.getUser(getSource()),
-            sPaths, recoveryID);
+        return new ChecksumErrorActivity(sarosSession.getUser(source),
+            sarosSession.getUser(target), sPaths, recoveryID);
     }
 
     @Override

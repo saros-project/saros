@@ -45,20 +45,20 @@ public class FollowingActivitiesManager extends AbstractActivityProvider {
         editorManager
             .addSharedEditorListener(new AbstractSharedEditorListener() {
                 @Override
-                public void followModeChanged(User target, boolean isFollowed) {
+                public void followModeChanged(User followedUser,
+                    boolean isFollowed) {
                     if (sarosSession == null) {
                         log.error("FollowModeChanged Event listener got a call without a running session.");
                         return;
                     }
-                    for (User user : sarosSession.getUsers()) {
-                        if (isFollowed) {
-                            fireActivity(user, new StartFollowingActivity(
-                                sarosSession.getLocalUser(), target));
-                        } else {
-                            fireActivity(user, new StopFollowingActivity(
-                                sarosSession.getLocalUser()));
 
-                        }
+                    if (isFollowed) {
+                        fireActivity(new StartFollowingActivity(sarosSession
+                            .getLocalUser(), followedUser));
+                    } else {
+                        fireActivity(new StopFollowingActivity(sarosSession
+                            .getLocalUser()));
+
                     }
                 }
             });
@@ -79,11 +79,11 @@ public class FollowingActivitiesManager extends AbstractActivityProvider {
             }
 
             log.info("Received new follow mode from: "
-                + user.getHumanReadableName() + " target: "
-                + activity.getTarget().getHumanReadableName());
+                + user.getHumanReadableName() + " followed User: "
+                + activity.getFollowedUser().getHumanReadableName());
 
             awarenessInformationCollector.setUserFollowing(user,
-                activity.getTarget());
+                activity.getFollowedUser());
             notifyListeners();
         }
 

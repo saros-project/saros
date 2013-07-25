@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.StartFollowingActivityDataObject;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -13,11 +12,11 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
  * @author Alexander Waldmann (contact@net-corps.de)
  */
 public class StartFollowingActivity extends AbstractActivity {
-    protected final User target;
+    protected final User followedUser;
 
-    public StartFollowingActivity(User source, User target) {
+    public StartFollowingActivity(User source, User followedUser) {
         super(source);
-        this.target = target;
+        this.followedUser = followedUser;
     }
 
     @Override
@@ -28,19 +27,16 @@ public class StartFollowingActivity extends AbstractActivity {
     @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
         return new StartFollowingActivityDataObject(source.getJID(),
-            target.getJID());
+            followedUser.getJID());
     }
 
     @Override
     public String toString() {
-        return "StartFollowingActivity(" + source + " > " + target + ")";
+        return "StartFollowingActivity(" + source + " > " + followedUser + ")";
     }
 
-    public User getTarget() {
-        return target;
+    public User getFollowedUser() {
+        return followedUser;
     }
 
-    public SPath getPath() {
-        return null;
-    }
 }

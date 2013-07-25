@@ -40,7 +40,6 @@ import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.FileListDiff;
 import de.fu_berlin.inf.dpp.FileListFactory;
 import de.fu_berlin.inf.dpp.ISarosContext;
-import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
@@ -473,9 +472,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                      */
                     ISarosSession sarosSession = sarosSessionObservable
                         .getValue();
-                    List<User> notifiedUsers = new ArrayList<User>();
                     if (sarosSession != null) {
-                        notifiedUsers.add(sarosSession.getHost());
                         /*
                          * The monitor that is created here is shown both
                          * locally and remote and is handled like a regular
@@ -483,7 +480,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                          */
                         IProgressMonitor remoteMonitor = rpm
                             .mirrorLocalProgressMonitorToRemote(sarosSession,
-                                notifiedUsers, monitor);
+                                sarosSession.getHost(), monitor);
                         remoteMonitor
                             .setTaskName("Project checkout via subversion");
                         newLocalProject = vcs.checkoutProject(newProjectName,

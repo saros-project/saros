@@ -24,10 +24,9 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumErrorActivity;
-import de.fu_berlin.inf.dpp.activities.business.FileActivity;
-import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivityReceiver;
+import de.fu_berlin.inf.dpp.activities.business.RecoveryFileActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
@@ -212,9 +211,9 @@ public class ConsistencyWatchdogHandler implements Startable {
             }
 
             // Tell the user that we sent all files
-            activityProvider.fireActivity(checksumError.getSource(),
-                new ChecksumErrorActivity(sarosSession.getLocalUser(), null,
-                    checksumError.getRecoveryID()));
+            activityProvider.fireActivity(new ChecksumErrorActivity(
+                sarosSession.getLocalUser(), checksumError.getSource(), null,
+                checksumError.getRecoveryID()));
         } finally {
             progress.done();
         }
@@ -252,8 +251,8 @@ public class ConsistencyWatchdogHandler implements Startable {
 
             try {
                 // Send the file to client
-                activityProvider.fireActivity(from,
-                    FileActivity.created(user, path, Purpose.RECOVERY));
+                activityProvider.fireActivity(RecoveryFileActivity.created(
+                    user, path, from));
 
                 // Immediately follow up with a new checksum
                 IDocument doc;
@@ -284,8 +283,8 @@ public class ConsistencyWatchdogHandler implements Startable {
         } else {
             // TODO Warn the user...
             // Tell the client to delete the file
-            activityProvider.fireActivity(from,
-                FileActivity.removed(user, path, Purpose.RECOVERY));
+            activityProvider.fireActivity(RecoveryFileActivity.removed(user,
+                path, from));
             activityProvider.fireActivity(ChecksumActivity.missing(user, path));
 
             progress.worked(8);
