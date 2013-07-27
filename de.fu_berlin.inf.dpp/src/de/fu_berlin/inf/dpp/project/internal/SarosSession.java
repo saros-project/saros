@@ -973,7 +973,7 @@ public final class SarosSession implements ISarosSession {
             IProject project = file.getProject();
 
             switch (fileActivity.getType()) {
-            case Created:
+            case CREATED:
                 if (!file.exists())
                     return true;
 
@@ -981,7 +981,7 @@ public final class SarosSession implements ISarosSession {
                     projectMapper.addResources(project,
                         Collections.singletonList(file));
                 break;
-            case Removed:
+            case REMOVED:
                 if (!isShared(file))
                     return false;
 
@@ -990,7 +990,7 @@ public final class SarosSession implements ISarosSession {
                         Collections.singletonList(file));
 
                 break;
-            case Moved:
+            case MOVED:
                 IFile oldFile = fileActivity.getOldPath().getFile();
                 if (oldFile == null || !isShared(oldFile))
                     return false;
@@ -1013,13 +1013,13 @@ public final class SarosSession implements ISarosSession {
             IProject project = folder.getProject();
 
             switch (folderActivity.getType()) {
-            case Created:
+            case CREATED:
                 if (projectMapper.isPartiallyShared(project)
                     && isShared(folder.getParent()))
                     projectMapper.addResources(project,
                         Collections.singletonList(folder));
                 break;
-            case Removed:
+            case REMOVED:
                 if (!isShared(folder))
                     return false;
 

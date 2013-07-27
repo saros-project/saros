@@ -183,11 +183,11 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
              */
 
             switch (fileActivity.getType()) {
-            case Created:
-            case Removed:
+            case CREATED:
+            case REMOVED:
                 latestChecksums.remove(fileActivity.getPath());
                 break;
-            case Moved:
+            case MOVED:
                 latestChecksums.remove(fileActivity.getPath());
                 latestChecksums.remove(fileActivity.getOldPath());
                 break;

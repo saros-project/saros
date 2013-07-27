@@ -61,10 +61,10 @@ public class ActivitiesExtensionProviderTest {
             new SplitOperation(insert, easySplit)));
 
     protected static final IActivityDataObject[] activityDataObjects = new IActivityDataObject[] {
-        new EditorActivityDataObject(jid, EditorActivity.Type.Activated, path),
-        new FileActivityDataObject(jid, FileActivity.Type.Created, path, null,
+        new EditorActivityDataObject(jid, EditorActivity.Type.ACTIVATED, path),
+        new FileActivityDataObject(jid, FileActivity.Type.CREATED, path, null,
             new byte[] { 34, 72 }, Purpose.ACTIVITY, null),
-        new FolderActivityDataObject(jid, FolderActivity.Type.Created, path),
+        new FolderActivityDataObject(jid, FolderActivity.Type.CREATED, path),
         new PermissionActivityDataObject(jid, new JID("user@server"),
             Permission.WRITE_ACCESS),
         new TextSelectionActivityDataObject(jid, 1, 2, path),
@@ -106,7 +106,7 @@ public class ActivitiesExtensionProviderTest {
     public void testGapInSequenceNumbers() throws XmlPullParserException,
         IOException {
         IActivityDataObject activityDataObject = new EditorActivityDataObject(
-            jid, EditorActivity.Type.Activated, null);
+            jid, EditorActivity.Type.ACTIVATED, null);
 
         List<TimedActivityDataObject> timedActivities = new ArrayList<TimedActivityDataObject>(
             2);
@@ -124,7 +124,7 @@ public class ActivitiesExtensionProviderTest {
     @Test
     public void testNoPrettyPrintInMarshalledObjects() throws Exception {
         IActivityDataObject activityDataObject = new EditorActivityDataObject(
-            jid, EditorActivity.Type.Activated, null);
+            jid, EditorActivity.Type.ACTIVATED, null);
 
         List<TimedActivityDataObject> timedActivities = new ArrayList<TimedActivityDataObject>(
             2);

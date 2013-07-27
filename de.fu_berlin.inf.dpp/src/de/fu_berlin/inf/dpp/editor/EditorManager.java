@@ -254,11 +254,11 @@ public class EditorManager extends AbstractActivityProvider {
             User localUser = sarosSession.getLocalUser();
             for (SPath path : getLocallyOpenEditors()) {
                 fireActivity(recipient, new EditorActivity(localUser,
-                    Type.Activated, path));
+                    Type.ACTIVATED, path));
             }
 
             fireActivity(recipient, new EditorActivity(localUser,
-                Type.Activated, locallyActiveEditor));
+                Type.ACTIVATED, locallyActiveEditor));
 
             if (locallyActiveEditor == null)
                 return;
@@ -556,7 +556,7 @@ public class EditorManager extends AbstractActivityProvider {
             path);
 
         fireActivity(new EditorActivity(sarosSession.getLocalUser(),
-            Type.Activated, path));
+            Type.ACTIVATED, path));
 
     }
 
@@ -761,13 +761,13 @@ public class EditorManager extends AbstractActivityProvider {
         User sender = editorActivity.getSource();
         SPath sPath = editorActivity.getPath();
         switch (editorActivity.getType()) {
-        case Activated:
+        case ACTIVATED:
             execActivated(sender, sPath);
             break;
-        case Closed:
+        case CLOSED:
             execClosed(sender, sPath);
             break;
-        case Saved:
+        case SAVED:
             saveText(sPath);
             break;
         default:
@@ -1162,7 +1162,7 @@ public class EditorManager extends AbstractActivityProvider {
         editorListenerDispatch.editorRemoved(sarosSession.getLocalUser(), path);
 
         fireActivity(new EditorActivity(sarosSession.getLocalUser(),
-            Type.Closed, path));
+            Type.CLOSED, path));
 
         /**
          * TODO We need a reliable way to communicate editors which are outside
@@ -1520,7 +1520,7 @@ public class EditorManager extends AbstractActivityProvider {
 
         editorListenerDispatch.userWithWriteAccessEditorSaved(path, false);
         fireActivity(new EditorActivity(sarosSession.getLocalUser(),
-            Type.Saved, path));
+            Type.SAVED, path));
     }
 
     /**

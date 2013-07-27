@@ -473,13 +473,13 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
 
         // TODO check if we should open / close existing editors here too
         switch (activity.getType()) {
-        case Created:
+        case CREATED:
             handleFileCreation(activity);
             break;
-        case Removed:
+        case REMOVED:
             handleFileDeletion(activity);
             break;
-        case Moved:
+        case MOVED:
             handleFileMove(activity);
             break;
         }
@@ -505,14 +505,14 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
         if (wasOpenedEditor)
             editorManager.closeEditor(path);
 
-        wasOpenedEditor &= activity.getType() != Type.Removed;
+        wasOpenedEditor &= activity.getType() != Type.REMOVED;
 
         FileActivity.Type type = activity.getType();
 
         try {
-            if (type == FileActivity.Type.Created)
+            if (type == FileActivity.Type.CREATED)
                 handleFileCreation(activity);
-            else if (type == FileActivity.Type.Removed)
+            else if (type == FileActivity.Type.REMOVED)
                 handleFileDeletion(activity);
             else
                 log.warn("performing recovery for type " + type
@@ -629,9 +629,9 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
         IFolder folder = path.getProject().getFolder(
             path.getProjectRelativePath());
 
-        if (activity.getType() == FolderActivity.Type.Created) {
+        if (activity.getType() == FolderActivity.Type.CREATED) {
             FileUtils.create(folder);
-        } else if (activity.getType() == FolderActivity.Type.Removed) {
+        } else if (activity.getType() == FolderActivity.Type.REMOVED) {
             try {
                 if (folder.exists())
                     FileUtils.delete(folder);
@@ -652,7 +652,7 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
 
         // Connect is special since the project doesn't have a VCSAdapter
         // yet.
-        final VCSAdapter vcs = activityType == VCSActivity.Type.Connect ? VCSAdapter
+        final VCSAdapter vcs = activityType == VCSActivity.Type.CONNECT ? VCSAdapter
             .getAdapter(revision) : VCSAdapter.getAdapter(project);
         if (vcs == null) {
             log.warn("Could not execute VCS activity. Do you have the Subclipse plug-in installed?");
@@ -683,13 +683,13 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
                     log.trace("progressMonitorDialog.run started");
                     if (!SWTUtils.isSWT())
                         log.trace("not in SWT thread");
-                    if (activityType == VCSActivity.Type.Connect) {
+                    if (activityType == VCSActivity.Type.CONNECT) {
                         vcs.connect(project, url, directory, progress);
-                    } else if (activityType == VCSActivity.Type.Disconnect) {
+                    } else if (activityType == VCSActivity.Type.DISCONNECT) {
                         vcs.disconnect(project, revision != null, progress);
-                    } else if (activityType == VCSActivity.Type.Switch) {
+                    } else if (activityType == VCSActivity.Type.SWITCH) {
                         vcs.switch_(resource, url, revision, progress);
-                    } else if (activityType == VCSActivity.Type.Update) {
+                    } else if (activityType == VCSActivity.Type.UPDATE) {
                         vcs.update(resource, revision, progress);
                     } else {
                         log.error("VCS activity type not implemented yet.");

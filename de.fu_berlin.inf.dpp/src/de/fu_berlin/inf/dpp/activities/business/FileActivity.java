@@ -24,11 +24,11 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
 
     public static enum Type {
         /** The file was created or modified, but the path stayed the same. */
-        Created,
+        CREATED,
         /** The file was deleted. */
-        Removed,
+        REMOVED,
         /** The path of the file changed. The content might have changed, too. */
-        Moved
+        MOVED
     }
 
     protected final Type type;
@@ -39,7 +39,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
     protected final Long checksum;
 
     /**
-     * Utility method for creating a FileActivity of type {@link Type#Created}
+     * Utility method for creating a FileActivity of type {@link Type#CREATED}
      * for a given path.
      * 
      * This method will make a snapshot copy of the file at this point in time.
@@ -56,12 +56,12 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
         Long checksum = FileUtils.checksum(file);
         byte[] content = FileUtils.getLocalFileContent(file);
 
-        return new FileActivity(source, Type.Created, path, null, content,
+        return new FileActivity(source, Type.CREATED, path, null, content,
             purpose, checksum);
     }
 
     /**
-     * Builder for moving files (type {@link Type#Moved}).
+     * Builder for moving files (type {@link Type#MOVED}).
      * 
      * @param source
      *            JID of the origin user
@@ -83,19 +83,19 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
         if (contentChange) {
             content = FileUtils.getLocalFileContent(destPath.getFile());
         }
-        return new FileActivity(source, Type.Moved, destPath, sourcePath,
+        return new FileActivity(source, Type.MOVED, destPath, sourcePath,
             content, Purpose.ACTIVITY, null);
     }
 
     /**
-     * Builder for removing files (type {@link Type#Removed})
+     * Builder for removing files (type {@link Type#REMOVED})
      * 
      * @param path
      *            the path of the file to remove
      */
     public static FileActivity removed(User source, SPath path, Purpose purpose) {
 
-        return new FileActivity(source, Type.Removed, path, null, null,
+        return new FileActivity(source, Type.REMOVED, path, null, null,
             purpose, null);
     }
 
@@ -105,15 +105,15 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
      * @param source
      *            the user who is the source (originator) of this Activity
      * @param newPath
-     *            where to save the data (if {@link Type#Created}), destination
-     *            of a move (if {@link Type#Moved}), file to remove (if
-     *            {@link Type#Removed})
+     *            where to save the data (if {@link Type#CREATED}), destination
+     *            of a move (if {@link Type#MOVED}), file to remove (if
+     *            {@link Type#REMOVED})
      * @param oldPath
-     *            if type is {@link Type#Moved}, the path from where the file
+     *            if type is {@link Type#MOVED}, the path from where the file
      *            was moved (<code>null</code> otherwise)
      * @param data
      *            data of the file to be created (only valid for
-     *            {@link Type#Created} and {@link Type#Moved})
+     *            {@link Type#CREATED} and {@link Type#MOVED})
      */
     public FileActivity(User source, Type type, SPath newPath, SPath oldPath,
         byte[] data, Purpose purpose, Long checksum) {
@@ -124,15 +124,15 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
             throw new IllegalArgumentException();
 
         switch (type) {
-        case Created:
+        case CREATED:
             if (data == null || oldPath != null)
                 throw new IllegalArgumentException();
             break;
-        case Removed:
+        case REMOVED:
             if (data != null || oldPath != null)
                 throw new IllegalArgumentException();
             break;
-        case Moved:
+        case MOVED:
             if (newPath == null || oldPath == null)
                 throw new IllegalArgumentException();
             break;
@@ -165,7 +165,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
 
     /**
      * @return the contents of this file for incoming file creation Activities (
-     *         if {@link #getType()} == {@link Type#Created}; <code>null</code>
+     *         if {@link #getType()} == {@link Type#CREATED}; <code>null</code>
      *         otherwise.
      */
     public byte[] getContents() {
@@ -174,7 +174,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
 
     @Override
     public String toString() {
-        if (type == Type.Moved)
+        if (type == Type.MOVED)
             return "FileActivity(type: Moved, old path: " + this.oldPath
                 + ", new path: " + this.newPath + ")";
         return "FileActivity(type: " + this.type + ", path: " + this.newPath

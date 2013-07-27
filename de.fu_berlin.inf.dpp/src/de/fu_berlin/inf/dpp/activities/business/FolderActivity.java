@@ -10,7 +10,7 @@ public class FolderActivity extends AbstractActivity implements
     IResourceActivity {
 
     public static enum Type {
-        Created, Removed
+        CREATED, REMOVED
     }
 
     protected final Type type;

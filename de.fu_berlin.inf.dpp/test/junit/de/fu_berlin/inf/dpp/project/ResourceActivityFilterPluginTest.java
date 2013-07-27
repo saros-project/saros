@@ -33,7 +33,7 @@ public class ResourceActivityFilterPluginTest {
 
     // Setup helpers
     private VCSActivity switch_(User source, SPath p) {
-        final VCSActivity result = new VCSActivity(VCSActivity.Type.Switch,
+        final VCSActivity result = new VCSActivity(VCSActivity.Type.SWITCH,
             source, p, "", "", "");
         return result;
     }
@@ -55,7 +55,7 @@ public class ResourceActivityFilterPluginTest {
 
         User source = new User(session, jid, 0, -1);
 
-        add_p_a = new FolderActivity(source, FolderActivity.Type.Created,
+        add_p_a = new FolderActivity(source, FolderActivity.Type.CREATED,
             newSPath("/p/a"));
 
         switch_p = switch_(source, newSPath("/p"));

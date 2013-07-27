@@ -100,12 +100,12 @@ public class RemoteWriteAccessManager {
             }
 
             switch (editorActivity.getType()) {
-            case Activated:
+            case ACTIVATED:
                 editorStates.get(path).add(sender);
                 break;
-            case Saved:
+            case SAVED:
                 break;
-            case Closed:
+            case CLOSED:
                 editorStates.get(path).remove(sender);
                 break;
             default:

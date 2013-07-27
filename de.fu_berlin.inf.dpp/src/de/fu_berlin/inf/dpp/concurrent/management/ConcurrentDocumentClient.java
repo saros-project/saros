@@ -150,7 +150,7 @@ public class ConcurrentDocumentClient {
     private final IActivityReceiver clientReceiver = new AbstractActivityReceiver() {
         @Override
         public void receive(FileActivity fileActivity) {
-            if (fileActivity.getType() == FileActivity.Type.Removed) {
+            if (fileActivity.getType() == FileActivity.Type.REMOVED) {
                 jupiterClient.reset(fileActivity.getPath());
             }
         }

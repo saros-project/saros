@@ -158,7 +158,7 @@ public class TimedActivityDataObject implements
 
             if (activityDataObject instanceof FileActivityDataObject
                 && ((FileActivityDataObject) activityDataObject).getType()
-                    .equals(FileActivity.Type.Created)) {
+                    .equals(FileActivity.Type.CREATED)) {
                 return false;
             }
         }

@@ -102,7 +102,7 @@ public class ActivityQueuerTest {
         activityQueuer.enableQueuing(NOT_SHARED_PROJECT_ID);
 
         IActivityDataObject serializedEditorActivity = new EditorActivityDataObject(
-            ALICE, EditorActivity.Type.Activated, null);
+            ALICE, EditorActivity.Type.ACTIVATED, null);
 
         /*
          * does this make sense ? user opened file X (path != null), closed file

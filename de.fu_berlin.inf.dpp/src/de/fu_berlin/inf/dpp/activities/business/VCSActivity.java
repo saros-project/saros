@@ -27,14 +27,14 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
          * root. <br>
          * param1: The provider ID.
          */
-        Connect,
+        CONNECT,
 
         /**
          * path: The path of the project to be disconnected. <br>
          * Supported arguments:<br>
          * param1: If !=null, delete contents.
          */
-        Disconnect,
+        DISCONNECT,
 
         /**
          * Supported arguments:<br>
@@ -42,14 +42,14 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
          * url: The URL of the target resource in the repo. <br>
          * param1: The revision of the target resource.
          */
-        Switch,
+        SWITCH,
 
         /**
          * Supported arguments:<br>
          * path: The path of the resource in the working directory. <br>
          * param1: The revision of the target resource.
          */
-        Update,
+        UPDATE,
     }
 
     protected Type type;
@@ -72,26 +72,26 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
 
     public static VCSActivity connect(ISarosSession sarosSession,
         IProject project, String url, String directory, String providerID) {
-        return new VCSActivity(Type.Connect, sarosSession, project, url,
+        return new VCSActivity(Type.CONNECT, sarosSession, project, url,
             directory, providerID);
     }
 
     public static VCSActivity disconnect(ISarosSession sarosSession,
         IProject project, boolean deleteContents) {
         String param1 = deleteContents ? "" : null;
-        return new VCSActivity(Type.Disconnect, sarosSession, project, null,
+        return new VCSActivity(Type.DISCONNECT, sarosSession, project, null,
             null, param1);
     }
 
     public static VCSActivity update(ISarosSession sarosSession,
         IResource resource, String revision) {
-        return new VCSActivity(Type.Update, sarosSession, resource, null, null,
+        return new VCSActivity(Type.UPDATE, sarosSession, resource, null, null,
             revision);
     }
 
     public static VCSActivity switch_(ISarosSession sarosSession,
         IResource resource, String url, String revision) {
-        return new VCSActivity(Type.Switch, sarosSession, resource, url, null,
+        return new VCSActivity(Type.SWITCH, sarosSession, resource, url, null,
             revision);
     }
 
@@ -156,9 +156,9 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
         if (!vcsPath.isPrefixOf(otherPath))
             return false;
         // An update can't include a switch.
-        if (getType() == VCSActivity.Type.Update
+        if (getType() == VCSActivity.Type.UPDATE
             && otherActivity instanceof VCSActivity
-            && ((VCSActivity) otherActivity).getType() == VCSActivity.Type.Switch) {
+            && ((VCSActivity) otherActivity).getType() == VCSActivity.Type.SWITCH) {
             return false;
         }
         if (vcsPath.equals(otherPath)) {
@@ -172,13 +172,13 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
     @Override
     public String toString() {
         String result = "VCSActivity(type=" + type;
-        if (type == Type.Disconnect)
+        if (type == Type.DISCONNECT)
             result += ", deleteContents=" + (param1 != null);
         else {
             result += ", path=" + path;
-            if (type == Type.Connect || type == Type.Switch)
+            if (type == Type.CONNECT || type == Type.SWITCH)
                 result += ", url=" + url;
-            if (type == Type.Connect)
+            if (type == Type.CONNECT)
                 result += ", directory=" + directory;
             result += ", revision=" + param1;
         }

@@ -52,7 +52,7 @@ public class EditorActivityDataObject extends AbstractProjectActivityDataObject 
         @Nullable SPathDataObject sPathDataObject) {
 
         super(source, sPathDataObject);
-        if ((type != Type.Activated) && (sPathDataObject == null)) {
+        if ((type != Type.ACTIVATED) && (sPathDataObject == null)) {
             throw new IllegalArgumentException(
                 "Null path for non-activation type editor activityDataObject given.");
         }

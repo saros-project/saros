@@ -43,7 +43,7 @@ public class EditorActivity extends AbstractActivity implements
     IResourceActivity {
 
     public static enum Type {
-        Activated, Closed, Saved
+        ACTIVATED, CLOSED, SAVED
     }
 
     protected final Type type;
@@ -51,7 +51,7 @@ public class EditorActivity extends AbstractActivity implements
 
     /**
      * @param path
-     *            an {@link SPath} or type {@link Type#Activated} and
+     *            an {@link SPath} or type {@link Type#ACTIVATED} and
      *            <code>null</code> as path if there is no editor activated
      *            anymore.
      */
@@ -59,7 +59,7 @@ public class EditorActivity extends AbstractActivity implements
 
         super(source);
         if (path == null) {
-            if (type != Type.Activated) {
+            if (type != Type.ACTIVATED) {
                 throw new IllegalArgumentException(
                     "Null path for non-activation type EditorActivity given.");
             }

@@ -53,15 +53,15 @@ public class FileActivityDataObject extends AbstractProjectActivityDataObject {
             throw new IllegalArgumentException();
 
         switch (type) {
-        case Created:
+        case CREATED:
             if (data == null || oldPath != null)
                 throw new IllegalArgumentException();
             break;
-        case Removed:
+        case REMOVED:
             if (data != null || oldPath != null)
                 throw new IllegalArgumentException();
             break;
-        case Moved:
+        case MOVED:
             if (newPath == null || oldPath == null)
                 throw new IllegalArgumentException();
             break;
@@ -80,7 +80,7 @@ public class FileActivityDataObject extends AbstractProjectActivityDataObject {
 
     @Override
     public String toString() {
-        if (type == Type.Moved)
+        if (type == Type.MOVED)
             return "FileActivityDataObject(type: Moved, old path: "
                 + this.oldPath + ", new path: " + this.path + ")";
         return "FileActivityDataObject(type: " + this.type + ", path: "

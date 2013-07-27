@@ -22,7 +22,7 @@ public class TimedActivityDataObjectTest {
         JID jid = new JID("userXYZ@jabber.org");
         int seqnr = 1;
         IActivityDataObject activityDataObject = new EditorActivityDataObject(
-            jid, EditorActivity.Type.Activated, path);
+            jid, EditorActivity.Type.ACTIVATED, path);
         timedADO = new TimedActivityDataObject(activityDataObject, jid, seqnr);
 
     }
@@ -39,7 +39,7 @@ public class TimedActivityDataObjectTest {
         JID jid = new JID("userXYZ@jabber.org");
         int seqnr = 1;
         IActivityDataObject activityDataObject = new EditorActivityDataObject(
-            jid, EditorActivity.Type.Activated, path);
+            jid, EditorActivity.Type.ACTIVATED, path);
 
         new TimedActivityDataObject(activityDataObject, jid, seqnr);
 
@@ -55,7 +55,7 @@ public class TimedActivityDataObjectTest {
             "xtx");
         JID jid = new JID("userXYZ@jabber.org");
         IActivityDataObject activityDataObject = new EditorActivityDataObject(
-            jid, EditorActivity.Type.Activated, path);
+            jid, EditorActivity.Type.ACTIVATED, path);
         assertEquals("The activity is not returned correctly.",
             activityDataObject, timedADO.getActivity());
     }
@@ -94,7 +94,7 @@ public class TimedActivityDataObjectTest {
         JID jid = new JID("userXYZ@jabber.org");
         int seqnr = 1;
         IActivityDataObject activityDataObject = new EditorActivityDataObject(
-            jid, EditorActivity.Type.Activated, path);
+            jid, EditorActivity.Type.ACTIVATED, path);
         String s1 = timedADO.toString();
         String s2 = "[" + seqnr + ":" + activityDataObject.toString() + "]";
         assertEquals("ToString isn't working properly.", s2, s1);
@@ -126,7 +126,7 @@ public class TimedActivityDataObjectTest {
         JID jid = new JID("userABC@jabber.org");
         int seqnr = 1;
         IActivityDataObject activityDataObject = new EditorActivityDataObject(
-            jid, EditorActivity.Type.Activated, path);
+            jid, EditorActivity.Type.ACTIVATED, path);
         TimedActivityDataObject t2 = new TimedActivityDataObject(
             activityDataObject, jid, seqnr);
 
@@ -140,7 +140,7 @@ public class TimedActivityDataObjectTest {
         JID jid2 = new JID("userABC@jabber.org");
         int seqnr2 = 2;
         IActivityDataObject activityDataObject2 = new EditorActivityDataObject(
-            jid2, EditorActivity.Type.Activated, path2);
+            jid2, EditorActivity.Type.ACTIVATED, path2);
         TimedActivityDataObject t3 = new TimedActivityDataObject(
             activityDataObject2, jid2, seqnr2);
         assertEquals(
@@ -153,7 +153,7 @@ public class TimedActivityDataObjectTest {
         JID jid3 = new JID("userXYZ@jabber.org");
         int seqnr3 = 2;
         IActivityDataObject activityDataObject3 = new EditorActivityDataObject(
-            jid3, EditorActivity.Type.Activated, path3);
+            jid3, EditorActivity.Type.ACTIVATED, path3);
 
         new TimedActivityDataObject(activityDataObject3, jid3, seqnr3);
 
@@ -167,7 +167,7 @@ public class TimedActivityDataObjectTest {
         JID jid4 = new JID("userXYZ@jabber.org");
         int seqnr4 = 1;
         IActivityDataObject activityDataObject4 = new EditorActivityDataObject(
-            jid4, EditorActivity.Type.Activated, path4);
+            jid4, EditorActivity.Type.ACTIVATED, path4);
         TimedActivityDataObject t5 = new TimedActivityDataObject(
             activityDataObject4, jid4, seqnr4);
         assertEquals(
@@ -188,7 +188,7 @@ public class TimedActivityDataObjectTest {
         JID jid2 = new JID("userABC@jabber.org");
         int seqnr2 = 2;
         IActivityDataObject activityDataObject2 = new EditorActivityDataObject(
-            jid2, EditorActivity.Type.Activated, path2);
+            jid2, EditorActivity.Type.ACTIVATED, path2);
         TimedActivityDataObject t3 = new TimedActivityDataObject(
             activityDataObject2, jid2, seqnr2);
         assertEquals("The method should return -1", 1 - 2,

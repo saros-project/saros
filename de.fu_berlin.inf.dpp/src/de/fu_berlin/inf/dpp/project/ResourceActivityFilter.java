@@ -61,9 +61,9 @@ class ResourceActivityFilter {
             } else if (activity instanceof FolderActivity) {
                 FolderActivity.Type tFolder = ((FolderActivity) activity)
                     .getType();
-                if (tFolder == FolderActivity.Type.Created)
+                if (tFolder == FolderActivity.Type.CREATED)
                     folderCreateActivities.add(activity);
-                else if (tFolder == FolderActivity.Type.Removed)
+                else if (tFolder == FolderActivity.Type.REMOVED)
                     folderRemoveActivities.add(activity);
             } else {
                 otherActivities.add(activity);

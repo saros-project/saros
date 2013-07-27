@@ -210,7 +210,7 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
                 log.error("Couldn't access file " + spath);
             }
         } else {
-            addActivity(new FolderActivity(user, FolderActivity.Type.Created,
+            addActivity(new FolderActivity(user, FolderActivity.Type.CREATED,
                 spath));
         }
     }
@@ -228,7 +228,7 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
             addActivity(FileActivity.removed(user, new SPath(resource),
                 Purpose.ACTIVITY));
         } else {
-            addActivity(new FolderActivity(user, FolderActivity.Type.Removed,
+            addActivity(new FolderActivity(user, FolderActivity.Type.REMOVED,
                 new SPath(resource)));
         }
     }

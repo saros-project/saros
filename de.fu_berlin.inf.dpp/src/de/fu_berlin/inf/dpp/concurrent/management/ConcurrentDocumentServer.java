@@ -98,7 +98,7 @@ public class ConcurrentDocumentServer implements Startable {
     private final IActivityReceiver hostReceiver = new AbstractActivityReceiver() {
         @Override
         public void receive(FileActivity fileActivity) {
-            if (fileActivity.getType() == FileActivity.Type.Removed) {
+            if (fileActivity.getType() == FileActivity.Type.REMOVED) {
                 server.removePath(fileActivity.getPath());
             }
         }

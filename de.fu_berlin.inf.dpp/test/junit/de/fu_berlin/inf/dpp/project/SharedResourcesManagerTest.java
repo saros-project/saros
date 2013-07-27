@@ -110,7 +110,7 @@ public class SharedResourcesManagerTest {
     }
 
     private FileActivity fileCreationWithContent(byte[] content) {
-        return new FileActivity(createNiceMock(User.class), Type.Created, path,
+        return new FileActivity(createNiceMock(User.class), Type.CREATED, path,
             null, content, Purpose.ACTIVITY, null);
     }
 }

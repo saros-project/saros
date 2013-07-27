@@ -179,12 +179,12 @@ public class RemoteEditorManager {
                 SPath sPath = editorActivity.getPath();
 
                 switch (editorActivity.getType()) {
-                case Activated:
+                case ACTIVATED:
                     activated(sPath);
                     break;
-                case Saved:
+                case SAVED:
                     break;
-                case Closed:
+                case CLOSED:
                     closed(sPath);
                     break;
                 default:

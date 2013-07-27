@@ -86,7 +86,7 @@ public class ActivityUtils {
     private static void foldRecursiveDelete(List<IActivityDataObject> result,
         FolderActivityDataObject folderEdit) {
 
-        if (folderEdit.getType() != Type.Removed) {
+        if (folderEdit.getType() != Type.REMOVED) {
             result.add(folderEdit);
             return;
         }
