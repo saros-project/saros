@@ -1,8 +1,5 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
-import java.util.Collections;
-import java.util.List;
-
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.StopActivityDataObject;
@@ -139,8 +136,8 @@ public class StopActivity extends AbstractActivity implements ITargetedActivity 
     }
 
     @Override
-    public List<User> getRecipients() {
-        return Collections.singletonList(getRecipient());
+    public User getTarget() {
+        return getRecipient();
     }
 
     public State getState() {

@@ -1,8 +1,5 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.commons.lang.ObjectUtils;
 
 import de.fu_berlin.inf.dpp.User;
@@ -164,7 +161,7 @@ public class ProgressActivity extends AbstractActivity implements
     }
 
     @Override
-    public List<User> getRecipients() {
-        return Collections.singletonList(target);
+    public User getTarget() {
+        return target;
     }
 }

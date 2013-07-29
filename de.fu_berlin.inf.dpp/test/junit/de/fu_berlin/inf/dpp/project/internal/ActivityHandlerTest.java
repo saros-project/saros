@@ -365,11 +365,11 @@ public class ActivityHandlerTest {
         for (IActivity activity : activities) {
             if (activity instanceof ITargetedActivity) {
                 // read target-Variable at runtime.
-                EasyMock.expect(((ITargetedActivity) activity).getRecipients())
-                    .andAnswer(new IAnswer<List<User>>() {
+                EasyMock.expect(((ITargetedActivity) activity).getTarget())
+                    .andAnswer(new IAnswer<User>() {
                         @Override
-                        public List<User> answer() throws Throwable {
-                            return Collections.singletonList(target);
+                        public User answer() throws Throwable {
+                            return target;
                         }
                     }).anyTimes();
             }

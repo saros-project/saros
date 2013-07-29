@@ -1,8 +1,6 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
@@ -31,8 +29,8 @@ public class RecoveryFileActivity extends FileActivity implements
     }
 
     @Override
-    public List<User> getRecipients() {
-        return Collections.singletonList(target);
+    public User getTarget() {
+        return target;
     }
 
     @Override

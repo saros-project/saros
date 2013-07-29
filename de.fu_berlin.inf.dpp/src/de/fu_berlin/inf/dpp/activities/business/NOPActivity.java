@@ -1,8 +1,5 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
-import java.util.Collections;
-import java.util.List;
-
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.NOPActivityDataObject;
@@ -30,16 +27,12 @@ public final class NOPActivity extends AbstractActivity implements
         return new NOPActivityDataObject(source.getJID(), target.getJID(), id);
     }
 
-    public User getTarget() {
-        return target;
-    }
-
     public int getID() {
         return id;
     }
 
     @Override
-    public List<User> getRecipients() {
-        return Collections.singletonList(target);
+    public User getTarget() {
+        return target;
     }
 }

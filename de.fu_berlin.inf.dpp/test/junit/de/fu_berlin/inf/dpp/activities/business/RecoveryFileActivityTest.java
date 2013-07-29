@@ -202,7 +202,7 @@ public class RecoveryFileActivityTest {
         RecoveryFileActivity activity, Type type) {
 
         assertEquals(source, activity.getSource());
-        assertEquals(target, activity.getRecipients().get(0));
+        assertEquals(target, activity.getTarget());
         assertEquals(type, activity.getType());
         assertEquals(newPath, activity.getPath());
         assertNull(activity.getOldPath());

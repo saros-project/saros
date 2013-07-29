@@ -1,8 +1,5 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
-import java.util.Collections;
-import java.util.List;
-
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.serializable.ChangeColorActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
@@ -79,7 +76,7 @@ public class ChangeColorActivity extends AbstractActivity implements
     }
 
     @Override
-    public List<User> getRecipients() {
-        return Collections.singletonList(target);
+    public User getTarget() {
+        return target;
     }
 }

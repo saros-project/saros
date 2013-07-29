@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
-import java.util.List;
 
 import de.fu_berlin.inf.dpp.User;
 
@@ -16,5 +15,5 @@ public interface ITargetedActivity extends IActivity {
     /**
      * @return the users that should receive this activity
      */
-    List<User> getRecipients();
+    User getTarget();
 }

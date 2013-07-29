@@ -329,7 +329,7 @@ public final class ActivityHandler implements Startable {
                 result.addAll(documentServer.transformIncoming(activity));
             } else if (activity instanceof ITargetedActivity) {
                 ITargetedActivity target = (ITargetedActivity) activity;
-                result.add(new QueueItem(target.getRecipients(), activity));
+                result.add(new QueueItem(target.getTarget(), activity));
 
             } else if (remoteUsers.size() > 0) {
 
