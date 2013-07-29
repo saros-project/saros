@@ -39,6 +39,8 @@ public interface IActivityDataObject {
 
     /**
      * Returns the JID of the user which has caused this activityDataObject.
+     * 
+     * @return not <code>null</code>
      */
     public JID getSource();
 

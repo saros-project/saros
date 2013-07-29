@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
-import org.picocontainer.annotations.Nullable;
+import org.apache.commons.lang.ObjectUtils;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
@@ -53,12 +53,14 @@ public class ChecksumActivity extends AbstractActivity implements
      * @param length
      *            The length of the document
      * @param jupiterTimestamp
-     *            The current jupiterTimestamp for this document (nullable)
+     *            The current jupiterTimestamp for this document, may be
+     *            <code>null</code>
      */
     public ChecksumActivity(User source, SPath path, long hash, long length,
-        @Nullable Timestamp jupiterTimestamp) {
+        Timestamp jupiterTimestamp) {
 
         super(source);
+
         this.path = path;
         this.hash = hash;
         this.length = length;
@@ -78,7 +80,7 @@ public class ChecksumActivity extends AbstractActivity implements
      * Returns a copy of the ChecksumActivity with a new {@link Timestamp}.
      */
     public ChecksumActivity withTimestamp(Timestamp jupiterTimestamp) {
-        return new ChecksumActivity(source, path, hash, length,
+        return new ChecksumActivity(getSource(), path, hash, length,
             jupiterTimestamp);
     }
 
@@ -92,8 +94,9 @@ public class ChecksumActivity extends AbstractActivity implements
 
     @Override
     public String toString() {
-        return "Checksum(path:" + this.path + ",hash:" + hash + ",length:"
-            + length + ",vectorTime:" + jupiterTimestamp + ")";
+        return "ChecksumActivity(path: " + path + ", hash: " + hash
+            + ", length: " + length + ", jupiterTimestamp: " + jupiterTimestamp
+            + ")";
     }
 
     @Override
@@ -107,7 +110,8 @@ public class ChecksumActivity extends AbstractActivity implements
         int result = super.hashCode();
         result = prime * result + (int) (hash ^ (hash >>> 32));
         result = prime * result + (int) (length ^ (length >>> 32));
-        result = prime * result + ((path == null) ? 0 : path.hashCode());
+        result = prime * result + ObjectUtils.hashCode(path);
+        result = prime * result + ObjectUtils.hashCode(jupiterTimestamp);
         return result;
     }
 
@@ -117,18 +121,20 @@ public class ChecksumActivity extends AbstractActivity implements
             return true;
         if (!super.equals(obj))
             return false;
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof ChecksumActivity))
             return false;
+
         ChecksumActivity other = (ChecksumActivity) obj;
-        if (hash != other.hash)
+
+        if (this.hash != other.hash)
             return false;
-        if (length != other.length)
+        if (this.length != other.length)
             return false;
-        if (path == null) {
-            if (other.path != null)
-                return false;
-        } else if (!path.equals(other.path))
+        if (!ObjectUtils.equals(this.path, other.path))
             return false;
+        if (!ObjectUtils.equals(this.jupiterTimestamp, other.jupiterTimestamp))
+            return false;
+
         return true;
     }
 
@@ -150,8 +156,8 @@ public class ChecksumActivity extends AbstractActivity implements
 
     @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
-        return new ChecksumActivityDataObject(source.getJID(),
-            path.toSPathDataObject(sarosSession), hash, length,
-            jupiterTimestamp);
+        return new ChecksumActivityDataObject(getSource().getJID(),
+            (path != null ? path.toSPathDataObject(sarosSession) : null), hash,
+            length, jupiterTimestamp);
     }
 }

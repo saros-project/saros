@@ -19,6 +19,8 @@
  */
 package de.fu_berlin.inf.dpp.activities.serializable;
 
+import org.apache.commons.lang.ObjectUtils;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
@@ -50,7 +52,9 @@ public class PermissionActivityDataObject extends AbstractActivityDataObject {
      */
     public PermissionActivityDataObject(JID source, JID affectedUser,
         Permission permission) {
+
         super(source);
+
         this.affectedUser = affectedUser;
         this.permission = permission;
     }
@@ -59,10 +63,8 @@ public class PermissionActivityDataObject extends AbstractActivityDataObject {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result
-            + ((affectedUser == null) ? 0 : affectedUser.hashCode());
-        result = prime * result
-            + ((permission == null) ? 0 : permission.hashCode());
+        result = prime * result + ObjectUtils.hashCode(affectedUser);
+        result = prime * result + ObjectUtils.hashCode(permission);
         return result;
     }
 
@@ -74,29 +76,26 @@ public class PermissionActivityDataObject extends AbstractActivityDataObject {
             return false;
         if (!(obj instanceof PermissionActivityDataObject))
             return false;
+
         PermissionActivityDataObject other = (PermissionActivityDataObject) obj;
-        if (affectedUser == null) {
-            if (other.affectedUser != null)
-                return false;
-        } else if (!affectedUser.equals(other.affectedUser))
+
+        if (!ObjectUtils.equals(this.permission, other.permission))
             return false;
-        if (permission == null) {
-            if (other.permission != null)
-                return false;
-        } else if (!permission.equals(other.permission))
+        if (!ObjectUtils.equals(this.affectedUser, other.affectedUser))
             return false;
+
         return true;
     }
 
     @Override
     public String toString() {
-        return "PermissionActivityDataObject(user:" + affectedUser
-            + ",new permission:" + permission + ")";
+        return "PermissionActivityDO(user: " + affectedUser
+            + ", new permission: " + permission + ")";
     }
 
     @Override
     public IActivity getActivity(ISarosSession sarosSession) {
-        return new PermissionActivity(sarosSession.getUser(source),
+        return new PermissionActivity(sarosSession.getUser(getSource()),
             sarosSession.getUser(affectedUser), permission);
     }
 }

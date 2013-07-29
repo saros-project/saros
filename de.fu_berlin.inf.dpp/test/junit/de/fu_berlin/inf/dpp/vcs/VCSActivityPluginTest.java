@@ -28,22 +28,22 @@ public class VCSActivityPluginTest {
         User source = new User(session, jid, 0, -1);
         IProject p = root.getProject("p");
         SPath p_a = new SPath(p, new Path("a"));
-        VCSActivity switch_p_a = new VCSActivity(VCSActivity.Type.SWITCH,
-            source, p_a, "", "", "");
+        VCSActivity switch_p_a = new VCSActivity(source,
+            VCSActivity.Type.SWITCH, p_a, "", "", "");
         assertFalse(switch_p_a.includes(switch_p_a));
 
         SPath p_a_b = new SPath(p, new Path("a/b"));
-        VCSActivity switch_p_a_b = new VCSActivity(VCSActivity.Type.SWITCH,
-            source, p_a_b, "", "", "");
+        VCSActivity switch_p_a_b = new VCSActivity(source,
+            VCSActivity.Type.SWITCH, p_a_b, "", "", "");
         assertFalse(switch_p_a_b.includes(switch_p_a));
         assertTrue(switch_p_a.includes(switch_p_a_b));
 
-        VCSActivity update_p_a_b = new VCSActivity(VCSActivity.Type.UPDATE,
-            source, p_a_b, "", "", "");
+        VCSActivity update_p_a_b = new VCSActivity(source,
+            VCSActivity.Type.UPDATE, p_a_b, "", "", "");
         assertTrue(switch_p_a.includes(update_p_a_b));
 
-        VCSActivity update_p_a = new VCSActivity(VCSActivity.Type.UPDATE,
-            source, p_a, "", "", "");
+        VCSActivity update_p_a = new VCSActivity(source,
+            VCSActivity.Type.UPDATE, p_a, "", "", "");
         assertFalse(update_p_a.includes(switch_p_a_b));
         assertFalse(switch_p_a_b.includes(update_p_a));
     }

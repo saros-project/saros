@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
+import org.apache.commons.lang.ObjectUtils;
+
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.FolderActivityDataObject;
@@ -18,6 +20,7 @@ public class FolderActivity extends AbstractActivity implements
 
     public FolderActivity(User source, Type type, SPath path) {
         super(source);
+
         this.type = type;
         this.path = path;
     }
@@ -35,8 +38,8 @@ public class FolderActivity extends AbstractActivity implements
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((path == null) ? 0 : path.hashCode());
-        result = prime * result + ((type == null) ? 0 : type.hashCode());
+        result = prime * result + ObjectUtils.hashCode(path);
+        result = prime * result + ObjectUtils.hashCode(type);
         return result;
     }
 
@@ -46,19 +49,16 @@ public class FolderActivity extends AbstractActivity implements
             return true;
         if (!super.equals(obj))
             return false;
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof FolderActivity))
             return false;
+
         FolderActivity other = (FolderActivity) obj;
-        if (path == null) {
-            if (other.path != null)
-                return false;
-        } else if (!path.equals(other.path))
+
+        if (this.type != other.type)
             return false;
-        if (type == null) {
-            if (other.type != null)
-                return false;
-        } else if (!type.equals(other.type))
+        if (!ObjectUtils.equals(this.path, other.path))
             return false;
+
         return true;
     }
 
@@ -74,8 +74,8 @@ public class FolderActivity extends AbstractActivity implements
 
     @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
-        return new FolderActivityDataObject(source.getJID(), type,
-            path.toSPathDataObject(sarosSession));
+        return new FolderActivityDataObject(getSource().getJID(), type,
+            (path != null ? path.toSPathDataObject(sarosSession) : null));
     }
 
 }

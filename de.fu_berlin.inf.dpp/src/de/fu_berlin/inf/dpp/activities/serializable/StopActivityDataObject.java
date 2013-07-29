@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.activities.serializable;
 
+import org.apache.commons.lang.ObjectUtils;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
@@ -27,7 +29,7 @@ public class StopActivityDataObject extends AbstractActivityDataObject {
     // the user who has to be locked / unlocked
     @XStreamAsAttribute
     @XStreamConverter(JIDConverter.class)
-    protected JID user;
+    protected JID affected;
 
     @XStreamAsAttribute
     protected Type type;
@@ -39,13 +41,13 @@ public class StopActivityDataObject extends AbstractActivityDataObject {
     @XStreamAsAttribute
     protected String stopActivityID;
 
-    public StopActivityDataObject(JID source, JID initiator, JID user,
+    public StopActivityDataObject(JID source, JID initiator, JID affected,
         Type type, State state, String stopActivityID) {
 
         super(source);
 
         this.initiator = initiator;
-        this.user = user;
+        this.affected = affected;
         this.state = state;
         this.type = type;
         this.stopActivityID = stopActivityID;
@@ -55,13 +57,11 @@ public class StopActivityDataObject extends AbstractActivityDataObject {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result
-            + ((initiator == null) ? 0 : initiator.hashCode());
-        result = prime * result + ((state == null) ? 0 : state.hashCode());
-        result = prime * result
-            + ((stopActivityID == null) ? 0 : stopActivityID.hashCode());
-        result = prime * result + ((type == null) ? 0 : type.hashCode());
-        result = prime * result + ((user == null) ? 0 : user.hashCode());
+        result = prime * result + ObjectUtils.hashCode(initiator);
+        result = prime * result + ObjectUtils.hashCode(state);
+        result = prime * result + ObjectUtils.hashCode(stopActivityID);
+        result = prime * result + ObjectUtils.hashCode(type);
+        result = prime * result + ObjectUtils.hashCode(affected);
         return result;
     }
 
@@ -71,53 +71,36 @@ public class StopActivityDataObject extends AbstractActivityDataObject {
             return true;
         if (!super.equals(obj))
             return false;
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof StopActivityDataObject))
             return false;
+
         StopActivityDataObject other = (StopActivityDataObject) obj;
-        if (initiator == null) {
-            if (other.initiator != null)
-                return false;
-        } else if (!initiator.equals(other.initiator))
+
+        if (!ObjectUtils.equals(this.state, other.state))
             return false;
-        if (state == null) {
-            if (other.state != null)
-                return false;
-        } else if (!state.equals(other.state))
+        if (!ObjectUtils.equals(this.type, other.type))
             return false;
-        if (stopActivityID == null) {
-            if (other.stopActivityID != null)
-                return false;
-        } else if (!stopActivityID.equals(other.stopActivityID))
+        if (!ObjectUtils.equals(this.stopActivityID, other.stopActivityID))
             return false;
-        if (type == null) {
-            if (other.type != null)
-                return false;
-        } else if (!type.equals(other.type))
+        if (!ObjectUtils.equals(this.initiator, other.initiator))
             return false;
-        if (user == null) {
-            if (other.user != null)
-                return false;
-        } else if (!user.equals(other.user))
+        if (!ObjectUtils.equals(this.affected, other.affected))
             return false;
+
         return true;
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("StopActivityDataObject (id: " + stopActivityID);
-        sb.append(", type: " + type);
-        sb.append(", state: " + state);
-        sb.append(", initiator: " + initiator.toString());
-        sb.append(", affected user: " + user.toString());
-        sb.append(", src: " + getSource() + ")");
-        return sb.toString();
+        return "StopActivityDO(id: " + stopActivityID + ", type: " + type
+            + ", state: " + state + ", initiator: " + initiator
+            + ", affected user: " + affected + ", src: " + getSource() + ")";
     }
 
     @Override
     public IActivity getActivity(ISarosSession sarosSession) {
-        return new StopActivity(sarosSession.getUser(source),
-            sarosSession.getUser(initiator), sarosSession.getUser(user), type,
+        return new StopActivity(sarosSession.getUser(getSource()),
+            sarosSession.getUser(initiator), sarosSession.getUser(affected), type,
             state, stopActivityID);
     }
 }

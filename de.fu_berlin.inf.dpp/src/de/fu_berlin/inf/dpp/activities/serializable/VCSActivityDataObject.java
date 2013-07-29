@@ -5,8 +5,6 @@ import java.util.Vector;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.IResourceActivity;
@@ -28,7 +26,9 @@ public class VCSActivityDataObject extends AbstractProjectActivityDataObject {
     public VCSActivityDataObject(JID source, VCSActivity.Type type, String url,
         SPathDataObject path, String directory, String param1,
         Vector<IActivityDataObject> containedActivity) {
+
         super(source, path);
+
         this.type = type;
         this.url = url;
         this.directory = directory;
@@ -38,10 +38,10 @@ public class VCSActivityDataObject extends AbstractProjectActivityDataObject {
 
     @Override
     public IActivity getActivity(ISarosSession sarosSession) {
-        SPath sPath = path == null ? null : path.toSPath(sarosSession);
-        User user = sarosSession == null ? null : sarosSession.getUser(source);
-        final VCSActivity vcsActivity = new VCSActivity(type, user, sPath, url,
-            directory, param1);
+        final VCSActivity vcsActivity = new VCSActivity(sarosSession.getUser(getSource()),
+            type, (getPath() != null ? getPath()
+                .toSPath(sarosSession) : null), url, directory, param1);
+
         vcsActivity.containedActivity.ensureCapacity(containedActivity.size());
         for (IActivityDataObject ado : containedActivity) {
             vcsActivity.containedActivity.add((IResourceActivity) ado

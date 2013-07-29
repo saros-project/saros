@@ -12,6 +12,7 @@ public class NOPActivityDataObject extends AbstractActivityDataObject {
 
     public NOPActivityDataObject(JID source, JID target, int id) {
         super(source);
+
         this.target = target;
         this.id = id;
     }

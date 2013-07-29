@@ -2,6 +2,8 @@ package de.fu_berlin.inf.dpp.activities.serializable;
 
 import java.util.Arrays;
 
+import org.apache.commons.lang.ObjectUtils;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
@@ -47,25 +49,8 @@ public class FileActivityDataObject extends AbstractProjectActivityDataObject {
     public FileActivityDataObject(JID source, Type type,
         SPathDataObject newPath, SPathDataObject oldPath, byte[] data,
         Purpose purpose, Long checksum) {
+
         super(source, newPath);
-
-        if (type == null || purpose == null)
-            throw new IllegalArgumentException();
-
-        switch (type) {
-        case CREATED:
-            if (data == null || oldPath != null)
-                throw new IllegalArgumentException();
-            break;
-        case REMOVED:
-            if (data != null || oldPath != null)
-                throw new IllegalArgumentException();
-            break;
-        case MOVED:
-            if (newPath == null || oldPath == null)
-                throw new IllegalArgumentException();
-            break;
-        }
 
         this.type = type;
         this.oldPath = oldPath;
@@ -81,10 +66,10 @@ public class FileActivityDataObject extends AbstractProjectActivityDataObject {
     @Override
     public String toString() {
         if (type == Type.MOVED)
-            return "FileActivityDataObject(type: Moved, old path: "
-                + this.oldPath + ", new path: " + this.path + ")";
-        return "FileActivityDataObject(type: " + this.type + ", path: "
-            + this.path + ")";
+            return "FileActivityDO(type: Moved, old path: " + oldPath
+                + ", new path: " + getPath() + ")";
+
+        return "FileActivityDO(type: " + type + ", path: " + getPath() + ")";
     }
 
     @Override
@@ -92,9 +77,8 @@ public class FileActivityDataObject extends AbstractProjectActivityDataObject {
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + Arrays.hashCode(data);
-        result = prime * result + ((oldPath == null) ? 0 : oldPath.hashCode());
-        result = prime * result + ((path == null) ? 0 : path.hashCode());
-        result = prime * result + ((type == null) ? 0 : type.hashCode());
+        result = prime * result + ObjectUtils.hashCode(oldPath);
+        result = prime * result + ObjectUtils.hashCode(type);
         return result;
     }
 
@@ -104,26 +88,18 @@ public class FileActivityDataObject extends AbstractProjectActivityDataObject {
             return true;
         if (!super.equals(obj))
             return false;
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof FileActivityDataObject))
             return false;
+
         FileActivityDataObject other = (FileActivityDataObject) obj;
-        if (oldPath == null) {
-            if (other.oldPath != null)
-                return false;
-        } else if (!oldPath.equals(other.oldPath))
+
+        if (!ObjectUtils.equals(this.type, other.type))
             return false;
-        if (path == null) {
-            if (other.path != null)
-                return false;
-        } else if (!path.equals(other.path))
-            return false;
-        if (type == null) {
-            if (other.type != null)
-                return false;
-        } else if (!type.equals(other.type))
+        if (!ObjectUtils.equals(this.oldPath, other.oldPath))
             return false;
         if (!Arrays.equals(data, other.data))
             return false;
+
         return true;
     }
 
@@ -133,8 +109,9 @@ public class FileActivityDataObject extends AbstractProjectActivityDataObject {
 
     @Override
     public IActivity getActivity(ISarosSession sarosSession) {
+        SPathDataObject newPath = getPath();
         return new FileActivity(sarosSession.getUser(source), type,
-            path.toSPath(sarosSession),
+            (newPath != null ? newPath.toSPath(sarosSession) : null),
             (oldPath != null ? oldPath.toSPath(sarosSession) : null), data,
             purpose, checksum);
     }

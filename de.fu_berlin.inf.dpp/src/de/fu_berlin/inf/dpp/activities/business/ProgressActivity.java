@@ -18,15 +18,10 @@ public class ProgressActivity extends AbstractActivity implements
     ITargetedActivity {
 
     protected User target;
-
     protected String progressID;
-
     protected int workCurrent;
-
     protected int workTotal;
-
     protected String taskName;
-
     protected ProgressAction action;
 
     public enum ProgressAction {
@@ -35,7 +30,12 @@ public class ProgressActivity extends AbstractActivity implements
 
     public ProgressActivity(User source, User target, String progressID,
         int workCurrent, int workTotal, String taskName, ProgressAction action) {
+
         super(source);
+
+        if (target == null)
+            throw new IllegalArgumentException("target must not be null");
+
         this.target = target;
         this.progressID = progressID;
         this.workCurrent = workCurrent;
@@ -46,9 +46,9 @@ public class ProgressActivity extends AbstractActivity implements
 
     @Override
     public String toString() {
-        return "Progress(source:" + getSource() + ",target:" + target + ",id:"
-            + this.progressID + ",work:" + workCurrent + "/" + workTotal
-            + ",task:" + taskName + ",action:" + action + ")";
+        return "ProgressActivity(source: " + getSource() + ", target: "
+            + target + ", id: " + progressID + ", work: " + workCurrent + "/"
+            + workTotal + ", task: " + taskName + ", action: " + action + ")";
     }
 
     @Override
@@ -106,12 +106,10 @@ public class ProgressActivity extends AbstractActivity implements
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((action == null) ? 0 : action.hashCode());
-        result = prime * result
-            + ((progressID == null) ? 0 : progressID.hashCode());
-        result = prime * result
-            + ((taskName == null) ? 0 : taskName.hashCode());
-        result = prime * result + ((target == null) ? 0 : target.hashCode());
+        result = prime * result + ObjectUtils.hashCode(action);
+        result = prime * result + ObjectUtils.hashCode(progressID);
+        result = prime * result + ObjectUtils.hashCode(taskName);
+        result = prime * result + ObjectUtils.hashCode(target);
         result = prime * result + workCurrent;
         result = prime * result + workTotal;
 
@@ -124,29 +122,25 @@ public class ProgressActivity extends AbstractActivity implements
             return true;
         if (!super.equals(obj))
             return false;
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof ProgressActivity))
             return false;
+
         ProgressActivity other = (ProgressActivity) obj;
-        if (action == null) {
-            if (other.action != null)
-                return false;
-        } else if (!action.equals(other.action))
+
+        if (this.workCurrent != other.workCurrent)
             return false;
-        if (progressID == null) {
-            if (other.progressID != null)
-                return false;
-        } else if (!progressID.equals(other.progressID))
+        if (this.workTotal != other.workTotal)
             return false;
-        if (taskName == null) {
-            if (other.taskName != null)
-                return false;
-        } else if (!taskName.equals(other.taskName))
+        if (this.action != other.action)
             return false;
-        if (workCurrent != other.workCurrent)
+        if (!ObjectUtils.equals(this.progressID, other.progressID))
             return false;
-        if (workTotal != other.workTotal)
+        if (!ObjectUtils.equals(this.taskName, other.taskName))
             return false;
-        return ObjectUtils.equals(this.target, other.target);
+        if (!ObjectUtils.equals(this.target, other.target))
+            return false;
+
+        return true;
     }
 
     /**

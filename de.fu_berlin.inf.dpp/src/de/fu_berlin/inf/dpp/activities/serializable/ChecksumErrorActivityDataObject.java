@@ -54,7 +54,9 @@ public class ChecksumErrorActivityDataObject extends AbstractActivityDataObject 
 
     public ChecksumErrorActivityDataObject(JID source, JID target,
         List<SPathDataObject> paths, String recoveryID) {
+
         super(source);
+
         this.target = target;
         this.paths = paths;
         this.recoveryID = recoveryID;
@@ -62,18 +64,20 @@ public class ChecksumErrorActivityDataObject extends AbstractActivityDataObject 
 
     @Override
     public IActivity getActivity(ISarosSession sarosSession) {
-        ArrayList<SPath> sPaths = new ArrayList<SPath>();
-        if (this.paths != null)
+        ArrayList<SPath> sPaths = null;
+        if (this.paths != null) {
+            sPaths = new ArrayList<SPath>();
             for (SPathDataObject path : this.paths) {
                 sPaths.add(path.toSPath(sarosSession));
             }
-        return new ChecksumErrorActivity(sarosSession.getUser(source),
+        }
+        return new ChecksumErrorActivity(sarosSession.getUser(getSource()),
             sarosSession.getUser(target), sPaths, recoveryID);
     }
 
     @Override
     public String toString() {
-        return "ChecksumErrorDO(src:" + this.getSource() + ", paths:"
-            + this.paths + ", recoveryID:" + recoveryID + ")";
+        return "ChecksumErrorActivityDO(src: " + getSource() + ", paths: "
+            + paths + ", recoveryID: " + recoveryID + ")";
     }
 }

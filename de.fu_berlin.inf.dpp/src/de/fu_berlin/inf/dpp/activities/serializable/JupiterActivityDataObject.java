@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.activities.serializable;
 
+import org.apache.commons.lang.ObjectUtils;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import de.fu_berlin.inf.dpp.activities.SPathDataObject;
@@ -30,10 +32,11 @@ public class JupiterActivityDataObject extends
 
     public JupiterActivityDataObject(Timestamp timestamp, Operation operation,
         JID source, SPathDataObject path) {
+
         super(source, path);
+
         this.timestamp = timestamp;
         this.operation = operation;
-        this.path = path;
     }
 
     @Override
@@ -42,24 +45,16 @@ public class JupiterActivityDataObject extends
             return true;
         if (!super.equals(obj))
             return false;
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof JupiterActivityDataObject))
             return false;
+
         JupiterActivityDataObject other = (JupiterActivityDataObject) obj;
-        if (path == null) {
-            if (other.path != null)
-                return false;
-        } else if (!path.equals(other.path))
+
+        if (!ObjectUtils.equals(this.operation, other.operation))
             return false;
-        if (operation == null) {
-            if (other.operation != null)
-                return false;
-        } else if (!operation.equals(other.operation))
+        if (!ObjectUtils.equals(this.timestamp, other.timestamp))
             return false;
-        if (timestamp == null) {
-            if (other.timestamp != null)
-                return false;
-        } else if (!timestamp.equals(other.timestamp))
-            return false;
+
         return true;
     }
 
@@ -67,35 +62,22 @@ public class JupiterActivityDataObject extends
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((path == null) ? 0 : path.hashCode());
-        result = prime * result
-            + ((operation == null) ? 0 : operation.hashCode());
-        result = prime * result
-            + ((timestamp == null) ? 0 : timestamp.hashCode());
+        result = prime * result + ObjectUtils.hashCode(operation);
+        result = prime * result + ObjectUtils.hashCode(timestamp);
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
-        StringBuilder buffer = new StringBuilder();
-        buffer.append("JupiterActivityDataObject(");
-        buffer.append(this.timestamp);
-        buffer.append(",");
-        buffer.append(this.operation);
-        buffer.append(",");
-        buffer.append(this.getSource());
-        buffer.append(")");
-        return buffer.toString();
+        return "JupiterActivityDO(timestamp: " + timestamp + ", operation: "
+            + operation + ", path: " + getPath() + ", source: " + getSource()
+            + ")";
     }
 
     @Override
     public IActivity getActivity(ISarosSession sarosSession) {
         return new JupiterActivity(timestamp, operation,
-            sarosSession.getUser(source), path.toSPath(sarosSession));
+            sarosSession.getUser(getSource()),
+            getPath() != null ? getPath().toSPath(sarosSession) : null);
     }
 }

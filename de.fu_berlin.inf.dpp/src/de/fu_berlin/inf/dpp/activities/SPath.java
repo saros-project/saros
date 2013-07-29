@@ -1,11 +1,11 @@
 package de.fu_berlin.inf.dpp.activities;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
-import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
@@ -57,9 +57,10 @@ public class SPath {
      * Default constructor, initializing this SPath as a reference to the
      * resource or editor identified by the given path in the given project.
      * 
-     * A Null path is allowed for representing no editor
+     * @param path
+     *            maybe <code>null</code> to represent "no editor"
      */
-    public SPath(IProject project, @Nullable IPath path) {
+    public SPath(IProject project, IPath path) {
         if (project == null)
             throw new IllegalArgumentException(
                 "SPath must be initialized with an IProject");
@@ -115,13 +116,9 @@ public class SPath {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result
-            + ((editorType == null) ? 0 : editorType.hashCode());
-        result = prime
-            * result
-            + ((projectRelativePath == null) ? 0 : projectRelativePath
-                .hashCode());
-        result = prime * result + ((project == null) ? 0 : project.hashCode());
+        result = prime * result + ObjectUtils.hashCode(editorType);
+        result = prime * result + ObjectUtils.hashCode(projectRelativePath);
+        result = prime * result + ObjectUtils.hashCode(project);
         return result;
     }
 
@@ -131,24 +128,19 @@ public class SPath {
             return true;
         if (obj == null)
             return false;
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof SPath))
             return false;
+
         SPath other = (SPath) obj;
-        if (editorType == null) {
-            if (other.editorType != null)
-                return false;
-        } else if (!editorType.equals(other.editorType))
+
+        if (!ObjectUtils.equals(this.editorType, other.editorType))
             return false;
-        if (projectRelativePath == null) {
-            if (other.projectRelativePath != null)
-                return false;
-        } else if (!projectRelativePath.equals(other.projectRelativePath))
+        if (!ObjectUtils.equals(this.projectRelativePath,
+            other.projectRelativePath))
             return false;
-        if (project == null) {
-            if (other.project != null)
-                return false;
-        } else if (!project.equals(other.project))
+        if (!ObjectUtils.equals(this.project, other.project))
             return false;
+
         return true;
     }
 
@@ -159,7 +151,7 @@ public class SPath {
             + ", path="
             + (projectRelativePath != null ? projectRelativePath
                 .toPortableString() : "<no path>") + ", project="
-            + project.getName() + "]";
+            + (project != null ? project.getName() : "<no project>") + "]";
     }
 
     /**

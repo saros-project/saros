@@ -152,7 +152,7 @@ public class StopManagerTest {
             public Object answer() throws Throwable {
                 StopActivity activity = (StopActivity) EasyMock
                     .getCurrentArguments()[0];
-                Assert.assertEquals(alicesBob, activity.getUser());
+                Assert.assertEquals(alicesBob, activity.getAffected());
                 Assert.assertEquals(alicesAlice, activity.getSource());
                 Assert.assertEquals(alicesAlice, activity.getInitiator());
                 Assert.assertEquals(StopActivity.Type.LOCKREQUEST,
@@ -170,7 +170,7 @@ public class StopManagerTest {
             public Object answer() throws Throwable {
                 StopActivity activity = (StopActivity) EasyMock
                     .getCurrentArguments()[0];
-                Assert.assertEquals(alicesBob, activity.getUser());
+                Assert.assertEquals(alicesBob, activity.getAffected());
                 Assert.assertEquals(alicesAlice, activity.getSource());
                 Assert.assertEquals(alicesAlice, activity.getInitiator());
                 Assert.assertEquals(StopActivity.Type.UNLOCKREQUEST,
@@ -671,9 +671,9 @@ public class StopManagerTest {
 
     private static StopActivity rewriteStopActivity(StopActivity inActivity,
         ISarosSession target) {
-        return new StopActivity(rewriteUser(inActivity.getUser(), target),
+        return new StopActivity(rewriteUser(inActivity.getAffected(), target),
             rewriteUser(inActivity.getInitiator(), target), rewriteUser(
-                inActivity.getUser(), target), inActivity.getType(),
+                inActivity.getAffected(), target), inActivity.getType(),
             inActivity.getState(), inActivity.getActivityID());
     }
 

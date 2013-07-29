@@ -497,7 +497,7 @@ public final class StopManager extends AbstractActivityProvider implements
     }
 
     private StartHandle generateStartHandle(StopActivity stopActivity) {
-        User user = stopActivity.getUser();
+        User user = stopActivity.getAffected();
         return new StartHandle(user, this, stopActivity.getActivityID());
     }
 

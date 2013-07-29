@@ -1,8 +1,8 @@
 package de.fu_berlin.inf.dpp.activities;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
-import org.picocontainer.annotations.Nullable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
@@ -33,13 +33,14 @@ public class SPathDataObject {
     /**
      * Create a new SPathDataObject for project using the given global ID.
      * 
-     * Path may be null if this SPathDataObject represents "no editor".
-     * 
-     * editorType may be null if this SPathDataObject represents a resource
-     * path.
+     * @param path
+     *            may be <code>null</code> if this SPathDataObject represents
+     *            "no editor".
+     * @param projectID
+     *            may be <code>null</code> if this SPathDataObject represents a
+     *            resource path
      */
-    public SPathDataObject(String projectID, @Nullable IPath path,
-        @Nullable String editorType) {
+    public SPathDataObject(String projectID, IPath path, String editorType) {
 
         this.projectID = projectID;
         this.path = path;
@@ -90,11 +91,9 @@ public class SPathDataObject {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result
-            + ((editorType == null) ? 0 : editorType.hashCode());
-        result = prime * result + ((path == null) ? 0 : path.hashCode());
-        result = prime * result
-            + ((projectID == null) ? 0 : projectID.hashCode());
+        result = prime * result + ObjectUtils.hashCode(editorType);
+        result = prime * result + ObjectUtils.hashCode(path);
+        result = prime * result + ObjectUtils.hashCode(projectID);
         return result;
     }
 
@@ -104,24 +103,18 @@ public class SPathDataObject {
             return true;
         if (obj == null)
             return false;
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof SPathDataObject))
             return false;
+
         SPathDataObject other = (SPathDataObject) obj;
-        if (editorType == null) {
-            if (other.editorType != null)
-                return false;
-        } else if (!editorType.equals(other.editorType))
+
+        if (!ObjectUtils.equals(this.editorType, other.editorType))
             return false;
-        if (path == null) {
-            if (other.path != null)
-                return false;
-        } else if (!path.equals(other.path))
+        if (!ObjectUtils.equals(this.path, other.path))
             return false;
-        if (projectID == null) {
-            if (other.projectID != null)
-                return false;
-        } else if (!projectID.equals(other.projectID))
+        if (!ObjectUtils.equals(this.projectID, other.projectID))
             return false;
+
         return true;
     }
 }

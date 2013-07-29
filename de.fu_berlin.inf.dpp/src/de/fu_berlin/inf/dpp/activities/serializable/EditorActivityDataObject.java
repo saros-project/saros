@@ -19,7 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.activities.serializable;
 
-import org.picocontainer.annotations.Nullable;
+import org.apache.commons.lang.ObjectUtils;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
@@ -44,29 +44,21 @@ public class EditorActivityDataObject extends AbstractProjectActivityDataObject 
     protected final Type type;
 
     /**
-     * @param sPathDataObject
+     * @param path
      *            a valid project-relative path or <code>null</code> if former
      *            resource should be deactivated.
      */
-    public EditorActivityDataObject(JID source, Type type,
-        @Nullable SPathDataObject sPathDataObject) {
-
-        super(source, sPathDataObject);
-        if ((type != Type.ACTIVATED) && (sPathDataObject == null)) {
-            throw new IllegalArgumentException(
-                "Null path for non-activation type editor activityDataObject given.");
-        }
+    public EditorActivityDataObject(JID source, Type type, SPathDataObject path) {
+        super(source, path);
 
         this.type = type;
-        this.path = sPathDataObject;
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((path == null) ? 0 : path.hashCode());
-        result = prime * result + ((type == null) ? 0 : type.hashCode());
+        result = prime * result + ObjectUtils.hashCode(type);
         return result;
     }
 
@@ -78,30 +70,24 @@ public class EditorActivityDataObject extends AbstractProjectActivityDataObject 
             return false;
         if (!(obj instanceof EditorActivityDataObject))
             return false;
+
         EditorActivityDataObject other = (EditorActivityDataObject) obj;
-        if (path == null) {
-            if (other.path != null)
-                return false;
-        } else if (!path.equals(other.path))
+
+        if (!ObjectUtils.equals(this.type, other.type))
             return false;
-        if (type == null) {
-            if (other.type != null)
-                return false;
-        } else if (!type.equals(other.type))
-            return false;
+
         return true;
     }
 
     @Override
     public String toString() {
-        return "EditorActivityDataObject(type:" + this.type + ",path:"
-            + (this.path != null ? this.path : "no path") + ")";
+        return "EditorActivityDO(type: " + type + ", path: " + getPath() + ")";
     }
 
     @Override
     public IActivity getActivity(ISarosSession sarosSession) {
-        return new EditorActivity(sarosSession.getUser(source), type,
-            (path != null ? path.toSPath(sarosSession) : null));
+        return new EditorActivity(sarosSession.getUser(getSource()), type,
+            (getPath() != null ? getPath().toSPath(sarosSession) : null));
     }
 
     public String getProjectID() {

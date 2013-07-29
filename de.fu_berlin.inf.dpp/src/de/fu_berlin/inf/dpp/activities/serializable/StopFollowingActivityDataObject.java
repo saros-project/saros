@@ -16,15 +16,12 @@ public class StopFollowingActivityDataObject extends AbstractActivityDataObject 
 
     @Override
     public IActivity getActivity(ISarosSession sharedProject) {
-        return new StopFollowingActivity(sharedProject.getUser(source));
+        return new StopFollowingActivity(sharedProject.getUser(getSource()));
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + ((source == null) ? 0 : source.hashCode());
-        return result;
+        return super.hashCode();
     }
 
     @Override
@@ -35,18 +32,12 @@ public class StopFollowingActivityDataObject extends AbstractActivityDataObject 
             return false;
         if (!(obj instanceof StopFollowingActivityDataObject))
             return false;
-        StopFollowingActivityDataObject other = (StopFollowingActivityDataObject) obj;
-        if (source == null) {
-            if (other.source != null)
-                return false;
-        } else if (!source.equals(other.source))
-            return false;
 
         return true;
     }
 
     @Override
     public String toString() {
-        return "StopFollowingActivityDataObject(" + source + ")";
+        return "StopFollowingActivityDO(source: " + getSource() + ")";
     }
 }

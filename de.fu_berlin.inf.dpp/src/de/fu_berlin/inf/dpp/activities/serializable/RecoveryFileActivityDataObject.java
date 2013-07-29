@@ -31,14 +31,17 @@ public class RecoveryFileActivityDataObject extends FileActivityDataObject
     public RecoveryFileActivityDataObject(JID source, JID target, Type type,
         SPathDataObject newPath, SPathDataObject oldPath, byte[] data,
         Long checksum) {
+
         super(source, type, newPath, oldPath, data, Purpose.RECOVERY, checksum);
+
         this.target = target;
     }
 
     @Override
     public IActivity getActivity(ISarosSession sarosSession) {
-        return new RecoveryFileActivity(sarosSession.getUser(source),
-            sarosSession.getUser(target), type, path.toSPath(sarosSession),
+        return new RecoveryFileActivity(sarosSession.getUser(getSource()),
+            sarosSession.getUser(target), getType(),
+            path.toSPath(sarosSession),
             (oldPath != null ? oldPath.toSPath(sarosSession) : null), data,
             checksum);
     }
@@ -47,21 +50,24 @@ public class RecoveryFileActivityDataObject extends FileActivityDataObject
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((target == null) ? 0 : target.hashCode());
+        result = prime * result + ObjectUtils.hashCode(target);
         return result;
     }
 
     @Override
-    public boolean equals(Object o) {
-
-        if (!super.equals(o))
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (!(obj instanceof RecoveryFileActivityDataObject))
             return false;
 
-        if (!(o instanceof RecoveryFileActivityDataObject))
+        RecoveryFileActivityDataObject other = (RecoveryFileActivityDataObject) obj;
+
+        if (!ObjectUtils.equals(this.target, other.target))
             return false;
 
-        RecoveryFileActivityDataObject other = (RecoveryFileActivityDataObject) o;
-        return ObjectUtils.equals(this.target, other.target);
+        return true;
     }
-
 }

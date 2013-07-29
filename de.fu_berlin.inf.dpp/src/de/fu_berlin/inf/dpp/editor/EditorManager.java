@@ -535,12 +535,12 @@ public class EditorManager extends AbstractActivityProvider {
 
     /**
      * Sets the local editor 'opened' and fires an {@link EditorActivity} of
-     * type <code>Activated</code>.
+     * type {@link Type#ACTIVATED}.
      * 
      * @param path
      *            the project-relative path to the resource that the editor is
-     *            currently editing or null if the local user has no editor
-     *            open.
+     *            currently editing or <code>null</code> if the local user has
+     *            no editor open.
      */
     public void generateEditorActivated(@Nullable SPath path) {
 

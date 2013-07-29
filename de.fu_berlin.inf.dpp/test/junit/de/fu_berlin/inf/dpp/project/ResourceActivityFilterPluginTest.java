@@ -33,8 +33,8 @@ public class ResourceActivityFilterPluginTest {
 
     // Setup helpers
     private VCSActivity switch_(User source, SPath p) {
-        final VCSActivity result = new VCSActivity(VCSActivity.Type.SWITCH,
-            source, p, "", "", "");
+        final VCSActivity result = new VCSActivity(source,
+            VCSActivity.Type.SWITCH, p, "", "", "");
         return result;
     }
 

@@ -22,6 +22,7 @@ public class ProjectExchangeInfoDataObject {
      */
     public ProjectExchangeInfoDataObject(String projectID, String description,
         String projectName, boolean partial, String fileList) {
+
         this.xmlFileList = fileList;
         this.projectName = projectName;
         this.description = description;

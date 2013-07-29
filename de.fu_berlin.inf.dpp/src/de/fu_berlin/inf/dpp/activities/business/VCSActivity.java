@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.activities.business;
 
 import java.util.Vector;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
@@ -60,14 +61,49 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
 
     public Vector<IResourceActivity> containedActivity = new Vector<IResourceActivity>();
 
-    public VCSActivity(Type type, User source, SPath path, String url,
+    /**
+     * 
+     * @param source
+     * @param type
+     *            Represents the VCS action that takes place
+     * @param path
+     *            The path of the resource in the working directory
+     * @param url
+     *            The repository root url (for {@link Type#CONNECT});<br>
+     *            the url of the target resource (for {@link Type#SWITCH});<br>
+     *            <code>null</code> otherwise.
+     * @param directory
+     *            The path of the target directory relative to the root (for
+     *            {@link Type#CONNECT});<br>
+     *            <code>null</code> otherwise.
+     * @param param1
+     *            The provider id (for {@link Type#CONNECT});<br>
+     *            the revision of the target resource (for {@link Type#SWITCH}
+     *            and {@link Type#UPDATE});<br>
+     *            the marker whether to delete the contents (delete
+     *            <code>if (param1 != null)</code>, for {@link Type#DISCONNECT}
+     *            ).
+     */
+    public VCSActivity(User source, Type type, SPath path, String url,
         String directory, String param1) {
+
         super(source);
+
         this.type = type;
         this.path = path;
         this.url = url;
         this.directory = directory;
         this.param1 = param1;
+    }
+
+    /**
+     * Internal ctor used by the builder methods
+     */
+    private VCSActivity(Type type, ISarosSession sarosSession,
+        IResource resource, String url, String directory, String param1) {
+        this(sarosSession != null ? sarosSession.getLocalUser() : null, type,
+            resource != null ? new SPath(resource) : null, url, directory,
+            param1);
     }
 
     public static VCSActivity connect(ISarosSession sarosSession,
@@ -95,13 +131,6 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
             revision);
     }
 
-    private VCSActivity(Type type, ISarosSession sarosSession,
-        IResource resource, String url, String directory, String param1) {
-        this(type, sarosSession != null ? sarosSession.getLocalUser() : null,
-            resource != null ? new SPath(resource) : null, url, directory,
-            param1);
-    }
-
     @Override
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
@@ -109,7 +138,7 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
 
     @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
-        SPathDataObject sPathDataObject = path == null ? null : path
+        SPathDataObject sPathDataObject = (path == null) ? null : path
             .toSPathDataObject(sarosSession);
         Vector<IActivityDataObject> ados = new Vector<IActivityDataObject>(
             containedActivity.size());
@@ -125,27 +154,57 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
         return path;
     }
 
+    /**
+     * Represents the VCS action that takes place
+     */
     public Type getType() {
         return type;
     }
 
+    /**
+     * Various purposes depending on {@link #getType()}
+     * 
+     * @return The provider id (for {@link Type#CONNECT});<br>
+     *         the revision of the target resource (for {@link Type#SWITCH} and
+     *         {@link Type#UPDATE});<br>
+     *         the marker whether to delete the contents (delete
+     *         <code>if (param1 != null)</code>, for {@link Type#DISCONNECT} ).
+     */
     public String getParam1() {
         return param1;
     }
 
+    /**
+     * The repository url (or part of it), depends on {@link #getType()}
+     * 
+     * @return The repository root url (for {@link Type#CONNECT}), see
+     *         {@link #getDirectory()} for the rest of the full path;<br>
+     *         the url of the target resource (for {@link Type#SWITCH});<br>
+     *         <code>null</code> otherwise.
+     */
     public String getURL() {
         return url;
     }
 
+    /**
+     * The path of the target directory relative to the repository root
+     * 
+     * @return for {@link Type#CONNECT}: part of the URL, path relative to
+     *         {@link #getURL()};<br>
+     *         <code>null</code> otherwise.
+     */
     public String getDirectory() {
         return directory;
     }
 
     /**
-     * Returns true if executing this activity would implicitely execute the
-     * otherActivity. In other words, if executing otherActivity after this one
-     * would be a null operation.<br>
-     * Currently this method only checks type and path, not URL and revision.
+     * Returns <code>true</code> if executing this activity would implicitely
+     * execute the <code>otherActivity</code>. In other words, if executing
+     * <code>otherActivity</code> after this one would be a <code>null</code>
+     * operation.<br>
+     * Currently this method only checks {@link #getType() type} and
+     * {@link #getPath() path}, not {@link #getURL() URL} and
+     * {@link #getParam1() revision}.
      */
     public boolean includes(IResourceActivity otherActivity) {
         if (otherActivity == null || getPath() == null
@@ -171,16 +230,16 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
 
     @Override
     public String toString() {
-        String result = "VCSActivity(type=" + type;
+        String result = "VCSActivity(type: " + type;
         if (type == Type.DISCONNECT)
-            result += ", deleteContents=" + (param1 != null);
+            result += ", deleteContents: " + (param1 != null);
         else {
-            result += ", path=" + path;
+            result += ", path: " + path;
             if (type == Type.CONNECT || type == Type.SWITCH)
-                result += ", url=" + url;
+                result += ", url: " + url;
             if (type == Type.CONNECT)
-                result += ", directory=" + directory;
-            result += ", revision=" + param1;
+                result += ", directory: " + directory;
+            result += ", revision: " + param1;
         }
         result += ")";
         return result;
@@ -190,12 +249,11 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result
-            + ((directory == null) ? 0 : directory.hashCode());
-        result = prime * result + ((param1 == null) ? 0 : param1.hashCode());
-        result = prime * result + ((path == null) ? 0 : path.hashCode());
-        result = prime * result + ((type == null) ? 0 : type.hashCode());
-        result = prime * result + ((url == null) ? 0 : url.hashCode());
+        result = prime * result + ObjectUtils.hashCode(directory);
+        result = prime * result + ObjectUtils.hashCode(param1);
+        result = prime * result + ObjectUtils.hashCode(path);
+        result = prime * result + ObjectUtils.hashCode(type);
+        result = prime * result + ObjectUtils.hashCode(url);
         return result;
     }
 
@@ -205,32 +263,22 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
             return true;
         if (!super.equals(obj))
             return false;
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof VCSActivity))
             return false;
+
         VCSActivity other = (VCSActivity) obj;
-        if (directory == null) {
-            if (other.directory != null)
-                return false;
-        } else if (!directory.equals(other.directory))
+
+        if (this.type != other.type)
             return false;
-        if (param1 == null) {
-            if (other.param1 != null)
-                return false;
-        } else if (!param1.equals(other.param1))
+        if (!ObjectUtils.equals(this.directory, other.directory))
             return false;
-        if (path == null) {
-            if (other.path != null)
-                return false;
-        } else if (!path.equals(other.path))
+        if (!ObjectUtils.equals(this.param1, other.param1))
             return false;
-        if (type != other.type)
+        if (!ObjectUtils.equals(this.url, other.url))
             return false;
-        if (url == null) {
-            if (other.url != null)
-                return false;
-        } else if (!url.equals(other.url))
+        if (!ObjectUtils.equals(this.path, other.path))
             return false;
+
         return true;
     }
-
 }

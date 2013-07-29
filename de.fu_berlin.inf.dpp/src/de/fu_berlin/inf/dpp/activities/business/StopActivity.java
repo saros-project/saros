@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
+import org.apache.commons.lang.ObjectUtils;
+
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.StopActivityDataObject;
@@ -21,7 +23,7 @@ public class StopActivity extends AbstractActivity implements ITargetedActivity 
     protected User initiator;
 
     /** The user who has to be locked / unlocked. */
-    protected final User user;
+    protected final User affected;
 
     public enum Type {
         LOCKREQUEST, UNLOCKREQUEST
@@ -38,13 +40,29 @@ public class StopActivity extends AbstractActivity implements ITargetedActivity 
     /** A stop activity has a unique ID. */
     protected final String stopActivityID;
 
-    public StopActivity(User source, User initiator, User user, Type type,
+    /**
+     * @param source
+     * @param initiator
+     *            The user who requested the lock/unlock (in most cases this
+     *            should be the host)
+     * @param affected
+     *            The user to be locked/unlocked by this Activity
+     * @param type
+     * @param state
+     * @param stopActivityID
+     */
+    public StopActivity(User source, User initiator, User affected, Type type,
         State state, String stopActivityID) {
 
         super(source);
 
+        if (initiator == null)
+            throw new IllegalArgumentException("initiator must not be null");
+        if (affected == null)
+            throw new IllegalArgumentException("affected must not be null");
+
         this.initiator = initiator;
-        this.user = user;
+        this.affected = affected;
         this.state = state;
         this.type = type;
         this.stopActivityID = stopActivityID;
@@ -54,13 +72,11 @@ public class StopActivity extends AbstractActivity implements ITargetedActivity 
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result
-            + ((initiator == null) ? 0 : initiator.hashCode());
-        result = prime * result + ((state == null) ? 0 : state.hashCode());
-        result = prime * result
-            + ((stopActivityID == null) ? 0 : stopActivityID.hashCode());
-        result = prime * result + ((type == null) ? 0 : type.hashCode());
-        result = prime * result + ((user == null) ? 0 : user.hashCode());
+        result = prime * result + ObjectUtils.hashCode(initiator);
+        result = prime * result + ObjectUtils.hashCode(state);
+        result = prime * result + ObjectUtils.hashCode(stopActivityID);
+        result = prime * result + ObjectUtils.hashCode(type);
+        result = prime * result + ObjectUtils.hashCode(affected);
         return result;
     }
 
@@ -70,42 +86,30 @@ public class StopActivity extends AbstractActivity implements ITargetedActivity 
             return true;
         if (!super.equals(obj))
             return false;
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof StopActivity))
             return false;
+
         StopActivity other = (StopActivity) obj;
-        if (initiator == null) {
-            if (other.initiator != null)
-                return false;
-        } else if (!initiator.equals(other.initiator))
+
+        if (this.state != other.state)
             return false;
-        if (state == null) {
-            if (other.state != null)
-                return false;
-        } else if (!state.equals(other.state))
+        if (this.type != other.type)
             return false;
-        if (stopActivityID == null) {
-            if (other.stopActivityID != null)
-                return false;
-        } else if (!stopActivityID.equals(other.stopActivityID))
+        if (!ObjectUtils.equals(this.stopActivityID, other.stopActivityID))
             return false;
-        if (type == null) {
-            if (other.type != null)
-                return false;
-        } else if (!type.equals(other.type))
+        if (!ObjectUtils.equals(this.initiator, other.initiator))
             return false;
-        if (user == null) {
-            if (other.user != null)
-                return false;
-        } else if (!user.equals(other.user))
+        if (!ObjectUtils.equals(this.affected, other.affected))
             return false;
+
         return true;
     }
 
     /**
      * The user to be locked/unlocked by this Activity
      */
-    public User getUser() {
-        return user;
+    public User getAffected() {
+        return affected;
     }
 
     /**
@@ -118,15 +122,15 @@ public class StopActivity extends AbstractActivity implements ITargetedActivity 
     }
 
     /**
-     * Returns the JID of the user to which this StopActivity should be sent.
+     * Returns the JID of the user to whom this StopActivity should be sent.
      * 
-     * This method is a convenience method for getting the user or initiator
-     * based on the state of this StopActivity.
+     * This method is a convenience method for getting the affected user or
+     * initiator based on the state of this StopActivity.
      */
     public User getRecipient() {
         switch (getState()) {
         case INITIATED:
-            return getUser();
+            return getAffected();
         case ACKNOWLEDGED:
             return getInitiator();
         default:
@@ -145,7 +149,7 @@ public class StopActivity extends AbstractActivity implements ITargetedActivity 
     }
 
     public StopActivity generateAcknowledgment(User source) {
-        return new StopActivity(source, initiator, user, type,
+        return new StopActivity(source, initiator, affected, type,
             State.ACKNOWLEDGED, stopActivityID);
     }
 
@@ -159,14 +163,9 @@ public class StopActivity extends AbstractActivity implements ITargetedActivity 
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("StopActivity (id: " + stopActivityID);
-        sb.append(", type: " + type);
-        sb.append(", state: " + state);
-        sb.append(", initiator: " + initiator.toString());
-        sb.append(", affected user: " + user.toString());
-        sb.append(", src: " + getSource() + ")");
-        return sb.toString();
+        return "StopActivity(id: " + stopActivityID + ", type: " + type
+            + ", state: " + state + ", initiator: " + initiator
+            + ", affected user: " + affected + ", src: " + getSource() + ")";
     }
 
     @Override
@@ -176,7 +175,7 @@ public class StopActivity extends AbstractActivity implements ITargetedActivity 
 
     @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
-        return new StopActivityDataObject(source.getJID(), initiator.getJID(),
-            user.getJID(), type, state, stopActivityID);
+        return new StopActivityDataObject(getSource().getJID(),
+            initiator.getJID(), affected.getJID(), type, state, stopActivityID);
     }
 }

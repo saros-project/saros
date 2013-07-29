@@ -4,7 +4,6 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 
-import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.ProgressActivity;
 import de.fu_berlin.inf.dpp.activities.business.ProgressActivity.ProgressAction;
@@ -40,7 +39,9 @@ public class ProgressActivityDataObject extends AbstractActivityDataObject {
     public ProgressActivityDataObject(JID source, JID target,
         String progressID, int workCurrent, int workTotal, String taskName,
         ProgressAction action) {
+
         super(source);
+
         this.target = target;
         this.progressID = progressID;
         this.workCurrent = workCurrent;
@@ -51,20 +52,15 @@ public class ProgressActivityDataObject extends AbstractActivityDataObject {
 
     @Override
     public String toString() {
-        return "Progress(source:" + getSource() + ",target:" + target + ",id:"
-            + this.progressID + ",work:" + workCurrent + "/" + workTotal
-            + ",task:" + taskName + ",action:" + action + ")";
+        return "ProgressActivityDO(source: " + getSource() + ", target: "
+            + target + ", id: " + progressID + ", work: " + workCurrent + "/"
+            + workTotal + ", task: " + taskName + ", action: " + action + ")";
     }
 
     @Override
     public IActivity getActivity(ISarosSession sarosSession) {
-
-        User source = sarosSession.getUser(getSource());
-        if (source == null)
-            throw new IllegalArgumentException("user " + getSource()
-                + " is not in the current session");
-
-        return new ProgressActivity(source, sarosSession.getUser(target),
-            progressID, workCurrent, workTotal, taskName, action);
+        return new ProgressActivity(sarosSession.getUser(getSource()),
+            sarosSession.getUser(target), progressID, workCurrent, workTotal,
+            taskName, action);
     }
 }

@@ -19,7 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.activities.business;
 
-import org.picocontainer.annotations.Nullable;
+import org.apache.commons.lang.ObjectUtils;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
@@ -51,13 +51,13 @@ public class EditorActivity extends AbstractActivity implements
 
     /**
      * @param path
-     *            an {@link SPath} or type {@link Type#ACTIVATED} and
-     *            <code>null</code> as path if there is no editor activated
-     *            anymore.
+     *            May be <code>null</code> -- only if type is
+     *            {@link Type#ACTIVATED} -- to denote that there is no active
+     *            editor anymore. Must not be <code>null</code> for other types.
      */
-    public EditorActivity(User source, Type type, @Nullable SPath path) {
-
+    public EditorActivity(User source, Type type, SPath path) {
         super(source);
+
         if (path == null) {
             if (type != Type.ACTIVATED) {
                 throw new IllegalArgumentException(
@@ -87,8 +87,8 @@ public class EditorActivity extends AbstractActivity implements
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((path == null) ? 0 : path.hashCode());
-        result = prime * result + ((type == null) ? 0 : type.hashCode());
+        result = prime * result + ObjectUtils.hashCode(path);
+        result = prime * result + ObjectUtils.hashCode(type);
         return result;
     }
 
@@ -100,24 +100,20 @@ public class EditorActivity extends AbstractActivity implements
             return false;
         if (!(obj instanceof EditorActivity))
             return false;
+
         EditorActivity other = (EditorActivity) obj;
-        if (path == null) {
-            if (other.path != null)
-                return false;
-        } else if (!path.equals(other.path))
+
+        if (this.type != other.type)
             return false;
-        if (type == null) {
-            if (other.type != null)
-                return false;
-        } else if (!type.equals(other.type))
+        if (!ObjectUtils.equals(this.path, other.path))
             return false;
+
         return true;
     }
 
     @Override
     public String toString() {
-        return "EditorActivity(type:" + this.type + ",path:"
-            + (this.path != null ? this.path : "no path") + ")";
+        return "EditorActivity(type: " + type + ", path: " + path + ")";
     }
 
     @Override
@@ -127,7 +123,7 @@ public class EditorActivity extends AbstractActivity implements
 
     @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
-        return new EditorActivityDataObject(source.getJID(), type,
+        return new EditorActivityDataObject(getSource().getJID(), type,
             (path != null ? path.toSPathDataObject(sarosSession) : null));
     }
 }

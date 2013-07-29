@@ -147,6 +147,7 @@
 			
 			<batchtest todir="${junit.report.dir}">
 				<fileset dir="${src.test.dir}">
+					<exclude name="**/Abstract*.java"/>
 					<exclude name="**/*PluginTest.java"/>
 					<exclude name="**/stf/**"/>
 					<include name="**/*Test.java"/>

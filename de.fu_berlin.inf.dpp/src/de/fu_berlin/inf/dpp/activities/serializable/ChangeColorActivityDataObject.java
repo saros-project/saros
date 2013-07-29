@@ -30,7 +30,9 @@ public class ChangeColorActivityDataObject extends AbstractActivityDataObject {
 
     public ChangeColorActivityDataObject(JID source, JID target, JID affected,
         int colorID) {
+
         super(source);
+
         this.target = target;
         this.affected = affected;
         this.colorID = colorID;
@@ -50,13 +52,13 @@ public class ChangeColorActivityDataObject extends AbstractActivityDataObject {
      */
     @Override
     public IActivity getActivity(ISarosSession session) {
-        return new ChangeColorActivity(session.getUser(source),
+        return new ChangeColorActivity(session.getUser(getSource()),
             session.getUser(target), session.getUser(affected), colorID);
     }
 
     @Override
     public String toString() {
-        return "ChangeColorActivityDataObject(" + source + " " + affected + " "
-            + colorID + ")";
+        return "ChangeColorActivityDO(source: " + getSource() + ", affected: "
+            + affected + ", colorID: " + colorID + ")";
     }
 }

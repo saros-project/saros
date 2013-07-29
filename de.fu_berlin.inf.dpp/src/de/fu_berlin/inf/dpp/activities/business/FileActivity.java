@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.activities.business;
 import java.io.IOException;
 import java.util.Arrays;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.eclipse.core.resources.IFile;
 
 import de.fu_berlin.inf.dpp.User;
@@ -107,7 +108,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
      * @param newPath
      *            where to save the data (if {@link Type#CREATED}), destination
      *            of a move (if {@link Type#MOVED}), file to remove (if
-     *            {@link Type#REMOVED})
+     *            {@link Type#REMOVED}); never <code>null</code>
      * @param oldPath
      *            if type is {@link Type#MOVED}, the path from where the file
      *            was moved (<code>null</code> otherwise)
@@ -120,8 +121,12 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
 
         super(source);
 
-        if (type == null || purpose == null)
-            throw new IllegalArgumentException();
+        if (type == null)
+            throw new IllegalArgumentException("type must not be null");
+        if (purpose == null)
+            throw new IllegalArgumentException("purpose must not be null");
+        if (newPath == null)
+            throw new IllegalArgumentException("newPath must not be null");
 
         switch (type) {
         case CREATED:
@@ -133,7 +138,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
                 throw new IllegalArgumentException();
             break;
         case MOVED:
-            if (newPath == null || oldPath == null)
+            if (oldPath == null)
                 throw new IllegalArgumentException();
             break;
         }
@@ -175,10 +180,10 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
     @Override
     public String toString() {
         if (type == Type.MOVED)
-            return "FileActivity(type: Moved, old path: " + this.oldPath
-                + ", new path: " + this.newPath + ")";
-        return "FileActivity(type: " + this.type + ", path: " + this.newPath
-            + ")";
+            return "FileActivity(type: Moved, old path: " + oldPath
+                + ", new path: " + newPath + ")";
+
+        return "FileActivity(type: " + type + ", path: " + newPath + ")";
     }
 
     @Override
@@ -186,9 +191,10 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + Arrays.hashCode(data);
-        result = prime * result + ((oldPath == null) ? 0 : oldPath.hashCode());
-        result = prime * result + ((newPath == null) ? 0 : newPath.hashCode());
-        result = prime * result + ((type == null) ? 0 : type.hashCode());
+        result = prime * result + ObjectUtils.hashCode(oldPath);
+        result = prime * result + ObjectUtils.hashCode(newPath);
+        result = prime * result + ObjectUtils.hashCode(type);
+        result = prime * result + ObjectUtils.hashCode(purpose);
         return result;
     }
 
@@ -198,26 +204,22 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
             return true;
         if (!super.equals(obj))
             return false;
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof FileActivity))
             return false;
+
         FileActivity other = (FileActivity) obj;
-        if (oldPath == null) {
-            if (other.oldPath != null)
-                return false;
-        } else if (!oldPath.equals(other.oldPath))
+
+        if (this.type != other.type)
             return false;
-        if (newPath == null) {
-            if (other.newPath != null)
-                return false;
-        } else if (!newPath.equals(other.newPath))
+        if (this.purpose != other.purpose)
             return false;
-        if (type == null) {
-            if (other.type != null)
-                return false;
-        } else if (!type.equals(other.type))
+        if (!ObjectUtils.equals(this.oldPath, other.oldPath))
             return false;
-        if (!Arrays.equals(data, other.data))
+        if (!ObjectUtils.equals(this.newPath, other.newPath))
             return false;
+        if (!Arrays.equals(this.data, other.data))
+            return false;
+
         return true;
     }
 
@@ -240,7 +242,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
 
     @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
-        return new FileActivityDataObject(source.getJID(), type,
+        return new FileActivityDataObject(getSource().getJID(), type,
             newPath.toSPathDataObject(sarosSession),
             (oldPath != null ? oldPath.toSPathDataObject(sarosSession) : null),
             data, purpose, checksum);

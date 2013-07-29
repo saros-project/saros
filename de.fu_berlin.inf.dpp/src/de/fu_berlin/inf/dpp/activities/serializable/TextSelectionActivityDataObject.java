@@ -44,10 +44,9 @@ public class TextSelectionActivityDataObject extends
 
     public TextSelectionActivityDataObject(JID source, int offset, int length,
         SPathDataObject path) {
+
         super(source, path);
-        if (path == null) {
-            throw new IllegalArgumentException("path must not be null");
-        }
+
         this.offset = offset;
         this.length = length;
     }
@@ -56,7 +55,6 @@ public class TextSelectionActivityDataObject extends
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((path == null) ? 0 : path.hashCode());
         result = prime * result + length;
         result = prime * result + offset;
         return result;
@@ -71,22 +69,26 @@ public class TextSelectionActivityDataObject extends
         if (!(obj instanceof TextSelectionActivityDataObject))
             return false;
 
-        TextSelectionActivityDataObject activity = (TextSelectionActivityDataObject) obj;
-        return (this.offset == activity.offset)
-            && (this.length == activity.length)
-            && (ObjectUtils.equals(this.path, activity.path));
+        TextSelectionActivityDataObject other = (TextSelectionActivityDataObject) obj;
+
+        if (!ObjectUtils.equals(this.offset, other.offset))
+            return false;
+        if (!ObjectUtils.equals(this.length, other.length))
+            return false;
+
+        return true;
     }
 
     @Override
     public String toString() {
-        return "TextSelectionActivityDataObject(offset:" + this.offset
-            + ",length:" + this.length + ",src:" + getSource() + ",path:"
-            + this.path + ")";
+        return "TextSelectionActivityDO(offset: " + offset + ", length:"
+            + length + ", src: " + getSource() + ", path: " + getPath() + ")";
     }
 
     @Override
     public IActivity getActivity(ISarosSession sarosSession) {
-        return new TextSelectionActivity(sarosSession.getUser(source), offset,
-            length, path.toSPath(sarosSession));
+        return new TextSelectionActivity(sarosSession.getUser(getSource()),
+            offset, length, (getPath() != null ? getPath().toSPath(sarosSession)
+                : null));
     }
 }

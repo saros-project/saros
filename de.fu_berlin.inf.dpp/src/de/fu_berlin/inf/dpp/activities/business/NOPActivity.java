@@ -13,6 +13,10 @@ public final class NOPActivity extends AbstractActivity implements
 
     public NOPActivity(User source, User target, int id) {
         super(source);
+
+        if (target == null)
+            throw new IllegalArgumentException("target must not be null");
+
         this.target = target;
         this.id = id;
     }
@@ -24,7 +28,8 @@ public final class NOPActivity extends AbstractActivity implements
 
     @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
-        return new NOPActivityDataObject(source.getJID(), target.getJID(), id);
+        return new NOPActivityDataObject(getSource().getJID(), target.getJID(),
+            id);
     }
 
     public int getID() {

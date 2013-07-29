@@ -24,11 +24,8 @@ public class ViewportActivityDataObject extends
 
     public ViewportActivityDataObject(JID source, int topIndex,
         int bottomIndex, SPathDataObject path) {
-        super(source, path);
 
-        if (path == null) {
-            throw new IllegalArgumentException("editor must not be null");
-        }
+        super(source, path);
 
         assert topIndex <= bottomIndex : "Top == " + topIndex + ", Bottom == "
             + bottomIndex;
@@ -50,7 +47,6 @@ public class ViewportActivityDataObject extends
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + bottomIndex;
-        result = prime * result + ((path == null) ? 0 : path.hashCode());
         result = prime * result + topIndex;
         return result;
     }
@@ -63,28 +59,27 @@ public class ViewportActivityDataObject extends
             return false;
         if (!(obj instanceof ViewportActivityDataObject))
             return false;
+
         ViewportActivityDataObject other = (ViewportActivityDataObject) obj;
-        if (bottomIndex != other.bottomIndex)
+
+        if (this.bottomIndex != other.bottomIndex)
             return false;
-        if (path == null) {
-            if (other.path != null)
-                return false;
-        } else if (!path.equals(other.path))
+        if (this.topIndex != other.topIndex)
             return false;
-        if (topIndex != other.topIndex)
-            return false;
+
         return true;
     }
 
     @Override
     public String toString() {
-        return "ViewportActivityDataObject(path:" + this.path + ",range:("
-            + this.topIndex + "," + this.bottomIndex + "))";
+        return "ViewportActivityDO(path:" + getPath() + ", range: (" + topIndex
+            + "," + bottomIndex + "))";
     }
 
     @Override
     public IActivity getActivity(ISarosSession sarosSession) {
-        return new ViewportActivity(sarosSession.getUser(source), topIndex,
-            bottomIndex, path.toSPath(sarosSession));
+        return new ViewportActivity(sarosSession.getUser(getSource()),
+            topIndex, bottomIndex, (getPath() != null ? getPath().toSPath(
+                sarosSession) : null));
     }
 }

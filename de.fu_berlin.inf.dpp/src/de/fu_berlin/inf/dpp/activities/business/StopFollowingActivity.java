@@ -10,6 +10,10 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
  * This activity notifies the recipient that the local user is following someone
  * in the running session
  * 
+ * TODO Consider treating {@link StartFollowingActivity} and
+ * {@link StopFollowingActivity} as different types of the same class (since
+ * this class here has no logic of its own).
+ * 
  * @author Alexander Waldmann (contact@net-corps.de)
  */
 public class StopFollowingActivity extends AbstractActivity {
@@ -24,12 +28,12 @@ public class StopFollowingActivity extends AbstractActivity {
 
     @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
-        return new StopFollowingActivityDataObject(source.getJID());
+        return new StopFollowingActivityDataObject(getSource().getJID());
     }
 
     @Override
     public String toString() {
-        return "StopFollowingActivity(" + source + ")";
+        return "StopFollowingActivity(" + getSource() + ")";
     }
 
     public SPath getPath() {

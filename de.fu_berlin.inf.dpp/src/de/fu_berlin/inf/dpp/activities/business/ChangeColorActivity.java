@@ -21,7 +21,14 @@ public class ChangeColorActivity extends AbstractActivity implements
 
     public ChangeColorActivity(User source, User target, User affected,
         int colorID) {
+
         super(source);
+
+        if (target == null)
+            throw new IllegalArgumentException("target must not be null");
+        if (affected == null)
+            throw new IllegalArgumentException("affected must not be null");
+
         this.target = target;
         this.affected = affected;
         this.colorID = colorID;
@@ -46,14 +53,14 @@ public class ChangeColorActivity extends AbstractActivity implements
      */
     @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
-        return new ChangeColorActivityDataObject(source.getJID(),
+        return new ChangeColorActivityDataObject(getSource().getJID(),
             target.getJID(), affected.getJID(), colorID);
     }
 
     @Override
     public String toString() {
-        return "ChangeColorActivity(" + source + " " + affected + " " + colorID
-            + ")";
+        return "ChangeColorActivity(source: " + getSource() + ", affected: "
+            + affected + ", colorID: " + colorID + ")";
     }
 
     /**

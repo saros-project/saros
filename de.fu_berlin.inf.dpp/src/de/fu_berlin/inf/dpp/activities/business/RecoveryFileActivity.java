@@ -24,7 +24,12 @@ public class RecoveryFileActivity extends FileActivity implements
 
     public RecoveryFileActivity(User source, User target, Type type,
         SPath newPath, SPath oldPath, byte[] data, Long checksum) {
+
         super(source, type, newPath, oldPath, data, Purpose.RECOVERY, checksum);
+
+        if (target == null)
+            throw new IllegalArgumentException("target must not be null");
+
         this.target = target;
     }
 
@@ -43,7 +48,7 @@ public class RecoveryFileActivity extends FileActivity implements
 
     /**
      * Utility method for creating a RecoveryFileActivity of type
-     * {@link FileActivity.Type#Created} for a given path.
+     * {@link FileActivity.Type#CREATED} for a given path.
      * 
      * This method will call the created()-method of the {@link FileActivity}.
      * This Method is used if the host has the file to be recovered.
@@ -67,7 +72,7 @@ public class RecoveryFileActivity extends FileActivity implements
 
     /**
      * Utility method for creating a RecoveryFileActivity of type
-     * {@link FileActivity.Type#Removed} for a given path.
+     * {@link FileActivity.Type#REMOVED} for a given path.
      * 
      * This method will call the removed()-method of the {@link FileActivity}.
      * This Method is used if the file to be recovered doesn't exist on the

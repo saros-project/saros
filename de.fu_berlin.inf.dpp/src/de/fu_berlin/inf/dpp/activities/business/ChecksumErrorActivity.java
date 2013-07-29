@@ -43,10 +43,21 @@ public class ChecksumErrorActivity extends AbstractActivity implements
     ITargetedActivity {
 
     protected List<SPath> paths;
-
     protected String recoveryID;
-
     private User target;
+
+    public ChecksumErrorActivity(User source, User target, List<SPath> paths,
+        String recoveryID) {
+
+        super(source);
+
+        if (target == null)
+            throw new IllegalArgumentException("target must not be null");
+
+        this.target = target;
+        this.paths = paths;
+        this.recoveryID = recoveryID;
+    }
 
     public List<SPath> getPaths() {
         return paths;
@@ -60,14 +71,6 @@ public class ChecksumErrorActivity extends AbstractActivity implements
         return recoveryID;
     }
 
-    public ChecksumErrorActivity(User source, User target, List<SPath> paths,
-        String recoveryID) {
-        super(source);
-        this.target = target;
-        this.paths = paths;
-        this.recoveryID = recoveryID;
-    }
-
     @Override
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
@@ -75,11 +78,13 @@ public class ChecksumErrorActivity extends AbstractActivity implements
 
     @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
-        ArrayList<SPathDataObject> dataObjectPaths = new ArrayList<SPathDataObject>();
-        if (this.paths != null)
+        ArrayList<SPathDataObject> dataObjectPaths = null;
+        if (this.paths != null) {
+            dataObjectPaths = new ArrayList<SPathDataObject>();
             for (SPath path : this.paths) {
                 dataObjectPaths.add(path.toSPathDataObject(sarosSession));
             }
+        }
         return new ChecksumErrorActivityDataObject(getSource().getJID(),
             target.getJID(), dataObjectPaths, recoveryID);
     }
@@ -88,10 +93,9 @@ public class ChecksumErrorActivity extends AbstractActivity implements
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((paths == null) ? 0 : paths.hashCode());
-        result = prime * result
-            + ((recoveryID == null) ? 0 : recoveryID.hashCode());
-        result = prime * result + ((target == null) ? 0 : target.hashCode());
+        result = prime * result + ObjectUtils.hashCode(paths);
+        result = prime * result + ObjectUtils.hashCode(recoveryID);
+        result = prime * result + ObjectUtils.hashCode(target);
         return result;
     }
 
@@ -101,26 +105,26 @@ public class ChecksumErrorActivity extends AbstractActivity implements
             return true;
         if (!super.equals(obj))
             return false;
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof ChecksumErrorActivity))
             return false;
+
         ChecksumErrorActivity other = (ChecksumErrorActivity) obj;
-        if (paths == null) {
-            if (other.paths != null)
-                return false;
-        } else if (!paths.equals(other.paths))
+
+        if (!ObjectUtils.equals(this.recoveryID, other.recoveryID))
             return false;
-        if (recoveryID == null) {
-            if (other.recoveryID != null)
-                return false;
-        } else if (!recoveryID.equals(other.recoveryID))
+        if (!ObjectUtils.equals(this.paths, other.paths))
             return false;
-        return ObjectUtils.equals(this.target, other.target);
+        if (!ObjectUtils.equals(this.target, other.target))
+            return false;
+
+        return true;
     }
 
     @Override
     public String toString() {
-        return "ChecksumError(src:" + this.getSource() + ", target:" + target
-            + "paths:" + this.paths + ", recoveryID:" + recoveryID + ")";
+        return "ChecksumErrorActivity(src: " + getSource() + ", target: "
+            + target + ", paths: " + paths + ", recoveryID: " + recoveryID
+            + ")";
     }
 
     @Override

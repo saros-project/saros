@@ -16,6 +16,10 @@ public class StartFollowingActivity extends AbstractActivity {
 
     public StartFollowingActivity(User source, User followedUser) {
         super(source);
+
+        if (followedUser == null)
+            throw new IllegalArgumentException("followedUser must not be null");
+
         this.followedUser = followedUser;
     }
 
@@ -26,13 +30,14 @@ public class StartFollowingActivity extends AbstractActivity {
 
     @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
-        return new StartFollowingActivityDataObject(source.getJID(),
+        return new StartFollowingActivityDataObject(getSource().getJID(),
             followedUser.getJID());
     }
 
     @Override
     public String toString() {
-        return "StartFollowingActivity(" + source + " > " + followedUser + ")";
+        return "StartFollowingActivity(" + getSource() + " > " + followedUser
+            + ")";
     }
 
     public User getFollowedUser() {

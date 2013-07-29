@@ -37,11 +37,11 @@ public class TextSelectionActivity extends AbstractActivity implements
     protected final SPath path;
 
     public TextSelectionActivity(User source, int offset, int length, SPath path) {
-
         super(source);
-        if (path == null) {
+
+        if (path == null)
             throw new IllegalArgumentException("path must not be null");
-        }
+
         this.offset = offset;
         this.length = length;
         this.path = path;
@@ -68,7 +68,7 @@ public class TextSelectionActivity extends AbstractActivity implements
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((path == null) ? 0 : path.hashCode());
+        result = prime * result + ObjectUtils.hashCode(path);
         result = prime * result + length;
         result = prime * result + offset;
         return result;
@@ -83,16 +83,22 @@ public class TextSelectionActivity extends AbstractActivity implements
         if (!(obj instanceof TextSelectionActivity))
             return false;
 
-        TextSelectionActivity activity = (TextSelectionActivity) obj;
-        return (this.offset == activity.offset)
-            && (this.length == activity.length)
-            && (ObjectUtils.equals(this.path, activity.path));
+        TextSelectionActivity other = (TextSelectionActivity) obj;
+
+        if (this.offset != other.offset)
+            return false;
+        if (this.length != other.length)
+            return false;
+        if (!ObjectUtils.equals(this.path, other.path))
+            return false;
+
+        return true;
     }
 
     @Override
     public String toString() {
-        return "TextSelectionActivity(offset:" + this.offset + ",length:"
-            + this.length + ",src:" + getSource() + ",path:" + this.path + ")";
+        return "TextSelectionActivity(offset: " + offset + ", length: "
+            + length + ", src: " + getSource() + ", path: " + path + ")";
     }
 
     @Override
@@ -102,7 +108,7 @@ public class TextSelectionActivity extends AbstractActivity implements
 
     @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
-        return new TextSelectionActivityDataObject(source.getJID(), offset,
-            length, path.toSPathDataObject(sarosSession));
+        return new TextSelectionActivityDataObject(getSource().getJID(),
+            offset, length, path.toSPathDataObject(sarosSession));
     }
 }

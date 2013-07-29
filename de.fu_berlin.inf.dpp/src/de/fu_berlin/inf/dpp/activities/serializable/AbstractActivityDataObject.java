@@ -23,6 +23,7 @@ public abstract class AbstractActivityDataObject implements IActivityDataObject 
     public AbstractActivityDataObject(JID source) {
         if (source == null)
             throw new IllegalArgumentException("Source cannot be null");
+
         this.source = source;
     }
 
@@ -33,7 +34,7 @@ public abstract class AbstractActivityDataObject implements IActivityDataObject 
 
     @Override
     public int hashCode() {
-        return (source == null) ? 0 : source.hashCode();
+        return ObjectUtils.hashCode(source);
     }
 
     @Override
@@ -46,6 +47,10 @@ public abstract class AbstractActivityDataObject implements IActivityDataObject 
             return false;
 
         AbstractActivityDataObject other = (AbstractActivityDataObject) obj;
-        return ObjectUtils.equals(this.source, other.source);
+
+        if (!ObjectUtils.equals(this.source, other.source))
+            return false;
+
+        return true;
     }
 }

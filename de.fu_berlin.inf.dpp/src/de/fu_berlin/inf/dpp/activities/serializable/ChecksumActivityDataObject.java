@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.activities.serializable;
 
-import org.picocontainer.annotations.Nullable;
+import org.apache.commons.lang.ObjectUtils;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
@@ -40,26 +40,25 @@ public class ChecksumActivityDataObject extends
     protected Timestamp jupiterTimestamp;
 
     /**
-     * Constructor for checksum activityDataObjects. Timestamp can be null.
-     * ChecksumActivity can have a null timestamp and as this class is a
-     * representation of the ChecksumActivity it also allows a timestamp of null
+     * Constructor
      * 
      * @param source
      *            The User that created this activity
-     * @param sPathDataObject
+     * @param path
      *            The SPath pointing to the document
      * @param hash
      *            The hashcode of the document
      * @param length
      *            The length of the document
      * @param jupiterTimestamp
-     *            The current jupiterTimestamp for this document
+     *            The current jupiterTimestamp for this document, may be
+     *            <code>null</code>
      */
-    public ChecksumActivityDataObject(JID source,
-        SPathDataObject sPathDataObject, long hash, long length,
-        @Nullable Timestamp jupiterTimestamp) {
+    public ChecksumActivityDataObject(JID source, SPathDataObject path,
+        long hash, long length, Timestamp jupiterTimestamp) {
 
-        super(source, sPathDataObject);
+        super(source, path);
+
         this.hash = hash;
         this.length = length;
         this.jupiterTimestamp = jupiterTimestamp;
@@ -67,8 +66,9 @@ public class ChecksumActivityDataObject extends
 
     @Override
     public String toString() {
-        return "Checksum(path:" + this.path + ",hash:" + hash + ",length:"
-            + length + ",vectorTime:" + jupiterTimestamp + ")";
+        return "ChecksumActivityDO(path: " + getPath() + ", hash: " + hash
+            + ", length: " + length + ", jupiterTimestamp: " + jupiterTimestamp
+            + ")";
     }
 
     @Override
@@ -77,7 +77,7 @@ public class ChecksumActivityDataObject extends
         int result = super.hashCode();
         result = prime * result + (int) (hash ^ (hash >>> 32));
         result = prime * result + (int) (length ^ (length >>> 32));
-        result = prime * result + ((path == null) ? 0 : path.hashCode());
+        result = prime * result + ObjectUtils.hashCode(jupiterTimestamp);
         return result;
     }
 
@@ -87,24 +87,25 @@ public class ChecksumActivityDataObject extends
             return true;
         if (!super.equals(obj))
             return false;
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof ChecksumActivityDataObject))
             return false;
+
         ChecksumActivityDataObject other = (ChecksumActivityDataObject) obj;
-        if (hash != other.hash)
+
+        if (this.hash != other.hash)
             return false;
-        if (length != other.length)
+        if (this.length != other.length)
             return false;
-        if (path == null) {
-            if (other.path != null)
-                return false;
-        } else if (!path.equals(other.path))
+        if (!ObjectUtils.equals(this.jupiterTimestamp, other.jupiterTimestamp))
             return false;
+
         return true;
     }
 
     @Override
     public IActivity getActivity(ISarosSession sarosSession) {
-        return new ChecksumActivity(sarosSession.getUser(source),
-            path.toSPath(sarosSession), hash, length, jupiterTimestamp);
+        return new ChecksumActivity(sarosSession.getUser(getSource()),
+            (getPath() != null ? getPath().toSPath(sarosSession) : null), hash,
+            length, jupiterTimestamp);
     }
 }

@@ -19,6 +19,8 @@
  */
 package de.fu_berlin.inf.dpp.activities.business;
 
+import org.apache.commons.lang.ObjectUtils;
+
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
@@ -42,6 +44,10 @@ public class PermissionActivity extends AbstractActivity {
         Permission permission) {
 
         super(source);
+
+        if (affectedUser == null)
+            throw new IllegalArgumentException("affectedUser must not be null");
+
         this.affectedUser = affectedUser;
         this.permission = permission;
     }
@@ -50,10 +56,8 @@ public class PermissionActivity extends AbstractActivity {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result
-            + ((affectedUser == null) ? 0 : affectedUser.hashCode());
-        result = prime * result
-            + ((permission == null) ? 0 : permission.hashCode());
+        result = prime * result + ObjectUtils.hashCode(affectedUser);
+        result = prime * result + ObjectUtils.hashCode(permission);
         return result;
     }
 
@@ -65,17 +69,14 @@ public class PermissionActivity extends AbstractActivity {
             return false;
         if (!(obj instanceof PermissionActivity))
             return false;
+
         PermissionActivity other = (PermissionActivity) obj;
-        if (affectedUser == null) {
-            if (other.affectedUser != null)
-                return false;
-        } else if (!affectedUser.equals(other.affectedUser))
+
+        if (this.permission != other.permission)
             return false;
-        if (permission == null) {
-            if (other.permission != null)
-                return false;
-        } else if (!permission.equals(other.permission))
+        if (!ObjectUtils.equals(this.affectedUser, other.affectedUser))
             return false;
+
         return true;
     }
 
@@ -89,8 +90,8 @@ public class PermissionActivity extends AbstractActivity {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "(user:" + this.getAffectedUser()
-            + ",new permission:" + this.getPermission() + ")";
+        return "PermissionActivity(user: " + getAffectedUser()
+            + ", new permission: " + getPermission() + ")";
     }
 
     @Override
@@ -100,7 +101,7 @@ public class PermissionActivity extends AbstractActivity {
 
     @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
-        return new PermissionActivityDataObject(source.getJID(),
+        return new PermissionActivityDataObject(getSource().getJID(),
             affectedUser.getJID(), permission);
     }
 }

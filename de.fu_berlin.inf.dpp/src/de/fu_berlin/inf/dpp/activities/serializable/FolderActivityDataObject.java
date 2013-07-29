@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.activities.serializable;
 
+import org.apache.commons.lang.ObjectUtils;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
@@ -18,6 +20,7 @@ public class FolderActivityDataObject extends AbstractProjectActivityDataObject 
 
     public FolderActivityDataObject(JID source, Type type, SPathDataObject path) {
         super(source, path);
+
         this.type = type;
     }
 
@@ -35,19 +38,19 @@ public class FolderActivityDataObject extends AbstractProjectActivityDataObject 
      *         folder in the same project as this activity's folder.
      */
     public boolean isChildOf(FolderActivityDataObject other) {
-        String thisProjectID = this.path.getProjectID();
-        String otherProjectID = other.path.getProjectID();
+        // TODO getPath() might be <code>null</code> --> possible NPE
+        String thisProjectID = this.getPath().getProjectID();
+        String otherProjectID = other.getPath().getProjectID();
 
         return thisProjectID.equals(otherProjectID)
-            && other.getPath().getIPath().isPrefixOf(this.path.getIPath());
+            && other.getPath().getIPath().isPrefixOf(this.getPath().getIPath());
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((path == null) ? 0 : path.hashCode());
-        result = prime * result + ((type == null) ? 0 : type.hashCode());
+        result = prime * result + ObjectUtils.hashCode(type);
         return result;
     }
 
@@ -57,31 +60,25 @@ public class FolderActivityDataObject extends AbstractProjectActivityDataObject 
             return true;
         if (!super.equals(obj))
             return false;
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof FolderActivityDataObject))
             return false;
+
         FolderActivityDataObject other = (FolderActivityDataObject) obj;
-        if (path == null) {
-            if (other.path != null)
-                return false;
-        } else if (!path.equals(other.path))
+
+        if (!ObjectUtils.equals(this.type, other.type))
             return false;
-        if (type == null) {
-            if (other.type != null)
-                return false;
-        } else if (!type.equals(other.type))
-            return false;
+
         return true;
     }
 
     @Override
     public String toString() {
-        return "FolderActivityDataObject(type: " + type + ", path: " + path
-            + ")";
+        return "FolderActivityDO(type: " + type + ", path: " + getPath() + ")";
     }
 
     @Override
     public IActivity getActivity(ISarosSession sarosSession) {
-        return new FolderActivity(sarosSession.getUser(source), type,
-            path.toSPath(sarosSession));
+        return new FolderActivity(sarosSession.getUser(getSource()), type,
+            (getPath() != null ? getPath().toSPath(sarosSession) : null));
     }
 }

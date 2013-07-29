@@ -65,6 +65,7 @@ public class TextEditActivity extends AbstractActivity implements
         String replacedText, SPath path) {
 
         super(source);
+
         if (text == null)
             throw new IllegalArgumentException("Text cannot be null");
         if (replacedText == null)
@@ -97,25 +98,23 @@ public class TextEditActivity extends AbstractActivity implements
 
     @Override
     public String toString() {
-        return "TextEditActivity("
-            + this.offset
-            + ",new:'"
-            + Utils.escapeForLogging(StringUtils.abbreviate(this.text, 150))
-            + "',old:'"
-            + Utils.escapeForLogging(StringUtils.abbreviate(this.replacedText,
-                150)) + "',path:" + this.path.toString() + ",src:"
-            + this.source + ")";
+        String newText = Utils.escapeForLogging(StringUtils.abbreviate(text,
+            150));
+        String oldText = Utils.escapeForLogging(StringUtils.abbreviate(
+            replacedText, 150));
+        return "TextEditActivity(offset: " + offset + ", new: '" + newText
+            + "', old: '" + oldText + "', path: " + path + ", src: "
+            + getSource() + ")";
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((path == null) ? 0 : path.hashCode());
+        result = prime * result + ObjectUtils.hashCode(path);
         result = prime * result + offset;
-        result = prime * result
-            + ((replacedText == null) ? 0 : replacedText.hashCode());
-        result = prime * result + ((text == null) ? 0 : text.hashCode());
+        result = prime * result + ObjectUtils.hashCode(replacedText);
+        result = prime * result + ObjectUtils.hashCode(text);
         return result;
     }
 
@@ -130,16 +129,13 @@ public class TextEditActivity extends AbstractActivity implements
 
         TextEditActivity other = (TextEditActivity) obj;
 
-        if (offset != other.offset)
+        if (this.offset != other.offset)
             return false;
-
-        if (!ObjectUtils.equals(this.path, other.path))
-            return false;
-
         if (!ObjectUtils.equals(this.replacedText, other.replacedText))
             return false;
-
         if (!ObjectUtils.equals(this.text, other.text))
+            return false;
+        if (!ObjectUtils.equals(this.path, other.path))
             return false;
 
         return true;

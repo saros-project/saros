@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.jface.text.source.LineRange;
 
@@ -21,9 +22,8 @@ public class ViewportActivity extends AbstractActivity implements
 
         super(source);
 
-        if (path == null) {
-            throw new IllegalArgumentException("editor must not be null");
-        }
+        if (path == null)
+            throw new IllegalArgumentException("path must not be null");
 
         assert topIndex <= bottomIndex : "Top == " + topIndex + ", Bottom == "
             + bottomIndex;
@@ -34,7 +34,6 @@ public class ViewportActivity extends AbstractActivity implements
     }
 
     public ViewportActivity(User source, ILineRange viewport, SPath path) {
-
         this(source, Math.max(0, viewport.getStartLine()), Math.max(0,
             viewport.getStartLine())
             + Math.max(0, viewport.getNumberOfLines()), path);
@@ -62,7 +61,7 @@ public class ViewportActivity extends AbstractActivity implements
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + bottomIndex;
-        result = prime * result + ((path == null) ? 0 : path.hashCode());
+        result = prime * result + ObjectUtils.hashCode(path);
         result = prime * result + topIndex;
         return result;
     }
@@ -75,23 +74,23 @@ public class ViewportActivity extends AbstractActivity implements
             return false;
         if (!(obj instanceof ViewportActivity))
             return false;
+
         ViewportActivity other = (ViewportActivity) obj;
-        if (bottomIndex != other.bottomIndex)
+
+        if (this.topIndex != other.topIndex)
             return false;
-        if (path == null) {
-            if (other.path != null)
-                return false;
-        } else if (!path.equals(other.path))
+        if (this.bottomIndex != other.bottomIndex)
             return false;
-        if (topIndex != other.topIndex)
+        if (!ObjectUtils.equals(this.path, other.path))
             return false;
+
         return true;
     }
 
     @Override
     public String toString() {
-        return "ViewportActivity(path:" + this.path + ",range:("
-            + this.topIndex + "," + this.bottomIndex + "))";
+        return "ViewportActivity(path: " + path + ", range: (" + topIndex + ","
+            + bottomIndex + "))";
     }
 
     @Override
@@ -101,7 +100,7 @@ public class ViewportActivity extends AbstractActivity implements
 
     @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
-        return new ViewportActivityDataObject(source.getJID(), topIndex,
+        return new ViewportActivityDataObject(getSource().getJID(), topIndex,
             bottomIndex, path.toSPathDataObject(sarosSession));
     }
 }

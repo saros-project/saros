@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
+import org.apache.commons.lang.ObjectUtils;
+
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
@@ -20,15 +22,14 @@ public class JupiterActivity extends AbstractActivity implements
      * operation.
      */
     private final Timestamp timestamp;
-
     private final Operation operation;
-
     private final SPath path;
 
     public JupiterActivity(Timestamp timestamp, Operation operation,
         User source, SPath path) {
 
         super(source);
+
         this.timestamp = timestamp;
         this.operation = operation;
         this.path = path;
@@ -48,24 +49,18 @@ public class JupiterActivity extends AbstractActivity implements
             return true;
         if (!super.equals(obj))
             return false;
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof JupiterActivity))
             return false;
+
         JupiterActivity other = (JupiterActivity) obj;
-        if (path == null) {
-            if (other.path != null)
-                return false;
-        } else if (!path.equals(other.path))
+
+        if (!ObjectUtils.equals(this.path, other.path))
             return false;
-        if (operation == null) {
-            if (other.operation != null)
-                return false;
-        } else if (!operation.equals(other.operation))
+        if (!ObjectUtils.equals(this.operation, other.operation))
             return false;
-        if (timestamp == null) {
-            if (other.timestamp != null)
-                return false;
-        } else if (!timestamp.equals(other.timestamp))
+        if (!ObjectUtils.equals(this.timestamp, other.timestamp))
             return false;
+
         return true;
     }
 
@@ -73,25 +68,16 @@ public class JupiterActivity extends AbstractActivity implements
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((path == null) ? 0 : path.hashCode());
-        result = prime * result
-            + ((operation == null) ? 0 : operation.hashCode());
-        result = prime * result
-            + ((timestamp == null) ? 0 : timestamp.hashCode());
+        result = prime * result + ObjectUtils.hashCode(path);
+        result = prime * result + ObjectUtils.hashCode(operation);
+        result = prime * result + ObjectUtils.hashCode(timestamp);
         return result;
     }
 
     @Override
     public String toString() {
-        StringBuilder buffer = new StringBuilder();
-        buffer.append("JupiterActivity(");
-        buffer.append(this.timestamp);
-        buffer.append(",");
-        buffer.append(this.operation);
-        buffer.append(",");
-        buffer.append(this.getSource());
-        buffer.append(")");
-        return buffer.toString();
+        return "JupiterActivity(timestamp: " + timestamp + ", operation: "
+            + operation + ", source: " + getSource() + ")";
     }
 
     @Override
@@ -107,6 +93,7 @@ public class JupiterActivity extends AbstractActivity implements
     @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
         return new JupiterActivityDataObject(timestamp, operation,
-            source.getJID(), path.toSPathDataObject(sarosSession));
+            getSource().getJID(),
+            (path != null ? path.toSPathDataObject(sarosSession) : null));
     }
 }

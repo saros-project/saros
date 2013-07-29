@@ -30,6 +30,7 @@ public class ProjectExchangeInfo {
      */
     public ProjectExchangeInfo(String projectID, String description,
         String projectName, boolean partial, FileList fileList) {
+
         this.fileList = fileList;
         this.projectName = projectName;
         this.description = description;
