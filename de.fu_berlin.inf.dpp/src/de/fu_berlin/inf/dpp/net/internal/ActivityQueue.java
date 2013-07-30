@@ -6,7 +6,6 @@ import java.util.PriorityQueue;
 
 import org.apache.log4j.Logger;
 
-import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
@@ -27,27 +26,16 @@ public final class ActivityQueue {
     private static final long ACTIVITY_TIMEOUT = 60 * 1000;
 
     /**
-     * Sequence numbers for outgoing and incoming activityDataObjects start with
-     * this value.
-     */
-    private static final int FIRST_SEQUENCE_NUMBER = 0;
-
-    /**
      * This {@link ActivityQueue} is for received activities from this
      * remote-user.
      */
     private final JID jid;
 
-    private final JID localJID;
-
-    /** The next sequence number we're going to send to this user. */
-    private int nextSequenceNumber = FIRST_SEQUENCE_NUMBER;
-
     /**
      * Sequence number expected from the next activityDataObject received from
      * this user.
      */
-    private int expectedSequenceNumber = FIRST_SEQUENCE_NUMBER;
+    private int expectedSequenceNumber;
 
     /**
      * Oldest local timestamp for the queued activityDataObjects or 0 if there
@@ -60,23 +48,18 @@ public final class ActivityQueue {
     /** Queue of activityDataObjects received. */
     private final PriorityQueue<TimedActivityDataObject> queuedActivities = new PriorityQueue<TimedActivityDataObject>();
 
-    public ActivityQueue(JID localJID, JID jid) {
-        this.localJID = localJID;
-        this.jid = jid;
-    }
-
     /**
-     * Create a {@link TimedActivityDataObject} to send to the user
-     * corresponding to this ActivityQueue and add it to the history of created
-     * activityDataObjects.
-     **/
-    // seems to be a misplaced method
-    public TimedActivityDataObject createTimedActivity(
-        IActivityDataObject activityDataObject) {
-
-        TimedActivityDataObject result = new TimedActivityDataObject(
-            activityDataObject, localJID, nextSequenceNumber++);
-        return result;
+     * Creates a new Queue
+     * 
+     * @param jid
+     *            JID of the remote user whose queue this is going to be
+     * @param firstSequenceNumber
+     *            The expected sequence number of the first incoming
+     *            activityDataObject of this user
+     */
+    public ActivityQueue(JID jid, int firstSequenceNumber) {
+        this.jid = jid;
+        this.expectedSequenceNumber = firstSequenceNumber;
     }
 
     /**
@@ -86,8 +69,7 @@ public final class ActivityQueue {
     public void add(TimedActivityDataObject activity) {
 
         // Ignore activityDataObjects with sequence numbers we have already
-        // seen or
-        // don't expect anymore.
+        // seen or don't expect anymore.
         if (activity.getSequenceNumber() < expectedSequenceNumber) {
             LOG.warn("Ignored activityDataObject. Expected Nr. "
                 + expectedSequenceNumber + ", got: " + activity);

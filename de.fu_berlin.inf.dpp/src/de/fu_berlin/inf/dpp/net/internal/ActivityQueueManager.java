@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
@@ -14,11 +13,16 @@ import de.fu_berlin.inf.dpp.net.JID;
  */
 public final class ActivityQueueManager {
     protected final Map<JID, ActivityQueue> jid2queue = new ConcurrentHashMap<JID, ActivityQueue>();
+    private final int firstSequenceNumber;
 
-    private final JID local;
-
-    public ActivityQueueManager(JID local) {
-        this.local = local;
+    /**
+     * @param firstSequenceNumber
+     *            The expected sequence number of the first incoming
+     *            activityDataObject (will be the same for all
+     *            {@link ActivityQueue}s).
+     */
+    public ActivityQueueManager(int firstSequenceNumber) {
+        this.firstSequenceNumber = firstSequenceNumber;
     }
 
     /**
@@ -33,25 +37,10 @@ public final class ActivityQueueManager {
     protected synchronized ActivityQueue getActivityQueue(JID jid) {
         ActivityQueue queue = jid2queue.get(jid);
         if (queue == null) {
-            queue = new ActivityQueue(local, jid);
+            queue = new ActivityQueue(jid, firstSequenceNumber);
             jid2queue.put(jid, queue);
         }
         return queue;
-    }
-
-    /**
-     * @see ActivitySequencer#createTimedActivities(JID, List)
-     */
-    public synchronized List<TimedActivityDataObject> createTimedActivities(
-        JID recipient, List<IActivityDataObject> activityDataObjects) {
-
-        ArrayList<TimedActivityDataObject> result = new ArrayList<TimedActivityDataObject>(
-            activityDataObjects.size());
-        ActivityQueue queue = getActivityQueue(recipient);
-        for (IActivityDataObject activityDataObject : activityDataObjects) {
-            result.add(queue.createTimedActivity(activityDataObject));
-        }
-        return result;
     }
 
     /**
@@ -94,7 +83,7 @@ public final class ActivityQueueManager {
     }
 
     /**
-     * @see ActivitySequencer#getExpectedSequenceNumbers()
+     * @see ActivityQueue#getExpectedSequenceNumber()
      */
     public Map<JID, Integer> getExpectedSequenceNumbers() {
         HashMap<JID, Integer> result = new HashMap<JID, Integer>();

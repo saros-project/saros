@@ -22,6 +22,7 @@ package de.fu_berlin.inf.dpp.net.internal;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -60,6 +61,12 @@ public class ActivitySequencer implements Startable {
 
     private static final Logger LOG = Logger.getLogger(ActivitySequencer.class
         .getName());
+
+    /**
+     * Sequence numbers for outgoing and incoming activityDataObjects start with
+     * this value.
+     */
+    private static final int FIRST_SEQUENCE_NUMBER = 0;
 
     /**
      * Holder class containing the transformed {@linkplain IActivityDataObject
@@ -177,6 +184,11 @@ public class ActivitySequencer implements Startable {
 
     private final DispatchThreadContext dispatchThread;
 
+    /**
+     * Next sequence numbers for outgoing activities
+     */
+    private final Map<JID, Integer> nextOutgoingSequenceNumbers;
+
     public ActivitySequencer(final ISarosSession sarosSession,
         final ITransmitter transmitter, final IReceiver receiver,
         final DispatchThreadContext threadContext,
@@ -190,7 +202,10 @@ public class ActivitySequencer implements Startable {
 
         this.localJID = sarosSession.getLocalUser().getJID();
 
-        this.activityQueueManager = new ActivityQueueManager(localJID);
+        this.activityQueueManager = new ActivityQueueManager(
+            FIRST_SEQUENCE_NUMBER);
+
+        this.nextOutgoingSequenceNumbers = new HashMap<JID, Integer>();
     }
 
     /**
@@ -342,11 +357,42 @@ public class ActivitySequencer implements Startable {
         assert !activityDataObjects.contains(null) : "activity must not be null";
 
         JID recipientJID = recipient.getJID();
+        List<TimedActivityDataObject> timedActivities = new ArrayList<TimedActivityDataObject>(
+            activityDataObjects.size());
 
-        List<TimedActivityDataObject> timedActivities = activityQueueManager
-            .createTimedActivities(recipientJID, activityDataObjects);
+        for (IActivityDataObject ado : activityDataObjects) {
+            timedActivities.add(new TimedActivityDataObject(ado, localJID,
+                getNextSequenceNumber(recipientJID)));
+        }
 
         return timedActivities;
+    }
+
+    /**
+     * Retrieves the next sequence number for an outgoing activity data object.<br>
+     * <br>
+     * Each call increments the return value for the next call.<br>
+     * <br>
+     * Example:
+     * 
+     * <pre>
+     * getNextSequenceNumber(jidA); // returns FIRST_SEQUENCE_NUMBER
+     * getNextSequenceNumber(jidA); // returns FIRST_SEQUENCE_NUMBER + 1
+     * getNextSequenceNumber(jidB); // returns FIRST_SEQUENCE_NUMBER
+     * getNextSequenceNumber(jidA); // returns FIRST_SEQUENCE_NUMBER + 2
+     * </pre>
+     * 
+     * @param recipient
+     *            The receiver of the activity data object
+     * @return
+     */
+    private synchronized Integer getNextSequenceNumber(JID recipient) {
+        Integer nr = nextOutgoingSequenceNumbers.get(recipient);
+        if (nr == null) {
+            nr = FIRST_SEQUENCE_NUMBER;
+        }
+        nextOutgoingSequenceNumbers.put(recipient, nr + 1);
+        return nr;
     }
 
     private void sendTimedActivities(User user,
