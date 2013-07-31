@@ -244,7 +244,7 @@ public class EditorManager extends AbstractActivityProvider {
         }
 
         @Override
-        public void userJoined(User user) {
+        public void userFinishedProjectNegotiation(User user) {
 
             // TODO The user should be able to ask us for this state
 

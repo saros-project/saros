@@ -88,7 +88,6 @@ import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
-import de.fu_berlin.inf.dpp.net.business.UserListHandler;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.extensions.KickUserExtension;
@@ -192,7 +191,7 @@ public final class SarosSession implements ISarosSession {
 
     private ActivitySequencer activitySequencer;
 
-    private UserListHandler userListHandler;
+    private UserInformationHandler userListHandler;
     private boolean started = false;
     private boolean stopped = false;
 
@@ -401,6 +400,11 @@ public final class SarosSession implements ISarosSession {
         return result;
     }
 
+    @Override
+    public boolean userHasProject(User user, IProject project) {
+        return projectMapper.userHasProject(user, project);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -502,6 +506,7 @@ public final class SarosSession implements ISarosSession {
          */
 
         if (isHost()) {
+
             List<User> timedOutUsers = userListHandler.synchronizeUserList(
                 getUsers(), getRemoteUsers());
 
@@ -523,6 +528,52 @@ public final class SarosSession implements ISarosSession {
     }
 
     @Override
+    public void userStartedQueuing(final User user) {
+
+        log.info("user " + user
+            + " started queuing projects and can receive IResourceActivities");
+
+        /**
+         * Updates the projects for the given user, so that host knows that he
+         * can now send ever Activity
+         */
+        projectMapper.addMissingProjectsToUser(user);
+
+        synchronizer.syncExec(Utils.wrapSafe(log, new Runnable() {
+            @Override
+            public void run() {
+                listenerDispatch.userStartedQueuing(user);
+            }
+        }));
+    }
+
+    @Override
+    public void userFinishedProjectNegotiation(final User user) {
+
+        log.info("user " + user
+            + " now has Projects and can process IResourceActivities");
+
+        synchronizer.syncExec(Utils.wrapSafe(log, new Runnable() {
+            @Override
+            public void run() {
+                listenerDispatch.userFinishedProjectNegotiation(user);
+            }
+        }));
+
+        if (isHost()) {
+
+            JID jid = user.getJID();
+            /**
+             * This informs all participants, that a user is now able to process
+             * IRessourceActivities. After receiving this message the
+             * participants will send their awareness-informations.
+             */
+            userListHandler.sendUserFinishedProjectNegotiation(
+                getRemoteUsers(), jid);
+        }
+    }
+
+    @Override
     public void removeUser(User user) {
         JID jid = user.getJID();
         if (participants.remove(jid) == null) {
@@ -530,6 +581,8 @@ public final class SarosSession implements ISarosSession {
                 + Utils.prefix(jid));
             return;
         }
+
+        projectMapper.userLeft(user);
 
         activitySequencer.userLeft(user);
 
@@ -1240,7 +1293,7 @@ public final class SarosSession implements ISarosSession {
         // transforming - thread access
         sessionContainer.addComponent(ActivityHandler.class);
         sessionContainer.addComponent(activityCallback);
-        sessionContainer.addComponent(UserListHandler.class);
+        sessionContainer.addComponent(UserInformationHandler.class);
 
         // Force the creation of the above components.
         sessionContainer.getComponents();
@@ -1264,7 +1317,8 @@ public final class SarosSession implements ISarosSession {
         activitySequencer = sessionContainer
             .getComponent(ActivitySequencer.class);
 
-        userListHandler = sessionContainer.getComponent(UserListHandler.class);
+        userListHandler = sessionContainer
+            .getComponent(UserInformationHandler.class);
 
         // ensure that the container uses caching
         assert sessionContainer.getComponent(ActivityHandler.class) == sessionContainer

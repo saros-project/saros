@@ -20,6 +20,7 @@ import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.model.TreeContentProvider;
@@ -109,7 +110,7 @@ public class RosterSessionContentProvider extends TreeContentProvider {
         }
     };
 
-    protected ISharedProjectListener sharedProjectListener = new ISharedProjectListener() {
+    protected ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
         @Override
         public void userLeft(User user) {
             UserElement userElement = getUserElement(rosterSessionInput, user);

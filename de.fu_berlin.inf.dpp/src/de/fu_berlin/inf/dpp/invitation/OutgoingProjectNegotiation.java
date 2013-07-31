@@ -112,6 +112,10 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             getRemoteFileList(monitor);
             monitor.subTask("");
 
+            // inform all listeners that the peer has started queuing and can
+            // therefore process IResourceActivities now
+            sarosSession.userStartedQueuing(sarosSession.getUser(peer));
+
             editorManager.setAllLocalOpenedEditorsLocked(false);
             zipArchives = createProjectArchives(projectFilesToSend, monitor);
             monitor.subTask("");
@@ -149,6 +153,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             deleteCollectors();
             monitor.done();
         }
+
+        sarosSession.userFinishedProjectNegotiation(sarosSession.getUser(peer));
 
         return terminateProcess(exception);
     }

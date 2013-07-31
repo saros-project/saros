@@ -24,6 +24,20 @@ public class SharedProjectListenerDispatch implements ISharedProjectListener {
     }
 
     @Override
+    public void userStartedQueuing(User user) {
+        for (ISharedProjectListener listener : this.listeners) {
+            listener.userStartedQueuing(user);
+        }
+    }
+
+    @Override
+    public void userFinishedProjectNegotiation(User user) {
+        for (ISharedProjectListener listener : this.listeners) {
+            listener.userFinishedProjectNegotiation(user);
+        }
+    }
+
+    @Override
     public void userLeft(User user) {
         for (ISharedProjectListener listener : this.listeners) {
             listener.userLeft(user);
@@ -39,5 +53,4 @@ public class SharedProjectListenerDispatch implements ISharedProjectListener {
     public void remove(ISharedProjectListener listener) {
         this.listeners.remove(listener);
     }
-
 }

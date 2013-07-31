@@ -325,4 +325,21 @@ public class SarosSessionStub implements ISarosSession {
     public void disableQueuing() {
         throw new RuntimeException("Unexpected call to Stub");
     }
+
+    @Override
+    public void userStartedQueuing(User user) {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    @Override
+    public void userFinishedProjectNegotiation(User user) {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    @Override
+    public boolean userHasProject(User user, IProject project) {
+        throw new RuntimeException("Unexpected call to Stub");
+    }
 }

@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.project.internal;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -12,11 +13,13 @@ import java.util.concurrent.TimeUnit;
 
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
+import org.eclipse.core.resources.IProject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.ChangeColorActivity;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumErrorActivity;
@@ -24,6 +27,7 @@ import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.business.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.business.ITargetedActivity;
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.activities.business.PermissionActivity;
@@ -59,8 +63,11 @@ public class ActivityHandlerTest {
     // SessionUsers
     List<User> participants;
     List<User> remoteUsers;
-    User bob;
+    List<User> remoteUsersWithProjects;
+
     User alice;
+    User bob;
+    User dave;
 
     // Needed to compare localActivities
     CountDownLatch gate;
@@ -89,6 +96,7 @@ public class ActivityHandlerTest {
             gate.countDown();
         }
     };
+    private SPath path;
 
     @Before
     public void setUp() {
@@ -165,26 +173,29 @@ public class ActivityHandlerTest {
 
             willBeSent = false;
 
-            if (!(activity instanceof JupiterActivity)
-                && !(activity instanceof ChecksumActivity)) {
+            // SUT-CALL
+            handler.handleIncomingActivities(Collections
+                .singletonList(activity));
 
-                // SUT-CALL
-                handler.handleIncomingActivities(Collections
-                    .singletonList(activity));
-
-                if (!willBeSent) {
-                    fail("Activity: " + activity + " was not send.");
-                } else if (activity instanceof ITargetedActivity) {
-                    assertEquals("Wrong target for" + activity, targets.get(0),
-                        bob);
-                    assertEquals("Wrong activity after Transformation.",
-                        activity, transformedActivity);
+            if (!willBeSent) {
+                fail("Activity: " + activity + " was not send.");
+            } else if (activity instanceof ITargetedActivity) {
+                assertEquals("Wrong target for" + activity, targets.get(0), bob);
+                assertEquals("Wrong activity after Transformation.", activity,
+                    transformedActivity);
+            } else {
+                List<User> expectedUsers;
+                if (activity instanceof IResourceActivity) {
+                    expectedUsers = remoteUsersWithProjects;
+                    assertFalse("User without Project received Activity"
+                        + activity, targets.contains(dave));
                 } else {
-                    assertTrue("Wrong targets for" + activity,
-                        targets.containsAll(remoteUsers));
-                    assertEquals("Wrong activity after Transformation.",
-                        activity, transformedActivity);
+                    expectedUsers = remoteUsers;
                 }
+                assertTrue("Wrong targets for" + activity,
+                    targets.containsAll(expectedUsers));
+                assertEquals("Wrong activity after Transformation.", activity,
+                    transformedActivity);
             }
         }
     }
@@ -210,7 +221,7 @@ public class ActivityHandlerTest {
             // As the dispatching is performed by a different Thread we have
             // to wait for it to dispatch the activity
             try {
-                if (!gate.await(2, TimeUnit.SECONDS)) {
+                if (!gate.await(5, TimeUnit.SECONDS)) {
                     fail(activity + " was not dispatched");
                 }
             } catch (InterruptedException e) {
@@ -251,7 +262,7 @@ public class ActivityHandlerTest {
             // As the dispatching is performed by a different Thread we have
             // to wait for it to dispatch the activity
             try {
-                if (!gate.await(2, TimeUnit.SECONDS)) {
+                if (!gate.await(5, TimeUnit.SECONDS)) {
                     fail(activity + " was not dispatched");
                 }
             } catch (InterruptedException e) {
@@ -292,26 +303,37 @@ public class ActivityHandlerTest {
      */
     private void createUsers() {
         // local User
-        alice = EasyMock.createNiceMock(User.class);
-        EasyMock.expect(alice.isLocal()).andReturn(true).anyTimes();
+        alice = EasyMock.createMock(User.class);
+        EasyMock.expect(alice.isLocal()).andStubReturn(true);
         EasyMock.replay(alice);
-        // remote users
-        bob = EasyMock.createNiceMock(User.class);
-        EasyMock.expect(bob.isLocal()).andReturn(false).anyTimes();
-        EasyMock.replay(bob);
 
-        User carl = EasyMock.createNiceMock(User.class);
-        EasyMock.expect(carl.isLocal()).andReturn(false).anyTimes();
-        EasyMock.replay(carl);
+        // remote users
+        bob = createUser(false);
+        User carl = createUser(false);
+        // User that can't process IResourceActivities
+        dave = createUser(false);
 
         // Add users to the lists
-        participants = new ArrayList<User>();
-        participants.add(alice);
-        participants.add(bob);
-        participants.add(carl);
+
+        remoteUsersWithProjects = new ArrayList<User>();
+        remoteUsersWithProjects.add(carl);
+        remoteUsersWithProjects.add(bob);
+
         remoteUsers = new ArrayList<User>();
-        remoteUsers.add(carl);
-        remoteUsers.add(bob);
+        remoteUsers.addAll(remoteUsersWithProjects);
+        remoteUsers.add(dave);
+
+        participants = new ArrayList<User>();
+        participants.addAll(remoteUsers);
+        participants.add(alice);
+
+    }
+
+    private User createUser(boolean local) {
+        User user = EasyMock.createMock(User.class);
+        EasyMock.expect(user.isLocal()).andStubReturn(local);
+        EasyMock.replay(user);
+        return user;
     }
 
     /**
@@ -323,10 +345,9 @@ public class ActivityHandlerTest {
         synchronizer = new NonUISynchronizer();
 
         // Create SessionMock
-        ISarosSession sessionMock = EasyMock
-            .createNiceMock(ISarosSession.class);
-        EasyMock.expect(sessionMock.getLocalUser()).andReturn(alice).anyTimes();
-        EasyMock.expect(sessionMock.getHost()).andReturn(alice).anyTimes();
+        ISarosSession sessionMock = EasyMock.createMock(ISarosSession.class);
+        EasyMock.expect(sessionMock.getLocalUser()).andStubReturn(alice);
+        EasyMock.expect(sessionMock.getHost()).andStubReturn(alice);
         // read host-Variable at runtime.
         EasyMock.expect(sessionMock.isHost()).andAnswer(new IAnswer<Boolean>() {
             @Override
@@ -335,10 +356,18 @@ public class ActivityHandlerTest {
             }
         }).anyTimes();
 
-        EasyMock.expect(sessionMock.getUsers()).andReturn(participants)
-            .anyTimes();
-        EasyMock.expect(sessionMock.getRemoteUsers()).andReturn(remoteUsers)
-            .anyTimes();
+        IProject project = EasyMock.createMock(IProject.class);
+
+        EasyMock.expect(sessionMock.userHasProject(dave, project))
+            .andStubReturn(false);
+        for (User user : remoteUsersWithProjects) {
+            EasyMock.expect(sessionMock.userHasProject(user, project))
+                .andStubReturn(true);
+        }
+
+        EasyMock.expect(sessionMock.getUsers()).andStubReturn(participants);
+        EasyMock.expect(sessionMock.getRemoteUsers())
+            .andStubReturn(remoteUsers);
         EasyMock.replay(sessionMock);
 
         // create ActivityMocks
@@ -361,6 +390,10 @@ public class ActivityHandlerTest {
         activities.add(EasyMock.createNiceMock(TextEditActivity.class));
         activities.add(EasyMock.createNiceMock(ChecksumActivity.class));
 
+        path = EasyMock.createMock(SPath.class);
+        EasyMock.expect(path.getProject()).andStubReturn(project);
+        EasyMock.replay(path);
+
         // Assign Targets and Source to activities
         for (IActivity activity : activities) {
             if (activity instanceof ITargetedActivity) {
@@ -382,7 +415,12 @@ public class ActivityHandlerTest {
                     }
                 }).anyTimes();
 
+            if (activity instanceof IResourceActivity) {
+                EasyMock.expect(((IResourceActivity) activity).getPath())
+                    .andStubReturn(path);
+            }
             EasyMock.replay(activity);
+
         }
 
         // create CDC-Mock

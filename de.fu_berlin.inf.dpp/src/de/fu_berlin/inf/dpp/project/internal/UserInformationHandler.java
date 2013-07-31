@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net.business;
+package de.fu_berlin.inf.dpp.project.internal;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,6 +18,7 @@ import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
+import de.fu_berlin.inf.dpp.net.internal.extensions.UserFinishedProjectNegotiationExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension.UserListEntry;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListReceivedExtension;
@@ -25,16 +26,16 @@ import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
- * Business Logic for handling Invitation requests
+ * Business Logic for receiving and sending updates of the invitation state of
+ * users. Also handles sending and responding to userLists after when a user
+ * joined the session
  */
 
-// FIMXE move to *project.internal package
-// FIMXE this component uses the network but is not a net component !
-@Component(module = "net")
-public class UserListHandler implements Startable {
+@Component(module = "core")
+public class UserInformationHandler implements Startable {
 
-    private static final Logger log = Logger.getLogger(UserListHandler.class
-        .getName());
+    private static final Logger log = Logger
+        .getLogger(UserInformationHandler.class.getName());
 
     private static final long USER_LIST_SYNCHRONIZE_TIMEOUT = 10000L;
 
@@ -56,7 +57,15 @@ public class UserListHandler implements Startable {
         }
     };
 
-    public UserListHandler(ISarosSession session,
+    private final PacketListener userFinishedProjectNegotiations = new PacketListener() {
+
+        @Override
+        public void processPacket(Packet packet) {
+            handleUserFinishedProjectNegotiationPacket(packet);
+        }
+    };
+
+    public UserInformationHandler(ISarosSession session,
         SessionIDObservable sessionID, ITransmitter transmitter,
         IReceiver receiver) {
         this.session = session;
@@ -76,6 +85,9 @@ public class UserListHandler implements Startable {
          */
         receiver.addPacketListener(userListListener,
             UserListExtension.PROVIDER.getPacketFilter());
+
+        receiver.addPacketListener(userFinishedProjectNegotiations,
+            UserFinishedProjectNegotiationExtension.PROVIDER.getPacketFilter());
     }
 
     @Override
@@ -167,6 +179,64 @@ public class UserListHandler implements Startable {
         } finally {
             collector.cancel();
         }
+    }
+
+    /**
+     * Informs all clients about the fact that a user now has projects and is
+     * able to process IRessourceActivities.
+     * 
+     * @param remoteUsers
+     *            The users to be informed
+     * @param jid
+     *            The JID of the user this message is about
+     */
+    public void sendUserFinishedProjectNegotiation(
+        Collection<User> remoteUsers, JID jid) {
+
+        PacketExtension packet = UserFinishedProjectNegotiationExtension.PROVIDER
+            .create(new UserFinishedProjectNegotiationExtension(
+                currentSessionID, jid));
+
+        for (User user : remoteUsers) {
+            try {
+                transmitter.sendToSessionUser(user.getJID(), packet);
+            } catch (IOException e) {
+                log.error(
+                    "failed to send userFinishedProjectNegotiation-message: "
+                        + user, e);
+                // TODO remove user from session
+            }
+        }
+    }
+
+    /**
+     * Handles incoming UserHasProjects-Packets and forwards the information to
+     * the session
+     * 
+     * @param packet
+     */
+    private void handleUserFinishedProjectNegotiationPacket(Packet packet) {
+
+        JID fromJID = new JID(packet.getFrom());
+
+        UserFinishedProjectNegotiationExtension payload = UserFinishedProjectNegotiationExtension.PROVIDER
+            .getPayload(packet);
+
+        if (payload == null) {
+            log.warn("UserFinishedProjectNegotiation-payload is corrupted");
+            return;
+        }
+
+        User fromUser = session.getUser(fromJID);
+
+        if (!currentSessionID.equals(payload.getSessionID())
+            || fromUser == null) {
+            log.warn("received UserFinishedProjectNegotiationPacket from "
+                + fromJID + " who is not part of the current session");
+            return;
+        }
+
+        session.userFinishedProjectNegotiation(fromUser);
     }
 
     private void handleUserListUpdate(Packet packet) {

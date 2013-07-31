@@ -329,4 +329,21 @@ public class NullSarosSession implements ISarosSession {
         log.warn("unexpected method call");
     }
 
+    @Override
+    public void userStartedQueuing(User user) {
+        log.warn("unexpected method call");
+    }
+
+    @Override
+    public void userFinishedProjectNegotiation(User user) {
+        log.warn("unexpected method call");
+
+    }
+
+    @Override
+    public boolean userHasProject(User user, IProject project) {
+        log.warn("unexpected method call");
+        return false;
+    }
+
 }

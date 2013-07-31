@@ -21,6 +21,16 @@ public abstract class AbstractSharedProjectListener implements
     }
 
     @Override
+    public void userStartedQueuing(User user) {
+        // Do nothing.
+    }
+
+    @Override
+    public void userFinishedProjectNegotiation(User user) {
+        // Do nothing
+    }
+
+    @Override
     public void userLeft(User user) {
         // Do nothing.
     }

@@ -16,6 +16,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.business.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.business.ITargetedActivity;
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
@@ -138,8 +139,24 @@ public final class ActivityHandler implements Startable {
 
             activities = result.getLocalActivities();
 
-            for (QueueItem item : result.getSendToPeers())
-                callback.send(item.recipients, item.activity);
+            for (QueueItem item : result.getSendToPeers()) {
+
+                // If the Activity is a IResourceActivity check that the user
+                // can actually process them
+                List<User> recipients = new ArrayList<User>();
+                if (item.activity instanceof IResourceActivity) {
+                    for (User user : item.recipients) {
+                        IResourceActivity activity = (IResourceActivity) item.activity;
+                        if (session.userHasProject(user, activity.getPath()
+                            .getProject())) {
+                            recipients.add(user);
+                        }
+                    }
+                } else {
+                    recipients = item.recipients;
+                }
+                callback.send(recipients, item.activity);
+            }
         }
 
         if (activities.isEmpty())

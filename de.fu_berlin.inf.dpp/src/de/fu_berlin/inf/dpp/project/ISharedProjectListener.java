@@ -56,6 +56,23 @@ public interface ISharedProjectListener {
     public void userJoined(User user);
 
     /**
+     * Is fired when a user started queuing and is now able to process all
+     * Activities
+     * 
+     * @param user
+     *            the user that has joined.
+     */
+    public void userStartedQueuing(User user);
+
+    /**
+     * Is fired when a finished the Project Negotiation
+     * 
+     * @param user
+     *            the user that has joined.
+     */
+    public void userFinishedProjectNegotiation(User user);
+
+    /**
      * Is fired when an user leaves the shared project.
      * 
      * @param user

@@ -36,7 +36,8 @@ public class AbstractSarosSessionListener implements ISarosSessionListener {
     }
 
     @Override
-    public void postOutgoingInvitationCompleted(IProgressMonitor monitor, User user) {
+    public void postOutgoingInvitationCompleted(IProgressMonitor monitor,
+        User user) {
         // do nothing
     }
 

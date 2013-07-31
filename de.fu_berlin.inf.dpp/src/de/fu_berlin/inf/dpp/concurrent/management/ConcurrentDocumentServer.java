@@ -71,7 +71,7 @@ public class ConcurrentDocumentServer implements Startable {
     public class HostSideProjectListener extends AbstractSharedProjectListener {
 
         @Override
-        public void userJoined(User user) {
+        public void userStartedQueuing(User user) {
             server.addUser(user);
         }
 

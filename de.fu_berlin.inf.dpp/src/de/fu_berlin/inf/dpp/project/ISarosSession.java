@@ -125,6 +125,23 @@ public interface ISarosSession {
     public void addUser(User user);
 
     /**
+     * Informs all listeners that a user now has Projects and can process
+     * IRessourceActivities.
+     * 
+     * @host This method may only called by the host.
+     * @param user
+     */
+    public void userStartedQueuing(final User user);
+
+    /**
+     * Informs all participants and listeners that a user now has finished the
+     * Project Negotiation.
+     * 
+     * @param user
+     */
+    public void userFinishedProjectNegotiation(final User user);
+
+    /**
      * Removes a user from this session.
      * 
      * @param user
@@ -332,6 +349,12 @@ public interface ISarosSession {
      *           of the project after you exit the SWT thread context.
      */
     public List<User> getRemoteUsersWithReadOnlyAccess();
+
+    /**
+     * Checks if the user is ready to process IRessourceActivities for a given
+     * project
+     */
+    public boolean userHasProject(User user, IProject project);
 
     /**
      * Returns the DateTime at which this SarosSession was started on the host.

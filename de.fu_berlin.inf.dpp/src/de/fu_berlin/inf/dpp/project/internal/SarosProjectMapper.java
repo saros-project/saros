@@ -16,6 +16,7 @@ import org.eclipse.core.resources.IResource;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SharedProject;
@@ -62,10 +63,15 @@ class SarosProjectMapper {
     private HashMap<JID, List<IProject>> projectOwnershipMapping = new HashMap<JID, List<IProject>>();
 
     /**
+     * Map containing the projects of the clients. Used by the host to determine
+     * which Activities can be send.
+     */
+    private HashMap<User, List<String>> projectsOfUsers = new HashMap<User, List<String>>();
+
+    /**
      * Map containing the partially shared resources for each shared project.
      * The value is <code>null</code> for completely shared projects.
      */
-
     private HashMap<IProject, Set<IResource>> partiallySharedResourceMapping = new HashMap<IProject, Set<IResource>>();
 
     /** Mapping from project IDs to {@link SharedProject} instances */
@@ -518,5 +524,39 @@ class SarosProjectMapper {
      */
     public synchronized boolean isPartiallyShared(IProject project) {
         return partiallySharedProjects.contains(project);
+    }
+
+    /**
+     * Checks if the given user already has the given project.
+     * 
+     * @param user
+     *            The user to be checked
+     * @param project
+     *            The project to be checked
+     */
+    public synchronized boolean userHasProject(User user, IProject project) {
+        return projectsOfUsers.get(user).contains(getID(project));
+    }
+
+    /**
+     * Adds all missing projects to the projects of the given user. This should
+     * be called once the user started queuing.
+     * 
+     * @param user
+     */
+    public synchronized void addMissingProjectsToUser(User user) {
+        List<String> projects = new ArrayList<String>();
+        for (String project : sharedProjects.keySet()) {
+            projects.add(project);
+        }
+
+        this.projectsOfUsers.put(user, projects);
+    }
+
+    /**
+     * Removes the user-project mapping of the user that left the session.
+     */
+    public void userLeft(User user) {
+        projectsOfUsers.remove(user);
     }
 }

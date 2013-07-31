@@ -74,6 +74,7 @@ import de.fu_berlin.inf.dpp.net.internal.StreamSession.StreamSessionOutputStream
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
@@ -1736,8 +1737,8 @@ public class StreamServiceManager implements Startable {
     /**
      * Removes a user's sessions when he leaves the shared project
      */
-    protected final class SharedProjectListener implements
-        ISharedProjectListener {
+    protected final class SharedProjectListener extends
+        AbstractSharedProjectListener {
         @Override
         public void userLeft(User user) {
 
@@ -1751,16 +1752,6 @@ public class StreamServiceManager implements Startable {
                     session.reportErrorAndDispose(new ReceiverGoneException());
                 }
             }
-        }
-
-        @Override
-        public void userJoined(User user) {
-            // NOP
-        }
-
-        @Override
-        public void permissionChanged(User user) {
-            // NOP
         }
     }
 
