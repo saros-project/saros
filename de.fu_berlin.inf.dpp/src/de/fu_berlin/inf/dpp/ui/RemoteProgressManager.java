@@ -100,12 +100,15 @@ public class RemoteProgressManager {
             if (activities == null)
                 return;
 
-            // This Activity is just used as a PoisonPill for the ActivityLoop
-            // of the ProgressMonitor and therefore most values don't have to
-            // be set correctly as this Activity will never be sent over the
-            // Network
-            receive(new ProgressActivity(source, null, progressID, 0, 0, null,
-                ProgressAction.DONE));
+            /**
+             * This Activity is just used as a PoisonPill for the ActivityLoop
+             * of the ProgressMonitor (identified by the ProgressAction.DONE)
+             * and therefore most values don't have to be set correctly as this
+             * Activity will never be sent over the Network.
+             */
+
+            receive(new ProgressActivity(source, source, progressID, 0, 0,
+                null, ProgressAction.DONE));
         }
 
         public synchronized void receive(ProgressActivity progressActivity) {
