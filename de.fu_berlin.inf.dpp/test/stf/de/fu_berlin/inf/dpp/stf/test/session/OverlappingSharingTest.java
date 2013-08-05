@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
@@ -48,6 +49,7 @@ public class OverlappingSharingTest extends StfTestCase {
      * 
      */
     @Test
+    @Ignore("Non-Host adding projects is currently deactivated")
     public void testOverlappingSharingInExistingProject() throws Exception {
 
         ALICE.superBot().internal().createProject("foo");

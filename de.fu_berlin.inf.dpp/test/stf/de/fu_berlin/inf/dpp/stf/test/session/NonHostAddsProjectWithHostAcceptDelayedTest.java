@@ -6,6 +6,7 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.CARL;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
@@ -20,6 +21,7 @@ public class NonHostAddsProjectWithHostAcceptDelayedTest extends StfTestCase {
     }
 
     @Test
+    @Ignore("Non-Host adding projects is currently deactivated")
     public void testDelayedHostAccept() throws Exception {
 
         Util.setUpSessionWithProjectAndFile("foo", "text.txt", "Hello World",

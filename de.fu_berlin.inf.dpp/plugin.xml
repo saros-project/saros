@@ -856,6 +856,9 @@
                      <reference
                            definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
                      </reference>
+                     <reference
+                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionHost">
+                     </reference>
                   </and>
                </visibleWhen>
             </command>
@@ -1006,6 +1009,9 @@
                   </reference>
                   <reference
                         definitionId="de.fu_berlin.inf.dpp.ui.definitions.sessionHeadlineSelected">
+                  </reference>
+                  <reference
+                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionHost">
                   </reference>
                </and>
             </visibleWhen>
@@ -1191,6 +1197,9 @@
                      </reference>
                      <reference
                            definitionId="de.fu_berlin.inf.dpp.ui.definitions.resourcesSelected">
+                     </reference>
+                     <reference
+                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionHost">
                      </reference>
                   </and>
                </visibleWhen>
