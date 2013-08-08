@@ -348,7 +348,14 @@ public class ActivitySequencer implements Startable {
      *            the user that left
      */
     public void userLeft(User user) {
+        /*
+         * FIXME This stuff is to lazy if called outside the UI-Thread as it is
+         * possible that activities may be still send or received. FIX: Ensure
+         * proper synchronization and discard incoming or outgoing activities if
+         * the user is not present.
+         */
         activityQueueManager.removeQueue(user.getJID());
+        nextOutgoingSequenceNumbers.remove(user.getJID());
     }
 
     private List<TimedActivityDataObject> createTimedActivities(User recipient,
