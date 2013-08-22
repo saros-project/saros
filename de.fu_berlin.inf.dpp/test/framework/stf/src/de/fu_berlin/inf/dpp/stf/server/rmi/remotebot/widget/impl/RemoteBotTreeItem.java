@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -143,6 +144,17 @@ public final class RemoteBotTreeItem extends StfRemoteObject implements
     public IRemoteBotTreeItem getNode(String nodeText, int index)
         throws RemoteException {
         return setWidget(widget.getNode(nodeText, index));
+    }
+
+    @Override
+    public IRemoteBotTreeItem getNodeWithRegex(String regex)
+        throws RemoteException {
+        for (String itemText : getTextOfItems()) {
+            if (itemText.matches(regex))
+                return getNode(itemText);
+        }
+        throw new WidgetNotFoundException("Could not find node with regex: "
+            + regex);
     }
 
     @Override

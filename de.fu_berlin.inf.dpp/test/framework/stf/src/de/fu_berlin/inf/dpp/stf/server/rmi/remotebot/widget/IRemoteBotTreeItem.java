@@ -67,6 +67,9 @@ public interface IRemoteBotTreeItem extends Remote {
     public IRemoteBotTreeItem getNode(String nodeText, int index)
         throws RemoteException;
 
+    public IRemoteBotTreeItem getNodeWithRegex(String regex)
+        throws RemoteException;
+
     public List<String> getNodes() throws RemoteException;
 
     public List<IRemoteBotTreeItem> getNodes(String nodeText)
