@@ -56,8 +56,19 @@ public class SharedResourcesManagerTest {
         manager = new SharedResourcesManager(null, null);
 
         IFile file = EasyMock.createMock(IFile.class);
-        expect(file.getContents()).andStubReturn(
-            new ByteArrayInputStream(FILE_CONTENT));
+
+        /**
+         * andStubReturn(new ByteArrayInputStream()) wouldn't work because the
+         * Stream can only be read once (and needs to be resetted afterwards).
+         * Instead, we provide a new Stream for every call (alternatively, these
+         * mocks could be re-created in the @Before method).
+         */
+        expect(file.getContents()).andStubAnswer(new IAnswer<InputStream>() {
+            @Override
+            public InputStream answer() throws Throwable {
+                return new ByteArrayInputStream(FILE_CONTENT);
+            }
+        });
         expect(file.exists()).andStubReturn(Boolean.TRUE);
         replay(file);
 
