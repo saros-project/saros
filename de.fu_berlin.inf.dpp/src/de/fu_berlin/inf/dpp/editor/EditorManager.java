@@ -22,7 +22,6 @@ package de.fu_berlin.inf.dpp.editor;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -35,7 +34,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -173,10 +171,6 @@ public class EditorManager extends AbstractActivityProvider {
 
     /** all files that have connected document providers */
     protected final Set<IFile> connectedFiles = new HashSet<IFile>();
-
-    protected HashMap<SPath, Long> lastEditTimes = new HashMap<SPath, Long>();
-
-    protected HashMap<SPath, Long> lastRemoteEditTimes = new HashMap<SPath, Long>();
 
     ContributionAnnotationManager contributionAnnotationManager;
 
@@ -355,8 +349,6 @@ public class EditorManager extends AbstractActivityProvider {
                     sarosSession.removeActivityProvider(EditorManager.this);
 
                     sarosSession = null;
-                    lastEditTimes.clear();
-                    lastRemoteEditTimes.clear();
                     contributionAnnotationManager.dispose();
                     contributionAnnotationManager = null;
                     remoteEditorManager = null;
@@ -709,8 +701,6 @@ public class EditorManager extends AbstractActivityProvider {
                 + isLocked);
             return;
         }
-
-        EditorManager.this.lastEditTimes.put(path, System.currentTimeMillis());
 
         fireActivity(textEdit);
 
@@ -1323,7 +1313,6 @@ public class EditorManager extends AbstractActivityProvider {
                     replacedText, text));
                 return;
             }
-            lastRemoteEditTimes.put(path, System.currentTimeMillis());
 
             for (IEditorPart editorPart : editorPool.getEditors(path)) {
 
@@ -1578,45 +1567,6 @@ public class EditorManager extends AbstractActivityProvider {
                 model.removeAnnotation(annotation);
             }
         }
-    }
-
-    /**
-     * To get the java system time of the last local edit operation.
-     * 
-     * @param path
-     *            the project relative path of the resource
-     * @return System.currentTimeMillis() of last local edit or 0 if there was
-     *         no edit.
-     */
-
-    // FIXME Bug: org.eclipse.core.runtime.IPath is incompatible with expected
-    // argument type de.fu_berlin.inf.dpp.activities.SPath
-
-    public long getLastEditTime(IPath path) {
-        if (!this.lastEditTimes.containsKey(path)) {
-            log.warn("File has never been edited: " + path);
-            return 0;
-        }
-        return this.lastEditTimes.get(path);
-    }
-
-    /**
-     * To get the java system time of the last remote edit operation.
-     * 
-     * @param path
-     *            the project relative path of the resource
-     * @return java system time of last remote edit
-     */
-
-    // FIXME Bug: org.eclipse.core.runtime.IPath is incompatible with expected
-    // argument type de.fu_berlin.inf.dpp.activities.SPath
-
-    public long getLastRemoteEditTime(IPath path) {
-        if (!this.lastRemoteEditTimes.containsKey(path)) {
-            log.warn("File has never been edited: " + path);
-            return 0;
-        }
-        return this.lastRemoteEditTimes.get(path);
     }
 
     /**

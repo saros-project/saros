@@ -134,10 +134,6 @@ class EditorPool {
 
         getEditors(path).add(editorPart);
         editorInputMap.put(editorPart, input);
-
-        this.editorManager.lastEditTimes.put(path, System.currentTimeMillis());
-        this.editorManager.lastRemoteEditTimes.put(path,
-            System.currentTimeMillis());
     }
 
     public SPath getCurrentPath(IEditorPart editorPart,
