@@ -535,7 +535,10 @@ class SarosProjectMapper {
      *            The project to be checked
      */
     public synchronized boolean userHasProject(User user, IProject project) {
-        return projectsOfUsers.get(user).contains(getID(project));
+        if (projectsOfUsers.containsKey(user)) {
+            return projectsOfUsers.get(user).contains(getID(project));
+        }
+        return false;
     }
 
     /**
