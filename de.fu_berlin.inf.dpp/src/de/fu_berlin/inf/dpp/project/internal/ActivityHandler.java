@@ -136,25 +136,10 @@ public final class ActivityHandler implements Startable {
         if (session.isHost()) {
 
             TransformationResult result = directServerActivities(activities);
-
             activities = result.getLocalActivities();
-
             for (QueueItem item : result.getSendToPeers()) {
 
-                // If the Activity is a IResourceActivity check that the user
-                // can actually process them
-                List<User> recipients = new ArrayList<User>();
-                if (item.activity instanceof IResourceActivity) {
-                    for (User user : item.recipients) {
-                        IResourceActivity activity = (IResourceActivity) item.activity;
-                        if (session.userHasProject(user, activity.getPath()
-                            .getProject())) {
-                            recipients.add(user);
-                        }
-                    }
-                } else {
-                    recipients = item.recipients;
-                }
+                List<User> recipients = getRecipientsForQueueItem(item);
                 callback.send(recipients, item.activity);
             }
         }
@@ -166,6 +151,45 @@ public final class ActivityHandler implements Startable {
             dispatchAndExecuteActivities(activities);
         else
             dispatchQueue.add(activities);
+    }
+
+    /**
+     * Determines the recipients for a given QueueItem
+     * 
+     * @param item
+     *            the QueueItem for which the participants should be determined
+     * @return a list of participants this activity should be sent to
+     */
+    private List<User> getRecipientsForQueueItem(QueueItem item) {
+
+        /*
+         * If the Activity is a IResourceActivity check that the user can
+         * actually process them
+         */
+        List<User> recipients = new ArrayList<User>();
+        if (item.activity instanceof IResourceActivity) {
+            IResourceActivity activity = (IResourceActivity) item.activity;
+            /*
+             * HACK: IRessourceActivities with null as path will be treated as
+             * not being resource related as we can't decide whether to send
+             * them or not. IRessourceActivities must not have null as path but
+             * as the EditorActivity currently break this and uses null paths
+             * for non-shared-files we have to make this distinction for now.
+             */
+            if (activity.getPath() == null) {
+                recipients = item.recipients;
+            } else {
+                for (User user : item.recipients) {
+                    if (session.userHasProject(user, activity.getPath()
+                        .getProject())) {
+                        recipients.add(user);
+                    }
+                }
+            }
+        } else {
+            recipients = item.recipients;
+        }
+        return recipients;
     }
 
     /**

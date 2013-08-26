@@ -47,6 +47,12 @@ public class EditorActivity extends AbstractActivity implements
     }
 
     protected final Type type;
+
+    /*
+     * TODO path must never be null for IResourceActivities. Add a
+     * StatusActivity for informing remote users that no shared resource is
+     * active anymore.
+     */
     protected final SPath path;
 
     /**

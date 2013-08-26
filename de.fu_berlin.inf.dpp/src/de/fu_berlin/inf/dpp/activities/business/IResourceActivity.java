@@ -8,8 +8,9 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 public interface IResourceActivity extends IActivity {
 
     /**
-     * The path to the file that this Activity is about. For instance for
-     * creating a file this path denotes the file which is created.
+     * @return the path of the file that this Activity is about. For instance
+     *         for creating a file this path denotes the file which is created.
+     *         Must <b>not</b> be <code>null</code>.
      */
     public SPath getPath();
 
