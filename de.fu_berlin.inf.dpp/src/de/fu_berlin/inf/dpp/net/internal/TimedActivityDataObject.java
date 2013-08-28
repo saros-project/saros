@@ -1,13 +1,9 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
-import java.util.List;
-
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 
-import de.fu_berlin.inf.dpp.activities.business.FileActivity;
-import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.util.xstream.JIDConverter;
@@ -77,7 +73,7 @@ public class TimedActivityDataObject implements
     }
 
     /**
-     * @return the sequence number of the activiy.
+     * @return the sequence number of the activity.
      */
     public int getSequenceNumber() {
         return this.sequenceNumber;
@@ -121,26 +117,5 @@ public class TimedActivityDataObject implements
             throw new NullPointerException();
         }
         return this.sequenceNumber - other.sequenceNumber;
-    }
-
-    /**
-     * Used for asserting that the given list contains no FileActivities which
-     * create files
-     */
-    public static boolean containsNoFileCreationActivities(
-        List<TimedActivityDataObject> timedActivities) {
-
-        for (TimedActivityDataObject timedActivity : timedActivities) {
-
-            IActivityDataObject activityDataObject = timedActivity
-                .getActivity();
-
-            if (activityDataObject instanceof FileActivityDataObject
-                && ((FileActivityDataObject) activityDataObject).getType()
-                    .equals(FileActivity.Type.CREATED)) {
-                return false;
-            }
-        }
-        return true;
     }
 }
