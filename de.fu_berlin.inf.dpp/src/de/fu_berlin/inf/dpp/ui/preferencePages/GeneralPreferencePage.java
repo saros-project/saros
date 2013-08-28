@@ -115,7 +115,6 @@ public final class GeneralPreferencePage extends FieldEditorPreferencePage
         createAutomaticConnectField(this.parent);
         createVersionControlPreferences(this.parent);
         createConcurrentUndoField(this.parent);
-        createFollowModePreferences(this.parent);
         createNeedsBasesSyncPreferences(this.parent);
     }
 
@@ -348,11 +347,6 @@ public final class GeneralPreferencePage extends FieldEditorPreferencePage
     private void createConcurrentUndoField(Composite group) {
         addField(new BooleanFieldEditor(PreferenceConstants.CONCURRENT_UNDO,
             CONCURRENT_UNDO_TEXT, group));
-    }
-
-    private void createFollowModePreferences(Composite group) {
-        addField(new BooleanFieldEditor(PreferenceConstants.AUTO_FOLLOW_MODE,
-            FOLLOW_MODE_TEXT, group));
     }
 
     protected void createNeedsBasesSyncPreferences(Composite group) {

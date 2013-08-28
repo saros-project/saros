@@ -94,8 +94,6 @@ public class SarosSessionTest {
         EasyMock.expectLastCall().anyTimes();
         saros.getVersion();
         EasyMock.expectLastCall().andReturn("JUNIT").anyTimes();
-        saros.getAutoFollowEnabled();
-        EasyMock.expectLastCall().andReturn(false).anyTimes();
         EasyMock.replay(saros);
 
         return saros;

@@ -103,6 +103,6 @@ public class SessionDataCollector extends AbstractStatisticCollector {
         data.setFeedbackDisabled(feedbackManager.isFeedbackDisabled());
         data.setFeedbackInterval(feedbackManager.getSurveyInterval());
         data.setUserID(statisticManager.getUserID());
-        data.setAutoFollowModeEnabled(saros.getAutoFollowEnabled());
+        data.setAutoFollowModeEnabled(/* no longer used */false);
     }
 }

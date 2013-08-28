@@ -510,17 +510,6 @@ public class Saros extends AbstractUIPlugin {
     }
 
     /**
-     * Returns the configuration setting for enabled auto follow mode
-     * 
-     * @return the state of the feature as <code> boolean</code>
-     */
-    // TODO move to PreferenceUtils
-    public boolean getAutoFollowEnabled() {
-        return getPreferenceStore().getBoolean(
-            PreferenceConstants.AUTO_FOLLOW_MODE);
-    }
-
-    /**
      * Returns @link{IProxyService} if there is a registered service otherwise
      * null.
      */

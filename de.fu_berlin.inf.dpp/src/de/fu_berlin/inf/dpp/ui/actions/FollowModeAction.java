@@ -6,11 +6,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.picocontainer.Disposable;
@@ -22,7 +20,6 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -34,7 +31,6 @@ import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Action to enter into FollowMode
@@ -87,13 +83,7 @@ public class FollowModeAction extends Action implements Disposable {
 
                 @Override
                 public void run() {
-
                     FollowModeAction.this.session = session;
-
-                    if (preferenceStore
-                        .getBoolean(PreferenceConstants.AUTO_FOLLOW_MODE))
-                        startAutoFollowHost();
-
                     updateEnablement();
                 }
             });
@@ -136,9 +126,6 @@ public class FollowModeAction extends Action implements Disposable {
 
     @Inject
     private EditorManager editorManager;
-
-    @Inject
-    private IPreferenceStore preferenceStore;
 
     private ISarosSession session;
 
@@ -282,39 +269,5 @@ public class FollowModeAction extends Action implements Disposable {
             return null;
 
         return users.get(0);
-    }
-
-    private void startAutoFollowHost() {
-
-        if (session == null || session.isHost())
-            return;
-
-        /*
-         * TODO Running this action too early might cause warnings if the
-         * viewport information have not yet arrived!
-         * 
-         * In the worst case, this might be called before the EditorManager has
-         * been initialized, which would probably cause undefined behavior.
-         * 
-         * Suggested Solution: 1.) We should make sure that ISessionListeners
-         * are sorted in a sane order.
-         * 
-         * 2.) We should think about making initial state information part of
-         * the Invitation process.
-         * 
-         * As a HACK, we run this action 1s after the listener was called.
-         */
-
-        Display display = SWTUtils.getDisplay();
-
-        if (display.isDisposed())
-            return;
-
-        display.timerExec(1000, Utils.wrapSafe(log, new Runnable() {
-            @Override
-            public void run() {
-                editorManager.setFollowing(session.getHost());
-            }
-        }));
     }
 }

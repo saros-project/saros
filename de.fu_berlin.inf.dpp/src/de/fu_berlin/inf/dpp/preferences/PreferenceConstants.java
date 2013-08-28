@@ -39,8 +39,6 @@ public class PreferenceConstants {
 
     public static final String AUTO_PORTMAPPING_LASTMAPPEDPORT = "autoportmappinglastmappedport";
 
-    public static final String AUTO_FOLLOW_MODE = "autofollowmode";
-
     public static final String NEEDS_BASED_SYNC = "undefined";
 
     public static final String SKYPE_USERNAME = "skypename";
