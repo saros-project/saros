@@ -22,7 +22,10 @@ package de.fu_berlin.inf.dpp.net.internal;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -67,6 +70,15 @@ public class ActivitySequencer implements Startable {
      * this value.
      */
     private static final int FIRST_SEQUENCE_NUMBER = 0;
+
+    private static class ActivityBuffer {
+        int nextSequenceNumber;
+        private final Deque<TimedActivityDataObject> queuedActivities = new LinkedList<TimedActivityDataObject>();
+
+        public ActivityBuffer(int firstSequenceNumber) {
+            nextSequenceNumber = firstSequenceNumber;
+        }
+    }
 
     /**
      * Holder class containing the transformed {@linkplain IActivityDataObject
@@ -164,8 +176,6 @@ public class ActivitySequencer implements Startable {
      */
     private final BlockingQueue<DataObjectQueueItem> outgoingActivitiesQueue = new LinkedBlockingQueue<DataObjectQueueItem>();
 
-    private final ActivityQueueManager activityQueueManager;
-
     private boolean started = false;
 
     private String currentSessionID;
@@ -189,6 +199,8 @@ public class ActivitySequencer implements Startable {
      */
     private final Map<JID, Integer> nextOutgoingSequenceNumbers;
 
+    private final Map<JID, ActivityBuffer> bufferedIncomingActivities;
+
     public ActivitySequencer(final ISarosSession sarosSession,
         final ITransmitter transmitter, final IReceiver receiver,
         final DispatchThreadContext threadContext,
@@ -202,10 +214,8 @@ public class ActivitySequencer implements Startable {
 
         this.localJID = sarosSession.getLocalUser().getJID();
 
-        this.activityQueueManager = new ActivityQueueManager(
-            FIRST_SEQUENCE_NUMBER);
-
         this.nextOutgoingSequenceNumbers = new HashMap<JID, Integer>();
+        this.bufferedIncomingActivities = new HashMap<JID, ActivityBuffer>();
     }
 
     /**
@@ -275,33 +285,68 @@ public class ActivitySequencer implements Startable {
         started = false;
     }
 
+    /*
+     * TODO some part of the logic can be removed if we ensure only ONE transmit
+     * stream and fail FAST if this stream is broken
+     */
     private void executeActivity(TimedActivityDataObject activity) {
 
         assert activity != null;
 
-        activityQueueManager.add(activity);
-
-        if (!started) {
-            LOG.debug("received activity but "
-                + "ActivitySequencer has not yet been started: " + activity);
-            return;
-        }
-
-        flushIncomingQueues();
-    }
-
-    /**
-     * Removes all activities that can be executed now from the incoming
-     * activities queues (buffers) and passes them to the upper layer (current
-     * Saros Session).
-     */
-    private void flushIncomingQueues() {
         List<IActivityDataObject> serializedActivities = new ArrayList<IActivityDataObject>();
-        for (TimedActivityDataObject timedActivity : activityQueueManager
-            .removeActivities()) {
-            serializedActivities.add(timedActivity.getActivity());
+
+        JID sender = activity.getSender();
+
+        synchronized (this) {
+            ActivityBuffer buffer = bufferedIncomingActivities.get(sender);
+
+            if (buffer == null) {
+                buffer = new ActivityBuffer(FIRST_SEQUENCE_NUMBER);
+
+                bufferedIncomingActivities.put(sender, buffer);
+            }
+
+            buffer.queuedActivities.add(activity);
+
+            if (!started) {
+                LOG.debug("received activity but ActivitySequencer has not yet been started: "
+                    + activity);
+                return;
+            }
+
+            // it is very VERY uncommon to not send 2^31 activities at all
+            while (true) {
+
+                activity = null;
+
+                for (Iterator<TimedActivityDataObject> it = buffer.queuedActivities
+                    .iterator(); it.hasNext();) {
+
+                    activity = it.next();
+
+                    if (activity.getSequenceNumber() == buffer.nextSequenceNumber) {
+                        it.remove();
+                        break;
+                    }
+
+                    activity = null;
+                }
+
+                if (activity == null) {
+                    /*
+                     * TODO shut down the session if a activity does not arrive
+                     * in a given timeout
+                     */
+                    break;
+                }
+
+                serializedActivities.add(activity.getActivity());
+                buffer.nextSequenceNumber++;
+            }
         }
-        sarosSession.exec(serializedActivities);
+
+        if (!serializedActivities.isEmpty())
+            sarosSession.exec(serializedActivities);
     }
 
     /**
@@ -347,15 +392,15 @@ public class ActivitySequencer implements Startable {
      * @param user
      *            the user that left
      */
-    public void userLeft(User user) {
+    public synchronized void userLeft(User user) {
         /*
          * FIXME This stuff is to lazy if called outside the UI-Thread as it is
          * possible that activities may be still send or received. FIX: Ensure
          * proper synchronization and discard incoming or outgoing activities if
          * the user is not present.
          */
-        activityQueueManager.removeQueue(user.getJID());
         nextOutgoingSequenceNumbers.remove(user.getJID());
+        bufferedIncomingActivities.remove(user.getJID());
     }
 
     private List<TimedActivityDataObject> createTimedActivities(User recipient,

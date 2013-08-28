@@ -4,12 +4,13 @@ import java.util.List;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.annotations.XStreamOmitField;
+import com.thoughtworks.xstream.annotations.XStreamConverter;
 
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.util.xstream.JIDConverter;
 
 /**
  * A simple {@link IActivityDataObject} wrapper that adds a time stamp.
@@ -20,25 +21,16 @@ import de.fu_berlin.inf.dpp.net.JID;
 public class TimedActivityDataObject implements
     Comparable<TimedActivityDataObject> {
 
-    /**
-     * Unknown sequence number. It is illegal to use it in
-     * {@link TimedActivityDataObject} instances.
-     */
-    public static final int UNKNOWN_SEQUENCE_NR = -2;
-
-    protected final IActivityDataObject activityDataObject;
+    private final IActivityDataObject activityDataObject;
 
     @XStreamAsAttribute
-    protected final int sequenceNumber;
-
-    /** A "real" wall clock timestamp for this activityDataObject. */
-    @XStreamOmitField
-    protected long localTimestamp = 0;
+    private final int sequenceNumber;
 
     /**
      * The JID of the user who sent this TimedActivityDataObject
      */
-    protected final JID sender;
+    @XStreamConverter(JIDConverter.class)
+    private final JID sender;
 
     /**
      * Constructs a new TimedActivityDataObject.
@@ -49,9 +41,7 @@ public class TimedActivityDataObject implements
      *            the sequence number that belongs to the activityDataObject.
      * 
      * @throws IllegalArgumentException
-     *             if activityDataObject is <code>null</code> or the sequence
-     *             number is {@link TimedActivityDataObject#UNKNOWN_SEQUENCE_NR}
-     *             .
+     *             if activityDataObject is <code>null</code> .
      */
     public TimedActivityDataObject(IActivityDataObject activityDataObject,
         JID sender, int sequenceNumber) {
@@ -59,12 +49,9 @@ public class TimedActivityDataObject implements
         if (sender == null) {
             throw new IllegalArgumentException("Source cannot be null");
         }
+
         if (activityDataObject == null) {
             throw new IllegalArgumentException("Activity cannot be null");
-        }
-        if (sequenceNumber == UNKNOWN_SEQUENCE_NR) {
-            throw new IllegalArgumentException(
-                "sequenceNumber must not be TimedActicity.UNKNOWN_SEQUENCE_NR");
         }
 
         this.activityDataObject = activityDataObject;
@@ -134,14 +121,6 @@ public class TimedActivityDataObject implements
             throw new NullPointerException();
         }
         return this.sequenceNumber - other.sequenceNumber;
-    }
-
-    public void setLocalTimestamp(long localTimestamp) {
-        this.localTimestamp = localTimestamp;
-    }
-
-    public long getLocalTimestamp() {
-        return localTimestamp;
     }
 
     /**

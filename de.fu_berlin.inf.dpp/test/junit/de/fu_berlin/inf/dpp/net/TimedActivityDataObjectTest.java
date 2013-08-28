@@ -47,7 +47,8 @@ public class TimedActivityDataObjectTest {
 
     /**
      * Test method for
-     * {@link de.fu_berlin.inf.dpp.net.internal.TimedActivityDataObject#getActivity()}.
+     * {@link de.fu_berlin.inf.dpp.net.internal.TimedActivityDataObject#getActivity()}
+     * .
      */
     @Test
     public void testGetActivity() {
@@ -62,7 +63,8 @@ public class TimedActivityDataObjectTest {
 
     /**
      * Test method for
-     * {@link de.fu_berlin.inf.dpp.net.internal.TimedActivityDataObject#getSender()}.
+     * {@link de.fu_berlin.inf.dpp.net.internal.TimedActivityDataObject#getSender()}
+     * .
      */
     @Test
     public void testGetSender() {
@@ -85,7 +87,8 @@ public class TimedActivityDataObjectTest {
 
     /**
      * Test method for
-     * {@link de.fu_berlin.inf.dpp.net.internal.TimedActivityDataObject#toString()}.
+     * {@link de.fu_berlin.inf.dpp.net.internal.TimedActivityDataObject#toString()}
+     * .
      */
     @Test
     public void testToString() {
@@ -193,18 +196,5 @@ public class TimedActivityDataObjectTest {
             activityDataObject2, jid2, seqnr2);
         assertEquals("The method should return -1", 1 - 2,
             timedADO.compareTo(t3));
-    }
-
-    /**
-     * Test method for
-     * {@link de.fu_berlin.inf.dpp.net.internal.TimedActivityDataObject#setLocalTimestamp(long)}
-     * .
-     */
-    @Test
-    public void testSetLocalTimestamp() {
-        long timestamp = 32168313;
-        timedADO.setLocalTimestamp(timestamp);
-        assertEquals("The timestamp wasn't set correctly.", timestamp,
-            timedADO.getLocalTimestamp());
     }
 }
