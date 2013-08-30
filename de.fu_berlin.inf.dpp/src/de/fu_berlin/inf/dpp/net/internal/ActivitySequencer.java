@@ -314,7 +314,12 @@ public class ActivitySequencer implements Startable {
                 return;
             }
 
-            // it is very VERY uncommon to not send 2^31 activities at all
+            /*
+             * it is very VERY uncommon to receive an activity with a sequence
+             * number that is 2^32 steps apart from the current expected
+             * sequencer number, so this algorithm does not check for duplicate
+             * sequence numbers
+             */
             while (true) {
 
                 activity = null;
