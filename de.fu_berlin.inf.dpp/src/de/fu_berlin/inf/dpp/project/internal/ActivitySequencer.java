@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp.net.internal;
+package de.fu_berlin.inf.dpp.project.internal;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,6 +44,8 @@ import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
+import de.fu_berlin.inf.dpp.net.internal.TimedActivities;
+import de.fu_berlin.inf.dpp.net.internal.TimedActivityDataObject;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;

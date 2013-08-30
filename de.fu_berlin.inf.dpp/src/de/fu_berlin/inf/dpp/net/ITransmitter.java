@@ -72,9 +72,10 @@ public interface ITransmitter {
      * </p>
      * 
      * <p>
-     * Note: Does NOT ensure that peers receive messages in order because there
-     * may be two completely different communication ways. See
-     * {@link de.fu_berlin.inf.dpp.net.internal.ActivitySequencer} for details.
+     * <s>Note: Does NOT ensure that peers receive messages in order because
+     * there may be two completely different communication ways. See
+     * {@link de.fu_berlin.inf.dpp.project.internal.ActivitySequencer} for
+     * details.</s> There is currently only one communication way enabled !
      * </p>
      * 
      * @param recipient
