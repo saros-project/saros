@@ -19,8 +19,6 @@
  */
 package de.fu_berlin.inf.dpp;
 
-import java.util.Date;
-
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.net.JID;
@@ -41,19 +39,13 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
  * There is one local user representing the person in front of the current
  * eclipse instance, all others are remote users.
  * 
- * The public and mutable properties are the {@link User.Permission}, time since
- * going off-line, connection state, away information and whether this user is
- * still joining or already part of the session.
+ * The public and mutable properties are the {@link User.Permission}.
  * 
  * @entityObject A user is a entity object, i.e. it can change over time.
  */
 public class User {
 
     private static final Logger log = Logger.getLogger(User.class);
-
-    public enum UserConnectionState {
-        UNKNOWN, ONLINE, OFFLINE
-    }
 
     public enum Permission {
         WRITE_ACCESS, READONLY_ACCESS
@@ -66,15 +58,6 @@ public class User {
     protected volatile int colorID;
 
     protected final int favoriteColorID;
-
-    protected UserConnectionState connectionState = UserConnectionState.UNKNOWN;
-
-    protected boolean away = false;
-
-    /**
-     * Time stamp when User became offline the last time. In seconds.
-     */
-    protected long offlineTime = 0;
 
     protected Permission permission = Permission.WRITE_ACCESS;
 
@@ -162,33 +145,6 @@ public class User {
 
     public int getFavoriteColorID() {
         return this.favoriteColorID;
-    }
-
-    public UserConnectionState getConnectionState() {
-        return this.connectionState;
-    }
-
-    public void setConnectionState(UserConnectionState presence) {
-        this.connectionState = presence;
-        if (this.connectionState == User.UserConnectionState.OFFLINE) {
-            this.offlineTime = new Date().getTime();
-        }
-    }
-
-    public boolean isAway() {
-        return away;
-    }
-
-    public void setAway(boolean away) {
-        this.away = away;
-    }
-
-    public int getOfflineSeconds() {
-        if (this.connectionState == UserConnectionState.OFFLINE) {
-            return (int) (((new Date().getTime()) - this.offlineTime) / 1000);
-        } else {
-            return 0;
-        }
     }
 
     @Override

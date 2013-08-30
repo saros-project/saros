@@ -3,18 +3,15 @@
  */
 package de.fu_berlin.inf.dpp.project;
 
-import java.util.Collection;
-
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.packet.Presence;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.User.UserConnectionState;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.RosterAdapter;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -23,26 +20,15 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * This listener is responsible for updating the User presence state from the
  * roster.
  */
-@Component(module = "net")
-public class SarosRosterListener implements IRosterListener {
+/*
+ * TODO this class is currently not used and should be rewritten to inform the
+ * session components about changes of user nicknames etc.
+ */
+@Component(module = "misc")
+public class SarosRosterListener extends RosterAdapter {
 
     @Inject
     protected SarosSessionObservable sarosSessionObservable;
-
-    @Override
-    public void entriesAdded(Collection<String> addresses) {
-        // NOP
-    }
-
-    @Override
-    public void entriesUpdated(Collection<String> addresses) {
-        // TODO Check if it affects one of our participants in a session
-    }
-
-    @Override
-    public void entriesDeleted(Collection<String> addresses) {
-        // TODO Check if it affects one of our participants in a session
-    }
 
     @Override
     public void presenceChanged(Presence presence) {
@@ -71,17 +57,6 @@ public class SarosRosterListener implements IRosterListener {
             return;
 
         assert user.getJID().strictlyEquals(presenceJID);
-
-        if (presence.isAvailable()) {
-            if (user.getConnectionState() != UserConnectionState.ONLINE) {
-                user.setConnectionState(User.UserConnectionState.ONLINE);
-            }
-            user.setAway(presence.isAway());
-        }
-
-        if (!presence.isAvailable()
-            && user.getConnectionState() != UserConnectionState.OFFLINE)
-            user.setConnectionState(User.UserConnectionState.OFFLINE);
     }
 
     @Override
