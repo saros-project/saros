@@ -482,12 +482,14 @@ public final class SarosSession implements ISarosSession {
         return true;
     }
 
+    /*
+     * FIXME only accept a JID or create a method session.createUser to ensure
+     * proper initialization etc. of User objects !
+     */
     @Override
     public void addUser(final User user) {
 
         // TODO synchronize this method !
-
-        assert user.getSarosSession().equals(this);
 
         JID jid = user.getJID();
 

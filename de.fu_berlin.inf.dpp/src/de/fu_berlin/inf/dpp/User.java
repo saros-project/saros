@@ -160,13 +160,6 @@ public class User {
     }
 
     /**
-     * Gets the ISarosSession to which this user belongs.
-     */
-    public ISarosSession getSarosSession() {
-        return sarosSession;
-    }
-
-    /**
      * Returns true if this User object identifies the user which is using the
      * local Eclipse instance as opposed to the remote users in different
      * Eclipse instances.
