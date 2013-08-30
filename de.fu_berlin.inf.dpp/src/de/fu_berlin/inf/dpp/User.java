@@ -19,13 +19,10 @@
  */
 package de.fu_berlin.inf.dpp;
 
-import org.apache.log4j.Logger;
-
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.util.StackTrace;
 
 /**
  * A user is a representation of a person sitting in front of an eclipse
@@ -45,21 +42,19 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
  */
 public class User {
 
-    private static final Logger log = Logger.getLogger(User.class);
-
     public enum Permission {
         WRITE_ACCESS, READONLY_ACCESS
     }
 
-    protected final ISarosSession sarosSession;
+    private final ISarosSession sarosSession;
 
-    protected final JID jid;
+    private final JID jid;
 
-    protected volatile int colorID;
+    private volatile int colorID;
 
-    protected final int favoriteColorID;
+    private final int favoriteColorID;
 
-    protected Permission permission = Permission.WRITE_ACCESS;
+    private Permission permission = Permission.WRITE_ACCESS;
 
     public User(ISarosSession sarosSession, JID jid, int colorID,
         int favoriteColorID) {
@@ -139,26 +134,14 @@ public class User {
         return result;
     }
 
-    public int getColorID() {
-        return this.colorID;
-    }
-
-    public int getFavoriteColorID() {
-        return this.favoriteColorID;
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
         if (obj == null)
             return false;
-        if (getClass() != obj.getClass()) {
-            if (obj.getClass() == String.class || obj.getClass() == JID.class)
-                log.warn(Messages.User_comparing + obj.getClass(),
-                    new StackTrace());
+        if (getClass() != obj.getClass())
             return false;
-        }
         User other = (User) obj;
         if (jid == null) {
             if (other.jid != null)
@@ -166,6 +149,14 @@ public class User {
         } else if (!jid.equals(other.jid))
             return false;
         return true;
+    }
+
+    public int getColorID() {
+        return this.colorID;
+    }
+
+    public int getFavoriteColorID() {
+        return this.favoriteColorID;
     }
 
     /**
