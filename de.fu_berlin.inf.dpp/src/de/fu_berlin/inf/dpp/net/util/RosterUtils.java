@@ -22,8 +22,10 @@ import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.packet.DiscoverInfo.Identity;
 import org.jivesoftware.smackx.packet.DiscoverItems;
 import org.jivesoftware.smackx.search.UserSearch;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
@@ -37,8 +39,20 @@ import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 public class RosterUtils {
     private static final Logger log = Logger.getLogger(RosterUtils.class);
 
+    @Inject
+    private static SarosNet defaultNetwork;
+
+    /*
+     * HACK this should be initialized in a better way and removed if resolving
+     * nicknames is removed from the User class
+     */
+
+    static {
+        SarosPluginContext.initComponent(new RosterUtils());
+    }
+
     private RosterUtils() {
-        // no instantiation allowed
+        // no public instantiation allowed
     }
 
     protected static class DialogContent {
@@ -120,11 +134,19 @@ public class RosterUtils {
     }
 
     /**
+     * @param sarosNet
+     *            network component that should be used to resolve the nickname
+     *            or <code>null</code> to use the default one
+     * @param jid
+     *            the JID to resolve the nickname for
      * @return The nickname associated with the given JID in the current roster
      *         or null if the current roster is not available or the nickname
      *         has not been set.
      */
     public static String getNickname(SarosNet sarosNet, JID jid) {
+
+        if (sarosNet == null)
+            sarosNet = defaultNetwork;
 
         if (sarosNet == null)
             return null;

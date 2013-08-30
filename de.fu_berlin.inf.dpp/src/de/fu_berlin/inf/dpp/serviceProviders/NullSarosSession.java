@@ -11,7 +11,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.joda.time.DateTime;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
@@ -147,12 +146,6 @@ public class NullSarosSession implements ISarosSession {
 
     @Override
     public ConcurrentDocumentClient getConcurrentDocumentClient() {
-        log.warn("unexpected method call");
-        return null;
-    }
-
-    @Override
-    public Saros getSaros() {
         log.warn("unexpected method call");
         return null;
     }

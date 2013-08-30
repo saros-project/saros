@@ -741,11 +741,6 @@ public final class SarosSession implements ISarosSession {
         return concurrentDocumentServer;
     }
 
-    @Override
-    public Saros getSaros() {
-        return saros;
-    }
-
     /**
      * @JTourBusStop 7, Activity sending, Incoming activities:
      * 

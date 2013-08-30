@@ -29,7 +29,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.joda.time.DateTime;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
@@ -268,15 +267,6 @@ public interface ISarosSession {
      * @return the concurrent document manager
      */
     public ConcurrentDocumentClient getConcurrentDocumentClient();
-
-    /**
-     * The Saros Plugin this SarosSession is running in.
-     * 
-     * @deprecated will be removed, do not use this in new code
-     */
-
-    @Deprecated
-    public Saros getSaros();
 
     /**
      * Returns a snapshot of the currently available (not in use) color IDs.

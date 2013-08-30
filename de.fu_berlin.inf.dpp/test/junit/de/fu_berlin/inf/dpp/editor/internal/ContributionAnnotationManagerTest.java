@@ -19,7 +19,6 @@ import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
@@ -41,9 +40,6 @@ public class ContributionAnnotationManagerTest {
         store.setValue(PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS, true);
 
         sessionMock = EasyMock.createNiceMock(ISarosSession.class);
-        Saros sarosMock = EasyMock.createNiceMock(Saros.class);
-
-        EasyMock.expect(sessionMock.getSaros()).andStubReturn(sarosMock);
 
         PowerMock.mockStaticPartial(User.class, "getHumanReadableName");
 
@@ -51,7 +47,7 @@ public class ContributionAnnotationManagerTest {
             User.getHumanReadableName(EasyMock.anyObject(SarosNet.class),
                 EasyMock.anyObject(JID.class))).andStubReturn("user");
 
-        PowerMock.replay(User.class, sessionMock, sarosMock);
+        PowerMock.replay(User.class, sessionMock);
 
         manager = new ContributionAnnotationManager(sessionMock, store);
 

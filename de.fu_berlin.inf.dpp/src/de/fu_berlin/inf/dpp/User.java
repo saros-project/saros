@@ -213,8 +213,7 @@ public class User {
      */
 
     public String getHumanReadableName() {
-        return User.getHumanReadableName(getSarosSession().getSaros()
-            .getSarosNet(), getJID());
+        return User.getHumanReadableName(null, getJID());
     }
 
     /**
@@ -236,8 +235,7 @@ public class User {
 
     public String getShortHumanReadableName() {
 
-        String nickName = RosterUtils.getNickname(getSarosSession().getSaros()
-            .getSarosNet(), getJID());
+        String nickName = RosterUtils.getNickname(null, getJID());
 
         if (nickName != null && !nickName.equals(getJID().getBase())) {
             return nickName;
