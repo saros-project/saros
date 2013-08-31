@@ -22,7 +22,6 @@ package de.fu_berlin.inf.dpp.project.internal;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -154,22 +153,22 @@ public final class SarosSession implements ISarosSession {
 
     private final ISarosContext sarosContext;
 
-    private ConcurrentDocumentClient concurrentDocumentClient;
+    private final ConcurrentDocumentClient concurrentDocumentClient;
 
-    private ConcurrentDocumentServer concurrentDocumentServer;
+    private final ConcurrentDocumentServer concurrentDocumentServer;
 
-    private ActivityHandler activityHandler;
+    private final ActivityHandler activityHandler;
 
     private final CopyOnWriteArrayList<IActivityProvider> activityProviders = new CopyOnWriteArrayList<IActivityProvider>();
 
     /* Instance fields */
-    private User localUser;
+    private final User localUser;
 
     private final ConcurrentHashMap<JID, User> participants = new ConcurrentHashMap<JID, User>();
 
     private final SharedProjectListenerDispatch listenerDispatch = new SharedProjectListenerDispatch();
 
-    private User host;
+    private final User hostUser;
 
     private final DateTime sessionStart;
 
@@ -180,17 +179,18 @@ public final class SarosSession implements ISarosSession {
     // KARL HELD YOU ARE MY WTF GUY !!!
     private List<IResource> selectedResources = new ArrayList<IResource>();
 
-    private MutablePicoContainer sessionContainer;
+    private final MutablePicoContainer sessionContainer;
 
-    private StopManager stopManager;
+    private final StopManager stopManager;
 
-    private ChangeColorManager changeColorManager;
+    private final ChangeColorManager changeColorManager;
 
-    private PermissionManager permissionManager;
+    private final PermissionManager permissionManager;
 
-    private ActivitySequencer activitySequencer;
+    private final ActivitySequencer activitySequencer;
 
-    private UserInformationHandler userListHandler;
+    private final UserInformationHandler userListHandler;
+
     private boolean started = false;
     private boolean stopped = false;
 
@@ -225,87 +225,27 @@ public final class SarosSession implements ISarosSession {
                 handleFileAndFolderActivities(activity);
             }
         }
-
     };
 
     /**
-     * Common constructor code for host and client side.
+     * Constructor for host.
      */
-    protected SarosSession(DateTime sessionStart, ISarosContext sarosContext,
-        int colorID) {
-
-        sarosContext.initComponent(this);
-
-        this.projectMapper = new SarosProjectMapper(this);
-        this.activityQueuer = new ActivityQueuer();
-        this.sarosContext = sarosContext;
-        this.sessionStart = sessionStart;
-
-        // FIXME that should be passed in !
-        JID localUserJID = sarosNet.getMyJID();
-
-        assert localUserJID != null;
-
-        this.localUser = new User(this, localUserJID, colorID, colorID);
-    }
-
-    /**
-     * Constructor called for SarosSession of the host
-     */
-    public SarosSession(int colorID, DateTime sessionStart,
+    public SarosSession(int localColorID, DateTime sessionStart,
         ISarosContext sarosContext) {
 
-        this(sessionStart, sarosContext, colorID);
-
-        host = localUser;
-
-        participants.put(host.getJID(), host);
-
-        initializeSessionContainer(sarosContext);
+        this(sarosContext, sessionStart, /* unused */null, localColorID, /* unused */
+        -1);
     }
 
     /**
-     * Constructor of client
+     * Constructor for client.
      */
-    public SarosSession(JID hostID, int myColorID, DateTime sessionStart,
+    public SarosSession(JID hostJID, int localColorID, DateTime sessionStart,
         ISarosContext sarosContext, JID inviterID, int inviterColorID) {
 
-        this(sessionStart, sarosContext, myColorID);
+        this(sarosContext, sessionStart, hostJID, localColorID, inviterColorID);
 
-        /*
-         * HACK abuse the fact that non-host inviting is currently disabled and
-         * so the inviterColorID is always the colorID of the host
-         */
-
-        host = new User(this, hostID, inviterColorID, inviterColorID);
-
-        participants.put(hostID, host);
-        participants.put(localUser.getJID(), localUser);
-
-        assert inviterID.equals(hostID) : "non host inviting is disabled";
-        /*
-         * As the host is still a special person, we must find out if we were
-         * invited by the host...
-         */
-        // if (!inviterID.equals(hostID)) {
-        // /*
-        // * ... or another participant whom we have to add to this session
-        // * too!
-        // */
-        // if (freeColors.remove(inviterColorID)) {
-        // log.debug("INVITERS colorID (" + inviterColorID
-        // + ") was removed from the list.");
-        // } else {
-        // log.warn("INVITERS colorID couldn't be removed from the list!");
-        // }
-        //
-        // User inviter = new User(this, inviterID, inviterColorID);
-        // inviter.invitationCompleted();
-        // participants.put(inviterID, inviter);
-        // }
-
-        initializeSessionContainer(sarosContext);
-        activitySequencer.registerUser(host);
+        assert inviterID.equals(hostJID) : "non host inviting is disabled";
     }
 
     @Override
@@ -405,9 +345,6 @@ public final class SarosSession implements ISarosSession {
         return projectMapper.userHasProject(user, project);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void initiatePermissionChange(final User user,
         final Permission newPermission, IProgressMonitor progress)
@@ -421,9 +358,6 @@ public final class SarosSession implements ISarosSession {
             progress, synchronizer);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setPermission(final User user, final Permission permission) {
 
@@ -439,31 +373,16 @@ public final class SarosSession implements ISarosSession {
         listenerDispatch.permissionChanged(user);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.ISharedProject
-     */
     @Override
     public User getHost() {
-        return host;
+        return hostUser;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISarosSession
-     */
     @Override
     public boolean isHost() {
         return localUser.isHost();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.ISharedProject
-     */
     @Override
     public boolean hasWriteAccess() {
         return localUser.hasWriteAccess();
@@ -638,31 +557,16 @@ public final class SarosSession implements ISarosSession {
         }));
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISarosSession
-     */
     @Override
     public void addListener(ISharedProjectListener listener) {
         listenerDispatch.add(listener);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISarosSession
-     */
     @Override
     public void removeListener(ISharedProjectListener listener) {
         listenerDispatch.remove(listener);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISarosSession
-     */
     @Override
     public Set<IProject> getProjects() {
         return projectMapper.getProjects();
@@ -677,6 +581,9 @@ public final class SarosSession implements ISarosSession {
 
         started = true;
         sessionContainer.start();
+
+        for (User user : getRemoteUsers())
+            activitySequencer.registerUser(user);
 
     }
 
@@ -700,13 +607,11 @@ public final class SarosSession implements ISarosSession {
     public User getUser(JID jid) {
 
         if (jid == null)
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("jid is null");
 
-        if (jid.isBareJID()) {
-            throw new IllegalArgumentException(MessageFormat.format(
-                Messages.SarosSession_jids_should_be_resource_qualified,
-                Utils.prefix(jid)));
-        }
+        if (jid.isBareJID())
+            throw new IllegalArgumentException(
+                "JID is not resource qualified: " + jid);
 
         User user = participants.get(jid);
 
@@ -716,16 +621,11 @@ public final class SarosSession implements ISarosSession {
         return user;
     }
 
-    /**
-     * Given a JID (with resource or not), will return the resource qualified
-     * JID associated with this user or null if no user for the given JID exists
-     * in this SarosSession.
-     */
     @Override
     public JID getResourceQualifiedJID(JID jid) {
 
         if (jid == null)
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("jid is null");
 
         User user = participants.get(jid);
 
@@ -1255,7 +1155,32 @@ public final class SarosSession implements ISarosSession {
         sendActivity(localUser, new NOPActivity(localUser, localUser, 0));
     }
 
-    private void initializeSessionContainer(ISarosContext context) {
+    private SarosSession(ISarosContext context, DateTime sessionStart,
+        JID host, int localColorID, int hostColorID) {
+
+        context.initComponent(this);
+
+        this.projectMapper = new SarosProjectMapper(this);
+        this.activityQueuer = new ActivityQueuer();
+        this.sarosContext = context;
+        this.sessionStart = sessionStart;
+
+        // FIXME that should be passed in !
+        JID localUserJID = sarosNet.getMyJID();
+
+        assert localUserJID != null;
+
+        localUser = new User(this, localUserJID, localColorID, localColorID);
+
+        if (host == null) {
+            hostUser = localUser;
+            participants.put(hostUser.getJID(), hostUser);
+        } else {
+            hostUser = new User(this, host, hostColorID, hostColorID);
+            participants.put(hostUser.getJID(), hostUser);
+            participants.put(localUser.getJID(), localUser);
+        }
+
         sessionContainer = context.createSimpleChildContainer();
         sessionContainer.addComponent(ISarosSession.class, this);
         sessionContainer.addComponent(StopManager.class);
@@ -1300,7 +1225,8 @@ public final class SarosSession implements ISarosSession {
         sessionContainer.addComponent(ConsistencyWatchdogHandler.class);
         // transforming - thread access
         sessionContainer.addComponent(ActivityHandler.class);
-        sessionContainer.addComponent(activityCallback);
+        sessionContainer.addComponent(IActivityHandlerCallback.class,
+            activityCallback);
         sessionContainer.addComponent(UserInformationHandler.class);
 
         // Force the creation of the above components.

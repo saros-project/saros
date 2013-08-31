@@ -213,13 +213,12 @@ public interface ISarosSession {
     public User getUser(JID jid);
 
     /**
-     * <p>
-     * Returns the resource qualified JID associated with a user of the session.
-     * </p>
-     * 
-     * E.g:
+     * Given a JID (resource qualified or not), will return the resource
+     * qualified JID associated with this user or <code>null</code> if no user
+     * for the given JID exists in the session.
      * 
      * <pre>
+     * E.g:
      * <code>
      * JID rqJID = session.getResourceQualifiedJID(new JID("alice@foo.com");
      * System.out.println(rqJID);
