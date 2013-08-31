@@ -112,13 +112,34 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             getRemoteFileList(monitor);
             monitor.subTask("");
 
+            /*
+             * FIXME looking "carefully" at the code you can easily see the
+             * issue mentioned in
+             * http://www.inf.fu-berlin.de/inst/ag-se/theses/Starroske13
+             * -saros-rca.pdf There is still a time frame where activities can
+             * be applied twice.
+             */
+
             // inform all listeners that the peer has started queuing and can
             // therefore process IResourceActivities now
             sarosSession.userStartedQueuing(sarosSession.getUser(peer));
 
+            /*
+             * FIXME why do we unlock the editors here when we are going to
+             * block ourself in the next call ?!
+             */
             editorManager.setAllLocalOpenedEditorsLocked(false);
-            zipArchives = createProjectArchives(projectFilesToSend, monitor);
-            monitor.subTask("");
+
+            List<StartHandle> stoppedUsers = null;
+            try {
+                stoppedUsers = stopUsers(monitor);
+                monitor.subTask("");
+                zipArchives = createProjectArchives(projectFilesToSend, monitor);
+                monitor.subTask("");
+            } finally {
+                if (stoppedUsers != null)
+                    startUsers(stoppedUsers);
+            }
 
             checkCancellation(CancelOption.NOTIFY_PEER);
 
@@ -257,17 +278,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             sessionManager.stopSarosSession();
     }
 
-    /**
-     * 
-     * @param projectFilesToSend
-     *            projectID => List of {@link IPath files} that will be sent to
-     *            peer
-     * @return List of project archives
-     */
-    private List<File> createProjectArchives(
-        MappedList<String, IPath> projectFilesToSend, IProgressMonitor monitor)
-        throws IOException, SarosCancellationException {
-
+    private List<StartHandle> stopUsers(IProgressMonitor monitor)
+        throws SarosCancellationException {
         Collection<User> usersToStop;
 
         /*
@@ -308,6 +320,27 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         }
 
         monitor.done();
+        return startHandles;
+    }
+
+    private void startUsers(List<StartHandle> startHandles) {
+        for (StartHandle startHandle : startHandles) {
+            log.debug(this + " : restarting user "
+                + Utils.prefix(startHandle.getUser().getJID()));
+            startHandle.start();
+        }
+    }
+
+    /**
+     * 
+     * @param projectFilesToSend
+     *            projectID => List of {@link IPath files} that will be sent to
+     *            peer
+     * @return List of project archives
+     */
+    private List<File> createProjectArchives(
+        MappedList<String, IPath> projectFilesToSend, IProgressMonitor monitor)
+        throws IOException, SarosCancellationException {
 
         log.debug(this + " : creating archive(s)");
 
@@ -324,41 +357,31 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
          * then closes the editor without saving it.
          */
 
-        try {
+        // FIXME this throws a NPE if the session has already been stopped
+        for (SPath path : editorManager.getOpenEditorsOfAllParticipants())
+            editorManager.saveText(path);
 
-            // FIXME this throws a NPE if the session has already been stopped
-            for (SPath path : editorManager.getOpenEditorsOfAllParticipants())
-                editorManager.saveText(path);
+        checkCancellation(CancelOption.NOTIFY_PEER);
 
-            checkCancellation(CancelOption.NOTIFY_PEER);
+        List<File> archivesToSend = new LinkedList<File>();
 
-            List<File> archivesToSend = new LinkedList<File>();
+        for (Map.Entry<String, List<IPath>> entry : projectFilesToSend
+            .entrySet()) {
 
-            for (Map.Entry<String, List<IPath>> entry : projectFilesToSend
-                .entrySet()) {
+            String projectID = entry.getKey();
+            List<IPath> filesToCompress = entry.getValue();
 
-                String projectID = entry.getKey();
-                List<IPath> filesToCompress = entry.getValue();
+            File projectArchive = createProjectArchive(subMonitor.newChild(1),
+                filesToCompress, projectID);
 
-                File projectArchive = createProjectArchive(
-                    subMonitor.newChild(1), filesToCompress, projectID);
+            if (projectArchive != null)
+                archivesToSend.add(projectArchive);
 
-                if (projectArchive != null)
-                    archivesToSend.add(projectArchive);
-
-            }
-
-            subMonitor.done();
-
-            return archivesToSend;
-
-        } finally {
-            for (StartHandle startHandle : startHandles) {
-                log.debug(this + " : restarting users "
-                    + Utils.prefix(startHandle.getUser().getJID()));
-                startHandle.start();
-            }
         }
+
+        subMonitor.done();
+
+        return archivesToSend;
     }
 
     private File createProjectArchive(IProgressMonitor monitor,
