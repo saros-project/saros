@@ -24,7 +24,7 @@ import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
+import de.fu_berlin.inf.dpp.invitation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.net.internal.extensions.SarosPacketExtension;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
@@ -102,7 +102,7 @@ public interface ITransmitter {
 
     /**
      * Sends a leave message to the participants of given Saros session. See
-     * {@link InvitationProcess} for more information when this is supposed be
+     * {@link SessionNegotiation} for more information when this is supposed be
      * sent.
      * 
      * @param sarosSession

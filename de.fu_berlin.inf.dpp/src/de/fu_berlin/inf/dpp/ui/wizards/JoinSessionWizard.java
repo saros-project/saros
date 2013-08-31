@@ -35,7 +35,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
-import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
+import de.fu_berlin.inf.dpp.invitation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -70,7 +70,7 @@ public class JoinSessionWizard extends Wizard {
 
     private ShowDescriptionPage descriptionPage;
 
-    private InvitationProcess.Status invitationStatus;
+    private SessionNegotiation.Status invitationStatus;
 
     @Inject
     private VersionManager manager;

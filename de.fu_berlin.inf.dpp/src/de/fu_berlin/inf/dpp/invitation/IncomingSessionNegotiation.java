@@ -29,7 +29,7 @@ import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 /*
  * IMPORTANT: All messages in the cancellation exception are SHOWN to the end user !
  */
-public class IncomingSessionNegotiation extends InvitationProcess {
+public class IncomingSessionNegotiation extends SessionNegotiation {
 
     private static Logger log = Logger
         .getLogger(IncomingSessionNegotiation.class);

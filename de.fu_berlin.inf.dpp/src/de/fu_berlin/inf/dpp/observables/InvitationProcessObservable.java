@@ -10,7 +10,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
+import de.fu_berlin.inf.dpp.invitation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
@@ -25,7 +25,7 @@ public class InvitationProcessObservable {
     private static Logger log = Logger
         .getLogger(InvitationProcessObservable.class);
 
-    private Map<JID, List<InvitationProcess>> processes = new HashMap<JID, List<InvitationProcess>>();
+    private Map<JID, List<SessionNegotiation>> processes = new HashMap<JID, List<SessionNegotiation>>();
 
     /**
      * Returns an invitation process from the currently running invitation
@@ -36,17 +36,17 @@ public class InvitationProcessObservable {
      *            process
      * @param id
      *            the ID of the invitation process
-     * @return an {@link InvitationProcess} object or <code>null</code> if no
+     * @return an {@link SessionNegotiation} object or <code>null</code> if no
      *         such process exists
      */
-    public synchronized InvitationProcess getInvitationProcess(JID jid,
+    public synchronized SessionNegotiation getInvitationProcess(JID jid,
         String id) {
-        List<InvitationProcess> currentProcesses = processes.get(jid);
+        List<SessionNegotiation> currentProcesses = processes.get(jid);
 
         if (currentProcesses == null || currentProcesses.isEmpty())
             return null;
 
-        for (InvitationProcess process : currentProcesses)
+        for (SessionNegotiation process : currentProcesses)
             if (process.getID().equals(id))
                 return process;
 
@@ -59,12 +59,12 @@ public class InvitationProcessObservable {
      * @param process
      *            the process to add
      */
-    public synchronized void addInvitationProcess(InvitationProcess process) {
-        List<InvitationProcess> currentProcesses = processes.get(process
+    public synchronized void addInvitationProcess(SessionNegotiation process) {
+        List<SessionNegotiation> currentProcesses = processes.get(process
             .getPeer());
 
         if (currentProcesses == null) {
-            currentProcesses = new ArrayList<InvitationProcess>();
+            currentProcesses = new ArrayList<SessionNegotiation>();
             processes.put(process.getPeer(), currentProcesses);
         }
 
@@ -72,7 +72,7 @@ public class InvitationProcessObservable {
             log.warn("there is already a running invitation for contact: "
                 + process.getPeer());
 
-        for (InvitationProcess currentProcess : currentProcesses) {
+        for (SessionNegotiation currentProcess : currentProcesses) {
             if (currentProcess.getID().equals(process.getID())) {
                 log.warn("an invitation with ID " + process.getID()
                     + " is already registered");
@@ -90,17 +90,17 @@ public class InvitationProcessObservable {
      *            the process to remove
      */
 
-    public synchronized void removeInvitationProcess(InvitationProcess process) {
-        List<InvitationProcess> currentProcesses = processes.get(process
+    public synchronized void removeInvitationProcess(SessionNegotiation process) {
+        List<SessionNegotiation> currentProcesses = processes.get(process
             .getPeer());
 
         if (currentProcesses == null)
             currentProcesses = Collections.emptyList();
 
-        for (Iterator<InvitationProcess> it = currentProcesses.iterator(); it
+        for (Iterator<SessionNegotiation> it = currentProcesses.iterator(); it
             .hasNext();) {
 
-            InvitationProcess currentProcess = it.next();
+            SessionNegotiation currentProcess = it.next();
             if (currentProcess.getID().equals(process.getID())) {
                 it.remove();
                 return;
@@ -118,10 +118,10 @@ public class InvitationProcessObservable {
      * @return a list of the currently running invitation processes which may be
      *         empty
      */
-    public synchronized List<InvitationProcess> getProcesses() {
-        List<InvitationProcess> runningProcesses = new ArrayList<InvitationProcess>();
+    public synchronized List<SessionNegotiation> getProcesses() {
+        List<SessionNegotiation> runningProcesses = new ArrayList<SessionNegotiation>();
 
-        for (List<InvitationProcess> processes : this.processes.values())
+        for (List<SessionNegotiation> processes : this.processes.values())
             runningProcesses.addAll(processes);
 
         return runningProcesses;

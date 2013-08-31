@@ -43,22 +43,23 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * @author rdjemili
  * @author sotitas
  */
-public abstract class InvitationProcess extends CancelableProcess {
+public abstract class SessionNegotiation extends CancelableProcess {
 
-    private static final Logger log = Logger.getLogger(InvitationProcess.class);
+    private static final Logger log = Logger
+        .getLogger(SessionNegotiation.class);
 
     /**
      * Timeout for all packet exchanges during the session negotiation
      */
     protected static final long PACKET_TIMEOUT = Long.getLong(
-        "de.fu_berlin.inf.dpp.invitation.session.PACKET_TIMEOUT", 30000L);
+        "de.fu_berlin.inf.dpp.negotiation.session.PACKET_TIMEOUT", 30000L);
 
     /**
      * Timeout on how long the session negotiation should wait for the remote
      * user to accept the invitation
      */
     protected static final long INVITATION_ACCEPTED_TIMEOUT = Long.getLong(
-        "de.fu_berlin.inf.dpp.invitation.session.INVITATION_ACCEPTED_TIMEOUT",
+        "de.fu_berlin.inf.dpp.negotiation.session.INVITATION_ACCEPTED_TIMEOUT",
         600000L);
 
     @Inject
@@ -79,8 +80,8 @@ public abstract class InvitationProcess extends CancelableProcess {
 
     protected final String peerNickname;
 
-    public InvitationProcess(String invitationID, JID peer, String description,
-        ISarosContext sarosContext) {
+    public SessionNegotiation(String invitationID, JID peer,
+        String description, ISarosContext sarosContext) {
         this.invitationID = invitationID;
         this.peer = peer;
         this.description = description;

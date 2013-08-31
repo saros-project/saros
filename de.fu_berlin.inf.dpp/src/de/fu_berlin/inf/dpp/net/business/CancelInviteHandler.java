@@ -8,7 +8,7 @@ import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
+import de.fu_berlin.inf.dpp.invitation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
@@ -47,7 +47,7 @@ public class CancelInviteHandler {
     public void invitationCanceled(JID sender, String invitationID,
         String errorMsg) {
 
-        InvitationProcess invitationProcess = invitationProcesses
+        SessionNegotiation invitationProcess = invitationProcesses
             .getInvitationProcess(sender, invitationID);
 
         if (invitationProcess == null) {

@@ -41,13 +41,13 @@ import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 /*
  * IMPORTANT: All messages in the cancellation exception are SHOWN to the end user !
  */
-public final class OutgoingSessionNegotiation extends InvitationProcess {
+public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
     private static final Logger log = Logger
         .getLogger(OutgoingSessionNegotiation.class);
 
     private static final boolean IGNORE_VERSION_COMPATIBILITY = Boolean
-        .getBoolean("de.fu_berlin.inf.dpp.invitation.session.IGNORE_VERSION_COMPATIBILITY");
+        .getBoolean("de.fu_berlin.inf.dpp.negotiation.session.IGNORE_VERSION_COMPATIBILITY");
 
     private static final Random INVITATION_ID_GENERATOR = new Random();
 
@@ -230,7 +230,7 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
     /**
      * Performs a discovery request on the remote side and checks for Saros
      * support. When this method returns, the remote JID (see
-     * {@link InvitationProcess#peer}) has been properly updated to a full
+     * {@link SessionNegotiation#peer}) has been properly updated to a full
      * resource qualified JID.
      */
     private void checkAvailability(IProgressMonitor monitor)

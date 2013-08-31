@@ -46,7 +46,7 @@ import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.invitation.IncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
-import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
+import de.fu_berlin.inf.dpp.invitation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.invitation.OutgoingProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.OutgoingSessionNegotiation;
 import de.fu_berlin.inf.dpp.invitation.ProcessListener;
@@ -114,7 +114,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     private final ProcessListener processListener = new ProcessListener() {
         @Override
-        public void processTerminated(InvitationProcess process) {
+        public void processTerminated(SessionNegotiation process) {
             currentSessionNegotiations.removeInvitationProcess(process);
         }
 
@@ -717,7 +717,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     private boolean terminateNegotiationProcesses() {
 
-        for (InvitationProcess process : currentSessionNegotiations
+        for (SessionNegotiation process : currentSessionNegotiations
             .getProcesses()) {
             process.localCancel(null, CancelOption.NOTIFY_PEER);
         }

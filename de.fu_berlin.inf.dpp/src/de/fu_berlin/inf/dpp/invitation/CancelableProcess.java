@@ -305,8 +305,8 @@ abstract class CancelableProcess {
              * FIXME NOT so nice hack, but otherwise this had to be done in the
              * listener if we only use processTerminated(CancelableProcess)
              */
-            if (this instanceof InvitationProcess)
-                listener.processTerminated((InvitationProcess) this);
+            if (this instanceof SessionNegotiation)
+                listener.processTerminated((SessionNegotiation) this);
             else if (this instanceof ProjectNegotiation)
                 listener.processTerminated((ProjectNegotiation) this);
         }
