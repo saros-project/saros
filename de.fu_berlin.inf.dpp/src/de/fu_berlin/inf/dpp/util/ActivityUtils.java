@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -44,7 +45,7 @@ public class ActivityUtils {
      * activityDataObject.
      */
     public static List<IActivityDataObject> optimize(
-        List<IActivityDataObject> toOptimize) {
+        Collection<IActivityDataObject> toOptimize) {
 
         List<IActivityDataObject> result = new ArrayList<IActivityDataObject>(
             toOptimize.size());

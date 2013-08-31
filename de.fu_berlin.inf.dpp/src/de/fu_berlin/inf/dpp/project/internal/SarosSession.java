@@ -305,6 +305,7 @@ public final class SarosSession implements ISarosSession {
         // }
 
         initializeSessionContainer(sarosContext);
+        activitySequencer.registerUser(host);
     }
 
     @Override
@@ -508,14 +509,19 @@ public final class SarosSession implements ISarosSession {
 
         if (isHost()) {
 
+            activitySequencer.registerUser(user);
+
             List<User> timedOutUsers = userListHandler.synchronizeUserList(
                 getUsers(), getRemoteUsers());
 
-            if (!timedOutUsers.isEmpty())
+            if (!timedOutUsers.isEmpty()) {
+                activitySequencer.unregisterUser(user);
+                participants.remove(jid);
                 // FIXME do not throw a runtime exception here
                 throw new RuntimeException(
                     "could not synchronize user list, following users did not respond: "
                         + StringUtils.join(timedOutUsers, ", "));
+            }
         }
 
         synchronizer.syncExec(Utils.wrapSafe(log, new Runnable() {
@@ -575,7 +581,7 @@ public final class SarosSession implements ISarosSession {
     }
 
     @Override
-    public void removeUser(User user) {
+    public void removeUser(final User user) {
         JID jid = user.getJID();
         if (participants.remove(jid) == null) {
             log.warn("tried to remove user who was not in participants:"
@@ -583,12 +589,18 @@ public final class SarosSession implements ISarosSession {
             return;
         }
 
+        activitySequencer.unregisterUser(user);
+
         projectMapper.userLeft(user);
 
-        activitySequencer.userLeft(user);
+        synchronizer.syncExec(Utils.wrapSafe(log, new Runnable() {
+            @Override
+            public void run() {
+                listenerDispatch.userLeft(user);
+            }
+        }));
 
         // TODO what is to do here if no user with write access exists anymore?
-        listenerDispatch.userLeft(user);
 
         // Disconnect bytestream connection when user leaves session to
         // prevent idling connection when not needed anymore.

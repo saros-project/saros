@@ -29,8 +29,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.PacketListener;
@@ -50,7 +48,6 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.ActivityUtils;
-import de.fu_berlin.inf.dpp.util.AutoHashMap;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -68,38 +65,22 @@ public class ActivitySequencer implements Startable {
         .getName());
 
     /**
-     * Sequence numbers for outgoing and incoming activityDataObjects start with
-     * this value.
+     * Sequence numbers for outgoing and incoming activity data objects start
+     * with this value.
      */
     private static final int FIRST_SEQUENCE_NUMBER = 0;
 
-    private static class ActivityBuffer {
-        int nextSequenceNumber;
-        private final Deque<TimedActivityDataObject> queuedActivities = new LinkedList<TimedActivityDataObject>();
+    private static class ActivityBuffer<T> {
+        /**
+         * Helper flag to signal that there pending data is still send even if
+         * the buffer is already empty.
+         */
+        private boolean isInTransmission;
+        private int nextSequenceNumber;
+        private final Deque<T> activities = new LinkedList<T>();
 
         public ActivityBuffer(int firstSequenceNumber) {
             nextSequenceNumber = firstSequenceNumber;
-        }
-    }
-
-    /**
-     * Holder class containing the transformed {@linkplain IActivityDataObject
-     * activity} and the recipients it should be send to.
-     */
-    private static class DataObjectQueueItem {
-
-        public final List<User> recipients;
-        public final IActivityDataObject activityDataObject;
-
-        public DataObjectQueueItem(List<User> recipients,
-            IActivityDataObject activityDataObject) {
-            this.recipients = recipients;
-            this.activityDataObject = activityDataObject;
-        }
-
-        public DataObjectQueueItem(User host,
-            IActivityDataObject transformedActivity) {
-            this(Collections.singletonList(host), transformedActivity);
         }
     }
 
@@ -111,74 +92,81 @@ public class ActivitySequencer implements Startable {
         }
     };
 
-    private final Runnable outgoingActivitiesQueueFlushTask = new Runnable() {
+    private final Runnable activitySender = new Runnable() {
 
         @Override
         public void run() {
-            try {
-                boolean abort = false;
-                while (!abort)
-                    abort = flush();
-            } catch (InterruptedException e) {
-                LOG.error("Flush got interrupted.", e);
-            }
-        }
 
-        private boolean flush() throws InterruptedException {
+            Map<JID, List<TimedActivityDataObject>> activitiesToSend = new HashMap<JID, List<TimedActivityDataObject>>();
 
-            List<DataObjectQueueItem> pendingActivities = new ArrayList<DataObjectQueueItem>(
-                outgoingActivitiesQueue.size());
+            send: while (true) {
+                if (stopSending)
+                    return;
 
-            pendingActivities.add(outgoingActivitiesQueue.take());
+                activitiesToSend.clear();
 
-            // If there was more than one ADO waiting, get the rest now.
-            outgoingActivitiesQueue.drainTo(pendingActivities);
+                synchronized (bufferedOutgoingActivities) {
+                    for (Entry<JID, ActivityBuffer<IActivityDataObject>> entry : bufferedOutgoingActivities
+                        .entrySet()) {
 
-            boolean abort = false;
+                        ActivityBuffer<IActivityDataObject> buffer = entry
+                            .getValue();
 
-            int idx = pendingActivities.indexOf(POISON);
+                        if (buffer == null || buffer.activities.isEmpty())
+                            continue;
 
-            if (idx != -1) {
-                abort = true;
+                        List<IActivityDataObject> optimizedActivities = ActivityUtils
+                            .optimize(buffer.activities);
 
-                /*
-                 * remove the poison pill and all activities after the pill
-                 */
-                while (pendingActivities.size() != idx)
-                    pendingActivities.remove(idx);
-            }
+                        buffer.activities.clear();
+                        buffer.isInTransmission = true;
 
-            Map<User, List<IActivityDataObject>> toSend = AutoHashMap
-                .getListHashMap();
+                        int currentSequenceNumber = buffer.nextSequenceNumber;
+                        buffer.nextSequenceNumber += optimizedActivities.size();
+                        activitiesToSend.put(
+                            entry.getKey(),
+                            createTimedActivities(optimizedActivities,
+                                currentSequenceNumber));
+                    }
 
-            for (DataObjectQueueItem item : pendingActivities) {
-                for (User recipient : item.recipients) {
-                    toSend.get(recipient).add(item.activityDataObject);
+                    if (activitiesToSend.isEmpty()) {
+                        try {
+                            bufferedOutgoingActivities.wait();
+                            continue send;
+                        } catch (InterruptedException e) {
+                            return;
+                        }
+                    }
+                }
+
+                for (Entry<JID, List<TimedActivityDataObject>> e : activitiesToSend
+                    .entrySet()) {
+                    sendTimedActivities(e.getKey(), e.getValue());
+                }
+
+                synchronized (bufferedOutgoingActivities) {
+                    for (Entry<JID, ActivityBuffer<IActivityDataObject>> entry : bufferedOutgoingActivities
+                        .entrySet()) {
+
+                        ActivityBuffer<IActivityDataObject> buffer = entry
+                            .getValue();
+
+                        if (buffer == null)
+                            continue;
+
+                        buffer.isInTransmission = false;
+                    }
+
+                    // notify waiting threads in flush method that we are done
+                    bufferedOutgoingActivities.notifyAll();
                 }
             }
-
-            for (Entry<User, List<IActivityDataObject>> e : toSend.entrySet()) {
-                sendTimedActivities(
-                    e.getKey(),
-                    createTimedActivities(e.getKey(),
-                        ActivityUtils.optimize(e.getValue())));
-            }
-
-            return abort;
         }
     };
 
-    /** Special queue item that terminates the processing */
-    private static final DataObjectQueueItem POISON = new DataObjectQueueItem(
-        (User) null, null);
-
-    /**
-     * Queue (buffer) for outgoing transformed {@linkplain IActivityDataObject
-     * activities} that needs to be send to remote session users.
-     */
-    private final BlockingQueue<DataObjectQueueItem> outgoingActivitiesQueue = new LinkedBlockingQueue<DataObjectQueueItem>();
-
     private boolean started = false;
+
+    private volatile boolean stopSending = false;
 
     private String currentSessionID;
 
@@ -196,12 +184,9 @@ public class ActivitySequencer implements Startable {
 
     private final DispatchThreadContext dispatchThread;
 
-    /**
-     * Next sequence numbers for outgoing activities
-     */
-    private final Map<JID, Integer> nextOutgoingSequenceNumbers;
+    private final Map<JID, ActivityBuffer<TimedActivityDataObject>> bufferedIncomingActivities;
 
-    private final Map<JID, ActivityBuffer> bufferedIncomingActivities;
+    private final Map<JID, ActivityBuffer<IActivityDataObject>> bufferedOutgoingActivities;
 
     public ActivitySequencer(final ISarosSession sarosSession,
         final ITransmitter transmitter, final IReceiver receiver,
@@ -216,15 +201,8 @@ public class ActivitySequencer implements Startable {
 
         this.localJID = sarosSession.getLocalUser().getJID();
 
-        this.nextOutgoingSequenceNumbers = new HashMap<JID, Integer>();
-        this.bufferedIncomingActivities = new HashMap<JID, ActivityBuffer>();
-    }
-
-    /**
-     * Used by the unit test
-     */
-    public boolean isStarted() {
-        return started;
+        this.bufferedIncomingActivities = new HashMap<JID, ActivityBuffer<TimedActivityDataObject>>();
+        this.bufferedOutgoingActivities = new HashMap<JID, ActivityBuffer<IActivityDataObject>>();
     }
 
     /**
@@ -240,7 +218,7 @@ public class ActivitySequencer implements Startable {
     public void start() {
 
         if (started)
-            throw new IllegalStateException();
+            throw new IllegalStateException("sequencer is already started");
 
         currentSessionID = sessionIDObservable.getValue();
         // FIXME: sessionID filter
@@ -250,7 +228,7 @@ public class ActivitySequencer implements Startable {
         started = true;
 
         activitySendThread = Utils.runSafeAsync("ActivitySender", LOG,
-            outgoingActivitiesQueueFlushTask);
+            activitySender);
     }
 
     /**
@@ -265,17 +243,17 @@ public class ActivitySequencer implements Startable {
     public void stop() {
 
         if (!started)
-            throw new IllegalStateException();
+            throw new IllegalStateException("sequencer is not started");
 
         receiver.removePacketListener(activitiesPacketListener);
 
-        /*
-         * Try to poison the flush task using the "Poison Pill" as known from
-         * the Java Concurrency in Practice book.
-         */
         while (true) {
+            stopSending = true;
+
             try {
-                outgoingActivitiesQueue.put(POISON);
+                synchronized (bufferedOutgoingActivities) {
+                    bufferedOutgoingActivities.notifyAll();
+                }
                 activitySendThread.join();
                 break;
             } catch (InterruptedException e) {
@@ -283,6 +261,16 @@ public class ActivitySequencer implements Startable {
             }
         }
 
+        synchronized (bufferedOutgoingActivities) {
+            bufferedOutgoingActivities.clear();
+            bufferedOutgoingActivities.notifyAll();
+        }
+
+        synchronized (bufferedIncomingActivities) {
+            bufferedIncomingActivities.clear();
+        }
+
+        stopSending = false;
         activitySendThread = null;
         started = false;
     }
@@ -300,21 +288,18 @@ public class ActivitySequencer implements Startable {
         JID sender = activity.getSender();
 
         synchronized (this) {
-            ActivityBuffer buffer = bufferedIncomingActivities.get(sender);
+            ActivityBuffer<TimedActivityDataObject> buffer = bufferedIncomingActivities
+                .get(sender);
 
             if (buffer == null) {
-                buffer = new ActivityBuffer(FIRST_SEQUENCE_NUMBER);
-
-                bufferedIncomingActivities.put(sender, buffer);
-            }
-
-            buffer.queuedActivities.add(activity);
-
-            if (!started) {
-                LOG.debug("received activity but ActivitySequencer has not yet been started: "
+                LOG.warn("dropping received activity from "
+                    + sender
+                    + " because it is currently not registers, dropped activity: "
                     + activity);
                 return;
             }
+
+            buffer.activities.add(activity);
 
             /*
              * it is very VERY uncommon to receive an activity with a sequence
@@ -326,7 +311,7 @@ public class ActivitySequencer implements Startable {
 
                 activity = null;
 
-                for (Iterator<TimedActivityDataObject> it = buffer.queuedActivities
+                for (Iterator<TimedActivityDataObject> it = buffer.activities
                     .iterator(); it.hasNext();) {
 
                     activity = it.next();
@@ -362,15 +347,11 @@ public class ActivitySequencer implements Startable {
     public void sendActivity(List<User> recipients,
         final IActivityDataObject activity) {
 
-        /*
-         * Short cut all messages directed at local user
-         */
-
-        ArrayList<User> toSendViaNetwork = new ArrayList<User>();
+        ArrayList<User> remoteRecipients = new ArrayList<User>();
         for (User user : recipients) {
 
             if (!user.isLocal()) {
-                toSendViaNetwork.add(user);
+                remoteRecipients.add(user);
                 continue;
             }
 
@@ -385,90 +366,125 @@ public class ActivitySequencer implements Startable {
             });
         }
 
-        if (toSendViaNetwork.isEmpty())
+        if (remoteRecipients.isEmpty())
             return;
 
-        // ActivitySender thread is flushing this queue
-        outgoingActivitiesQueue.add(new DataObjectQueueItem(toSendViaNetwork,
-            activity));
+        synchronized (bufferedOutgoingActivities) {
+            for (User recipient : remoteRecipients) {
+                ActivityBuffer<IActivityDataObject> buffer = bufferedOutgoingActivities
+                    .get(recipient.getJID());
+
+                if (buffer == null) {
+                    LOG.warn("cannot send activity to "
+                        + recipient
+                        + " because it is currently not registers, dropped activity: "
+                        + activity);
+                    continue;
+                }
+                buffer.activities.add(activity);
+            }
+
+            // ActivitySender thread is flushing the buffers
+            bufferedOutgoingActivities.notifyAll();
+        }
     }
 
     /**
-     * Removes the queued activities for the given user.
+     * Registers a user with the sequencer allowing the sending and receiving to
+     * and from this user. The local user of a session does not need to be
+     * registered as it is always allowed to send activities to the local user
+     * itself.
      * 
      * @param user
-     *            the user that left
      */
-    public synchronized void userLeft(User user) {
+    public void registerUser(User user) {
+        synchronized (bufferedOutgoingActivities) {
+            if (bufferedOutgoingActivities.get(user.getJID()) == null)
+                bufferedOutgoingActivities.put(user.getJID(),
+                    new ActivityBuffer<IActivityDataObject>(
+                        FIRST_SEQUENCE_NUMBER));
+        }
+
+        synchronized (bufferedIncomingActivities) {
+            if (bufferedIncomingActivities.get(user.getJID()) == null)
+                bufferedIncomingActivities.put(user.getJID(),
+                    new ActivityBuffer<TimedActivityDataObject>(
+                        FIRST_SEQUENCE_NUMBER));
+        }
+    }
+
+    /**
+     * Unregisters a user from the sequencer disallowing the sending and
+     * receiving to and from this user.
+     * 
+     * @param user
+     */
+    public void unregisterUser(User user) {
         /*
          * FIXME This stuff is to lazy if called outside the UI-Thread as it is
          * possible that activities may be still send or received. FIX: Ensure
          * proper synchronization and discard incoming or outgoing activities if
          * the user is not present.
          */
-        nextOutgoingSequenceNumbers.remove(user.getJID());
-        bufferedIncomingActivities.remove(user.getJID());
+
+        synchronized (bufferedOutgoingActivities) {
+            bufferedOutgoingActivities.put(user.getJID(), null);
+            bufferedOutgoingActivities.notifyAll();
+        }
+
+        synchronized (bufferedIncomingActivities) {
+            bufferedIncomingActivities.put(user.getJID(), null);
+        }
     }
 
-    private List<TimedActivityDataObject> createTimedActivities(User recipient,
-        List<IActivityDataObject> activityDataObjects) {
+    /**
+     * Waits until all buffered activities for the specific user are sent.
+     * Calling {@link #sendActivity} at the same time may or may not ignore
+     * those new activities.
+     * 
+     * @param user
+     */
+    public void flush(User user) {
+
+        synchronized (bufferedOutgoingActivities) {
+            while (true) {
+                ActivityBuffer<IActivityDataObject> buffer = bufferedOutgoingActivities
+                    .get(user.getJID());
+
+                if (buffer == null
+                    || (buffer.activities.size() == 0 && !buffer.isInTransmission))
+                    break;
+
+                try {
+                    bufferedOutgoingActivities.wait();
+                } catch (InterruptedException e) {
+                    return;
+                }
+            }
+        }
+    }
+
+    private List<TimedActivityDataObject> createTimedActivities(
+        List<IActivityDataObject> activityDataObjects, int startSequenceNumber) {
 
         assert !activityDataObjects.contains(null) : "activity must not be null";
 
-        JID recipientJID = recipient.getJID();
         List<TimedActivityDataObject> timedActivities = new ArrayList<TimedActivityDataObject>(
             activityDataObjects.size());
 
         for (IActivityDataObject ado : activityDataObjects) {
             timedActivities.add(new TimedActivityDataObject(ado, localJID,
-                getNextSequenceNumber(recipientJID)));
+                startSequenceNumber++));
         }
 
         return timedActivities;
     }
 
-    /**
-     * Retrieves the next sequence number for an outgoing activity data object.<br>
-     * <br>
-     * Each call increments the return value for the next call.<br>
-     * <br>
-     * Example:
-     * 
-     * <pre>
-     * getNextSequenceNumber(jidA); // returns FIRST_SEQUENCE_NUMBER
-     * getNextSequenceNumber(jidA); // returns FIRST_SEQUENCE_NUMBER + 1
-     * getNextSequenceNumber(jidB); // returns FIRST_SEQUENCE_NUMBER
-     * getNextSequenceNumber(jidA); // returns FIRST_SEQUENCE_NUMBER + 2
-     * </pre>
-     * 
-     * @param recipient
-     *            The receiver of the activity data object
-     * @return
-     */
-    private synchronized Integer getNextSequenceNumber(JID recipient) {
-        Integer nr = nextOutgoingSequenceNumbers.get(recipient);
-        if (nr == null) {
-            nr = FIRST_SEQUENCE_NUMBER;
-        }
-        nextOutgoingSequenceNumbers.put(recipient, nr + 1);
-        return nr;
-    }
-
-    private void sendTimedActivities(User user,
+    private void sendTimedActivities(JID recipient,
         List<TimedActivityDataObject> timedActivities) {
-
-        assert !user.isLocal() : "recipient must not be the local user";
-
-        // FIXME SarosSession must handle this !
-        if (!user.isInSarosSession()) {
-            LOG.warn("activities for peer not in session are dropped.");
-            return;
-        }
 
         if (timedActivities.size() == 0)
             return;
-
-        JID recipient = user.getJID();
 
         PacketExtension timedActivitiesPacket = ActivitiesExtension.PROVIDER
             .create(currentSessionID, timedActivities);
@@ -485,6 +501,10 @@ public class ActivitySequencer implements Startable {
         try {
             transmitter.sendToSessionUser(recipient, timedActivitiesPacket);
         } catch (IOException e) {
+            /*
+             * FIMXE kick the user out of session (if host) or just terminate
+             * the session(client)
+             */
             LOG.error("failed to sent timed activities: " + timedActivities, e);
         }
     }
@@ -508,8 +528,7 @@ public class ActivitySequencer implements Startable {
          * FIXME the session.getUser() should not be handled here but in the
          * SarosSession class
          */
-        if (!currentSessionID.equals(payload.getSessionID())
-            || sarosSession.getUser(from) == null) {
+        if (!currentSessionID.equals(payload.getSessionID())) {
             LOG.warn("received timed activities from user " + from
                 + " who is not part of the current session");
             return;
