@@ -77,17 +77,13 @@ public class UserInformationHandler implements Startable {
     @Override
     public void start() {
         currentSessionID = sessionID.getValue();
-        /*
-         * FIXME: add the session ID to the filter so we do not need to handle
-         * it in handeUserListUpdate Should be done when there are major changes
-         * made to the network layer as this change would cause an
-         * incompatibility with older versions.
-         */
+
         receiver.addPacketListener(userListListener,
-            UserListExtension.PROVIDER.getPacketFilter());
+            UserListExtension.PROVIDER.getPacketFilter(currentSessionID));
 
         receiver.addPacketListener(userFinishedProjectNegotiations,
-            UserFinishedProjectNegotiationExtension.PROVIDER.getPacketFilter());
+            UserFinishedProjectNegotiationExtension.PROVIDER
+                .getPacketFilter(currentSessionID));
     }
 
     @Override
@@ -229,13 +225,17 @@ public class UserInformationHandler implements Startable {
 
         User fromUser = session.getUser(fromJID);
 
-        if (!currentSessionID.equals(payload.getSessionID())
-            || fromUser == null) {
+        if (fromUser == null) {
             log.warn("received UserFinishedProjectNegotiationPacket from "
                 + fromJID + " who is not part of the current session");
             return;
         }
 
+        /*
+         * TODO This call needs a review as it is invoking listeners in another
+         * thread context and thus blocking the dispatching for network packets
+         * for an unknown time.
+         */
         session.userFinishedProjectNegotiation(fromUser);
     }
 
@@ -254,8 +254,7 @@ public class UserInformationHandler implements Startable {
 
         User fromUser = session.getUser(fromJID);
 
-        if (!currentSessionID.equals(userListInfo.getSessionID())
-            || fromUser == null) {
+        if (fromUser == null) {
             log.warn("received user list from " + fromJID
                 + " who is not part of the current session");
             return;

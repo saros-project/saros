@@ -51,7 +51,7 @@ public class UserListExtension extends SarosSessionPacketExtension {
     }
 
     public static class Provider extends
-        XStreamExtensionProvider<UserListExtension> {
+        SarosSessionPacketExtension.Provider<UserListExtension> {
 
         private Provider() {
             super("userList", UserListExtension.class);
