@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.activities.serializable;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.StopFollowingActivity;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -8,6 +10,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 /**
  * DataObject for the event that a user stopped following another user
  */
+@XStreamAlias("stopFollowingActivity")
 public class StopFollowingActivityDataObject extends AbstractActivityDataObject {
 
     public StopFollowingActivityDataObject(JID source) {

@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.activities.serializable;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 
@@ -15,6 +16,7 @@ import de.fu_berlin.inf.dpp.util.xstream.JIDConverter;
  * @author cnk
  * @author tobi
  */
+@XStreamAlias("changeColorActivity")
 public class ChangeColorActivityDataObject extends AbstractActivityDataObject {
 
     @XStreamAsAttribute

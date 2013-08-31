@@ -24,17 +24,22 @@ import java.util.List;
 
 import org.jivesoftware.smack.packet.PacketExtension;
 
-import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.AbstractActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.AbstractProjectActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.ChangeColorActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ChecksumActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ChecksumErrorActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.EditorActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.FolderActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.JupiterActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.NOPActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.PermissionActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ProgressActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.RecoveryFileActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.StartFollowingActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.StopActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.StopFollowingActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.VCSActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
@@ -64,28 +69,71 @@ public class ActivitiesExtension extends SarosPacketExtension {
      *               annotations like XStreamAlias will not be honored.
      */
 
-    /**
-     * 
-     */
-
     public static class Provider extends
         XStreamExtensionProvider<TimedActivities> {
         private Provider() {
-            super("activityDataObjects", TimedActivities.class,
+            super("activityDataObjects",
+
+            // Misc
+                JID.class,
+
+                // ActivitySequencer
+                TimedActivities.class,
+
+                TimedActivityDataObject.class,
+
+                // Jupiter classes
+                JupiterVectorTime.class,
+
+                DeleteOperation.class,
+
+                InsertOperation.class,
+
+                NoOperation.class,
+
+                SplitOperation.class,
+
+                TimestampOperation.class,
+
+                // TODO check XStream doc if those two classes are really needed
                 AbstractActivityDataObject.class,
-                EditorActivityDataObject.class, FileActivityDataObject.class,
-                RecoveryFileActivityDataObject.class,
-                FolderActivityDataObject.class,
-                PermissionActivityDataObject.class,
-                TextSelectionActivityDataObject.class,
-                ViewportActivityDataObject.class,
-                TimedActivityDataObject.class, JupiterActivityDataObject.class,
-                JupiterVectorTime.class, DeleteOperation.class,
-                InsertOperation.class, NoOperation.class, SplitOperation.class,
-                TimestampOperation.class, JID.class, SPathDataObject.class,
+
+                AbstractProjectActivityDataObject.class,
+
+                // Business DAOs
+                ChangeColorActivityDataObject.class,
+
                 ChecksumActivityDataObject.class,
+
                 ChecksumErrorActivityDataObject.class,
-                ProgressActivityDataObject.class, VCSActivityDataObject.class);
+
+                EditorActivityDataObject.class,
+
+                FileActivityDataObject.class,
+
+                FolderActivityDataObject.class,
+
+                JupiterActivityDataObject.class,
+
+                NOPActivityDataObject.class,
+
+                PermissionActivityDataObject.class,
+
+                ProgressActivityDataObject.class,
+
+                RecoveryFileActivityDataObject.class,
+
+                StartFollowingActivityDataObject.class,
+
+                StopActivityDataObject.class,
+
+                StopFollowingActivityDataObject.class,
+
+                TextSelectionActivityDataObject.class,
+
+                VCSActivityDataObject.class,
+
+                ViewportActivityDataObject.class);
         }
 
         public PacketExtension create(String sessionID,

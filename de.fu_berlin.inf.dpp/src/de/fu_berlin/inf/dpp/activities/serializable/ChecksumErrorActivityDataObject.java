@@ -39,7 +39,7 @@ import de.fu_berlin.inf.dpp.util.xstream.JIDConverter;
  * A Checksum Error is a notification send to the host and peers by a user, who
  * wants inconsistencies to be recovered.
  */
-@XStreamAlias("ChecksumError")
+@XStreamAlias("checksumErrorActivity")
 public class ChecksumErrorActivityDataObject extends AbstractActivityDataObject {
 
     @XStreamAsAttribute

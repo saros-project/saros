@@ -15,7 +15,7 @@ import de.fu_berlin.inf.dpp.util.xstream.JIDConverter;
  * A {@link ProgressActivityDataObject} is used for communicating
  * {@link ProgressActivity}s to peers.
  */
-@XStreamAlias("ProgressActivity")
+@XStreamAlias("progressActivity")
 public class ProgressActivityDataObject extends AbstractActivityDataObject {
 
     @XStreamAsAttribute

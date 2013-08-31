@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.activities.serializable;
 
 import org.apache.commons.lang.ObjectUtils;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 
@@ -14,6 +15,7 @@ import de.fu_berlin.inf.dpp.util.xstream.JIDConverter;
 /**
  * DataObject for the event that a user started following another user
  */
+@XStreamAlias("startFollowingActivity")
 public class StartFollowingActivityDataObject extends
     AbstractActivityDataObject {
 
