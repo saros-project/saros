@@ -5,7 +5,7 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({ StopManagerTest.class })
-public class SynchronizeTestSuite {
-
-    //
+public class TestSuite {
+    // the class remains completely empty,
+    // being used only as a holder for the above annotations
 }

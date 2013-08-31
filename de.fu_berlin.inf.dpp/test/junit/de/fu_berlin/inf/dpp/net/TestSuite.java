@@ -1,12 +1,11 @@
-package de.fu_berlin.inf.dpp.concurrent.undo;
+package de.fu_berlin.inf.dpp.net;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ UndoTest.class })
-public class ConcurrentUndoTestSuite {
-
+@Suite.SuiteClasses({ JIDTest.class, RosterTrackerTest.class, UPnPTest.class })
+public class TestSuite {
     // the class remains completely empty,
     // being used only as a holder for the above annotations
 }

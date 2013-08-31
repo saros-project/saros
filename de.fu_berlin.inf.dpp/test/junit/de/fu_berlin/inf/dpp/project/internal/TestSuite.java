@@ -7,7 +7,7 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({ ActivityHandlerTest.class, ActivityQueuerTest.class,
     ActivitySequencerTest.class, ChecksumCacheTest.class,
     SarosProjectMapperTest.class, SarosSessionTest.class })
-public class ProjectInternalTestSuite {
+public class TestSuite {
     // the class remains completely empty,
     // being used only as a holder for the above annotations
 }

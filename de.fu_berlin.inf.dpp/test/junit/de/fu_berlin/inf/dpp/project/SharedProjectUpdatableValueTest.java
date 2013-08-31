@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.project.SharedProject.UpdatableValue;
 
-public class SharedProjectUpdatableValuePluginTest {
+public class SharedProjectUpdatableValueTest {
     public @Test
     void update() {
         UpdatableValue<String> x = new UpdatableValue<String>(null);

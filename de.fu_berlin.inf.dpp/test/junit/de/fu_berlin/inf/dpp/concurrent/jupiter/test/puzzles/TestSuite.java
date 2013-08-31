@@ -8,7 +8,7 @@ import org.junit.runners.Suite;
     DOptPuzzleTest.class, GOTOInclusionTransformationTest.class,
     InclusionTransformationTest.class, SimpleClientServerTest.class,
     SimpleJupiterDocumentTest.class, SimpleServerProxyTest.class })
-public class JupiterPuzzlesTestSuite {
+public class TestSuite {
     // the class remains completely empty,
     // being used only as a holder for the above annotations
 }

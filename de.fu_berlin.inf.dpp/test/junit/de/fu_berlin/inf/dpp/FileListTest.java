@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp.net;
+package de.fu_berlin.inf.dpp;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

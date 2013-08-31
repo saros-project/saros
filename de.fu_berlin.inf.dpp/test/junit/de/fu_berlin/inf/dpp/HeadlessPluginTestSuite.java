@@ -5,7 +5,7 @@ import org.junit.runners.Suite;
 
 import de.fu_berlin.inf.dpp.project.ResourceActivityFilterPluginTest;
 import de.fu_berlin.inf.dpp.project.SharedProjectPluginTest;
-import de.fu_berlin.inf.dpp.project.SharedProjectUpdatableValuePluginTest;
+import de.fu_berlin.inf.dpp.project.SharedProjectUpdatableValueTest;
 import de.fu_berlin.inf.dpp.vcs.VCSActivityPluginTest;
 
 /**
@@ -14,7 +14,7 @@ import de.fu_berlin.inf.dpp.vcs.VCSActivityPluginTest;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({ VCSActivityPluginTest.class,
-    SharedProjectUpdatableValuePluginTest.class, SharedProjectPluginTest.class,
+    SharedProjectUpdatableValueTest.class, SharedProjectPluginTest.class,
     ResourceActivityFilterPluginTest.class })
 public class HeadlessPluginTestSuite {
     // empty class

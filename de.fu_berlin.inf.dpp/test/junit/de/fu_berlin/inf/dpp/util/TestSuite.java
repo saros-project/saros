@@ -7,7 +7,7 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({ UtilTest.class, NamedThreadFactoryTest.class,
     PairTest.class, ArrayUtilsTest.class, ActivityUtilsTest.class,
     ThreadAccessRecorderTest.class, VersionManagerTest.class })
-public class UtilTestSuite {
+public class TestSuite {
     // the class remains completely empty,
     // being used only as a holder for the above annotations
 }
