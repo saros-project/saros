@@ -70,7 +70,7 @@ public class ActivityHandlerTest {
     User dave;
 
     // Needed to compare localActivities
-    CountDownLatch gate;
+    volatile CountDownLatch gate;
 
     // Roles of the Users in this Test
     User target;
@@ -93,7 +93,10 @@ public class ActivityHandlerTest {
             // As this is called by another Thread we have to inform the caller
             // when we are ready
             localActivity = activity;
-            gate.countDown();
+            CountDownLatch gateToCountdown = gate;
+
+            if (gateToCountdown != null)
+                gateToCountdown.countDown();
         }
     };
     private SPath path;
