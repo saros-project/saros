@@ -13,26 +13,23 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ChangeColorActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ChecksumActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.TimedActivityDataObject;
 
 public class ActivityUtilsTest {
 
-    List<TimedActivityDataObject> timedActivities;
+    List<IActivityDataObject> activities;
     SPathDataObject sPath = new SPathDataObject("", (IPath) null, "");
 
     @Before
     public void setUp() throws Exception {
-        timedActivities = new ArrayList<TimedActivityDataObject>();
+        activities = new ArrayList<IActivityDataObject>();
 
         for (int i = 5; i > 0; i--) {
             ChecksumActivityDataObject tmp = new ChecksumActivityDataObject(
                 new JID(""), sPath, 0, 0, null);
 
-            TimedActivityDataObject tmp1 = new TimedActivityDataObject(tmp,
-                new JID(""), 0);
-
-            timedActivities.add(tmp1);
+            activities.add(tmp);
         }
 
     }
@@ -41,13 +38,13 @@ public class ActivityUtilsTest {
     public void testContainsChecksumsOnly0() {
         // Should be true, because there are only ChecksumActivityDataObject's
         // in the list
-        assertTrue(ActivityUtils.containsChecksumsOnly(timedActivities));
+        assertTrue(ActivityUtils.containsChecksumsOnly(activities));
     }
 
     @Test
     public void testContainsChecksumsOnly1() {
 
-        List<TimedActivityDataObject> emptyTimedActivities = new ArrayList<TimedActivityDataObject>();
+        List<IActivityDataObject> emptyTimedActivities = new ArrayList<IActivityDataObject>();
 
         // should be true, because there is no other ActivityDataObject
         assertTrue(ActivityUtils.containsChecksumsOnly(emptyTimedActivities));
@@ -59,11 +56,9 @@ public class ActivityUtilsTest {
         ChangeColorActivityDataObject tmp = new ChangeColorActivityDataObject(
             new JID(""), new JID(""), new JID(""), 0);
 
-        TimedActivityDataObject tmp1 = new TimedActivityDataObject(tmp,
-            new JID(""), 0);
-        timedActivities.add(tmp1);
+        activities.add(tmp);
 
         // should be false, because there is another ActivityDataObject
-        assertFalse(ActivityUtils.containsChecksumsOnly(timedActivities));
+        assertFalse(ActivityUtils.containsChecksumsOnly(activities));
     }
 }

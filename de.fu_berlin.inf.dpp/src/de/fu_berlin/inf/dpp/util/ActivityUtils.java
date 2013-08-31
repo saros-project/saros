@@ -13,7 +13,6 @@ import de.fu_berlin.inf.dpp.activities.serializable.FolderActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
-import de.fu_berlin.inf.dpp.net.internal.TimedActivityDataObject;
 
 /**
  * Class contains static helper methods on activities
@@ -21,8 +20,8 @@ import de.fu_berlin.inf.dpp.net.internal.TimedActivityDataObject;
 public class ActivityUtils {
 
     /**
-     * Checks if all {@link TimedActivityDataObject}s in the given Collection
-     * are of instance {@link ChecksumActivityDataObject}
+     * Checks if all {@link IActivityDataObject}s in the given Collection are of
+     * instance {@link ChecksumActivityDataObject}
      * 
      * @param timedActivities
      *            Collection of {@link ChecksumActivityDataObject}s
@@ -30,11 +29,12 @@ public class ActivityUtils {
      *         given collection, false otherwise
      */
     public static boolean containsChecksumsOnly(
-        List<TimedActivityDataObject> timedActivities) {
+        Collection<IActivityDataObject> timedActivities) {
 
-        for (TimedActivityDataObject a : timedActivities)
-            if (!(a.getActivity() instanceof ChecksumActivityDataObject))
+        for (IActivityDataObject a : timedActivities)
+            if (!(a instanceof ChecksumActivityDataObject))
                 return false;
+
         return true;
     }
 

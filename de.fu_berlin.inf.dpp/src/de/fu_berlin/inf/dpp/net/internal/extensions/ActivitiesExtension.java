@@ -19,11 +19,15 @@
  */
 package de.fu_berlin.inf.dpp.net.internal.extensions;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.jivesoftware.smack.packet.PacketExtension;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
+
+import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.AbstractActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.AbstractProjectActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ChangeColorActivityDataObject;
@@ -32,6 +36,7 @@ import de.fu_berlin.inf.dpp.activities.serializable.ChecksumErrorActivityDataObj
 import de.fu_berlin.inf.dpp.activities.serializable.EditorActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.FolderActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.JupiterActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.NOPActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.PermissionActivityDataObject;
@@ -43,7 +48,6 @@ import de.fu_berlin.inf.dpp.activities.serializable.StopFollowingActivityDataObj
 import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.VCSActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
-import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterVectorTime;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
@@ -51,15 +55,70 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.TimedActivities;
-import de.fu_berlin.inf.dpp.net.internal.TimedActivityDataObject;
 
-/* TODO correct this class to use the correct provider */
-
-@Component(module = "net")
-public class ActivitiesExtension extends SarosPacketExtension {
+@XStreamAlias("activityPackage")
+public class ActivitiesExtension extends SarosSessionPacketExtension {
 
     public static final Provider PROVIDER = new Provider();
+
+    @XStreamImplicit
+    private final List<IActivityDataObject> activityDataObjects;
+
+    @XStreamAsAttribute
+    private final int sequenceNumber;
+
+    /**
+     * Creates an object that can be transformed into a
+     * {@linkplain PacketExtension} using the provider of this extension. All
+     * object parameters <b>must be</b> not <code>null</code>.
+     * 
+     * @Note This constructor does not check for correctness of the input
+     *       parameters.
+     * 
+     * @param sessionID
+     *            the session id the {@linkplain IActivityDataObject activity
+     *            data objects} belong to
+     * @param activityDataObjects
+     *            the {@linkplain IActivityDataObject activity data objects}
+     *            that should be included in this extension
+     * @param sequenceNumber
+     *            the sequence number of the <b>first</b>
+     *            {@linkplain IActivityDataObject activity data object}
+     */
+    public ActivitiesExtension(String sessionID,
+        List<IActivityDataObject> activityDataObjects, int sequenceNumber) {
+        super(sessionID);
+        this.activityDataObjects = activityDataObjects;
+        this.sequenceNumber = sequenceNumber;
+    }
+
+    /**
+     * Returns the {@linkplain IActivityDataObject activity data objects}
+     * included in this extension.
+     * 
+     * @return
+     */
+    public List<IActivityDataObject> getActivityDataObjects() {
+        return activityDataObjects;
+    }
+
+    /**
+     * Returns the sequence number of the first {@linkplain IActivityDataObject
+     * activity data object} in the list returned from
+     * {@link #getActivityDataObjects}.
+     * 
+     * <p>
+     * All other sequence numbers can be recalculated where the sequence number
+     * of the activity data object from
+     * <code>getActivityDataObjects().get(x)</code> is
+     * <code>getSequenceNumber() + x</code>.
+     * </p>
+     * 
+     * @return
+     */
+    public int getSequenceNumber() {
+        return sequenceNumber;
+    }
 
     /**
      * @JTourBusStop 7, Activity creation, IActivityDataObject registration:
@@ -70,17 +129,12 @@ public class ActivitiesExtension extends SarosPacketExtension {
      */
 
     public static class Provider extends
-        XStreamExtensionProvider<TimedActivities> {
+        SarosSessionPacketExtension.Provider<ActivitiesExtension> {
         private Provider() {
-            super("activityDataObjects",
+            super("activityDataObjects", ActivitiesExtension.class,
 
             // Misc
                 JID.class,
-
-                // ActivitySequencer
-                TimedActivities.class,
-
-                TimedActivityDataObject.class,
 
                 // Jupiter classes
                 JupiterVectorTime.class,
@@ -94,6 +148,9 @@ public class ActivitiesExtension extends SarosPacketExtension {
                 SplitOperation.class,
 
                 TimestampOperation.class,
+
+                // SPATH
+                SPathDataObject.class,
 
                 // TODO check XStream doc if those two classes are really needed
                 AbstractActivityDataObject.class,
@@ -134,12 +191,6 @@ public class ActivitiesExtension extends SarosPacketExtension {
                 VCSActivityDataObject.class,
 
                 ViewportActivityDataObject.class);
-        }
-
-        public PacketExtension create(String sessionID,
-            List<TimedActivityDataObject> activities) {
-            return create(new TimedActivities(sessionID,
-                new ArrayList<TimedActivityDataObject>(activities)));
         }
     }
 }

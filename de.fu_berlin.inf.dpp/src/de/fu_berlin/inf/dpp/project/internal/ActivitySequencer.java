@@ -42,8 +42,6 @@ import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
-import de.fu_berlin.inf.dpp.net.internal.TimedActivities;
-import de.fu_berlin.inf.dpp.net.internal.TimedActivityDataObject;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -70,6 +68,28 @@ public class ActivitySequencer implements Startable {
      */
     private static final int FIRST_SEQUENCE_NUMBER = 0;
 
+    private static class SequencedActivity {
+        private final int sequenceNumber;
+        private final IActivityDataObject activity;
+
+        private SequencedActivity(IActivityDataObject activity,
+            int sequenceNumber) {
+            this.activity = activity;
+            this.sequenceNumber = sequenceNumber;
+        }
+    }
+
+    private static class SequencedActivities {
+        private final int sequenceNumber;
+        private final List<IActivityDataObject> activites;
+
+        private SequencedActivities(List<IActivityDataObject> activites,
+            int sequenceNumber) {
+            this.activites = activites;
+            this.sequenceNumber = sequenceNumber;
+        }
+    }
+
     private static class ActivityBuffer<T> {
         /**
          * Helper flag to signal that there pending data is still send even if
@@ -79,7 +99,7 @@ public class ActivitySequencer implements Startable {
         private int nextSequenceNumber;
         private final Deque<T> activities = new LinkedList<T>();
 
-        public ActivityBuffer(int firstSequenceNumber) {
+        private ActivityBuffer(int firstSequenceNumber) {
             nextSequenceNumber = firstSequenceNumber;
         }
     }
@@ -88,7 +108,7 @@ public class ActivitySequencer implements Startable {
 
         @Override
         public void processPacket(Packet packet) {
-            receiveTimedActivities(packet);
+            receiveActivities(packet);
         }
     };
 
@@ -97,7 +117,7 @@ public class ActivitySequencer implements Startable {
         @Override
         public void run() {
 
-            Map<JID, List<TimedActivityDataObject>> activitiesToSend = new HashMap<JID, List<TimedActivityDataObject>>();
+            Map<JID, SequencedActivities> activitiesToSend = new HashMap<JID, SequencedActivities>();
 
             send: while (true) {
                 if (stopSending)
@@ -123,9 +143,9 @@ public class ActivitySequencer implements Startable {
 
                         int currentSequenceNumber = buffer.nextSequenceNumber;
                         buffer.nextSequenceNumber += optimizedActivities.size();
-                        activitiesToSend.put(
-                            entry.getKey(),
-                            createTimedActivities(optimizedActivities,
+
+                        activitiesToSend.put(entry.getKey(),
+                            new SequencedActivities(optimizedActivities,
                                 currentSequenceNumber));
                     }
 
@@ -139,9 +159,10 @@ public class ActivitySequencer implements Startable {
                     }
                 }
 
-                for (Entry<JID, List<TimedActivityDataObject>> e : activitiesToSend
+                for (Entry<JID, SequencedActivities> e : activitiesToSend
                     .entrySet()) {
-                    sendTimedActivities(e.getKey(), e.getValue());
+                    sendActivities(e.getKey(), e.getValue().activites,
+                        e.getValue().sequenceNumber);
                 }
 
                 synchronized (bufferedOutgoingActivities) {
@@ -180,11 +201,9 @@ public class ActivitySequencer implements Startable {
 
     private final IReceiver receiver;
 
-    private final JID localJID;
-
     private final DispatchThreadContext dispatchThread;
 
-    private final Map<JID, ActivityBuffer<TimedActivityDataObject>> bufferedIncomingActivities;
+    private final Map<JID, ActivityBuffer<SequencedActivity>> bufferedIncomingActivities;
 
     private final Map<JID, ActivityBuffer<IActivityDataObject>> bufferedOutgoingActivities;
 
@@ -199,9 +218,7 @@ public class ActivitySequencer implements Startable {
         this.receiver = receiver;
         this.sessionIDObservable = sessionIDObservable;
 
-        this.localJID = sarosSession.getLocalUser().getJID();
-
-        this.bufferedIncomingActivities = new HashMap<JID, ActivityBuffer<TimedActivityDataObject>>();
+        this.bufferedIncomingActivities = new HashMap<JID, ActivityBuffer<SequencedActivity>>();
         this.bufferedOutgoingActivities = new HashMap<JID, ActivityBuffer<IActivityDataObject>>();
     }
 
@@ -221,9 +238,9 @@ public class ActivitySequencer implements Startable {
             throw new IllegalStateException("sequencer is already started");
 
         currentSessionID = sessionIDObservable.getValue();
-        // FIXME: sessionID filter
+
         receiver.addPacketListener(activitiesPacketListener,
-            ActivitiesExtension.PROVIDER.getPacketFilter());
+            ActivitiesExtension.PROVIDER.getPacketFilter(currentSessionID));
 
         started = true;
 
@@ -279,27 +296,25 @@ public class ActivitySequencer implements Startable {
      * TODO some part of the logic can be removed if we ensure only ONE transmit
      * stream and fail FAST if this stream is broken
      */
-    private void executeActivity(TimedActivityDataObject activity) {
+    private void executeActivity(JID sender, SequencedActivity sequencedActivity) {
 
-        assert activity != null;
+        assert sequencedActivity != null;
 
         List<IActivityDataObject> serializedActivities = new ArrayList<IActivityDataObject>();
 
-        JID sender = activity.getSender();
-
         synchronized (this) {
-            ActivityBuffer<TimedActivityDataObject> buffer = bufferedIncomingActivities
+            ActivityBuffer<SequencedActivity> buffer = bufferedIncomingActivities
                 .get(sender);
 
             if (buffer == null) {
                 LOG.warn("dropping received activity from "
                     + sender
                     + " because it is currently not registers, dropped activity: "
-                    + activity);
+                    + sequencedActivity.activity);
                 return;
             }
 
-            buffer.activities.add(activity);
+            buffer.activities.add(sequencedActivity);
 
             /*
              * it is very VERY uncommon to receive an activity with a sequence
@@ -309,22 +324,22 @@ public class ActivitySequencer implements Startable {
              */
             while (true) {
 
-                activity = null;
+                sequencedActivity = null;
 
-                for (Iterator<TimedActivityDataObject> it = buffer.activities
+                for (Iterator<SequencedActivity> it = buffer.activities
                     .iterator(); it.hasNext();) {
 
-                    activity = it.next();
+                    sequencedActivity = it.next();
 
-                    if (activity.getSequenceNumber() == buffer.nextSequenceNumber) {
+                    if (sequencedActivity.sequenceNumber == buffer.nextSequenceNumber) {
                         it.remove();
                         break;
                     }
 
-                    activity = null;
+                    sequencedActivity = null;
                 }
 
-                if (activity == null) {
+                if (sequencedActivity == null) {
                     /*
                      * TODO shut down the session if a activity does not arrive
                      * in a given timeout
@@ -332,7 +347,7 @@ public class ActivitySequencer implements Startable {
                     break;
                 }
 
-                serializedActivities.add(activity.getActivity());
+                serializedActivities.add(sequencedActivity.activity);
                 buffer.nextSequenceNumber++;
             }
         }
@@ -407,8 +422,8 @@ public class ActivitySequencer implements Startable {
 
         synchronized (bufferedIncomingActivities) {
             if (bufferedIncomingActivities.get(user.getJID()) == null)
-                bufferedIncomingActivities.put(user.getJID(),
-                    new ActivityBuffer<TimedActivityDataObject>(
+                bufferedIncomingActivities
+                    .put(user.getJID(), new ActivityBuffer<SequencedActivity>(
                         FIRST_SEQUENCE_NUMBER));
         }
     }
@@ -464,90 +479,67 @@ public class ActivitySequencer implements Startable {
         }
     }
 
-    private List<TimedActivityDataObject> createTimedActivities(
-        List<IActivityDataObject> activityDataObjects, int startSequenceNumber) {
+    private void sendActivities(JID recipient,
+        List<IActivityDataObject> activities, int sequenceNumber) {
 
-        assert !activityDataObjects.contains(null) : "activity must not be null";
-
-        List<TimedActivityDataObject> timedActivities = new ArrayList<TimedActivityDataObject>(
-            activityDataObjects.size());
-
-        for (IActivityDataObject ado : activityDataObjects) {
-            timedActivities.add(new TimedActivityDataObject(ado, localJID,
-                startSequenceNumber++));
-        }
-
-        return timedActivities;
-    }
-
-    private void sendTimedActivities(JID recipient,
-        List<TimedActivityDataObject> timedActivities) {
-
-        if (timedActivities.size() == 0)
+        if (activities.size() == 0)
             return;
 
-        PacketExtension timedActivitiesPacket = ActivitiesExtension.PROVIDER
-            .create(currentSessionID, timedActivities);
+        PacketExtension activityPacketExtension = ActivitiesExtension.PROVIDER
+            .create(new ActivitiesExtension(currentSessionID, activities,
+                sequenceNumber));
 
-        String msg = "send (" + String.format("%03d", timedActivities.size())
-            + ") " + Utils.prefix(recipient) + timedActivities;
+        String msg = "send (" + String.format("%03d", activities.size()) + ") "
+            + Utils.prefix(recipient) + activities;
 
         // only log on debug level if there is more than a checksum
-        if (ActivityUtils.containsChecksumsOnly(timedActivities))
+        if (ActivityUtils.containsChecksumsOnly(activities))
             LOG.trace(msg);
         else
             LOG.debug(msg);
 
         try {
-            transmitter.sendToSessionUser(recipient, timedActivitiesPacket);
+            transmitter.sendToSessionUser(recipient, activityPacketExtension);
         } catch (IOException e) {
             /*
              * FIMXE kick the user out of session (if host) or just terminate
              * the session(client)
              */
-            LOG.error("failed to sent timed activities: " + timedActivities, e);
+            LOG.error("failed to sent activities: " + activities, e);
         }
     }
 
-    private void receiveTimedActivities(Packet timedActivitiesPacket) {
+    private void receiveActivities(Packet activityPacket) {
 
-        TimedActivities payload = ActivitiesExtension.PROVIDER
-            .getPayload(timedActivitiesPacket);
+        ActivitiesExtension payload = ActivitiesExtension.PROVIDER
+            .getPayload(activityPacket);
 
         if (payload == null) {
-            LOG.warn("timed activities packet payload is corrupted");
+            LOG.warn("activity packet payload is corrupted");
             return;
         }
 
-        JID from = new JID(timedActivitiesPacket.getFrom());
+        JID from = new JID(activityPacket.getFrom());
 
-        List<TimedActivityDataObject> timedActivities = payload
-            .getTimedActivities();
+        List<IActivityDataObject> activities = payload.getActivityDataObjects();
 
-        /*
-         * FIXME the session.getUser() should not be handled here but in the
-         * SarosSession class
-         */
-        if (!currentSessionID.equals(payload.getSessionID())) {
-            LOG.warn("received timed activities from user " + from
-                + " who is not part of the current session");
-            return;
-        }
+        String msg = "rcvd (" + String.format("%03d", activities.size()) + ") "
+            + from + ": " + activities;
 
-        String msg = "rcvd (" + String.format("%03d", timedActivities.size())
-            + ") " + from + ": " + timedActivities;
-
-        if (ActivityUtils.containsChecksumsOnly(timedActivities))
+        if (ActivityUtils.containsChecksumsOnly(activities))
             LOG.trace(msg);
         else
             LOG.debug(msg);
 
-        for (TimedActivityDataObject timedActivity : timedActivities) {
+        int sequenceNumber = payload.getSequenceNumber();
 
-            assert timedActivity.getActivity().getSource() != null : "received activity without source"
-                + timedActivity.getActivity();
+        for (IActivityDataObject activity : activities) {
 
-            executeActivity(timedActivity);
+            assert activity.getSource() != null : "received activity without source"
+                + activity;
+
+            executeActivity(from, new SequencedActivity(activity,
+                sequenceNumber++));
         }
     }
 }
