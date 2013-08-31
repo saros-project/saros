@@ -8,15 +8,17 @@ import de.fu_berlin.inf.dpp.FileList;
  * projectID.
  */
 public class ProjectExchangeInfo {
-    protected FileList fileList;
-    protected String projectName;
-    protected String projectID;
-    protected boolean partial;
+    private final FileList fileList;
+    private final String projectName;
+    private final String projectID;
+    private final boolean partial;
 
-    // The description is not used yet, but there was a description field all
-    // the time and I didn't want to delete it. This field could be useful
-    // sometime...
-    protected String description;
+    /*
+     * The description is not used yet, but there was a description field all
+     * the time and I didn't want to delete it. This field could be useful
+     * sometime...
+     */
+    private final String description;
 
     /**
      * 
@@ -57,10 +59,4 @@ public class ProjectExchangeInfo {
     public boolean isPartial() {
         return partial;
     }
-
-    public ProjectExchangeInfoDataObject toProjectInfoDataObject() {
-        return new ProjectExchangeInfoDataObject(projectID, description,
-            projectName, partial, fileList.toXML());
-    }
-
 }
