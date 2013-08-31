@@ -22,12 +22,8 @@ public class TransferDescriptionTest {
         td.setArchivePath("foo/bar");
         td.setSize(0xFFFFF);
         td.setCompressContent(true);
-        td.setInvitationID("0815");
-        td.setTestID("test");
-        td.setProcessID("007");
 
         byte[] data = TransferDescription.toByteArray(td);
-        System.out.println(data.length);
         TransferDescription td2 = TransferDescription.fromByteArray(data);
 
         assertEquals(td.getType(), td2.getType());
@@ -38,8 +34,5 @@ public class TransferDescriptionTest {
         assertEquals(td.getArchivePath(), td2.getArchivePath());
         assertEquals(td.getSize(), td2.getSize());
         assertEquals(td.compressContent(), td2.compressContent());
-        assertEquals(td.getInvitationID(), td2.getInvitationID());
-        assertEquals(td.getTestID(), td2.getTestID());
-        assertEquals(td.getProcessID(), td2.getProcessID());
     }
 }

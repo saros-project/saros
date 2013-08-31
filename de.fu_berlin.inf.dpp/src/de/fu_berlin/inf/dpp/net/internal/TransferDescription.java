@@ -33,10 +33,6 @@ public class TransferDescription {
      * meta data for a stream
      */
     public static final String STREAM_META = "stream-meta";
-    /**
-     * test data for connection tests
-     */
-    public static final String CONNECTION_TEST = "connection-test";
 
     private String type;
 
@@ -55,32 +51,9 @@ public class TransferDescription {
     private long size;
 
     /**
-     * Field used to indicate that the file is compressed already, like in
-     * ARCHIVE_TRANSFER or RESOURCE_TRANSFER with a File like a jar, jpeg, ....
+     * Field used to indicate that the payload may be compressed.
      */
     private boolean compress;
-
-    /**
-     * The invitationID of this TransferDescription or null if this
-     * TransferDescription is not used during an invitation.
-     */
-    private String invitationID;
-
-    /**
-     * If this TransferDescription is of type
-     * {@link TransferDescription#CONNECTION_TEST} then testID is set to the ID
-     * of the IQ packet to send in reply to receiving test data.
-     * 
-     * testID is null if this TransferDescription is not of type
-     * {@link TransferDescription#CONNECTION_TEST}
-     */
-    private String testID;
-
-    /**
-     * The processID of this TransferDescription or null if this
-     * TransferDescription is not used during project exchange.
-     */
-    private String processID;
 
     @Override
     public String toString() {
@@ -91,8 +64,6 @@ public class TransferDescription {
         } else if (STREAM_META.equals(type)) {
             return "Stream metadata from " + Utils.prefix(sender)
                 + ": stream= " + archivePath + " [SID=" + sessionID + "]";
-        } else if (CONNECTION_TEST.equals(type)) {
-            return "Connection test from " + Utils.prefix(sender);
         } else {
             StringBuilder sb = new StringBuilder("Bytestream transfer. type="
                 + type + " namespace=" + namespace);
@@ -106,17 +77,6 @@ public class TransferDescription {
 
     public static TransferDescription createCustomTransferDescription() {
         return new TransferDescription();
-    }
-
-    public static TransferDescription createTestTransferDescription(
-        JID recipient, String testID, JID sender) {
-        TransferDescription result = new TransferDescription();
-        result.recipient = recipient;
-        result.sender = sender;
-        result.testID = testID;
-        result.type = CONNECTION_TEST;
-        result.compress = false;
-        return result;
     }
 
     public static TransferDescription createStreamDataTransferDescription(
@@ -156,10 +116,6 @@ public class TransferDescription {
         out.writeUTF(description.sessionID != null ? description.sessionID : "");
         out.writeUTF(description.archivePath != null ? description.archivePath
             : "");
-        out.writeUTF(description.invitationID != null ? description.invitationID
-            : "");
-        out.writeUTF(description.testID != null ? description.testID : "");
-        out.writeUTF(description.processID != null ? description.processID : "");
 
         out.writeUTF(description.recipient != null ? description.recipient
             .toString() : "");
@@ -185,9 +141,6 @@ public class TransferDescription {
         description.extensionVersion = in.readUTF();
         description.sessionID = in.readUTF();
         description.archivePath = in.readUTF();
-        description.invitationID = in.readUTF();
-        description.testID = in.readUTF();
-        description.processID = in.readUTF();
 
         description.recipient = new JID(in.readUTF());
         description.sender = new JID(in.readUTF());
@@ -244,15 +197,6 @@ public class TransferDescription {
         return sender;
     }
 
-    TransferDescription setTestID(String testID) {
-        this.testID = testID;
-        return this;
-    }
-
-    public String getTestID() {
-        return testID;
-    }
-
     TransferDescription setSessionID(String sessionID) {
         this.sessionID = sessionID;
         return this;
@@ -260,24 +204,6 @@ public class TransferDescription {
 
     public String getSessionID() {
         return sessionID;
-    }
-
-    TransferDescription setProcessID(String processID) {
-        this.processID = processID;
-        return this;
-    }
-
-    public String getProcessID() {
-        return processID;
-    }
-
-    TransferDescription setInvitationID(String invitationID) {
-        this.invitationID = invitationID;
-        return this;
-    }
-
-    public String getInvitationID() {
-        return invitationID;
     }
 
     TransferDescription setArchivePath(String archivePath) {
