@@ -120,12 +120,12 @@ public class ActivitySequencer implements Startable {
             Map<JID, SequencedActivities> activitiesToSend = new HashMap<JID, SequencedActivities>();
 
             send: while (true) {
-                if (stopSending)
-                    return;
-
                 activitiesToSend.clear();
 
                 synchronized (bufferedOutgoingActivities) {
+                    if (stopSending)
+                        return;
+
                     for (Entry<JID, ActivityBuffer<IActivityDataObject>> entry : bufferedOutgoingActivities
                         .entrySet()) {
 
@@ -187,7 +187,7 @@ public class ActivitySequencer implements Startable {
 
     private boolean started = false;
 
-    private volatile boolean stopSending = false;
+    private boolean stopSending = false;
 
     private String currentSessionID;
 
@@ -265,10 +265,9 @@ public class ActivitySequencer implements Startable {
         receiver.removePacketListener(activitiesPacketListener);
 
         while (true) {
-            stopSending = true;
-
             try {
                 synchronized (bufferedOutgoingActivities) {
+                    stopSending = true;
                     bufferedOutgoingActivities.notifyAll();
                 }
                 activitySendThread.join();
