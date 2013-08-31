@@ -71,9 +71,10 @@ public class InvitationHandler {
                 String description = invitation.getDescription();
 
                 log.info("received invitation from " + Utils.prefix(fromJID)
-                    + " [invitationID: " + invitationID + ", " + "sessionID: "
-                    + sessionID + ", " + "version: " + versionInfo.version
-                    + ", " + "compability: " + versionInfo.compatibility + "]");
+                    + " [invitation id: " + invitationID + ", "
+                    + "session id: " + sessionID + ", " + "version: "
+                    + versionInfo.version + ", " + "compability: "
+                    + versionInfo.compatibility + "]");
 
                 /**
                  * @JTourBusStop 7, Invitation Process:
@@ -119,30 +120,30 @@ public class InvitationHandler {
                     .getPayload(packet);
 
                 if (projectNegotiation == null) {
-                    log.warn("Received Project Negotiation from "
+                    log.warn("received project negotiation from "
                         + Utils.prefix(fromJID)
                         + " that contains malformed payload");
                     return;
                 }
 
                 String sessionID = projectNegotiation.getSessionID();
-                String processID = projectNegotiation.getProcessID();
+                String negotiationID = projectNegotiation.getNegotiationID();
                 List<ProjectExchangeInfo> projectInfos = projectNegotiation
                     .getProjectInfos();
 
                 if (!sessionIDObservable.getValue().equals(sessionID)) {
-                    log.warn("Received Project Negotiation from "
+                    log.warn("received project negotiation from "
                         + Utils.prefix(fromJID)
                         + " that is not in the same session");
                     return;
                 }
 
-                log.info("Received Project Negotiation from " + fromJID
-                    + " with SessionID: " + sessionID + " and ProcessID: "
-                    + processID);
+                log.info("received project negotiation from " + fromJID
+                    + " with session id: " + sessionID
+                    + " and negotiation id: " + negotiationID);
 
                 sessionManager.incomingProjectReceived(fromJID, projectInfos,
-                    processID);
+                    negotiationID);
 
             }
 

@@ -5,18 +5,16 @@ import java.util.List;
 import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 
 public class ProjectNegotiationOfferingExtension extends
-    SarosSessionPacketExtension {
+    ProjectNegotiationExtension {
 
     private List<ProjectExchangeInfo> projectInfos;
-    private String processID;
 
     public static final Provider PROVIDER = new Provider();
 
     public ProjectNegotiationOfferingExtension(String sessionID,
-        List<ProjectExchangeInfo> projectInfos, String processID) {
-        super(sessionID);
+        List<ProjectExchangeInfo> projectInfos, String negotiationID) {
+        super(sessionID, negotiationID);
         this.projectInfos = projectInfos;
-        this.processID = processID;
     }
 
     /**
@@ -26,17 +24,9 @@ public class ProjectNegotiationOfferingExtension extends
         return projectInfos;
     }
 
-    /**
-     * 
-     * @return The ProcessID of this NegotiationProcess
-     */
-    public String getProcessID() {
-        return processID;
-    }
-
     public static class Provider
         extends
-        SarosSessionPacketExtension.Provider<ProjectNegotiationOfferingExtension> {
+        ProjectNegotiationExtension.Provider<ProjectNegotiationOfferingExtension> {
 
         private Provider() {
             super("ProjectNegotiationOffering",

@@ -5,18 +5,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.jivesoftware.smack.filter.AndFilter;
-import org.jivesoftware.smack.filter.PacketFilter;
-import org.jivesoftware.smack.packet.Packet;
-
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.util.Utils;
 
-public class FileListExtension extends SarosSessionPacketExtension {
+public class FileListExtension extends ProjectNegotiationExtension {
 
     public static final Provider PROVIDER = new Provider();
-
-    private final String negotiationID;
 
     private final List<byte[]> serializedFileLists;
 
@@ -24,8 +18,7 @@ public class FileListExtension extends SarosSessionPacketExtension {
 
     public FileListExtension(String sessionID, String negotiationID,
         FileList... fileLists) {
-        super(sessionID);
-        this.negotiationID = negotiationID;
+        super(sessionID, negotiationID);
 
         serializedFileLists = new ArrayList<byte[]>(fileLists.length);
 
@@ -39,15 +32,6 @@ public class FileListExtension extends SarosSessionPacketExtension {
             throw new RuntimeException(
                 "corrupt JVM installation - UTF-8 charset is not supported", e);
         }
-    }
-
-    /**
-     * Returns the negotiation ID this file list extension belongs to.
-     * 
-     * @return
-     */
-    public String getNegotationID() {
-        return negotiationID;
     }
 
     /**
@@ -77,27 +61,10 @@ public class FileListExtension extends SarosSessionPacketExtension {
     }
 
     public static class Provider extends
-        SarosSessionPacketExtension.Provider<FileListExtension> {
+        ProjectNegotiationExtension.Provider<FileListExtension> {
 
         private Provider() {
             super("fileList", FileListExtension.class);
-        }
-
-        public PacketFilter getPacketFilter(final String sessionID,
-            final String negotiationID) {
-
-            return new AndFilter(super.getPacketFilter(sessionID),
-                new PacketFilter() {
-                    @Override
-                    public boolean accept(Packet packet) {
-                        FileListExtension extension = getPayload(packet);
-
-                        if (extension == null)
-                            return false;
-
-                        return negotiationID.equals(extension.getNegotationID());
-                    }
-                });
         }
     }
 }
