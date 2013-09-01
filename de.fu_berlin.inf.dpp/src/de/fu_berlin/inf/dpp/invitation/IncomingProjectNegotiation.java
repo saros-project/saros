@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smackx.filetransfer.FileTransferListener;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
@@ -47,7 +48,9 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.extensions.FileListExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.StartActivityQueuingResponse;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
@@ -96,6 +99,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     private final ISarosSession sarosSession;
 
     private boolean running;
+
+    private SarosPacketCollector startActivityQueuingRequestCollector;
 
     public IncomingProjectNegotiation(ISarosSession sarosSession, JID peer,
         String processID, List<ProjectExchangeInfo> projectInfos,
@@ -171,6 +176,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
         Exception exception = null;
 
+        createCollectors();
+
         try {
             checkCancellation(CancelOption.NOTIFY_PEER);
 
@@ -189,6 +196,12 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             List<FileList> missingFiles = calculateMissingFiles(projectNames,
                 skipSyncs, useVersionControl, this.monitor.newChild(10));
 
+            transmitter.sendToSessionUser(peer, FileListExtension.PROVIDER
+                .create(new FileListExtension(sessionID, processID,
+                    missingFiles.toArray(new FileList[0]))));
+
+            awaitActivityQueueingActivation(this.monitor.newChild(0));
+
             // the user who sends this ProjectNegotiation is now responsible for
             // all resources from that project
             for (Entry<String, IProject> entry : localProjects.entrySet()) {
@@ -197,9 +210,10 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 sarosSession.enableQueuing(entry.getKey());
             }
 
-            transmitter.sendToSessionUser(peer, FileListExtension.PROVIDER
-                .create(new FileListExtension(sessionID, processID,
-                    missingFiles.toArray(new FileList[0]))));
+            transmitter.sendToSessionUser(getPeer(),
+                StartActivityQueuingResponse.PROVIDER
+                    .create(new StartActivityQueuingResponse(sessionID,
+                        processID)));
 
             checkCancellation(CancelOption.NOTIFY_PEER);
 
@@ -241,6 +255,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                     .removeFileTransferListener(archiveTransferListener);
 
             fileReplacementInProgressObservable.replacementDone();
+
+            deleteCollectors();
             monitor.done();
 
             // Re-enable auto-building...
@@ -817,6 +833,39 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     public List<ProjectExchangeInfo> getProjectInfos() {
         return projectInfos;
+    }
+
+    /**
+     * Waits for the activity queuing request from the remote side.
+     * 
+     * @param monitor
+     */
+    private void awaitActivityQueueingActivation(IProgressMonitor monitor)
+        throws SarosCancellationException {
+
+        monitor.beginTask("Waiting for " + peer.getName()
+            + " to continue the project negotiation...",
+            IProgressMonitor.UNKNOWN);
+
+        Packet packet = collectPacket(startActivityQueuingRequestCollector,
+            PACKET_TIMEOUT);
+
+        if (packet == null)
+            throw new LocalCancellationException("received no response from "
+                + peer + " while waiting to continue the project negotiation",
+                CancelOption.DO_NOT_NOTIFY_PEER);
+
+        monitor.done();
+    }
+
+    private void createCollectors() {
+        startActivityQueuingRequestCollector = xmppReceiver
+            .createCollector(StartActivityQueuingResponse.PROVIDER
+                .getPacketFilter(sessionID, processID));
+    }
+
+    private void deleteCollectors() {
+        startActivityQueuingRequestCollector.cancel();
     }
 
     private File receiveArchive(

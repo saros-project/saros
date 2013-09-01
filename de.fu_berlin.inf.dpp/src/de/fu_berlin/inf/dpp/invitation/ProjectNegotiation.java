@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.jivesoftware.smack.Connection;
+import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smackx.filetransfer.FileTransfer;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
@@ -18,9 +19,11 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
+import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelProjectNegotiationExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
@@ -37,6 +40,12 @@ public abstract class ProjectNegotiation extends CancelableProcess {
     private static final Logger log = Logger
         .getLogger(ProjectNegotiation.class);
 
+    /**
+     * Timeout for all packet exchanges during the project negotiation
+     */
+    protected static final long PACKET_TIMEOUT = Long.getLong(
+        "de.fu_berlin.inf.dpp.negotiation.project.PACKET_TIMEOUT", 30000L);
+
     protected String processID;
     protected JID peer;
 
@@ -47,6 +56,9 @@ public abstract class ProjectNegotiation extends CancelableProcess {
 
     @Inject
     protected SarosNet sarosNet;
+
+    @Inject
+    protected IReceiver xmppReceiver;
 
     /**
      * The file transfer manager can be <code>null</code> if no connection was
@@ -223,5 +235,36 @@ public abstract class ProjectNegotiation extends CancelableProcess {
         }
 
         throw new RemoteCancellationException(null);
+    }
+
+    /**
+     * Returns the next packet from a collector.
+     * 
+     * @param collector
+     *            the collector to monitor
+     * @param timeout
+     *            the amount of time to wait for the next packet (in
+     *            milliseconds)
+     * @return the collected packet or <code>null</code> if no packet was
+     *         received
+     * @throws SarosCancellationException
+     *             if the process was canceled
+     */
+    protected final Packet collectPacket(SarosPacketCollector collector,
+        long timeout) throws SarosCancellationException {
+
+        Packet packet = null;
+
+        while (timeout > 0) {
+            checkCancellation(CancelOption.NOTIFY_PEER);
+
+            packet = collector.nextResult(1000);
+
+            if (packet != null)
+                break;
+
+            timeout -= 1000;
+        }
+        return packet;
     }
 }

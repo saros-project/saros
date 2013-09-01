@@ -34,11 +34,12 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
-import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.extensions.FileListExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ProjectNegotiationOfferingExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.StartActivityQueuingRequest;
+import de.fu_berlin.inf.dpp.net.internal.extensions.StartActivityQueuingResponse;
 import de.fu_berlin.inf.dpp.project.IChecksumCache;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.Messages;
@@ -72,12 +73,11 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     private EditorManager editorManager;
 
     @Inject
-    private IReceiver xmppReceiver;
-
-    @Inject
     private IChecksumCache checksumCache;
 
     private SarosPacketCollector remoteFileListResponseCollector;
+
+    private SarosPacketCollector startActivityQueuingResponseCollector;
 
     public OutgoingProjectNegotiation(JID to, ISarosSession sarosSession,
         List<IProject> projects, ISarosContext sarosContext) {
@@ -113,18 +113,6 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             monitor.subTask("");
 
             /*
-             * FIXME looking "carefully" at the code you can easily see the
-             * issue mentioned in
-             * http://www.inf.fu-berlin.de/inst/ag-se/theses/Starroske13
-             * -saros-rca.pdf There is still a time frame where activities can
-             * be applied twice.
-             */
-
-            // inform all listeners that the peer has started queuing and can
-            // therefore process IResourceActivities now
-            sarosSession.userStartedQueuing(sarosSession.getUser(peer));
-
-            /*
              * FIXME why do we unlock the editors here when we are going to
              * block ourself in the next call ?!
              */
@@ -134,6 +122,22 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             try {
                 stoppedUsers = stopUsers(monitor);
                 monitor.subTask("");
+
+                sendAndAwaitActivityQueueingActivation(monitor);
+                monitor.subTask("");
+
+                /*
+                 * inform all listeners that the peer has started queuing and
+                 * can therefore process IResourceActivities now
+                 * 
+                 * TODO this needs a review as this is called inside the
+                 * "blocked" section and so it is not allowed to send resource
+                 * activities at this time. Maybe change the description of the
+                 * listener interface ?
+                 */
+
+                sarosSession.userStartedQueuing(sarosSession.getUser(peer));
+
                 zipArchives = createProjectArchives(projectFilesToSend, monitor);
                 monitor.subTask("");
             } finally {
@@ -236,7 +240,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         checkCancellation(CancelOption.NOTIFY_PEER);
 
         Packet packet = collectPacket(remoteFileListResponseCollector,
-            60 * 60 * 1000, monitor);
+            60 * 60 * 1000);
 
         if (packet == null)
             throw new LocalCancellationException("received no response from "
@@ -418,34 +422,19 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         return tempArchive;
     }
 
-    private Packet collectPacket(SarosPacketCollector collector, long timeout,
-        IProgressMonitor monitor) throws SarosCancellationException {
-
-        Packet packet = null;
-
-        while (timeout > 0) {
-            if (monitor != null && monitor.isCanceled())
-                checkCancellation(CancelOption.NOTIFY_PEER);
-
-            packet = collector.nextResult(1000);
-
-            if (packet != null)
-                break;
-
-            timeout -= 1000;
-        }
-
-        return packet;
-    }
-
     private void createCollectors() {
         remoteFileListResponseCollector = xmppReceiver
             .createCollector(FileListExtension.PROVIDER.getPacketFilter(
                 sessionID, processID));
+
+        startActivityQueuingResponseCollector = xmppReceiver
+            .createCollector(StartActivityQueuingResponse.PROVIDER
+                .getPacketFilter(sessionID, processID));
     }
 
     private void deleteCollectors() {
         remoteFileListResponseCollector.cancel();
+        startActivityQueuingResponseCollector.cancel();
     }
 
     private void sendArchive(File archive, JID remoteContact,
@@ -526,6 +515,34 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         subMonitor.done();
 
         return pInfos;
+    }
+
+    /**
+     * Sends an activity queuing request to the remote side and awaits the
+     * confirmation of the request.
+     * 
+     * @param monitor
+     */
+    private void sendAndAwaitActivityQueueingActivation(IProgressMonitor monitor)
+        throws IOException, SarosCancellationException {
+
+        monitor.beginTask("Waiting for " + peer.getName()
+            + " to perform additional initialization...",
+            IProgressMonitor.UNKNOWN);
+
+        transmitter.sendToSessionUser(getPeer(),
+            StartActivityQueuingRequest.PROVIDER
+                .create(new StartActivityQueuingRequest(sessionID, processID)));
+
+        Packet packet = collectPacket(startActivityQueuingResponseCollector,
+            PACKET_TIMEOUT);
+
+        if (packet == null)
+            throw new LocalCancellationException("received no response from "
+                + peer + " while waiting to finish additional initialization",
+                CancelOption.DO_NOT_NOTIFY_PEER);
+
+        monitor.done();
     }
 
     @Override
