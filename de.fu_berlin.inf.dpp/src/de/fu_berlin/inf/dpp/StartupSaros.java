@@ -9,6 +9,9 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
+import de.fu_berlin.inf.dpp.feedback.StatisticManagerConfiguration;
+import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.stf.server.STFController;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -32,6 +35,12 @@ public class StartupSaros implements IStartup {
 
     @Inject
     private SarosUI sarosUI;
+
+    @Inject
+    private Saros saros;
+
+    @Inject
+    private PreferenceUtils preferenceUtils;
 
     @Inject
     private XMPPAccountStore xmppAccountStore;
@@ -67,20 +76,39 @@ public class StartupSaros implements IStartup {
              * user is probably already experienced.
              */
 
-            handleStartup(xmppAccountStore.isEmpty());
+            if (xmppAccountStore.isEmpty())
+                showTutorialWebpage();
+            else {
+                /*
+                 * HACK workaround for http://sourceforge.net/p/dpp/bugs/782/
+                 * Perform connecting after the view is created so that the
+                 * necessary GUI elements for the chat have already installed
+                 * their listeners.
+                 * 
+                 * FIXME This will not work if the view is not created on
+                 * startup !
+                 */
+
+                // determine if auto-connect can and should be performed
+                if (preferenceUtils.isAutoConnecting()
+                    && !xmppAccountStore.isEmpty()
+                    && StatisticManagerConfiguration
+                        .hasStatisticAgreement(saros)
+                    && ErrorLogManager.hasErrorLogAgreement(saros)) {
+                    saros.asyncConnect();
+                }
+            }
         }
     }
 
-    private void handleStartup(boolean showConfigurationWizard) {
-        if (showConfigurationWizard) {
-            SWTUtils.runSafeSWTAsync(log, new Runnable() {
-                @Override
-                public void run() {
-                    SWTUtils.openInternalBrowser(Messages.Saros_tutorial_url,
-                        Messages.Saros_tutorial_title);
-                }
-            });
-        }
+    private void showTutorialWebpage() {
+        SWTUtils.runSafeSWTAsync(log, new Runnable() {
+            @Override
+            public void run() {
+                SWTUtils.openInternalBrowser(Messages.Saros_tutorial_url,
+                    Messages.Saros_tutorial_title);
+            }
+        });
     }
 
     private void startSTFController(final int port) {

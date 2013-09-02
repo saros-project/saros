@@ -56,8 +56,6 @@ import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
-import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
-import de.fu_berlin.inf.dpp.feedback.StatisticManagerConfiguration;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.net.upnp.internal.UPnPAccessImpl;
@@ -281,13 +279,6 @@ public class Saros extends AbstractUIPlugin {
         isInitialized = true;
 
         upnpService.init(new UPnPAccessImpl(), getPreferenceStore());
-
-        // determine if auto-connect can and should be performed
-        if (preferenceUtils.isAutoConnecting() && !xmppAccountStore.isEmpty()
-            && StatisticManagerConfiguration.hasStatisticAgreement(this)
-            && ErrorLogManager.hasErrorLogAgreement(this)) {
-            asyncConnect();
-        }
 
         /*
          * If other colors than the ones we support are set in the
