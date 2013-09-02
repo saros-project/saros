@@ -434,21 +434,7 @@ public class ActivitySequencer implements Startable {
      * @param user
      */
     public void unregisterUser(User user) {
-        /*
-         * FIXME This stuff is to lazy if called outside the UI-Thread as it is
-         * possible that activities may be still send or received. FIX: Ensure
-         * proper synchronization and discard incoming or outgoing activities if
-         * the user is not present.
-         */
-
-        synchronized (bufferedOutgoingActivities) {
-            bufferedOutgoingActivities.put(user.getJID(), null);
-            bufferedOutgoingActivities.notifyAll();
-        }
-
-        synchronized (bufferedIncomingActivities) {
-            bufferedIncomingActivities.put(user.getJID(), null);
-        }
+        unregisterUser(user.getJID());
     }
 
     /**
@@ -478,6 +464,24 @@ public class ActivitySequencer implements Startable {
         }
     }
 
+    private void unregisterUser(JID jid) {
+        /*
+         * FIXME This stuff is to lazy if called outside the UI-Thread as it is
+         * possible that activities may be still send or received. FIX: Ensure
+         * proper synchronization and discard incoming or outgoing activities if
+         * the user is not present.
+         */
+
+        synchronized (bufferedOutgoingActivities) {
+            bufferedOutgoingActivities.put(jid, null);
+            bufferedOutgoingActivities.notifyAll();
+        }
+
+        synchronized (bufferedIncomingActivities) {
+            bufferedIncomingActivities.put(jid, null);
+        }
+    }
+
     private void sendActivities(JID recipient,
         List<IActivityDataObject> activities, int sequenceNumber) {
 
@@ -500,11 +504,12 @@ public class ActivitySequencer implements Startable {
         try {
             transmitter.sendToSessionUser(recipient, activityPacketExtension);
         } catch (IOException e) {
-            /*
-             * FIMXE kick the user out of session (if host) or just terminate
-             * the session(client)
-             */
             LOG.error("failed to sent activities: " + activities, e);
+            /*
+             * as our "wonderful" networklayer will try to establish a new
+             * connection (sometimes forever) we will "shutdown" the user here
+             */
+            unregisterUser(recipient);
         }
     }
 
@@ -539,6 +544,18 @@ public class ActivitySequencer implements Startable {
 
             executeActivity(from, new SequencedActivity(activity,
                 sequenceNumber++));
+        }
+    }
+
+    /**
+     * For testing purposes only.
+     * 
+     * @param user
+     * @return
+     */
+    boolean isUserRegistered(User user) {
+        synchronized (bufferedOutgoingActivities) {
+            return bufferedOutgoingActivities.get(user.getJID()) != null;
         }
     }
 }

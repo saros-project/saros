@@ -1,13 +1,18 @@
 package de.fu_berlin.inf.dpp.project.internal;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.easymock.EasyMock;
+import org.jivesoftware.smack.packet.PacketExtension;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -147,16 +152,54 @@ public class ActivitySequencerTest {
     }
 
     @Test(timeout = 30000)
+    public void testUnregisterUserOnTransmissionFailure() {
+
+        ITransmitter brokenTransmitter = EasyMock
+            .createNiceMock(ITransmitter.class);
+
+        try {
+            brokenTransmitter.sendToSessionUser(EasyMock.anyObject(JID.class),
+                EasyMock.anyObject(PacketExtension.class));
+        } catch (IOException e) {
+            // cannot happen in recording mode
+        }
+
+        EasyMock.expectLastCall().andStubThrow(new IOException());
+
+        EasyMock.replay(brokenTransmitter);
+
+        aliceSequencer = new ActivitySequencer(sessionStubAlice,
+            brokenTransmitter, aliceReceiver, null, SESSION_ID_ALICE);
+
+        aliceSequencer.start();
+
+        User bobUserInAliceSession = new User(sessionStubAlice, BOB_JID, 0, 0);
+
+        aliceSequencer.registerUser(bobUserInAliceSession);
+
+        assertTrue("Bob is not registered",
+            aliceSequencer.isUserRegistered(bobUser));
+
+        aliceSequencer.sendActivity(Collections
+            .singletonList(bobUserInAliceSession), new NOPActivity(aliceUser,
+            bobUserInAliceSession, 0).getActivityDataObject(sessionStubAlice));
+
+        aliceSequencer.flush(bobUserInAliceSession);
+
+        assertFalse("Bob is still registered",
+            aliceSequencer.isUserRegistered(bobUserInAliceSession));
+    }
+
+    @Test(timeout = 30000)
     public void testSendAndFlushAndReceiveAndOrder() {
 
         int activityCount = 1000;
 
-        ActivitySequencer aliceSequencer = new ActivitySequencer(
-            sessionStubAlice, aliceTransmitter, aliceReceiver, null,
-            SESSION_ID_ALICE);
+        aliceSequencer = new ActivitySequencer(sessionStubAlice,
+            aliceTransmitter, aliceReceiver, null, SESSION_ID_ALICE);
 
-        ActivitySequencer bobSequencer = new ActivitySequencer(sessionStubBob,
-            bobTransmitter, bobReceiver, null, SESSION_ID_ALICE);
+        bobSequencer = new ActivitySequencer(sessionStubBob, bobTransmitter,
+            bobReceiver, null, SESSION_ID_ALICE);
 
         aliceSequencer.start();
         bobSequencer.start();
@@ -194,12 +237,11 @@ public class ActivitySequencerTest {
     @Test(timeout = 30000)
     public void testSendWithoutRegisteredUser() {
 
-        ActivitySequencer aliceSequencer = new ActivitySequencer(
-            sessionStubAlice, aliceTransmitter, aliceReceiver, null,
-            SESSION_ID_ALICE);
+        aliceSequencer = new ActivitySequencer(sessionStubAlice,
+            aliceTransmitter, aliceReceiver, null, SESSION_ID_ALICE);
 
-        ActivitySequencer bobSequencer = new ActivitySequencer(sessionStubBob,
-            bobTransmitter, bobReceiver, null, SESSION_ID_ALICE);
+        bobSequencer = new ActivitySequencer(sessionStubBob, bobTransmitter,
+            bobReceiver, null, SESSION_ID_ALICE);
 
         aliceSequencer.start();
         bobSequencer.start();
@@ -229,12 +271,11 @@ public class ActivitySequencerTest {
     @Test(timeout = 30000)
     public void testReceiveWithoutRegisteredUser() {
 
-        ActivitySequencer aliceSequencer = new ActivitySequencer(
-            sessionStubAlice, aliceTransmitter, aliceReceiver, null,
-            SESSION_ID_ALICE);
+        aliceSequencer = new ActivitySequencer(sessionStubAlice,
+            aliceTransmitter, aliceReceiver, null, SESSION_ID_ALICE);
 
-        ActivitySequencer bobSequencer = new ActivitySequencer(sessionStubBob,
-            bobTransmitter, bobReceiver, null, SESSION_ID_ALICE);
+        bobSequencer = new ActivitySequencer(sessionStubBob, bobTransmitter,
+            bobReceiver, null, SESSION_ID_ALICE);
 
         aliceSequencer.start();
         bobSequencer.start();
@@ -264,12 +305,11 @@ public class ActivitySequencerTest {
     @Test(timeout = 30000)
     public void testSendAndReceiveWithDifferendSessionIDs() {
 
-        ActivitySequencer aliceSequencer = new ActivitySequencer(
-            sessionStubAlice, aliceTransmitter, aliceReceiver, null,
-            SESSION_ID_ALICE);
+        aliceSequencer = new ActivitySequencer(sessionStubAlice,
+            aliceTransmitter, aliceReceiver, null, SESSION_ID_ALICE);
 
-        ActivitySequencer bobSequencer = new ActivitySequencer(sessionStubBob,
-            bobTransmitter, bobReceiver, null, SESSION_ID_BOB);
+        bobSequencer = new ActivitySequencer(sessionStubBob, bobTransmitter,
+            bobReceiver, null, SESSION_ID_BOB);
 
         aliceSequencer.start();
         bobSequencer.start();
