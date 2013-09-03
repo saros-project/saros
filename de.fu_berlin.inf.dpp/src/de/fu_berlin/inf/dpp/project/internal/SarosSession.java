@@ -21,10 +21,10 @@ package de.fu_berlin.inf.dpp.project.internal;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,9 +42,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.joda.time.DateTime;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.annotations.Inject;
@@ -57,6 +54,7 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
+import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.IResourceActivity;
@@ -69,7 +67,6 @@ import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogHandler;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.feedback.DataTransferCollector;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
@@ -105,7 +102,6 @@ import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.ArrayUtils;
-import de.fu_berlin.inf.dpp.util.FileUtils;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -178,6 +174,9 @@ public final class SarosSession implements ISarosSession {
 
     // KARL HELD YOU ARE MY WTF GUY !!!
     private List<IResource> selectedResources = new ArrayList<IResource>();
+
+    /** Files shared with NeedBased feature **/
+    private Set<SPath> needBasedPathsList = new HashSet<SPath>();
 
     private final MutablePicoContainer sessionContainer;
 
@@ -797,8 +796,6 @@ public final class SarosSession implements ISarosSession {
         return false;
     }
 
-    List<SPath> needBasedPathsList = new ArrayList<SPath>();
-
     /**
      * Method to enable the need based sync.
      * 
@@ -809,38 +806,42 @@ public final class SarosSession implements ISarosSession {
      */
     private void needBasedSynchronization(JupiterActivity jupiterActivity,
         List<User> toWhom) {
+
         if (jupiterActivity == null)
             throw new IllegalArgumentException();
 
-        if (preferenceUtils.isNeedsBasedSyncEnabled().equals("false"))
+        final SPath path = jupiterActivity.getPath();
+        final IProject project = path.getProject();
+        final String needBasedSetting = preferenceUtils
+            .isNeedsBasedSyncEnabled().toLowerCase();
+
+        if (!isOwnedProject(project))
             return;
 
-        final SPath path = jupiterActivity.getPath();
-        IProject iProject = path.getProject();
+        if (isShared(path.getFile()))
+            return;
 
-        if (!isOwnedProject(iProject))
+        /* FIMXE CONSTANT ! */
+        if (needBasedSetting.equals("false"))
             return;
 
         if (needBasedPathsList.contains(path))
             return;
 
-        /*
-         * quick adding when file is not shared
-         */
-        if (!isShared(path.getFile())) {
-            if (preferenceUtils.isNeedsBasedSyncEnabled().equals("undefined")) {
-                if (!CollaborationUtils.activateNeedBasedSynchronization(saros))
-                    return;
-            }
+        /* FIMXE CONSTANT ! */
+        if (needBasedSetting.equals("undefined")
+        /* FIMXE opens dialog & static* method ! */
+        && (!CollaborationUtils.activateNeedBasedSynchronization(saros)))
+            return;
 
-            needBasedPathsList.add(path);
+        needBasedPathsList.add(path);
 
-            try {
-                sendSingleFile(path);
-            } catch (FileNotFoundException e) {
-                log.error("File could not be found, despite existing: " + path,
-                    e);
-            }
+        try {
+            sendSingleFile(path);
+        } catch (IOException e) {
+            needBasedPathsList.remove(path);
+            log.error("file could not be found or read, despite existing: "
+                + path, e);
         }
     }
 
@@ -851,57 +852,42 @@ public final class SarosSession implements ISarosSession {
      * 
      * @param path
      *            identifies the file to synchronize to all session participants
+     * @throws IOException
+     *             if the file determined by the path could not be read
      * @throws FileNotFoundException
+     *             if the file determined by the path does not exist
      */
-    protected void sendSingleFile(final SPath path)
-        throws FileNotFoundException {
+    private void sendSingleFile(final SPath path) throws IOException {
+
         if (path == null)
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("path is null");
 
-        for (final User recipient : getRemoteUsers()) {
-            final ProgressMonitorDialog dialog = new ProgressMonitorDialog(
-                EditorAPI.getAWorkbenchWindow().getShell());
-            final SarosSession session = this;
+        final FileActivity needBasedFileActivity = FileActivity.created(
+            getLocalUser(), path, Purpose.NEEDS_BASED_SYNC);
 
-            // GUI code in the business logic is a real WTF !
-            SWTUtils.runSafeSWTSync(log, new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        dialog.run(true, true, new IRunnableWithProgress() {
-                            @Override
-                            public void run(IProgressMonitor monitor) {
-                                // synchronize the file and check if it is
-                                // correctly transmitted
-                                FileUtils.syncSingleFile(recipient, session,
-                                    path, SubMonitor.convert(monitor));
+        synchronizer.syncExec(Utils.wrapSafe(log, new Runnable() {
 
-                                /*
-                                 * Notify the session participants of your
-                                 * activated editor. This is mandatory to avoid
-                                 * inconsistencies with the editor manager and
-                                 * by that with the follow mode.
-                                 */
-                                editorManager.sendPartActivated();
-                            }
-                        });
-                    } catch (InvocationTargetException e) {
-                        try {
-                            throw e.getCause();
-                        } catch (CancellationException c) {
-                            log.info("Need based sync was cancelled by local user");
-                        } catch (Throwable t) {
-                            log.error("Internal Error: ", t);
-                        }
-                    } catch (InterruptedException e) {
-                        log.debug(
-                            "Thread is interrupted, either before or during the need based synchronization of "
-                                + path, e);
-                    }
+            @Override
+            public void run() {
+                for (final User recipient : getRemoteUsers()) {
+
+                    if (isHost())
+                        concurrentDocumentServer.reset(recipient.getJID(), path);
+                    else
+                        concurrentDocumentClient.reset(path);
+
+                    // TODO do not bypass the ActivityHandler !
+                    sendActivity(recipient, needBasedFileActivity);
+
+                    /*
+                     * Notify the session participants of your activated editor.
+                     * This is mandatory to avoid inconsistencies with the
+                     * editor manager and by that with the follow mode.
+                     */
+                    editorManager.sendPartActivated();
                 }
-            });
-
-        }
+            }
+        }));
     }
 
     /**

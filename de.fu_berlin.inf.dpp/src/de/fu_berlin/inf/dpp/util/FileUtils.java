@@ -22,13 +22,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.SubMonitor;
-
-import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.business.FileActivity;
-import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
  * This class contains static utility methods for file handling.
@@ -402,38 +395,6 @@ public class FileUtils {
         workspace.run(moveProcedure, workspace.getRoot(),
             IWorkspace.AVOID_UPDATE, null);
 
-    }
-
-    /* FIMXE logic code should not be extracted to Util classes ! */
-
-    /**
-     * Synchronizing a single file for the given user.
-     */
-    public static void syncSingleFile(User from,
-        final ISarosSession sarosSession, final SPath path, SubMonitor progress) {
-
-        progress.beginTask("Synchronizing file: " + path.toString(), 10);
-        progress.worked(1);
-
-        // Reset jupiter
-        if (sarosSession.isHost()) {
-            sarosSession.getConcurrentDocumentServer().reset(from.getJID(),
-                path);
-        } else {
-            sarosSession.getConcurrentDocumentClient().reset(path);
-        }
-
-        progress.worked(1);
-        final User user = sarosSession.getLocalUser();
-
-        try {
-            // Send the file to client
-            sarosSession.sendActivity(from,
-                FileActivity.created(user, path, Purpose.NEEDS_BASED_SYNC));
-        } catch (IOException e) {
-            log.error("File could not be read, despite existing: " + path, e);
-        }
-        progress.done();
     }
 
     /**
