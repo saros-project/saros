@@ -41,6 +41,8 @@ public class DataTransferManagerTest {
 
         private NetTransferMode mode;
 
+        private String connectionID;
+
         public Transport(NetTransferMode mode) {
             this.mode = mode;
         }
@@ -60,7 +62,12 @@ public class DataTransferManagerTest {
                 getNetTransferMode(), listener);
 
             establishedConnections.add(connection);
-            listener.connectionChanged(peer, connection, true);
+            listener.connectionChanged(connectionID, peer, connection, true);
+        }
+
+        // FIXME remove THIS !
+        public synchronized void setConnectionID(String connectionID) {
+            this.connectionID = connectionID;
         }
 
         @Override
@@ -149,7 +156,7 @@ public class DataTransferManagerTest {
         @Override
         public void close() {
             closed = true;
-            listener.connectionClosed(to, this);
+            listener.connectionClosed(/* FIMXE */null, to, this);
         }
 
         @Override
@@ -333,6 +340,67 @@ public class DataTransferManagerTest {
         assertEquals("wrong transport mode returned", NetTransferMode.NONE,
             dtm.getTransferMode(new JID("nothing@all")));
 
+    }
+
+    @Test(expected = IOException.class)
+    public void testSendOnInvalidConnectionIdentifierWithNoConnection()
+        throws Exception {
+        ITransport mainTransport = new Transport(NetTransferMode.SOCKS5_DIRECT);
+
+        DataTransferManager dtm = new DataTransferManager(sarosNetStub, null,
+            mainTransport, null, null, null);
+
+        connectionListener.getValue().connectionStateChanged(connectionMock,
+            ConnectionState.CONNECTED);
+
+        TransferDescription description = TransferDescription
+            .createCustomTransferDescription();
+
+        description.setRecipient(new JID("foo@bar.com"));
+
+        dtm.sendData("foo", description, new byte[0]);
+    }
+
+    @Test(expected = IOException.class)
+    public void testSendOnInvalidConnectionIdentifier() throws Exception {
+        ITransport mainTransport = new Transport(NetTransferMode.SOCKS5_DIRECT);
+
+        DataTransferManager dtm = new DataTransferManager(sarosNetStub, null,
+            mainTransport, null, null, null);
+
+        connectionListener.getValue().connectionStateChanged(connectionMock,
+            ConnectionState.CONNECTED);
+
+        TransferDescription description = TransferDescription
+            .createCustomTransferDescription();
+
+        dtm.connect("bar", new JID("foo@bar.com"));
+
+        description.setRecipient(new JID("foo@bar.com"));
+
+        dtm.sendData("foo", description, new byte[0]);
+    }
+
+    @Test
+    public void testSendOnValidConnectionIdentifier() throws Exception {
+        Transport mainTransport = new Transport(NetTransferMode.SOCKS5_DIRECT);
+
+        mainTransport.setConnectionID("foo");
+
+        DataTransferManager dtm = new DataTransferManager(sarosNetStub, null,
+            mainTransport, null, null, null);
+
+        connectionListener.getValue().connectionStateChanged(connectionMock,
+            ConnectionState.CONNECTED);
+
+        TransferDescription description = TransferDescription
+            .createCustomTransferDescription();
+
+        dtm.connect("foo", new JID("foo@bar.com"));
+
+        description.setRecipient(new JID("foo@bar.com"));
+
+        dtm.sendData("foo", description, new byte[0]);
     }
 
     @Test(timeout = 30000)

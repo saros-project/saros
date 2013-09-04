@@ -48,6 +48,8 @@ public class DataTransferManager implements IConnectionListener {
     private static final Logger log = Logger
         .getLogger(DataTransferManager.class);
 
+    private static final String DEFAULT_CONNECTION_IDENTIFIER = "default";
+
     private final TransferModeDispatch transferModeDispatch = new TransferModeDispatch();
 
     private CopyOnWriteArrayList<IPacketInterceptor> packetInterceptors = new CopyOnWriteArrayList<IPacketInterceptor>();
@@ -71,7 +73,7 @@ public class DataTransferManager implements IConnectionListener {
 
     private final Lock connectLock = new ReentrantLock();
 
-    private final Set<JID> currentOutgoingConnectionEstablishments = new HashSet<JID>();
+    private final Set<String> currentOutgoingConnectionEstablishments = new HashSet<String>();
 
     private final List<ITransport> availableTransports = new CopyOnWriteArrayList<ITransport>();
 
@@ -119,19 +121,22 @@ public class DataTransferManager implements IConnectionListener {
         }
 
         @Override
-        public void connectionChanged(JID peer,
+        public void connectionChanged(String connectionIdentifier, JID peer,
             IByteStreamConnection connection, boolean incomingRequest) {
 
             synchronized (connections) {
                 log.debug("bytestream connection changed "
                     + connection.getMode() + " [to: " + peer + "|inc: "
-                    + incomingRequest + "]");
+                    + incomingRequest + "|id: " + connectionIdentifier + "]");
 
                 ConnectionHolder holder = connections
-                    .get(toTokenID(null, peer));
+                    .get(toConnectionIdentifierToken(connectionIdentifier, peer));
                 if (holder == null) {
                     holder = new ConnectionHolder();
-                    connections.put(toTokenID(null, peer), holder);
+                    connections
+                        .put(
+                            toConnectionIdentifierToken(connectionIdentifier,
+                                peer), holder);
                 }
 
                 if (!incomingRequest) {
@@ -153,8 +158,9 @@ public class DataTransferManager implements IConnectionListener {
         }
 
         @Override
-        public void connectionClosed(JID peer, IByteStreamConnection connection) {
-            closeConnection(peer);
+        public void connectionClosed(String connectionIdentifier, JID peer,
+            IByteStreamConnection connection) {
+            closeConnection(connectionIdentifier, peer);
             transferModeDispatch.connectionChanged(peer, null);
         }
     };
@@ -180,13 +186,8 @@ public class DataTransferManager implements IConnectionListener {
         sarosNet.addListener(this);
     }
 
-    /**
-     * Dispatch to the used {@link BinaryChannelConnection}.
-     * 
-     * @throws IOException
-     *             If a technical problem occurred.
-     */
-    public void sendData(TransferDescription transferData, byte[] payload)
+    public void sendData(String connectionIdentifier,
+        TransferDescription transferDescription, byte[] payload)
         throws IOException {
 
         JID connectionJID = currentLocalJID;
@@ -194,14 +195,50 @@ public class DataTransferManager implements IConnectionListener {
         if (connectionJID == null)
             throw new IOException("not connected to a XMPP server");
 
-        log.trace("sending data ... from " + connectionJID + " to "
-            + transferData.getRecipient());
+        IByteStreamConnection connection = getCurrentConnection(
+            connectionIdentifier, transferDescription.getRecipient());
 
-        JID recipient = transferData.getRecipient();
-        transferData.setSender(connectionJID);
+        if (connection == null)
+            throw new IOException("not connected to "
+                + transferDescription.getRecipient()
+                + " [connection identifier=" + connectionIdentifier + "]");
 
-        IByteStreamConnection connection = connectInternal(recipient);
+        if (log.isTraceEnabled())
+            log.trace("sending data ... from " + connectionJID + " to "
+                + transferDescription.getRecipient()
+                + "[connection identifier=" + connectionIdentifier + "]");
 
+        sendInternal(connection, transferDescription, payload);
+    }
+
+    /**
+     * @deprecated establishes connections on demand
+     * @param transferDescription
+     * @param payload
+     * @throws IOException
+     */
+    @Deprecated
+    public void sendData(TransferDescription transferDescription, byte[] payload)
+        throws IOException {
+
+        JID connectionJID = currentLocalJID;
+
+        if (connectionJID == null)
+            throw new IOException("not connected to a XMPP server");
+
+        if (log.isTraceEnabled())
+            log.trace("sending data ... from " + connectionJID + " to "
+                + transferDescription.getRecipient());
+
+        JID recipient = transferDescription.getRecipient();
+        transferDescription.setSender(connectionJID);
+
+        sendInternal(connectInternal(null, recipient), transferDescription,
+            payload);
+    }
+
+    private void sendInternal(IByteStreamConnection connection,
+        TransferDescription transferData, byte[] payload) throws IOException {
         try {
 
             boolean sendPacket = true;
@@ -221,7 +258,7 @@ public class DataTransferManager implements IConnectionListener {
             long transferStartTime = System.currentTimeMillis();
             connection.send(transferData, payload);
 
-            transferModeDispatch.transferFinished(recipient,
+            transferModeDispatch.transferFinished(transferData.getRecipient(),
                 connection.getMode(), false, payload.length, sizeUncompressed,
                 System.currentTimeMillis() - transferStartTime);
         } catch (IOException e) {
@@ -233,8 +270,17 @@ public class DataTransferManager implements IConnectionListener {
         }
     }
 
+    /**
+     * @deprecated
+     */
+    @Deprecated
     public void connect(JID recipient) throws IOException {
-        connectInternal(recipient);
+        connectInternal(null, recipient);
+    }
+
+    public void connect(String connectionIdentifier, JID recipient)
+        throws IOException {
+        connectInternal(connectionIdentifier, recipient);
     }
 
     public TransferModeDispatch getTransferModeDispatch() {
@@ -242,14 +288,21 @@ public class DataTransferManager implements IConnectionListener {
     }
 
     /**
-     * Disconnects {@link IByteStreamConnection} with the specified peer
+     * @deprecated Disconnects {@link IByteStreamConnection} with the specified
+     *             peer
      * 
      * @param peer
      *            {@link JID} of the peer to disconnect the
      *            {@link IByteStreamConnection}
      */
+    @Deprecated
     public boolean closeConnection(JID peer) {
-        ConnectionHolder holder = connections.remove(toTokenID(null, peer));
+        return closeConnection(null, peer);
+    }
+
+    public boolean closeConnection(String connectionIdentifier, JID peer) {
+        ConnectionHolder holder = connections
+            .remove(toConnectionIdentifierToken(connectionIdentifier, peer));
 
         if (holder == null)
             return false;
@@ -261,24 +314,38 @@ public class DataTransferManager implements IConnectionListener {
             holder.in.close();
 
         return holder.out != null || holder.in != null;
+
     }
 
+    /**
+     * @deprecated
+     */
+    @Deprecated
     public NetTransferMode getTransferMode(JID jid) {
-        IByteStreamConnection connection = getCurrentConnection(jid);
+        return getTransferMode(null, jid);
+    }
+
+    public NetTransferMode getTransferMode(String connectionIdentifier, JID jid) {
+        IByteStreamConnection connection = getCurrentConnection(
+            connectionIdentifier, jid);
         return connection == null ? NetTransferMode.NONE : connection.getMode();
     }
 
-    private IByteStreamConnection connectInternal(JID recipient)
-        throws IOException {
+    private IByteStreamConnection connectInternal(String connectionIdentifier,
+        JID recipient) throws IOException {
 
         IByteStreamConnection connection = null;
 
+        String connectionID = toConnectionIdentifierToken(connectionIdentifier,
+            recipient);
+
         synchronized (currentOutgoingConnectionEstablishments) {
-            if (!currentOutgoingConnectionEstablishments.contains(recipient)) {
-                connection = getCurrentConnection(recipient);
+            if (!currentOutgoingConnectionEstablishments.contains(connectionID)) {
+                connection = getCurrentConnection(connectionIdentifier,
+                    recipient);
 
                 if (connection == null)
-                    currentOutgoingConnectionEstablishments.add(recipient);
+                    currentOutgoingConnectionEstablishments.add(connectionID);
             }
 
             if (connection != null) {
@@ -291,7 +358,7 @@ public class DataTransferManager implements IConnectionListener {
 
         try {
 
-            connection = getCurrentConnection(recipient);
+            connection = getCurrentConnection(connectionIdentifier, recipient);
 
             if (connection != null)
                 return connection;
@@ -332,8 +399,8 @@ public class DataTransferManager implements IConnectionListener {
             }
 
             if (connection != null) {
-                byteStreamConnectionListener.connectionChanged(recipient,
-                    connection, false);
+                byteStreamConnectionListener.connectionChanged(
+                    connectionIdentifier, recipient, connection, false);
 
                 return connection;
             }
@@ -342,7 +409,7 @@ public class DataTransferManager implements IConnectionListener {
                 + Utils.prefix(recipient));
         } finally {
             synchronized (currentOutgoingConnectionEstablishments) {
-                currentOutgoingConnectionEstablishments.remove(recipient);
+                currentOutgoingConnectionEstablishments.remove(connectionID);
             }
             connectLock.unlock();
         }
@@ -540,14 +607,19 @@ public class DataTransferManager implements IConnectionListener {
      * connected to the remote side as well as the remote side is connected to
      * the local side the local to remote connection will be returned.
      * 
+     * @param connectionIdentifier
+     *            identifier for the connection to retrieve or <code>null</code>
+     *            to retrieve the default one
      * @param jid
      *            JID of the remote side
      * @return the connection to the remote side or <code>null</code> if no
      *         connection exists
      */
-    private IByteStreamConnection getCurrentConnection(JID jid) {
+    private IByteStreamConnection getCurrentConnection(
+        String connectionIdentifier, JID jid) {
         synchronized (connections) {
-            ConnectionHolder holder = connections.get(toTokenID(null, jid));
+            ConnectionHolder holder = connections
+                .get(toConnectionIdentifierToken(connectionIdentifier, jid));
 
             if (holder == null)
                 return null;
@@ -559,10 +631,12 @@ public class DataTransferManager implements IConnectionListener {
         }
     }
 
-    private String toTokenID(String token, JID jid) {
-        if (token == null)
-            token = "default:";
+    private String toConnectionIdentifierToken(String connectionIdentifier,
+        JID jid) {
 
-        return token.concat(jid.toString());
+        if (connectionIdentifier == null)
+            connectionIdentifier = DEFAULT_CONNECTION_IDENTIFIER;
+
+        return connectionIdentifier.concat(":").concat(jid.toString());
     }
 }

@@ -74,7 +74,8 @@ public abstract class ByteStreamTransport implements ITransport {
                     return;
                 }
 
-                listener.connectionChanged(peer, connection, true);
+                listener.connectionChanged(/* FIMXE */null, peer, connection,
+                    true);
 
             } catch (InterruptedException e) {
                 /*

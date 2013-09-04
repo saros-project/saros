@@ -160,7 +160,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
             }
         }
 
-        listener.connectionClosed(getPeer(), this);
+        listener.connectionClosed(/* FIMXE */null, getPeer(), this);
     }
 
     @Override
