@@ -208,6 +208,7 @@ public class DataTransferManager implements IConnectionListener {
                 + transferDescription.getRecipient()
                 + "[connection identifier=" + connectionIdentifier + "]");
 
+        transferDescription.setSender(connectionJID);
         sendInternal(connection, transferDescription, payload);
     }
 
