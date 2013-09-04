@@ -66,8 +66,8 @@ public class DataTransferManager implements IConnectionListener {
 
     private final PreferenceUtils preferenceUtils;
 
-    private final Map<JID, ConnectionHolder> connections = Collections
-        .synchronizedMap(new HashMap<JID, ConnectionHolder>());
+    private final Map<String, ConnectionHolder> connections = Collections
+        .synchronizedMap(new HashMap<String, ConnectionHolder>());
 
     private final Lock connectLock = new ReentrantLock();
 
@@ -127,10 +127,11 @@ public class DataTransferManager implements IConnectionListener {
                     + connection.getMode() + " [to: " + peer + "|inc: "
                     + incomingRequest + "]");
 
-                ConnectionHolder holder = connections.get(peer);
+                ConnectionHolder holder = connections
+                    .get(toTokenID(null, peer));
                 if (holder == null) {
                     holder = new ConnectionHolder();
-                    connections.put(peer, holder);
+                    connections.put(toTokenID(null, peer), holder);
                 }
 
                 if (!incomingRequest) {
@@ -248,7 +249,7 @@ public class DataTransferManager implements IConnectionListener {
      *            {@link IByteStreamConnection}
      */
     public boolean closeConnection(JID peer) {
-        ConnectionHolder holder = connections.remove(peer);
+        ConnectionHolder holder = connections.remove(toTokenID(null, peer));
 
         if (holder == null)
             return false;
@@ -546,7 +547,7 @@ public class DataTransferManager implements IConnectionListener {
      */
     private IByteStreamConnection getCurrentConnection(JID jid) {
         synchronized (connections) {
-            ConnectionHolder holder = connections.get(jid);
+            ConnectionHolder holder = connections.get(toTokenID(null, jid));
 
             if (holder == null)
                 return null;
@@ -556,5 +557,12 @@ public class DataTransferManager implements IConnectionListener {
 
             return holder.in;
         }
+    }
+
+    private String toTokenID(String token, JID jid) {
+        if (token == null)
+            token = "default:";
+
+        return token.concat(jid.toString());
     }
 }
