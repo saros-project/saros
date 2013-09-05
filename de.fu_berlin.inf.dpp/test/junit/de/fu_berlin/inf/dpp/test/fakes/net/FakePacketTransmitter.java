@@ -11,7 +11,6 @@ import org.jivesoftware.smack.packet.PacketExtension;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.extensions.SarosPacketExtension;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 class FakePacketTransmitter implements ITransmitter {
@@ -35,12 +34,8 @@ class FakePacketTransmitter implements ITransmitter {
     }
 
     @Override
-    public void sendPacket(Packet packet, boolean forceSarosCompatibility)
-        throws IOException {
+    public void sendPacket(Packet packet) throws IOException {
         packet.setFrom(localJID.toString());
-
-        if (forceSarosCompatibility)
-            packet.setPacketID(SarosPacketExtension.VERSION);
 
         JID to = new JID(packet.getTo());
 
@@ -64,7 +59,7 @@ class FakePacketTransmitter implements ITransmitter {
         message.addExtension(extension);
         message.setTo(jid.toString());
         try {
-            sendPacket(message, true);
+            sendPacket(message);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

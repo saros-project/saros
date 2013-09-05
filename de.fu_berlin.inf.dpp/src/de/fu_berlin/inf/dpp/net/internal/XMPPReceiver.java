@@ -263,7 +263,7 @@ public class XMPPReceiver implements IReceiver {
         }
 
         Packet packet = new Message();
-        packet.setPacketID(description.getExtensionVersion());
+        packet.setPacketID(Packet.ID_NOT_AVAILABLE);
         packet.setFrom(description.getSender().toString());
         packet.setTo(description.getRecipient().toString());
         packet.addExtension(extension);

@@ -8,6 +8,8 @@ public abstract class SarosPacketExtension {
 
     public static final String VERSION = "de.fu_berlin.inf.dpp/extension/V1";
 
+    private final String version = VERSION;
+
     public abstract static class Provider<T extends SarosPacketExtension>
         extends XStreamExtensionProvider<T> {
 
@@ -24,7 +26,7 @@ public abstract class SarosPacketExtension {
                     SarosPacketExtension extension = getPayload(packet);
 
                     return extension != null
-                        && VERSION.equals(packet.getPacketID());
+                        && VERSION.equals(extension.version);
                 }
             });
         }

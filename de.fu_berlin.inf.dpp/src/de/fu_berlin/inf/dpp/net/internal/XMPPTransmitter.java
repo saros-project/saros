@@ -37,7 +37,6 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.internal.extensions.SarosLeaveExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.SarosPacketExtension;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -143,7 +142,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             .setSender(session.getLocalUser().getJID())
             .setType(extension.getElementName())
             .setNamespace(extension.getNamespace())
-            .setExtensionVersion(SarosPacketExtension.VERSION)
             .setSessionID(currentSessionID);
 
         byte[] data = extension.toXML().getBytes("UTF-8");
@@ -190,23 +188,19 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         assert jid.toString().equals(message.getTo());
 
         try {
-            sendPacket(message, true);
+            sendPacket(message);
         } catch (IOException e) {
             log.error("could not send message to " + Utils.prefix(jid), e);
         }
     }
 
     @Override
-    public synchronized void sendPacket(Packet packet,
-        boolean forceSarosCompatibility) throws IOException {
+    public synchronized void sendPacket(Packet packet) throws IOException {
 
         if (isConnectionInvalid())
             throw new IOException("not connected to a XMPP server");
 
         try {
-            if (forceSarosCompatibility)
-                packet.setPacketID(SarosPacketExtension.VERSION);
-
             connection.sendPacket(packet);
         } catch (Exception e) {
             throw new IOException("could not send packet " + packet + " : "

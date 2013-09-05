@@ -166,7 +166,7 @@ public class VersionManager {
                 reply.setPacketID(iq.getPacketID());
 
                 try {
-                    transmitter.sendPacket(reply, false);
+                    transmitter.sendPacket(reply);
                 } catch (IOException e) {
                     log.error("could not send version info to " + iq.getFrom(),
                         e);
@@ -226,7 +226,7 @@ public class VersionManager {
                 }));
 
         try {
-            transmitter.sendPacket(request, false);
+            transmitter.sendPacket(request);
             return VERSION_PROVIDER.getPayload(collector.nextResult(10 * 1000));
         } catch (IOException e) {
             log.warn(e.getMessage(), e);
