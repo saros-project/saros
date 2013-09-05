@@ -29,5 +29,13 @@ public interface IByteStreamConnection {
     public void send(TransferDescription data, byte[] content)
         throws IOException;
 
+    /**
+     * Returns the connection id of this connection.
+     * 
+     * @return the connection id or <code>null</code> if the connection has no
+     *         id
+     */
+    public String getConnectionID();
+
     public NetTransferMode getMode();
 }

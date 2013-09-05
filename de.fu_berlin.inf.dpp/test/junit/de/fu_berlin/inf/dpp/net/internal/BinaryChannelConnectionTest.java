@@ -109,7 +109,7 @@ public class BinaryChannelConnectionTest {
         final CountDownLatch received = new CountDownLatch(1);
 
         BinaryChannelConnection alice = new BinaryChannelConnection(new JID(
-            "alice@baumeister.de"), aliceSession,
+            "alice@baumeister.de"), "junit", aliceSession,
             NetTransferMode.SOCKS5_DIRECT, new StreamConnectionListener() {
                 @Override
                 public void addIncomingTransferObject(
@@ -119,8 +119,8 @@ public class BinaryChannelConnectionTest {
             });
 
         BinaryChannelConnection bob = new BinaryChannelConnection(new JID(
-            "bob@baumeister.de"), bobSession, NetTransferMode.SOCKS5_DIRECT,
-            new StreamConnectionListener() {
+            "bob@baumeister.de"), "junit", bobSession,
+            NetTransferMode.SOCKS5_DIRECT, new StreamConnectionListener() {
                 @Override
                 public void addIncomingTransferObject(
                     final IncomingTransferObject incomingTransferObject) {
@@ -156,7 +156,7 @@ public class BinaryChannelConnectionTest {
         final CountDownLatch received = new CountDownLatch(1);
 
         BinaryChannelConnection alice = new BinaryChannelConnection(new JID(
-            "alice@baumeister.de"), aliceSession,
+            "alice@baumeister.de"), "junit", aliceSession,
             NetTransferMode.SOCKS5_DIRECT, new StreamConnectionListener() {
                 @Override
                 public void addIncomingTransferObject(
@@ -166,8 +166,8 @@ public class BinaryChannelConnectionTest {
             });
 
         BinaryChannelConnection bob = new BinaryChannelConnection(new JID(
-            "bob@baumeister.de"), bobSession, NetTransferMode.SOCKS5_DIRECT,
-            new StreamConnectionListener() {
+            "bob@baumeister.de"), "junit", bobSession,
+            NetTransferMode.SOCKS5_DIRECT, new StreamConnectionListener() {
                 @Override
                 public void addIncomingTransferObject(
                     final IncomingTransferObject incomingTransferObject) {
@@ -213,7 +213,7 @@ public class BinaryChannelConnectionTest {
         final CountDownLatch received = new CountDownLatch((int) packetsToSend);
 
         BinaryChannelConnection alice = new BinaryChannelConnection(new JID(
-            "alice@baumeister.de"), aliceSession,
+            "alice@baumeister.de"), "junit", aliceSession,
             NetTransferMode.SOCKS5_DIRECT, new StreamConnectionListener() {
                 @Override
                 public void addIncomingTransferObject(
@@ -223,8 +223,8 @@ public class BinaryChannelConnectionTest {
             });
 
         BinaryChannelConnection bob = new BinaryChannelConnection(new JID(
-            "bob@baumeister.de"), bobSession, NetTransferMode.SOCKS5_DIRECT,
-            new StreamConnectionListener() {
+            "bob@baumeister.de"), "junit", bobSession,
+            NetTransferMode.SOCKS5_DIRECT, new StreamConnectionListener() {
                 @Override
                 public void addIncomingTransferObject(
                     final IncomingTransferObject incomingTransferObject) {

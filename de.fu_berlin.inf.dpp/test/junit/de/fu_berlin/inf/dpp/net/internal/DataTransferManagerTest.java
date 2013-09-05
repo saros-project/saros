@@ -48,8 +48,12 @@ public class DataTransferManagerTest {
         }
 
         @Override
-        public synchronized IByteStreamConnection connect(JID peer)
-            throws IOException, InterruptedException {
+        public synchronized IByteStreamConnection connect(
+            String connectionIdentifier, JID peer) throws IOException,
+            InterruptedException {
+
+            connectionID = connectionIdentifier;
+
             ChannelConnection connection = new ChannelConnection(peer,
                 getNetTransferMode(), listener);
 
@@ -63,11 +67,6 @@ public class DataTransferManagerTest {
 
             establishedConnections.add(connection);
             listener.connectionChanged(connectionID, peer, connection, true);
-        }
-
-        // FIXME remove THIS !
-        public synchronized void setConnectionID(String connectionID) {
-            this.connectionID = connectionID;
         }
 
         @Override
@@ -112,11 +111,11 @@ public class DataTransferManagerTest {
         }
 
         @Override
-        public IByteStreamConnection connect(JID peer) throws IOException,
-            InterruptedException {
+        public IByteStreamConnection connect(String connectionIdentifier,
+            JID peer) throws IOException, InterruptedException {
 
             if (jidsToIgnore.contains(peer))
-                return super.connect(peer);
+                return super.connect(connectionIdentifier, peer);
 
             synchronized (this) {
                 if (isConnecting)
@@ -127,7 +126,8 @@ public class DataTransferManagerTest {
 
             acknowledge.countDown();
             proceed.await();
-            IByteStreamConnection connection = super.connect(peer);
+            IByteStreamConnection connection = super.connect(
+                connectionIdentifier, peer);
             isConnecting = false;
             return connection;
         }
@@ -178,6 +178,11 @@ public class DataTransferManagerTest {
         public int getSendPacketsCount() {
             return sendPackets;
         }
+
+        @Override
+        public String getConnectionID() {
+            return null;
+        }
     }
 
     private SarosNet sarosNetStub;
@@ -205,6 +210,30 @@ public class DataTransferManagerTest {
     @Before
     public void setUp() {
         sarosNetStub = createSarosNetMock(connectionListener);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testEstablishConnectionWithNullPeer() throws Exception {
+
+        DataTransferManager dtm = new DataTransferManager(sarosNetStub, null,
+            null, null, null, null);
+
+        connectionListener.getValue().connectionStateChanged(connectionMock,
+            ConnectionState.CONNECTED);
+
+        dtm.connect("foo", null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testEstablishConnectionWithNullConnectionID() throws Exception {
+
+        DataTransferManager dtm = new DataTransferManager(sarosNetStub, null,
+            null, null, null, null);
+
+        connectionListener.getValue().connectionStateChanged(connectionMock,
+            ConnectionState.CONNECTED);
+
+        dtm.connect(null, new JID("foo@bar.com"));
     }
 
     @Test(expected = IOException.class)
@@ -246,8 +275,11 @@ public class DataTransferManagerTest {
 
         ITransport fallbackTransport = new Transport(NetTransferMode.IBB);
 
-        EasyMock.expect(mainTransport.connect(EasyMock.isA(JID.class)))
-            .andThrow(new IOException()).anyTimes();
+        EasyMock
+            .expect(
+                mainTransport.connect(EasyMock.isA(String.class),
+                    EasyMock.isA(JID.class))).andThrow(new IOException())
+            .anyTimes();
 
         EasyMock.expect(mainTransport.getNetTransferMode())
             .andReturn(NetTransferMode.SOCKS5_DIRECT).anyTimes();
@@ -384,8 +416,6 @@ public class DataTransferManagerTest {
     @Test
     public void testSendOnValidConnectionIdentifier() throws Exception {
         Transport mainTransport = new Transport(NetTransferMode.SOCKS5_DIRECT);
-
-        mainTransport.setConnectionID("foo");
 
         DataTransferManager dtm = new DataTransferManager(sarosNetStub, null,
             mainTransport, null, null, null);

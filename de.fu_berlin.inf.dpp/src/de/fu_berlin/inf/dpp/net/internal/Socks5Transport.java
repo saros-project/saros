@@ -17,6 +17,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
@@ -58,7 +59,7 @@ public class Socks5Transport extends ByteStreamTransport {
 
     private static final Random ID_GENERATOR = new Random();
 
-    private static final String RESPONSE_SESSION_ID_PREFIX = "response_js5";
+    private static final String RESPONSE_SESSION_ID_PREFIX = "response-socks5";
 
     private static final byte BIDIRECTIONAL_TEST_BYTE = 0x1A;
 
@@ -89,22 +90,23 @@ public class Socks5Transport extends ByteStreamTransport {
     private static final int TOTAL_CONNECT_TIMEOUT = Integer.getInteger(
         "de.fu_berlin.inf.dpp.net.socks5.TOTAL_CONNECT_TIMEOUT", 20000);
 
-    private HashMap<String, Exchanger<Socks5BytestreamSession>> runningConnects = new HashMap<String, Exchanger<Socks5BytestreamSession>>();
+    private HashMap<String, Exchanger<Socks5BytestreamSession>> runningRemoteConnects = new HashMap<String, Exchanger<Socks5BytestreamSession>>();
     private ExecutorService executorService;
 
     /**
-     * 
+     * @param sessionID
      * @param peer
      * @return a Future that tries to establish a second connection to the
      *         peer's local SOCKS5 proxy
      */
     protected Future<Socks5BytestreamSession> futureToEstablishResponseSession(
-        final String peer) {
+        final String sessionID, final String peer) {
 
         return executorService.submit(new Callable<Socks5BytestreamSession>() {
             @Override
             public Socks5BytestreamSession call() throws Exception {
-                return (Socks5BytestreamSession) establishResponseSession(peer);
+                return (Socks5BytestreamSession) establishResponseSession(
+                    sessionID, peer);
             }
         });
     }
@@ -326,9 +328,11 @@ public class Socks5Transport extends ByteStreamTransport {
         Socks5BytestreamSession inSession = (Socks5BytestreamSession) request
             .accept();
 
+        String sessionID = getSessionID(request.getSessionID());
+
         // get running connect
-        Exchanger<Socks5BytestreamSession> exchanger = runningConnects
-            .get(peer);
+        Exchanger<Socks5BytestreamSession> exchanger = runningRemoteConnects
+            .get(sessionID);
 
         if (exchanger == null) {
             LOG.warn(prefix()
@@ -383,8 +387,23 @@ public class Socks5Transport extends ByteStreamTransport {
         if (listener == null)
             throw new IOException(this + " transport is not initialized");
 
+        String sessionID = request.getSessionID();
+
+        String connectionIdentifier = getConnectionIdentifier(sessionID);
+
+        if (connectionIdentifier == null) {
+            LOG.warn("rejecting request from " + peer
+                + " , no connection identifier found: " + sessionID);
+            request.reject();
+            return null;
+        }
+
+        assert sessionID != null;
+
         // start to establish response
-        Future<Socks5BytestreamSession> responseFuture = futureToEstablishResponseSession(peer);
+        Future<Socks5BytestreamSession> responseFuture = futureToEstablishResponseSession(
+            sessionID, peer);
+
         Socks5BytestreamSession inSession = null;
 
         try {
@@ -395,7 +414,8 @@ public class Socks5Transport extends ByteStreamTransport {
                 waitToCloseResponse(responseFuture);
                 configureSocks5Socket(inSession);
 
-                return new BinaryChannelConnection(new JID(peer), inSession,
+                return new BinaryChannelConnection(new JID(peer),
+                    connectionIdentifier, inSession,
                     NetTransferMode.SOCKS5_DIRECT, listener);
             } else {
                 LOG.debug(prefix() + "incoming connection is mediated.");
@@ -419,7 +439,8 @@ public class Socks5Transport extends ByteStreamTransport {
                 Utils.closeQuietly(inSession);
                 configureSocks5Socket(outSession);
 
-                return new BinaryChannelConnection(new JID(peer), outSession,
+                return new BinaryChannelConnection(new JID(peer),
+                    connectionIdentifier, outSession,
                     NetTransferMode.SOCKS5_DIRECT, listener);
             }
 
@@ -441,8 +462,8 @@ public class Socks5Transport extends ByteStreamTransport {
         BytestreamSession session = testAndGetMediatedBidirectionalBytestream(
             inSession, outSession, true);
 
-        return new BinaryChannelConnection(new JID(peer), session,
-            NetTransferMode.SOCKS5_MEDIATED, listener);
+        return new BinaryChannelConnection(new JID(peer), connectionIdentifier,
+            session, NetTransferMode.SOCKS5_MEDIATED, listener);
     }
 
     /**
@@ -471,21 +492,26 @@ public class Socks5Transport extends ByteStreamTransport {
      * See handleResponse().
      */
     @Override
-    protected IByteStreamConnection establishBinaryChannel(String peer)
-        throws XMPPException, IOException, InterruptedException {
-
-        // before establishing, we have to put the exchanger to the map
-        Exchanger<Socks5BytestreamSession> exchanger = new Exchanger<Socks5BytestreamSession>();
-        runningConnects.put(peer, exchanger);
-
-        LOG.debug(prefix() + "establishing new connection to " + peer
-            + verboseLocalProxyInfo());
+    protected IByteStreamConnection establishBinaryChannel(
+        String connectionIdentifier, String peer) throws XMPPException,
+        IOException, InterruptedException {
 
         BytestreamManager manager = getManager();
         IByteStreamConnectionListener listener = getConnectionListener();
 
         if (manager == null || listener == null)
             throw new IOException(this + " transport is not initialized");
+
+        LOG.debug(prefix() + "establishing new connection to " + peer
+            + verboseLocalProxyInfo());
+
+        // before establishing, we have to put the exchanger to the map
+        Exchanger<Socks5BytestreamSession> exchanger = new Exchanger<Socks5BytestreamSession>();
+
+        String sessionID = generateSessionID(connectionIdentifier,
+            getNextNegotiationID());
+
+        runningRemoteConnects.put(sessionID, exchanger);
 
         try {
 
@@ -495,12 +521,13 @@ public class Socks5Transport extends ByteStreamTransport {
             try {
 
                 outSession = (Socks5BytestreamSession) manager
-                    .establishSession(peer);
+                    .establishSession(peer, sessionID);
 
                 if (outSession.isDirect()) {
                     configureSocks5Socket(outSession);
                     return new BinaryChannelConnection(new JID(peer),
-                        outSession, NetTransferMode.SOCKS5_DIRECT, listener);
+                        connectionIdentifier, outSession,
+                        NetTransferMode.SOCKS5_DIRECT, listener);
                 }
 
                 LOG.debug(prefix()
@@ -539,7 +566,8 @@ public class Socks5Transport extends ByteStreamTransport {
                     configureSocks5Socket(inSession);
 
                     return new BinaryChannelConnection(new JID(peer),
-                        inSession, NetTransferMode.SOCKS5_DIRECT, listener);
+                        connectionIdentifier, inSession,
+                        NetTransferMode.SOCKS5_DIRECT, listener);
                 }
 
             } catch (TimeoutException e) {
@@ -559,11 +587,12 @@ public class Socks5Transport extends ByteStreamTransport {
             BytestreamSession session = testAndGetMediatedBidirectionalBytestream(
                 inSession, outSession, false);
 
-            return new BinaryChannelConnection(new JID(peer), session,
-                NetTransferMode.SOCKS5_MEDIATED, listener);
+            return new BinaryChannelConnection(new JID(peer),
+                connectionIdentifier, session, NetTransferMode.SOCKS5_MEDIATED,
+                listener);
 
         } finally {
-            runningConnects.remove(peer);
+            runningRemoteConnects.remove(sessionID);
         }
     }
 
@@ -575,8 +604,8 @@ public class Socks5Transport extends ByteStreamTransport {
      * @throws IOException
      * @throws InterruptedException
      */
-    protected BytestreamSession establishResponseSession(String peer)
-        throws XMPPException, IOException, InterruptedException {
+    protected BytestreamSession establishResponseSession(String sessionID,
+        String peer) throws XMPPException, IOException, InterruptedException {
 
         LOG.debug(prefix() + "Start to establish new response connection");
 
@@ -586,7 +615,7 @@ public class Socks5Transport extends ByteStreamTransport {
             throw new IOException(this + " transport is not initialized");
 
         return manager.establishSession(peer.toString(),
-            this.getNextResponseSessionID());
+            getResponseSessionID(sessionID));
     }
 
     @Override
@@ -706,13 +735,63 @@ public class Socks5Transport extends ByteStreamTransport {
         return "[" + getNetTransferMode().name() + "] ";
     }
 
-    private String getNextResponseSessionID() {
-        return RESPONSE_SESSION_ID_PREFIX
-            + (ID_GENERATOR.nextLong() & Long.MAX_VALUE);
+    private long getNextNegotiationID() {
+        return ID_GENERATOR.nextLong() & Long.MAX_VALUE;
     }
 
-    private boolean isResponse(BytestreamRequest request) {
+    private static String generateSessionID(String connectionIdentifier,
+        long negotiationID) {
+        return connectionIdentifier + SESSION_ID_DELIMITER + negotiationID;
+    }
+
+    private static String getResponseSessionID(String sessionID) {
+
+        if (sessionID == null || sessionID.isEmpty())
+            return null;
+
+        if (sessionID.startsWith(RESPONSE_SESSION_ID_PREFIX))
+            return sessionID;
+
+        return RESPONSE_SESSION_ID_PREFIX + SESSION_ID_DELIMITER + sessionID;
+    }
+
+    // [response]:connectionID:negotiationID
+    private static String getConnectionIdentifier(String sessionID) {
+
+        if (sessionID == null || sessionID.isEmpty())
+            return null;
+
+        String[] sessionIDTokens = sessionID.split(Pattern.quote(String
+            .valueOf(SESSION_ID_DELIMITER)));
+
+        if (sessionIDTokens.length == 2)
+            return sessionIDTokens[1];
+
+        if (sessionIDTokens.length == 3
+            && sessionIDTokens[0].equals(RESPONSE_SESSION_ID_PREFIX))
+            return sessionIDTokens[1];
+
+        return null;
+    }
+
+    // response:connectionID:negotiationID
+    private static String getSessionID(String responseSessionID) {
+
+        if (responseSessionID == null || responseSessionID.isEmpty())
+            return null;
+
+        String[] sessionIDTokens = responseSessionID.split(Pattern.quote(String
+            .valueOf(SESSION_ID_DELIMITER)));
+
+        if (sessionIDTokens.length != 3
+            || !sessionIDTokens[0].equals(RESPONSE_SESSION_ID_PREFIX))
+            return null;
+
+        return sessionIDTokens[1] + SESSION_ID_DELIMITER + sessionIDTokens[2];
+
+    }
+
+    private static boolean isResponse(BytestreamRequest request) {
         return request.getSessionID().startsWith(RESPONSE_SESSION_ID_PREFIX);
     }
-
 }

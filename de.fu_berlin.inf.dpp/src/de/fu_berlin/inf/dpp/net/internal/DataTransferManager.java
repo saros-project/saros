@@ -48,7 +48,7 @@ public class DataTransferManager implements IConnectionListener {
     private static final Logger log = Logger
         .getLogger(DataTransferManager.class);
 
-    private static final String DEFAULT_CONNECTION_IDENTIFIER = "default";
+    private static final String DEFAULT_CONNECTION_ID = "default";
 
     private final TransferModeDispatch transferModeDispatch = new TransferModeDispatch();
 
@@ -121,22 +121,20 @@ public class DataTransferManager implements IConnectionListener {
         }
 
         @Override
-        public void connectionChanged(String connectionIdentifier, JID peer,
+        public void connectionChanged(String connectionID, JID peer,
             IByteStreamConnection connection, boolean incomingRequest) {
 
             synchronized (connections) {
                 log.debug("bytestream connection changed "
                     + connection.getMode() + " [to: " + peer + "|inc: "
-                    + incomingRequest + "|id: " + connectionIdentifier + "]");
+                    + incomingRequest + "|id: " + connectionID + "]");
 
-                ConnectionHolder holder = connections
-                    .get(toConnectionIdentifierToken(connectionIdentifier, peer));
+                ConnectionHolder holder = connections.get(toConnectionIDToken(
+                    connectionID, peer));
                 if (holder == null) {
                     holder = new ConnectionHolder();
-                    connections
-                        .put(
-                            toConnectionIdentifierToken(connectionIdentifier,
-                                peer), holder);
+                    connections.put(toConnectionIDToken(connectionID, peer),
+                        holder);
                 }
 
                 if (!incomingRequest) {
@@ -158,9 +156,9 @@ public class DataTransferManager implements IConnectionListener {
         }
 
         @Override
-        public void connectionClosed(String connectionIdentifier, JID peer,
+        public void connectionClosed(String connectionID, JID peer,
             IByteStreamConnection connection) {
-            closeConnection(connectionIdentifier, peer);
+            closeConnection(connectionID, peer);
             transferModeDispatch.connectionChanged(peer, null);
         }
     };
@@ -186,7 +184,7 @@ public class DataTransferManager implements IConnectionListener {
         sarosNet.addListener(this);
     }
 
-    public void sendData(String connectionIdentifier,
+    public void sendData(String connectionID,
         TransferDescription transferDescription, byte[] payload)
         throws IOException {
 
@@ -195,18 +193,18 @@ public class DataTransferManager implements IConnectionListener {
         if (connectionJID == null)
             throw new IOException("not connected to a XMPP server");
 
-        IByteStreamConnection connection = getCurrentConnection(
-            connectionIdentifier, transferDescription.getRecipient());
+        IByteStreamConnection connection = getCurrentConnection(connectionID,
+            transferDescription.getRecipient());
 
         if (connection == null)
             throw new IOException("not connected to "
                 + transferDescription.getRecipient()
-                + " [connection identifier=" + connectionIdentifier + "]");
+                + " [connection identifier=" + connectionID + "]");
 
         if (log.isTraceEnabled())
             log.trace("sending data ... from " + connectionJID + " to "
                 + transferDescription.getRecipient()
-                + "[connection identifier=" + connectionIdentifier + "]");
+                + "[connection identifier=" + connectionID + "]");
 
         transferDescription.setSender(connectionJID);
         sendInternal(connection, transferDescription, payload);
@@ -234,8 +232,8 @@ public class DataTransferManager implements IConnectionListener {
         JID recipient = transferDescription.getRecipient();
         transferDescription.setSender(connectionJID);
 
-        sendInternal(connectInternal(null, recipient), transferDescription,
-            payload);
+        sendInternal(connectInternal(DEFAULT_CONNECTION_ID, recipient),
+            transferDescription, payload);
     }
 
     private void sendInternal(IByteStreamConnection connection,
@@ -275,13 +273,18 @@ public class DataTransferManager implements IConnectionListener {
      * @deprecated
      */
     @Deprecated
-    public void connect(JID recipient) throws IOException {
-        connectInternal(null, recipient);
+    public void connect(JID peer) throws IOException {
+        connect(DEFAULT_CONNECTION_ID, peer);
     }
 
-    public void connect(String connectionIdentifier, JID recipient)
-        throws IOException {
-        connectInternal(connectionIdentifier, recipient);
+    public void connect(String connectionID, JID peer) throws IOException {
+        if (connectionID == null)
+            throw new NullPointerException("connectionID is null");
+
+        if (peer == null)
+            throw new NullPointerException("peer is null");
+
+        connectInternal(connectionID, peer);
     }
 
     public TransferModeDispatch getTransferModeDispatch() {
@@ -298,12 +301,12 @@ public class DataTransferManager implements IConnectionListener {
      */
     @Deprecated
     public boolean closeConnection(JID peer) {
-        return closeConnection(null, peer);
+        return closeConnection(DEFAULT_CONNECTION_ID, peer);
     }
 
     public boolean closeConnection(String connectionIdentifier, JID peer) {
-        ConnectionHolder holder = connections
-            .remove(toConnectionIdentifierToken(connectionIdentifier, peer));
+        ConnectionHolder holder = connections.remove(toConnectionIDToken(
+            connectionIdentifier, peer));
 
         if (holder == null)
             return false;
@@ -326,27 +329,27 @@ public class DataTransferManager implements IConnectionListener {
         return getTransferMode(null, jid);
     }
 
-    public NetTransferMode getTransferMode(String connectionIdentifier, JID jid) {
-        IByteStreamConnection connection = getCurrentConnection(
-            connectionIdentifier, jid);
+    public NetTransferMode getTransferMode(String connectionID, JID jid) {
+        IByteStreamConnection connection = getCurrentConnection(connectionID,
+            jid);
         return connection == null ? NetTransferMode.NONE : connection.getMode();
     }
 
-    private IByteStreamConnection connectInternal(String connectionIdentifier,
-        JID recipient) throws IOException {
+    private IByteStreamConnection connectInternal(String connectionID, JID peer)
+        throws IOException {
 
         IByteStreamConnection connection = null;
 
-        String connectionID = toConnectionIdentifierToken(connectionIdentifier,
-            recipient);
+        String connectionIDToken = toConnectionIDToken(connectionID, peer);
 
         synchronized (currentOutgoingConnectionEstablishments) {
-            if (!currentOutgoingConnectionEstablishments.contains(connectionID)) {
-                connection = getCurrentConnection(connectionIdentifier,
-                    recipient);
+            if (!currentOutgoingConnectionEstablishments
+                .contains(connectionIDToken)) {
+                connection = getCurrentConnection(connectionID, peer);
 
                 if (connection == null)
-                    currentOutgoingConnectionEstablishments.add(connectionID);
+                    currentOutgoingConnectionEstablishments
+                        .add(connectionIDToken);
             }
 
             if (connection != null) {
@@ -359,7 +362,7 @@ public class DataTransferManager implements IConnectionListener {
 
         try {
 
-            connection = getCurrentConnection(connectionIdentifier, recipient);
+            connection = getCurrentConnection(connectionID, peer);
 
             if (connection != null)
                 return connection;
@@ -377,40 +380,39 @@ public class DataTransferManager implements IConnectionListener {
                     .getLocalAddresses().toArray()));
 
             for (ITransport transport : transportModesToUse) {
-                log.info("establishing connection to " + recipient.getBase()
+                log.info("establishing connection to " + peer.getBase()
                     + " from " + connectionJID + " using "
                     + transport.getNetTransferMode());
                 try {
-                    connection = transport.connect(recipient);
+                    connection = transport.connect(connectionID, peer);
                     break;
                 } catch (IOException e) {
-                    log.error(Utils.prefix(recipient)
-                        + " failed to connect using " + transport.toString()
-                        + ": " + e.getMessage(), e);
+                    log.error(Utils.prefix(peer) + " failed to connect using "
+                        + transport.toString() + ": " + e.getMessage(), e);
                 } catch (InterruptedException e) {
                     IOException io = new InterruptedIOException(
                         "connecting cancelled: " + e.getMessage());
                     io.initCause(e);
                     throw io;
                 } catch (Exception e) {
-                    log.error(Utils.prefix(recipient)
-                        + " failed to connect using " + transport.toString()
+                    log.error(Utils.prefix(peer) + " failed to connect using "
+                        + transport.toString()
                         + " because of an unknown error: " + e.getMessage(), e);
                 }
             }
 
             if (connection != null) {
-                byteStreamConnectionListener.connectionChanged(
-                    connectionIdentifier, recipient, connection, false);
+                byteStreamConnectionListener.connectionChanged(connectionID,
+                    peer, connection, false);
 
                 return connection;
             }
 
-            throw new IOException("could not connect to: "
-                + Utils.prefix(recipient));
+            throw new IOException("could not connect to: " + Utils.prefix(peer));
         } finally {
             synchronized (currentOutgoingConnectionEstablishments) {
-                currentOutgoingConnectionEstablishments.remove(connectionID);
+                currentOutgoingConnectionEstablishments
+                    .remove(connectionIDToken);
             }
             connectLock.unlock();
         }
@@ -608,7 +610,7 @@ public class DataTransferManager implements IConnectionListener {
      * connected to the remote side as well as the remote side is connected to
      * the local side the local to remote connection will be returned.
      * 
-     * @param connectionIdentifier
+     * @param connectionID
      *            identifier for the connection to retrieve or <code>null</code>
      *            to retrieve the default one
      * @param jid
@@ -616,11 +618,11 @@ public class DataTransferManager implements IConnectionListener {
      * @return the connection to the remote side or <code>null</code> if no
      *         connection exists
      */
-    private IByteStreamConnection getCurrentConnection(
-        String connectionIdentifier, JID jid) {
+    private IByteStreamConnection getCurrentConnection(String connectionID,
+        JID jid) {
         synchronized (connections) {
-            ConnectionHolder holder = connections
-                .get(toConnectionIdentifierToken(connectionIdentifier, jid));
+            ConnectionHolder holder = connections.get(toConnectionIDToken(
+                connectionID, jid));
 
             if (holder == null)
                 return null;
@@ -632,11 +634,11 @@ public class DataTransferManager implements IConnectionListener {
         }
     }
 
-    private String toConnectionIdentifierToken(String connectionIdentifier,
+    private static String toConnectionIDToken(String connectionIdentifier,
         JID jid) {
 
         if (connectionIdentifier == null)
-            connectionIdentifier = DEFAULT_CONNECTION_IDENTIFIER;
+            connectionIdentifier = DEFAULT_CONNECTION_ID;
 
         return connectionIdentifier.concat(":").concat(jid.toString());
     }

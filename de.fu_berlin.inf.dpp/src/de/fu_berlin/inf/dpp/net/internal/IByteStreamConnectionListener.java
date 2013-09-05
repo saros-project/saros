@@ -14,10 +14,10 @@ public interface IByteStreamConnectionListener {
     public void addIncomingTransferObject(
         final IncomingTransferObject incomingTransferObject);
 
-    public void connectionClosed(String connectionIdentifier, JID remoteJID,
+    public void connectionClosed(String connectionID, JID remoteJID,
         IByteStreamConnection connection);
 
-    public void connectionChanged(String connectionIdentifier, JID remoteJID,
+    public void connectionChanged(String connectionID, JID remoteJID,
         IByteStreamConnection connection, boolean incomingRequest);
 
 }

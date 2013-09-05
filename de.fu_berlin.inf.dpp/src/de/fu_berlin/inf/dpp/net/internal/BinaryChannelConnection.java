@@ -59,6 +59,8 @@ public class BinaryChannelConnection implements IByteStreamConnection {
 
     private final JID peer;
 
+    private final String connectionID;
+
     private AtomicInteger nextFragmentId = new AtomicInteger(0);
 
     private boolean connected;
@@ -104,11 +106,12 @@ public class BinaryChannelConnection implements IByteStreamConnection {
         }
     }
 
-    public BinaryChannelConnection(JID peer, BytestreamSession session,
-        NetTransferMode mode, IByteStreamConnectionListener listener)
-        throws IOException {
+    public BinaryChannelConnection(JID peer, String connectionID,
+        BytestreamSession session, NetTransferMode mode,
+        IByteStreamConnectionListener listener) throws IOException {
         this.listener = listener;
         this.peer = peer;
+        this.connectionID = connectionID;
         this.session = session;
         this.session.setReadTimeout(0); // keep connection alive
         this.transferMode = mode;
@@ -123,6 +126,11 @@ public class BinaryChannelConnection implements IByteStreamConnection {
         this.receiveThread = new ReceiverThread();
         this.receiveThread.setName("BinaryChannel-" + peer.getName());
         this.receiveThread.start();
+    }
+
+    @Override
+    public String getConnectionID() {
+        return connectionID;
     }
 
     @Override
@@ -160,7 +168,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
             }
         }
 
-        listener.connectionClosed(/* FIMXE */null, getPeer(), this);
+        listener.connectionClosed(connectionID, getPeer(), this);
     }
 
     @Override
