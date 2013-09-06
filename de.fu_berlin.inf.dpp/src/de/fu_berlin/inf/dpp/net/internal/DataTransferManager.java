@@ -546,58 +546,6 @@ public class DataTransferManager implements IConnectionListener {
             disposeConnection();
     }
 
-    /**
-     * Disconnects all idle IBB connections to peers. Use to enforce attempting
-     * a Socks5 connection on next data transfer.
-     * 
-     * @return false if not all IBBs could be closed because of ongoing
-     *         transfers
-     * @deprecated
-     */
-    @Deprecated
-    public synchronized boolean disconnectInBandBytestreams() {
-
-        /*
-         * Stefan Rossbach: although a nice feature, it will not hurt anybody if
-         * UPNP port mapping activation will affect only the next Saros
-         * sessions.
-         * 
-         * Currently disabled as it is possible to close a connection that may
-         * have a pending send.
-         */
-
-        return false;
-        // log.info("Closing all IBBs on request");
-        // List<IByteStreamConnection> openConnections;
-        //
-        // openConnections = new ArrayList<IByteStreamConnection>(
-        // connections.values());
-        //
-        // boolean isTransfering = false;
-        // for (IByteStreamConnection connection : openConnections) {
-        // if (connection != null
-        // && connection.getMode() == NetTransferMode.IBB) {
-        //
-        // // If this connection is currently in use, don't disconnect
-        // if (isReceiving(connection.getPeer())
-        // || isSending(connection.getPeer())) {
-        // isTransfering = true;
-        // continue;
-        // }
-        //
-        // try {
-        // connection.close();
-        // log.info("Closing IBB connection to "
-        // + connection.getPeer().getBareJID());
-        // } catch (RuntimeException e) {
-        // log.error("Error while closing " + connection.getMode()
-        // + " connection ", e);
-        // }
-        // }
-        // }
-        // return isTransfering == false;
-    }
-
     // TODO: move to ITransmitter
     public void addPacketInterceptor(IPacketInterceptor interceptor) {
         packetInterceptors.addIfAbsent(interceptor);

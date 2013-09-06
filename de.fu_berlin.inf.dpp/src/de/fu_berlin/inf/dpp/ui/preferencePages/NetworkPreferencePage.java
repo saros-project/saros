@@ -130,11 +130,10 @@ public final class NetworkPreferencePage extends PreferencePage implements
                     if (upnpService.setSelectedGateway((GatewayDevice) item
                         .getData())) {
 
-                        if (!dataTransferManager.disconnectInBandBytestreams())
-                            SarosView
-                                .showNotification(
-                                    Messages.NetworkPreferencePage_upnp_activation,
-                                    Messages.NetworkPreferencePage_upnp_activation_text);
+                        SarosView
+                            .showNotification(
+                                Messages.NetworkPreferencePage_upnp_activation,
+                                Messages.NetworkPreferencePage_upnp_activation_text);
                     }
                 }
             }
