@@ -11,14 +11,14 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.RecordEntry;
  */
 public class MalformedRecordException extends RuntimeException {
 
-	private static final long serialVersionUID = -1572530830099480598L;
+    private static final long serialVersionUID = -1572530830099480598L;
 
-	public MalformedRecordException(String record) {
-		super("Malformed record " + record);
-	}
+    public MalformedRecordException(String record) {
+        super("Malformed record " + record);
+    }
 
-	public MalformedRecordException(RecordEntry entry) {
-		super("Missing record attribute: " + entry.toString());
-	}
+    public MalformedRecordException(RecordEntry entry) {
+        super("Missing record attribute: " + entry.toString());
+    }
 
 }

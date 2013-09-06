@@ -24,82 +24,82 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
  * 
  */
 public abstract class AbstractElementRecordCreateCommand extends SXECommand {
-	private LayoutElementRecord parent;
-	protected String newChildName;
-	private LayoutElementRecord child;
+    private LayoutElementRecord parent;
+    protected String newChildName;
+    private LayoutElementRecord child;
 
-	/**
-	 * protected because subclasses may be specialized to a specific type only
-	 * (like polylines)
-	 * 
-	 * @param name
-	 */
-	protected void setChildName(String name) {
-		this.newChildName = name;
-	}
+    /**
+     * protected because subclasses may be specialized to a specific type only
+     * (like polylines)
+     * 
+     * @param name
+     */
+    protected void setChildName(String name) {
+        this.newChildName = name;
+    }
 
-	public void setParent(Object e) {
-		if (e instanceof LayoutElementRecord)
-			this.parent = (LayoutElementRecord) e;
-	}
+    public void setParent(Object e) {
+        if (e instanceof LayoutElementRecord)
+            this.parent = (LayoutElementRecord) e;
+    }
 
-	protected LayoutElementRecord getNewChild() {
-		return child;
-	}
+    protected LayoutElementRecord getNewChild() {
+        return child;
+    }
 
-	@Override
-	public List<IRecord> getRecords() {
-		List<IRecord> records = new LinkedList<IRecord>();
+    @Override
+    public List<IRecord> getRecords() {
+        List<IRecord> records = new LinkedList<IRecord>();
 
-		child = (LayoutElementRecord) parent.createNewElementRecord(null,
-				newChildName);
+        child = (LayoutElementRecord) parent.createNewElementRecord(null,
+            newChildName);
 
-		records.add(child);
-		records.addAll(getAttributeRecords(child));
+        records.add(child);
+        records.addAll(getAttributeRecords(child));
 
-		return records;
-	}
+        return records;
+    }
 
-	protected abstract List<IRecord> getAttributeRecords(
-			LayoutElementRecord child);
+    protected abstract List<IRecord> getAttributeRecords(
+        LayoutElementRecord child);
 
-	@Override
-	public List<IRecord> getUndoRecords() {
-		List<IRecord> records = new LinkedList<IRecord>();
-		records.add(child.getRemoveRecord());
+    @Override
+    public List<IRecord> getUndoRecords() {
+        List<IRecord> records = new LinkedList<IRecord>();
+        records.add(child.getRemoveRecord());
 
-		return records;
-	}
+        return records;
+    }
 
-	@Override
-	public List<IRecord> getRedoRecords() {
-		List<IRecord> records = new LinkedList<IRecord>();
-		records.add(child.getRecreateRecord());
-		return records;
-	}
+    @Override
+    public List<IRecord> getRedoRecords() {
+        List<IRecord> records = new LinkedList<IRecord>();
+        records.add(child.getRecreateRecord());
+        return records;
+    }
 
-	@Override
-	public DocumentRecord getDocumentRecord() {
-		return parent.getDocumentRecord();
-	}
+    @Override
+    public DocumentRecord getDocumentRecord() {
+        return parent.getDocumentRecord();
+    }
 
-	@Override
-	protected boolean canExecuteSXECommand() {
-		if (newChildName == null || parent == null || !parent.isComposite())
-			return false;
+    @Override
+    protected boolean canExecuteSXECommand() {
+        if (newChildName == null || parent == null || !parent.isComposite())
+            return false;
 
-		return parent.isPartOfVisibleDocument();
-	}
+        return parent.isPartOfVisibleDocument();
+    }
 
-	@Override
-	protected boolean canUndoSXECommand() {
-		return child.isPartOfVisibleDocument();
-	}
+    @Override
+    protected boolean canUndoSXECommand() {
+        return child.isPartOfVisibleDocument();
+    }
 
-	@Override
-	public void dispose() {
-		newChildName = null;
-		parent = null;
-		child = null;
-	}
+    @Override
+    public void dispose() {
+        newChildName = null;
+        parent = null;
+        child = null;
+    }
 }

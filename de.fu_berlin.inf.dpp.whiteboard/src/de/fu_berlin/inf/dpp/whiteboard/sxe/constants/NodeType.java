@@ -17,26 +17,26 @@ package de.fu_berlin.inf.dpp.whiteboard.sxe.constants;
  */
 public enum NodeType {
 
-	ELEMENT("element"), ATTR("attr")
-	// , TEXT("text"),
-	// COMMENT("comment"),PROCESSINGINSTRUCTION("processinginstruction")
-	;
+    ELEMENT("element"), ATTR("attr")
+    // , TEXT("text"),
+    // COMMENT("comment"),PROCESSINGINSTRUCTION("processinginstruction")
+    ;
 
-	private String type;
+    private String type;
 
-	private NodeType(String type) {
-		this.type = type;
-	}
+    private NodeType(String type) {
+        this.type = type;
+    }
 
-	@Override
-	public String toString() {
-		return type;
-	}
+    @Override
+    public String toString() {
+        return type;
+    }
 
-	public static NodeType fromString(String raw) {
-		for (NodeType t : NodeType.values())
-			if (t.toString().equals(raw))
-				return t;
-		return null;
-	}
+    public static NodeType fromString(String raw) {
+        for (NodeType t : NodeType.values())
+            if (t.toString().equals(raw))
+                return t;
+        return null;
+    }
 }

@@ -18,21 +18,21 @@ import org.eclipse.gef.tools.MarqueeDragTracker;
  */
 public class SVGRootPart extends SVGRectPart {
 
-	@Override
-	protected IFigure createFigure() {
-		IFigure figure = new FreeformLayer();
-		figure.setLayoutManager(new FreeformLayout());
+    @Override
+    protected IFigure createFigure() {
+        IFigure figure = new FreeformLayer();
+        figure.setLayoutManager(new FreeformLayout());
 
-		return figure;
-	}
+        return figure;
+    }
 
-	/**
-	 * The root cannot be dragged nor selected but a marquee tool would be
-	 * useful
-	 */
-	@Override
-	public DragTracker getDragTracker(Request request) {
-		return new MarqueeDragTracker();
-	}
+    /**
+     * The root cannot be dragged nor selected but a marquee tool would be
+     * useful
+     */
+    @Override
+    public DragTracker getDragTracker(Request request) {
+        return new MarqueeDragTracker();
+    }
 
 }

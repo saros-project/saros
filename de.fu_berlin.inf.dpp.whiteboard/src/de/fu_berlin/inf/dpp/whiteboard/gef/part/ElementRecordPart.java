@@ -28,68 +28,68 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.records.SetRecord;
  * 
  */
 public abstract class ElementRecordPart extends AbstractGraphicalEditPart
-		implements ChildRecordChangeListener {
+    implements ChildRecordChangeListener {
 
-	@Override
-	public void activate() {
-		super.activate();
-		getElementRecord().addChildRecordChangeListener(this);
-	}
+    @Override
+    public void activate() {
+        super.activate();
+        getElementRecord().addChildRecordChangeListener(this);
+    }
 
-	@Override
-	public void deactivate() {
-		super.deactivate();
-		getElementRecord().removeChildRecordChangeListener(this);
-	}
+    @Override
+    public void deactivate() {
+        super.deactivate();
+        getElementRecord().removeChildRecordChangeListener(this);
+    }
 
-	public LayoutElementRecord getElementRecord() {
-		return (LayoutElementRecord) getModel();
-	}
+    public LayoutElementRecord getElementRecord() {
+        return (LayoutElementRecord) getModel();
+    }
 
-	// @Override
-	@Override
-	protected void createEditPolicies() {
-		installEditPolicy(EditPolicy.LAYOUT_ROLE,
-				new ElementModelLayoutEditPolicy());
-		installEditPolicy(EditPolicy.COMPONENT_ROLE,
-				new ElementModelDeletePolicy());
-	}
+    // @Override
+    @Override
+    protected void createEditPolicies() {
+        installEditPolicy(EditPolicy.LAYOUT_ROLE,
+            new ElementModelLayoutEditPolicy());
+        installEditPolicy(EditPolicy.COMPONENT_ROLE,
+            new ElementModelDeletePolicy());
+    }
 
-	@Override
-	public List<ElementRecord> getModelChildren() {
-		return getElementRecord().getVisibleChildElements();
-	}
+    @Override
+    public List<ElementRecord> getModelChildren() {
+        return getElementRecord().getVisibleChildElements();
+    }
 
-	@Override
-	public void childElementRecordChanged(List<IRecord> records) {
-		refreshChildren();
-	}
+    @Override
+    public void childElementRecordChanged(List<IRecord> records) {
+        refreshChildren();
+    }
 
-	@Override
-	public void attributeRecordChanged(List<IRecord> records) {
-		refreshVisuals();
-	}
+    @Override
+    public void attributeRecordChanged(List<IRecord> records) {
+        refreshVisuals();
+    }
 
-	@Override
-	protected void refreshVisuals() {
-		Rectangle bounds = getElementRecord().getLayout();
-		((GraphicalEditPart) getParent()).setLayoutConstraint(this,
-				getFigure(), bounds);
-	}
+    @Override
+    protected void refreshVisuals() {
+        Rectangle bounds = getElementRecord().getLayout();
+        ((GraphicalEditPart) getParent()).setLayoutConstraint(this,
+            getFigure(), bounds);
+    }
 
-	@Override
-	public void childRecordConflict(Map<NodeRecord, Set<SetRecord>> conflicts) {
-		// TODO inform user
-	}
+    @Override
+    public void childRecordConflict(Map<NodeRecord, Set<SetRecord>> conflicts) {
+        // TODO inform user
+    }
 
-	/**
-	 * Returns the current zoom Level. 1 for 100%
-	 * 
-	 * @return
-	 */
-	protected double getCurrentZoom() {
-		ZoomManager z = ((ScalableFreeformRootEditPart) getViewer()
-				.getRootEditPart()).getZoomManager();
-		return z.getZoom() * z.getUIMultiplier();
-	}
+    /**
+     * Returns the current zoom Level. 1 for 100%
+     * 
+     * @return
+     */
+    protected double getCurrentZoom() {
+        ZoomManager z = ((ScalableFreeformRootEditPart) getViewer()
+            .getRootEditPart()).getZoomManager();
+        return z.getZoom() * z.getUIMultiplier();
+    }
 }

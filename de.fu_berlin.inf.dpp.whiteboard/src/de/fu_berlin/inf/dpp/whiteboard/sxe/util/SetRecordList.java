@@ -20,61 +20,61 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.records.SetRecord;
  */
 public class SetRecordList extends LinkedList<SetRecord> {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Override
-	public boolean contains(Object o) {
-		if (!(o instanceof SetRecord))
-			return false;
+    @Override
+    public boolean contains(Object o) {
+        if (!(o instanceof SetRecord))
+            return false;
 
-		ListIterator<SetRecord> it = listIterator(size());
-		SetRecord r = (SetRecord) o;
-		SetRecord previous;
+        ListIterator<SetRecord> it = listIterator(size());
+        SetRecord r = (SetRecord) o;
+        SetRecord previous;
 
-		while (it.hasPrevious()) {
-			previous = it.previous();
-			if (previous.getVersion() == r.getVersion())
-				return r.equals(previous);
-			if (previous.getVersion() < r.getVersion())
-				break;
-		}
+        while (it.hasPrevious()) {
+            previous = it.previous();
+            if (previous.getVersion() == r.getVersion())
+                return r.equals(previous);
+            if (previous.getVersion() < r.getVersion())
+                break;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	@Override
-	public boolean add(SetRecord r) {
-		if (!isEmpty())
-			if (r.getVersion() <= getLast().getVersion())
-				throw new IllegalArgumentException(
-						"Cannot add a set-record with version<=last");
-		return super.add(r);
-	}
+    @Override
+    public boolean add(SetRecord r) {
+        if (!isEmpty())
+            if (r.getVersion() <= getLast().getVersion())
+                throw new IllegalArgumentException(
+                    "Cannot add a set-record with version<=last");
+        return super.add(r);
+    }
 
-	@Override
-	public void add(int i, SetRecord r) {
-		if (i != size())
-			throw new IllegalArgumentException(
-					"Can only append set-records to the end");
-		add(r);
-	}
+    @Override
+    public void add(int i, SetRecord r) {
+        if (i != size())
+            throw new IllegalArgumentException(
+                "Can only append set-records to the end");
+        add(r);
+    }
 
-	@Override
-	public void addFirst(SetRecord r) {
-		if (!isEmpty())
-			throw new IllegalArgumentException(
-					"Can only append set-records to the end");
-		add(r);
-	}
+    @Override
+    public void addFirst(SetRecord r) {
+        if (!isEmpty())
+            throw new IllegalArgumentException(
+                "Can only append set-records to the end");
+        add(r);
+    }
 
-	// @Override
-	// public boolean addAll(Collection<? extends SetRecord> arg0) {
-	// return false;
-	// }
-	//
-	// @Override
-	// public boolean addAll(int arg0, Collection<? extends SetRecord> arg1) {
-	// return false;
-	// }
+    // @Override
+    // public boolean addAll(Collection<? extends SetRecord> arg0) {
+    // return false;
+    // }
+    //
+    // @Override
+    // public boolean addAll(int arg0, Collection<? extends SetRecord> arg1) {
+    // return false;
+    // }
 
 }

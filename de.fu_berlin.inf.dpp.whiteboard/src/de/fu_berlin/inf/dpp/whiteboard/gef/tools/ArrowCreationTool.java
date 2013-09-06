@@ -21,19 +21,19 @@ import de.fu_berlin.inf.dpp.whiteboard.gef.request.CreatePointlistRequest;
  */
 public class ArrowCreationTool extends LineCreationTool {
 
-	/**
-	 * Adds the current location to the point list of the
-	 * CreatePointlistRequest.
-	 */
-	@Override
-	protected void updateTargetRequest() {
-		CreatePointlistRequest req = getCreatePointlistRequest();
-		if (isInState(STATE_DRAG)) {
-			req.updateArrowPoint(getLocation());
-		} else {
-			req.clear();
-			req.setLocation(getLocation());
-		}
-	}
+    /**
+     * Adds the current location to the point list of the
+     * CreatePointlistRequest.
+     */
+    @Override
+    protected void updateTargetRequest() {
+        CreatePointlistRequest req = getCreatePointlistRequest();
+        if (isInState(STATE_DRAG)) {
+            req.updateArrowPoint(getLocation());
+        } else {
+            req.clear();
+            req.setLocation(getLocation());
+        }
+    }
 
 }

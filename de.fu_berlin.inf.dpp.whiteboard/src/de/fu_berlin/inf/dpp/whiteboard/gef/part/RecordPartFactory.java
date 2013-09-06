@@ -18,24 +18,24 @@ import de.fu_berlin.inf.dpp.whiteboard.gef.model.SVGTextBoxRecord;
  */
 public class RecordPartFactory implements EditPartFactory {
 
-	@Override
-	public EditPart createEditPart(EditPart context, Object model) {
-		AbstractGraphicalEditPart part = null;
+    @Override
+    public EditPart createEditPart(EditPart context, Object model) {
+        AbstractGraphicalEditPart part = null;
 
-		if (model instanceof SVGRootRecord) {
-			part = new SVGRootPart();
-		} else if (model instanceof SVGTextBoxRecord) {
-			part = new SVGTextBoxPart();
-		} else if (model instanceof SVGRectRecord) {
-			part = new SVGRectPart();
-		} else if (model instanceof SVGPolylineRecord) {
-			part = new SVGPolylinePart();
-		} else if (model instanceof SVGEllipseRecord) {
-			part = new SVGEllipsePart();
-		}
-		if (part != null)
-			part.setModel(model);
+        if (model instanceof SVGRootRecord) {
+            part = new SVGRootPart();
+        } else if (model instanceof SVGTextBoxRecord) {
+            part = new SVGTextBoxPart();
+        } else if (model instanceof SVGRectRecord) {
+            part = new SVGRectPart();
+        } else if (model instanceof SVGPolylineRecord) {
+            part = new SVGPolylinePart();
+        } else if (model instanceof SVGEllipseRecord) {
+            part = new SVGEllipsePart();
+        }
+        if (part != null)
+            part.setModel(model);
 
-		return part;
-	}
+        return part;
+    }
 }

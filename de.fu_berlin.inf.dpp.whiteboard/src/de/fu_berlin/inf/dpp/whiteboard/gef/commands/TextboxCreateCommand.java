@@ -11,31 +11,31 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
 
 public class TextboxCreateCommand extends ElementRecordCreateCommand {
 
-	Logger log = Logger.getLogger(TextboxCreateCommand.class);
-	private String Text = null;
+    Logger log = Logger.getLogger(TextboxCreateCommand.class);
+    private String Text = null;
 
-	public TextboxCreateCommand() {
-		setChildName(SVGConstants.SVG_TEXT_TAG);
-	}
+    public TextboxCreateCommand() {
+        setChildName(SVGConstants.SVG_TEXT_TAG);
+    }
 
-	@Override
-	public List<IRecord> getRecords() {
-		return super.getRecords();
-	}
+    @Override
+    public List<IRecord> getRecords() {
+        return super.getRecords();
+    }
 
-	@Override
-	protected List<IRecord> getAttributeRecords(LayoutElementRecord child) {
-		((SVGTextBoxRecord) getNewChild()).setText(this.Text);
-		log.info("GetAttributeRecords, Text:" + this.Text);
-		return super.getAttributeRecords(child);
-	}
+    @Override
+    protected List<IRecord> getAttributeRecords(LayoutElementRecord child) {
+        ((SVGTextBoxRecord) getNewChild()).setText(this.Text);
+        log.info("GetAttributeRecords, Text:" + this.Text);
+        return super.getAttributeRecords(child);
+    }
 
-	public void setText(String text) {
-		this.Text = text;
-	}
+    public void setText(String text) {
+        this.Text = text;
+    }
 
-	public String getText() {
-		return this.Text;
-	}
+    public String getText() {
+        return this.Text;
+    }
 
 }

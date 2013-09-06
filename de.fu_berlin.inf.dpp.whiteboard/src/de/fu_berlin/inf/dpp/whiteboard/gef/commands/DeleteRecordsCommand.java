@@ -28,94 +28,94 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.util.HierarchicalRecordSet;
  */
 public class DeleteRecordsCommand extends SXECommand {
 
-	/** all records to delete */
-	private HierarchicalRecordSet recordSet = new HierarchicalRecordSet();
-	private DocumentRecord documentRecord;
+    /** all records to delete */
+    private HierarchicalRecordSet recordSet = new HierarchicalRecordSet();
+    private DocumentRecord documentRecord;
 
-	public void addRecordToDelete(ElementRecord record) {
-		if (record.getParent() == null)
-			return;
-		if (documentRecord == null)
-			documentRecord = record.getDocumentRecord();
-		recordSet.insertRecord(record);
-	}
+    public void addRecordToDelete(ElementRecord record) {
+        if (record.getParent() == null)
+            return;
+        if (documentRecord == null)
+            documentRecord = record.getDocumentRecord();
+        recordSet.insertRecord(record);
+    }
 
-	@Override
-	protected boolean canExecuteSXECommand() {
-		if (recordSet.getRootRecords().isEmpty())
-			return false;
+    @Override
+    protected boolean canExecuteSXECommand() {
+        if (recordSet.getRootRecords().isEmpty())
+            return false;
 
-		for (ElementRecord er : recordSet.getRootRecords()) {
-			if (er.isPartOfVisibleDocument())
-				return true;
-		}
-		return false;
-	}
+        for (ElementRecord er : recordSet.getRootRecords()) {
+            if (er.isPartOfVisibleDocument())
+                return true;
+        }
+        return false;
+    }
 
-	@Override
-	public List<IRecord> getRecords() {
-		List<IRecord> records = new LinkedList<IRecord>();
+    @Override
+    public List<IRecord> getRecords() {
+        List<IRecord> records = new LinkedList<IRecord>();
 
-		for (ElementRecord er : recordSet.getRootRecords()) {
-			records.add(er.getRemoveRecord());
-		}
+        for (ElementRecord er : recordSet.getRootRecords()) {
+            records.add(er.getRemoveRecord());
+        }
 
-		return records;
-	}
+        return records;
+    }
 
-	@Override
-	public List<IRecord> getUndoRecords() {
+    @Override
+    public List<IRecord> getUndoRecords() {
 
-		List<IRecord> records = new ArrayList<IRecord>();
+        List<IRecord> records = new ArrayList<IRecord>();
 
-		for (ElementRecord e : recordSet.getRootRecords()) {
-			records.add(e.getRecreateRecord());
-		}
+        for (ElementRecord e : recordSet.getRootRecords()) {
+            records.add(e.getRecreateRecord());
+        }
 
-		return records;
-	}
+        return records;
+    }
 
-	@Override
-	public DocumentRecord getDocumentRecord() {
-		return documentRecord;
-	}
+    @Override
+    public DocumentRecord getDocumentRecord() {
+        return documentRecord;
+    }
 
-	@Override
-	protected boolean canUndoSXECommand() {
-		LayoutElementRecord parent;
+    @Override
+    protected boolean canUndoSXECommand() {
+        LayoutElementRecord parent;
 
-		if (recordSet.getRootRecords().isEmpty())
-			return false;
+        if (recordSet.getRootRecords().isEmpty())
+            return false;
 
-		try {
-			for (ElementRecord e : recordSet.getRootRecords()) {
-				parent = (LayoutElementRecord) e.getParent();
-				if (!parent.isPartOfVisibleDocument())
-					return false;
-				if (!parent.isComposite())
-					return false;
-				/*
-				 * also if existent, let's just set it visible again. Will be
-				 * ignored by the controller then.
-				 */
-			}
-		} catch (ClassCastException e) {
-			return false;
-		}
+        try {
+            for (ElementRecord e : recordSet.getRootRecords()) {
+                parent = (LayoutElementRecord) e.getParent();
+                if (!parent.isPartOfVisibleDocument())
+                    return false;
+                if (!parent.isComposite())
+                    return false;
+                /*
+                 * also if existent, let's just set it visible again. Will be
+                 * ignored by the controller then.
+                 */
+            }
+        } catch (ClassCastException e) {
+            return false;
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	@Override
-	public void dispose() {
-		super.dispose();
-		recordSet.clear();
-		recordSet = null;
-		documentRecord = null;
-	}
+    @Override
+    public void dispose() {
+        super.dispose();
+        recordSet.clear();
+        recordSet = null;
+        documentRecord = null;
+    }
 
-	void setDocumentRecord(DocumentRecord document) {
-		this.documentRecord = document;
-	}
+    void setDocumentRecord(DocumentRecord document) {
+        this.documentRecord = document;
+    }
 
 }

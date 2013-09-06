@@ -25,76 +25,76 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
  */
 public class HierarchicalRecordSet {
 
-	protected LinkedList<ElementRecord> rootRecords = new LinkedList<ElementRecord>();
-	protected TreeSet<ElementRecord> subtreeRecords = new TreeSet<ElementRecord>();
+    protected LinkedList<ElementRecord> rootRecords = new LinkedList<ElementRecord>();
+    protected TreeSet<ElementRecord> subtreeRecords = new TreeSet<ElementRecord>();
 
-	/**
-	 * Inserts all records of the targets collection of type
-	 * {@link ElementRecord} to this set.
-	 * 
-	 * @param targets
-	 */
-	public void insertElementRecords(Collection<IRecord> targets) {
-		for (IRecord r : targets) {
-			if (r instanceof ElementRecord) {
-				insertRecord((ElementRecord) r);
-			}
-		}
-	}
+    /**
+     * Inserts all records of the targets collection of type
+     * {@link ElementRecord} to this set.
+     * 
+     * @param targets
+     */
+    public void insertElementRecords(Collection<IRecord> targets) {
+        for (IRecord r : targets) {
+            if (r instanceof ElementRecord) {
+                insertRecord((ElementRecord) r);
+            }
+        }
+    }
 
-	/**
-	 * <p>
-	 * If any of the passed record's parents or itself is already contained
-	 * there is nothing to do. </br> Else it will be inserted as a new root
-	 * record. Furthermore all its descendants will be added to subtree records
-	 * and removed from root records if applicable.
-	 * </p>
-	 * 
-	 * @param record
-	 */
-	public void insertRecord(ElementRecord record) {
+    /**
+     * <p>
+     * If any of the passed record's parents or itself is already contained
+     * there is nothing to do. </br> Else it will be inserted as a new root
+     * record. Furthermore all its descendants will be added to subtree records
+     * and removed from root records if applicable.
+     * </p>
+     * 
+     * @param record
+     */
+    public void insertRecord(ElementRecord record) {
 
-		if (subtreeRecords.contains(record) || rootRecords.contains(record)) {
-			return;
-		} else {
-			ElementRecord tmp;
-			Collection<ElementRecord> children = record
-					.getAllVisibleDescendantElements();
+        if (subtreeRecords.contains(record) || rootRecords.contains(record)) {
+            return;
+        } else {
+            ElementRecord tmp;
+            Collection<ElementRecord> children = record
+                .getAllVisibleDescendantElements();
 
-			Iterator<ElementRecord> it = rootRecords.iterator();
-			while (it.hasNext()) {
-				tmp = it.next();
-				if (children.contains(tmp)) {
-					subtreeRecords.add(tmp);
-					it.remove();
-				}
-			}
+            Iterator<ElementRecord> it = rootRecords.iterator();
+            while (it.hasNext()) {
+                tmp = it.next();
+                if (children.contains(tmp)) {
+                    subtreeRecords.add(tmp);
+                    it.remove();
+                }
+            }
 
-			rootRecords.add(record);
-			subtreeRecords.addAll(children);
+            rootRecords.add(record);
+            subtreeRecords.addAll(children);
 
-		}
-	}
+        }
+    }
 
-	/**
-	 * 
-	 * @return all records so that
-	 */
-	public List<ElementRecord> getRootRecords() {
-		return rootRecords;
-	}
+    /**
+     * 
+     * @return all records so that
+     */
+    public List<ElementRecord> getRootRecords() {
+        return rootRecords;
+    }
 
-	public Collection<ElementRecord> getSubtreeRecords() {
-		return subtreeRecords;
-	}
+    public Collection<ElementRecord> getSubtreeRecords() {
+        return subtreeRecords;
+    }
 
-	public boolean isEmpty() {
-		return rootRecords.isEmpty();
-	}
+    public boolean isEmpty() {
+        return rootRecords.isEmpty();
+    }
 
-	public void clear() {
-		rootRecords.clear();
-		subtreeRecords.clear();
-	}
+    public void clear() {
+        rootRecords.clear();
+        subtreeRecords.clear();
+    }
 
 }

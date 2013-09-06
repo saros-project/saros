@@ -12,9 +12,9 @@ import de.fu_berlin.inf.dpp.whiteboard.net.WhiteboardManager;
  */
 public class StartupWhiteboard implements IStartup {
 
-	@Override
-	public void earlyStartup() {
-		WhiteboardManager.getInstance();
-	}
+    @Override
+    public void earlyStartup() {
+        WhiteboardManager.getInstance();
+    }
 
 }

@@ -16,15 +16,15 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ElementRecord;
  */
 public class ElementModelDeletePolicy extends ComponentEditPolicy {
 
-	@Override
-	protected Command createDeleteCommand(GroupRequest deleteRequest) {
-		if (getHost().getModel() instanceof SVGRootRecord)
-			return null;
-		DeleteRecordsCommand command = new DeleteRecordsCommand();
-		if (getHost().getModel() instanceof ElementRecord) {
-			command.addRecordToDelete((ElementRecord) getHost().getModel());
-			return command;
-		}
-		return null;
-	}
+    @Override
+    protected Command createDeleteCommand(GroupRequest deleteRequest) {
+        if (getHost().getModel() instanceof SVGRootRecord)
+            return null;
+        DeleteRecordsCommand command = new DeleteRecordsCommand();
+        if (getHost().getModel() instanceof ElementRecord) {
+            command.addRecordToDelete((ElementRecord) getHost().getModel());
+            return command;
+        }
+        return null;
+    }
 }

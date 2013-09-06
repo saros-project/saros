@@ -18,27 +18,27 @@ package de.fu_berlin.inf.dpp.whiteboard.sxe.constants;
  */
 public enum RecordEntry {
 
-	RID("rid"), TARGET("target"), TYPE("type"), VERSION("version"), RECORD_TYPE(
-			"record-type"), TARGET_VERSION("target-version"), PARENT("parent"), VISIBLE(
-			"visible"), PRIMARY_WEIGHT("primary-weight"), NS("ns"), NAME("name"), CHDATA(
-			"chdata"), CREATOR("creator"), LAST_MODIFIED_BY("last-modified-by"), SENDER(
-			"sender");
+    RID("rid"), TARGET("target"), TYPE("type"), VERSION("version"), RECORD_TYPE(
+        "record-type"), TARGET_VERSION("target-version"), PARENT("parent"), VISIBLE(
+        "visible"), PRIMARY_WEIGHT("primary-weight"), NS("ns"), NAME("name"), CHDATA(
+        "chdata"), CREATOR("creator"), LAST_MODIFIED_BY("last-modified-by"), SENDER(
+        "sender");
 
-	private String type;
+    private String type;
 
-	private RecordEntry(String type) {
-		this.type = type;
-	}
+    private RecordEntry(String type) {
+        this.type = type;
+    }
 
-	@Override
-	public String toString() {
-		return type;
-	}
+    @Override
+    public String toString() {
+        return type;
+    }
 
-	public static RecordEntry fromString(String raw) {
-		for (RecordEntry t : RecordEntry.values())
-			if (t.toString().equals(raw))
-				return t;
-		return null;
-	}
+    public static RecordEntry fromString(String raw) {
+        for (RecordEntry t : RecordEntry.values())
+            if (t.toString().equals(raw))
+                return t;
+        return null;
+    }
 }

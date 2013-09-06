@@ -21,22 +21,22 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.records.NodeRecord;
  */
 public class CombinedTargetRecordCreationFactory implements CreationFactory {
 
-	private final String tag;
-	private final GEFRecordFactory factory = new GEFRecordFactory();
+    private final String tag;
+    private final GEFRecordFactory factory = new GEFRecordFactory();
 
-	public CombinedTargetRecordCreationFactory(String tag) {
-		this.tag = tag;
-	}
+    public CombinedTargetRecordCreationFactory(String tag) {
+        this.tag = tag;
+    }
 
-	@Override
-	// used to feedback the right shape, creation is done in the command
-	public NodeRecord getNewObject() {
-		return factory.createElementRecord(null, null, tag);
-	}
+    @Override
+    // used to feedback the right shape, creation is done in the command
+    public NodeRecord getNewObject() {
+        return factory.createElementRecord(null, null, tag);
+    }
 
-	@Override
-	public String getObjectType() {
-		return tag;
-	}
+    @Override
+    public String getObjectType() {
+        return tag;
+    }
 
 }

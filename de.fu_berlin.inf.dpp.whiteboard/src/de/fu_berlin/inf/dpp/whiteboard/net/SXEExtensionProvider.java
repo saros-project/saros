@@ -17,40 +17,40 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXESession;
  */
 public class SXEExtensionProvider implements PacketExtensionProvider {
 
-	private static final SXEExtensionProvider instance = new SXEExtensionProvider();
+    private static final SXEExtensionProvider instance = new SXEExtensionProvider();
 
-	public static SXEExtensionProvider getInstance() {
-		return instance;
-	}
+    public static SXEExtensionProvider getInstance() {
+        return instance;
+    }
 
-	private final SXEMessageReader reader = new SXEMessageReader();
+    private final SXEMessageReader reader = new SXEMessageReader();
 
-	/**
-	 * The constructor will register the provider in the Smack API
-	 */
-	private SXEExtensionProvider() {
-		ProviderManager providerManager = ProviderManager.getInstance();
-		providerManager.addExtensionProvider(SXEMessage.SXE_TAG,
-				SXEMessage.SXE_XMLNS, this);
-	}
+    /**
+     * The constructor will register the provider in the Smack API
+     */
+    private SXEExtensionProvider() {
+        ProviderManager providerManager = ProviderManager.getInstance();
+        providerManager.addExtensionProvider(SXEMessage.SXE_TAG,
+            SXEMessage.SXE_XMLNS, this);
+    }
 
-	@Override
-	public PacketExtension parseExtension(XmlPullParser xpp) throws Exception {
+    @Override
+    public PacketExtension parseExtension(XmlPullParser xpp) throws Exception {
 
-		SXEExtension pe = new SXEExtension();
+        SXEExtension pe = new SXEExtension();
 
-		SXEMessage message = reader.parseMessage(xpp);
+        SXEMessage message = reader.parseMessage(xpp);
 
-		pe.setMessage(message);
+        pe.setMessage(message);
 
-		return pe;
-	}
+        return pe;
+    }
 
-	public SXEPacketFilter getInvitationPacketFilter() {
-		return new SXEPacketFilter(SXEMessageType.STATE_OFFER);
-	}
+    public SXEPacketFilter getInvitationPacketFilter() {
+        return new SXEPacketFilter(SXEMessageType.STATE_OFFER);
+    }
 
-	public SXEPacketFilter getRecordsPacketFilter(SXESession session) {
-		return new SXEPacketFilter(session, SXEMessageType.RECORDS);
-	}
+    public SXEPacketFilter getRecordsPacketFilter(SXESession session) {
+        return new SXEPacketFilter(session, SXEMessageType.RECORDS);
+    }
 }

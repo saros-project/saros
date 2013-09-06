@@ -18,89 +18,89 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
  */
 public abstract class SXECommand extends Command {
 
-	private static final Logger log = Logger.getLogger(SXECommand.class);
+    private static final Logger log = Logger.getLogger(SXECommand.class);
 
-	public abstract List<IRecord> getRecords();
+    public abstract List<IRecord> getRecords();
 
-	public abstract List<IRecord> getUndoRecords();
+    public abstract List<IRecord> getUndoRecords();
 
-	public List<IRecord> getRedoRecords() {
-		return getRecords();
-	}
+    public List<IRecord> getRedoRecords() {
+        return getRecords();
+    }
 
-	public abstract DocumentRecord getDocumentRecord();
+    public abstract DocumentRecord getDocumentRecord();
 
-	@Override
-	public final void execute() {
-		try {
+    @Override
+    public final void execute() {
+        try {
 
-			List<IRecord> records = getRecords();
-			getDocumentRecord().getController().executeAndCommit(records);
+            List<IRecord> records = getRecords();
+            getDocumentRecord().getController().executeAndCommit(records);
 
-		} catch (Exception e) {
-			log.error("Cannot execute operation: ", e);
-		}
-	}
+        } catch (Exception e) {
+            log.error("Cannot execute operation: ", e);
+        }
+    }
 
-	@Override
-	public void undo() {
-		try {
+    @Override
+    public void undo() {
+        try {
 
-			List<IRecord> records = getUndoRecords();
+            List<IRecord> records = getUndoRecords();
 
-			getDocumentRecord().getController().executeAndCommit(records);
+            getDocumentRecord().getController().executeAndCommit(records);
 
-		} catch (Exception e) {
-			log.error("Cannot execute operation: ", e);
-		}
-	}
+        } catch (Exception e) {
+            log.error("Cannot execute operation: ", e);
+        }
+    }
 
-	@Override
-	public void redo() {
-		try {
+    @Override
+    public void redo() {
+        try {
 
-			List<IRecord> records = getRedoRecords();
+            List<IRecord> records = getRedoRecords();
 
-			getDocumentRecord().getController().executeAndCommit(records);
+            getDocumentRecord().getController().executeAndCommit(records);
 
-		} catch (Exception e) {
-			log.error("Cannot execute operation: ", e);
-		}
+        } catch (Exception e) {
+            log.error("Cannot execute operation: ", e);
+        }
 
-	}
+    }
 
-	@Override
-	public final boolean canExecute() {
-		if (getDocumentRecord() == null
-				|| getDocumentRecord().getController() == null)
-			return false;
-		return canExecuteSXECommand();
-	}
+    @Override
+    public final boolean canExecute() {
+        if (getDocumentRecord() == null
+            || getDocumentRecord().getController() == null)
+            return false;
+        return canExecuteSXECommand();
+    }
 
-	protected abstract boolean canExecuteSXECommand();
+    protected abstract boolean canExecuteSXECommand();
 
-	@Override
-	public final boolean canUndo() {
-		if (getDocumentRecord() == null
-				|| getDocumentRecord().getController() == null) {
-			return false;
-		}
-		return canUndoSXECommand();
-	}
+    @Override
+    public final boolean canUndo() {
+        if (getDocumentRecord() == null
+            || getDocumentRecord().getController() == null) {
+            return false;
+        }
+        return canUndoSXECommand();
+    }
 
-	protected abstract boolean canUndoSXECommand();
+    protected abstract boolean canUndoSXECommand();
 
-	@Override
-	public Command chain(Command command) {
-		if (command == null)
-			return this;
-		if (command instanceof SXECommand) {
-			CompoundCommand result = new SXECompoundCommand();
-			result.setDebugLabel("chained SXECommands");
-			result.add(this);
-			result.add(command);
-			return result;
-		} else
-			return super.chain(command);
-	}
+    @Override
+    public Command chain(Command command) {
+        if (command == null)
+            return this;
+        if (command instanceof SXECommand) {
+            CompoundCommand result = new SXECompoundCommand();
+            result.setDebugLabel("chained SXECommands");
+            result.add(this);
+            result.add(command);
+            return result;
+        } else
+            return super.chain(command);
+    }
 }

@@ -18,77 +18,77 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
  */
 public class SXECompoundCommand extends CompoundCommand {
 
-	private static final Logger log = Logger.getLogger(SXECommand.class);
+    private static final Logger log = Logger.getLogger(SXECommand.class);
 
-	@Override
-	public final void execute() {
-		try {
+    @Override
+    public final void execute() {
+        try {
 
-			List<IRecord> records = new LinkedList<IRecord>();
+            List<IRecord> records = new LinkedList<IRecord>();
 
-			for (Object o : getCommands()) {
-				records.addAll(((SXECommand) o).getRecords());
-			}
+            for (Object o : getCommands()) {
+                records.addAll(((SXECommand) o).getRecords());
+            }
 
-			((SXECommand) getCommands().get(0)).getDocumentRecord()
-					.getController().executeAndCommit(records);
+            ((SXECommand) getCommands().get(0)).getDocumentRecord()
+                .getController().executeAndCommit(records);
 
-		} catch (Exception e) {
-			log.error("Cannot execute operation: ", e);
-		}
-	}
+        } catch (Exception e) {
+            log.error("Cannot execute operation: ", e);
+        }
+    }
 
-	@Override
-	public void add(Command command) {
-		if (!(command instanceof SXECommand)) {
-			log.error("Cannot add " + command + " to SXECompoundCommand");
-			return;
-		}
-		super.add(command);
-	}
+    @Override
+    public void add(Command command) {
+        if (!(command instanceof SXECommand)) {
+            log.error("Cannot add " + command + " to SXECompoundCommand");
+            return;
+        }
+        super.add(command);
+    }
 
-	@Override
-	public void redo() {
-		try {
+    @Override
+    public void redo() {
+        try {
 
-			List<IRecord> records = new LinkedList<IRecord>();
+            List<IRecord> records = new LinkedList<IRecord>();
 
-			for (Object o : getCommands()) {
-				records.addAll(((SXECommand) o).getRedoRecords());
-			}
+            for (Object o : getCommands()) {
+                records.addAll(((SXECommand) o).getRedoRecords());
+            }
 
-			((SXECommand) getCommands().get(0)).getDocumentRecord()
-					.getController().executeAndCommit(records);
+            ((SXECommand) getCommands().get(0)).getDocumentRecord()
+                .getController().executeAndCommit(records);
 
-		} catch (Exception e) {
-			log.error("Cannot execute operation: ", e);
-		}
-	}
+        } catch (Exception e) {
+            log.error("Cannot execute operation: ", e);
+        }
+    }
 
-	@Override
-	public void undo() {
-		try {
+    @Override
+    public void undo() {
+        try {
 
-			List<IRecord> records = new LinkedList<IRecord>();
+            List<IRecord> records = new LinkedList<IRecord>();
 
-			for (Object o : getCommands()) {
-				records.addAll(((SXECommand) o).getUndoRecords());
-			}
+            for (Object o : getCommands()) {
+                records.addAll(((SXECommand) o).getUndoRecords());
+            }
 
-			((SXECommand) getCommands().get(0)).getDocumentRecord()
-					.getController().executeAndCommit(records);
+            ((SXECommand) getCommands().get(0)).getDocumentRecord()
+                .getController().executeAndCommit(records);
 
-		} catch (Exception e) {
-			log.error("Cannot execute operation: ", e);
-		}
-	}
+        } catch (Exception e) {
+            log.error("Cannot execute operation: ", e);
+        }
+    }
 
-	@Override
-	public Command chain(Command c) {
-		if (c instanceof SXECommand) {
-			add(c);
-			return this;
-		} else
-			return super.chain(c);
-	}
+    @Override
+    public Command chain(Command c) {
+        if (c instanceof SXECommand) {
+            add(c);
+            return this;
+        } else
+            return super.chain(c);
+    }
 }

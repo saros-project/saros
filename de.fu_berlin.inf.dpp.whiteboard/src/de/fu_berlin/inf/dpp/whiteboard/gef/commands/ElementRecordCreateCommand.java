@@ -15,42 +15,42 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
  * 
  */
 public class ElementRecordCreateCommand extends
-		AbstractElementRecordCreateCommand {
+    AbstractElementRecordCreateCommand {
 
-	private Rectangle layout;
+    private Rectangle layout;
 
-	public void setLayout(Rectangle layout) {
-		this.layout = layout;
-	}
+    public void setLayout(Rectangle layout) {
+        this.layout = layout;
+    }
 
-	/**
-	 * Overridden to be public
-	 */
-	@Override
-	public void setChildName(String name) {
-		super.setChildName(name);
-	}
+    /**
+     * Overridden to be public
+     */
+    @Override
+    public void setChildName(String name) {
+        super.setChildName(name);
+    }
 
-	public String getChildName() {
-		return this.newChildName;
-	}
+    public String getChildName() {
+        return this.newChildName;
+    }
 
-	@Override
-	protected List<IRecord> getAttributeRecords(LayoutElementRecord child) {
-		return child.getChangeLayoutRecords(layout);
-	}
+    @Override
+    protected List<IRecord> getAttributeRecords(LayoutElementRecord child) {
+        return child.getChangeLayoutRecords(layout);
+    }
 
-	@Override
-	protected boolean canExecuteSXECommand() {
-		if (layout == null)
-			return false;
-		return super.canExecuteSXECommand();
-	}
+    @Override
+    protected boolean canExecuteSXECommand() {
+        if (layout == null)
+            return false;
+        return super.canExecuteSXECommand();
+    }
 
-	@Override
-	public void dispose() {
-		super.dispose();
-		layout = null;
-	}
+    @Override
+    public void dispose() {
+        super.dispose();
+        layout = null;
+    }
 
 }

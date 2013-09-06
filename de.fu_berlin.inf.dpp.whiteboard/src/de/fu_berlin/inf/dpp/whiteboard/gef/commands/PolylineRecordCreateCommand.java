@@ -17,35 +17,35 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
  * 
  */
 public class PolylineRecordCreateCommand extends
-		AbstractElementRecordCreateCommand {
+    AbstractElementRecordCreateCommand {
 
-	private PointList points;
+    private PointList points;
 
-	public PolylineRecordCreateCommand() {
-		setChildName(SVGConstants.SVG_POLYLINE_TAG);
-	}
+    public PolylineRecordCreateCommand() {
+        setChildName(SVGConstants.SVG_POLYLINE_TAG);
+    }
 
-	public void setPointList(PointList r) {
-		points = r;
-	}
+    public void setPointList(PointList r) {
+        points = r;
+    }
 
-	@Override
-	protected List<IRecord> getAttributeRecords(LayoutElementRecord child) {
-		return ((SVGPolylineRecord) getNewChild()).createPointsRecord(points);
-	}
+    @Override
+    protected List<IRecord> getAttributeRecords(LayoutElementRecord child) {
+        return ((SVGPolylineRecord) getNewChild()).createPointsRecord(points);
+    }
 
-	@Override
-	protected boolean canExecuteSXECommand() {
-		if (points == null)
-			return false;
-		return super.canExecuteSXECommand();
-	}
+    @Override
+    protected boolean canExecuteSXECommand() {
+        if (points == null)
+            return false;
+        return super.canExecuteSXECommand();
+    }
 
-	@Override
-	public void dispose() {
-		super.dispose();
-		points.removeAllPoints();
-		points = null;
-	}
+    @Override
+    public void dispose() {
+        super.dispose();
+        points.removeAllPoints();
+        points = null;
+    }
 
 }

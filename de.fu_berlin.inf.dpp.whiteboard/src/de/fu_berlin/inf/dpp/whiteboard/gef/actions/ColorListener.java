@@ -11,11 +11,11 @@ import org.eclipse.swt.graphics.RGB;
  */
 public interface ColorListener {
 
-	/**
-	 * Usercolors has been changed. May be only 1 of those has been changed
-	 * 
-	 * @param foreGround
-	 * @param backGround
-	 */
-	public void updateColor(RGB foreGround, RGB backGround);
+    /**
+     * Usercolors has been changed. May be only 1 of those has been changed
+     * 
+     * @param foreGround
+     * @param backGround
+     */
+    public void updateColor(RGB foreGround, RGB backGround);
 }

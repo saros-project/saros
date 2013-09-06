@@ -18,79 +18,79 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.RecordDataObject
  */
 public class SXEMessage {
 
-	public static final String SXE_TAG = "sxe";
-	public static final String SXE_XMLNS = "urn:xmpp:sxe:0";
+    public static final String SXE_TAG = "sxe";
+    public static final String SXE_XMLNS = "urn:xmpp:sxe:0";
 
-	private final SXESession session;
-	private final String msgId;
+    private final SXESession session;
+    private final String msgId;
 
-	private SXEMessageType messageType;
-	private List<RecordDataObject> records;
+    private SXEMessageType messageType;
+    private List<RecordDataObject> records;
 
-	private String from;
-	private String to;
+    private String from;
+    private String to;
 
-	// private String sessionName;
+    // private String sessionName;
 
-	public SXEMessage(SXESession sessionId, String msgId) {
-		this.session = sessionId;
-		this.msgId = msgId;
-	}
+    public SXEMessage(SXESession sessionId, String msgId) {
+        this.session = sessionId;
+        this.msgId = msgId;
+    }
 
-	public SXESession getSession() {
-		return session;
-	}
+    public SXESession getSession() {
+        return session;
+    }
 
-	public String getMessageId() {
-		return msgId;
-	}
+    public String getMessageId() {
+        return msgId;
+    }
 
-	public SXEMessageType getMessageType() {
-		return messageType;
-	}
+    public SXEMessageType getMessageType() {
+        return messageType;
+    }
 
-	public void setMessageType(SXEMessageType messageType) {
-		this.messageType = messageType;
-	}
+    public void setMessageType(SXEMessageType messageType) {
+        this.messageType = messageType;
+    }
 
-	public String getFrom() {
-		return from;
-	}
+    public String getFrom() {
+        return from;
+    }
 
-	public void setFrom(String from) {
-		this.from = from;
-	}
+    public void setFrom(String from) {
+        this.from = from;
+    }
 
-	public String getTo() {
-		return to;
-	}
+    public String getTo() {
+        return to;
+    }
 
-	public void setTo(String to) {
-		this.to = to;
-	}
+    public void setTo(String to) {
+        this.to = to;
+    }
 
-	public List<RecordDataObject> getRecords() {
-		return records;
-	}
+    public List<RecordDataObject> getRecords() {
+        return records;
+    }
 
-	public void setRecords(List<RecordDataObject> records) {
-		this.records = records;
-	}
+    public void setRecords(List<RecordDataObject> records) {
+        this.records = records;
+    }
 
-	@Override
-	public String toString() {
-		String out = "";
-		out += "from: " + from;
-		out += ", to: " + to;
-		out += ", msgId: " + msgId;
-		out += "messageTyp: " + messageType;
-		out += "message: [";
-		for (RecordDataObject rec : records) {
-			out += rec + ", ";
-		}
-		out += "]";
+    @Override
+    public String toString() {
+        String out = "";
+        out += "from: " + from;
+        out += ", to: " + to;
+        out += ", msgId: " + msgId;
+        out += "messageTyp: " + messageType;
+        out += "message: [";
+        for (RecordDataObject rec : records) {
+            out += rec + ", ";
+        }
+        out += "]";
 
-		return super.toString() + ": " + out;
-	}
+        return super.toString() + ": " + out;
+    }
 
 }

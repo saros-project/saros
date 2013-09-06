@@ -9,14 +9,14 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.records.DocumentRecord;
  */
 public class SVGRootRecord extends SVGRectRecord {
 
-	public SVGRootRecord(DocumentRecord documentRecord) {
-		super(documentRecord);
-		setName(SVGConstants.SVG_SVG_TAG);
-		setNs(SVGConstants.SVG_NAMESPACE_URI);
-	}
+    public SVGRootRecord(DocumentRecord documentRecord) {
+        super(documentRecord);
+        setName(SVGConstants.SVG_SVG_TAG);
+        setNs(SVGConstants.SVG_NAMESPACE_URI);
+    }
 
-	public boolean isComposite() {
-		return true;
-	}
+    public boolean isComposite() {
+        return true;
+    }
 
 }

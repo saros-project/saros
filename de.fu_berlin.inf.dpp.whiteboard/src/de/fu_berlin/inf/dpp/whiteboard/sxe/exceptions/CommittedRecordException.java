@@ -9,11 +9,11 @@ package de.fu_berlin.inf.dpp.whiteboard.sxe.exceptions;
  */
 public class CommittedRecordException extends RuntimeException {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public CommittedRecordException() {
-		super(
-				"Cannot change a record that is already commited. Create a new one to change XML data.");
-	}
+    public CommittedRecordException() {
+        super(
+            "Cannot change a record that is already commited. Create a new one to change XML data.");
+    }
 
 }

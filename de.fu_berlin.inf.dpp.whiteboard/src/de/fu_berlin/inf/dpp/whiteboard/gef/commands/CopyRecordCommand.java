@@ -27,67 +27,67 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.util.HierarchicalRecordSet;
  */
 public class CopyRecordCommand extends Command {
 
-	private HierarchicalRecordSet recordsToCopy = new HierarchicalRecordSet();
-	private ArrayList<LayoutElementRecord> copiedRecords = new ArrayList<LayoutElementRecord>();;
+    private HierarchicalRecordSet recordsToCopy = new HierarchicalRecordSet();
+    private ArrayList<LayoutElementRecord> copiedRecords = new ArrayList<LayoutElementRecord>();;
 
-	public boolean addElement(LayoutElementRecord node) {
-		if (!isCopyableNode(node))
-			return false;
-		recordsToCopy.insertRecord(node);
-		return true;
-	}
+    public boolean addElement(LayoutElementRecord node) {
+        if (!isCopyableNode(node))
+            return false;
+        recordsToCopy.insertRecord(node);
+        return true;
+    }
 
-	@Override
-	public boolean canExecute() {
-		if (recordsToCopy == null || recordsToCopy.isEmpty())
-			return false;
-		Iterator<ElementRecord> it = recordsToCopy.getRootRecords().iterator();
-		ElementRecord er;
-		while (it.hasNext()) {
-			er = it.next();
-			if (!isCopyableNode(er))
-				return false;
-			if (!er.getParent().isPartOfVisibleDocument())
-				return false;
-		}
-		return true;
-	}
+    @Override
+    public boolean canExecute() {
+        if (recordsToCopy == null || recordsToCopy.isEmpty())
+            return false;
+        Iterator<ElementRecord> it = recordsToCopy.getRootRecords().iterator();
+        ElementRecord er;
+        while (it.hasNext()) {
+            er = it.next();
+            if (!isCopyableNode(er))
+                return false;
+            if (!er.getParent().isPartOfVisibleDocument())
+                return false;
+        }
+        return true;
+    }
 
-	@Override
-	public void execute() {
-		if (canExecute()) {
-			ElementRecord copy;
-			for (ElementRecord er : recordsToCopy.getRootRecords()) {
-				copy = er.getCopy(true);
-				/*
-				 * it is undesirable to add anything with the same primary
-				 * weight to the same parent, thus it is reset.
-				 */
-				copy.setPrimaryWeight(null);
-				copiedRecords.add((LayoutElementRecord) copy);
-			}
-			Clipboard.getDefault().setContents(copiedRecords);
-		}
-	}
+    @Override
+    public void execute() {
+        if (canExecute()) {
+            ElementRecord copy;
+            for (ElementRecord er : recordsToCopy.getRootRecords()) {
+                copy = er.getCopy(true);
+                /*
+                 * it is undesirable to add anything with the same primary
+                 * weight to the same parent, thus it is reset.
+                 */
+                copy.setPrimaryWeight(null);
+                copiedRecords.add((LayoutElementRecord) copy);
+            }
+            Clipboard.getDefault().setContents(copiedRecords);
+        }
+    }
 
-	@Override
-	public boolean canUndo() {
-		return false;
-	}
+    @Override
+    public boolean canUndo() {
+        return false;
+    }
 
-	public boolean isCopyableNode(NodeRecord node) {
-		if (node instanceof SVGRootRecord)
-			return false;
-		return true;
-	}
+    public boolean isCopyableNode(NodeRecord node) {
+        if (node instanceof SVGRootRecord)
+            return false;
+        return true;
+    }
 
-	@Override
-	public void dispose() {
-		super.dispose();
-		recordsToCopy.clear();
-		recordsToCopy = null;
-		// cannot clear as they may remain in the Clipboard
-		copiedRecords = null;
-	}
+    @Override
+    public void dispose() {
+        super.dispose();
+        recordsToCopy.clear();
+        recordsToCopy = null;
+        // cannot clear as they may remain in the Clipboard
+        copiedRecords = null;
+    }
 
 }

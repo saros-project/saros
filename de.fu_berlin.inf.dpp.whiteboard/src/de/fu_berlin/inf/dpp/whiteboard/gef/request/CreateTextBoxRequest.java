@@ -6,18 +6,18 @@ import de.fu_berlin.inf.dpp.whiteboard.gef.editpolicy.XYLayoutWithFreehandEditPo
 
 public class CreateTextBoxRequest extends CreateRequest {
 
-	protected String text;
+    protected String text;
 
-	public CreateTextBoxRequest() {
-		setType(XYLayoutWithFreehandEditPolicy.REQ_CREATE_TEXTBOX);
-	}
+    public CreateTextBoxRequest() {
+        setType(XYLayoutWithFreehandEditPolicy.REQ_CREATE_TEXTBOX);
+    }
 
-	public String getText() {
-		return text;
-	}
+    public String getText() {
+        return text;
+    }
 
-	public void setText(String text) {
-		this.text = text;
-	}
+    public void setText(String text) {
+        this.text = text;
+    }
 
 }

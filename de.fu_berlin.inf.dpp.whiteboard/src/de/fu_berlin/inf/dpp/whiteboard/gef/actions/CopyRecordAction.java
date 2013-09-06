@@ -36,72 +36,72 @@ import de.fu_berlin.inf.dpp.whiteboard.view.SarosWhiteboardView;
  * 
  */
 public class CopyRecordAction extends SelectionAction {
-	public CopyRecordAction(IWorkbenchPart part) {
-		super(part);
-		// force calculateEnabled() to be called in every context
-		setLazyEnablementCalculation(true);
-	}
+    public CopyRecordAction(IWorkbenchPart part) {
+        super(part);
+        // force calculateEnabled() to be called in every context
+        setLazyEnablementCalculation(true);
+    }
 
-	@Override
-	protected void init() {
-		super.init();
-		ISharedImages sharedImages = PlatformUI.getWorkbench()
-				.getSharedImages();
-		setText("Copy");
-		setId(ActionFactory.COPY.getId());
-		setHoverImageDescriptor(sharedImages
-				.getImageDescriptor(ISharedImages.IMG_TOOL_COPY));
-		setImageDescriptor(sharedImages
-				.getImageDescriptor(ISharedImages.IMG_TOOL_COPY));
-		setDisabledImageDescriptor(sharedImages
-				.getImageDescriptor(ISharedImages.IMG_TOOL_COPY_DISABLED));
-		setEnabled(false);
-	}
+    @Override
+    protected void init() {
+        super.init();
+        ISharedImages sharedImages = PlatformUI.getWorkbench()
+            .getSharedImages();
+        setText("Copy");
+        setId(ActionFactory.COPY.getId());
+        setHoverImageDescriptor(sharedImages
+            .getImageDescriptor(ISharedImages.IMG_TOOL_COPY));
+        setImageDescriptor(sharedImages
+            .getImageDescriptor(ISharedImages.IMG_TOOL_COPY));
+        setDisabledImageDescriptor(sharedImages
+            .getImageDescriptor(ISharedImages.IMG_TOOL_COPY_DISABLED));
+        setEnabled(false);
+    }
 
-	@SuppressWarnings("rawtypes")
-	private Command createCopyCommand(List selectedObjects) {
-		if (selectedObjects == null || selectedObjects.isEmpty()) {
-			return null;
-		}
+    @SuppressWarnings("rawtypes")
+    private Command createCopyCommand(List selectedObjects) {
+        if (selectedObjects == null || selectedObjects.isEmpty()) {
+            return null;
+        }
 
-		CopyRecordCommand cmd = new CopyRecordCommand();
-		Object o;
-		Iterator it = selectedObjects.iterator();
-		while (it.hasNext()) {
-			o = it.next();
-			if (!(o instanceof EditPart))
-				continue;
-			EditPart ep = (EditPart) o;
-			LayoutElementRecord node = (LayoutElementRecord) ep.getModel();
-			if (!cmd.isCopyableNode(node)) // TODO only copy others?
-				return null;
-			cmd.addElement(node);
-		}
-		return cmd;
-	}
+        CopyRecordCommand cmd = new CopyRecordCommand();
+        Object o;
+        Iterator it = selectedObjects.iterator();
+        while (it.hasNext()) {
+            o = it.next();
+            if (!(o instanceof EditPart))
+                continue;
+            EditPart ep = (EditPart) o;
+            LayoutElementRecord node = (LayoutElementRecord) ep.getModel();
+            if (!cmd.isCopyableNode(node)) // TODO only copy others?
+                return null;
+            cmd.addElement(node);
+        }
+        return cmd;
+    }
 
-	@Override
-	protected boolean calculateEnabled() {
-		Command cmd = createCopyCommand(getSelectedObjects());
-		if (cmd == null)
-			return false;
-		return cmd.canExecute();
-	}
+    @Override
+    protected boolean calculateEnabled() {
+        Command cmd = createCopyCommand(getSelectedObjects());
+        if (cmd == null)
+            return false;
+        return cmd.canExecute();
+    }
 
-	@Override
-	public void run() {
-		Command cmd = createCopyCommand(getSelectedObjects());
-		if (cmd != null && cmd.canExecute()) {
-			cmd.execute();
-			// force an updateActions for paste command
-			if (getWorkbenchPart().getSite().getPage().getActivePart() instanceof SarosWhiteboardView) {
-				((SarosWhiteboardView) getWorkbenchPart().getSite().getPage()
-						.getActivePart()).getEditor().updateSelectionActions();
-			} else if (getWorkbenchPart().getSite().getPage().getActivePart() instanceof WhiteboardEditor) {
-				((WhiteboardEditor) getWorkbenchPart().getSite().getPage()
-						.getActivePart()).updateSelectionActions();
-			}
-		}
-	}
+    @Override
+    public void run() {
+        Command cmd = createCopyCommand(getSelectedObjects());
+        if (cmd != null && cmd.canExecute()) {
+            cmd.execute();
+            // force an updateActions for paste command
+            if (getWorkbenchPart().getSite().getPage().getActivePart() instanceof SarosWhiteboardView) {
+                ((SarosWhiteboardView) getWorkbenchPart().getSite().getPage()
+                    .getActivePart()).getEditor().updateSelectionActions();
+            } else if (getWorkbenchPart().getSite().getPage().getActivePart() instanceof WhiteboardEditor) {
+                ((WhiteboardEditor) getWorkbenchPart().getSite().getPage()
+                    .getActivePart()).updateSelectionActions();
+            }
+        }
+    }
 
 }

@@ -45,221 +45,221 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.RecordDataObject
  */
 public class SarosSXETransmitter implements ISXETransmitter {
 
-	/**
-	 * Max. waiting time for responses from other whiteboard instances
-	 */
-	private static final long SXE_TIMEOUT = 30000L;
+    /**
+     * Max. waiting time for responses from other whiteboard instances
+     */
+    private static final long SXE_TIMEOUT = 30000L;
 
-	/**
-	 * Interval to poll receiving
-	 * 
-	 * @see XMPPTransmitter#receive(SubMonitor, SarosPacketCollector, long,
-	 *      boolean)
-	 */
-	private static final long SXE_TIMEOUT_INTERVAL = 500L;
+    /**
+     * Interval to poll receiving
+     * 
+     * @see XMPPTransmitter#receive(SubMonitor, SarosPacketCollector, long,
+     *      boolean)
+     */
+    private static final long SXE_TIMEOUT_INTERVAL = 500L;
 
-	public static final Logger log = Logger
-			.getLogger(SarosSXETransmitter.class);
+    public static final Logger log = Logger
+        .getLogger(SarosSXETransmitter.class);
 
-	/* we don't want to block the GUI for sending */
-	protected ExecutorService sendingDispatch = Executors
-			.newSingleThreadExecutor(new NamedThreadFactory(
-					"Whiteboard-SXESending-Dispatch-"));
+    /* we don't want to block the GUI for sending */
+    protected ExecutorService sendingDispatch = Executors
+        .newSingleThreadExecutor(new NamedThreadFactory(
+            "Whiteboard-SXESending-Dispatch-"));
 
-	private final SXEExtensionProvider provider = SXEExtensionProvider
-			.getInstance();
+    private final SXEExtensionProvider provider = SXEExtensionProvider
+        .getInstance();
 
-	@Inject
-	private ITransmitter transmitter;
+    @Inject
+    private ITransmitter transmitter;
 
-	@Inject
-	private IReceiver receiver;
+    @Inject
+    private IReceiver receiver;
 
-	private final ISarosSession sarosSession;
+    private final ISarosSession sarosSession;
 
-	public SarosSXETransmitter(ISarosSession sarosSession) {
-		SarosPluginContext.initComponent(this);
-		this.sarosSession = sarosSession;
-	}
+    public SarosSXETransmitter(ISarosSession sarosSession) {
+        SarosPluginContext.initComponent(this);
+        this.sarosSession = sarosSession;
+    }
 
-	private PacketListener invitationListener;
+    private PacketListener invitationListener;
 
-	private PacketListener recordListener;
+    private PacketListener recordListener;
 
-	@Override
-	public void installRecordReceiver(final SXEController controller) {
+    @Override
+    public void installRecordReceiver(final SXEController controller) {
 
-		recordListener = new PacketListener() {
-			@Override
-			public void processPacket(Packet packet) {
-				final SXEExtension extension = (SXEExtension) packet
-						.getExtension(SXEMessage.SXE_TAG, SXEMessage.SXE_XMLNS);
-				extension.getMessage().setFrom(packet.getFrom());
-				/*
-				 * TODO consider the lastModifiedBy field: if not sent in the
-				 * record it may be set here like the sender
-				 */
-				setSender(extension.getMessage().getRecords(), packet.getFrom());
-				SWTUtils.runSafeSWTAsync(log, new Runnable() {
+        recordListener = new PacketListener() {
+            @Override
+            public void processPacket(Packet packet) {
+                final SXEExtension extension = (SXEExtension) packet
+                    .getExtension(SXEMessage.SXE_TAG, SXEMessage.SXE_XMLNS);
+                extension.getMessage().setFrom(packet.getFrom());
+                /*
+                 * TODO consider the lastModifiedBy field: if not sent in the
+                 * record it may be set here like the sender
+                 */
+                setSender(extension.getMessage().getRecords(), packet.getFrom());
+                SWTUtils.runSafeSWTAsync(log, new Runnable() {
 
-					@Override
-					public void run() {
-						controller.executeRemoteRecords(extension.getMessage());
-					}
+                    @Override
+                    public void run() {
+                        controller.executeRemoteRecords(extension.getMessage());
+                    }
 
-				});
-			}
-		};
+                });
+            }
+        };
 
-		receiver.addPacketListener(recordListener,
-				provider.getRecordsPacketFilter(controller.getSession()));
-	}
+        receiver.addPacketListener(recordListener,
+            provider.getRecordsPacketFilter(controller.getSession()));
+    }
 
-	@Override
-	public void sendAsync(final SXEMessage msg) {
-		sendingDispatch.submit(ThreadUtils.wrapSafe(log, new Runnable() {
+    @Override
+    public void sendAsync(final SXEMessage msg) {
+        sendingDispatch.submit(ThreadUtils.wrapSafe(log, new Runnable() {
 
-			@Override
-			public void run() {
-				sendWithoutDispatch(msg);
-			}
-		}));
-	}
+            @Override
+            public void run() {
+                sendWithoutDispatch(msg);
+            }
+        }));
+    }
 
-	protected void sendWithoutDispatch(SXEMessage msg) {
-		SXEExtension extension = new SXEExtension();
-		extension.setMessage(msg);
+    protected void sendWithoutDispatch(SXEMessage msg) {
+        SXEExtension extension = new SXEExtension();
+        extension.setMessage(msg);
 
-		try {
-			if (msg.getTo() == null) {
-				for (User u : sarosSession.getRemoteUsers()) {
-					transmitter.sendToSessionUser(u.getJID(), extension);
-				}
-			} else {
-				JID jid = new JID(msg.getTo());
-				transmitter.sendToSessionUser(jid, extension);
-			}
-		} catch (Exception e) {
-			log.error(
-					prefix()
-							+ "sending whiteboard message failed because of an network error",
-					e);
-		}
-	}
+        try {
+            if (msg.getTo() == null) {
+                for (User u : sarosSession.getRemoteUsers()) {
+                    transmitter.sendToSessionUser(u.getJID(), extension);
+                }
+            } else {
+                JID jid = new JID(msg.getTo());
+                transmitter.sendToSessionUser(jid, extension);
+            }
+        } catch (Exception e) {
+            log.error(
+                prefix()
+                    + "sending whiteboard message failed because of an network error",
+                e);
+        }
+    }
 
-	@Override
-	public synchronized SXEMessage sendAndAwait(IProgressMonitor monitor,
-			SXEMessage msg, SXEMessageType... awaitFor) throws IOException,
-			LocalCancellationException {
+    @Override
+    public synchronized SXEMessage sendAndAwait(IProgressMonitor monitor,
+        SXEMessage msg, SXEMessageType... awaitFor) throws IOException,
+        LocalCancellationException {
 
-		log.debug(prefix() + "send " + msg.getMessageType() + " to "
-				+ msg.getTo() + " waiting for " + Arrays.toString(awaitFor));
+        log.debug(prefix() + "send " + msg.getMessageType() + " to "
+            + msg.getTo() + " waiting for " + Arrays.toString(awaitFor));
 
-		Packet packet;
+        Packet packet;
 
-		PacketFilter filter = new SXEPacketFilter(msg.getSession(),
-				msg.getTo(), awaitFor);
+        PacketFilter filter = new SXEPacketFilter(msg.getSession(),
+            msg.getTo(), awaitFor);
 
-		SarosPacketCollector collector = receiver.createCollector(filter);
+        SarosPacketCollector collector = receiver.createCollector(filter);
 
-		try {
-			sendWithoutDispatch(msg);
-			long startTime = System.currentTimeMillis();
+        try {
+            sendWithoutDispatch(msg);
+            long startTime = System.currentTimeMillis();
 
-			do {
-				packet = collector.nextResult(SXE_TIMEOUT_INTERVAL);
+            do {
+                packet = collector.nextResult(SXE_TIMEOUT_INTERVAL);
 
-				if (monitor.isCanceled())
-					throw new LocalCancellationException();
+                if (monitor.isCanceled())
+                    throw new LocalCancellationException();
 
-				if (System.currentTimeMillis() - startTime > SXE_TIMEOUT) {
-					String warn = "Received no answer from " + msg.getTo()
-							+ ", giving up...";
-					log.warn(warn);
-					throw new LocalCancellationException(warn,
-							ProcessTools.CancelOption.DO_NOT_NOTIFY_PEER);
-				}
+                if (System.currentTimeMillis() - startTime > SXE_TIMEOUT) {
+                    String warn = "Received no answer from " + msg.getTo()
+                        + ", giving up...";
+                    log.warn(warn);
+                    throw new LocalCancellationException(warn,
+                        ProcessTools.CancelOption.DO_NOT_NOTIFY_PEER);
+                }
 
-			} while (packet == null);
+            } while (packet == null);
 
-		} finally {
-			collector.cancel();
-		}
+        } finally {
+            collector.cancel();
+        }
 
-		SXEMessage response = ((SXEExtension) packet.getExtension(
-				SXEMessage.SXE_TAG, SXEMessage.SXE_XMLNS)).getMessage();
-		response.setFrom(msg.getTo());
+        SXEMessage response = ((SXEExtension) packet.getExtension(
+            SXEMessage.SXE_TAG, SXEMessage.SXE_XMLNS)).getMessage();
+        response.setFrom(msg.getTo());
 
-		return response;
-	}
+        return response;
+    }
 
-	//
-	// @Override
-	// public SXEMessage receive(SubMonitor monitor, SXESession session, String
-	// peer,
-	// SXEMessageType... awaitFor) throws IOException,
-	// LocalCancellationException {
-	//
-	// PacketFilter filter = new SXEPacketFilter(session, peer, awaitFor);
-	// SarosPacketCollector collector = transmitter.installReceiver(filter);
-	//
-	// Packet packet = transmitter.receive(monitor, collector, SXE_TIMEOUT,
-	// true);
-	//
-	// SXEExtension extension =
-	// (SXEExtension)packet.getExtension(SXEMessage.SXE_TAG,SXEMessage.SXE_XMLNS);
-	// extension.getMessage().setFrom(peer);
-	//
-	// return extension.getMessage();
-	// }
+    //
+    // @Override
+    // public SXEMessage receive(SubMonitor monitor, SXESession session, String
+    // peer,
+    // SXEMessageType... awaitFor) throws IOException,
+    // LocalCancellationException {
+    //
+    // PacketFilter filter = new SXEPacketFilter(session, peer, awaitFor);
+    // SarosPacketCollector collector = transmitter.installReceiver(filter);
+    //
+    // Packet packet = transmitter.receive(monitor, collector, SXE_TIMEOUT,
+    // true);
+    //
+    // SXEExtension extension =
+    // (SXEExtension)packet.getExtension(SXEMessage.SXE_TAG,SXEMessage.SXE_XMLNS);
+    // extension.getMessage().setFrom(peer);
+    //
+    // return extension.getMessage();
+    // }
 
-	/**
-	 * Registers the controller to receive state-offer messages and to start the
-	 * invitation process
-	 */
-	public void enableInvitation(final SXEController controller) {
+    /**
+     * Registers the controller to receive state-offer messages and to start the
+     * invitation process
+     */
+    public void enableInvitation(final SXEController controller) {
 
-		invitationListener = new PacketListener() {
-			@Override
-			public void processPacket(Packet packet) {
-				SXEExtension extension = (SXEExtension) packet.getExtension(
-						SXEMessage.SXE_TAG, SXEMessage.SXE_XMLNS);
-				extension.getMessage().setFrom(packet.getFrom());
+        invitationListener = new PacketListener() {
+            @Override
+            public void processPacket(Packet packet) {
+                SXEExtension extension = (SXEExtension) packet.getExtension(
+                    SXEMessage.SXE_TAG, SXEMessage.SXE_XMLNS);
+                extension.getMessage().setFrom(packet.getFrom());
 
-				SXEIncomingSynchronizationProcess inv = new SXEIncomingSynchronizationProcess(
-						controller, SarosSXETransmitter.this,
-						extension.getMessage());
+                SXEIncomingSynchronizationProcess inv = new SXEIncomingSynchronizationProcess(
+                    controller, SarosSXETransmitter.this,
+                    extension.getMessage());
 
-				inv.start();
-			}
-		};
+                inv.start();
+            }
+        };
 
-		receiver.addPacketListener(invitationListener,
-				provider.getInvitationPacketFilter());
-	}
+        receiver.addPacketListener(invitationListener,
+            provider.getInvitationPacketFilter());
+    }
 
-	protected void setSender(List<RecordDataObject> rdos, String sender) {
-		for (RecordDataObject rdo : rdos)
-			rdo.setSenderIfAbsent(sender);
-	}
+    protected void setSender(List<RecordDataObject> rdos, String sender) {
+        for (RecordDataObject rdo : rdos)
+            rdo.setSenderIfAbsent(sender);
+    }
 
-	/**
-	 * Don's receive anymore records
-	 */
-	public void disconnect() {
-		receiver.removePacketListener(recordListener);
-	}
+    /**
+     * Don's receive anymore records
+     */
+    public void disconnect() {
+        receiver.removePacketListener(recordListener);
+    }
 
-	/**
-	 * remove the extension provider and invitation
-	 */
-	public void dispose() {
-		disconnect();
-		receiver.removePacketListener(invitationListener);
-	}
+    /**
+     * remove the extension provider and invitation
+     */
+    public void dispose() {
+        disconnect();
+        receiver.removePacketListener(invitationListener);
+    }
 
-	protected String prefix() {
-		return "SXE ";
-	}
+    protected String prefix() {
+        return "SXE ";
+    }
 
 }

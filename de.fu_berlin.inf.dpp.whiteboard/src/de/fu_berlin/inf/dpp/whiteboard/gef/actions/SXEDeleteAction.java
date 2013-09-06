@@ -27,28 +27,28 @@ import de.fu_berlin.inf.dpp.whiteboard.gef.part.ElementRecordPart;
  */
 public class SXEDeleteAction extends DeleteAction {
 
-	public SXEDeleteAction(IWorkbenchPart part) {
-		super(part);
-	}
+    public SXEDeleteAction(IWorkbenchPart part) {
+        super(part);
+    }
 
-	@Override
-	@SuppressWarnings("rawtypes")
-	public Command createDeleteCommand(List objects) {
-		if (objects.isEmpty())
-			return null;
-		if (!(objects.get(0) instanceof EditPart))
-			return null;
+    @Override
+    @SuppressWarnings("rawtypes")
+    public Command createDeleteCommand(List objects) {
+        if (objects.isEmpty())
+            return null;
+        if (!(objects.get(0) instanceof EditPart))
+            return null;
 
-		DeleteRecordsCommand cmd = new DeleteRecordsCommand();
+        DeleteRecordsCommand cmd = new DeleteRecordsCommand();
 
-		for (int i = 0; i < objects.size(); i++) {
-			if (objects.get(i) instanceof ElementRecordPart) {
-				cmd.addRecordToDelete(((ElementRecordPart) objects.get(i))
-						.getElementRecord());
-			}
-		}
+        for (int i = 0; i < objects.size(); i++) {
+            if (objects.get(i) instanceof ElementRecordPart) {
+                cmd.addRecordToDelete(((ElementRecordPart) objects.get(i))
+                    .getElementRecord());
+            }
+        }
 
-		return cmd;
-	}
+        return cmd;
+    }
 
 }

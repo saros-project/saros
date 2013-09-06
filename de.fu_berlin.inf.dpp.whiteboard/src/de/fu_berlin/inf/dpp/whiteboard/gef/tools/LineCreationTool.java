@@ -25,45 +25,45 @@ import de.fu_berlin.inf.dpp.whiteboard.gef.request.CreatePointlistRequest;
  */
 public class LineCreationTool extends PointlistCreationTool {
 
-	@Override
-	protected String getCommandName() {
-		return XYLayoutWithFreehandEditPolicy.REQ_CREATE_LINE;
-	}
+    @Override
+    protected String getCommandName() {
+        return XYLayoutWithFreehandEditPolicy.REQ_CREATE_LINE;
+    }
 
-	/**
-	 * Creates a CreateLineRequest. Is called if "getTargetRequest" is called
-	 * the first time
-	 */
-	@Override
-	protected Request createTargetRequest() {
-		CreateLineRequest request = new CreateLineRequest();
-		request.setFactory(getFactory());
-		return request;
-	}
+    /**
+     * Creates a CreateLineRequest. Is called if "getTargetRequest" is called
+     * the first time
+     */
+    @Override
+    protected Request createTargetRequest() {
+        CreateLineRequest request = new CreateLineRequest();
+        request.setFactory(getFactory());
+        return request;
+    }
 
-	@Override
-	protected CreatePointlistRequest getCreatePointlistRequest() {
-		return (CreateLineRequest) getTargetRequest();
-	}
+    @Override
+    protected CreatePointlistRequest getCreatePointlistRequest() {
+        return (CreateLineRequest) getTargetRequest();
+    }
 
-	@Override
-	protected String getDebugName() {
-		return "Line Creation Tool";
-	}
+    @Override
+    protected String getDebugName() {
+        return "Line Creation Tool";
+    }
 
-	/**
-	 * Adds the current location to the point list of the
-	 * CreatePointlistRequest.
-	 */
-	@Override
-	protected void updateTargetRequest() {
-		CreatePointlistRequest req = getCreatePointlistRequest();
-		if (isInState(STATE_DRAG)) {
-			req.updateEndPoint(getLocation());
-		} else {
-			req.clear();
-			req.setLocation(getLocation());
-		}
-	}
+    /**
+     * Adds the current location to the point list of the
+     * CreatePointlistRequest.
+     */
+    @Override
+    protected void updateTargetRequest() {
+        CreatePointlistRequest req = getCreatePointlistRequest();
+        if (isInState(STATE_DRAG)) {
+            req.updateEndPoint(getLocation());
+        } else {
+            req.clear();
+            req.setLocation(getLocation());
+        }
+    }
 
 }
