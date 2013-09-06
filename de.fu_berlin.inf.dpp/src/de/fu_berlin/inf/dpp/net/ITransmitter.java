@@ -37,8 +37,6 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 @Component(module = "net")
 public interface ITransmitter {
 
-    public static final int MAX_XMPP_MESSAGE_SIZE = 16378;
-
     /**
      * Sends the specified packet to the server.
      * 

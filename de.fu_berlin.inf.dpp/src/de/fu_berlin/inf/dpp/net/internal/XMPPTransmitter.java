@@ -41,10 +41,8 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
- * The one ITransmitter implementation which uses Smack Chat objects.
- * 
- * Hides the complexity of dealing with changing XMPPConnection objects and
- * provides convenience functions for sending messages.
+ * ITransmitter implementation using XMPP, IBB streams and Socks5 streams for
+ * sending packet extensions and packets.
  */
 @Component(module = "net")
 public class XMPPTransmitter implements ITransmitter, IConnectionListener {
@@ -56,9 +54,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         .getInteger(
             "de.fu_berlin.inf.dpp.net.transmitter.PACKET_EXTENSION_COMPRESS_THRESHOLD",
             32);
-
-    private static final boolean ALLOW_CHAT_TRANSFER_FALLBACK = Boolean
-        .getBoolean("de.fu_berlin.inf.dpp.net.transmitter.ALLOW_CHAT_TRANSFER_FALLBACK");
 
     private final SessionIDObservable sessionID;
 
@@ -135,51 +130,34 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
         byte[] data = extension.toXML().getBytes("UTF-8");
 
-        if (!dataManager.getTransferMode(recipient).isP2P()
-            && data.length < MAX_XMPP_MESSAGE_SIZE
-            && ALLOW_CHAT_TRANSFER_FALLBACK) {
-
-            sendMessageToUser(recipient, extension);
-            return;
-        }
-
         if (data.length > PACKET_EXTENSION_COMPRESS_THRESHOLD)
             transferDescription.setCompressContent(true);
-
-        IOException ioe;
 
         try {
             // recipient is included in the transfer description
             dataManager.sendData(transferDescription, data);
             return;
         } catch (IOException e) {
-            ioe = e;
             log.error(
-                "could not send packet extension through a direct connection ("
+                "could not send packet extension through a direct connection to "
+                    + Utils.prefix(recipient) + " ("
                     + Utils.formatByte(data.length) + ")", e);
+            throw e;
         }
-
-        if (data.length < MAX_XMPP_MESSAGE_SIZE && ALLOW_CHAT_TRANSFER_FALLBACK) {
-            log.warn("sending packet extension through chat");
-            sendMessageToUser(recipient, extension);
-            return;
-        }
-
-        throw ioe;
     }
 
     @Override
-    public void sendMessageToUser(JID jid, PacketExtension extension) {
+    public void sendMessageToUser(JID recipient, PacketExtension extension) {
         Message message = new Message();
         message.addExtension(extension);
-        message.setTo(jid.toString());
+        message.setTo(recipient.toString());
 
-        assert jid.toString().equals(message.getTo());
+        assert recipient.toString().equals(message.getTo());
 
         try {
             sendPacket(message);
         } catch (IOException e) {
-            log.error("could not send message to " + Utils.prefix(jid), e);
+            log.error("could not send message to " + Utils.prefix(recipient), e);
         }
     }
 
