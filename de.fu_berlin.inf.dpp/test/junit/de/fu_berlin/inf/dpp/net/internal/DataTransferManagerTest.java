@@ -183,6 +183,11 @@ public class DataTransferManagerTest {
         public String getConnectionID() {
             return null;
         }
+
+        @Override
+        public void initialize() {
+            // NOP
+        }
     }
 
     private SarosNet sarosNetStub;

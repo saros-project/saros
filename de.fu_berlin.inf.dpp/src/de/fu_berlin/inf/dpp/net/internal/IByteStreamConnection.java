@@ -17,6 +17,13 @@ public interface IByteStreamConnection {
     public boolean isConnected();
 
     /**
+     * Initializes the byte stream connection. After the initialization is
+     * performed the byte stream connection must be able to send and receive
+     * data.
+     */
+    public void initialize();
+
+    /**
      * If this call returns the data has been send successfully, otherwise an
      * IOException is thrown with the reason why the transfer failed.
      * 

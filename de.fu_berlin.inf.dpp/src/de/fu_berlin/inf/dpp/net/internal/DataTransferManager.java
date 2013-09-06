@@ -162,6 +162,8 @@ public class DataTransferManager implements IConnectionListener {
                     assert (old == null || !old.isConnected());
                     holder.in = connection;
                 }
+
+                connection.initialize();
             }
 
             transferModeDispatch.connectionChanged(peer, connection);

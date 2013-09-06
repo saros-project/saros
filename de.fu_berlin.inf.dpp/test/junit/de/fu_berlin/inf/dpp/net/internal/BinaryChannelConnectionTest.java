@@ -128,6 +128,9 @@ public class BinaryChannelConnectionTest {
                 }
             });
 
+        alice.initialize();
+        bob.initialize();
+
         TransferDescription description = TransferDescription
             .createCustomTransferDescription();
 

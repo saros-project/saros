@@ -64,6 +64,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
     private AtomicInteger nextFragmentId = new AtomicInteger(0);
 
     private boolean connected;
+    private boolean initialized;
 
     private Map<Integer, ByteArrayOutputStream> pendingFragmentedPackets = new HashMap<Integer, ByteArrayOutputStream>();
     private Map<Integer, BinaryChannelTransferObject> pendingTransferObjects = new HashMap<Integer, BinaryChannelTransferObject>();
@@ -120,12 +121,22 @@ public class BinaryChannelConnection implements IByteStreamConnection {
             session.getOutputStream()));
         inputStream = new DataInputStream(new BufferedInputStream(
             session.getInputStream()));
+    }
 
+    @Override
+    public synchronized void initialize() {
+        if (initialized)
+            return;
+
+        /*
+         * it is ok to start the receiver a bit later because the data will be
+         * already buffered by SMACK or the OS
+         */
+        receiveThread = new ReceiverThread();
+        receiveThread.setName("BinaryChannel-" + peer.getName());
+        receiveThread.start();
         connected = true;
-
-        this.receiveThread = new ReceiverThread();
-        this.receiveThread.setName("BinaryChannel-" + peer.getName());
-        this.receiveThread.start();
+        initialized = true;
     }
 
     @Override
@@ -153,6 +164,8 @@ public class BinaryChannelConnection implements IByteStreamConnection {
                 connected = false;
             }
         }
+
+        assert receiveThread != null;
 
         if (Thread.currentThread() != receiveThread) {
             try {
