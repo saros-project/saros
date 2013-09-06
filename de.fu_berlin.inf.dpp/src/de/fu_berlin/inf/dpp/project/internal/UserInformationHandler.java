@@ -130,7 +130,7 @@ public class UserInformationHandler implements Startable {
             for (User user : remoteUsers) {
                 try {
                     transmitter
-                        .sendToSessionUser(user.getJID(), userListPacket);
+                        .sendExtensionByStream(user.getJID(), userListPacket);
                 } catch (IOException e) {
                     log.error("failed to send user list to user: " + user, e);
                     notReplied.add(user);
@@ -195,7 +195,7 @@ public class UserInformationHandler implements Startable {
 
         for (User user : remoteUsers) {
             try {
-                transmitter.sendToSessionUser(user.getJID(), packet);
+                transmitter.sendExtensionByStream(user.getJID(), packet);
             } catch (IOException e) {
                 log.error(
                     "failed to send userFinishedProjectNegotiation-message: "
@@ -292,7 +292,7 @@ public class UserInformationHandler implements Startable {
     private void sendUserListConfirmation(JID to) {
         log.debug("sending user list received confirmation to " + to);
         try {
-            transmitter.sendToSessionUser(to,
+            transmitter.sendExtensionByStream(to,
                 UserListReceivedExtension.PROVIDER
                     .create(new UserListReceivedExtension(currentSessionID)));
         } catch (IOException e) {

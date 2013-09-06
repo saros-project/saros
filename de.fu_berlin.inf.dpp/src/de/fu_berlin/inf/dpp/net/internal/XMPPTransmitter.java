@@ -103,7 +103,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         remoteUsers.remove(host);
 
         for (User user : remoteUsers)
-            sendMessageToUser(user.getJID(), extension);
+            sendExtension(user.getJID(), extension);
 
         if (!sarosSession.isHost() && hostPresent) {
             try {
@@ -112,14 +112,14 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
                 Thread.currentThread().interrupt();
             }
 
-            sendMessageToUser(host.getJID(), extension);
+            sendExtension(host.getJID(), extension);
         }
     }
 
     /* Methods to remove from the IFACE END */
 
     @Override
-    public void sendToSessionUser(JID recipient, PacketExtension extension)
+    public void sendExtensionByStream(JID recipient, PacketExtension extension)
         throws IOException {
 
         /*
@@ -139,7 +139,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             && data.length < MAX_XMPP_MESSAGE_SIZE
             && ALLOW_CHAT_TRANSFER_FALLBACK) {
 
-            sendMessageToUser(recipient, extension);
+            sendExtension(recipient, extension);
             return;
         }
 
@@ -161,7 +161,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
         if (data.length < MAX_XMPP_MESSAGE_SIZE && ALLOW_CHAT_TRANSFER_FALLBACK) {
             log.warn("sending packet extension through chat");
-            sendMessageToUser(recipient, extension);
+            sendExtension(recipient, extension);
             return;
         }
 
@@ -169,7 +169,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     }
 
     @Override
-    public void sendMessageToUser(JID jid, PacketExtension extension) {
+    public void sendExtension(JID jid, PacketExtension extension) {
         Message message = new Message();
         message.addExtension(extension);
         message.setTo(jid.toString());

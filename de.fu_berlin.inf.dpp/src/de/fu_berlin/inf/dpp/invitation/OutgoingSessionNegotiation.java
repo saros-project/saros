@@ -331,7 +331,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
             invitationID, sessionID.getValue(), sarosSession.getSessionStart(),
             localVersionInfo, description);
 
-        transmitter.sendMessageToUser(peer,
+        transmitter.sendExtension(peer,
             InvitationOfferingExtension.PROVIDER.create(invitationOffering));
     }
 
@@ -453,7 +453,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
         log.debug(this + " : sending updated session negotiation data");
 
         monitor.setTaskName("Sending local session configuration...");
-        transmitter.sendMessageToUser(peer,
+        transmitter.sendExtension(peer,
             InvitationParameterExchangeExtension.PROVIDER
                 .create(modifiedParameters));
 
@@ -503,7 +503,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
             log.debug(this + " : added " + Utils.prefix(peer)
                 + " to the current session, colorID: " + clientColorID);
 
-            transmitter.sendMessageToUser(peer,
+            transmitter.sendExtension(peer,
                 InvitationAcknowledgedExtension.PROVIDER
                     .create(new InvitationAcknowledgedExtension(invitationID)));
         }

@@ -178,7 +178,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
     private void sendInvitationAccepted() {
         log.debug(this + " : sending invitation accepted confirmation");
 
-        transmitter.sendMessageToUser(peer,
+        transmitter.sendExtension(peer,
             InvitationAcceptedExtension.PROVIDER
                 .create(new InvitationAcceptedExtension(invitationID)));
     }
@@ -209,7 +209,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
 
         log.debug(this + " : sending session negotiation data");
 
-        transmitter.sendMessageToUser(peer,
+        transmitter.sendExtension(peer,
             InvitationParameterExchangeExtension.PROVIDER.create(parameters));
     }
 
@@ -310,7 +310,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
      * client's perspective).
      */
     private void sendInvitationCompleted(IProgressMonitor monitor) {
-        transmitter.sendMessageToUser(peer,
+        transmitter.sendExtension(peer,
             InvitationCompletedExtension.PROVIDER
                 .create(new InvitationCompletedExtension(invitationID)));
 

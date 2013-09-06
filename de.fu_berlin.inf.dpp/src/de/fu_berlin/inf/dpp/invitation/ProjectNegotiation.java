@@ -127,7 +127,7 @@ public abstract class ProjectNegotiation extends CancelableProcess {
             .create(new CancelProjectNegotiationExtension(sessionID, cause
                 .getMessage()));
 
-        transmitter.sendMessageToUser(getPeer(), notification);
+        transmitter.sendExtension(getPeer(), notification);
     }
 
     /**
