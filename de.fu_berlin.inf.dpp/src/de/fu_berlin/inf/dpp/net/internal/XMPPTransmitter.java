@@ -27,7 +27,6 @@ import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
-import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -37,7 +36,6 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.internal.extensions.SarosLeaveExtension;
-import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -67,9 +65,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     private final DataTransferManager dataManager;
 
     private Connection connection;
-
-    @Inject
-    private SarosSessionObservable sarosSessionObservable;
 
     public XMPPTransmitter(SessionIDObservable sessionID,
         DataTransferManager dataManager, SarosNet sarosNet) {
@@ -127,11 +122,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     public void sendToSessionUser(JID recipient, PacketExtension extension)
         throws IOException {
 
-        String currentSessionID = sessionID.getValue();
-        ISarosSession session = sarosSessionObservable.getValue();
-
-        if (session == null)
-            throw new IOException("no session running");
         /*
          * The TransferDescription can be created out of the session, the name
          * and namespace of the packet extension and standard values and thus
@@ -139,10 +129,9 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
          */
         TransferDescription transferDescription = TransferDescription
             .createCustomTransferDescription().setRecipient(recipient)
-            .setSender(session.getLocalUser().getJID())
+            // .setSender(set by DataTransferManager)
             .setType(extension.getElementName())
-            .setNamespace(extension.getNamespace())
-            .setSessionID(currentSessionID);
+            .setNamespace(extension.getNamespace());
 
         byte[] data = extension.toXML().getBytes("UTF-8");
 
