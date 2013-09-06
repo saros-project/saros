@@ -765,7 +765,7 @@ public class Socks5Transport extends ByteStreamTransport {
             .valueOf(SESSION_ID_DELIMITER)));
 
         if (sessionIDTokens.length == 2)
-            return sessionIDTokens[1];
+            return sessionIDTokens[0];
 
         if (sessionIDTokens.length == 3
             && sessionIDTokens[0].equals(RESPONSE_SESSION_ID_PREFIX))
