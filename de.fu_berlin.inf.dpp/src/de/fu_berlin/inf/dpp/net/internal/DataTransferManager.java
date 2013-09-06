@@ -111,6 +111,22 @@ public class DataTransferManager implements IConnectionListener {
                 + Utils.throughput(transferObject.getCompressedSize(),
                     transferObject.getTransferDuration()));
 
+            if (transferObject.getTransferDescription().compressContent()) {
+                byte[] payload = transferObject.getPayload();
+                long compressedPayloadLenght = payload.length;
+
+                try {
+                    payload = Utils.inflate(payload, null);
+                } catch (IOException e) {
+                    log.error("could not decompress transfer object payload", e);
+                    return;
+                }
+
+                // FIXME change method signature
+                ((BinaryChannelTransferObject) transferObject).setPayload(
+                    compressedPayloadLenght, payload);
+            }
+
             transferModeDispatch.transferFinished(description.getSender(),
                 transferObject.getTransferMode(), true,
                 transferObject.getCompressedSize(),

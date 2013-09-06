@@ -19,7 +19,6 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 public class BinaryChannelConnectionTest {
 
@@ -139,55 +138,6 @@ public class BinaryChannelConnectionTest {
 
         try {
             alice.send(description, bytesToSend);
-            received.await(10000, TimeUnit.MILLISECONDS);
-        } finally {
-            alice.close();
-            bob.close();
-        }
-
-        assertTrue("no bytes were received", received.getCount() == 0);
-
-        assertArrayEquals("fragmentation error", bytesToSend, receivedBytes);
-    }
-
-    @Test
-    public void testDecompression() throws Exception {
-
-        final CountDownLatch received = new CountDownLatch(1);
-
-        BinaryChannelConnection alice = new BinaryChannelConnection(new JID(
-            "alice@baumeister.de"), "junit", aliceSession,
-            NetTransferMode.SOCKS5_DIRECT, new StreamConnectionListener() {
-                @Override
-                public void addIncomingTransferObject(
-                    final IncomingTransferObject incomingTransferObject) {
-                    // NOP
-                }
-            });
-
-        BinaryChannelConnection bob = new BinaryChannelConnection(new JID(
-            "bob@baumeister.de"), "junit", bobSession,
-            NetTransferMode.SOCKS5_DIRECT, new StreamConnectionListener() {
-                @Override
-                public void addIncomingTransferObject(
-                    final IncomingTransferObject incomingTransferObject) {
-                    receivedBytes = incomingTransferObject.getPayload();
-                    received.countDown();
-                }
-            });
-
-        TransferDescription description = TransferDescription
-            .createCustomTransferDescription();
-
-        description.setCompressContent(true);
-
-        byte[] bytesToSend = new byte[512 * 1024];
-
-        for (int i = 0; i < bytesToSend.length; i++)
-            bytesToSend[i] = (byte) i;
-
-        try {
-            alice.send(description, Utils.deflate(bytesToSend, null));
             received.await(10000, TimeUnit.MILLISECONDS);
         } finally {
             alice.close();

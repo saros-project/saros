@@ -72,7 +72,6 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
             throw new IllegalStateException("there are chunks missing: "
                 + chunkCount + " > 0");
 
-        tranferDuration = System.currentTimeMillis() - tranferDuration;
         payload = data;
         transferredSize = originalSize;
         uncompressedSize = data.length;
@@ -86,6 +85,11 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
      *         <code>false</code> otherwise
      */
     boolean isLastChunk() {
-        return --chunkCount <= 0;
+        boolean last = (--chunkCount <= 0);
+
+        if (last)
+            tranferDuration = System.currentTimeMillis() - tranferDuration;
+
+        return last;
     }
 }

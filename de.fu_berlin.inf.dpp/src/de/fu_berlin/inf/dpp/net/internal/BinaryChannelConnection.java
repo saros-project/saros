@@ -294,15 +294,9 @@ public class BinaryChannelConnection implements IByteStreamConnection {
                     .remove(fragmentId);
 
                 payload = out.toByteArray();
-                payloadLength = payload.length;
-
                 out = null; // help GC
 
-                if (fullyReceivedTransferObject.getTransferDescription()
-                    .compressContent())
-                    payload = Utils.inflate(payload, null);
-
-                fullyReceivedTransferObject.setPayload(payloadLength, payload);
+                fullyReceivedTransferObject.setPayload(payload.length, payload);
 
                 return fullyReceivedTransferObject;
             default:
