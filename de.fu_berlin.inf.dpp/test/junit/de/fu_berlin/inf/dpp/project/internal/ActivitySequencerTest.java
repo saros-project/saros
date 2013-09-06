@@ -158,7 +158,7 @@ public class ActivitySequencerTest {
             .createNiceMock(ITransmitter.class);
 
         try {
-            brokenTransmitter.sendExtensionByStream(EasyMock.anyObject(JID.class),
+            brokenTransmitter.sendToSessionUser(EasyMock.anyObject(JID.class),
                 EasyMock.anyObject(PacketExtension.class));
         } catch (IOException e) {
             // cannot happen in recording mode

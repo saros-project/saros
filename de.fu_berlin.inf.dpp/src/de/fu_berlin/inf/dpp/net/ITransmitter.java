@@ -40,53 +40,57 @@ public interface ITransmitter {
     public static final int MAX_XMPP_MESSAGE_SIZE = 16378;
 
     /**
-     * Sends the specified packet.
+     * Sends the specified packet to the server.
      * 
      * @param packet
      *            the packet to send
      * @throws IOException
-     *             if an I/O error occurs
+     *             if an I/O error occurs or no connection is established to a
+     *             XMPP server
      */
     public void sendPacket(Packet packet) throws IOException;
 
     /**
      * <p>
-     * Sends the given {@link PacketExtension extension} to the given
-     * {@link JID recipient}.
+     * Sends the given {@link PacketExtension} to the given {@link JID}. The
+     * recipient has to be in the session or the extension will not be sent.
      * </p>
-     * The underlying implementation must ensure that the extension was sent to
-     * the recipient. </p>
+     * 
+     * <p>
+     * If the extension's raw data (bytes) is longer than
+     * {@value #MAX_XMPP_MESSAGE_SIZE} or if there is a peer-to-peer bytestream
+     * to the recipient the extension will be sent using the bytestream. Else it
+     * will be sent by chat.
+     * </p>
+     * 
+     * <p>
+     * <s>Note: Does NOT ensure that peers receive messages in order because
+     * there may be two completely different communication ways. See
+     * {@link de.fu_berlin.inf.dpp.project.internal.ActivitySequencer} for
+     * details.</s> There is currently only one communication way enabled !
+     * </p>
      * 
      * @param recipient
-     *            the recipient of the extension
      * @param extension
-     *            the extension to send
      * @throws IOException
-     *             if an I/O error occurs
+     *             if sending by bytestreams fails and the extension raw data is
+     *             longer than {@value #MAX_XMPP_MESSAGE_SIZE}
      */
-    public void sendExtensionByStream(JID recipient, PacketExtension extension)
+    public void sendToSessionUser(JID recipient, PacketExtension extension)
         throws IOException;
 
     /**
-     * <p>
-     * Sends the given {@link PacketExtension extension} to the given
-     * {@link JID recipient}.
-     * </p>
-     * <p>
-     * It is up to the underlying implementation to ensure that the extension
-     * was sent or not.
-     * </p>
-     * <p>
-     * Clients should not use this method when they have to ensure that the
-     * extension must reach the recipient.
-     * </p>
+     * Sends the given {@link PacketExtension} to the given {@link JID} over the
+     * currently established XMPP connection. There is <b>no</b> guarantee that
+     * this message (extension) will arrive at the recipients side !
      * 
-     * @param recipient
+     * 
+     * @param jid
      *            the recipient of the extension
      * @param extension
-     *            the extension to send
+     *            the to send
      */
-    public void sendExtension(JID recipient, PacketExtension extension);
+    public void sendMessageToUser(JID jid, PacketExtension extension);
 
     /**
      * Sends a leave message to the participants of given Saros session. See

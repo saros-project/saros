@@ -213,7 +213,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         ProjectNegotiationOfferingExtension offering = new ProjectNegotiationOfferingExtension(
             sessionID, projectExchangeInfos, processID);
         try {
-            transmitter.sendExtensionByStream(peer,
+            transmitter.sendToSessionUser(peer,
                 ProjectNegotiationOfferingExtension.PROVIDER.create(offering));
         } catch (IOException e) {
             // TODO cancel negotiation
@@ -530,7 +530,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             + " to perform additional initialization...",
             IProgressMonitor.UNKNOWN);
 
-        transmitter.sendExtensionByStream(getPeer(),
+        transmitter.sendToSessionUser(getPeer(),
             StartActivityQueuingRequest.PROVIDER
                 .create(new StartActivityQueuingRequest(sessionID, processID)));
 

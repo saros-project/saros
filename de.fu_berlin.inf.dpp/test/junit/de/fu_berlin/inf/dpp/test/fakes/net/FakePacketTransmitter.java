@@ -48,13 +48,13 @@ class FakePacketTransmitter implements ITransmitter {
     }
 
     @Override
-    public void sendExtensionByStream(JID recipient, PacketExtension extension)
+    public void sendToSessionUser(JID recipient, PacketExtension extension)
         throws IOException {
-        sendExtension(recipient, extension);
+        sendMessageToUser(recipient, extension);
     }
 
     @Override
-    public void sendExtension(JID jid, PacketExtension extension) {
+    public void sendMessageToUser(JID jid, PacketExtension extension) {
         Message message = new Message();
         message.addExtension(extension);
         message.setTo(jid.toString());

@@ -132,7 +132,7 @@ public abstract class SessionNegotiation extends CancelableProcess {
         PacketExtension notification = CancelInviteExtension.PROVIDER
             .create(new CancelInviteExtension(invitationID, cause.getMessage()));
 
-        transmitter.sendExtension(getPeer(), notification);
+        transmitter.sendMessageToUser(getPeer(), notification);
     }
 
     /**

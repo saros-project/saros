@@ -502,7 +502,7 @@ public class ActivitySequencer implements Startable {
             LOG.debug(msg);
 
         try {
-            transmitter.sendExtensionByStream(recipient, activityPacketExtension);
+            transmitter.sendToSessionUser(recipient, activityPacketExtension);
         } catch (IOException e) {
             LOG.error("failed to sent activities: " + activities, e);
             /*
