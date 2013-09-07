@@ -2,36 +2,37 @@ package de.fu_berlin.inf.dpp.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
+import java.util.Map;
 
 import de.fu_berlin.inf.dpp.activities.SPathDataObject;
-import de.fu_berlin.inf.dpp.activities.business.FolderActivity.Type;
 import de.fu_berlin.inf.dpp.activities.serializable.ChecksumActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.FolderActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
 
 /**
- * Class contains static helper methods on activities
+ * Class contains static helper methods for {@link IActivityDataObject ADOs}.
  */
 public class ActivityUtils {
 
     /**
-     * Checks if all {@link IActivityDataObject}s in the given Collection are of
-     * instance {@link ChecksumActivityDataObject}
+     * Checks if the give collections contains only
+     * {@linkplain ChecksumActivityDataObject checksum ADOs}.
      * 
-     * @param timedActivities
-     *            Collection of {@link ChecksumActivityDataObject}s
-     * @return true, if only {@link ChecksumActivityDataObject}s are in the
-     *         given collection, false otherwise
+     * @param activities
+     *            collection containing {@linkplain IActivityDataObject ADOs}
+     * @return <code>true</code> if the collection contains only checksum ADOs,
+     *         <code>false</code> otherwise
      */
     public static boolean containsChecksumsOnly(
-        Collection<IActivityDataObject> timedActivities) {
+        Collection<IActivityDataObject> activities) {
 
-        for (IActivityDataObject a : timedActivities)
+        if (activities.isEmpty())
+            return false;
+
+        for (IActivityDataObject a : activities)
             if (!(a instanceof ChecksumActivityDataObject))
                 return false;
 
@@ -39,84 +40,76 @@ public class ActivityUtils {
     }
 
     /**
-     * This method tries to reduce the number of activityDataObjects transmitted
-     * by removing activityDataObjects that would overwrite each other and
-     * joining activityDataObjects that can be send as a single
-     * activityDataObject.
+     * Tries to reduce the number of {@link IActivityDataObject ADOs} so that:
+     * <p>
+     * 
+     * <pre>
+     * for (activity : optimize(activities))
+     *         exec(activity)
+     * 
+     * will produce the same result as
+     * 
+     * for (activity : activities)
+     *         exec(activity)
+     * </pre>
+     * 
+     * @param activities
+     *            a collection containing the ADOs to optimize
+     * @return a list which may contains a reduced amount of ADOs
      */
+
     public static List<IActivityDataObject> optimize(
-        Collection<IActivityDataObject> toOptimize) {
+        Collection<IActivityDataObject> activities) {
 
         List<IActivityDataObject> result = new ArrayList<IActivityDataObject>(
-            toOptimize.size());
+            activities.size());
 
-        TextSelectionActivityDataObject selection = null;
-        LinkedHashMap<SPathDataObject, ViewportActivityDataObject> viewport = new LinkedHashMap<SPathDataObject, ViewportActivityDataObject>();
+        boolean[] dropDAOIdx = new boolean[activities.size()];
 
-        for (IActivityDataObject activityDataObject : toOptimize) {
+        Map<SPathDataObject, Integer> selections = new HashMap<SPathDataObject, Integer>();
+        Map<SPathDataObject, Integer> viewports = new HashMap<SPathDataObject, Integer>();
 
-            if (activityDataObject instanceof TextSelectionActivityDataObject) {
-                selection = (TextSelectionActivityDataObject) activityDataObject;
-            } else if (activityDataObject instanceof ViewportActivityDataObject) {
-                ViewportActivityDataObject viewActivity = (ViewportActivityDataObject) activityDataObject;
-                viewport.remove(viewActivity.getPath());
-                viewport.put(viewActivity.getPath(), viewActivity);
-            } else if (activityDataObject instanceof FolderActivityDataObject) {
-                FolderActivityDataObject folderEdit = (FolderActivityDataObject) activityDataObject;
-                foldRecursiveDelete(result, folderEdit);
-            } else {
-                result.add(activityDataObject);
+        /*
+         * keep only the latest selection/viewport activities per project and
+         * path
+         */
+
+        int daoIdx = 0;
+
+        for (IActivityDataObject dao : activities) {
+
+            if (dao instanceof TextSelectionActivityDataObject) {
+
+                SPathDataObject daoPath = ((TextSelectionActivityDataObject) dao)
+                    .getPath();
+
+                Integer idx = selections.get(daoPath);
+
+                if (idx != null)
+                    dropDAOIdx[idx] = true;
+
+                selections.put(daoPath, daoIdx);
+            } else if (dao instanceof ViewportActivityDataObject) {
+                SPathDataObject daoPath = ((ViewportActivityDataObject) dao)
+                    .getPath();
+
+                Integer idx = viewports.get(daoPath);
+
+                if (idx != null)
+                    dropDAOIdx[idx] = true;
+
+                viewports.put(daoPath, daoIdx);
             }
+
+            daoIdx++;
         }
 
-        // only send one selection activityDataObject
-        if (selection != null)
-            result.add(selection);
+        daoIdx = 0;
 
-        // Add only one viewport per editor
-        for (Entry<SPathDataObject, ViewportActivityDataObject> entry : viewport
-            .entrySet()) {
-            result.add(entry.getValue());
-        }
-
-        assert !result.contains(null);
+        for (IActivityDataObject dao : activities)
+            if (!dropDAOIdx[daoIdx++])
+                result.add(dao);
 
         return result;
-    }
-
-    private static void foldRecursiveDelete(List<IActivityDataObject> result,
-        FolderActivityDataObject folderEdit) {
-
-        if (folderEdit.getType() != Type.REMOVED) {
-            result.add(folderEdit);
-            return;
-        }
-
-        int i = result.size() - 1;
-        boolean dropNew = false;
-
-        while (i >= 0 && !dropNew) {
-            FolderActivityDataObject curr = null;
-
-            if (result.get(i) instanceof FolderActivityDataObject)
-                curr = (FolderActivityDataObject) result.get(i);
-            else {
-                i--;
-                continue;
-            }
-
-            if (curr.isChildOf(folderEdit))
-                result.remove(i);
-
-            else if (curr.getPath().equals(folderEdit.getPath())) {
-                result.remove(i);
-                dropNew = true;
-            }
-
-            i--;
-        }
-
-        if (!dropNew)
-            result.add(folderEdit);
     }
 }
