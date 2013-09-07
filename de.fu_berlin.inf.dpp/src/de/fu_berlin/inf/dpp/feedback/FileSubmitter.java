@@ -1,24 +1,21 @@
 package de.fu_berlin.inf.dpp.feedback;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Collections;
-import java.util.concurrent.CancellationException;
+import java.util.Random;
 
-import org.apache.commons.httpclient.ConnectTimeoutException;
-import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.multipart.FilePart;
-import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
-import org.apache.commons.httpclient.methods.multipart.Part;
-import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 
-import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.util.FileZipper;
 
 /**
@@ -28,7 +25,7 @@ import de.fu_berlin.inf.dpp.util.FileZipper;
  */
 public class FileSubmitter {
 
-    protected static final Logger log = Logger.getLogger(FileSubmitter.class
+    private static final Logger log = Logger.getLogger(FileSubmitter.class
         .getName());
 
     /**
@@ -40,19 +37,23 @@ public class FileSubmitter {
      * "http://brazzaville.imp.fu-berlin.de:5900/" (was broken for some weeks as
      * of 2010/03)
      */
-    public static final String SERVER_URL = "http://saros-statistics.imp.fu-berlin.de/";
-    /** the path of the Servlet that is supposed to handle the upload */
-    public static final String SERVLET_PATH = "SarosStatisticServer/fileupload";
+    private static final String SERVER_URL = "http://saros-statistics.imp.fu-berlin.de/";
 
-    protected static final String STATISTIC_ID_PARAM = "?id=1";
-    protected static final String ERROR_LOG_ID_PARAM = "?id=2";
+    /** the path of the servlet that is supposed to handle the upload */
+    private static final String SERVLET_PATH = "SarosStatisticServer/fileupload";
+
+    /*
+     * the Tomcat servlet is able to fetch the parameters from the URL, so we do
+     * not need to add them to the POST message body
+     */
+    private static final String STATISTIC_ID_PARAM = "?id=1";
+    private static final String ERROR_LOG_ID_PARAM = "?id=2";
 
     /** Value for connection timeout */
-    protected static final int TIMEOUT = 30000;
+    private static final int TIMEOUT = 30000;
 
     /**
-     * Wrapper for {@link #uploadFile(File, String, SubMonitor)} for uploading
-     * statistics files. (encapsulates URL and path for statistics submission)
+     * Convenience wrapper method to upload a statistic file to the server
      * 
      * @param file
      *            the file to be uploaded
@@ -62,7 +63,7 @@ public class FileSubmitter {
      * 
      * @blocking
      */
-    public static void uploadStatisticFile(File file, SubMonitor monitor)
+    public static void uploadStatisticFile(File file, IProgressMonitor monitor)
         throws IOException {
 
         uploadFile(file, SERVER_URL + SERVLET_PATH + STATISTIC_ID_PARAM,
@@ -80,25 +81,21 @@ public class FileSubmitter {
      * @param zipName
      *            a name for the zip archive, e.g. with added user ID to make it
      *            unique, zipName must be at least 3 characters long!
-     * @throws SarosCancellationException
+     * @throws IOException
+     *             if an I/O error occurs
      */
     public static void uploadErrorLog(String zipLocation, String zipName,
-        File file, SubMonitor monitor) throws IOException,
-        SarosCancellationException {
-        monitor.beginTask("Upload error log...", 1);
+        File file, IProgressMonitor monitor) throws IOException {
 
-        try {
-            File archive = new File(zipLocation, zipName + ".zip");
-            archive.deleteOnExit();
+        File archive = new File(zipLocation, zipName + ".zip");
+        archive.deleteOnExit();
 
-            FileZipper.zipFiles(Collections.singletonList(file), archive, true,
-                null);
+        FileZipper.zipFiles(Collections.singletonList(file), archive, true,
+            null);
 
-            uploadFile(archive, SERVER_URL + SERVLET_PATH + ERROR_LOG_ID_PARAM,
-                monitor.newChild(1));
-        } finally {
-            monitor.done();
-        }
+        uploadFile(archive, SERVER_URL + SERVLET_PATH + ERROR_LOG_ID_PARAM,
+            monitor);
+
     }
 
     /**
@@ -108,101 +105,134 @@ public class FileSubmitter {
      * 
      * @param file
      *            the file to upload
-     * @param server
+     * @param url
      *            the URL of the server, that is supposed to handle the file
      * @param monitor
-     *            a SubMonitor to report progress to
+     *            a monitor to report progress to
      * @throws IOException
-     *             is thrown, if the upload failed; the exception wraps the
-     *             target exception that contains the main cause for the failure
-     * 
-     *             TODO Make cancellation more fine grained (if the user cancels
-     *             it takes too long to react)
+     *             if an I/O error occurs
      * 
      * @blocking
      * @cancelable
      */
-    public static void uploadFile(File file, String server, SubMonitor monitor)
-        throws IOException {
+
+    private static void uploadFile(File file, String url,
+        IProgressMonitor monitor) throws IOException {
+
+        final String CRLF = "\r\n";
+        final String doubleDash = "--";
+        final String boundary = generateBoundary();
+
+        HttpURLConnection connection = null;
+        OutputStream urlConnectionOut = null;
+        FileInputStream fileIn = null;
+
+        if (monitor == null)
+            monitor = new NullProgressMonitor();
+
+        int contentLength = (int) file.length();
+
+        if (contentLength == 0) {
+            log.warn("file size of file " + file.getAbsolutePath()
+                + " is 0 or the file does not exist");
+            return;
+        }
+
+        monitor.beginTask("Uploading file " + file.getName(), contentLength);
+
         try {
-            if (file == null || !file.exists()) {
-                throw new IOException("Upload not possible",
-                    new IllegalArgumentException(
-                        "The file that should be uploaded was"
-                            + " either null or nonexistent"));
-            }
+            URL connectionURL = new URL(url);
 
-            monitor.beginTask("Uploading file " + file.getName(), 100);
+            if (!"http".equals(connectionURL.getProtocol()))
+                throw new IOException("only HTTP protocol is supported");
 
-            PostMethod post = new PostMethod(server);
-            // holds the status response after the method was executed
-            int status = 0;
+            connection = (HttpURLConnection) connectionURL.openConnection();
+            connection.setUseCaches(false);
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+            connection.setRequestMethod("POST");
+            connection.setReadTimeout(TIMEOUT);
+            connection.setConnectTimeout(TIMEOUT);
 
-            post.getParams().setBooleanParameter(
-                HttpMethodParams.USE_EXPECT_CONTINUE, true);
+            connection.setRequestProperty("Content-Type",
+                "multipart/form-data; boundary=" + boundary);
 
-            /*
-             * retry the method 3 times, but not if the request was send
-             * successfully
-             */
-            post.getParams().setParameter(HttpMethodParams.RETRY_HANDLER,
-                new DefaultHttpMethodRetryHandler(3, false));
+            String contentDispositionLine = "Content-Disposition: form-data; name=\""
+                + file.getName()
+                + "\"; filename=\""
+                + file.getName()
+                + "\""
+                + CRLF;
 
-            monitor.worked(20);
-            if (monitor.isCanceled())
-                throw new CancellationException();
+            String contentTypeLine = "Content-Type: application/octet-stream; charset=ISO-8859-1"
+                + CRLF;
 
-            try {
-                // create a multipart request for the file
-                Part[] parts = { new FilePart(file.getName(), file) };
-                post.setRequestEntity(new MultipartRequestEntity(parts, post
-                    .getParams()));
+            String contentTransferEncoding = "Content-Transfer-Encoding: binary"
+                + CRLF;
 
-                HttpClient client = new HttpClient();
+            contentLength += 2 * boundary.length()
+                + contentDispositionLine.length() + contentTypeLine.length()
+                + contentTransferEncoding.length() + 4 * CRLF.length() + 3
+                * doubleDash.length();
 
-                /*
-                 * connection has to be established within the timeout,
-                 * otherwise a ConnectTimeoutException is thrown
-                 */
-                client.getHttpConnectionManager().getParams()
-                    .setConnectionTimeout(TIMEOUT);
+            connection.setFixedLengthStreamingMode(contentLength);
 
-                log.info("Trying to upload file " + file.getName() + " to "
-                    + server + " ...");
+            connection.connect();
 
-                monitor.worked(20);
+            urlConnectionOut = connection.getOutputStream();
+
+            PrintWriter writer = new PrintWriter(new OutputStreamWriter(
+                urlConnectionOut, "US-ASCII"), true);
+
+            writer.append(doubleDash).append(boundary).append(CRLF);
+            writer.append(contentDispositionLine);
+            writer.append(contentTypeLine);
+            writer.append(contentTransferEncoding);
+            writer.append(CRLF);
+            writer.flush();
+
+            fileIn = new FileInputStream(file);
+            byte[] buffer = new byte[8192];
+
+            for (int read = 0; (read = fileIn.read(buffer)) > 0;) {
                 if (monitor.isCanceled())
-                    throw new CancellationException();
-
-                // try to upload the file
-                status = client.executeMethod(post);
-
-                monitor.worked(50);
-
-                // examine status response
-                if (status == HttpStatus.SC_OK) {
-                    log.info("Upload successfull for " + file.getName()
-                        + ".\nServer response: "
-                        + IOUtils.toString(post.getResponseBodyAsStream()));
                     return;
-                }
 
-            } catch (ConnectTimeoutException e) {
-                // couldn't connect within the timeout
-                throw new IOException("Couldn't connect to host " + server, e);
-            } catch (Exception e) {
-                throw new IOException(
-                    "An internal error occurred while trying to upload file "
-                        + file.getName(), e);
-            } finally {
-                post.releaseConnection();
+                urlConnectionOut.write(buffer, 0, read);
+                monitor.worked(read);
             }
-            // upload failed
-            throw new IOException("Upload failed", new RuntimeException(
-                "Server response: " + status + " "
-                    + HttpStatus.getStatusText(status)));
+
+            urlConnectionOut.flush();
+
+            writer.append(CRLF);
+            writer.append(doubleDash).append(boundary).append(doubleDash)
+                .append(CRLF);
+            writer.close();
+
+            if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                log.debug("uploaded file " + file.getAbsolutePath() + " to "
+                    + connectionURL.getHost());
+                return;
+            }
+
+            throw new IOException("failed to upload file "
+                + file.getAbsolutePath() + connectionURL.getHost() + " ["
+                + connection.getResponseMessage() + "]");
         } finally {
+            IOUtils.closeQuietly(fileIn);
+            IOUtils.closeQuietly(urlConnectionOut);
+
+            if (connection != null)
+                connection.disconnect();
+
             monitor.done();
         }
+    }
+
+    private static String generateBoundary() {
+        Random random = new Random();
+        return Long.toHexString(random.nextLong())
+            + Long.toHexString(random.nextLong())
+            + Long.toHexString(random.nextLong());
     }
 }

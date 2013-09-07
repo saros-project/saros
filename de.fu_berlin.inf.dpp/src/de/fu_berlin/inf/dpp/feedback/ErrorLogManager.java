@@ -10,6 +10,7 @@ import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
@@ -17,7 +18,6 @@ import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.preferencePages.FeedbackPreferencePage;
@@ -298,15 +298,14 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
             protected IStatus run(IProgressMonitor monitor) {
                 try {
                     FileSubmitter.uploadErrorLog(saros.getStateLocation()
-                        .toOSString(), logNameExtended, errorLog, SubMonitor
-                        .convert(monitor));
+                        .toOSString(), logNameExtended, errorLog, monitor);
                 } catch (IOException e) {
                     String msg = String.format("Couldn't upload file: %s. %s",
                         e.getMessage(), e.getCause() != null ? e.getCause()
                             .getMessage() : "");
                     log.error(msg);
                     return new Status(IStatus.ERROR, Saros.SAROS, msg, e);
-                } catch (SarosCancellationException e) {
+                } catch (OperationCanceledException e) {
                     return Status.CANCEL_STATUS;
                 } finally {
                     monitor.done();

@@ -6,11 +6,11 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.CancellationException;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
@@ -294,15 +294,14 @@ public class StatisticManager extends AbstractFeedbackManager implements
             @Override
             public IStatus run(IProgressMonitor monitor) {
                 try {
-                    FileSubmitter.uploadStatisticFile(file,
-                        SubMonitor.convert(monitor));
+                    FileSubmitter.uploadStatisticFile(file, monitor);
                 } catch (IOException e) {
                     String msg = String.format("Couldn't upload file: %s. %s",
                         e.getMessage(), e.getCause() != null ? e.getCause()
                             .getMessage() : "");
                     log.error(msg);
                     return new Status(IStatus.ERROR, Saros.SAROS, msg, e);
-                } catch (CancellationException e) {
+                } catch (OperationCanceledException e) {
                     return Status.CANCEL_STATUS;
                 } finally {
                     monitor.done();
