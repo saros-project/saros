@@ -166,7 +166,8 @@ public class ChatLine extends Composite {
 
     private boolean isValidURL(String urlString) {
         try {
-            return /* dummy = */new URL(urlString) != null;
+            URL url = new URL(urlString);
+            return !url.getHost().isEmpty();
         } catch (MalformedURLException e) {
             return false;
         }
