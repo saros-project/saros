@@ -88,7 +88,6 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.extensions.KickUserExtension;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
-import de.fu_berlin.inf.dpp.preferences.PreferenceManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
@@ -1187,7 +1186,6 @@ public final class SarosSession implements ISarosSession {
         sessionContainer.addComponent(ChangeColorManager.class);
         sessionContainer.addComponent(SharedResourcesManager.class);
         sessionContainer.addComponent(PermissionManager.class);
-        sessionContainer.addComponent(PreferenceManager.class);
 
         // Statistic collectors. Make sure to add new collectors to the
         // StatisticCollectorTest as well
