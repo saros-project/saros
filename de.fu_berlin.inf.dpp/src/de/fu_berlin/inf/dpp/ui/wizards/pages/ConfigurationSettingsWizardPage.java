@@ -221,8 +221,17 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
             5));
         statisticSubmissionComposite.setBackgroundMode(SWT.INHERIT_NONE);
 
-        Link message = new Link(statisticSubmissionComposite, SWT.WRAP);
-        message.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+        Link message = new Link(statisticSubmissionComposite, SWT.NONE);
+        GridData data = new GridData(SWT.FILL, SWT.CENTER, false, false);
+
+        /*
+         * Link composites always use as much horizontal space as they get.
+         * Restrict the width here or otherwise this page will blow up
+         * (horizontal) depending on the text that is used for this link.
+         */
+        data.widthHint = 400;
+
+        message.setLayoutData(data);
         message
             .setText(de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_feedback_descr);
         message.addListener(SWT.Selection, new LinkListener());
