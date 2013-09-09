@@ -3,12 +3,12 @@ package de.fu_berlin.inf.dpp.ui.widgets.wizard;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -83,8 +83,7 @@ public class EnterXMPPAccountComposite extends Composite {
         serverOptionsExpandableComposite = new ExpandableComposite(this,
             SWT.NONE, ExpandableComposite.TWISTIE
                 | ExpandableComposite.CLIENT_INDENT);
-        serverOptionsExpandableComposite.setLayoutData(GridDataFactory
-            .fillDefaults().grab(true, true).minSize(SWT.DEFAULT, 50).create());
+
         serverOptionsExpandableComposite.setText("Advanced Options");
         serverOptionsExpandableComposite
             .addExpansionListener(new ExpansionAdapter() {
@@ -97,7 +96,6 @@ public class EnterXMPPAccountComposite extends Composite {
         Composite expandableCompositeContent = new Composite(
             serverOptionsExpandableComposite, SWT.NONE);
         expandableCompositeContent.setLayout(new GridLayout(2, false));
-        serverOptionsExpandableComposite.setClient(expandableCompositeContent);
 
         new Label(expandableCompositeContent, SWT.NONE).setText("Server");
 
@@ -115,6 +113,28 @@ public class EnterXMPPAccountComposite extends Composite {
 
         useSASLButton = new Button(expandableCompositeContent, SWT.CHECK);
         useSASLButton.setText("Use SASL");
+
+        serverOptionsExpandableComposite.setClient(expandableCompositeContent);
+
+        /*
+         * As the ExpandableComposite will tell us only the full height if it is
+         * expanded but we want to show it not expanded we kindly "ask" the
+         * composite about its size so that the parent of this composite can
+         * correctly calculate its size and layout stuff.
+         */
+        serverOptionsExpandableComposite.setExpanded(true);
+
+        Point defaultSize = serverOptionsExpandableComposite.computeSize(
+            SWT.DEFAULT, SWT.DEFAULT);
+
+        serverOptionsExpandableComposite.setExpanded(false);
+
+        GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+
+        data.widthHint = defaultSize.x;
+        data.heightHint = defaultSize.y;
+
+        serverOptionsExpandableComposite.setLayoutData(data);
 
         hookListeners();
     }
