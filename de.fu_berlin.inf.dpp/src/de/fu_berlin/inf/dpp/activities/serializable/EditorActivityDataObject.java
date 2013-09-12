@@ -90,7 +90,8 @@ public class EditorActivityDataObject extends AbstractProjectActivityDataObject 
             (getPath() != null ? getPath().toSPath(sarosSession) : null));
     }
 
-    public String getProjectID() {
-        return (getPath() == null) ? null : getPath().getProjectID();
+    @Deprecated
+    public Type getType() {
+        return type;
     }
 }

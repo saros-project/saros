@@ -1,13 +1,19 @@
 package de.fu_berlin.inf.dpp.project.internal;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import de.fu_berlin.inf.dpp.activities.SPathDataObject;
+import de.fu_berlin.inf.dpp.activities.business.EditorActivity.Type;
 import de.fu_berlin.inf.dpp.activities.serializable.AbstractProjectActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.EditorActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.JupiterActivityDataObject;
+import de.fu_berlin.inf.dpp.net.JID;
 
 /**
  * This class enables the queuing of {@linkplain IActivityDataObject serialized
@@ -15,14 +21,14 @@ import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
  */
 public class ActivityQueuer {
 
-    private final List<IActivityDataObject> activityQueue;
+    private final List<AbstractProjectActivityDataObject> activityQueue;
 
     private final Set<String> projectsThatShouldBeQueued;
 
     private boolean stopQueuing;
 
     public ActivityQueuer() {
-        activityQueue = new ArrayList<IActivityDataObject>();
+        activityQueue = new ArrayList<AbstractProjectActivityDataObject>();
         projectsThatShouldBeQueued = new HashSet<String>();
         stopQueuing = false;
     }
@@ -47,7 +53,54 @@ public class ActivityQueuer {
         List<IActivityDataObject> activitiesThatWillBeExecuted = new ArrayList<IActivityDataObject>();
 
         if (stopQueuing) {
-            activitiesThatWillBeExecuted.addAll(activityQueue);
+            if (activityQueue.isEmpty())
+                return activities;
+
+            /*
+             * HACK: ensure that an editor activated activity is included for
+             * all queued JupiterActivities and EditorActivities. Otherwise we
+             * will get lost updates because the changes are not saved. See the
+             * editor package and its classes for additional details. As we can
+             * start queuing at any point we might miss the editor activated
+             * activity or we joined the session after those activities were
+             * fired on the remote sides.
+             */
+
+            Map<SPathDataObject, List<JID>> editorADOs = new HashMap<SPathDataObject, List<JID>>();
+
+            for (AbstractProjectActivityDataObject pado : activityQueue) {
+
+                // path cannot be null, see handleProjectActivities
+                SPathDataObject path = pado.getPath();
+                JID source = pado.getSource();
+
+                if (pado instanceof EditorActivityDataObject) {
+
+                    EditorActivityDataObject eado = (EditorActivityDataObject) pado;
+
+                    if (!alreadyRememberedEditorADO(editorADOs, path,
+                        source) && eado.getType() != Type.ACTIVATED) {
+                        activitiesThatWillBeExecuted
+                            .add(new EditorActivityDataObject(eado.getSource(),
+                                Type.ACTIVATED, path));
+                    }
+
+                    rememberEditorADO(editorADOs, path,
+                        source);
+                } else if (pado instanceof JupiterActivityDataObject
+                    && !alreadyRememberedEditorADO(editorADOs, path,
+                        source)) {
+
+                    activitiesThatWillBeExecuted
+                        .add(new EditorActivityDataObject(pado.getSource(),
+                            Type.ACTIVATED, path));
+
+                    rememberEditorADO(editorADOs, path,
+                        source);
+                }
+                activitiesThatWillBeExecuted.add(pado);
+            }
+
             activitiesThatWillBeExecuted.addAll(activities);
             projectsThatShouldBeQueued.clear();
             activityQueue.clear();
@@ -106,5 +159,27 @@ public class ActivityQueuer {
         } else {
             activitiesThatWillBeExecuted.add(projectDataObject);
         }
+    }
+
+    private boolean alreadyRememberedEditorADO(
+        Map<SPathDataObject, List<JID>> editorADOs,
+        SPathDataObject spdo, JID jid) {
+
+        List<JID> jids = editorADOs.get(spdo);
+        return jids != null && jids.contains(jid);
+    }
+
+    private void rememberEditorADO(
+        Map<SPathDataObject, List<JID>> editorADOs,
+        SPathDataObject spdo, JID jid) {
+        List<JID> jids = editorADOs.get(spdo);
+
+        if (jids == null) {
+            jids = new ArrayList<JID>();
+            editorADOs.put(spdo, jids);
+        }
+
+        if (!jids.contains(jid))
+            jids.add(jid);
     }
 }
