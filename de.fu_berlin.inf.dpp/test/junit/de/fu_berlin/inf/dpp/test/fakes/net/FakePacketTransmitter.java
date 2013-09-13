@@ -48,6 +48,12 @@ class FakePacketTransmitter implements ITransmitter {
     }
 
     @Override
+    public void sendToSessionUser(String connectionID, JID recipient,
+        PacketExtension extension) throws IOException {
+        sendMessageToUser(recipient, extension);
+    }
+
+    @Override
     public void sendToSessionUser(JID recipient, PacketExtension extension)
         throws IOException {
         sendMessageToUser(recipient, extension);

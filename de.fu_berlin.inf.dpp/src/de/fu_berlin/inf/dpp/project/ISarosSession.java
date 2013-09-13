@@ -49,6 +49,8 @@ import de.fu_berlin.inf.dpp.synchronize.StopManager;
  */
 public interface ISarosSession {
 
+    public static final String SESSION_CONNECTION_ID = "saros-main-session";
+
     /**
      * @return a list of all users of this session
      */

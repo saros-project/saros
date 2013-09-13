@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.invitation;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Random;
 
@@ -201,14 +202,10 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
             awaitCompletion(monitor);
 
-            /*
-             * HACK Ensure byte stream connection to peer so the project wizard
-             * always show the currently used connection (IBB, Socks5(D/M)
-             */
-
             monitor.setTaskName("Negotiating data connection...");
 
-            dataTransferManager.connect(peer);
+            dataTransferManager.connect(ISarosSession.SESSION_CONNECTION_ID,
+                peer);
 
             User newUser = completeInvitation(monitor);
 
@@ -487,8 +484,11 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
      * added to the session the user list is synchronized and afterwards an
      * acknowledgment is send to the remote side that the remote user can now
      * start working in this session.
+     * 
+     * @throws IOException
      */
-    private User completeInvitation(IProgressMonitor monitor) {
+    private User completeInvitation(IProgressMonitor monitor)
+        throws IOException {
 
         log.debug(this + " : synchronizing user list");
 
@@ -503,8 +503,8 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
             log.debug(this + " : added " + Utils.prefix(peer)
                 + " to the current session, colorID: " + clientColorID);
 
-            transmitter.sendMessageToUser(peer,
-                InvitationAcknowledgedExtension.PROVIDER
+            transmitter.sendToSessionUser(ISarosSession.SESSION_CONNECTION_ID,
+                peer, InvitationAcknowledgedExtension.PROVIDER
                     .create(new InvitationAcknowledgedExtension(invitationID)));
         }
 

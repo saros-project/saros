@@ -73,9 +73,23 @@ public interface ITransmitter {
      * @throws IOException
      *             if sending by bytestreams fails and the extension raw data is
      *             longer than {@value #MAX_XMPP_MESSAGE_SIZE}
+     * 
+     * @deprecated use {@link #sendToSessionUser(String, JID, PacketExtension)}
      */
+    @Deprecated
     public void sendToSessionUser(JID recipient, PacketExtension extension)
         throws IOException;
+
+    /**
+     * Sends the given {@link PacketExtension} to the given {@link JID}.
+     * 
+     * @param connectionID
+     * @param recipient
+     * @param extension
+     * @throws IOException
+     */
+    public void sendToSessionUser(String connectionID, JID recipient,
+        PacketExtension extension) throws IOException;
 
     /**
      * Sends the given {@link PacketExtension} to the given {@link JID} over the
@@ -88,6 +102,7 @@ public interface ITransmitter {
      * @param extension
      *            the to send
      */
+    // FIXME rename to sendExtension
     public void sendMessageToUser(JID jid, PacketExtension extension);
 
     /**

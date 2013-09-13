@@ -521,7 +521,8 @@ public final class SarosSession implements ISarosSession {
 
         // Disconnect bytestream connection when user leaves session to
         // prevent idling connection when not needed anymore.
-        transferManager.closeConnection(jid);
+        transferManager.closeConnection(ISarosSession.SESSION_CONNECTION_ID,
+            jid);
 
         log.info("user " + Utils.prefix(jid) + " left session");
     }
@@ -538,9 +539,9 @@ public final class SarosSession implements ISarosSession {
                 "the local user cannot kick itself out of the session");
 
         try {
-            transmitter.sendToSessionUser(user.getJID(),
-                KickUserExtension.PROVIDER.create(new KickUserExtension(
-                    sessionIDObservable.getValue())));
+            transmitter.sendToSessionUser(ISarosSession.SESSION_CONNECTION_ID, user
+                .getJID(), KickUserExtension.PROVIDER
+                .create(new KickUserExtension(sessionIDObservable.getValue())));
         } catch (IOException e) {
             log.warn("could not kick user "
                 + user
@@ -596,6 +597,10 @@ public final class SarosSession implements ISarosSession {
         sarosContext.removeChildContainer(sessionContainer);
         sessionContainer.stop();
         sessionContainer.dispose();
+
+        for (User user : getRemoteUsers())
+            transferManager.closeConnection(
+                ISarosSession.SESSION_CONNECTION_ID, user.getJID());
     }
 
     /**

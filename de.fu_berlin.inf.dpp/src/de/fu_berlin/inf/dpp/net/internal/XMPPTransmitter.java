@@ -116,7 +116,12 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     @Override
     public void sendToSessionUser(JID recipient, PacketExtension extension)
         throws IOException {
+        sendToSessionUser(null, recipient, extension);
+    }
 
+    @Override
+    public void sendToSessionUser(String connectionID, JID recipient,
+        PacketExtension extension) throws IOException {
         /*
          * The TransferDescription can be created out of the session, the name
          * and namespace of the packet extension and standard values and thus
@@ -135,7 +140,11 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
         try {
             // recipient is included in the transfer description
-            dataManager.sendData(transferDescription, data);
+            if (connectionID == null)
+                dataManager.sendData(transferDescription, data);
+            else
+                dataManager.sendData(connectionID, transferDescription, data);
+
             return;
         } catch (IOException e) {
             log.error(
