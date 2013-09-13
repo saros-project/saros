@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.stf.test.invitation;
 
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.NO;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.OK;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_SESSION_INVITATION;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -14,11 +14,9 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.annotation.TestLink;
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 
-@TestLink(id = "Saros-132_version_mismatch")
 public class InviteWithDifferentVersionsTest extends StfTestCase {
 
     @BeforeClass
@@ -48,12 +46,15 @@ public class InviteWithDifferentVersionsTest extends StfTestCase {
 
         boolean foundAlice = false;
 
+        String problemShellContentText = null;
+
         for (String shellName : shellNamesAlice) {
-            if (shellName.matches(".*Saros Version.*")) {
+            if (shellName.matches(".*Problem Occurred.*")) {
                 foundAlice = true;
                 IRemoteBotShell shell = ALICE.remoteBot().shell(shellName);
                 shell.activate();
-                shell.bot().button(NO).click();
+                problemShellContentText = shell.bot().label(2).getText();
+                shell.bot().button(OK).click();
                 shell.waitShortUntilIsClosed();
                 break;
             }
@@ -68,11 +69,18 @@ public class InviteWithDifferentVersionsTest extends StfTestCase {
             }
         }
 
-        assertTrue("Alice version mismatch warning shell was not open",
-            foundAlice);
+        assertTrue("Alice session invitation continued", foundAlice);
+
         assertFalse(
             "Bobs invitation window is open although he has an invalid version",
             foundBob);
+
+        boolean isVersionMismatch = problemShellContentText != null
+            && problemShellContentText.toLowerCase().contains(
+                "is not compatible with your installed saros plugin");
+
+        assertTrue("Expected version mismatch but got: "
+            + problemShellContentText, isVersionMismatch);
     }
 
     @AfterClass
