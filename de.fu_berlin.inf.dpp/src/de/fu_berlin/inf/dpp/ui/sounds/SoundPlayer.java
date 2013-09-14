@@ -12,8 +12,10 @@ import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 import org.apache.log4j.Logger;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -24,10 +26,17 @@ public class SoundPlayer {
 
     private final static int EXTERNAL_BUFFER_SIZE = 524288; // 128Kb
 
+    @Inject
+    private static IPreferenceStore store;
+
+    static {
+        SarosPluginContext.initComponent(new SoundPlayer());
+    }
+
     public static void playSound(final String fileName) {
 
-        if (!PlatformUI.getPreferenceStore().getBoolean(
-            PreferenceConstants.BEEP_UPON_IM)) {
+        if (store == null
+            || !store.getBoolean(PreferenceConstants.BEEP_UPON_IM)) {
             return;
         } else {
 
