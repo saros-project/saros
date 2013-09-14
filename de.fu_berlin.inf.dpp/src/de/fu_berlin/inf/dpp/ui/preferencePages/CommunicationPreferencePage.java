@@ -102,7 +102,7 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
             PreferenceConstants.FORCE_CUSTOM_MUC_SERVICE,
             "Always use custom chatserver", chatGroup);
 
-        beepUponIM = new BooleanFieldEditor(PreferenceConstants.BEEP_UPON_IM,
+        beepUponIM = new BooleanFieldEditor(PreferenceConstants.SOUND_ENABLED,
             "Beep when receiving a chat message", chatGroup);
         beepUponIM.setEnabled(true, chatGroup);
 

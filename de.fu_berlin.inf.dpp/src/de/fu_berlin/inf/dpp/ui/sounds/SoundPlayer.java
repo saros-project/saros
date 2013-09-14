@@ -36,7 +36,7 @@ public class SoundPlayer {
     public static void playSound(final String fileName) {
 
         if (store == null
-            || !store.getBoolean(PreferenceConstants.BEEP_UPON_IM)) {
+            || !store.getBoolean(PreferenceConstants.SOUND_ENABLED)) {
             return;
         } else {
 

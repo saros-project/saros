@@ -124,8 +124,7 @@ public class PreferenceConstants {
 
     public static final String FORCE_CUSTOM_MUC_SERVICE = "force_custom_muc_service";
 
-    /** Beep when receiving an IM **/
-    public static final String BEEP_UPON_IM = "BEEP_UPON_IM";
+    public static final String SOUND_ENABLED = "sound.enabled";
 
     public static final String VOIP_ENABLED = "voip.enabled";
 
