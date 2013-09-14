@@ -6,7 +6,6 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
 
@@ -253,11 +252,10 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
      * Checks the compatibility of the local Saros version with the remote side.
      * If the versions are compatible, the invitation continues. Otherwise, the
      * invitation is cancelled locally.
-     * 
+     * <p>
      * However, if
      * {@link OutgoingSessionNegotiation#IGNORE_VERSION_COMPATIBILITY} is set to
-     * <code>true</code>, a {@link MessageDialog} pops up, and the user gets the
-     * chance to proceed with the invitation process anyway.
+     * <code>true</code> the invitation process will continue.
      */
     private void checkVersion(IProgressMonitor monitor)
         throws SarosCancellationException {
@@ -269,36 +267,34 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
         checkCancellation(CancelOption.DO_NOT_NOTIFY_PEER);
 
-        Compatibility comp = null;
-
-        if (versionInfo != null) {
-            comp = versionInfo.compatibility;
-
-            if (comp == VersionManager.Compatibility.OK) {
-                log.debug(this + " : Saros versions are compatible");
-                this.remoteVersionInfo = versionInfo;
-            } else {
-                log.debug(this + " : Saros versions are not compatible");
-                if (IGNORE_VERSION_COMPATIBILITY)
-                    this.remoteVersionInfo = versionInfo;
-                else {
-                    throw new LocalCancellationException(
-                        "The Saros plugin of "
-                            + peerNickname
-                            + " (Version "
-                            + versionInfo.version
-                            + ") is not compatible with your installed Saros plugin (Version "
-                            + versionManager.getVersion().toString() + ")",
-                        CancelOption.DO_NOT_NOTIFY_PEER);
-                }
-            }
-        } else {
-            log.debug(this + " : could not obtain remote version information");
+        if (versionInfo == null) {
+            log.error(this + " : could not obtain remote Saros version");
             throw new LocalCancellationException(
                 "Could not obtain the version of the Saros plugin from "
                     + peerNickname + ". Please try again.",
                 CancelOption.DO_NOT_NOTIFY_PEER);
         }
+
+        Compatibility comp = versionInfo.compatibility;
+
+        if (comp != Compatibility.OK && !IGNORE_VERSION_COMPATIBILITY) {
+            log.error(this + " : Saros versions are not compatible");
+            throw new LocalCancellationException(
+                "The Saros plugin of "
+                    + peerNickname
+                    + " (Version "
+                    + versionInfo.version
+                    + ") is not compatible with your installed Saros plugin (Version "
+                    + versionManager.getVersion() + ")",
+                CancelOption.DO_NOT_NOTIFY_PEER);
+        }
+
+        if (comp == Compatibility.OK)
+            log.debug(this + " : Saros versions are compatible");
+        else
+            log.warn(this + " : Saros versions are not compatible");
+
+        remoteVersionInfo = versionInfo;
     }
 
     /**
