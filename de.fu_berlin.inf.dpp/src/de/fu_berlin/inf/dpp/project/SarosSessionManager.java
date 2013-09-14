@@ -46,12 +46,12 @@ import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.invitation.IncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
-import de.fu_berlin.inf.dpp.invitation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.invitation.OutgoingProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.OutgoingSessionNegotiation;
 import de.fu_berlin.inf.dpp.invitation.ProcessListener;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
+import de.fu_berlin.inf.dpp.invitation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
@@ -73,6 +73,7 @@ import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
  * 
  * @author rdjemili
  */
+
 @Component(module = "core")
 public class SarosSessionManager implements ISarosSessionManager {
 
@@ -89,7 +90,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     private final ITransmitter transmitter;
 
-    private final SessionIDObservable sessionID;
+    private final SessionIDObservable sessionIDObservable;
 
     private final PreferenceUtils preferenceUtils;
 
@@ -144,7 +145,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         this.sarosNet = sarosNet;
         this.transmitter = transmitter;
         this.sarosSessionObservable = sarosSessionObservable;
-        this.sessionID = sessionID;
+        this.sessionIDObservable = sessionID;
         this.currentSessionNegotiations = currentSessionNegotiations;
         this.currentProjectNegotiations = currentProjectNegotiations;
         this.preferenceUtils = preferenceUtils;
@@ -208,7 +209,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
             sessionStartup = true;
 
-            sessionID.setValue(String.valueOf(SESSION_ID_GENERATOR
+            sessionIDObservable.setValue(String.valueOf(SESSION_ID_GENERATOR
                 .nextInt(Integer.MAX_VALUE)));
 
             final SarosSession sarosSession = new SarosSession(
@@ -307,7 +308,8 @@ public class SarosSessionManager implements ISarosSessionManager {
                 .getValue();
 
             if (sarosSession == null) {
-                sessionID.setValue(SessionIDObservable.NOT_IN_SESSION);
+                sessionIDObservable
+                    .setValue(SessionIDObservable.NOT_IN_SESSION);
                 return;
             }
 
@@ -335,7 +337,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
             sessionEnded(sarosSession);
 
-            sessionID.setValue(SessionIDObservable.NOT_IN_SESSION);
+            sessionIDObservable.setValue(SessionIDObservable.NOT_IN_SESSION);
 
             log.info("session stopped");
         } finally {
@@ -372,31 +374,34 @@ public class SarosSessionManager implements ISarosSessionManager {
             return;
         }
 
-        if (!startStopSessionLock.tryLock()) {
-            log.warn("could not accept invitation because the current session is about to stop");
-            return;
-        }
-
         IncomingSessionNegotiation process;
 
-        try {
-            /*
-             * Side effect ! Setting the sessionID will reject further
-             * invitation requests
-             */
+        synchronized (this) {
+            if (!startStopSessionLock.tryLock()) {
+                log.warn("could not accept invitation because the current session is about to stop");
+                return;
+            }
 
-            this.sessionID.setValue(sessionID);
+            try {
 
-            process = new IncomingSessionNegotiation(this, from, versionInfo,
-                sessionStart, invitationID, description, sarosContext);
+                if (sessionIDObservable.getValue() != SessionIDObservable.NOT_IN_SESSION) {
+                    log.error("could not accept invitation because there is already a pending invitation");
+                    return;
+                }
 
-            process.setProcessListener(processListener);
-            currentSessionNegotiations.addInvitationProcess(process);
+                sessionIDObservable.setValue(sessionID);
 
-        } finally {
-            startStopSessionLock.unlock();
+                process = new IncomingSessionNegotiation(this, from,
+                    versionInfo, sessionStart, invitationID, description,
+                    sarosContext);
+
+                process.setProcessListener(processListener);
+                currentSessionNegotiations.addInvitationProcess(process);
+
+            } finally {
+                startStopSessionLock.unlock();
+            }
         }
-
         handler.handleIncomingSessionNegotiation(process);
 
     }
@@ -423,24 +428,25 @@ public class SarosSessionManager implements ISarosSessionManager {
             return;
         }
 
-        if (!startStopSessionLock.tryLock()) {
-            log.warn("could not accept project negotation because the current session is about to stop");
-            return;
-        }
-
         IncomingProjectNegotiation process;
 
-        try {
-            process = new IncomingProjectNegotiation(getSarosSession(), from,
-                processID, projectInfos, sarosContext);
+        synchronized (this) {
+            if (!startStopSessionLock.tryLock()) {
+                log.warn("could not accept project negotation because the current session is about to stop");
+                return;
+            }
 
-            process.setProcessListener(processListener);
-            currentProjectNegotiations.addProjectExchangeProcess(process);
+            try {
+                process = new IncomingProjectNegotiation(getSarosSession(),
+                    from, processID, projectInfos, sarosContext);
 
-        } finally {
-            startStopSessionLock.unlock();
+                process.setProcessListener(processListener);
+                currentProjectNegotiations.addProjectExchangeProcess(process);
+
+            } finally {
+                startStopSessionLock.unlock();
+            }
         }
-
         handler.handleIncomingProjectNegotiation(process);
 
     }
@@ -456,24 +462,25 @@ public class SarosSessionManager implements ISarosSessionManager {
             return;
         }
 
-        if (!startStopSessionLock.tryLock()) {
-            log.warn("could not start an invitation because the current session is about to stop");
-            return;
-        }
-
         OutgoingSessionNegotiation process;
 
-        try {
-            process = new OutgoingSessionNegotiation(toInvite, sarosSession,
-                description, sarosContext);
+        synchronized (this) {
+            if (!startStopSessionLock.tryLock()) {
+                log.warn("could not start an invitation because the current session is about to stop");
+                return;
+            }
 
-            process.setProcessListener(processListener);
-            currentSessionNegotiations.addInvitationProcess(process);
+            try {
+                process = new OutgoingSessionNegotiation(toInvite,
+                    sarosSession, description, sarosContext);
 
-        } finally {
-            startStopSessionLock.unlock();
+                process.setProcessListener(processListener);
+                currentSessionNegotiations.addInvitationProcess(process);
+
+            } finally {
+                startStopSessionLock.unlock();
+            }
         }
-
         handler.handleOutgoingSessionNegotiation(process);
     }
 
@@ -552,27 +559,29 @@ public class SarosSessionManager implements ISarosSessionManager {
             return;
         }
 
-        if (!startStopSessionLock.tryLock()) {
-            log.warn("could not start a project negotiation because the current session is about to stop");
-            return;
-        }
-
         List<OutgoingProjectNegotiation> negotiations = new ArrayList<OutgoingProjectNegotiation>();
 
-        try {
-            for (User user : session.getRemoteUsers()) {
-
-                OutgoingProjectNegotiation process = new OutgoingProjectNegotiation(
-                    user.getJID(), session, projectsToShare, sarosContext);
-
-                process.setProcessListener(processListener);
-                currentProjectNegotiations.addProjectExchangeProcess(process);
-                negotiations.add(process);
+        synchronized (this) {
+            if (!startStopSessionLock.tryLock()) {
+                log.warn("could not start a project negotiation because the current session is about to stop");
+                return;
             }
-        } finally {
-            startStopSessionLock.unlock();
-        }
 
+            try {
+                for (User user : session.getRemoteUsers()) {
+
+                    OutgoingProjectNegotiation process = new OutgoingProjectNegotiation(
+                        user.getJID(), session, projectsToShare, sarosContext);
+
+                    process.setProcessListener(processListener);
+                    currentProjectNegotiations
+                        .addProjectExchangeProcess(process);
+                    negotiations.add(process);
+                }
+            } finally {
+                startStopSessionLock.unlock();
+            }
+        }
         for (OutgoingProjectNegotiation negotiation : negotiations)
             handler.handleOutgoingProjectNegotiation(negotiation);
     }
@@ -604,24 +613,25 @@ public class SarosSessionManager implements ISarosSessionManager {
             return;
         }
 
-        if (!startStopSessionLock.tryLock()) {
-            log.warn("could not start a project negotiation because the current session is about to stop");
-            return;
-        }
-
         OutgoingProjectNegotiation process;
 
-        try {
-            process = new OutgoingProjectNegotiation(user, session,
-                currentSharedProjects, sarosContext);
+        synchronized (this) {
+            if (!startStopSessionLock.tryLock()) {
+                log.warn("could not start a project negotiation because the current session is about to stop");
+                return;
+            }
 
-            process.setProcessListener(processListener);
-            currentProjectNegotiations.addProjectExchangeProcess(process);
+            try {
+                process = new OutgoingProjectNegotiation(user, session,
+                    currentSharedProjects, sarosContext);
 
-        } finally {
-            startStopSessionLock.unlock();
+                process.setProcessListener(processListener);
+                currentProjectNegotiations.addProjectExchangeProcess(process);
+
+            } finally {
+                startStopSessionLock.unlock();
+            }
         }
-
         handler.handleOutgoingProjectNegotiation(process);
     }
 
