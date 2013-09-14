@@ -33,7 +33,6 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ColorNegotiationHook;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
-import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 import de.fu_berlin.inf.dpp.util.VersionManager.Compatibility;
@@ -280,9 +279,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
                 this.remoteVersionInfo = versionInfo;
             } else {
                 log.debug(this + " : Saros versions are not compatible");
-                if (IGNORE_VERSION_COMPATIBILITY
-                    && DialogUtils.confirmVersionConflict(versionInfo, peer,
-                        versionManager.getVersion()))
+                if (IGNORE_VERSION_COMPATIBILITY)
                     this.remoteVersionInfo = versionInfo;
                 else {
                     throw new LocalCancellationException(

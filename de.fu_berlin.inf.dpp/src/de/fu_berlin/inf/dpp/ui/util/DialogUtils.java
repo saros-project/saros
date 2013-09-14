@@ -10,16 +10,12 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
-import org.osgi.framework.Version;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.dialogs.RememberDecisionMessageDialog;
-import de.fu_berlin.inf.dpp.util.StackTrace;
-import de.fu_berlin.inf.dpp.util.VersionManager;
-import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
 public class DialogUtils {
 
@@ -160,136 +156,10 @@ public class DialogUtils {
         return openWindow(md) == 0;
     }
 
-    /**
-     * Asks the user for confirmation to proceed.
-     * 
-     * @return <code>true</code> if the user confirms to proceed,
-     *         <code>false</code> otherwise.
-     * 
-     * 
-     * @nonReentrant In order to avoid a mass of question dialogs the same time.
-     *               TODO: is this the right way?
-     */
-    public static synchronized boolean confirmUnsupportedSaros(final JID peer) {
-
-        try {
-            return SWTUtils.runSWTSync(new Callable<Boolean>() {
-                @Override
-                public Boolean call() {
-                    return MessageDialog.openConfirm(getAShell(),
-                        Messages.InvitationWizard_invite_no_support,
-                        MessageFormat.format(
-                            Messages.InvitationWizard_invite_no_support_text,
-                            peer));
-                }
-            });
-        } catch (Exception e) {
-            log.error(
-                "An error ocurred while trying to open the confirm dialog.", e); //$NON-NLS-1$
-            return false;
-        }
-    }
-
-    /**
-     * Asks the user for confirmation to proceed. This method should only be
-     * user if the versions are incompatible.
-     * 
-     * @param remoteVersionInfo
-     *            a {@link VersionInfo} object with the local
-     *            {@link VersionInfo#version} and the ultimate
-     *            {@link VersionInfo#compatibility}. You can get this
-     *            {@link VersionInfo} object by the method
-     *            {@link VersionManager#determineCompatibility(JID)}.
-     *            <code>null</code> is allowed.
-     * 
-     * @return <code>true</code> if the user confirms to proceed,
-     *         <code>false</code> otherwise.
-     * 
-     *         TODO: is this the right way?
-     * @nonReentrant In order to avoid a mass of question dialogs the same time.
-     */
-    public static synchronized boolean confirmVersionConflict(
-        VersionInfo remoteVersionInfo, JID peer, Version localVersion) {
-
-        final String title = MessageFormat.format(
-            Messages.InvitationWizard_version_conflict, peer.getBase());
-        final String message;
-        if (remoteVersionInfo == null) {
-            message = MessageFormat.format(
-                Messages.InvitationWizard_version_request_failed, peer,
-                peer.getBase());
-        } else {
-            switch (remoteVersionInfo.compatibility) {
-            case TOO_OLD:
-                message = MessageFormat.format(
-                    Messages.InvitationWizard_version_too_old, localVersion,
-                    remoteVersionInfo.version, peer.getBase());
-                break;
-            case TOO_NEW:
-                message = MessageFormat.format(
-                    Messages.InvitationWizard_version_too_new, localVersion,
-                    remoteVersionInfo.version, peer.getBase());
-                break;
-            default:
-                log.warn(
-                    "Warning message requested when no warning is in place!", //$NON-NLS-1$
-                    new StackTrace());
-                // No warning to display
-                message = MessageFormat.format(
-                    Messages.InvitationWizard_invite_error, peer);
-                break;
-            }
-        }
-
-        try {
-            return SWTUtils.runSWTSync(new Callable<Boolean>() {
-                @Override
-                public Boolean call() {
-                    return MessageDialog.openQuestion(getAShell(), title,
-                        message);
-                }
-            });
-        } catch (Exception e) {
-            log.error(
-                "An error ocurred while trying to open the confirm dialog.", e); //$NON-NLS-1$
-            return false;
-        }
-    }
-
-    public static boolean confirmUnknownVersion(JID peer, Version localVersion) {
-
-        final String title = MessageFormat.format(
-            Messages.InvitationWizard_is_compatible, peer.getBase());
-        final String message = MessageFormat.format(
-            Messages.InvitationWizard_version_check_failed_text,
-            peer.getBase(), localVersion.toString());
-
-        try {
-            return SWTUtils.runSWTSync(new Callable<Boolean>() {
-                @Override
-                public Boolean call() {
-                    return MessageDialog.openQuestion(getAShell(), title,
-                        message);
-                }
-            });
-        } catch (Exception e) {
-            log.error(
-                "An error ocurred while trying to open the confirm dialog.", e); //$NON-NLS-1$
-            return false;
-        }
-    }
-
     public static void notifyUserOffline(JID peer) {
         DialogUtils.popUpFailureMessage(
             Messages.InvitationWizard_buddy_offline, MessageFormat.format(
                 Messages.InvitationWizard_buddy_offline_text, peer), false);
-    }
-
-    private static Shell getAShell() {
-        Shell shell = EditorAPI.getShell();
-        if (shell == null)
-            shell = new Shell();
-        return shell;
     }
 
     /**
