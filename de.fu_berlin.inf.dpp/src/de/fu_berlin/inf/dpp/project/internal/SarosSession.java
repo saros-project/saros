@@ -93,13 +93,11 @@ import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.Messages;
 import de.fu_berlin.inf.dpp.project.SharedProject;
 import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.ArrayUtils;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -204,8 +202,12 @@ public final class SarosSession implements ISarosSession {
          *               to avoid misuse.
          */
         @Override
-        public void activityCreated(final IActivity activityData) {
-            handleActivityCreated(activityData);
+        public void activityCreated(final IActivity activity) {
+            if (activity == null)
+                throw new NullPointerException("activity is null");
+
+            activityHandler.handleOutgoingActivities(Collections
+                .singletonList(activity));
         }
     };
 
@@ -220,7 +222,7 @@ public final class SarosSession implements ISarosSession {
         public void execute(IActivity activity) {
             for (IActivityProvider executor : activityProviders) {
                 executor.exec(activity);
-                handleFileAndFolderActivities(activity);
+                updatePartialSharedResources(activity);
             }
         }
     };
@@ -348,10 +350,10 @@ public final class SarosSession implements ISarosSession {
         final Permission newPermission, IProgressMonitor progress)
         throws CancellationException, InterruptedException {
 
-        if (!localUser.isHost()) {
-            throw new IllegalArgumentException(
-                Messages.SarosSession_only_inviter_can_initate_permission_changes);
-        }
+        if (!localUser.isHost())
+            throw new IllegalStateException(
+                "only the host can initiate permission changes");
+
         permissionManager.initiatePermissionChange(user, newPermission,
             progress, synchronizer);
     }
@@ -359,16 +361,18 @@ public final class SarosSession implements ISarosSession {
     @Override
     public void setPermission(final User user, final Permission permission) {
 
-        assert SWTUtils.isSWT() : "Must be called from SWT Thread";
-
         if (user == null || permission == null)
             throw new IllegalArgumentException();
 
-        user.setPermission(permission);
+        synchronizer.syncExec(Utils.wrapSafe(log, new Runnable() {
+            @Override
+            public void run() {
+                user.setPermission(permission);
+                listenerDispatch.permissionChanged(user);
+            }
+        }));
 
         log.info("user " + user + " is now a " + permission);
-
-        listenerDispatch.permissionChanged(user);
     }
 
     @Override
@@ -610,9 +614,6 @@ public final class SarosSession implements ISarosSession {
                 ISarosSession.SESSION_CONNECTION_ID, user.getJID());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public User getUser(JID jid) {
 
@@ -674,39 +675,25 @@ public final class SarosSession implements ISarosSession {
      */
 
     @Override
-    public void exec(List<IActivityDataObject> activityDataObjects) {
-        List<IActivityDataObject> dataObjects = activityQueuer
-            .process(activityDataObjects);
-        List<IActivity> activities = convertActivities(dataObjects);
-        activityHandler.handleIncomingActivities(activities);
-    }
+    public void exec(List<IActivityDataObject> ados) {
+        final List<IActivity> activities = new ArrayList<IActivity>();
 
-    private List<IActivity> convertActivities(
-        List<IActivityDataObject> activityDataObjects) {
-        List<IActivity> result = new ArrayList<IActivity>(
-            activityDataObjects.size());
-
-        for (IActivityDataObject dataObject : activityDataObjects) {
+        for (IActivityDataObject ado : activityQueuer.process(ados)) {
             try {
-                result.add(dataObject.getActivity(this));
+                activities.add(ado.getActivity(this));
             } catch (IllegalArgumentException e) {
-                log.warn("DataObject could not be attached to SarosSession: "
-                    + dataObject, e);
+                log.error("could not deserialize activity data object: " + ado,
+                    e);
             }
         }
 
-        return result;
+        activityHandler.handleIncomingActivities(activities);
     }
 
-    private void handleActivityCreated(IActivity activity) {
-
-        if (activity == null)
-            throw new NullPointerException("activity is null");
-
-        activityHandler.handleOutgoingActivities(Collections
-            .singletonList(activity));
-    }
-
+    /*
+     * FIXME most (if not all checks) to send or not activities should be
+     * handled by the activity handler and not here !
+     */
     private void sendActivity(final List<User> recipients,
         final IActivity activity) {
         if (recipients == null)
@@ -752,7 +739,7 @@ public final class SarosSession implements ISarosSession {
         // handle FileActivities and FolderActivities to update ProjectMapper
         if (activity instanceof FolderActivity
             || activity instanceof FileActivity) {
-            send = handleFileAndFolderActivities(activity);
+            send = updatePartialSharedResources(activity);
         }
 
         if (!send)
@@ -762,7 +749,7 @@ public final class SarosSession implements ISarosSession {
             activitySequencer.sendActivity(recipients,
                 activity.getActivityDataObject(this));
         } catch (IllegalArgumentException e) {
-            log.warn("Could not convert Activity to DataObject: ", e);
+            log.warn("could not serialize activity: " + activity, e);
         }
     }
 
@@ -894,7 +881,7 @@ public final class SarosSession implements ISarosSession {
     }
 
     /**
-     * Method to update the ProjectMapper when changes on shared files oder
+     * Method to update the project mapper when changes on shared files oder
      * folders happened.
      * 
      * @param activity
@@ -902,7 +889,7 @@ public final class SarosSession implements ISarosSession {
      * @return <code>true</code> if the activity should be send to the user,
      *         <code>false</code> otherwise
      */
-    protected boolean handleFileAndFolderActivities(IActivity activity) {
+    protected boolean updatePartialSharedResources(IActivity activity) {
         if (!(activity instanceof FileActivity)
             && !(activity instanceof FolderActivity))
             return true;
@@ -1008,7 +995,7 @@ public final class SarosSession implements ISarosSession {
         return projectMapper.getPartiallySharedResources();
     }
 
-    protected void addMembers(IResource iResource,
+    private void addMembers(IResource iResource,
         List<IResource> dependentResources) {
         if (iResource instanceof IFolder || iResource instanceof IProject) {
 
