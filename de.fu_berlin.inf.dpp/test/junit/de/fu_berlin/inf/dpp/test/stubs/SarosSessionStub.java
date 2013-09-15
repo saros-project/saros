@@ -59,12 +59,6 @@ public class SarosSessionStub implements ISarosSession {
 
     }
 
-    @Override
-    public void sendActivity(User recipient, IActivity activity) {
-        throw new RuntimeException("Unexpected call to Stub");
-
-    }
-
     public void sendActivity(List<User> recipient, IActivity activity) {
         throw new RuntimeException("Unexpected call to Stub");
 

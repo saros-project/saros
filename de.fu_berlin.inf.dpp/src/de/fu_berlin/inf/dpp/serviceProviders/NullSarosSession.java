@@ -162,12 +162,6 @@ public class NullSarosSession implements ISarosSession {
     }
 
     @Override
-    public void sendActivity(User recipient, IActivity activity) {
-        log.warn("unexpected method call");
-
-    }
-
-    @Override
     public void addActivityProvider(IActivityProvider provider) {
         log.warn("unexpected method call");
 

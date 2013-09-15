@@ -707,18 +707,9 @@ public final class SarosSession implements ISarosSession {
             .singletonList(activity));
     }
 
-    /**
-     * Convenience method to address a single recipient.
-     * 
-     * @see #sendActivity(List, IActivity)
-     */
-    @Override
-    public void sendActivity(User recipient, IActivity activity) {
-        sendActivity(Collections.singletonList(recipient), activity);
-    }
-
-    private void sendActivity(List<User> toWhom, final IActivity activity) {
-        if (toWhom == null)
+    private void sendActivity(final List<User> recipients,
+        final IActivity activity) {
+        if (recipients == null)
             throw new IllegalArgumentException();
 
         if (activity == null)
@@ -738,7 +729,7 @@ public final class SarosSession implements ISarosSession {
          * JupiterActivity.
          */
         if (activity instanceof JupiterActivity)
-            needBasedSynchronization(((JupiterActivity) activity), toWhom);
+            needBasedSynchronization(((JupiterActivity) activity), recipients);
 
         // avoid consistency control during project negotiation to relieve the
         // general transmission process
@@ -768,7 +759,7 @@ public final class SarosSession implements ISarosSession {
             return;
 
         try {
-            activitySequencer.sendActivity(toWhom,
+            activitySequencer.sendActivity(recipients,
                 activity.getActivityDataObject(this));
         } catch (IllegalArgumentException e) {
             log.warn("Could not convert Activity to DataObject: ", e);
@@ -888,7 +879,8 @@ public final class SarosSession implements ISarosSession {
                         concurrentDocumentClient.reset(path);
 
                     // TODO do not bypass the ActivityHandler !
-                    sendActivity(recipient, needBasedFileActivity);
+                    sendActivity(Collections.singletonList(recipient),
+                        needBasedFileActivity);
 
                     /*
                      * Notify the session participants of your activated editor.
@@ -1149,7 +1141,8 @@ public final class SarosSession implements ISarosSession {
     public void disableQueuing() {
         activityQueuer.disableQueuing();
         // send us a dummy activity to ensure the queues get flushed
-        sendActivity(localUser, new NOPActivity(localUser, localUser, 0));
+        sendActivity(Collections.singletonList(localUser), new NOPActivity(
+            localUser, localUser, 0));
     }
 
     private SarosSession(ISarosContext context, DateTime sessionStart,

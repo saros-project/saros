@@ -32,7 +32,6 @@ import org.joda.time.DateTime;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
-import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
@@ -279,15 +278,6 @@ public interface ISarosSession {
      * FOR INTERNAL USE ONLY !
      */
     public void exec(List<IActivityDataObject> activityDataObjects);
-
-    /**
-     * Sends the given activity to the given list of users.
-     * 
-     * This method will by-pass the ConcurrentDocumentManager and should not be
-     * used in new code.
-     */
-    @Deprecated()
-    public void sendActivity(User recipient, IActivity activity);
 
     /**
      * Adds an {@link IActivityProvider} and also registers itself as
