@@ -429,7 +429,7 @@ public final class SarosSession implements ISarosSession {
             activitySequencer.registerUser(user);
 
             List<User> timedOutUsers = userListHandler.synchronizeUserList(
-                getUsers(), getRemoteUsers());
+                getUsers(), null, getRemoteUsers());
 
             if (!timedOutUsers.isEmpty()) {
                 activitySequencer.unregisterUser(user);
@@ -510,6 +510,17 @@ public final class SarosSession implements ISarosSession {
 
         projectMapper.userLeft(user);
 
+        if (isHost()) {
+
+            List<User> timedOutUsers = userListHandler.synchronizeUserList(
+                null, Collections.singletonList(user), getRemoteUsers());
+
+            if (!timedOutUsers.isEmpty()) {
+                log.error("could not synchronize user list properly, following users did not respond: "
+                    + StringUtils.join(timedOutUsers, ", "));
+            }
+        }
+
         synchronizer.syncExec(Utils.wrapSafe(log, new Runnable() {
             @Override
             public void run() {
@@ -539,21 +550,17 @@ public final class SarosSession implements ISarosSession {
                 "the local user cannot kick itself out of the session");
 
         try {
-            transmitter.sendToSessionUser(ISarosSession.SESSION_CONNECTION_ID, user
-                .getJID(), KickUserExtension.PROVIDER
-                .create(new KickUserExtension(sessionIDObservable.getValue())));
+            transmitter.sendToSessionUser(ISarosSession.SESSION_CONNECTION_ID,
+                user.getJID(), KickUserExtension.PROVIDER
+                    .create(new KickUserExtension(sessionIDObservable
+                        .getValue())));
         } catch (IOException e) {
             log.warn("could not kick user "
                 + user
                 + " from the session because the connection to the user is already lost");
         }
 
-        synchronizer.asyncExec(Utils.wrapSafe(log, new Runnable() {
-            @Override
-            public void run() {
-                removeUser(user);
-            }
-        }));
+        removeUser(user);
     }
 
     @Override

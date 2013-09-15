@@ -17,7 +17,6 @@ import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -32,8 +31,6 @@ public class LeaveAndKickHandler {
 
     private static final Logger log = Logger
         .getLogger(LeaveAndKickHandler.class.getName());
-
-    private final UISynchronizer synchronizer;
 
     private final ISarosSessionManager sessionManager;
 
@@ -79,14 +76,12 @@ public class LeaveAndKickHandler {
 
     public LeaveAndKickHandler(IReceiver receiver,
         ISarosSessionManager sessionManager,
-        SessionIDObservable sessionIDObservable, UISynchronizer synchronizer) {
+        SessionIDObservable sessionIDObservable) {
 
         this.receiver = receiver;
 
         this.sessionManager = sessionManager;
         this.sessionIDObservable = sessionIDObservable;
-
-        this.synchronizer = synchronizer;
 
         this.sessionManager.addSarosSessionListener(sessionListener);
     }
@@ -138,24 +133,33 @@ public class LeaveAndKickHandler {
                 "Session was closed by inviter " + user.getHumanReadableName()
                     + ".");
 
-        } else {
-            synchronizer.asyncExec(Utils.wrapSafe(log, new Runnable() {
-                @Override
-                public void run() {
-                    sarosSession.removeUser(user);
-                }
-            }));
         }
+
+        // host will send us an update
+        if (!sarosSession.isHost())
+            return;
+
+        /*
+         * must be run async. otherwise the user list synchronization will time
+         * out as we block the packet receive thread here
+         */
+        Utils.runSafeAsync("RemoveUser", log, new Runnable() {
+            @Override
+            public void run() {
+                sarosSession.removeUser(user);
+            }
+        });
+
     }
 
-    // FIXME the session should handle the synchronization
     private void stopSession(final ISarosSession session, final String topic,
         final String reason) {
-        synchronizer.asyncExec(Utils.wrapSafe(log, new Runnable() {
+        Utils.runSafeAsync("StopSessionOnHostLeave", log, new Runnable() {
             @Override
             public void run() {
                 List<User> currentRemoteSessionUsers = session.getRemoteUsers();
 
+                // FIXME remove this, see XMPPTransmitter sendLeaveMessage
                 /*
                  * remove all users so we do not send leave messages as the
                  * other users already receive the message from the host
@@ -163,15 +167,10 @@ public class LeaveAndKickHandler {
                 for (User remoteSessionUser : currentRemoteSessionUsers)
                     session.removeUser(remoteSessionUser);
 
-                Utils.runSafeAsync("LeaveSession", log, new Runnable() {
-                    @Override
-                    public void run() {
-                        sessionManager.stopSarosSession();
+                sessionManager.stopSarosSession();
 
-                        SarosView.showNotification(topic, reason);
-                    }
-                });
+                SarosView.showNotification(topic, reason);
             }
-        }));
+        });
     }
 }

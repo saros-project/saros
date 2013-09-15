@@ -1,52 +1,52 @@
 package de.fu_berlin.inf.dpp.net.internal.extensions;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.Permission;
-import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.JID;
 
-@Component(module = "net")
 public class UserListExtension extends SarosSessionPacketExtension {
 
     public static final Provider PROVIDER = new Provider();
 
-    // TODO: send the Collection<User>
-    // It causes a marshallation exception... why??
+    private ArrayList<UserListEntry> userList = new ArrayList<UserListEntry>();
 
-    /*
-     * Stefan Rossbach: because a user object contains a SarosSession object.
-     * That object has so many references to other objects that may not be
-     * serializeable. Luckily you got the exception instead of sending approx.
-     * 50 MB serialized data per user object !
-     */
-
-    public ArrayList<UserListEntry> userList = new ArrayList<UserListEntry>();
-
-    public UserListExtension(String sessionID, Collection<User> users) {
+    public UserListExtension(String sessionID) {
         super(sessionID);
-        for (User user : users) {
-            UserListEntry newUser = new UserListEntry(user.getJID(),
-                user.getColorID(), user.getFavoriteColorID(),
-                user.getPermission());
-            userList.add(newUser);
-        }
+    }
+
+    public void addUser(User user, long flags) {
+        userList.add(UserListEntry.create(user, flags));
+    }
+
+    public List<UserListEntry> getEntries() {
+        return userList;
     }
 
     public static class UserListEntry {
+        public static final long USER_ADDED = 0x1L;
+        public static final long USER_REMOVED = 0x2L;
+
+        public long flags;
         public JID jid;
         public int colorID;
         public int favoriteColorID;
         public Permission permission;
 
-        public UserListEntry(JID jid, int colorID, int favoriteColorID,
-            Permission permission) {
+        private static UserListEntry create(User user, long flags) {
+            return new UserListEntry(user.getJID(), user.getColorID(),
+                user.getFavoriteColorID(), user.getPermission(), flags);
+        }
+
+        private UserListEntry(JID jid, int colorID, int favoriteColorID,
+            Permission permission, long flags) {
             this.jid = jid;
             this.colorID = colorID;
             this.favoriteColorID = favoriteColorID;
             this.permission = permission;
+            this.flags = flags;
         }
     }
 
@@ -57,5 +57,4 @@ public class UserListExtension extends SarosSessionPacketExtension {
             super("userList", UserListExtension.class);
         }
     }
-
 }

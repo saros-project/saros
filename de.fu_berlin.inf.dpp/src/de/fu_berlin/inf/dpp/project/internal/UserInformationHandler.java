@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.project.internal;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -94,9 +95,12 @@ public class UserInformationHandler implements Startable {
     /**
      * Synchronizes a user list with the given remote users.
      * 
-     * @param userList
-     *            collection containing the users to update
-     * 
+     * @param usersAdded
+     *            collection containing the users that are added to the current
+     *            session or <code>null</code>
+     * @param usersRemoved
+     *            collection containing the users that are removed from the
+     *            current session or <code>null</code>
      * @param remoteUsers
      *            the users that will receive the user list
      * 
@@ -106,7 +110,8 @@ public class UserInformationHandler implements Startable {
      * @throws IllegalStateException
      *             if the local user of the session is not the host
      */
-    public List<User> synchronizeUserList(Collection<User> userList,
+    public synchronized List<User> synchronizeUserList(
+        Collection<User> usersAdded, Collection<User> usersRemoved,
         Collection<User> remoteUsers) {
 
         List<User> notReplied = new ArrayList<User>();
@@ -120,10 +125,21 @@ public class UserInformationHandler implements Startable {
             .createCollector(UserListReceivedExtension.PROVIDER
                 .getPacketFilter(currentSessionID));
 
-        PacketExtension userListPacket = UserListExtension.PROVIDER
-            .create(new UserListExtension(currentSessionID, userList));
+        UserListExtension extension = new UserListExtension(currentSessionID);
 
-        log.debug("synchronizing user list " + userList + " with user(s) "
+        if (usersAdded == null)
+            usersAdded = Collections.emptyList();
+
+        if (usersRemoved == null)
+            usersRemoved = Collections.emptyList();
+
+        for (User user : usersAdded)
+            extension.addUser(user, UserListEntry.USER_ADDED);
+
+        for (User user : usersRemoved)
+            extension.addUser(user, UserListEntry.USER_REMOVED);
+
+        log.debug("synchronizing user list " + usersAdded + " with user(s) "
             + remoteUsers);
 
         try {
@@ -131,7 +147,7 @@ public class UserInformationHandler implements Startable {
                 try {
                     transmitter.sendToSessionUser(
                         ISarosSession.SESSION_CONNECTION_ID, user.getJID(),
-                        userListPacket);
+                        UserListExtension.PROVIDER.create(extension));
                 } catch (IOException e) {
                     log.error("failed to send user list to user: " + user, e);
                     notReplied.add(user);
@@ -196,8 +212,8 @@ public class UserInformationHandler implements Startable {
 
         for (User user : remoteUsers) {
             try {
-                transmitter.sendToSessionUser(ISarosSession.SESSION_CONNECTION_ID,
-                    user.getJID(), packet);
+                transmitter.sendToSessionUser(
+                    ISarosSession.SESSION_CONNECTION_ID, user.getJID(), packet);
             } catch (IOException e) {
                 log.error(
                     "failed to send userFinishedProjectNegotiation-message: "
@@ -242,14 +258,18 @@ public class UserInformationHandler implements Startable {
     }
 
     private void handleUserListUpdate(Packet packet) {
+        /*
+         * maybe it is better to execute all the code in a new thread to prevent
+         * blocking the listener callback thread
+         */
         JID fromJID = new JID(packet.getFrom());
 
         log.debug("received user list from " + fromJID);
 
-        UserListExtension userListInfo = UserListExtension.PROVIDER
+        UserListExtension userListExtension = UserListExtension.PROVIDER
             .getPayload(packet);
 
-        if (userListInfo == null) {
+        if (userListExtension == null) {
             log.warn("user list payload is corrupted");
             return;
         }
@@ -262,29 +282,33 @@ public class UserInformationHandler implements Startable {
             return;
         }
 
-        /*
-         * TODO: the host should be able to send user lists which will contain
-         * users that currently left the session.
-         * 
-         * Another reason would be: Carls network crashes ... Alice detects this
-         * and would send a "Carl removed from session message" to all other
-         * session users.
-         */
-        for (UserListEntry userEntry : userListInfo.userList) {
+        for (UserListEntry userEntry : userListExtension.getEntries()) {
+            User user = null;
+            if ((userEntry.flags & UserListEntry.USER_ADDED) != 0) {
+                user = session.getUser(userEntry.jid);
 
-            User user = session.getUser(userEntry.jid);
-
-            // new session user
-            if (user == null) {
+                if (user != null) {
+                    log.warn("cannot add user " + userEntry.jid
+                        + ", user is already in the session");
+                    continue;
+                }
 
                 user = new User(session, userEntry.jid, userEntry.colorID,
                     userEntry.favoriteColorID);
 
                 user.setPermission(userEntry.permission);
                 session.addUser(user);
-            } else {
-                // existing session user
-                user.setPermission(userEntry.permission);
+
+            } else if ((userEntry.flags & UserListEntry.USER_REMOVED) != 0) {
+                user = session.getUser(userEntry.jid);
+
+                if (user == null) {
+                    log.warn("cannot remove user " + userEntry.jid
+                        + ", user is not in the session");
+                    continue;
+                }
+
+                session.removeUser(user);
             }
         }
 
@@ -294,8 +318,8 @@ public class UserInformationHandler implements Startable {
     private void sendUserListConfirmation(JID to) {
         log.debug("sending user list received confirmation to " + to);
         try {
-            transmitter.sendToSessionUser(ISarosSession.SESSION_CONNECTION_ID, to,
-                UserListReceivedExtension.PROVIDER
+            transmitter.sendToSessionUser(ISarosSession.SESSION_CONNECTION_ID,
+                to, UserListReceivedExtension.PROVIDER
                     .create(new UserListReceivedExtension(currentSessionID)));
         } catch (IOException e) {
             log.error("failed to send user list received confirmation to: "

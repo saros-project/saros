@@ -148,7 +148,6 @@ public interface ISarosSession {
      * @param user
      *            the user that is to be removed
      * 
-     * @swt Must be called from SWT!
      */
     public void removeUser(User user);
 
