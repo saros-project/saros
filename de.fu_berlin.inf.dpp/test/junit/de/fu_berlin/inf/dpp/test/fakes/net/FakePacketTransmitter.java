@@ -11,7 +11,6 @@ import org.jivesoftware.smack.packet.PacketExtension;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 class FakePacketTransmitter implements ITransmitter {
 
@@ -69,10 +68,5 @@ class FakePacketTransmitter implements ITransmitter {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public void sendLeaveMessage(ISarosSession sarosSession) {
-        // NOP
     }
 }

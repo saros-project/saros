@@ -19,7 +19,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import de.fu_berlin.inf.dpp.ISarosContext;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
@@ -96,8 +95,6 @@ public class SarosSessionManagerTest {
         SarosSession session = PowerMock.createNiceMock(SarosSession.class);
         SarosNet network = PowerMock.createNiceMock(SarosNet.class);
 
-        ITransmitter transmitter = PowerMock.createNiceMock(ITransmitter.class);
-
         PreferenceUtils preferences = PowerMock
             .createNiceMock(PreferenceUtils.class);
 
@@ -107,7 +104,7 @@ public class SarosSessionManagerTest {
 
         PowerMock.replayAll();
 
-        manager = new SarosSessionManager(network, transmitter,
+        manager = new SarosSessionManager(network,
             new SarosSessionObservable(), new SessionIDObservable(),
             new InvitationProcessObservable(),
             new ProjectNegotiationObservable(), preferences);

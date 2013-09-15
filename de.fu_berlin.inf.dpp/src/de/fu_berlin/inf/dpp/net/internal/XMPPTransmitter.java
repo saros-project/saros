@@ -20,7 +20,6 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
@@ -28,16 +27,12 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
 
-import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
-import de.fu_berlin.inf.dpp.net.internal.extensions.SarosLeaveExtension;
-import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -55,63 +50,14 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             "de.fu_berlin.inf.dpp.net.transmitter.PACKET_EXTENSION_COMPRESS_THRESHOLD",
             32);
 
-    private final SessionIDObservable sessionID;
-
     private final DataTransferManager dataManager;
 
     private Connection connection;
 
-    public XMPPTransmitter(SessionIDObservable sessionID,
-        DataTransferManager dataManager, SarosNet sarosNet) {
+    public XMPPTransmitter(DataTransferManager dataManager, SarosNet sarosNet) {
         sarosNet.addListener(this);
         this.dataManager = dataManager;
-        this.sessionID = sessionID;
     }
-
-    /* Methods to remove from the IFACE START */
-
-    @Override
-    public void sendLeaveMessage(ISarosSession sarosSession) {
-
-        PacketExtension extension = SarosLeaveExtension.PROVIDER
-            .create(new SarosLeaveExtension(sessionID.getValue()));
-
-        /*
-         * FIXME the new Session-6 feature assumes that the host is the last
-         * user who must receive the leave message a.k.a as all other users have
-         * removed us from their sessions ... again using P2P here is WTF
-         */
-
-        /*
-         * HACK notify the host last, using an average amount of 2 seconds
-         * before sending the leave message which should be enough under normal
-         * circumstances to have the other packets reach their destination about
-         * the globe.
-         */
-
-        List<User> remoteUsers = sarosSession.getRemoteUsers();
-
-        User host = sarosSession.getHost();
-
-        boolean hostPresent = remoteUsers.contains(host);
-
-        remoteUsers.remove(host);
-
-        for (User user : remoteUsers)
-            sendMessageToUser(user.getJID(), extension);
-
-        if (!sarosSession.isHost() && hostPresent) {
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-
-            sendMessageToUser(host.getJID(), extension);
-        }
-    }
-
-    /* Methods to remove from the IFACE END */
 
     @Override
     public void sendToSessionUser(JID recipient, PacketExtension extension)

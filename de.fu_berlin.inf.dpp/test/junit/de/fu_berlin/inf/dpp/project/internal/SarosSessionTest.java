@@ -64,6 +64,9 @@ import de.fu_berlin.inf.dpp.util.Utils;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ Utils.class, StatisticManager.class, ResourcesPlugin.class })
 public class SarosSessionTest {
+
+    private static final String SAROS_SESSION_ID = "SAROS_SESSION_TEST";
+
     static private SarosNet createSarosNetMock() {
         SarosNet net = EasyMock.createMock(SarosNet.class);
         net.getMyJID();
@@ -184,6 +187,8 @@ public class SarosSessionTest {
 
         container.start();
 
+        container.getComponent(SessionIDObservable.class).setValue(
+            SAROS_SESSION_ID);
         ISarosContext context = EasyMock.createMock(ISarosContext.class);
         context.initComponent(EasyMock.isA(Object.class));
         EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
@@ -200,6 +205,17 @@ public class SarosSessionTest {
                 return null;
             }
         }).times(2);
+
+        EasyMock.expect(context.getComponent(EasyMock.isA(Class.class)))
+            .andStubAnswer(new IAnswer<Object>() {
+
+                @Override
+                public Object answer() throws Throwable {
+                    return container.getComponent(EasyMock
+                        .getCurrentArguments()[0]);
+                }
+            });
+
         context.createSimpleChildContainer();
         EasyMock.expectLastCall().andReturn(container.makeChildContainer());
         context.removeChildContainer(EasyMock.isA(MutablePicoContainer.class));
@@ -280,7 +296,7 @@ public class SarosSessionTest {
         Assert.assertTrue(editorListeners.isEmpty());
         Assert.assertEquals(0, session.getActivityProviderCount());
         Assert.assertTrue(workspaceListeners.isEmpty());
-
+        Assert.assertEquals(SAROS_SESSION_ID, session.getID());
         PowerMock.verifyAll();
     }
 

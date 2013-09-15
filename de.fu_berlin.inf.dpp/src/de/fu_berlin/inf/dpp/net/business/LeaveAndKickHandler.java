@@ -1,7 +1,5 @@
 package de.fu_berlin.inf.dpp.net.business;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
@@ -123,10 +121,11 @@ public class LeaveAndKickHandler {
 
         /*
          * FIXME LeaveEvents need to be Activities, otherwise RaceConditions can
-         * occur when two users leave a the "same" time srossbach: it is not
-         * possible that multiple users can leave at the same time because this
-         * code is executed by the dispatch thread context which executes all
-         * incoming packets sequentially
+         * occur when two users leave a the "same" time
+         * 
+         * srossbach: it is not possible that multiple users can leave at the
+         * same time because this code is executed by the dispatch thread
+         * context which executes all incoming packets sequentially
          */
         if (user.isHost()) {
             stopSession(sarosSession, "Closing the session",
@@ -136,8 +135,11 @@ public class LeaveAndKickHandler {
         }
 
         // host will send us an update
-        if (!sarosSession.isHost())
+        if (!sarosSession.isHost()) {
+            log.warn("received leave message from user " + user
+                + " which is not the host of the current session");
             return;
+        }
 
         /*
          * must be run async. otherwise the user list synchronization will time
@@ -157,18 +159,7 @@ public class LeaveAndKickHandler {
         Utils.runSafeAsync("StopSessionOnHostLeave", log, new Runnable() {
             @Override
             public void run() {
-                List<User> currentRemoteSessionUsers = session.getRemoteUsers();
-
-                // FIXME remove this, see XMPPTransmitter sendLeaveMessage
-                /*
-                 * remove all users so we do not send leave messages as the
-                 * other users already receive the message from the host
-                 */
-                for (User remoteSessionUser : currentRemoteSessionUsers)
-                    session.removeUser(remoteSessionUser);
-
                 sessionManager.stopSarosSession();
-
                 SarosView.showNotification(topic, reason);
             }
         });

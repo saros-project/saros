@@ -86,6 +86,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.extensions.KickUserExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.SarosLeaveExtension;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
@@ -118,13 +119,6 @@ public final class SarosSession implements ISarosSession {
     /* Dependencies */
     @Inject
     private Saros saros;
-
-    /*
-     * isn't it wonderful that the Saros session does not even know its own ID
-     * ?!
-     */
-    @Inject
-    private SessionIDObservable sessionIDObservable;
 
     @Inject
     private ITransmitter transmitter;
@@ -186,6 +180,8 @@ public final class SarosSession implements ISarosSession {
     private final ActivitySequencer activitySequencer;
 
     private final UserInformationHandler userListHandler;
+
+    private final String sessionID;
 
     private boolean started = false;
     private boolean stopped = false;
@@ -375,6 +371,15 @@ public final class SarosSession implements ISarosSession {
         log.info("user " + user + " is now a " + permission);
     }
 
+    /**
+     * Returns the id of the current session.
+     * 
+     * @return the id of the current session
+     */
+    public String getID() {
+        return sessionID;
+    }
+
     @Override
     public User getHost() {
         return hostUser;
@@ -554,10 +559,9 @@ public final class SarosSession implements ISarosSession {
                 "the local user cannot kick itself out of the session");
 
         try {
-            transmitter.sendToSessionUser(ISarosSession.SESSION_CONNECTION_ID,
-                user.getJID(), KickUserExtension.PROVIDER
-                    .create(new KickUserExtension(sessionIDObservable
-                        .getValue())));
+            transmitter.sendToSessionUser(SESSION_CONNECTION_ID, user.getJID(),
+                KickUserExtension.PROVIDER
+                    .create(new KickUserExtension(getID())));
         } catch (IOException e) {
             log.warn("could not kick user "
                 + user
@@ -608,6 +612,24 @@ public final class SarosSession implements ISarosSession {
         sarosContext.removeChildContainer(sessionContainer);
         sessionContainer.stop();
         sessionContainer.dispose();
+
+        List<User> usersToNotify;
+
+        if (isHost())
+            usersToNotify = getRemoteUsers();
+        else
+            usersToNotify = Collections.singletonList(getHost());
+
+        for (User user : usersToNotify) {
+            try {
+                transmitter.sendToSessionUser(SESSION_CONNECTION_ID, user
+                    .getJID(), SarosLeaveExtension.PROVIDER
+                    .create(new SarosLeaveExtension(getID())));
+            } catch (IOException e) {
+                log.warn("failed to notify user " + user
+                    + " about local session stop", e);
+            }
+        }
 
         for (User user : getRemoteUsers())
             transferManager.closeConnection(
@@ -1136,7 +1158,8 @@ public final class SarosSession implements ISarosSession {
         JID host, int localColorID, int hostColorID) {
 
         context.initComponent(this);
-
+        this.sessionID = context.getComponent(SessionIDObservable.class)
+            .getValue();
         this.projectMapper = new SarosProjectMapper(this);
         this.activityQueuer = new ActivityQueuer();
         this.sarosContext = context;

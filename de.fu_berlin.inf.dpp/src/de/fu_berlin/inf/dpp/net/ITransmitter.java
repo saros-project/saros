@@ -24,8 +24,6 @@ import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.invitation.SessionNegotiation;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
  * A humble interface that is responsible for network functionality. The idea
@@ -104,14 +102,4 @@ public interface ITransmitter {
      */
     // FIXME rename to sendExtension
     public void sendMessageToUser(JID jid, PacketExtension extension);
-
-    /**
-     * Sends a leave message to the participants of given Saros session. See
-     * {@link SessionNegotiation} for more information when this is supposed be
-     * sent.
-     * 
-     * @param sarosSession
-     *            the Saros session that this join message refers to.
-     */
-    public void sendLeaveMessage(ISarosSession sarosSession);
 }

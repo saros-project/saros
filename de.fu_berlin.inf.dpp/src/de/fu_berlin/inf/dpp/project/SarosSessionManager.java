@@ -54,7 +54,6 @@ import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
@@ -87,8 +86,6 @@ public class SarosSessionManager implements ISarosSessionManager {
     private static final long NEGOTIATION_PROCESS_TIMEOUT = 10000L;
 
     private final SarosSessionObservable sarosSessionObservable;
-
-    private final ITransmitter transmitter;
 
     private final SessionIDObservable sessionIDObservable;
 
@@ -136,14 +133,13 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
     };
 
-    public SarosSessionManager(SarosNet sarosNet, ITransmitter transmitter,
+    public SarosSessionManager(SarosNet sarosNet,
         SarosSessionObservable sarosSessionObservable,
         SessionIDObservable sessionID,
         InvitationProcessObservable currentSessionNegotiations,
         ProjectNegotiationObservable currentProjectNegotiations,
         PreferenceUtils preferenceUtils) {
         this.sarosNet = sarosNet;
-        this.transmitter = transmitter;
         this.sarosSessionObservable = sarosSessionObservable;
         this.sessionIDObservable = sessionID;
         this.currentSessionNegotiations = currentSessionNegotiations;
@@ -321,9 +317,6 @@ public class SarosSessionManager implements ISarosSessionManager {
                 log.warn("there are still running negotiation processes");
 
             sessionEnding(sarosSession);
-
-            // FIXME move to session
-            transmitter.sendLeaveMessage(sarosSession);
 
             log.debug("Leave message sent.");
 
