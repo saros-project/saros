@@ -7,7 +7,7 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({ CreatingNewFileTest.class, DerivedResourcesTest.class,
     EditFileThatIsNotOpenOnRemoteSideTest.class,
     EditFileThatIsNotOpenOnRemoteSideTest.class,
-    EstablishSessionWithDifferentTransportModes.class,
+    EstablishSessionWithDifferentTransportModesTest.class,
     OverlappingSharingTest.class, ShareMultipleProjectsTest.class })
 public class TestSuite {
     // the class remains completely empty,
