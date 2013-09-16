@@ -145,7 +145,7 @@ public class LeaveAndKickHandler {
          * must be run async. otherwise the user list synchronization will time
          * out as we block the packet receive thread here
          */
-        Utils.runSafeAsync("RemoveUser", log, new Runnable() {
+        Utils.runSafeAsync("RemoveUser-" + user, log, new Runnable() {
             @Override
             public void run() {
                 sarosSession.removeUser(user);

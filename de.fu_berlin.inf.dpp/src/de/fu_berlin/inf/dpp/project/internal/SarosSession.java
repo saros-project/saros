@@ -519,10 +519,12 @@ public final class SarosSession implements ISarosSession {
 
         projectMapper.userLeft(user);
 
-        if (isHost()) {
+        List<User> currentRemoteUsers = getRemoteUsers();
+
+        if (isHost() && !currentRemoteUsers.isEmpty()) {
 
             List<User> timedOutUsers = userListHandler.synchronizeUserList(
-                null, Collections.singletonList(user), getRemoteUsers());
+                null, Collections.singletonList(user), currentRemoteUsers);
 
             if (!timedOutUsers.isEmpty()) {
                 log.error("could not synchronize user list properly, following users did not respond: "

@@ -102,30 +102,35 @@ public class UserInformationHandler implements Startable {
      *            collection containing the users that are removed from the
      *            current session or <code>null</code>
      * @param remoteUsers
-     *            the users that will receive the user list
+     *            collection containing the users that will receive the user
+     *            list
      * 
      * @return a list of users that did not reply when synchronizing the user
      *         list
      * 
      * @throws IllegalStateException
      *             if the local user of the session is not the host
+     * @throws IllegalArgumentException
+     *             if remoteUsers collection is empty<br/>
+     *             if usersAdded and usersRemoved are either both empty or
+     *             <code>null</code>
      */
     public synchronized List<User> synchronizeUserList(
         Collection<User> usersAdded, Collection<User> usersRemoved,
         Collection<User> remoteUsers) {
 
-        List<User> notReplied = new ArrayList<User>();
-        List<User> awaitReply = new ArrayList<User>(remoteUsers);
-
         if (!session.isHost())
             throw new IllegalStateException(
                 "only the host can synchronize the user list");
 
-        SarosPacketCollector collector = receiver
-            .createCollector(UserListReceivedExtension.PROVIDER
-                .getPacketFilter(currentSessionID));
+        if (remoteUsers.isEmpty())
+            throw new IllegalArgumentException("remoteUser collection is empty");
 
-        UserListExtension extension = new UserListExtension(currentSessionID);
+        final List<User> notReplied = new ArrayList<User>();
+        final List<User> awaitReply = new ArrayList<User>(remoteUsers);
+
+        final UserListExtension extension = new UserListExtension(
+            currentSessionID);
 
         if (usersAdded == null)
             usersAdded = Collections.emptyList();
@@ -133,14 +138,22 @@ public class UserInformationHandler implements Startable {
         if (usersRemoved == null)
             usersRemoved = Collections.emptyList();
 
+        if (usersAdded.isEmpty() && usersRemoved.isEmpty())
+            throw new IllegalArgumentException(
+                "usersAdded and usersRemoved collections are empty");
+
         for (User user : usersAdded)
             extension.addUser(user, UserListEntry.USER_ADDED);
 
         for (User user : usersRemoved)
             extension.addUser(user, UserListEntry.USER_REMOVED);
 
-        log.debug("synchronizing user list " + usersAdded + " with user(s) "
-            + remoteUsers);
+        log.debug("synchronizing user list (A)" + usersAdded + ", (R) "
+            + usersRemoved + " with user(s) " + remoteUsers);
+
+        final SarosPacketCollector collector = receiver
+            .createCollector(UserListReceivedExtension.PROVIDER
+                .getPacketFilter(currentSessionID));
 
         try {
             for (User user : remoteUsers) {
@@ -160,6 +173,18 @@ public class UserInformationHandler implements Startable {
             // see BUG #3544930 , the confirmation is useless
 
             while ((System.currentTimeMillis() - synchronizeStart) < USER_LIST_SYNCHRONIZE_TIMEOUT) {
+
+                // remove users that left the session in the meantime
+                List<User> currentRemoteUsers = session.getRemoteUsers();
+
+                for (Iterator<User> it = awaitReply.iterator(); it.hasNext();) {
+                    User user = it.next();
+                    if (!currentRemoteUsers.contains(user)) {
+                        log.debug("no longer waiting for user list confirmation of user "
+                            + user + " [left session]");
+                        it.remove();
+                    }
+                }
 
                 if (awaitReply.isEmpty())
                     break;
