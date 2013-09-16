@@ -429,9 +429,11 @@ public class Messages extends NLS {
     public static String DeleteContactAction_name_end_deco;
     public static String DeleteContactAction_title;
     public static String DeleteContactAction_tooltip;
-    public static String FollowModeAction_disable_followmode_tooltip;
-    public static String FollowModeAction_enable_disable_tooltip;
-    public static String FollowModeAction_enable_followmode_tooltip;
+
+    public static String FollowModeAction_enter_followmode;
+    public static String FollowModeAction_leave_followmode;
+    public static String FollowModeAction_follow_user;
+
     public static String FollowThisPersonAction_follow_title;
     public static String FollowThisPersonAction_follow_tooltip;
     public static String FollowThisPersonAction_stop_follow_title;

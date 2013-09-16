@@ -86,6 +86,11 @@ public class ImageManager {
     public static final Image ICON_BUDDY_SAROS_FOLLOWMODE = new DecorationOverlayIcon(
         ICON_BUDDY_SAROS, OVERLAY_FOLLOWMODE, IDecoration.TOP_LEFT)
         .createImage();
+
+    public static final Image ICON_BUDDY_SAROS_FOLLOWMODE_DISABLED = new DecorationOverlayIcon(
+        ICON_BUDDY_OFFLINE, OVERLAY_FOLLOWMODE, IDecoration.TOP_LEFT)
+        .createImage();
+
     public static final Image ICON_BUDDY_SAROS_FOLLOWMODE_READONLY = new DecorationOverlayIcon(
         ICON_BUDDY_SAROS_FOLLOWMODE, OVERLAY_READONLY, IDecoration.BOTTOM_RIGHT)
         .createImage();
