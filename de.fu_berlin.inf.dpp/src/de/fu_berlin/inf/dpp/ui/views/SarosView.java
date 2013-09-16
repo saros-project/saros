@@ -517,16 +517,10 @@ public class SarosView extends ViewPart {
                         manager.add(restrictToReadOnlyAccessAction);
                     }
                 } else {
-                    boolean debugMode = false;
-
-                    assert (debugMode = true) == true;
                     if (isHost) {
                         manager.add(giveWriteAccessAction);
                         manager.add(restrictToReadOnlyAccessAction);
-
-                        if (debugMode)
-                            manager.add(kickUserAction);
-
+                        manager.add(kickUserAction);
                         manager.add(new Separator());
                     }
                     manager.add(followModeAction);

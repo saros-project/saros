@@ -1,26 +1,35 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.model.rosterSession.UserElement;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 
 public class RemoveUserAction extends Action {
+
+    private static final Logger LOG = Logger.getLogger(RemoveUserAction.class);
 
     @Inject
     private ISarosSessionManager sessionManager;
@@ -78,19 +87,49 @@ public class RemoveUserAction extends Action {
     @Override
     public void run() {
 
-        ISarosSession currentSession = session;
+        final ISarosSession currentSession = session;
 
         if (currentSession == null)
             return;
 
-        List<UserElement> participants = SelectionRetrieverFactory
-            .getSelectionRetriever(UserElement.class).getSelection();
+        final List<User> users = SelectionRetrieverFactory
+            .getSelectionRetriever(User.class).getSelection();
 
-        if (!canRemoveUsers(participants))
+        if (!canRemoveUsers(users))
             return;
 
-        for (UserElement e : participants)
-            session.kickUser((User) e.getUser());
+        Shell shell = EditorAPI.getShell();
+
+        if (shell == null)
+            shell = new Shell(SWTUtils.getDisplay());
+
+        ProgressMonitorDialog dialog = new ProgressMonitorDialog(shell);
+
+        try {
+            dialog.run(true, false, new IRunnableWithProgress() {
+                @Override
+                public void run(IProgressMonitor monitor)
+                    throws InterruptedException {
+
+                    List<String> userNames = new ArrayList<String>();
+
+                    for (User user : users)
+                        userNames.add(user.getShortHumanReadableName());
+
+                    monitor.beginTask(
+                        "Removing user(s): "
+                            + StringUtils.join(userNames, ", "),
+                        IProgressMonitor.UNKNOWN);
+
+                    for (User user : users)
+                        session.kickUser(user);
+
+                    monitor.done();
+                }
+            });
+        } catch (Exception e) {
+            LOG.error("internal error while removing users", e); //$NON-NLS-1$
+        }
     }
 
     public void dispose() {
@@ -104,20 +143,20 @@ public class RemoveUserAction extends Action {
     private void updateEnablement() {
         ISarosSession currentSession = session;
 
-        List<UserElement> participants = SelectionRetrieverFactory
-            .getSelectionRetriever(UserElement.class).getSelection();
+        List<User> users = SelectionRetrieverFactory
+            .getSelectionRetriever(User.class).getSelection();
 
         setEnabled(currentSession != null && currentSession.isHost()
-            && canRemoveUsers(participants));
+            && canRemoveUsers(users));
     }
 
-    private boolean canRemoveUsers(List<UserElement> users) {
+    private boolean canRemoveUsers(List<User> users) {
 
         if (users.size() == 0)
             return false;
 
-        for (UserElement e : users) {
-            if (((User) e.getUser()).isHost()) {
+        for (User user : users) {
+            if (user.isHost()) {
                 return false;
             }
         }
