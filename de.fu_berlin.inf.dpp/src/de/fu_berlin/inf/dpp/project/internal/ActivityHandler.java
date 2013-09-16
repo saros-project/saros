@@ -383,7 +383,11 @@ public final class ActivityHandler implements Startable {
                 }
                 result.add(new QueueItem(receivers, activity));
 
-            } else {
+                /*
+                 * should we really execute an activity from a user that is
+                 * about to or has left the session ?
+                 */
+            } else if (!(session.getLocalUser().equals(activity.getSource()))) {
                 result.executeLocally.add(activity);
             }
         }
