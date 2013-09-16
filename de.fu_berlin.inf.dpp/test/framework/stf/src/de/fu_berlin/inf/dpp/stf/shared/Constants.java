@@ -57,27 +57,30 @@ public interface Constants {
     public final static String SRC = "src";
     public final static String SUFFIX_JAVA = ".java";
 
-    /**********************************************
+    /* *********************************************
      * 
      * View Progress
      * 
-     **********************************************/
+     * ********************************************
+     */
     public final static String SHELL_PROGRESS_INFORMATION = "Progress Information";
 
-    /**********************************************
+    /* *********************************************
      * 
      * Dialog Preferences
      * 
-     **********************************************/
+     * ********************************************
+     */
     static public final String NODE_CONSOLE = "Console";
     static public final String NODE_EDITORS = "Editors";
     static public final String NODE_TEXT_EDITORS = "Text Editors";
     static public final String NODE_ANNOTATIONS = "Annotations";
-    /**********************************************
+    /* *********************************************
      * 
      * Main Menu File
      * 
-     **********************************************/
+     * ********************************************
+     */
 
     static public final String MENU_NEW = "New";
     static public final String MENU_PROJECT = "Project...";
@@ -113,11 +116,12 @@ public interface Constants {
     static public final String LABEL_PACKAGE = "Package:";
     static public final String LABEL_NAME = "Name:";
 
-    /**********************************************
+    /* *********************************************
      * 
      * Main Menu Edit
      * 
-     **********************************************/
+     * ********************************************
+     */
     public final static String SHELL_DELETE_RESOURCE = "Delete Resources";
 
     /* menu names */
@@ -126,11 +130,12 @@ public interface Constants {
     public final static String MENU_COPY = "Copy";
     public final static String MENU_PASTE = "Paste";
 
-    /**********************************************
+    /* *********************************************
      * 
      * Main Menu Refactor
      * 
-     **********************************************/
+     * ********************************************
+     */
     /* shell titles */
     public final static String SHELL_MOVE = "Move";
     public final static String SHELL_RENAME_PACKAGE = "Rename Package";
@@ -144,11 +149,12 @@ public interface Constants {
     public final static String MENU_RENAME = "Rename...";
     public final static String MENU_MOVE = "Move...";
 
-    /**********************************************
+    /* *********************************************
      * 
      * Main Menu Window
      * 
-     **********************************************/
+     * ********************************************
+     */
 
     static public final String TREE_ITEM_GENERAL_IN_PRFERENCES = "General";
     static public final String TREE_ITEM_WORKSPACE_IN_PREFERENCES = "Workspace";
@@ -168,20 +174,22 @@ public interface Constants {
     public final static String ID_DEBUG_PERSPECTIVE = "org.eclipse.debug.ui.DebugPerspective";
     public final static String ID_RESOURCE_PERSPECTIVE = "eclipse.ui.resourcePerspective";
 
-    /**********************************************
+    /* *********************************************
      * 
      * Multiused label name.
      * 
-     **********************************************/
+     * ********************************************
+     */
 
     public final static String ADD_PROJECTS = Configuration
         .getString("add_projects");
 
-    /**********************************************
+    /* *********************************************
      * 
      * Main Menu Saros
      * 
-     **********************************************/
+     * ********************************************
+     */
 
     public final static String MENU_SAROS = Configuration
         .getString("menu_saros");
@@ -200,6 +208,12 @@ public interface Constants {
     public final static String MENU_STOP_SESSION = Configuration
         .getString("menu_stop_session");
 
+    /* *********************************************
+     * 
+     * Saros Preferences
+     * 
+     * *********************************************
+     */
     public final static String SHELL_PREFERNCES = Configuration
         .getString("shell_preferences");
     public final static String SHELL_CREATE_XMPP_JABBER_ACCOUNT = Configuration
@@ -308,11 +322,21 @@ public interface Constants {
     static public final String NODE_SAROS_SCREENSHARING_REMOTE_SCREEN_VIEW = Configuration
         .getString("node_Saros_screensharing_remote_screen_view");
 
-    /**********************************************
+    public static final String PREF_NODE_SAROS_NETWORK_TRANSPORT_MODE_GROUP = Configuration
+        .getString("NetworkPreferencePage_connection_established");
+
+    public static final String PREF_NODE_SAROS_NETWORK_TRANSPORT_MODE_SOCKS5_MEDIATED_CHECKBOX = Configuration
+        .getString("NetworkPreferencePage_buttonOnlyAllowMediatedSocks5_text");
+
+    public static final String PREF_NODE_SAROS_NETWORK_TRANSPORT_MODE_IBB_CHECKBOX = Configuration
+        .getString("NetworkPreferencePage_button_establish_connection");
+
+    /* *********************************************
      * 
      * Saros View
      * 
-     **********************************************/
+     * ********************************************
+     */
 
     /*
      * View infos
