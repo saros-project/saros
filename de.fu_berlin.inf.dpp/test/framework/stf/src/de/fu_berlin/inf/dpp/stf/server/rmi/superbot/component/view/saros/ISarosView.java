@@ -14,11 +14,10 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosv
 
 /**
  * <p>
- * This interface contains convenience API to perform a actions in the Saros
- * view.
+ * This interface contains convenience API to perform actions in the Saros view.
  * </p>
  * 
- * If not mentioned otherwise all offered methods fulfill there contract by
+ * If not mentioned otherwise all offered methods fulfill their contract by
  * interacting only with the GUI.
  * 
  * @author lchen
@@ -59,7 +58,7 @@ public interface ISarosView extends Remote {
     public void disconnect() throws RemoteException;
 
     /**
-     * Add the given contact to the contact list of the currently logged in
+     * Adds the given contact to the contact list of the currently logged in
      * tester. Does nothing if the contact is already in the contact list.
      * 
      * @param jid
@@ -83,7 +82,8 @@ public interface ISarosView extends Remote {
     /**
      * Selects the tree node "Buddies"
      */
-    public IContextMenusInContactListArea selectBuddies() throws RemoteException;
+    public IContextMenusInContactListArea selectBuddies()
+        throws RemoteException;
 
     /**
      * Selects the tree node "Session"
@@ -299,7 +299,7 @@ public interface ISarosView extends Remote {
      * </ol>
      * 
      * TODO: this function isn't complete yet. SWTBot don't support native
-     * dialog, So the action on the "Select the file to send" dialog can be
+     * dialog, so the action on the "Select the file to send" dialog can be
      * performed.
      * 
      * @param jid
@@ -374,7 +374,7 @@ public interface ISarosView extends Remote {
      * Performs the action "inconsistency detected in ..." which should be
      * activated by clicking the tool bar button with the toolTip text
      * {@link StfRemoteObject#TB_INCONSISTENCY_DETECTED} on the session view.
-     * The button is only enabled, if there are inconsistency detected in a
+     * The button is only enabled, if there are inconsistencies detected in a
      * file.
      * <p>
      * <b>Attention:</b>
@@ -495,13 +495,14 @@ public interface ISarosView extends Remote {
      * Wait until the condition {@link ISarosView#isInSession()} is false.
      * <p>
      * <b>Attention</b>:<br/>
-     * Some actions need to long time to complete, so you will get assertError
+     * Some actions need too much time to complete, so you will get assertError
      * if you immediately assert the after-state caused by such actions. E.g.
      * you will get assertError with the assertion
-     * assertTrue(alice.views().sessionviews().isInsession()) if alice leave the
-     * session without waitUntil the condition {@link ISarosView#isInSession()}
-     * So it is recommended that you wait until the session is completely closed
-     * before you run the assertion or perform a following action.
+     * assertTrue(alice.views().sessionviews().isInsession()) if alice leaves
+     * the session without waitUntil the condition
+     * {@link ISarosView#isInSession()}. So it is recommended that you wait
+     * until the session is completely closed before you run the assertion or
+     * perform a following action.
      * 
      * @throws RemoteException
      */
