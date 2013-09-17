@@ -5,6 +5,7 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
@@ -22,7 +23,7 @@ import de.fu_berlin.inf.dpp.ui.widgets.ColorChooser.ColorSelectionListener;
 /**
  * This class is responsible for allowing the user to select his / her favorite
  * color that should be used (if available) when starting or joining a Saros
- * session.
+ * session and for allowing the user to choose the visible annotations.
  * 
  * @author Maria Spiering
  * @author Stefan Rossbach
@@ -42,6 +43,8 @@ public final class AppearancePreferencePage extends PreferencePage implements
 
     private int chosenFavoriteColorId = DEFAULT_COLOR_ID;
 
+    private Button showContributionAnnotationButton;
+
     public AppearancePreferencePage() {
         SarosPluginContext.initComponent(this);
         setDescription(Messages.AppearancePreferencePage_appearance_settings);
@@ -60,6 +63,12 @@ public final class AppearancePreferencePage extends PreferencePage implements
                 chosenFavoriteColorId);
         }
 
+        boolean showContribAnno = showContributionAnnotationButton
+            .getSelection();
+
+        preferenceStore.setValue(
+            PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS, showContribAnno);
+
         return super.performOk();
     }
 
@@ -69,6 +78,12 @@ public final class AppearancePreferencePage extends PreferencePage implements
             .setToDefault(PreferenceConstants.FAVORITE_SESSION_COLOR_ID);
 
         colorChooser.selectColor(DEFAULT_COLOR_ID);
+
+        preferenceStore
+            .setToDefault(PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS);
+        showContributionAnnotationButton.setSelection(preferenceStore
+            .getBoolean(PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS));
+
         super.performDefaults();
     }
 
@@ -79,7 +94,28 @@ public final class AppearancePreferencePage extends PreferencePage implements
         composite.setLayout(layout);
 
         createColorGroup(composite);
+        createAnnotationsVisibleControl(composite);
         return composite;
+    }
+
+    private void createAnnotationsVisibleControl(Composite parent) {
+        final Group annotationsGroup = new Group(parent, SWT.NONE);
+        annotationsGroup
+            .setText(Messages.AppearancePreferencePage_annotations_group_label);
+        annotationsGroup.setLayout(new GridLayout(1, false));
+        annotationsGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
+            false));
+
+        showContributionAnnotationButton = new Button(annotationsGroup,
+            SWT.CHECK);
+        showContributionAnnotationButton
+            .setText(Messages.AppearancePreferencePage_enable_contribution_annotation);
+        showContributionAnnotationButton
+            .setToolTipText(Messages.AppearancePreferencePage_show_contribution_annotations_tooltip);
+
+        boolean isContribAnnoVisible = preferenceStore
+            .getBoolean(PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS);
+        showContributionAnnotationButton.setSelection(isContribAnnoVisible);
     }
 
     private void createColorGroup(Composite parent) {

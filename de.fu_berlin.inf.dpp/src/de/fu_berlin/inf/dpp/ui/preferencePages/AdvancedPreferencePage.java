@@ -57,18 +57,6 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
                 { "Prompt", MessageDialogWithToggle.PROMPT } },
             getFieldEditorParent(), true));
 
-        BooleanFieldEditor fieldEditor = new BooleanFieldEditor(
-            PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS,
-            Messages.AdvancedPreferencePage_show_contribution_annotations,
-            getFieldEditorParent());
-
-        fieldEditor
-            .getDescriptionControl(getFieldEditorParent())
-            .setToolTipText(
-                Messages.AdvancedPreferencePage_show_contribution_annotations_tooltip);
-
-        addField(fieldEditor);
-
         addField(new BooleanFieldEditor(
             PreferenceConstants.ENABLE_BALLOON_NOTIFICATION,
             Messages.AdvancedPreferencePage_enable_balloon_notifications,
