@@ -26,6 +26,7 @@ import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelProjectNegotiationExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -127,7 +128,12 @@ public abstract class ProjectNegotiation extends CancelableProcess {
             .create(new CancelProjectNegotiationExtension(sessionID, cause
                 .getMessage()));
 
-        transmitter.sendMessageToUser(getPeer(), notification);
+        try {
+            transmitter.sendToSessionUser(ISarosSession.SESSION_CONNECTION_ID,
+                getPeer(), notification);
+        } catch (IOException e) {
+            transmitter.sendMessageToUser(getPeer(), notification);
+        }
     }
 
     /**

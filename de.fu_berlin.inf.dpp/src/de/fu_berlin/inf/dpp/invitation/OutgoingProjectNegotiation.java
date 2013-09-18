@@ -136,7 +136,13 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                  * listener interface ?
                  */
 
-                sarosSession.userStartedQueuing(sarosSession.getUser(peer));
+                User user = sarosSession.getUser(peer);
+
+                if (user == null)
+                    throw new LocalCancellationException(null,
+                        CancelOption.DO_NOT_NOTIFY_PEER);
+
+                sarosSession.userStartedQueuing(user);
 
                 zipArchives = createProjectArchives(projectFilesToSend, monitor);
                 monitor.subTask("");
@@ -165,6 +171,15 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 zipArchives.add(zipArchive);
 
                 sendArchive(zipArchive, peer, processID, monitor);
+
+                User user = sarosSession.getUser(peer);
+
+                if (user == null)
+                    throw new LocalCancellationException(null,
+                        CancelOption.DO_NOT_NOTIFY_PEER);
+
+                sarosSession.userFinishedProjectNegotiation(user);
+
             }
         } catch (Exception e) {
             exception = e;
@@ -178,8 +193,6 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             deleteCollectors();
             monitor.done();
         }
-
-        sarosSession.userFinishedProjectNegotiation(sarosSession.getUser(peer));
 
         return terminateProcess(exception);
     }
