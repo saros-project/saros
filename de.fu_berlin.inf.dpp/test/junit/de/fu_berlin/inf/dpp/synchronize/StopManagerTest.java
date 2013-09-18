@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CancellationException;
@@ -46,17 +47,25 @@ public class StopManagerTest {
         alicesSession.addActivityProvider(EasyMock.isA(StopManager.class));
         alicesSession.removeActivityProvider(EasyMock.isA(StopManager.class));
 
-        alicesAlice = new User(alicesSession, new JID("alice"), 1, -1);
-        alicesBob = new User(alicesSession, new JID("bob"), 2, -1);
-        alicesCarl = new User(alicesSession, new JID("carl"), 3, -1);
+        alicesAlice = new User(new JID("alice"), true, true, 1, -1);
+        alicesBob = new User(new JID("bob"), false, false, 2, -1);
+        alicesCarl = new User(new JID("carl"), false, false, 3, -1);
+
+        alicesAlice.setInSession(true);
+        alicesBob.setInSession(true);
+        alicesCarl.setInSession(true);
+
         alicesSession.getLocalUser();
-        EasyMock.expectLastCall().andReturn(alicesAlice).anyTimes();
+        EasyMock.expectLastCall().andStubReturn(alicesAlice);
+
         alicesSession.getUser(alicesBob.getJID());
-        EasyMock.expectLastCall().andReturn(alicesBob).anyTimes();
+        EasyMock.expectLastCall().andStubReturn(alicesBob);
+
         alicesSession.getUser(alicesAlice.getJID());
-        EasyMock.expectLastCall().andReturn(alicesAlice).anyTimes();
+        EasyMock.expectLastCall().andStubReturn(alicesAlice);
+
         alicesSession.getUser(alicesCarl.getJID());
-        EasyMock.expectLastCall().andReturn(alicesCarl).anyTimes();
+        EasyMock.expectLastCall().andStubReturn(alicesCarl);
 
         EasyMock.replay(alicesSession);
 
@@ -64,34 +73,50 @@ public class StopManagerTest {
         bobsSession.addActivityProvider(EasyMock.isA(StopManager.class));
         bobsSession.removeActivityProvider(EasyMock.isA(StopManager.class));
 
-        bobsAlice = new User(bobsSession, new JID("alice"), 1, -1);
-        bobsBob = new User(bobsSession, new JID("bob"), 2, -1);
-        bobsCarl = new User(bobsSession, new JID("carl"), 3, -1);
+        bobsAlice = new User(new JID("alice"), true, false, 1, -1);
+        bobsBob = new User(new JID("bob"), false, true, 2, -1);
+        bobsCarl = new User(new JID("carl"), false, false, 3, -1);
+
+        bobsAlice.setInSession(true);
+        bobsBob.setInSession(true);
+        bobsCarl.setInSession(true);
+
         bobsSession.getLocalUser();
-        EasyMock.expectLastCall().andReturn(bobsBob).anyTimes();
+        EasyMock.expectLastCall().andStubReturn(bobsBob);
+
         bobsSession.getUser(bobsAlice.getJID());
-        EasyMock.expectLastCall().andReturn(bobsAlice).anyTimes();
+        EasyMock.expectLastCall().andStubReturn(bobsAlice);
+
         bobsSession.getUser(bobsBob.getJID());
-        EasyMock.expectLastCall().andReturn(bobsBob).anyTimes();
+        EasyMock.expectLastCall().andStubReturn(bobsBob);
+
         bobsSession.getUser(bobsCarl.getJID());
-        EasyMock.expectLastCall().andReturn(bobsCarl).anyTimes();
+        EasyMock.expectLastCall().andStubReturn(bobsCarl);
         EasyMock.replay(bobsSession);
 
         carlsSession = EasyMock.createMock(ISarosSession.class);
         carlsSession.addActivityProvider(EasyMock.isA(StopManager.class));
         carlsSession.removeActivityProvider(EasyMock.isA(StopManager.class));
 
-        carlsAlice = new User(carlsSession, new JID("alice"), 1, -1);
-        carlsBob = new User(carlsSession, new JID("bob"), 2, -1);
-        carlsCarl = new User(carlsSession, new JID("carl"), 3, -1);
+        carlsAlice = new User(new JID("alice"), true, false, 1, -1);
+        carlsBob = new User(new JID("bob"), false, false, 2, -1);
+        carlsCarl = new User(new JID("carl"), false, true, 3, -1);
+
+        carlsAlice.setInSession(true);
+        carlsBob.setInSession(true);
+        carlsCarl.setInSession(true);
+
         carlsSession.getLocalUser();
-        EasyMock.expectLastCall().andReturn(carlsCarl).anyTimes();
+        EasyMock.expectLastCall().andStubReturn(carlsCarl);
+
         carlsSession.getUser(carlsAlice.getJID());
-        EasyMock.expectLastCall().andReturn(carlsAlice).anyTimes();
+        EasyMock.expectLastCall().andStubReturn(carlsAlice);
+
         carlsSession.getUser(carlsBob.getJID());
-        EasyMock.expectLastCall().andReturn(carlsBob).anyTimes();
+        EasyMock.expectLastCall().andStubReturn(carlsBob);
+
         carlsSession.getUser(carlsCarl.getJID());
-        EasyMock.expectLastCall().andReturn(carlsCarl).anyTimes();
+        EasyMock.expectLastCall().andStubReturn(carlsCarl);
         EasyMock.replay(carlsSession);
     }
 
@@ -252,9 +277,12 @@ public class StopManagerTest {
         // Now make both listeners data to each other
         IActivityListener alicesListener = createForwarder(bobsSession,
             bobsStopManager);
+
         alicesStopManager.addActivityListener(alicesListener);
+
         IActivityListener bobsListener = createForwarder(alicesSession,
             alicesStopManager);
+
         bobsStopManager.addActivityListener(bobsListener);
 
         // verify that everything is unlocked
@@ -349,12 +377,17 @@ public class StopManagerTest {
         // Now make both listeners data to each other
         IActivityListener alicesListener = createForwarder(bobsStopManager,
             carlsStopManager);
+
         alicesStopManager.addActivityListener(alicesListener);
+
         IActivityListener bobsListener = createForwarder(alicesSession,
             alicesStopManager);
+
         bobsStopManager.addActivityListener(bobsListener);
+
         IActivityListener carlsListener = createForwarder(alicesSession,
             alicesStopManager);
+
         carlsStopManager.addActivityListener(carlsListener);
 
         // verify that everything is unlocked
@@ -415,15 +448,15 @@ public class StopManagerTest {
         alicesSession.addActivityProvider(EasyMock.isA(StopManager.class));
         alicesSession.removeActivityProvider(EasyMock.isA(StopManager.class));
 
-        alicesAlice = new User(alicesSession, new JID("alice"), 1, -1);
-        alicesBob = new User(alicesSession, new JID("bob"), 2, -1);
-        alicesCarl = new User(alicesSession, new JID("carl"), 3, -1);
         alicesSession.getLocalUser();
         EasyMock.expectLastCall().andReturn(alicesAlice).anyTimes();
+
         alicesSession.getUser(alicesAlice.getJID());
         EasyMock.expectLastCall().andReturn(alicesAlice).anyTimes();
+
         alicesSession.getUser(alicesCarl.getJID());
         EasyMock.expectLastCall().andReturn(alicesCarl).anyTimes();
+
         alicesSession.getUser(alicesBob.getJID());
         EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
 
@@ -448,12 +481,17 @@ public class StopManagerTest {
         // Now make both listeners data to each other
         IActivityListener alicesListener = createForwarder(bobsStopManager,
             carlsStopManager);
+
         alicesStopManager.addActivityListener(alicesListener);
+
         IActivityListener bobsListener = createForwarder(alicesSession,
             alicesStopManager);
+
         bobsStopManager.addActivityListener(bobsListener);
+
         IActivityListener carlsListener = createForwarder(alicesSession,
             alicesStopManager);
+
         carlsStopManager.addActivityListener(carlsListener);
 
         // verify that everything is unlocked
@@ -503,66 +541,39 @@ public class StopManagerTest {
      * This tests that after a StopManager has sent a request and the user is
      * leaving the session and we will not get a reply from it.
      */
-    @Test
+    @Test(timeout = 30000)
     public void testNoReplyAndLeave() {
-        // Abuse the monitor so we can use it in the anonymous class.
-        final IProgressMonitor activitySent = new NullProgressMonitor();
-
-        // Create a special session that allows us to kick bob out of the
-        // session and test the cancellation for that case.
-        alicesSession = EasyMock.createMock(ISarosSession.class);
-        alicesSession.addActivityProvider(EasyMock.isA(StopManager.class));
-        alicesSession.removeActivityProvider(EasyMock.isA(StopManager.class));
-
-        alicesAlice = new User(alicesSession, new JID("alice"), 1, -1);
-        alicesBob = new User(alicesSession, new JID("bob"), 2, -1);
-        alicesCarl = new User(alicesSession, new JID("carl"), 3, -1);
-        alicesSession.getLocalUser();
-        EasyMock.expectLastCall().andReturn(alicesAlice).anyTimes();
-        alicesSession.getUser(alicesAlice.getJID());
-        EasyMock.expectLastCall().andReturn(alicesAlice).anyTimes();
-        alicesSession.getUser(alicesCarl.getJID());
-        EasyMock.expectLastCall().andReturn(alicesCarl).anyTimes();
-        alicesSession.getUser(alicesBob.getJID());
-        EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
-
-            @Override
-            public Object answer() throws Throwable {
-                if (activitySent.isCanceled())
-                    return null;
-                return alicesBob;
-            }
-        }).anyTimes();
-
-        EasyMock.replay(alicesSession);
 
         // Observe the activities created and remember a lock request.
         IActivityListener listener = EasyMock
             .createMock(IActivityListener.class);
+
         listener.activityCreated(EasyMock.isA(StopActivity.class));
-        EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
+        EasyMock.expectLastCall().andStubAnswer(new IAnswer<Object>() {
 
             @Override
             public Object answer() throws Throwable {
                 StopActivity stop = (StopActivity) EasyMock
                     .getCurrentArguments()[0];
+
                 if (stop.getType() == StopActivity.Type.LOCKREQUEST)
-                    activitySent.setCanceled(true);
+                    alicesBob.setInSession(false);
 
                 return null;
             }
-        }).anyTimes();
-        EasyMock.replay(listener);
+        });
 
-        List<User> users = new LinkedList<User>();
-        users.add(alicesBob);
+        EasyMock.replay(listener);
 
         StopManager stopManager = new StopManager(alicesSession);
         stopManager.addActivityListener(listener);
         stopManager.start();
+
         try {
-            stopManager.stop(users, "test", new NullProgressMonitor());
-            Assert.fail("Could not stop.");
+            stopManager.stop(Collections.singletonList(alicesBob), "test",
+                new NullProgressMonitor());
+
+            // Assert.fail("Could not stop."); will block forever see timeout;
         } catch (CancellationException e) {
             // What we wanted.
         }
@@ -576,38 +587,8 @@ public class StopManagerTest {
     /**
      * This tests that starting of a handle might fail.
      */
-    @Test
+    @Test(timeout = 30000)
     public void testLockAndUserLeaveOnResume() {
-        // Abuse the monitor so we can use it in the anonymous class.
-        final IProgressMonitor activitySent = new NullProgressMonitor();
-
-        // Create a special session that allows us to kick bob out of the
-        // session and test the cancellation for that case.
-        alicesSession = EasyMock.createMock(ISarosSession.class);
-        alicesSession.addActivityProvider(EasyMock.isA(StopManager.class));
-        alicesSession.removeActivityProvider(EasyMock.isA(StopManager.class));
-
-        alicesAlice = new User(alicesSession, new JID("alice"), 1, -1);
-        alicesBob = new User(alicesSession, new JID("bob"), 2, -1);
-        alicesCarl = new User(alicesSession, new JID("carl"), 3, -1);
-        alicesSession.getLocalUser();
-        EasyMock.expectLastCall().andReturn(alicesAlice).anyTimes();
-        alicesSession.getUser(alicesAlice.getJID());
-        EasyMock.expectLastCall().andReturn(alicesAlice).anyTimes();
-        alicesSession.getUser(alicesCarl.getJID());
-        EasyMock.expectLastCall().andReturn(alicesCarl).anyTimes();
-        alicesSession.getUser(alicesBob.getJID());
-        EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
-
-            @Override
-            public Object answer() throws Throwable {
-                if (activitySent.isCanceled())
-                    return null;
-                return alicesBob;
-            }
-        }).anyTimes();
-
-        EasyMock.replay(alicesSession);
 
         final StopManager alicesStopManager = new StopManager(alicesSession);
         final StopManager bobsStopManager = new StopManager(bobsSession);
@@ -615,22 +596,23 @@ public class StopManagerTest {
         // Observe the activities created and remember a lock request.
         IActivityListener alicesListener = EasyMock
             .createMock(IActivityListener.class);
+
         alicesListener.activityCreated(EasyMock.isA(StopActivity.class));
-        EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
+        EasyMock.expectLastCall().andStubAnswer(new IAnswer<Object>() {
 
             @Override
             public Object answer() throws Throwable {
                 StopActivity stop = (StopActivity) EasyMock
                     .getCurrentArguments()[0];
                 if (stop.getType() == StopActivity.Type.UNLOCKREQUEST)
-                    activitySent.setCanceled(true);
+                    alicesBob.setInSession(false);
                 else
-                    bobsStopManager
-                        .exec(rewriteStopActivity(stop, bobsSession));
+                    bobsStopManager.exec(rewriteStopActivity(stop));
 
                 return null;
             }
-        }).anyTimes();
+        });
+
         EasyMock.replay(alicesListener);
 
         // Start the managers now
@@ -639,13 +621,12 @@ public class StopManagerTest {
 
         IActivityListener bobsListener = createForwarder(alicesSession,
             alicesStopManager);
+
         bobsStopManager.addActivityListener(bobsListener);
         bobsStopManager.start();
 
-        // Stop bob now
-        List<User> users = new LinkedList<User>();
-        users.add(alicesBob);
-        List<StartHandle> handles = alicesStopManager.stop(users, "test",
+        List<StartHandle> handles = alicesStopManager.stop(
+            Collections.singletonList(alicesBob), "test",
             new NullProgressMonitor());
 
         Assert.assertEquals(1, handles.size());
@@ -665,15 +646,17 @@ public class StopManagerTest {
         EasyMock.verify(bobsSession);
     }
 
-    private static User rewriteUser(User user, ISarosSession target) {
-        return new User(target, user.getJID(), user.getColorID(), -1);
+    private static User rewriteUser(User user) {
+        User copy = new User(user.getJID(), user.isHost(), !user.isLocal(),
+            user.getColorID(), -1);
+        copy.setInSession(true);
+        return copy;
     }
 
-    private static StopActivity rewriteStopActivity(StopActivity inActivity,
-        ISarosSession target) {
-        return new StopActivity(rewriteUser(inActivity.getAffected(), target),
-            rewriteUser(inActivity.getInitiator(), target), rewriteUser(
-                inActivity.getAffected(), target), inActivity.getType(),
+    private static StopActivity rewriteStopActivity(StopActivity inActivity) {
+        return new StopActivity(rewriteUser(inActivity.getAffected()),
+            rewriteUser(inActivity.getInitiator()),
+            rewriteUser(inActivity.getAffected()), inActivity.getType(),
             inActivity.getState(), inActivity.getActivityID());
     }
 
@@ -698,8 +681,7 @@ public class StopManagerTest {
                 // TODO: This should be async but this method is ran from the
                 // SWT thread and the StopManager tries to execute from the SWT
                 // Thread.
-                targetManager.exec(rewriteStopActivity(inActivity,
-                    targetSession));
+                targetManager.exec(rewriteStopActivity(inActivity));
                 return null;
             }
         }).anyTimes();
@@ -713,12 +695,14 @@ public class StopManagerTest {
      * JID.
      * 
      */
-    private IActivityListener createForwarder(final StopManager bob,
+    private IActivityListener createForwarder(final StopManager from,
         final StopManager carl) {
+
         IActivityListener listener = EasyMock
             .createMock(IActivityListener.class);
+
         listener.activityCreated(EasyMock.isA(StopActivity.class));
-        EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
+        EasyMock.expectLastCall().andStubAnswer(new IAnswer<Object>() {
 
             @Override
             public Object answer() throws Throwable {
@@ -729,15 +713,16 @@ public class StopManagerTest {
                 // SWT thread and the StopManager tries to execute from the SWT
                 // Thread.
                 if (inActivity.getRecipient().getJID().equals(new JID("bob")))
-                    bob.exec(rewriteStopActivity(inActivity, bobsSession));
+                    from.exec(rewriteStopActivity(inActivity));
                 else if (inActivity.getRecipient().getJID()
                     .equals(new JID("carl")))
-                    carl.exec(rewriteStopActivity(inActivity, carlsSession));
+                    carl.exec(rewriteStopActivity(inActivity));
                 else
                     Assert.fail("Should not be reached");
                 return null;
             }
-        }).anyTimes();
+        });
+
         EasyMock.replay(listener);
         return listener;
     }

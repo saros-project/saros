@@ -320,7 +320,7 @@ public class UserInformationHandler implements Startable {
                     continue;
                 }
 
-                user = new User(session, userEntry.jid, userEntry.colorID,
+                user = new User(userEntry.jid, false, false, userEntry.colorID,
                     userEntry.favoriteColorID);
 
                 user.setPermission(userEntry.permission);

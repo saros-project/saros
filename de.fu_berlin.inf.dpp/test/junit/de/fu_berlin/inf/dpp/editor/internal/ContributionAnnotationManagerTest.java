@@ -56,7 +56,7 @@ public class ContributionAnnotationManagerTest {
     @Test
     public void testHistoryRemoval() {
 
-        User alice = new User(sessionMock, new JID("alice@test"), 0, 0);
+        User alice = new User(new JID("alice@test"), false, false, 0, 0);
 
         AnnotationModel model = new AnnotationModel();
 
@@ -78,7 +78,7 @@ public class ContributionAnnotationManagerTest {
 
     @Test
     public void testHistoryRemovalAfterRefresh() {
-        User alice = new User(sessionMock, new JID("alice@test"), 0, 0);
+        User alice = new User(new JID("alice@test"), false, false, 0, 0);
 
         AnnotationModel model = new AnnotationModel();
 

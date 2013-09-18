@@ -12,13 +12,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 
 public class ColorIDSetTest {
@@ -32,12 +30,12 @@ public class ColorIDSetTest {
         userList = new ArrayList<User>();
         userMap = new HashMap<JID, UserColorID>();
 
-        ISarosSession session = EasyMock.createMock(ISarosSession.class);
-
-        alice = new User(session, new JID("alice@saros.org/Wonderland"), 0, -1);
-        bob = new User(session, new JID("bob@saros.org/Jamaica"), 1, -1);
-        carl = new User(session, new JID("carl@lagerfeld.org/Paris"), 2, -1);
-        dave = new User(session, new JID("dave@saros.org/Hell"), 0, -1);
+        alice = new User(new JID("alice@saros.org/Wonderland"), false, false,
+            0, -1);
+        bob = new User(new JID("bob@saros.org/Jamaica"), false, false, 1, -1);
+        carl = new User(new JID("carl@lagerfeld.org/Paris"), false, false, 2,
+            -1);
+        dave = new User(new JID("dave@saros.org/Hell"), false, false, 0, -1);
     }
 
     private ColorIDSet createColorIDSet(Collection<User> users) {

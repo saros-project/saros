@@ -50,7 +50,7 @@ public class UserInformationHandlerTest {
         UserInformationHandler handler = new UserInformationHandler(session,
             sessionID, transmitter, receiver);
 
-        User alice = new User(session, new JID("alice@test/Saros"), 0, 0);
+        User alice = new User(new JID("alice@test/Saros"), false, false, 0, 0);
 
         handler.start();
 
@@ -67,7 +67,7 @@ public class UserInformationHandlerTest {
         UserInformationHandler handler = new UserInformationHandler(session,
             sessionID, transmitter, receiver);
 
-        User alice = new User(session, new JID("alice@test/Saros"), 0, 0);
+        User alice = new User(new JID("alice@test/Saros"), false, false, 0, 0);
 
         handler.start();
 
@@ -84,7 +84,7 @@ public class UserInformationHandlerTest {
         UserInformationHandler handler = new UserInformationHandler(session,
             sessionID, transmitter, receiver);
 
-        User alice = new User(session, new JID("alice@test/Saros"), 0, 0);
+        User alice = new User(new JID("alice@test/Saros"), false, false, 0, 0);
 
         handler.start();
 
@@ -101,7 +101,7 @@ public class UserInformationHandlerTest {
         UserInformationHandler handler = new UserInformationHandler(session,
             sessionID, transmitter, receiver);
 
-        User alice = new User(session, new JID("alice@test/Saros"), 0, 0);
+        User alice = new User(new JID("alice@test/Saros"), false, false, 0, 0);
 
         handler.start();
 
@@ -119,8 +119,10 @@ public class UserInformationHandlerTest {
         UserInformationHandler handler = new UserInformationHandler(session,
             sessionID, transmitter, receiver);
 
-        User alice = new User(session, new JID("alice@test/Saros"), 0, 0);
-        User bob = new User(session, new JID("alice@test/Saros"), 0, 0);
+        User alice = new User(new JID("alice@test/Saros"), false, false, 0, 0);
+        User bob = new User(new JID("bob@test/Saros"), false, false, 0, 0);
+
+        alice.setInSession(false);
 
         handler.start();
 

@@ -418,7 +418,7 @@ public final class SarosSession implements ISarosSession {
         // TODO synchronize this method !
 
         JID jid = user.getJID();
-
+        user.setInSession(true);
         if (participants.putIfAbsent(jid, user) != null) {
             log.error("user " + Utils.prefix(jid)
                 + " added twice to SarosSession", new StackTrace());
@@ -426,7 +426,6 @@ public final class SarosSession implements ISarosSession {
         }
 
         /*
-         * welcome to a dual host-client and P2P architecture
          * 
          * as long as we do not know when something is send to someone this will
          * always produce errors ... swapping synchronizeUserList and userJoined
@@ -514,6 +513,8 @@ public final class SarosSession implements ISarosSession {
                 + Utils.prefix(jid));
             return;
         }
+
+        user.setInSession(false);
 
         activitySequencer.unregisterUser(user);
 
@@ -1172,13 +1173,17 @@ public final class SarosSession implements ISarosSession {
 
         assert localUserJID != null;
 
-        localUser = new User(this, localUserJID, localColorID, localColorID);
+        localUser = new User(localUserJID, host == null, true, localColorID,
+            localColorID);
+
+        localUser.setInSession(true);
 
         if (host == null) {
             hostUser = localUser;
             participants.put(hostUser.getJID(), hostUser);
         } else {
-            hostUser = new User(this, host, hostColorID, hostColorID);
+            hostUser = new User(host, true, false, hostColorID, hostColorID);
+            hostUser.setInSession(true);
             participants.put(hostUser.getJID(), hostUser);
             participants.put(localUser.getJID(), localUser);
         }

@@ -22,21 +22,22 @@ package de.fu_berlin.inf.dpp;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
  * A user is a representation of a person sitting in front of an eclipse
  * instance for the use in one Saros session.
  * 
- * A user object always has the following immutable characteristics: He/she
- * belongs to a single ISarosSession, has a final favorite color, and fixed JID.
+ * A user object always has the following immutable characteristics: He/she has
+ * a favorite color, is either host or client, is either local or remote and has
+ * fixed JID.
  * 
  * There is one user who is the host, all others are clients.
  * 
  * There is one local user representing the person in front of the current
  * eclipse instance, all others are remote users.
  * 
- * The public and mutable properties are the {@link User.Permission}.
+ * The public and mutable properties are the {@link User.Permission} and
+ * {@link #isInSarosSession()}.
  * 
  * @entityObject A user is a entity object, i.e. it can change over time.
  */
@@ -46,7 +47,9 @@ public class User {
         WRITE_ACCESS, READONLY_ACCESS
     }
 
-    private final ISarosSession sarosSession;
+    private final boolean isHost;
+
+    private final boolean isLocal;
 
     private final JID jid;
 
@@ -56,18 +59,20 @@ public class User {
 
     private Permission permission = Permission.WRITE_ACCESS;
 
-    public User(ISarosSession sarosSession, JID jid, int colorID,
+    private boolean isInSession;
+
+    public User(JID jid, boolean isHost, boolean isLocal, int colorID,
         int favoriteColorID) {
-        if (sarosSession == null || jid == null)
-            throw new IllegalArgumentException();
-        this.sarosSession = sarosSession;
+
         this.jid = jid;
+        this.isHost = isHost;
+        this.isLocal = isLocal;
         this.colorID = colorID;
         this.favoriteColorID = favoriteColorID;
     }
 
     public JID getJID() {
-        return this.jid;
+        return jid;
     }
 
     /**
@@ -86,7 +91,7 @@ public class User {
      * @return
      */
     public Permission getPermission() {
-        return this.permission;
+        return permission;
     }
 
     /**
@@ -100,7 +105,7 @@ public class User {
      *         This is always !{@link #hasReadOnlyAccess()}
      */
     public boolean hasWriteAccess() {
-        return this.permission == Permission.WRITE_ACCESS;
+        return permission == Permission.WRITE_ACCESS;
     }
 
     /**
@@ -114,16 +119,25 @@ public class User {
      *         This is always !{@link #hasWriteAccess()}
      */
     public boolean hasReadOnlyAccess() {
-        return this.permission == Permission.READONLY_ACCESS;
+        return permission == Permission.READONLY_ACCESS;
     }
 
+    /**
+     * Checks if the user is still part of the session. A user object that is no
+     * longer part of the session will <b>never</b> be part of the session
+     * again. In other words: userA.equals(userB) <=> true but userA == userB
+     * <=> false.
+     * 
+     * @return <code>true</code> if the user is part of the session,
+     *         <code>false</code> otherwise
+     */
     public boolean isInSarosSession() {
-        return sarosSession.getUser(getJID()) != null;
+        return isInSession;
     }
 
     @Override
     public String toString() {
-        return this.jid.getName();
+        return jid.getName();
     }
 
     @Override
@@ -152,11 +166,11 @@ public class User {
     }
 
     public int getColorID() {
-        return this.colorID;
+        return colorID;
     }
 
     public int getFavoriteColorID() {
-        return this.favoriteColorID;
+        return favoriteColorID;
     }
 
     /**
@@ -165,7 +179,7 @@ public class User {
      * Eclipse instances.
      */
     public boolean isLocal() {
-        return this.equals(sarosSession.getLocalUser());
+        return isLocal;
     }
 
     /**
@@ -181,7 +195,7 @@ public class User {
      * {@link User.Permission} management,
      */
     public boolean isHost() {
-        return this.equals(sarosSession.getHost());
+        return isHost;
     }
 
     /**
@@ -238,5 +252,12 @@ public class User {
     @Deprecated
     public void setColorID(int colorID) {
         this.colorID = colorID;
+    }
+
+    /**
+     * FOR INTERNAL USE ONLY
+     */
+    public void setInSession(boolean isInSession) {
+        this.isInSession = isInSession;
     }
 }

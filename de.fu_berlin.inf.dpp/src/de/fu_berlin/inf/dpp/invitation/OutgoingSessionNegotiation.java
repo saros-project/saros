@@ -487,7 +487,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
         monitor.setTaskName("Synchronizing user list...");
 
-        User user = new User(sarosSession, peer, clientColorID,
+        User user = new User(peer, false, false, clientColorID,
             clientFavoriteColorID);
 
         synchronized (CancelableProcess.SHARED_LOCK) {

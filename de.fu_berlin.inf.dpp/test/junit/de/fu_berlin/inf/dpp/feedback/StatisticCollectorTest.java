@@ -42,8 +42,8 @@ public class StatisticCollectorTest {
     private static ISarosSession createSessionMock(
         final List<Object> sessionListeners) {
         ISarosSession session = EasyMock.createMock(ISarosSession.class);
-        final User bob = new User(session, new JID("bob"), 1, -1);
-        final User alice = new User(session, new JID("alice"), 2, -1);
+        final User bob = new User(new JID("bob"), false, false, 1, -1);
+        final User alice = new User(new JID("alice"), false, false, 2, -1);
         final List<User> participants = new LinkedList<User>();
         participants.add(bob);
         participants.add(alice);

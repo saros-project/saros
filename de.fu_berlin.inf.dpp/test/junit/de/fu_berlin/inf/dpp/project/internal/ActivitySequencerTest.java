@@ -112,8 +112,8 @@ public class ActivitySequencerTest {
         sessionStubAlice = new SequencerSessionStub();
         sessionStubBob = new SequencerSessionStub();
 
-        aliceUser = new User(sessionStubAlice, ALICE_JID, 0, 0);
-        bobUser = new User(sessionStubAlice, BOB_JID, 0, 0);
+        aliceUser = new User(ALICE_JID, true, true, 0, 0);
+        bobUser = new User(BOB_JID, false, true, 0, 0);
 
         sessionStubAlice.setLocalUser(aliceUser);
         sessionStubBob.setLocalUser(bobUser);
@@ -158,7 +158,8 @@ public class ActivitySequencerTest {
             .createNiceMock(ITransmitter.class);
 
         try {
-            brokenTransmitter.sendToSessionUser(EasyMock.anyObject(String.class),
+            brokenTransmitter.sendToSessionUser(
+                EasyMock.anyObject(String.class),
                 EasyMock.anyObject(JID.class),
                 EasyMock.anyObject(PacketExtension.class));
         } catch (IOException e) {
@@ -174,7 +175,7 @@ public class ActivitySequencerTest {
 
         aliceSequencer.start();
 
-        User bobUserInAliceSession = new User(sessionStubAlice, BOB_JID, 0, 0);
+        User bobUserInAliceSession = new User(BOB_JID, false, false, 0, 0);
 
         aliceSequencer.registerUser(bobUserInAliceSession);
 
@@ -205,8 +206,8 @@ public class ActivitySequencerTest {
         aliceSequencer.start();
         bobSequencer.start();
 
-        User bobUserInAliceSession = new User(sessionStubAlice, BOB_JID, 0, 0);
-        User aliceUserInBobSession = new User(sessionStubBob, ALICE_JID, 0, 0);
+        User bobUserInAliceSession = new User(BOB_JID, false, false, 0, 0);
+        User aliceUserInBobSession = new User(ALICE_JID, true, false, 0, 0);
 
         sessionStubAlice.addUser(bobUserInAliceSession);
         sessionStubBob.addUser(aliceUserInBobSession);
@@ -247,8 +248,8 @@ public class ActivitySequencerTest {
         aliceSequencer.start();
         bobSequencer.start();
 
-        User bobUserInAliceSession = new User(sessionStubAlice, BOB_JID, 0, 0);
-        User aliceUserInBobSession = new User(sessionStubBob, ALICE_JID, 0, 0);
+        User bobUserInAliceSession = new User(BOB_JID, false, false, 0, 0);
+        User aliceUserInBobSession = new User(ALICE_JID, true, false, 0, 0);
 
         sessionStubAlice.addUser(bobUserInAliceSession);
         sessionStubBob.addUser(aliceUserInBobSession);
@@ -281,8 +282,8 @@ public class ActivitySequencerTest {
         aliceSequencer.start();
         bobSequencer.start();
 
-        User bobUserInAliceSession = new User(sessionStubAlice, BOB_JID, 0, 0);
-        User aliceUserInBobSession = new User(sessionStubBob, ALICE_JID, 0, 0);
+        User bobUserInAliceSession = new User(BOB_JID, false, false, 0, 0);
+        User aliceUserInBobSession = new User(ALICE_JID, true, false, 0, 0);
 
         sessionStubAlice.addUser(bobUserInAliceSession);
         sessionStubBob.addUser(aliceUserInBobSession);
@@ -315,8 +316,8 @@ public class ActivitySequencerTest {
         aliceSequencer.start();
         bobSequencer.start();
 
-        User bobUserInAliceSession = new User(sessionStubAlice, BOB_JID, 0, 0);
-        User aliceUserInBobSession = new User(sessionStubBob, ALICE_JID, 0, 0);
+        User bobUserInAliceSession = new User(BOB_JID, false, false, 0, 0);
+        User aliceUserInBobSession = new User(ALICE_JID, true, false, 0, 0);
 
         sessionStubAlice.addUser(bobUserInAliceSession);
         sessionStubBob.addUser(aliceUserInBobSession);

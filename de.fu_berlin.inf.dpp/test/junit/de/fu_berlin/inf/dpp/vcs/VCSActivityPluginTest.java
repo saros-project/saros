@@ -1,7 +1,5 @@
 package de.fu_berlin.inf.dpp.vcs;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -15,7 +13,6 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.VCSActivity;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 public class VCSActivityPluginTest {
     @Test
@@ -23,9 +20,7 @@ public class VCSActivityPluginTest {
         IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 
         JID jid = new JID("");
-        ISarosSession session = createMock(ISarosSession.class);
-        replay(session);
-        User source = new User(session, jid, 0, -1);
+        User source = new User(jid, false, false, 0, -1);
         IProject p = root.getProject("p");
         SPath p_a = new SPath(p, new Path("a"));
         VCSActivity switch_p_a = new VCSActivity(source,
