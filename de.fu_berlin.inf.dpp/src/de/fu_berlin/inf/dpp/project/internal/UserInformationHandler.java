@@ -313,8 +313,10 @@ public class UserInformationHandler implements Startable {
                 user = session.getUser(userEntry.jid);
 
                 if (user != null) {
-                    log.warn("cannot add user " + userEntry.jid
-                        + ", user is already in the session");
+                    log.debug("updating permissions for user: " + user + " ["
+                        + userEntry.permission + "]");
+                    // FIXME this should be properly synchronized
+                    user.setPermission(userEntry.permission);
                     continue;
                 }
 
