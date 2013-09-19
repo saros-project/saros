@@ -1,10 +1,11 @@
 package de.fu_berlin.inf.dpp.stf.server.bot.widget;
 
-import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.withMnemonic;
+import static org.eclipse.swtbot.swt.finder.matchers.WithMnemonicRegex.withMnemonicRegex;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.instanceOf;
 
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
@@ -39,12 +40,29 @@ public class ContextMenuHelper {
      */
     public static void clickContextMenu(
         final AbstractSWTBot<? extends Control> bot, final String... nodes) {
+        clickContextMenuWithRegEx(bot, quote(nodes));
+    }
 
-        final MenuItem menuItem = getMenuItem(bot, nodes);
+    /**
+     * Clicks the context menu item matching the text nodes with regular
+     * expression.
+     * 
+     * @param bot
+     *            a SWTBot class that wraps a {@link Widget} which extends
+     *            {@link Control}. E.g. {@link SWTBotTree}.
+     * @param nodes
+     *            the nodes of the context menu e.g New, Class
+     * @throws WidgetNotFoundException
+     *             if the widget is not found.
+     */
+    public static void clickContextMenuWithRegEx(
+        final AbstractSWTBot<? extends Control> bot, final String... nodes) {
+
+        final MenuItem menuItem = getMenuItemWithRegEx(bot, nodes);
         // show
         if (menuItem == null) {
-            throw new WidgetNotFoundException("Could not find menu: "
-                + Arrays.asList(nodes));
+            throw new WidgetNotFoundException(
+                "Could not find menu with regex: " + Arrays.asList(nodes));
         }
 
         // click
@@ -73,7 +91,7 @@ public class ContextMenuHelper {
     public static boolean existsContextMenu(
         final AbstractSWTBot<? extends Control> bot, final String... nodes) {
 
-        final MenuItem menuItem = getMenuItem(bot, nodes);
+        final MenuItem menuItem = getMenuItemWithRegEx(bot, quote(nodes));
 
         // hide
         if (menuItem != null) {
@@ -104,10 +122,10 @@ public class ContextMenuHelper {
     public static boolean isContextMenuEnabled(
         final AbstractSWTBot<? extends Control> bot, final String... nodes) {
 
-        final MenuItem menuItem = getMenuItem(bot, nodes);
+        final MenuItem menuItem = getMenuItemWithRegEx(bot, quote(nodes));
         // show
         if (menuItem == null) {
-            throw new WidgetNotFoundException("Could not find menu: "
+            throw new WidgetNotFoundException("could not find menu: "
                 + Arrays.asList(nodes));
         }
 
@@ -163,7 +181,7 @@ public class ContextMenuHelper {
         }
     }
 
-    private static MenuItem getMenuItem(
+    private static MenuItem getMenuItemWithRegEx(
         final AbstractSWTBot<? extends Control> bot, final String... texts) {
         final MenuItem menuItem = UIThreadRunnable
             .syncExec(new WidgetResult<MenuItem>() {
@@ -182,7 +200,7 @@ public class ContextMenuHelper {
                     for (String text : texts) {
                         @SuppressWarnings("unchecked")
                         Matcher<?> matcher = allOf(instanceOf(MenuItem.class),
-                            withMnemonic(text));
+                            withMnemonicRegex(text));
                         menuItem = show(menu, matcher);
 
                         if (menuItem != null)
@@ -198,4 +216,12 @@ public class ContextMenuHelper {
         return menuItem;
     }
 
+    private static String[] quote(String[] text) {
+        final String[] quotedText = new String[text.length];
+
+        for (int i = 0; i < text.length; i++)
+            quotedText[i] = Pattern.quote(text[i]);
+
+        return quotedText;
+    }
 }

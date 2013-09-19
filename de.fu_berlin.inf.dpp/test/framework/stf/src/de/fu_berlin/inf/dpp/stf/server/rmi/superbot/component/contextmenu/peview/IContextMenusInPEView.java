@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.INewC;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.IRefactorC;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.IRunAsContextMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.IShareWithC;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.ITeamC;
 
@@ -23,6 +24,8 @@ public interface IContextMenusInPEView extends Remote {
 
     public IRefactorC refactor() throws RemoteException;
 
+    public IRunAsContextMenu runAs() throws RemoteException;
+
     public void refresh() throws RemoteException;
 
     public void copy() throws RemoteException;
@@ -32,4 +35,5 @@ public interface IContextMenusInPEView extends Remote {
     public boolean existsWithRegex(String name) throws RemoteException;
 
     public boolean exists(String name) throws RemoteException;
+
 }

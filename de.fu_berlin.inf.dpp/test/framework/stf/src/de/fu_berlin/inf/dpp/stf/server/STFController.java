@@ -58,6 +58,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotViewMe
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.impl.ContextMenusInPEView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.impl.NewC;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.impl.RefactorC;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.impl.RunAsContextMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.impl.ShareWithC;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.impl.TeamC;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.impl.ContextMenusInContactListArea;
@@ -214,6 +215,7 @@ public class STFController {
         exportObject(WindowMenu.getInstance(), "windowM");
         exportObject(SarosMenu.getInstance(), "sarosM");
         exportObject(TeamC.getInstance(), "teamC");
+        exportObject(RunAsContextMenu.getInstance(), "runAsC");
         exportObject(ShareWithC.getInstance(), "shareWithC");
         exportObject(ContextMenusInPEView.getInstance(), "contextMenu");
         exportObject(ContextMenusInContactListArea.getInstance(),

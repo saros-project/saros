@@ -3,26 +3,12 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
-
 /**
- * This interface contains convenience API to perform a action using console
- * view widgets. You can start off as follows:
- * <ol>
- * <li>
- * At first you need to create a {@link AbstractTester} object in your
- * junit-test. (How to do it please read the user guide.</li>
- * <li>
- * then you can use the object basic initialized in {@link AbstractTester} to
- * access the API :), e.g.
- * 
- * <pre>
- * alice.consoleV.getTextInConsole();
- * </pre>
- * 
- * </li>
+ * This interface contains convenience API to perform actions inside the console
+ * view.
  * 
  * @author lchen
+ * @author srossbach
  */
 public interface IConsoleView extends Remote {
 
@@ -48,4 +34,16 @@ public interface IConsoleView extends Remote {
      */
     public void waitUntilExistsTextInConsole() throws RemoteException;
 
+    /**
+     * Clears all entries of the current console.
+     * 
+     * @throws RemoteException
+     */
+    public void clearCurrentConsole() throws RemoteException;
+
+    /**
+     * Waits until the current console contains the specific text.
+     */
+    public void waitUntilCurrentConsoleContainsText(String text)
+        throws RemoteException;
 }

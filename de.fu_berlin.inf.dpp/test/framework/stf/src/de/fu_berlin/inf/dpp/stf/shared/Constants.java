@@ -590,6 +590,17 @@ public interface Constants {
 
     /**********************************************
      * 
+     * ContextMenu: Run As
+     * 
+     **********************************************/
+    /* Context menu of a selected item on the package explorer view */
+    public final static String CM_RUN_AS = "Run As";
+    public final static String CM_ON_SERVER = "Run on server";
+    public final static String CM_JAVA_APPLET = "Java Applet";
+    public final static String CM_JAVA_APPLICATION = "Java Application";
+
+    /**********************************************
+     * 
      * View Progress
      * 
      **********************************************/
