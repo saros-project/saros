@@ -171,16 +171,16 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 zipArchives.add(zipArchive);
 
                 sendArchive(zipArchive, peer, processID, monitor);
-
-                User user = sarosSession.getUser(peer);
-
-                if (user == null)
-                    throw new LocalCancellationException(null,
-                        CancelOption.DO_NOT_NOTIFY_PEER);
-
-                sarosSession.userFinishedProjectNegotiation(user);
-
             }
+
+            User user = sarosSession.getUser(peer);
+
+            if (user == null)
+                throw new LocalCancellationException(null,
+                    CancelOption.DO_NOT_NOTIFY_PEER);
+
+            sarosSession.userFinishedProjectNegotiation(user);
+
         } catch (Exception e) {
             exception = e;
         } finally {
