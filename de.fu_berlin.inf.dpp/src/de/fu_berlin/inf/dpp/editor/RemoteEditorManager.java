@@ -319,6 +319,22 @@ public class RemoteEditorManager {
     }
 
     /**
+     * Returns a set of all paths representing the editors which are currently
+     * opened and active by the remote users of this shared session (i.e. not
+     * our own).
+     * 
+     * @return set of all active remote editors
+     */
+    public Set<SPath> getRemoteActiveEditors() {
+        Set<SPath> result = new HashSet<SPath>();
+        for (RemoteEditorState state : editorStates.values()) {
+            if (state.activeEditor != null)
+                result.add(state.activeEditor.getPath());
+        }
+        return result;
+    }
+
+    /**
      * Returns a snapshot copy of all paths representing the editors which are
      * currently opened by the given user of this shared session (i.e. not our
      * own).
