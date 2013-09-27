@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -81,6 +82,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         prefs.setValue(PreferenceConstants.DISABLE_VERSION_CONTROL, false);
 
         // Advanced Preferences
+
+        prefs.setValue(PreferenceConstants.AUTO_STOP_EMPTY_SESSION,
+            MessageDialogWithToggle.PROMPT);
+
         prefs.setValue(PreferenceConstants.SKIP_SYNC_SELECTABLE, false);
         prefs.setValue(PreferenceConstants.ENABLE_BALLOON_NOTIFICATION, true);
 

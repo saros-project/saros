@@ -212,9 +212,9 @@ public class PreferenceConstants {
     public static final String SAROSVIEW_SASH_WEIGHT_RIGHT = "ui.sarosview.sashweight.right";
 
     /*
-     * Leave sessions when alone as host?
+     * Stop sessions when alone as host?
      */
-    public static final String STOP_EMPTY_SESSIONS = "stop_empty_sessions";
+    public static final String AUTO_STOP_EMPTY_SESSION = "auto.stop.empty.session";
 
     /**
      * color ID that should be used in a session if it is not already occupied

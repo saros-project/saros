@@ -1,7 +1,9 @@
 package de.fu_berlin.inf.dpp.ui.preferencePages;
 
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.picocontainer.annotations.Inject;
@@ -46,6 +48,14 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
         boolean debugMode = false;
 
         assert (debugMode = true) == true;
+
+        addField(new RadioGroupFieldEditor(
+            PreferenceConstants.AUTO_STOP_EMPTY_SESSION,
+            "Auto stop empty session", 3, new String[][] {
+                { "Always", MessageDialogWithToggle.ALWAYS },
+                { "Never", MessageDialogWithToggle.NEVER },
+                { "Prompt", MessageDialogWithToggle.PROMPT } },
+            getFieldEditorParent(), true));
 
         BooleanFieldEditor fieldEditor = new BooleanFieldEditor(
             PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS,

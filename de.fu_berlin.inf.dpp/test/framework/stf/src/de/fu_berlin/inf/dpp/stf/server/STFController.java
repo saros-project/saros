@@ -18,6 +18,7 @@ import java.util.List;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import de.fu_berlin.inf.dpp.ISarosContext;
@@ -133,9 +134,13 @@ public class STFController {
         IPreferenceStore preferenceStore = context
             .getComponent(IPreferenceStore.class);
 
-        if (preferenceStore != null)
-            preferenceStore.setDefault(PreferenceConstants.STOP_EMPTY_SESSIONS,
-                "true");
+        if (preferenceStore != null) {
+            preferenceStore.setDefault(
+                PreferenceConstants.AUTO_STOP_EMPTY_SESSION,
+                MessageDialogWithToggle.ALWAYS);
+            preferenceStore
+                .setToDefault(PreferenceConstants.AUTO_STOP_EMPTY_SESSION);
+        }
 
         // Revert March 2013 color hack
         if (preferenceStore != null)
