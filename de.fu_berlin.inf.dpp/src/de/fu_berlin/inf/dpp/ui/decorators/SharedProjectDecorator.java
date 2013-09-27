@@ -48,20 +48,40 @@ import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
  * 
  * @author oezbek
  */
-@Component(module = "integration")
-public class SharedProjectDecorator implements ILightweightLabelDecorator {
+/*
+ * http://help.eclipse.org/helios/index.jsp?topic=/org.eclipse.platform.doc.isv/
+ * guide/workbench_advext_decorators.htm
+ * 
+ * If your plug-in needs to manipulate the label text in addition to the icon,
+ * or if the type of icon is determined dynamically, you can use a
+ * non-declarative lightweight decorator. In this case, an implementation class
+ * that implements ILightweightLabelDecorator must be defined. The designated
+ * class is responsible for supplying a prefix, suffix, and overlay image at
+ * runtime which are applied to the label. The mechanics of concatenating the
+ * prefix and suffix with the label text and performing the overlay are handled
+ * by the workbench code in a background thread. Thus, any work performed by
+ * your plug-in in its ILightweightLabelDecorator implementation must be
+ * UI-thread safe.
+ */
+@Component(module = "eclipse")
+public final class SharedProjectDecorator implements ILightweightLabelDecorator {
 
-    private static final Logger log = Logger
+    private static final Logger LOG = Logger
         .getLogger(SharedProjectDecorator.class);
 
-    public static final ImageDescriptor projectDescriptor = ImageManager
+    private static final ImageDescriptor PROJECT_DESCRIPTOR = ImageManager
         .getImageDescriptor("icons/ovr16/shared.png"); // NON-NLS-1
 
-    protected volatile ISarosSession sarosSession;
+    private final List<ILabelProviderListener> listeners = new ArrayList<ILabelProviderListener>();
 
-    protected List<ILabelProviderListener> listeners = new ArrayList<ILabelProviderListener>();
+    private final List<IResource> resources = new ArrayList<IResource>();
 
-    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+    @Inject
+    private ISarosSessionManager sessionManager;
+
+    private volatile ISarosSession sarosSession;
+
+    private final ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
 
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
@@ -77,15 +97,12 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator {
 
         @Override
         public void projectAdded(String projectID) {
-            log.debug("PROJECT ADDED: " + projectID);
+            LOG.debug("updating project decoration for project id: "
+                + projectID);
             updateDecoratorsAsync(sarosSession.getProjects().toArray());
-            updateDecoratorsAsync(sarosSession.getSharedResources()
-                .toArray());
+            updateDecoratorsAsync(sarosSession.getSharedResources().toArray());
         }
     };
-
-    @Inject
-    protected ISarosSessionManager sessionManager;
 
     public SharedProjectDecorator() {
         SarosPluginContext.initComponent(this);
@@ -101,8 +118,6 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator {
         sessionManager.removeSarosSessionListener(sessionListener);
     }
 
-    List<IResource> resources = new ArrayList<IResource>();
-
     @Override
     public void decorate(Object element, IDecoration decoration) {
         ISarosSession session = sarosSession;
@@ -115,7 +130,7 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator {
         if (session.isShared(resource)) {
             resources.add(resource);
 
-            decoration.addOverlay(SharedProjectDecorator.projectDescriptor,
+            decoration.addOverlay(SharedProjectDecorator.PROJECT_DESCRIPTOR,
                 IDecoration.TOP_LEFT);
 
             if (resource.getType() == IResource.PROJECT) {
@@ -145,8 +160,7 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator {
     }
 
     protected void updateDecoratorsAsync(final Object[] objects) {
-        log.debug("Decoration update");
-        SWTUtils.runSafeSWTAsync(log, new Runnable() {
+        SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
             @Override
             public void run() {
                 LabelProviderChangedEvent event = new LabelProviderChangedEvent(
