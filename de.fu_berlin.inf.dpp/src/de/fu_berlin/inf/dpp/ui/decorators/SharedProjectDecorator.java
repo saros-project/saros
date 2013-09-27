@@ -19,8 +19,10 @@
  */
 package de.fu_berlin.inf.dpp.ui.decorators;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IResource;
@@ -72,45 +74,53 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
     private static final ImageDescriptor PROJECT_DESCRIPTOR = ImageManager
         .getImageDescriptor("icons/ovr16/shared.png"); // NON-NLS-1
 
-    private final List<ILabelProviderListener> listeners = new ArrayList<ILabelProviderListener>();
+    private final List<ILabelProviderListener> listeners = new CopyOnWriteArrayList<ILabelProviderListener>();
 
-    private final List<IResource> resources = new ArrayList<IResource>();
+    private final Set<IResource> resources = new HashSet<IResource>();
 
     @Inject
     private ISarosSessionManager sessionManager;
 
-    private volatile ISarosSession sarosSession;
+    private ISarosSession sarosSession;
 
     private final ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
 
         @Override
-        public void sessionStarted(ISarosSession newSarosSession) {
-            sarosSession = newSarosSession;
+        public void sessionStarted(ISarosSession session) {
+            synchronized (SharedProjectDecorator.this) {
+                sarosSession = session;
+            }
         }
 
         @Override
-        public void sessionEnded(ISarosSession oldSarosSession) {
-            assert sarosSession == oldSarosSession;
-            sarosSession = null;
-            updateDecoratorsAsync(resources.toArray());
+        public void sessionEnded(ISarosSession session) {
+            IResource[] resourcesToClear;
+
+            synchronized (SharedProjectDecorator.this) {
+                resourcesToClear = resources.toArray(new IResource[0]);
+                resources.clear();
+                sarosSession = null;
+            }
+            updateDecoratorsAsync(resourcesToClear);
         }
 
         @Override
         public void projectAdded(String projectID) {
             LOG.debug("updating project decoration for project id: "
                 + projectID);
-            updateDecoratorsAsync(sarosSession.getProjects().toArray());
-            updateDecoratorsAsync(sarosSession.getSharedResources().toArray());
+
+            updateDecoratorsAsync(sarosSession.getProjects().toArray(
+                new IResource[0]));
+
+            updateDecoratorsAsync(sarosSession.getSharedResources().toArray(
+                new IResource[0]));
         }
     };
 
     public SharedProjectDecorator() {
         SarosPluginContext.initComponent(this);
-
+        sarosSession = sessionManager.getSarosSession();
         sessionManager.addSarosSessionListener(sessionListener);
-        if (sessionManager.getSarosSession() != null) {
-            sessionListener.sessionStarted(sessionManager.getSarosSession());
-        }
     }
 
     @Override
@@ -119,7 +129,7 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
     }
 
     @Override
-    public void decorate(Object element, IDecoration decoration) {
+    public synchronized void decorate(Object element, IDecoration decoration) {
         ISarosSession session = sarosSession;
 
         if (session == null)
@@ -159,12 +169,12 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
         listeners.remove(listener);
     }
 
-    protected void updateDecoratorsAsync(final Object[] objects) {
+    private void updateDecoratorsAsync(final IResource[] resources) {
         SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
             @Override
             public void run() {
                 LabelProviderChangedEvent event = new LabelProviderChangedEvent(
-                    SharedProjectDecorator.this, objects);
+                    SharedProjectDecorator.this, resources);
 
                 for (ILabelProviderListener listener : listeners) {
                     listener.labelProviderChanged(event);
