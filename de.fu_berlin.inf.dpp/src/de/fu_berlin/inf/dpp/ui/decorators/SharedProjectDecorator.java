@@ -19,9 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.ui.decorators;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
@@ -44,7 +42,7 @@ import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 
 /**
- * Decorates Shared Projects.
+ * Decorates shared projects and their files.
  * 
  * @see ILightweightLabelDecorator
  * 
@@ -76,50 +74,35 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
 
     private final List<ILabelProviderListener> listeners = new CopyOnWriteArrayList<ILabelProviderListener>();
 
-    private final Set<IResource> resources = new HashSet<IResource>();
-
     @Inject
     private ISarosSessionManager sessionManager;
 
-    private ISarosSession sarosSession;
+    private volatile ISarosSession session;
 
     private final ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
 
         @Override
         public void sessionStarted(ISarosSession session) {
-            synchronized (SharedProjectDecorator.this) {
-                sarosSession = session;
-            }
+            SharedProjectDecorator.this.session = session;
         }
 
         @Override
         public void sessionEnded(ISarosSession session) {
-            IResource[] resourcesToClear;
-
-            synchronized (SharedProjectDecorator.this) {
-                resourcesToClear = resources.toArray(new IResource[0]);
-                resources.clear();
-                sarosSession = null;
-            }
-            updateDecoratorsAsync(resourcesToClear);
+            SharedProjectDecorator.this.session = null;
+            LOG.debug("clearing project decoration for all shared projects");
+            updateDecoratorsAsync(null); // update all labels
         }
 
         @Override
         public void projectAdded(String projectID) {
-            LOG.debug("updating project decoration for project id: "
-                + projectID);
-
-            updateDecoratorsAsync(sarosSession.getProjects().toArray(
-                new IResource[0]));
-
-            updateDecoratorsAsync(sarosSession.getSharedResources().toArray(
-                new IResource[0]));
+            LOG.debug("updating project decoration for all shared projects");
+            updateDecoratorsAsync(null); // update all labels
         }
     };
 
     public SharedProjectDecorator() {
         SarosPluginContext.initComponent(this);
-        sarosSession = sessionManager.getSarosSession();
+        session = sessionManager.getSarosSession();
         sessionManager.addSarosSessionListener(sessionListener);
     }
 
@@ -129,28 +112,28 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
     }
 
     @Override
-    public synchronized void decorate(Object element, IDecoration decoration) {
-        ISarosSession session = sarosSession;
+    public void decorate(Object element, IDecoration decoration) {
+        // make a copy as this value might change while decorating
+        ISarosSession currentSession = session;
 
-        if (session == null)
+        if (currentSession == null)
             return;
 
         IResource resource = (IResource) element;
 
-        if (session.isShared(resource)) {
-            resources.add(resource);
+        if (!currentSession.isShared(resource))
+            return;
 
-            decoration.addOverlay(SharedProjectDecorator.PROJECT_DESCRIPTOR,
-                IDecoration.TOP_LEFT);
+        decoration.addOverlay(SharedProjectDecorator.PROJECT_DESCRIPTOR,
+            IDecoration.TOP_LEFT);
 
-            if (resource.getType() == IResource.PROJECT) {
-                boolean isCompletelyShared = session
-                    .isCompletelyShared(resource.getProject());
+        if (resource.getType() == IResource.PROJECT) {
+            boolean isCompletelyShared = currentSession
+                .isCompletelyShared(resource.getProject());
 
-                decoration
-                    .addSuffix(isCompletelyShared ? Messages.SharedProjectDecorator_shared
-                        : Messages.SharedProjectDecorator_shared_partial);
-            }
+            decoration
+                .addSuffix(isCompletelyShared ? Messages.SharedProjectDecorator_shared
+                    : Messages.SharedProjectDecorator_shared_partial);
         }
     }
 
