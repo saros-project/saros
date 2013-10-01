@@ -20,13 +20,15 @@
 package de.fu_berlin.inf.dpp.ui.decorators;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IResource;
@@ -48,7 +50,6 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
-import de.fu_berlin.inf.dpp.editor.RemoteEditorManager;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -58,6 +59,14 @@ import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 
+/*
+ * This class MUST be thread safe !
+ * 
+ * http://help.eclipse.org/helios/index.jsp?topic=/org.eclipse.platform.doc.isv
+ * /guide/workbench_advext_decorators.htm
+ */
+//TODO rename this class, requires change in the plugin.xml too
+
 /**
  * Decorates project files and their parent folders belonging to the active
  * editors of the remote users.
@@ -65,7 +74,6 @@ import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
  * @see ILightweightLabelDecorator
  */
 @Component(module = "eclipse")
-// TODO rename this class, requires change in the plugin.xml too
 public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
     private static final Logger LOG = Logger
@@ -73,17 +81,25 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
     private static final String IMAGE_PATH = "icons/ovr16/dot.png"; //$NON-NLS-1$
 
-    private final AtomicReference<ISarosSession> sarosSession = new AtomicReference<ISarosSession>();
-
-    private final Set<Object> decoratedElements;
-
     private final List<ILabelProviderListener> listeners = new CopyOnWriteArrayList<ILabelProviderListener>();
+
+    /** Contains a set of resources to an active editor. Each for every user. */
+    /*
+     * if we can ensure a clean shutdown a.k.a sessionEnded is called no
+     * activity is dispatched any longer this map does not need to be
+     * synchronized
+     */
+    private final Map<User, Set<IResource>> activeEditorResources = Collections
+        .synchronizedMap(new HashMap<User, Set<IResource>>());
 
     // add +1 for default color
     private final MemoryImageDescriptor[] imageDescriptors = new MemoryImageDescriptor[SarosSession.MAX_USERCOLORS + 1];
 
-    /** default image descriptor index pointing to a neutral color */
+    /** Default image descriptor index pointing to a neutral color. */
     private final int defaultImageDescriptorIndex = imageDescriptors.length - 1;
+
+    private final Map<IResource, ImageDescriptor> resourceToImageMapping = new ConcurrentHashMap<IResource, ImageDescriptor>(
+        16, 0.75F, 1);
 
     @Inject
     private EditorManager editorManager;
@@ -108,94 +124,47 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
     private ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
 
         @Override
-        public void sessionStarted(ISarosSession newSarosSession) {
-            sarosSession.set(newSarosSession);
-
-            if (!decoratedElements.isEmpty()) {
-                LOG.warn("Set of files to decorate not empty on session start. "
-                    + decoratedElements.toString());
-                // update remaining files
-                updateDecoratorsAsync(decoratedElements.toArray());
-            }
-        }
-
-        @Override
-        public void sessionEnded(ISarosSession oldSarosSession) {
-            sarosSession.set(null);
-            // Update all
-            updateDecoratorsAsync(decoratedElements.toArray());
-        }
-
-        @Override
-        public void projectAdded(String projectID) {
-            updateDecoratorsAsync(decoratedElements.toArray());
+        public void sessionEnded(ISarosSession session) {
+            resourceToImageMapping.clear();
+            updateDecoration(null);
+            activeEditorResources.clear();
         }
     };
 
     private ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
 
-        Map<User, SPath> lastActiveOpenEditors = new HashMap<User, SPath>();
-
         @Override
         public void activeEditorChanged(User user, SPath path) {
-            Set<IResource> resources = new HashSet<IResource>();
+            Set<IResource> oldResources = null;
 
-            LOG.trace("User: " + user + " activated an editor -> " + path);
-
-            if (path == null) {
-                LOG.warn("path object should not be null");
+            if (user.isLocal())
                 return;
+
+            if (LOG.isTraceEnabled())
+                LOG.trace("remote user: " + user + " activated an editor -> "
+                    + path);
+
+            oldResources = activeEditorResources.remove(user);
+
+            if (path != null) {
+                activeEditorResources.put(user,
+                    getResources(path.getResource()));
             }
 
-            if (sarosSession.get() == null)
-                return;
-
-            SPath lastActiveEditor = lastActiveOpenEditors.get(user);
-
-            if (lastActiveEditor != null)
-                addResourceAndParents(resources, lastActiveEditor.getResource());
-
-            lastActiveOpenEditors.put(user, path);
-            addResourceAndParents(resources, path.getResource());
-            updateDecoratorsAsync(resources.toArray());
-        }
-
-        @Override
-        public void editorRemoved(User user, SPath path) {
-            Set<IResource> resources = new HashSet<IResource>();
-
-            LOG.trace("User: " + user + " closed an editor -> " + path);
-
-            if (path == null) {
-                LOG.warn("path object should not be null");
-                return;
-            }
-
-            if (sarosSession.get() == null)
-                return;
-
-            lastActiveOpenEditors.put(user, null);
-            addResourceAndParents(resources, path.getResource());
-            updateDecoratorsAsync(resources.toArray());
-
-        }
-
-        @Override
-        public void followModeChanged(User user, boolean isFollowed) {
-            updateDecorations(user);
+            updateImageDescriptorMapping();
+            updateDecoration(oldResources);
         }
 
         @Override
         public void colorChanged() {
-            updateDecoratorsAsync(decoratedElements.toArray());
+            updateImageDescriptorMapping();
+            updateDecoration(null);
         }
     };
 
     public SharedProjectFileDecorator() {
 
         SarosPluginContext.initComponent(this);
-
-        decoratedElements = new HashSet<Object>();
 
         sessionManager.addSarosSessionListener(sessionListener);
 
@@ -218,117 +187,14 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
         tintImage.dispose();
     }
 
-    private void updateDecorations(User user) {
-
-        Set<IResource> resources = new HashSet<IResource>();
-
-        if (sarosSession.get() == null)
-            return;
-
-        for (SPath path : editorManager.getRemoteOpenEditors(user))
-            addResourceAndParents(resources, path.getResource());
-
-        updateDecoratorsAsync(resources.toArray());
-    }
-
     @Override
     public void decorate(Object element, IDecoration decoration) {
-        if (decorateInternal(element, decoration)) {
-            decoratedElements.add(element);
-        } else {
-            decoratedElements.remove(element);
-        }
-    }
+        ImageDescriptor imageDescriptor = resourceToImageMapping.get(element);
 
-    private void addResourceAndParents(Set<IResource> resources,
-        IResource resource) {
-
-        if (resource == null) {
-            LOG.warn("resource should not be null");
+        if (imageDescriptor == null)
             return;
-        }
 
-        resources.add(resource);
-        IResource parent = resource.getParent();
-
-        while (parent != null) {
-            resources.add(parent);
-            parent = parent.getParent();
-        }
-    }
-
-    private boolean decorateInternal(Object element, IDecoration decoration) {
-        try {
-
-            ISarosSession session = sarosSession.get();
-            if (session == null)
-                return false;
-
-            IResource resource = (IResource) element;
-
-            if (!session.isShared(resource))
-                return false;
-
-            Set<SPath> activeRemoteEditors;
-
-            /*
-             * this may cause a NPE although it would not matter because this
-             * only happens when the session already ended and so this method is
-             * 1. be called again even if the NPE happens 2. returns false in
-             * case of an exception
-             */
-            // openRemoteEditors = editorManager.getRemoteOpenEditors();
-
-            RemoteEditorManager remoteEditorManager = editorManager
-                .getRemoteEditorManager();
-
-            if (remoteEditorManager == null)
-                activeRemoteEditors = new HashSet<SPath>();
-            else
-                activeRemoteEditors = remoteEditorManager
-                    .getRemoteActiveEditors();
-
-            int imageDescriptorIndex = -1;
-
-            for (SPath activeRemoteEditor : activeRemoteEditors) {
-
-                if (!resource.getFullPath().isPrefixOf(
-                    activeRemoteEditor.getFullPath()))
-                    continue;
-
-                if (!activeRemoteEditor.getFile().exists())
-                    continue;
-
-                int currentImageDescriptorIndex = getImageDescriptorIndex(editorManager
-                    .getRemoteActiveEditorUsers(activeRemoteEditor));
-
-                if (imageDescriptorIndex == -1)
-                    imageDescriptorIndex = currentImageDescriptorIndex;
-
-                if (currentImageDescriptorIndex != imageDescriptorIndex)
-                    imageDescriptorIndex = defaultImageDescriptorIndex;
-
-                if (imageDescriptorIndex == defaultImageDescriptorIndex)
-                    break;
-            }
-
-            if (imageDescriptorIndex != -1) {
-
-                if (LOG.isTraceEnabled())
-                    LOG.trace("decorated " + element + " [idx="
-                        + imageDescriptorIndex + "]");
-
-                decoration.addOverlay(imageDescriptors[imageDescriptorIndex],
-                    IDecoration.TOP_RIGHT);
-
-                return true;
-            } else if (LOG.isTraceEnabled())
-                LOG.trace("not decorated " + element);
-
-        } catch (RuntimeException e) {
-            LOG.error("Internal Error in SharedProjectFileDecorator:", e);
-        }
-        return false;
+        decoration.addOverlay(imageDescriptor, IDecoration.TOP_RIGHT);
     }
 
     @Override
@@ -345,12 +211,32 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
     public void dispose() {
         sessionManager.removeSarosSessionListener(sessionListener);
         editorManager.removeSharedEditorListener(editorListener);
-        sarosSession.set(null);
     }
 
     @Override
     public boolean isLabelProperty(Object element, String property) {
         return false;
+    }
+
+    /**
+     * Updates decorations for all resources contained in
+     * {@link #activeEditorResources}.
+     * 
+     * @param additionalResources
+     *            additional resources to decorate
+     */
+    private void updateDecoration(Collection<IResource> additionalResources) {
+        Set<IResource> resourcesToUpdate = new HashSet<IResource>();
+
+        synchronized (activeEditorResources) {
+            for (Set<IResource> resources : activeEditorResources.values())
+                resourcesToUpdate.addAll(resources);
+        }
+
+        if (additionalResources != null)
+            resourcesToUpdate.addAll(additionalResources);
+
+        updateDecoratorsAsync(resourcesToUpdate.toArray(new IResource[0]));
     }
 
     private void updateDecoratorsAsync(final Object[] updateElements) {
@@ -368,19 +254,74 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
         });
     }
 
-    private int getImageDescriptorIndex(Collection<User> collection) {
+    /**
+     * Returns all parent resources for the given resource.
+     */
+    private Set<IResource> getResources(IResource resource) {
 
-        if (collection.size() != 1)
-            return defaultImageDescriptorIndex;
+        Set<IResource> resources = new HashSet<IResource>();
 
-        User user = collection.iterator().next();
+        if (resource == null) {
+            LOG.warn("resource should not be null");
+            return resources;
+        }
+
+        resources.add(resource);
+        IResource parent = resource.getParent();
+
+        while (parent != null) {
+            resources.add(parent);
+            parent = parent.getParent();
+        }
+
+        return resources;
+    }
+
+    /**
+     * Updates the {@link #resourceToImageMapping} based on the contents of
+     * {@link #activeEditorResources}.
+     */
+    private void updateImageDescriptorMapping() {
+        resourceToImageMapping.clear();
+
+        synchronized (activeEditorResources) {
+            for (Entry<User, Set<IResource>> entry : activeEditorResources
+                .entrySet()) {
+
+                User user = entry.getKey();
+                Set<IResource> resources = entry.getValue();
+
+                for (IResource resource : resources) {
+
+                    ImageDescriptor descriptor = resourceToImageMapping
+                        .get(resource);
+
+                    if (descriptor == null)
+                        descriptor = getImageDescriptor(user);
+                    else
+                        descriptor = getImageDescriptor(null);
+
+                    resourceToImageMapping.put(resource, descriptor);
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns an image descriptor for the given user or a default one if no
+     * user is provided.
+     */
+    private ImageDescriptor getImageDescriptor(User user) {
+
+        if (user == null)
+            return imageDescriptors[defaultImageDescriptorIndex];
 
         int colorID = user.getColorID();
 
         if (colorID < 0 || colorID >= SarosSession.MAX_USERCOLORS)
-            return defaultImageDescriptorIndex;
+            return imageDescriptors[defaultImageDescriptorIndex];
 
-        return colorID;
+        return imageDescriptors[colorID];
 
     }
 
@@ -393,32 +334,39 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
         int red = color.getRed();
         int green = color.getGreen();
         int blue = color.getBlue();
+
         if (data.depth < 24 || !data.palette.isDirect)
             return null;
+
         int rs = data.palette.redShift;
         int gs = data.palette.greenShift;
         int bs = data.palette.blueShift;
         int rm = data.palette.redMask;
         int gm = data.palette.greenMask;
         int bm = data.palette.blueMask;
+
         if (rs < 0)
             rs = ~rs + 1;
+
         if (gs < 0)
             gs = ~gs + 1;
+
         if (bs < 0)
             bs = ~bs + 1;
+
         for (int x = 0; x < data.width; x++) {
             for (int y = 0; y < data.height; y++) {
                 int p = data.getPixel(x, y);
                 int r = (p & rm) >>> rs;
                 int g = (p & gm) >>> gs;
                 int b = (p & bm) >>> bs;
-                r = ((r * red) >>> 8);
-                g = ((g * green) >>> 8);
-                b = ((b * blue) >>> 8);
+                r = (r * red) / 255;
+                g = (g * green) / 255;
+                b = (b * blue) / 255;
                 data.setPixel(x, y, (r << rs) | (g << gs) | (b << bs));
             }
         }
+
         return new Image(Display.getCurrent(), data);
     }
 }
