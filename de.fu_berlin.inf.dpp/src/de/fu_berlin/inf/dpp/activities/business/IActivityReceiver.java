@@ -53,4 +53,6 @@ public interface IActivityReceiver {
     void receive(StopFollowingActivity stopFollowingActivity);
 
     void receive(NOPActivity nopActivity);
+
+    void receive(ShareConsoleActivity shareConsoleActivity);
 }

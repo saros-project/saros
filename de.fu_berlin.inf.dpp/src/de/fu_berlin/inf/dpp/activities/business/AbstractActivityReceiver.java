@@ -98,4 +98,9 @@ public class AbstractActivityReceiver implements IActivityReceiver {
     public void receive(ViewportActivity viewportActivity) {
         // do nothing
     }
+
+    @Override
+    public void receive(ShareConsoleActivity shareConsoleActivity) {
+        // do nothing
+    }
 }

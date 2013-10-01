@@ -42,6 +42,7 @@ import de.fu_berlin.inf.dpp.activities.serializable.NOPActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.PermissionActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ProgressActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.RecoveryFileActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.ShareConsoleActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.StartFollowingActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.StopActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.StopFollowingActivityDataObject;
@@ -137,11 +138,12 @@ public class ActivitiesExtension extends SarosSessionPacketExtension {
                 JID.class,
 
                 // Jupiter classes
-                JupiterVectorTime.class,
 
                 DeleteOperation.class,
 
                 InsertOperation.class,
+
+                JupiterVectorTime.class,
 
                 NoOperation.class,
 
@@ -157,7 +159,7 @@ public class ActivitiesExtension extends SarosSessionPacketExtension {
 
                 AbstractProjectActivityDataObject.class,
 
-                // Business DAOs
+                // Business ADOs
                 ChangeColorActivityDataObject.class,
 
                 ChecksumActivityDataObject.class,
@@ -179,6 +181,8 @@ public class ActivitiesExtension extends SarosSessionPacketExtension {
                 ProgressActivityDataObject.class,
 
                 RecoveryFileActivityDataObject.class,
+
+                ShareConsoleActivityDataObject.class,
 
                 StartFollowingActivityDataObject.class,
 
