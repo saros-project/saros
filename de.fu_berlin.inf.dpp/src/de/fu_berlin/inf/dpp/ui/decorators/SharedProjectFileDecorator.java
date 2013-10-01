@@ -40,7 +40,6 @@ import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.widgets.Display;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
@@ -52,9 +51,11 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -121,17 +122,33 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
         }
     }
 
-    private ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+    private final ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+
+        @Override
+        public void sessionStarting(ISarosSession session) {
+            session.addListener(sessionEventListener);
+        }
 
         @Override
         public void sessionEnded(ISarosSession session) {
+            session.removeListener(sessionEventListener);
             resourceToImageMapping.clear();
             updateDecoration(null);
             activeEditorResources.clear();
         }
     };
 
-    private ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
+    private final ISharedProjectListener sessionEventListener = new AbstractSharedProjectListener() {
+
+        @Override
+        public void userLeft(User user) {
+            Set<IResource> oldResources = activeEditorResources.remove(user);
+            updateImageDescriptorMapping();
+            updateDecoration(oldResources);
+        }
+    };
+
+    private final ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
 
         @Override
         public void activeEditorChanged(User user, SPath path) {
@@ -166,25 +183,15 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
         SarosPluginContext.initComponent(this);
 
-        sessionManager.addSarosSessionListener(sessionListener);
+        initializeImageDescriptors();
 
+        sessionManager.addSarosSessionListener(sessionListener);
         editorManager.addSharedEditorListener(editorListener);
 
-        if (sessionManager.getSarosSession() != null)
-            sessionListener.sessionStarted(sessionManager.getSarosSession());
+        ISarosSession session = sessionManager.getSarosSession();
 
-        Image tintImage = ImageManager.getImage(IMAGE_PATH);
-
-        for (int i = 0; i <= SarosSession.MAX_USERCOLORS; i++) {
-            Color tintColor = SarosAnnotation.getUserColor(i);
-            Image tintedImage = tintImage(tintImage, tintColor);
-            imageDescriptors[i] = new MemoryImageDescriptor(
-                tintedImage.getImageData());
-            tintColor.dispose();
-            tintedImage.dispose();
-        }
-
-        tintImage.dispose();
+        if (session != null)
+            sessionListener.sessionStarting(session);
     }
 
     @Override
@@ -325,6 +332,21 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
     }
 
+    private void initializeImageDescriptors() {
+        Image tintImage = ImageManager.getImage(IMAGE_PATH);
+
+        for (int i = 0; i <= SarosSession.MAX_USERCOLORS; i++) {
+            Color tintColor = SarosAnnotation.getUserColor(i);
+            Image tintedImage = tintImage(tintImage, tintColor);
+            imageDescriptors[i] = new MemoryImageDescriptor(
+                tintedImage.getImageData());
+            tintColor.dispose();
+            tintedImage.dispose();
+        }
+
+        tintImage.dispose();
+    }
+
     // TODO move to an utility class
     /**
      * Returns null, if the image is not a RGB image with 8 Bit per color value
@@ -367,6 +389,6 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
             }
         }
 
-        return new Image(Display.getCurrent(), data);
+        return new Image(image.getDevice(), data);
     }
 }
