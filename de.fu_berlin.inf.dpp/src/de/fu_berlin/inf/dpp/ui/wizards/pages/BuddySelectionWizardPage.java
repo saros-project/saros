@@ -10,7 +10,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.jivesoftware.smack.Roster;
 import org.picocontainer.annotations.Inject;
 
@@ -34,19 +33,34 @@ import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.FilterNonSarosBuddie
  * @author bkahlert
  */
 public class BuddySelectionWizardPage extends WizardPage {
-    private final Logger log = Logger.getLogger(BuddySelectionWizardPage.class);
+    private static final Logger LOG = Logger
+        .getLogger(BuddySelectionWizardPage.class);
 
-    public static final String TITLE = Messages.BuddySelectionWizardPage_title;
-    public static final String DESCRIPTION = Messages.BuddySelectionWizardPage_description;
+    protected static final String TITLE = Messages.BuddySelectionWizardPage_title;
+    protected static final String DESCRIPTION = Messages.BuddySelectionWizardPage_description;
 
-    public static final String NO_BUDDY_SELECTED_ERROR_MESSAGE = Messages.BuddySelectionWizardPage_error_select_one_buddy;
-    public static final String OFFLINE_BUDDY_SELECTED_ERROR_MESSAGE = Messages.BuddySelectionWizardPage_error_selected_offline;
-    public static final String BUDDIES_WITHOUT_SAROS_SUPPORT_WARNING_MESSAGE = Messages.BuddySelectionWizardPage_warn_only_saros_buddies;
+    protected static final String NO_BUDDY_SELECTED_ERROR_MESSAGE = Messages.BuddySelectionWizardPage_error_select_one_buddy;
+    protected static final String OFFLINE_BUDDY_SELECTED_ERROR_MESSAGE = Messages.BuddySelectionWizardPage_error_selected_offline;
+    protected static final String BUDDIES_WITHOUT_SAROS_SUPPORT_WARNING_MESSAGE = Messages.BuddySelectionWizardPage_warn_only_saros_buddies;
 
     protected BuddySelectionComposite buddySelectionComposite;
 
+    /**
+     * Flag indicating if this wizard page can be completed even if no contact
+     * is selected
+     */
+    protected final boolean allowEmptyContactSelection;
+
+    /**
+     * This flag is true as soon as the user selected buddies without problems.
+     */
+    protected boolean selectionWasValid = false;
+
     @Inject
     protected IPreferenceStore preferenceStore;
+
+    @Inject
+    protected DiscoveryManager discoveryManager;
 
     /**
      * This {@link BuddySelectionListener} changes the {@link WizardPage}'s
@@ -68,8 +82,6 @@ public class BuddySelectionWizardPage extends WizardPage {
         }
     };
 
-    @Inject
-    protected DiscoveryManager discoveryManager;
     /**
      * This listener update the page completion if someone's presence changed.
      */
@@ -77,29 +89,34 @@ public class BuddySelectionWizardPage extends WizardPage {
         @Override
         public void featureSupportUpdated(final JID jid, String feature,
             boolean isSupported) {
-            if (Saros.NAMESPACE.equals(feature)) {
-                SWTUtils.runSafeSWTAsync(log, new Runnable() {
-                    @Override
-                    public void run() {
-                        updatePageCompletion();
-                    }
-                });
-            }
+
+            if (!Saros.NAMESPACE.equals(feature))
+                return;
+
+            SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
+                @Override
+                public void run() {
+                    if (BuddySelectionWizardPage.this.getControl().isDisposed())
+                        return;
+
+                    updatePageCompletion();
+                }
+            });
         }
     };
 
-    /**
-     * This flag is true as soon as the user selected buddies without problems.
-     */
-    protected boolean selectionWasValid = false;
-
     public BuddySelectionWizardPage() {
+        this(false);
+    }
+
+    public BuddySelectionWizardPage(boolean allowEmptyContactSelection) {
         super(BuddySelectionWizardPage.class.getName());
         setTitle(TITLE);
         setDescription(DESCRIPTION);
 
         SarosPluginContext.initComponent(this);
         discoveryManager.addDiscoveryManagerListener(discoveryManagerListener);
+        this.allowEmptyContactSelection = allowEmptyContactSelection;
     }
 
     @Override
@@ -114,136 +131,86 @@ public class BuddySelectionWizardPage extends WizardPage {
         Composite composite = new Composite(parent, SWT.NONE);
         setControl(composite);
 
-        composite.setLayout(new GridLayout(2, false));
+        composite.setLayout(new GridLayout(1, false));
+
+        boolean initialFilterConfig = preferenceStore
+            .getBoolean(PreferenceConstants.BUDDYSELECTION_FILTERNONSAROSBUDDIES);
+
+        buddySelectionComposite = new BuddySelectionComposite(composite,
+            SWT.BORDER | SWT.V_SCROLL, initialFilterConfig);
 
         /*
-         * Row 1
+         * preset the contact(s) e.g from the Saros view when invoking 'Work
+         * Together on...' context menu
          */
-        Label buddySelectionLabel = new Label(composite, SWT.NONE);
-        buddySelectionLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.TOP,
-            false, true));
-        buddySelectionLabel
-            .setText(Messages.BuddySelectionWizardPage_label_buddies);
+        buddySelectionComposite.setSelectedBuddies(SelectionRetrieverFactory
+            .getSelectionRetriever(JID.class).getOverallSelection());
 
-        createBuddySelectionComposite(composite);
-        this.buddySelectionComposite.setLayoutData(new GridData(SWT.FILL,
-            SWT.FILL, true, true));
+        buddySelectionComposite
+            .addBuddySelectionListener(buddySelectionListener);
 
-        /*
-         * Page completion
-         */
+        buddySelectionComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
+            true, true));
+
         updatePageCompletion();
     }
 
-    protected void createBuddySelectionComposite(Composite parent) {
-        if (this.buddySelectionComposite != null
-            && !this.buddySelectionComposite.isDisposed())
-            this.buddySelectionComposite.dispose();
-
-        boolean initialFilterConfig = true;
-
-        String preferredFilterConfig = preferenceStore
-            .getString(PreferenceConstants.BUDDYSELECTION_FILTERNONSAROSBUDDIES);
-        if (preferredFilterConfig.equals("true")
-            || preferredFilterConfig.equals("false")) {
-            initialFilterConfig = preferenceStore
-                .getBoolean(PreferenceConstants.BUDDYSELECTION_FILTERNONSAROSBUDDIES);
-        }
-
-        // if nothing is set yet, use YES as initial config...
-
-        this.buddySelectionComposite = new BuddySelectionComposite(parent,
-            SWT.BORDER | SWT.V_SCROLL, initialFilterConfig);
-        this.buddySelectionComposite
-            .setSelectedBuddies(SelectionRetrieverFactory
-                .getSelectionRetriever(JID.class).getOverallSelection());
-        this.buddySelectionComposite
-            .addBuddySelectionListener(buddySelectionListener);
-
-        /*
-         * If no buddy is selected and exactly one with saros support is
-         * available, use it.
-         */
-        if (this.buddySelectionComposite.getSelectedBuddies().size() == 0) {
-            List<JID> buddies = this.buddySelectionComposite
-                .getBuddiesWithSarosSupport();
-
-            if (buddies.size() == 1) {
-                this.buddySelectionComposite.setSelectedBuddies(buddies);
-            }
-        }
-    }
-
     protected void updatePageCompletion() {
-        if (buddySelectionComposite != null
-            && !buddySelectionComposite.isDisposed()) {
 
-            List<JID> selectedBuddies = this.buddySelectionComposite
-                .getSelectedBuddies();
-            List<JID> selectedBuddiesWithSarosSupport = this.buddySelectionComposite
-                .getSelectedBuddiesWithSarosSupport();
+        List<JID> selectedBuddies = getSelectedBuddies();
 
-            if (selectedBuddies == null
-                || selectedBuddiesWithSarosSupport == null)
-                return;
+        List<JID> selectedBuddiesWithSarosSupport = getSelectedBuddiesWithSarosSupport();
 
-            /*
-             * Condition: at least one buddy selected
-             */
-            if (selectedBuddies.size() == 0) {
-                if (selectionWasValid)
-                    setErrorMessage(NO_BUDDY_SELECTED_ERROR_MESSAGE);
-                setPageComplete(false);
-            } else if (!this.buddySelectionComposite.areAllSelectedOnline()) {
-                setErrorMessage(OFFLINE_BUDDY_SELECTED_ERROR_MESSAGE);
-                setPageComplete(false);
+        if (allowEmptyContactSelection && selectedBuddies.isEmpty()) {
+            setPageComplete(true);
+            setErrorMessage(null);
+        } else if (selectedBuddies.size() == 0) {
+            if (selectionWasValid)
+                setErrorMessage(NO_BUDDY_SELECTED_ERROR_MESSAGE);
+            setPageComplete(false);
+        } else if (!buddySelectionComposite.areAllSelectedOnline()) {
+            setErrorMessage(OFFLINE_BUDDY_SELECTED_ERROR_MESSAGE);
+            setPageComplete(false);
+        } else {
+            selectionWasValid = true;
+            setErrorMessage(null);
+
+            if (selectedBuddies.size() > selectedBuddiesWithSarosSupport.size()) {
+                setMessage(BUDDIES_WITHOUT_SAROS_SUPPORT_WARNING_MESSAGE,
+                    IMessageProvider.WARNING);
             } else {
-                selectionWasValid = true;
-                this.setErrorMessage(null);
-
-                /*
-                 * Warning if buddy without Saros support is selected
-                 */
-                if (selectedBuddies.size() > selectedBuddiesWithSarosSupport
-                    .size()) {
-                    setMessage(BUDDIES_WITHOUT_SAROS_SUPPORT_WARNING_MESSAGE,
-                        IMessageProvider.WARNING);
-                } else {
-                    this.setMessage(DESCRIPTION);
-                }
-
-                setPageComplete(true);
+                setMessage(DESCRIPTION);
             }
+
+            setPageComplete(true);
         }
     }
 
     @Override
     public void setVisible(boolean visible) {
         super.setVisible(visible);
+
         if (!visible)
             return;
 
-        this.buddySelectionComposite.setFocus();
+        buddySelectionComposite.setFocus();
     }
 
-    /*
-     * WizardPage Results
-     */
+    // WizardPage Results
 
     public List<JID> getSelectedBuddies() {
-        if (this.buddySelectionComposite == null
-            || this.buddySelectionComposite.isDisposed())
+        if (buddySelectionComposite == null
+            || buddySelectionComposite.isDisposed())
             return null;
 
-        return this.buddySelectionComposite.getSelectedBuddies();
+        return buddySelectionComposite.getSelectedBuddies();
     }
 
     public List<JID> getSelectedBuddiesWithSarosSupport() {
-        if (this.buddySelectionComposite == null
-            || this.buddySelectionComposite.isDisposed())
+        if (buddySelectionComposite == null
+            || buddySelectionComposite.isDisposed())
             return null;
 
-        return this.buddySelectionComposite
-            .getSelectedBuddiesWithSarosSupport();
+        return buddySelectionComposite.getSelectedBuddiesWithSarosSupport();
     }
 }

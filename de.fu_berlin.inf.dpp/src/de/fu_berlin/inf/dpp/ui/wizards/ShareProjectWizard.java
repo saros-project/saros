@@ -35,14 +35,15 @@ public class ShareProjectWizard extends Wizard {
     protected ISarosSessionManager sarosSessionManager;
 
     protected ProjectSelectionWizardPage projectSelectionWizardPage = new ProjectSelectionWizardPage();
-    protected BuddySelectionWizardPage buddySelectionWizardPage = new BuddySelectionWizardPage();
+    protected BuddySelectionWizardPage buddySelectionWizardPage = new BuddySelectionWizardPage(
+        true);
 
     public ShareProjectWizard() {
         SarosPluginContext.initComponent(this);
-        this.setWindowTitle(TITLE);
-        this.setDefaultPageImageDescriptor(IMAGE);
-        this.setNeedsProgressMonitor(true);
-        this.setHelpAvailable(false);
+        setWindowTitle(TITLE);
+        setDefaultPageImageDescriptor(IMAGE);
+        setNeedsProgressMonitor(true);
+        setHelpAvailable(false);
     }
 
     /**
@@ -57,8 +58,8 @@ public class ShareProjectWizard extends Wizard {
 
     @Override
     public void addPages() {
-        this.addPage(this.projectSelectionWizardPage);
-        this.addPage(this.buddySelectionWizardPage);
+        addPage(projectSelectionWizardPage);
+        addPage(buddySelectionWizardPage);
     }
 
     /**
@@ -80,15 +81,17 @@ public class ShareProjectWizard extends Wizard {
      */
     @Override
     public boolean performFinish() {
+
         List<IResource> selectedResources = projectSelectionWizardPage
             .getSelectedResources();
+
         List<JID> selectedBuddies = buddySelectionWizardPage
             .getSelectedBuddies();
 
         if (selectedResources == null || selectedBuddies == null)
             return false;
 
-        if (selectedResources.isEmpty() || selectedBuddies.isEmpty())
+        if (selectedResources.isEmpty())
             return false;
 
         projectSelectionWizardPage.rememberCurrentSelection();
