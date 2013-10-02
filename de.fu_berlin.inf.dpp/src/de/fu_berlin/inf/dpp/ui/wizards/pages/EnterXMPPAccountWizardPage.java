@@ -12,8 +12,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
@@ -25,7 +23,6 @@ import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.wizard.EnterXMPPAccountComposite;
 import de.fu_berlin.inf.dpp.ui.wizards.CreateXMPPAccountWizard;
 import de.fu_berlin.inf.nebula.explanation.note.SimpleNoteComposite;
-import de.fu_berlin.inf.nebula.utils.FontUtils;
 
 /**
  * Allows the user to enter an XMPP account defined by a {@link JID}, a password
@@ -71,8 +68,7 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
     private boolean wasPortValid = false;
 
     /**
-     * This flag is true if Saros's Jabber server restriction should be
-     * displayed.
+     * This flag is true if Saros's XMPP server restriction should be displayed.
      */
     private boolean showSarosXMPPRestriction = false;
 
@@ -89,63 +85,9 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
         Composite composite = new Composite(parent, SWT.NONE);
         setControl(composite);
 
-        composite.setLayout(new GridLayout(3, false));
+        composite.setLayout(new GridLayout(1, false));
 
-        GridData leftRightGridData = new GridData(SWT.FILL, SWT.FILL, true,
-            true);
-
-        /*
-         * LEFT COLUMN
-         */
-        Composite leftColumn = createLeftColumn(composite);
-        leftColumn.setLayoutData(leftRightGridData);
-
-        /*
-         * SEPARATOR "OR"
-         */
-        Label separator = new Label(composite, SWT.NONE);
-        separator.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false,
-            true));
-        separator.setText(Messages.EnterXMPPAccountWizardPage_or);
-        FontUtils.changeFontSizeBy(separator, 10);
-
-        /*
-         * RIGHT COLUMN
-         */
-        Composite rightColumn = createRightColumn(composite);
-        rightColumn.setLayoutData(leftRightGridData);
-
-        /*
-         * 2nd row
-         */
-
-        SimpleNoteComposite x = new SimpleNoteComposite(composite, SWT.BORDER,
-            SWT.ICON_INFORMATION,
-            Messages.EnterXMPPAccountWizardPage_info_already_created_account);
-
-        x.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 3, 1));
-        x.setSpacing(8);
-
-        hookListeners();
-        updatePageCompletion();
-    }
-
-    private Composite createLeftColumn(Composite composite) {
-        Group newAccountColumnGroup = new Group(composite, SWT.NONE);
-        newAccountColumnGroup.setLayout(new GridLayout(2, false));
-
-        newAccountColumnGroup
-            .setText(Messages.EnterXMPPAccountWizardPage_new_account);
-
-        Composite newAccountComposite = new Composite(newAccountColumnGroup,
-            SWT.NONE);
-
-        newAccountComposite.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER,
-            true, true));
-
-        newAccountComposite.setLayout(new GridLayout(1, false));
-
-        createAccountButton = new Button(newAccountComposite, SWT.PUSH);
+        createAccountButton = new Button(composite, SWT.PUSH);
         createAccountButton
             .setText(Messages.EnterXMPPAccountWizardPage_create_new_account);
 
@@ -157,27 +99,25 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
 
         });
 
-        return newAccountColumnGroup;
-    }
+        enterXMPPAccountComposite = new EnterXMPPAccountComposite(composite,
+            SWT.NONE);
 
-    private Composite createRightColumn(Composite composite) {
-        Group existingAccountColumnGroup = new Group(composite, SWT.NONE);
-        existingAccountColumnGroup.setLayout(new GridLayout(2, false));
+        enterXMPPAccountComposite.setLayoutData(new GridData(SWT.FILL,
+            SWT.FILL, false, false));
 
-        existingAccountColumnGroup
-            .setText(Messages.EnterXMPPAccountWizardPage_existing_account);
-
-        enterXMPPAccountComposite = new EnterXMPPAccountComposite(
-            existingAccountColumnGroup, SWT.NONE);
-
-        GridData gridData2 = new GridData(SWT.CENTER, SWT.CENTER, true, true);
-        gridData2.verticalIndent = 23;
-        gridData2.minimumWidth = 350;
-        enterXMPPAccountComposite.setLayoutData(gridData2);
         enterXMPPAccountComposite.setUsingTLS(true);
         enterXMPPAccountComposite.setUsingSASL(true);
 
-        return existingAccountColumnGroup;
+        SimpleNoteComposite noteComposite = new SimpleNoteComposite(composite,
+            SWT.BORDER, SWT.ICON_INFORMATION,
+            Messages.EnterXMPPAccountWizardPage_info_already_created_account);
+
+        noteComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
+            false));
+        noteComposite.setSpacing(8);
+
+        hookListeners();
+        updatePageCompletion();
     }
 
     private void hookListeners() {
