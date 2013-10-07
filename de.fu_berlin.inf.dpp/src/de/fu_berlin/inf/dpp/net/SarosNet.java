@@ -240,7 +240,14 @@ public class SarosNet {
     }
 
     /**
-     * @return Exception that occurred during recent connection failure or
+     * Returns the exception that occurred due to a connection failure. The
+     * exception can only be retrieved during a
+     * {@linkplain ConnectionState#ERROR} callback and is <code>null</code>
+     * otherwise.
+     * 
+     * @see IConnectionListener#connectionStateChanged(Connection,
+     *      ConnectionState)
+     * @return exception that occurred during recent connection failure or
      *         <code>null</code> if not applicable.
      */
     public Exception getConnectionError() {
