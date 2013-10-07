@@ -40,22 +40,33 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
     private static final Logger log = Logger
         .getLogger(ChangeXMPPAccountAction.class);
 
-    protected Menu accountMenu;
+    private Menu accountMenu;
 
     @Inject
-    protected XMPPAccountStore accountService;
+    private XMPPAccountStore accountService;
 
     @Inject
-    protected Saros saros;
+    private Saros saros;
 
     @Inject
-    protected ISarosSessionManager sarosSessionManager;
+    private ISarosSessionManager sarosSessionManager;
 
-    protected IConnectionListener connectionListener = new IConnectionListener() {
+    private final AtomicBoolean running = new AtomicBoolean();
+
+    private boolean isConnectionError;
+
+    private final IConnectionListener connectionListener = new IConnectionListener() {
         @Override
-        public void connectionStateChanged(Connection connection,
-            ConnectionState newState) {
-            updateStatus();
+        public void connectionStateChanged(final Connection connection,
+            final ConnectionState state) {
+            SWTUtils.runSafeSWTAsync(log, new Runnable() {
+
+                @Override
+                public void run() {
+                    updateStatus(state);
+                }
+
+            });
         }
     };
 
@@ -64,10 +75,8 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
         this.setText(Messages.ChangeXMPPAccountAction_connect);
         saros.getSarosNet().addListener(connectionListener);
         setMenuCreator(this);
-        updateStatus();
+        updateStatus(saros.getSarosNet().getConnectionState());
     }
-
-    protected final AtomicBoolean running = new AtomicBoolean();
 
     // user clicks on Button
     @Override
@@ -140,7 +149,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
         addActionToMenu(accountMenu, action);
     }
 
-    protected void connectWithThisAccount(final XMPPAccount account) {
+    private void connectWithThisAccount(final XMPPAccount account) {
 
         if (sarosSessionManager.getSarosSession() == null) {
             connect(account);
@@ -161,7 +170,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
         });
     }
 
-    protected void connect(XMPPAccount account) {
+    private void connect(XMPPAccount account) {
         if (account != null)
             accountService.setAccountActive(account);
 
@@ -181,7 +190,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
         });
     }
 
-    protected void disconnect() {
+    private void disconnect() {
         Utils.runSafeAsync("DisconnectAction", log, new Runnable() {
             @Override
             public void run() {
@@ -198,39 +207,45 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
         });
     }
 
-    protected void addActionToMenu(Menu parent, Action action) {
+    private void addActionToMenu(Menu parent, Action action) {
         ActionContributionItem item = new ActionContributionItem(action);
         item.fill(parent, -1);
     }
 
-    protected void updateStatus() {
+    private void updateStatus(ConnectionState state) {
         try {
-            ConnectionState state = saros.getSarosNet().getConnectionState();
             switch (state) {
             case CONNECTED:
+                isConnectionError = false;
                 setText(Messages.ChangeXMPPAccountAction_disconnect);
                 setImageDescriptor(ImageManager
-                    .getImageDescriptor("/icons/elcl16/connect.png"));
+                    .getImageDescriptor("/icons/elcl16/xmpp_disconnect_tsk.png"));
                 break;
             case CONNECTING:
+                isConnectionError = false;
                 setText(Messages.ChangeXMPPAccountAction_connecting);
-                setImageDescriptor(ImageManager
-                    .getImageDescriptor("/icons/elcl16/connecting.png"));
+                setDisabledImageDescriptor(ImageManager
+                    .getImageDescriptor("/icons/elcl16/xmpp_connecting_misc.png"));
                 break;
             case ERROR:
+                isConnectionError = true;
                 setImageDescriptor(ImageManager
-                    .getImageDescriptor("/icons/elcl16/conn_err.png"));
+                    .getImageDescriptor("/icons/elcl16/xmpp_connection_error_misc.png"));
                 break;
             case NOT_CONNECTED:
                 setText(Messages.ChangeXMPPAccountAction_connect);
-                setImageDescriptor(ImageManager
-                    .getImageDescriptor("/icons/elcl16/disconnected.png"));
+
+                if (!isConnectionError)
+                    setImageDescriptor(ImageManager
+                        .getImageDescriptor("/icons/elcl16/xmpp_connect_tsk.png"));
+
                 break;
             case DISCONNECTING:
             default:
+                isConnectionError = false;
                 setText(Messages.ChangeXMPPAccountAction_disconnecting);
-                setImageDescriptor(ImageManager
-                    .getImageDescriptor("/icons/elcl16/disconnecting.png"));
+                setDisabledImageDescriptor(ImageManager
+                    .getImageDescriptor("/icons/elcl16/xmpp_disconnecting_misc.png"));
                 break;
             }
 
