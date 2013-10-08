@@ -5,6 +5,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.widgets.Composite;
 import org.jivesoftware.smack.Connection;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.StreamError;
+import org.jivesoftware.smack.packet.XMPPError;
 import org.osgi.framework.Version;
 import org.picocontainer.annotations.Inject;
 
@@ -21,33 +24,40 @@ import de.fu_berlin.inf.nebula.utils.FontUtils;
 import de.fu_berlin.inf.nebula.utils.LayoutUtils;
 
 public class ConnectionStateComposite extends Composite {
-    private static final String CONNECTED_TOOLTIP = Messages.ConnectionStateComposite_tooltip_connected;
 
-    private static final Logger log = Logger
+    private static final Logger LOG = Logger
         .getLogger(ConnectionStateComposite.class);
 
-    @Inject
-    protected SarosNet sarosNet;
+    private static final String CONNECTED_TOOLTIP = Messages.ConnectionStateComposite_tooltip_connected;
 
     @Inject
-    protected/* BUG IN PICO cannot resolve bindings in child containers */// @SarosVersion
+    private SarosNet sarosNet;
+
+    @Inject
+    private/* BUG IN PICO cannot resolve bindings in child containers */// @SarosVersion
     Version version;
 
     @Inject
-    protected XMPPAccountStore accountStore;
+    private XMPPAccountStore accountStore;
 
-    protected CLabel stateLabel;
+    private final CLabel stateLabel;
 
     private ConnectionState lastConnectionState;
 
-    protected final IConnectionListener connectionListener = new IConnectionListener() {
+    private final IConnectionListener connectionListener = new IConnectionListener() {
         @Override
-        public void connectionStateChanged(Connection connection,
-            final ConnectionState newState) {
-            SWTUtils.runSafeSWTAsync(log, new Runnable() {
+        public void connectionStateChanged(final Connection connection,
+            final ConnectionState state) {
+
+            final Exception error = sarosNet.getConnectionError();
+
+            SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
                 @Override
                 public void run() {
-                    updateLabel(newState);
+                    if (ConnectionStateComposite.this.isDisposed())
+                        return;
+
+                    updateLabel(state, error);
                 }
             });
         }
@@ -58,17 +68,20 @@ public class ConnectionStateComposite extends Composite {
 
         SarosPluginContext.initComponent(this);
 
-        this.setLayout(LayoutUtils.createGridLayout(1, false, 10, 3, 0, 0));
+        setLayout(LayoutUtils.createGridLayout(1, false, 10, 3, 0, 0));
         stateLabel = new CLabel(this, SWT.NONE);
         stateLabel.setLayoutData(LayoutUtils.createFillHGrabGridData());
         FontUtils.makeBold(stateLabel);
 
-        updateLabel(sarosNet.getConnectionState());
-        this.stateLabel.setForeground(getDisplay().getSystemColor(
-            SWT.COLOR_WHITE));
-        this.stateLabel.setBackground(getDisplay().getSystemColor(
+        stateLabel.setForeground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
+
+        stateLabel.setBackground(getDisplay().getSystemColor(
             SWT.COLOR_DARK_GRAY));
-        this.setBackground(getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
+
+        setBackground(getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
+
+        updateLabel(sarosNet.getConnectionState(),
+            sarosNet.getConnectionError());
 
         sarosNet.addListener(connectionListener);
     }
@@ -79,49 +92,33 @@ public class ConnectionStateComposite extends Composite {
         sarosNet.removeListener(connectionListener);
     }
 
-    protected void updateLabel(ConnectionState newState) {
+    private void updateLabel(ConnectionState state, Exception error) {
 
         // do not hide the latest error
         if (lastConnectionState == ConnectionState.ERROR
-            && newState == ConnectionState.NOT_CONNECTED)
+            && state == ConnectionState.NOT_CONNECTED)
             return;
 
-        lastConnectionState = newState;
+        stateLabel.setText(getDescription(state, error));
+        stateLabel.setToolTipText(state == ConnectionState.CONNECTED ? String
+            .format(CONNECTED_TOOLTIP, version) : null);
 
-        if (stateLabel != null && !stateLabel.isDisposed()) {
-            stateLabel.setText(getDescription(newState));
+        layout();
 
-            if (newState == ConnectionState.CONNECTED) {
-                stateLabel.setToolTipText(String.format(CONNECTED_TOOLTIP,
-                    version));
-            } else {
-                stateLabel.setToolTipText(null);
-            }
-            layout();
-        }
+        lastConnectionState = state;
     }
 
     /**
-     * @param state
-     * @return a nice string description of the given state, which can be used
-     *         to be shown in labels (e.g. CONNECTING becomes "Connecting...").
+     * Returns a nice string description of the given state, which can be used
+     * to be shown in labels (e.g. CONNECTING becomes "Connecting...").
      */
-    public String getDescription(ConnectionState state) {
+    private String getDescription(ConnectionState state, Exception error) {
         if (accountStore.isEmpty()) {
             return Messages.ConnectionStateComposite_info_add_jabber_account;
         }
 
-        Exception e = null;
         switch (state) {
         case NOT_CONNECTED:
-            // FIXME: fix SarosNet if no ERROR is reported !!!
-            e = sarosNet.getConnectionError();
-            if (e != null
-                && e.toString().equalsIgnoreCase("stream:error (text)")) {
-                // the same user logged in via xmpp on another server/host
-                SarosView.showNotification("XMPP Connection lost",
-                    Messages.ConnectionStateComposite_remote_login_warning);
-            }
             return Messages.ConnectionStateComposite_not_connected;
         case CONNECTING:
             return Messages.ConnectionStateComposite_connecting;
@@ -133,14 +130,34 @@ public class ConnectionStateComposite extends Composite {
         case DISCONNECTING:
             return Messages.ConnectionStateComposite_disconnecting;
         case ERROR:
-            e = sarosNet.getConnectionError();
-            if (e == null) {
-                return Messages.ConnectionStateComposite_error;
-            } else if (e.toString().equalsIgnoreCase("stream:error (conflict)")) { //$NON-NLS-1$
-                return Messages.ConnectionStateComposite_error_ressource_conflict;
-            } else {
+            if (!(error instanceof XMPPException)
+                || !(lastConnectionState == ConnectionState.CONNECTED || lastConnectionState == ConnectionState.CONNECTING))
                 return Messages.ConnectionStateComposite_error_connection_lost;
+
+            XMPPError xmppError = ((XMPPException) error).getXMPPError();
+
+            StreamError streamError = ((XMPPException) error).getStreamError();
+
+            // see http://xmpp.org/rfcs/rfc3921.html chapter 3
+
+            if (lastConnectionState == ConnectionState.CONNECTED
+                && (streamError == null || !"conflict"
+                    .equalsIgnoreCase(streamError.getCode())))
+                return Messages.ConnectionStateComposite_error_connection_lost;
+
+            if (lastConnectionState == ConnectionState.CONNECTING
+                && (xmppError == null || xmppError.getCode() != 409))
+                return Messages.ConnectionStateComposite_error_connection_lost;
+
+            if (lastConnectionState == ConnectionState.CONNECTING) {
+                SarosView.showNotification("XMPP Connection lost",
+                    "You are already logged in.");
+            } else {
+                SarosView.showNotification("XMPP Connection lost",
+                    Messages.ConnectionStateComposite_remote_login_warning);
             }
+
+            return Messages.ConnectionStateComposite_error_ressource_conflict;
         default:
             return Messages.ConnectionStateComposite_error_unknown;
         }
