@@ -45,7 +45,6 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.Messages;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.util.FileZipper;
-import de.fu_berlin.inf.dpp.util.MappedList;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.ZipProgressMonitor;
 
@@ -54,18 +53,9 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     private static Logger log = Logger
         .getLogger(OutgoingProjectNegotiation.class);
 
-    /**
-     * this maps the currently exchanging projects. projectID => project in
-     * workspace
-     */
     private List<IProject> projects;
 
     private ISarosSession sarosSession;
-
-    /**
-     * projectID => List of {@link IPath files} that will be send to peer
-     */
-    private MappedList<String, IPath> projectFilesToSend = new MappedList<String, IPath>();
 
     private final static Random PROCESS_ID_GENERATOR = new Random();
 
@@ -109,7 +99,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
             monitor.subTask("");
 
-            getRemoteFileList(monitor);
+            List<FileList> fileLists = getRemoteFileList(monitor);
             monitor.subTask("");
 
             /*
@@ -144,7 +134,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
                 sarosSession.userStartedQueuing(user);
 
-                zipArchives = createProjectArchives(projectFilesToSend, monitor);
+                zipArchives = createProjectArchives(fileLists, monitor);
                 monitor.subTask("");
             } finally {
                 if (stoppedUsers != null)
@@ -243,7 +233,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
      * @throws IOException
      * @throws SarosCancellationException
      */
-    protected void getRemoteFileList(IProgressMonitor monitor)
+    private List<FileList> getRemoteFileList(IProgressMonitor monitor)
         throws IOException, SarosCancellationException {
 
         log.debug(this + " : waiting for remote file list");
@@ -268,12 +258,9 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
         checkCancellation(CancelOption.NOTIFY_PEER);
 
-        for (FileList fileList : remoteFileLists) {
-            projectFilesToSend
-                .put(fileList.getProjectID(), fileList.getPaths());
-        }
-
         monitor.done();
+
+        return remoteFileLists;
     }
 
     @Override
@@ -350,20 +337,18 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     }
 
     /**
-     * 
-     * @param projectFilesToSend
-     *            projectID => List of {@link IPath files} that will be sent to
-     *            peer
+     * @param fileLists
+     *            a list of file lists containing the files to archive
      * @return List of project archives
      */
-    private List<File> createProjectArchives(
-        MappedList<String, IPath> projectFilesToSend, IProgressMonitor monitor)
-        throws IOException, SarosCancellationException {
+    private List<File> createProjectArchives(List<FileList> fileLists,
+        IProgressMonitor monitor) throws IOException,
+        SarosCancellationException {
 
         log.debug(this + " : creating archive(s)");
 
         SubMonitor subMonitor = SubMonitor.convert(monitor,
-            "Creating project archives...", projectFilesToSend.keySet().size());
+            "Creating project archives...", fileLists.size());
 
         /*
          * Use editorManager.saveText() because the EditorAPI.saveProject() will
@@ -383,14 +368,10 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
         List<File> archivesToSend = new LinkedList<File>();
 
-        for (Map.Entry<String, List<IPath>> entry : projectFilesToSend
-            .entrySet()) {
-
-            String projectID = entry.getKey();
-            List<IPath> filesToCompress = entry.getValue();
+        for (FileList fileList : fileLists) {
 
             File projectArchive = createProjectArchive(subMonitor.newChild(1),
-                filesToCompress, projectID);
+                fileList.getPaths(), fileList.getProjectID());
 
             if (projectArchive != null)
                 archivesToSend.add(projectArchive);
