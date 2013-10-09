@@ -10,6 +10,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -27,7 +28,7 @@ import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
-import de.fu_berlin.inf.dpp.util.StopWatch;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 public class SendFileJob extends StreamJob {
     private static final Logger log = Logger.getLogger(SendFileJob.class);
@@ -187,7 +188,7 @@ public class SendFileJob extends StreamJob {
                 sendBytes += numRead;
 
                 monitor.worked(numRead);
-                monitor.subTask(watch.throughput(sendBytes));
+                monitor.subTask(Utils.throughput(sendBytes, watch.getTime()));
             }
 
             out.flush();

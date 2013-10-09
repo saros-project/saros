@@ -15,6 +15,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -197,7 +198,8 @@ public class FileZipper {
         stopWatch.stop();
 
         log.debug(String.format("created archive %s I/O: [%s]",
-            archive.getAbsolutePath(), stopWatch.throughput(archive.length())));
+            archive.getAbsolutePath(),
+            Utils.throughput(archive.length(), stopWatch.getTime())));
 
     }
 

@@ -9,6 +9,7 @@ import java.text.MessageFormat;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -28,7 +29,7 @@ import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.util.StopWatch;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 public class ReceiveFileJob extends StreamJob {
     private static final Logger log = Logger.getLogger(ReceiveFileJob.class);
@@ -165,7 +166,7 @@ public class ReceiveFileJob extends StreamJob {
                 fileOutputStream.write(buffer, 0, readBytes);
 
                 monitor.worked(readBytes);
-                monitor.subTask(watch.throughput(received));
+                monitor.subTask(Utils.throughput(received, watch.getTime()));
 
                 if (monitor.isCanceled() && !canceled) {
                     // just stop once
