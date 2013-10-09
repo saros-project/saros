@@ -13,6 +13,9 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.filter.PacketFilter;
+import org.jivesoftware.smack.packet.Packet;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
@@ -43,8 +46,10 @@ import de.fu_berlin.inf.dpp.feedback.StatisticCollectorTest;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
+import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.TransferModeDispatch;
@@ -66,6 +71,41 @@ import de.fu_berlin.inf.dpp.util.Utils;
 public class SarosSessionTest {
 
     private static final String SAROS_SESSION_ID = "SAROS_SESSION_TEST";
+
+    private static class CountingReceiver implements IReceiver {
+
+        private int currentListeners;
+
+        @Override
+        public synchronized void addPacketListener(PacketListener listener,
+            PacketFilter filter) {
+            currentListeners++;
+        }
+
+        @Override
+        public synchronized void removePacketListener(PacketListener listener) {
+            currentListeners--;
+        }
+
+        @Override
+        public void processPacket(Packet packet) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public SarosPacketCollector createCollector(PacketFilter filter) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void processTransferObject(IncomingTransferObject transferObject) {
+            throw new UnsupportedOperationException();
+        }
+
+        public synchronized int getCurrentPacketListenersCount() {
+            return currentListeners;
+        }
+    }
 
     static private SarosNet createSarosNetMock() {
         SarosNet net = EasyMock.createMock(SarosNet.class);
@@ -120,6 +160,8 @@ public class SarosSessionTest {
 
     private MutablePicoContainer container;
 
+    private CountingReceiver countingReceiver;
+
     @Before
     public void setUp() {
 
@@ -147,8 +189,23 @@ public class SarosSessionTest {
         // Mock in replay state for child classes
         container.addComponent(ITransmitter.class,
             EasyMock.createMock(ITransmitter.class));
-        container.addComponent(IReceiver.class,
-            EasyMock.createMock(IReceiver.class));
+
+        countingReceiver = new CountingReceiver();
+
+        IReceiver receiver = EasyMock.createMock(IReceiver.class);
+
+        receiver.addPacketListener(EasyMock.anyObject(PacketListener.class),
+            EasyMock.anyObject(PacketFilter.class));
+
+        EasyMock.expectLastCall().andStubDelegateTo(countingReceiver);
+
+        receiver.removePacketListener(EasyMock.anyObject(PacketListener.class));
+        EasyMock.expectLastCall().andStubDelegateTo(countingReceiver);
+
+        EasyMock.replay(receiver);
+
+        container.addComponent(receiver);
+
         container.addComponent(ISarosSessionManager.class,
             EasyMock.createMock(ISarosSessionManager.class));
         container.addComponent(SarosUI.class,
@@ -283,6 +340,9 @@ public class SarosSessionTest {
         // Test creating, starting and stopping the session.
         SarosSession session = new SarosSession(0, new DateTime(), context);
         Assert.assertEquals(0, session.getActivityProviderCount());
+        Assert.assertEquals(0,
+            countingReceiver.getCurrentPacketListenersCount());
+
         Assert.assertTrue(workspaceListeners.isEmpty());
         session.start();
 
@@ -297,6 +357,9 @@ public class SarosSessionTest {
         Assert.assertEquals(0, session.getActivityProviderCount());
         Assert.assertTrue(workspaceListeners.isEmpty());
         Assert.assertEquals(SAROS_SESSION_ID, session.getID());
+        Assert.assertEquals(
+            "not all packet listeners were removed from the receiver", 0,
+            countingReceiver.getCurrentPacketListenersCount());
         PowerMock.verifyAll();
     }
 

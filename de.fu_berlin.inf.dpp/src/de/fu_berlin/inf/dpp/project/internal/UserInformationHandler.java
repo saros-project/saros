@@ -85,6 +85,7 @@ public class UserInformationHandler implements Startable {
     @Override
     public void stop() {
         receiver.removePacketListener(userListListener);
+        receiver.removePacketListener(userFinishedProjectNegotiations);
     }
 
     /**
