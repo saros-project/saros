@@ -25,13 +25,20 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.audio.MixerManager;
-import de.fu_berlin.inf.dpp.preferences.AudioSettings;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.Messages;
 
 @Component(module = "prefs")
 public class CommunicationPreferencePage extends FieldEditorPreferencePage
     implements IWorkbenchPreferencePage {
+
+    // TODO put this into the preference store
+    private static final String[] AUDIO_SAMPLE_RATE = new String[] { "44100",
+        "32000", "16000" };
+
+    private static final String[][] AUDIO_QUALITY_VALUES = { { "0", "0" },
+        { "1", "1" }, { "2", "2" }, { "3", "3" }, { "4", "4" }, { "5", "5" },
+        { "6", "6" }, { "7", "7" }, { "8", "8" }, { "9", "9" }, { "10", "10" } };
 
     @Inject
     protected Saros saros;
@@ -53,10 +60,6 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
     private Group chatGroup;
     private Group voipGroup;
     private Composite chatServerGroup;
-
-    private String[][] audioQualityValues = { { "0", "0" }, { "1", "1" },
-        { "2", "2" }, { "3", "3" }, { "4", "4" }, { "5", "5" }, { "6", "6" },
-        { "7", "7" }, { "8", "8" }, { "9", "9" }, { "10", "10" } };
 
     public CommunicationPreferencePage() {
         super(FieldEditorPreferencePage.GRID);
@@ -111,12 +114,12 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
 
         audioQuality = new ComboFieldEditor(
             PreferenceConstants.AUDIO_QUALITY_LEVEL,
-            "Audio Quality Level (0-10) - 10 is best", audioQualityValues,
+            "Audio Quality Level (0-10) - 10 is best", AUDIO_QUALITY_VALUES,
             voipGroup);
 
         ComboFieldEditor audioSamplerate = new ComboFieldEditor(
             PreferenceConstants.AUDIO_SAMPLERATE, "Audio Samplerate (kHz)",
-            get2dArray(AudioSettings.AUDIO_SAMPLE_RATE), voipGroup);
+            get2dArray(AUDIO_SAMPLE_RATE), voipGroup);
 
         audio_vbr = new BooleanFieldEditor(
             PreferenceConstants.AUDIO_VBR,
