@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.DataFormatException;
@@ -25,7 +24,6 @@ import org.apache.commons.codec.BinaryDecoder;
 import org.apache.commons.codec.BinaryEncoder;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.EncoderException;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.net.URLCodec;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ObjectUtils;
@@ -37,7 +35,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
-import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.bytestreams.BytestreamSession;
 
 import bmsi.util.Diff;
@@ -52,7 +49,6 @@ public final class Utils {
 
     private static final Logger log = Logger.getLogger(Utils.class);
 
-    private static final Base64 BASE64_CODEC = new Base64();
     private static final URLCodec URL_CODEC = new URLCodec();
 
     private Utils() {
@@ -105,44 +101,12 @@ public final class Utils {
         }
     }
 
-    public static String escapeBase64(String toEscape) {
-        return escape(toEscape, BASE64_CODEC);
-    }
-
-    public static String unescapeBase64(String toUnescape) {
-        return unescape(toUnescape, BASE64_CODEC);
-    }
-
     public static String urlEscape(String toEscape) {
         return escape(toEscape, URL_CODEC);
     }
 
     public static String urlUnescape(String toUnescape) {
         return unescape(toUnescape, URL_CODEC);
-    }
-
-    /**
-     * Returns a runnable that upon being run will wait the given time in
-     * milliseconds and then run the given runnable.
-     * 
-     * The returned runnable supports being interrupted upon which the runnable
-     * returns with the interrupted flag being raised.
-     * 
-     */
-    public static Runnable delay(final int milliseconds, final Runnable runnable) {
-        return new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(milliseconds);
-                } catch (InterruptedException e) {
-                    log.error("Code not designed to be interruptable", e);
-                    Thread.currentThread().interrupt();
-                    return;
-                }
-                runnable.run();
-            }
-        };
     }
 
     /**
@@ -277,23 +241,6 @@ public final class Utils {
     }
 
     /**
-     * Run the given runnable in a new thread and log any RuntimeExceptions to
-     * the given log and blocks the current thread until the runnable returns.
-     * 
-     * @blocking
-     */
-    public static void runSafeSyncFork(Logger log, Runnable runnable) {
-        Thread t = runSafeAsync(null, log, runnable);
-        try {
-            t.join();
-        } catch (InterruptedException e) {
-            log.warn("Waiting for the forked thread in runSafeSyncFork was"
-                + " interrupted unexpectedly");
-            Thread.currentThread().interrupt();
-        }
-    }
-
-    /**
      * Return a string representation of the given paths suitable for debugging
      * by joining their OS dependent full path representation by ', '
      */
@@ -364,17 +311,6 @@ public final class Utils {
             return false;
         } else
             return true;
-    }
-
-    // only used by ConnectionTestAction
-    public static String getMessage(Throwable e) {
-        if (e instanceof XMPPException) {
-            return e.toString();
-        }
-        if (e instanceof ExecutionException && e.getCause() != null) {
-            return getMessage(e.getCause());
-        }
-        return e.getMessage();
     }
 
     public static final int CHUNKSIZE = 16 * 1024;
