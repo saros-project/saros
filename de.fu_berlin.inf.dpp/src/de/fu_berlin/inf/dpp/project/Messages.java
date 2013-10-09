@@ -16,8 +16,7 @@ public class Messages extends NLS {
     public static String PermissionManager_you_have_now_access;
     public static String ResourceChangeValidator_error_leave_session_before_delete_project;
     public static String ResourceChangeValidator_error_no_write_access;
-    public static String SarosSession_jids_should_be_resource_qualified;
-    public static String SarosSession_only_inviter_can_initate_permission_changes;
+
     public static String SarosSession_performing_permission_change;
     public static String SarosSessionManager_canceled_invitation;
     public static String SarosSessionManager_canceled_invitation_text;

@@ -32,7 +32,6 @@ public class Messages extends NLS {
     public static String AddXMPPAccountWizard_title;
 
     public static String AdvancedPreferencePage_description;
-    public static String AdvancedPreferencePage_ping_pong;
     public static String AdvancedPreferencePage_show_xmpp_debug;
     public static String AdvancedPreferencePage_enable_balloon_notifications;
     public static String AdvancedPreferencePage_show_contribution_annotations;
@@ -126,7 +125,6 @@ public class Messages extends NLS {
     public static String ConnectionStateComposite_connecting;
     public static String ConnectionStateComposite_connected;
     public static String ConnectionStateComposite_disconnecting;
-    public static String ConnectionStateComposite_error;
     public static String ConnectionStateComposite_error_ressource_conflict;
     public static String ConnectionStateComposite_error_unknown;
     public static String ConnectionStateComposite_error_connection_lost;
@@ -134,12 +132,7 @@ public class Messages extends NLS {
     public static String ConnectionStateComposite_not_connected;
     public static String ConnectionStateComposite_tooltip_connected;
     public static String ConnectionStateComposite_remote_login_warning;
-    public static String ConnectionTestAction_error_message;
-    public static String ConnectionTestAction_error_title;
-    public static String ConnectionTestAction_successful_message;
-    public static String ConnectionTestAction_successful_title;
-    public static String ConnectionTestAction_title;
-    public static String ConnectionTestAction_tooltip;
+
     public static String ConsistencyAction_message_inconsistency_detected;
     public static String ConsistencyAction_progress_perform_recovery;
     public static String ConsistencyAction_title_inconsistency_deteced;
@@ -220,15 +213,7 @@ public class Messages extends NLS {
     public static String GiveWriteAccessAction_tooltip;
     public static String InvitationWizard_buddy_offline;
     public static String InvitationWizard_buddy_offline_text;
-    public static String InvitationWizard_invite_error;
-    public static String InvitationWizard_invite_no_support;
-    public static String InvitationWizard_invite_no_support_text;
-    public static String InvitationWizard_is_compatible;
-    public static String InvitationWizard_version_check_failed_text;
-    public static String InvitationWizard_version_conflict;
-    public static String InvitationWizard_version_request_failed;
-    public static String InvitationWizard_version_too_new;
-    public static String InvitationWizard_version_too_old;
+
     public static String JoinSessionWizard_8;
     public static String JoinSessionWizard_accept;
     public static String JoinSessionWizard_inv_cancelled;
@@ -358,11 +343,7 @@ public class Messages extends NLS {
     public static String NetworkPreferencePage_upnp_devices;
     public static String NetworkPreferencePage_upnp_label_Text;
     public static String NewContactAction_tooltip;
-    public static String PartialProjectSelectionDialog_description;
-    public static String PartialProjectSelectionDialog_error_only_files_from_main_project;
-    public static String PartialProjectSelectionDialog_select_ressources_to_share;
-    public static String PartialProjectSelectionDialog_title;
-    public static String PartialProjectSelectionDialog_title2;
+
     public static String ProjectSelectionComposite_hide_closed_projects;
     public static String ProjectSelectionComposite_new_project;
     public static String ProjectSelectionWizardPage_description;
@@ -381,7 +362,6 @@ public class Messages extends NLS {
     public static String RestrictToReadOnlyAccessAction_title;
     public static String RestrictToReadOnlyAccessAction_tooltip;
 
-    public static String RosterEntryElement_connected_using;
     public static String RosterEntryElement_subscription_pending;
     public static String RosterEntryElement_subscription_cancelled;
 
