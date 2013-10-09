@@ -105,7 +105,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     public IncomingProjectNegotiation(ISarosSession sarosSession, JID peer,
         String processID, List<ProjectExchangeInfo> projectInfos,
         ISarosContext sarosContext) {
-        super(peer, sarosContext);
+        super(peer, sarosSession.getID(), sarosContext);
 
         this.sarosSession = sarosSession;
         this.processID = processID;

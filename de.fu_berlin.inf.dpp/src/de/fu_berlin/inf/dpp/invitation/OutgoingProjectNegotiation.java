@@ -67,7 +67,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
      */
     private MappedList<String, IPath> projectFilesToSend = new MappedList<String, IPath>();
 
-    private final static Random INVITATION_RAND = new Random();
+    private final static Random PROCESS_ID_GENERATOR = new Random();
 
     @Inject
     private EditorManager editorManager;
@@ -81,9 +81,9 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
     public OutgoingProjectNegotiation(JID to, ISarosSession sarosSession,
         List<IProject> projects, ISarosContext sarosContext) {
-        super(to, sarosContext);
+        super(to, sarosSession.getID(), sarosContext);
 
-        this.processID = String.valueOf(INVITATION_RAND.nextLong());
+        this.processID = String.valueOf(PROCESS_ID_GENERATOR.nextLong());
         this.sarosSession = sarosSession;
         this.projects = projects;
     }
