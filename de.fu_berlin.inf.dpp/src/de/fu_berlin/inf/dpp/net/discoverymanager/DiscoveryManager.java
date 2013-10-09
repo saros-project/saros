@@ -312,17 +312,12 @@ public class DiscoveryManager implements Disposable {
         try {
             isSupportedNonBlock(contact, Saros.NAMESPACE);
         } catch (CacheMissException e) {
-            supportExecutor.execute(new Runnable() {
+            supportExecutor.execute(Utils.wrapSafe(log, new Runnable() {
                 @Override
                 public void run() {
-                    Utils.runSafeAsync("GetSarosSupport", log, new Runnable() {
-                        @Override
-                        public void run() {
-                            isSarosSupported(contact);
-                        }
-                    });
+                    isSarosSupported(contact);
                 }
-            });
+            }));
         }
     }
 
