@@ -371,11 +371,7 @@ public final class SarosSession implements ISarosSession {
         log.info("user " + user + " is now a " + permission);
     }
 
-    /**
-     * Returns the id of the current session.
-     * 
-     * @return the id of the current session
-     */
+    @Override
     public String getID() {
         return sessionID;
     }
