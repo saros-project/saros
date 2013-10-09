@@ -19,16 +19,16 @@ import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.invitation.IncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
-import de.fu_berlin.inf.dpp.invitation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.invitation.OutgoingProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.OutgoingSessionNegotiation;
 import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
+import de.fu_berlin.inf.dpp.invitation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.project.INegotiationHandler;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.project.Messages;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -66,7 +66,7 @@ public class NegotiationHandler implements INegotiationHandler {
 
         public OutgoingInvitationJob(OutgoingSessionNegotiation process) {
             super(MessageFormat.format(
-                Messages.SarosSessionManager_inviting_user,
+                Messages.NegotiationHandler_inviting_user,
                 User.getHumanReadableName(network, process.getPeer())));
             this.process = process;
             this.peer = process.getPeer().getBase();
@@ -94,10 +94,10 @@ public class NegotiationHandler implements INegotiationHandler {
                 case REMOTE_CANCEL:
                     SarosView
                         .showNotification(
-                            Messages.SarosSessionManager_canceled_invitation,
+                            Messages.NegotiationHandler_canceled_invitation,
                             MessageFormat
                                 .format(
-                                    Messages.SarosSessionManager_canceled_invitation_text,
+                                    Messages.NegotiationHandler_canceled_invitation_text,
                                     peer));
 
                     return new Status(
@@ -105,16 +105,16 @@ public class NegotiationHandler implements INegotiationHandler {
                         Saros.SAROS,
                         MessageFormat
                             .format(
-                                Messages.SarosSessionManager_canceled_invitation_text,
+                                Messages.NegotiationHandler_canceled_invitation_text,
                                 peer));
 
                 case REMOTE_ERROR:
                     SarosView
                         .showNotification(
-                            Messages.SarosSessionManager_error_during_invitation,
+                            Messages.NegotiationHandler_error_during_invitation,
                             MessageFormat
                                 .format(
-                                    Messages.SarosSessionManager_error_during_invitation_text,
+                                    Messages.NegotiationHandler_error_during_invitation_text,
                                     peer, process.getErrorMessage()));
 
                     return new Status(
@@ -122,7 +122,7 @@ public class NegotiationHandler implements INegotiationHandler {
                         Saros.SAROS,
                         MessageFormat
                             .format(
-                                Messages.SarosSessionManager_error_during_invitation_text,
+                                Messages.NegotiationHandler_error_during_invitation_text,
                                 peer, process.getErrorMessage()));
                 }
             } catch (Exception e) {
@@ -144,7 +144,7 @@ public class NegotiationHandler implements INegotiationHandler {
 
         public OutgoingProjectJob(
             OutgoingProjectNegotiation outgoingProjectNegotiation) {
-            super(Messages.SarosSessionManager_sharing_project);
+            super(Messages.NegotiationHandler_sharing_project);
             process = outgoingProjectNegotiation;
             peer = process.getPeer().getBase();
 
@@ -174,7 +174,7 @@ public class NegotiationHandler implements INegotiationHandler {
                 case REMOTE_CANCEL:
                     message = MessageFormat
                         .format(
-                            Messages.SarosSessionManager_project_sharing_cancelled_text,
+                            Messages.NegotiationHandler_project_sharing_cancelled_text,
                             peerName);
 
                     SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
@@ -190,11 +190,11 @@ public class NegotiationHandler implements INegotiationHandler {
                 case REMOTE_ERROR:
                     message = MessageFormat
                         .format(
-                            Messages.SarosSessionManager_sharing_project_cancelled_remotely,
+                            Messages.NegotiationHandler_sharing_project_cancelled_remotely,
                             peerName, process.getErrorMessage());
                     SarosView
                         .showNotification(
-                            Messages.SarosSessionManager_sharing_project_cancelled_remotely_text,
+                            Messages.NegotiationHandler_sharing_project_cancelled_remotely_text,
                             message);
 
                     return new Status(IStatus.ERROR, Saros.SAROS, message);

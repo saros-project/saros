@@ -42,7 +42,6 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.StartActivityQueuingRequest;
 import de.fu_berlin.inf.dpp.net.internal.extensions.StartActivityQueuingResponse;
 import de.fu_berlin.inf.dpp.project.IChecksumCache;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.Messages;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.util.FileZipper;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -466,9 +465,11 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         List<IProject> projectsToShare, IProgressMonitor monitor)
         throws IOException, LocalCancellationException {
 
-        SubMonitor subMonitor = SubMonitor.convert(monitor,
-            Messages.SarosSessionManager_creating_file_list,
-            projectsToShare.size());
+        SubMonitor subMonitor = SubMonitor
+            .convert(
+                monitor,
+                "Creating file list and calculating file checksums. This may take a while...",
+                projectsToShare.size());
 
         List<ProjectExchangeInfo> pInfos = new ArrayList<ProjectExchangeInfo>(
             projectsToShare.size());

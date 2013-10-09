@@ -18,16 +18,6 @@ public class Messages extends NLS {
     public static String ResourceChangeValidator_error_no_write_access;
 
     public static String SarosSession_performing_permission_change;
-    public static String SarosSessionManager_canceled_invitation;
-    public static String SarosSessionManager_canceled_invitation_text;
-    public static String SarosSessionManager_creating_file_list;
-    public static String SarosSessionManager_error_during_invitation;
-    public static String SarosSessionManager_error_during_invitation_text;
-    public static String SarosSessionManager_inviting_user;
-    public static String SarosSessionManager_project_sharing_cancelled_text;
-    public static String SarosSessionManager_sharing_project;
-    public static String SarosSessionManager_sharing_project_cancelled_remotely;
-    public static String SarosSessionManager_sharing_project_cancelled_remotely_text;
     public static String SharedProject_path_is_null;
     public static String SharedProject_resource_in_map_not_exist;
     public static String SharedProject_resource_is_null;

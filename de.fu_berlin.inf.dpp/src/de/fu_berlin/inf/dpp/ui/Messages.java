@@ -436,6 +436,16 @@ public class Messages extends NLS {
     public static String OpenPreferencesAction_title;
     public static String OpenPreferencesAction_tooltip;
 
+    public static String NegotiationHandler_canceled_invitation;
+    public static String NegotiationHandler_canceled_invitation_text;
+    public static String NegotiationHandler_error_during_invitation;
+    public static String NegotiationHandler_error_during_invitation_text;
+    public static String NegotiationHandler_inviting_user;
+    public static String NegotiationHandler_project_sharing_cancelled_text;
+    public static String NegotiationHandler_sharing_project;
+    public static String NegotiationHandler_sharing_project_cancelled_remotely;
+    public static String NegotiationHandler_sharing_project_cancelled_remotely_text;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);
