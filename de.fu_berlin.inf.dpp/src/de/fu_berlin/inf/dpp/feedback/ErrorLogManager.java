@@ -18,8 +18,8 @@ import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.ui.preferencePages.FeedbackPreferencePage;
 
 /**
@@ -42,7 +42,7 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
     protected static final Logger log = Logger.getLogger(ErrorLogManager.class
         .getName());
 
-    protected SessionIDObservable sessionID;
+    protected final String sessionID;
     private static String mostRecentSessionID;
 
     private static synchronized void rememberSession(String sessionId) {
@@ -52,7 +52,7 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
     @Override
     public void start() {
         // save the id of the just started session
-        rememberSession(sessionID.getValue());
+        rememberSession(sessionID);
     }
 
     @Override
@@ -61,9 +61,9 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
             submitErrorLog(saros);
     }
 
-    public ErrorLogManager(Saros saros, SessionIDObservable sessionID) {
+    public ErrorLogManager(Saros saros, ISarosSession session) {
         super(saros);
-        this.sessionID = sessionID;
+        sessionID = session.getID();
 
         logErrorLogSettings();
     }

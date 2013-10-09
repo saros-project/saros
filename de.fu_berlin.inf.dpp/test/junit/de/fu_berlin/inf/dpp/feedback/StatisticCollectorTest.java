@@ -27,7 +27,6 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
-import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceInitializer;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
@@ -64,13 +63,11 @@ public class StatisticCollectorTest {
                 return null;
             }
         }).anyTimes();
-        session.getLocalUser();
-        EasyMock.expectLastCall().andReturn(bob).anyTimes();
-        session.getUsers();
-        EasyMock.expectLastCall().andReturn(participants).anyTimes();
-        session.getHost();
-        EasyMock.expectLastCall().andReturn(bob).anyTimes();
 
+        EasyMock.expect(session.getLocalUser()).andStubReturn(bob);
+        EasyMock.expect(session.getUsers()).andStubReturn(participants);
+        EasyMock.expect(session.getHost()).andStubReturn(bob);
+        EasyMock.expect(session.getID()).andStubReturn("0815");
         EasyMock.replay(session);
         return session;
     }
@@ -154,10 +151,10 @@ public class StatisticCollectorTest {
         PowerMock.replayAll(StatisticManager.class);
 
         // Create a container
-        PicoBuilder picoBuilder = new PicoBuilder(new CompositeInjection(
-            new ConstructorInjection(), new AnnotatedFieldInjection()))
-            .withCaching().withLifecycle();
-        final MutablePicoContainer container = picoBuilder.build();
+        final MutablePicoContainer container = new PicoBuilder(
+            new CompositeInjection(new ConstructorInjection(),
+                new AnnotatedFieldInjection())).withCaching().withLifecycle()
+            .build();
 
         // session
         final List<Object> sessionListeners = new LinkedList<Object>();
@@ -179,9 +176,9 @@ public class StatisticCollectorTest {
 
         container.addComponent(Saros.class,
             SarosSessionTest.createSarosMock(store));
+
         container.addComponent(DataTransferManager.class,
             SarosSessionTest.createDataTransferManagerMock());
-        container.addComponent(SessionIDObservable.class);
 
         // Components we want to create
         container.addComponent(StatisticManager.class);

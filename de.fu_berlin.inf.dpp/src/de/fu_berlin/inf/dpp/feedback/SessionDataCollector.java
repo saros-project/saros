@@ -24,7 +24,6 @@ import org.joda.time.Duration;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -37,7 +36,6 @@ import de.fu_berlin.inf.dpp.util.Utils;
 @Component(module = "feedback")
 public class SessionDataCollector extends AbstractStatisticCollector {
 
-    protected SessionIDObservable sessionID;
     protected FeedbackManager feedbackManager;
     protected Saros saros;
 
@@ -47,10 +45,8 @@ public class SessionDataCollector extends AbstractStatisticCollector {
     protected boolean isHost;
 
     public SessionDataCollector(StatisticManager statisticManager,
-        ISarosSession session, SessionIDObservable sessionID, Saros saros,
-        FeedbackManager feedbackManager) {
+        ISarosSession session, Saros saros, FeedbackManager feedbackManager) {
         super(statisticManager, session);
-        this.sessionID = sessionID;
         this.saros = saros;
         this.feedbackManager = feedbackManager;
     }
@@ -84,7 +80,7 @@ public class SessionDataCollector extends AbstractStatisticCollector {
 
     @Override
     protected void doOnSessionStart(ISarosSession sarosSession) {
-        currentSessionID = sessionID.getValue();
+        currentSessionID = sarosSession.getID();
         localSessionStart = new DateTime();
     }
 
