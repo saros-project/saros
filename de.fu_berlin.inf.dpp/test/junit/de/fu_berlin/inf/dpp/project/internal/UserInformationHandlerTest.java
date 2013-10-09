@@ -15,14 +15,12 @@ import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
-import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 public class UserInformationHandlerTest {
 
     private final List<User> emptyUserList = Collections.emptyList();
 
-    private SessionIDObservable sessionID;
     private ITransmitter transmitter;
     private IReceiver receiver;
     private ISarosSession session;
@@ -30,7 +28,6 @@ public class UserInformationHandlerTest {
 
     @Before
     public void setUp() {
-        sessionID = new SessionIDObservable();
         transmitter = EasyMock.createNiceMock(ITransmitter.class);
         receiver = EasyMock.createNiceMock(IReceiver.class);
         dummyCollector = EasyMock.createNiceMock(SarosPacketCollector.class);
@@ -48,7 +45,7 @@ public class UserInformationHandlerTest {
         EasyMock.replay(session);
 
         UserInformationHandler handler = new UserInformationHandler(session,
-            sessionID, transmitter, receiver);
+            transmitter, receiver);
 
         User alice = new User(new JID("alice@test/Saros"), false, false, 0, 0);
 
@@ -65,7 +62,7 @@ public class UserInformationHandlerTest {
         EasyMock.replay(session);
 
         UserInformationHandler handler = new UserInformationHandler(session,
-            sessionID, transmitter, receiver);
+            transmitter, receiver);
 
         User alice = new User(new JID("alice@test/Saros"), false, false, 0, 0);
 
@@ -82,7 +79,7 @@ public class UserInformationHandlerTest {
         EasyMock.replay(session);
 
         UserInformationHandler handler = new UserInformationHandler(session,
-            sessionID, transmitter, receiver);
+            transmitter, receiver);
 
         User alice = new User(new JID("alice@test/Saros"), false, false, 0, 0);
 
@@ -99,7 +96,7 @@ public class UserInformationHandlerTest {
         EasyMock.replay(session);
 
         UserInformationHandler handler = new UserInformationHandler(session,
-            sessionID, transmitter, receiver);
+            transmitter, receiver);
 
         User alice = new User(new JID("alice@test/Saros"), false, false, 0, 0);
 
@@ -117,7 +114,7 @@ public class UserInformationHandlerTest {
         EasyMock.replay(session);
 
         UserInformationHandler handler = new UserInformationHandler(session,
-            sessionID, transmitter, receiver);
+            transmitter, receiver);
 
         User alice = new User(new JID("alice@test/Saros"), false, false, 0, 0);
         User bob = new User(new JID("bob@test/Saros"), false, false, 0, 0);

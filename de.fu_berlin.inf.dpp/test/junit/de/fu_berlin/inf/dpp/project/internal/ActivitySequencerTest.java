@@ -23,7 +23,6 @@ import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.test.fakes.net.FakeConnectionFactory;
 import de.fu_berlin.inf.dpp.test.fakes.net.FakeConnectionFactory.FakeConnectionFactoryResult;
 import de.fu_berlin.inf.dpp.test.stubs.SarosSessionStub;
@@ -38,9 +37,15 @@ public class ActivitySequencerTest {
 
         private User localUser;
 
+        private String id;
+
         public void setLocalUser(User localUser) {
             this.localUser = localUser;
             users.add(localUser);
+        }
+
+        public void setID(String id) {
+            this.id = id;
         }
 
         /*
@@ -72,14 +77,16 @@ public class ActivitySequencerTest {
             receivedActivityDataObjects.addAll(activityDataObjects);
         }
 
+        @Override
+        public String getID() {
+            return id == null ? "0815" : id;
+        }
+
         public synchronized List<IActivityDataObject> getReceivedActivities() {
             return new ArrayList<IActivityDataObject>(
                 receivedActivityDataObjects);
         }
     }
-
-    private static final SessionIDObservable SESSION_ID_ALICE;
-    private static final SessionIDObservable SESSION_ID_BOB;
 
     private static final JID ALICE_JID = new JID("alice@test/Saros");
     private static final JID BOB_JID = new JID("bob@test/Saros");
@@ -98,14 +105,6 @@ public class ActivitySequencerTest {
 
     private ActivitySequencer aliceSequencer;
     private ActivitySequencer bobSequencer;
-
-    static {
-        SESSION_ID_ALICE = new SessionIDObservable();
-        SESSION_ID_BOB = new SessionIDObservable();
-
-        SESSION_ID_ALICE.setValue("alice");
-        SESSION_ID_BOB.setValue("bob");
-    }
 
     @Before
     public void setUp() {
@@ -145,7 +144,7 @@ public class ActivitySequencerTest {
     @Test(timeout = 30000)
     public void testStartAndStop() {
         ActivitySequencer sequencer = new ActivitySequencer(sessionStubAlice,
-            aliceTransmitter, aliceReceiver, null, SESSION_ID_ALICE);
+            aliceTransmitter, aliceReceiver, null);
 
         sequencer.start();
         sequencer.stop();
@@ -171,7 +170,7 @@ public class ActivitySequencerTest {
         EasyMock.replay(brokenTransmitter);
 
         aliceSequencer = new ActivitySequencer(sessionStubAlice,
-            brokenTransmitter, aliceReceiver, null, SESSION_ID_ALICE);
+            brokenTransmitter, aliceReceiver, null);
 
         aliceSequencer.start();
 
@@ -198,10 +197,10 @@ public class ActivitySequencerTest {
         int activityCount = 1000;
 
         aliceSequencer = new ActivitySequencer(sessionStubAlice,
-            aliceTransmitter, aliceReceiver, null, SESSION_ID_ALICE);
+            aliceTransmitter, aliceReceiver, null);
 
         bobSequencer = new ActivitySequencer(sessionStubBob, bobTransmitter,
-            bobReceiver, null, SESSION_ID_ALICE);
+            bobReceiver, null);
 
         aliceSequencer.start();
         bobSequencer.start();
@@ -240,10 +239,10 @@ public class ActivitySequencerTest {
     public void testSendWithoutRegisteredUser() {
 
         aliceSequencer = new ActivitySequencer(sessionStubAlice,
-            aliceTransmitter, aliceReceiver, null, SESSION_ID_ALICE);
+            aliceTransmitter, aliceReceiver, null);
 
         bobSequencer = new ActivitySequencer(sessionStubBob, bobTransmitter,
-            bobReceiver, null, SESSION_ID_ALICE);
+            bobReceiver, null);
 
         aliceSequencer.start();
         bobSequencer.start();
@@ -274,10 +273,10 @@ public class ActivitySequencerTest {
     public void testReceiveWithoutRegisteredUser() {
 
         aliceSequencer = new ActivitySequencer(sessionStubAlice,
-            aliceTransmitter, aliceReceiver, null, SESSION_ID_ALICE);
+            aliceTransmitter, aliceReceiver, null);
 
         bobSequencer = new ActivitySequencer(sessionStubBob, bobTransmitter,
-            bobReceiver, null, SESSION_ID_ALICE);
+            bobReceiver, null);
 
         aliceSequencer.start();
         bobSequencer.start();
@@ -308,10 +307,11 @@ public class ActivitySequencerTest {
     public void testSendAndReceiveWithDifferendSessionIDs() {
 
         aliceSequencer = new ActivitySequencer(sessionStubAlice,
-            aliceTransmitter, aliceReceiver, null, SESSION_ID_ALICE);
+            aliceTransmitter, aliceReceiver, null);
 
+        sessionStubBob.setID("4711");
         bobSequencer = new ActivitySequencer(sessionStubBob, bobTransmitter,
-            bobReceiver, null, SESSION_ID_BOB);
+            bobReceiver, null);
 
         aliceSequencer.start();
         bobSequencer.start();

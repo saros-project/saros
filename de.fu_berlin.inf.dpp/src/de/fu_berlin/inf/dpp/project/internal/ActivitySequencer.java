@@ -43,7 +43,6 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesExtension;
-import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.ActivityUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -189,13 +188,11 @@ public class ActivitySequencer implements Startable {
 
     private boolean stopSending = false;
 
-    private String currentSessionID;
+    private final String currentSessionID;
 
     private Thread activitySendThread;
 
     private final ISarosSession sarosSession;
-
-    private final SessionIDObservable sessionIDObservable;
 
     private final ITransmitter transmitter;
 
@@ -209,14 +206,13 @@ public class ActivitySequencer implements Startable {
 
     public ActivitySequencer(final ISarosSession sarosSession,
         final ITransmitter transmitter, final IReceiver receiver,
-        final DispatchThreadContext threadContext,
-        final SessionIDObservable sessionIDObservable) {
+        final DispatchThreadContext threadContext) {
 
         this.dispatchThread = threadContext;
         this.sarosSession = sarosSession;
         this.transmitter = transmitter;
         this.receiver = receiver;
-        this.sessionIDObservable = sessionIDObservable;
+        this.currentSessionID = sarosSession.getID();
 
         this.bufferedIncomingActivities = new HashMap<JID, ActivityBuffer<SequencedActivity>>();
         this.bufferedOutgoingActivities = new HashMap<JID, ActivityBuffer<IActivityDataObject>>();
@@ -236,8 +232,6 @@ public class ActivitySequencer implements Startable {
 
         if (started)
             throw new IllegalStateException("sequencer is already started");
-
-        currentSessionID = sessionIDObservable.getValue();
 
         receiver.addPacketListener(activitiesPacketListener,
             ActivitiesExtension.PROVIDER.getPacketFilter(currentSessionID));

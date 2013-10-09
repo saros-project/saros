@@ -10,7 +10,6 @@ import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.extensions.KickUserExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.SarosLeaveExtension;
-import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
@@ -32,21 +31,17 @@ public class LeaveAndKickHandler {
 
     private final ISarosSessionManager sessionManager;
 
-    private final SessionIDObservable sessionIDObservable;
-
     private final IReceiver receiver;
 
-    private ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+    private final ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
 
         @Override
         public void sessionStarted(ISarosSession session) {
             receiver.addPacketListener(leaveExtensionListener,
-                SarosLeaveExtension.PROVIDER
-                    .getPacketFilter(sessionIDObservable.getValue()));
+                SarosLeaveExtension.PROVIDER.getPacketFilter(session.getID()));
 
             receiver.addPacketListener(kickExtensionListener,
-                KickUserExtension.PROVIDER.getPacketFilter(sessionIDObservable
-                    .getValue()));
+                KickUserExtension.PROVIDER.getPacketFilter(session.getID()));
         }
 
         @Override
@@ -56,7 +51,7 @@ public class LeaveAndKickHandler {
         }
     };
 
-    private PacketListener leaveExtensionListener = new PacketListener() {
+    private final PacketListener leaveExtensionListener = new PacketListener() {
 
         @Override
         public void processPacket(Packet packet) {
@@ -64,7 +59,7 @@ public class LeaveAndKickHandler {
         }
     };
 
-    private PacketListener kickExtensionListener = new PacketListener() {
+    private final PacketListener kickExtensionListener = new PacketListener() {
 
         @Override
         public void processPacket(Packet packet) {
@@ -73,13 +68,11 @@ public class LeaveAndKickHandler {
     };
 
     public LeaveAndKickHandler(IReceiver receiver,
-        ISarosSessionManager sessionManager,
-        SessionIDObservable sessionIDObservable) {
+        ISarosSessionManager sessionManager) {
 
         this.receiver = receiver;
 
         this.sessionManager = sessionManager;
-        this.sessionIDObservable = sessionIDObservable;
 
         this.sessionManager.addSarosSessionListener(sessionListener);
     }

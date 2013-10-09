@@ -333,4 +333,10 @@ public class NullSarosSession implements ISarosSession {
         return false;
     }
 
+    @Override
+    public String getID() {
+        log.warn("unexpected method call");
+        return null;
+    }
+
 }

@@ -330,4 +330,9 @@ public class SarosSessionStub implements ISarosSession {
     public boolean userHasProject(User user, IProject project) {
         throw new RuntimeException("Unexpected call to Stub");
     }
+
+    @Override
+    public String getID() {
+        throw new RuntimeException("Unexpected call to Stub");
+    }
 }

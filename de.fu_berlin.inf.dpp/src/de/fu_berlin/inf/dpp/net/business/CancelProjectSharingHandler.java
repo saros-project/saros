@@ -9,7 +9,6 @@ import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelProjectNegotiationExtension;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
-import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
@@ -18,23 +17,22 @@ import de.fu_berlin.inf.dpp.util.Utils;
 
 public class CancelProjectSharingHandler {
 
-    private static Logger log = Logger
+    private static final Logger log = Logger
         .getLogger(CancelProjectSharingHandler.class.getName());
 
-    private ISarosSessionManager sessionManager;
+    private final ISarosSessionManager sessionManager;
 
-    private SessionIDObservable sessionIDObservable;
-    private ProjectNegotiationObservable projectExchangeProcesses;
+    private final ProjectNegotiationObservable projectExchangeProcesses;
 
-    private IReceiver receiver;
+    private final IReceiver receiver;
 
-    private ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+    private final ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
 
         @Override
         public void sessionStarted(ISarosSession session) {
             receiver.addPacketListener(cancelProjectNegotiationListener,
                 CancelProjectNegotiationExtension.PROVIDER
-                    .getPacketFilter(sessionIDObservable.getValue()));
+                    .getPacketFilter(session.getID()));
         }
 
         @Override
@@ -43,7 +41,7 @@ public class CancelProjectSharingHandler {
         }
     };
 
-    private PacketListener cancelProjectNegotiationListener = new PacketListener() {
+    private final PacketListener cancelProjectNegotiationListener = new PacketListener() {
 
         @Override
         public void processPacket(Packet packet) {
@@ -56,13 +54,11 @@ public class CancelProjectSharingHandler {
 
     public CancelProjectSharingHandler(IReceiver receiver,
         ISarosSessionManager sessionManager,
-        SessionIDObservable sessionIDObservable,
         ProjectNegotiationObservable projectNegotiationObservable) {
 
         this.receiver = receiver;
 
         this.sessionManager = sessionManager;
-        this.sessionIDObservable = sessionIDObservable;
         this.projectExchangeProcesses = projectNegotiationObservable;
 
         this.sessionManager.addSarosSessionListener(sessionListener);

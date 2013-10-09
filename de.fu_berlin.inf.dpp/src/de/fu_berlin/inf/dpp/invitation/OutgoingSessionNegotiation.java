@@ -27,7 +27,6 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationCompletedExtension
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationOfferingExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationParameterExchangeExtension;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
-import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ColorNegotiationHook;
@@ -64,9 +63,6 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
     @Inject
     private DiscoveryManager discoveryManager;
-
-    @Inject
-    private SessionIDObservable sessionID;
 
     @Inject
     private DataTransferManager dataTransferManager;
@@ -318,7 +314,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
             .invert();
 
         InvitationOfferingExtension invitationOffering = new InvitationOfferingExtension(
-            invitationID, sessionID.getValue(), sarosSession.getSessionStart(),
+            invitationID, sarosSession.getID(), sarosSession.getSessionStart(),
             localVersionInfo, description);
 
         transmitter.sendMessageToUser(peer,

@@ -23,7 +23,6 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.UserFinishedProjectNegotiati
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension.UserListEntry;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListReceivedExtension;
-import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
@@ -46,8 +45,6 @@ public class UserInformationHandler implements Startable {
 
     private final ISarosSession session;
 
-    private final SessionIDObservable sessionID;
-
     private String currentSessionID;
 
     private final PacketListener userListListener = new PacketListener() {
@@ -67,17 +64,15 @@ public class UserInformationHandler implements Startable {
     };
 
     public UserInformationHandler(ISarosSession session,
-        SessionIDObservable sessionID, ITransmitter transmitter,
-        IReceiver receiver) {
+        ITransmitter transmitter, IReceiver receiver) {
         this.session = session;
-        this.sessionID = sessionID;
+        this.currentSessionID = session.getID();
         this.transmitter = transmitter;
         this.receiver = receiver;
     }
 
     @Override
     public void start() {
-        currentSessionID = sessionID.getValue();
 
         receiver.addPacketListener(userListListener,
             UserListExtension.PROVIDER.getPacketFilter(currentSessionID));

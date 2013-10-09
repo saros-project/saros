@@ -497,4 +497,11 @@ public interface ISarosSession {
      * activities.
      */
     public void disableQueuing();
+
+    /**
+     * Returns the id of the current session.
+     * 
+     * @return the id of the current session
+     */
+    public String getID();
 }
