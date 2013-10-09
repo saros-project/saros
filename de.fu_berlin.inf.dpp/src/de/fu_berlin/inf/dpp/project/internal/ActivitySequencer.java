@@ -184,6 +184,8 @@ public class ActivitySequencer implements Startable {
         }
     };
 
+    private volatile IActivitySequencerCallback callback;
+
     private boolean started = false;
 
     private boolean stopSending = false;
@@ -283,6 +285,10 @@ public class ActivitySequencer implements Startable {
         stopSending = false;
         activitySendThread = null;
         started = false;
+    }
+
+    public void setCallback(IActivitySequencerCallback callback) {
+        this.callback = callback;
     }
 
     /*
@@ -505,6 +511,11 @@ public class ActivitySequencer implements Startable {
              * connection (sometimes forever) we will "shutdown" the user here
              */
             unregisterUser(recipient);
+
+            IActivitySequencerCallback currentCallback = callback;
+
+            if (currentCallback != null)
+                currentCallback.transmissionFailed(recipient);
         }
     }
 

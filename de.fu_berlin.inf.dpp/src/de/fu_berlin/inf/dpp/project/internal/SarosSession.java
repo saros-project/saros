@@ -96,6 +96,8 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SharedProject;
 import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
+import de.fu_berlin.inf.dpp.project.internal.timeout.ClientSessionTimeoutHandler;
+import de.fu_berlin.inf.dpp.project.internal.timeout.ServerSessionTimeoutHandler;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
@@ -1230,6 +1232,11 @@ public final class SarosSession implements ISarosSession {
         sessionContainer.addComponent(IActivityHandlerCallback.class,
             activityCallback);
         sessionContainer.addComponent(UserInformationHandler.class);
+        // Timeout
+        if (isHost())
+            sessionContainer.addComponent(ServerSessionTimeoutHandler.class);
+        else
+            sessionContainer.addComponent(ClientSessionTimeoutHandler.class);
 
         // Force the creation of the above components.
         sessionContainer.getComponents();
