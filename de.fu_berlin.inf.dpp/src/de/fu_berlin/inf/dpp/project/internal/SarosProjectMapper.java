@@ -13,9 +13,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -43,8 +40,12 @@ class SarosProjectMapper {
     /**
      * Mapping from project IDs to currently registered shared projects.
      */
-    private BiMap<String, IProject> sharedProjects = HashBiMap.create();
+    private Map<String, IProject> idToProjectMapping = new HashMap<String, IProject>();
 
+    /**
+     * Mapping from currently registered shared projects to their id's.
+     */
+    private Map<IProject, String> projectToIDMapping = new HashMap<IProject, String>();
     /**
      * Mapping of which user shared which project in the session. Needed for
      * partial sharing when the Needbased Feature is enabled.
@@ -127,8 +128,8 @@ class SarosProjectMapper {
         if (project == null)
             throw new NullPointerException("project is null");
 
-        String currentProjectID = sharedProjects.inverse().get(project);
-        IProject currentProject = sharedProjects.get(id);
+        String currentProjectID = projectToIDMapping.get(project);
+        IProject currentProject = idToProjectMapping.get(id);
 
         if (currentProjectID != null && !id.equals(currentProjectID)) {
             throw new IllegalStateException("cannot assign ID " + id
@@ -178,7 +179,8 @@ class SarosProjectMapper {
             return;
         }
 
-        sharedProjects.put(id, project);
+        idToProjectMapping.put(id, project);
+        projectToIDMapping.put(project, id);
 
         if (isPartially)
             partiallySharedResourceMapping.put(project,
@@ -200,7 +202,7 @@ class SarosProjectMapper {
      *            the id of the project to remove
      */
     public synchronized void removeProject(String id) {
-        IProject project = sharedProjects.get(id);
+        IProject project = idToProjectMapping.get(id);
 
         if (project == null) {
             LOG.warn("could not remove project, no project is registerid with ID: "
@@ -213,7 +215,8 @@ class SarosProjectMapper {
         else
             completelySharedProjects.remove(project);
 
-        sharedProjects.remove(id);
+        idToProjectMapping.remove(id);
+        projectToIDMapping.remove(project);
         partiallySharedResourceMapping.remove(project);
         SharedProject sharedProject = sharedProjectResources.remove(id);
         sharedProject.delete();
@@ -280,7 +283,7 @@ class SarosProjectMapper {
     public synchronized void addResources(IProject project,
         Collection<? extends IResource> resources) {
 
-        if (sharedProjects.inverse().get(project) == null) {
+        if (projectToIDMapping.get(project) == null) {
             LOG.warn("could not add resources to project " + project
                 + " because it is not shared");
             // throw new IllegalStateException(
@@ -328,7 +331,7 @@ class SarosProjectMapper {
     public synchronized void removeResources(IProject project,
         Collection<? extends IResource> resources) {
 
-        if (sharedProjects.inverse().get(project) == null) {
+        if (projectToIDMapping.get(project) == null) {
             LOG.warn("could not remove resources from project " + project
                 + " because it is not shared");
             // throw new IllegalStateException(
@@ -386,7 +389,7 @@ class SarosProjectMapper {
      *         is not shared
      */
     public synchronized String getID(IProject project) {
-        return sharedProjects.inverse().get(project);
+        return projectToIDMapping.get(project);
     }
 
     /**
@@ -397,7 +400,7 @@ class SarosProjectMapper {
      *         shared project is registered with this ID
      */
     public synchronized IProject getProject(String id) {
-        return sharedProjects.get(id);
+        return idToProjectMapping.get(id);
     }
 
     /**
@@ -412,11 +415,11 @@ class SarosProjectMapper {
             return false;
 
         if (resource.getType() == IResource.PROJECT)
-            return sharedProjects.containsValue(resource);
+            return idToProjectMapping.containsValue(resource);
 
         IProject project = resource.getProject();
 
-        if (!sharedProjects.containsValue(project))
+        if (!idToProjectMapping.containsValue(project))
             return false;
 
         if (isCompletelyShared(project))
@@ -433,7 +436,7 @@ class SarosProjectMapper {
      * @return
      */
     public synchronized Set<IProject> getProjects() {
-        return new HashSet<IProject>(sharedProjects.values());
+        return new HashSet<IProject>(idToProjectMapping.values());
     }
 
     /**
@@ -465,7 +468,7 @@ class SarosProjectMapper {
      * @return
      */
     public synchronized int size() {
-        return sharedProjects.size();
+        return idToProjectMapping.size();
     }
 
     public synchronized SharedProject getSharedProject(String projectID) {
@@ -549,7 +552,7 @@ class SarosProjectMapper {
      */
     public synchronized void addMissingProjectsToUser(User user) {
         List<String> projects = new ArrayList<String>();
-        for (String project : sharedProjects.keySet()) {
+        for (String project : idToProjectMapping.keySet()) {
             projects.add(project);
         }
 

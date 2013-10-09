@@ -52,8 +52,6 @@ import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.Startable;
 import org.picocontainer.annotations.Inject;
 
-import com.google.common.collect.ImmutableList;
-
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.ConnectionException;
@@ -285,8 +283,8 @@ public class StreamServiceManager implements Startable {
         synchronized (sessions) {
             // avoid ConcurrentModificationException when a sessions removes
             // itself
-            for (StreamSession session : ImmutableList
-                .copyOf(sessions.values())) {
+            for (StreamSession session : new ArrayList<StreamSession>(
+                sessions.values())) {
                 session.dispose();
             }
             sessions.clear();
