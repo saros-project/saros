@@ -84,21 +84,12 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         if (data.length > PACKET_EXTENSION_COMPRESS_THRESHOLD)
             transferDescription.setCompressContent(true);
 
-        try {
-            // recipient is included in the transfer description
-            if (connectionID == null)
-                dataManager.sendData(transferDescription, data);
-            else
-                dataManager.sendData(connectionID, transferDescription, data);
+        // recipient is included in the transfer description
+        if (connectionID == null)
+            dataManager.sendData(transferDescription, data);
+        else
+            dataManager.sendData(connectionID, transferDescription, data);
 
-            return;
-        } catch (IOException e) {
-            log.error(
-                "could not send packet extension through a direct connection to "
-                    + Utils.prefix(recipient) + " ("
-                    + Utils.formatByte(data.length) + ")", e);
-            throw e;
-        }
     }
 
     @Override
