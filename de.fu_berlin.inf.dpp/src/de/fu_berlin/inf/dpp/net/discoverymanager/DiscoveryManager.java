@@ -41,6 +41,8 @@ import de.fu_berlin.inf.dpp.util.Utils;
 @Component(module = "net")
 public class DiscoveryManager implements Disposable {
 
+    private static final Logger LOG = Logger.getLogger(DiscoveryManager.class);
+
     /**
      * Exception used to signify that no entry has been found in the cache
      */
@@ -48,64 +50,70 @@ public class DiscoveryManager implements Disposable {
         private static final long serialVersionUID = -4340008321236181064L;
     }
 
-    private static final Logger log = Logger.getLogger(DiscoveryManager.class);
+    private static class DiscoverInfoWrapper {
+        public DiscoverInfo item;
+
+        public boolean isAvailable() {
+            return item != null;
+        }
+    }
 
     /**
      * The cache contains the results of calls to querySupport indexed by the
      * string value of a given JID. If the discovery failed, a null value is
      * stored.
      */
-    protected Map<String, DiscoverInfoWrapper> cache = Collections
+    private final Map<String, DiscoverInfoWrapper> cache = Collections
         .synchronizedMap(new HashMap<String, DiscoverInfoWrapper>());
 
     @Inject
-    protected SarosNet sarosNet;
+    private SarosNet sarosNet;
 
     @Inject
-    protected RosterTracker rosterTracker;
+    private RosterTracker rosterTracker;
 
-    protected CopyOnWriteArrayList<DiscoveryManagerListener> discoveryManagerListeners = new CopyOnWriteArrayList<DiscoveryManagerListener>();
+    private final CopyOnWriteArrayList<DiscoveryManagerListener> discoveryManagerListeners = new CopyOnWriteArrayList<DiscoveryManagerListener>();
 
-    /*
+    /**
      * Queues incoming calls that check Saros support by going to the discovery
      * server. Max number of concurrent threads = 3.
      */
-    ExecutorService supportExecutor = Executors.newFixedThreadPool(3,
-        new NamedThreadFactory("DiscoveryExecuter-"));
+    private final ExecutorService supportExecutor = Executors
+        .newFixedThreadPool(3, new NamedThreadFactory("DiscoveryExecuter-"));
 
     /**
      * This RosterListener closure is added to the RosterTracker to get
      * notifications when the roster changes.
      */
-    protected IRosterListener rosterListener = new IRosterListener() {
+    private final IRosterListener rosterListener = new IRosterListener() {
 
         /**
          * Stores the most recent presence for each user, so we can keep track
          * of away/available changes which should not update the RosterView.
          */
-        protected Map<String, Presence> lastPresenceMap = new HashMap<String, Presence>();
+        private final Map<String, Presence> lastPresenceMap = new HashMap<String, Presence>();
 
-        protected void clearCache(Presence presence) {
+        private void clearCache(Presence presence) {
             String rjid = presence.getFrom();
             if (rjid == null) {
-                log.error("presence.getFrom() is null");
+                LOG.error("presence.getFrom() is null");
                 return;
             }
 
             DiscoverInfoWrapper infoWrapper = cache.remove(rjid);
             if (infoWrapper != null) {
                 if (infoWrapper.isAvailable()) {
-                    log.debug("clearing cache entry of contact " + rjid + ": "
+                    LOG.debug("clearing cache entry of contact " + rjid + ": "
                         + infoWrapper.item.getChildElementXML());
                 } else {
-                    log.debug("clearing cache entry of contact " + rjid
+                    LOG.debug("clearing cache entry of contact " + rjid
                         + " but cache entry is empty (a discovery is "
                         + "still running or the last one failed)");
                 }
             }
         }
 
-        protected void clearCache(Collection<String> addresses) {
+        private void clearCache(Collection<String> addresses) {
             for (String pjid : addresses) {
                 /*
                  * TODO We should remove all presences kept for the given
@@ -120,19 +128,19 @@ public class DiscoveryManager implements Disposable {
 
         @Override
         public void entriesAdded(Collection<String> addresses) {
-            log.trace("entriesAdded");
+            LOG.trace("entriesAdded");
             clearCache(addresses);
         }
 
         @Override
         public void entriesDeleted(Collection<String> addresses) {
-            log.trace("entriesDeleted");
+            LOG.trace("entriesDeleted");
             clearCache(addresses);
         }
 
         @Override
         public void entriesUpdated(Collection<String> addresses) {
-            log.trace("entriesUpdated");
+            LOG.trace("entriesUpdated");
             // TODO This is called to frequently by smack and invalidates our
             // beautiful cache!
             clearCache(addresses);
@@ -140,13 +148,13 @@ public class DiscoveryManager implements Disposable {
 
         @Override
         public void presenceChanged(Presence current) {
-            log.trace("presenceChanged: " + current.toString());
+            LOG.trace("presenceChanged: " + current.toString());
             if (hasOnlineStateChanged(current))
                 clearCache(current);
             lastPresenceMap.put(current.getFrom(), current);
         }
 
-        protected boolean hasOnlineStateChanged(Presence presence) {
+        private boolean hasOnlineStateChanged(Presence presence) {
             Presence last = lastPresenceMap.get(presence.getFrom());
             if (last == null)
                 return false;
@@ -176,6 +184,7 @@ public class DiscoveryManager implements Disposable {
     @Override
     public void dispose() {
         rosterTracker.removeRosterListener(rosterListener);
+        supportExecutor.shutdownNow();
     }
 
     /**
@@ -289,7 +298,7 @@ public class DiscoveryManager implements Disposable {
 
             String rjid = presence.getFrom();
             if (rjid == null) {
-                log.error("presence.getFrom() is null");
+                LOG.error("presence.getFrom() is null");
                 continue;
             }
 
@@ -312,23 +321,12 @@ public class DiscoveryManager implements Disposable {
         try {
             isSupportedNonBlock(contact, Saros.NAMESPACE);
         } catch (CacheMissException e) {
-            supportExecutor.execute(Utils.wrapSafe(log, new Runnable() {
+            supportExecutor.execute(Utils.wrapSafe(LOG, new Runnable() {
                 @Override
                 public void run() {
                     isSarosSupported(contact);
                 }
             }));
-        }
-    }
-
-    /**
-     * DiscoverInfo wrapper.
-     */
-    protected static class DiscoverInfoWrapper {
-        public DiscoverInfo item;
-
-        public boolean isAvailable() {
-            return item != null;
         }
     }
 
@@ -345,10 +343,10 @@ public class DiscoveryManager implements Disposable {
      * @caching If results are available in the cache, they are used instead of
      *          querying the server.
      */
-    protected boolean isFeatureSupported(JID recipient, String feature) {
+    private boolean isFeatureSupported(JID recipient, String feature) {
 
         if (recipient.getResource().equals(""))
-            log.warn("Resource missing: ", new StackTrace());
+            LOG.warn("Resource missing: ", new StackTrace());
 
         DiscoverInfoWrapper info;
 
@@ -373,7 +371,7 @@ public class DiscoveryManager implements Disposable {
             else {
                 disco = info.item = querySupport(recipient);
                 if (disco != null)
-                    log.debug("Inserted DiscoveryInfo into Cache for: "
+                    LOG.debug("Inserted DiscoveryInfo into Cache for: "
                         + recipient);
             }
         }
@@ -406,14 +404,14 @@ public class DiscoveryManager implements Disposable {
      * @nonCaching This method does not use a cache, but queries the server
      *             directly.
      */
-    protected DiscoverInfo querySupport(final JID recipient) {
+    private DiscoverInfo querySupport(final JID recipient) {
 
         if (recipient.getResource().equals(""))
-            log.warn("Service discovery is likely to "
+            LOG.warn("Service discovery is likely to "
                 + "fail because resource is missing: " + recipient.toString(),
                 new StackTrace());
 
-        Connection connection = sarosNet.getConnection();
+        final Connection connection = sarosNet.getConnection();
 
         if (connection == null)
             throw new IllegalStateException("Not Connected");
@@ -425,7 +423,7 @@ public class DiscoveryManager implements Disposable {
             return sdm.discoverInfo(recipient.toString());
         } catch (XMPPException e) {
 
-            log.warn(
+            LOG.warn(
                 "Service Discovery failed on recipient " + recipient.toString()
                     + " server: " + connection.getHost(), e);
             return null;
@@ -439,7 +437,7 @@ public class DiscoveryManager implements Disposable {
      */
     public void addDiscoveryManagerListener(
         DiscoveryManagerListener discoveryManagerListener) {
-        this.discoveryManagerListeners.addIfAbsent(discoveryManagerListener);
+        discoveryManagerListeners.addIfAbsent(discoveryManagerListener);
     }
 
     /**
@@ -449,7 +447,7 @@ public class DiscoveryManager implements Disposable {
      */
     public void removeDiscoveryManagerListener(
         DiscoveryManagerListener discoveryManagerListener) {
-        this.discoveryManagerListeners.remove(discoveryManagerListener);
+        discoveryManagerListeners.remove(discoveryManagerListener);
     }
 
     /**
