@@ -119,7 +119,7 @@ public class RosterTracker implements IConnectionListener {
      * 
      * An empty list is returned if no presence for the given JID is online.
      */
-    public Iterable<JID> getAvailablePresences(JID from) {
+    public List<JID> getAvailablePresences(JID from) {
         if (from == null)
             throw new IllegalArgumentException("JID cannot be null");
 

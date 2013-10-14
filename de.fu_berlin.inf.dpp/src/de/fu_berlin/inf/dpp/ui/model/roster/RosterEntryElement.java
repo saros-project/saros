@@ -20,7 +20,6 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManager;
-import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManager.CacheMissException;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
@@ -135,14 +134,12 @@ public class RosterEntryElement extends TreeElement {
     }
 
     public boolean isSarosSupported() {
-        boolean sarosSupported = false;
+        Boolean sarosSupported = discoveryManager.isFeatureSupported(jid,
+            Saros.NAMESPACE);
 
-        try {
-            sarosSupported = this.discoveryManager.isSupportedNonBlock(jid,
-                Saros.NAMESPACE);
-        } catch (CacheMissException e) {
-            // Saros support wasn't in cache. Update the discovery manager.
+        if (sarosSupported == null) {
             discoveryManager.cacheSarosSupport(jid);
+            return false;
         }
 
         return sarosSupported;

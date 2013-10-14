@@ -1,8 +1,10 @@
 package de.fu_berlin.inf.dpp.net.discoverymanager;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
@@ -42,13 +44,6 @@ import de.fu_berlin.inf.dpp.util.Utils;
 public class DiscoveryManager implements Disposable {
 
     private static final Logger LOG = Logger.getLogger(DiscoveryManager.class);
-
-    /**
-     * Exception used to signify that no entry has been found in the cache
-     */
-    public static class CacheMissException extends Exception {
-        private static final long serialVersionUID = -4340008321236181064L;
-    }
 
     private static class DiscoverInfoWrapper {
         public DiscoverInfo item;
@@ -192,48 +187,49 @@ public class DiscoveryManager implements Disposable {
     }
 
     /**
-     * Returns true if there is an available presence which supports the given
-     * feature. Returns false if all available presences do not support the
-     * given feature.
+     * Checks if the given {@linkplain JID} supports the requested feature. If
+     * the JID is not resource qualified a best attempt is made to check all
+     * resources that are available for the given JID. This method does
+     * <b>not</b> perform any I/O operation and will return immediately.
      * 
-     * This method will not trigger any updates or block but rather just use the
-     * cache and return quickly.
-     * 
-     * @throws CacheMissException
-     *             if there is no available presences supporting the feature,
-     *             but not all presences have been queried for support yet.
-     * 
-     * @reentrant
-     * @nonBlocking
+     * @param recipient
+     *            {@link JID} of the contact to query support for
+     * @param namespace
+     *            the namespace of the feature
+     * @return <code>true</code> if the given feature is supported,
+     *         <code>false</code> if it is not supported or <b><code>null</code>
+     *         </b> if no information is available
      */
-    public boolean isSupportedNonBlock(JID jid, String namespace)
-        throws CacheMissException {
+    public Boolean isFeatureSupported(final JID recipient,
+        final String namespace) {
 
-        jid = jid.getBareJID();
+        Boolean supported = null;
 
-        boolean allCached = true;
+        final List<JID> jidsToQuery = new ArrayList<JID>();
 
-        for (JID rqJID : rosterTracker.getAvailablePresences(jid)) {
+        if (recipient.isBareJID())
+            jidsToQuery.addAll(rosterTracker.getAvailablePresences(recipient));
+        else
+            jidsToQuery.add(recipient);
 
-            if (!cache.containsKey(rqJID.toString())) {
-                allCached = false;
-                continue;
-            }
+        for (JID rqJID : jidsToQuery) {
 
             DiscoverInfoWrapper info = cache.get(rqJID.toString());
             if (info == null)
                 continue;
 
             DiscoverInfo disco = info.item;
-            if (disco != null && disco.containsFeature(namespace))
-                return true;
+
+            if (disco == null)
+                continue;
+
+            supported = disco.containsFeature(namespace);
+
+            if (supported)
+                break;
         }
 
-        if (allCached) {
-            return false;
-        }
-
-        throw new CacheMissException();
+        return supported;
     }
 
     /**
@@ -270,7 +266,7 @@ public class DiscoveryManager implements Disposable {
             }
 
             JID jidToCheck = new JID(rjid);
-            if (isFeatureSupported(jidToCheck, namespace)) {
+            if (isFeatureSupportedInternal(jidToCheck, namespace)) {
                 return jidToCheck;
             }
         }
@@ -285,16 +281,17 @@ public class DiscoveryManager implements Disposable {
      * @nonblocking This method start a new ASync thread.
      */
     public void cacheSarosSupport(final JID contact) {
-        try {
-            isSupportedNonBlock(contact, Saros.NAMESPACE);
-        } catch (CacheMissException e) {
-            threadPoolExecutor.execute(Utils.wrapSafe(LOG, new Runnable() {
-                @Override
-                public void run() {
-                    getSupportingPresence(contact, Saros.NAMESPACE);
-                }
-            }));
-        }
+        Boolean supported = isFeatureSupported(contact, Saros.NAMESPACE);
+
+        if (supported != null && supported)
+            return;
+
+        threadPoolExecutor.execute(Utils.wrapSafe(LOG, new Runnable() {
+            @Override
+            public void run() {
+                getSupportingPresence(contact, Saros.NAMESPACE);
+            }
+        }));
     }
 
     /**
@@ -310,7 +307,7 @@ public class DiscoveryManager implements Disposable {
      * @caching If results are available in the cache, they are used instead of
      *          querying the server.
      */
-    private boolean isFeatureSupported(JID recipient, String feature) {
+    private boolean isFeatureSupportedInternal(JID recipient, String feature) {
 
         if (recipient.getResource().equals(""))
             LOG.warn("Resource missing: ", new StackTrace());

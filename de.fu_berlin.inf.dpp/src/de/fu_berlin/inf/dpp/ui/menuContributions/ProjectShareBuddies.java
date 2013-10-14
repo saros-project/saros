@@ -21,7 +21,6 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManager;
-import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManager.CacheMissException;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
@@ -65,15 +64,10 @@ public class ProjectShareBuddies extends ContributionItem {
         int numSarosSupportedBuddies = 0;
 
         for (final RosterEntry rosterEntry : this.getSortedRosterEntries()) {
-            boolean sarosSupport;
-            try {
-                sarosSupport = discoveryManager.isSupportedNonBlock(new JID(
-                    rosterEntry.getUser()), Saros.NAMESPACE);
-            } catch (CacheMissException e) {
-                sarosSupport = true;
-            }
+            Boolean sarosSupport = discoveryManager.isFeatureSupported(new JID(
+                rosterEntry.getUser()), Saros.NAMESPACE);
 
-            if (sarosSupport) {
+            if (sarosSupport != null && sarosSupport) {
                 createBuddyMenuItem(menu, numSarosSupportedBuddies++,
                     rosterEntry, selectedResources);
             }
