@@ -6,7 +6,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
@@ -70,12 +72,10 @@ public class DiscoveryManager implements Disposable {
 
     private final CopyOnWriteArrayList<DiscoveryManagerListener> discoveryManagerListeners = new CopyOnWriteArrayList<DiscoveryManagerListener>();
 
-    /**
-     * Queues incoming calls that check Saros support by going to the discovery
-     * server. Max number of concurrent threads = 3.
-     */
-    private final ExecutorService supportExecutor = Executors
-        .newFixedThreadPool(3, new NamedThreadFactory("DiscoveryExecuter-"));
+    /** Thread pool to execute service discovery requests asynchronously. */
+    private final ExecutorService threadPoolExecutor = new ThreadPoolExecutor(
+        0, 2, 30, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(),
+        new NamedThreadFactory("ServiceDiscoveryWorker", false));
 
     /**
      * This RosterListener closure is added to the RosterTracker to get
@@ -188,7 +188,7 @@ public class DiscoveryManager implements Disposable {
     @Override
     public void dispose() {
         rosterTracker.removeRosterListener(rosterListener);
-        supportExecutor.shutdownNow();
+        threadPoolExecutor.shutdownNow();
     }
 
     /**
@@ -288,7 +288,7 @@ public class DiscoveryManager implements Disposable {
         try {
             isSupportedNonBlock(contact, Saros.NAMESPACE);
         } catch (CacheMissException e) {
-            supportExecutor.execute(Utils.wrapSafe(LOG, new Runnable() {
+            threadPoolExecutor.execute(Utils.wrapSafe(LOG, new Runnable() {
                 @Override
                 public void run() {
                     getSupportingPresence(contact, Saros.NAMESPACE);
