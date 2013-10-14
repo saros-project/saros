@@ -17,7 +17,6 @@ import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.packet.DiscoverInfo;
 import org.jivesoftware.smackx.packet.Jingle;
 import org.picocontainer.Disposable;
-import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -66,11 +65,9 @@ public class DiscoveryManager implements Disposable {
     private final Map<String, DiscoverInfoWrapper> cache = Collections
         .synchronizedMap(new HashMap<String, DiscoverInfoWrapper>());
 
-    @Inject
-    private SarosNet sarosNet;
+    private final SarosNet network;
 
-    @Inject
-    private RosterTracker rosterTracker;
+    private final RosterTracker rosterTracker;
 
     private final CopyOnWriteArrayList<DiscoveryManagerListener> discoveryManagerListeners = new CopyOnWriteArrayList<DiscoveryManagerListener>();
 
@@ -95,12 +92,14 @@ public class DiscoveryManager implements Disposable {
 
         private void clearCache(Presence presence) {
             String rjid = presence.getFrom();
+
             if (rjid == null) {
                 LOG.error("presence.getFrom() is null");
                 return;
             }
 
             DiscoverInfoWrapper infoWrapper = cache.remove(rjid);
+
             if (infoWrapper != null) {
                 if (infoWrapper.isAvailable()) {
                     LOG.debug("clearing cache entry of contact " + rjid + ": "
@@ -141,16 +140,20 @@ public class DiscoveryManager implements Disposable {
         @Override
         public void entriesUpdated(Collection<String> addresses) {
             LOG.trace("entriesUpdated");
-            // TODO This is called to frequently by smack and invalidates our
-            // beautiful cache!
+            /*
+             * TODO This is called to frequently by Smack and invalidates our
+             * beautiful cache!
+             */
             clearCache(addresses);
         }
 
         @Override
         public void presenceChanged(Presence current) {
             LOG.trace("presenceChanged: " + current.toString());
+
             if (hasOnlineStateChanged(current))
                 clearCache(current);
+
             lastPresenceMap.put(current.getFrom(), current);
         }
 
@@ -173,8 +176,10 @@ public class DiscoveryManager implements Disposable {
         }
     };
 
-    public DiscoveryManager(RosterTracker rosterTracker) {
-        rosterTracker.addRosterListener(rosterListener);
+    public DiscoveryManager(SarosNet network, RosterTracker rosterTracker) {
+        this.network = network;
+        this.rosterTracker = rosterTracker;
+        this.rosterTracker.addRosterListener(rosterListener);
     }
 
     /**
@@ -411,7 +416,7 @@ public class DiscoveryManager implements Disposable {
                 + "fail because resource is missing: " + recipient.toString(),
                 new StackTrace());
 
-        final Connection connection = sarosNet.getConnection();
+        final Connection connection = network.getConnection();
 
         if (connection == null)
             throw new IllegalStateException("Not Connected");
@@ -456,7 +461,7 @@ public class DiscoveryManager implements Disposable {
      */
     private void notifyFeatureSupportUpdated(JID jid, String feature,
         boolean isSupported) {
-        for (DiscoveryManagerListener discoveryManagerListener : this.discoveryManagerListeners) {
+        for (DiscoveryManagerListener discoveryManagerListener : discoveryManagerListeners) {
             discoveryManagerListener.featureSupportUpdated(jid, feature,
                 isSupported);
         }
