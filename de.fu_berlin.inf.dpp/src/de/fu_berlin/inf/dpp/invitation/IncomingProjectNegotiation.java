@@ -153,8 +153,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      *            user (given from the {@link EnterProjectNamePage})
      */
     public Status accept(Map<String, String> projectNames,
-        IProgressMonitor monitor, Map<String, Boolean> skipSyncs,
-        boolean useVersionControl) {
+        IProgressMonitor monitor, boolean useVersionControl) {
 
         synchronized (this) {
             running = true;
@@ -194,7 +193,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 .addFileTransferListener(archiveTransferListener);
 
             List<FileList> missingFiles = calculateMissingFiles(projectNames,
-                skipSyncs, useVersionControl, this.monitor.newChild(10));
+                useVersionControl, this.monitor.newChild(10));
 
             transmitter
                 .sendToSessionUser(ISarosSession.SESSION_CONNECTION_ID, peer,
@@ -375,9 +374,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      *            projectID => projectName (in local workspace)
      */
     private List<FileList> calculateMissingFiles(
-        Map<String, String> projectNames, Map<String, Boolean> skipSyncs,
-        boolean useVersionControl, SubMonitor subMonitor)
-        throws SarosCancellationException, IOException {
+        Map<String, String> projectNames, boolean useVersionControl,
+        SubMonitor subMonitor) throws SarosCancellationException, IOException {
 
         subMonitor.beginTask(null, 100);
         int numberOfLoops = projectNames.size();
@@ -437,8 +435,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             log.debug("compute required Files for project " + projectName
                 + " with ID: " + projectID);
             FileList requiredFiles = computeRequiredFiles(localProject,
-                projectInfo.getFileList(), projectID, skipSyncs.get(projectID)
-                    .booleanValue(), vcs, lMonitor.newChild(30));
+                projectInfo.getFileList(), projectID, vcs,
+                lMonitor.newChild(30));
             requiredFiles.setProjectID(projectID);
             checkCancellation(CancelOption.NOTIFY_PEER);
             missingFiles.add(requiredFiles);
@@ -610,8 +608,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * 
      * @param currentLocalProject
      * @param remoteFileList
-     * @param skipSync
-     *            Skip the initial synchronization.
      * @param vcs
      *            The VCS adapter of the local project.
      * @param monitor
@@ -622,14 +618,9 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * @throws IOException
      */
     private FileList computeRequiredFiles(IProject currentLocalProject,
-        FileList remoteFileList, String projectID, boolean skipSync,
-        VCSAdapter vcs, IProgressMonitor monitor)
-        throws LocalCancellationException, IOException {
-
-        if (skipSync) {
-            monitor.done();
-            return FileListFactory.createEmptyFileList();
-        }
+        FileList remoteFileList, String projectID, VCSAdapter vcs,
+        IProgressMonitor monitor) throws LocalCancellationException,
+        IOException {
 
         SubMonitor subMonitor = SubMonitor.convert(monitor,
             "Compute required Files...", 1);

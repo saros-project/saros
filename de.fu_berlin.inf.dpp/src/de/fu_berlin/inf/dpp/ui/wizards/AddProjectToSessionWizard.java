@@ -142,7 +142,6 @@ public class AddProjectToSessionWizard extends Wizard {
 
         final Map<String, IProject> sources = new HashMap<String, IProject>();
         final Map<String, String> projectNames = new HashMap<String, String>();
-        final Map<String, Boolean> skipProjectSyncing = new HashMap<String, Boolean>();
         final boolean useVersionControl = namePage.useVersionControl();
 
         for (FileList fList : this.fileLists) {
@@ -150,8 +149,6 @@ public class AddProjectToSessionWizard extends Wizard {
                 namePage.getSourceProject(fList.getProjectID()));
             projectNames.put(fList.getProjectID(),
                 namePage.getTargetProjectName(fList.getProjectID()));
-            skipProjectSyncing.put(fList.getProjectID(),
-                namePage.isSyncSkippingSelected(fList.getProjectID()));
         }
 
         List<IProject> existingProjects = new ArrayList<IProject>();
@@ -278,8 +275,7 @@ public class AddProjectToSessionWizard extends Wizard {
             protected IStatus run(IProgressMonitor monitor) {
                 try {
                     ProjectNegotiation.Status status = process.accept(
-                        projectNames, monitor, skipProjectSyncing,
-                        useVersionControl);
+                        projectNames, monitor, useVersionControl);
 
                     if (status != ProjectNegotiation.Status.OK)
                         return Status.CANCEL_STATUS;
