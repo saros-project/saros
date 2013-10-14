@@ -28,9 +28,9 @@ public class JupiterDocumentServer {
     /**
      * List of proxy clients.
      */
-    protected final HashMap<JID, Jupiter> proxies = new HashMap<JID, Jupiter>();
+    private final HashMap<JID, Jupiter> proxies = new HashMap<JID, Jupiter>();
 
-    protected final SPath editor;
+    private final SPath editor;
 
     /**
      * Create a new JupiterDocument (server-side) representing the document
@@ -41,14 +41,15 @@ public class JupiterDocumentServer {
     }
 
     public synchronized void addProxyClient(JID jid) {
-        if (!this.proxies.containsKey(jid))
-            this.proxies.put(jid, new Jupiter(false));
+        if (!proxies.containsKey(jid))
+            proxies.put(jid, new Jupiter(false));
     }
 
     public synchronized boolean removeProxyClient(JID jid) {
-        return this.proxies.remove(jid) != null;
+        return proxies.remove(jid) != null;
     }
 
+    // FIXME why is this not synchronized ?!
     public Map<JID, JupiterActivity> transformJupiterActivity(
         JupiterActivity jupiterActivity) throws TransformationException {
 
@@ -58,6 +59,17 @@ public class JupiterDocumentServer {
 
         // 1. Use JupiterClient of sender to transform JupiterActivity
         Jupiter sourceProxy = proxies.get(source.getJID());
+
+        /*
+         * TODO maybe just silently add a proxy ? currently the project is
+         * registered before decompression so it is possible to start working on
+         * the files during this phase and this is why this can return null
+         */
+
+        if (sourceProxy == null)
+            throw new IllegalStateException(
+                "no proxy client registered for client: " + source.getJID());
+
         Operation op = sourceProxy.receiveJupiterActivity(jupiterActivity);
 
         // 2. Generate outgoing JupiterActivities for all other clients and the
@@ -79,13 +91,6 @@ public class JupiterDocumentServer {
         }
 
         return result;
-    }
-
-    public boolean isExist(JID jid) {
-        if (this.proxies.containsKey(jid)) {
-            return true;
-        }
-        return false;
     }
 
     public synchronized void updateVectorTime(JID source, JID dest) {

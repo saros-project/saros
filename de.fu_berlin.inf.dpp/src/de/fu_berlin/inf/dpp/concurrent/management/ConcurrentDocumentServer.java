@@ -44,31 +44,10 @@ public class ConcurrentDocumentServer implements Startable {
 
     private final JupiterServer server;
 
-    private final ISharedProjectListener projectListener;
-
-    public ConcurrentDocumentServer(ISarosSession sarosSession) {
-
-        this.sarosSession = sarosSession;
-        this.server = new JupiterServer(sarosSession);
-        this.projectListener = new HostSideProjectListener();
-    }
-
-    @Override
-    public void start() {
-        sarosSession.addListener(projectListener);
-    }
-
-    @Override
-    public void stop() {
-        sarosSession.removeListener(projectListener);
-    }
-
     /**
      * ISharedProjectListener for updating Jupiter documents on the host.
-     * 
-     * @host
      */
-    public class HostSideProjectListener extends AbstractSharedProjectListener {
+    private final ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
 
         @Override
         public void userStartedQueuing(User user) {
@@ -79,6 +58,21 @@ public class ConcurrentDocumentServer implements Startable {
         public void userLeft(User user) {
             server.removeUser(user);
         }
+    };
+
+    public ConcurrentDocumentServer(ISarosSession sarosSession) {
+        this.sarosSession = sarosSession;
+        this.server = new JupiterServer(sarosSession);
+    }
+
+    @Override
+    public void start() {
+        sarosSession.addListener(projectListener);
+    }
+
+    @Override
+    public void stop() {
+        sarosSession.removeListener(projectListener);
     }
 
     /**

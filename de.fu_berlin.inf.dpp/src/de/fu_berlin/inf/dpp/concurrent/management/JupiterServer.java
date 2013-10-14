@@ -1,7 +1,9 @@
 package de.fu_berlin.inf.dpp.concurrent.management;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
@@ -25,7 +27,9 @@ public class JupiterServer {
      * 
      * @host
      */
-    protected HashMap<SPath, JupiterDocumentServer> concurrentDocuments = new HashMap<SPath, JupiterDocumentServer>();
+    private HashMap<SPath, JupiterDocumentServer> concurrentDocuments = new HashMap<SPath, JupiterDocumentServer>();
+
+    private Set<JID> currentClients = new HashSet<JID>();
 
     private ISarosSession sarosSession;
 
@@ -39,6 +43,7 @@ public class JupiterServer {
 
     public synchronized void addUser(User user) {
         JID jid = user.getJID();
+        currentClients.add(jid);
         for (JupiterDocumentServer server : concurrentDocuments.values()) {
             server.addProxyClient(jid);
         }
@@ -46,6 +51,7 @@ public class JupiterServer {
 
     public synchronized void removeUser(User user) {
         JID jid = user.getJID();
+        currentClients.remove(jid);
         for (JupiterDocumentServer server : concurrentDocuments.values()) {
             server.removeProxyClient(jid);
         }
@@ -54,23 +60,26 @@ public class JupiterServer {
     /**
      * @host
      */
+    /*
+     * FIXME this does currently only work the first time a project is added ...
+     * to really fix the issue we have to track the project ID / resources that
+     * are added to the project sharing for each user !
+     */
     protected synchronized JupiterDocumentServer getServer(SPath path) {
 
-        JupiterDocumentServer docServer = this.concurrentDocuments.get(path);
+        JupiterDocumentServer docServer = concurrentDocuments.get(path);
 
         if (docServer == null) {
-            // Create new document server
+            Set<JID> clients = new HashSet<JID>(currentClients);
+
+            clients.add(sarosSession.getHost().getJID());
+
             docServer = new JupiterDocumentServer(path);
 
-            // Create new local host document client
-            docServer.addProxyClient(sarosSession.getHost().getJID());
+            for (JID client : clients)
+                docServer.addProxyClient(client);
 
-            /** Add all users */
-            for (User user : sarosSession.getUsers()) {
-                docServer.addProxyClient(user.getJID());
-            }
-
-            this.concurrentDocuments.put(path, docServer);
+            concurrentDocuments.put(path, docServer);
         }
         return docServer;
     }
@@ -88,11 +97,9 @@ public class JupiterServer {
     }
 
     public synchronized Map<JID, ChecksumActivity> withTimestamp(
-        ChecksumActivity checksumActivity)
-        throws TransformationException {
+        ChecksumActivity checksumActivity) throws TransformationException {
 
-        JupiterDocumentServer docServer = getServer(checksumActivity
-            .getPath());
+        JupiterDocumentServer docServer = getServer(checksumActivity.getPath());
 
         return docServer.withTimestamp(checksumActivity);
     }
