@@ -21,7 +21,6 @@ import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.packet.DiscoverInfo;
 import org.picocontainer.Disposable;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -121,19 +120,16 @@ public class DiscoveryManager implements Disposable {
 
         @Override
         public void entriesAdded(Collection<String> addresses) {
-            LOG.trace("entriesAdded");
             clearCache(addresses);
         }
 
         @Override
         public void entriesDeleted(Collection<String> addresses) {
-            LOG.trace("entriesDeleted");
             clearCache(addresses);
         }
 
         @Override
         public void entriesUpdated(Collection<String> addresses) {
-            LOG.trace("entriesUpdated");
             /*
              * TODO This is called to frequently by Smack and invalidates our
              * beautiful cache!
@@ -142,26 +138,21 @@ public class DiscoveryManager implements Disposable {
         }
 
         @Override
-        public void presenceChanged(Presence current) {
-            LOG.trace("presenceChanged: " + current.toString());
+        public void presenceChanged(Presence presence) {
 
-            if (hasOnlineStateChanged(current))
-                clearCache(current);
+            if (hasOnlineStateChanged(presence))
+                clearCache(presence);
 
-            lastPresenceMap.put(current.getFrom(), current);
         }
 
         private boolean hasOnlineStateChanged(Presence presence) {
             Presence last = lastPresenceMap.get(presence.getFrom());
+            lastPresenceMap.put(presence.getFrom(), presence);
+
             if (last == null)
                 return false;
 
-            if (((last.isAvailable() || last.isAway()) && (presence
-                .isAvailable() || presence.isAway()))) {
-                return false;
-            }
-
-            return true;
+            return last.isAvailable() ^ presence.isAvailable();
         }
 
         @Override
@@ -176,10 +167,6 @@ public class DiscoveryManager implements Disposable {
         this.rosterTracker.addRosterListener(rosterListener);
     }
 
-    /**
-     * This must be called before finalization otherwise you will get NPE on
-     * RosterTracker.
-     */
     @Override
     public void dispose() {
         rosterTracker.removeRosterListener(rosterListener);
@@ -187,30 +174,57 @@ public class DiscoveryManager implements Disposable {
     }
 
     /**
-     * Checks if the given {@linkplain JID} supports the requested feature. If
-     * the JID is not resource qualified a best attempt is made to check all
-     * resources that are available for the given JID. This method does
-     * <b>not</b> perform any I/O operation and will return immediately.
+     * Adds a {@link DiscoveryManagerListener}
      * 
-     * @param recipient
-     *            {@link JID} of the contact to query support for
+     * @param discoveryManagerListener
+     */
+    public void addDiscoveryManagerListener(
+        DiscoveryManagerListener discoveryManagerListener) {
+        discoveryManagerListeners.addIfAbsent(discoveryManagerListener);
+    }
+
+    /**
+     * Removes a {@link DiscoveryManagerListener}
+     * 
+     * @param discoveryManagerListener
+     */
+    public void removeDiscoveryManagerListener(
+        DiscoveryManagerListener discoveryManagerListener) {
+        discoveryManagerListeners.remove(discoveryManagerListener);
+    }
+
+    /**
+     * Checks if the given {@linkplain JID} supports the requested feature. The
+     * JID may be non resource qualified in which case all presences belonging
+     * to that JID are checked.
+     * <p>
+     * This method does <b>not</b> perform any I/O operation and will return
+     * immediately.
+     * <p>
+     * <b>Please note the return value:
+     * <code>if(isFeatureSupported(foo, bar)) ... </code> is likely to produce a
+     * {@link NullPointerException NPE}.</b>
+     * 
+     * @param jid
+     *            {@link JID} to query support for
      * @param namespace
      *            the namespace of the feature
      * @return <code>true</code> if the given feature is supported,
      *         <code>false</code> if it is not supported or <b><code>null</code>
      *         </b> if no information is available
+     * @see #queryFeatureSupport(JID, String, boolean)
      */
-    public Boolean isFeatureSupported(final JID recipient,
-        final String namespace) {
+    public Boolean isFeatureSupported(final JID jid, final String namespace) {
+        checkJID(jid);
 
         Boolean supported = null;
 
         final List<JID> jidsToQuery = new ArrayList<JID>();
 
-        if (recipient.isBareJID())
-            jidsToQuery.addAll(rosterTracker.getAvailablePresences(recipient));
+        if (jid.isBareJID())
+            jidsToQuery.addAll(rosterTracker.getAvailablePresences(jid));
         else
-            jidsToQuery.add(recipient);
+            jidsToQuery.add(jid);
 
         for (JID rqJID : jidsToQuery) {
 
@@ -238,7 +252,7 @@ public class DiscoveryManager implements Disposable {
      * 
      * If not in the cache then a blocking cache update is performed.
      * 
-     * @param recipient
+     * @param jid
      *            The JID of the user to find a supporting presence for. The JID
      *            can be resource qualified in which case the resource is
      *            stripped, before performing the look-up.
@@ -248,14 +262,10 @@ public class DiscoveryManager implements Disposable {
      * @caching If results are available in the cache, they are used instead of
      *          querying the server.
      */
-    public JID getSupportingPresence(JID recipient, String namespace) {
-        if (recipient == null)
-            throw new IllegalArgumentException("JID cannot be null");
+    public JID getSupportingPresence(final JID jid, final String namespace) {
+        checkJID(jid);
 
-        // If the caller gave us a RQ-JID, strip the resource
-        recipient = recipient.getBareJID();
-
-        for (Presence presence : rosterTracker.getPresences(recipient)) {
+        for (Presence presence : rosterTracker.getPresences(jid.getBareJID())) {
             if (!presence.isAvailable())
                 continue;
 
@@ -266,89 +276,130 @@ public class DiscoveryManager implements Disposable {
             }
 
             JID jidToCheck = new JID(rjid);
-            if (isFeatureSupportedInternal(jidToCheck, namespace)) {
+            Boolean supported = queryFeatureSupport(jidToCheck, namespace);
+
+            if (supported != null && supported)
                 return jidToCheck;
-            }
         }
 
         return null;
     }
 
     /**
-     * Begin a thread that populates Saros-support information for all people in
-     * the given list.
+     * Query the given {@linkplain JID} for the requested feature. The JID may
+     * be non resource qualified in which case all presences belonging to that
+     * JID are queried.
+     * <p>
+     * All registered
+     * {@linkplain #addDiscoveryManagerListener(DiscoveryManagerListener)
+     * listeners} will be notified about the result. The request may be
+     * performed asynchronously in which case the caller must ensure that a
+     * listener has already been added to retrieve the results.
+     * <p>
+     * <b>Please note the return value:
+     * <code>if(queryFeatureSupport(foo, bar, async)) ... </code> is likely to
+     * produce a {@link NullPointerException NPE}.</b>
      * 
-     * @nonblocking This method start a new ASync thread.
+     * @param jid
+     *            {@link JID} to query support for
+     * @param namespace
+     *            the namespace of the feature
+     * @param async
+     *            if <code>true</code> the request will be performed
+     *            asynchronously
+     * @return <code>true</code> if the given JID supports the feature or
+     *         <code>false</code> if the given JID does not support the feature
+     *         or <code>null</code> if the query fails or is performed
+     *         asynchronously
      */
-    public void cacheSarosSupport(final JID contact) {
-        Boolean supported = isFeatureSupported(contact, Saros.NAMESPACE);
+    public Boolean queryFeatureSupport(final JID jid, final String namespace,
+        boolean async) {
+        checkJID(jid);
 
-        if (supported != null && supported)
-            return;
+        if (!async)
+            return queryFeatureSupport(jid, namespace);
 
         threadPoolExecutor.execute(Utils.wrapSafe(LOG, new Runnable() {
             @Override
             public void run() {
-                getSupportingPresence(contact, Saros.NAMESPACE);
+                queryFeatureSupport(jid, namespace);
             }
         }));
+
+        return null;
     }
 
     /**
-     * Perform a ServiceDiscovery and check if the given feature is among the
-     * features supported by the given recipient.
+     * Perform a service discovery and check if the given feature is among the
+     * features supported by the given recipient. All registered listeners will
+     * be notified about the result.
      * 
-     * @param recipient
-     *            A RQ-JID (user@host/resource) of the user to query support
-     *            for.
+     * @param jid
+     *            A RQ-JID (user@host/resource) of the user to query support for
+     *            or a non RQ-JID to query all presences for this JID.
      * 
      * @blocking This method blocks until the ServiceDiscovery returns.
      * @reentrant This method can be called concurrently.
      * @caching If results are available in the cache, they are used instead of
      *          querying the server.
      */
-    private boolean isFeatureSupportedInternal(JID recipient, String feature) {
+    private Boolean queryFeatureSupport(JID jid, String namespace) {
 
-        if (recipient.getResource().equals(""))
-            LOG.warn("Resource missing: ", new StackTrace());
+        Boolean supported = null;
 
-        DiscoverInfoWrapper info;
+        checkJID(jid);
 
-        // add dummy
-        synchronized (cache) {
-            info = cache.get(recipient.toString());
-            if (info == null) {
-                info = new DiscoverInfoWrapper();
-                cache.put(recipient.toString(), info);
+        DiscoverInfoWrapper wrapper;
+
+        final List<JID> jidsToQuery = new ArrayList<JID>();
+
+        if (jid.isBareJID())
+            jidsToQuery.addAll(rosterTracker.getAvailablePresences(jid));
+        else
+            jidsToQuery.add(jid);
+
+        for (JID rqJID : jidsToQuery) {
+
+            // add dummy
+            synchronized (cache) {
+                wrapper = cache.get(rqJID.toString());
+                if (wrapper == null) {
+                    wrapper = new DiscoverInfoWrapper();
+                    cache.put(rqJID.toString(), wrapper);
+                }
             }
-        }
 
-        DiscoverInfo disco = null;
+            DiscoverInfo disco = null;
 
-        // FIXME: If a cache clear appears at this point it is possible to have
-        // more than one discovery running for the same JID.
-
-        // wait if there is one discovery in progress
-        synchronized (info) {
-            if (info.isAvailable())
-                disco = info.item;
-            else {
-                disco = info.item = querySupport(recipient);
-                if (disco != null)
-                    LOG.debug("Inserted DiscoveryInfo into Cache for: "
-                        + recipient);
+            // wait if there is already a discovery for the JID in progress
+            synchronized (wrapper) {
+                if (wrapper.isAvailable())
+                    disco = wrapper.item;
+                else {
+                    disco = wrapper.item = performServiceDiscovery(rqJID);
+                    if (disco != null)
+                        LOG.debug("Inserted DiscoveryInfo into Cache for: "
+                            + rqJID);
+                }
             }
+
+            // Null means that the discovery failed
+            if (disco == null) {
+                // and so we do not know if the feature is supported
+                // notifyFeatureSupportUpdated(jid, namespace, false);
+                continue;
+            }
+
+            notifyFeatureSupportUpdated(rqJID, namespace,
+                disco.containsFeature(namespace));
+
+            if (supported != null && !supported)
+                supported = disco.containsFeature(namespace);
+            else
+                supported = disco.containsFeature(namespace);
         }
 
-        // Null means that the discovery failed
-        if (disco == null) {
-            notifyFeatureSupportUpdated(recipient, feature, false);
-            return false;
-        }
-
-        notifyFeatureSupportUpdated(recipient, feature,
-            disco.containsFeature(feature));
-        return disco.containsFeature(feature);
+        return supported;
     }
 
     /**
@@ -357,7 +408,7 @@ public class DiscoveryManager implements Disposable {
      * 
      * [1] XEP-0030 http://xmpp.org/extensions/xep-0030.html
      * 
-     * @param recipient
+     * @param jid
      *            The JID must have a resource identifier (user@host/resource),
      *            otherwise you get a blame StackTrace in your logs.
      * @return DiscoverInfo from recipient or null if an XMPPException was
@@ -368,50 +419,38 @@ public class DiscoveryManager implements Disposable {
      * @nonCaching This method does not use a cache, but queries the server
      *             directly.
      */
-    private DiscoverInfo querySupport(final JID recipient) {
+    private DiscoverInfo performServiceDiscovery(final JID jid) {
 
-        if (recipient.getResource().equals(""))
-            LOG.warn("Service discovery is likely to "
-                + "fail because resource is missing: " + recipient.toString(),
-                new StackTrace());
+        if (jid.isBareJID()) {
+            LOG.warn(
+                "cannot perform service discovery on a non resource qualified jid: "
+                    + jid.toString(), new StackTrace());
+            return null;
+        }
 
         final Connection connection = network.getConnection();
 
-        if (connection == null)
-            throw new IllegalStateException("Not Connected");
+        if (connection == null) {
+            LOG.warn("cannot not perform a service discovery because not connected to a XMPP server");
+            return null;
+        }
 
         ServiceDiscoveryManager sdm = ServiceDiscoveryManager
             .getInstanceFor(connection);
 
         try {
-            return sdm.discoverInfo(recipient.toString());
+            return sdm.discoverInfo(jid.toString());
         } catch (XMPPException e) {
 
-            LOG.warn(
-                "Service Discovery failed on recipient " + recipient.toString()
-                    + " server: " + connection.getHost(), e);
+            LOG.warn("Service Discovery failed on recipient " + jid.toString()
+                + " server: " + connection.getHost(), e);
+
+            /*
+             * FIXME handle timeouts and error conditions differently ! see
+             * http://xmpp.org/extensions/xep-0030.html#errors
+             */
             return null;
         }
-    }
-
-    /**
-     * Adds a {@link DiscoveryManagerListener}
-     * 
-     * @param discoveryManagerListener
-     */
-    public void addDiscoveryManagerListener(
-        DiscoveryManagerListener discoveryManagerListener) {
-        discoveryManagerListeners.addIfAbsent(discoveryManagerListener);
-    }
-
-    /**
-     * Removes a {@link DiscoveryManagerListener}
-     * 
-     * @param discoveryManagerListener
-     */
-    public void removeDiscoveryManagerListener(
-        DiscoveryManagerListener discoveryManagerListener) {
-        discoveryManagerListeners.remove(discoveryManagerListener);
     }
 
     /**
@@ -424,5 +463,13 @@ public class DiscoveryManager implements Disposable {
             discoveryManagerListener.featureSupportUpdated(jid, feature,
                 isSupported);
         }
+    }
+
+    private void checkJID(JID jid) {
+        if (jid == null)
+            throw new NullPointerException("jid is null");
+
+        if (!jid.isValid())
+            throw new IllegalArgumentException("jid is not valid: " + jid);
     }
 }

@@ -105,10 +105,10 @@ public class RosterEntryElement extends TreeElement {
 
     @Override
     public Image getImage() {
-        if (this.roster == null)
+        if (roster == null)
             return null;
 
-        final Presence presence = this.roster.getPresence(jid.getBase());
+        final Presence presence = roster.getPresence(jid.getBase());
         boolean sarosSupported = isSarosSupported();
 
         if (presence.isAvailable()) {
@@ -125,8 +125,7 @@ public class RosterEntryElement extends TreeElement {
     }
 
     public boolean isOnline() {
-        Presence presence = this.roster.getPresence(this.jid.getBase());
-        return presence.isAvailable() || presence.isAway();
+        return roster.getPresence(jid.getBase()).isAvailable();
     }
 
     public JID getJID() {
@@ -134,11 +133,17 @@ public class RosterEntryElement extends TreeElement {
     }
 
     public boolean isSarosSupported() {
+
+        // do not start to query offline contacts
+        if (!isOnline())
+            return false;
+
         Boolean sarosSupported = discoveryManager.isFeatureSupported(jid,
             Saros.NAMESPACE);
 
         if (sarosSupported == null) {
-            discoveryManager.cacheSarosSupport(jid);
+            // FIXME this is definitely not the right place to call this
+            discoveryManager.queryFeatureSupport(jid, Saros.NAMESPACE, true);
             return false;
         }
 
