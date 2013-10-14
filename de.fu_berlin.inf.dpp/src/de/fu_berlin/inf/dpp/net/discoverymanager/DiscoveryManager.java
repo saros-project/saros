@@ -15,7 +15,6 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.packet.DiscoverInfo;
-import org.jivesoftware.smackx.packet.Jingle;
 import org.picocontainer.Disposable;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -193,43 +192,6 @@ public class DiscoveryManager implements Disposable {
     }
 
     /**
-     * This method returns true if {@link Jingle#NAMESPACE} is supported by the
-     * XMPP client connected under the given plain JID (a RQ-JID is stripped of
-     * its resource)
-     * 
-     * This method is syntactic sugar for
-     * 
-     * <code>getSupportingPresence(recipient, Jingle.NAMESPACE) != null;</code>
-     * 
-     * @blocking This method blocks until the ServiceDiscovery returns or until
-     *           cache lock is available.
-     * @reentrant This method can be called concurrently.
-     * @caching If results are available in the cache, they are used instead of
-     *          querying the server.
-     */
-    public boolean isJingleSupported(final JID recipient) {
-        return getSupportingPresence(recipient, Jingle.NAMESPACE) != null;
-    }
-
-    /**
-     * This method returns true if {@link Saros#NAMESPACE} is available on the
-     * given plain JID (a RQ-JID is stripped of its resource).
-     * 
-     * This method is syntactic sugar for
-     * 
-     * <code>getSupportingPresence(recipient, Saros.NAMESPACE) != null;</code>
-     * 
-     * @blocking This method blocks until the ServiceDiscovery returns or until
-     *           cache lock is available.
-     * @reentrant This method can be called concurrently.
-     * @caching If results are available in the cache, they are used instead of
-     *          querying the server.
-     */
-    public boolean isSarosSupported(final JID recipient) {
-        return getSupportingPresence(recipient, Saros.NAMESPACE) != null;
-    }
-
-    /**
      * Returns true if there is an available presence which supports the given
      * feature. Returns false if all available presences do not support the
      * given feature.
@@ -329,7 +291,7 @@ public class DiscoveryManager implements Disposable {
             supportExecutor.execute(Utils.wrapSafe(LOG, new Runnable() {
                 @Override
                 public void run() {
-                    isSarosSupported(contact);
+                    getSupportingPresence(contact, Saros.NAMESPACE);
                 }
             }));
         }
