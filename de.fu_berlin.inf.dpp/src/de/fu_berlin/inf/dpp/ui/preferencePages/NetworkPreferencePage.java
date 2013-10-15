@@ -30,7 +30,6 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.Messages;
@@ -50,9 +49,6 @@ public final class NetworkPreferencePage extends PreferencePage implements
     @Inject
     private IUPnPService upnpService;
 
-    @Inject
-    private DataTransferManager dataTransferManager;
-
     private Object lastCheckedItem;
 
     private Label gatewayInfo;
@@ -64,8 +60,8 @@ public final class NetworkPreferencePage extends PreferencePage implements
     private Text localSocks5PortText;
     private Button buttonAllowAlternativeSocks5Port;
 
-    private Text stunIpAddressText;
-    private Text stunPortAddressText;
+    private Text stunIPAddressText;
+    private Text stunPortText;
 
     public NetworkPreferencePage() {
 
@@ -85,12 +81,15 @@ public final class NetworkPreferencePage extends PreferencePage implements
 
         setErrorMessage(null);
 
-        if (!checkStunIpAddress(stunIpAddressText.getText())) {
+        final String stunIPAddress = stunIPAddressText.getText().trim();
+        final String stunPort = stunPortText.getText().trim();
+
+        if (!stunIPAddress.isEmpty() && !checkStunIpAddress(stunIPAddress)) {
             setErrorMessage(Messages.NetworkPreferencePage_text_stun_server_not_valid);
             return false;
         }
 
-        if (!checkPort(stunPortAddressText.getText())) {
+        if (!stunPort.isEmpty() && !checkPort(stunPortText.getText())) {
             setErrorMessage(Messages.NetworkPreferencePage_text_stun_server_not_valid2);
             return false;
         }
@@ -116,26 +115,25 @@ public final class NetworkPreferencePage extends PreferencePage implements
             PreferenceConstants.USE_NEXT_PORTS_FOR_FILE_TRANSFER,
             buttonAllowAlternativeSocks5Port.getSelection());
 
-        getPreferenceStore().setValue(PreferenceConstants.STUN,
-            stunIpAddressText.getText());
+        getPreferenceStore().setValue(PreferenceConstants.STUN, stunIPAddress);
 
         getPreferenceStore().setValue(PreferenceConstants.STUN_PORT,
-            Integer.valueOf(stunPortAddressText.getText()));
+            stunPort.isEmpty() ? 0 : Integer.valueOf(stunPort));
 
         // FIXME: you can only remove a gateway after the discovery is performed
-        if (upnpService.getGateways() != null) {
-            upnpService.setSelectedGateway(null);
-            for (TableItem item : upnpDevicesTable.getItems()) {
-                if (item.getChecked()) {
-                    if (upnpService.setSelectedGateway((GatewayDevice) item
-                        .getData())) {
+        if (upnpService.getGateways() == null)
+            return super.performOk();
 
-                        SarosView
-                            .showNotification(
-                                Messages.NetworkPreferencePage_upnp_activation,
-                                Messages.NetworkPreferencePage_upnp_activation_text);
-                    }
-                }
+        upnpService.setSelectedGateway(null);
+        for (TableItem item : upnpDevicesTable.getItems()) {
+            if (!item.getChecked())
+                continue;
+
+            if (upnpService.setSelectedGateway((GatewayDevice) item.getData())) {
+
+                SarosView.showNotification(
+                    Messages.NetworkPreferencePage_upnp_activation,
+                    Messages.NetworkPreferencePage_upnp_activation_text);
             }
         }
 
@@ -174,11 +172,13 @@ public final class NetworkPreferencePage extends PreferencePage implements
     }
 
     private void initialize() {
-        stunIpAddressText.setText(getPreferenceStore().getString(
+        stunIPAddressText.setText(getPreferenceStore().getString(
             PreferenceConstants.STUN));
 
-        stunPortAddressText.setText(String.valueOf(getPreferenceStore().getInt(
-            PreferenceConstants.STUN_PORT)));
+        int stunPort = getPreferenceStore().getInt(
+            PreferenceConstants.STUN_PORT);
+
+        stunPortText.setText(stunPort == 0 ? "" : String.valueOf(stunPort));
 
         localSocks5PortText.setText(String.valueOf(getPreferenceStore().getInt(
             PreferenceConstants.FILE_TRANSFER_PORT)));
@@ -200,11 +200,11 @@ public final class NetworkPreferencePage extends PreferencePage implements
 
     @Override
     protected void performDefaults() {
-        stunIpAddressText.setText(getPreferenceStore().getDefaultString(
+        stunIPAddressText.setText(getPreferenceStore().getDefaultString(
             PreferenceConstants.STUN));
 
-        stunPortAddressText.setText(String.valueOf(getPreferenceStore()
-            .getDefaultInt(PreferenceConstants.STUN_PORT)));
+        stunPortText.setText(String.valueOf(getPreferenceStore().getDefaultInt(
+            PreferenceConstants.STUN_PORT)));
 
         localSocks5PortText.setText(String.valueOf(getPreferenceStore()
             .getDefaultInt(PreferenceConstants.FILE_TRANSFER_PORT)));
@@ -363,16 +363,16 @@ public final class NetworkPreferencePage extends PreferencePage implements
         ipAddressLabel
             .setToolTipText(Messages.NetworkPreferencePage_adress_tooltip);
 
-        stunIpAddressText = new Text(group, SWT.SINGLE | SWT.BORDER);
-        stunIpAddressText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
+        stunIPAddressText = new Text(group, SWT.SINGLE | SWT.BORDER);
+        stunIPAddressText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
             true, false));
         Label portLabel = new Label(group, SWT.CENTER);
         portLabel.setText(Messages.NetworkPreferencePage_port);
         portLabel.setToolTipText(Messages.NetworkPreferencePage_port_tooltip);
 
-        stunPortAddressText = new Text(group, SWT.SINGLE | SWT.BORDER);
-        stunPortAddressText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
-            true, false));
+        stunPortText = new Text(group, SWT.SINGLE | SWT.BORDER);
+        stunPortText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
+            false));
 
         return group;
     }

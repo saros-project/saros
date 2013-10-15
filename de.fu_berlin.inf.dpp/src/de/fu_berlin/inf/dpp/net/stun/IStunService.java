@@ -5,6 +5,8 @@ import java.util.Collection;
 
 public interface IStunService {
 
+    public static final int DEFAULT_STUN_PORT = 3478;
+
     /**
      * Returns whether one of the available network interfaces is connected
      * directly to the Internet.
@@ -31,9 +33,9 @@ public interface IStunService {
      * protocol RFC 5389 via UDP.
      * 
      * @param stunAddress
-     *            Address of the STUN server
+     *            address of the STUN server
      * @param stunPort
-     *            Port of the STUN server
+     *            port of the STUN server, if 0 the default STUN port is used
      * @param timeout
      *            timeout in milliseconds before the discovery is aborted
      * 

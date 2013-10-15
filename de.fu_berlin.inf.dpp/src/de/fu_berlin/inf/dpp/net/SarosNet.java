@@ -98,7 +98,7 @@ public class SarosNet {
      * @param stunServer
      *            STUN server (address)
      * @param stunPort
-     *            STUN server port
+     *            STUN server port if 0 the default stun port will be used
      * @param enablePortMapping
      *            true to enable UPnP port mapping
      */
@@ -113,6 +113,9 @@ public class SarosNet {
         this.stunServer = stunServer;
         this.stunPort = stunPort;
         this.isPortMappingEnabled = enablePortMapping;
+
+        if (this.stunServer.isEmpty())
+            this.stunServer = null;
     }
 
     /**
@@ -381,7 +384,7 @@ public class SarosNet {
                     proxy.replaceLocalAddresses(myAdressesStr);
                 }
 
-                if (stunService != null) {
+                if (stunService != null && stunServer != null) {
                     Utils.runSafeAsync("StunAddProxys", LOG, new Runnable() {
                         @Override
                         public void run() {

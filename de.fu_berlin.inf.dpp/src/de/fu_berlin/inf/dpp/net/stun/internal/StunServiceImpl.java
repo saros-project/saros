@@ -51,6 +51,9 @@ public final class StunServiceImpl implements IStunService {
         if (stunAddress == null)
             throw new NullPointerException("STUN address is null");
 
+        if (stunPort == 0)
+            stunPort = DEFAULT_STUN_PORT;
+
         if (stunPort <= 0 || stunPort >= 65536)
             throw new IllegalArgumentException(
                 "stun port is not in range of 1 - 65535");
