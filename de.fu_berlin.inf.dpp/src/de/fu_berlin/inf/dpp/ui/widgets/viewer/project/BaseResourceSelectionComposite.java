@@ -28,19 +28,22 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.model.WorkbenchContentProvider;
+import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.ui.widgets.viewer.ViewerComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.BaseResourceSelectionListener;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.ResourceSelectionChangedEvent;
 import de.fu_berlin.inf.dpp.util.ArrayUtils;
+import de.fu_berlin.inf.nebula.utils.LayoutUtils;
 
 /**
- * This {@link Composite} extends {@link ResourceDisplayComposite} and allows to
- * check (via check boxes) {@link IProject}s, {@link IFolder}s and {@link IFile}
- * s.
+ * This {@link Composite} allows to check (via check boxes) {@link IProject}s,
+ * {@link IFolder}s and {@link IFile} s.
  * 
  * This component remembers all selections and has methods to undo/redo the
  * selection in the viewer.
@@ -62,7 +65,7 @@ import de.fu_berlin.inf.dpp.util.ArrayUtils;
  * 
  */
 public abstract class BaseResourceSelectionComposite extends
-    ResourceDisplayComposite<CheckboxTreeViewer> {
+    ViewerComposite<CheckboxTreeViewer> {
 
     private static final Logger log = Logger
         .getLogger(BaseResourceSelectionComposite.class);
@@ -82,6 +85,9 @@ public abstract class BaseResourceSelectionComposite extends
 
     protected final static String SERIALIZATION_SEPARATOR = "**#**";
     protected final static String SERIALIZATION_SEPARATOR_REGEX = "\\*\\*#\\*\\*";
+
+    @Inject
+    protected Saros saros;
 
     protected ICheckStateListener checkStateListener = new ICheckStateListener() {
         @Override
@@ -451,8 +457,16 @@ public abstract class BaseResourceSelectionComposite extends
     public BaseResourceSelectionComposite(Composite parent, int style) {
         super(parent, style | SWT.CHECK);
 
+        SarosPluginContext.initComponent(this);
+
+        super.setLayout(LayoutUtils.createGridLayout());
+
         checkboxTreeViewer = getViewer();
 
+        checkboxTreeViewer.getControl().setLayoutData(
+            LayoutUtils.createFillGridData());
+
+        checkboxTreeViewer.setInput(ResourcesPlugin.getWorkspace().getRoot());
         checkboxTreeViewer.addCheckStateListener(checkStateListener);
 
         addDisposeListener(new DisposeListener() {
@@ -494,6 +508,14 @@ public abstract class BaseResourceSelectionComposite extends
     @Override
     protected CheckboxTreeViewer createViewer(int style) {
         return new CheckboxTreeViewer(new Tree(this, style));
+    }
+
+    @Override
+    protected void configureViewer(CheckboxTreeViewer viewer) {
+        viewer.setContentProvider(new WorkbenchContentProvider());
+        viewer.setLabelProvider(new WorkbenchLabelProvider());
+        viewer.setUseHashlookup(true);
+        viewer.setSorter(new WorkbenchItemsSorter());
     }
 
     /**
@@ -601,6 +623,34 @@ public abstract class BaseResourceSelectionComposite extends
         for (BaseResourceSelectionListener resourceSelectionListener : this.resourceSelectionListeners) {
             resourceSelectionListener.resourceSelectionChanged(event);
         }
+    }
+
+    /**
+     * Returns the displayed Project {@link IResource}s.
+     * 
+     * @return
+     */
+    public List<IResource> getResources() {
+        WorkbenchContentProvider contentProvider = (WorkbenchContentProvider) getViewer()
+            .getContentProvider();
+
+        Object[] objects = contentProvider.getElements(getViewer().getInput());
+        return ArrayUtils.getAdaptableObjects(objects, IResource.class,
+            Platform.getAdapterManager());
+    }
+
+    /**
+     * Returns the displayed {@link IProject}s.
+     * 
+     * @return
+     */
+    public int getProjectsCount() {
+        WorkbenchContentProvider contentProvider = (WorkbenchContentProvider) getViewer()
+            .getContentProvider();
+
+        Object[] objects = contentProvider.getElements(getViewer().getInput());
+        return ArrayUtils.getAdaptableObjects(objects, IProject.class,
+            Platform.getAdapterManager()).size();
     }
 
     @Override
