@@ -14,10 +14,10 @@ import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
-import de.fu_berlin.inf.dpp.ui.wizards.pages.ProjectSelectionWizardPage;
+import de.fu_berlin.inf.dpp.ui.wizards.pages.ResourceSelectionWizardPage;
 
 /**
- * Wizard for adding projects to a running session.
+ * Wizard for adding resources to a running session.
  * 
  * @author bkahlert
  */
@@ -26,16 +26,15 @@ public class ShareProjectAddProjectsWizard extends Wizard {
     public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_SHARE_PROJECT_ADD_PROJECTS;
 
     @Inject
-    protected ISarosSessionManager sarosSessionManager;
+    private ISarosSessionManager sarosSessionManager;
 
-    protected ProjectSelectionWizardPage projectSelectionWizardPage = new ProjectSelectionWizardPage();
+    private ResourceSelectionWizardPage resourceSelectionWizardPage = new ResourceSelectionWizardPage();
 
     public ShareProjectAddProjectsWizard() {
         SarosPluginContext.initComponent(this);
-        this.setWindowTitle(TITLE);
-        this.setDefaultPageImageDescriptor(IMAGE);
-
-        this.setHelpAvailable(false);
+        setWindowTitle(TITLE);
+        setDefaultPageImageDescriptor(IMAGE);
+        setHelpAvailable(false);
     }
 
     @Override
@@ -46,17 +45,18 @@ public class ShareProjectAddProjectsWizard extends Wizard {
 
     @Override
     public void addPages() {
-        this.addPage(this.projectSelectionWizardPage);
+        addPage(this.resourceSelectionWizardPage);
     }
 
     @Override
     public boolean performFinish() {
-        List<IResource> selectedResources = projectSelectionWizardPage
+        List<IResource> selectedResources = resourceSelectionWizardPage
             .getSelectedResources();
+
         if (selectedResources == null || selectedResources.isEmpty())
             return false;
 
-        projectSelectionWizardPage.rememberCurrentSelection();
+        resourceSelectionWizardPage.rememberCurrentSelection();
 
         SarosView.clearNotifications();
 

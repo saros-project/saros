@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.ui.wizards.pages;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -18,32 +17,35 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
+import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.ResourceSelectionComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.FilterClosedProjectsChangedEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.ResourceSelectionChangedEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.ResourceSelectionListener;
 
-public class ProjectSelectionWizardPage extends WizardPage {
-    Logger log = Logger.getLogger(this.getClass());
+public class ResourceSelectionWizardPage extends WizardPage {
+    private static final Logger LOG = Logger
+        .getLogger(ResourceSelectionWizardPage.class);
 
-    protected ResourceSelectionComposite resourceSelectionComposite;
+    private ResourceSelectionComposite resourceSelectionComposite;
 
     /**
      * This {@link ResourceSelectionListener} changes the {@link WizardPage} 's
-     * state according to the selected {@link IProject}.
+     * state according to the selected {@link IResource resources}.
      */
-    protected ResourceSelectionListener resourceSelectionListener = new ResourceSelectionListener() {
+    private final ResourceSelectionListener resourceSelectionListener = new ResourceSelectionListener() {
         @Override
         public void resourceSelectionChanged(ResourceSelectionChangedEvent event) {
-            if (resourceSelectionComposite != null
-                && !resourceSelectionComposite.isDisposed()) {
-                if (!resourceSelectionComposite.hasSelectedResources()) {
-                    setErrorMessage(Messages.ProjectSelectionWizardPage_selected_no_project);
-                    setPageComplete(false);
-                } else {
-                    setErrorMessage(null);
-                    setPageComplete(true);
-                }
+            if (resourceSelectionComposite == null
+                || resourceSelectionComposite.isDisposed())
+                return;
+
+            if (!resourceSelectionComposite.hasSelectedResources()) {
+                setErrorMessage(Messages.ProjectSelectionWizardPage_selected_no_project);
+                setPageComplete(false);
+            } else {
+                setErrorMessage(null);
+                setPageComplete(true);
             }
         }
 
@@ -56,8 +58,8 @@ public class ProjectSelectionWizardPage extends WizardPage {
         }
     };
 
-    public ProjectSelectionWizardPage() {
-        super(ProjectSelectionWizardPage.class.getName());
+    public ResourceSelectionWizardPage() {
+        super(ResourceSelectionWizardPage.class.getName());
         setTitle(Messages.ProjectSelectionWizardPage_title);
         setDescription(Messages.ProjectSelectionWizardPage_description);
     }
@@ -69,8 +71,9 @@ public class ProjectSelectionWizardPage extends WizardPage {
 
         composite.setLayout(new GridLayout(1, false));
 
-        createProjectSelectionComposite(composite);
-        this.resourceSelectionComposite.setLayoutData(new GridData(SWT.FILL,
+        createResourceSelectionComposite(composite);
+
+        resourceSelectionComposite.setLayoutData(new GridData(SWT.FILL,
             SWT.FILL, true, true));
     }
 
@@ -81,13 +84,10 @@ public class ProjectSelectionWizardPage extends WizardPage {
      * 
      * @param parent
      */
-    protected void createProjectSelectionComposite(Composite parent) {
-        if (this.resourceSelectionComposite != null
-            && !this.resourceSelectionComposite.isDisposed())
-            this.resourceSelectionComposite.dispose();
+    private void createResourceSelectionComposite(Composite parent) {
 
-        this.resourceSelectionComposite = new ResourceSelectionComposite(
-            parent, SWT.BORDER | SWT.V_SCROLL, PlatformUI.getPreferenceStore()
+        resourceSelectionComposite = new ResourceSelectionComposite(parent,
+            SWT.BORDER | SWT.V_SCROLL, PlatformUI.getPreferenceStore()
                 .getBoolean(
                     PreferenceConstants.PROJECTSELECTION_FILTERCLOSEDPROJECTS));
 
@@ -125,7 +125,7 @@ public class ProjectSelectionWizardPage extends WizardPage {
             }
         };
 
-        SWTUtils.runSafeSWTAsync(log, new Runnable() {
+        SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
 
             @Override
             public void run() {
@@ -140,8 +140,9 @@ public class ProjectSelectionWizardPage extends WizardPage {
         super.setVisible(visible);
         if (!visible)
             return;
-        de.fu_berlin.inf.dpp.ui.views.SarosView.clearNotifications();
-        this.resourceSelectionComposite.setFocus();
+
+        SarosView.clearNotifications();
+        resourceSelectionComposite.setFocus();
     }
 
     /*
@@ -149,10 +150,11 @@ public class ProjectSelectionWizardPage extends WizardPage {
      */
 
     public List<IResource> getSelectedResources() {
-        if (this.resourceSelectionComposite == null
-            || this.resourceSelectionComposite.isDisposed())
+        if (resourceSelectionComposite == null
+            || resourceSelectionComposite.isDisposed())
             return null;
-        return this.resourceSelectionComposite.getSelectedResources();
+
+        return resourceSelectionComposite.getSelectedResources();
     }
 
     /**

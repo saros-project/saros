@@ -4,12 +4,12 @@ import org.eclipse.jface.wizard.IWizardPage;
 
 import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoExplorer.WizardPageDemo;
-import de.fu_berlin.inf.dpp.ui.wizards.pages.ProjectSelectionWizardPage;
+import de.fu_berlin.inf.dpp.ui.wizards.pages.ResourceSelectionWizardPage;
 
 @Demo("This demo shows a ProjectSelectionWizardPage that reflects the projects that were selected on creation.")
 public class ProjectSelectionDemo extends WizardPageDemo {
     @Override
     public IWizardPage getWizardPage() {
-        return new ProjectSelectionWizardPage();
+        return new ResourceSelectionWizardPage();
     }
 }

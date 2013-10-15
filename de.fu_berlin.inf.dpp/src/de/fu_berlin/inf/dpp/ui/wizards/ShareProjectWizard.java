@@ -16,12 +16,13 @@ import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.ContactSelectionWizardPage;
-import de.fu_berlin.inf.dpp.ui.wizards.pages.ProjectSelectionWizardPage;
+import de.fu_berlin.inf.dpp.ui.wizards.pages.ResourceSelectionWizardPage;
 
 /**
- * Wizard for sharing project resources.
+ * Wizard for sharing resources.
  * <p>
- * Starts sharing the selected resource(s) with the selected buddy(s) on finish.
+ * Starts sharing the selected resource(s) with the selected contacts(s) on
+ * finish.
  * 
  * @author bkahlert
  * @author kheld
@@ -32,10 +33,10 @@ public class ShareProjectWizard extends Wizard {
     public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_SHARE_PROJECT_OUTGOING;
 
     @Inject
-    protected ISarosSessionManager sarosSessionManager;
+    private ISarosSessionManager sarosSessionManager;
 
-    protected ProjectSelectionWizardPage projectSelectionWizardPage = new ProjectSelectionWizardPage();
-    protected ContactSelectionWizardPage buddySelectionWizardPage = new ContactSelectionWizardPage(
+    private ResourceSelectionWizardPage resourceSelectionWizardPage = new ResourceSelectionWizardPage();
+    private ContactSelectionWizardPage contactSelectionWizardPage = new ContactSelectionWizardPage(
         true);
 
     public ShareProjectWizard() {
@@ -46,20 +47,20 @@ public class ShareProjectWizard extends Wizard {
         setHelpAvailable(false);
     }
 
-    /**
-     * Remove any open notifications on page change in the wizard, in case the
-     * user restored a selection in the ResourceSelectionComposite
-     */
     @Override
     public IWizardPage getNextPage(IWizardPage page) {
+        /*
+         * Remove any open notifications on page change in the wizard, in case
+         * the user restored a selection in the ResourceSelectionComposite
+         */
         SarosView.clearNotifications();
         return super.getNextPage(page);
     }
 
     @Override
     public void addPages() {
-        addPage(projectSelectionWizardPage);
-        addPage(buddySelectionWizardPage);
+        addPage(resourceSelectionWizardPage);
+        addPage(contactSelectionWizardPage);
     }
 
     /**
@@ -82,24 +83,24 @@ public class ShareProjectWizard extends Wizard {
     @Override
     public boolean performFinish() {
 
-        List<IResource> selectedResources = projectSelectionWizardPage
+        List<IResource> selectedResources = resourceSelectionWizardPage
             .getSelectedResources();
 
-        List<JID> selectedBuddies = buddySelectionWizardPage
+        List<JID> selectedContacts = contactSelectionWizardPage
             .getSelectedContacts();
 
-        if (selectedResources == null || selectedBuddies == null)
+        if (selectedResources == null || selectedContacts == null)
             return false;
 
         if (selectedResources.isEmpty())
             return false;
 
-        projectSelectionWizardPage.rememberCurrentSelection();
+        resourceSelectionWizardPage.rememberCurrentSelection();
 
         SarosView.clearNotifications();
 
         CollaborationUtils.shareResourcesWith(sarosSessionManager,
-            selectedResources, selectedBuddies);
+            selectedResources, selectedContacts);
 
         return true;
     }
