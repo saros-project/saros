@@ -125,7 +125,7 @@ public class ProjectShareBuddies extends ContributionItem {
             public void widgetSelected(SelectionEvent e) {
                 List<JID> buddies = new ArrayList<JID>();
                 buddies.add(new JID(rosterEntry));
-                CollaborationUtils.shareResourcesWith(sarosSessionManager,
+                CollaborationUtils.startSession(sarosSessionManager,
                     resources, buddies);
             }
         });

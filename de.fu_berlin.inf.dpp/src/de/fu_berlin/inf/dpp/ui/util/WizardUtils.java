@@ -18,9 +18,9 @@ import de.fu_berlin.inf.dpp.ui.wizards.AddXMPPAccountWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.CreateXMPPAccountWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.EditXMPPAccountWizard;
-import de.fu_berlin.inf.dpp.ui.wizards.ShareProjectAddBuddiesWizard;
-import de.fu_berlin.inf.dpp.ui.wizards.ShareProjectAddProjectsWizard;
-import de.fu_berlin.inf.dpp.ui.wizards.ShareProjectWizard;
+import de.fu_berlin.inf.dpp.ui.wizards.AddContactsToSessionWizard;
+import de.fu_berlin.inf.dpp.ui.wizards.AddResourcesToSessionWizard;
+import de.fu_berlin.inf.dpp.ui.wizards.StartSessionWizard;
 
 /**
  * Utility class for {@link IWizard}s
@@ -153,26 +153,26 @@ public class WizardUtils {
     }
 
     /**
-     * Opens a {@link ShareProjectWizard} in the SWT thread and returns the
+     * Opens a {@link StartSessionWizard} in the SWT thread and returns the
      * displayed instance in case of success.
      */
-    public static ShareProjectWizard openShareProjectWizard() {
-        return openWizardSuccessfully(new ShareProjectWizard());
+    public static StartSessionWizard openStartSessionWizard() {
+        return openWizardSuccessfully(new StartSessionWizard());
     }
 
     /**
-     * Opens a {@link ShareProjectAddProjectsWizard} in the SWT thread and
+     * Opens a {@link AddResourcesToSessionWizard} in the SWT thread and
      * returns the displayed instance in case of success.
      */
-    public static ShareProjectAddProjectsWizard openShareProjectAddProjectsWizard() {
-        return openWizardSuccessfully(new ShareProjectAddProjectsWizard());
+    public static AddResourcesToSessionWizard openAddResourcesToSessionWizard() {
+        return openWizardSuccessfully(new AddResourcesToSessionWizard());
     }
 
     /**
-     * Opens a {@link ShareProjectAddBuddiesWizard} in the SWT thread and
+     * Opens a {@link AddContactsToSessionWizard} in the SWT thread and
      * returns the displayed instance in case of success.
      */
-    public static ShareProjectAddBuddiesWizard openShareProjectAddBuddiesWizard() {
-        return openWizardSuccessfully(new ShareProjectAddBuddiesWizard());
+    public static AddContactsToSessionWizard openAddContactsToSessionWizard() {
+        return openWizardSuccessfully(new AddContactsToSessionWizard());
     }
 }

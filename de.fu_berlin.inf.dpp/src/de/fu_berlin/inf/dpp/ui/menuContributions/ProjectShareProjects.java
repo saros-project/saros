@@ -108,7 +108,7 @@ public class ProjectShareProjects extends ContributionItem {
             public void widgetSelected(SelectionEvent e) {
                 List<IResource> resources = new ArrayList<IResource>();
                 resources.add(project);
-                CollaborationUtils.shareResourcesWith(sarosSessionManager,
+                CollaborationUtils.startSession(sarosSessionManager,
                     resources, selectedBuddies);
             }
         });

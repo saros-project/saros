@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.ui.wizards.pages.ContactSelectionWizardPage;
  * 
  * @author bkahlert
  */
-public class ShareProjectAddBuddiesWizard extends Wizard {
+public class AddContactsToSessionWizard extends Wizard {
     public static final String TITLE = Messages.ShareProjectAddBuddiesWizard_title;
     public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_SHARE_PROJECT_ADD_BUDDIES;
 
@@ -28,7 +28,7 @@ public class ShareProjectAddBuddiesWizard extends Wizard {
 
     protected ContactSelectionWizardPage buddySelectionWizardPage = new ContactSelectionWizardPage();
 
-    public ShareProjectAddBuddiesWizard() {
+    public AddContactsToSessionWizard() {
         SarosPluginContext.initComponent(this);
         this.setWindowTitle(TITLE);
         this.setDefaultPageImageDescriptor(IMAGE);

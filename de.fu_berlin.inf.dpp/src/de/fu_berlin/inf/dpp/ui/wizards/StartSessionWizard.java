@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.ui.wizards.pages.ContactSelectionWizardPage;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.ResourceSelectionWizardPage;
 
 /**
- * Wizard for sharing resources.
+ * Wizard for starting a session.
  * <p>
  * Starts sharing the selected resource(s) with the selected contacts(s) on
  * finish.
@@ -27,7 +27,7 @@ import de.fu_berlin.inf.dpp.ui.wizards.pages.ResourceSelectionWizardPage;
  * @author bkahlert
  * @author kheld
  */
-public class ShareProjectWizard extends Wizard {
+public class StartSessionWizard extends Wizard {
 
     public static final String TITLE = Messages.ShareProjectWizard_title;
     public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_SHARE_PROJECT_OUTGOING;
@@ -39,7 +39,7 @@ public class ShareProjectWizard extends Wizard {
     private ContactSelectionWizardPage contactSelectionWizardPage = new ContactSelectionWizardPage(
         true);
 
-    public ShareProjectWizard() {
+    public StartSessionWizard() {
         SarosPluginContext.initComponent(this);
         setWindowTitle(TITLE);
         setDefaultPageImageDescriptor(IMAGE);
@@ -99,7 +99,7 @@ public class ShareProjectWizard extends Wizard {
 
         SarosView.clearNotifications();
 
-        CollaborationUtils.shareResourcesWith(sarosSessionManager,
+        CollaborationUtils.startSession(sarosSessionManager,
             selectedResources, selectedContacts);
 
         return true;

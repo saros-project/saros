@@ -21,7 +21,7 @@ import de.fu_berlin.inf.dpp.ui.wizards.pages.ResourceSelectionWizardPage;
  * 
  * @author bkahlert
  */
-public class ShareProjectAddProjectsWizard extends Wizard {
+public class AddResourcesToSessionWizard extends Wizard {
     public static final String TITLE = Messages.ShareProjectAddProjectsWizard_title;
     public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_SHARE_PROJECT_ADD_PROJECTS;
 
@@ -30,7 +30,7 @@ public class ShareProjectAddProjectsWizard extends Wizard {
 
     private ResourceSelectionWizardPage resourceSelectionWizardPage = new ResourceSelectionWizardPage();
 
-    public ShareProjectAddProjectsWizard() {
+    public AddResourcesToSessionWizard() {
         SarosPluginContext.initComponent(this);
         setWindowTitle(TITLE);
         setDefaultPageImageDescriptor(IMAGE);
@@ -45,7 +45,7 @@ public class ShareProjectAddProjectsWizard extends Wizard {
 
     @Override
     public void addPages() {
-        addPage(this.resourceSelectionWizardPage);
+        addPage(resourceSelectionWizardPage);
     }
 
     @Override

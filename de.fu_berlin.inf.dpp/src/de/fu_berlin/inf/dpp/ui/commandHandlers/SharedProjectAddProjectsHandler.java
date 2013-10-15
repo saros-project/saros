@@ -7,18 +7,18 @@ import org.eclipse.core.resources.IResource;
 
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
-import de.fu_berlin.inf.dpp.ui.wizards.ShareProjectAddProjectsWizard;
+import de.fu_berlin.inf.dpp.ui.wizards.AddResourcesToSessionWizard;
 
 /**
  * Handles the addition of {@link IResource}s that must explicitly be selected
- * in the opening {@link ShareProjectAddProjectsWizard} to the running
+ * in the opening {@link AddResourcesToSessionWizard} to the running
  * {@link ISarosSession}.
  */
 public class SharedProjectAddProjectsHandler extends AbstractHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        WizardUtils.openShareProjectAddProjectsWizard();
+        WizardUtils.openAddResourcesToSessionWizard();
         return null;
     }
 

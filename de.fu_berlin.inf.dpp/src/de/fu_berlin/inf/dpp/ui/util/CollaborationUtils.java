@@ -55,8 +55,8 @@ public class CollaborationUtils {
         .getLogger(CollaborationUtils.class);
 
     /**
-     * Shares given project resources with given buddies.<br/>
-     * Does nothing if a {@link SarosSession} is already running.
+     * Starts a new session and shares the given resources with given buddies.<br/>
+     * Does nothing if a {@link ISarosSession session} is already running.
      * 
      * @param sarosSessionManager
      * @param selectedResources
@@ -64,7 +64,7 @@ public class CollaborationUtils {
      * 
      * @nonBlocking
      */
-    public static void shareResourcesWith(
+    public static void startSession(
         final ISarosSessionManager sarosSessionManager,
         List<IResource> selectedResources, final List<JID> buddies) {
 

@@ -49,7 +49,7 @@ public class ShareProjectHandler extends AbstractHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        WizardUtils.openShareProjectWizard();
+        WizardUtils.openStartSessionWizard();
         return null;
     }
 }
