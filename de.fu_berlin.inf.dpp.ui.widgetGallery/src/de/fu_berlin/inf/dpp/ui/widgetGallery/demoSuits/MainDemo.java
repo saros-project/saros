@@ -10,7 +10,6 @@ import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.basic.BasicDemoSuite;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.chat.ChatDemoSuite;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.decoration.DecorationDemoSuite;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.instruction.InstructionDemoSuite;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.project.ProjectDemoSuite;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.roster.RosterDemoSuite;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.rosterSession.RosterSessionDemoSuite;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.wizard.WizardDemoSuite;
@@ -19,7 +18,7 @@ import de.fu_berlin.inf.nebula.explanation.ListExplanationComposite.ListExplanat
 
 @DemoSuite({ DecorationDemoSuite.class, BasicDemoSuite.class,
     InstructionDemoSuite.class, ChatDemoSuite.class, RosterDemoSuite.class,
-    RosterSessionDemoSuite.class, ProjectDemoSuite.class, WizardDemoSuite.class })
+    RosterSessionDemoSuite.class, WizardDemoSuite.class })
 @Demo
 public class MainDemo extends AbstractDemo {
 
