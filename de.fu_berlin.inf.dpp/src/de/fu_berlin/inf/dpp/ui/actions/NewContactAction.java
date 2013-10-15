@@ -61,7 +61,7 @@ public class NewContactAction extends Action {
 
     @Override
     public void run() {
-        WizardUtils.openAddBuddyWizard();
+        WizardUtils.openAddContactWizard();
     }
 
     protected void updateEnablement() {

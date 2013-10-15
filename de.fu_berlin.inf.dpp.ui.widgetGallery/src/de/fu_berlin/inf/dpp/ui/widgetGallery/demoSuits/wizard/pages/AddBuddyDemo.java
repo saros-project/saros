@@ -4,12 +4,12 @@ import org.eclipse.jface.wizard.IWizardPage;
 
 import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoExplorer.WizardPageDemo;
-import de.fu_berlin.inf.dpp.ui.wizards.pages.AddBuddyWizardPage;
+import de.fu_berlin.inf.dpp.ui.wizards.pages.AddContactWizardPage;
 
 @Demo
 public class AddBuddyDemo extends WizardPageDemo {
     @Override
     public IWizardPage getWizardPage() {
-        return new AddBuddyWizardPage();
+        return new AddContactWizardPage();
     }
 }

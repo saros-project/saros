@@ -54,7 +54,7 @@ public class AllWizardsDemo extends AbstractDemo {
         wizards.put("AddBuddyWizard", new Runnable() {
             @Override
             public void run() {
-                WizardUtils.openAddBuddyWizard();
+                WizardUtils.openAddContactWizard();
             }
         });
         wizards.put("ShareProjectWizard", new Runnable() {

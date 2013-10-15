@@ -23,7 +23,7 @@ import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.BaseBuddySelectionListener;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.BuddySelectionListener;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.FilterNonSarosBuddiesChangedEvent;
-import de.fu_berlin.inf.dpp.ui.wizards.AddBuddyWizard;
+import de.fu_berlin.inf.dpp.ui.wizards.AddContactWizard;
 import de.fu_berlin.inf.nebula.utils.LayoutUtils;
 import de.fu_berlin.inf.nebula.utils.ViewerUtils;
 
@@ -119,11 +119,11 @@ public class BuddySelectionComposite extends BaseBuddySelectionComposite {
         addBuddyButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                AddBuddyWizard addBuddyWizard = WizardUtils
-                    .openAddBuddyWizard();
+                AddContactWizard addBuddyWizard = WizardUtils
+                    .openAddContactWizard();
                 if (addBuddyWizard != null) {
                     List<JID> selectedBuddies = getSelectedBuddies();
-                    selectedBuddies.add(addBuddyWizard.getBuddy());
+                    selectedBuddies.add(addBuddyWizard.getContact());
                     setSelectedBuddies(selectedBuddies);
                 }
             }

@@ -13,7 +13,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.NewProjectAction;
 
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
-import de.fu_berlin.inf.dpp.ui.wizards.AddBuddyWizard;
+import de.fu_berlin.inf.dpp.ui.wizards.AddContactWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.AddXMPPAccountWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.CreateXMPPAccountWizard;
@@ -145,11 +145,11 @@ public class WizardUtils {
     }
 
     /**
-     * Opens a {@link AddBuddyWizard} in the SWT thread and returns the
+     * Opens a {@link AddContactWizard} in the SWT thread and returns the
      * displayed instance in case of success.
      */
-    public static AddBuddyWizard openAddBuddyWizard() {
-        return openWizardSuccessfully(new AddBuddyWizard());
+    public static AddContactWizard openAddContactWizard() {
+        return openWizardSuccessfully(new AddContactWizard());
     }
 
     /**

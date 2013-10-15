@@ -10,7 +10,7 @@ public class AddBuddyHandler extends AbstractHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        WizardUtils.openAddBuddyWizard();
+        WizardUtils.openAddContactWizard();
         return null;
     }
 

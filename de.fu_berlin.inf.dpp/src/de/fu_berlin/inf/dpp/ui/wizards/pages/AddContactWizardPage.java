@@ -38,7 +38,7 @@ import de.fu_berlin.inf.nebula.utils.LayoutUtils;
  * @author bkahlert
  */
 
-public class AddBuddyWizardPage extends WizardPage {
+public class AddContactWizardPage extends WizardPage {
     public static final String TITLE = "Add Buddy"; //$NON-NLS-1$
     public static final String DESCRIPTION = "Enter the XMPP/Jabber ID of the buddy you want to add."; //$NON-NLS-1$
 
@@ -56,12 +56,12 @@ public class AddBuddyWizardPage extends WizardPage {
     protected boolean wasJIDValid = false;
 
     /**
-     * True if the buddy is already in the {@link Roster}.
+     * True if the contact is already in the {@link Roster}.
      */
-    protected boolean isBuddyAlreadyAdded = false;
+    protected boolean isContactAlreadyAdded = false;
 
-    public AddBuddyWizardPage() {
-        super(AddBuddyWizardPage.class.getName());
+    public AddContactWizardPage() {
+        super(AddContactWizardPage.class.getName());
         SarosPluginContext.initComponent(this);
         setTitle(TITLE);
         setDescription(DESCRIPTION);
@@ -124,7 +124,7 @@ public class AddBuddyWizardPage extends WizardPage {
     }
 
     protected void hookListeners() {
-        this.jidCombo.getControl().addModifyListener(new ModifyListener() {
+        jidCombo.getControl().addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
                 updatePageCompletion();
@@ -134,7 +134,7 @@ public class AddBuddyWizardPage extends WizardPage {
 
     protected void updatePageCompletion() {
         JID ownJid = sarosNet.getMyJID();
-        JID foreignJid = this.getBuddy();
+        JID foreignJid = getContact();
 
         if (foreignJid.isValid() && !foreignJid.equals(ownJid)
             && !foreignJid.isResourceQualifiedJID()) {
@@ -149,13 +149,13 @@ public class AddBuddyWizardPage extends WizardPage {
                 setMessage(Messages.roster_alreadyadded_errorMessage
                     + "\n" + Messages.wizard_finish_noeffect, //$NON-NLS-1$
                     IMessageProvider.INFORMATION);
-                isBuddyAlreadyAdded = true;
+                isContactAlreadyAdded = true;
             } else {
-                this.setMessage(DESCRIPTION);
-                isBuddyAlreadyAdded = false;
+                setMessage(DESCRIPTION);
+                isContactAlreadyAdded = false;
             }
 
-            this.setErrorMessage(null);
+            setErrorMessage(null);
             setPageComplete(true);
         } else {
             /*
@@ -163,17 +163,14 @@ public class AddBuddyWizardPage extends WizardPage {
              */
 
             if (foreignJid.equals(ownJid)) {
-                this.setErrorMessage(Messages.roster_addself_errorMessage);
+                setErrorMessage(Messages.roster_addself_errorMessage);
             } else if (wasJIDValid) {
-                this.setErrorMessage(Messages.jid_format_errorMessage);
+                setErrorMessage(Messages.jid_format_errorMessage);
             }
-            this.setPageComplete(false);
+
+            setPageComplete(false);
         }
     }
-
-    /*
-     * WizardPage Results
-     */
 
     @Override
     public void setVisible(boolean visible) {
@@ -181,10 +178,10 @@ public class AddBuddyWizardPage extends WizardPage {
         if (!visible)
             return;
 
-        this.jidCombo.setFocus();
+        jidCombo.setFocus();
     }
 
-    public JID getBuddy() {
+    public JID getContact() {
         return new JID(getText());
     }
 
@@ -192,11 +189,11 @@ public class AddBuddyWizardPage extends WizardPage {
         return this.nicknameText.getText().trim();
     }
 
-    public boolean isBuddyAlreadyAdded() {
-        return isBuddyAlreadyAdded;
+    public boolean isContactAlreadyAdded() {
+        return isContactAlreadyAdded;
     }
 
     protected String getText() {
-        return this.jidCombo.getText().trim();
+        return jidCombo.getText().trim();
     }
 }

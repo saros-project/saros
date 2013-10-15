@@ -40,16 +40,16 @@ import de.fu_berlin.inf.dpp.net.subscriptionmanager.SubscriptionManagerListener;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.wizards.pages.AddBuddyWizardPage;
+import de.fu_berlin.inf.dpp.ui.wizards.pages.AddContactWizardPage;
 
 /**
- * Wizard for adding a new buddy to the {@link Roster} of the currently
+ * Wizard for adding a new contact to the {@link Roster roster} of the currently
  * connected user.
  * 
  * @author bkahlert
  */
-public class AddBuddyWizard extends Wizard {
-    private static final Logger log = Logger.getLogger(AddBuddyWizard.class);
+public class AddContactWizard extends Wizard {
+    private static final Logger log = Logger.getLogger(AddContactWizard.class);
 
     public static final String TITLE = Messages.AddBuddyWizard_title;
     public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_ADD_BUDDY;
@@ -60,15 +60,15 @@ public class AddBuddyWizard extends Wizard {
     @Inject
     protected SubscriptionManager subscriptionManager;
 
-    protected final AddBuddyWizardPage addBuddyWizardPage = new AddBuddyWizardPage();
+    protected final AddContactWizardPage addContactWizardPage = new AddContactWizardPage();
 
     /**
      * Caches the {@link JID} reference in case the {@link WizardPage}s are
      * already disposed but a user still needs access.
      */
-    protected JID cachedBuddy;
+    protected JID cachedContact;
 
-    public AddBuddyWizard() {
+    public AddContactWizard() {
         SarosPluginContext.initComponent(this);
         setWindowTitle(TITLE);
         setDefaultPageImageDescriptor(IMAGE);
@@ -77,16 +77,16 @@ public class AddBuddyWizard extends Wizard {
 
     @Override
     public void addPages() {
-        this.addPage(addBuddyWizardPage);
+        addPage(addContactWizardPage);
     }
 
     @Override
     public boolean performFinish() {
-        final JID jid = this.addBuddyWizardPage.getBuddy();
-        final String nickname = this.addBuddyWizardPage.getNickname();
+        final JID jid = addContactWizardPage.getContact();
+        final String nickname = addContactWizardPage.getNickname();
 
-        if (this.addBuddyWizardPage.isBuddyAlreadyAdded()) {
-            log.debug("Buddy " + jid.toString() + " already added.");
+        if (addContactWizardPage.isContactAlreadyAdded()) {
+            log.debug("contact " + jid.toString() + " already added");
             return true;
         }
 
@@ -123,7 +123,7 @@ public class AddBuddyWizard extends Wizard {
                         RosterUtils.addToRoster(sarosNet.getConnection(), jid,
                             nickname);
 
-                        cachedBuddy = jid;
+                        cachedContact = jid;
                     } catch (CancellationException e) {
                         throw new InterruptedException();
                     } catch (XMPPException e) {
@@ -135,7 +135,7 @@ public class AddBuddyWizard extends Wizard {
             });
         } catch (InvocationTargetException e) {
             log.warn(e.getCause().getMessage(), e.getCause());
-            addBuddyWizardPage.setErrorMessage(e.getMessage());
+            addContactWizardPage.setErrorMessage(e.getMessage());
             subscriptionManager
                 .removeSubscriptionManagerListener(subscriptionManagerListener);
             // Leave the wizard open
@@ -150,16 +150,12 @@ public class AddBuddyWizard extends Wizard {
         return true;
     }
 
-    /*
-     * Wizard Results
-     */
-
     /**
-     * Returns {@JID} of the newly added buddy
+     * Returns {@JID} of the newly added contact
      * 
      * @return
      */
-    public JID getBuddy() {
-        return cachedBuddy;
+    public JID getContact() {
+        return cachedContact;
     }
 }
