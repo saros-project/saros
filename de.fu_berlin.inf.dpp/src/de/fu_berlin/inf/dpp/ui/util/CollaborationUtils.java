@@ -27,10 +27,12 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.PlatformUI;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -51,25 +53,35 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * @author kheld
  */
 public class CollaborationUtils {
-    private static final Logger log = Logger
+
+    private static final Logger LOG = Logger
         .getLogger(CollaborationUtils.class);
 
+    @Inject
+    private static ISarosSessionManager sessionManager;
+
+    static {
+        SarosPluginContext.initComponent(new CollaborationUtils());
+    }
+
+    private CollaborationUtils() {
+        // NOP
+    }
+
     /**
-     * Starts a new session and shares the given resources with given buddies.<br/>
+     * Starts a new session and shares the given resources with given contacts.<br/>
      * Does nothing if a {@link ISarosSession session} is already running.
      * 
-     * @param sarosSessionManager
-     * @param selectedResources
-     * @param buddies
+     * @param resources
+     * @param contacts
      * 
      * @nonBlocking
      */
-    public static void startSession(
-        final ISarosSessionManager sarosSessionManager,
-        List<IResource> selectedResources, final List<JID> buddies) {
+    public static void startSession(List<IResource> resources,
+        final List<JID> contacts) {
 
         final Map<IProject, List<IResource>> newResources = acquireResources(
-            selectedResources, null);
+            resources, null);
 
         Job sessionStartupJob = new Job("Session Startup") {
 
@@ -79,21 +91,20 @@ public class CollaborationUtils {
                     IProgressMonitor.UNKNOWN);
 
                 try {
-                    sarosSessionManager.startSession(newResources);
-                    Set<JID> participantsToAdd = new HashSet<JID>(buddies);
+                    sessionManager.startSession(newResources);
+                    Set<JID> participantsToAdd = new HashSet<JID>(contacts);
 
-                    ISarosSession session = sarosSessionManager
-                        .getSarosSession();
+                    ISarosSession session = sessionManager.getSarosSession();
 
                     if (session == null)
                         return Status.CANCEL_STATUS;
 
-                    sarosSessionManager.invite(participantsToAdd,
+                    sessionManager.invite(participantsToAdd,
                         getShareProjectDescription(session));
 
                 } catch (Exception e) {
 
-                    log.error("could not start a Saros session", e);
+                    LOG.error("could not start a Saros session", e);
                     return new Status(IStatus.ERROR, Saros.SAROS,
                         e.getMessage(), e);
                 }
@@ -111,17 +122,15 @@ public class CollaborationUtils {
      * Leaves the currently running {@link SarosSession}<br/>
      * Does nothing if no {@link SarosSession} is running.
      * 
-     * @param sarosSessionManager
      */
-    public static void leaveSession(
-        final ISarosSessionManager sarosSessionManager) {
-        ISarosSession sarosSession = sarosSessionManager.getSarosSession();
+    public static void leaveSession() {
 
-        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-            .getShell();
+        ISarosSession sarosSession = sessionManager.getSarosSession();
+
+        Shell shell = EditorAPI.getShell();
 
         if (sarosSession == null) {
-            log.warn("cannot leave a non-running session");
+            LOG.warn("cannot leave a non-running session");
             return;
         }
 
@@ -145,32 +154,28 @@ public class CollaborationUtils {
         if (!reallyLeave)
             return;
 
-        Utils.runSafeAsync("StopSession", log, new Runnable() {
+        Utils.runSafeAsync("StopSession", LOG, new Runnable() {
             @Override
             public void run() {
-                sarosSessionManager.stopSarosSession();
+                sessionManager.stopSarosSession();
             }
         });
     }
 
     /**
      * Adds the given project resources to the session.<br/>
-     * Does nothing if no {@link SarosSession} is running.
+     * Does nothing if no {@link SarosSession session} is running.
      * 
-     * @param sarosSessionManager
      * @param resourcesToAdd
      * 
      * @nonBlocking
      */
-    public static void addResourcesToSarosSession(
-        final ISarosSessionManager sarosSessionManager,
-        List<IResource> resourcesToAdd) {
+    public static void addResourcesToSession(List<IResource> resourcesToAdd) {
 
-        final ISarosSession sarosSession = sarosSessionManager
-            .getSarosSession();
+        final ISarosSession sarosSession = sessionManager.getSarosSession();
 
         if (sarosSession == null) {
-            log.warn("cannot add resources to a non-running session");
+            LOG.warn("cannot add resources to a non-running session");
             return;
         }
 
@@ -180,12 +185,12 @@ public class CollaborationUtils {
         if (projectResources.isEmpty())
             return;
 
-        Utils.runSafeAsync("AddResourceToSession", log, new Runnable() {
+        Utils.runSafeAsync("AddResourceToSession", LOG, new Runnable() {
             @Override
             public void run() {
 
                 if (sarosSession.hasWriteAccess()) {
-                    sarosSessionManager.addResourcesToSession(projectResources);
+                    sessionManager.addResourcesToSession(projectResources);
                     return;
                 }
 
@@ -198,36 +203,33 @@ public class CollaborationUtils {
     }
 
     /**
-     * Adds the given buddies to the session.<br/>
-     * Does nothing if no {@link SarosSession} is running.
+     * Adds the given contacts to the session.<br/>
+     * Does nothing if no {@link ISarosSession session} is running.
      * 
-     * @param sarosSessionManager
-     * @param buddies
+     * @param contacts
      * 
      * @nonBlocking
      */
-    public static void addBuddiesToSarosSession(
-        final ISarosSessionManager sarosSessionManager, final List<JID> buddies) {
+    public static void addContactsToSession(final List<JID> contacts) {
 
-        final ISarosSession sarosSession = sarosSessionManager
-            .getSarosSession();
+        final ISarosSession sarosSession = sessionManager.getSarosSession();
 
         if (sarosSession == null) {
-            log.warn("cannot add contacts to a non-running session");
+            LOG.warn("cannot add contacts to a non-running session");
             return;
         }
 
-        Utils.runSafeAsync("AddContactToSession", log, new Runnable() {
+        Utils.runSafeAsync("AddContactToSession", LOG, new Runnable() {
             @Override
             public void run() {
 
-                Set<JID> participantsToAdd = new HashSet<JID>(buddies);
+                Set<JID> participantsToAdd = new HashSet<JID>(contacts);
 
                 for (User user : sarosSession.getUsers())
                     participantsToAdd.remove(user.getJID());
 
                 if (participantsToAdd.size() > 0) {
-                    sarosSessionManager.invite(participantsToAdd,
+                    sessionManager.invite(participantsToAdd,
                         getShareProjectDescription(sarosSession));
                 }
             }
@@ -392,7 +394,7 @@ public class CollaborationUtils {
                             additionalFilesForPartialSharing.add(resource);
                     }
                 } catch (CoreException e) {
-                    log.warn(
+                    LOG.warn(
                         "could not read the contents of the settings folder", e);
                 }
             }

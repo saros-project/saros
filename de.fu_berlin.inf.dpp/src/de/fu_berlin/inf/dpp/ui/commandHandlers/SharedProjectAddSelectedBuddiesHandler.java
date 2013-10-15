@@ -5,12 +5,9 @@ import java.util.List;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 
@@ -20,17 +17,13 @@ import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactor
  */
 public class SharedProjectAddSelectedBuddiesHandler extends AbstractHandler {
 
-    @Inject
-    protected ISarosSessionManager sarosSessionManager;
-
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        if (sarosSessionManager == null)
-            SarosPluginContext.initComponent(this);
 
         List<JID> jids = SelectionRetrieverFactory.getSelectionRetriever(
             JID.class).getSelection();
-        CollaborationUtils.addBuddiesToSarosSession(sarosSessionManager, jids);
+
+        CollaborationUtils.addContactsToSession(jids);
         return null;
     }
 

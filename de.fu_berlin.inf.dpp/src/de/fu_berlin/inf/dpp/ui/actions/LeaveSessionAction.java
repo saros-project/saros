@@ -73,40 +73,38 @@ public class LeaveSessionAction extends Action {
         updateEnablement();
     }
 
-    /**
-     * @review runSafe OK
-     */
     @Override
     public void run() {
-        CollaborationUtils.leaveSession(sessionManager);
+        CollaborationUtils.leaveSession();
     }
 
     protected void updateEnablement() {
-        if (sessionManager.getSarosSession() != null) {
-            if (sessionManager.getSarosSession().isHost()) {
-                setToolTipText(Messages.LeaveSessionAction_stop_session_tooltip);
-                setImageDescriptor(new ImageDescriptor() {
-                    @Override
-                    public ImageData getImageData() {
-                        return ImageManager.ELCL_PROJECT_SHARE_TERMINATE
-                            .getImageData();
-                    }
-                });
-            } else {
-                setToolTipText(Messages.LeaveSessionAction_leave_session_tooltip);
-                setImageDescriptor(new ImageDescriptor() {
-                    @Override
-                    public ImageData getImageData() {
-                        return ImageManager.ELCL_PROJECT_SHARE_LEAVE
-                            .getImageData();
-                    }
-                });
-            }
-            setEnabled(true);
-        } else {
+        ISarosSession session = sessionManager.getSarosSession();
+
+        if (session == null) {
             setEnabled(false);
+            return;
         }
 
+        if (session.isHost()) {
+            setToolTipText(Messages.LeaveSessionAction_stop_session_tooltip);
+            setImageDescriptor(new ImageDescriptor() {
+                @Override
+                public ImageData getImageData() {
+                    return ImageManager.ELCL_PROJECT_SHARE_TERMINATE
+                        .getImageData();
+                }
+            });
+        } else {
+            setToolTipText(Messages.LeaveSessionAction_leave_session_tooltip);
+            setImageDescriptor(new ImageDescriptor() {
+                @Override
+                public ImageData getImageData() {
+                    return ImageManager.ELCL_PROJECT_SHARE_LEAVE.getImageData();
+                }
+            });
+        }
+        setEnabled(true);
     }
 
 }

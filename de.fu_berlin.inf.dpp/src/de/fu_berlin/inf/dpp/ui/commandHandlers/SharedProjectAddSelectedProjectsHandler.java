@@ -6,11 +6,8 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IResource;
-import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 
@@ -20,18 +17,13 @@ import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactor
  */
 public class SharedProjectAddSelectedProjectsHandler extends AbstractHandler {
 
-    @Inject
-    protected ISarosSessionManager sarosSessionManager;
-
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        if (sarosSessionManager == null)
-            SarosPluginContext.initComponent(this);
 
         List<IResource> selectedResources = SelectionRetrieverFactory
             .getSelectionRetriever(IResource.class).getSelection();
-        CollaborationUtils.addResourcesToSarosSession(sarosSessionManager,
-            selectedResources);
+
+        CollaborationUtils.addResourcesToSession(selectedResources);
         return null;
     }
 

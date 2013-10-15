@@ -22,7 +22,6 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterEntryElement;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
@@ -37,9 +36,6 @@ public class ProjectShareBuddies extends ContributionItem {
 
     @Inject
     protected SarosNet sarosNet;
-
-    @Inject
-    protected ISarosSessionManager sarosSessionManager;
 
     @Inject
     protected DiscoveryManager discoveryManager;
@@ -123,10 +119,9 @@ public class ProjectShareBuddies extends ContributionItem {
         menuItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                List<JID> buddies = new ArrayList<JID>();
-                buddies.add(new JID(rosterEntry));
-                CollaborationUtils.startSession(sarosSessionManager,
-                    resources, buddies);
+                List<JID> contacts = new ArrayList<JID>();
+                contacts.add(new JID(rosterEntry));
+                CollaborationUtils.startSession(resources, contacts);
             }
         });
 

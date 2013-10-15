@@ -22,7 +22,6 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
@@ -36,9 +35,6 @@ public class ProjectShareProjects extends ContributionItem {
 
     @Inject
     protected Saros saros;
-
-    @Inject
-    protected ISarosSessionManager sarosSessionManager;
 
     protected WorkbenchLabelProvider workbenchLabelProvider = new WorkbenchLabelProvider();
 
@@ -93,11 +89,11 @@ public class ProjectShareProjects extends ContributionItem {
      * @param parentMenu
      * @param index
      * @param project
-     * @param selectedBuddies
+     * @param selectedContacts
      * @return
      */
     protected MenuItem createProjectMenuItem(Menu parentMenu, int index,
-        final IProject project, final List<JID> selectedBuddies) {
+        final IProject project, final List<JID> selectedContacts) {
 
         MenuItem menuItem = new MenuItem(parentMenu, SWT.NONE, index);
         menuItem.setText(workbenchLabelProvider.getText(project));
@@ -108,8 +104,7 @@ public class ProjectShareProjects extends ContributionItem {
             public void widgetSelected(SelectionEvent e) {
                 List<IResource> resources = new ArrayList<IResource>();
                 resources.add(project);
-                CollaborationUtils.startSession(sarosSessionManager,
-                    resources, selectedBuddies);
+                CollaborationUtils.startSession(resources, selectedContacts);
             }
         });
 

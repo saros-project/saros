@@ -160,7 +160,7 @@ public class HostLeftAloneInSessionHandler {
             SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
                 @Override
                 public void run() {
-                    CollaborationUtils.leaveSession(sessionManager);
+                    CollaborationUtils.leaveSession();
                 }
             });
         }

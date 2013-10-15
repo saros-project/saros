@@ -6,10 +6,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
-import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
@@ -25,13 +22,9 @@ public class AddResourcesToSessionWizard extends Wizard {
     public static final String TITLE = Messages.ShareProjectAddProjectsWizard_title;
     public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_SHARE_PROJECT_ADD_PROJECTS;
 
-    @Inject
-    private ISarosSessionManager sarosSessionManager;
-
-    private ResourceSelectionWizardPage resourceSelectionWizardPage = new ResourceSelectionWizardPage();
+    private final ResourceSelectionWizardPage resourceSelectionWizardPage = new ResourceSelectionWizardPage();
 
     public AddResourcesToSessionWizard() {
-        SarosPluginContext.initComponent(this);
         setWindowTitle(TITLE);
         setDefaultPageImageDescriptor(IMAGE);
         setHelpAvailable(false);
@@ -60,8 +53,7 @@ public class AddResourcesToSessionWizard extends Wizard {
 
         SarosView.clearNotifications();
 
-        CollaborationUtils.addResourcesToSarosSession(sarosSessionManager,
-            selectedResources);
+        CollaborationUtils.addResourcesToSession(selectedResources);
 
         return true;
     }

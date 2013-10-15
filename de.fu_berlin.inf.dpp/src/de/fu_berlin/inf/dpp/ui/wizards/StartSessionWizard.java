@@ -6,11 +6,9 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
-import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
@@ -31,9 +29,6 @@ public class StartSessionWizard extends Wizard {
 
     public static final String TITLE = Messages.ShareProjectWizard_title;
     public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_SHARE_PROJECT_OUTGOING;
-
-    @Inject
-    private ISarosSessionManager sarosSessionManager;
 
     private ResourceSelectionWizardPage resourceSelectionWizardPage = new ResourceSelectionWizardPage();
     private ContactSelectionWizardPage contactSelectionWizardPage = new ContactSelectionWizardPage(
@@ -67,18 +62,7 @@ public class StartSessionWizard extends Wizard {
      * @JTourBusStop 2, Invitation Process:
      * 
      *               The chosen resources are put into collections to be sent to
-     *               the chosen buddies.
-     * 
-     *               As a slight detour, notice that the call to
-     *               CollaborationUtils.shareResourcesWith includes
-     *               sarosSessionManager as an argument. However, when you look
-     *               through this class you should find this variable is
-     *               declared but never initialized! It is not null however.
-     * 
-     *               Notice that "@Inject" annotation above the
-     *               sarosSessionManager declaration? That means that our
-     *               PicoContainer has taken care of initializing the variable
-     *               for us. Look up PicoContainer to find out more about this.
+     *               the chosen contacts.
      */
     @Override
     public boolean performFinish() {
@@ -99,8 +83,7 @@ public class StartSessionWizard extends Wizard {
 
         SarosView.clearNotifications();
 
-        CollaborationUtils.startSession(sarosSessionManager,
-            selectedResources, selectedContacts);
+        CollaborationUtils.startSession(selectedResources, selectedContacts);
 
         return true;
     }
