@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.propertyTesters;
+package de.fu_berlin.inf.dpp.ui.expressions;
 
 import org.eclipse.core.expressions.PropertyTester;
 

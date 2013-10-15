@@ -1605,34 +1605,35 @@
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
-            class="de.fu_berlin.inf.dpp.propertyTesters.SarosPropertyTester"
+            class="de.fu_berlin.inf.dpp.ui.expressions.SarosPropertyTester"
             id="de.fu_berlin.inf.dpp.propertyTesters.SarosPropertyTester"
             namespace="de.fu_berlin.inf.dpp"
             properties="isConnected"
             type="de.fu_berlin.inf.dpp.Saros">
       </propertyTester>
       <propertyTester
-            class="de.fu_berlin.inf.dpp.propertyTesters.SarosSessionPropertyTester"
-            id="de.fu_berlin.inf.dpp.propertyTesters.SarosSessionPropertyTester"  namespace="de.fu_berlin.inf.dpp"
+            class="de.fu_berlin.inf.dpp.ui.expressions.SarosSessionPropertyTester"
+            id="de.fu_berlin.inf.dpp.propertyTesters.SarosSessionPropertyTester"
+            namespace="de.fu_berlin.inf.dpp"
             properties="isHost,hasWriteAccess"
             type="de.fu_berlin.inf.dpp.project.ISarosSession">
       </propertyTester>
       <propertyTester
-            class="de.fu_berlin.inf.dpp.propertyTesters.ProjectPropertyTester"
+            class="de.fu_berlin.inf.dpp.ui.expressions.ProjectPropertyTester"
             id="de.fu_berlin.inf.dpp.propertyTesters.ProjectPropertyTester"
             namespace="de.fu_berlin.inf.dpp"
             properties="isInSarosSession"
             type="org.eclipse.core.resources.IResource">
       </propertyTester>
       <propertyTester
-            class="de.fu_berlin.inf.dpp.propertyTesters.BuddyPropertyTester"
+            class="de.fu_berlin.inf.dpp.ui.expressions.BuddyPropertyTester"
             id="de.fu_berlin.inf.dpp.propertyTesters.BuddyPropertyTester"
             namespace="de.fu_berlin.inf.dpp"
             properties="isInSarosSession"
             type="de.fu_berlin.inf.dpp.net.JID">
       </propertyTester>
       <propertyTester
-            class="de.fu_berlin.inf.dpp.propertyTesters.ParticipantPropertyTester"
+            class="de.fu_berlin.inf.dpp.ui.expressions.ParticipantPropertyTester"
             id="de.fu_berlin.inf.dpp.propertyTesters.ParticipantPropertyTester"
             namespace="de.fu_berlin.inf.dpp"
             properties="hasWriteAccess,isRemote"
