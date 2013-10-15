@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.ui.widgets.viewer.rosterSession;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -75,9 +74,7 @@ import de.fu_berlin.inf.nebula.utils.ViewerUtils;
  * @author bkahlert
  * 
  */
-public class BuddySessionDisplayComposite extends ViewerComposite {
-    private static final Logger log = Logger
-        .getLogger(BuddySessionDisplayComposite.class);
+public class BuddySessionDisplayComposite extends ViewerComposite<TreeViewer> {
 
     @Inject
     private SarosNet sarosNet;
@@ -100,8 +97,8 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
 
         @Override
         public void followModeChanged() {
-            ViewerUtils.refresh(viewer, true);
-            ViewerUtils.expandAll(viewer);
+            ViewerUtils.refresh(getViewer(), true);
+            ViewerUtils.expandAll(getViewer());
         }
     };
 
@@ -112,11 +109,11 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
             switch (newState) {
             case CONNECTED:
                 updateViewer();
-                ViewerUtils.expandAll(viewer);
+                ViewerUtils.expandAll(getViewer());
                 break;
             case NOT_CONNECTED:
                 updateViewer();
-                ViewerUtils.expandAll(viewer);
+                ViewerUtils.expandAll(getViewer());
                 break;
             default:
                 break;
@@ -127,13 +124,13 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
     private ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
         @Override
         public void userJoined(User user) {
-            ViewerUtils.refresh(viewer, true);
-            ViewerUtils.expandAll(viewer);
+            ViewerUtils.refresh(getViewer(), true);
+            ViewerUtils.expandAll(getViewer());
         }
 
         @Override
         public void userLeft(User user) {
-            ViewerUtils.refresh(viewer, true);
+            ViewerUtils.refresh(getViewer(), true);
         }
     };
 
@@ -143,54 +140,52 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
             currentSession = newSarosSession;
             newSarosSession.addListener(projectListener);
             updateViewer();
-            ViewerUtils.expandAll(viewer);
+            ViewerUtils.expandAll(getViewer());
         }
 
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
-            ViewerUtils.refresh(viewer, true);
+            ViewerUtils.refresh(getViewer(), true);
         }
 
         @Override
         public void sessionEnding(ISarosSession oldSarosSession) {
             currentSession = null;
             oldSarosSession.removeListener(projectListener);
-            ViewerUtils.refresh(viewer, true);
+            ViewerUtils.refresh(getViewer(), true);
         }
 
         @Override
         public void sessionEnded(ISarosSession oldSarosSession) {
             updateViewer();
-            ViewerUtils.expandAll(viewer);
+            ViewerUtils.expandAll(getViewer());
         }
 
         @Override
         public void projectAdded(String projectID) {
-            ViewerUtils.refresh(viewer, true);
+            ViewerUtils.refresh(getViewer(), true);
         }
 
         @Override
         public void preIncomingInvitationCompleted(IProgressMonitor monitor) {
-            ViewerUtils.refresh(viewer, true);
-            ViewerUtils.expandAll(viewer);
+            ViewerUtils.refresh(getViewer(), true);
+            ViewerUtils.expandAll(getViewer());
         }
 
         @Override
         public void postOutgoingInvitationCompleted(IProgressMonitor monitor,
             User user) {
-            ViewerUtils.refresh(viewer, true);
-            ViewerUtils.expandAll(viewer);
+            ViewerUtils.refresh(getViewer(), true);
+            ViewerUtils.expandAll(getViewer());
         }
     };
 
     private IPropertyChangeListener editorPrefsListener = new IPropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent event) {
-            ViewerUtils.refresh(viewer, true);
+            ViewerUtils.refresh(getViewer(), true);
         }
     };
-
-    private Tree tree;
 
     /**
      * Used to display the {@link Roster} even in case the user is disconnected.
@@ -203,10 +198,12 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
         SarosPluginContext.initComponent(this);
 
         super.setLayout(LayoutUtils.createGridLayout());
-        this.viewer.getControl()
+
+        getViewer().getControl()
             .setLayoutData(LayoutUtils.createFillGridData());
+
         updateViewer();
-        ViewerUtils.expandAll(viewer);
+        ViewerUtils.expandAll(getViewer());
 
         sarosNet.addListener(connectionListener);
         this.sarosSessionManager.addSarosSessionListener(sarosSessionListener);
@@ -335,17 +332,16 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
     }
 
     @Override
-    protected void createViewer(int style) {
-        this.tree = new Tree(this, style);
-        this.viewer = new TreeViewer(tree);
+    protected TreeViewer createViewer(int style) {
+        return new TreeViewer(new Tree(this, style));
     }
 
     @Override
-    protected void configureViewer() {
-        this.viewer.setContentProvider(new RosterSessionContentProvider());
-        this.viewer.setLabelProvider(new TreeLabelProvider());
-        this.viewer.setComparator(new RosterSessionComparator());
-        this.viewer.addFilter(new ViewerFilter() {
+    protected void configureViewer(TreeViewer viewer) {
+        viewer.setContentProvider(new RosterSessionContentProvider());
+        viewer.setLabelProvider(new TreeLabelProvider());
+        viewer.setComparator(new RosterSessionComparator());
+        viewer.addFilter(new ViewerFilter() {
             @Override
             public boolean select(Viewer viewer, Object parentElement,
                 Object element) {
@@ -371,13 +367,14 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
                 return true;
             }
         });
-        this.viewer.setUseHashlookup(true);
+
+        viewer.setUseHashlookup(true);
 
         /*
          * Draw a rounded rectangle indicating the highlighting color that is
          * used for this participant in the current session
          */
-        this.tree.addListener(SWT.PaintItem, new Listener() {
+        viewer.getTree().addListener(SWT.PaintItem, new Listener() {
             @Override
             public void handleEvent(Event event) {
 
@@ -411,7 +408,7 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
     private void updateViewer() {
         if (sarosNet.getRoster() != null)
             cachedRoster = sarosNet.getRoster();
-        ViewerUtils.setInput(viewer, new RosterSessionInput(cachedRoster,
+        ViewerUtils.setInput(getViewer(), new RosterSessionInput(cachedRoster,
             sarosSessionManager.getSarosSession()));
     }
 

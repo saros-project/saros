@@ -36,7 +36,8 @@ import de.fu_berlin.inf.nebula.utils.LayoutUtils;
  * @author bkahlert
  * 
  */
-public class ProjectDisplayComposite extends ViewerComposite {
+public class ProjectDisplayComposite<T extends TableViewer> extends
+    ViewerComposite<T> {
 
     public ProjectDisplayComposite(Composite parent, int style) {
         super(parent, style);
@@ -44,31 +45,23 @@ public class ProjectDisplayComposite extends ViewerComposite {
         SarosPluginContext.initComponent(this);
 
         super.setLayout(LayoutUtils.createGridLayout());
-        this.viewer.getControl()
+        getViewer().getControl()
             .setLayoutData(LayoutUtils.createFillGridData());
-        this.viewer.setInput(ResourcesPlugin.getWorkspace());
+        getViewer().setInput(ResourcesPlugin.getWorkspace());
     }
 
-    /**
-     * Creates the viewer
-     * 
-     * @param style
-     */
+    @SuppressWarnings("unchecked")
     @Override
-    protected void createViewer(int style) {
-        this.viewer = new TableViewer(new Table(this, style));
+    protected T createViewer(int style) {
+        return (T) new TableViewer(new Table(this, style));
     }
 
-    /**
-     * Configures the viewer
-     */
     @Override
-    protected void configureViewer() {
-        this.viewer
-            .setContentProvider(new ProjectOnlyWorkbenchContentProvider());
-        this.viewer.setLabelProvider(WorkbenchLabelProvider
+    protected void configureViewer(T viewer) {
+        viewer.setContentProvider(new ProjectOnlyWorkbenchContentProvider());
+        viewer.setLabelProvider(WorkbenchLabelProvider
             .getDecoratingWorkbenchLabelProvider());
-        this.viewer.setUseHashlookup(true);
+        viewer.setUseHashlookup(true);
     }
 
     /**
@@ -77,10 +70,9 @@ public class ProjectDisplayComposite extends ViewerComposite {
      * @return
      */
     public List<IProject> getProjects() {
-        WorkbenchContentProvider contentProvider = (WorkbenchContentProvider) this.viewer
+        WorkbenchContentProvider contentProvider = (WorkbenchContentProvider) getViewer()
             .getContentProvider();
-        Object[] objects = contentProvider
-            .getElements(((TableViewer) this.viewer).getInput());
+        Object[] objects = contentProvider.getElements(getViewer().getInput());
         return ArrayUtils.getAdaptableObjects(objects, IProject.class,
             Platform.getAdapterManager());
     }

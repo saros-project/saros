@@ -127,9 +127,9 @@ public class ProjectSelectionComposite extends BaseProjectSelectionComposite {
         }
 
         if (filterClosedProjects) {
-            viewer.addFilter(closedProjectsFilter);
+            getViewer().addFilter(closedProjectsFilter);
         } else {
-            viewer.removeFilter(closedProjectsFilter);
+            getViewer().removeFilter(closedProjectsFilter);
         }
 
         notifyProjectSelectionListener(filterClosedProjects);

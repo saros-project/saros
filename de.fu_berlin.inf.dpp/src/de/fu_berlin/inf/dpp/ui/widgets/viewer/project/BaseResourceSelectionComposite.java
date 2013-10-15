@@ -62,21 +62,23 @@ import de.fu_berlin.inf.dpp.util.ArrayUtils;
  * 
  */
 public abstract class BaseResourceSelectionComposite extends
-    ResourceDisplayComposite {
+    ResourceDisplayComposite<CheckboxTreeViewer> {
+
+    private static final Logger log = Logger
+        .getLogger(BaseResourceSelectionComposite.class);
 
     private static final String SAROS_RESOURCE_SELECTION_PRESET_NAMES = "Saros.resource_selection.preset_names";
     protected List<BaseResourceSelectionListener> resourceSelectionListeners = new ArrayList<BaseResourceSelectionListener>();
-    protected CheckboxTreeViewer checkboxTreeViewer = (CheckboxTreeViewer) this.viewer;
-    Logger log = Logger.getLogger(this.getClass());
+    protected final CheckboxTreeViewer checkboxTreeViewer;
 
     /*
      * Stacks used for saving previous selections in the tree view, enabling
      * undo/redo functionality
      */
-    Stack<Object[]> lastChecked = new Stack<Object[]>();
-    Stack<Object[]> lastGrayed = new Stack<Object[]>();
-    Stack<Object[]> prevChecked = new Stack<Object[]>();
-    Stack<Object[]> prevGrayed = new Stack<Object[]>();
+    protected Stack<Object[]> lastChecked = new Stack<Object[]>();
+    protected Stack<Object[]> lastGrayed = new Stack<Object[]>();
+    protected Stack<Object[]> prevChecked = new Stack<Object[]>();
+    protected Stack<Object[]> prevGrayed = new Stack<Object[]>();
 
     protected final static String SERIALIZATION_SEPARATOR = "**#**";
     protected final static String SERIALIZATION_SEPARATOR_REGEX = "\\*\\*#\\*\\*";
@@ -136,8 +138,8 @@ public abstract class BaseResourceSelectionComposite extends
             prevGrayed.clear();
         }
 
-        lastGrayed.push(((CheckboxTreeViewer) viewer).getGrayedElements());
-        lastChecked.push(((CheckboxTreeViewer) viewer).getCheckedElements());
+        lastGrayed.push(checkboxTreeViewer.getGrayedElements());
+        lastChecked.push(checkboxTreeViewer.getCheckedElements());
         log.debug("Remembered checked/grayed items: "
             + lastChecked.lastElement().length + "/"
             + lastGrayed.lastElement().length + " Saved " + lastChecked.size()
@@ -246,12 +248,12 @@ public abstract class BaseResourceSelectionComposite extends
          * setting the grayed status AND fires the changelisteners which is
          * important for the wizards next button to activate
          */
-        Object[] checked = ((CheckboxTreeViewer) viewer).getCheckedElements();
+        Object[] checked = checkboxTreeViewer.getCheckedElements();
 
         StringBuilder checkedString = new StringBuilder();
 
         for (Object resource : checked) {
-            if (((CheckboxTreeViewer) viewer).getGrayed(resource) == false) {
+            if (checkboxTreeViewer.getGrayed(resource) == false) {
                 checkedString.append(((IResource) resource).getFullPath())
                     .append(SERIALIZATION_SEPARATOR);
             }
@@ -350,18 +352,16 @@ public abstract class BaseResourceSelectionComposite extends
              * selection (which we want to undo). Using them would not undo
              * anything.
              */
-            ((CheckboxTreeViewer) viewer).setGrayedElements(lastGrayed
-                .lastElement());
-            ((CheckboxTreeViewer) viewer).setCheckedElements(lastChecked
-                .lastElement());
+            checkboxTreeViewer.setGrayedElements(lastGrayed.lastElement());
+            checkboxTreeViewer.setCheckedElements(lastChecked.lastElement());
 
         } else {
             /*
              * No previous selection available, so unset all selections (set to
              * initial state)
              */
-            ((CheckboxTreeViewer) viewer).setCheckedElements(new Object[0]);
-            ((CheckboxTreeViewer) viewer).setGrayedElements(new Object[0]);
+            checkboxTreeViewer.setCheckedElements(new Object[0]);
+            checkboxTreeViewer.setGrayedElements(new Object[0]);
         }
 
         // Need to update the controls (if there are any)
@@ -381,8 +381,8 @@ public abstract class BaseResourceSelectionComposite extends
             lastChecked.push(checkedElements);
             lastGrayed.push(grayedElements);
 
-            ((CheckboxTreeViewer) viewer).setGrayedElements(grayedElements);
-            ((CheckboxTreeViewer) viewer).setCheckedElements(checkedElements);
+            checkboxTreeViewer.setGrayedElements(grayedElements);
+            checkboxTreeViewer.setCheckedElements(checkedElements);
 
             // Disable redo button if no redo possible anymore
 
@@ -451,20 +451,21 @@ public abstract class BaseResourceSelectionComposite extends
     public BaseResourceSelectionComposite(Composite parent, int style) {
         super(parent, style | SWT.CHECK);
 
-        ((CheckboxTreeViewer) this.viewer)
-            .addCheckStateListener(checkStateListener);
+        checkboxTreeViewer = getViewer();
+
+        checkboxTreeViewer.addCheckStateListener(checkStateListener);
 
         addDisposeListener(new DisposeListener() {
             @Override
             public void widgetDisposed(DisposeEvent e) {
-                if (viewer != null)
-                    ((CheckboxTreeViewer) viewer)
+                if (checkboxTreeViewer != null)
+                    checkboxTreeViewer
                         .removeCheckStateListener(checkStateListener);
             }
         });
 
         SarosPluginContext.initComponent(this);
-        viewer.addFilter(sharedProjectsFilter);
+        checkboxTreeViewer.addFilter(sharedProjectsFilter);
     }
 
     @Inject
@@ -491,8 +492,8 @@ public abstract class BaseResourceSelectionComposite extends
     };
 
     @Override
-    public void createViewer(int style) {
-        this.viewer = new CheckboxTreeViewer(new Tree(this, style));
+    protected CheckboxTreeViewer createViewer(int style) {
+        return new CheckboxTreeViewer(new Tree(this, style));
     }
 
     /**
@@ -501,7 +502,6 @@ public abstract class BaseResourceSelectionComposite extends
      * @param resources
      */
     public void setSelectedResources(List<IResource> resources) {
-        CheckboxTreeViewer checkboxTreeViewer = (CheckboxTreeViewer) this.viewer;
 
         List<IResource> checkedResourcesBeforeUpdate = ArrayUtils
             .getAdaptableObjects(checkboxTreeViewer.getCheckedElements(),
@@ -547,7 +547,6 @@ public abstract class BaseResourceSelectionComposite extends
      * @return
      */
     public List<IResource> getSelectedResources() {
-        CheckboxTreeViewer checkboxTreeViewer = ((CheckboxTreeViewer) this.viewer);
 
         List<IResource> resources = ArrayUtils.getAdaptableObjects(
             checkboxTreeViewer.getCheckedElements(), IResource.class,
@@ -562,7 +561,6 @@ public abstract class BaseResourceSelectionComposite extends
      * Returns true if at least one resource is selected
      */
     public boolean hasSelectedResources() {
-        CheckboxTreeViewer checkboxTreeViewer = ((CheckboxTreeViewer) this.viewer);
         return checkboxTreeViewer.getCheckedElements().length > 0;
     }
 

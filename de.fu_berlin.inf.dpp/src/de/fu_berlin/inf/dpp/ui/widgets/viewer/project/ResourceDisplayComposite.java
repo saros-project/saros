@@ -39,7 +39,8 @@ import de.fu_berlin.inf.nebula.utils.LayoutUtils;
  * @author kheld
  * 
  */
-public class ResourceDisplayComposite extends ViewerComposite {
+public class ResourceDisplayComposite<T extends TreeViewer> extends
+    ViewerComposite<T> {
     @Inject
     protected Saros saros;
 
@@ -50,30 +51,23 @@ public class ResourceDisplayComposite extends ViewerComposite {
 
         super.setLayout(LayoutUtils.createGridLayout());
 
-        this.viewer.getControl()
+        getViewer().getControl()
             .setLayoutData(LayoutUtils.createFillGridData());
-        this.viewer.setInput(ResourcesPlugin.getWorkspace().getRoot());
+        getViewer().setInput(ResourcesPlugin.getWorkspace().getRoot());
     }
 
-    /**
-     * Creates the viewer
-     * 
-     * @param style
-     */
+    @SuppressWarnings("unchecked")
     @Override
-    protected void createViewer(int style) {
-        this.viewer = new TreeViewer(this, SWT.NONE);
+    protected T createViewer(int style) {
+        return (T) new TreeViewer(this, SWT.NONE);
     }
 
-    /**
-     * Configures the viewer
-     */
     @Override
-    protected void configureViewer() {
-        this.viewer.setContentProvider(new WorkbenchContentProvider());
-        this.viewer.setLabelProvider(new WorkbenchLabelProvider());
-        this.viewer.setUseHashlookup(true);
-        this.viewer.setSorter(new WorkbenchItemsSorter());
+    protected void configureViewer(T viewer) {
+        viewer.setContentProvider(new WorkbenchContentProvider());
+        viewer.setLabelProvider(new WorkbenchLabelProvider());
+        viewer.setUseHashlookup(true);
+        viewer.setSorter(new WorkbenchItemsSorter());
     }
 
     /**
@@ -82,10 +76,10 @@ public class ResourceDisplayComposite extends ViewerComposite {
      * @return
      */
     public List<IResource> getResources() {
-        WorkbenchContentProvider contentProvider = (WorkbenchContentProvider) this.viewer
+        WorkbenchContentProvider contentProvider = (WorkbenchContentProvider) getViewer()
             .getContentProvider();
 
-        Object[] objects = contentProvider.getElements(this.viewer.getInput());
+        Object[] objects = contentProvider.getElements(getViewer().getInput());
         return ArrayUtils.getAdaptableObjects(objects, IResource.class,
             Platform.getAdapterManager());
     }
@@ -96,11 +90,10 @@ public class ResourceDisplayComposite extends ViewerComposite {
      * @return
      */
     public int getProjectsCount() {
-        WorkbenchContentProvider contentProvider = (WorkbenchContentProvider) this.viewer
+        WorkbenchContentProvider contentProvider = (WorkbenchContentProvider) getViewer()
             .getContentProvider();
 
-        Object[] objects = contentProvider
-            .getElements(((TreeViewer) this.viewer).getInput());
+        Object[] objects = contentProvider.getElements(getViewer().getInput());
         return ArrayUtils.getAdaptableObjects(objects, IProject.class,
             Platform.getAdapterManager()).size();
     }
@@ -109,5 +102,4 @@ public class ResourceDisplayComposite extends ViewerComposite {
     public void setLayout(Layout layout) {
         // ignore
     }
-
 }

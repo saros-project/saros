@@ -58,7 +58,8 @@ import de.fu_berlin.inf.nebula.utils.ViewerUtils;
  * @author bkahlert
  * 
  */
-public class ContactSelectionComposite extends ViewerComposite {
+public class ContactSelectionComposite extends
+    ViewerComposite<CheckboxTreeViewer> {
 
     protected RosterCheckStateProvider checkStateProvider;
 
@@ -73,8 +74,8 @@ public class ContactSelectionComposite extends ViewerComposite {
             ConnectionState newState) {
             switch (newState) {
             case CONNECTED:
-                ViewerUtils.setInput(viewer, sarosNet.getRoster());
-                ViewerUtils.expandAll(viewer);
+                ViewerUtils.setInput(getViewer(), sarosNet.getRoster());
+                ViewerUtils.expandAll(getViewer());
                 break;
             case NOT_CONNECTED:
                 /*
@@ -111,23 +112,22 @@ public class ContactSelectionComposite extends ViewerComposite {
 
         super.setLayout(LayoutUtils.createGridLayout());
 
-        viewer.getControl().setLayoutData(LayoutUtils.createFillGridData());
-        viewer.setInput(sarosNet.getRoster());
+        getViewer().getControl()
+            .setLayoutData(LayoutUtils.createFillGridData());
+        getViewer().setInput(sarosNet.getRoster());
 
-        ViewerUtils.expandAll(viewer);
+        ViewerUtils.expandAll(getViewer());
 
         sarosNet.addListener(connectionListener);
 
-        ((CheckboxTreeViewer) this.viewer)
-            .addCheckStateListener(checkStateListener);
+        getViewer().addCheckStateListener(checkStateListener);
 
         addDisposeListener(new DisposeListener() {
             @Override
             public void widgetDisposed(DisposeEvent e) {
-                if (viewer != null) {
-                    ((CheckboxTreeViewer) viewer)
-                        .removeCheckStateListener(checkStateListener);
-                }
+                CheckboxTreeViewer viewer = getViewer();
+                if (viewer != null)
+                    viewer.removeCheckStateListener(checkStateListener);
 
                 if (sarosNet != null)
                     sarosNet.removeListener(connectionListener);
@@ -136,23 +136,23 @@ public class ContactSelectionComposite extends ViewerComposite {
     }
 
     @Override
-    public void createViewer(int style) {
+    public CheckboxTreeViewer createViewer(int style) {
         /*
          * The normal CheckboxTreeViewer does not preserve the checkbox states.
          * We therefore use a workaround class.
          */
-        viewer = new CheckboxTreeViewer(new Tree(this, style));
+        return new CheckboxTreeViewer(new Tree(this, style));
     }
 
     @Override
-    protected void configureViewer() {
+    protected void configureViewer(CheckboxTreeViewer viewer) {
         viewer.setContentProvider(new RosterContentProvider());
         viewer.setLabelProvider(new TreeLabelProvider());
         viewer.setComparator(new RosterComparator());
         viewer.setUseHashlookup(true);
 
         checkStateProvider = new RosterCheckStateProvider();
-        ((CheckboxTreeViewer) viewer).setCheckStateProvider(checkStateProvider);
+        viewer.setCheckStateProvider(checkStateProvider);
     }
 
     /**
@@ -161,7 +161,7 @@ public class ContactSelectionComposite extends ViewerComposite {
      * @param contacts
      */
     public void setSelectedContacts(List<JID> contacts) {
-        CheckboxTreeViewer treeViewer = (CheckboxTreeViewer) viewer;
+        CheckboxTreeViewer treeViewer = getViewer();
 
         List<RosterEntryElement> allElements = collectAllRosterEntryElement(treeViewer);
 
@@ -246,8 +246,7 @@ public class ContactSelectionComposite extends ViewerComposite {
     public List<JID> getSelectedContacts() {
         List<JID> contacts = new ArrayList<JID>();
 
-        for (Object element : ((CheckboxTreeViewer) this.viewer)
-            .getCheckedElements()) {
+        for (Object element : getViewer().getCheckedElements()) {
             JID contact = (JID) ((ITreeElement) element).getAdapter(JID.class);
             if (contact != null)
                 contacts.add(contact);
@@ -262,8 +261,7 @@ public class ContactSelectionComposite extends ViewerComposite {
      */
     public List<JID> getSelectedContactsWithSarosSupport() {
         List<JID> contacts = new ArrayList<JID>();
-        for (Object element : ((CheckboxTreeViewer) this.viewer)
-            .getCheckedElements()) {
+        for (Object element : getViewer().getCheckedElements()) {
             JID contact = (JID) ((ITreeElement) element).getAdapter(JID.class);
             boolean isSarosSupported = element instanceof RosterEntryElement
                 && ((RosterEntryElement) element).isSarosSupported();
@@ -281,8 +279,7 @@ public class ContactSelectionComposite extends ViewerComposite {
      * @return
      */
     public boolean areAllSelectedOnline() {
-        for (Object element : ((CheckboxTreeViewer) this.viewer)
-            .getCheckedElements()) {
+        for (Object element : getViewer().getCheckedElements()) {
             if (element instanceof RosterEntryElement
                 && !((RosterEntryElement) element).isOnline())
                 return false;

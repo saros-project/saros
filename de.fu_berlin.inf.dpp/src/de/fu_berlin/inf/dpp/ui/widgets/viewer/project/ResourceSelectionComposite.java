@@ -362,9 +362,9 @@ public class ResourceSelectionComposite extends BaseResourceSelectionComposite {
         }
 
         if (filterClosedProjects) {
-            viewer.addFilter(closedProjectsFilter);
+            getViewer().addFilter(closedProjectsFilter);
         } else {
-            viewer.removeFilter(closedProjectsFilter);
+            getViewer().removeFilter(closedProjectsFilter);
         }
 
         notifyProjectSelectionListener(filterClosedProjects);
@@ -396,7 +396,7 @@ public class ResourceSelectionComposite extends BaseResourceSelectionComposite {
 
         // If a project was successfully added: select it
         if (newProject != null) {
-            viewer.refresh();
+            getViewer().refresh();
             List<IResource> selectedResources = new ArrayList<IResource>();
             selectedResources.addAll(this.getSelectedResources());
             /*

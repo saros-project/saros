@@ -158,11 +158,11 @@ public class FilteredContactSelectionComposite extends
         }
 
         if (filter) {
-            viewer.addFilter(nonSarosContactsFilter);
-            ViewerUtils.expandAll(viewer);
+            getViewer().addFilter(nonSarosContactsFilter);
+            ViewerUtils.expandAll(getViewer());
         } else {
-            viewer.removeFilter(nonSarosContactsFilter);
-            ViewerUtils.expandAll(viewer);
+            getViewer().removeFilter(nonSarosContactsFilter);
+            ViewerUtils.expandAll(getViewer());
         }
 
         notifyBuddySelectionListener(filter);

@@ -40,7 +40,8 @@ import de.fu_berlin.inf.dpp.util.ArrayUtils;
  * @author bkahlert
  * 
  */
-public class BaseProjectSelectionComposite extends ProjectDisplayComposite {
+public class BaseProjectSelectionComposite extends
+    ProjectDisplayComposite<CheckboxTableViewer> {
     protected List<BaseProjectSelectionListener> projectSelectionListeners = new ArrayList<BaseProjectSelectionListener>();
 
     protected ICheckStateListener checkStateListener = new ICheckStateListener() {
@@ -54,22 +55,20 @@ public class BaseProjectSelectionComposite extends ProjectDisplayComposite {
     public BaseProjectSelectionComposite(Composite parent, int style) {
         super(parent, style | SWT.CHECK);
 
-        ((CheckboxTableViewer) this.viewer)
-            .addCheckStateListener(checkStateListener);
+        getViewer().addCheckStateListener(checkStateListener);
 
         addDisposeListener(new DisposeListener() {
             @Override
             public void widgetDisposed(DisposeEvent e) {
-                if (viewer != null)
-                    ((CheckboxTableViewer) viewer)
-                        .removeCheckStateListener(checkStateListener);
+                if (getViewer() != null)
+                    getViewer().removeCheckStateListener(checkStateListener);
             }
         });
     }
 
     @Override
-    public void createViewer(int style) {
-        this.viewer = new CheckboxTableViewer(new Table(this, style));
+    protected CheckboxTableViewer createViewer(int style) {
+        return new CheckboxTableViewer(new Table(this, style));
     }
 
     /**
@@ -78,7 +77,7 @@ public class BaseProjectSelectionComposite extends ProjectDisplayComposite {
      * @param projects
      */
     public void setSelectedProjects(List<IProject> projects) {
-        CheckboxTableViewer checkboxTableViewer = (CheckboxTableViewer) this.viewer;
+        CheckboxTableViewer checkboxTableViewer = getViewer();
         IStructuredContentProvider structuredContentProvider = (IStructuredContentProvider) checkboxTableViewer
             .getContentProvider();
 
@@ -143,8 +142,7 @@ public class BaseProjectSelectionComposite extends ProjectDisplayComposite {
      */
     public List<IProject> getSelectedProjects() {
         List<IProject> projects = new ArrayList<IProject>();
-        for (Object element : ((CheckboxTableViewer) this.viewer)
-            .getCheckedElements()) {
+        for (Object element : getViewer().getCheckedElements()) {
             projects.add((IProject) element);
         }
         return projects;
