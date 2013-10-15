@@ -97,7 +97,7 @@ import de.fu_berlin.inf.dpp.ui.sounds.SoundPlayer;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.ui.widgets.ConnectionStateComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.session.ChatRoomsComposite;
+import de.fu_berlin.inf.dpp.ui.widgets.chat.ChatRoomsComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.rosterSession.BuddySessionDisplayComposite;
 import de.fu_berlin.inf.nebula.utils.LayoutUtils;
 

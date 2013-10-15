@@ -19,10 +19,10 @@ import org.hamcrest.Matcher;
 import de.fu_berlin.inf.dpp.stf.server.bot.widget.SarosSWTBotChatInput;
 import de.fu_berlin.inf.dpp.stf.server.bot.widget.SarosSWTBotChatLine;
 import de.fu_berlin.inf.dpp.stf.server.bot.widget.SarosSWTBotChatLinePartnerChangeSeparator;
-import de.fu_berlin.inf.dpp.ui.widgets.chatControl.items.ChatLine;
-import de.fu_berlin.inf.dpp.ui.widgets.chatControl.items.ChatLinePartnerChangeSeparator;
-import de.fu_berlin.inf.dpp.ui.widgets.chatControl.parts.ChatDisplay;
-import de.fu_berlin.inf.dpp.ui.widgets.chatControl.parts.ChatInput;
+import de.fu_berlin.inf.dpp.ui.widgets.chat.items.ChatLine;
+import de.fu_berlin.inf.dpp.ui.widgets.chat.items.ChatLinePartnerChangeSeparator;
+import de.fu_berlin.inf.dpp.ui.widgets.chat.parts.ChatDisplay;
+import de.fu_berlin.inf.dpp.ui.widgets.chat.parts.ChatInput;
 
 /**
  * SarosSWTBot is a {@link SWTBot} with capabilities for testing specific GUI

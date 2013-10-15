@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.widgets.chatControl.items;
+package de.fu_berlin.inf.dpp.ui.widgets.chat.items;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

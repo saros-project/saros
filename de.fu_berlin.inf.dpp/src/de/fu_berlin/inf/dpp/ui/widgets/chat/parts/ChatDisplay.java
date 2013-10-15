@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.widgets.chatControl.parts;
+package de.fu_berlin.inf.dpp.ui.widgets.chat.parts;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -20,11 +20,11 @@ import org.eclipse.swt.widgets.Listener;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.ChatClearedEvent;
-import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.IChatDisplayListener;
-import de.fu_berlin.inf.dpp.ui.widgets.chatControl.items.ChatLine;
-import de.fu_berlin.inf.dpp.ui.widgets.chatControl.items.ChatLinePartnerChangeSeparator;
-import de.fu_berlin.inf.dpp.ui.widgets.chatControl.items.ChatLineSeparator;
+import de.fu_berlin.inf.dpp.ui.widgets.chat.events.ChatClearedEvent;
+import de.fu_berlin.inf.dpp.ui.widgets.chat.events.IChatDisplayListener;
+import de.fu_berlin.inf.dpp.ui.widgets.chat.items.ChatLine;
+import de.fu_berlin.inf.dpp.ui.widgets.chat.items.ChatLinePartnerChangeSeparator;
+import de.fu_berlin.inf.dpp.ui.widgets.chat.items.ChatLineSeparator;
 import de.fu_berlin.inf.nebula.widgets.SimpleRoundedComposite;
 
 /**

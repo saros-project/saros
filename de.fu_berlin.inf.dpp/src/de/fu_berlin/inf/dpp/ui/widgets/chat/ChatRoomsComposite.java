@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.widgets.session;
+package de.fu_berlin.inf.dpp.ui.widgets.chat;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -43,7 +43,6 @@ import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
-import de.fu_berlin.inf.dpp.ui.widgets.chatControl.ChatControl;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.nebula.explanation.ListExplanationComposite.ListExplanation;
 import de.fu_berlin.inf.nebula.explanation.explanatory.ListExplanatoryComposite;

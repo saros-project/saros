@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.model.rosterSession.UserElement;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
-import de.fu_berlin.inf.dpp.ui.widgets.session.ChatRoomsComposite;
+import de.fu_berlin.inf.dpp.ui.widgets.chat.ChatRoomsComposite;
 
 public class OpenChatAction extends Action {
 

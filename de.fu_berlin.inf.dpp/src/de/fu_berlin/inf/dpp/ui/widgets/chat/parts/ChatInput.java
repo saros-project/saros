@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.widgets.chatControl.parts;
+package de.fu_berlin.inf.dpp.ui.widgets.chat.parts;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;

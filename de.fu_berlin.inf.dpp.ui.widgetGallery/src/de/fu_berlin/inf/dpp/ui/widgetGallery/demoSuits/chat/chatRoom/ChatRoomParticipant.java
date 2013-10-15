@@ -12,11 +12,11 @@ import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChat;
 import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferences;
-import de.fu_berlin.inf.dpp.ui.widgets.chatControl.ChatControl;
-import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.CharacterEnteredEvent;
-import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.ChatClearedEvent;
-import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.IChatControlListener;
-import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.MessageEnteredEvent;
+import de.fu_berlin.inf.dpp.ui.widgets.chat.ChatControl;
+import de.fu_berlin.inf.dpp.ui.widgets.chat.events.CharacterEnteredEvent;
+import de.fu_berlin.inf.dpp.ui.widgets.chat.events.ChatClearedEvent;
+import de.fu_berlin.inf.dpp.ui.widgets.chat.events.IChatControlListener;
+import de.fu_berlin.inf.dpp.ui.widgets.chat.events.MessageEnteredEvent;
 
 public class ChatRoomParticipant {
     protected static String server = "jabber.ccc.de";

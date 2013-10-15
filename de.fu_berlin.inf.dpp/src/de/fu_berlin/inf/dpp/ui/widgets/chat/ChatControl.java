@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.widgets.chatControl;
+package de.fu_berlin.inf.dpp.ui.widgets.chat;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -47,14 +47,13 @@ import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.sounds.SoundManager;
 import de.fu_berlin.inf.dpp.ui.sounds.SoundPlayer;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.CharacterEnteredEvent;
-import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.ChatClearedEvent;
-import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.IChatControlListener;
-import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.IChatDisplayListener;
-import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.MessageEnteredEvent;
-import de.fu_berlin.inf.dpp.ui.widgets.chatControl.parts.ChatDisplay;
-import de.fu_berlin.inf.dpp.ui.widgets.chatControl.parts.ChatInput;
-import de.fu_berlin.inf.dpp.ui.widgets.session.ChatRoomsComposite;
+import de.fu_berlin.inf.dpp.ui.widgets.chat.events.CharacterEnteredEvent;
+import de.fu_berlin.inf.dpp.ui.widgets.chat.events.ChatClearedEvent;
+import de.fu_berlin.inf.dpp.ui.widgets.chat.events.IChatControlListener;
+import de.fu_berlin.inf.dpp.ui.widgets.chat.events.IChatDisplayListener;
+import de.fu_berlin.inf.dpp.ui.widgets.chat.events.MessageEnteredEvent;
+import de.fu_berlin.inf.dpp.ui.widgets.chat.parts.ChatDisplay;
+import de.fu_berlin.inf.dpp.ui.widgets.chat.parts.ChatInput;
 import de.fu_berlin.inf.nebula.explanation.ExplanationComposite;
 
 /**
