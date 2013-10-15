@@ -14,7 +14,7 @@ import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.views.WidgetGalleryView;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.BuddyDisplayComposite;
+import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.ContactSelectionComposite;
 import de.fu_berlin.inf.nebula.utils.LayoutUtils;
 
 @Demo
@@ -25,7 +25,7 @@ public class BuddyDisplayCompositeDemo extends AbstractDemo {
     public void createDemo(final Composite parent) {
         parent.setLayout(LayoutUtils.createGridLayout());
 
-        BuddyDisplayComposite buddyDisplayComposite = new BuddyDisplayComposite(
+        ContactSelectionComposite buddyDisplayComposite = new ContactSelectionComposite(
             parent, SWT.BORDER | SWT.MULTI);
         buddyDisplayComposite.setLayoutData(LayoutUtils.createFillGridData());
         WidgetGalleryView.selectionProviderIntermediate

@@ -15,7 +15,7 @@ import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
-import de.fu_berlin.inf.dpp.ui.wizards.pages.BuddySelectionWizardPage;
+import de.fu_berlin.inf.dpp.ui.wizards.pages.ContactSelectionWizardPage;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.ProjectSelectionWizardPage;
 
 /**
@@ -35,7 +35,7 @@ public class ShareProjectWizard extends Wizard {
     protected ISarosSessionManager sarosSessionManager;
 
     protected ProjectSelectionWizardPage projectSelectionWizardPage = new ProjectSelectionWizardPage();
-    protected BuddySelectionWizardPage buddySelectionWizardPage = new BuddySelectionWizardPage(
+    protected ContactSelectionWizardPage buddySelectionWizardPage = new ContactSelectionWizardPage(
         true);
 
     public ShareProjectWizard() {
@@ -86,7 +86,7 @@ public class ShareProjectWizard extends Wizard {
             .getSelectedResources();
 
         List<JID> selectedBuddies = buddySelectionWizardPage
-            .getSelectedBuddies();
+            .getSelectedContacts();
 
         if (selectedResources == null || selectedBuddies == null)
             return false;

@@ -20,16 +20,16 @@ import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterEntryElement;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterGroupElement;
 import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.BaseBuddySelectionListener;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.BuddySelectionListener;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.FilterNonSarosBuddiesChangedEvent;
+import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.ContactSelectionListener;
+import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.FilterContactsChangedEvent;
+import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.FilteredContactSelectionListener;
 import de.fu_berlin.inf.dpp.ui.wizards.AddContactWizard;
 import de.fu_berlin.inf.nebula.utils.LayoutUtils;
 import de.fu_berlin.inf.nebula.utils.ViewerUtils;
 
 /**
- * This {@link Composite} extends {@link BaseBuddySelectionComposite} and
- * displays additional controls.
+ * This {@link Composite} extends {@link ContactSelectionComposite} and displays
+ * additional controls.
  * <p>
  * This composite does <strong>NOT</strong> handle setting the layout and adding
  * sub {@link Control}s correctly.
@@ -45,16 +45,20 @@ import de.fu_berlin.inf.nebula.utils.ViewerUtils;
  * @author bkahlert
  * 
  */
-public class BuddySelectionComposite extends BaseBuddySelectionComposite {
-    protected boolean filterNonSarosBuddies;
-    protected Button filterNonSarosBuddiesButton;
-    protected ViewerFilter nonSarosBuddiesFilter = new ViewerFilter() {
+public class FilteredContactSelectionComposite extends
+    ContactSelectionComposite {
+
+    protected boolean filterNonSarosContacts;
+
+    protected Button filterNonSarosContactsButton;
+
+    protected ViewerFilter nonSarosContactsFilter = new ViewerFilter() {
         @Override
         public boolean select(Viewer viewer, Object parentElement,
             Object element) {
             /*
              * Groups are only displayed if at they contain at least one
-             * selected element (e.g. buddy with Saros support).
+             * selected element (e.g. contact with Saros support).
              */
             if (element instanceof RosterGroupElement) {
                 RosterGroupElement rosterGroupElement = (RosterGroupElement) element;
@@ -81,12 +85,12 @@ public class BuddySelectionComposite extends BaseBuddySelectionComposite {
         }
     };
 
-    public BuddySelectionComposite(Composite parent, int style,
+    public FilteredContactSelectionComposite(Composite parent, int style,
         boolean filterNonSarosBuddies) {
         super(parent, style);
 
         createControls();
-        setFilterNonSarosBuddies(filterNonSarosBuddies);
+        setFilterNonSarosContacts(filterNonSarosBuddies);
     }
 
     /**
@@ -97,81 +101,86 @@ public class BuddySelectionComposite extends BaseBuddySelectionComposite {
         controlComposite.setLayoutData(LayoutUtils.createFillHGrabGridData());
         controlComposite.setLayout(new GridLayout(2, false));
 
-        filterNonSarosBuddiesButton = new Button(controlComposite, SWT.CHECK);
-        filterNonSarosBuddiesButton.setLayoutData(new GridData(SWT.BEGINNING,
+        filterNonSarosContactsButton = new Button(controlComposite, SWT.CHECK);
+        filterNonSarosContactsButton.setLayoutData(new GridData(SWT.BEGINNING,
             SWT.CENTER, false, false));
-        filterNonSarosBuddiesButton
+
+        filterNonSarosContactsButton
             .setText(Messages.BuddySelectionComposite_hide_buddies_no_saros);
-        filterNonSarosBuddiesButton
+
+        filterNonSarosContactsButton
             .addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    setFilterNonSarosBuddies(filterNonSarosBuddiesButton
+                    setFilterNonSarosContacts(filterNonSarosContactsButton
                         .getSelection());
                 }
             });
 
-        Button addBuddyButton = new Button(controlComposite, SWT.PUSH);
-        addBuddyButton.setLayoutData(new GridData(SWT.END, SWT.CENTER, true,
+        Button addContactButton = new Button(controlComposite, SWT.PUSH);
+        addContactButton.setLayoutData(new GridData(SWT.END, SWT.CENTER, true,
             false));
-        addBuddyButton.setText(Messages.BuddySelectionComposite_add_buddy);
-        addBuddyButton.setImage(ImageManager.ELCL_BUDDY_ADD);
-        addBuddyButton.addSelectionListener(new SelectionAdapter() {
+        addContactButton.setText(Messages.BuddySelectionComposite_add_buddy);
+        addContactButton.setImage(ImageManager.ELCL_BUDDY_ADD);
+        addContactButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                AddContactWizard addBuddyWizard = WizardUtils
+                AddContactWizard addContactWizard = WizardUtils
                     .openAddContactWizard();
-                if (addBuddyWizard != null) {
-                    List<JID> selectedBuddies = getSelectedBuddies();
-                    selectedBuddies.add(addBuddyWizard.getContact());
-                    setSelectedBuddies(selectedBuddies);
-                }
+
+                if (addContactWizard == null)
+                    return;
+
+                List<JID> selectedContacts = getSelectedContacts();
+                selectedContacts.add(addContactWizard.getContact());
+                setSelectedContacts(selectedContacts);
             }
         });
     }
 
     /**
-     * Defines whether non Saros buddies should be displayed or not
+     * Defines whether non Saros contacts should be displayed or not
      * 
-     * @param filterNonSarosBuddies
-     *            true if nonSaros buddies should not be displayed
+     * @param filter
+     *            <code>true</code> if non Saros contacts should not be
+     *            displayed
      */
-    public void setFilterNonSarosBuddies(boolean filterNonSarosBuddies) {
-        if (this.filterNonSarosBuddies == filterNonSarosBuddies)
+    public void setFilterNonSarosContacts(boolean filter) {
+        if (filterNonSarosContacts == filter)
             return;
 
-        this.filterNonSarosBuddies = filterNonSarosBuddies;
+        filterNonSarosContacts = filter;
 
-        if (this.filterNonSarosBuddiesButton != null
-            && !this.filterNonSarosBuddiesButton.isDisposed()
-            && this.filterNonSarosBuddiesButton.getSelection() != filterNonSarosBuddies) {
-            this.filterNonSarosBuddiesButton
-                .setSelection(filterNonSarosBuddies);
+        if (filterNonSarosContactsButton != null
+            && !filterNonSarosContactsButton.isDisposed()
+            && filterNonSarosContactsButton.getSelection() != filter) {
+            filterNonSarosContactsButton.setSelection(filter);
         }
 
-        if (filterNonSarosBuddies) {
-            viewer.addFilter(nonSarosBuddiesFilter);
+        if (filter) {
+            viewer.addFilter(nonSarosContactsFilter);
             ViewerUtils.expandAll(viewer);
         } else {
-            viewer.removeFilter(nonSarosBuddiesFilter);
+            viewer.removeFilter(nonSarosContactsFilter);
             ViewerUtils.expandAll(viewer);
         }
 
-        notifyBuddySelectionListener(filterNonSarosBuddies);
+        notifyBuddySelectionListener(filter);
     }
 
     /**
-     * Notify all {@link BuddySelectionListener}s about a changed
-     * {@link BuddySelectionComposite#filterNonSarosBuddies} option.
+     * Notify all {@link FilteredContactSelectionListener}s about a changed
+     * {@link FilteredContactSelectionComposite#filterNonSarosContacts} option.
      * 
-     * @param filterNonSarosBuddies
+     * @param filterNonSarosContacts
      */
-    public void notifyBuddySelectionListener(boolean filterNonSarosBuddies) {
-        FilterNonSarosBuddiesChangedEvent event = new FilterNonSarosBuddiesChangedEvent(
-            filterNonSarosBuddies);
-        for (BaseBuddySelectionListener buddySelectionListener : this.buddySelectionListeners) {
-            if (buddySelectionListener instanceof BuddySelectionListener)
-                ((BuddySelectionListener) buddySelectionListener)
+    public void notifyBuddySelectionListener(boolean filterNonSarosContacts) {
+        FilterContactsChangedEvent event = new FilterContactsChangedEvent(
+            filterNonSarosContacts);
+
+        for (ContactSelectionListener contactSelectionListener : contactSelectionListeners) {
+            if (contactSelectionListener instanceof FilteredContactSelectionListener)
+                ((FilteredContactSelectionListener) contactSelectionListener)
                     .filterNonSarosBuddiesChanged(event);
         }
     }

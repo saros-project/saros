@@ -12,7 +12,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
-import de.fu_berlin.inf.dpp.ui.wizards.pages.BuddySelectionWizardPage;
+import de.fu_berlin.inf.dpp.ui.wizards.pages.ContactSelectionWizardPage;
 
 /**
  * Wizard for adding buddies to a running session.
@@ -26,7 +26,7 @@ public class ShareProjectAddBuddiesWizard extends Wizard {
     @Inject
     protected ISarosSessionManager sarosSessionManager;
 
-    protected BuddySelectionWizardPage buddySelectionWizardPage = new BuddySelectionWizardPage();
+    protected ContactSelectionWizardPage buddySelectionWizardPage = new ContactSelectionWizardPage();
 
     public ShareProjectAddBuddiesWizard() {
         SarosPluginContext.initComponent(this);
@@ -44,7 +44,7 @@ public class ShareProjectAddBuddiesWizard extends Wizard {
     @Override
     public boolean performFinish() {
         List<JID> selectedBuddies = buddySelectionWizardPage
-            .getSelectedBuddies();
+            .getSelectedContacts();
         if (selectedBuddies == null)
             return false;
 

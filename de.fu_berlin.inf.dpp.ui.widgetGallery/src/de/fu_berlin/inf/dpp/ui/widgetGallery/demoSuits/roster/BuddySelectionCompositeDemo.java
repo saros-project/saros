@@ -13,17 +13,17 @@ import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.BuddySelectionComposite;
+import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.FilteredContactSelectionComposite;
 
 @Demo("This demo show a BuddySelectionComposite that reflects the currently selected buddies in the workbench.")
 public class BuddySelectionCompositeDemo extends AbstractDemo {
-    protected BuddySelectionComposite buddySelectionComposite;
+    protected FilteredContactSelectionComposite buddySelectionComposite;
 
     protected ISelectionListener selectionListener = new ISelectionListener() {
         @Override
         public void selectionChanged(IWorkbenchPart part, ISelection selection) {
             buddySelectionComposite
-                .setSelectedBuddies(SelectionRetrieverFactory
+                .setSelectedContacts(SelectionRetrieverFactory
                     .getSelectionRetriever(JID.class).getOverallSelection());
         }
     };
@@ -32,7 +32,7 @@ public class BuddySelectionCompositeDemo extends AbstractDemo {
     public void createDemo(Composite parent) {
         parent.setLayout(new GridLayout(1, false));
 
-        buddySelectionComposite = new BuddySelectionComposite(parent,
+        buddySelectionComposite = new FilteredContactSelectionComposite(parent,
             SWT.BORDER, true);
         buddySelectionComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
             true, true));

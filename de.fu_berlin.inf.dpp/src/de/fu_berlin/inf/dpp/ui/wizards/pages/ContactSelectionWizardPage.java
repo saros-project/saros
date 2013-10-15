@@ -22,28 +22,28 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.BuddySelectionComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.BuddySelectionChangedEvent;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.BuddySelectionListener;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.FilterNonSarosBuddiesChangedEvent;
+import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.FilteredContactSelectionComposite;
+import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.ContactSelectionChangedEvent;
+import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.FilteredContactSelectionListener;
+import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.FilterContactsChangedEvent;
 
 /**
  * Allows the user to select a {@link JID} from the {@link Roster}.
  * 
  * @author bkahlert
  */
-public class BuddySelectionWizardPage extends WizardPage {
+public class ContactSelectionWizardPage extends WizardPage {
     private static final Logger LOG = Logger
-        .getLogger(BuddySelectionWizardPage.class);
+        .getLogger(ContactSelectionWizardPage.class);
 
     protected static final String TITLE = Messages.BuddySelectionWizardPage_title;
     protected static final String DESCRIPTION = Messages.BuddySelectionWizardPage_description;
 
-    protected static final String NO_BUDDY_SELECTED_ERROR_MESSAGE = Messages.BuddySelectionWizardPage_error_select_one_buddy;
-    protected static final String OFFLINE_BUDDY_SELECTED_ERROR_MESSAGE = Messages.BuddySelectionWizardPage_error_selected_offline;
-    protected static final String BUDDIES_WITHOUT_SAROS_SUPPORT_WARNING_MESSAGE = Messages.BuddySelectionWizardPage_warn_only_saros_buddies;
+    protected static final String NO_CONTACT_SELECTED_ERROR_MESSAGE = Messages.BuddySelectionWizardPage_error_select_one_buddy;
+    protected static final String OFFLINE_CONTACT_SELECTED_ERROR_MESSAGE = Messages.BuddySelectionWizardPage_error_selected_offline;
+    protected static final String CONTACTS_WITHOUT_SAROS_SUPPORT_WARNING_MESSAGE = Messages.BuddySelectionWizardPage_warn_only_saros_buddies;
 
-    protected BuddySelectionComposite buddySelectionComposite;
+    protected FilteredContactSelectionComposite contactSelectionComposite;
 
     /**
      * Flag indicating if this wizard page can be completed even if no contact
@@ -63,22 +63,22 @@ public class BuddySelectionWizardPage extends WizardPage {
     protected DiscoveryManager discoveryManager;
 
     /**
-     * This {@link BuddySelectionListener} changes the {@link WizardPage}'s
+     * This {@link FilteredContactSelectionListener} changes the {@link WizardPage}'s
      * state according to the selected {@link JID}s.
      */
-    protected BuddySelectionListener buddySelectionListener = new BuddySelectionListener() {
+    protected FilteredContactSelectionListener buddySelectionListener = new FilteredContactSelectionListener() {
         @Override
-        public void buddySelectionChanged(BuddySelectionChangedEvent event) {
+        public void contactSelectionChanged(ContactSelectionChangedEvent event) {
             updatePageCompletion();
         }
 
         @Override
         public void filterNonSarosBuddiesChanged(
-            FilterNonSarosBuddiesChangedEvent event) {
+            FilterContactsChangedEvent event) {
 
             preferenceStore.setValue(
                 PreferenceConstants.BUDDYSELECTION_FILTERNONSAROSBUDDIES,
-                event.isFilterNonSarosBuddies());
+                event.isFilterNonSarosContacts());
         }
     };
 
@@ -96,7 +96,7 @@ public class BuddySelectionWizardPage extends WizardPage {
             SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
                 @Override
                 public void run() {
-                    if (BuddySelectionWizardPage.this.getControl().isDisposed())
+                    if (ContactSelectionWizardPage.this.getControl().isDisposed())
                         return;
 
                     updatePageCompletion();
@@ -105,12 +105,12 @@ public class BuddySelectionWizardPage extends WizardPage {
         }
     };
 
-    public BuddySelectionWizardPage() {
+    public ContactSelectionWizardPage() {
         this(false);
     }
 
-    public BuddySelectionWizardPage(boolean allowEmptyContactSelection) {
-        super(BuddySelectionWizardPage.class.getName());
+    public ContactSelectionWizardPage(boolean allowEmptyContactSelection) {
+        super(ContactSelectionWizardPage.class.getName());
         setTitle(TITLE);
         setDescription(DESCRIPTION);
 
@@ -136,20 +136,20 @@ public class BuddySelectionWizardPage extends WizardPage {
         boolean initialFilterConfig = preferenceStore
             .getBoolean(PreferenceConstants.BUDDYSELECTION_FILTERNONSAROSBUDDIES);
 
-        buddySelectionComposite = new BuddySelectionComposite(composite,
+        contactSelectionComposite = new FilteredContactSelectionComposite(composite,
             SWT.BORDER | SWT.V_SCROLL, initialFilterConfig);
 
         /*
          * preset the contact(s) e.g from the Saros view when invoking 'Work
          * Together on...' context menu
          */
-        buddySelectionComposite.setSelectedBuddies(SelectionRetrieverFactory
+        contactSelectionComposite.setSelectedContacts(SelectionRetrieverFactory
             .getSelectionRetriever(JID.class).getOverallSelection());
 
-        buddySelectionComposite
-            .addBuddySelectionListener(buddySelectionListener);
+        contactSelectionComposite
+            .addContactSelectionListener(buddySelectionListener);
 
-        buddySelectionComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
+        contactSelectionComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
             true, true));
 
         updatePageCompletion();
@@ -157,26 +157,26 @@ public class BuddySelectionWizardPage extends WizardPage {
 
     protected void updatePageCompletion() {
 
-        List<JID> selectedBuddies = getSelectedBuddies();
+        List<JID> selectedBuddies = getSelectedContacts();
 
-        List<JID> selectedBuddiesWithSarosSupport = getSelectedBuddiesWithSarosSupport();
+        List<JID> selectedBuddiesWithSarosSupport = getSelectedContactsWithSarosSupport();
 
         if (allowEmptyContactSelection && selectedBuddies.isEmpty()) {
             setPageComplete(true);
             setErrorMessage(null);
         } else if (selectedBuddies.size() == 0) {
             if (selectionWasValid)
-                setErrorMessage(NO_BUDDY_SELECTED_ERROR_MESSAGE);
+                setErrorMessage(NO_CONTACT_SELECTED_ERROR_MESSAGE);
             setPageComplete(false);
-        } else if (!buddySelectionComposite.areAllSelectedOnline()) {
-            setErrorMessage(OFFLINE_BUDDY_SELECTED_ERROR_MESSAGE);
+        } else if (!contactSelectionComposite.areAllSelectedOnline()) {
+            setErrorMessage(OFFLINE_CONTACT_SELECTED_ERROR_MESSAGE);
             setPageComplete(false);
         } else {
             selectionWasValid = true;
             setErrorMessage(null);
 
             if (selectedBuddies.size() > selectedBuddiesWithSarosSupport.size()) {
-                setMessage(BUDDIES_WITHOUT_SAROS_SUPPORT_WARNING_MESSAGE,
+                setMessage(CONTACTS_WITHOUT_SAROS_SUPPORT_WARNING_MESSAGE,
                     IMessageProvider.WARNING);
             } else {
                 setMessage(DESCRIPTION);
@@ -193,24 +193,24 @@ public class BuddySelectionWizardPage extends WizardPage {
         if (!visible)
             return;
 
-        buddySelectionComposite.setFocus();
+        contactSelectionComposite.setFocus();
     }
 
     // WizardPage Results
 
-    public List<JID> getSelectedBuddies() {
-        if (buddySelectionComposite == null
-            || buddySelectionComposite.isDisposed())
+    public List<JID> getSelectedContacts() {
+        if (contactSelectionComposite == null
+            || contactSelectionComposite.isDisposed())
             return null;
 
-        return buddySelectionComposite.getSelectedBuddies();
+        return contactSelectionComposite.getSelectedContacts();
     }
 
-    public List<JID> getSelectedBuddiesWithSarosSupport() {
-        if (buddySelectionComposite == null
-            || buddySelectionComposite.isDisposed())
+    public List<JID> getSelectedContactsWithSarosSupport() {
+        if (contactSelectionComposite == null
+            || contactSelectionComposite.isDisposed())
             return null;
 
-        return buddySelectionComposite.getSelectedBuddiesWithSarosSupport();
+        return contactSelectionComposite.getSelectedContactsWithSarosSupport();
     }
 }
