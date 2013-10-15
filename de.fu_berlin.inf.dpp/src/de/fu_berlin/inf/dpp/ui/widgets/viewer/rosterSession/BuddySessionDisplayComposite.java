@@ -396,6 +396,14 @@ public class BuddySessionDisplayComposite extends ViewerComposite<TreeViewer> {
                 bounds.width = 15;
                 bounds.x += 15;
 
+                /*
+                 * make the rectangle a little bit smaller so it does not
+                 * collide with the edges when the tree item is selected
+                 */
+
+                bounds.y += 2;
+                bounds.height -= 4;
+
                 Color backgroundColor = SarosAnnotation.getUserColor(user);
 
                 PaintUtils.drawRoundedRectangle(gc, bounds, backgroundColor);
