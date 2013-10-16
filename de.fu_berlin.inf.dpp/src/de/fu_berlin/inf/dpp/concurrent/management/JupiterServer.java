@@ -29,7 +29,7 @@ public class JupiterServer {
      */
     private HashMap<SPath, JupiterDocumentServer> concurrentDocuments = new HashMap<SPath, JupiterDocumentServer>();
 
-    private Set<JID> currentClients = new HashSet<JID>();
+    private Set<User> currentClients = new HashSet<User>();
 
     private ISarosSession sarosSession;
 
@@ -43,7 +43,7 @@ public class JupiterServer {
 
     public synchronized void addUser(User user) {
         JID jid = user.getJID();
-        currentClients.add(jid);
+        currentClients.add(user);
         for (JupiterDocumentServer server : concurrentDocuments.values()) {
             server.addProxyClient(jid);
         }
@@ -51,33 +51,44 @@ public class JupiterServer {
 
     public synchronized void removeUser(User user) {
         JID jid = user.getJID();
-        currentClients.remove(jid);
+        currentClients.remove(user);
         for (JupiterDocumentServer server : concurrentDocuments.values()) {
             server.removeProxyClient(jid);
         }
     }
 
     /**
+     * Retrieves the JupiterDocumentServer for a given path. If no
+     * JupiterDocumentServer exists for this path, a new one is created and
+     * returned afterwards.
+     * 
      * @host
      */
     /*
-     * FIXME this does currently only work the first time a project is added ...
-     * to really fix the issue we have to track the project ID / resources that
-     * are added to the project sharing for each user !
+     * TODO This solution currently just works for partial sharing by
+     * coincidence. To really fix the issue we have to expand the
+     * SarosSessionMapper to also track the resources and not just the projects
+     * that are already shared for every user individually.
      */
     protected synchronized JupiterDocumentServer getServer(SPath path) {
 
         JupiterDocumentServer docServer = concurrentDocuments.get(path);
 
         if (docServer == null) {
-            Set<JID> clients = new HashSet<JID>(currentClients);
-
-            clients.add(sarosSession.getHost().getJID());
 
             docServer = new JupiterDocumentServer(path);
 
-            for (JID client : clients)
-                docServer.addProxyClient(client);
+            for (User client : currentClients) {
+                /*
+                 * Make sure that we only add clients that already have the
+                 * resources in question. Other clients that haven't accepted
+                 * the Project yet will be added later.
+                 */
+                if (sarosSession.userHasProject(client, path.getProject())) {
+                    docServer.addProxyClient(client.getJID());
+                }
+            }
+            docServer.addProxyClient(sarosSession.getHost().getJID());
 
             concurrentDocuments.put(path, docServer);
         }
