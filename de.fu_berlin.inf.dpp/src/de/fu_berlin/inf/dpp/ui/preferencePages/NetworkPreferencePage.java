@@ -203,8 +203,10 @@ public final class NetworkPreferencePage extends PreferencePage implements
         stunIPAddressText.setText(getPreferenceStore().getDefaultString(
             PreferenceConstants.STUN));
 
-        stunPortText.setText(String.valueOf(getPreferenceStore().getDefaultInt(
-            PreferenceConstants.STUN_PORT)));
+        int stunPort = getPreferenceStore().getDefaultInt(
+            PreferenceConstants.STUN_PORT);
+
+        stunPortText.setText(stunPort == 0 ? "" : String.valueOf(stunPort));
 
         localSocks5PortText.setText(String.valueOf(getPreferenceStore()
             .getDefaultInt(PreferenceConstants.FILE_TRANSFER_PORT)));
