@@ -2,8 +2,6 @@ package de.fu_berlin.inf.dpp.ui.widgets.viewer.rosterSession;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -24,7 +22,6 @@ import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
-import org.eclipse.ui.editors.text.EditorsUI;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.Roster;
 import org.picocontainer.annotations.Inject;
@@ -92,6 +89,11 @@ public class BuddySessionDisplayComposite extends ViewerComposite<TreeViewer> {
     private FollowingActivitiesManager followingActivitiesManager;
 
     private volatile ISarosSession currentSession;
+
+    /**
+     * Used to display the {@link Roster} even in case the user is disconnected.
+     */
+    private Roster cachedRoster;
 
     private IFollowModeChangesListener followModeChangesListener = new IFollowModeChangesListener() {
 
@@ -180,18 +182,6 @@ public class BuddySessionDisplayComposite extends ViewerComposite<TreeViewer> {
         }
     };
 
-    private IPropertyChangeListener editorPrefsListener = new IPropertyChangeListener() {
-        @Override
-        public void propertyChange(PropertyChangeEvent event) {
-            ViewerUtils.refresh(getViewer(), true);
-        }
-    };
-
-    /**
-     * Used to display the {@link Roster} even in case the user is disconnected.
-     */
-    private Roster cachedRoster;
-
     public BuddySessionDisplayComposite(Composite parent, int style) {
         super(parent, style);
 
@@ -206,7 +196,7 @@ public class BuddySessionDisplayComposite extends ViewerComposite<TreeViewer> {
         ViewerUtils.expandAll(getViewer());
 
         sarosNet.addListener(connectionListener);
-        this.sarosSessionManager.addSarosSessionListener(sarosSessionListener);
+        sarosSessionManager.addSarosSessionListener(sarosSessionListener);
 
         ISarosSession session = sarosSessionManager.getSarosSession();
 
@@ -224,24 +214,18 @@ public class BuddySessionDisplayComposite extends ViewerComposite<TreeViewer> {
             currentSession = session;
         }
 
-        this.followingActivitiesManager
+        followingActivitiesManager
             .addIinternalListener(followModeChangesListener);
 
-        EditorsUI.getPreferenceStore().addPropertyChangeListener(
-            editorPrefsListener);
-
-        this.addDisposeListener(new DisposeListener() {
+        addDisposeListener(new DisposeListener() {
             @Override
             public void widgetDisposed(DisposeEvent e) {
 
-                if (EditorsUI.getPreferenceStore() != null) {
-                    EditorsUI.getPreferenceStore()
-                        .removePropertyChangeListener(editorPrefsListener);
-                }
                 if (sarosSessionManager != null) {
                     sarosSessionManager
                         .removeSarosSessionListener(sarosSessionListener);
                 }
+
                 if (sarosNet != null) {
                     sarosNet.removeListener(connectionListener);
                 }
@@ -414,8 +398,12 @@ public class BuddySessionDisplayComposite extends ViewerComposite<TreeViewer> {
     }
 
     private void updateViewer() {
-        if (sarosNet.getRoster() != null)
-            cachedRoster = sarosNet.getRoster();
+
+        Roster roster = sarosNet.getRoster();
+
+        if (roster != null)
+            cachedRoster = roster;
+
         ViewerUtils.setInput(getViewer(), new RosterSessionInput(cachedRoster,
             sarosSessionManager.getSarosSession()));
     }
