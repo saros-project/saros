@@ -6,7 +6,8 @@ import org.jivesoftware.smack.packet.Packet;
 
 public abstract class SarosPacketExtension {
 
-    public static final String VERSION = "de.fu_berlin.inf.dpp/extension/V1";
+    // keep this short as it is included in every packet extension !
+    public static final String VERSION = "SPXV1";
 
     private final String version = VERSION;
 
