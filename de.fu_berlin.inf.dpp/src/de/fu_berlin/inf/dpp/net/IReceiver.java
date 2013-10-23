@@ -7,6 +7,16 @@ import org.jivesoftware.smack.packet.Packet;
 public interface IReceiver {
 
     /**
+     * @JTourBusStop 4, Architecture Overview, Network Layer - Receiver:
+     * 
+     *               (...) And this Interface is the main entrance point for
+     *               receiving them.
+     * 
+     *               For a more detailed look on how Activities work see the
+     *               "Activity sending"-Tour.
+     */
+
+    /**
      * Adds the given listener to the list of listeners notified when a new
      * packet arrives.
      * 

@@ -33,6 +33,24 @@ import de.fu_berlin.inf.dpp.activities.business.IActivity;
 public interface IActivityProvider {
 
     /**
+     * @JTourBusStop 1, Architecture Overview, User Interface -
+     *               ActivityProviders:
+     * 
+     *               The "User Interface"-Component is responsible for managing
+     *               all the visual elements in Saros, listening to changes in
+     *               Eclipse and reacting to actions performed by the local
+     *               user.
+     * 
+     *               Saros internally work with Activities. Activities are
+     *               created by Activity Providers, which take local actions and
+     *               turns them into Activities. Activity Providers are also
+     *               responsible for transforming Activities from remote users
+     *               into actions that can be executed on the local
+     *               Saros-Instance.
+     * 
+     */
+
+    /**
      * Executes the given activity.
      * 
      * @swt The implementor may expect that this method is called from the SWT

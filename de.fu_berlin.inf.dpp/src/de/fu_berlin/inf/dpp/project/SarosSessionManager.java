@@ -75,6 +75,26 @@ import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 @Component(module = "core")
 public class SarosSessionManager implements ISarosSessionManager {
 
+    /**
+     * @JTourBusStop 5, Architecture Overview, Invitation Management:
+     * 
+     *               While Activities are used to keep a running session
+     *               consistent, we use MESSAGES whenever the Session itself is
+     *               modified. This includes adding users or projects to the
+     *               session.
+     * 
+     *               The Invitation Process is managed by the "Invitation
+     *               Management"-Component. This class is the main entrance
+     *               point of this Component. During the invitation Process, the
+     *               Network Layer is used to send MESSAGES between the host and
+     *               the invitees and the Session Management is informed about
+     *               joined users and added projects.
+     * 
+     *               For more informations about the Invitation Process see the
+     *               "Invitation Process"-Tour.
+     * 
+     */
+
     private static final Logger log = Logger
         .getLogger(SarosSessionManager.class.getName());
 

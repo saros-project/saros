@@ -35,6 +35,7 @@ import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
+import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 
@@ -47,6 +48,25 @@ import de.fu_berlin.inf.dpp.synchronize.StopManager;
  */
 public interface ISarosSession {
 
+    /**
+     * @JTourBusStop 2, Architecture Overview, Session Management:
+     * 
+     *               This Interface is the main entrance Point for the "Session
+     *               Management"-Component. The Session Management is
+     *               responsible for managing a Session and keeping the shared
+     *               projects in a consistent state across the local copies of
+     *               all participants. It functions as the core component in a
+     *               running session and directs communication between all other
+     *               components. In general this component takes input from the
+     *               User Interface, processes it and afterwards passes the
+     *               result to the Network Layer.
+     * 
+     */
+
+    /**
+     * Connection identifier to use for sending data. See
+     * {@link ITransmitter#sendToSessionUser}
+     */
     public static final String SESSION_CONNECTION_ID = "saros-main-session";
 
     /**

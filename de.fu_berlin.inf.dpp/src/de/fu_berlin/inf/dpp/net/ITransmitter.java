@@ -32,9 +32,19 @@ import de.fu_berlin.inf.dpp.annotations.Component;
  * 
  * @author rdjemili
  */
+
 @Component(module = "net")
 public interface ITransmitter {
 
+    /**
+     * @JTourBusStop 3, Architecture Overview, Network Layer - Transmitter:
+     * 
+     *               The Network Layer is responsible for communicating with
+     *               other participants by sending and receiving messages. This
+     *               Interface is the main entrance point for sending messages.
+     *               (...)
+     * 
+     */
     /**
      * Sends the specified packet to the server.
      * 
