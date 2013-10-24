@@ -132,8 +132,18 @@ public final class ActivityHandler implements Startable {
      * @param activities
      *            an <b>immutable</b> list containing the activities
      */
+
     public synchronized void handleIncomingActivities(List<IActivity> activities) {
+
         if (session.isHost()) {
+
+            /**
+             * @JTourBusStop 8, Activity sending, Activity Server:
+             * 
+             *               This is where the server receives activities. The
+             *               Server may transform activities again if necessary
+             *               and afterward sends them to the correct clients.
+             */
 
             TransformationResult result = directServerActivities(activities);
             activities = result.getLocalActivities();
@@ -143,6 +153,17 @@ public final class ActivityHandler implements Startable {
                 callback.send(recipients, item.activity);
             }
         }
+
+        /**
+         * @JTourBusStop 9, Activity sending, Client Receiver:
+         * 
+         *               This is the part where clients will receive activities.
+         *               These activities are put into the queue of the activity
+         *               dispatcher. This queue is consumed by the
+         *               dispatchThread which transforms activities again if
+         *               necessary and then forwards it to the SarosSession.
+         * 
+         */
 
         if (activities.isEmpty())
             return;
@@ -193,11 +214,16 @@ public final class ActivityHandler implements Startable {
     }
 
     /**
-     * @JTourBusStop 6, Activity sending, Transforming the IActivity:
+     * @JTourBusStop 6, Activity sending, Transforming the IActivity (Client):
      * 
      *               This function will transform activities and then forward
      *               them to the callback. E.g. this will turn TextEditActivity
      *               into Jupiter actitivities.
+     * 
+     *               Saros uses a client-server-architecture. All activities
+     *               will first be send to the server located at the Host. The
+     *               Host himself also acts as a client, but houses an
+     *               additional server-part.
      */
 
     /**

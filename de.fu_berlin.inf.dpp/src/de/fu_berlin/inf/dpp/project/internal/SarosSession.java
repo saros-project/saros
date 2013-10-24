@@ -215,6 +215,13 @@ public final class SarosSession implements ISarosSession {
 
         @Override
         public void execute(IActivity activity) {
+            /**
+             * @JTourBusStop 10, Activity sending, Local Execution:
+             * 
+             *               Afterwards every registered Activity Provider is
+             *               informed about the remote activity that should be
+             *               executed locally.
+             */
             for (IActivityProvider executor : activityProviders) {
                 executor.exec(activity);
                 updatePartialSharedResources(activity);
@@ -687,9 +694,8 @@ public final class SarosSession implements ISarosSession {
     /**
      * @JTourBusStop 7, Activity sending, Incoming activities:
      * 
-     *               The ActivitySequencer will call this function for new
-     *               activities, they are transformed again, forwarded and put
-     *               into the queue of the activity dispatcher.
+     *               The ActivitySequencer will call this function for
+     *               activities received over the Network Layer.
      * 
      */
 

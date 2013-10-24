@@ -103,7 +103,7 @@ public final class StopManager extends AbstractActivityProvider implements
     }
 
     /**
-     * @JTourBusStop 9, Activity sending, Triple dispatch:
+     * @JTourBusStop 12, Activity sending, Triple dispatch:
      * 
      *               This class extends the AbstractActivityReceiver and
      *               overrides the method with the right overload.
@@ -456,7 +456,7 @@ public final class StopManager extends AbstractActivityProvider implements
     }
 
     /**
-     * @JTourBusStop 8, Activity sending, Handling activities:
+     * @JTourBusStop 11, Activity sending, Handling activities:
      * 
      *               The activity dispatcher of the session has called us. This
      *               class will use the triple dispatch to filter for the
