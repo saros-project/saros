@@ -19,7 +19,6 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
@@ -29,29 +28,31 @@ import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.nebula.utils.ViewerUtils;
 
 /**
- * {@link IContentProvider} for use in conjunction with a {@link Roster} input.
+ * {@link IContentProvider} for use in conjunction with a {@link Roster roster}
+ * input.
  * <p>
- * Automatically keeps track of changes of buddies.
+ * Automatically keeps track of changes of contacts.
  * 
  * @author bkahlert
  */
 public class RosterSessionContentProvider extends TreeContentProvider {
 
-    protected Viewer viewer;
-    protected RosterContentProvider rosterContentProvider = new RosterContentProvider();
-    protected RosterSessionInput rosterSessionInput;
+    private Viewer viewer;
+    private RosterContentProvider rosterContentProvider = new RosterContentProvider();
+
+    private SessionHeaderElement sessionHeaderElement;
+    private RosterHeaderElement rosterHeaderElement;
+
+    private Roster currentRoster;
+    private ISarosSession currentSession;
 
     @Inject
-    /*
-     * TODO: see
-     * https://sourceforge.net/tracker/?func=detail&aid=3102858&group_id
-     * =167540&atid=843362
-     */
-    protected EditorManager editorManager;
-    protected ISharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
+    private EditorManager editorManager;
+
+    private final ISharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
         @Override
         public void followModeChanged(User user, boolean isFollowed) {
-            UserElement userElement = getUserElement(rosterSessionInput, user);
+            UserElement userElement = getUserElement(currentRoster, user);
             if (userElement != null)
                 ViewerUtils.update(viewer, userElement, null);
         }
@@ -88,7 +89,7 @@ public class RosterSessionContentProvider extends TreeContentProvider {
         }
     };
 
-    protected RosterListener rosterListener = new RosterListener() {
+    private final RosterListener rosterListener = new RosterListener() {
         @Override
         public void entriesAdded(Collection<String> addresses) {
             ViewerUtils.refresh(viewer, true);
@@ -110,34 +111,30 @@ public class RosterSessionContentProvider extends TreeContentProvider {
         }
     };
 
-    protected ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
+    private final ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
         @Override
         public void userLeft(User user) {
-            UserElement userElement = getUserElement(rosterSessionInput, user);
+            UserElement userElement = getUserElement(currentRoster, user);
             if (userElement != null)
                 ViewerUtils.remove(viewer, userElement);
         }
 
         @Override
         public void userJoined(User user) {
-            UserElement userElement = getUserElement(rosterSessionInput, user);
+            UserElement userElement = getUserElement(currentRoster, user);
             if (userElement != null)
                 ViewerUtils.add(viewer, sessionHeaderElement, userElement);
         }
 
         @Override
         public void permissionChanged(User user) {
-            UserElement userElement = getUserElement(rosterSessionInput, user);
+            UserElement userElement = getUserElement(currentRoster, user);
             if (userElement != null)
                 ViewerUtils.update(viewer, userElement, null);
         }
     };
 
-    protected SessionHeaderElement sessionHeaderElement;
-    protected RosterHeaderElement rosterHeaderElement;
-
     public RosterSessionContentProvider() {
-        super();
         SarosPluginContext.initComponent(this);
         editorManager.addSharedEditorListener(sharedEditorListener);
     }
@@ -146,44 +143,49 @@ public class RosterSessionContentProvider extends TreeContentProvider {
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         this.viewer = viewer;
 
-        this.rosterContentProvider
-            .inputChanged(
-                viewer,
-                (oldInput instanceof RosterSessionInput) ? ((RosterSessionInput) oldInput)
-                    .getRoster() : null,
-                (newInput instanceof RosterSessionInput) ? ((RosterSessionInput) newInput)
-                    .getRoster() : null);
+        final Roster oldRoster = (oldInput instanceof RosterSessionInput) ? ((RosterSessionInput) oldInput)
+            .getRoster() : null;
 
-        if (oldInput instanceof RosterSessionInput) {
-            RosterSessionInput oldRosterSessionInput = (RosterSessionInput) oldInput;
-            if (oldRosterSessionInput.getRoster() != null) {
-                oldRosterSessionInput.getRoster().removeRosterListener(
-                    this.rosterListener);
-            }
-        }
+        final Roster newRoster = currentRoster = (newInput instanceof RosterSessionInput) ? ((RosterSessionInput) newInput)
+            .getRoster() : null;
 
-        if (newInput instanceof RosterSessionInput) {
-            RosterSessionInput newRosterSessionInput = (RosterSessionInput) newInput;
-            this.rosterSessionInput = newRosterSessionInput;
-            if (newRosterSessionInput.getRoster() != null) {
-                newRosterSessionInput.getRoster().addRosterListener(
-                    this.rosterListener);
-            }
-            if (newRosterSessionInput.getSarosSession() != null) {
-                newRosterSessionInput.getSarosSession().addListener(
-                    sharedProjectListener);
-            }
-            createHeaders();
-        } else {
-            disposeHeaderElements();
-            this.rosterSessionInput = null;
+        final ISarosSession oldSession = (oldInput instanceof RosterSessionInput) ? ((RosterSessionInput) oldInput)
+            .getSarosSession() : null;
+
+        final ISarosSession newSession = currentSession = (newInput instanceof RosterSessionInput) ? ((RosterSessionInput) newInput)
+            .getSarosSession() : null;
+
+        rosterContentProvider.inputChanged(viewer, oldRoster, newRoster);
+
+        if (oldRoster != null)
+            oldRoster.removeRosterListener(rosterListener);
+
+        if (oldSession != null)
+            oldSession.removeListener(sharedProjectListener);
+
+        disposeHeaderElements();
+
+        if (!(newInput instanceof RosterSessionInput))
             return;
-        }
+
+        createHeaders((RosterSessionInput) newInput);
+
+        /*
+         * FIXME we install roster listeners twice ! (1st. here, 2nd. in the
+         * rosterContentProvider
+         */
+        if (newRoster != null)
+            newRoster.addRosterListener(rosterListener);
+
+        if (newSession != null)
+            newSession.addListener(sharedProjectListener);
+
     }
 
     private void disposeHeaderElements() {
         if (sessionHeaderElement != null)
             sessionHeaderElement.dispose();
+
         if (rosterHeaderElement != null)
             rosterHeaderElement.dispose();
 
@@ -191,30 +193,34 @@ public class RosterSessionContentProvider extends TreeContentProvider {
         rosterHeaderElement = null;
     }
 
-    protected void createHeaders() {
-        disposeHeaderElements();
+    private void createHeaders(RosterSessionInput input) {
+
         sessionHeaderElement = new SessionHeaderElement(viewer.getControl()
-            .getFont(), rosterSessionInput);
+            .getFont(), input);
 
         rosterHeaderElement = new RosterHeaderElement(viewer.getControl()
-            .getFont(), this.rosterContentProvider,
-            this.rosterSessionInput.getRoster());
+            .getFont(), rosterContentProvider, input.getRoster());
     }
 
     @Override
     public void dispose() {
-        if (this.rosterSessionInput != null) {
-            if (this.rosterSessionInput.getSarosSession() != null) {
-                this.rosterSessionInput.getSarosSession().removeListener(
-                    sharedProjectListener);
-            }
-            if (this.rosterSessionInput.getRoster() != null) {
-                this.rosterSessionInput.getRoster().removeRosterListener(
-                    this.rosterListener);
-            }
-        }
-        this.rosterContentProvider.dispose();
+        if (currentSession != null)
+            currentSession.removeListener(sharedProjectListener);
+
+        if (currentRoster != null)
+            currentRoster.removeRosterListener(rosterListener);
+
         editorManager.removeSharedEditorListener(sharedEditorListener);
+
+        rosterContentProvider.dispose();
+
+        disposeHeaderElements();
+
+        /* ENSURE GC */
+        currentSession = null;
+        currentRoster = null;
+        editorManager = null;
+        rosterContentProvider = null;
     }
 
     /**
@@ -223,62 +229,30 @@ public class RosterSessionContentProvider extends TreeContentProvider {
      */
     @Override
     public Object[] getElements(Object inputElement) {
-        if (inputElement != null && inputElement instanceof RosterSessionInput) {
-            List<Object> elements = new ArrayList<Object>();
 
-            if (sessionHeaderElement != null)
-                elements.add(sessionHeaderElement);
+        if (!(inputElement instanceof RosterSessionInput))
+            return new Object[0];
 
-            if (rosterHeaderElement != null)
-                elements.add(rosterHeaderElement);
+        List<Object> elements = new ArrayList<Object>();
 
-            return elements.toArray();
-        }
+        if (sessionHeaderElement != null)
+            elements.add(sessionHeaderElement);
 
-        return new Object[0];
-    }
+        if (rosterHeaderElement != null)
+            elements.add(rosterHeaderElement);
 
-    /**
-     * Creates a {@link UserElement} from an input element and some
-     * {@link Presence} instance.
-     * 
-     * @param inputElement
-     *            only {@link RosterSessionInput} is supported; other input
-     *            results in null as the return
-     * @param jid
-     * @return
-     */
-    protected static UserElement getUserElement(Object inputElement, String jid) {
-        if (inputElement instanceof RosterSessionInput) {
-            ISarosSession sarosSession = ((RosterSessionInput) inputElement)
-                .getSarosSession();
-            if (sarosSession != null) {
-                JID rqJID = sarosSession.getResourceQualifiedJID(new JID(jid));
-                User user = sarosSession.getUser(rqJID);
-                return getUserElement(inputElement, user);
-            }
-        }
-
-        return null;
+        return elements.toArray();
     }
 
     /**
      * Creates a {@link UserElement} from an input element and a {@link User}.
      * 
-     * @param inputElement
-     *            only {@link RosterSessionInput} is supported; other input
-     *            results in null as the return
+     * @param roster
      * @param user
-     * @return
+     * @return a {@link UserElement} or <code>null</code> if the roster is
+     *         <code>null</code>
      */
-    protected static UserElement getUserElement(Object inputElement, User user) {
-        if (inputElement instanceof RosterSessionInput) {
-            Roster roster = ((RosterSessionInput) inputElement).getRoster();
-            if (roster != null) {
-                UserElement userElement = new UserElement(user, roster);
-                return userElement;
-            }
-        }
-        return null;
+    private UserElement getUserElement(Roster roster, User user) {
+        return roster == null ? null : new UserElement(user, roster);
     }
 }
