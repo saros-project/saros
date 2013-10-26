@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.project.internal;
 
 import java.io.File;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,7 +17,6 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
-import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -338,7 +338,7 @@ public class SarosSessionTest {
         PowerMock.replay(ResourcesPlugin.class);
 
         // Test creating, starting and stopping the session.
-        SarosSession session = new SarosSession(0, new DateTime(), context);
+        SarosSession session = new SarosSession(0, new Date(), context);
         Assert.assertEquals(0, session.getActivityProviderCount());
         Assert.assertEquals(0,
             countingReceiver.getCurrentPacketListenersCount());

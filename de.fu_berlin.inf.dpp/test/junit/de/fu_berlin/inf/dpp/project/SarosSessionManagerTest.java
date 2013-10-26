@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.project;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -10,7 +11,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.easymock.EasyMock;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -99,7 +99,7 @@ public class SarosSessionManagerTest {
             .createNiceMock(PreferenceUtils.class);
 
         PowerMock.expectNew(SarosSession.class, EasyMock.anyInt(),
-            EasyMock.anyObject(DateTime.class),
+            EasyMock.anyObject(Date.class),
             EasyMock.anyObject(ISarosContext.class)).andStubReturn(session);
 
         PowerMock.replayAll();

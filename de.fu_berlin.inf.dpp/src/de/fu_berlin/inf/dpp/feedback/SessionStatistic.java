@@ -22,19 +22,19 @@ package de.fu_berlin.inf.dpp.feedback;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.TimeZone;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 
 import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -652,14 +652,14 @@ public class SessionStatistic {
         data.setProperty(KEY_PSEUDONYM, pseudonym);
     }
 
-    public void setLocalSessionStartTime(DateTime localSessionStart) {
+    public void setLocalSessionStartTime(Date localSessionStart) {
         data.setProperty(KEY_SESSION_LOCAL_START,
-            localSessionStart.toDateTime(DateTimeZone.UTC).toString());
+            toISO8601UTCTimeFormat(localSessionStart));
     }
 
-    public void setLocalSessionEndTime(DateTime localSessionEnd) {
+    public void setLocalSessionEndTime(Date localSessionEnd) {
         data.setProperty(KEY_SESSION_LOCAL_START,
-            localSessionEnd.toDateTime(DateTimeZone.UTC).toString());
+            toISO8601UTCTimeFormat(localSessionEnd));
     }
 
     /**
@@ -989,5 +989,13 @@ public class SessionStatistic {
 
         data.setProperty(KEY_PARTIAL_SHARED_PROJECTS_FILES,
             String.valueOf(partialSharedFileCount));
+    }
+
+    // need to be Java 6 compatible !
+    private static String toISO8601UTCTimeFormat(Date date) {
+        TimeZone timeZone = TimeZone.getTimeZone("UTC");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        dateFormat.setTimeZone(timeZone);
+        return dateFormat.format(date);
     }
 }

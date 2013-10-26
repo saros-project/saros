@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.serviceProviders;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -9,7 +10,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.joda.time.DateTime;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.Permission;
@@ -192,7 +192,7 @@ public class NullSarosSession implements ISarosSession {
     }
 
     @Override
-    public DateTime getSessionStart() {
+    public Date getSessionStart() {
         log.warn("unexpected method call");
         return null;
     }

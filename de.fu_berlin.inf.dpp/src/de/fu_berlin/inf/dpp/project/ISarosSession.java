@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.project;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,7 +28,6 @@ import java.util.concurrent.CancellationException;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.joda.time.DateTime;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.Permission;
@@ -337,9 +337,9 @@ public interface ISarosSession {
     public boolean userHasProject(User user, IProject project);
 
     /**
-     * Returns the DateTime at which this SarosSession was started on the host.
+     * Returns the date at which this SarosSession was started on the host.
      */
-    public DateTime getSessionStart();
+    public Date getSessionStart();
 
     /**
      * @return <code>true</code> if the given {@link IResource resource} is

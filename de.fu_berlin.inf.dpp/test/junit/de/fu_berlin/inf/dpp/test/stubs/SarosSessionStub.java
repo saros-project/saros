@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.test.stubs;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -8,7 +9,6 @@ import java.util.concurrent.CancellationException;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.joda.time.DateTime;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.Permission;
@@ -125,7 +125,7 @@ public class SarosSessionStub implements ISarosSession {
     }
 
     @Override
-    public DateTime getSessionStart() {
+    public Date getSessionStart() {
         throw new RuntimeException("Unexpected call to Stub");
     }
 

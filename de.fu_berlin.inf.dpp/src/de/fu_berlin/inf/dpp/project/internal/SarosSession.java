@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +43,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
-import org.joda.time.DateTime;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.annotations.Inject;
 
@@ -159,7 +159,7 @@ public final class SarosSession implements ISarosSession {
 
     private final User hostUser;
 
-    private final DateTime sessionStart;
+    private final Date sessionStart;
 
     private final SarosProjectMapper projectMapper;
 
@@ -228,7 +228,7 @@ public final class SarosSession implements ISarosSession {
     /**
      * Constructor for host.
      */
-    public SarosSession(int localColorID, DateTime sessionStart,
+    public SarosSession(int localColorID, Date sessionStart,
         ISarosContext sarosContext) {
 
         this(sarosContext, sessionStart, /* unused */null, localColorID, /* unused */
@@ -238,7 +238,7 @@ public final class SarosSession implements ISarosSession {
     /**
      * Constructor for client.
      */
-    public SarosSession(JID hostJID, int localColorID, DateTime sessionStart,
+    public SarosSession(JID hostJID, int localColorID, Date sessionStart,
         ISarosContext sarosContext, JID inviterID, int inviterColorID) {
 
         this(sarosContext, sessionStart, hostJID, localColorID, inviterColorID);
@@ -1004,7 +1004,7 @@ public final class SarosSession implements ISarosSession {
     }
 
     @Override
-    public DateTime getSessionStart() {
+    public Date getSessionStart() {
         return sessionStart;
     }
 
@@ -1155,8 +1155,8 @@ public final class SarosSession implements ISarosSession {
             localUser, localUser, 0));
     }
 
-    private SarosSession(ISarosContext context, DateTime sessionStart,
-        JID host, int localColorID, int hostColorID) {
+    private SarosSession(ISarosContext context, Date sessionStart, JID host,
+        int localColorID, int hostColorID) {
 
         context.initComponent(this);
         this.sessionID = context.getComponent(SessionIDObservable.class)

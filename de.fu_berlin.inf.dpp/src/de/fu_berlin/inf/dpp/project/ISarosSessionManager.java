@@ -1,13 +1,13 @@
 package de.fu_berlin.inf.dpp.project;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.joda.time.DateTime;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
@@ -51,7 +51,7 @@ public interface ISarosSessionManager {
      * @return the new Saros session.
      */
     public ISarosSession joinSession(JID host, int clientColor,
-        DateTime sessionStart, JID inviter, int hostColor);
+        Date sessionStart, JID inviter, int hostColor);
 
     /**
      * Leaves the currently active session. If the local user is the host, this
@@ -94,7 +94,7 @@ public interface ISarosSessionManager {
      *            what this session invitation is about
      */
     public void invitationReceived(JID from, String sessionID,
-        String invitationID, DateTime sessionStart, VersionInfo versionInfo,
+        String invitationID, Date sessionStart, VersionInfo versionInfo,
         String description);
 
     /**

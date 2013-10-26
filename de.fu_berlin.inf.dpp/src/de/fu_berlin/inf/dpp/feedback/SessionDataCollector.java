@@ -19,8 +19,7 @@
 
 package de.fu_berlin.inf.dpp.feedback;
 
-import org.joda.time.DateTime;
-import org.joda.time.Duration;
+import java.util.Date;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -40,8 +39,8 @@ public class SessionDataCollector extends AbstractStatisticCollector {
     protected Saros saros;
 
     protected String currentSessionID;
-    protected DateTime localSessionStart;
-    protected DateTime localSessionEnd;
+    protected Date localSessionStart;
+    protected Date localSessionEnd;
     protected boolean isHost;
 
     public SessionDataCollector(StatisticManager statisticManager,
@@ -56,9 +55,8 @@ public class SessionDataCollector extends AbstractStatisticCollector {
         data.setSessionID(currentSessionID);
         data.setLocalSessionStartTime(localSessionStart);
         data.setLocalSessionEndTime(localSessionEnd);
-        data.setLocalSessionDuration(StatisticManager
-            .getTimeInMinutes(new Duration(localSessionStart, localSessionEnd)
-                .getMillis()));
+        data.setLocalSessionDuration(StatisticManager.getTimeInMinutes(Math
+            .max(0, localSessionEnd.getTime() - localSessionStart.getTime())));
         data.setSessionCount(statisticManager.getSessionCount());
         data.setIsHost(isHost);
 
@@ -74,14 +72,14 @@ public class SessionDataCollector extends AbstractStatisticCollector {
 
     @Override
     protected void doOnSessionEnd(ISarosSession sarosSession) {
-        localSessionEnd = new DateTime();
+        localSessionEnd = new Date();
         isHost = sarosSession.getLocalUser().isHost();
     }
 
     @Override
     protected void doOnSessionStart(ISarosSession sarosSession) {
         currentSessionID = sarosSession.getID();
-        localSessionStart = new DateTime();
+        localSessionStart = new Date();
     }
 
     /**

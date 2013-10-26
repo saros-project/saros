@@ -1,11 +1,11 @@
 package de.fu_berlin.inf.dpp.invitation;
 
+import java.util.Date;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.jivesoftware.smack.packet.Packet;
-import org.joda.time.DateTime;
 
 import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
@@ -36,7 +36,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
 
     private ISarosSessionManager sessionManager;
     private JoinSessionWizard inInvitationUI;
-    private DateTime sessionStart;
+    private Date sessionStart;
     private ISarosSession sarosSession;
 
     private VersionInfo remoteVersionInfo;
@@ -47,7 +47,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
     private SarosPacketCollector invitationAcknowledgedCollector;
 
     public IncomingSessionNegotiation(ISarosSessionManager sessionManager,
-        JID from, VersionInfo remoteVersionInfo, DateTime sessionStart,
+        JID from, VersionInfo remoteVersionInfo, Date sessionStart,
         String invitationID, String description, ISarosContext sarosContext) {
 
         super(invitationID, from, description, sarosContext);

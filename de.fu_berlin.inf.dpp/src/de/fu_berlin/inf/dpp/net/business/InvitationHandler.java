@@ -1,12 +1,12 @@
 package de.fu_berlin.inf.dpp.net.business;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
-import org.joda.time.DateTime;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
@@ -66,7 +66,7 @@ public class InvitationHandler {
 
                 String sessionID = invitation.getSessionID();
                 String invitationID = invitation.getInvitationID();
-                DateTime sessionStartTime = invitation.getSessionStartTime();
+                Date sessionStartTime = invitation.getSessionStartTime();
                 VersionInfo versionInfo = invitation.getVersionInfo();
                 String description = invitation.getDescription();
 

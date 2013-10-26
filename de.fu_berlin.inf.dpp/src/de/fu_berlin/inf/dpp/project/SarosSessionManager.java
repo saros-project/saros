@@ -21,6 +21,7 @@ package de.fu_berlin.inf.dpp.project;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -36,7 +37,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.jivesoftware.smack.Connection;
-import org.joda.time.DateTime;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.FileList;
@@ -209,8 +209,7 @@ public class SarosSessionManager implements ISarosSessionManager {
                 .nextInt(Integer.MAX_VALUE)));
 
             final SarosSession sarosSession = new SarosSession(
-                preferenceUtils.getFavoriteColorID(), new DateTime(),
-                sarosContext);
+                preferenceUtils.getFavoriteColorID(), new Date(), sarosContext);
 
             sarosSessionObservable.setValue(sarosSession);
 
@@ -253,7 +252,7 @@ public class SarosSessionManager implements ISarosSessionManager {
     // FIXME offer a startSession method for the client and host !
     @Override
     public ISarosSession joinSession(JID host, int clientColor,
-        DateTime sessionStart, JID inviter, int hostColor) {
+        Date sessionStart, JID inviter, int hostColor) {
 
         assert getSarosSession() == null;
 
@@ -357,7 +356,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     @Override
     public void invitationReceived(JID from, String sessionID,
-        String invitationID, DateTime sessionStart, VersionInfo versionInfo,
+        String invitationID, Date sessionStart, VersionInfo versionInfo,
         String description) {
 
         INegotiationHandler handler = negotiationHandler;

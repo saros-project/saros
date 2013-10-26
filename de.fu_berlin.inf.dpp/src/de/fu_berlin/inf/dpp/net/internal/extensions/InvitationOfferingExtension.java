@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.net.internal.extensions;
 
-import org.joda.time.DateTime;
+import java.util.Date;
 
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
@@ -9,12 +9,12 @@ public class InvitationOfferingExtension extends InvitationExtension {
     public static final Provider PROVIDER = new Provider();
 
     private String sessionID;
-    private DateTime sessionStartTime;
+    private Date sessionStartTime;
     private VersionInfo versionInfo;
     private String description;
 
     public InvitationOfferingExtension(String invitationID, String sessionID,
-        DateTime sessionStartTime, VersionInfo versionInfo, String description) {
+        Date sessionStartTime, VersionInfo versionInfo, String description) {
         super(invitationID);
 
         this.sessionID = sessionID;
@@ -56,7 +56,7 @@ public class InvitationOfferingExtension extends InvitationExtension {
      * 
      * @return
      */
-    public DateTime getSessionStartTime() {
+    public Date getSessionStartTime() {
         return sessionStartTime;
     }
 
