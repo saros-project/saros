@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.test.stubs;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -121,11 +120,6 @@ public class SarosSessionStub implements ISarosSession {
 
     @Override
     public SharedProject getSharedProject(IProject project) {
-        throw new RuntimeException("Unexpected call to Stub");
-    }
-
-    @Override
-    public Date getSessionStart() {
         throw new RuntimeException("Unexpected call to Stub");
     }
 

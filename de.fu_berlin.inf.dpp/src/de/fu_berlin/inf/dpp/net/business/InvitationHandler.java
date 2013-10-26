@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.net.business;
 
-import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -66,7 +65,6 @@ public class InvitationHandler {
 
                 String sessionID = invitation.getSessionID();
                 String invitationID = invitation.getInvitationID();
-                Date sessionStartTime = invitation.getSessionStartTime();
                 VersionInfo versionInfo = invitation.getVersionInfo();
                 String description = invitation.getDescription();
 
@@ -94,8 +92,7 @@ public class InvitationHandler {
                     transmitter.sendMessageToUser(fromJID, response);
 
                     sessionManager.invitationReceived(fromJID, sessionID,
-                        invitationID, sessionStartTime, versionInfo,
-                        description);
+                        invitationID, versionInfo, description);
                 } else {
                     // TODO This text should be replaced with a cancel ID
                     PacketExtension response = CancelInviteExtension.PROVIDER

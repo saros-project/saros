@@ -21,7 +21,6 @@ package de.fu_berlin.inf.dpp.project;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -209,7 +208,7 @@ public class SarosSessionManager implements ISarosSessionManager {
                 .nextInt(Integer.MAX_VALUE)));
 
             final SarosSession sarosSession = new SarosSession(
-                preferenceUtils.getFavoriteColorID(), new Date(), sarosContext);
+                preferenceUtils.getFavoriteColorID(), sarosContext);
 
             sarosSessionObservable.setValue(sarosSession);
 
@@ -251,13 +250,13 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     // FIXME offer a startSession method for the client and host !
     @Override
-    public ISarosSession joinSession(JID host, int clientColor,
-        Date sessionStart, JID inviter, int hostColor) {
+    public ISarosSession joinSession(JID host, int clientColor, JID inviter,
+        int hostColor) {
 
         assert getSarosSession() == null;
 
         SarosSession sarosSession = new SarosSession(host, clientColor,
-            sessionStart, sarosContext, inviter, hostColor);
+            sarosContext, inviter, hostColor);
 
         sarosSessionObservable.setValue(sarosSession);
 
@@ -356,8 +355,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     @Override
     public void invitationReceived(JID from, String sessionID,
-        String invitationID, Date sessionStart, VersionInfo versionInfo,
-        String description) {
+        String invitationID, VersionInfo versionInfo, String description) {
 
         INegotiationHandler handler = negotiationHandler;
 
@@ -384,8 +382,7 @@ public class SarosSessionManager implements ISarosSessionManager {
                 sessionIDObservable.setValue(sessionID);
 
                 process = new IncomingSessionNegotiation(this, from,
-                    versionInfo, sessionStart, invitationID, description,
-                    sarosContext);
+                    versionInfo, invitationID, description, sarosContext);
 
                 process.setProcessListener(processListener);
                 currentSessionNegotiations.addInvitationProcess(process);

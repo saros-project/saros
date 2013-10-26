@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.project.internal;
 
 import java.io.File;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -338,7 +337,7 @@ public class SarosSessionTest {
         PowerMock.replay(ResourcesPlugin.class);
 
         // Test creating, starting and stopping the session.
-        SarosSession session = new SarosSession(0, new Date(), context);
+        SarosSession session = new SarosSession(0, context);
         Assert.assertEquals(0, session.getActivityProviderCount());
         Assert.assertEquals(0,
             countingReceiver.getCurrentPacketListenersCount());

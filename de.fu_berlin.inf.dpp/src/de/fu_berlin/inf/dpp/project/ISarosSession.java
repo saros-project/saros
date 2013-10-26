@@ -19,7 +19,6 @@
  */
 package de.fu_berlin.inf.dpp.project;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -335,11 +334,6 @@ public interface ISarosSession {
      * project
      */
     public boolean userHasProject(User user, IProject project);
-
-    /**
-     * Returns the date at which this SarosSession was started on the host.
-     */
-    public Date getSessionStart();
 
     /**
      * @return <code>true</code> if the given {@link IResource resource} is

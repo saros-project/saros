@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.serviceProviders;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -187,12 +186,6 @@ public class NullSarosSession implements ISarosSession {
 
     @Override
     public List<User> getRemoteUsersWithReadOnlyAccess() {
-        log.warn("unexpected method call");
-        return null;
-    }
-
-    @Override
-    public Date getSessionStart() {
         log.warn("unexpected method call");
         return null;
     }

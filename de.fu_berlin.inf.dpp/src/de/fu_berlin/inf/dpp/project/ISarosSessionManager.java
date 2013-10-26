@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.project;
 
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -50,8 +49,8 @@ public interface ISarosSessionManager {
      *            the host of the session.
      * @return the new Saros session.
      */
-    public ISarosSession joinSession(JID host, int clientColor,
-        Date sessionStart, JID inviter, int hostColor);
+    public ISarosSession joinSession(JID host, int clientColor, JID inviter,
+        int hostColor);
 
     /**
      * Leaves the currently active session. If the local user is the host, this
@@ -86,16 +85,13 @@ public interface ISarosSessionManager {
      *            the unique session ID of the inviter side
      * @param invitationID
      *            a unique identifier for the negotiation process
-     * @param sessionStart
-     *            start time of the remote session
      * @param versionInfo
      *            information of the inviter side
      * @param description
      *            what this session invitation is about
      */
     public void invitationReceived(JID from, String sessionID,
-        String invitationID, Date sessionStart, VersionInfo versionInfo,
-        String description);
+        String invitationID, VersionInfo versionInfo, String description);
 
     /**
      * Will start sharing all projects of the current session with a

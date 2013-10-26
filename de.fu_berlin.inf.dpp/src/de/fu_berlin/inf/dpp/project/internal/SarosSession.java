@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -159,8 +158,6 @@ public final class SarosSession implements ISarosSession {
 
     private final User hostUser;
 
-    private final Date sessionStart;
-
     private final SarosProjectMapper projectMapper;
 
     private boolean useVersionControl = true;
@@ -228,20 +225,19 @@ public final class SarosSession implements ISarosSession {
     /**
      * Constructor for host.
      */
-    public SarosSession(int localColorID, Date sessionStart,
-        ISarosContext sarosContext) {
+    public SarosSession(int localColorID, ISarosContext sarosContext) {
 
-        this(sarosContext, sessionStart, /* unused */null, localColorID, /* unused */
+        this(sarosContext, /* unused */null, localColorID, /* unused */
         -1);
     }
 
     /**
      * Constructor for client.
      */
-    public SarosSession(JID hostJID, int localColorID, Date sessionStart,
+    public SarosSession(JID hostJID, int localColorID,
         ISarosContext sarosContext, JID inviterID, int inviterColorID) {
 
-        this(sarosContext, sessionStart, hostJID, localColorID, inviterColorID);
+        this(sarosContext, hostJID, localColorID, inviterColorID);
 
         assert inviterID.equals(hostJID) : "non host inviting is disabled";
     }
@@ -1004,11 +1000,6 @@ public final class SarosSession implements ISarosSession {
     }
 
     @Override
-    public Date getSessionStart() {
-        return sessionStart;
-    }
-
-    @Override
     public boolean isShared(IResource resource) {
         return projectMapper.isShared(resource);
     }
@@ -1155,8 +1146,8 @@ public final class SarosSession implements ISarosSession {
             localUser, localUser, 0));
     }
 
-    private SarosSession(ISarosContext context, Date sessionStart, JID host,
-        int localColorID, int hostColorID) {
+    private SarosSession(ISarosContext context, JID host, int localColorID,
+        int hostColorID) {
 
         context.initComponent(this);
         this.sessionID = context.getComponent(SessionIDObservable.class)
@@ -1164,7 +1155,6 @@ public final class SarosSession implements ISarosSession {
         this.projectMapper = new SarosProjectMapper(this);
         this.activityQueuer = new ActivityQueuer();
         this.sarosContext = context;
-        this.sessionStart = sessionStart;
 
         // FIXME that should be passed in !
         JID localUserJID = sarosNet.getMyJID();

@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.invitation;
 
-import java.util.Date;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -36,7 +35,6 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
 
     private ISarosSessionManager sessionManager;
     private JoinSessionWizard inInvitationUI;
-    private Date sessionStart;
     private ISarosSession sarosSession;
 
     private VersionInfo remoteVersionInfo;
@@ -47,12 +45,11 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
     private SarosPacketCollector invitationAcknowledgedCollector;
 
     public IncomingSessionNegotiation(ISarosSessionManager sessionManager,
-        JID from, VersionInfo remoteVersionInfo, Date sessionStart,
-        String invitationID, String description, ISarosContext sarosContext) {
+        JID from, VersionInfo remoteVersionInfo, String invitationID,
+        String description, ISarosContext sarosContext) {
 
         super(invitationID, from, description, sarosContext);
 
-        this.sessionStart = sessionStart;
         this.sessionManager = sessionManager;
         this.remoteVersionInfo = remoteVersionInfo;
     }
@@ -275,7 +272,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
         }
 
         sarosSession = sessionManager.joinSession(parameters.getSessionHost(),
-            clientColor, sessionStart, peer, hostFavoriteColor);
+            clientColor, peer, hostFavoriteColor);
     }
 
     /**

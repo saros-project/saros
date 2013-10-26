@@ -314,8 +314,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
             .invert();
 
         InvitationOfferingExtension invitationOffering = new InvitationOfferingExtension(
-            invitationID, sarosSession.getID(), sarosSession.getSessionStart(),
-            localVersionInfo, description);
+            invitationID, sarosSession.getID(), localVersionInfo, description);
 
         transmitter.sendMessageToUser(peer,
             InvitationOfferingExtension.PROVIDER.create(invitationOffering));
