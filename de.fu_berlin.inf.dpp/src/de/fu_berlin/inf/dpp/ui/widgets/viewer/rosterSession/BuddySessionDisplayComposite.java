@@ -33,13 +33,9 @@ import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
-import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.internal.FollowingActivitiesManager;
-import de.fu_berlin.inf.dpp.project.internal.IFollowModeChangesListener;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.ui.model.TreeLabelProvider;
 import de.fu_berlin.inf.dpp.ui.model.rosterSession.RosterSessionComparator;
@@ -82,26 +78,12 @@ public class BuddySessionDisplayComposite extends ViewerComposite<TreeViewer> {
     @Inject
     private EditorManager editorManager;
 
-    @Inject
-    private FollowingActivitiesManager followingActivitiesManager;
-
-    private ISarosSession currentSession;
-
     private ViewerFilter filter;
 
     /**
      * Used to display the {@link Roster} even in case the user is disconnected.
      */
     private Roster cachedRoster;
-
-    private final IFollowModeChangesListener followModeChangesListener = new IFollowModeChangesListener() {
-
-        @Override
-        public void followModeChanged() {
-            ViewerUtils.refresh(getViewer(), true);
-            ViewerUtils.expandAll(getViewer());
-        }
-    };
 
     private final IConnectionListener connectionListener = new IConnectionListener() {
         @Override
@@ -136,19 +118,6 @@ public class BuddySessionDisplayComposite extends ViewerComposite<TreeViewer> {
         }
     };
 
-    private final ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
-        @Override
-        public void userJoined(User user) {
-            ViewerUtils.refresh(getViewer(), true);
-            ViewerUtils.expandAll(getViewer());
-        }
-
-        @Override
-        public void userLeft(User user) {
-            ViewerUtils.refresh(getViewer(), true);
-        }
-    };
-
     private final ISarosSessionListener sarosSessionListener = new AbstractSarosSessionListener() {
         @Override
         public void sessionStarting(final ISarosSession session) {
@@ -161,13 +130,6 @@ public class BuddySessionDisplayComposite extends ViewerComposite<TreeViewer> {
 
                     if (filter != null)
                         getViewer().removeFilter(filter);
-
-                    if (currentSession != null)
-                        currentSession.removeListener(projectListener);
-
-                    session.addListener(projectListener);
-
-                    currentSession = session;
 
                     updateViewer();
                     getViewer().expandAll();
@@ -189,11 +151,7 @@ public class BuddySessionDisplayComposite extends ViewerComposite<TreeViewer> {
                     if (filter != null)
                         getViewer().removeFilter(filter);
 
-                    if (currentSession != null)
-                        currentSession.removeListener(projectListener);
-
                     filter = null;
-                    currentSession = null;
 
                     updateViewer();
                     getViewer().expandAll();
@@ -227,13 +185,8 @@ public class BuddySessionDisplayComposite extends ViewerComposite<TreeViewer> {
 
         if (session != null) {
             filter = new HideContactsInSessionFilter(session);
-            session.addListener(projectListener);
-            currentSession = session;
             getViewer().addFilter(filter);
         }
-
-        followingActivitiesManager
-            .addIinternalListener(followModeChangesListener);
 
         addDisposeListener(new DisposeListener() {
             @Override
@@ -247,11 +200,7 @@ public class BuddySessionDisplayComposite extends ViewerComposite<TreeViewer> {
                 if (sarosNet != null)
                     sarosNet.removeListener(connectionListener);
 
-                if (currentSession != null)
-                    currentSession.removeListener(projectListener);
-
                 filter = null;
-                currentSession = null;
             }
         });
 

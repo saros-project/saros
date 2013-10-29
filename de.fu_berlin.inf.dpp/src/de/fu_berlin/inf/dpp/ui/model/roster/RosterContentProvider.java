@@ -2,10 +2,8 @@ package de.fu_berlin.inf.dpp.ui.model.roster;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.jivesoftware.smack.Roster;
@@ -21,7 +19,6 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManagerListener;
 import de.fu_berlin.inf.dpp.ui.model.TreeContentProvider;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.nebula.utils.ViewerUtils;
 
 /**
@@ -31,33 +28,26 @@ import de.fu_berlin.inf.nebula.utils.ViewerUtils;
  * 
  * @author bkahlert
  */
-public class RosterContentProvider extends TreeContentProvider {
-    private static final Logger log = Logger
-        .getLogger(RosterContentProvider.class);
+public final class RosterContentProvider extends TreeContentProvider {
 
-    protected Viewer viewer;
+    private Viewer viewer;
+    private Roster roster;
 
     @Inject
-    protected DiscoveryManager discoveryManager;
-    protected DiscoveryManagerListener discoveryManagerListener = new DiscoveryManagerListener() {
+    private DiscoveryManager discoveryManager;
+
+    private final DiscoveryManagerListener discoveryManagerListener = new DiscoveryManagerListener() {
         @Override
         public void featureSupportUpdated(final JID jid, String feature,
             boolean isSupported) {
-            if (Saros.NAMESPACE.equals(feature)) {
-                SWTUtils.runSafeSWTAsync(log, new Runnable() {
-                    @Override
-                    public void run() {
-                        // ViewerUtils.refresh(viewer, true);
-                        ViewerUtils.update(viewer, new RosterEntryElement(
-                            roster, jid), null);
-                    }
-                });
-            }
+
+            if (Saros.NAMESPACE.equals(feature))
+                ViewerUtils.update(viewer, new RosterEntryElement(roster, jid),
+                    null);
         }
     };
 
-    protected Roster roster;
-    protected RosterListener rosterListener = new RosterListener() {
+    private final RosterListener rosterListener = new RosterListener() {
         @Override
         public void presenceChanged(Presence presence) {
             ViewerUtils.update(viewer, new RosterEntryElement(roster, new JID(
@@ -76,26 +66,14 @@ public class RosterContentProvider extends TreeContentProvider {
 
         @Override
         public void entriesAdded(Collection<String> addresses) {
-            for (Iterator<String> iterator = addresses.iterator(); iterator
-                .hasNext();) {
-                String address = iterator.next();
-                RosterEntryElement rosterEntryElement = new RosterEntryElement(
-                    roster, new JID(address));
-                if (rosterEntryElement.getParent() != null) {
-                    ViewerUtils.add(viewer, rosterEntryElement.getParent(),
-                        rosterEntryElement);
-                } else {
-                    ViewerUtils.refresh(viewer, true);
-                }
-            }
+            ViewerUtils.refresh(viewer, true);
         }
     };
 
     public RosterContentProvider() {
-        super();
         SarosPluginContext.initComponent(this);
 
-        this.discoveryManager
+        discoveryManager
             .addDiscoveryManagerListener(this.discoveryManagerListener);
     }
 
@@ -103,25 +81,27 @@ public class RosterContentProvider extends TreeContentProvider {
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         this.viewer = viewer;
 
-        if (oldInput instanceof Roster) {
-            ((Roster) oldInput).removeRosterListener(this.rosterListener);
-        }
+        if (oldInput instanceof Roster)
+            ((Roster) oldInput).removeRosterListener(rosterListener);
+
+        roster = null;
 
         if (newInput instanceof Roster) {
-            this.roster = (Roster) newInput;
-            this.roster.addRosterListener(this.rosterListener);
-        } else {
-            this.roster = null;
+            roster = (Roster) newInput;
+            roster.addRosterListener(rosterListener);
         }
     }
 
     @Override
     public void dispose() {
-        if (this.roster != null) {
-            this.roster.removeRosterListener(this.rosterListener);
-        }
-        this.discoveryManager
-            .removeDiscoveryManagerListener(this.discoveryManagerListener);
+        if (roster != null)
+            roster.removeRosterListener(rosterListener);
+
+        discoveryManager
+            .removeDiscoveryManagerListener(discoveryManagerListener);
+
+        roster = null;
+        discoveryManager = null;
     }
 
     /**
@@ -130,21 +110,20 @@ public class RosterContentProvider extends TreeContentProvider {
      */
     @Override
     public Object[] getElements(Object inputElement) {
-        if (inputElement != null && inputElement instanceof Roster) {
-            Roster roster = (Roster) inputElement;
-            List<Object> elements = new ArrayList<Object>();
 
-            for (RosterGroup rosterGroup : roster.getGroups())
-                elements.add(new RosterGroupElement(roster, rosterGroup));
+        if (!(inputElement instanceof Roster))
+            return new Object[0];
 
-            for (RosterEntry rosterEntry : roster.getUnfiledEntries())
-                elements.add(new RosterEntryElement(roster, new JID(rosterEntry
-                    .getUser())));
+        Roster roster = (Roster) inputElement;
+        List<Object> elements = new ArrayList<Object>();
 
-            return elements.toArray();
-        }
+        for (RosterGroup rosterGroup : roster.getGroups())
+            elements.add(new RosterGroupElement(roster, rosterGroup));
 
-        return new Object[0];
+        for (RosterEntry rosterEntry : roster.getUnfiledEntries())
+            elements.add(new RosterEntryElement(roster, new JID(rosterEntry
+                .getUser())));
+
+        return elements.toArray();
     }
-
 }

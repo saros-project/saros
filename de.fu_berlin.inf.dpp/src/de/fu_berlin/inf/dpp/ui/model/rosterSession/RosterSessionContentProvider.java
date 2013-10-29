@@ -19,9 +19,12 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
+import de.fu_berlin.inf.dpp.net.RosterAdapter;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.project.internal.FollowingActivitiesManager;
+import de.fu_berlin.inf.dpp.project.internal.IFollowModeChangesListener;
 import de.fu_berlin.inf.dpp.ui.model.TreeContentProvider;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterContentProvider;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -35,7 +38,7 @@ import de.fu_berlin.inf.nebula.utils.ViewerUtils;
  * 
  * @author bkahlert
  */
-public class RosterSessionContentProvider extends TreeContentProvider {
+public final class RosterSessionContentProvider extends TreeContentProvider {
 
     private Viewer viewer;
     private RosterContentProvider rosterContentProvider = new RosterContentProvider();
@@ -48,6 +51,19 @@ public class RosterSessionContentProvider extends TreeContentProvider {
 
     @Inject
     private EditorManager editorManager;
+
+    @Inject
+    private FollowingActivitiesManager followingActivitiesManager;
+
+    private final IFollowModeChangesListener followModeChangesListener = new IFollowModeChangesListener() {
+
+        @Override
+        public void followModeChanged() {
+            ViewerUtils.refresh(viewer, true);
+            // FIXME expand the sessionHeaderElement not the whole viewer
+            ViewerUtils.expandAll(viewer);
+        }
+    };
 
     private final ISharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
         @Override
@@ -89,22 +105,15 @@ public class RosterSessionContentProvider extends TreeContentProvider {
         }
     };
 
-    private final RosterListener rosterListener = new RosterListener() {
-        @Override
-        public void entriesAdded(Collection<String> addresses) {
-            ViewerUtils.refresh(viewer, true);
-        }
-
+    // TODO call update and not refresh
+    private final RosterListener rosterListener = new RosterAdapter() {
+        // update nicknames
         @Override
         public void entriesUpdated(Collection<String> addresses) {
             ViewerUtils.refresh(viewer, true);
         }
 
-        @Override
-        public void entriesDeleted(Collection<String> addresses) {
-            ViewerUtils.refresh(viewer, true);
-        }
-
+        // update away icons
         @Override
         public void presenceChanged(Presence presence) {
             ViewerUtils.refresh(viewer, true);
@@ -124,6 +133,9 @@ public class RosterSessionContentProvider extends TreeContentProvider {
             UserElement userElement = getUserElement(currentRoster, user);
             if (userElement != null)
                 ViewerUtils.add(viewer, sessionHeaderElement, userElement);
+
+            // FIXME expand the sessionHeaderElement not the whole viewer
+            ViewerUtils.expandAll(viewer);
         }
 
         @Override
@@ -137,6 +149,8 @@ public class RosterSessionContentProvider extends TreeContentProvider {
     public RosterSessionContentProvider() {
         SarosPluginContext.initComponent(this);
         editorManager.addSharedEditorListener(sharedEditorListener);
+        followingActivitiesManager
+            .addIinternalListener(followModeChangesListener);
     }
 
     @Override
@@ -170,10 +184,6 @@ public class RosterSessionContentProvider extends TreeContentProvider {
 
         createHeaders((RosterSessionInput) newInput);
 
-        /*
-         * FIXME we install roster listeners twice ! (1st. here, 2nd. in the
-         * rosterContentProvider
-         */
         if (newRoster != null)
             newRoster.addRosterListener(rosterListener);
 
@@ -212,6 +222,9 @@ public class RosterSessionContentProvider extends TreeContentProvider {
 
         editorManager.removeSharedEditorListener(sharedEditorListener);
 
+        followingActivitiesManager
+            .removeIinternalListener(followModeChangesListener);
+
         rosterContentProvider.dispose();
 
         disposeHeaderElements();
@@ -221,6 +234,7 @@ public class RosterSessionContentProvider extends TreeContentProvider {
         currentRoster = null;
         editorManager = null;
         rosterContentProvider = null;
+        followingActivitiesManager = null;
     }
 
     /**
