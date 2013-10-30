@@ -11,9 +11,8 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.ISharedImages;
-import org.eclipse.ui.PlatformUI;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
@@ -25,6 +24,7 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
@@ -33,6 +33,12 @@ import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
 @Component(module = "action")
 public class ConsistencyAction extends Action {
+
+    private static final ImageDescriptor IN_SYNC = ImageManager
+        .getImageDescriptor("icons/etool16/in_sync.png"); //$NON-NLS-1$;
+
+    private static final ImageDescriptor OUT_SYNC = ImageManager
+        .getImageDescriptor("icons/etool16/out_sync.png"); //$NON-NLS-1$;
 
     private static final Logger log = Logger.getLogger(ConsistencyAction.class);
 
@@ -47,8 +53,8 @@ public class ConsistencyAction extends Action {
 
     public ConsistencyAction() {
 
-        setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
-            .getImageDescriptor(ISharedImages.IMG_OBJS_WARN_TSK));
+        setImageDescriptor(IN_SYNC);
+
         setToolTipText(Messages.ConsistencyAction_tooltip_no_inconsistency);
 
         SarosPluginContext.initComponent(this);
@@ -80,6 +86,11 @@ public class ConsistencyAction extends Action {
 
         sarosSession = newSharedProject;
 
+        if (sarosSession != null)
+            setDisabledImageDescriptor(IN_SYNC);
+        else
+            setDisabledImageDescriptor(null);
+
         // Register to new project
         if (sarosSession != null) {
             inconsistentObservable.addAndNotify(isConsistencyListener);
@@ -100,41 +111,45 @@ public class ConsistencyAction extends Action {
             }
             log.debug("Inconsistency indicator goes: " //$NON-NLS-1$
                 + (newValue ? "on" : "off")); //$NON-NLS-1$ //$NON-NLS-2$
+
             setEnabled(newValue);
 
-            if (newValue) {
-                final Set<SPath> paths = new HashSet<SPath>(
-                    watchdogClient.getPathsWithWrongChecksums());
-
-                SWTUtils.runSafeSWTAsync(log, new Runnable() {
-                    @Override
-                    public void run() {
-
-                        String files = Utils.toOSString(paths);
-
-                        // set tooltip
-                        setToolTipText(MessageFormat
-                            .format(
-                                Messages.ConsistencyAction_tooltip_inconsistency_detected,
-                                files));
-
-                        // TODO Balloon is too aggressive at the moment, when
-                        // the host is slow in sending changes (for instance
-                        // when refactoring)
-
-                        // show balloon notification
-                        SarosView
-                            .showNotification(
-                                Messages.ConsistencyAction_title_inconsistency_deteced,
-                                MessageFormat
-                                    .format(
-                                        Messages.ConsistencyAction_message_inconsistency_detected,
-                                        files));
-                    }
-                });
-            } else {
+            if (!newValue) {
                 setToolTipText(Messages.ConsistencyAction_tooltip_no_inconsistency);
+                return;
             }
+
+            setImageDescriptor(OUT_SYNC);
+
+            final Set<SPath> paths = new HashSet<SPath>(
+                watchdogClient.getPathsWithWrongChecksums());
+
+            SWTUtils.runSafeSWTAsync(log, new Runnable() {
+                @Override
+                public void run() {
+
+                    String files = Utils.toOSString(paths);
+
+                    // set tooltip
+                    setToolTipText(MessageFormat
+                        .format(
+                            Messages.ConsistencyAction_tooltip_inconsistency_detected,
+                            files));
+
+                    // TODO Balloon is too aggressive at the moment, when
+                    // the host is slow in sending changes (for instance
+                    // when refactoring)
+
+                    // show balloon notification
+                    SarosView
+                        .showNotification(
+                            Messages.ConsistencyAction_title_inconsistency_deteced,
+                            MessageFormat
+                                .format(
+                                    Messages.ConsistencyAction_message_inconsistency_detected,
+                                    files));
+                }
+            });
         }
 
     };
