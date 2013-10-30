@@ -31,6 +31,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
@@ -58,7 +59,6 @@ import org.eclipse.ui.part.ViewPart;
 import org.jivesoftware.smack.packet.Presence;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -67,6 +67,7 @@ import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterAdapter;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
+import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
@@ -138,16 +139,22 @@ public class SarosView extends ViewPart {
         @Override
         public void presenceChanged(Presence presence) {
 
+            final boolean playAvailableSound = preferenceStore
+                .getBoolean(PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_ONLINE);
+
+            final boolean playUnavailableSound = preferenceStore
+                .getBoolean(PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_OFFLINE);
+
             Presence lastPresence = lastPresenceMap.put(presence.getFrom(),
                 presence);
 
             if ((lastPresence == null || !lastPresence.isAvailable())
-                && presence.isAvailable()) {
+                && presence.isAvailable() && playAvailableSound) {
                 SoundPlayer.playSound(SoundManager.USER_ONLINE);
             }
 
             if ((lastPresence != null) && lastPresence.isAvailable()
-                && !presence.isAvailable()) {
+                && !presence.isAvailable() && playUnavailableSound) {
                 SoundPlayer.playSound(SoundManager.USER_OFFLINE);
             }
         }
@@ -227,7 +234,7 @@ public class SarosView extends ViewPart {
     protected FollowModeAction followModeAction;
 
     @Inject
-    protected Saros saros;
+    protected IPreferenceStore preferenceStore;
 
     @Inject
     protected ISarosSessionManager sarosSessionManager;
@@ -238,14 +245,17 @@ public class SarosView extends ViewPart {
     @Inject
     protected RosterTracker rosterTracker;
 
+    @Inject
+    protected SarosNet network;
+
     private static volatile boolean showBalloonNotifications;
 
     public SarosView() {
         super();
         SarosPluginContext.initComponent(this);
-        saros.getPreferenceStore().addPropertyChangeListener(propertyListener);
-        showBalloonNotifications = saros.getPreferenceStore().getBoolean(
-            PreferenceConstants.ENABLE_BALLOON_NOTIFICATION);
+        preferenceStore.addPropertyChangeListener(propertyListener);
+        showBalloonNotifications = preferenceStore
+            .getBoolean(PreferenceConstants.ENABLE_BALLOON_NOTIFICATION);
     }
 
     /**
@@ -284,10 +294,10 @@ public class SarosView extends ViewPart {
         leftComposite.addControlListener(new ControlListener() {
             @Override
             public void controlResized(ControlEvent e) {
-                saros.getPreferenceStore().setValue(
+                preferenceStore.setValue(
                     PreferenceConstants.SAROSVIEW_SASH_WEIGHT_LEFT,
                     baseSashForm.getWeights()[0]);
-                saros.getPreferenceStore().setValue(
+                preferenceStore.setValue(
                     PreferenceConstants.SAROSVIEW_SASH_WEIGHT_RIGHT,
                     baseSashForm.getWeights()[1]);
             }
@@ -350,10 +360,10 @@ public class SarosView extends ViewPart {
          * of the baseSashForm.
          */
         int[] weights = new int[] {
-            saros.getPreferenceStore().getInt(
-                PreferenceConstants.SAROSVIEW_SASH_WEIGHT_LEFT),
-            saros.getPreferenceStore().getInt(
-                PreferenceConstants.SAROSVIEW_SASH_WEIGHT_RIGHT) };
+            preferenceStore
+                .getInt(PreferenceConstants.SAROSVIEW_SASH_WEIGHT_LEFT),
+            preferenceStore
+                .getInt(PreferenceConstants.SAROSVIEW_SASH_WEIGHT_RIGHT) };
         baseSashForm.setWeights(weights);
 
         chatRooms = new ChatRoomsComposite(rightComposite, SWT.NONE,
@@ -397,7 +407,7 @@ public class SarosView extends ViewPart {
         getSite().setSelectionProvider(buddySessionViewer);
 
         rosterTracker.addRosterListener(rosterListenerBuddys);
-        rosterListenerBuddys.rosterChanged(saros.getSarosNet().getRoster());
+        rosterListenerBuddys.rosterChanged(network.getRoster());
 
         getViewSite().getPage().addPartListener(partListener);
     }

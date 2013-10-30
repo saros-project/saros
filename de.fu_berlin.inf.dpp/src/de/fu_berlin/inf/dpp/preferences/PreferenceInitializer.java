@@ -108,6 +108,14 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         prefs.setValue(PreferenceConstants.FORCE_CUSTOM_MUC_SERVICE, true);
         prefs.setValue(PreferenceConstants.SOUND_ENABLED, true);
 
+        prefs.setValue(PreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_SENT, true);
+        prefs.setValue(PreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_RECEIVED,
+            true);
+        prefs.setValue(PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_ONLINE,
+            true);
+        prefs.setValue(PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_OFFLINE,
+            true);
+
         prefs.setValue(PreferenceConstants.VOIP_ENABLED, false);
         prefs.setValue(PreferenceConstants.AUDIO_VBR, true);
         prefs.setValue(PreferenceConstants.AUDIO_ENABLE_DTX, true);

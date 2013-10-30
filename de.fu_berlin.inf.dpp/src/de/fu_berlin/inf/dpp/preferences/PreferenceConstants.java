@@ -146,6 +146,16 @@ public class PreferenceConstants {
     /** Playback device for VoIP **/
     public static final String AUDIO_PLAYBACK_DEVICE = "AUDIO_PLAYBACK_DEVICE";
 
+    /* Sound Events */
+
+    public static final String SOUND_PLAY_EVENT_MESSAGE_SENT = "sound.play.event.message.sent";
+
+    public static final String SOUND_PLAY_EVENT_MESSAGE_RECEIVED = "sound.play.event.message.received";
+
+    public static final String SOUND_PLAY_EVENT_CONTACT_ONLINE = "sound.play.event.contact.online";
+
+    public static final String SOUND_PLAY_EVENT_CONTACT_OFFLINE = "sound.play.event.contact.offline";
+
     /*
      * VideoSharing
      */

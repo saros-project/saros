@@ -21,13 +21,13 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.audio.MixerManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.Messages;
 
+//FIXME the layout of this page is completely BROKEN !!!
 @Component(module = "prefs")
 public class CommunicationPreferencePage extends FieldEditorPreferencePage
     implements IWorkbenchPreferencePage {
@@ -41,22 +41,28 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
         { "6", "6" }, { "7", "7" }, { "8", "8" }, { "9", "9" }, { "10", "10" } };
 
     @Inject
-    protected Saros saros;
+    private IPreferenceStore prefs;
 
     @Inject
-    protected MixerManager mixerManager;
+    private MixerManager mixerManager;
 
-    protected Composite parent;
-    protected StringFieldEditor chatserver;
-    protected BooleanFieldEditor useCustomChatServer;
-    protected StringFieldEditor skypeName;
-    protected BooleanFieldEditor beepUponIM;
-    protected BooleanFieldEditor audio_vbr;
-    protected BooleanFieldEditor audio_dtx;
-    protected ComboFieldEditor audioQuality;
+    private BooleanFieldEditor enableSoundEvents;
 
-    protected IPreferenceStore prefs;
+    private BooleanFieldEditor playSoundEventChatMessageSent;
+    private BooleanFieldEditor playSoundEventChatMessageReceived;
 
+    private BooleanFieldEditor playSoundEventContactComesOnline;
+    private BooleanFieldEditor playSoundEventContactGoesOffline;
+
+    private StringFieldEditor chatserver;
+    private BooleanFieldEditor useCustomChatServer;
+    private StringFieldEditor skypeName;
+
+    private BooleanFieldEditor audio_vbr;
+    private BooleanFieldEditor audio_dtx;
+    private ComboFieldEditor audioQuality;
+
+    private Group soundGroup;
     private Group chatGroup;
     private Group voipGroup;
     private Composite chatServerGroup;
@@ -64,24 +70,31 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
     public CommunicationPreferencePage() {
         super(FieldEditorPreferencePage.GRID);
         SarosPluginContext.initComponent(this);
-        setPreferenceStore(saros.getPreferenceStore());
+        setPreferenceStore(prefs);
         setDescription("Settings for Chat and VoIP Functionality.");
-        this.prefs = saros.getPreferenceStore();
+    }
+
+    @Override
+    public void init(IWorkbench workbench) {
+        // NOP
     }
 
     @Override
     protected void createFieldEditors() {
+        soundGroup = new Group(getFieldEditorParent(), SWT.NONE);
+        chatGroup = new Group(getFieldEditorParent(), SWT.NONE);
+        voipGroup = new Group(getFieldEditorParent(), SWT.NONE);
 
-        parent = getFieldEditorParent();
-
-        chatGroup = new Group(parent, SWT.NONE);
-        voipGroup = new Group(parent, SWT.NONE);
-
+        GridData soundGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
         GridData chatGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
         GridData voipGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 
+        soundGridData.horizontalSpan = 2;
         chatGridData.horizontalSpan = 2;
         voipGridData.horizontalSpan = 2;
+
+        soundGroup.setText("Sounds");
+        soundGroup.setLayout(new GridLayout(1, false));
 
         chatGroup.setText("Chat");
         chatGroup.setLayout(new GridLayout(2, false));
@@ -89,8 +102,29 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
         voipGroup.setText("VoIP");
         voipGroup.setLayout(new GridLayout(2, false));
 
+        soundGroup.setLayoutData(soundGridData);
         chatGroup.setLayoutData(chatGridData);
         voipGroup.setLayoutData(voipGridData);
+
+        enableSoundEvents = new BooleanFieldEditor(
+            PreferenceConstants.SOUND_ENABLED, "Enable sound events",
+            soundGroup);
+
+        playSoundEventChatMessageSent = new BooleanFieldEditor(
+            PreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_SENT,
+            "Play notification when sending a message", soundGroup);
+
+        playSoundEventChatMessageReceived = new BooleanFieldEditor(
+            PreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_RECEIVED,
+            "Play notification when receiving a message", soundGroup);
+
+        playSoundEventContactComesOnline = new BooleanFieldEditor(
+            PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_ONLINE,
+            "Play notification when contact comes online", soundGroup);
+
+        playSoundEventContactGoesOffline = new BooleanFieldEditor(
+            PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_OFFLINE,
+            "Play notification when contact goes offline", soundGroup);
 
         chatServerGroup = new Composite(chatGroup, SWT.NONE);
         chatServerGroup.setLayout(new GridLayout(2, false));
@@ -104,10 +138,6 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
         useCustomChatServer = new BooleanFieldEditor(
             PreferenceConstants.FORCE_CUSTOM_MUC_SERVICE,
             "Always use custom chatserver", chatGroup);
-
-        beepUponIM = new BooleanFieldEditor(PreferenceConstants.SOUND_ENABLED,
-            "Beep when receiving a chat message", chatGroup);
-        beepUponIM.setEnabled(true, chatGroup);
 
         skypeName = new StringFieldEditor(PreferenceConstants.SKYPE_USERNAME,
             "Skype name:", getFieldEditorParent());
@@ -166,9 +196,14 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
 
         audioRecordDevices.setEnabled(enabled, voipGroup);
 
+        addField(enableSoundEvents);
+        addField(playSoundEventChatMessageSent);
+        addField(playSoundEventChatMessageReceived);
+        addField(playSoundEventContactComesOnline);
+        addField(playSoundEventContactGoesOffline);
+
         addField(chatserver);
         addField(useCustomChatServer);
-        addField(beepUponIM);
         addField(skypeName);
         addField(audioQuality);
         addField(audioSamplerate);
@@ -186,6 +221,8 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
             useCustomChatServer.setEnabled(!chatserver.getStringValue()
                 .isEmpty(), chatGroup);
         }
+
+        updateSoundEventEditors();
     }
 
     @Override
@@ -204,20 +241,27 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
                 String serverName = event.getNewValue().toString();
                 useCustomChatServer
                     .setEnabled(!serverName.isEmpty(), chatGroup);
-            }
+            } else if (field == enableSoundEvents)
+                updateSoundEventEditors();
         }
     }
 
-    protected String[][] getRecordMixerNames() {
+    @Override
+    protected void performDefaults() {
+        super.performDefaults();
+        updateSoundEventEditors();
+    }
+
+    private String[][] getRecordMixerNames() {
         return getMixerNames(0);
     }
 
-    protected String[][] getPlaybackMixerNames() {
+    private String[][] getPlaybackMixerNames() {
         return getMixerNames(1);
     }
 
     @SuppressWarnings("unchecked")
-    protected String[][] getMixerNames(int type) {
+    private String[][] getMixerNames(int type) {
         List<Mixer.Info> mixerInfo;
         if (type == 0)
             mixerInfo = mixerManager.getRecordingMixers();
@@ -239,7 +283,7 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
 
     }
 
-    protected String[][] get2dArray(String[] inputArray) {
+    private String[][] get2dArray(String[] inputArray) {
         String outputArray[][] = new String[inputArray.length][2];
         for (int i = 0; i < inputArray.length; i++) {
             outputArray[i][0] = inputArray[i];
@@ -248,8 +292,12 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
         return outputArray;
     }
 
-    @Override
-    public void init(IWorkbench workbench) {
-        // TODO Auto-generated method stub
+    private void updateSoundEventEditors() {
+        boolean enabled = enableSoundEvents.getBooleanValue();
+
+        playSoundEventChatMessageSent.setEnabled(enabled, soundGroup);
+        playSoundEventChatMessageReceived.setEnabled(enabled, soundGroup);
+        playSoundEventContactComesOnline.setEnabled(enabled, soundGroup);
+        playSoundEventContactGoesOffline.setEnabled(enabled, soundGroup);
     }
 }

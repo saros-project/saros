@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
@@ -38,6 +39,7 @@ import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
+import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -93,6 +95,9 @@ public class ChatControl extends Composite {
 
     @Inject
     protected ISarosSessionManager sessionManager;
+
+    @Inject
+    protected IPreferenceStore preferenceStore;
 
     /**
      * This {@link IChatDisplayListener} is used to forward events fired in the
@@ -193,6 +198,13 @@ public class ChatControl extends Composite {
 
         @Override
         public void messageReceived(final JID sender, final String message) {
+
+            final boolean playMessageSentSound = preferenceStore
+                .getBoolean(PreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_SENT);
+
+            final boolean playMessageReceivedSound = preferenceStore
+                .getBoolean(PreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_RECEIVED);
+
             SWTUtils.runSafeSWTAsync(log, new Runnable() {
 
                 @Override
@@ -206,9 +218,14 @@ public class ChatControl extends Composite {
                     addChatLine(new ChatElement(message, sender, new Date()));
 
                     if (!isOwnJID(sender)) {
-                        SoundPlayer.playSound(SoundManager.MESSAGE_RECEIVED);
+
+                        if (playMessageReceivedSound) {
+                            SoundPlayer
+                                .playSound(SoundManager.MESSAGE_RECEIVED);
+                        }
+
                         incrementUnseenMessages();
-                    } else {
+                    } else if (playMessageSentSound) {
                         SoundPlayer.playSound(SoundManager.MESSAGE_SENT);
                     }
                 }
