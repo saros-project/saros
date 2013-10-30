@@ -2,6 +2,8 @@ package de.fu_berlin.inf.dpp.ui.wizards.pages;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
@@ -24,7 +26,13 @@ public class ColorChooserWizardPage extends WizardPage {
     public void createControl(Composite parent) {
         setPageComplete(selectedColor != UserColorID.UNKNOWN);
 
-        colorChooser = new ColorChooser(parent, SWT.NONE);
+        Composite composite = new Composite(parent, SWT.NONE);
+        composite.setLayout(new GridLayout());
+
+        colorChooser = new ColorChooser(composite, SWT.NONE);
+
+        colorChooser.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true,
+            true));
 
         if (hideUnavailableColors)
             colorChooser.updateColorEnablement();
@@ -43,7 +51,7 @@ public class ColorChooserWizardPage extends WizardPage {
         if (selectedColor != UserColorID.UNKNOWN)
             colorChooser.selectColor(selectedColor);
 
-        setControl(colorChooser);
+        setControl(composite);
     }
 
     public int getSelectedColor() {
