@@ -51,7 +51,7 @@ import de.fu_berlin.inf.dpp.ui.wizards.pages.AddContactWizardPage;
 public class AddContactWizard extends Wizard {
     private static final Logger log = Logger.getLogger(AddContactWizard.class);
 
-    public static final String TITLE = Messages.AddBuddyWizard_title;
+    public static final String TITLE = Messages.AddContactWizard_title;
     public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_ADD_CONTACT;
 
     @Inject
@@ -109,7 +109,7 @@ public class AddContactWizard extends Wizard {
                 public void run(IProgressMonitor monitor)
                     throws InvocationTargetException, InterruptedException {
 
-                    monitor.beginTask("Adding buddy " + jid + "...",
+                    monitor.beginTask("Adding contact " + jid + "...",
                         IProgressMonitor.UNKNOWN);
 
                     try {

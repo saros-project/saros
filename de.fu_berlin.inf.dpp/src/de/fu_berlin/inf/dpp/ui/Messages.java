@@ -4,7 +4,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "de.fu_berlin.inf.dpp.ui.messages"; //$NON-NLS-1$
-    public static String AddBuddyWizard_title;
+    public static String AddContactWizard_title;
     public static String AddContactWizardPage_nickname;
     public static String AddContactWizardPage_optional;
     public static String AddProjectToSessionWizard_delete_local_changes;
@@ -276,7 +276,8 @@ public class Messages extends NLS {
     public static String SendFileAction_unexpected_error;
     public static String SessionHeaderElement_no_session_running;
     public static String SessionHeaderElement_session;
-    public static String ShareProjectAddBuddiesWizard_title;
+
+    public static String ShareProjectAddContactsWizard_title;
     public static String ShareProjectAddProjectsWizard_title;
     public static String ShareProjectWizard_title;
 

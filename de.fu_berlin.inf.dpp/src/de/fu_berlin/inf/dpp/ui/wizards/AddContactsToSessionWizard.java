@@ -12,12 +12,12 @@ import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.ContactSelectionWizardPage;
 
 /**
- * Wizard for adding buddies to a running session.
+ * Wizard for adding contacts to a running session.
  * 
  * @author bkahlert
  */
 public class AddContactsToSessionWizard extends Wizard {
-    public static final String TITLE = Messages.ShareProjectAddBuddiesWizard_title;
+    public static final String TITLE = Messages.ShareProjectAddContactsWizard_title;
     public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_SHARE_PROJECT_ADD_CONTACTS;
 
     private final ContactSelectionWizardPage contactSelectionWizardPage = new ContactSelectionWizardPage();
