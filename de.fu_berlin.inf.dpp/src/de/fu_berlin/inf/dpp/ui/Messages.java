@@ -447,6 +447,17 @@ public class Messages extends NLS {
     public static String NegotiationHandler_sharing_project_cancelled_remotely;
     public static String NegotiationHandler_sharing_project_cancelled_remotely_text;
 
+    public static String UserStatusChangeHandler_user_joined;
+    public static String UserStatusChangeHandler_user_joined_text;
+    public static String UserStatusChangeHandler_user_left;
+    public static String UserStatusChangeHandler_user_left_text;
+    public static String UserStatusChangeHandler_user_no_participant;
+    public static String UserStatusChangeHandler_he_has_now_access;
+    public static String UserStatusChangeHandler_permission_changed;
+    public static String UserStatusChangeHandler_read_only;
+    public static String UserStatusChangeHandler_write;
+    public static String UserStatusChangeHandler_you_have_now_access;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

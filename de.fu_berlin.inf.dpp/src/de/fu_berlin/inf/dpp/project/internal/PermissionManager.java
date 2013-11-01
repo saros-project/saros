@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.project.internal;
 
-import java.text.MessageFormat;
 import java.util.concurrent.CancellationException;
 
 import org.apache.log4j.Logger;
@@ -73,9 +72,11 @@ public class PermissionManager extends AbstractActivityProvider implements
 
         User user = activity.getAffectedUser();
         if (!user.isInSarosSession()) {
-            throw new IllegalArgumentException(MessageFormat.format(
-                Messages.PermissionManager_buddy_no_participant, user));
+            log.warn("could not change permissions of user " + user
+                + " because the user is longer part of the session");
+            return;
         }
+
         Permission permission = activity.getPermission();
         this.sarosSession.setPermission(user, permission);
     }

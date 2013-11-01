@@ -9,7 +9,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.Messages;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 
 /**
@@ -46,21 +46,22 @@ public class UserStatusChangeHandler {
             if (user.isLocal()) {
                 SarosView
                     .showNotification(
-                        Messages.PermissionManager_permission_changed,
-                        MessageFormat.format(
-                            Messages.PermissionManager_you_have_now_access,
-                            user.getHumanReadableName(),
-                            user.hasWriteAccess() ? Messages.PermissionManager_write
-                                : Messages.PermissionManager_read_only));
+                        Messages.UserStatusChangeHandler_permission_changed,
+                        MessageFormat
+                            .format(
+                                Messages.UserStatusChangeHandler_you_have_now_access,
+                                user.getHumanReadableName(),
+                                user.hasWriteAccess() ? Messages.UserStatusChangeHandler_write
+                                    : Messages.UserStatusChangeHandler_read_only));
             } else {
                 SarosView
                     .showNotification(
-                        Messages.PermissionManager_permission_changed,
+                        Messages.UserStatusChangeHandler_permission_changed,
                         MessageFormat.format(
-                            Messages.PermissionManager_he_has_now_access,
+                            Messages.UserStatusChangeHandler_he_has_now_access,
                             user.getHumanReadableName(),
-                            user.hasWriteAccess() ? Messages.PermissionManager_write
-                                : Messages.PermissionManager_read_only));
+                            user.hasWriteAccess() ? Messages.UserStatusChangeHandler_write
+                                : Messages.UserStatusChangeHandler_read_only));
 
             }
         }
@@ -68,18 +69,18 @@ public class UserStatusChangeHandler {
         @Override
         public void userJoined(User user) {
 
-            SarosView.showNotification(Messages.PermissionManager_buddy_joined,
-                MessageFormat.format(
-                    Messages.PermissionManager_buddy_joined_text,
-                    user.getHumanReadableName()));
+            SarosView.showNotification(
+                Messages.UserStatusChangeHandler_user_joined, MessageFormat
+                    .format(Messages.UserStatusChangeHandler_user_joined_text,
+                        user.getHumanReadableName()));
         }
 
         @Override
         public void userLeft(User user) {
-            SarosView.showNotification(Messages.PermissionManager_buddy_left,
-                MessageFormat.format(
-                    Messages.PermissionManager_buddy_left_text,
-                    user.getHumanReadableName()));
+            SarosView.showNotification(
+                Messages.UserStatusChangeHandler_user_left, MessageFormat
+                    .format(Messages.UserStatusChangeHandler_user_left_text,
+                        user.getHumanReadableName()));
         }
     };
 

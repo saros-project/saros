@@ -4,16 +4,6 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "de.fu_berlin.inf.dpp.project.messages"; //$NON-NLS-1$
-    public static String PermissionManager_buddy_joined;
-    public static String PermissionManager_buddy_joined_text;
-    public static String PermissionManager_buddy_left;
-    public static String PermissionManager_buddy_left_text;
-    public static String PermissionManager_buddy_no_participant;
-    public static String PermissionManager_he_has_now_access;
-    public static String PermissionManager_permission_changed;
-    public static String PermissionManager_read_only;
-    public static String PermissionManager_write;
-    public static String PermissionManager_you_have_now_access;
     public static String ResourceChangeValidator_error_leave_session_before_delete_project;
     public static String ResourceChangeValidator_error_no_write_access;
 
