@@ -39,8 +39,8 @@ import de.fu_berlin.inf.nebula.utils.LayoutUtils;
  */
 
 public class AddContactWizardPage extends WizardPage {
-    public static final String TITLE = "Add Buddy"; //$NON-NLS-1$
-    public static final String DESCRIPTION = "Enter the XMPP/Jabber ID of the buddy you want to add."; //$NON-NLS-1$
+    public static final String TITLE = "Add Contact";
+    public static final String DESCRIPTION = "Enter the XMPP/Jabber ID of the contact you want to add.";
 
     @Inject
     protected SarosNet sarosNet;
@@ -109,7 +109,7 @@ public class AddContactWizardPage extends WizardPage {
         gridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
         gridData.verticalIndent = space;
         nicknameLabel.setLayoutData(gridData);
-        nicknameLabel.setText(Messages.AddBuddyWizardPage_nickname);
+        nicknameLabel.setText(Messages.AddContactWizardPage_nickname);
 
         Text nicknameText = new Text(composite, SWT.BORDER);
         gridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
@@ -117,7 +117,7 @@ public class AddContactWizardPage extends WizardPage {
         gridData.verticalIndent = space;
         nicknameText.setLayoutData(gridData);
         this.nicknameText = new EmptyText(nicknameText,
-            Messages.AddBuddyWizardPage_optional);
+            Messages.AddContactWizardPage_optional);
 
         hookListeners();
         updatePageCompletion();

@@ -5,8 +5,8 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "de.fu_berlin.inf.dpp.ui.messages"; //$NON-NLS-1$
     public static String AddBuddyWizard_title;
-    public static String AddBuddyWizardPage_nickname;
-    public static String AddBuddyWizardPage_optional;
+    public static String AddContactWizardPage_nickname;
+    public static String AddContactWizardPage_optional;
     public static String AddProjectToSessionWizard_delete_local_changes;
     public static String AddProjectToSessionWizard_file_added;
     public static String AddProjectToSessionWizard_file_overwritten;
