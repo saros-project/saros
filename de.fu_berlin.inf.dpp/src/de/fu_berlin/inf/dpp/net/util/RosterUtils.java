@@ -55,6 +55,8 @@ public class RosterUtils {
         // no public instantiation allowed
     }
 
+    // which ***** inserted this GUI stuff here ?!
+
     protected static class DialogContent {
 
         public DialogContent(String dialogTitle, String dialogMessage,
@@ -86,36 +88,36 @@ public class RosterUtils {
         // FIXME: use e.getXMPPError().getCode(); !
 
         if (e.getMessage().contains("item-not-found")) {
-            return new DialogContent("Buddy Unknown",
-                "The buddy is unknown to the XMPP/Jabber server.\n\n"
-                    + "Do you want to add the buddy anyway?",
-                "Buddy unknown to XMPP/Jabber server.");
+            return new DialogContent("Contact Unknown",
+                "The contact is unknown to the XMPP/Jabber server.\n\n"
+                    + "Do you want to add the contact anyway?",
+                "Contact unknown to XMPP/Jabber server.");
         }
 
         if (e.getMessage().contains("remote-server-not-found")) {
             return new DialogContent("Server Not Found",
                 "The responsible XMPP/Jabber server could not be found.\n\n"
-                    + "Do you want to add the buddy anyway?",
+                    + "Do you want to add the contact anyway?",
                 "Unable to find the responsible XMPP/Jabber server.");
 
         }
 
         if (e.getMessage().contains("501")) {
             return new DialogContent(
-                "Unsupported Buddy Status Check",
+                "Unsupported Contact Status Check",
                 "The responsible XMPP/Jabber server does not support status requests.\n\n"
-                    + "If the buddy exists you can still successfully add him.\n\n"
-                    + "Do you want to try to add the buddy?",
-                "Buddy status check unsupported by XMPP/Jabber server.");
+                    + "If the contact exists you can still successfully add him.\n\n"
+                    + "Do you want to try to add the contact?",
+                "Contact status check unsupported by XMPP/Jabber server.");
         }
 
         if (e.getMessage().contains("503")) {
             return new DialogContent(
-                "Unknown Buddy Status",
+                "Unknown Contact Status",
                 "For privacy reasons the XMPP/Jabber server does not reply to status requests.\n\n"
-                    + "If the buddy exists you can still successfully add him.\n\n"
-                    + "Do you want to try to add the buddy?",
-                "Unable to check the buddy status.");
+                    + "If the contact exists you can still successfully add him.\n\n"
+                    + "Do you want to try to add the contact?",
+                "Unable to check the contact status.");
         }
 
         if (e.getMessage().contains("No response from the server")) {
@@ -123,13 +125,13 @@ public class RosterUtils {
                 "Server Not Responding",
                 "The responsible XMPP/Jabber server is not connectable.\n"
                     + "The server is either inexistent or offline right now.\n\n"
-                    + "Do you want to add the buddy anyway?",
+                    + "Do you want to add the contact anyway?",
                 "The XMPP/Jabber server did not respond.");
         }
 
         return new DialogContent("Unknown Error",
             "An unknown error has occured:\n\n" + e.getMessage() + "\n\n"
-                + "Do you want to add the buddy anyway?", "Unknown error: "
+                + "Do you want to add the contact anyway?", "Unknown error: "
                 + e.getMessage());
     }
 
@@ -286,11 +288,11 @@ public class RosterUtils {
                             return !DialogUtils
                                 .openQuestionMessageDialog(
                                     null,
-                                    "Buddy Unknown",
+                                    "Contact Unknown",
                                     "You entered a valid XMPP/Jabber server.\n\n"
                                         + "Unfortunately your entered JID is unknown to the server.\n"
                                         + "Please make sure you spelled the JID correctly.\n\n"
-                                        + "Do you want to add the buddy anyway?");
+                                        + "Do you want to add the contact anyway?");
                         }
                     });
                 } catch (Exception e) {
@@ -301,7 +303,7 @@ public class RosterUtils {
                     throw new XMPPException(
                         "Please make sure you spelled the JID correctly.");
                 }
-                log.debug("The buddy " + jid
+                log.debug("The contact " + jid
                     + " couldn't be found on the server."
                     + " The user chose to add it anyway.");
 
@@ -328,7 +330,7 @@ public class RosterUtils {
                 throw new XMPPException(
                     dialogContent.invocationTargetExceptionMessage);
 
-            log.warn("Problem while adding a buddy. User decided to add buddy anyway. Problem:\n"
+            log.warn("Problem while adding a contact. User decided to add contact anyway. Problem:\n"
                 + e.getMessage());
         }
 
