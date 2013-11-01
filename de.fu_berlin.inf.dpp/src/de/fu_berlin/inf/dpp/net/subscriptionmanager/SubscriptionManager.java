@@ -197,11 +197,11 @@ public class SubscriptionManager {
             public void run() {
                 boolean accept = MessageDialog.openConfirm(
                     EditorAPI.getShell(),
-                    Messages.SubscriptionManager_incoming_buddy_request_title,
+                    Messages.SubscriptionManager_incoming_subscription_request_title,
                     MessageFormat
                         .format(
-                            Messages.SubscriptionManager_incoming_buddy_request_message,
-                            presence.getFrom()));
+                            Messages.SubscriptionManager_incoming_subscription_request_message,
+                            new JID(presence.getFrom()).getBareJID()));
 
                 if (accept)
                     handleSubscriptionRequest(presence);

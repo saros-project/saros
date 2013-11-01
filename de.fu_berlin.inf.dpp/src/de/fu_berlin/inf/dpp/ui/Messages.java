@@ -428,8 +428,8 @@ public class Messages extends NLS {
     public static String ResourceSelectionComposite_delete_dialog_title;
     public static String ResourceSelectionComposite_delete_dialog_message;
 
-    public static String SubscriptionManager_incoming_buddy_request_title;
-    public static String SubscriptionManager_incoming_buddy_request_message;
+    public static String SubscriptionManager_incoming_subscription_request_title;
+    public static String SubscriptionManager_incoming_subscription_request_message;
 
     public static String HostLeftAloneInSessionDialog_title;
     public static String HostLeftAloneInSessionDialog_message;

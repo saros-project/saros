@@ -296,7 +296,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
 
             filesRemaining.set(pathsOfHandledFiles.size());
 
-            remoteProgress.beginTask("Consistency recovery for buddy "
+            remoteProgress.beginTask("Consistency recovery for user "
                 + session.getLocalUser().getJID().getBase(),
                 filesRemaining.get());
 
