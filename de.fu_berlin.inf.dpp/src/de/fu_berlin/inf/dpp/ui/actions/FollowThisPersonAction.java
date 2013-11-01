@@ -84,7 +84,7 @@ public class FollowThisPersonAction extends Action implements Disposable {
         setImageDescriptor(new ImageDescriptor() {
             @Override
             public ImageData getImageData() {
-                return ImageManager.ICON_BUDDY_SAROS_FOLLOWMODE.getImageData();
+                return ImageManager.ICON_USER_SAROS_FOLLOWMODE.getImageData();
             }
         });
 

@@ -81,7 +81,7 @@ public class RestrictToReadOnlyAccessAction extends Action implements
         setImageDescriptor(new ImageDescriptor() {
             @Override
             public ImageData getImageData() {
-                return ImageManager.ICON_BUDDY_SAROS_READONLY.getImageData();
+                return ImageManager.ICON_USER_SAROS_READONLY.getImageData();
             }
         });
 

@@ -52,7 +52,7 @@ public class AddContactWizard extends Wizard {
     private static final Logger log = Logger.getLogger(AddContactWizard.class);
 
     public static final String TITLE = Messages.AddBuddyWizard_title;
-    public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_ADD_BUDDY;
+    public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_ADD_CONTACT;
 
     @Inject
     protected SarosNet sarosNet;

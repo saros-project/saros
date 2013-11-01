@@ -141,14 +141,14 @@ public class UserElement extends TreeElement {
         if (roster != null && !user.isLocal()
             && roster.getPresence(user.getJID().toString()).isAway()) {
             if (user.hasWriteAccess())
-                return ImageManager.ICON_BUDDY_SAROS_AWAY;
+                return ImageManager.ICON_USER_SAROS_AWAY;
             else
-                return ImageManager.ICON_BUDDY_SAROS_READONLY_AWAY;
+                return ImageManager.ICON_USER_SAROS_READONLY_AWAY;
         } else {
             if (user.hasWriteAccess())
-                return ImageManager.ICON_BUDDY_SAROS;
+                return ImageManager.ICON_CONTACT_SAROS_SUPPORT;
             else
-                return ImageManager.ICON_BUDDY_SAROS_READONLY;
+                return ImageManager.ICON_USER_SAROS_READONLY;
         }
     }
 

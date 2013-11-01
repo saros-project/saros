@@ -157,14 +157,14 @@ public class FollowModeAction extends Action implements IMenuCreator,
     private final ImageDescriptor followModeEnabledImageDescriptor = new ImageDescriptor() {
         @Override
         public ImageData getImageData() {
-            return ImageManager.ICON_BUDDY_SAROS_FOLLOWMODE.getImageData();
+            return ImageManager.ICON_USER_SAROS_FOLLOWMODE.getImageData();
         }
     };
 
     private final ImageDescriptor followModeDisabledImageDescriptor = new ImageDescriptor() {
         @Override
         public ImageData getImageData() {
-            return ImageManager.ICON_BUDDY_SAROS_FOLLOWMODE_DISABLED
+            return ImageManager.ICON_USER_SAROS_FOLLOWMODE_DISABLED
                 .getImageData();
         }
     };

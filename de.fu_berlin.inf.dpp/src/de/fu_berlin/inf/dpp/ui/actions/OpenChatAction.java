@@ -92,21 +92,21 @@ public class OpenChatAction extends Action {
     }
 
     private JID getSelectedJID() {
-        List<UserElement> sessionBuddies = SelectionRetrieverFactory
+        List<UserElement> users = SelectionRetrieverFactory
             .getSelectionRetriever(UserElement.class).getSelection();
-        List<JID> rosterBuddies = SelectionRetrieverFactory
+        List<JID> contacts = SelectionRetrieverFactory
             .getSelectionRetriever(JID.class).getSelection();
 
-        if (sessionBuddies.size() + rosterBuddies.size() == 1) {
-            if (sessionBuddies.size() == 1) {
-                User user = (User) sessionBuddies.get(0).getUser();
+        if (users.size() + contacts.size() == 1) {
+            if (users.size() == 1) {
+                User user = (User) users.get(0).getUser();
                 if (user == null) {
                     return null;
                 }
 
                 return user.getJID();
             } else {
-                return rosterBuddies.get(0);
+                return contacts.get(0);
             }
         }
 

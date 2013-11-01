@@ -173,7 +173,7 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
          * skype
          */
         Composite skypeComposite = new IllustratedComposite(leftColumn,
-            SWT.TOP, ImageManager.ELCL_BUDDY_SKYPE_CALL);
+            SWT.TOP, ImageManager.ELCL_CONTACT_SKYPE_CALL);
         skypeComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
             true));
         skypeComposite.setLayout(LayoutUtils.createGridLayout(2, false, 0, 5));

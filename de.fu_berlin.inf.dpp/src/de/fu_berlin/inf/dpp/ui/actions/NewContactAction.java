@@ -43,7 +43,7 @@ public class NewContactAction extends Action {
         setImageDescriptor(new ImageDescriptor() {
             @Override
             public ImageData getImageData() {
-                return ImageManager.ELCL_BUDDY_ADD.getImageData();
+                return ImageManager.ELCL_CONTACT_ADD.getImageData();
             }
         });
 

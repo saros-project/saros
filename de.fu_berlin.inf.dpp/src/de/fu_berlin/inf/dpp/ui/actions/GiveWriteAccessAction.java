@@ -76,7 +76,7 @@ public class GiveWriteAccessAction extends Action implements Disposable {
         setImageDescriptor(new ImageDescriptor() {
             @Override
             public ImageData getImageData() {
-                return ImageManager.ICON_BUDDY_SAROS.getImageData();
+                return ImageManager.ICON_CONTACT_SAROS_SUPPORT.getImageData();
             }
         });
         setToolTipText(Messages.GiveWriteAccessAction_tooltip);

@@ -90,10 +90,10 @@ public class RenameContactAction extends Action {
 
     protected void updateEnablement() {
         try {
-            List<JID> buddies = SelectionRetrieverFactory
+            List<JID> contacts = SelectionRetrieverFactory
                 .getSelectionRetriever(JID.class).getSelection();
             this.setEnabled(saros.getSarosNet().isConnected()
-                && buddies.size() == 1);
+                && contacts.size() == 1);
         } catch (NullPointerException e) {
             this.setEnabled(false);
         } catch (Exception e) {

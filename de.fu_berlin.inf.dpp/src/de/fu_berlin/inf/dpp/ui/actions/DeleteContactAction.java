@@ -97,9 +97,9 @@ public class DeleteContactAction extends Action implements Disposable {
 
     protected void updateEnablement() {
         try {
-            List<JID> buddies = SelectionRetrieverFactory
+            List<JID> contacts = SelectionRetrieverFactory
                 .getSelectionRetriever(JID.class).getSelection();
-            this.setEnabled(sarosNet.isConnected() && buddies.size() == 1);
+            this.setEnabled(sarosNet.isConnected() && contacts.size() == 1);
         } catch (NullPointerException e) {
             this.setEnabled(false);
         } catch (Exception e) {

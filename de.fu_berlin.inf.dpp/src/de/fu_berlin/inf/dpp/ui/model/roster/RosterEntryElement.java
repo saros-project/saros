@@ -113,14 +113,14 @@ public class RosterEntryElement extends TreeElement {
 
         if (presence.isAvailable()) {
             if (presence.isAway()) {
-                return sarosSupported ? ImageManager.ICON_BUDDY_SAROS_AWAY
-                    : ImageManager.ICON_BUDDY_AWAY;
+                return sarosSupported ? ImageManager.ICON_USER_SAROS_AWAY
+                    : ImageManager.ICON_CONTACT_AWAY;
             } else {
-                return sarosSupported ? ImageManager.ICON_BUDDY_SAROS
-                    : ImageManager.ICON_BUDDY;
+                return sarosSupported ? ImageManager.ICON_CONTACT_SAROS_SUPPORT
+                    : ImageManager.ICON_CONTACT;
             }
         } else {
-            return ImageManager.ICON_BUDDY_OFFLINE;
+            return ImageManager.ICON_CONTACT_OFFLINE;
         }
     }
 

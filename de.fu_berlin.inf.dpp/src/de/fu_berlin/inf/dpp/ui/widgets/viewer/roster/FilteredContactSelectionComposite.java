@@ -121,7 +121,7 @@ public class FilteredContactSelectionComposite extends
         addContactButton.setLayoutData(new GridData(SWT.END, SWT.CENTER, true,
             false));
         addContactButton.setText(Messages.BuddySelectionComposite_add_buddy);
-        addContactButton.setImage(ImageManager.ELCL_BUDDY_ADD);
+        addContactButton.setImage(ImageManager.ELCL_CONTACT_ADD);
         addContactButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {

@@ -22,14 +22,14 @@ public class SummaryItemCompositeDemo extends AbstractDemo {
         Composite root = new Composite(parent, SWT.NONE);
         root.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, true));
         root.setLayout(LayoutUtils.createGridLayout(0, 10));
-        Image[] images = new Image[] { ImageManager.ICON_BUDDY,
-            ImageManager.ICON_BUDDY_SAROS, ImageManager.ICON_BUDDY_SAROS_AWAY,
-            ImageManager.ICON_BUDDY_SAROS_FOLLOWMODE,
-            ImageManager.ICON_BUDDY_SAROS_FOLLOWMODE_AWAY,
-            ImageManager.ICON_BUDDY_SAROS_FOLLOWMODE_READONLY,
-            ImageManager.ICON_BUDDY_SAROS_FOLLOWMODE_READONLY_AWAY,
-            ImageManager.ICON_BUDDY_SAROS_READONLY,
-            ImageManager.ICON_BUDDY_SAROS_READONLY_AWAY,
+        Image[] images = new Image[] { ImageManager.ICON_CONTACT,
+            ImageManager.ICON_CONTACT_SAROS_SUPPORT, ImageManager.ICON_USER_SAROS_AWAY,
+            ImageManager.ICON_USER_SAROS_FOLLOWMODE,
+            ImageManager.ICON_USER_SAROS_FOLLOWMODE_AWAY,
+            ImageManager.ICON_USER_SAROS_FOLLOWMODE_READONLY,
+            ImageManager.ICON_USER_SAROS_FOLLOWMODE_READONLY_AWAY,
+            ImageManager.ICON_USER_SAROS_READONLY,
+            ImageManager.ICON_USER_SAROS_READONLY_AWAY,
             ImageManager.ICON_GROUP };
 
         for (Image image : images) {

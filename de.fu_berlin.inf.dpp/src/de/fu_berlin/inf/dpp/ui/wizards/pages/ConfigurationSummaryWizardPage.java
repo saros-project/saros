@@ -98,7 +98,7 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
         SimpleNoteComposite addBuddies = new SimpleNoteComposite(
             autoConnectComposite,
             SWT.BORDER,
-            ImageManager.ELCL_BUDDY_ADD,
+            ImageManager.ELCL_CONTACT_ADD,
             de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_addBuddies);
         addBuddies
             .setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
@@ -276,7 +276,7 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
             if (!skypeUsername.isEmpty()) {
                 this.skypeUsername
                     .setContent(new IllustratedText(
-                        ImageManager.ELCL_BUDDY_SKYPE_CALL,
+                        ImageManager.ELCL_CONTACT_SKYPE_CALL,
                         MessageFormat
                             .format(
                                 de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_skype_show_username,
@@ -284,7 +284,7 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
             } else {
                 this.skypeUsername
                     .setContent(new IllustratedText(
-                        ImageManager.DLCL_BUDDY_SKYPE_CALL,
+                        ImageManager.DLCL_CONTACT_SKYPE_CALL,
                         de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_skype_show_username_not));
             }
         }

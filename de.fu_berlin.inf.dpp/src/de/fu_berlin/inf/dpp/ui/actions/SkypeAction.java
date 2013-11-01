@@ -68,7 +68,7 @@ public class SkypeAction extends Action implements Disposable {
         setImageDescriptor(new ImageDescriptor() {
             @Override
             public ImageData getImageData() {
-                return ImageManager.ELCL_BUDDY_SKYPE_CALL.getImageData();
+                return ImageManager.ELCL_CONTACT_SKYPE_CALL.getImageData();
             }
         });
 
@@ -79,11 +79,11 @@ public class SkypeAction extends Action implements Disposable {
 
     public void updateEnablement() {
         try {
-            List<JID> buddies = SelectionRetrieverFactory
+            List<JID> contacts = SelectionRetrieverFactory
                 .getSelectionRetriever(JID.class).getSelection();
-            setEnabled(buddies.size() == 1
+            setEnabled(contacts.size() == 1
                 && skypeManager
-                    .getSkypeURLNonBlock(buddies.get(0).getBareJID()) != null);
+                    .getSkypeURLNonBlock(contacts.get(0).getBareJID()) != null);
         } catch (NullPointerException e) {
             this.setEnabled(false);
         } catch (Exception e) {
