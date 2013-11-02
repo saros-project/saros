@@ -371,15 +371,18 @@ public class Messages extends NLS {
     public static String RosterEntryElement_subscription_pending;
     public static String RosterEntryElement_subscription_cancelled;
 
-    public static String RosterHeaderElement_buddies;
+    public static String RosterHeaderElement_contacts;
+
     public static String UPnPUIUtils_disconnected;
     public static String UPnPUIUtils_no_gateway;
     public static String UPnPUIUtils_no_valid_gateway;
+
     public static String UserElement_following;
     public static String UserElement_following_paused;
     public static String UserElement_joining;
     public static String UserElement_read_only;
     public static String UserElement_host;
+
     public static String VideoPlayerView_bitrate;
     public static String VideoPlayerView_bitrate_text;
     public static String VideoPlayerView_change_image_source;

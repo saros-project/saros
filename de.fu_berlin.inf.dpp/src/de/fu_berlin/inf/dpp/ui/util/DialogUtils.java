@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.ui.util;
 
-import java.text.MessageFormat;
 import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
@@ -13,8 +12,6 @@ import org.eclipse.swt.widgets.Shell;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.dialogs.RememberDecisionMessageDialog;
 
 public class DialogUtils {
@@ -154,12 +151,6 @@ public class DialogUtils {
             dialogMessage, MessageDialog.QUESTION, new String[] {
                 IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL }, 0);
         return openWindow(md) == 0;
-    }
-
-    public static void notifyUserOffline(JID peer) {
-        DialogUtils.popUpFailureMessage(
-            Messages.InvitationWizard_buddy_offline, MessageFormat.format(
-                Messages.InvitationWizard_buddy_offline_text, peer), false);
     }
 
     /**

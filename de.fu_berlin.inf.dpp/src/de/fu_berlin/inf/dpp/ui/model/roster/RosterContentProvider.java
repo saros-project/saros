@@ -24,7 +24,7 @@ import de.fu_berlin.inf.nebula.utils.ViewerUtils;
 /**
  * {@link IContentProvider} for use in conjunction with a {@link Roster} input.
  * <p>
- * Automatically keeps track of changes of buddies.
+ * Automatically keeps track of changes of contacts.
  * 
  * @author bkahlert
  */

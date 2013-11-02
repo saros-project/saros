@@ -29,7 +29,7 @@ public class RosterHeaderElement extends HeaderElement {
     @Override
     public StyledString getStyledText() {
         StyledString styledString = new StyledString();
-        styledString.append(Messages.RosterHeaderElement_buddies, boldStyler);
+        styledString.append(Messages.RosterHeaderElement_contacts, boldStyler);
         return styledString;
     }
 
