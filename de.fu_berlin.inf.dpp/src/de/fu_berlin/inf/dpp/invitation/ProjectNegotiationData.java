@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.invitation;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-import de.fu_berlin.inf.dpp.FileList;
 
 /**
  * This class contains all the information that the remote user needs during a

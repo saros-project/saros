@@ -38,10 +38,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.jivesoftware.smack.Connection;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.invitation.FileList;
 import de.fu_berlin.inf.dpp.invitation.IncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.invitation.OutgoingProjectNegotiation;

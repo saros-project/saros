@@ -37,9 +37,6 @@ import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.FileList;
-import de.fu_berlin.inf.dpp.FileListDiff;
-import de.fu_berlin.inf.dpp.FileListFactory;
 import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;

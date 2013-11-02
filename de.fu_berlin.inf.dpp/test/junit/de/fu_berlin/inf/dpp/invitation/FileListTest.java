@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp;
+package de.fu_berlin.inf.dpp.invitation;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -42,9 +42,9 @@ import org.eclipse.core.runtime.Path;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.FileList;
-import de.fu_berlin.inf.dpp.FileListDiff;
-import de.fu_berlin.inf.dpp.FileListFactory;
+import de.fu_berlin.inf.dpp.invitation.FileList;
+import de.fu_berlin.inf.dpp.invitation.FileListDiff;
+import de.fu_berlin.inf.dpp.invitation.FileListFactory;
 
 /**
  * TODO [TEST] Add Testcases for non-existing files florianthiel: Does FileList

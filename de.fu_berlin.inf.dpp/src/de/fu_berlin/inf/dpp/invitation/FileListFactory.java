@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp;
+package de.fu_berlin.inf.dpp.invitation;
 
 import java.util.List;
 

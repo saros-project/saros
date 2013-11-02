@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp;
+package de.fu_berlin.inf.dpp.invitation;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 
-import de.fu_berlin.inf.dpp.FileList.MetaData;
+import de.fu_berlin.inf.dpp.invitation.FileList.MetaData;
 import de.fu_berlin.inf.dpp.util.FileUtils;
 
 /**

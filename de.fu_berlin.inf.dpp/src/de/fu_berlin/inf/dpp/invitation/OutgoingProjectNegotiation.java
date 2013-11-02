@@ -23,8 +23,6 @@ import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.FileList;
-import de.fu_berlin.inf.dpp.FileListFactory;
 import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;

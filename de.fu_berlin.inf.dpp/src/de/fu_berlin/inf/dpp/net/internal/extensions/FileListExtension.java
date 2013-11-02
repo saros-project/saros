@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import de.fu_berlin.inf.dpp.FileList;
+import de.fu_berlin.inf.dpp.invitation.FileList;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 public class FileListExtension extends ProjectNegotiationExtension {
