@@ -355,7 +355,9 @@ public class Messages extends NLS {
     public static String ProjectSelectionWizardPage_description;
     public static String ProjectSelectionWizardPage_selected_no_project;
     public static String ProjectSelectionWizardPage_title;
-    public static String ProjectShareBuddies_no_buddies_online_with_saros;
+
+    public static String ProjectShareBuddies_menuItem_no_contacts_available_text;
+
     public static String ProjectShareProjects_no_projects_in_workspace;
     public static String RenameContactAction_new_nickname_dialog_title;
     public static String RenameContactAction_rename_current_nickname_message;

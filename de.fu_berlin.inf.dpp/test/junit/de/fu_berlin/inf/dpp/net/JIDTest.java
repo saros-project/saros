@@ -24,7 +24,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.jivesoftware.smack.RosterEntry;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -82,14 +81,6 @@ public class JIDTest {
     @Test(expected = IllegalArgumentException.class)
     public void testJIDContructorWithNullString() {
         new JID((String) null);
-    }
-
-    /**
-     * TODO Test also other malformatted JID formats.
-     */
-    @Test(expected = IllegalArgumentException.class)
-    public void testJIDConstructorWithNullRosterEntry() {
-        new JID((RosterEntry) null);
     }
 
     @Test

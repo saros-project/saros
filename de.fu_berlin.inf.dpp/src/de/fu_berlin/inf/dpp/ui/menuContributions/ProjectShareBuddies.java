@@ -1,7 +1,7 @@
 package de.fu_berlin.inf.dpp.ui.menuContributions;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -57,31 +57,32 @@ public class ProjectShareBuddies extends ContributionItem {
         final List<IResource> selectedResources = SelectionRetrieverFactory
             .getSelectionRetriever(IResource.class).getSelection();
 
-        int numSarosSupportedBuddies = 0;
+        int numSarosSupportedContacts = 0;
 
-        for (final RosterEntry rosterEntry : this.getSortedRosterEntries()) {
+        for (final RosterEntry rosterEntry : getSortedRosterEntries()) {
             Boolean sarosSupport = discoveryManager.isFeatureSupported(new JID(
                 rosterEntry.getUser()), Saros.NAMESPACE);
 
             if (sarosSupport != null && sarosSupport) {
-                createBuddyMenuItem(menu, numSarosSupportedBuddies++,
+                createContactMenuItem(menu, numSarosSupportedContacts++,
                     rosterEntry, selectedResources);
             }
         }
 
-        if (numSarosSupportedBuddies == 0) {
-            createNoBuddiesMenuItem(menu, numSarosSupportedBuddies);
+        if (numSarosSupportedContacts == 0) {
+            createInvalidContactsMenuItem(menu, numSarosSupportedContacts);
         }
     }
 
     /**
-     * Returns a sorted array of {@link Roster}'s buddies.
+     * Returns a sorted array of {@link Roster}'s contacts.
      * 
      * @return
      */
     protected RosterEntry[] getSortedRosterEntries() {
         RosterEntry[] rosterEntries = sarosNet.getRoster().getEntries()
             .toArray(new RosterEntry[0]);
+
         Arrays.sort(rosterEntries, new Comparator<RosterEntry>() {
             @Override
             public int compare(RosterEntry o1, RosterEntry o2) {
@@ -103,7 +104,7 @@ public class ProjectShareBuddies extends ContributionItem {
      * @param resources
      * @return
      */
-    protected MenuItem createBuddyMenuItem(Menu parentMenu, int index,
+    protected MenuItem createContactMenuItem(Menu parentMenu, int index,
         final RosterEntry rosterEntry, final List<IResource> resources) {
 
         /*
@@ -119,9 +120,8 @@ public class ProjectShareBuddies extends ContributionItem {
         menuItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                List<JID> contacts = new ArrayList<JID>();
-                contacts.add(new JID(rosterEntry));
-                CollaborationUtils.startSession(resources, contacts);
+                CollaborationUtils.startSession(resources,
+                    Collections.singletonList(new JID(rosterEntry.getUser())));
             }
         });
 
@@ -129,17 +129,17 @@ public class ProjectShareBuddies extends ContributionItem {
     }
 
     /**
-     * Creates a menu entry which indicates that no Saros enabled buddies are
+     * Creates a menu entry which indicates that no Saros enabled contacts are
      * online.
      * 
      * @param parentMenu
      * @param index
      * @return
      */
-    protected MenuItem createNoBuddiesMenuItem(Menu parentMenu, int index) {
+    protected MenuItem createInvalidContactsMenuItem(Menu parentMenu, int index) {
         MenuItem menuItem = new MenuItem(parentMenu, SWT.NONE, index);
         menuItem
-            .setText(Messages.ProjectShareBuddies_no_buddies_online_with_saros);
+            .setText(Messages.ProjectShareBuddies_menuItem_no_contacts_available_text);
         menuItem.setEnabled(false);
         return menuItem;
     }

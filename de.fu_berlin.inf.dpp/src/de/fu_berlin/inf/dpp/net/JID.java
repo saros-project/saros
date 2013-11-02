@@ -22,7 +22,6 @@ package de.fu_berlin.inf.dpp.net;
 import java.io.Serializable;
 import java.util.regex.Pattern;
 
-import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.util.StringUtils;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 
@@ -85,19 +84,6 @@ public class JID implements Serializable {
             throw new IllegalArgumentException("domain cannot be null");
 
         this.jid = name + "@" + domain;
-    }
-
-    /**
-     * Construct a new JID
-     * 
-     * @param rosterEntry
-     */
-    public JID(RosterEntry rosterEntry) {
-        if (rosterEntry == null)
-            throw new IllegalArgumentException(JID.class.getSimpleName()
-                + " cannot be null");
-
-        this.jid = rosterEntry.getUser();
     }
 
     /**

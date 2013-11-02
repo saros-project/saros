@@ -338,12 +338,12 @@ public class RosterUtils {
     }
 
     /**
-     * Removes given buddy from the {@link Roster}.
+     * Removes given contact from the {@link Roster}.
      * 
      * @blocking
      * 
      * @param rosterEntry
-     *            the buddy that is to be removed
+     *            the contact that is to be removed
      * @throws XMPPException
      *             is thrown if no connection is established.
      */
