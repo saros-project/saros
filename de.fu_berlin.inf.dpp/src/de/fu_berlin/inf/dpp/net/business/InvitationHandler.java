@@ -64,7 +64,7 @@ public class InvitationHandler {
                 }
 
                 String sessionID = invitation.getSessionID();
-                String invitationID = invitation.getInvitationID();
+                String invitationID = invitation.getNegotiationID();
                 VersionInfo versionInfo = invitation.getVersionInfo();
                 String description = invitation.getDescription();
 

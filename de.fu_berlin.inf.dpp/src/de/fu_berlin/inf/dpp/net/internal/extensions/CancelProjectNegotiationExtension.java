@@ -1,11 +1,14 @@
 package de.fu_berlin.inf.dpp.net.internal.extensions;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
+@XStreamAlias(/* ProjectNegotiationCancel */"PNCL")
 public class CancelProjectNegotiationExtension extends
     SarosSessionPacketExtension {
 
     public static final Provider PROVIDER = new Provider();
 
+    @XStreamAlias("error")
     private String errorMessage;
 
     public CancelProjectNegotiationExtension(String sessionID,
@@ -28,8 +31,7 @@ public class CancelProjectNegotiationExtension extends
     public static class Provider extends
         SarosSessionPacketExtension.Provider<CancelProjectNegotiationExtension> {
         private Provider() {
-            super("cancelProjectSharing",
-                CancelProjectNegotiationExtension.class);
+            super("pncl", CancelProjectNegotiationExtension.class);
         }
     }
 }

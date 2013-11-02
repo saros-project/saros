@@ -1,11 +1,20 @@
 package de.fu_berlin.inf.dpp.net.internal.extensions;
 
-import de.fu_berlin.inf.dpp.net.JID;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamConverter;
 
+import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.util.xstream.JIDConverter;
+
+@XStreamAlias(/* ProjectNegotiationCompleted */"PNCMP")
 public class UserFinishedProjectNegotiationExtension extends
     SarosSessionPacketExtension {
 
     public static final Provider PROVIDER = new Provider();
+
+    @XStreamAsAttribute
+    @XStreamConverter(JIDConverter.class)
     private JID jid;
 
     public UserFinishedProjectNegotiationExtension(String sessionID, JID jid) {
@@ -22,8 +31,7 @@ public class UserFinishedProjectNegotiationExtension extends
         SarosSessionPacketExtension.Provider<UserFinishedProjectNegotiationExtension> {
 
         private Provider() {
-            super("userFinishedProjectNegotiation",
-                UserFinishedProjectNegotiationExtension.class);
+            super("pncmp", UserFinishedProjectNegotiationExtension.class);
         }
     }
 }

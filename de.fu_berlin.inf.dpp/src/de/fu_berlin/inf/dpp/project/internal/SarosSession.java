@@ -85,7 +85,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.extensions.KickUserExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.SarosLeaveExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveSessionExtension;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
@@ -620,8 +620,8 @@ public final class SarosSession implements ISarosSession {
         for (User user : usersToNotify) {
             try {
                 transmitter.sendToSessionUser(SESSION_CONNECTION_ID, user
-                    .getJID(), SarosLeaveExtension.PROVIDER
-                    .create(new SarosLeaveExtension(getID())));
+                    .getJID(), LeaveSessionExtension.PROVIDER
+                    .create(new LeaveSessionExtension(getID())));
             } catch (IOException e) {
                 log.warn("failed to notify user " + user
                     + " about local session stop", e);

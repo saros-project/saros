@@ -1,5 +1,8 @@
 package de.fu_berlin.inf.dpp.net.internal.extensions;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
+@XStreamAlias("PONG")
 public class PongExtension extends SarosSessionPacketExtension {
 
     public static final Provider PROVIDER = new Provider();

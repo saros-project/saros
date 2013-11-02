@@ -4,9 +4,14 @@ import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
 public abstract class ProjectNegotiationExtension extends
     SarosSessionPacketExtension {
 
+    @XStreamAlias("nid")
+    @XStreamAsAttribute
     protected final String negotiationID;
 
     protected ProjectNegotiationExtension(String sessionID, String negotiationID) {

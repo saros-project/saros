@@ -4,19 +4,21 @@ import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-@Component(module = "net")
 public abstract class InvitationExtension extends SarosPacketExtension {
 
-    final protected String invitationID;
+    @XStreamAlias("nid")
+    @XStreamAsAttribute
+    final protected String negotiationID;
 
-    public InvitationExtension(String invitationID) {
-        this.invitationID = invitationID;
+    public InvitationExtension(String negotiationID) {
+        this.negotiationID = negotiationID;
     }
 
-    public String getInvitationID() {
-        return invitationID;
+    public String getNegotiationID() {
+        return negotiationID;
     }
 
     public abstract static class Provider<T extends InvitationExtension>
@@ -36,7 +38,7 @@ public abstract class InvitationExtension extends SarosPacketExtension {
                     if (extension == null)
                         return false;
 
-                    return invitationID.equals(extension.getInvitationID());
+                    return invitationID.equals(extension.getNegotiationID());
                 }
             });
         }

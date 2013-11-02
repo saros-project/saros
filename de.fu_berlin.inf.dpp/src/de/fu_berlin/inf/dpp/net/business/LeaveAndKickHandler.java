@@ -9,7 +9,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.extensions.KickUserExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.SarosLeaveExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveSessionExtension;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
@@ -38,7 +38,7 @@ public class LeaveAndKickHandler {
         @Override
         public void sessionStarted(ISarosSession session) {
             receiver.addPacketListener(leaveExtensionListener,
-                SarosLeaveExtension.PROVIDER.getPacketFilter(session.getID()));
+                LeaveSessionExtension.PROVIDER.getPacketFilter(session.getID()));
 
             receiver.addPacketListener(kickExtensionListener,
                 KickUserExtension.PROVIDER.getPacketFilter(session.getID()));

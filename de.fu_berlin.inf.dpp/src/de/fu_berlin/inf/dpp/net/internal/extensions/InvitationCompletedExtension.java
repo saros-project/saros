@@ -1,5 +1,8 @@
 package de.fu_berlin.inf.dpp.net.internal.extensions;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
+@XStreamAlias(/* SessionNegotiationCompleted */"SNCMP")
 public class InvitationCompletedExtension extends InvitationExtension {
     public static final Provider PROVIDER = new Provider();
 
@@ -10,7 +13,7 @@ public class InvitationCompletedExtension extends InvitationExtension {
     public static class Provider extends
         InvitationExtension.Provider<InvitationCompletedExtension> {
         private Provider() {
-            super("invitationCompleted", InvitationAcknowledgedExtension.class);
+            super("sncmp", InvitationAcknowledgedExtension.class);
         }
     }
 }

@@ -1,6 +1,8 @@
 package de.fu_berlin.inf.dpp.net.internal.extensions;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
+@XStreamAlias(/* StartActivityQueuingResponse */"SAQRP")
 public class StartActivityQueuingResponse extends ProjectNegotiationExtension {
 
     public static final Provider PROVIDER = new Provider();
@@ -13,8 +15,7 @@ public class StartActivityQueuingResponse extends ProjectNegotiationExtension {
         ProjectNegotiationExtension.Provider<StartActivityQueuingResponse> {
 
         private Provider() {
-            super("startActivityQueuingRequest",
-                StartActivityQueuingResponse.class);
+            super("saqrp", StartActivityQueuingResponse.class);
         }
     }
 }

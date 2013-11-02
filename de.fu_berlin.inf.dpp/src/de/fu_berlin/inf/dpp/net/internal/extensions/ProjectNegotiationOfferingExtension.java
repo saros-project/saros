@@ -2,14 +2,17 @@ package de.fu_berlin.inf.dpp.net.internal.extensions;
 
 import java.util.List;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 
+@XStreamAlias(/* ProjectNegotiationOffering */"PNOF")
 public class ProjectNegotiationOfferingExtension extends
     ProjectNegotiationExtension {
 
-    private List<ProjectExchangeInfo> projectInfos;
-
     public static final Provider PROVIDER = new Provider();
+
+    private List<ProjectExchangeInfo> projectInfos;
 
     public ProjectNegotiationOfferingExtension(String sessionID,
         List<ProjectExchangeInfo> projectInfos, String negotiationID) {
@@ -29,8 +32,7 @@ public class ProjectNegotiationOfferingExtension extends
         ProjectNegotiationExtension.Provider<ProjectNegotiationOfferingExtension> {
 
         private Provider() {
-            super("ProjectNegotiationOffering",
-                ProjectNegotiationOfferingExtension.class);
+            super("pnof", ProjectNegotiationOfferingExtension.class);
         }
     }
 

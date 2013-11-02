@@ -57,7 +57,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
 import de.fu_berlin.inf.dpp.net.JID;
 
-@XStreamAlias("activityPackage")
+@XStreamAlias("ADOS")
 public class ActivitiesExtension extends SarosSessionPacketExtension {
 
     public static final Provider PROVIDER = new Provider();
@@ -65,6 +65,7 @@ public class ActivitiesExtension extends SarosSessionPacketExtension {
     @XStreamImplicit
     private final List<IActivityDataObject> activityDataObjects;
 
+    @XStreamAlias("seq")
     @XStreamAsAttribute
     private final int sequenceNumber;
 
@@ -132,7 +133,7 @@ public class ActivitiesExtension extends SarosSessionPacketExtension {
     public static class Provider extends
         SarosSessionPacketExtension.Provider<ActivitiesExtension> {
         private Provider() {
-            super("activityDataObjects", ActivitiesExtension.class,
+            super("ados", ActivitiesExtension.class,
 
             // Misc
                 JID.class,

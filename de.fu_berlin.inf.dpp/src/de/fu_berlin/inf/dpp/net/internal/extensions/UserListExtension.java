@@ -3,10 +3,13 @@ package de.fu_berlin.inf.dpp.net.internal.extensions;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.net.JID;
 
+@XStreamAlias(/* UserListStatusUpdate */"ULSUP")
 public class UserListExtension extends SarosSessionPacketExtension {
 
     public static final Provider PROVIDER = new Provider();
@@ -54,7 +57,7 @@ public class UserListExtension extends SarosSessionPacketExtension {
         SarosSessionPacketExtension.Provider<UserListExtension> {
 
         private Provider() {
-            super("userList", UserListExtension.class);
+            super("ulsup", UserListExtension.class);
         }
     }
 }

@@ -1,13 +1,23 @@
 package de.fu_berlin.inf.dpp.net.internal.extensions;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
+@XStreamAlias(/* SessionNegotiationOffering */"SNOF")
 public class InvitationOfferingExtension extends InvitationExtension {
 
     public static final Provider PROVIDER = new Provider();
 
+    @XStreamAlias("sid")
+    @XStreamAsAttribute
     private String sessionID;
+
+    @XStreamAlias("version")
     private VersionInfo versionInfo;
+
+    @XStreamAlias("description")
     private String description;
 
     public InvitationOfferingExtension(String invitationID, String sessionID,
@@ -51,7 +61,7 @@ public class InvitationOfferingExtension extends InvitationExtension {
         InvitationExtension.Provider<InvitationOfferingExtension> {
 
         private Provider() {
-            super("invitationOffering", InvitationOfferingExtension.class);
+            super("snof", InvitationOfferingExtension.class);
         }
     }
 }

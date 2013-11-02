@@ -50,6 +50,7 @@ import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.extensions.FileListExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.StartActivityQueuingRequest;
 import de.fu_berlin.inf.dpp.net.internal.extensions.StartActivityQueuingResponse;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
@@ -853,7 +854,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     private void createCollectors() {
         startActivityQueuingRequestCollector = xmppReceiver
-            .createCollector(StartActivityQueuingResponse.PROVIDER
+            .createCollector(StartActivityQueuingRequest.PROVIDER
                 .getPacketFilter(sessionID, processID));
     }
 

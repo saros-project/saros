@@ -22,7 +22,8 @@ package de.fu_berlin.inf.dpp.net.internal.extensions;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import de.fu_berlin.inf.dpp.invitation.hooks.ISessionNegotiationHook;
 import de.fu_berlin.inf.dpp.net.JID;
 
@@ -30,12 +31,13 @@ import de.fu_berlin.inf.dpp.net.JID;
  * Packet used for exchanging data during session negotiation. Can be used on
  * both sides.
  */
-@Component(module = "net")
+
+@XStreamAlias(/* SessionNegotiationParameterExchange */"SNPE")
 public class InvitationParameterExchangeExtension extends InvitationExtension {
 
     public static final Provider PROVIDER = new Provider();
 
-    private String sessionID;
+    @XStreamAlias("host")
     private JID sessionHost;
 
     /**
@@ -49,10 +51,11 @@ public class InvitationParameterExchangeExtension extends InvitationExtension {
      * more fragile, e.g. consider moving/renaming a hook class. An identifier
      * can mask such changes.
      */
+    @XStreamAlias("settings")
     private Map<String, Map<String, String>> hookSettings;
 
-    public InvitationParameterExchangeExtension(String invitationID) {
-        super(invitationID);
+    public InvitationParameterExchangeExtension(String negotiationID) {
+        super(negotiationID);
 
         hookSettings = new HashMap<String, Map<String, String>>();
     }
@@ -65,18 +68,7 @@ public class InvitationParameterExchangeExtension extends InvitationExtension {
         this.sessionHost = sessionHost;
     }
 
-    public String getSessionID() {
-        return sessionID;
-    }
-
-    public static class Provider extends
-        InvitationExtension.Provider<InvitationParameterExchangeExtension> {
-
-        private Provider() {
-            super("invitationParameterExchange",
-                InvitationParameterExchangeExtension.class);
-        }
-    }
+    // Component ? this is a stupid class containing data for serialization ...
 
     /**
      * Saves the hook-specific settings into this extension.
@@ -113,4 +105,13 @@ public class InvitationParameterExchangeExtension extends InvitationExtension {
     public Map<String, String> getHookSettings(ISessionNegotiationHook hook) {
         return hookSettings.get(hook.getIdentifier());
     }
+
+    public static class Provider extends
+        InvitationExtension.Provider<InvitationParameterExchangeExtension> {
+
+        private Provider() {
+            super("snpe", InvitationParameterExchangeExtension.class);
+        }
+    }
+
 }

@@ -2,20 +2,19 @@ package de.fu_berlin.inf.dpp.net.internal.extensions;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-@XStreamAlias("PING")
-public class PingExtension extends SarosSessionPacketExtension {
+@XStreamAlias(/* SessionLeave */"SNLV")
+public class LeaveSessionExtension extends SarosSessionPacketExtension {
 
     public static final Provider PROVIDER = new Provider();
 
-    public PingExtension(String sessionID) {
+    public LeaveSessionExtension(String sessionID) {
         super(sessionID);
     }
 
     public static class Provider extends
-        SarosSessionPacketExtension.Provider<PingExtension> {
-
+        SarosSessionPacketExtension.Provider<LeaveSessionExtension> {
         private Provider() {
-            super("ping", PingExtension.class);
+            super("snlv", LeaveSessionExtension.class);
         }
     }
 }

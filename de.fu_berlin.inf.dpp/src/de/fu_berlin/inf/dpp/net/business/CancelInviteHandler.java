@@ -31,7 +31,7 @@ public class CancelInviteHandler {
                 .getPayload(packet);
 
             invitationCanceled(new JID(packet.getFrom()),
-                extension.getInvitationID(), extension.getErrorMessage());
+                extension.getNegotiationID(), extension.getErrorMessage());
         }
     };
 

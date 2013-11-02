@@ -1,5 +1,8 @@
 package de.fu_berlin.inf.dpp.net.internal.extensions;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
+@XStreamAlias(/* SessionKickUser */"SNKU")
 public class KickUserExtension extends SarosSessionPacketExtension {
 
     public static final Provider PROVIDER = new Provider();
@@ -11,7 +14,7 @@ public class KickUserExtension extends SarosSessionPacketExtension {
     public static class Provider extends
         SarosSessionPacketExtension.Provider<KickUserExtension> {
         private Provider() {
-            super("kickedFromSession", KickUserExtension.class);
+            super("snku", KickUserExtension.class);
         }
     }
 }

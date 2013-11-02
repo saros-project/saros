@@ -3,13 +3,14 @@
  */
 package de.fu_berlin.inf.dpp.net.internal.extensions;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-@Component(module = "net")
+@XStreamAlias(/* SessionNegotiationCancel */"SNCL")
 public class CancelInviteExtension extends InvitationExtension {
 
     public static final Provider PROVIDER = new Provider();
 
+    @XStreamAlias("error")
     private String errorMessage;
 
     public CancelInviteExtension(String invitationID, String errorMessage) {
@@ -31,7 +32,7 @@ public class CancelInviteExtension extends InvitationExtension {
     public static class Provider extends
         InvitationExtension.Provider<CancelInviteExtension> {
         private Provider() {
-            super("cancelInvitation", CancelInviteExtension.class);
+            super("sncl", CancelInviteExtension.class);
         }
     }
 }

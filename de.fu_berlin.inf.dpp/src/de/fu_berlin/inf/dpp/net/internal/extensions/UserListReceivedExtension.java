@@ -1,8 +1,8 @@
 package de.fu_berlin.inf.dpp.net.internal.extensions;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-@Component(module = "net")
+@XStreamAlias(/* UserListStatusUpdateProcessed */"ULSUPS")
 public class UserListReceivedExtension extends SarosSessionPacketExtension {
 
     public static final Provider PROVIDER = new Provider();
@@ -14,7 +14,7 @@ public class UserListReceivedExtension extends SarosSessionPacketExtension {
     public static class Provider extends
         SarosSessionPacketExtension.Provider<UserListReceivedExtension> {
         private Provider() {
-            super("userListReceived", UserListReceivedExtension.class);
+            super("ulsups", UserListReceivedExtension.class);
         }
     }
 }

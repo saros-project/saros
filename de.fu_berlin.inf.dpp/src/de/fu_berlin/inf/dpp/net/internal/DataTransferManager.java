@@ -220,8 +220,8 @@ public class DataTransferManager implements IConnectionListener {
                 + " [connection identifier=" + connectionID + "]");
 
         if (log.isTraceEnabled())
-            log.trace("sending data ... from " + connectionJID + " to "
-                + transferDescription.getRecipient()
+            log.trace("sending data " + transferDescription + " from "
+                + connectionJID + " to " + transferDescription.getRecipient()
                 + "[connection identifier=" + connectionID + "]");
 
         transferDescription.setSender(connectionJID);

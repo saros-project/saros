@@ -73,16 +73,15 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationCompletedExtension
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationOfferingExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationParameterExchangeExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.KickUserExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveSessionExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PingExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PongExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ProjectNegotiationOfferingExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.SarosLeaveExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.StartActivityQueuingRequest;
 import de.fu_berlin.inf.dpp.net.internal.extensions.StartActivityQueuingResponse;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserFinishedProjectNegotiationExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListReceivedExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.UserListRequestExtension;
 import de.fu_berlin.inf.dpp.net.stun.IStunService;
 import de.fu_berlin.inf.dpp.net.stun.internal.StunServiceImpl;
 import de.fu_berlin.inf.dpp.net.subscriptionmanager.SubscriptionManager;
@@ -349,8 +348,7 @@ public class SarosContext implements ISarosContext {
             Class.forName(FileListExtension.class.getName());
             Class.forName(KickUserExtension.class.getName());
             Class.forName(UserListExtension.class.getName());
-            Class.forName(SarosLeaveExtension.class.getName());
-            Class.forName(UserListRequestExtension.class.getName());
+            Class.forName(LeaveSessionExtension.class.getName());
             Class.forName(UserListReceivedExtension.class.getName());
             Class.forName(PingExtension.class.getName());
             Class.forName(PongExtension.class.getName());

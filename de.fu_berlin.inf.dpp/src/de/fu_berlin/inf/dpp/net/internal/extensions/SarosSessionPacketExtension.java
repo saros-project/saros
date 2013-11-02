@@ -4,8 +4,13 @@ import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
 public abstract class SarosSessionPacketExtension extends SarosPacketExtension {
 
+    @XStreamAlias("sid")
+    @XStreamAsAttribute
     protected final String sessionID;
 
     protected SarosSessionPacketExtension(String sessionID) {

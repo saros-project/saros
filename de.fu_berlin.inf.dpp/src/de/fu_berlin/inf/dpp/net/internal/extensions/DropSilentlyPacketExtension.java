@@ -23,19 +23,14 @@ import org.jivesoftware.smack.packet.PacketExtension;
 
 public class DropSilentlyPacketExtension implements PacketExtension {
 
-    // TODO This string constant is defined several times throughout the source.
-    public static final String NAMESPACE = "de.fu_berlin.inf.dpp";
-
-    public static final String ELEMENT = "drop";
-
     @Override
     public String getElementName() {
-        return DropSilentlyPacketExtension.ELEMENT;
+        return "drop";
     }
 
     @Override
     public String getNamespace() {
-        return DropSilentlyPacketExtension.NAMESPACE;
+        return XStreamExtensionProvider.NAMESPACE;
     }
 
     @Override

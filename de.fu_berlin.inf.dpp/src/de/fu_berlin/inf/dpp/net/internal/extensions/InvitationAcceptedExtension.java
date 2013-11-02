@@ -1,5 +1,8 @@
 package de.fu_berlin.inf.dpp.net.internal.extensions;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
+@XStreamAlias(/* SessionNegotiationAccepted */"SNAC")
 public class InvitationAcceptedExtension extends InvitationExtension {
 
     public static final Provider PROVIDER = new Provider();
@@ -11,7 +14,7 @@ public class InvitationAcceptedExtension extends InvitationExtension {
     public static class Provider extends
         InvitationExtension.Provider<InvitationAcceptedExtension> {
         private Provider() {
-            super("invitationAccepted", InvitationAcceptedExtension.class);
+            super("snac", InvitationAcceptedExtension.class);
         }
     }
 }
