@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.ui;
 
 import org.eclipse.osgi.util.NLS;
 
+// TODO add a guideline on how to name the strings !!!
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "de.fu_berlin.inf.dpp.ui.messages"; //$NON-NLS-1$
     public static String AddContactWizard_title;
@@ -303,8 +304,8 @@ public class Messages extends NLS {
     public static String wizard_finish_noeffect;
     public static String account_exists_errorMessage;
 
-    public static String BuddySelectionComposite_add_buddy;
-    public static String BuddySelectionComposite_hide_buddies_no_saros;
+    public static String FilteredContactSelectionComposite_add_contact_button_text;
+    public static String FilteredContactSelectionComposite_filter_non_saros_contacts_button_text;
 
     public static String ContactSelectionWizardPage_title;
     public static String ContactSelectionWizardPage_description;

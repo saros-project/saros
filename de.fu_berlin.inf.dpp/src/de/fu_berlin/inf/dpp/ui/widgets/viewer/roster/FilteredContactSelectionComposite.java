@@ -86,11 +86,11 @@ public class FilteredContactSelectionComposite extends
     };
 
     public FilteredContactSelectionComposite(Composite parent, int style,
-        boolean filterNonSarosBuddies) {
+        boolean filterNonSarosContacts) {
         super(parent, style);
 
         createControls();
-        setFilterNonSarosContacts(filterNonSarosBuddies);
+        setFilterNonSarosContacts(filterNonSarosContacts);
     }
 
     /**
@@ -106,7 +106,7 @@ public class FilteredContactSelectionComposite extends
             SWT.CENTER, false, false));
 
         filterNonSarosContactsButton
-            .setText(Messages.BuddySelectionComposite_hide_buddies_no_saros);
+            .setText(Messages.FilteredContactSelectionComposite_filter_non_saros_contacts_button_text);
 
         filterNonSarosContactsButton
             .addSelectionListener(new SelectionAdapter() {
@@ -120,7 +120,8 @@ public class FilteredContactSelectionComposite extends
         Button addContactButton = new Button(controlComposite, SWT.PUSH);
         addContactButton.setLayoutData(new GridData(SWT.END, SWT.CENTER, true,
             false));
-        addContactButton.setText(Messages.BuddySelectionComposite_add_buddy);
+        addContactButton
+            .setText(Messages.FilteredContactSelectionComposite_add_contact_button_text);
         addContactButton.setImage(ImageManager.ELCL_CONTACT_ADD);
         addContactButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -165,7 +166,7 @@ public class FilteredContactSelectionComposite extends
             ViewerUtils.expandAll(getViewer());
         }
 
-        notifyBuddySelectionListener(filter);
+        notifyContactSelectionListener(filter);
     }
 
     /**
@@ -174,7 +175,7 @@ public class FilteredContactSelectionComposite extends
      * 
      * @param filterNonSarosContacts
      */
-    public void notifyBuddySelectionListener(boolean filterNonSarosContacts) {
+    public void notifyContactSelectionListener(boolean filterNonSarosContacts) {
         FilterContactsChangedEvent event = new FilterContactsChangedEvent(
             filterNonSarosContacts);
 

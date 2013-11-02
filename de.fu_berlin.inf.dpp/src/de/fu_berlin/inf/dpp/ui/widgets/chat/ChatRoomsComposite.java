@@ -72,7 +72,8 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
     protected ListExplanation howTo = new ListExplanation(SWT.ICON_INFORMATION,
         "To share projects you can either:", "Right-click on a project",
-        "Right-click on a buddy", "Use the Saros menu in the Eclipse menu bar");
+        "Right-click on a contact",
+        "Use the Saros menu in the Eclipse menu bar");
 
     protected boolean isSessionRunning;
 
