@@ -193,18 +193,25 @@ public interface Constants {
 
     public final static String MENU_SAROS = Configuration
         .getString("menu_saros");
+
     public final static String MENU_START_SAROS_CONFIGURATION = Configuration
         .getString("menu_start_saros_configuration");
+
     public final static String MENU_CREATE_ACCOUNT = Configuration
         .getString("menu_create_account");
+
     public final static String MENU_ADD_BUDDY = Configuration
         .getString("menu_add_buddy");
+
     public final static String ADD_BUDDIES = Configuration
         .getString("add_buddies");
+
     public final static String SHARE_PROJECTS = Configuration
         .getString("share_projects");
+
     public final static String MENU_PREFERENCES = Configuration
         .getString("menu_preferences");
+
     public final static String MENU_STOP_SESSION = Configuration
         .getString("menu_stop_session");
 
@@ -351,35 +358,50 @@ public interface Constants {
         .getString("view_saros_whiteboard_id");
 
     public final static String SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED = Configuration
-        .getString("SubscriptionManager_incoming_buddy_request_title");
+        .getString("SubscriptionManager_incoming_subscription_request_title");
+
     public final static String SHELL_BUDDY_ALREADY_ADDED = Configuration
         .getString("shell_buddy_already_added");
+
     public final static String SHELL_BUDDY_LOOKUP_FAILED = Configuration
         .getString("shell_buddy_look_up_failed");
+
     public final static String SHELL_SERVER_NOT_FOUND = Configuration
         .getString("shell_server_not_found");
+
     public final static String SHELL_SET_NEW_NICKNAME = Configuration
         .getString("RenameContactAction_new_nickname_dialog_title");
+
     public final static String SHELL_CONFIRM_CLOSING_SESSION = Configuration
         .getString("shell_confirm_closing_session");
+
     public final static String SHELL_INCOMING_SCREENSHARING_SESSION = Configuration
         .getString("shell_incoming_screensharing_session");
+
     public final static String SHELL_SCREENSHARING_ERROR_OCCURED = Configuration
         .getString("shell_screensharing_an_error_occured");
+
     public final static String SHELL_INVITATION = Configuration
         .getString("shell_invitation");
+
     public final static String SHELL_ADD_BUDDY = Configuration
         .getString("shell_add_buddy");
+
     public final static String CM_ADD_BUDDY_OFFLINE = Configuration
         .getString("cm_add_buddy_offline");
+
     public final static String CM_ADD_BUDDY = Configuration
         .getString("cm_add_buddy");
+
     public final static String SHELL_ADD_BUDDY_TO_SESSION = Configuration
         .getString("shell_add_buddy_to_session");
+
     public final static String SHELL_ERROR_IN_SAROS_PLUGIN = Configuration
         .getString("shell_error_in_saros_plugin");
+
     public final static String SHELL_CLOSING_THE_SESSION = Configuration
         .getString("close_the_session");
+
     public final static String SHELL_CONFIRM_LEAVING_SESSION = Configuration
         .getString("confirm_leaving_session");
 
