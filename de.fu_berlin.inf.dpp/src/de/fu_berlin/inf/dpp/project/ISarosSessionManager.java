@@ -10,8 +10,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.invitation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
@@ -135,12 +135,12 @@ public interface ISarosSessionManager {
      *            The one who added the project.
      * @param projectInfos
      *            what projects where added ({@link FileList}, projectName etc.)
-     *            see: {@link ProjectExchangeInfo}
+     *            see: {@link ProjectNegotiationData}
      * @param processID
      *            ID of the exchanging process
      */
     public void incomingProjectReceived(JID from,
-        List<ProjectExchangeInfo> projectInfos, String processID);
+        List<ProjectNegotiationData> projectInfos, String processID);
 
     /**
      * Call this when a new project was added.

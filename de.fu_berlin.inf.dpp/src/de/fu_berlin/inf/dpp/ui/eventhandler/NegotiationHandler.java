@@ -15,12 +15,12 @@ import org.eclipse.ui.progress.IProgressConstants;
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.invitation.IncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.invitation.OutgoingProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.OutgoingSessionNegotiation;
+import de.fu_berlin.inf.dpp.invitation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -297,10 +297,10 @@ public class NegotiationHandler implements INegotiationHandler {
     }
 
     private void showIncomingProjectUI(final IncomingProjectNegotiation process) {
-        List<ProjectExchangeInfo> pInfos = process.getProjectInfos();
+        List<ProjectNegotiationData> pInfos = process.getProjectInfos();
         final List<FileList> fileLists = new ArrayList<FileList>(pInfos.size());
 
-        for (ProjectExchangeInfo pInfo : pInfos)
+        for (ProjectNegotiationData pInfo : pInfos)
             fileLists.add(pInfo.getFileList());
 
         SWTUtils.runSafeSWTAsync(LOG, new Runnable() {

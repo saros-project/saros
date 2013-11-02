@@ -8,8 +8,8 @@ import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.invitation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -125,8 +125,8 @@ public class InvitationHandler {
 
                 String sessionID = projectNegotiation.getSessionID();
                 String negotiationID = projectNegotiation.getNegotiationID();
-                List<ProjectExchangeInfo> projectInfos = projectNegotiation
-                    .getProjectInfos();
+                List<ProjectNegotiationData> projectInfos = projectNegotiation
+                    .getProjectNegotiationData();
 
                 if (!sessionIDObservable.getValue().equals(sessionID)) {
                     log.warn("received project negotiation from "

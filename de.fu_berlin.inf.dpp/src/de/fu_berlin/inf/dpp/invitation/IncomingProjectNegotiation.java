@@ -41,7 +41,6 @@ import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.FileListDiff;
 import de.fu_berlin.inf.dpp.FileListFactory;
 import de.fu_berlin.inf.dpp.ISarosContext;
-import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
@@ -74,7 +73,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     private SubMonitor monitor;
     private AddProjectToSessionWizard addIncomingProjectUI;
 
-    private List<ProjectExchangeInfo> projectInfos;
+    private List<ProjectNegotiationData> projectInfos;
 
     @Inject
     private PreferenceUtils preferenceUtils;
@@ -104,7 +103,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     private SarosPacketCollector startActivityQueuingRequestCollector;
 
     public IncomingProjectNegotiation(ISarosSession sarosSession, JID peer,
-        String processID, List<ProjectExchangeInfo> projectInfos,
+        String processID, List<ProjectNegotiationData> projectInfos,
         ISarosContext sarosContext) {
         super(peer, sarosSession.getID(), sarosContext);
 
@@ -118,7 +117,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     @Override
     public Map<String, String> getProjectNames() {
         Map<String, String> result = new HashMap<String, String>();
-        for (ProjectExchangeInfo info : this.projectInfos) {
+        for (ProjectNegotiationData info : this.projectInfos) {
             result.put(info.getProjectID(), info.getProjectName());
         }
         return result;
@@ -133,7 +132,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      *         fileList}
      */
     public FileList getRemoteFileList(String projectID) {
-        for (ProjectExchangeInfo info : this.projectInfos) {
+        for (ProjectNegotiationData info : this.projectInfos) {
             if (info.getProjectID().equals(projectID))
                 return info.getFileList();
         }
@@ -278,7 +277,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     }
 
     public boolean isPartialRemoteProject(String projectID) {
-        for (ProjectExchangeInfo info : this.projectInfos) {
+        for (ProjectNegotiationData info : this.projectInfos) {
             if (info.getProjectID().equals(projectID))
                 return info.isPartial();
         }
@@ -391,8 +390,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             String projectID = entry.getKey();
             String projectName = entry.getValue();
             checkCancellation(CancelOption.NOTIFY_PEER);
-            ProjectExchangeInfo projectInfo = null;
-            for (ProjectExchangeInfo pInfo : this.projectInfos) {
+            ProjectNegotiationData projectInfo = null;
+            for (ProjectNegotiationData pInfo : this.projectInfos) {
                 if (pInfo.getProjectID().equals(projectID))
                     projectInfo = pInfo;
             }
@@ -458,7 +457,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      */
     private IProject assignLocalProject(final IProject baseProject,
         final String newProjectName, String projectID, final VCSAdapter vcs,
-        final IProgressMonitor monitor, ProjectExchangeInfo projectInfo)
+        final IProgressMonitor monitor, ProjectNegotiationData projectInfo)
         throws IOException, LocalCancellationException {
         IProject newLocalProject = baseProject;
         FileList remoteFileList = projectInfo.getFileList();
@@ -825,7 +824,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         }
     }
 
-    public List<ProjectExchangeInfo> getProjectInfos() {
+    public List<ProjectNegotiationData> getProjectInfos() {
         return projectInfos;
     }
 

@@ -41,13 +41,13 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.invitation.IncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.invitation.OutgoingProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.OutgoingSessionNegotiation;
 import de.fu_berlin.inf.dpp.invitation.ProcessListener;
+import de.fu_berlin.inf.dpp.invitation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.SessionNegotiation;
@@ -402,13 +402,13 @@ public class SarosSessionManager implements ISarosSessionManager {
      *            The one who added the project.
      * @param projectInfos
      *            what projects where added ({@link FileList}, projectName etc.)
-     *            see: {@link ProjectExchangeInfo}
+     *            see: {@link ProjectNegotiationData}
      * @param processID
      *            ID of the exchanging process
      */
     @Override
     public void incomingProjectReceived(JID from,
-        List<ProjectExchangeInfo> projectInfos, String processID) {
+        List<ProjectNegotiationData> projectInfos, String processID) {
 
         INegotiationHandler handler = negotiationHandler;
 

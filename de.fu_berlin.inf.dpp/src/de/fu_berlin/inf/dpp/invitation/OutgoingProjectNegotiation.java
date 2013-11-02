@@ -27,7 +27,6 @@ import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.FileListFactory;
 import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
@@ -186,12 +185,12 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         return terminateProcess(exception);
     }
 
-    private void sendFileList(List<ProjectExchangeInfo> projectExchangeInfos,
-        IProgressMonitor monitor) throws SarosCancellationException {
+    private void sendFileList(
+        List<ProjectNegotiationData> projectExchangeInfos,
+        IProgressMonitor monitor) throws IOException,
+        SarosCancellationException {
 
         /*
-         * FIXME must be calculated while the session is blocked !
-         * 
          * FIXME display the remote side something that will it receive
          * something in the near future
          */
@@ -201,27 +200,24 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         log.debug(this + " : sending file list");
 
         /*
-         * sending an activity takes 0 ms because the activity will be buffered
-         * and send by another thread
+         * file lists are normally very small so we "accept" the circumstance
+         * that this step cannot be cancelled.
          */
-        // monitor.setTaskName("Sending file list...");
+
+        monitor.setTaskName("Sending file list...");
 
         /*
          * The Remote receives this message at the InvitationHandler which calls
          * the SarosSessionManager which creates a IncomingProjectNegotiation
-         * instance and pass it to the SarosUI which finally opens the Wizard on
-         * the remote side
+         * instance and pass it to the installed callback handler (which in the
+         * current implementation opens a wizard on the remote side)
          */
         ProjectNegotiationOfferingExtension offering = new ProjectNegotiationOfferingExtension(
-            sessionID, projectExchangeInfos, processID);
-        try {
-            transmitter.sendToSessionUser(ISarosSession.SESSION_CONNECTION_ID,
-                peer,
+            sessionID, processID, projectExchangeInfos);
+
+        transmitter
+            .sendToSessionUser(ISarosSession.SESSION_CONNECTION_ID, peer,
                 ProjectNegotiationOfferingExtension.PROVIDER.create(offering));
-        } catch (IOException e) {
-            // TODO cancel negotiation
-            log.error("Failed sending Project Negotiation offering", e);
-        }
     }
 
     /**
@@ -461,17 +457,20 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
      * @param projectsToShare
      *            List of projects to share
      */
-    private List<ProjectExchangeInfo> createProjectExchangeInfoList(
+    private List<ProjectNegotiationData> createProjectExchangeInfoList(
         List<IProject> projectsToShare, IProgressMonitor monitor)
         throws IOException, LocalCancellationException {
 
+        /*
+         * FIXME must be calculated while the session is blocked !
+         */
         SubMonitor subMonitor = SubMonitor
             .convert(
                 monitor,
                 "Creating file list and calculating file checksums. This may take a while...",
                 projectsToShare.size());
 
-        List<ProjectExchangeInfo> pInfos = new ArrayList<ProjectExchangeInfo>(
+        List<ProjectNegotiationData> pInfos = new ArrayList<ProjectNegotiationData>(
             projectsToShare.size());
 
         for (IProject project : projectsToShare) {
@@ -491,8 +490,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 projectFileList.setProjectID(projectID);
                 boolean partial = !sarosSession.isCompletelyShared(project);
 
-                ProjectExchangeInfo pInfo = new ProjectExchangeInfo(projectID,
-                    project.getName(), projectName, partial, projectFileList);
+                ProjectNegotiationData pInfo = new ProjectNegotiationData(
+                    projectID, projectName, partial, projectFileList);
 
                 pInfos.add(pInfo);
 

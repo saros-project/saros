@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
+import de.fu_berlin.inf.dpp.invitation.ProjectNegotiationData;
 
 @XStreamAlias(/* ProjectNegotiationOffering */"PNOF")
 public class ProjectNegotiationOfferingExtension extends
@@ -12,19 +12,17 @@ public class ProjectNegotiationOfferingExtension extends
 
     public static final Provider PROVIDER = new Provider();
 
-    private List<ProjectExchangeInfo> projectInfos;
+    private List<ProjectNegotiationData> projectNegotiationData;
 
     public ProjectNegotiationOfferingExtension(String sessionID,
-        List<ProjectExchangeInfo> projectInfos, String negotiationID) {
+        String negotiationID,
+        List<ProjectNegotiationData> projectNegotiationData) {
         super(sessionID, negotiationID);
-        this.projectInfos = projectInfos;
+        this.projectNegotiationData = projectNegotiationData;
     }
 
-    /**
-     * @return The projectExchangeInformations
-     */
-    public List<ProjectExchangeInfo> getProjectInfos() {
-        return projectInfos;
+    public List<ProjectNegotiationData> getProjectNegotiationData() {
+        return projectNegotiationData;
     }
 
     public static class Provider
@@ -32,7 +30,8 @@ public class ProjectNegotiationOfferingExtension extends
         ProjectNegotiationExtension.Provider<ProjectNegotiationOfferingExtension> {
 
         private Provider() {
-            super("pnof", ProjectNegotiationOfferingExtension.class);
+            super("pnof", ProjectNegotiationOfferingExtension.class,
+                ProjectNegotiationData.class);
         }
     }
 
