@@ -240,7 +240,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         throws RemoteException {
 
         SWTBot bot = new SWTBot();
-        SWTBotShell shell = bot.shell(SHELL_ADD_BUDDY_TO_SESSION);
+        SWTBotShell shell = bot.shell(SHELL_ADD_CONTACT_TO_SESSION);
 
         shell.activate();
 
@@ -265,7 +265,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
     @Override
     public void confirmShellAddContact(JID jid) throws RemoteException {
         SWTBot bot = new SWTBot();
-        SWTBotShell shell = bot.shell(SHELL_ADD_BUDDY);
+        SWTBotShell shell = bot.shell(SHELL_ADD_CONTACT_WIZARD);
         shell.activate();
 
         shell.bot().comboBoxWithLabel(LABEL_XMPP_JABBER_ID)
@@ -276,7 +276,8 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         bot.sleep(500);
 
         for (SWTBotShell currentShell : bot.shells()) {
-            if (currentShell.getText().equals("Buddy Unknown")) {
+            // FIXME HARDCODED !
+            if (currentShell.getText().equals("Contact Unknown")) {
                 currentShell.bot().button(YES).click();
                 break;
             }

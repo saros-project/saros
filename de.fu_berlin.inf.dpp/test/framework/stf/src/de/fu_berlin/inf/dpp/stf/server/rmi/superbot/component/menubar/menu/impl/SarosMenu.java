@@ -31,14 +31,13 @@ public final class SarosMenu extends StfRemoteObject implements ISarosMenu {
     public void createAccount(JID jid, String password) throws RemoteException {
         RemoteWorkbenchBot.getInstance().activateWorkbench();
         menu.menu(MENU_CREATE_ACCOUNT).click();
-        SuperBot.getInstance().confirmShellCreateNewXMPPAccount(jid,
-            password);
+        SuperBot.getInstance().confirmShellCreateNewXMPPAccount(jid, password);
     }
 
     @Override
     public void addContact(JID jid) throws RemoteException {
         RemoteWorkbenchBot.getInstance().activateWorkbench();
-        menu.menu(MENU_ADD_BUDDY).click();
+        menu.menu(MENU_ADD_CONTACT).click();
         SuperBot.getInstance().confirmShellAddContact(jid);
     }
 
@@ -46,7 +45,7 @@ public final class SarosMenu extends StfRemoteObject implements ISarosMenu {
     public void addContactsToSession(String... jidOfInvitees)
         throws RemoteException {
         RemoteWorkbenchBot.getInstance().activateWorkbench();
-        menu.menu(ADD_BUDDIES).click();
+        menu.menu(MENU_ADD_CONTACTS_TO_SESSION).click();
         SuperBot.getInstance().confirmShellAddContactsToSession(jidOfInvitees);
     }
 

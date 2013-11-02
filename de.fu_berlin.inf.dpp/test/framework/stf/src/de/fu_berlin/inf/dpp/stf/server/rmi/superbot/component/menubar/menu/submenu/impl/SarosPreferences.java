@@ -246,8 +246,8 @@ public final class SarosPreferences extends StfRemoteObject implements
         shell.bot().tree().expandNode(NODE_SAROS, NODE_SAROS_NETWORK).select();
 
         SWTBotCheckBox checkBox = shell.bot().checkBoxInGroup(
-            SAROS_ADVANCED_GROUP_FILE_TRANSFER_FORCE_IBB,
-            SAROS_ADVANCED_GROUP_FILE_TRANSFER);
+            PREF_NODE_SAROS_NETWORK_ADVANCED_GROUP_FILE_TRANSFER_FORCE_IBB,
+            PREF_NODE_SAROS_NETWORK_ADVANCED_GROUP_FILE_TRANSFER);
 
         if (check)
             checkBox.select();

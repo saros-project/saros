@@ -633,10 +633,10 @@ public class Util {
         for (AbstractTester tester : testers) {
             if (tester.superBot().views().sarosView().isInSession()
                 && tester.superBot().views().sarosView().isFollowing()) {
-                JID followedBuddyJID = tester.superBot().views().sarosView()
+                JID followedTesterJID = tester.superBot().views().sarosView()
                     .getFollowedUser();
                 tester.superBot().views().sarosView()
-                    .selectUser(followedBuddyJID).stopFollowing();
+                    .selectUser(followedTesterJID).stopFollowing();
             }
         }
     }
@@ -664,10 +664,10 @@ public class Util {
             stopFollowTasks.add(new Callable<Void>() {
                 @Override
                 public Void call() throws Exception {
-                    JID followedBuddyJID = tester.superBot().views()
+                    JID followedTesterJID = tester.superBot().views()
                         .sarosView().getFollowedUser();
                     tester.superBot().views().sarosView()
-                        .selectUser(followedBuddyJID).stopFollowing();
+                        .selectUser(followedTesterJID).stopFollowing();
                     return null;
                 }
             });

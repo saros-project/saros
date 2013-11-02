@@ -5,9 +5,9 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.FINISH;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.LABEL_XMPP_JABBER_ID;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.NO;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_ADD_BUDDY;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_ADD_CONTACT_WIZARD;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_SERVER_NOT_FOUND;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.TB_ADD_A_NEW_BUDDY;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.TB_ADD_NEW_CONTACT;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.VIEW_SAROS;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -141,13 +141,13 @@ public class HandleContactsTest extends StfTestCase {
      */
     @Test
     public void testAddNoValidContact() throws RemoteException {
-        ALICE.remoteBot().view(VIEW_SAROS).toolbarButton(TB_ADD_A_NEW_BUDDY)
+        ALICE.remoteBot().view(VIEW_SAROS).toolbarButton(TB_ADD_NEW_CONTACT)
             .click();
         Map<String, String> labelsAndTexts = new HashMap<String, String>();
         labelsAndTexts.put("XMPP/Jabber ID", "BOB@bla");
 
-        ALICE.remoteBot().waitUntilShellIsOpen(SHELL_ADD_BUDDY);
-        IRemoteBotShell shell = ALICE.remoteBot().shell(SHELL_ADD_BUDDY);
+        ALICE.remoteBot().waitUntilShellIsOpen(SHELL_ADD_CONTACT_WIZARD);
+        IRemoteBotShell shell = ALICE.remoteBot().shell(SHELL_ADD_CONTACT_WIZARD);
         shell.activate();
         shell.bot().comboBoxWithLabel(LABEL_XMPP_JABBER_ID).setText("BOB@bla");
         shell.bot().button(FINISH).click();

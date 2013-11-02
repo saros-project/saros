@@ -126,7 +126,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     @Override
     public void addContact(JID jid) throws RemoteException {
         if (!isInContactList(jid)) {
-            clickToolbarButtonWithTooltip(TB_ADD_A_NEW_BUDDY);
+            clickToolbarButtonWithTooltip(TB_ADD_NEW_CONTACT);
             SuperBot.getInstance().confirmShellAddContact(jid);
         }
         // wait for update of the saros session tree
@@ -210,7 +210,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
 
     @Override
     public IContextMenusInContactListArea selectBuddies() throws RemoteException {
-        initBuddiesContextMenuWrapper(Pattern.quote((NODE_BUDDIES)));
+        initBuddiesContextMenuWrapper(Pattern.quote((NODE_CONTACTS)));
         return ContextMenusInContactListArea.getInstance();
     }
 
@@ -221,7 +221,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
             throw new RuntimeException("no buddy exists with the JID: "
                 + jid.getBase());
         }
-        initBuddiesContextMenuWrapper(Pattern.quote(NODE_BUDDIES),
+        initBuddiesContextMenuWrapper(Pattern.quote(NODE_CONTACTS),
             Pattern.quote(getNickname(jid)) + ".*");
         return ContextMenusInContactListArea.getInstance();
     }
@@ -302,7 +302,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
 
     @Override
     public List<String> getContacts() throws RemoteException {
-        SWTBotTreeItem items = tree.getTreeItem(NODE_BUDDIES);
+        SWTBotTreeItem items = tree.getTreeItem(NODE_CONTACTS);
         List<String> buddies = new ArrayList<String>();
 
         for (SWTBotTreeItem item : items.getItems())
@@ -319,7 +319,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
                 return false;
 
             nickName = Pattern.quote(nickName) + ".*";
-            for (String label : tree.getTreeItem(NODE_BUDDIES).getNodes())
+            for (String label : tree.getTreeItem(NODE_CONTACTS).getNodes())
                 if (label.matches(nickName))
                     return true;
 

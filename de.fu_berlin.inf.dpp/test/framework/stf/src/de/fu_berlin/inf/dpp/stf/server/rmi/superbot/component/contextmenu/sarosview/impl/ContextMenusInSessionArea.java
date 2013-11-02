@@ -178,11 +178,13 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
     public void addBuddies(String... jidOfInvitees) throws RemoteException {
         SWTBotTreeItem treeItem = getTreeItem();
 
-        log.trace("clicking on context menu item: " + ADD_BUDDIES);
+        log.trace("clicking on context menu item: "
+            + CM_ADD_CONTACTS_TO_SESSION);
 
         try {
             treeItem.select();
-            ContextMenuHelper.clickContextMenu(tree, ADD_BUDDIES);
+            ContextMenuHelper
+                .clickContextMenu(tree, CM_ADD_CONTACTS_TO_SESSION);
         } catch (RuntimeException e) {
             logError(log, e, tree, treeItem);
             throw e;

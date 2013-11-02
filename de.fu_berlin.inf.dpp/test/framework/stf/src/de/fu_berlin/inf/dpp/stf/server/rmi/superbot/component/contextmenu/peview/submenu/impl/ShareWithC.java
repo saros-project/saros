@@ -36,7 +36,7 @@ public final class ShareWithC extends StfRemoteObject implements IShareWithC {
         throws RemoteException {
         treeItem.select();
         ContextMenuHelper.clickContextMenu(tree, CM_SHARE_WITH,
-            CM_MULTIPLE_BUDDIES);
+            CM_MULTIPLE_CONTACTS);
         SuperBot.getInstance().confirmShellShareProjects(projectName,
             baseJIDOfInvitees);
     }

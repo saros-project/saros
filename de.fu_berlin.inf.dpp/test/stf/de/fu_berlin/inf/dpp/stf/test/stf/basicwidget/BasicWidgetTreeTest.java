@@ -15,7 +15,7 @@ import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_SAROS;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_SHOW_VIEW;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_WINDOW;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.NODE_ANNOTATIONS;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.NODE_BUDDIES;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.NODE_CONTACTS;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.NODE_CONSOLE;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.NODE_EDITORS;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.NODE_GENERAL;
@@ -168,7 +168,7 @@ public class BasicWidgetTreeTest extends StfTestCase {
         ALICE.superBot().views().sarosView()
             .connectWith(ALICE.getJID(), ALICE.getPassword());
         assertTrue(ALICE.remoteBot().view(VIEW_SAROS).bot().tree()
-            .selectTreeItem(NODE_BUDDIES)
+            .selectTreeItem(NODE_CONTACTS)
             .existsSubItemWithRegex(Pattern.quote(BOB.getName()) + ".*"));
     }
 
@@ -244,7 +244,7 @@ public class BasicWidgetTreeTest extends StfTestCase {
         ALICE.superBot().views().sarosView()
             .connectWith(ALICE.getJID(), ALICE.getPassword());
         assertTrue(ALICE.remoteBot().view(VIEW_SAROS).bot().tree()
-            .selectTreeItemWithRegex(NODE_BUDDIES, BOB.getName() + ".*")
+            .selectTreeItemWithRegex(NODE_CONTACTS, BOB.getName() + ".*")
             .existsContextMenu(CM_RENAME));
     }
 
@@ -264,7 +264,7 @@ public class BasicWidgetTreeTest extends StfTestCase {
             .connectWith(ALICE.getJID(), ALICE.getPassword());
         ALICE.superBot().views().sarosView().waitUntilIsConnected();
         assertTrue(ALICE.remoteBot().view(VIEW_SAROS).bot().tree()
-            .selectTreeItemWithRegex(NODE_BUDDIES, BOB.getName() + ".*")
+            .selectTreeItemWithRegex(NODE_CONTACTS, BOB.getName() + ".*")
             .isContextMenuEnabled(CM_RENAME));
     }
 
@@ -273,7 +273,7 @@ public class BasicWidgetTreeTest extends StfTestCase {
         ALICE.superBot().views().sarosView()
             .connectWith(ALICE.getJID(), ALICE.getPassword());
         ALICE.remoteBot().view(VIEW_SAROS).bot().tree()
-            .selectTreeItemWithRegex(NODE_BUDDIES, BOB.getName() + ".*")
+            .selectTreeItemWithRegex(NODE_CONTACTS, BOB.getName() + ".*")
             .clickContextMenu(CM_RENAME);
         assertTrue(ALICE.remoteBot().isShellOpen(SHELL_SET_NEW_NICKNAME));
     }

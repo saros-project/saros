@@ -38,7 +38,7 @@ public class Configuration {
      * @return the value for the key as a String or <code>null</code> if the
      *         value could not been found
      */
-    public static String getString(String key) {
+    public static String get(String key) {
 
         String value = null;
 

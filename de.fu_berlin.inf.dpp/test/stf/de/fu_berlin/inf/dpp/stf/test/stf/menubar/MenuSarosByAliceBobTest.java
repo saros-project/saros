@@ -4,7 +4,7 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.ACCEPT;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.FINISH;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_ADD_BUDDY;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_ADD_CONTACT;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_SAROS;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.NEXT;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHARE_PROJECTS;
@@ -134,7 +134,8 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
     public void testAddBuddy() throws RemoteException {
         ALICE.superBot().views().sarosView()
             .connectWith(ALICE.getJID(), ALICE.getPassword());
-        ALICE.remoteBot().menu(MENU_SAROS).menu(MENU_ADD_BUDDY).click();
+        ALICE.remoteBot().activateWorkbench();
+        ALICE.remoteBot().menu(MENU_SAROS).menu(MENU_ADD_CONTACT).click();
         ALICE.superBot().confirmShellAddContact(BOB.getJID());
     }
 
