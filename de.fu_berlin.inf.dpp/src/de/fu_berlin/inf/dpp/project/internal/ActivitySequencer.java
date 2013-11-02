@@ -235,6 +235,33 @@ public class ActivitySequencer implements Startable {
         if (started)
             throw new IllegalStateException("sequencer is already started");
 
+        /* *
+         * 
+         * @JTourBusStop 8, Creating custom network messages, Receiving custom
+         * messages - Part 1:
+         * 
+         * In order to receive custom messages you must install a packet filter
+         * to the current implementation of the IReceiver interface.
+         * 
+         * Remember the provider you created in step 4 ? It will offer you the
+         * filter you need.
+         * 
+         * Please be AWARE that due to inheritance it will offer you MULTIPLE
+         * filters. You normally want to use the filter that needed the most
+         * arguments. Failing to use the proper filter may let you process
+         * messages that you did not wanted to be aware of this behavior !
+         * 
+         * IMPORTANT: You are ALLOWED to send data during a listener callback
+         * although you should avoid it because processing custom message should
+         * not block.
+         * 
+         * Furthermore if you try to send data and then wait for another reply
+         * inside the listener callback (e.g with a collector) you can wait
+         * FOREVER because you are blocking the thread context in which messages
+         * will be dispatched and so it is likely to CRASH the whole
+         * application. Please do not do that, you were warned here !
+         */
+
         receiver.addPacketListener(activitiesPacketListener,
             ActivitiesExtension.PROVIDER.getPacketFilter(currentSessionID));
 
@@ -520,6 +547,23 @@ public class ActivitySequencer implements Startable {
     }
 
     private void receiveActivities(Packet activityPacket) {
+
+        /* *
+         * 
+         * @JTourBusStop 10, Creating custom network messages, Accessing the
+         * data of custom messages:
+         * 
+         * In order to access the data from a received custom message (packet)
+         * you must unmarshall it. As you might already have guessed
+         * unmarshalling is also provided by the provider. As you see below you
+         * just have to call getPayload on the packet which includes your
+         * marshalled data in the packet extension of that packet.
+         * 
+         * Please note the null check is not really needed as we should ensure
+         * that it cannot happen that you receive malformed data. Never less it
+         * does not matter and is a good practice as it avoids further
+         * exceptions which may be hard to analyze.
+         */
 
         ActivitiesExtension payload = ActivitiesExtension.PROVIDER
             .getPayload(activityPacket);

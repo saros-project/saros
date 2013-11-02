@@ -7,6 +7,16 @@ import org.jivesoftware.smack.packet.Packet;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
+/* *
+ * 
+ * @JTourBusStop 2, Creating custom network messages, Session Packet
+ * Extensions:
+ * 
+ * As you see we also have another base class to inherit from if you want to
+ * use messages that should only be processed during a running Saros
+ * session.
+ */
+
 public abstract class SarosSessionPacketExtension extends SarosPacketExtension {
 
     @XStreamAlias("sid")

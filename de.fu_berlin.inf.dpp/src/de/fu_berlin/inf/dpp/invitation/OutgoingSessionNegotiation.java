@@ -491,6 +491,17 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
             log.debug(this + " : added " + Utils.prefix(peer)
                 + " to the current session, colorID: " + clientColorID);
 
+            /* *
+             * 
+             * @JTourBusStop 7, Creating custom network messages, Sending custom
+             * messages:
+             * 
+             * This is pretty straight forward. Create an instance of your
+             * extension with the proper arguments and use the provider to
+             * create a (marshalled) packet extension. The extension can now be
+             * send using the various methods of the ITransmitted interface.
+             */
+
             transmitter.sendToSessionUser(ISarosSession.SESSION_CONNECTION_ID,
                 peer, InvitationAcknowledgedExtension.PROVIDER
                     .create(new InvitationAcknowledgedExtension(invitationID)));
@@ -502,6 +513,23 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
     }
 
     private void createCollectors() {
+
+        /* *
+         * 
+         * @JTourBusStop 9, Creating custom network messages, Receiving custom
+         * messages - Part 2:
+         * 
+         * Another way to receive custom message is to use a collector which you
+         * can poll instead. The same rules as in step 7 applies to the
+         * collector as well. Pay attention to the filter you use and avoid
+         * using the collector when the current thread context is the context
+         * for dispatching messages.
+         * 
+         * IMPORTANT: Your logic must ensure that the collector is cancelled
+         * after it is no longer used. Failing to do so will result in memory
+         * leaks.
+         */
+
         invitationAcceptedCollector = receiver
             .createCollector(InvitationAcceptedExtension.PROVIDER
                 .getPacketFilter(invitationID));

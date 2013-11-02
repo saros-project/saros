@@ -7,6 +7,23 @@ import org.jivesoftware.smack.packet.Packet;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
+/* *
+ * 
+ * @JTourBusStop 1, Creating custom network messages, Packet Extensions:
+ * 
+ * We have seen many attempts in the past where developers tried to
+ * accomplish things with the existing Saros API which could not be solved
+ * because the logic behind the API was lacking of information that was
+ * either never present or was available to late.
+ * 
+ * This tour explain how to create custom messages that can be used to
+ * exchange needed informations.
+ * 
+ * Saros uses XMPP packet extensions (data represented in XML) to exchange
+ * its data as messages. This class is the base class to inherit from when
+ * creating a new packet extension.
+ */
+
 public abstract class SarosPacketExtension {
 
     // keep this short as it is included in every packet extension !

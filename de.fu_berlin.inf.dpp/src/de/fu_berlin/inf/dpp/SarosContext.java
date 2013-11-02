@@ -331,6 +331,15 @@ public class SarosContext implements ISarosContext {
     }
 
     private void installPacketExtensionProviders() {
+
+        /* *
+         * 
+         * @JTourBusStop 6, Creating custom network messages, Installing the
+         * provider:
+         * 
+         * This should be straight forward. Follow the code pattern below.
+         */
+
         /*
          * The packet extensions must be loaded here so they are added to the
          * Smack ExtensionProvider at context startup.

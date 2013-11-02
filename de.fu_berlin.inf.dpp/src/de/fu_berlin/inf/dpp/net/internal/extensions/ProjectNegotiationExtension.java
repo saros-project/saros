@@ -30,6 +30,15 @@ public abstract class ProjectNegotiationExtension extends
             super(elementName, classes);
         }
 
+        /* *
+         * 
+         * @JTourBusStop 5, Creating custom network messages, Extending the
+         * packet filter:
+         * 
+         * It might be necessary to extends the packet filter so here is the
+         * basic example how to extend it properly.
+         */
+
         public PacketFilter getPacketFilter(final String sessionID,
             final String negotiationID) {
 
