@@ -238,24 +238,17 @@ public class CollaborationUtils {
 
     /**
      * Creates the message that invitees see on an incoming project share
-     * request.
+     * request. Currently it contains the project names along with the number of
+     * shared files and total file size for each shared project.
      * 
      * @param sarosSession
      * @return
      */
     private static String getShareProjectDescription(ISarosSession sarosSession) {
 
-        JID inviter = sarosSession.getLocalUser().getJID();
         Set<IProject> projects = sarosSession.getProjects();
 
         StringBuilder result = new StringBuilder();
-
-        result
-            .append(MessageFormat.format(
-                Messages.CollaborationUtils_user_invited_to_saros_session,
-                inviter.getBase(),
-                ((projects.size() == 1) ? Messages.CollaborationUtils_project_singular_ending
-                    : Messages.CollaborationUtils_project_plural_ending)));
 
         for (IProject project : projects) {
 
