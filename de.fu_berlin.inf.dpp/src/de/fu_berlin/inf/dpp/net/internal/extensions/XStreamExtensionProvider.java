@@ -37,6 +37,7 @@ import org.xmlpull.v1.XmlPullParser;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
+import com.thoughtworks.xstream.converters.basic.BooleanConverter;
 import com.thoughtworks.xstream.io.xml.CompactWriter;
 
 import de.fu_berlin.inf.dpp.util.xstream.IPathConverter;
@@ -75,6 +76,7 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider,
         this.namespace = NAMESPACE;
 
         xstream = new XStream();
+        xstream.registerConverter(BooleanConverter.BINARY);
         xstream.registerConverter(new IPathConverter());
         xstream.processAnnotations(XStreamPacketExtension.class);
         xstream.processAnnotations(classes);

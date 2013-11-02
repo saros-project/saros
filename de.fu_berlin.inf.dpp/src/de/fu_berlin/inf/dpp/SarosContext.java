@@ -66,7 +66,7 @@ import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelProjectNegotiationExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.FileListExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.ProjectNegotiationMissingFilesExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationAcceptedExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationAcknowledgedExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationCompletedExtension;
@@ -354,7 +354,7 @@ public class SarosContext implements ISarosContext {
             Class.forName(InvitationAcceptedExtension.class.getName());
             Class.forName(InvitationCompletedExtension.class.getName());
             Class.forName(CancelProjectNegotiationExtension.class.getName());
-            Class.forName(FileListExtension.class.getName());
+            Class.forName(ProjectNegotiationMissingFilesExtension.class.getName());
             Class.forName(KickUserExtension.class.getName());
             Class.forName(UserListExtension.class.getName());
             Class.forName(LeaveSessionExtension.class.getName());

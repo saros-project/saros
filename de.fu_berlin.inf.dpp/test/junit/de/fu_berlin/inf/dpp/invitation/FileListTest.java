@@ -26,6 +26,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -42,9 +43,9 @@ import org.eclipse.core.runtime.Path;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.invitation.FileList;
-import de.fu_berlin.inf.dpp.invitation.FileListDiff;
-import de.fu_berlin.inf.dpp.invitation.FileListFactory;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.basic.BooleanConverter;
+import com.thoughtworks.xstream.io.xml.CompactWriter;
 
 /**
  * TODO [TEST] Add Testcases for non-existing files florianthiel: Does FileList
@@ -60,10 +61,15 @@ public class FileListTest {
 
     private static IProject project;
 
+    private static XStream xstream = new XStream();
+
     static {
         project = EasyMock.createNiceMock(IProject.class);
         EasyMock.expect(project.getName()).andReturn("Foo").anyTimes();
         EasyMock.replay(project);
+
+        xstream.registerConverter(BooleanConverter.BINARY);
+        xstream.processAnnotations(FileList.class);
     }
 
     private IFile fileInRoot1;
@@ -271,7 +277,7 @@ public class FileListTest {
 
     @Test
     public void testRoundtripSerialization() {
-        FileList replicated = FileList.fromXML(threeEntryList.toXML());
+        FileList replicated = fromXML(toXML(threeEntryList));
         assertEquals(threeEntryList, replicated);
     }
 
@@ -309,8 +315,18 @@ public class FileListTest {
         }
 
         FileList list = FileListFactory.createPathFileList(files);
-        String xml = list.toXML();
-        FileList listFromXml = FileList.fromXML(xml);
+        String xml = toXML(list);
+        FileList listFromXml = fromXML(xml);
         assertEquals(list, listFromXml);
+    }
+
+    private String toXML(FileList list) {
+        StringWriter writer = new StringWriter(512 * 1024);
+        xstream.marshal(list, new CompactWriter(writer));
+        return writer.toString();
+    }
+
+    private static FileList fromXML(String xml) {
+        return (FileList) xstream.fromXML(xml);
     }
 }

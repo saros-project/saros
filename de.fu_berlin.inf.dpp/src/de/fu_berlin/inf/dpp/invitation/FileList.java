@@ -20,7 +20,6 @@
 package de.fu_berlin.inf.dpp.invitation;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,12 +39,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 
-import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
-import com.thoughtworks.xstream.converters.basic.BooleanConverter;
-import com.thoughtworks.xstream.io.xml.CompactWriter;
 
 import de.fu_berlin.inf.dpp.project.IChecksumCache;
 import de.fu_berlin.inf.dpp.util.FileUtils;
@@ -63,17 +59,8 @@ import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
  * 
  * @author rdjemili
  */
-@XStreamAlias("fileList")
+@XStreamAlias("FILELIST")
 public class FileList {
-
-    private static final XStream XSTREAM;
-
-    static {
-        XStream xstream = new XStream();
-        xstream.registerConverter(BooleanConverter.BINARY);
-        xstream.processAnnotations(FileList.class);
-        XSTREAM = xstream;
-    }
 
     private static final Logger log = Logger.getLogger(FileList.class);
 
@@ -466,26 +453,6 @@ public class FileList {
 
         cachedList = root.toList();
         return cachedList;
-    }
-
-    /**
-     * @return the XML representation of this FileList.
-     * 
-     * @see #fromXML(String)
-     */
-    public String toXML() {
-        StringWriter writer = new StringWriter(512 * 1024);
-        XSTREAM.marshal(this, new CompactWriter(writer));
-        return writer.toString();
-    }
-
-    /**
-     * Parses given XML and returns a {@link FileList} instance.
-     * 
-     * @see FileList#toXML()
-     */
-    public static FileList fromXML(String xml) {
-        return (FileList) XSTREAM.fromXML(xml);
     }
 
     @Override

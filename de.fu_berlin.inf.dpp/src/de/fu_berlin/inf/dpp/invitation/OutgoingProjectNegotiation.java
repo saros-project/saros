@@ -33,7 +33,7 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
-import de.fu_berlin.inf.dpp.net.internal.extensions.FileListExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.ProjectNegotiationMissingFilesExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ProjectNegotiationOfferingExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.StartActivityQueuingRequest;
 import de.fu_berlin.inf.dpp.net.internal.extensions.StartActivityQueuingResponse;
@@ -244,7 +244,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 + peer + " while waiting for the file list",
                 CancelOption.DO_NOT_NOTIFY_PEER);
 
-        List<FileList> remoteFileLists = FileListExtension.PROVIDER.getPayload(
+        List<FileList> remoteFileLists = ProjectNegotiationMissingFilesExtension.PROVIDER.getPayload(
             packet).getFileLists();
 
         log.debug(this + " : remote file list has been received");
@@ -412,7 +412,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
     private void createCollectors() {
         remoteFileListResponseCollector = xmppReceiver
-            .createCollector(FileListExtension.PROVIDER.getPacketFilter(
+            .createCollector(ProjectNegotiationMissingFilesExtension.PROVIDER.getPacketFilter(
                 sessionID, processID));
 
         startActivityQueuingResponseCollector = xmppReceiver

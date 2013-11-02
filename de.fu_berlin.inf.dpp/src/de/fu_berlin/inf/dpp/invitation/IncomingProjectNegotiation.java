@@ -45,7 +45,7 @@ import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
-import de.fu_berlin.inf.dpp.net.internal.extensions.FileListExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.ProjectNegotiationMissingFilesExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.StartActivityQueuingRequest;
 import de.fu_berlin.inf.dpp.net.internal.extensions.StartActivityQueuingResponse;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
@@ -192,11 +192,9 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             List<FileList> missingFiles = calculateMissingFiles(projectNames,
                 useVersionControl, this.monitor.newChild(10));
 
-            transmitter
-                .sendToSessionUser(ISarosSession.SESSION_CONNECTION_ID, peer,
-                    FileListExtension.PROVIDER.create(new FileListExtension(
-                        sessionID, processID, missingFiles
-                            .toArray(new FileList[0]))));
+            transmitter.sendToSessionUser(ISarosSession.SESSION_CONNECTION_ID,
+                peer, ProjectNegotiationMissingFilesExtension.PROVIDER.create(new ProjectNegotiationMissingFilesExtension(
+                    sessionID, processID, missingFiles)));
 
             awaitActivityQueueingActivation(this.monitor.newChild(0));
 
