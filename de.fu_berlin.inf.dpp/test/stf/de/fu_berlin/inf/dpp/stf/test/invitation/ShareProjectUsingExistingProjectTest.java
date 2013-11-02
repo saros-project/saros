@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
@@ -84,6 +85,7 @@ public class ShareProjectUsingExistingProjectTest extends StfTestCase {
     }
 
     @Test
+    @Ignore("The feature is currently disabled because it is not working as expected")
     public void testShareProjectUsingExistingProjectWithCopy() throws Exception {
         Util.buildSessionSequentially(Constants.PROJECT1,
             TypeOfCreateProject.EXIST_PROJECT_WITH_COPY, ALICE, BOB);

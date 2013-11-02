@@ -5,9 +5,9 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.CARL;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.DAVE;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.ACCEPT;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_ADD_PROJECTS;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_INVITATION_CANCELLED;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_SESSION_INVITATION;
-import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
@@ -44,9 +44,9 @@ public class ParallelInvitationWithTerminationByHostTest extends StfTestCase {
      * <li>Carl accepts the invitation but does not choose a target project.</li>
      * <li>Alice opens the Progress View and cancels Carl's invitation before
      * Carl accepts</li>
-     * <li>Dave accepts the invitation and chooses a target project.</li>
-     * <li>Alice opens the Progress View and cancels Dave 's invitation during
-     * the synchronisation.</li>
+     * <li>Dave accepts the invitation but does not choose a target project.</li>
+     * <li>Alice opens the Progress View and cancels Carl's invitation before
+     * Dave accepts</li>
      * </ol>
      * 
      * Result:
@@ -76,48 +76,47 @@ public class ParallelInvitationWithTerminationByHostTest extends StfTestCase {
                 Constants.CLS1);
 
         /*
-         * build session with BOB, CARL and DAVE simultaneously
+         * as we do not know who gets invited first and we have limited access
+         * to the progress view make sure BOBs invitation is at the first place
          */
-        ALICE
-            .superBot()
-            .views()
-            .sarosView()
-            .selectNoSessionRunning()
-            .shareProjects(Constants.PROJECT1, BOB.getJID(), DAVE.getJID(),
-                CARL.getJID());
+        ALICE.superBot().views().sarosView().selectNoSessionRunning()
+            .shareProjects(Constants.PROJECT1, BOB.getJID());
+
         BOB.remoteBot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         BOB.remoteBot().shell(SHELL_SESSION_INVITATION).activate();
+
+        ALICE.superBot().views().sarosView().selectContact(CARL.getJID())
+            .addToSarosSession();
+
+        CARL.remoteBot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
+
+        ALICE.superBot().views().sarosView().selectContact(DAVE.getJID())
+            .addToSarosSession();
+
+        DAVE.remoteBot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
+
+        // kick BOB
         ALICE.superBot().views().progressView().removeProcess(0);
+
         BOB.remoteBot().waitLongUntilShellIsOpen(SHELL_INVITATION_CANCELLED);
         BOB.remoteBot().shell(SHELL_INVITATION_CANCELLED).activate();
         BOB.remoteBot().shell(SHELL_INVITATION_CANCELLED).close();
 
-        CARL.remoteBot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         CARL.remoteBot().shell(SHELL_SESSION_INVITATION).activate();
         CARL.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
-        ALICE.superBot().views().progressView().removeProcess(1);
-        CARL.remoteBot().waitLongUntilShellIsOpen(SHELL_INVITATION_CANCELLED);
-        assertTrue(CARL.remoteBot().shell(SHELL_INVITATION_CANCELLED)
-            .isActive());
 
-        CARL.remoteBot().shell(SHELL_INVITATION_CANCELLED).close();
-
-        DAVE.remoteBot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         DAVE.remoteBot().shell(SHELL_SESSION_INVITATION).activate();
         DAVE.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
 
-        // DAVE.button.clickButton(FINISH);
-        ALICE.superBot().views().progressView().removeProcess(3);
-        // FIXME Timeout exception by MAC OS X, the building session under
-        // MAS
-        // is so fast that the session process is already done after
-        // canceling
-        // this process, so DAVE should never get the window
-        // "Invitation canceled".
-        DAVE.remoteBot().waitLongUntilShellIsOpen(SHELL_INVITATION_CANCELLED);
-        assertTrue(DAVE.remoteBot().shell(SHELL_INVITATION_CANCELLED)
-            .isActive());
+        CARL.remoteBot().waitLongUntilShellIsOpen(SHELL_ADD_PROJECTS);
 
-        DAVE.remoteBot().shell(SHELL_INVITATION_CANCELLED).close();
+        DAVE.remoteBot().waitLongUntilShellIsOpen(SHELL_ADD_PROJECTS);
+
+        // stop the session
+
+        ALICE.superBot().views().sarosView().leaveSession();
+
+        // TODO we get an invitation cancelled message dialog which is
+        // completely wrong
     }
 }
