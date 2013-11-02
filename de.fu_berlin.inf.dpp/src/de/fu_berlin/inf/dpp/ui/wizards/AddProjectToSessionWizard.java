@@ -325,8 +325,14 @@ public class AddProjectToSessionWizard extends Wizard {
                 if (shell == null || shell.isDisposed())
                     return;
                 isExceptionCancel = true;
-                showCancelMessage(jid, errorMsg, cancelLocation);
                 wizardDialog.close();
+            }
+        });
+
+        SWTUtils.runSafeSWTAsync(log, new Runnable() {
+            @Override
+            public void run() {
+                showCancelMessage(jid, errorMsg, cancelLocation);
             }
         });
     }
@@ -386,17 +392,18 @@ public class AddProjectToSessionWizard extends Wizard {
             .open() == IDialogConstants.OK_ID;
     }
 
-    public void showCancelMessage(JID jid, String errorMsg,
+    private void showCancelMessage(JID jid, String errorMsg,
         CancelLocation cancelLocation) {
 
-        String peer = jid.getBase();
+        final String peer = jid.getBase();
+        final Shell shell = EditorAPI.getShell();
 
         if (errorMsg != null) {
             switch (cancelLocation) {
             case LOCAL:
                 DialogUtils
                     .openErrorMessageDialog(
-                        getShell(),
+                        shell,
                         Messages.AddProjectToSessionWizard_invitation_cancelled,
                         MessageFormat
                             .format(
@@ -406,7 +413,7 @@ public class AddProjectToSessionWizard extends Wizard {
             case REMOTE:
                 DialogUtils
                     .openErrorMessageDialog(
-                        getShell(),
+                        shell,
                         Messages.AddProjectToSessionWizard_invitation_cancelled,
                         MessageFormat
                             .format(
@@ -420,7 +427,7 @@ public class AddProjectToSessionWizard extends Wizard {
             case REMOTE:
                 DialogUtils
                     .openInformationMessageDialog(
-                        getShell(),
+                        shell,
                         Messages.AddProjectToSessionWizard_invitation_cancelled,
                         MessageFormat
                             .format(
