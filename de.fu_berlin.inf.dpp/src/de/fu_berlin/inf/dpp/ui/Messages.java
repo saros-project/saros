@@ -186,10 +186,7 @@ public class Messages extends NLS {
 
     public static String EnterXMPPAccountWizardPage_create_new_account;
     public static String EnterXMPPAccountWizardPage_description;
-    public static String EnterXMPPAccountWizardPage_existing_account;
     public static String EnterXMPPAccountWizardPage_info_already_created_account;
-    public static String EnterXMPPAccountWizardPage_new_account;
-    public static String EnterXMPPAccountWizardPage_or;
     public static String EnterXMPPAccountWizardPage_title;
     public static String ErrorMessageDialog_error_plugin;
     public static String ErrorMessageDialog_error_unspecified;
@@ -214,8 +211,6 @@ public class Messages extends NLS {
 
     public static String GiveWriteAccessAction_title;
     public static String GiveWriteAccessAction_tooltip;
-    public static String InvitationWizard_buddy_offline;
-    public static String InvitationWizard_buddy_offline_text;
 
     public static String JoinSessionWizard_8;
     public static String JoinSessionWizard_accept;
@@ -350,8 +345,6 @@ public class Messages extends NLS {
     public static String NetworkPreferencePage_upnp_label_Text;
     public static String NewContactAction_tooltip;
 
-    public static String ProjectSelectionComposite_hide_closed_projects;
-    public static String ProjectSelectionComposite_new_project;
     public static String ProjectSelectionWizardPage_description;
     public static String ProjectSelectionWizardPage_selected_no_project;
     public static String ProjectSelectionWizardPage_title;
@@ -461,7 +454,6 @@ public class Messages extends NLS {
     public static String UserStatusChangeHandler_user_joined_text;
     public static String UserStatusChangeHandler_user_left;
     public static String UserStatusChangeHandler_user_left_text;
-    public static String UserStatusChangeHandler_user_no_participant;
     public static String UserStatusChangeHandler_he_has_now_access;
     public static String UserStatusChangeHandler_permission_changed;
     public static String UserStatusChangeHandler_read_only;
