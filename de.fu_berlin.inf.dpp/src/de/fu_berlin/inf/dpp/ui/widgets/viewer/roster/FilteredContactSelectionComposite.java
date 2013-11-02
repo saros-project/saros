@@ -181,7 +181,7 @@ public class FilteredContactSelectionComposite extends
         for (ContactSelectionListener contactSelectionListener : contactSelectionListeners) {
             if (contactSelectionListener instanceof FilteredContactSelectionListener)
                 ((FilteredContactSelectionListener) contactSelectionListener)
-                    .filterNonSarosBuddiesChanged(event);
+                    .filterNonSarosContactsChanged(event);
         }
     }
 }

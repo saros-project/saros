@@ -24,8 +24,8 @@ import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.FilteredContactSelectionComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.ContactSelectionChangedEvent;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.FilteredContactSelectionListener;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.FilterContactsChangedEvent;
+import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.FilteredContactSelectionListener;
 
 /**
  * Allows the user to select a {@link JID} from the {@link Roster}.
@@ -36,12 +36,12 @@ public class ContactSelectionWizardPage extends WizardPage {
     private static final Logger LOG = Logger
         .getLogger(ContactSelectionWizardPage.class);
 
-    protected static final String TITLE = Messages.BuddySelectionWizardPage_title;
-    protected static final String DESCRIPTION = Messages.BuddySelectionWizardPage_description;
+    protected static final String TITLE = Messages.ContactSelectionWizardPage_title;
+    protected static final String DESCRIPTION = Messages.ContactSelectionWizardPage_description;
 
-    protected static final String NO_CONTACT_SELECTED_ERROR_MESSAGE = Messages.BuddySelectionWizardPage_error_select_one_buddy;
-    protected static final String OFFLINE_CONTACT_SELECTED_ERROR_MESSAGE = Messages.BuddySelectionWizardPage_error_selected_offline;
-    protected static final String CONTACTS_WITHOUT_SAROS_SUPPORT_WARNING_MESSAGE = Messages.BuddySelectionWizardPage_warn_only_saros_buddies;
+    protected static final String NO_CONTACT_SELECTED_ERROR_MESSAGE = Messages.ContactSelectionWizardPage_error_no_contact_selected;
+    protected static final String OFFLINE_CONTACT_SELECTED_ERROR_MESSAGE = Messages.ContactSelectionWizardPage_error_offline_contact_selected;
+    protected static final String CONTACTS_WITHOUT_SAROS_SUPPORT_WARNING_MESSAGE = Messages.ContactSelectionWizardPage_warn_contact_without_saros_support_selected;
 
     protected FilteredContactSelectionComposite contactSelectionComposite;
 
@@ -52,7 +52,7 @@ public class ContactSelectionWizardPage extends WizardPage {
     protected final boolean allowEmptyContactSelection;
 
     /**
-     * This flag is true as soon as the user selected buddies without problems.
+     * This flag is true as soon as the user selected contacts without problems.
      */
     protected boolean selectionWasValid = false;
 
@@ -63,22 +63,23 @@ public class ContactSelectionWizardPage extends WizardPage {
     protected DiscoveryManager discoveryManager;
 
     /**
-     * This {@link FilteredContactSelectionListener} changes the {@link WizardPage}'s
-     * state according to the selected {@link JID}s.
+     * This {@link FilteredContactSelectionListener} changes the
+     * {@link WizardPage}'s state according to the selected {@link JID}s.
      */
-    protected FilteredContactSelectionListener buddySelectionListener = new FilteredContactSelectionListener() {
+    protected FilteredContactSelectionListener contactSelectionListener = new FilteredContactSelectionListener() {
         @Override
         public void contactSelectionChanged(ContactSelectionChangedEvent event) {
             updatePageCompletion();
         }
 
         @Override
-        public void filterNonSarosBuddiesChanged(
+        public void filterNonSarosContactsChanged(
             FilterContactsChangedEvent event) {
 
-            preferenceStore.setValue(
-                PreferenceConstants.BUDDYSELECTION_FILTERNONSAROSBUDDIES,
-                event.isFilterNonSarosContacts());
+            preferenceStore
+                .setValue(
+                    PreferenceConstants.CONTACT_SELECTION_FILTER_NON_SAROS_CONTACTS,
+                    event.isFilterNonSarosContacts());
         }
     };
 
@@ -96,7 +97,8 @@ public class ContactSelectionWizardPage extends WizardPage {
             SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
                 @Override
                 public void run() {
-                    if (ContactSelectionWizardPage.this.getControl().isDisposed())
+                    if (ContactSelectionWizardPage.this.getControl()
+                        .isDisposed())
                         return;
 
                     updatePageCompletion();
@@ -134,10 +136,10 @@ public class ContactSelectionWizardPage extends WizardPage {
         composite.setLayout(new GridLayout(1, false));
 
         boolean initialFilterConfig = preferenceStore
-            .getBoolean(PreferenceConstants.BUDDYSELECTION_FILTERNONSAROSBUDDIES);
+            .getBoolean(PreferenceConstants.CONTACT_SELECTION_FILTER_NON_SAROS_CONTACTS);
 
-        contactSelectionComposite = new FilteredContactSelectionComposite(composite,
-            SWT.BORDER | SWT.V_SCROLL, initialFilterConfig);
+        contactSelectionComposite = new FilteredContactSelectionComposite(
+            composite, SWT.BORDER | SWT.V_SCROLL, initialFilterConfig);
 
         /*
          * preset the contact(s) e.g from the Saros view when invoking 'Work
@@ -147,24 +149,24 @@ public class ContactSelectionWizardPage extends WizardPage {
             .getSelectionRetriever(JID.class).getOverallSelection());
 
         contactSelectionComposite
-            .addContactSelectionListener(buddySelectionListener);
+            .addContactSelectionListener(contactSelectionListener);
 
-        contactSelectionComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
-            true, true));
+        contactSelectionComposite.setLayoutData(new GridData(SWT.FILL,
+            SWT.FILL, true, true));
 
         updatePageCompletion();
     }
 
     protected void updatePageCompletion() {
 
-        List<JID> selectedBuddies = getSelectedContacts();
+        List<JID> selectedContacts = getSelectedContacts();
 
-        List<JID> selectedBuddiesWithSarosSupport = getSelectedContactsWithSarosSupport();
+        List<JID> selectedContactsWithSarosSupport = getSelectedContactsWithSarosSupport();
 
-        if (allowEmptyContactSelection && selectedBuddies.isEmpty()) {
+        if (allowEmptyContactSelection && selectedContacts.isEmpty()) {
             setPageComplete(true);
             setErrorMessage(null);
-        } else if (selectedBuddies.size() == 0) {
+        } else if (selectedContacts.size() == 0) {
             if (selectionWasValid)
                 setErrorMessage(NO_CONTACT_SELECTED_ERROR_MESSAGE);
             setPageComplete(false);
@@ -175,7 +177,8 @@ public class ContactSelectionWizardPage extends WizardPage {
             selectionWasValid = true;
             setErrorMessage(null);
 
-            if (selectedBuddies.size() > selectedBuddiesWithSarosSupport.size()) {
+            if (selectedContacts.size() > selectedContactsWithSarosSupport
+                .size()) {
                 setMessage(CONTACTS_WITHOUT_SAROS_SUPPORT_WARNING_MESSAGE,
                     IMessageProvider.WARNING);
             } else {

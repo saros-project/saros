@@ -109,7 +109,8 @@ public class Messages extends NLS {
     public static String ConfigurationSettingsWizardPage_statistic;
     public static String ConfigurationSettingsWizardPage_title;
     public static String ConfigurationSettingsWizardPage_yes_use;
-    public static String ConfigurationSummaryWizardPage_addBuddies;
+
+    public static String ConfigurationSummaryWizardPage_addContacts;
     public static String ConfigurationSummaryWizardPage_check_settings;
     public static String ConfigurationSummaryWizardPage_connect_auto;
     public static String ConfigurationSummaryWizardPage_connect_auto_not;
@@ -122,6 +123,7 @@ public class Messages extends NLS {
     public static String ConfigurationSummaryWizardPage_title;
     public static String ConfigurationSummaryWizardPage_use_upnp;
     public static String ConfigurationSummaryWizardPage_use_upnp_not;
+
     public static String ConnectionStateComposite_connecting;
     public static String ConnectionStateComposite_connected;
     public static String ConnectionStateComposite_disconnecting;
@@ -300,14 +302,16 @@ public class Messages extends NLS {
     public static String roster_alreadyadded_errorMessage;
     public static String wizard_finish_noeffect;
     public static String account_exists_errorMessage;
+
     public static String BuddySelectionComposite_add_buddy;
     public static String BuddySelectionComposite_hide_buddies_no_saros;
-    public static String BuddySelectionWizardPage_description;
-    public static String BuddySelectionWizardPage_error_select_one_buddy;
-    public static String BuddySelectionWizardPage_error_selected_offline;
-    public static String BuddySelectionWizardPage_label_buddies;
-    public static String BuddySelectionWizardPage_title;
-    public static String BuddySelectionWizardPage_warn_only_saros_buddies;
+
+    public static String ContactSelectionWizardPage_title;
+    public static String ContactSelectionWizardPage_description;
+    public static String ContactSelectionWizardPage_error_no_contact_selected;
+    public static String ContactSelectionWizardPage_error_offline_contact_selected;
+    public static String ContactSelectionWizardPage_warn_contact_without_saros_support_selected;
+
     public static String NetworkPreferencePage_adress;
     public static String NetworkPreferencePage_adress_tooltip;
     public static String NetworkPreferencePage_allow_port_mapping;

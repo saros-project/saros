@@ -90,7 +90,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         prefs.setValue(PreferenceConstants.ENABLE_BALLOON_NOTIFICATION, true);
 
         prefs.setValue(
-            PreferenceConstants.BUDDYSELECTION_FILTERNONSAROSBUDDIES, true);
+            PreferenceConstants.CONTACT_SELECTION_FILTER_NON_SAROS_CONTACTS, true);
 
         // Initialize Feedback Preferences
         prefs.setValue(PreferenceConstants.FEEDBACK_SURVEY_DISABLED,

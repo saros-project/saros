@@ -95,14 +95,15 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
         check.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
         check.setSpacing(5);
 
-        SimpleNoteComposite addBuddies = new SimpleNoteComposite(
+        SimpleNoteComposite addContacts = new SimpleNoteComposite(
             autoConnectComposite,
             SWT.BORDER,
             ImageManager.ELCL_CONTACT_ADD,
-            de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_addBuddies);
-        addBuddies
-            .setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-        addBuddies.setSpacing(5);
+            de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_addContacts);
+
+        addContacts.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
+            false));
+        addContacts.setSpacing(5);
 
         SimpleNoteComposite shareProjects = new SimpleNoteComposite(
             autoConnectComposite,

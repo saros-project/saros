@@ -13,7 +13,7 @@ public interface FilteredContactSelectionListener extends ContactSelectionListen
      * 
      * @param event
      */
-    public void filterNonSarosBuddiesChanged(
+    public void filterNonSarosContactsChanged(
         FilterContactsChangedEvent event);
 
 }
