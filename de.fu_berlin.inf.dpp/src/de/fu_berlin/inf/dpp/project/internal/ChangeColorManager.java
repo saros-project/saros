@@ -64,8 +64,11 @@ public class ChangeColorManager extends AbstractActivityProvider implements
         @Override
         public void userJoined(User user) {
 
+            List<User> currentUsers = new ArrayList<User>();
+
             synchronized (ChangeColorManager.this) {
                 favoriteUserColors.put(user, user.getFavoriteColorID());
+                currentUsers.addAll(favoriteUserColors.keySet());
             }
 
             if (!sarosSession.isHost()) {
@@ -74,14 +77,17 @@ public class ChangeColorManager extends AbstractActivityProvider implements
                 return;
             }
 
-            reassignSessionColorIDs(sarosSession.getUsers(), user, true);
+            reassignSessionColorIDs(currentUsers, user, true);
         }
 
         @Override
         public void userLeft(User user) {
 
+            List<User> currentUsers = new ArrayList<User>();
+
             synchronized (ChangeColorManager.this) {
                 favoriteUserColors.remove(user);
+                currentUsers.addAll(favoriteUserColors.keySet());
             }
 
             if (!sarosSession.isHost()) {
@@ -89,7 +95,7 @@ public class ChangeColorManager extends AbstractActivityProvider implements
                 return;
             }
 
-            reassignSessionColorIDs(sarosSession.getUsers(), user, false);
+            reassignSessionColorIDs(currentUsers, user, false);
         }
     };
 
@@ -183,13 +189,11 @@ public class ChangeColorManager extends AbstractActivityProvider implements
         User affected = activity.getAffected();
         int colorID = activity.getColorID();
 
-        synchronized (this) {
+        List<User> currentUsers = new ArrayList<User>();
 
-            /*
-             * FIXME the leave message packet is send from a client to all other
-             * session users. This does not work well as this component uses a
-             * host - client architecture !!!
-             */
+        synchronized (this) {
+            currentUsers.addAll(favoriteUserColors.keySet());
+
             if (affected == null) {
                 log.warn("received color id change for a user that is no longer part of the session");
                 return;
@@ -222,16 +226,12 @@ public class ChangeColorManager extends AbstractActivityProvider implements
             }
         }
 
-        if (fireChanges)
-            broadcastColorIDChange(affected, affected.getColorID());
+        if (fireChanges) {
+            broadcastColorIDChange(affected, currentUsers,
+                affected.getColorID());
+        }
 
-        // FIXME this can fail on client side, see fixme above
-        /*
-         * FIXME rework the code in SarosSession to ensure that getParticipants
-         * always return a non dirty state during activity execution
-         */
-
-        updateColorSet(sarosSession.getUsers());
+        updateColorSet(currentUsers);
 
         editorManager.colorChanged();
         editorManager.refreshAnnotations();
@@ -352,7 +352,8 @@ public class ChangeColorManager extends AbstractActivityProvider implements
         }
 
         for (User currentUser : currentUsers)
-            broadcastColorIDChange(currentUser, currentUser.getColorID());
+            broadcastColorIDChange(currentUser, currentUsers,
+                currentUser.getColorID());
 
         editorManager.colorChanged();
         editorManager.refreshAnnotations();
@@ -383,7 +384,8 @@ public class ChangeColorManager extends AbstractActivityProvider implements
      * @param assignedColors
      * @return
      */
-    private boolean isOptimalColorAssignment(Map<User, Integer> assignedColors) {
+    private synchronized boolean isOptimalColorAssignment(
+        Map<User, Integer> assignedColors) {
         return assignedColors.values().containsAll(
             new HashSet<Integer>(favoriteUserColors.values()))
             && isValidColorAssignment(assignedColors);
@@ -474,15 +476,22 @@ public class ChangeColorManager extends AbstractActivityProvider implements
         return assignedColors;
     }
 
-    private void broadcastColorIDChange(User affected, int colorID) {
+    /**
+     * Notify the recipients about the color change of the affected users. If
+     * the session host is included in the recipient list it will be ignored.
+     */
+    private void broadcastColorIDChange(User affected, List<User> recipients,
+        int colorID) {
 
         assert sarosSession.isHost() : "only the session host can broadcast color id changes";
 
-        List<User> currentRemoteSessionUsers = sarosSession.getRemoteUsers();
+        for (User user : recipients) {
+            if (user.isHost())
+                continue;
 
-        for (User user : currentRemoteSessionUsers)
             fireActivity(new ChangeColorActivity(sarosSession.getLocalUser(),
                 user, affected, colorID));
+        }
     }
 
     private boolean isValidColorID(int colorID) {
@@ -564,6 +573,7 @@ public class ChangeColorManager extends AbstractActivityProvider implements
         for (User user : users)
             colorIDSetStorage.updateColor(colorIDSet, user.getJID(),
                 UserColorID.UNKNOWN, UserColorID.UNKNOWN);
+
         for (User user : users) {
             if (!isValidColorID(user.getColorID()))
                 continue;
