@@ -57,9 +57,9 @@ public class User {
 
     private final int favoriteColorID;
 
-    private Permission permission = Permission.WRITE_ACCESS;
+    private volatile Permission permission = Permission.WRITE_ACCESS;
 
-    private boolean isInSession;
+    private volatile boolean isInSession;
 
     public User(JID jid, boolean isHost, boolean isLocal, int colorID,
         int favoriteColorID) {

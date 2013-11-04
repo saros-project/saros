@@ -48,34 +48,34 @@ import de.fu_berlin.inf.dpp.test.fakes.synchonize.NonUISynchronizer;
 public class ActivityHandlerTest {
 
     // SUT
-    ActivityHandler handler;
-    NonUISynchronizer synchronizer;
+    private ActivityHandler handler;
+    private NonUISynchronizer synchronizer;
 
     // Results from Callback
-    IActivity transformedActivity;
-    IActivity localActivity;
-    boolean willBeSent;
-    List<User> targets = new ArrayList<User>();
+    private IActivity transformedActivity;
+    private IActivity localActivity;
+    private boolean willBeSent;
+    private List<User> targets = new ArrayList<User>();
 
     // Input
-    List<IActivity> activities;
+    private List<IActivity> activities;
 
     // SessionUsers
-    List<User> participants;
-    List<User> remoteUsers;
-    List<User> remoteUsersWithProjects;
+    private List<User> participants;
+    private List<User> remoteUsers;
+    private List<User> remoteUsersWithProjects;
 
-    User alice;
-    User bob;
-    User dave;
+    private User alice;
+    private User bob;
+    private User dave;
 
     // Needed to compare localActivities
-    volatile CountDownLatch gate;
+    private volatile CountDownLatch gate;
 
     // Roles of the Users in this Test
-    User target;
-    User source;
-    boolean host;
+    private User target;
+    private User source;
+    private boolean host;
 
     // Callback that is called from the ActivityHandler
     public IActivityHandlerCallback callback = new IActivityHandlerCallback() {
@@ -335,6 +335,7 @@ public class ActivityHandlerTest {
     private User createUser(boolean local) {
         User user = EasyMock.createMock(User.class);
         EasyMock.expect(user.isLocal()).andStubReturn(local);
+        EasyMock.expect(user.isInSarosSession()).andStubReturn(true);
         EasyMock.replay(user);
         return user;
     }

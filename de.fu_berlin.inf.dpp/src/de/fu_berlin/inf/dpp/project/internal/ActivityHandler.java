@@ -315,9 +315,31 @@ public final class ActivityHandler implements Startable {
             public void run() {
 
                 for (IActivity activity : activities) {
-                    List<IActivity> transformedActivities = new ArrayList<IActivity>();
-                    transformedActivities = documentClient
+
+                    User source = activity.getSource();
+
+                    /*
+                     * Ensure that we do not execute activities after all
+                     * listeners were notified (See SarosSession#removeUser). It
+                     * is still possible that a user may left during activity
+                     * execution but this is likely no to produce any errors.
+                     * 
+                     * TODO: as the notification for users who left the session
+                     * is send in parallel with the activities there will be
+                     * race conditions were one user may execute a given
+                     * activity but another user will not which may lead to
+                     * unwanted inconsistencies if that activity was a resource
+                     * activity.
+                     */
+                    if (source == null || !source.isInSarosSession()) {
+                        LOG.warn("dropping activity for user that is no longer in session: "
+                            + activity);
+                        continue;
+                    }
+
+                    List<IActivity> transformedActivities = documentClient
                         .transformFromJupiter(activity);
+
                     for (IActivity transformedActivity : transformedActivities) {
                         try {
                             callback.execute(transformedActivity);
