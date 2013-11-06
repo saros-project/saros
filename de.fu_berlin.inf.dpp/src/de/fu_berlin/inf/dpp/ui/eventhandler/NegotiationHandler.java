@@ -14,7 +14,6 @@ import org.eclipse.ui.progress.IProgressConstants;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.invitation.FileList;
 import de.fu_berlin.inf.dpp.invitation.IncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
@@ -181,7 +180,7 @@ public class NegotiationHandler implements INegotiationHandler {
                         @Override
                         public void run() {
                             DialogUtils.openInformationMessageDialog(
-                                EditorAPI.getShell(), message, message);
+                                SWTUtils.getShell(), message, message);
                         }
                     });
 
@@ -283,7 +282,7 @@ public class NegotiationHandler implements INegotiationHandler {
                 JoinSessionWizard sessionWizard = new JoinSessionWizard(process);
 
                 final WizardDialogAccessable wizardDialog = new WizardDialogAccessable(
-                    EditorAPI.getShell(), sessionWizard);
+                    SWTUtils.getShell(), sessionWizard);
 
                 // TODO Provide help :-)
                 wizardDialog.setHelpAvailable(false);
@@ -312,7 +311,7 @@ public class NegotiationHandler implements INegotiationHandler {
                         .getProjectNames());
 
                 final WizardDialogAccessable wizardDialog = new WizardDialogAccessable(
-                    EditorAPI.getShell(), projectWizard, SWT.MIN | SWT.MAX,
+                    SWTUtils.getShell(), projectWizard, SWT.MIN | SWT.MAX,
                     SWT.SYSTEM_MODAL | SWT.APPLICATION_MODAL
                         | SWT.PRIMARY_MODAL);
 

@@ -35,7 +35,6 @@ import com.thoughtworks.xstream.InitializationException;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.ConnectionException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.StreamException;
@@ -276,7 +275,7 @@ public class VideoSharing {
         SWTUtils.runSafeSWTAsync(log, new Runnable() {
             @Override
             public void run() {
-                DialogUtils.openErrorMessageDialog(EditorAPI.getShell(), title,
+                DialogUtils.openErrorMessageDialog(SWTUtils.getShell(), title,
                     message);
             }
         });

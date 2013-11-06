@@ -396,7 +396,7 @@ public class AddProjectToSessionWizard extends Wizard {
         CancelLocation cancelLocation) {
 
         final String peer = jid.getBase();
-        final Shell shell = EditorAPI.getShell();
+        final Shell shell = SWTUtils.getShell();
 
         if (errorMsg != null) {
             switch (cancelLocation) {

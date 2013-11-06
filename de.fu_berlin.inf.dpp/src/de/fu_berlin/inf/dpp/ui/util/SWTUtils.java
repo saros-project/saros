@@ -7,6 +7,7 @@ import java.util.concurrent.Callable;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -204,5 +205,41 @@ public class SWTUtils {
      */
     public static Display getDisplay() {
         return PlatformUI.getWorkbench().getDisplay();
+    }
+
+    /**
+     * Tries to get a {@linkplain Shell shell} that is centered on the shells of
+     * the current Eclipse application.
+     * <p/>
+     * Should be used instead of {@link Display#getActiveShell()}.
+     * 
+     * @return a shell centered on top of the current application or
+     *         <code>null</code> if no such shell exists or the default display
+     *         is disposed
+     */
+    public static Shell getShell() {
+
+        final Display display = getDisplay();
+
+        if (display.isDisposed())
+            return null;
+
+        final IWorkbench workbench = PlatformUI.getWorkbench();
+
+        final IWorkbenchWindow activeWorkbenchWindow = workbench
+            .getActiveWorkbenchWindow();
+
+        if (activeWorkbenchWindow != null
+            && !activeWorkbenchWindow.getShell().isDisposed())
+            return activeWorkbenchWindow.getShell();
+
+        final IWorkbenchWindow[] workbenchWindows = workbench
+            .getWorkbenchWindows();
+
+        if (workbenchWindows.length > 0
+            && !workbenchWindows[0].getShell().isDisposed())
+            return workbenchWindows[0].getShell();
+
+        return display.getActiveShell();
     }
 }

@@ -20,7 +20,6 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.ui.progress.IProgressConstants;
 
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.ConnectionException;
 import de.fu_berlin.inf.dpp.exceptions.ReceiverGoneException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
@@ -205,7 +204,7 @@ public class ReceiveFileJob extends StreamJob {
 
             @Override
             public String call() throws Exception {
-                FileDialog fd = new FileDialog(EditorAPI.getShell(), SWT.SAVE);
+                FileDialog fd = new FileDialog(SWTUtils.getShell(), SWT.SAVE);
                 fd.setText(Messages.SendFileAction_dialog_choose_location_title);
                 fd.setFileName(targetFilename);
                 File file = null;
@@ -222,7 +221,7 @@ public class ReceiveFileJob extends StreamJob {
 
                     if (file.exists()) {
                         again = !DialogUtils.openQuestionMessageDialog(
-                            EditorAPI.getShell(),
+                            SWTUtils.getShell(),
                             Messages.SendFileAction_dialog_file_exists_title,
                             Messages.SendFileAction_dialog_file_exists_message);
 

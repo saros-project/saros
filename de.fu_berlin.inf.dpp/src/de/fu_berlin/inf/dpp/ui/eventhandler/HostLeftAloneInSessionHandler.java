@@ -6,7 +6,6 @@ import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
@@ -147,7 +146,7 @@ public class HostLeftAloneInSessionHandler {
 
         if (prompt) {
             MessageDialogWithToggle dialog = MessageDialogWithToggle
-                .openYesNoQuestion(EditorAPI.getShell(),
+                .openYesNoQuestion(SWTUtils.getShell(),
                     Messages.HostLeftAloneInSessionDialog_title,
                     Messages.HostLeftAloneInSessionDialog_message,
                     "Remember decision", false, preferenceStore,

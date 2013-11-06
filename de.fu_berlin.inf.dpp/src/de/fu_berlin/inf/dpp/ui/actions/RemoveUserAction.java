@@ -17,7 +17,6 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
@@ -98,7 +97,7 @@ public class RemoveUserAction extends Action {
         if (!canRemoveUsers(users))
             return;
 
-        Shell shell = EditorAPI.getShell();
+        Shell shell = SWTUtils.getShell();
 
         if (shell == null)
             shell = new Shell(SWTUtils.getDisplay());

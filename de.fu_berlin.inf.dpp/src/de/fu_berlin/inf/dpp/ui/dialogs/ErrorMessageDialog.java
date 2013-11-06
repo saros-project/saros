@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.picocontainer.annotations.Nullable;
 
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 
@@ -29,7 +28,7 @@ public class ErrorMessageDialog {
         SWTUtils.runSafeSWTSync(log, new Runnable() {
             @Override
             public void run() {
-                MessageDialog.openError(EditorAPI.getShell(),
+                MessageDialog.openError(SWTUtils.getShell(),
                     exception.toString(), exception.getMessage());
             }
         });
@@ -43,7 +42,7 @@ public class ErrorMessageDialog {
         SWTUtils.runSafeSWTSync(log, new Runnable() {
             @Override
             public void run() {
-                MessageDialog.openError(EditorAPI.getShell(), windowTitle,
+                MessageDialog.openError(SWTUtils.getShell(), windowTitle,
                     exception.toString());
             }
         });
@@ -67,7 +66,7 @@ public class ErrorMessageDialog {
         SWTUtils.runSafeSWTSync(log, new Runnable() {
             @Override
             public void run() {
-                MessageDialog.openError(EditorAPI.getShell(),
+                MessageDialog.openError(SWTUtils.getShell(),
                     Messages.ErrorMessageDialog_error_plugin, error);
             }
         });

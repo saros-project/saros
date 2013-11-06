@@ -33,7 +33,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.invitation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
@@ -207,7 +206,7 @@ public class JoinSessionWizard extends Wizard {
 
         String peer = jid.getBase();
 
-        Shell shell = EditorAPI.getShell();
+        Shell shell = SWTUtils.getShell();
 
         if (errorMsg != null) {
             switch (cancelLocation) {

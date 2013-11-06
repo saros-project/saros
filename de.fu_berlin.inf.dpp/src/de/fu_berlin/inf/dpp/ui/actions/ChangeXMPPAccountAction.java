@@ -19,7 +19,6 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
@@ -160,7 +159,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
             @Override
             public void run() {
                 boolean proceed = DialogUtils.openQuestionMessageDialog(
-                    EditorAPI.getShell(),
+                    SWTUtils.getShell(),
                     "Disconnecting from the current Saros Session",
                     "Connecting with a different account will disconnect you from your current Saros session. Do you wish to continue ?");
 

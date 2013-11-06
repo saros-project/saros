@@ -12,7 +12,6 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.communication.audio.util.AudioReceiverRunnable;
 import de.fu_berlin.inf.dpp.communication.audio.util.AudioSenderRunnable;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.ConnectionException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.StreamException;
@@ -101,7 +100,7 @@ public class AudioServiceManager {
                 @Override
                 public void run() {
                     DialogUtils.openInformationMessageDialog(
-                        EditorAPI.getShell(), "VoIP Session stopped",
+                        SWTUtils.getShell(), "VoIP Session stopped",
                         "The VoIP Session has been stopped!");
                 }
             });
@@ -216,7 +215,7 @@ public class AudioServiceManager {
         SWTUtils.runSafeSWTAsync(log, new Runnable() {
             @Override
             public void run() {
-                DialogUtils.openErrorMessageDialog(EditorAPI.getShell(), title,
+                DialogUtils.openErrorMessageDialog(SWTUtils.getShell(), title,
                     message);
             }
         });

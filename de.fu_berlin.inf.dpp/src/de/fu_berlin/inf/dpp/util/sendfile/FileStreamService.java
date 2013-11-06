@@ -6,7 +6,6 @@ import java.util.concurrent.Callable;
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.internal.StreamService;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.ui.Messages;
@@ -63,7 +62,7 @@ public class FileStreamService extends StreamService {
 
                 return DialogUtils
                     .openQuestionMessageDialog(
-                        EditorAPI.getShell(),
+                        SWTUtils.getShell(),
                         Messages.SendFileAction_dialog_incoming_file_transfer_title,
                         MessageFormat
                             .format(

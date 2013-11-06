@@ -23,7 +23,6 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
@@ -221,7 +220,7 @@ public class ConsistencyAction extends Action {
             public void run() {
                 log.debug("user activated CW recovery."); //$NON-NLS-1$
 
-                Shell dialogShell = EditorAPI.getShell();
+                Shell dialogShell = SWTUtils.getShell();
                 if (dialogShell == null)
                     dialogShell = new Shell();
 

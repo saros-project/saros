@@ -32,7 +32,6 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -127,7 +126,7 @@ public class CollaborationUtils {
 
         ISarosSession sarosSession = sessionManager.getSarosSession();
 
-        Shell shell = EditorAPI.getShell();
+        Shell shell = SWTUtils.getShell();
 
         if (sarosSession == null) {
             LOG.warn("cannot leave a non-running session");

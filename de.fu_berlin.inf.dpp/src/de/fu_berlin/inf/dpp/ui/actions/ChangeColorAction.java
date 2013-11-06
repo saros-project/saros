@@ -15,11 +15,11 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.ui.wizards.ColorChooserWizard;
@@ -74,7 +74,7 @@ public final class ChangeColorAction extends Action implements Disposable {
 
         ColorChooserWizard wizard = new ColorChooserWizard();
 
-        WizardDialog dialog = new WizardDialog(EditorAPI.getShell(), wizard);
+        WizardDialog dialog = new WizardDialog(SWTUtils.getShell(), wizard);
         dialog.setHelpAvailable(false);
 
         dialog.setBlockOnOpen(true);
@@ -93,7 +93,7 @@ public final class ChangeColorAction extends Action implements Disposable {
         if (session.getAvailableColors().contains(colorID))
             session.changeColor(colorID);
         else
-            MessageDialog.openInformation(EditorAPI.getShell(),
+            MessageDialog.openInformation(SWTUtils.getShell(),
                 Messages.ChangeColorAction_message_title,
                 Messages.ChangeColorAction_message_text);
     }

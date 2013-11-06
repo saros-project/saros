@@ -14,7 +14,6 @@ import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -196,7 +195,7 @@ public class SubscriptionManager {
             @Override
             public void run() {
                 boolean accept = MessageDialog.openConfirm(
-                    EditorAPI.getShell(),
+                    SWTUtils.getShell(),
                     Messages.SubscriptionManager_incoming_subscription_request_title,
                     MessageFormat
                         .format(

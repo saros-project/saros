@@ -16,7 +16,6 @@ import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.dialogs.FeedbackDialog;
@@ -338,7 +337,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
 
                 @Override
                 public Boolean call() {
-                    Dialog dialog = new FeedbackDialog(EditorAPI.getShell(),
+                    Dialog dialog = new FeedbackDialog(SWTUtils.getShell(),
                         saros, FeedbackManager.this, message);
                     return dialog.open() == Window.OK;
                 }
@@ -373,7 +372,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
                 browserType = BROWSER_NONE;
                 // last resort: present a link to the survey
                 // TODO user should be able to copy&paste the link easily
-                MessageDialog.openWarning(EditorAPI.getShell(),
+                MessageDialog.openWarning(SWTUtils.getShell(),
                     "Opening survey failed",
                     "Your browser couldn't be opend. Please visit "
                         + SURVEY_URL + " yourself.");

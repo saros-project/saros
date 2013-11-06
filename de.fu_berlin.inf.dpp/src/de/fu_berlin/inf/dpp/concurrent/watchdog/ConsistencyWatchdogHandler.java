@@ -30,7 +30,6 @@ import de.fu_berlin.inf.dpp.activities.business.RecoveryFileActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
@@ -103,7 +102,7 @@ public class ConsistencyWatchdogHandler implements Startable {
             public void run() {
 
                 final ProgressMonitorDialog dialog = new ProgressMonitorDialog(
-                    EditorAPI.getAWorkbenchWindow().getShell()) {
+                    SWTUtils.getShell()) {
                     @Override
                     protected Image getImage() {
                         return getWarningImage();

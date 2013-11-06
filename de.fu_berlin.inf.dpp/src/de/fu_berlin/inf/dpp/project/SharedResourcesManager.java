@@ -64,7 +64,6 @@ import de.fu_berlin.inf.dpp.activities.business.VCSActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
@@ -668,7 +667,7 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
 
         try {
             // TODO Should these operations run in an IWorkspaceRunnable?
-            Shell shell = EditorAPI.getAWorkbenchWindow().getShell();
+            Shell shell = SWTUtils.getShell();
             ProgressMonitorDialog progressMonitorDialog = new ProgressMonitorDialog(
                 shell);
             progressMonitorDialog.open();

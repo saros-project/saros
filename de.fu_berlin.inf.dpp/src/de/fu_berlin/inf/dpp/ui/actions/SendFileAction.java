@@ -41,11 +41,11 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.util.sendfile.FileStreamService;
@@ -123,7 +123,7 @@ public class SendFileAction extends Action implements Disposable {
             return;
 
         // prompt to choose a file
-        FileDialog fd = new FileDialog(EditorAPI.getShell(), SWT.OPEN);
+        FileDialog fd = new FileDialog(SWTUtils.getShell(), SWT.OPEN);
         fd.setText(Messages.SendFileAction_filedialog_text);
         String filename = fd.open();
         if (filename == null)

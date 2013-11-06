@@ -41,7 +41,6 @@ import org.eclipse.ui.PlatformUI;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
@@ -146,8 +145,8 @@ public class SarosUI {
     public void performPermissionChange(final ISarosSession session,
         final User user, final Permission newPermission) {
 
-        ProgressMonitorDialog dialog = new ProgressMonitorDialog(EditorAPI
-            .getAWorkbenchWindow().getShell());
+        ProgressMonitorDialog dialog = new ProgressMonitorDialog(
+            SWTUtils.getShell());
 
         try {
             dialog.run(true, true, new IRunnableWithProgress() {
@@ -169,8 +168,8 @@ public class SarosUI {
                         SWTUtils.runSafeSWTSync(log, new Runnable() {
                             @Override
                             public void run() {
-                                MessageDialog.openInformation(EditorAPI
-                                    .getAWorkbenchWindow().getShell(),
+                                MessageDialog.openInformation(
+                                    SWTUtils.getShell(),
                                     Messages.SarosUI_permission_canceled,
                                     Messages.SarosUI_permission_canceled_text);
                             }
@@ -184,7 +183,7 @@ public class SarosUI {
             });
         } catch (InvocationTargetException e) {
             log.error("Internal Error: ", e); //$NON-NLS-1$
-            MessageDialog.openError(EditorAPI.getAWorkbenchWindow().getShell(),
+            MessageDialog.openError(SWTUtils.getShell(),
                 Messages.SarosUI_permission_failed,
                 Messages.SarosUI_permission_failed_text);
         } catch (InterruptedException e) {

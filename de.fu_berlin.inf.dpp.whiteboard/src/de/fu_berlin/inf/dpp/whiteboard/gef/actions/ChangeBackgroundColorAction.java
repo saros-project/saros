@@ -7,7 +7,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.ColorDialog;
 
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.ui.actions.ChangeColorAction;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.whiteboard.gef.util.ColorUtils;
@@ -62,7 +61,7 @@ public class ChangeBackgroundColorAction extends Action implements
 		SWTUtils.runSafeSWTSync(log, new Runnable() {
 			@Override
 			public void run() {
-				ColorDialog changeColor = new ColorDialog(EditorAPI.getShell());
+				ColorDialog changeColor = new ColorDialog(SWTUtils.getShell());
 				RGB selectedColor = changeColor.open();
 				if (selectedColor == null) {
 					return;

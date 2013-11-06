@@ -11,7 +11,6 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
 
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.ui.dialogs.RememberDecisionMessageDialog;
 
 public class DialogUtils {
@@ -77,7 +76,7 @@ public class DialogUtils {
         SWTUtils.runSafeSWTAsync(log, new Runnable() {
             @Override
             public void run() {
-                DialogUtils.openErrorMessageDialog(EditorAPI.getShell(), title,
+                DialogUtils.openErrorMessageDialog(SWTUtils.getShell(), title,
                     message);
             }
         });
@@ -172,7 +171,7 @@ public class DialogUtils {
                 @Override
                 public Boolean call() {
                     RememberDecisionMessageDialog dialog = new RememberDecisionMessageDialog(
-                        EditorAPI.getShell(), title, null, message,
+                        SWTUtils.getShell(), title, null, message,
                         MessageDialog.QUESTION, new String[] {
                             IDialogConstants.YES_LABEL,
                             IDialogConstants.NO_LABEL }, 0);
@@ -217,7 +216,7 @@ public class DialogUtils {
             return SWTUtils.runSWTSync(new Callable<Boolean>() {
                 @Override
                 public Boolean call() {
-                    MessageDialog md = new MessageDialog(EditorAPI.getShell(),
+                    MessageDialog md = new MessageDialog(SWTUtils.getShell(),
                         title, null, message, MessageDialog.QUESTION,
                         dialogButtonLabels, 0);
                     md.open();
@@ -246,7 +245,7 @@ public class DialogUtils {
             return SWTUtils.runSWTSync(new Callable<Boolean>() {
                 @Override
                 public Boolean call() {
-                    return MessageDialog.openQuestion(EditorAPI.getShell(),
+                    return MessageDialog.openQuestion(SWTUtils.getShell(),
                         title, message);
                 }
             });
@@ -269,7 +268,7 @@ public class DialogUtils {
         SWTUtils.runSafeSWTSync(log, new Runnable() {
             @Override
             public void run() {
-                MessageDialog.openError(EditorAPI.getShell(), title, message);
+                MessageDialog.openError(SWTUtils.getShell(), title, message);
             }
         });
     }

@@ -5,7 +5,6 @@ import java.util.concurrent.Callable;
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.internal.StreamService;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.ui.dialogs.ErrorMessageDialog;
@@ -81,7 +80,7 @@ public class AudioService extends StreamService {
 
                     return DialogUtils
                         .openQuestionMessageDialog(
-                            EditorAPI.getShell(),
+                            SWTUtils.getShell(),
                             "Incoming VoIP Invitation",
                             "Accept new VoIP Invitation from "
                                 + from.getJID()
@@ -96,7 +95,7 @@ public class AudioService extends StreamService {
                 public Boolean call() throws Exception {
 
                     return DialogUtils.openQuestionMessageDialog(
-                        EditorAPI.getShell(), "Incoming VoIP Invitation",
+                        SWTUtils.getShell(), "Incoming VoIP Invitation",
                         "Accept new VoIP Invitation from " + from.getJID()
                             + " ?");
                 }
