@@ -243,10 +243,6 @@ public class BinaryChannelConnection implements IByteStreamConnection {
 
             int fragmentId;
 
-            if (log.isTraceEnabled())
-                log.trace("processing opcode: "
-                    + Integer.toHexString(opcode).toUpperCase());
-
             int payloadLength;
 
             switch (opcode) {
@@ -254,6 +250,13 @@ public class BinaryChannelConnection implements IByteStreamConnection {
                 fragmentId = inputStream.readShort();
                 int chunks = inputStream.readInt();
                 payloadLength = inputStream.readInt();
+
+                if (log.isTraceEnabled()) {
+                    log.trace("processing opcode 0x"
+                        + Integer.toHexString(opcode).toUpperCase()
+                        + " [TFD]: id=" + fragmentId + ", chunks=" + chunks
+                        + ", TFD len=" + payloadLength + " bytes");
+                }
 
                 if (payloadLength <= 0 || payloadLength > CHUNKSIZE)
                     throw new ProtocolException(
@@ -278,6 +281,13 @@ public class BinaryChannelConnection implements IByteStreamConnection {
             case Opcode.DATA:
                 fragmentId = inputStream.readShort();
                 payloadLength = inputStream.readInt();
+
+                if (log.isTraceEnabled()) {
+                    log.trace("processing opcode 0x"
+                        + Integer.toHexString(opcode).toUpperCase()
+                        + " [DATA]: id=" + fragmentId + ", DATA len="
+                        + payloadLength + " bytes");
+                }
 
                 if (payloadLength <= 0 || payloadLength > CHUNKSIZE)
                     throw new ProtocolException(
@@ -327,6 +337,12 @@ public class BinaryChannelConnection implements IByteStreamConnection {
 
     private synchronized void sendData(int fragmentId, byte[] data, int offset,
         int length) throws IOException {
+
+        if (log.isTraceEnabled()) {
+            log.trace("sending data: id=" + fragmentId + ", len=" + length
+                + " bytes");
+        }
+
         outputStream.write(Opcode.DATA);
         outputStream.writeShort(fragmentId);
         outputStream.writeInt(length);
@@ -336,6 +352,12 @@ public class BinaryChannelConnection implements IByteStreamConnection {
 
     private synchronized void sendTransferDescription(byte[] description,
         int fragmentId, int chunks) throws IOException {
+
+        if (log.isTraceEnabled()) {
+            log.trace("sending transfer description: id=" + fragmentId
+                + ", len=" + description.length + " bytes");
+        }
+
         outputStream.write(Opcode.TRANSFERDESCRIPTION);
         outputStream.writeShort(fragmentId);
         outputStream.writeInt(chunks);
