@@ -34,7 +34,7 @@ public class EditorListener {
     private static final Logger log = Logger.getLogger(EditorListener.class
         .getName());
 
-    protected EditorManager manager;
+    protected final EditorManager manager;
 
     protected ITextViewer viewer;
 
@@ -44,45 +44,66 @@ public class EditorListener {
 
     protected ILineRange lastViewport = new LineRange(-1, -1);
 
+    protected boolean isUnsupportedEditor;
+
     public EditorListener(EditorManager manager) {
         this.manager = manager;
     }
 
-    public void bind(IEditorPart part) {
+    /**
+     * Connects all selection listeners to the given {@linkplain IEditorPart
+     * editor part}. If an editor part was already bound it will be unbound and
+     * replaced with the given editor part.
+     * 
+     * @see #unbind()
+     * 
+     * @param part
+     *            the editor part to observe
+     * @return <code>true</code> if the selection listeners were successfully
+     *         installed, <code>false</code> if the selection listeners could
+     *         not be installed
+     */
+    public boolean bind(final IEditorPart part) {
 
-        if (this.part != null) {
+        if (this.part != null)
             unbind();
+
+        final ITextViewer viewer = EditorAPI.getViewer(part);
+
+        if (viewer == null) {
+            log.warn("could not attach selection listeners to editor part:"
+                + part + " , could not retrieve text widget");
+            return false;
         }
 
         this.part = part;
-        this.viewer = EditorAPI.getViewer(part);
+        this.viewer = viewer;
 
-        if (viewer == null) {
-            throw new IllegalArgumentException(
-                "EditorPart does not provide an ITextViewer!");
-        }
+        final StyledText textWidget = viewer.getTextWidget();
 
-        StyledText textWidget = viewer.getTextWidget();
         textWidget.addControlListener(controlListener);
         textWidget.addMouseListener(mouseListener);
         textWidget.addKeyListener(keyListener);
+
         viewer.addTextListener(textListener);
         viewer.getSelectionProvider().addSelectionChangedListener(
             selectionChangedListener);
         viewer.addViewportListener(viewportListener);
+
+        return true;
     }
 
     /**
-     * Disconnects all listeners from the underlying EditorPart.
+     * Disconnects all selection listeners from the underlying
+     * {@linkplain IEditorPart editor part}.
      * 
-     * @throws IllegalStateException
-     *             if already disposed
+     * @see #bind(IEditorPart)
+     * 
      */
     public void unbind() {
 
-        if (part == null) {
-            throw new IllegalStateException();
-        }
+        if (part == null)
+            return;
 
         StyledText textWidget = viewer.getTextWidget();
         textWidget.removeControlListener(controlListener);
