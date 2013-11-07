@@ -10,12 +10,13 @@ import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 import de.fu_berlin.inf.dpp.util.ArrayUtils;
 
 /**
- * Utility class for a convenient work with the {@link ISelectionService}
+ * Utility class for a convenient work with the {@link ISelectionService}.
  * 
  * @author bkahlert
  */
@@ -25,36 +26,55 @@ public class SelectionUtils {
     }
 
     /**
-     * Returns the {@link ISelectionService}
+     * Returns the {@link ISelectionService selection service}. Will always
+     * return <code>null</code> if called from a non-UI thread.
      * 
-     * @return
+     * @return the current selection service or <code>null</code> if it is not
+     *         available
      */
     public static ISelectionService getSelectionService() {
-        return PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-            .getSelectionService();
+        final IWorkbenchWindow workbenchWindow = PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow();
+
+        if (workbenchWindow == null)
+            return null;
+
+        return workbenchWindow.getSelectionService();
     }
 
     /**
-     * Returns the current selection
+     * Returns the current selection. Will always return <code>null</code> if
+     * called from a non-UI thread.
      * 
-     * @return
+     * @return the current selection, or <code>null</code> if undefined
      * @see ISelectionService#getSelection()
      */
     public static ISelection getSelection() {
-        return getSelectionService().getSelection();
+        final ISelectionService selectionService = getSelectionService();
+
+        if (selectionService == null)
+            return null;
+
+        return selectionService.getSelection();
     }
 
     /**
-     * Returns the current selection in the given part
+     * Returns the current selection in the given part. Will always return
+     * <code>null</code> if called from a non-UI thread.
      * 
      * @param partId
      *            of the part
      * 
-     * @return
+     * @return the current selection, or <code>null</code> if undefined
      * @see ISelectionService#getSelection(String)
      */
-    public static ISelection getSelection(String partId) {
-        return getSelectionService().getSelection(partId);
+    public static ISelection getSelection(final String partId) {
+        final ISelectionService selectionService = getSelectionService();
+
+        if (selectionService == null)
+            return null;
+
+        return selectionService.getSelection(partId);
     }
 
     /**
@@ -63,20 +83,29 @@ public class SelectionUtils {
      * @return
      */
     public static List<ISelection> getOverallSelections() {
-        List<ISelection> selections = new ArrayList<ISelection>();
+        final List<ISelection> selections = new ArrayList<ISelection>();
 
-        for (IWorkbenchPage workbenchPage : PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getPages()) {
+        final IWorkbenchWindow workbenchWindow = PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow();
+
+        if (workbenchWindow == null)
+            return selections;
+
+        for (IWorkbenchPage workbenchPage : workbenchWindow.getPages()) {
             for (IEditorReference editorReference : workbenchPage
                 .getEditorReferences()) {
+
                 ISelection selection = getSelection(editorReference.getId());
+
                 if (selection != null)
                     selections.add(selection);
             }
 
             for (IViewReference viewReference : workbenchPage
                 .getViewReferences()) {
+
                 ISelection selection = getSelection(viewReference.getId());
+
                 if (selection != null)
                     selections.add(selection);
             }
@@ -94,8 +123,8 @@ public class SelectionUtils {
      *            to adapt each object to
      * @return
      */
-    public static <Adapter> List<Adapter> getAdaptableObjects(
-        ISelection selection, Class<? extends Adapter> adapter) {
+    public static <T> List<T> getAdaptableObjects(ISelection selection,
+        Class<? extends T> adapter) {
         List<Object> objectsToAdapt = new ArrayList<Object>();
 
         if (selection instanceof IStructuredSelection) {

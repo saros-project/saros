@@ -15,50 +15,41 @@ import de.fu_berlin.inf.dpp.ui.util.selection.retriever.ISelectionRetriever;
  * <p>
  * E.g. if you wish to retrieve all selected {@link IFile}s
  * 
- * @param <AdapterType>
+ * @param <T>
  *            selections need to be adaptable to
  * 
  * @author bkahlert
  */
-public class SelectionRetriever<AdapterType> implements
-    ISelectionRetriever<AdapterType> {
+public class SelectionRetriever<T> implements ISelectionRetriever<T> {
 
-    public Class<? extends AdapterType> adapter;
+    public Class<? extends T> adapter;
 
-    public SelectionRetriever(Class<? extends AdapterType> adapter) {
+    public SelectionRetriever(Class<? extends T> adapter) {
         this.adapter = adapter;
     }
 
     @Override
-    public List<AdapterType> getSelection() {
-        return this.getSelection(null);
+    public List<T> getSelection() {
+        return getSelection(null);
     }
 
     @Override
-    public List<AdapterType> getSelection(String partId) {
-        List<AdapterType> objects = new ArrayList<AdapterType>();
+    public List<T> getSelection(final String partId) {
+        final ISelection selection = (partId == null) ? SelectionUtils
+            .getSelection() : SelectionUtils.getSelection(partId);
 
-        ISelection selection = (partId == null) ? SelectionUtils.getSelection()
-            : SelectionUtils.getSelection(partId);
-
-        for (AdapterType object : SelectionUtils.getAdaptableObjects(selection,
-            adapter)) {
-            objects.add(object);
-        }
-
-        return objects;
+        return SelectionUtils.getAdaptableObjects(selection, adapter);
     }
 
     @Override
-    public List<AdapterType> getOverallSelection() {
-        List<AdapterType> objects = new ArrayList<AdapterType>();
+    public List<T> getOverallSelection() {
+        final List<T> objects = new ArrayList<T>();
+        final List<ISelection> selections = SelectionUtils
+            .getOverallSelections();
 
-        List<ISelection> selections = SelectionUtils.getOverallSelections();
         for (ISelection selection : selections) {
-            for (AdapterType object : SelectionUtils.getAdaptableObjects(
-                selection, adapter)) {
-                objects.add(object);
-            }
+            objects.addAll(SelectionUtils.getAdaptableObjects(selection,
+                adapter));
         }
 
         return objects;

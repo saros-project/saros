@@ -44,7 +44,7 @@ public class SelectionRetrieverFactory {
      * does not only return directly selected projects but also the projects,
      * selected resources (like source folder and files) belong to.
      * 
-     * @param <AdapterType>
+     * @param <T>
      *            type of the returned list
      * @param adapter
      *            type the selections should be adapted to
@@ -52,28 +52,28 @@ public class SelectionRetrieverFactory {
      *            if true, returns an "intelligent" {@link SelectionRetriever}
      * @return
      */
-    static public <AdapterType> ISelectionRetriever<AdapterType> getSelectionRetriever(
-        Class<? extends AdapterType> adapter, boolean smart) {
+    static public <T> ISelectionRetriever<T> getSelectionRetriever(
+        Class<? extends T> adapter, boolean smart) {
 
         if (smart && adapter.equals(IProject.class)) {
             /*
              * If looking for projects we also want to find them in case a
              * project's resource was selected.
              */
-            return new AbstractSelectionConvertingRetriever<IResource, AdapterType>(
+            return new AbstractSelectionConvertingRetriever<IResource, T>(
                 IResource.class) {
 
                 @SuppressWarnings("unchecked")
                 @Override
-                protected AdapterType convert(IResource resource) {
-                    return (AdapterType) resource.getProject();
+                protected T convert(IResource resource) {
+                    return (T) resource.getProject();
                 }
             };
         } else {
             /*
              * Default selection retriever
              */
-            return new SelectionRetriever<AdapterType>(adapter);
+            return new SelectionRetriever<T>(adapter);
         }
     }
 
@@ -87,14 +87,14 @@ public class SelectionRetrieverFactory {
      * does not only return directly selected projects but also the projects,
      * selected resources (like source folder and files) belong to.
      * 
-     * @param <AdapterType>
+     * @param <T>
      *            type of the returned list
      * @param adapter
      *            type the selections should be adapted to
      * @return
      */
-    static public <AdapterType> ISelectionRetriever<AdapterType> getSelectionRetriever(
-        Class<? extends AdapterType> adapter) {
+    public static <T> ISelectionRetriever<T> getSelectionRetriever(
+        Class<? extends T> adapter) {
         return getSelectionRetriever(adapter, true);
     }
 }
