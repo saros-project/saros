@@ -508,14 +508,22 @@ public final class SarosSession implements ISarosSession {
 
     @Override
     public void removeUser(final User user) {
-        JID jid = user.getJID();
-        if (participants.remove(jid) == null) {
-            log.warn("tried to remove user who was not in participants:"
-                + Utils.prefix(jid));
-            return;
+        synchronized (this) {
+            if (!user.isInSarosSession()) {
+                log.warn("user " + user
+                    + " is already or is currently removed from the session");
+                return;
+            }
+
+            user.setInSession(false);
         }
 
-        user.setInSession(false);
+        JID jid = user.getJID();
+        if (participants.remove(jid) == null) {
+            log.error("tried to remove user " + user
+                + " who was never added to the session");
+            return;
+        }
 
         activitySequencer.unregisterUser(user);
 
