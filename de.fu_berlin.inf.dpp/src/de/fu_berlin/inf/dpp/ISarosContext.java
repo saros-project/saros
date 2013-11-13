@@ -4,7 +4,7 @@ import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.PicoContainer;
 
 /**
- * Interface of a SarosContext. To be used by unit tests.
+ * Interface of a SarosContext.
  */
 public interface ISarosContext {
 

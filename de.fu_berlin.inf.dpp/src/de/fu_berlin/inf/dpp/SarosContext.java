@@ -1,9 +1,5 @@
 package de.fu_berlin.inf.dpp;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.util.Arrays;
 import java.util.List;
 
@@ -20,7 +16,6 @@ import org.picocontainer.Parameter;
 import org.picocontainer.PicoBuilder;
 import org.picocontainer.PicoCompositionException;
 import org.picocontainer.PicoContainer;
-import org.picocontainer.annotations.Bind;
 import org.picocontainer.injectors.AnnotatedFieldInjection;
 import org.picocontainer.injectors.CompositeInjection;
 import org.picocontainer.injectors.ConstructorInjection;
@@ -66,7 +61,6 @@ import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelProjectNegotiationExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.ProjectNegotiationMissingFilesExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationAcceptedExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationAcknowledgedExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationCompletedExtension;
@@ -76,6 +70,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.KickUserExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveSessionExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PingExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PongExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.ProjectNegotiationMissingFilesExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ProjectNegotiationOfferingExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.StartActivityQueuingRequest;
 import de.fu_berlin.inf.dpp.net.internal.extensions.StartActivityQueuingResponse;
@@ -139,26 +134,6 @@ import de.fu_berlin.inf.dpp.videosharing.VideoSharingService;
 public class SarosContext implements ISarosContext {
 
     public static class Bindings {
-        @Retention(RetentionPolicy.RUNTIME)
-        @Target({ ElementType.FIELD, ElementType.PARAMETER })
-        @Bind
-        public @interface IBBTransport {
-            // marker interface
-        }
-
-        @Retention(RetentionPolicy.RUNTIME)
-        @Target({ ElementType.FIELD, ElementType.PARAMETER })
-        @Bind
-        public @interface Socks5Transport {
-            // marker interface
-        }
-
-        @Retention(RetentionPolicy.RUNTIME)
-        @Target({ ElementType.FIELD, ElementType.PARAMETER })
-        @Bind
-        public @interface SarosVersion {
-            // marker interface
-        }
 
     }
 
@@ -253,13 +228,13 @@ public class SarosContext implements ISarosContext {
         Component.create(DataTransferManager.class),
         Component.create(DiscoveryManager.class),
 
-        Component.create(
-            BindKey.bindKey(ITransport.class, Bindings.IBBTransport.class),
-            IBBTransport.class),
+        Component.create(BindKey.bindKey(ITransport.class,
+            ISarosContextBindings.IBBTransport.class), IBBTransport.class),
 
-        Component.create(
-            BindKey.bindKey(ITransport.class, Bindings.Socks5Transport.class),
-            Socks5Transport.class),
+        Component
+            .create(BindKey.bindKey(ITransport.class,
+                ISarosContextBindings.Socks5Transport.class),
+                Socks5Transport.class),
 
         Component.create(RosterTracker.class),
         Component.create(SarosNet.class),
@@ -354,7 +329,8 @@ public class SarosContext implements ISarosContext {
             Class.forName(InvitationAcceptedExtension.class.getName());
             Class.forName(InvitationCompletedExtension.class.getName());
             Class.forName(CancelProjectNegotiationExtension.class.getName());
-            Class.forName(ProjectNegotiationMissingFilesExtension.class.getName());
+            Class.forName(ProjectNegotiationMissingFilesExtension.class
+                .getName());
             Class.forName(KickUserExtension.class.getName());
             Class.forName(UserListExtension.class.getName());
             Class.forName(LeaveSessionExtension.class.getName());
@@ -406,7 +382,8 @@ public class SarosContext implements ISarosContext {
         container.addComponent(Saros.class, saros);
 
         container.addComponent(BindKey.bindKey(Version.class,
-            Bindings.SarosVersion.class), saros.getBundle().getVersion());
+            ISarosContextBindings.SarosVersion.class), saros.getBundle()
+            .getVersion());
 
         container.addComponent(IPreferenceStore.class,
             saros.getPreferenceStore());

@@ -18,7 +18,7 @@ import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Packet;
 import org.osgi.framework.Version;
 
-import de.fu_berlin.inf.dpp.SarosContext.Bindings.SarosVersion;
+import de.fu_berlin.inf.dpp.ISarosContextBindings.SarosVersion;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;

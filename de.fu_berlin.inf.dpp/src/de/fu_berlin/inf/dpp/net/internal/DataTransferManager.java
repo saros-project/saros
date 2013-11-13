@@ -20,8 +20,8 @@ import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 import org.picocontainer.annotations.Nullable;
 
-import de.fu_berlin.inf.dpp.SarosContext.Bindings.IBBTransport;
-import de.fu_berlin.inf.dpp.SarosContext.Bindings.Socks5Transport;
+import de.fu_berlin.inf.dpp.ISarosContextBindings.IBBTransport;
+import de.fu_berlin.inf.dpp.ISarosContextBindings.Socks5Transport;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
