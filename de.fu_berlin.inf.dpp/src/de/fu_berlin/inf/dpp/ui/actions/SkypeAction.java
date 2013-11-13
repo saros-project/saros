@@ -14,7 +14,6 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
-import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
@@ -82,8 +81,8 @@ public class SkypeAction extends Action implements Disposable {
             List<JID> contacts = SelectionRetrieverFactory
                 .getSelectionRetriever(JID.class).getSelection();
             setEnabled(contacts.size() == 1
-                && skypeManager
-                    .getSkypeURLNonBlock(contacts.get(0).getBareJID()) != null);
+                && skypeManager.getSkypeURLNonBlock(contacts.get(0)
+                    .getBareJID()) != null);
         } catch (NullPointerException e) {
             this.setEnabled(false);
         } catch (Exception e) {

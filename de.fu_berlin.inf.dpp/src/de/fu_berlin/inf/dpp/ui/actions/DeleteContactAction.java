@@ -34,7 +34,6 @@ import org.eclipse.ui.PlatformUI;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPException;
-import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;

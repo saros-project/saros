@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -76,6 +77,7 @@ import de.fu_berlin.inf.dpp.ui.actions.ChangeColorAction;
 import de.fu_berlin.inf.dpp.ui.actions.ChangeXMPPAccountAction;
 import de.fu_berlin.inf.dpp.ui.actions.ConsistencyAction;
 import de.fu_berlin.inf.dpp.ui.actions.DeleteContactAction;
+import de.fu_berlin.inf.dpp.ui.actions.Disposable;
 import de.fu_berlin.inf.dpp.ui.actions.FollowModeAction;
 import de.fu_berlin.inf.dpp.ui.actions.FollowThisPersonAction;
 import de.fu_berlin.inf.dpp.ui.actions.GiveWriteAccessAction;
@@ -227,12 +229,6 @@ public class SarosView extends ViewPart {
 
     protected ChatRoomsComposite chatRooms;
 
-    protected OpenChatAction openChatAction;
-
-    protected RemoveUserAction kickUserAction;
-
-    protected FollowModeAction followModeAction;
-
     @Inject
     protected IPreferenceStore preferenceStore;
 
@@ -249,6 +245,8 @@ public class SarosView extends ViewPart {
     protected SarosNet network;
 
     private static volatile boolean showBalloonNotifications;
+
+    private Map<Class<?>, IAction> registeredActions = new HashMap<Class<?>, IAction>();
 
     public SarosView() {
         super();
@@ -382,10 +380,12 @@ public class SarosView extends ViewPart {
          *               right-click on a buddy in the buddy list.
          */
 
+        createActions();
+
         /*
          * Toolbar
          */
-        IActionBars bars = this.getViewSite().getActionBars();
+        IActionBars bars = getViewSite().getActionBars();
         IToolBarManager toolBar = bars.getToolBarManager();
         addToolBarItems(toolBar);
 
@@ -416,30 +416,25 @@ public class SarosView extends ViewPart {
         boolean isDebug = false;
         assert (isDebug = true) == true;
 
-        toolBar.add(new ChangeXMPPAccountAction());
-        toolBar.add(new NewContactAction());
-        toolBar.add(new OpenPreferencesAction());
+        toolBar.add(getAction(ChangeXMPPAccountAction.class));
+        toolBar.add(getAction(NewContactAction.class));
+        toolBar.add(getAction(OpenPreferencesAction.class));
         toolBar.add(new Separator());
 
         if (isDebug)
-            toolBar.add(new StoppedAction());
+            toolBar.add(getAction(StoppedAction.class));
 
-        followModeAction = new FollowModeAction();
-        toolBar.add(followModeAction);
-        toolBar.add(new ConsistencyAction());
+        toolBar.add(getAction(FollowModeAction.class));
+        toolBar.add(getAction(ConsistencyAction.class));
         toolBar.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-        toolBar.add(new LeaveSessionAction());
+        toolBar.add(getAction(LeaveSessionAction.class));
     }
 
     /**
      * @param menuManager
      */
     protected void addRosterMenuItems(MenuManager menuManager) {
-        final SkypeAction skypeAction = new SkypeAction();
-        openChatAction = new OpenChatAction(chatRooms);
 
-        final RenameContactAction renameContactAction = new RenameContactAction();
-        final DeleteContactAction deleteContactAction = new DeleteContactAction();
         menuManager.addMenuListener(new IMenuListener() {
             @Override
             public void menuAboutToShow(final IMenuManager manager) {
@@ -461,11 +456,11 @@ public class SarosView extends ViewPart {
                 if (buddies.size() == 0)
                     return;
 
-                manager.add(skypeAction);
+                manager.add(getAction(SkypeAction.class));
                 manager.add(new Separator());
-                manager.add(openChatAction);
-                manager.add(renameContactAction);
-                manager.add(deleteContactAction);
+                manager.add(getAction(OpenChatAction.class));
+                manager.add(getAction(RenameContactAction.class));
+                manager.add(getAction(DeleteContactAction.class));
             }
         });
     }
@@ -474,18 +469,6 @@ public class SarosView extends ViewPart {
      * @param menuManager
      */
     protected void addSessionMenuItems(MenuManager menuManager) {
-        final GiveWriteAccessAction giveWriteAccessAction = new GiveWriteAccessAction();
-        final RestrictToReadOnlyAccessAction restrictToReadOnlyAccessAction = new RestrictToReadOnlyAccessAction();
-        final FollowThisPersonAction followModeAction = new FollowThisPersonAction();
-        final JumpToUserWithWriteAccessPositionAction jumpToUserWithWriteAccessPositionAction = new JumpToUserWithWriteAccessPositionAction();
-        final SendFileAction sendFileAction = new SendFileAction();
-        final VideoSharingAction videoSharingAction = new VideoSharingAction();
-        final VoIPAction voipAction = new VoIPAction();
-        final ChangeColorAction changedColorAction = new ChangeColorAction();
-
-        openChatAction = new OpenChatAction(chatRooms);
-
-        kickUserAction = new RemoveUserAction();
 
         menuManager.addMenuListener(new IMenuListener() {
             @Override
@@ -520,26 +503,29 @@ public class SarosView extends ViewPart {
                     return;
 
                 if (participants.get(0).isLocal()) {
-                    manager.add(changedColorAction);
+                    manager.add(getAction(ChangeColorAction.class));
 
                     if (isHost) {
-                        manager.add(giveWriteAccessAction);
-                        manager.add(restrictToReadOnlyAccessAction);
+                        manager.add(getAction(GiveWriteAccessAction.class));
+                        manager
+                            .add(getAction(RestrictToReadOnlyAccessAction.class));
                     }
                 } else {
                     if (isHost) {
-                        manager.add(giveWriteAccessAction);
-                        manager.add(restrictToReadOnlyAccessAction);
-                        manager.add(kickUserAction);
+                        manager.add(getAction(GiveWriteAccessAction.class));
+                        manager
+                            .add(getAction(RestrictToReadOnlyAccessAction.class));
+                        manager.add(getAction(RemoveUserAction.class));
                         manager.add(new Separator());
                     }
-                    manager.add(followModeAction);
-                    manager.add(jumpToUserWithWriteAccessPositionAction);
+                    manager.add(getAction(FollowThisPersonAction.class));
+                    manager
+                        .add(getAction(JumpToUserWithWriteAccessPositionAction.class));
                     manager.add(new Separator());
-                    manager.add(openChatAction);
-                    manager.add(sendFileAction);
-                    manager.add(videoSharingAction);
-                    manager.add(voipAction);
+                    manager.add(getAction(OpenChatAction.class));
+                    manager.add(getAction(SendFileAction.class));
+                    manager.add(getAction(VideoSharingAction.class));
+                    manager.add(getAction(VoIPAction.class));
                 }
             }
         });
@@ -578,9 +564,10 @@ public class SarosView extends ViewPart {
         super.dispose();
 
         rosterTracker.removeRosterListener(rosterListenerBuddys);
-        openChatAction.dispose();
-        kickUserAction.dispose();
-        followModeAction.dispose();
+
+        for (IAction action : registeredActions.values())
+            if (action instanceof Disposable)
+                ((Disposable) action).dispose();
     }
 
     /**
@@ -665,5 +652,57 @@ public class SarosView extends ViewPart {
     @Override
     public void setFocus() {
         // TODO Auto-generated method stub
+    }
+
+    private void createActions() {
+
+        // ContextMenus Session
+        registerAction(new GiveWriteAccessAction());
+        registerAction(new RestrictToReadOnlyAccessAction());
+        registerAction(new FollowThisPersonAction());
+        registerAction(new JumpToUserWithWriteAccessPositionAction());
+        registerAction(new SendFileAction());
+        registerAction(new VideoSharingAction());
+        registerAction(new VoIPAction());
+        registerAction(new ChangeColorAction());
+        registerAction(new RemoveUserAction());
+
+        // ContextMenus Roster/Contact list
+        registerAction(new SkypeAction());
+        registerAction(new RenameContactAction());
+        registerAction(new DeleteContactAction());
+
+        // ContextMenus Both
+        registerAction(new OpenChatAction(chatRooms));
+
+        // Toolbar
+        registerAction(new ChangeXMPPAccountAction());
+        registerAction(new NewContactAction());
+        registerAction(new OpenPreferencesAction());
+        registerAction(new StoppedAction());
+        registerAction(new FollowModeAction());
+        registerAction(new ConsistencyAction());
+        registerAction(new LeaveSessionAction());
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T extends IAction> T getAction(Class<T> clazz) {
+        IAction action = registeredActions.get(clazz);
+
+        if (action == null)
+            throw new IllegalArgumentException("an action with class "
+                + clazz.getName() + " is not registered");
+
+        return (T) action;
+    }
+
+    private <T extends IAction> T registerAction(T action) {
+        IAction oldAction = registeredActions.put(action.getClass(), action);
+
+        if (oldAction != null)
+            throw new IllegalArgumentException("tried to register action "
+                + action.getClass() + " more than once");
+
+        return action;
     }
 }

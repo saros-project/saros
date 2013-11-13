@@ -21,7 +21,7 @@ import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.ChatRoomsComposite;
 
-public class OpenChatAction extends Action {
+public class OpenChatAction extends Action implements Disposable {
 
     @Inject
     private SarosNet sarosNet;
@@ -74,6 +74,7 @@ public class OpenChatAction extends Action {
         chatRoomsComposite.openChat(chatService.createChat(jid), true);
     }
 
+    @Override
     public void dispose() {
         SelectionUtils.getSelectionService().removeSelectionListener(
             selectionListener);
@@ -94,8 +95,8 @@ public class OpenChatAction extends Action {
     private JID getSelectedJID() {
         List<UserElement> users = SelectionRetrieverFactory
             .getSelectionRetriever(UserElement.class).getSelection();
-        List<JID> contacts = SelectionRetrieverFactory
-            .getSelectionRetriever(JID.class).getSelection();
+        List<JID> contacts = SelectionRetrieverFactory.getSelectionRetriever(
+            JID.class).getSelection();
 
         if (users.size() + contacts.size() == 1) {
             if (users.size() == 1) {

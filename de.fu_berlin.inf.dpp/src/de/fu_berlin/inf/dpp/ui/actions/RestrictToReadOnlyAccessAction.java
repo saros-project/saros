@@ -10,7 +10,6 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.services.IDisposable;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
@@ -35,7 +34,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
  *  Merge with {@link GiveWriteAccess}
  */
 public class RestrictToReadOnlyAccessAction extends Action implements
-    IDisposable {
+    Disposable {
 
     private static final Logger log = Logger
         .getLogger(RestrictToReadOnlyAccessAction.class.getName());
