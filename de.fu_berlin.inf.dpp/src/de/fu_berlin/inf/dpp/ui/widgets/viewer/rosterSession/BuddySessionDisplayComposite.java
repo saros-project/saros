@@ -11,7 +11,6 @@ import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
@@ -303,20 +302,19 @@ public class BuddySessionDisplayComposite extends ViewerComposite<TreeViewer> {
             @Override
             public void handleEvent(Event event) {
 
-                if (event.item == null
-                    || !(event.item.getData() instanceof UserElement))
+                TreeItem treeItem = (TreeItem) event.item;
+
+                /*
+                 * do not adapt the object or we will draw into widget / tree
+                 * items that should not be *decorated*
+                 */
+
+                if (!(treeItem.getData() instanceof UserElement))
                     return;
 
-                User user = (User) Platform.getAdapterManager().getAdapter(
-                    event.item.getData(), User.class);
+                User user = (User) ((UserElement) treeItem.getData()).getUser();
 
-                if (user == null)
-                    return;
-
-                GC gc = event.gc;
-
-                Rectangle bounds = ((TreeItem) event.item)
-                    .getBounds(event.index);
+                Rectangle bounds = treeItem.getBounds(event.index);
 
                 bounds.width = 15;
                 bounds.x += 15;
@@ -329,11 +327,9 @@ public class BuddySessionDisplayComposite extends ViewerComposite<TreeViewer> {
                 bounds.y += 2;
                 bounds.height -= 4;
 
-                Color backgroundColor = SarosAnnotation.getUserColor(user);
-
-                PaintUtils.drawRoundedRectangle(gc, bounds, backgroundColor);
-
-                backgroundColor.dispose();
+                Color background = SarosAnnotation.getUserColor(user);
+                PaintUtils.drawRoundedRectangle(event.gc, bounds, background);
+                background.dispose();
             }
         });
     }
