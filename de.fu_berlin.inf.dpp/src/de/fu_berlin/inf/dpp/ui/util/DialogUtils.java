@@ -22,9 +22,7 @@ public class DialogUtils {
     }
 
     /**
-     * Calls open() on the given window (and returns the result), but before it
-     * dispatches a call to forceActive (which gives a visual hint on the task
-     * bar that the application wants focus).
+     * Calls open() on the given window and returns the result.
      */
     public static int openWindow(Window wd) {
 
@@ -32,7 +30,6 @@ public class DialogUtils {
             wd.create();
         }
         wd.getShell().open();
-        wd.getShell().forceActive();
         return wd.open();
 
     }
