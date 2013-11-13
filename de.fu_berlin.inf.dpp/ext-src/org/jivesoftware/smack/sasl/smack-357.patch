@@ -44,3 +44,4 @@ index 4ea801f..2681b09 100644
 +        sc = Sasl.createSaslClient(mechanisms, null, "xmpp", host, props, cbh);
          authenticate();
      }
+ 

@@ -1,0 +1,54 @@
+diff --git a/de.fu_berlin.inf.dpp/ext-src/org/jivesoftware/smack/util/PacketParserUtils.java b/de.fu_berlin.inf.dpp/ext-src/org/jivesoftware/smack/util/PacketParserUtils.java
+index 504362c..b53e447 100644
+--- a/de.fu_berlin.inf.dpp/ext-src/org/jivesoftware/smack/util/PacketParserUtils.java
++++ b/de.fu_berlin.inf.dpp/ext-src/org/jivesoftware/smack/util/PacketParserUtils.java
+@@ -1,7 +1,7 @@
+ /**
+  * $RCSfile$
+- * $Revision: 13688 $
+- * $Date: 2013-06-22 10:01:40 -0700 (Sat, 22 Jun 2013) $
++ * $Revision: 13767 $
++ * $Date: 2013-10-09 12:02:34 -0500 (Wed, 09 Oct 2013) $
+  *
+  * Copyright 2003-2007 Jive Software.
+  *
+@@ -705,20 +705,33 @@
+      */
+     public static StreamError parseStreamError(XmlPullParser parser)
+         throws IOException, XmlPullParserException {
+-        StreamError streamError = null;
++        final int depth = parser.getDepth();
+         boolean done = false;
++        String code = null;
++        String text = null;
+         while (!done) {
+             int eventType = parser.next();
+ 
+             if (eventType == XmlPullParser.START_TAG) {
+-                streamError = new StreamError(parser.getName());
+-            } else if (eventType == XmlPullParser.END_TAG) {
+-                if (parser.getName().equals("error")) {
+-                    done = true;
++                String namespace = parser.getNamespace();
++                if (StreamError.NAMESPACE.equals(namespace)) {
++                    String name = parser.getName();
++                    if (name.equals("text") && !parser.isEmptyElementTag()) {
++                        parser.next();
++                        text = parser.getText();
++                    } else {
++                        // If it's not a text element, that is qualified by the
++                        // StreamError.NAMESPACE,
++                        // then it has to be the stream error code
++                        code = name;
++                    }
+                 }
++            } else if (eventType == XmlPullParser.END_TAG
++                && depth == parser.getDepth()) {
++                done = true;
+             }
+         }
+-        return streamError;
++        return new StreamError(code, text);
+     }
+ 
+     /**

@@ -8,6 +8,9 @@ Addresses contact renaming in the roster (listener was not notified)
 http://issues.igniterealtime.org/browse/SMACK-357
 Addresses SASL issues with GTALK and other XMPP server
 
+http://issues.igniterealtime.org/browse/SMACK-452
+Addresses an issue when additional informations are included in a StreamError tag (fixed in 3.2.2)
+
 IMPORTANT:
 
 When you update the Smack Library.

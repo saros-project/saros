@@ -921,6 +921,8 @@ public class Roster {
                         // Keep note that an entry has been added
                         addedEntries.add(item.getUser());
                     } else {
+                        // If the entry was in then list then update its state
+                        // with the new values
                         // If new item is different then update it and keep note
                         // We have also to check if only the group names have
                         // changed from the item

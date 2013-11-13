@@ -1,7 +1,7 @@
 /**
  * $RCSfile$
- * $Revision: 11827 $
- * $Date: 2010-08-15 09:37:51 -0700 (Sun, 15 Aug 2010) $
+ * $Revision: 13662 $
+ * $Date: 2013-05-17 15:05:57 -0700 (Fri, 17 May 2013) $
  *
  * Copyright 2003-2007 Jive Software.
  *
@@ -201,6 +201,11 @@ public class RosterEntry {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public int hashCode() {
+        return this.user.hashCode();
     }
 
     /**

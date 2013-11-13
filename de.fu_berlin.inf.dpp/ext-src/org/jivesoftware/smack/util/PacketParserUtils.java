@@ -1,7 +1,7 @@
 /**
  * $RCSfile$
- * $Revision: 13539 $
- * $Date: 2013-03-05 02:35:04 -0800 (Tue, 05 Mar 2013) $
+ * $Revision: 13767 $
+ * $Date: 2013-10-09 12:02:34 -0500 (Wed, 09 Oct 2013) $
  *
  * Copyright 2003-2007 Jive Software.
  *
@@ -170,9 +170,14 @@ public class PacketParserUtils {
      */
     private static String parseContent(XmlPullParser parser)
         throws XmlPullParserException, IOException {
-        StringBuffer content = new StringBuffer();
         int parserDepth = parser.getDepth();
-        while (!(parser.next() == XmlPullParser.END_TAG && parser.getDepth() == parserDepth)) {
+        return parseContentDepth(parser, parserDepth);
+    }
+
+    public static String parseContentDepth(XmlPullParser parser, int depth)
+        throws XmlPullParserException, IOException {
+        StringBuffer content = new StringBuffer();
+        while (!(parser.next() == XmlPullParser.END_TAG && parser.getDepth() == depth)) {
             content.append(parser.getText());
         }
         return content.toString();
@@ -700,21 +705,33 @@ public class PacketParserUtils {
      */
     public static StreamError parseStreamError(XmlPullParser parser)
         throws IOException, XmlPullParserException {
-        StreamError streamError = null;
+        final int depth = parser.getDepth();
         boolean done = false;
+        String code = null;
+        String text = null;
         while (!done) {
             int eventType = parser.next();
 
             if (eventType == XmlPullParser.START_TAG) {
-                if (streamError == null)
-                    streamError = new StreamError(parser.getName());
-            } else if (eventType == XmlPullParser.END_TAG) {
-                if (parser.getName().equals("error")) {
-                    done = true;
+                String namespace = parser.getNamespace();
+                if (StreamError.NAMESPACE.equals(namespace)) {
+                    String name = parser.getName();
+                    if (name.equals("text") && !parser.isEmptyElementTag()) {
+                        parser.next();
+                        text = parser.getText();
+                    } else {
+                        // If it's not a text element, that is qualified by the
+                        // StreamError.NAMESPACE,
+                        // then it has to be the stream error code
+                        code = name;
+                    }
                 }
+            } else if (eventType == XmlPullParser.END_TAG
+                && depth == parser.getDepth()) {
+                done = true;
             }
         }
-        return streamError;
+        return new StreamError(code, text);
     }
 
     /**
