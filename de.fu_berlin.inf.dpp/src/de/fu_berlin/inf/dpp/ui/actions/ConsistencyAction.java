@@ -25,6 +25,7 @@ import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
@@ -45,7 +46,7 @@ import de.fu_berlin.inf.dpp.util.ValueChangeListener;
  * will display "bar" if the action is disabled
  */
 @Component(module = "action")
-public class ConsistencyAction extends Action {
+public class ConsistencyAction extends Action implements Disposable {
 
     private static final int MIN_ALPHA_VALUE = 64;
     private static final int MAX_ALPHA_VALUE = 255;
@@ -77,6 +78,26 @@ public class ConsistencyAction extends Action {
         }
     }
 
+    private final ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+        @Override
+        public void sessionStarted(ISarosSession newSarosSession) {
+            setSharedProject(newSarosSession);
+        }
+
+        @Override
+        public void sessionEnded(ISarosSession oldSarosSession) {
+            setSharedProject(null);
+        }
+    };
+
+    private final ValueChangeListener<Boolean> isConsistencyListener = new ValueChangeListener<Boolean>() {
+
+        @Override
+        public void setValue(Boolean newValue) {
+            handleConistencyChange(newValue);
+        }
+    };
+
     @Inject
     protected ISarosSessionManager sessionManager;
 
@@ -88,6 +109,8 @@ public class ConsistencyAction extends Action {
 
     private boolean isFading;
 
+    private ISarosSession sarosSession;
+
     public ConsistencyAction() {
 
         setImageDescriptor(IN_SYNC);
@@ -96,23 +119,10 @@ public class ConsistencyAction extends Action {
 
         SarosPluginContext.initComponent(this);
 
-        sessionManager
-            .addSarosSessionListener(new AbstractSarosSessionListener() {
-                @Override
-                public void sessionStarted(ISarosSession newSarosSession) {
-                    setSharedProject(newSarosSession);
-                }
-
-                @Override
-                public void sessionEnded(ISarosSession oldSarosSession) {
-                    setSharedProject(null);
-                }
-            });
+        sessionManager.addSarosSessionListener(sessionListener);
 
         setSharedProject(sessionManager.getSarosSession());
     }
-
-    protected ISarosSession sarosSession;
 
     private void setSharedProject(ISarosSession newSharedProject) {
 
@@ -139,7 +149,7 @@ public class ConsistencyAction extends Action {
              * will grayscale the alpha scaled image and so it is possible that
              * nothing is displayed anymore
              */
-            SWTUtils.runSafeSWTSync(log, new Runnable() {
+            SWTUtils.runSafeSWTAsync(log, new Runnable() {
                 @Override
                 public void run() {
                     setImageDescriptor(IN_SYNC);
@@ -148,69 +158,64 @@ public class ConsistencyAction extends Action {
         }
     }
 
-    ValueChangeListener<Boolean> isConsistencyListener = new ValueChangeListener<Boolean>() {
+    private void handleConistencyChange(Boolean isInconsistent) {
 
-        @Override
-        public void setValue(Boolean newValue) {
-
-            if (sarosSession.isHost() && newValue == true) {
-                log.warn("No inconsistency should ever be reported" //$NON-NLS-1$
-                    + " to the host"); //$NON-NLS-1$
-                return;
-            }
-            log.debug("Inconsistency indicator goes: " //$NON-NLS-1$
-                + (newValue ? "on" : "off")); //$NON-NLS-1$ //$NON-NLS-2$
-
-            setEnabled(newValue);
-
-            if (!newValue) {
-                setToolTipText(Messages.ConsistencyAction_tooltip_no_inconsistency);
-                return;
-            }
-
-            SWTUtils.runSafeSWTSync(log, new Runnable() {
-
-                @Override
-                public void run() {
-                    if (isFading)
-                        return;
-
-                    startFading(MAX_ALPHA_VALUE, FADE_DOWN);
-                }
-
-            });
-
-            final Set<SPath> paths = new HashSet<SPath>(
-                watchdogClient.getPathsWithWrongChecksums());
-
-            SWTUtils.runSafeSWTAsync(log, new Runnable() {
-                @Override
-                public void run() {
-
-                    String files = Utils.toOSString(paths);
-
-                    // set tooltip
-                    setToolTipText(MessageFormat
-                        .format(
-                            Messages.ConsistencyAction_tooltip_inconsistency_detected,
-                            files));
-
-                    // TODO Balloon is too aggressive at the moment, when
-                    // the host is slow in sending changes (for instance
-                    // when refactoring)
-
-                    // show balloon notification
-                    SarosView
-                        .showNotification(
-                            Messages.ConsistencyAction_title_inconsistency_deteced,
-                            MessageFormat
-                                .format(
-                                    Messages.ConsistencyAction_message_inconsistency_detected,
-                                    files));
-                }
-            });
+        if (sarosSession.isHost() && isInconsistent) {
+            log.warn("No inconsistency should ever be reported" //$NON-NLS-1$
+                + " to the host"); //$NON-NLS-1$
+            return;
         }
-    };
+        log.debug("Inconsistency indicator goes: " //$NON-NLS-1$
+            + (isInconsistent ? "on" : "off")); //$NON-NLS-1$ //$NON-NLS-2$
+
+        setEnabled(isInconsistent);
+
+        if (!isInconsistent) {
+            setToolTipText(Messages.ConsistencyAction_tooltip_no_inconsistency);
+            return;
+        }
+
+        SWTUtils.runSafeSWTSync(log, new Runnable() {
+
+            @Override
+            public void run() {
+                if (isFading)
+                    return;
+
+                startFading(MAX_ALPHA_VALUE, FADE_DOWN);
+            }
+
+        });
+
+        final Set<SPath> paths = new HashSet<SPath>(
+            watchdogClient.getPathsWithWrongChecksums());
+
+        SWTUtils.runSafeSWTAsync(log, new Runnable() {
+            @Override
+            public void run() {
+
+                String files = Utils.toOSString(paths);
+
+                // set tooltip
+                setToolTipText(MessageFormat.format(
+                    Messages.ConsistencyAction_tooltip_inconsistency_detected,
+                    files));
+
+                // TODO Balloon is too aggressive at the moment, when
+                // the host is slow in sending changes (for instance
+                // when refactoring)
+
+                // show balloon notification
+                SarosView
+                    .showNotification(
+                        Messages.ConsistencyAction_title_inconsistency_deteced,
+                        MessageFormat
+                            .format(
+                                Messages.ConsistencyAction_message_inconsistency_detected,
+                                files));
+            }
+        });
+    }
 
     @Override
     public void run() {
@@ -248,6 +253,11 @@ public class ConsistencyAction extends Action {
                 }
             }
         });
+    }
+
+    @Override
+    public void dispose() {
+        sessionManager.removeSarosSessionListener(sessionListener);
     }
 
     /**

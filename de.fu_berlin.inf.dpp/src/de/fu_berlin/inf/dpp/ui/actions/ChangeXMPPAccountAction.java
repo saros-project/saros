@@ -34,7 +34,8 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * between accounts. At the moment, it is implemented by a drop-down in the
  * RosterView.
  */
-public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
+public class ChangeXMPPAccountAction extends Action implements IMenuCreator,
+    Disposable {
 
     private static final Logger log = Logger
         .getLogger(ChangeXMPPAccountAction.class);
@@ -85,6 +86,16 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
         else
             connect(accountService.isEmpty() ? null : accountService
                 .getActiveAccount());
+    }
+
+    @Override
+    public void dispose() {
+        saros.getSarosNet().removeListener(connectionListener);
+    }
+
+    @Override
+    public Menu getMenu(Menu parent) {
+        return null;
     }
 
     @Override
@@ -256,15 +267,4 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
             log.error("Internal error in ChangeXMPPAccountAction:", e);
         }
     }
-
-    @Override
-    public void dispose() {
-        // NOP
-    }
-
-    @Override
-    public Menu getMenu(Menu parent) {
-        return null;
-    }
-
 }

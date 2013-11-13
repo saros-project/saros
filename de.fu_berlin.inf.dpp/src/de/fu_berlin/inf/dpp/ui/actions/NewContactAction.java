@@ -33,10 +33,18 @@ import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 
-public class NewContactAction extends Action {
+public class NewContactAction extends Action implements Disposable {
 
     @Inject
-    protected SarosNet sarosNet;
+    private SarosNet sarosNet;
+
+    private final IConnectionListener connectionListener = new IConnectionListener() {
+        @Override
+        public void connectionStateChanged(Connection connection,
+            ConnectionState state) {
+            setEnabled(sarosNet.isConnected());
+        }
+    };
 
     public NewContactAction() {
         setToolTipText(Messages.NewContactAction_tooltip);
@@ -49,22 +57,17 @@ public class NewContactAction extends Action {
 
         SarosPluginContext.initComponent(this);
 
-        sarosNet.addListener(new IConnectionListener() {
-            @Override
-            public void connectionStateChanged(Connection connection,
-                ConnectionState newState) {
-                updateEnablement();
-            }
-        });
-        updateEnablement();
+        sarosNet.addListener(connectionListener);
+        setEnabled(sarosNet.isConnected());
+    }
+
+    @Override
+    public void dispose() {
+        sarosNet.removeListener(connectionListener);
     }
 
     @Override
     public void run() {
         WizardUtils.openAddContactWizard();
-    }
-
-    protected void updateEnablement() {
-        setEnabled(sarosNet.isConnected());
     }
 }

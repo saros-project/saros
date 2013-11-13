@@ -28,6 +28,7 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
@@ -41,10 +42,22 @@ import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
  * @author oezbek
  */
 @Component(module = "action")
-public class LeaveSessionAction extends Action {
+public class LeaveSessionAction extends Action implements Disposable {
 
     @Inject
-    protected ISarosSessionManager sessionManager;
+    private ISarosSessionManager sessionManager;
+
+    private final ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+        @Override
+        public void sessionStarted(ISarosSession newSarosSession) {
+            updateEnablement();
+        }
+
+        @Override
+        public void sessionEnded(ISarosSession oldSarosSession) {
+            updateEnablement();
+        }
+    };
 
     public LeaveSessionAction() {
         setToolTipText(Messages.LeaveSessionAction_leave_session_tooltip);
@@ -56,20 +69,7 @@ public class LeaveSessionAction extends Action {
         });
 
         SarosPluginContext.initComponent(this);
-
-        sessionManager
-            .addSarosSessionListener(new AbstractSarosSessionListener() {
-                @Override
-                public void sessionStarted(ISarosSession newSarosSession) {
-                    updateEnablement();
-                }
-
-                @Override
-                public void sessionEnded(ISarosSession oldSarosSession) {
-                    updateEnablement();
-                }
-            });
-
+        sessionManager.addSarosSessionListener(sessionListener);
         updateEnablement();
     }
 
@@ -78,7 +78,12 @@ public class LeaveSessionAction extends Action {
         CollaborationUtils.leaveSession();
     }
 
-    protected void updateEnablement() {
+    @Override
+    public void dispose() {
+        sessionManager.removeSarosSessionListener(sessionListener);
+    }
+
+    private void updateEnablement() {
         ISarosSession session = sessionManager.getSarosSession();
 
         if (session == null) {
@@ -106,5 +111,4 @@ public class LeaveSessionAction extends Action {
         }
         setEnabled(true);
     }
-
 }
