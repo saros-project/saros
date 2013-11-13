@@ -26,7 +26,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.net.UnknownHostException;
 import java.text.MessageFormat;
 import java.util.Random;
 
@@ -703,22 +702,21 @@ public class Saros extends AbstractUIPlugin {
 
     private String generateHumanReadableErrorMessage(XMPPException e) {
 
-        Throwable cause = e.getWrappedThrowable();
+        // as of Smack 3.3.1 this is always null for connection attemps
+        // Throwable cause = e.getWrappedThrowable();
 
         XMPPError error = e.getXMPPError();
 
-        if (error != null && error.getCode() == 504
-            && cause instanceof UnknownHostException)
+        if (error != null && error.getCode() == 504)
             return Messages.Saros_connecting_unknown_host
                 + Messages.Saros_connecting_modify_account
-                + "\n\nDetailed error:\nSMACK: " + error + "\n" + "Cause: "
-                + cause;
-        else if (error != null && error.getCode() == 502
-            && cause instanceof IOException)
+                + "\n\nDetailed error:\nSMACK: " + error + "\n"
+                + e.getMessage();
+        else if (error != null && error.getCode() == 502)
             return Messages.Saros_connecting_connect_error
                 + Messages.Saros_connecting_modify_account
-                + "\n\nDetailed error:\nSMACK: " + error + "\n" + "Cause: "
-                + cause;
+                + "\n\nDetailed error:\nSMACK: " + error + "\n"
+                + e.getMessage();
 
         String question = null;
 
