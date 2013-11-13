@@ -3,9 +3,6 @@ package de.fu_berlin.inf.dpp;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.PicoContainer;
 
-/**
- * Interface of a SarosContext.
- */
 public interface ISarosContext {
 
     /**

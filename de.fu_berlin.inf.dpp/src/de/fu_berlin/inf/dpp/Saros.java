@@ -244,8 +244,8 @@ public class Saros extends AbstractUIPlugin {
 
         super.start(context);
 
-        sarosContext = SarosContext.getContextForSaros(this)
-            .withDotMonitor(dotMonitor).build();
+        sarosContext = new SarosContext(new SarosEclipseContextFactory(this,
+            new SarosCoreContextFactory()), dotMonitor);
 
         SarosPluginContext.setSarosContext(sarosContext);
 

@@ -12,7 +12,7 @@ import org.picocontainer.annotations.Bind;
 
 /**
  * This interface contains marker interfaces for binding components to specific
- * key.
+ * keys.
  * 
  * @see PicoContainer#getComponent(Object)
  * @see MutablePicoContainer#addComponent(Object, Object,
