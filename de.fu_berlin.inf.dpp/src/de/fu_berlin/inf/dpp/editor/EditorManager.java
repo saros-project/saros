@@ -72,6 +72,7 @@ import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
 import de.fu_berlin.inf.dpp.editor.internal.ContributionAnnotationManager;
+import de.fu_berlin.inf.dpp.editor.internal.CustomAnnotationManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
@@ -173,6 +174,8 @@ public class EditorManager extends AbstractActivityProvider {
     protected final Set<IFile> connectedFiles = new HashSet<IFile>();
 
     ContributionAnnotationManager contributionAnnotationManager;
+
+    private final CustomAnnotationManager customAnnotationManager = new CustomAnnotationManager();
 
     private IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
         @Override
@@ -345,6 +348,8 @@ public class EditorManager extends AbstractActivityProvider {
 
                     editorPool.removeAllEditors(sarosSession);
 
+                    customAnnotationManager.uninstallAllPainters(true);
+
                     dirtyStateListener.unregisterAll();
 
                     sarosSession.removeListener(sharedProjectListener);
@@ -447,6 +452,7 @@ public class EditorManager extends AbstractActivityProvider {
 
         editorAPI = editorApi;
         this.preferenceStore = preferenceStore;
+        registerCustomAnnotations();
         sessionManager.addSarosSessionListener(this.sessionListener);
         addSharedEditorListener(sharedEditorListener);
     }
@@ -982,7 +988,12 @@ public class EditorManager extends AbstractActivityProvider {
          * side effect: this method call also locks the editor part if the user
          * has no write access or if the session is currently locked
          */
-        this.editorPool.add(editorPart);
+        editorPool.add(editorPart);
+
+        ITextViewer viewer = EditorAPI.getViewer(editorPart);
+
+        if (viewer instanceof ISourceViewer)
+            customAnnotationManager.installPainter((ISourceViewer) viewer);
 
         refreshAnnotations(editorPart);
 
@@ -1077,6 +1088,12 @@ public class EditorManager extends AbstractActivityProvider {
         } else {
             generateViewport(editorPart, viewport);
         }
+
+        ITextViewer viewer = EditorAPI.getViewer(editorPart);
+
+        if (viewer instanceof ISourceViewer)
+            customAnnotationManager.installPainter((ISourceViewer) viewer);
+
     }
 
     /**
@@ -1142,6 +1159,12 @@ public class EditorManager extends AbstractActivityProvider {
         }
 
         this.editorPool.remove(editorPart, sarosSession);
+
+        ITextViewer viewer = EditorAPI.getViewer(editorPart);
+
+        if (viewer instanceof ISourceViewer)
+            customAnnotationManager.uninstallPainter((ISourceViewer) viewer,
+                false);
 
         // Check if the currently active editor is closed
         boolean newActiveEditor = path.equals(this.locallyActiveEditor);
@@ -1884,5 +1907,17 @@ public class EditorManager extends AbstractActivityProvider {
                 editorAPI.closeEditor(iEditorPart);
             }
         }
+    }
+
+    /**
+     * Add annotation types and drawing strategies using the following two
+     * method calls
+     * {@link CustomAnnotationManager#registerAnnotation(String, int)
+     * registerAnnotation()} and
+     * {@link CustomAnnotationManager#registerDrawingStrategy(String, org.eclipse.jface.text.source.AnnotationPainter.IDrawingStrategy)
+     * registerDrawingStrategy()} .
+     */
+    private void registerCustomAnnotations() {
+        // add method calls here
     }
 }

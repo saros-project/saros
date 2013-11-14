@@ -87,16 +87,23 @@ public interface IEditorAPI {
     public SPath getEditorPath(IEditorPart editorPart);
 
     /**
-     * Show a viewport annotation in the given editorPart at the given viewport
-     * for the given user.
+     * Updates the ViewportAnnotation, which indicates the visible lines in a
+     * remote user's editor.
+     * 
+     * @param editorPart
+     *            {@link IEditorPart} for which the ViewportAnnotation are set.
+     * @param lineRange
+     *            Visible lines for the remote user.
+     * @param user
+     *            {@link User} for whom the ViewportAnnotations are updated.
      */
     public void setViewportAnnotation(IEditorPart editorPart,
-        ILineRange viewport, User user);
+        ILineRange lineRange, User user);
 
     /**
      * Try to make sure the given viewport is visible in the given editor
      */
-    public void reveal(IEditorPart editorPart, ILineRange viewport);
+    public void reveal(IEditorPart editorPart, ILineRange lineRange);
 
     /**
      * @return Return the viewport for given editor or null, if this editorPart

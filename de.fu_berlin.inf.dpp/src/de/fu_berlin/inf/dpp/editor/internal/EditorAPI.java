@@ -468,7 +468,17 @@ public class EditorAPI implements IEditorAPI {
             }
 
             SarosAnnotation oldAnnotation = (SarosAnnotation) annotation;
-            if (oldAnnotation.getSource().equals(source)) {
+
+            /*
+             * We only remove an annotation if its user and annotationType are
+             * identical. Unfortunately the TYPE is not public so we avoid using
+             * it by comparing the class. This works but is not as nice as it
+             * could be (this part of the method is likely to be refactored in
+             * the nearest future).
+             */
+            if (oldAnnotation.getSource().equals(source)
+                && (newAnnotation == null || oldAnnotation.getClass().equals(
+                    newAnnotation.getClass()))) {
                 // If model supports IAnnotationModelExtension we can
                 // just update the existing annotation.
                 if (newAnnotation != null
@@ -710,10 +720,10 @@ public class EditorAPI implements IEditorAPI {
     }
 
     @Override
-    public void reveal(IEditorPart editorPart, ILineRange viewport) {
+    public void reveal(IEditorPart editorPart, ILineRange lineRange) {
 
-        int top = viewport.getStartLine();
-        int bottom = top + viewport.getNumberOfLines();
+        int top = lineRange.getStartLine();
+        int bottom = top + lineRange.getNumberOfLines();
 
         ITextViewer viewer = EditorAPI.getViewer(editorPart);
         IDocument document = viewer.getDocument();
@@ -734,18 +744,6 @@ public class EditorAPI implements IEditorAPI {
             log.error("Internal Error: BadLocationException - ", e);
         }
 
-    }
-
-    @Override
-    public void setViewportAnnotation(IEditorPart editorPart,
-        ILineRange viewport, User user) {
-
-        int top = viewport.getStartLine();
-        int bottom = top + viewport.getNumberOfLines();
-
-        ITextViewer viewer = EditorAPI.getViewer(editorPart);
-
-        updateViewportAnnotation(viewer, top, bottom, user);
     }
 
     public static ILineRange getViewport(ITextViewer viewer) {
@@ -775,8 +773,20 @@ public class EditorAPI implements IEditorAPI {
         return getViewport(textViewer);
     }
 
+    @Override
+    public void setViewportAnnotation(IEditorPart editorPart,
+        ILineRange lineRange, User user) {
+
+        int top = lineRange.getStartLine();
+        int bottom = top + lineRange.getNumberOfLines();
+
+        ITextViewer viewer = EditorAPI.getViewer(editorPart);
+
+        updateViewportAnnotation(viewer, top, bottom, user);
+    }
+
     @SuppressWarnings("unchecked")
-    protected void updateViewportAnnotation(ITextViewer viewer, int top,
+    private void updateViewportAnnotation(ITextViewer viewer, int top,
         int bottom, User source) {
 
         if (!(viewer instanceof ISourceViewer)) {
@@ -785,6 +795,11 @@ public class EditorAPI implements IEditorAPI {
 
         IAnnotationModel model = ((ISourceViewer) viewer).getAnnotationModel();
 
+        if (model == null) {
+            return;
+        }
+
+        // remove the ViewportAnnotations of the given user
         for (Iterator<Annotation> it = model.getAnnotationIterator(); it
             .hasNext();) {
             Annotation annotation = it.next();
@@ -795,6 +810,7 @@ public class EditorAPI implements IEditorAPI {
             }
         }
 
+        // calculate the new position of the annotation and add it to the model
         IDocument document = viewer.getDocument();
         try {
             int lines = document.getNumberOfLines();
@@ -802,14 +818,19 @@ public class EditorAPI implements IEditorAPI {
             bottom = Math.max(0, Math.min(lines - 1, bottom));
 
             int start = document.getLineOffset(top);
+            int end = document.getLineOffset(bottom);
+
             if (start == -1)
                 throw new BadLocationException("Start line -1");
-            int end = document.getLineOffset(bottom);
+
             if (end == -1 || end < start)
                 throw new BadLocationException("End line -1 or less than start");
+
             ViewportAnnotation va = new ViewportAnnotation(source);
+
             if (lines > 1)
                 va.setMoreThanOneLine(true);
+
             SarosAnnotation annotation = va;
             Position position = new Position(start, end - start);
             model.addAnnotation(annotation, position);
