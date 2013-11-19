@@ -11,6 +11,7 @@ import org.jivesoftware.smack.packet.XMPPError;
 import org.osgi.framework.Version;
 import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.ISarosContextBindings.SarosVersion;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
@@ -34,7 +35,7 @@ public class ConnectionStateComposite extends Composite {
     private SarosNet sarosNet;
 
     @Inject
-    private/* BUG IN PICO cannot resolve bindings in child containers */// @SarosVersion
+    private @SarosVersion
     Version version;
 
     @Inject
