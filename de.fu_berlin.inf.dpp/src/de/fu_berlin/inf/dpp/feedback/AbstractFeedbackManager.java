@@ -42,13 +42,13 @@ public abstract class AbstractFeedbackManager {
      * @param preferenceKey
      */
     protected void makePrefConsistent(String preferenceKey) {
-        int globalValue = saros.getConfigPrefs().getInt(preferenceKey,
+        int globalValue = saros.getGlobalPreferences().getInt(preferenceKey,
             UNDEFINED);
         int localValue = saros.getPreferenceStore().getInt(preferenceKey);
 
         if (globalValue == UNDEFINED) {
-            saros.getConfigPrefs().putInt(preferenceKey, localValue);
-            saros.saveConfigPrefs();
+            saros.getGlobalPreferences().putInt(preferenceKey, localValue);
+            saros.saveGlobalPreferences();
         } else if (globalValue != localValue) {
             saros.getPreferenceStore().setValue(preferenceKey, globalValue);
         }

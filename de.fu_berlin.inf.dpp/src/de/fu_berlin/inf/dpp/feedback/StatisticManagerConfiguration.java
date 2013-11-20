@@ -21,7 +21,7 @@ public class StatisticManagerConfiguration {
             return userID;
 
         // Fall back to the Configuration
-        return saros.getConfigPrefs().get(
+        return saros.getGlobalPreferences().get(
             PreferenceConstants.STATISTICS_PSEUDONYM_ID, "");
     }
 
@@ -43,7 +43,7 @@ public class StatisticManagerConfiguration {
                 PreferenceConstants.STATISTIC_ALLOW_PSEUDONYM);
         }
 
-        return saros.getConfigPrefs().getBoolean(
+        return saros.getGlobalPreferences().getBoolean(
             PreferenceConstants.STATISTIC_ALLOW_PSEUDONYM, false);
     }
 
@@ -56,7 +56,7 @@ public class StatisticManagerConfiguration {
      * @return 0 = unknown, 1 = allowed, 2 = forbidden
      */
     public static int getStatisticSubmissionStatus(Saros saros) {
-        int status = saros.getConfigPrefs().getInt(
+        int status = saros.getGlobalPreferences().getInt(
             PreferenceConstants.STATISTIC_ALLOW_SUBMISSION,
             AbstractFeedbackManager.UNDEFINED);
 
@@ -69,9 +69,9 @@ public class StatisticManagerConfiguration {
     public static void setPseudonymSubmissionAllowed(Saros saros,
         boolean isPseudonymAllowed) {
         // store in configuration and preference scope
-        saros.getConfigPrefs().putBoolean(
+        saros.getGlobalPreferences().putBoolean(
             PreferenceConstants.STATISTIC_ALLOW_PSEUDONYM, isPseudonymAllowed);
-        saros.saveConfigPrefs();
+        saros.saveGlobalPreferences();
         saros.getPreferenceStore().setValue(
             PreferenceConstants.STATISTIC_ALLOW_PSEUDONYM, isPseudonymAllowed);
 
@@ -101,18 +101,18 @@ public class StatisticManagerConfiguration {
      */
     protected static void setStatisticSubmission(Saros saros, int submission) {
         // store in configuration and preference scope
-        saros.getConfigPrefs().putInt(
+        saros.getGlobalPreferences().putInt(
             PreferenceConstants.STATISTIC_ALLOW_SUBMISSION, submission);
-        saros.saveConfigPrefs();
+        saros.saveGlobalPreferences();
         saros.getPreferenceStore().setValue(
             PreferenceConstants.STATISTIC_ALLOW_SUBMISSION, submission);
     }
 
     public static void setStatisticsPseudonymID(Saros saros, String userID) {
         // store in configuration and preference scope
-        saros.getConfigPrefs().put(PreferenceConstants.STATISTICS_PSEUDONYM_ID,
+        saros.getGlobalPreferences().put(PreferenceConstants.STATISTICS_PSEUDONYM_ID,
             userID);
-        saros.saveConfigPrefs();
+        saros.saveGlobalPreferences();
         saros.getPreferenceStore().setValue(
             PreferenceConstants.STATISTICS_PSEUDONYM_ID, userID);
     }
@@ -127,14 +127,14 @@ public class StatisticManagerConfiguration {
      * @return the random user ID for this eclipse installation
      */
     public static String getUserID(Saros saros) {
-        String userID = saros.getConfigPrefs().get(
+        String userID = saros.getGlobalPreferences().get(
             PreferenceConstants.RANDOM_USER_ID, null);
         if (userID == null) {
             userID = generateUserID();
             // save ID in the global preferences
-            saros.getConfigPrefs().put(PreferenceConstants.RANDOM_USER_ID,
+            saros.getGlobalPreferences().put(PreferenceConstants.RANDOM_USER_ID,
                 userID);
-            saros.saveConfigPrefs();
+            saros.saveGlobalPreferences();
         }
         // HACK if we are a developer, add this info to our user ID
         if (saros.getVersion().endsWith("DEVEL"))

@@ -95,7 +95,7 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
      * @return 0 = unknown, 1 = allowed, 2 = forbidden
      */
     public static int getErrorLogSubmissionStatus(Saros saros) {
-        int status = saros.getConfigPrefs().getInt(
+        int status = saros.getGlobalPreferences().getInt(
             PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION, UNDEFINED);
 
         if (status == UNDEFINED)
@@ -125,9 +125,9 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
     public static void setErrorLogSubmissionAllowed(Saros saros, boolean allowed) {
         int submission = allowed ? ALLOW : FORBID;
         // store in configuration and preference scope
-        saros.getConfigPrefs().putInt(
+        saros.getGlobalPreferences().putInt(
             PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION, submission);
-        saros.saveConfigPrefs();
+        saros.saveGlobalPreferences();
         saros.getPreferenceStore().setValue(
             PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION, submission);
     }
@@ -168,7 +168,7 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
      * @return ALLOW or FORBID
      */
     public static int getFullErrorLogSubmissionStatus(Saros saros) {
-        int status = saros.getConfigPrefs().getInt(
+        int status = saros.getGlobalPreferences().getInt(
             PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION_FULL, UNDEFINED);
 
         if (status == UNDEFINED)
@@ -199,9 +199,9 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
         boolean allowed) {
         int submission = allowed ? ALLOW : FORBID;
         // store in configuration and preference scope
-        saros.getConfigPrefs().putInt(
+        saros.getGlobalPreferences().putInt(
             PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION_FULL, submission);
-        saros.saveConfigPrefs();
+        saros.saveGlobalPreferences();
         saros.getPreferenceStore().setValue(
             PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION_FULL, submission);
     }

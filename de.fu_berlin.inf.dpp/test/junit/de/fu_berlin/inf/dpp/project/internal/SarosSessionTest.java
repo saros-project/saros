@@ -128,11 +128,11 @@ public class SarosSessionTest {
         saros.getPreferenceStore();
         EasyMock.expectLastCall().andReturn(store).anyTimes();
 
-        saros.getConfigPrefs();
+        saros.getGlobalPreferences();
         EasyMock.expectLastCall()
             .andReturn(new ConfigurationScope().getNode(Saros.SAROS))
             .anyTimes();
-        saros.saveConfigPrefs();
+        saros.saveGlobalPreferences();
         EasyMock.expectLastCall().anyTimes();
         saros.getVersion();
         EasyMock.expectLastCall().andReturn("JUNIT").anyTimes();

@@ -151,7 +151,7 @@ public class StatisticManager extends AbstractFeedbackManager implements
      *         (concerning all workspaces)
      */
     public long getSessionCount() {
-        return saros.getConfigPrefs().getLong(
+        return saros.getGlobalPreferences().getLong(
             PreferenceConstants.SESSION_COUNT, 0);
     }
 
@@ -162,9 +162,9 @@ public class StatisticManager extends AbstractFeedbackManager implements
      *            the number of sessions to save
      */
     public void putSessionCount(long count) {
-        saros.getConfigPrefs()
+        saros.getGlobalPreferences()
             .putLong(PreferenceConstants.SESSION_COUNT, count);
-        saros.saveConfigPrefs();
+        saros.saveGlobalPreferences();
     }
 
     /**

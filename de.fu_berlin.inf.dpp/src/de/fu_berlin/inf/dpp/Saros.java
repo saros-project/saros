@@ -160,7 +160,7 @@ public class Saros extends AbstractUIPlugin {
 
     /**
      * The global plug-in preferences, shared among all workspaces. Should only
-     * be accessed over {@link #getConfigPrefs()} from outside this class.
+     * be accessed over {@link #getGlobalPreferences()} from outside this class.
      */
     protected Preferences configPrefs;
 
@@ -312,7 +312,7 @@ public class Saros extends AbstractUIPlugin {
     public void stop(BundleContext context) throws Exception {
 
         // TODO Devise a general way to stop and dispose our components
-        saveConfigPrefs();
+        saveGlobalPreferences();
         saveSecurePrefs();
 
         if (dotMonitor != null) {
@@ -386,7 +386,7 @@ public class Saros extends AbstractUIPlugin {
      *         preferences that are visible for all workspaces of this eclipse
      *         installation
      */
-    public synchronized Preferences getConfigPrefs() {
+    public synchronized Preferences getGlobalPreferences() {
         // TODO Singleton-Pattern code smell: ConfigPrefs should be a @component
         if (configPrefs == null) {
             configPrefs = new ConfigurationScope().getNode(SAROS);
@@ -399,7 +399,7 @@ public class Saros extends AbstractUIPlugin {
      * the bundle is stopped to prevent loss of data. Can be called whenever
      * found necessary.
      */
-    public synchronized void saveConfigPrefs() {
+    public synchronized void saveGlobalPreferences() {
         /*
          * Note: If multiple JVMs use the config preferences and the underlying
          * backing store, they might not always work with latest data, e.g. when

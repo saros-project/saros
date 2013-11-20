@@ -110,6 +110,6 @@ public class SarosEclipseContextFactory extends AbstractSarosContextFactory {
         container
             .addComponent(ISecurePreferences.class, saros.getSecurePrefs());
 
-        container.addComponent(Preferences.class, saros.getConfigPrefs());
+        container.addComponent(Preferences.class, saros.getGlobalPreferences());
     }
 }

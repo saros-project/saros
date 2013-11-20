@@ -152,7 +152,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
      *         default value -1
      */
     public int getSessionsUntilNext() {
-        return saros.getConfigPrefs().getInt(
+        return saros.getGlobalPreferences().getInt(
             PreferenceConstants.SESSIONS_UNTIL_NEXT, -1);
     }
 
@@ -169,9 +169,9 @@ public class FeedbackManager extends AbstractFeedbackManager implements
     public static void setSessionsUntilNext(Saros saros, int untilNext) {
         if (untilNext < 0)
             untilNext = -1;
-        saros.getConfigPrefs().putInt(PreferenceConstants.SESSIONS_UNTIL_NEXT,
+        saros.getGlobalPreferences().putInt(PreferenceConstants.SESSIONS_UNTIL_NEXT,
             untilNext);
-        saros.saveConfigPrefs();
+        saros.saveGlobalPreferences();
     }
 
     /**
@@ -193,7 +193,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
      * @return 0 - undefined, 1 - enabled, 2 - disabled
      */
     public static int getFeedbackStatus(Saros saros) {
-        int disabled = saros.getConfigPrefs().getInt(
+        int disabled = saros.getGlobalPreferences().getInt(
             PreferenceConstants.FEEDBACK_SURVEY_DISABLED, -1);
 
         if (disabled == -1)
@@ -240,9 +240,9 @@ public class FeedbackManager extends AbstractFeedbackManager implements
     public static void setFeedbackDisabled(Saros saros, boolean disabled) {
         int status = disabled ? FEEDBACK_DISABLED : FEEDBACK_ENABLED;
 
-        saros.getConfigPrefs().putInt(
+        saros.getGlobalPreferences().putInt(
             PreferenceConstants.FEEDBACK_SURVEY_DISABLED, status);
-        saros.saveConfigPrefs();
+        saros.saveGlobalPreferences();
         saros.getPreferenceStore().setValue(
             PreferenceConstants.FEEDBACK_SURVEY_DISABLED, status);
     }
@@ -266,7 +266,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
      * @return
      */
     public static int getSurveyInterval(Saros saros) {
-        int interval = saros.getConfigPrefs().getInt(
+        int interval = saros.getGlobalPreferences().getInt(
             PreferenceConstants.FEEDBACK_SURVEY_INTERVAL, -1);
 
         if (interval == -1)
@@ -296,9 +296,9 @@ public class FeedbackManager extends AbstractFeedbackManager implements
      * @param interval
      */
     public static void setSurveyInterval(Saros saros, int interval) {
-        saros.getConfigPrefs().putInt(
+        saros.getGlobalPreferences().putInt(
             PreferenceConstants.FEEDBACK_SURVEY_INTERVAL, interval);
-        saros.saveConfigPrefs();
+        saros.saveGlobalPreferences();
         saros.getPreferenceStore().setValue(
             PreferenceConstants.FEEDBACK_SURVEY_INTERVAL, interval);
     }
