@@ -39,7 +39,7 @@ import de.fu_berlin.inf.dpp.ui.preferencePages.FeedbackPreferencePage;
 public class ErrorLogManager extends AbstractFeedbackManager implements
     Startable {
 
-    protected static final Logger log = Logger.getLogger(ErrorLogManager.class
+    private static final Logger log = Logger.getLogger(ErrorLogManager.class
         .getName());
 
     protected final String sessionID;
@@ -58,11 +58,10 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
     @Override
     public void stop() {
         if (isErrorLogSubmissionAllowed())
-            submitErrorLog(saros);
+            submitErrorLog();
     }
 
-    public ErrorLogManager(Saros saros, ISarosSession session) {
-        super(saros);
+    public ErrorLogManager(final ISarosSession session) {
         sessionID = session.getID();
 
         logErrorLogSettings();
@@ -73,62 +72,28 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
      * 
      * @return true if it is allowed
      */
-    public boolean isErrorLogSubmissionAllowed() {
-        return isErrorLogSubmissionAllowed(saros);
-    }
-
-    /**
-     * Returns if the submission of the error log is allowed as a boolean.
-     * 
-     * @return true if it is allowed
-     */
-    public static boolean isErrorLogSubmissionAllowed(Saros saros) {
-        return getErrorLogSubmissionStatus(saros) == ALLOW;
+    public static boolean isErrorLogSubmissionAllowed() {
+        return getErrorLogSubmissionStatus() == ALLOW;
     }
 
     /**
      * Returns whether the submission of the error log is allowed, forbidden or
-     * unknown. The global preferences have priority but if the value wasn't
-     * found there the value from the PreferenceStore (with fall back to the
-     * default) is used.
+     * unknown.
      * 
      * @return 0 = unknown, 1 = allowed, 2 = forbidden
      */
-    public static int getErrorLogSubmissionStatus(Saros saros) {
-        int status = saros.getGlobalPreferences().getInt(
+    public static int getErrorLogSubmissionStatus() {
+
+        return FeedbackPreferences.getPreferences().getInt(
             PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION, UNDEFINED);
-
-        if (status == UNDEFINED)
-            status = saros.getPreferenceStore().getInt(
-                PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION);
-        return status;
     }
 
     /**
-     * Saves in the workspace and globally if the user wants to submit the error
-     * log.<br>
-     * <br>
-     * Note: It must be set globally first, so a PropertyChangeListener for the
-     * local setting is working with latest global data.
+     * Sets if the user wants to submit the error log.
      */
-    public void setErrorLogSubmissionAllowed(boolean allowed) {
-        setErrorLogSubmissionAllowed(saros, allowed);
-    }
-
-    /**
-     * Saves in the workspace and globally if the user wants to submit the error
-     * log.<br>
-     * <br>
-     * Note: It must be set globally first, so a PropertyChangeListener for the
-     * local setting is working with latest global data.
-     */
-    public static void setErrorLogSubmissionAllowed(Saros saros, boolean allowed) {
-        int submission = allowed ? ALLOW : FORBID;
-        // store in configuration and preference scope
-        saros.getGlobalPreferences().putInt(
-            PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION, submission);
-        saros.saveGlobalPreferences();
-        saros.getPreferenceStore().setValue(
+    public static void setErrorLogSubmissionAllowed(final boolean allowed) {
+        final int submission = allowed ? ALLOW : FORBID;
+        FeedbackPreferences.getPreferences().putInt(
             PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION, submission);
     }
 
@@ -138,8 +103,8 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
      * @return true if the user either allowed or forbade the submission,
      *         otherwise false
      */
-    public static boolean hasErrorLogAgreement(Saros saros) {
-        return getErrorLogSubmissionStatus(saros) != UNKNOWN;
+    public static boolean hasErrorLogAgreement() {
+        return getErrorLogSubmissionStatus() != UNKNOWN;
     }
 
     /**
@@ -147,17 +112,8 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
      * 
      * @return true if it is allowed
      */
-    public boolean isFullErrorLogSubmissionAllowed() {
-        return isFullErrorLogSubmissionAllowed(saros);
-    }
-
-    /**
-     * Returns if the submission of the full error log is allowed as a boolean.
-     * 
-     * @return true if it is allowed
-     */
-    public static boolean isFullErrorLogSubmissionAllowed(Saros saros) {
-        return getFullErrorLogSubmissionStatus(saros) == ALLOW;
+    public static boolean isFullErrorLogSubmissionAllowed() {
+        return getFullErrorLogSubmissionStatus() == ALLOW;
     }
 
     /**
@@ -167,42 +123,17 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
      * 
      * @return ALLOW or FORBID
      */
-    public static int getFullErrorLogSubmissionStatus(Saros saros) {
-        int status = saros.getGlobalPreferences().getInt(
+    public static int getFullErrorLogSubmissionStatus() {
+        return FeedbackPreferences.getPreferences().getInt(
             PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION_FULL, UNDEFINED);
-
-        if (status == UNDEFINED)
-            status = saros.getPreferenceStore().getInt(
-                PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION_FULL);
-        return status;
     }
 
     /**
-     * Saves in the workspace and globally if the user wants to submit the
-     * *full* error log.<br>
-     * <br>
-     * Note: It must be set globally first, so a PropertyChangeListener for the
-     * local setting is working with latest global data.
+     * Sets if the user wants to submit the *full* error log.
      */
-    public void setFullErrorLogSubmissionAllowed(boolean allowed) {
-        setFullErrorLogSubmissionAllowed(saros, allowed);
-    }
-
-    /**
-     * Saves in the workspace and globally if the user wants to submit the
-     * *full* error log.<br>
-     * <br>
-     * Note: It must be set globally first, so a PropertyChangeListener for the
-     * local setting is working with latest global data.
-     */
-    public static void setFullErrorLogSubmissionAllowed(Saros saros,
-        boolean allowed) {
-        int submission = allowed ? ALLOW : FORBID;
-        // store in configuration and preference scope
-        saros.getGlobalPreferences().putInt(
-            PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION_FULL, submission);
-        saros.saveGlobalPreferences();
-        saros.getPreferenceStore().setValue(
+    public static void setFullErrorLogSubmissionAllowed(final boolean allowed) {
+        final int submission = allowed ? ALLOW : FORBID;
+        FeedbackPreferences.getPreferences().putInt(
             PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION_FULL, submission);
     }
 
@@ -274,9 +205,9 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
      * @nonblocking
      * @cancelable
      */
-    public static void submitErrorLog(final Saros saros) {
+    public static void submitErrorLog() {
         // determine which log should be uploaded
-        final File errorLog = isFullErrorLogSubmissionAllowed(saros) ? getFullErrorLogFile()
+        final File errorLog = isFullErrorLogSubmissionAllowed() ? getFullErrorLogFile()
             : getErrorsOnlyLogFile();
 
         if (errorLog == null)
@@ -289,16 +220,18 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
         final String logNameExtended = FilenameUtils.getBaseName(errorLog
             .getName())
             + "_"
-            + StatisticManagerConfiguration.getUserID(saros)
-            + "_" + mostRecentSessionID;
+            + StatisticManagerConfiguration.getUserID()
+            + "_"
+            + mostRecentSessionID;
 
         new Job("Uploading Error Log...") {
 
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                 try {
-                    FileSubmitter.uploadErrorLog(saros.getStateLocation()
-                        .toOSString(), logNameExtended, errorLog, monitor);
+                    FileSubmitter.uploadErrorLog(
+                        System.getProperty("java.io.tmpdir"), logNameExtended,
+                        errorLog, monitor);
                 } catch (IOException e) {
                     String msg = String.format("Couldn't upload file: %s. %s",
                         e.getMessage(), e.getCause() != null ? e.getCause()
@@ -314,12 +247,6 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
             }
 
         }.schedule();
-    }
-
-    @Override
-    protected void ensureConsistentPreferences() {
-        makePrefConsistent(PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION);
-        makePrefConsistent(PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION_FULL);
     }
 
     protected void logErrorLogSettings() {

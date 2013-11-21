@@ -3,10 +3,7 @@
  */
 package de.fu_berlin.inf.dpp.ui.preferencePages;
 
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
-
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -28,11 +25,11 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.feedback.AbstractFeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
+import de.fu_berlin.inf.dpp.feedback.FeedbackInterval;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.Messages;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
@@ -54,7 +51,7 @@ public class FeedbackPreferencePage extends PreferencePage implements
     IWorkbenchPreferencePage {
 
     @Inject
-    protected Saros saros;
+    private IPreferenceStore preferenceStore;
 
     protected Button radioDisable;
     protected Button radioEnable;
@@ -77,7 +74,7 @@ public class FeedbackPreferencePage extends PreferencePage implements
 
     public FeedbackPreferencePage() {
         SarosPluginContext.initComponent(this);
-        setPreferenceStore(saros.getPreferenceStore());
+        setPreferenceStore(preferenceStore);
         setDescription(Messages.getString("feedback.page.description")); //$NON-NLS-1$
     }
 
@@ -87,15 +84,19 @@ public class FeedbackPreferencePage extends PreferencePage implements
     }
 
     protected void initialize() {
-        isFeedbackDisabled = FeedbackManager.isFeedbackDisabled(saros);
-        int interval = FeedbackManager.getSurveyInterval(saros);
+        isFeedbackDisabled = FeedbackManager.isFeedbackDisabled();
+
+        int interval = FeedbackManager.getSurveyInterval();
+
         currentInterval = FeedbackInterval.getFromInterval(interval);
+
         isSubmissionAllowed = StatisticManagerConfiguration
-            .isStatisticSubmissionAllowed(saros);
+            .isStatisticSubmissionAllowed();
+
         isPseudonymAllowed = StatisticManagerConfiguration
-            .isPseudonymSubmissionAllowed(saros);
-        pseudonymID = StatisticManagerConfiguration
-            .getStatisticsPseudonymID(saros);
+            .isPseudonymSubmissionAllowed();
+
+        pseudonymID = StatisticManagerConfiguration.getStatisticsPseudonymID();
 
         initComponents();
     }
@@ -198,7 +199,7 @@ public class FeedbackPreferencePage extends PreferencePage implements
         startSurveyButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                FeedbackManager.resetSessionsUntilNextToInterval(saros);
+                FeedbackManager.resetSessionsUntilNextToInterval();
                 int browserType = FeedbackManager.showSurvey();
                 /*
                  * close the preferences window if the internal browser is used
@@ -381,7 +382,7 @@ public class FeedbackPreferencePage extends PreferencePage implements
         startErrorSubmissionButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                ErrorLogManager.submitErrorLog(saros);
+                ErrorLogManager.submitErrorLog();
             }
         });
 
@@ -461,112 +462,25 @@ public class FeedbackPreferencePage extends PreferencePage implements
     @Override
     public boolean performOk() {
 
-        FeedbackManager.setFeedbackDisabled(saros, isFeedbackDisabled);
-        FeedbackManager.setSurveyInterval(saros, currentInterval.getInterval());
+        FeedbackManager.setFeedbackDisabled(isFeedbackDisabled);
 
-        StatisticManagerConfiguration.setStatisticSubmissionAllowed(saros,
-            isSubmissionAllowed);
-        StatisticManagerConfiguration.setPseudonymSubmissionAllowed(saros,
-            isPseudonymAllowed);
-        StatisticManagerConfiguration.setStatisticsPseudonymID(saros,
-            pseudonymID);
-        ErrorLogManager.setErrorLogSubmissionAllowed(saros,
-            isErrorLogSubmissionAllowed);
-        ErrorLogManager.setFullErrorLogSubmissionAllowed(saros,
-            isFullErrorLogSubmissionAllowed);
+        FeedbackManager.setSurveyInterval(currentInterval.getInterval());
+
+        StatisticManagerConfiguration
+            .setStatisticSubmissionAllowed(isSubmissionAllowed);
+
+        StatisticManagerConfiguration
+            .setPseudonymSubmissionAllowed(isPseudonymAllowed);
+
+        StatisticManagerConfiguration.setStatisticsPseudonymID(pseudonymID);
+
+        ErrorLogManager
+            .setErrorLogSubmissionAllowed(isErrorLogSubmissionAllowed);
+
+        ErrorLogManager
+            .setFullErrorLogSubmissionAllowed(isFullErrorLogSubmissionAllowed);
 
         return super.performOk();
-    }
-
-    /**
-     * The enum class to handle feedback intervals. It is supposed to map the
-     * interval's index in the combobox to the actual interval value and vice
-     * versa.
-     */
-    protected enum FeedbackInterval {
-        EVERY(1), EVERY_THIRD(3), EVERY_FIFTH(5), EVERY_TENTH(10), EVERY_FIFTEENTH(
-            15);
-
-        private static final Map<Integer, FeedbackInterval> lookup = new HashMap<Integer, FeedbackInterval>();
-
-        static {
-            for (FeedbackInterval f : EnumSet.allOf(FeedbackInterval.class)) {
-                lookup.put(f.getInterval(), f);
-            }
-        }
-
-        private int interval;
-
-        private FeedbackInterval(int i) {
-            this.interval = i;
-        }
-
-        public int getInterval() {
-            return interval;
-        }
-
-        public int getIndex() {
-            return this.ordinal();
-        }
-
-        @Override
-        public String toString() {
-            return this.name().toLowerCase().replace('_', ' ')
-                .concat(" session"); //$NON-NLS-1$
-        }
-
-        /**
-         * Returns the enum for the given interval.
-         * 
-         * @param interval
-         * @return the enum for the interval, can't be null
-         */
-        public static FeedbackInterval getFromInterval(int interval) {
-            FeedbackInterval[] values = FeedbackInterval.values();
-            // make sure the given interval isn't too small or too big
-            if (interval < values[0].interval)
-                interval = values[0].interval;
-            if (interval > values[values.length - 1].interval)
-                interval = values[values.length - 1].interval;
-
-            FeedbackInterval i = lookup.get(interval);
-            // if the interval didn't exist in the map, return the default
-            if (i == null) {
-                return EVERY_FIFTH;
-            }
-            return i;
-        }
-
-        /**
-         * Returns the enum for the given index.
-         * 
-         * @param index
-         * @return the enum for the index
-         */
-        public static FeedbackInterval getFromIndex(int index) {
-            // make sure the index exists
-            if (index < 0)
-                index = 0;
-            if (index > FeedbackInterval.values().length - 1)
-                index = FeedbackInterval.values().length - 1;
-
-            return FeedbackInterval.values()[index];
-        }
-
-        /**
-         * Returns an array of Strings that contains the enum names in a user
-         * friendly text representation.
-         * 
-         * @return String array of enum names
-         */
-        public static String[] toStringArray() {
-            FeedbackInterval[] intervals = FeedbackInterval.values();
-            String[] strings = new String[intervals.length];
-            for (int i = 0; i < intervals.length; i++) {
-                strings[i] = intervals[i].toString();
-            }
-            return strings;
-        }
     }
 
 }

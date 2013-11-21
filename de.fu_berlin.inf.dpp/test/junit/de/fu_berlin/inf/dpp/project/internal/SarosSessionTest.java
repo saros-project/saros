@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.project.internal;
 
-import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,6 +20,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.osgi.service.prefs.Preferences;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.PicoBuilder;
 import org.picocontainer.PicoContainer;
@@ -40,7 +40,7 @@ import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.colorstorage.ColorIDSetStorage;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
-import de.fu_berlin.inf.dpp.feedback.SessionStatistic;
+import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;
 import de.fu_berlin.inf.dpp.feedback.StatisticCollectorTest;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.net.IReceiver;
@@ -62,6 +62,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.test.fakes.synchonize.NonUISynchronizer;
 import de.fu_berlin.inf.dpp.test.util.MemoryPreferenceStore;
+import de.fu_berlin.inf.dpp.test.util.MemoryPreferences;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -170,8 +171,11 @@ public class SarosSessionTest {
 
         container = picoBuilder.build();
 
-        IPreferenceStore store = new MemoryPreferenceStore();
+        final IPreferenceStore store = new MemoryPreferenceStore();
         PreferenceInitializer.setPreferences(store);
+
+        final Preferences preferences = new MemoryPreferences();
+        PreferenceInitializer.setPreferences(preferences);
 
         // Special/Proper mocks
         container.addComponent(SarosNet.class, createSarosNetMock());
@@ -215,6 +219,10 @@ public class SarosSessionTest {
             EasyMock.createMock(AudioServiceManager.class));
         container.addComponent(ConsistencyWatchdogClient.class,
             EasyMock.createMock(ConsistencyWatchdogClient.class));
+
+        // Init Feedback
+
+        FeedbackPreferences.setPreferences(preferences);
 
         // Adding the real class here.
 
@@ -291,22 +299,6 @@ public class SarosSessionTest {
         Utils.getEclipsePlatformInfo();
         EasyMock.expectLastCall().andReturn("JUnit-Test").anyTimes();
         PowerMock.replayAll(Utils.class);
-
-        PowerMock.mockStaticPartial(StatisticManager.class,
-            "createStatisticFile");
-        StatisticManager.createStatisticFile(
-            EasyMock.isA(SessionStatistic.class), EasyMock.isA(Saros.class),
-            EasyMock.isA(String.class));
-        EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
-
-            @Override
-            public Object answer() throws Throwable {
-                File file = File.createTempFile("saros-junit-test", "tst");
-                file.deleteOnExit();
-                return file;
-            }
-        }).anyTimes();
-        PowerMock.replayAll(StatisticManager.class);
 
         final List<Object> workspaceListeners = new LinkedList<Object>();
         IWorkspace workspace = EasyMock.createMock(IWorkspace.class);

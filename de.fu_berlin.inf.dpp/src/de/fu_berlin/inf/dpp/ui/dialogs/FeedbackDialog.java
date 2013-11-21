@@ -17,7 +17,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.Messages;
 import de.fu_berlin.inf.dpp.util.LinkListener;
@@ -37,17 +36,15 @@ public class FeedbackDialog extends MessageDialog {
     /** check box to let the user toggle "don't ask me again" */
     protected Button checkButton;
 
-    protected Saros saros;
-
     protected FeedbackManager feedbackManager;
 
-    public FeedbackDialog(Shell parentShell, Saros saros,
-        FeedbackManager feedbackManager, String message) {
+    public FeedbackDialog(Shell parentShell, FeedbackManager feedbackManager,
+        String message) {
         // create MessageDialog with title and message, buttons are
         // added later
         super(parentShell, FEEDBACK_TITLE, null, message,
             MessageDialog.QUESTION, null, -1);
-        this.saros = saros;
+
         this.feedbackManager = feedbackManager;
     }
 

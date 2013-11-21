@@ -32,21 +32,20 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
 public class StatisticManager extends AbstractFeedbackManager implements
     Startable {
 
-    protected static final Logger log = Logger.getLogger(StatisticManager.class
+    private static final Logger log = Logger.getLogger(StatisticManager.class
         .getName());
 
-    protected static final Random random = new Random();
+    private static final Random RANDOM = new Random();
 
     public static final String INFO_URL = "http://www.saros-project.org/Feedback"; //$NON-NLS-1$
 
     public static final String STATISTIC_FILE_NAME = "session-data";
     public static final String STATISTIC_FILE_EXTENSION = ".txt";
 
-    protected FeedbackManager feedbackManager;
-    protected SessionStatistic statistic;
+    private SessionStatistic statistic;
 
-    protected Set<AbstractStatisticCollector> allCollectors;
-    protected Set<AbstractStatisticCollector> activeCollectors;
+    private Set<AbstractStatisticCollector> allCollectors;
+    private Set<AbstractStatisticCollector> activeCollectors;
 
     @Override
     public void start() {
@@ -65,9 +64,7 @@ public class StatisticManager extends AbstractFeedbackManager implements
         assert activeCollectors.isEmpty();
     }
 
-    public StatisticManager(Saros saros, FeedbackManager feedbackManager) {
-        super(saros);
-        this.feedbackManager = feedbackManager;
+    public StatisticManager() {
         this.allCollectors = new HashSet<AbstractStatisticCollector>();
 
         logFeedbackSettings();
@@ -83,11 +80,6 @@ public class StatisticManager extends AbstractFeedbackManager implements
      */
     public static double getTimeInMinutes(long millisecs) {
         return Math.round(millisecs / 600.0) / 100.0;
-    }
-
-    @Override
-    protected void ensureConsistentPreferences() {
-        makePrefConsistent(PreferenceConstants.STATISTIC_ALLOW_SUBMISSION);
     }
 
     /**
@@ -108,13 +100,11 @@ public class StatisticManager extends AbstractFeedbackManager implements
      * @return true if it is allowed
      */
     public boolean isStatisticSubmissionAllowed() {
-        return StatisticManagerConfiguration
-            .isStatisticSubmissionAllowed(saros);
+        return StatisticManagerConfiguration.isStatisticSubmissionAllowed();
     }
 
     public boolean isPseudonymSubmissionAllowed() {
-        return StatisticManagerConfiguration
-            .isPseudonymSubmissionAllowed(saros);
+        return StatisticManagerConfiguration.isPseudonymSubmissionAllowed();
     }
 
     /**
@@ -131,7 +121,7 @@ public class StatisticManager extends AbstractFeedbackManager implements
      *         {@link FeedbackPreferencePage}
      */
     public String getStatisticsPseudonymID() {
-        return StatisticManagerConfiguration.getStatisticsPseudonymID(saros);
+        return StatisticManagerConfiguration.getStatisticsPseudonymID();
     }
 
     /**
@@ -141,7 +131,7 @@ public class StatisticManager extends AbstractFeedbackManager implements
      *         otherwise false
      */
     public boolean hasStatisticAgreement() {
-        return StatisticManagerConfiguration.hasStatisticAgreement(saros);
+        return StatisticManagerConfiguration.hasStatisticAgreement();
     }
 
     /**
@@ -151,7 +141,7 @@ public class StatisticManager extends AbstractFeedbackManager implements
      *         (concerning all workspaces)
      */
     public long getSessionCount() {
-        return saros.getGlobalPreferences().getLong(
+        return FeedbackPreferences.getPreferences().getLong(
             PreferenceConstants.SESSION_COUNT, 0);
     }
 
@@ -162,9 +152,8 @@ public class StatisticManager extends AbstractFeedbackManager implements
      *            the number of sessions to save
      */
     public void putSessionCount(long count) {
-        saros.getGlobalPreferences()
-            .putLong(PreferenceConstants.SESSION_COUNT, count);
-        saros.saveGlobalPreferences();
+        FeedbackPreferences.getPreferences().putLong(
+            PreferenceConstants.SESSION_COUNT, count);
     }
 
     /**
@@ -183,8 +172,8 @@ public class StatisticManager extends AbstractFeedbackManager implements
         StringBuilder sb = new StringBuilder();
         sb.append("Current feedback settings:\n");
         sb.append("  Feedback disabled: "
-            + feedbackManager.isFeedbackDisabled() + "\n");
-        sb.append("  Feedback interval: " + feedbackManager.getSurveyInterval()
+            + FeedbackManager.isFeedbackDisabled() + "\n");
+        sb.append("  Feedback interval: " + FeedbackManager.getSurveyInterval()
             + "\n");
         sb.append("  Statistic submission allowed: "
             + isStatisticSubmissionAllowed() + "\n");
@@ -192,7 +181,7 @@ public class StatisticManager extends AbstractFeedbackManager implements
             + isPseudonymSubmissionAllowed());
         if (isPseudonymSubmissionAllowed())
             sb.append("\n  Pseudonym is: "
-                + StatisticManagerConfiguration.getStatisticsPseudonymID(saros));
+                + StatisticManagerConfiguration.getStatisticsPseudonymID());
         log.info(sb.toString());
     }
 
@@ -206,7 +195,7 @@ public class StatisticManager extends AbstractFeedbackManager implements
      * @return the random user ID for this eclipse installation
      */
     public synchronized String getUserID() {
-        return StatisticManagerConfiguration.getUserID(saros);
+        return StatisticManagerConfiguration.getUserID();
     }
 
     /*------------------------------------------*
@@ -233,14 +222,13 @@ public class StatisticManager extends AbstractFeedbackManager implements
      * 
      * @return a name for the statistic file
      */
-    protected String createFileName() {
+    protected String generateFileName() {
         String sessionID = statistic.getSessionID();
-        // create a random number if the session ID wasn't found
-        if (sessionID == null) {
-            sessionID = String.valueOf(random.nextInt(Integer.MAX_VALUE));
-        }
-        return STATISTIC_FILE_NAME + "_" + sessionID + "_" + getUserID() + "_"
-            + System.currentTimeMillis() + STATISTIC_FILE_EXTENSION;
+
+        if (sessionID == null)
+            sessionID = String.valueOf(RANDOM.nextInt(Integer.MAX_VALUE));
+
+        return STATISTIC_FILE_NAME + "_" + sessionID + "_" + getUserID();
     }
 
     /**
@@ -251,32 +239,31 @@ public class StatisticManager extends AbstractFeedbackManager implements
      *              asynchronously in a new thread.
      */
     protected void saveAndSubmitStatistic() {
-        // save to disk
-        File file = createStatisticFile(statistic, saros, createFileName());
 
-        // only submit, if user permitted submission
-        if (isStatisticSubmissionAllowed()) {
-            submitStatisticFile(file);
-        } else {
-            log.info(String.format("Statistic was "
-                + "gathered and saved to %s, but the "
-                + "submission is forbidden by the user.",
-                file.getAbsolutePath()));
+        if (!isStatisticSubmissionAllowed()) {
+            log.info("User does not allow to submit session statistics");
+            return;
         }
-    }
 
-    /**
-     * Helper method to create and populate the statistic file. It is static so
-     * it can be mocked for unit tests.
-     * 
-     * @param statistic
-     * @param saros
-     * @param fileName
-     * @return
-     */
-    public static File createStatisticFile(SessionStatistic statistic,
-        Saros saros, String fileName) {
-        return statistic.toFile(saros.getStateLocation(), fileName);
+        File file = null;
+
+        try {
+
+            file = File.createTempFile(generateFileName(),
+                STATISTIC_FILE_EXTENSION);
+
+            file.deleteOnExit();
+            statistic.toFile(file);
+
+        } catch (IOException e) {
+            log.error(
+                "failed to save session statistic to file: "
+                    + (file == null ? "could not create temp file" : file
+                        .getAbsolutePath()), e);
+            return;
+        }
+
+        submitStatisticFile(file);
     }
 
     /**

@@ -22,13 +22,14 @@ package de.fu_berlin.inf.dpp.preferences;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.osgi.service.prefs.Preferences;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 import de.fu_berlin.inf.dpp.feedback.AbstractFeedbackManager;
+import de.fu_berlin.inf.dpp.feedback.FeedbackInterval;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing;
 import de.fu_berlin.inf.dpp.videosharing.preferences.VideoSharingPreferenceHelper;
@@ -44,17 +45,18 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
     /*
      * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer
      */
-    protected static final Logger log = Logger
+    private static final Logger LOG = Logger
         .getLogger(PreferenceInitializer.class.getName());
 
     @Override
     public void initializeDefaultPreferences() {
-        IEclipsePreferences prefs = new DefaultScope().getNode(Saros.SAROS);
+        LOG.info("initializing preference default values");
+        Preferences prefs = new DefaultScope().getNode(Saros.SAROS);
         setPreferences(prefs);
     }
 
-    public static void setPreferences(IEclipsePreferences prefs) {
-        setPreferences(new IEclipsePreferencesWrapper(prefs));
+    public static void setPreferences(Preferences prefs) {
+        setPreferences(new PreferencesWrapper(prefs));
     }
 
     public static void setPreferences(IPreferenceStore preferenceStore) {
@@ -90,12 +92,14 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         prefs.setValue(PreferenceConstants.ENABLE_BALLOON_NOTIFICATION, true);
 
         prefs.setValue(
-            PreferenceConstants.CONTACT_SELECTION_FILTER_NON_SAROS_CONTACTS, true);
+            PreferenceConstants.CONTACT_SELECTION_FILTER_NON_SAROS_CONTACTS,
+            true);
 
         // Initialize Feedback Preferences
         prefs.setValue(PreferenceConstants.FEEDBACK_SURVEY_DISABLED,
             FeedbackManager.FEEDBACK_ENABLED);
-        prefs.setValue(PreferenceConstants.FEEDBACK_SURVEY_INTERVAL, 5);
+        prefs.setValue(PreferenceConstants.FEEDBACK_SURVEY_INTERVAL,
+            FeedbackInterval.DEFAULT.getInterval());
         prefs.setValue(PreferenceConstants.STATISTIC_ALLOW_SUBMISSION,
             AbstractFeedbackManager.UNKNOWN);
         prefs.setValue(PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION,
@@ -184,11 +188,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         void setValue(String s, String s1);
     }
 
-    private static class IEclipsePreferencesWrapper implements
-        PreferenceHolderWrapper {
-        private IEclipsePreferences preferences;
+    private static class PreferencesWrapper implements PreferenceHolderWrapper {
+        private Preferences preferences;
 
-        private IEclipsePreferencesWrapper(IEclipsePreferences preferences) {
+        private PreferencesWrapper(Preferences preferences) {
             this.preferences = preferences;
         }
 

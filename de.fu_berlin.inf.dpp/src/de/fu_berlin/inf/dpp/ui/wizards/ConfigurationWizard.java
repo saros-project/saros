@@ -110,11 +110,10 @@ public class ConfigurationWizard extends AddXMPPAccountWizard {
         boolean errorLogSubmissionAllowed = configurationSettingsWizardPage
             .isErrorLogSubmissionAllowed();
 
-        StatisticManagerConfiguration.setStatisticSubmissionAllowed(saros,
-            statisticSubmissionAllowed);
+        StatisticManagerConfiguration
+            .setStatisticSubmissionAllowed(statisticSubmissionAllowed);
 
-        ErrorLogManager.setErrorLogSubmissionAllowed(saros,
-            errorLogSubmissionAllowed);
+        ErrorLogManager.setErrorLogSubmissionAllowed(errorLogSubmissionAllowed);
 
         GatewayDevice selGwDevice = configurationSettingsWizardPage
             .getPortmappingDevice();

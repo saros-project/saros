@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.IStartup;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.intro.IIntroManager;
@@ -9,8 +10,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
-import de.fu_berlin.inf.dpp.feedback.StatisticManagerConfiguration;
+import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.stf.server.STFController;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
@@ -32,6 +32,9 @@ public class StartupSaros implements IStartup {
 
     @Inject
     private ISarosContext context;
+
+    @Inject
+    private IPreferenceStore preferenceStore;
 
     @Inject
     private SarosUI sarosUI;
@@ -56,6 +59,14 @@ public class StartupSaros implements IStartup {
 
     @Override
     public void earlyStartup() {
+
+        /*
+         * HACK as the preferences are initialized after the context is created
+         * and the default preferences does not affect the global preferences
+         * needed by the Feedback component we have to initialize them here
+         */
+
+        FeedbackPreferences.applyDefaults(preferenceStore);
 
         if (xmppAccountStore.isEmpty())
             showSarosView();
@@ -89,12 +100,8 @@ public class StartupSaros implements IStartup {
                  * startup !
                  */
 
-                // determine if auto-connect can and should be performed
                 if (preferenceUtils.isAutoConnecting()
-                    && !xmppAccountStore.isEmpty()
-                    && StatisticManagerConfiguration
-                        .hasStatisticAgreement(saros)
-                    && ErrorLogManager.hasErrorLogAgreement(saros)) {
+                    && !xmppAccountStore.isEmpty()) {
                     saros.asyncConnect();
                 }
             }

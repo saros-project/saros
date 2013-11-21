@@ -52,8 +52,7 @@ public final class SarosPreferences extends StfRemoteObject implements
             .shell(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
 
         createAccountShell.activate();
-        SuperBot.getInstance().confirmShellCreateNewXMPPAccount(jid,
-            password);
+        SuperBot.getInstance().confirmShellCreateNewXMPPAccount(jid, password);
         createAccountShell.bot().button(NEXT).click();
         createAccountShell.bot().button(FINISH).click();
         createAccountShell.bot().button(APPLY).click();
@@ -123,8 +122,8 @@ public final class SarosPreferences extends StfRemoteObject implements
             .bot()
             .buttonInGroup(BUTTON_EDIT_ACCOUNT,
                 GROUP_TITLE_XMPP_JABBER_ACCOUNTS).click();
-        SuperBot.getInstance().confirmShellEditXMPPAccount(
-            newXmppJabberID, newPassword);
+        SuperBot.getInstance().confirmShellEditXMPPAccount(newXmppJabberID,
+            newPassword);
         shell.bot().button(APPLY).click();
         shell.bot().button(OK).click();
         shell.bot().waitUntil(SarosConditions.isShellClosed(shell));
@@ -262,7 +261,7 @@ public final class SarosPreferences extends StfRemoteObject implements
 
     @Override
     public void disableAutomaticReminder() throws RemoteException {
-        if (!FeedbackManager.isFeedbackDisabled(getSaros())) {
+        if (!FeedbackManager.isFeedbackDisabled()) {
             clickMenuSarosPreferences();
 
             SWTBotShell shell = new SWTBot().shell(SHELL_PREFERNCES);
@@ -283,8 +282,9 @@ public final class SarosPreferences extends StfRemoteObject implements
 
     @Override
     public void disableAutomaticReminderNoGUI() throws RemoteException {
-        if (!FeedbackManager.isFeedbackDisabled(getSaros())) {
-            FeedbackManager.setFeedbackDisabled(getSaros(), true);
+        if (!FeedbackManager.isFeedbackDisabled()) {
+
+            FeedbackManager.setFeedbackDisabled(true);
         }
     }
 

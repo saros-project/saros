@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.osgi.service.prefs.Preferences;
 import org.picocontainer.Characteristics;
 import org.picocontainer.ComponentAdapter;
 import org.picocontainer.MutablePicoContainer;
@@ -16,6 +17,7 @@ import org.picocontainer.injectors.ConstructorInjection;
 import org.picocontainer.injectors.ProviderAdapter;
 import org.picocontainer.injectors.Reinjector;
 
+import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelProjectNegotiationExtension;
@@ -129,6 +131,7 @@ public class SarosContext implements ISarosContext {
 
     private void init() {
 
+        log.info("creating Saros runtime context...");
         /*
          * All singletons which exist for the whole plug-in life-cycle are
          * managed by PicoContainer for us.
@@ -164,6 +167,12 @@ public class SarosContext implements ISarosContext {
 
         installPacketExtensionProviders();
 
+        // additional initialization
+
+        FeedbackPreferences.setPreferences(container
+            .getComponent(Preferences.class));
+
+        log.info("successfully created Saros runtime context");
     }
 
     /**

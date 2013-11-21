@@ -34,10 +34,8 @@ import java.util.TimeZone;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.User.Permission;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * The SessionStatistic class wraps a Properties object in which the gathered
@@ -265,48 +263,23 @@ public class SessionStatistic {
     }
 
     /**
-     * Writes the session data to a file with the given filename in the given
-     * directory path with a subfolder of the current date (format:
-     * <code>statistic_yyyy-MM-dd</code>).
+     * Writes the session data to a file.
      * 
-     * @param path
-     * @param filename
-     * @return an existing statistic file or null if an IOExeption occurred on
-     *         writing
+     * @param file
+     *            the file to save the current session statistic into
      */
-    public File toFile(IPath path, String filename) {
-        // TODO: This method is hard to test, let the caller pass a 'File'. The
-        // caller should allocate the file and this way could make it point to a
-        // temporary one.
+    public void toFile(File file) throws IOException {
 
-        // create a subfolder with the current date, if nonexistent
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String dirName = "statistic_" + dateFormat.format(new Date());
-        IPath filePath = path.append(dirName).append(filename);
-
-        if (!Utils.mkdirs(filePath.toOSString())) {
-            log.error("Could not create the necessary directories to save"
-                + " the statistic as a file. Therefore the statistic could"
-                + " not be saved.");
-            return null;
-        }
-
-        File file = filePath.toFile();
         FileOutputStream fos = null;
-        log.info("Writing statistic data to " + file.getPath());
+        log.info("Writing statistic data to " + file.getAbsolutePath());
 
         // write the statistic to the file
         try {
             fos = new FileOutputStream(file);
             data.store(fos, "Saros session data");
-        } catch (IOException e) {
-            log.error("Couldn't write session data to file " + path, e);
-            return null;
         } finally {
             IOUtils.closeQuietly(fos);
         }
-
-        return file;
     }
 
     /*------------------------------------------------------*

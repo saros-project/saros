@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.feedback;
 
-import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,6 +9,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.osgi.service.prefs.Preferences;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.PicoBuilder;
 import org.picocontainer.injectors.AnnotatedFieldInjection;
@@ -32,10 +32,11 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.internal.SarosSessionTest;
 import de.fu_berlin.inf.dpp.test.util.MemoryPreferenceStore;
+import de.fu_berlin.inf.dpp.test.util.MemoryPreferences;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ Utils.class, StatisticManager.class })
+@PrepareForTest({ Utils.class })
 public class StatisticCollectorTest {
 
     private static ISarosSession createSessionMock(
@@ -134,22 +135,6 @@ public class StatisticCollectorTest {
         EasyMock.expectLastCall().andReturn("JUnit-Test").anyTimes();
         PowerMock.replayAll(Utils.class);
 
-        PowerMock.mockStaticPartial(StatisticManager.class,
-            "createStatisticFile");
-        StatisticManager.createStatisticFile(
-            EasyMock.isA(SessionStatistic.class), EasyMock.isA(Saros.class),
-            EasyMock.isA(String.class));
-        EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
-
-            @Override
-            public Object answer() throws Throwable {
-                File file = File.createTempFile("saros-junit-test", "tst");
-                file.deleteOnExit();
-                return file;
-            }
-        }).anyTimes();
-        PowerMock.replayAll(StatisticManager.class);
-
         // Create a container
         final MutablePicoContainer container = new PicoBuilder(
             new CompositeInjection(new ConstructorInjection(),
@@ -171,11 +156,18 @@ public class StatisticCollectorTest {
         AudioServiceManager audioManager = createAudioServiceManagerMock(audioListeners);
         container.addComponent(AudioServiceManager.class, audioManager);
 
-        IPreferenceStore store = new MemoryPreferenceStore();
+        final IPreferenceStore store = new MemoryPreferenceStore();
+        final Preferences preferences = new MemoryPreferences();
+
         PreferenceInitializer.setPreferences(store);
+        PreferenceInitializer.setPreferences(preferences);
 
         container.addComponent(Saros.class,
             SarosSessionTest.createSarosMock(store));
+
+        container.addComponent(IPreferenceStore.class, store);
+
+        FeedbackPreferences.setPreferences(preferences);
 
         container.addComponent(DataTransferManager.class,
             SarosSessionTest.createDataTransferManagerMock());

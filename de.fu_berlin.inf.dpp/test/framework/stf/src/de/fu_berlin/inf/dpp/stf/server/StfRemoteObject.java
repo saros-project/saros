@@ -1,5 +1,8 @@
 package de.fu_berlin.inf.dpp.stf.server;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.osgi.service.prefs.Preferences;
+
 import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
@@ -49,5 +52,13 @@ public abstract class StfRemoteObject implements Constants {
 
     protected EditorAPI getEditorAPI() {
         return context.getComponent(EditorAPI.class);
+    }
+
+    protected Preferences getGlobalPreferences() {
+        return context.getComponent(Preferences.class);
+    }
+
+    protected IPreferenceStore getLocalPreferences() {
+        return context.getComponent(IPreferenceStore.class);
     }
 }
