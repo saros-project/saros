@@ -24,6 +24,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import de.fu_berlin.inf.dpp.editor.annotations.RemoteCursorAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
+import de.fu_berlin.inf.dpp.editor.annotations.SelectionFillUpAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.session.User;
@@ -61,7 +62,6 @@ public class LocationAnnotationManager {
      * 
      * @param event
      * @param allEditors
-     *            not used (yet)
      */
     public void propertyChange(final PropertyChangeEvent event,
         final Set<IEditorPart> allEditors) {
@@ -75,6 +75,20 @@ public class LocationAnnotationManager {
             @Override
             public void run() {
                 fillUpEnabled = Boolean.valueOf(event.getNewValue().toString());
+
+                if (!fillUpEnabled) {
+                    Predicate<Annotation> predicate = new Predicate<Annotation>() {
+                        @Override
+                        public boolean evaluate(Annotation annotation) {
+                            return (annotation instanceof SelectionFillUpAnnotation);
+                        }
+                    };
+
+                    for (IEditorPart editorPart : allEditors) {
+                        annotationModelHelper.removeAnnotationsFromEditor(
+                            editorPart, predicate);
+                    }
+                }
             }
         });
     }
@@ -184,7 +198,9 @@ public class LocationAnnotationManager {
      * 
      * Such selections consist of a highlight (one character wide, if there is
      * no actual text selection) and a vertical line that resembles the local
-     * text cursor.
+     * text cursor. If the selection includes multiple lines an additional
+     * element will be created to highlight the space between a line's last
+     * character and the right margin.
      * 
      * @param source
      *            The remote user who made the text selection (or to whom the
@@ -260,6 +276,10 @@ public class LocationAnnotationManager {
          * end of it.
          */
         setRemoteCursorAnnotation(source, new Position(offset + length), model);
+
+        if (fillUpEnabled) {
+            setFillUpAnnotation(source, new Position(offset, length), model);
+        }
     }
 
     /**
@@ -282,7 +302,8 @@ public class LocationAnnotationManager {
             new Predicate<Annotation>() {
                 @Override
                 public boolean evaluate(Annotation annotation) {
-                    return (annotation instanceof SelectionAnnotation || annotation instanceof RemoteCursorAnnotation)
+                    return (annotation instanceof SelectionAnnotation
+                        || annotation instanceof SelectionFillUpAnnotation || annotation instanceof RemoteCursorAnnotation)
                         && ((SarosAnnotation) annotation).getSource().equals(
                             user);
                 }
@@ -298,6 +319,18 @@ public class LocationAnnotationManager {
 
         setAnnotationForSelection(new SelectionAnnotation(user, isCursor),
             position, annotationModel);
+    }
+
+    /**
+     * Helper function to create an additional annotation that highlights the
+     * empty space between a line's last character an the right margin (see
+     * {@link SelectionFillUpAnnotation}).
+     */
+    private void setFillUpAnnotation(User user, Position position,
+        IAnnotationModel annotationModel) {
+
+        setAnnotationForSelection(new SelectionFillUpAnnotation(user,
+            position.offset, position.length), position, annotationModel);
     }
 
     /**

@@ -10,8 +10,8 @@ import org.eclipse.swt.graphics.Point;
 
 /**
  * Used to draw a cursor-like line at the position of the text cursor of a
- * remote User. This enables the local User to see exactly where the other
- * Users' cursors are.
+ * remote user. This enables the local user to see exactly where the other
+ * users' cursors are.
  */
 public class RemoteCursorStrategy implements IDrawingStrategy {
     private static final int CURSOR_WIDTH = 2;

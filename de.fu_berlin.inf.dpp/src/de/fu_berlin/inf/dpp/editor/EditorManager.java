@@ -69,6 +69,8 @@ import de.fu_berlin.inf.dpp.editor.annotations.ContributionAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.RemoteCursorAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.RemoteCursorStrategy;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
+import de.fu_berlin.inf.dpp.editor.annotations.SelectionFillUpAnnotation;
+import de.fu_berlin.inf.dpp.editor.annotations.SelectionFillUpStrategy;
 import de.fu_berlin.inf.dpp.editor.internal.AnnotationModelHelper;
 import de.fu_berlin.inf.dpp.editor.internal.ContributionAnnotationManager;
 import de.fu_berlin.inf.dpp.editor.internal.CustomAnnotationManager;
@@ -1913,8 +1915,40 @@ public class EditorManager extends AbstractActivityProvider {
      * registerDrawingStrategy()} .
      */
     private void registerCustomAnnotations() {
+        /*
+         * Explanation of the "layer magic": The six SelectionAnnotationTypes (1
+         * default + 5 users) are located on layers 8 to 13 (see plugin.xml,
+         * extension point "markerAnnotationSpecification").
+         */
+        int defaultSelectionLayer = 8;
+
+        /*
+         * For every SelectionFillUpAnnotation of a different color there is an
+         * own layer. There is one layer for the default color and one for each
+         * of the different user colors. All SelectionFillUpAnnotations are
+         * drawn in lower levels than the RemoteCursorAnnotation.
+         * 
+         * TODO: The color determines on which layer a selection will be drawn.
+         * So, in "competitive" situations, some selections will never be
+         * visible because they are always drawn in a lower layer. (Can only
+         * happen in sessions with more than two participants: Carl selected a
+         * block, Bob selects a statement within, Alice might not be able to see
+         * Bob's selection until Carl's changes his.)
+         */
+        SelectionFillUpStrategy strategy = new SelectionFillUpStrategy();
+        for (int i = 0; i <= SarosAnnotation.SIZE; i++) {
+            String type = SarosAnnotation.getNumberedType(
+                SelectionFillUpAnnotation.TYPE, i);
+            customAnnotationManager.registerAnnotation(type,
+                defaultSelectionLayer + i);
+            customAnnotationManager.registerDrawingStrategy(type, strategy);
+        }
+
+        /*
+         * The RemoteCursorAnnotations are drawn in the layer above.
+         */
         customAnnotationManager.registerAnnotation(RemoteCursorAnnotation.TYPE,
-            0);
+            defaultSelectionLayer + SarosAnnotation.SIZE + 1);
         customAnnotationManager.registerDrawingStrategy(
             RemoteCursorAnnotation.TYPE, new RemoteCursorStrategy());
     }

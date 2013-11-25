@@ -154,7 +154,19 @@ public abstract class SarosAnnotation extends Annotation {
         }
     }
 
-    private static String getNumberedType(final String type, final int colorID) {
+    /**
+     * Creates a per-user type from a base type and a color id.
+     * 
+     * Typically used to distinguish annotations stemming from different users
+     * (in contexts where the user himself is not important, but his color is).
+     * 
+     * @param type
+     *            The type String of an annotation without a user- (or
+     *            color-)specification
+     * @param colorID
+     *            The specificator. This method can cope with non-color ids.
+     */
+    public static String getNumberedType(final String type, final int colorID) {
 
         final String colorIDSuffix;
 
