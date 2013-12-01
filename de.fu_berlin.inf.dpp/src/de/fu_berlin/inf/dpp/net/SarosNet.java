@@ -72,16 +72,13 @@ public class SarosNet {
 
     private final List<IConnectionListener> listeners = new CopyOnWriteArrayList<IConnectionListener>();
 
-    // Smack (XMPP) connection listener
-    private ConnectionListener smackConnectionListener;
-
     private final IStunService stunService;
 
     private final IUPnPService upnpService;
 
     private int packetReplyTimeout;
 
-    private final class XMPPConnectionListener implements ConnectionListener {
+    private final ConnectionListener smackConnectionListener = new ConnectionListener() {
 
         @Override
         public void connectionClosed() {
@@ -94,11 +91,13 @@ public class SarosNet {
 
         @Override
         public void connectionClosedOnError(Exception e) {
-            LOG.error("XMPP connection error: ", e);
-            setConnectionState(ConnectionState.ERROR, e);
-            disconnectInternal();
-            setConnectionState(ConnectionState.NOT_CONNECTED, null);
-            localJID = null;
+            synchronized (SarosNet.this) {
+                LOG.error("XMPP connection error: ", e);
+                setConnectionState(ConnectionState.ERROR, e);
+                disconnectInternal();
+                setConnectionState(ConnectionState.NOT_CONNECTED, null);
+                localJID = null;
+            }
         }
 
         @Override
@@ -115,7 +114,7 @@ public class SarosNet {
         public void reconnectionSuccessful() {
             // NOP
         }
-    }
+    };
 
     public SarosNet(@Nullable IUPnPService upnpService,
         @Nullable IStunService stunService) {
@@ -232,8 +231,9 @@ public class SarosNet {
      * 
      * @blocking
      */
-    public void connect(ConnectionConfiguration connectionConfiguration,
-        String username, String password) throws XMPPException {
+    public synchronized void connect(
+        ConnectionConfiguration connectionConfiguration, String username,
+        String password) throws XMPPException {
 
         if (isConnected())
             disconnect();
@@ -251,10 +251,6 @@ public class SarosNet {
 
             ServiceDiscoveryManager.getInstanceFor(connection).addFeature(
                 namespace);
-
-            // add connection listener so we get notified if it will be closed
-            if (smackConnectionListener == null)
-                smackConnectionListener = new XMPPConnectionListener();
 
             /*
              * BUG in Smack: should be possible to register the listener before
@@ -288,7 +284,7 @@ public class SarosNet {
      * 
      * @blocking
      */
-    public void disconnect() {
+    public synchronized void disconnect() {
         if (isConnected()) {
             setConnectionState(ConnectionState.DISCONNECTING, null);
 
@@ -350,7 +346,7 @@ public class SarosNet {
         listeners.remove(listener);
     }
 
-    private void disconnectInternal() {
+    private synchronized void disconnectInternal() {
 
         if (connection == null)
             return;
@@ -380,18 +376,18 @@ public class SarosNet {
         if (connection != null) {
             String user = connection.getUser();
             if (user != null)
-                prefix = Utils.prefix(new JID(user));
+                prefix = new JID(user).toString();
         }
 
         if (error == null) {
-            LOG.debug(prefix + "new connection state == " + state);
+            LOG.debug(prefix + " new connection state == " + state);
         } else {
-            LOG.error(prefix + "new connection state == " + state, error);
+            LOG.error(prefix + " new connection state == " + state, error);
         }
 
-        for (IConnectionListener listener : this.listeners) {
+        for (IConnectionListener listener : listeners) {
             try {
-                listener.connectionStateChanged(this.connection, state);
+                listener.connectionStateChanged(connection, state);
             } catch (Exception e) {
                 LOG.error("internal error in listener: " + listener, e);
             }

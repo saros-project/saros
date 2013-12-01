@@ -331,20 +331,20 @@ public class Saros extends AbstractUIPlugin {
                         try {
 
                             sessionManager.stopSarosSession();
+                            getSarosNet().disconnect();
                         } finally {
                             /*
                              * Always shutdown the network to ensure a proper
                              * cleanup(currently only UPNP)
                              */
-                            getSarosNet().disconnect();
-                        }
 
-                        /**
-                         * This will cause dispose() to be called on all
-                         * components managed by PicoContainer which implement
-                         * {@link Disposable}.
-                         */
-                        sarosContext.dispose();
+                            /*
+                             * This will cause dispose() to be called on all
+                             * components managed by PicoContainer which
+                             * implement {@link Disposable}.
+                             */
+                            sarosContext.dispose();
+                        }
                     }
                 });
 
@@ -646,16 +646,11 @@ public class Saros extends AbstractUIPlugin {
         boolean useTLS = account.useTLS();
         boolean useSASL = account.useSASL();
 
-        sarosNet.configure(
-            NAMESPACE,
-            RESOURCE,
+        sarosNet.configure(NAMESPACE, RESOURCE,
             preferenceUtils.isDebugEnabled(),
             preferenceUtils.isLocalSOCKS5ProxyEnabled(),
             preferenceUtils.getFileTransferPort(),
-
-            getPreferenceStore().getString(
-                PreferenceConstants.AUTO_PORTMAPPING_DEVICEID),
-
+            preferenceUtils.getAutoPortmappingGatewayID(),
             preferenceUtils.getStunIP(), preferenceUtils.getStunPort(),
             preferenceUtils.isAutoPortmappingEnabled());
 
