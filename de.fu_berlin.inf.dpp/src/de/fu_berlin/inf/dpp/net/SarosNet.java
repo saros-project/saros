@@ -2,12 +2,14 @@ package de.fu_berlin.inf.dpp.net;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
+import org.bitlet.weupnp.GatewayDevice;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
@@ -29,9 +31,13 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * This class is responsible for establishing XMPP connections and notifying
  * registered listeners about the state of the current connection.
  */
+// FIXME synchronization of the whole connect / disconnect logic !!!
 @Component(module = "net")
 public class SarosNet {
     private static final Logger LOG = Logger.getLogger(SarosNet.class);
+
+    // DO NOT CHANGE THE CONTENT OF THIS STRING, NEVER NEVER NEVER !!!
+    private static final String PORT_MAPPING_DESCRIPTION = "Saros Socks5 TCP";
 
     private Connection connection;
 
@@ -39,9 +45,24 @@ public class SarosNet {
     private String resource;
     private int proxyPort;
     private boolean isProxyEnabled;
+    private String gatewayDeviceID;
+
+    /** The current IP address of the STUN server or <code>null</code>. */
     private String stunServer;
+
+    /** The current port of the STUN server or <code>null</code>. */
     private int stunPort;
-    private boolean isPortMappingEnabled;
+
+    /** The current gateway device to use for port mapping or <code>null</code>. */
+    private GatewayDevice device;
+
+    /**
+     * The listening port of the current Socks5Proxy. Is <b>-1</b> if the proxy
+     * is not running.
+     */
+    private int socks5ProxyPort;
+
+    private final Object portMappingLock = new Object();
 
     private JID localJID;
 
@@ -59,6 +80,42 @@ public class SarosNet {
     private final IUPnPService upnpService;
 
     private int packetReplyTimeout;
+
+    private final class XMPPConnectionListener implements ConnectionListener {
+
+        @Override
+        public void connectionClosed() {
+            /*
+             * see Smack Source: connectionClosed is called before
+             * connectionClosedOnError and so would violate the state transition
+             * described in the ConnectionState class
+             */
+        }
+
+        @Override
+        public void connectionClosedOnError(Exception e) {
+            LOG.error("XMPP connection error: ", e);
+            setConnectionState(ConnectionState.ERROR, e);
+            disconnectInternal();
+            setConnectionState(ConnectionState.NOT_CONNECTED, null);
+            localJID = null;
+        }
+
+        @Override
+        public void reconnectingIn(int seconds) {
+            // NOP
+        }
+
+        @Override
+        public void reconnectionFailed(Exception e) {
+            // NOP
+        }
+
+        @Override
+        public void reconnectionSuccessful() {
+            // NOP
+        }
+    }
 
     public SarosNet(@Nullable IUPnPService upnpService,
         @Nullable IStunService stunService) {
@@ -83,27 +140,57 @@ public class SarosNet {
      *            true to enable Socks5Proxy
      * @param proxyPort
      *            Socks5Proxy port
+     * @param gatewayDeviceID
+     *            the USN of a UPNP compatible gateways device to perform port
+     *            mapping on or <code>null</code>
      * @param stunServer
-     *            STUN server (address)
+     *            STUN server address or <code>null</code> if STUN discovery
+     *            should not be performed
      * @param stunPort
      *            STUN server port if 0 the default stun port will be used
-     * @param enablePortMapping
-     *            true to enable UPnP port mapping
      */
-    public void configure(String namespace, String resource,
-        boolean enableDebug, boolean proxyEnabled, int proxyPort,
-        String stunServer, int stunPort, boolean enablePortMapping) {
+    public synchronized void configure(final String namespace,
+        final String resource, final boolean enableDebug,
+        final boolean proxyEnabled, final int proxyPort,
+        final String gatewayDeviceID, final String stunServer,
+        final int stunPort, boolean enablePortMapping) {
+
+        if (isConnected())
+            throw new IllegalStateException(
+                "cannot configure the network while a connection is established");
+
         Connection.DEBUG_ENABLED = enableDebug;
         this.namespace = namespace;
         this.resource = resource;
         this.proxyPort = proxyPort;
         this.isProxyEnabled = proxyEnabled;
+        this.gatewayDeviceID = gatewayDeviceID;
         this.stunServer = stunServer;
         this.stunPort = stunPort;
-        this.isPortMappingEnabled = enablePortMapping;
 
-        if (this.stunServer.isEmpty())
+        this.device = null;
+
+        if (this.stunServer != null && this.stunServer.isEmpty())
             this.stunServer = null;
+
+        if (this.gatewayDeviceID != null && this.gatewayDeviceID.isEmpty())
+            this.gatewayDeviceID = null;
+
+        if (this.gatewayDeviceID == null)
+            return;
+
+        /*
+         * perform blocking tasks in the background meanwhile to speed up first
+         * connection attempt, currently it is only UPNP discovery
+         */
+
+        Utils.runSafeAsync("SearchUPNP", LOG, new Runnable() {
+            @Override
+            public void run() {
+                if (upnpService != null)
+                    upnpService.discoverGateways();
+            }
+        });
     }
 
     /**
@@ -151,7 +238,7 @@ public class SarosNet {
         if (isConnected())
             disconnect();
 
-        setBytestreamConnectionProperties();
+        initialzeNetworkComponents();
 
         Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.manual);
 
@@ -264,6 +351,7 @@ public class SarosNet {
     }
 
     private void disconnectInternal() {
+
         if (connection == null)
             return;
 
@@ -273,6 +361,8 @@ public class SarosNet {
         } catch (RuntimeException e) {
             LOG.warn("could not disconnect from the current XMPPConnection", e);
         } finally {
+
+            uninitialzeNetworkComponents();
             connection = null;
         }
     }
@@ -313,7 +403,7 @@ public class SarosNet {
      * Socks5Proxy configuration, look up streamhost address candiates for
      * Socks5Proxy, update UPnP settings on proxy setting change.
      */
-    private void setBytestreamConnectionProperties() {
+    private void initialzeNetworkComponents() {
 
         /*
          * Setting the Smack timeout for packet replies. The default of 5000 can
@@ -323,136 +413,149 @@ public class SarosNet {
          */
         SmackConfiguration.setPacketReplyTimeout(packetReplyTimeout);
 
-        // Socks5 Proxy Configuration
-        boolean settingsChanged = false;
-        boolean portChanged = false;
+        if (!isProxyEnabled)
+            return; // we are done, STUN and UPNP only affect Socks5
+
+        SmackConfiguration.setLocalSocks5ProxyEnabled(true);
+        SmackConfiguration.setLocalSocks5ProxyPort(proxyPort);
+
+        final Socks5Proxy proxy = Socks5Proxy.getSocks5Proxy();
+
+        proxy.start();
+        socks5ProxyPort = proxy.getPort();
+
+        LOG.debug("started Socks5 proxy on port: " + socks5ProxyPort
+            + " [listening on all interfaces]");
+
+        List<String> interfaceAddresses = new ArrayList<String>();
+
+        for (InetAddress interfaceAddress : NetworkingUtils
+            .getAllNonLoopbackLocalIPAdresses(true)) {
+            interfaceAddresses.add(interfaceAddress.getHostAddress());
+        }
+
+        LOG.debug("found interface addresses: " + interfaceAddresses);
+        proxy.replaceLocalAddresses(interfaceAddresses);
 
         /*
-         * TODO Fix in Smack: Either always start proxy when enabled in the
-         * smack configuration or never start it automatically. Currently it
-         * only starts after initiation the singleton on first access.
+         * The public IP address from the STUN result may be added to late but
+         * this is definitely better then blocking the connection establishment
+         * for several seconds. Also it is very uncommon the a connection
+         * attempt to another is done just several seconds after the connection
+         * to the XMPP server is established
          */
+        if (stunService != null && stunServer != null) {
+            Utils.runSafeAsync("StunAddProxys", LOG, new Runnable() {
+                @Override
+                public void run() {
+                    Collection<InetSocketAddress> addresses = stunService
+                        .discover(stunServer, stunPort, 10000);
 
-        Socks5Proxy proxy = NetworkingUtils.getSocks5ProxySafe();
-
-        if (isProxyEnabled != SmackConfiguration.isLocalSocks5ProxyEnabled()) {
-            settingsChanged = true;
-            SmackConfiguration.setLocalSocks5ProxyEnabled(isProxyEnabled);
+                    for (InetSocketAddress address : addresses)
+                        NetworkingUtils.addProxyAddress(address.getAddress()
+                            .getHostAddress(), true);
+                }
+            });
         }
 
-        // Note: The proxy gets restarted on port change, too.
-        if (proxyPort != SmackConfiguration.getLocalSocks5ProxyPort()) {
-            settingsChanged = true;
-            portChanged = true;
-            SmackConfiguration.setLocalSocks5ProxyPort(proxyPort);
-        }
+        final CountDownLatch mappingStart = new CountDownLatch(1);
 
-        // Get & set all (useful) internal and external IP addresses as
-        // potential connect addresses
-        if (isProxyEnabled) {
+        if (gatewayDeviceID != null && upnpService != null) {
+            final String gatewayDeviceIDToFind = gatewayDeviceID;
+            Utils.runSafeAsync("CreatePortMapping", LOG, new Runnable() {
+                @Override
+                public void run() {
+                    synchronized (portMappingLock) {
+                        mappingStart.countDown();
+
+                        List<GatewayDevice> devices = upnpService.getGateways();
+
+                        if (devices == null)
+                            devices = upnpService.getGateways();
+
+                        for (GatewayDevice currentDevice : devices) {
+                            if (gatewayDeviceIDToFind.equals(currentDevice
+                                .getUSN())) {
+                                device = currentDevice;
+                                break;
+                            }
+                        }
+
+                        if (device == null) {
+                            LOG.warn("could not find gateway device with id: + "
+                                + gatewayDeviceID
+                                + " in the current network environment");
+                            return;
+                        }
+
+                        upnpService.deletePortMapping(device, socks5ProxyPort,
+                            IUPnPService.TCP);
+
+                        LOG.debug("creating port mapping on device: "
+                            + device.getFriendlyName() + " [" + socks5ProxyPort
+                            + "|" + IUPnPService.TCP + "]");
+
+                        if (!upnpService.createPortMapping(device,
+                            socks5ProxyPort, IUPnPService.TCP,
+                            PORT_MAPPING_DESCRIPTION)) {
+
+                            LOG.warn("failed to create port mapping on device: "
+                                + device.getFriendlyName()
+                                + " ["
+                                + socks5ProxyPort
+                                + "|"
+                                + IUPnPService.TCP
+                                + "]");
+
+                            device = null;
+                            return;
+                        }
+
+                        InetAddress externalAddress = upnpService
+                            .getExternalAddress(device);
+
+                        if (externalAddress != null)
+                            NetworkingUtils.addProxyAddress(
+                                externalAddress.getHostAddress(), true);
+                    }
+                }
+            });
 
             try {
-                List<InetAddress> myAdresses = NetworkingUtils
-                    .getAllNonLoopbackLocalIPAdresses(true);
-
-                if (!myAdresses.isEmpty()) {
-                    // convert to List of Strings
-                    List<String> myAdressesStr = new LinkedList<String>();
-                    for (InetAddress ip : myAdresses)
-                        myAdressesStr.add(ip.getHostAddress());
-                    proxy.replaceLocalAddresses(myAdressesStr);
-                }
-
-                if (stunService != null && stunServer != null) {
-                    Utils.runSafeAsync("StunAddProxys", LOG, new Runnable() {
-                        @Override
-                        public void run() {
-                            Collection<InetSocketAddress> addresses = stunService
-                                .discover(stunServer, stunPort, 10000);
-
-                            for (InetSocketAddress address : addresses)
-                                NetworkingUtils.addProxyAddress(address
-                                    .getAddress().getHostAddress(), true);
-                        }
-                    });
-                }
-            } catch (Exception e) {
-                LOG.debug("Error while retrieving IP addresses", e);
-            }
-        }
-
-        if (settingsChanged || proxy.isRunning() != isProxyEnabled) {
-            StringBuilder sb = new StringBuilder();
-            if (settingsChanged)
-                sb.append("Socks5Proxy properties changed. ");
-
-            if (proxy.isRunning()) {
-                proxy.stop();
-                sb.append("Socks5Proxy stopped. ");
-            }
-            if (isProxyEnabled) {
-                proxy.start();
-                sb.append("Socks5Proxy started on port " + proxy.getPort()
-                    + "...");
-            }
-            LOG.debug(sb);
-
-            if (upnpService != null) {
-                // Update the mapped port on Socks5Proy port change
-                if (isProxyEnabled && portChanged && upnpService.isMapped())
-                    upnpService.createSarosPortMapping();
-
-                // create UPnP port mapping if not existing
-                if (isProxyEnabled && isPortMappingEnabled
-                    && !upnpService.isMapped())
-                    upnpService.createSarosPortMapping();
-
-                // remove UPnP port mapping if not required
-                if (!isProxyEnabled && upnpService.isMapped())
-                    upnpService.removeSarosPortMapping();
-
-                if (upnpService.isMapped()) {
-                    String gatewayPublicIP = upnpService.getPublicGatewayIP();
-                    if (gatewayPublicIP != null)
-                        NetworkingUtils.addProxyAddress(gatewayPublicIP, true);
-                }
+                mappingStart.await();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
         }
     }
 
-    private class XMPPConnectionListener implements ConnectionListener {
+    private void uninitialzeNetworkComponents() {
+        if (socks5ProxyPort == -1)
+            return;
 
-        @Override
-        public void connectionClosed() {
-            /*
-             * see Smack Source: connectionClosed is called before
-             * connectionClosedOnError and so would violate the state transition
-             * described in the ConnectionState class
-             */
+        Socks5Proxy.getSocks5Proxy().stop();
+
+        deleteMapping: synchronized (portMappingLock) {
+            if (device == null)
+                break deleteMapping;
+
+            if (!upnpService
+                .isMapped(device, socks5ProxyPort, IUPnPService.TCP))
+                break deleteMapping;
+
+            LOG.debug("deleting port mapping on device: "
+                + device.getFriendlyName() + " [" + socks5ProxyPort + "|"
+                + IUPnPService.TCP + "]");
+
+            if (!upnpService.deletePortMapping(device, socks5ProxyPort,
+                IUPnPService.TCP)) {
+                LOG.warn("failed to delete port mapping on device: "
+                    + device.getFriendlyName() + " [" + socks5ProxyPort + "|"
+                    + IUPnPService.TCP + "]");
+            }
         }
 
-        @Override
-        public void connectionClosedOnError(Exception e) {
-            LOG.error("XMPP connection error: ", e);
-            setConnectionState(ConnectionState.ERROR, e);
-            disconnectInternal();
-            setConnectionState(ConnectionState.NOT_CONNECTED, null);
-            localJID = null;
-        }
-
-        @Override
-        public void reconnectingIn(int seconds) {
-            // NOP
-        }
-
-        @Override
-        public void reconnectionFailed(Exception e) {
-            // NOP
-        }
-
-        @Override
-        public void reconnectionSuccessful() {
-            // NOP
-        }
+        socks5ProxyPort = -1;
+        device = null;
     }
 }

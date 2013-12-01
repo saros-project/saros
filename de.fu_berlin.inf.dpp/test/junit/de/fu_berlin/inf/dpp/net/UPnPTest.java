@@ -15,10 +15,9 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.BasicConfigurator;
 import org.bitlet.weupnp.GatewayDevice;
 import org.bitlet.weupnp.PortMappingEntry;
-import org.jivesoftware.smack.SmackConfiguration;
-import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 import org.junit.Before;
 import org.junit.Test;
 import org.xml.sax.SAXException;
@@ -31,6 +30,10 @@ import de.fu_berlin.inf.dpp.net.upnp.internal.UPnPServiceImpl;
  * Test class to perform tests on UPnP management functionality in Saros.
  */
 public class UPnPTest {
+
+    static {
+        BasicConfigurator.configure();
+    }
 
     /**
      * UPnP access stub for UPnPManager to work with to use local test data
@@ -96,8 +99,7 @@ public class UPnPTest {
     @Before
     public void setUp() throws Exception {
         upnpAccess = new UPnPAccessStub();
-        testUpnpManager = new UPnPServiceImpl();
-        testUpnpManager.init(upnpAccess, null);
+        testUpnpManager = new UPnPServiceImpl(upnpAccess);
 
         testGateway1 = new GatewayDevice();
         testGateway1.setFriendlyName("Test Gateway 1");
@@ -118,77 +120,50 @@ public class UPnPTest {
     @Test
     public void testIntitialState() {
         assertTrue(testUpnpManager.getGateways() == null);
-        assertFalse(testUpnpManager.isMapped());
     }
 
     @Test
     public void testDiscoveryNoDeviceFound() {
         testUpnpManager.discoverGateways();
         assertTrue(testUpnpManager.getGateways().isEmpty());
-        assertFalse(testUpnpManager.isMapped());
     }
 
     @Test
     public void testDiscovery() {
 
-        // prepare
         upnpAccess.addGatewayDevice(testGateway1);
         upnpAccess.addGatewayDevice(testGateway2);
         upnpAccess.addGatewayDevice(testGateway3);
 
-        // test
         testUpnpManager.discoverGateways();
 
-        // check
         assertEquals(testUpnpManager.getGateways().size(), 3);
-        assertTrue(testUpnpManager.getGateways().get(0).equals(testGateway1));
-        assertTrue(testUpnpManager.getGateways().get(1).equals(testGateway2));
-        assertTrue(testUpnpManager.getGateways().get(2).equals(testGateway3));
-    }
-
-    @Test
-    public void testPreselectionWithDiscovery() {
-
-        // prepare
-        upnpAccess.addGatewayDevice(testGateway1);
-        upnpAccess.addGatewayDevice(testGateway2);
-        upnpAccess.addGatewayDevice(testGateway3);
-
-        testUpnpManager.setPreSelectedDeviceID(testGateway2.getUSN());
-
-        // test
-        testUpnpManager.discoverGateways();
-
-        // check
-        assertTrue(testUpnpManager.getSelectedGateway() == testGateway2);
+        assertEquals(testUpnpManager.getGateways().get(0), testGateway1);
+        assertEquals(testUpnpManager.getGateways().get(1), testGateway2);
+        assertEquals(testUpnpManager.getGateways().get(2), testGateway3);
     }
 
     @Test
     public void testAddAndRemoveSarosPortmapping() {
 
-        // prepare staged environment
-        upnpAccess.addGatewayDevice(testGateway1);
-        SmackConfiguration.setLocalSocks5ProxyEnabled(true);
-        SmackConfiguration.setLocalSocks5ProxyPort(0);
-        Socks5Proxy.getSocks5Proxy().start();
+        final int port = 4711;
 
-        testUpnpManager.setPreSelectedDeviceID(testGateway1.getUSN());
+        upnpAccess.addGatewayDevice(testGateway1);
+
         testUpnpManager.discoverGateways();
 
-        // test adding portmapping
-        assertTrue(testUpnpManager.createSarosPortMapping());
+        assertTrue("failed to create port mapping",
+            testUpnpManager.createPortMapping(testGateway1, port,
+                IUPnPService.TCP, null));
 
-        // check
-        assertTrue(testUpnpManager.isMapped());
-        assertEquals(Socks5Proxy.getSocks5Proxy().getPort(),
-            testUpnpManager.getCurrentlyMappedPort());
+        assertTrue("internal port mapping entries were not updated",
+            testUpnpManager.isMapped(testGateway1, port, IUPnPService.TCP));
 
-        // test removing portmapping
-        assertTrue(testUpnpManager.removeSarosPortMapping());
+        assertTrue("failed to remove port mapping",
+            testUpnpManager.deletePortMapping(testGateway1, port,
+                IUPnPService.TCP));
 
-        // check
-        assertFalse(testUpnpManager.isMapped());
-
-        Socks5Proxy.getSocks5Proxy().stop();
+        assertFalse("internal port mapping entries were not updated",
+            testUpnpManager.isMapped(testGateway1, port, IUPnPService.TCP));
     }
 }

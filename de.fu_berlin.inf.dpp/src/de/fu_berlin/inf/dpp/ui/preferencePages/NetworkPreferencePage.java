@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.preferencePages;
 
 import java.net.InetAddress;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -120,21 +119,31 @@ public final class NetworkPreferencePage extends PreferencePage implements
         getPreferenceStore().setValue(PreferenceConstants.STUN_PORT,
             stunPort.isEmpty() ? 0 : Integer.valueOf(stunPort));
 
-        // FIXME: you can only remove a gateway after the discovery is performed
-        if (upnpService.getGateways() == null)
-            return super.performOk();
+        final String currentSavedUPNPDeviceID = getPreferenceStore().getString(
+            PreferenceConstants.AUTO_PORTMAPPING_DEVICEID);
 
-        upnpService.setSelectedGateway(null);
+        String currentSelectedUPNPDeviceID = null;
+
         for (TableItem item : upnpDevicesTable.getItems()) {
             if (!item.getChecked())
                 continue;
 
-            if (upnpService.setSelectedGateway((GatewayDevice) item.getData())) {
+            currentSelectedUPNPDeviceID = (String) item.getData();
+        }
 
+        if (currentSelectedUPNPDeviceID != null) {
+            getPreferenceStore().setValue(
+                PreferenceConstants.AUTO_PORTMAPPING_DEVICEID,
+                currentSelectedUPNPDeviceID);
+
+            if (!currentSelectedUPNPDeviceID.equals(currentSavedUPNPDeviceID))
                 SarosView.showNotification(
                     Messages.NetworkPreferencePage_upnp_activation,
                     Messages.NetworkPreferencePage_upnp_activation_text);
-            }
+
+        } else {
+            getPreferenceStore().setToDefault(
+                PreferenceConstants.AUTO_PORTMAPPING_DEVICEID);
         }
 
         return super.performOk();
@@ -224,6 +233,9 @@ public final class NetworkPreferencePage extends PreferencePage implements
         buttonAllowAlternativeSocks5Port.setSelection(saros
             .getPreferenceStore().getDefaultBoolean(
                 PreferenceConstants.USE_NEXT_PORTS_FOR_FILE_TRANSFER));
+
+        for (TableItem item : upnpDevicesTable.getItems())
+            item.setChecked(false);
 
         super.performDefaults();
 
@@ -379,12 +391,10 @@ public final class NetworkPreferencePage extends PreferencePage implements
         return group;
     }
 
-    private static final char[] PROGRESS = { '|', '/', '-', '\\' };
-    private int progressIndex = 0;
-
     private void discoverUpnpGateways() {
         if (upnpService.getGateways() == null) {
-            gatewayInfo.setText(Messages.NetworkPreferencePage_discover_upnp);
+            gatewayInfo
+                .setText(Messages.NetworkPreferencePage_discover_upnp_gateway);
             gatewayInfo.pack();
             gatewayInfo.setVisible(true);
 
@@ -394,33 +404,7 @@ public final class NetworkPreferencePage extends PreferencePage implements
                     @Override
                     public void run() {
 
-                        upnpService.startGatewayDiscovery(false);
-
-                        while (upnpService.getGateways() == null) {
-                            SWTUtils.runSafeSWTAsync(null, new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (!gatewayInfo.isDisposed()) {
-                                        gatewayInfo.setText(MessageFormat
-                                            .format(
-                                                Messages.NetworkPreferencePage_discover_upnp_gateway,
-                                                PROGRESS[progressIndex]));
-                                        gatewayInfo.pack();
-                                    }
-                                }
-                            });
-
-                            progressIndex++;
-
-                            if (progressIndex == PROGRESS.length)
-                                progressIndex = 0;
-
-                            try {
-                                Thread.sleep(500);
-                            } catch (InterruptedException e) {
-                                return;
-                            }
-                        }
+                        upnpService.discoverGateways();
 
                         SWTUtils.runSafeSWTAsync(null, new Runnable() {
                             @Override
@@ -442,7 +426,9 @@ public final class NetworkPreferencePage extends PreferencePage implements
                                 gatewayInfo.setVisible(false);
                                 updateUpnpDevicesTable(
                                     upnpService.getGateways(),
-                                    upnpService.getSelectedGateway());
+                                    getPreferenceStore()
+                                        .getString(
+                                            PreferenceConstants.AUTO_PORTMAPPING_DEVICEID));
                                 upnpDevicesTable.setVisible(true);
                             }
                         });
@@ -460,8 +446,10 @@ public final class NetworkPreferencePage extends PreferencePage implements
                 return;
             }
 
-            updateUpnpDevicesTable(upnpService.getGateways(),
-                upnpService.getSelectedGateway());
+            updateUpnpDevicesTable(
+                upnpService.getGateways(),
+                getPreferenceStore().getString(
+                    PreferenceConstants.AUTO_PORTMAPPING_DEVICEID));
             upnpDevicesTable.setVisible(true);
         }
 
@@ -482,7 +470,7 @@ public final class NetworkPreferencePage extends PreferencePage implements
     }
 
     private void updateUpnpDevicesTable(List<GatewayDevice> gateways,
-        GatewayDevice defaultGateway) {
+        String defaultGatewayID) {
         upnpDevicesTable.setLinesVisible(true);
         upnpDevicesTable.setHeaderVisible(true);
 
@@ -533,9 +521,9 @@ public final class NetworkPreferencePage extends PreferencePage implements
             item.setText(2, internalIpAddress);
             item.setText(3, externalIpAddress);
             item.setText(4, deviceIpAddress);
-            item.setData(device);
+            item.setData(device.getUSN());
 
-            if (device.equals(defaultGateway)) {
+            if (device.getUSN().equals(defaultGatewayID)) {
                 lastCheckedItem = item;
                 item.setChecked(true);
             }

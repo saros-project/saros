@@ -4,12 +4,12 @@ import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 
@@ -17,6 +17,8 @@ import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
  * Static networking class, dealing with local IP retrieval
  */
 public class NetworkingUtils {
+
+    private static final Logger LOG = Logger.getLogger(NetworkingUtils.class);
 
     /**
      * Retrieves all IP addresses from all non-loopback-, running network
@@ -28,22 +30,32 @@ public class NetworkingUtils {
      * @param includeIPv6Addresses
      *            flag if IPv6 addresses are added to the result
      * @return List<{@link String}> of all retrieved IP addresses
-     * @throws UnknownHostException
-     * @throws SocketException
      */
     public static List<InetAddress> getAllNonLoopbackLocalIPAdresses(
-        boolean includeIPv6Addresses) throws UnknownHostException,
-        SocketException {
+        boolean includeIPv6Addresses) {
 
-        LinkedList<InetAddress> ips = new LinkedList<InetAddress>();
+        LinkedList<InetAddress> addresses = new LinkedList<InetAddress>();
 
-        for (Enumeration<NetworkInterface> networkInterfaces = NetworkInterface
-            .getNetworkInterfaces(); networkInterfaces.hasMoreElements();) {
+        Enumeration<NetworkInterface> networkInterfaces;
+
+        try {
+            networkInterfaces = NetworkInterface.getNetworkInterfaces();
+        } catch (SocketException e) {
+            LOG.error("failed to retrieve available network interfaces", e);
+            return addresses;
+        }
+
+        while (networkInterfaces.hasMoreElements()) {
 
             NetworkInterface networkInterface = networkInterfaces.nextElement();
 
-            if (networkInterface.isLoopback() || !networkInterface.isUp())
+            try {
+                if (networkInterface.isLoopback() || !networkInterface.isUp())
+                    continue;
+            } catch (SocketException e) {
+                LOG.warn("skipping network interface: " + networkInterface, e);
                 continue;
+            }
 
             Enumeration<InetAddress> inetAddresses = networkInterface
                 .getInetAddresses();
@@ -56,13 +68,13 @@ public class NetworkingUtils {
 
                 if (inetAddress instanceof Inet6Address) {
                     if (includeIPv6Addresses)
-                        ips.addLast(inetAddress);
+                        addresses.addLast(inetAddress);
                 } else
-                    ips.addFirst(inetAddress);
+                    addresses.addFirst(inetAddress);
             }
         }
 
-        return ips;
+        return addresses;
     }
 
     /**

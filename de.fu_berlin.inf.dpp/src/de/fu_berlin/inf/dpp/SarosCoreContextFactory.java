@@ -36,7 +36,9 @@ import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.stun.IStunService;
 import de.fu_berlin.inf.dpp.net.stun.internal.StunServiceImpl;
 import de.fu_berlin.inf.dpp.net.subscriptionmanager.SubscriptionManager;
+import de.fu_berlin.inf.dpp.net.upnp.IUPnPAccess;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
+import de.fu_berlin.inf.dpp.net.upnp.internal.UPnPAccessImpl;
 import de.fu_berlin.inf.dpp.net.upnp.internal.UPnPServiceImpl;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
@@ -118,6 +120,7 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
 
         // broken - uses SWT GUI stuff
         Component.create(IUPnPService.class, UPnPServiceImpl.class),
+        Component.create(IUPnPAccess.class, UPnPAccessImpl.class),
         Component.create(IReceiver.class, XMPPReceiver.class),
         Component.create(ITransmitter.class, XMPPTransmitter.class),
 

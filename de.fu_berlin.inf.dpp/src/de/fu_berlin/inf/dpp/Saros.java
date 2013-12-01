@@ -57,7 +57,6 @@ import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
-import de.fu_berlin.inf.dpp.net.upnp.internal.UPnPAccessImpl;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
@@ -277,8 +276,6 @@ public class Saros extends AbstractUIPlugin {
 
         isInitialized = true;
 
-        upnpService.init(new UPnPAccessImpl(), getPreferenceStore());
-
         /*
          * If other colors than the ones we support are set in the
          * PreferenceStore, overwrite them
@@ -331,21 +328,16 @@ public class Saros extends AbstractUIPlugin {
                     @Override
                     public void run() {
 
-                        /*
-                         * Always remove UPnP port mapping for Saros first
-                         * because some routers have no lease duration and so
-                         * this mapping will still be present if something goes
-                         * wrong in the shutdown process
-                         */
-                        IUPnPService upnpManager = sarosContext
-                            .getComponent(IUPnPService.class);
+                        try {
 
-                        if (upnpManager.isMapped())
-                            upnpManager.removeSarosPortMapping();
-
-                        sessionManager.stopSarosSession();
-
-                        getSarosNet().disconnect();
+                            sessionManager.stopSarosSession();
+                        } finally {
+                            /*
+                             * Always shutdown the network to ensure a proper
+                             * cleanup(currently only UPNP)
+                             */
+                            getSarosNet().disconnect();
+                        }
 
                         /**
                          * This will cause dispose() to be called on all
@@ -654,11 +646,17 @@ public class Saros extends AbstractUIPlugin {
         boolean useTLS = account.useTLS();
         boolean useSASL = account.useSASL();
 
-        sarosNet.configure(NAMESPACE, RESOURCE,
+        sarosNet.configure(
+            NAMESPACE,
+            RESOURCE,
             preferenceUtils.isDebugEnabled(),
             preferenceUtils.isLocalSOCKS5ProxyEnabled(),
-            preferenceUtils.getFileTransferPort(), preferenceUtils.getStunIP(),
-            preferenceUtils.getStunPort(),
+            preferenceUtils.getFileTransferPort(),
+
+            getPreferenceStore().getString(
+                PreferenceConstants.AUTO_PORTMAPPING_DEVICEID),
+
+            preferenceUtils.getStunIP(), preferenceUtils.getStunPort(),
             preferenceUtils.isAutoPortmappingEnabled());
 
         Exception connectionError = null;

@@ -1,54 +1,19 @@
 package de.fu_berlin.inf.dpp.net.upnp;
 
+import java.net.InetAddress;
 import java.util.List;
 
 import org.bitlet.weupnp.GatewayDevice;
-import org.eclipse.jface.preference.IPreferenceStore;
 
 public interface IUPnPService {
 
-    public int getCurrentlyMappedPort();
-
-    /**
-     * Sets the {@link IPreferenceStore} for global settings, or null when
-     * settings shall not stored in preferences. If an {@link IPreferenceStore}
-     * is specified and port mapping is enabled in preferences, gateway
-     * discovery is started.
-     * 
-     * @param upnpAccess
-     * @param preferenceStore
-     *            {@link IPreferenceStore} to store settings in, may be null to
-     *            disable storage
-     */
-    public void init(IUPnPAccess upnpAccess, IPreferenceStore preferenceStore);
-
-    /**
-     * Returns the currently selected gateway to perform port mapping on.
-     * 
-     * @return currently selected {@link GatewayDevice}, or null if none.
-     */
-    public GatewayDevice getSelectedGateway();
-
-    /**
-     * Sets the {@link GatewayDevice} selected for Saros to perform port mapping
-     * on. If the device changes and a mapping was made before, the mapping is
-     * removed on the previous device and created on the new device.
-     * 
-     * @param gateway
-     *            {@link GatewayDevice} selected for Saros to perform port
-     *            mapping on.
-     * @return true if the gateway device changed, false if gateway did not
-     *         change or is null
-     * 
-     * @throws IllegalArgumentException
-     *             if the given gateway is not a discovered one
-     */
-    public boolean setSelectedGateway(GatewayDevice gateway)
-        throws IllegalArgumentException;
+    public static final String TCP = "TCP";
+    public static final String UDP = "UDP";
 
     /**
      * Returns all discovered gateways.
      * 
+     * @see #discoverGateways()
      * @return {@link List} of {@link GatewayDevice} found during UPnP
      *         discovery. Is <code>null</code> if discovery was not performed
      *         yet.
@@ -56,58 +21,69 @@ public interface IUPnPService {
     public List<GatewayDevice> getGateways();
 
     /**
-     * Starts UPnp gateway discovery.
+     * Starts a gateway discovery.
      * 
-     * @param blocked
-     *            Boolean flag whether the discovery should be performed
-     *            blocking or concurrently
-     */
-    public void startGatewayDiscovery(boolean blocked);
-
-    /**
-     * Trigger the UPnP discovery.
+     * @see #getGateways()
      */
     public void discoverGateways();
 
     /**
-     * A port mapping is created for the current Socks5Proxy port if a
-     * Socks5Proxy is running.
+     * Creates a port mapping (port forwarding) on the given gateway device.
+     * device. It is up to the implementation to overwrite existing port
+     * mappings or refuse to overwrite them.
      * 
-     * @return true if port mapping was created, false otherwise
+     * @param device
+     *            {@link GatewayDevice} to create the port mapping for
+     * @param port
+     *            to map
+     * @param protocol
+     *            to use (TCP or UDP)
+     * @param description
+     *            for the port mapping or <code>null</code>
+     * @return <code>true</code> if creating the port mapping was successful,
+     *         <code>false</code> otherwise
      */
-    public boolean createSarosPortMapping();
+    public boolean createPortMapping(GatewayDevice device, int port,
+        String protocol, String description);
 
     /**
-     * Removes the port mapping for Saros.
+     * Deletes a port mapping on the given gateway device.
      * 
-     * @return true if port mapping removal was successful, false otherwise
+     * @param device
+     *            {@link GatewayDevice} to delete the port mapping from
+     * @param port
+     *            port of the mapping
+     * @param protocol
+     *            protocol of the mapping (TCP or UDP)
+     * @return <code>true</code> if removing the port mapping was successful,
+     *         <code>false</code> otherwise
      */
-    public boolean removeSarosPortMapping();
+    public boolean deletePortMapping(GatewayDevice device, int port,
+        String protocol);
 
     /**
-     * Informs the user after checking certain conditions about a gateway
-     * probably blocking him from connection requests. A warning bubble window
-     * is displayed if: <li>this check was not performed before</li> <li>IBB
-     * transport is not enforced in preferences</li><li>a gateway was discovered
-     * by UPnP</li> <li>STUN discovery did not detected open access</li>
-     */
-    public void checkAndInformAboutUPnP();
-
-    /**
-     * Returns whether a port is currently mapped.
+     * Returns whether a port is currently mapped on the given gateway device.
      * 
-     * @return true if a port is currently mapped for Saros, false otherwise.
+     * @param device
+     *            {@link GatewayDevice} to check
+     * @param port
+     *            port to check
+     * @param protocol
+     *            protocol to check
+     * 
+     * @return <code>true</code> if a port mapping is currently present,
+     *         <code>false</code> otherwise
      */
-    public boolean isMapped();
-
-    public void setPreSelectedDeviceID(String preSelectedDeviceID);
-
-    public String getPreSelectedDeviceID();
+    public boolean isMapped(GatewayDevice device, int port, String protocol);
 
     /**
-     * Retrieves and returns the public IP of the selected gateway. Is
-     * <code>null</code> if no gateway is selected or IP retrieval failed.
+     * Returns the external (IP) address of the given device. This is normally
+     * the address that was assigned by an ISP to the current device during
+     * login (e.g PPPOE or other protocols).
+     * 
+     * @param device
+     *            the device to query
+     * @return the external address or <code>null</code> if it does not exist
      */
-    public String getPublicGatewayIP();
-
+    public InetAddress getExternalAddress(GatewayDevice device);
 }

@@ -221,7 +221,7 @@ public class DataTransferManagerTest {
     public void testEstablishConnectionWithNullPeer() throws Exception {
 
         DataTransferManager dtm = new DataTransferManager(sarosNetStub, null,
-            null, null, null, null);
+            null, null, null);
 
         connectionListener.getValue().connectionStateChanged(connectionMock,
             ConnectionState.CONNECTED);
@@ -233,7 +233,7 @@ public class DataTransferManagerTest {
     public void testEstablishConnectionWithNullConnectionID() throws Exception {
 
         DataTransferManager dtm = new DataTransferManager(sarosNetStub, null,
-            null, null, null, null);
+            null, null, null);
 
         connectionListener.getValue().connectionStateChanged(connectionMock,
             ConnectionState.CONNECTED);
@@ -245,7 +245,7 @@ public class DataTransferManagerTest {
     public void testEstablishConnectionWithNoTransports() throws Exception {
 
         DataTransferManager dtm = new DataTransferManager(sarosNetStub, null,
-            null, null, null, null);
+            null, null, null);
 
         connectionListener.getValue().connectionStateChanged(connectionMock,
             ConnectionState.CONNECTED);
@@ -261,7 +261,7 @@ public class DataTransferManagerTest {
         ITransport fallbackTransport = new Transport(NetTransferMode.IBB);
 
         DataTransferManager dtm = new DataTransferManager(sarosNetStub, null,
-            mainTransport, fallbackTransport, null, null);
+            mainTransport, fallbackTransport, null);
 
         connectionListener.getValue().connectionStateChanged(connectionMock,
             ConnectionState.CONNECTED);
@@ -297,7 +297,7 @@ public class DataTransferManagerTest {
         EasyMock.replay(mainTransport);
 
         DataTransferManager dtm = new DataTransferManager(sarosNetStub, null,
-            mainTransport, fallbackTransport, null, null);
+            mainTransport, fallbackTransport, null);
 
         connectionListener.getValue().connectionStateChanged(connectionMock,
             ConnectionState.CONNECTED);
@@ -323,7 +323,7 @@ public class DataTransferManagerTest {
         ITransport fallbackTransport = new Transport(NetTransferMode.IBB);
 
         DataTransferManager dtm = new DataTransferManager(sarosNetStub, null,
-            mainTransport, fallbackTransport, null, preferenceUtil);
+            mainTransport, fallbackTransport, preferenceUtil);
 
         connectionListener.getValue().connectionStateChanged(connectionMock,
             ConnectionState.CONNECTED);
@@ -341,7 +341,7 @@ public class DataTransferManagerTest {
         Transport mainTransport = new Transport(NetTransferMode.SOCKS5_DIRECT);
 
         DataTransferManager dtm = new DataTransferManager(sarosNetStub, null,
-            mainTransport, null, null, null);
+            mainTransport, null, null);
 
         connectionListener.getValue().connectionStateChanged(connectionMock,
             ConnectionState.CONNECTED);
@@ -363,7 +363,7 @@ public class DataTransferManagerTest {
         ITransport mainTransport = new Transport(NetTransferMode.SOCKS5_DIRECT);
 
         DataTransferManager dtm = new DataTransferManager(sarosNetStub, null,
-            mainTransport, null, null, null);
+            mainTransport, null, null);
 
         connectionListener.getValue().connectionStateChanged(connectionMock,
             ConnectionState.CONNECTED);
@@ -385,7 +385,7 @@ public class DataTransferManagerTest {
         ITransport mainTransport = new Transport(NetTransferMode.SOCKS5_DIRECT);
 
         DataTransferManager dtm = new DataTransferManager(sarosNetStub, null,
-            mainTransport, null, null, null);
+            mainTransport, null, null);
 
         connectionListener.getValue().connectionStateChanged(connectionMock,
             ConnectionState.CONNECTED);
@@ -403,7 +403,7 @@ public class DataTransferManagerTest {
         ITransport mainTransport = new Transport(NetTransferMode.SOCKS5_DIRECT);
 
         DataTransferManager dtm = new DataTransferManager(sarosNetStub, null,
-            mainTransport, null, null, null);
+            mainTransport, null, null);
 
         connectionListener.getValue().connectionStateChanged(connectionMock,
             ConnectionState.CONNECTED);
@@ -423,7 +423,7 @@ public class DataTransferManagerTest {
         Transport mainTransport = new Transport(NetTransferMode.SOCKS5_DIRECT);
 
         DataTransferManager dtm = new DataTransferManager(sarosNetStub, null,
-            mainTransport, null, null, null);
+            mainTransport, null, null);
 
         connectionListener.getValue().connectionStateChanged(connectionMock,
             ConnectionState.CONNECTED);
@@ -455,7 +455,7 @@ public class DataTransferManagerTest {
         Transport fallbackTransport = new Transport(NetTransferMode.IBB);
 
         final DataTransferManager dtm = new DataTransferManager(sarosNetStub,
-            null, mainTransport, fallbackTransport, null, null);
+            null, mainTransport, fallbackTransport, null);
 
         connectionListener.getValue().connectionStateChanged(connectionMock,
             ConnectionState.CONNECTED);
@@ -539,7 +539,7 @@ public class DataTransferManagerTest {
         Transport mainTransport = new Transport(NetTransferMode.SOCKS5_DIRECT);
 
         DataTransferManager dtm = new DataTransferManager(sarosNetStub, null,
-            mainTransport, null, null, null);
+            mainTransport, null, null);
 
         connectionListener.getValue().connectionStateChanged(connectionMock,
             ConnectionState.CONNECTED);
@@ -566,7 +566,7 @@ public class DataTransferManagerTest {
         Transport fallbackTransport = new Transport(NetTransferMode.IBB);
 
         final DataTransferManager dtm = new DataTransferManager(sarosNetStub,
-            null, mainTransport, fallbackTransport, null, null);
+            null, mainTransport, fallbackTransport, null);
 
         connectionListener.getValue().connectionStateChanged(connectionMock,
             ConnectionState.CONNECTED);
@@ -610,7 +610,7 @@ public class DataTransferManagerTest {
         Transport mainTransport = new Transport(NetTransferMode.SOCKS5_DIRECT);
 
         DataTransferManager dtm = new DataTransferManager(sarosNetStub, null,
-            mainTransport, null, null, null);
+            mainTransport, null, null);
 
         connectionListener.getValue().connectionStateChanged(connectionMock,
             ConnectionState.CONNECTED);
@@ -635,7 +635,7 @@ public class DataTransferManagerTest {
         Transport mainTransport = new Transport(NetTransferMode.SOCKS5_DIRECT);
 
         DataTransferManager dtm = new DataTransferManager(sarosNetStub, null,
-            mainTransport, null, null, null);
+            mainTransport, null, null);
 
         connectionListener.getValue().connectionStateChanged(connectionMock,
             ConnectionState.CONNECTED);

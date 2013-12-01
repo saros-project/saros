@@ -456,7 +456,6 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
         }
 
         // insert found gateways into combobox
-        int indexToSelect = 0;
         for (GatewayDevice gw : upnpService.getGateways()) {
             try {
                 String name = gw.getFriendlyName();
@@ -465,10 +464,6 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
 
                 combo.add(name);
 
-                if (upnpService.getSelectedGateway() != null
-                    && gw.getUSN().equals(
-                        upnpService.getSelectedGateway().getUSN()))
-                    indexToSelect = combo.getItemCount() - 1;
             } catch (Exception e) {
                 LOG.debug("Error updating UPnP selector:" + e.getMessage()); //$NON-NLS-1$
                 // ignore faulty gateway
@@ -479,7 +474,7 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
         if (combo.getItemCount() > 0) {
             checkbox.setEnabled(true);
             combo.setEnabled(true);
-            combo.select(indexToSelect);
+            combo.select(0);
             combo.pack();
             info.setVisible(false);
         } else {

@@ -31,7 +31,6 @@ import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.SarosNet;
-import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -59,8 +58,6 @@ public class DataTransferManager implements IConnectionListener {
     private Connection connection;
 
     private final IReceiver receiver;
-
-    private final IUPnPService upnpService;
 
     private final ITransport mainTransport;
 
@@ -167,10 +164,6 @@ public class DataTransferManager implements IConnectionListener {
             }
 
             transferModeDispatch.connectionChanged(peer, connection);
-
-            if (connection.getMode() == NetTransferMode.IBB && incomingRequest
-                && upnpService != null)
-                upnpService.checkAndInformAboutUPnP();
         }
 
         @Override
@@ -189,13 +182,11 @@ public class DataTransferManager implements IConnectionListener {
     public DataTransferManager(SarosNet sarosNet, IReceiver receiver,
         @Nullable @Socks5Transport ITransport mainTransport,
         @Nullable @IBBTransport ITransport fallbackTransport,
-        @Nullable IUPnPService upnpService,
         @Nullable PreferenceUtils preferenceUtils) {
 
         this.receiver = receiver;
         this.fallbackTransport = fallbackTransport;
         this.mainTransport = mainTransport;
-        this.upnpService = upnpService;
         this.preferenceUtils = preferenceUtils;
         this.initTransports();
 

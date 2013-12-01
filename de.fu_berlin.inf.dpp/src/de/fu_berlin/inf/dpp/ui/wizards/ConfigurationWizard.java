@@ -115,10 +115,11 @@ public class ConfigurationWizard extends AddXMPPAccountWizard {
 
         ErrorLogManager.setErrorLogSubmissionAllowed(errorLogSubmissionAllowed);
 
-        GatewayDevice selGwDevice = configurationSettingsWizardPage
+        GatewayDevice gatewayDevice = configurationSettingsWizardPage
             .getPortmappingDevice();
 
-        upnpService.setSelectedGateway(selGwDevice);
-
+        if (gatewayDevice != null)
+            preferences.setValue(PreferenceConstants.AUTO_PORTMAPPING_DEVICEID,
+                gatewayDevice.getUSN());
     }
 }
