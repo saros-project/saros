@@ -15,7 +15,6 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.BasicConfigurator;
 import org.bitlet.weupnp.GatewayDevice;
 import org.bitlet.weupnp.PortMappingEntry;
 import org.junit.Before;
@@ -31,15 +30,11 @@ import de.fu_berlin.inf.dpp.net.upnp.internal.UPnPServiceImpl;
  */
 public class UPnPTest {
 
-    static {
-        BasicConfigurator.configure();
-    }
-
     /**
      * UPnP access stub for UPnPManager to work with to use local test data
      * instead of a real network and gateway.
      */
-    protected static class UPnPAccessStub implements IUPnPAccess {
+    private static class UPnPAccessStub implements IUPnPAccess {
         Collection<GatewayDevice> gatewaysToServe = new ArrayList<GatewayDevice>();
         Map<Integer, PortMappingEntry> portmappings = new HashMap<Integer, PortMappingEntry>();
 
@@ -90,11 +85,11 @@ public class UPnPTest {
         }
     }
 
-    protected UPnPAccessStub upnpAccess;
-    protected IUPnPService testUpnpManager;
-    protected GatewayDevice testGateway1;
-    protected GatewayDevice testGateway2;
-    protected GatewayDevice testGateway3;
+    private UPnPAccessStub upnpAccess;
+    private UPnPServiceImpl testUpnpManager;
+    private GatewayDevice testGateway1;
+    private GatewayDevice testGateway2;
+    private GatewayDevice testGateway3;
 
     @Before
     public void setUp() throws Exception {
@@ -144,7 +139,7 @@ public class UPnPTest {
     }
 
     @Test
-    public void testAddAndRemoveSarosPortmapping() {
+    public void testAddAndRemovePortmapping() {
 
         final int port = 4711;
 
@@ -165,5 +160,25 @@ public class UPnPTest {
 
         assertFalse("internal port mapping entries were not updated",
             testUpnpManager.isMapped(testGateway1, port, IUPnPService.TCP));
+    }
+
+    @Test
+    public void testDispose() {
+
+        upnpAccess.addGatewayDevice(testGateway1);
+
+        testUpnpManager.createPortMapping(testGateway1, 4711, IUPnPService.TCP,
+            null);
+
+        testUpnpManager.createPortMapping(testGateway1, 1174, IUPnPService.UDP,
+            null);
+
+        testUpnpManager.dispose();
+
+        assertFalse("internal port mapping were not updated on dispose",
+            testUpnpManager.isMapped(testGateway1, 4711, IUPnPService.TCP));
+
+        assertFalse("internal port mapping were not updated on dispose",
+            testUpnpManager.isMapped(testGateway1, 4711, IUPnPService.UDP));
     }
 }

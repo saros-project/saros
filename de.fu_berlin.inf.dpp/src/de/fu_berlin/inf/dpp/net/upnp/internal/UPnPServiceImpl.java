@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -15,6 +16,7 @@ import java.util.TimerTask;
 import org.apache.log4j.Logger;
 import org.bitlet.weupnp.GatewayDevice;
 import org.bitlet.weupnp.PortMappingEntry;
+import org.picocontainer.Disposable;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPAccess;
@@ -24,7 +26,7 @@ import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
  *  Class for performing UPnP functions (using the weupnp library) and managing the mapping state.
  */
 @Component(module = "net")
-public class UPnPServiceImpl implements IUPnPService {
+public class UPnPServiceImpl implements IUPnPService, Disposable {
 
     private static final Logger LOG = Logger.getLogger(UPnPServiceImpl.class);
 
@@ -288,36 +290,29 @@ public class UPnPServiceImpl implements IUPnPService {
         return address;
     }
 
-    // @Override
-    // public synchronized String getPublicGatewayIP() {
-    // if (selectedGateway == null)
-    // return null;
-    //
-    // final String ip;
-    //
-    // try {
-    // ip = selectedGateway.getExternalIPAddress();
-    // } catch (Exception e) {
-    // LOG.debug("Error requesting the public IP of active gateway "
-    // + selectedGateway.getFriendlyName(), e);
-    //
-    // return null;
-    // }
-    //
-    // final InetAddress address;
-    // // test IP to be a possible public IP
-    // try {
-    // address = InetAddress.getByName(ip);
-    // } catch (UnknownHostException e) {
-    // return null;
-    // }
-    //
-    // if (address.isAnyLocalAddress() || address.isLoopbackAddress()
-    // || address.isLinkLocalAddress())
-    // return null;
-    //
-    // return address.getHostAddress();
-    // }
+    @Override
+    public synchronized void dispose() {
+        LOG.debug("deleting existing port mappings");
+
+        for (Entry<GatewayDevice, Map<String, Set<Integer>>> mappedPortsEntry : currentMappedPorts
+            .entrySet()) {
+
+            final GatewayDevice device = mappedPortsEntry.getKey();
+            final Map<String, Set<Integer>> mappedPortsForProtocol = mappedPortsEntry
+                .getValue();
+
+            for (Entry<String, Set<Integer>> mappedPortsForProtocolEntry : mappedPortsForProtocol
+                .entrySet()) {
+                String protocol = mappedPortsForProtocolEntry.getKey();
+                // create a copy or we will get a CME
+                Set<Integer> mappedPorts = new HashSet<Integer>(
+                    mappedPortsForProtocolEntry.getValue());
+
+                for (int port : mappedPorts)
+                    deletePortMapping(device, port, protocol);
+            }
+        }
+    }
 
     // // FIXME remove this method it access the GUI
     // /**
