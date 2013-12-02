@@ -20,7 +20,10 @@
 package de.fu_berlin.inf.dpp.editor;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -39,6 +42,7 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
+import org.eclipse.jface.text.source.IAnnotationModelExtension;
 import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.ui.IEditorInput;
@@ -64,14 +68,13 @@ import de.fu_berlin.inf.dpp.activities.business.ViewportActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.RemoteEditorManager.RemoteEditor;
 import de.fu_berlin.inf.dpp.editor.RemoteEditorManager.RemoteEditorState;
-import de.fu_berlin.inf.dpp.editor.annotations.ContributionAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
-import de.fu_berlin.inf.dpp.editor.internal.AnnotationModelHelper;
+import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
+import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
 import de.fu_berlin.inf.dpp.editor.internal.ContributionAnnotationManager;
 import de.fu_berlin.inf.dpp.editor.internal.CustomAnnotationManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
-import de.fu_berlin.inf.dpp.editor.internal.LocationAnnotationManager;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
@@ -170,8 +173,6 @@ public class EditorManager extends AbstractActivityProvider {
     /** all files that have connected document providers */
     protected final Set<IFile> connectedFiles = new HashSet<IFile>();
 
-    AnnotationModelHelper annotationModelHelper;
-    LocationAnnotationManager locationAnnotationManager;
     ContributionAnnotationManager contributionAnnotationManager;
 
     private final CustomAnnotationManager customAnnotationManager = new CustomAnnotationManager();
@@ -282,12 +283,10 @@ public class EditorManager extends AbstractActivityProvider {
             if (user.equals(followedUser))
                 setFollowing(null);
 
-            removeAnnotationsFromAllEditors(new Predicate<Annotation>() {
+            removeAllAnnotations(new Predicate<SarosAnnotation>() {
                 @Override
-                public boolean evaluate(Annotation annotation) {
-                    return annotation instanceof SarosAnnotation
-                        && ((SarosAnnotation) annotation).getSource().equals(
-                            user);
+                public boolean evaluate(SarosAnnotation annotation) {
+                    return annotation.getSource().equals(user);
                 }
             });
             remoteEditorManager.removeUser(user);
@@ -307,8 +306,6 @@ public class EditorManager extends AbstractActivityProvider {
             sarosSession.addListener(sharedProjectListener);
 
             sarosSession.addActivityProvider(EditorManager.this);
-            annotationModelHelper = new AnnotationModelHelper();
-            locationAnnotationManager = new LocationAnnotationManager();
             contributionAnnotationManager = new ContributionAnnotationManager(
                 newSarosSession, preferenceStore);
             remoteEditorManager = new RemoteEditorManager(sarosSession);
@@ -342,10 +339,10 @@ public class EditorManager extends AbstractActivityProvider {
                      * First need to remove the annotations and then clear the
                      * editorPool
                      */
-                    removeAnnotationsFromAllEditors(new Predicate<Annotation>() {
+                    removeAllAnnotations(new Predicate<SarosAnnotation>() {
                         @Override
-                        public boolean evaluate(Annotation annotation) {
-                            return annotation instanceof SarosAnnotation;
+                        public boolean evaluate(SarosAnnotation annotation) {
+                            return true;
                         }
                     });
 
@@ -359,8 +356,6 @@ public class EditorManager extends AbstractActivityProvider {
                     sarosSession.removeActivityProvider(EditorManager.this);
 
                     sarosSession = null;
-                    annotationModelHelper = null;
-                    locationAnnotationManager = null;
                     contributionAnnotationManager.dispose();
                     contributionAnnotationManager = null;
                     remoteEditorManager = null;
@@ -419,6 +414,7 @@ public class EditorManager extends AbstractActivityProvider {
 
         @Override
         public void activeEditorChanged(User user, SPath path) {
+
             // #2707089 We must clear annotations from shared editors that are
             // not commonly viewed
 
@@ -426,13 +422,19 @@ public class EditorManager extends AbstractActivityProvider {
             if (user.isLocal())
                 return;
 
-            // Clear all viewport annotations of this user. That's not a problem
-            // because the order of the activities is:
-            // (1) EditorActivity (triggered this method call),
-            // (2) TextSelectionActivity,
-            // (3) ViewportActivity.
-            for (IEditorPart editor : editorPool.getAllEditors()) {
-                locationAnnotationManager.clearViewportForUser(user, editor);
+            Predicate<SarosAnnotation> p = new Predicate<SarosAnnotation>() {
+                @Override
+                public boolean evaluate(SarosAnnotation annotation) {
+                    return annotation instanceof ViewportAnnotation;
+                }
+            };
+
+            for (SPath localEditor : locallyOpenEditors) {
+                if (!localEditor.equals(path)) {
+                    for (IEditorPart match : editorPool.getEditors(localEditor)) {
+                        removeAllAnnotations(match, p);
+                    }
+                }
             }
         }
     };
@@ -810,17 +812,11 @@ public class EditorManager extends AbstractActivityProvider {
             }
             int cursorOffset = textEdit.getOffset()
                 + textEdit.getText().length();
-
             if (viewer.getTopIndexStartOffset() <= cursorOffset
                 && cursorOffset <= viewer.getBottomIndexEndOffset()) {
 
-                TextSelection selection = new TextSelection(cursorOffset, 0);
-                locationAnnotationManager.setSelection(editorPart, selection,
-                    user);
-
-                if (user.equals(getFollowedUser())) {
-                    EditorAPI.reveal(editorPart, selection);
-                }
+                editorAPI.setSelection(editorPart, new TextSelection(
+                    cursorOffset, 0), user, user.equals(getFollowedUser()));
             }
         }
 
@@ -849,12 +845,8 @@ public class EditorManager extends AbstractActivityProvider {
         Set<IEditorPart> editors = EditorManager.this.editorPool
             .getEditors(path);
         for (IEditorPart editorPart : editors) {
-            locationAnnotationManager.setSelection(editorPart, textSelection,
-                user);
-
-            if (user.equals(getFollowedUser())) {
-                EditorAPI.reveal(editorPart, textSelection);
-            }
+            this.editorAPI.setSelection(editorPart, textSelection, user,
+                user.equals(getFollowedUser()));
         }
 
         /*
@@ -904,9 +896,8 @@ public class EditorManager extends AbstractActivityProvider {
         ILineRange lineRange = viewport.getLineRange();
         for (IEditorPart editorPart : editors) {
             if (following || user.hasWriteAccess())
-                locationAnnotationManager.setViewportForUser(user, editorPart,
-                    lineRange);
-
+                this.editorAPI.setViewportAnnotation(editorPart, lineRange,
+                    user);
             if (following)
                 this.editorAPI.reveal(editorPart, lineRange);
         }
@@ -1544,18 +1535,62 @@ public class EditorManager extends AbstractActivityProvider {
     }
 
     /**
-     * Removes all {@link SarosAnnotation}s that fulfill given {@link Predicate}
-     * from all editors.
+     * This is only used in the following implementation of removeAllAnnotations
+     * so that an error is only printed once.
+     */
+    private boolean errorPrinted = false;
+
+    /**
+     * Removes all annotations that fulfill given {@link Predicate}.
      * 
      * @param predicate
-     *            The filter to use for cleaning.
      */
-    protected void removeAnnotationsFromAllEditors(
-        Predicate<Annotation> predicate) {
-
+    protected void removeAllAnnotations(Predicate<SarosAnnotation> predicate) {
         for (IEditorPart editor : this.editorPool.getAllEditors()) {
-            annotationModelHelper
-                .removeAnnotationsFromEditor(editor, predicate);
+            removeAllAnnotations(editor, predicate);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    protected void removeAllAnnotations(IEditorPart editor,
+        Predicate<SarosAnnotation> predicate) {
+        IEditorInput input = editor.getEditorInput();
+        IDocumentProvider provider = getDocumentProvider(input);
+        IAnnotationModel model = provider.getAnnotationModel(input);
+
+        if (model == null) {
+            return;
+        }
+
+        // Collect annotations.
+        ArrayList<Annotation> annotations = new ArrayList<Annotation>(128);
+        for (Iterator<Annotation> it = model.getAnnotationIterator(); it
+            .hasNext();) {
+            Annotation annotation = it.next();
+
+            if (annotation instanceof SarosAnnotation) {
+                SarosAnnotation sarosAnnontation = (SarosAnnotation) annotation;
+                if (predicate.evaluate(sarosAnnontation)) {
+                    annotations.add(annotation);
+                }
+            }
+        }
+
+        // Remove collected annotations.
+        if (model instanceof IAnnotationModelExtension) {
+            IAnnotationModelExtension extension = (IAnnotationModelExtension) model;
+            extension.replaceAnnotations(
+                annotations.toArray(new Annotation[annotations.size()]),
+                Collections.emptyMap());
+        } else {
+            if (!errorPrinted) {
+                log.error("AnnotationModel does not "
+                    + "support IAnnoationModelExtension: " + model);
+                errorPrinted = true;
+            }
+            for (Annotation annotation : annotations) {
+                model.removeAnnotation(annotation);
+            }
         }
     }
 
@@ -1620,8 +1655,8 @@ public class EditorManager extends AbstractActivityProvider {
     }
 
     /**
-     * Removes and then re-adds all annotations (viewport, contribution,
-     * selection, ...) for the given editor part.
+     * Removes and then re-adds all viewport, contribution and selection
+     * annotations for the given editor part.
      * 
      * @param editorPart
      *            the editor part to refresh
@@ -1635,17 +1670,17 @@ public class EditorManager extends AbstractActivityProvider {
         }
 
         /*
-         * ContributionAnnotations must not be removed here otherwise the
-         * history in the ContributionAnnotationManager will break.
+         * contribution annotation must not be removed here otherwise the
+         * history in the ContributionAnnotationManager will get broken.
          */
-        annotationModelHelper.removeAnnotationsFromEditor(editorPart,
-            new Predicate<Annotation>() {
-                @Override
-                public boolean evaluate(Annotation annotation) {
-                    return annotation instanceof SarosAnnotation
-                        && !(annotation instanceof ContributionAnnotation);
-                }
-            });
+
+        removeAllAnnotations(editorPart, new Predicate<SarosAnnotation>() {
+            @Override
+            public boolean evaluate(SarosAnnotation annotation) {
+                return annotation instanceof ViewportAnnotation
+                    || annotation instanceof SelectionAnnotation;
+            }
+        });
 
         ITextViewer viewer = EditorAPI.getViewer(editorPart);
 
@@ -1656,6 +1691,7 @@ public class EditorManager extends AbstractActivityProvider {
         }
 
         for (User user : sarosSession.getUsers()) {
+
             if (user.isLocal()) {
                 continue;
             }
@@ -1670,17 +1706,15 @@ public class EditorManager extends AbstractActivityProvider {
             RemoteEditor remoteEditor = remoteEditorState.getRemoteEditor(path);
 
             if (user.hasWriteAccess() || user.equals(followedUser)) {
-                ILineRange lineRange = remoteEditor.getViewport();
-                if (lineRange != null) {
-                    locationAnnotationManager.setViewportForUser(user,
-                        editorPart, lineRange);
+                ILineRange viewport = remoteEditor.getViewport();
+                if (viewport != null) {
+                    editorAPI.setViewportAnnotation(editorPart, viewport, user);
                 }
             }
 
             ITextSelection selection = remoteEditor.getSelection();
             if (selection != null) {
-                locationAnnotationManager.setSelection(editorPart, selection,
-                    user);
+                editorAPI.setSelection(editorPart, selection, user, false);
             }
         }
     }
