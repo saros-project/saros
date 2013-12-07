@@ -19,7 +19,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.Messages;
-import de.fu_berlin.inf.dpp.util.LinkListener;
+import de.fu_berlin.inf.dpp.ui.util.LinkListener;
 
 /**
  * Implements a dialog that asks the user to participate in our Saros feedback

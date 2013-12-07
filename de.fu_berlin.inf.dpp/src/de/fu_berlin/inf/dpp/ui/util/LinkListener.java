@@ -1,14 +1,13 @@
 /**
  * 
  */
-package de.fu_berlin.inf.dpp.util;
+package de.fu_berlin.inf.dpp.ui.util;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Listener;
 
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 
 /**
  * A simple Listener that handles link selection events by opening the link text

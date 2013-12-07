@@ -29,10 +29,10 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
+import de.fu_berlin.inf.dpp.ui.util.LinkListener;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.IllustratedComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.decoration.EmptyText;
-import de.fu_berlin.inf.dpp.util.LinkListener;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**

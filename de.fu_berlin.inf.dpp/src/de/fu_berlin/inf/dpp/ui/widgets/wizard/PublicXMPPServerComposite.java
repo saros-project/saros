@@ -14,8 +14,8 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
+import de.fu_berlin.inf.dpp.ui.util.LinkListener;
 import de.fu_berlin.inf.dpp.ui.widgets.NoteComposite;
-import de.fu_berlin.inf.dpp.util.LinkListener;
 
 public class PublicXMPPServerComposite extends NoteComposite {
 

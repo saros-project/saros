@@ -35,8 +35,8 @@ import de.fu_berlin.inf.dpp.feedback.Messages;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.feedback.StatisticManagerConfiguration;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.ui.util.LinkListener;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.util.LinkListener;
 
 /**
  * The preferences page for the settings concerning the user feedback. The user
