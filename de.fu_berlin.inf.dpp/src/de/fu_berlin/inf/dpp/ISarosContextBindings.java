@@ -40,4 +40,11 @@ public interface ISarosContextBindings {
     public @interface SarosVersion {
         // marker interface
     }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ ElementType.FIELD, ElementType.PARAMETER })
+    @Bind
+    public @interface PlatformVersion {
+        // marker interface
+    }
 }

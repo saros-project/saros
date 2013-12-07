@@ -137,10 +137,10 @@ public class VersionManager {
     private final ITransmitter transmitter;
     private final IReceiver receiver;
 
-    public VersionManager(@SarosVersion Version version,
+    public VersionManager(@SarosVersion String version,
         final IReceiver receiver, final ITransmitter transmitter) {
 
-        this.version = version;
+        this.version = /* HACK */Version.parseVersion(version);
         this.receiver = receiver;
         this.transmitter = transmitter;
 

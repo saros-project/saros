@@ -61,8 +61,8 @@ public class SessionStatistic {
     protected static final String SAROS_VERSION = "saros.version";
     protected static final String JAVA_VERSION = "java.version";
     protected static final String OS_NAME = "os.name";
-    protected static final String ECLIPSE_VERSION = "eclipse.version";
-
+    protected static final String PLATFORM_VERSION = "platform.version";
+    // TODO platform name (runtime, e.g Eclipse, Netbeans etc.)
     protected static final String KEY_USER_ID = "random.user.id";
     protected static final String KEY_USER_IS_HOST = "user.is.host";
 
@@ -310,12 +310,12 @@ public class SessionStatistic {
         data.setProperty(OS_NAME, osName);
     }
 
-    public String getEclipseVersion() {
-        return data.getProperty(ECLIPSE_VERSION);
+    public String getPlatformVersion() {
+        return data.getProperty(PLATFORM_VERSION);
     }
 
-    public void setEclipseVersion(String version) {
-        data.setProperty(ECLIPSE_VERSION, version);
+    public void setPlatformVersion(String version) {
+        data.setProperty(PLATFORM_VERSION, version);
     }
 
     public boolean getFeedbackDisabled(boolean disabled) {

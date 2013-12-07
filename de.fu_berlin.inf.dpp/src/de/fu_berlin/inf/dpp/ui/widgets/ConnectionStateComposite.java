@@ -8,7 +8,6 @@ import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.StreamError;
 import org.jivesoftware.smack.packet.XMPPError;
-import org.osgi.framework.Version;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.ISarosContextBindings.SarosVersion;
@@ -36,7 +35,7 @@ public class ConnectionStateComposite extends Composite {
 
     @Inject
     private @SarosVersion
-    Version version;
+    String version;
 
     @Inject
     private XMPPAccountStore accountStore;

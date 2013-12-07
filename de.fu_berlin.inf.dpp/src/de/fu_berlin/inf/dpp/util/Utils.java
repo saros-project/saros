@@ -255,7 +255,7 @@ public final class Utils {
         return sb.toString();
     }
 
-    public static String getEclipsePlatformInfo() {
+    private static String getEclipsePlatformInfo() {
         return Platform.getBundle("org.eclipse.core.runtime").getVersion()
             .toString();
     }

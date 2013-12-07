@@ -21,6 +21,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.osgi.service.prefs.Preferences;
+import org.picocontainer.BindKey;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.PicoBuilder;
 import org.picocontainer.PicoContainer;
@@ -33,6 +34,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import de.fu_berlin.inf.dpp.ISarosContext;
+import de.fu_berlin.inf.dpp.ISarosContextBindings;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.communication.audio.AudioServiceManager;
@@ -64,10 +66,9 @@ import de.fu_berlin.inf.dpp.test.fakes.synchonize.NonUISynchronizer;
 import de.fu_berlin.inf.dpp.test.util.MemoryPreferenceStore;
 import de.fu_berlin.inf.dpp.test.util.MemoryPreferences;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ Utils.class, StatisticManager.class, ResourcesPlugin.class })
+@PrepareForTest({ StatisticManager.class, ResourcesPlugin.class })
 public class SarosSessionTest {
 
     private static final String SAROS_SESSION_ID = "SAROS_SESSION_TEST";
@@ -170,6 +171,12 @@ public class SarosSessionTest {
             .withCaching().withLifecycle();
 
         container = picoBuilder.build();
+
+        container.addComponent(BindKey.bindKey(String.class,
+            ISarosContextBindings.SarosVersion.class), "0815");
+
+        container.addComponent(BindKey.bindKey(String.class,
+            ISarosContextBindings.PlatformVersion.class), "4711");
 
         final IPreferenceStore store = new MemoryPreferenceStore();
         PreferenceInitializer.setPreferences(store);
@@ -294,11 +301,6 @@ public class SarosSessionTest {
         });
 
         EasyMock.replay(context);
-
-        PowerMock.mockStaticPartial(Utils.class, "getEclipsePlatformInfo");
-        Utils.getEclipsePlatformInfo();
-        EasyMock.expectLastCall().andReturn("JUnit-Test").anyTimes();
-        PowerMock.replayAll(Utils.class);
 
         final List<Object> workspaceListeners = new LinkedList<Object>();
         IWorkspace workspace = EasyMock.createMock(IWorkspace.class);

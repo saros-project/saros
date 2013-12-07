@@ -2,9 +2,9 @@ package de.fu_berlin.inf.dpp;
 
 import java.util.Arrays;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.osgi.framework.Version;
 import org.osgi.service.prefs.Preferences;
 import org.picocontainer.BindKey;
 import org.picocontainer.MutablePicoContainer;
@@ -100,9 +100,14 @@ public class SarosEclipseContextFactory extends AbstractSarosContextFactory {
 
         container.addComponent(saros);
 
-        container.addComponent(BindKey.bindKey(Version.class,
+        container.addComponent(BindKey.bindKey(String.class,
             ISarosContextBindings.SarosVersion.class), saros.getBundle()
-            .getVersion());
+            .getVersion().toString());
+
+        container.addComponent(BindKey.bindKey(String.class,
+            ISarosContextBindings.PlatformVersion.class),
+            Platform.getBundle("org.eclipse.core.runtime").getVersion()
+                .toString());
 
         container.addComponent(IPreferenceStore.class,
             saros.getPreferenceStore());

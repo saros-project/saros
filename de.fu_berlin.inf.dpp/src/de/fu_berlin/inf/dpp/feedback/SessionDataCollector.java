@@ -21,10 +21,11 @@ package de.fu_berlin.inf.dpp.feedback;
 
 import java.util.Date;
 
+import de.fu_berlin.inf.dpp.ISarosContextBindings.PlatformVersion;
+import de.fu_berlin.inf.dpp.ISarosContextBindings.SarosVersion;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Collects some general session data (session time, session ID, session count),
@@ -35,8 +36,10 @@ import de.fu_berlin.inf.dpp.util.Utils;
 @Component(module = "feedback")
 public class SessionDataCollector extends AbstractStatisticCollector {
 
-    protected FeedbackManager feedbackManager;
     protected Saros saros;
+
+    private final String sarosVersion;
+    private final String platformVersion;
 
     protected String currentSessionID;
     protected Date localSessionStart;
@@ -44,10 +47,11 @@ public class SessionDataCollector extends AbstractStatisticCollector {
     protected boolean isHost;
 
     public SessionDataCollector(StatisticManager statisticManager,
-        ISarosSession session, Saros saros, FeedbackManager feedbackManager) {
+        ISarosSession session, @SarosVersion String sarosVersion,
+        @PlatformVersion String platformVersion) {
         super(statisticManager, session);
-        this.saros = saros;
-        this.feedbackManager = feedbackManager;
+        this.sarosVersion = sarosVersion;
+        this.platformVersion = platformVersion;
     }
 
     @Override
@@ -89,13 +93,13 @@ public class SessionDataCollector extends AbstractStatisticCollector {
      * 
      */
     protected void storeGeneralInfos() {
-        data.setSarosVersion(saros.getVersion());
+        data.setSarosVersion(sarosVersion);
         data.setJavaVersion(System.getProperty("java.version",
             "Unknown Java Version"));
         data.setOSName(System.getProperty("os.name", "Unknown OS"));
-        data.setEclipseVersion(Utils.getEclipsePlatformInfo());
-        data.setFeedbackDisabled(feedbackManager.isFeedbackDisabled());
-        data.setFeedbackInterval(feedbackManager.getSurveyInterval());
+        data.setPlatformVersion(platformVersion);
+        data.setFeedbackDisabled(FeedbackManager.isFeedbackDisabled());
+        data.setFeedbackInterval(FeedbackManager.getSurveyInterval());
         data.setUserID(statisticManager.getUserID());
         data.setAutoFollowModeEnabled(/* no longer used */false);
     }

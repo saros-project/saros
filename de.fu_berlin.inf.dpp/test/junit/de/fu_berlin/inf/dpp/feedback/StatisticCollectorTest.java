@@ -8,17 +8,15 @@ import org.easymock.IAnswer;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.osgi.service.prefs.Preferences;
+import org.picocontainer.BindKey;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.PicoBuilder;
 import org.picocontainer.injectors.AnnotatedFieldInjection;
 import org.picocontainer.injectors.CompositeInjection;
 import org.picocontainer.injectors.ConstructorInjection;
-import org.powermock.api.easymock.PowerMock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
+import de.fu_berlin.inf.dpp.ISarosContextBindings;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.communication.audio.AudioServiceManager;
@@ -33,10 +31,7 @@ import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.internal.SarosSessionTest;
 import de.fu_berlin.inf.dpp.test.util.MemoryPreferenceStore;
 import de.fu_berlin.inf.dpp.test.util.MemoryPreferences;
-import de.fu_berlin.inf.dpp.util.Utils;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({ Utils.class })
 public class StatisticCollectorTest {
 
     private static ISarosSession createSessionMock(
@@ -129,12 +124,6 @@ public class StatisticCollectorTest {
     @Test
     public void testCollectorRegistrationAndDestruction() {
 
-        // Eclipse is not initialized. Create a mock for that method
-        PowerMock.mockStaticPartial(Utils.class, "getEclipsePlatformInfo");
-        Utils.getEclipsePlatformInfo();
-        EasyMock.expectLastCall().andReturn("JUnit-Test").anyTimes();
-        PowerMock.replayAll(Utils.class);
-
         // Create a container
         final MutablePicoContainer container = new PicoBuilder(
             new CompositeInjection(new ConstructorInjection(),
@@ -185,6 +174,13 @@ public class StatisticCollectorTest {
         container.addComponent(FollowModeCollector.class);
         container.addComponent(SelectionCollector.class);
         container.addComponent(VoIPCollector.class);
+
+        container.addComponent(BindKey.bindKey(String.class,
+            ISarosContextBindings.SarosVersion.class), "0815");
+
+        container.addComponent(BindKey.bindKey(String.class,
+            ISarosContextBindings.PlatformVersion.class), "4711");
+
         container.getComponents();
 
         // Verify that the collectors are available
@@ -205,7 +201,5 @@ public class StatisticCollectorTest {
         Assert.assertTrue(sessionListeners.isEmpty());
         Assert.assertTrue(editorListeners.isEmpty());
         Assert.assertTrue(audioListeners.isEmpty());
-
-        PowerMock.verifyAll();
     }
 }

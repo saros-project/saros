@@ -66,7 +66,7 @@ public class VersionManagerTest {
         bobTransmitter = result.getTransmitter(bobJID);
     }
 
-    private void init(Version local, Version remote) {
+    private void init(String local, String remote) {
 
         versionManagerLocal = new VersionManager(local, aliceReceiver,
             aliceTransmitter);
@@ -78,10 +78,7 @@ public class VersionManagerTest {
     @Test
     public void testVersionsSame() {
 
-        Version local = new Version("1.1.1.r1");
-        Version remote = new Version("1.1.1.r1");
-
-        init(local, remote);
+        init("1.1.1.r1", "1.1.1.r1");
 
         VersionInfo info = versionManagerLocal.determineCompatibility(bobJID);
 
@@ -91,10 +88,7 @@ public class VersionManagerTest {
     @Test
     public void testlocalVersionsTooOld() {
 
-        Version local = new Version("1.1.1.r1");
-        Version remote = new Version("1.1.2.r1");
-
-        init(local, remote);
+        init("1.1.1.r1", "1.1.2.r1");
 
         VersionInfo info = versionManagerLocal.determineCompatibility(bobJID);
 
@@ -104,10 +98,7 @@ public class VersionManagerTest {
     @Test
     public void testlocalVersionsTooNew() {
 
-        Version local = new Version("1.1.2.r1");
-        Version remote = new Version("1.1.1.r1");
-
-        init(local, remote);
+        init("1.1.2.r1", "1.1.1.r1");
 
         VersionInfo info = versionManagerLocal.determineCompatibility(bobJID);
 
@@ -120,7 +111,7 @@ public class VersionManagerTest {
         Version local = new Version("999999.1.2.r1");
         Version remote = new Version("999999.1.1.r1");
 
-        init(local, remote);
+        init(local.toString(), remote.toString());
 
         Field f = versionManagerLocal.getClass().getDeclaredField(
             "compatibilityChart");
@@ -162,7 +153,7 @@ public class VersionManagerTest {
         Version local = new Version("1999999.1.1.r1");
         Version remote = new Version("1999999.1.2.r1");
 
-        init(local, remote);
+        init(local.toString(), remote.toString());
 
         Field f = versionManagerLocal.getClass().getDeclaredField(
             "compatibilityChart");
