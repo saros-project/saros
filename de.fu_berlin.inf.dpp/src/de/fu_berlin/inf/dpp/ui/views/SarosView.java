@@ -91,7 +91,6 @@ import de.fu_berlin.inf.dpp.ui.actions.RenameContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.RestrictToReadOnlyAccessAction;
 import de.fu_berlin.inf.dpp.ui.actions.SendFileAction;
 import de.fu_berlin.inf.dpp.ui.actions.SkypeAction;
-import de.fu_berlin.inf.dpp.ui.actions.StoppedAction;
 import de.fu_berlin.inf.dpp.ui.actions.VideoSharingAction;
 import de.fu_berlin.inf.dpp.ui.actions.VoIPAction;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterEntryElement;
@@ -420,10 +419,6 @@ public class SarosView extends ViewPart {
         toolBar.add(getAction(NewContactAction.class));
         toolBar.add(getAction(OpenPreferencesAction.class));
         toolBar.add(new Separator());
-
-        if (isDebug)
-            toolBar.add(getAction(StoppedAction.class));
-
         toolBar.add(getAction(FollowModeAction.class));
         toolBar.add(getAction(ConsistencyAction.class));
         toolBar.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -679,7 +674,6 @@ public class SarosView extends ViewPart {
         registerAction(new ChangeXMPPAccountAction());
         registerAction(new NewContactAction());
         registerAction(new OpenPreferencesAction());
-        registerAction(new StoppedAction());
         registerAction(new FollowModeAction());
         registerAction(new ConsistencyAction());
         registerAction(new LeaveSessionAction());
