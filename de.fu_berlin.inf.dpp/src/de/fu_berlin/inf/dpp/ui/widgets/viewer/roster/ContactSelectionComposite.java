@@ -34,12 +34,12 @@ import de.fu_berlin.inf.dpp.ui.model.roster.RosterCheckStateProvider;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterComparator;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterContentProvider;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterEntryElement;
+import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
+import de.fu_berlin.inf.dpp.ui.util.ViewerUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.ViewerComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.ContactSelectionChangedEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.ContactSelectionListener;
 import de.fu_berlin.inf.dpp.util.ArrayUtils;
-import de.fu_berlin.inf.nebula.utils.LayoutUtils;
-import de.fu_berlin.inf.nebula.utils.ViewerUtils;
 
 /**
  * This {@link Composite} displays {@link RosterEntry roster entries} and allows

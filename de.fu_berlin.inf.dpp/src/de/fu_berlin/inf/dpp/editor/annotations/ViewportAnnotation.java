@@ -11,7 +11,7 @@ import org.eclipse.swt.widgets.Display;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.Permission;
-import de.fu_berlin.inf.nebula.utils.ColorUtils;
+import de.fu_berlin.inf.dpp.ui.util.ColorUtils;
 
 /**
  * The annotation that shows the viewports of users with

@@ -10,12 +10,12 @@ import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.views.WidgetGalleryView;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.ContactSelectionComposite;
-import de.fu_berlin.inf.nebula.utils.LayoutUtils;
 
 @Demo
 public class BuddyDisplayCompositeDemo extends AbstractDemo {

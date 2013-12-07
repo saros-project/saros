@@ -35,11 +35,11 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.ViewerComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.BaseResourceSelectionListener;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.ResourceSelectionChangedEvent;
 import de.fu_berlin.inf.dpp.util.ArrayUtils;
-import de.fu_berlin.inf.nebula.utils.LayoutUtils;
 
 /**
  * This {@link Composite} allows to check (via check boxes) {@link IProject}s,

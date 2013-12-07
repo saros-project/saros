@@ -31,12 +31,12 @@ import org.eclipse.ui.PlatformUI;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
+import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.BaseResourceSelectionListener;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.FilterClosedProjectsChangedEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.ResourceSelectionListener;
-import de.fu_berlin.inf.nebula.utils.LayoutUtils;
 
 public class ResourceSelectionComposite extends BaseResourceSelectionComposite {
     protected boolean filterClosedProjects;

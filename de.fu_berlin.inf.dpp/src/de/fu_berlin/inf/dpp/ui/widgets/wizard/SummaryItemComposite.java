@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.ui.widgets.wizard;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
-import de.fu_berlin.inf.nebula.widgets.SimpleIllustratedComposite;
+import de.fu_berlin.inf.dpp.ui.widgets.SimpleIllustratedComposite;
 
 public class SummaryItemComposite extends SimpleIllustratedComposite {
     protected IllustratedText defaultContent;

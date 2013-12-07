@@ -16,14 +16,14 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.feedback.Messages;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.util.FontUtils;
+import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
+import de.fu_berlin.inf.dpp.ui.widgets.SimpleIllustratedComposite;
+import de.fu_berlin.inf.dpp.ui.widgets.SimpleIllustratedComposite.IllustratedText;
+import de.fu_berlin.inf.dpp.ui.widgets.SimpleNoteComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.wizard.SummaryItemComposite;
 import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
 import de.fu_berlin.inf.dpp.util.ArrayUtils;
-import de.fu_berlin.inf.nebula.explanation.note.SimpleNoteComposite;
-import de.fu_berlin.inf.nebula.utils.FontUtils;
-import de.fu_berlin.inf.nebula.utils.LayoutUtils;
-import de.fu_berlin.inf.nebula.widgets.SimpleIllustratedComposite;
-import de.fu_berlin.inf.nebula.widgets.SimpleIllustratedComposite.IllustratedText;
 
 /**
  * Final {@link WizardPage} for the {@link ConfigurationWizard} that summarizes

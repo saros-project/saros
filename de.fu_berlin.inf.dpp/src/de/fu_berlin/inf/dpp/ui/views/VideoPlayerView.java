@@ -58,6 +58,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.part.ViewPart;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -69,6 +70,8 @@ import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.actions.VideoSharingAction;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
+import de.fu_berlin.inf.dpp.ui.widgets.ListExplanationComposite.ListExplanation;
+import de.fu_berlin.inf.dpp.ui.widgets.ListExplanatoryComposite;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing.Mode;
@@ -81,16 +84,13 @@ import de.fu_berlin.inf.dpp.videosharing.activities.VideoActivity;
 import de.fu_berlin.inf.dpp.videosharing.decode.Decoder;
 import de.fu_berlin.inf.dpp.videosharing.decode.DecodingStatisticPacket;
 import de.fu_berlin.inf.dpp.videosharing.player.VideoDisplay;
-import de.fu_berlin.inf.nebula.explanation.ListExplanationComposite.ListExplanation;
-import de.fu_berlin.inf.nebula.explanation.explanatory.ListExplanatoryViewPart;
 
 /**
  * @author s-lau
  * @author bkahlert (ExplanatoryViewPart)
  */
 @Component(module = "ui")
-public class VideoPlayerView extends ListExplanatoryViewPart implements
-    VideoDisplay {
+public class VideoPlayerView extends ViewPart implements VideoDisplay {
     private static final Logger log = Logger.getLogger(VideoPlayerView.class);
 
     public static final String ID = "de.fu_berlin.inf.dpp.ui.views.VideoPlayerView"; //$NON-NLS-1$
@@ -103,6 +103,8 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
     protected IPreferenceStore preferences;
     protected boolean resample = false;
     protected boolean keepAspectRatio = true;
+
+    protected ListExplanatoryComposite explanatoryComposite;
 
     /* howto */
     protected ListExplanation howTo = new ListExplanation(SWT.ICON_INFORMATION,
@@ -177,7 +179,17 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
     }
 
     @Override
-    public void createContentPartControl(Composite parent) {
+    public void createPartControl(Composite parent) {
+        this.explanatoryComposite = new ListExplanatoryComposite(parent,
+            SWT.NONE);
+        Composite contentComposite = new Composite(this.explanatoryComposite,
+            SWT.NONE);
+        this.explanatoryComposite.setContentControl(contentComposite);
+
+        createContentPartControl(contentComposite);
+    }
+
+    private void createContentPartControl(Composite parent) {
         this.showExplanation(this.howTo);
 
         this.parent = parent;
@@ -314,6 +326,21 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
         fps.setText(""); //$NON-NLS-1$
         bitrate.setText(""); //$NON-NLS-1$
         delay.setText(""); //$NON-NLS-1$
+    }
+
+    /**
+     * @see ListExplanatoryComposite#showExplanation(ListExplanation)
+     */
+    public void showExplanation(ListExplanation listExplanation) {
+        if (this.explanatoryComposite != null)
+            this.explanatoryComposite.showExplanation(listExplanation);
+    }
+
+    /**
+     * @see SimpleExplanatoryComposite#hideExplanation()
+     */
+    public void hideExplanation() {
+        this.showExplanation(null);
     }
 
     protected void updateStatusbar() {

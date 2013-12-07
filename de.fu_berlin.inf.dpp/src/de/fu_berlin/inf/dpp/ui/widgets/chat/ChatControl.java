@@ -49,6 +49,7 @@ import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.sounds.SoundManager;
 import de.fu_berlin.inf.dpp.ui.sounds.SoundPlayer;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
+import de.fu_berlin.inf.dpp.ui.widgets.ExplanationComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.events.CharacterEnteredEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.events.ChatClearedEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.events.IChatControlListener;
@@ -56,7 +57,6 @@ import de.fu_berlin.inf.dpp.ui.widgets.chat.events.IChatDisplayListener;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.events.MessageEnteredEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.parts.ChatDisplay;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.parts.ChatInput;
-import de.fu_berlin.inf.nebula.explanation.ExplanationComposite;
 
 /**
  * This composite displays a chat conversation and the possibility to enter

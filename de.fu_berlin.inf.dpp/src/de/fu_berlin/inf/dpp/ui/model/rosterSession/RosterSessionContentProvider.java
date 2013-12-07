@@ -28,7 +28,7 @@ import de.fu_berlin.inf.dpp.project.internal.IFollowModeChangesListener;
 import de.fu_berlin.inf.dpp.ui.model.TreeContentProvider;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterContentProvider;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.nebula.utils.ViewerUtils;
+import de.fu_berlin.inf.dpp.ui.util.ViewerUtils;
 
 /**
  * {@link IContentProvider} for use in conjunction with a {@link Roster roster}

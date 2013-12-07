@@ -18,16 +18,16 @@ import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChat;
 import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatService;
 import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferences;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
+import de.fu_berlin.inf.dpp.ui.widgets.SimpleExplanationComposite.SimpleExplanation;
+import de.fu_berlin.inf.dpp.ui.widgets.SimpleExplanatoryComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.ChatControl;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.events.CharacterEnteredEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.events.ChatClearedEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.events.IChatControlListener;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.events.MessageEnteredEvent;
-import de.fu_berlin.inf.nebula.explanation.SimpleExplanationComposite.SimpleExplanation;
-import de.fu_berlin.inf.nebula.explanation.explanatory.SimpleExplanatoryComposite;
-import de.fu_berlin.inf.nebula.utils.LayoutUtils;
 
 @Demo
 public class ChatControlDemo extends AbstractDemo {

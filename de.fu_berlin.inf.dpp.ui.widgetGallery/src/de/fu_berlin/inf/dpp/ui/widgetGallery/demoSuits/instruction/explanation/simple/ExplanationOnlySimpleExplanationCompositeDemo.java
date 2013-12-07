@@ -5,8 +5,8 @@ import org.eclipse.swt.widgets.Composite;
 
 import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
-import de.fu_berlin.inf.nebula.explanation.SimpleExplanationComposite;
-import de.fu_berlin.inf.nebula.explanation.SimpleExplanationComposite.SimpleExplanation;
+import de.fu_berlin.inf.dpp.ui.widgets.SimpleExplanationComposite;
+import de.fu_berlin.inf.dpp.ui.widgets.SimpleExplanationComposite.SimpleExplanation;
 
 @Demo
 public class ExplanationOnlySimpleExplanationCompositeDemo extends AbstractDemo {

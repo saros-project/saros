@@ -10,10 +10,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 
+import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
-import de.fu_berlin.inf.nebula.utils.LayoutUtils;
-import de.fu_berlin.inf.nebula.widgets.IllustratedComposite;
+import de.fu_berlin.inf.dpp.ui.widgets.IllustratedComposite;
 
 @Demo
 public class IllustratedCompositeDemo extends AbstractDemo {

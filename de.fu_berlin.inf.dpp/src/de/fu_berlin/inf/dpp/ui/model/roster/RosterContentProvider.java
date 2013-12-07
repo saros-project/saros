@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManagerListener;
 import de.fu_berlin.inf.dpp.ui.model.TreeContentProvider;
-import de.fu_berlin.inf.nebula.utils.ViewerUtils;
+import de.fu_berlin.inf.dpp.ui.util.ViewerUtils;
 
 /**
  * {@link IContentProvider} for use in conjunction with a {@link Roster} input.

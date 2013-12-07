@@ -13,8 +13,8 @@ import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.instruction.InstructionDe
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.roster.RosterDemoSuite;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.rosterSession.RosterSessionDemoSuite;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.wizard.WizardDemoSuite;
-import de.fu_berlin.inf.nebula.explanation.ListExplanationComposite;
-import de.fu_berlin.inf.nebula.explanation.ListExplanationComposite.ListExplanation;
+import de.fu_berlin.inf.dpp.ui.widgets.ListExplanationComposite;
+import de.fu_berlin.inf.dpp.ui.widgets.ListExplanationComposite.ListExplanation;
 
 @DemoSuite({ DecorationDemoSuite.class, BasicDemoSuite.class,
     InstructionDemoSuite.class, ChatDemoSuite.class, RosterDemoSuite.class,

@@ -97,12 +97,12 @@ import de.fu_berlin.inf.dpp.ui.actions.VoIPAction;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterEntryElement;
 import de.fu_berlin.inf.dpp.ui.sounds.SoundManager;
 import de.fu_berlin.inf.dpp.ui.sounds.SoundPlayer;
+import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.ui.widgets.ConnectionStateComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.ChatRoomsComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.rosterSession.BuddySessionDisplayComposite;
-import de.fu_berlin.inf.nebula.utils.LayoutUtils;
 
 /**
  * @JTourBusStop 1, The Interface Tour:

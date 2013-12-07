@@ -20,8 +20,7 @@ Require-Bundle: org.eclipse.ui,
  org.tigris.subversion.subclipse.ui;resolution:=optional,
  org.eclipse.ui.console,
  org.eclipse.core.expressions,
- de.fu_berlin.inf.dpp,
- de.fu_berlin.inf.nebula;bundle-version="1.0.0"
+ de.fu_berlin.inf.dpp
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: FU-Berlin
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

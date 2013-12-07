@@ -20,9 +20,9 @@ import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
+import de.fu_berlin.inf.dpp.ui.widgets.SimpleNoteComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.wizard.EnterXMPPAccountComposite;
 import de.fu_berlin.inf.dpp.ui.wizards.CreateXMPPAccountWizard;
-import de.fu_berlin.inf.nebula.explanation.note.SimpleNoteComposite;
 
 /**
  * Allows the user to enter an XMPP account defined by a {@link JID}, a password

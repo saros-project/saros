@@ -20,12 +20,12 @@ import org.eclipse.swt.widgets.Listener;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.Messages;
+import de.fu_berlin.inf.dpp.ui.widgets.SimpleRoundedComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.events.ChatClearedEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.events.IChatDisplayListener;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.items.ChatLine;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.items.ChatLinePartnerChangeSeparator;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.items.ChatLineSeparator;
-import de.fu_berlin.inf.nebula.widgets.SimpleRoundedComposite;
 
 /**
  * This control displays a chat conversation between n users

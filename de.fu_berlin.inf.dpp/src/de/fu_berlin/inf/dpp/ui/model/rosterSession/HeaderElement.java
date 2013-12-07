@@ -9,7 +9,7 @@ import org.eclipse.swt.widgets.Display;
 
 import de.fu_berlin.inf.dpp.ui.model.ITreeElement;
 import de.fu_berlin.inf.dpp.ui.model.TreeElement;
-import de.fu_berlin.inf.nebula.utils.FontUtils;
+import de.fu_berlin.inf.dpp.ui.util.FontUtils;
 
 /**
  * Abstract headline for use with {@link IContentProvider}s that use
