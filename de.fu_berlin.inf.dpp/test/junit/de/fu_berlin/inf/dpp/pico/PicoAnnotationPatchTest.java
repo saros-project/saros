@@ -14,7 +14,7 @@ import org.picocontainer.PicoBuilder;
 import org.picocontainer.annotations.Bind;
 import org.picocontainer.injectors.AdaptingInjection;
 
-public class TestPicoAnnotationPatch {
+public class PicoAnnotationPatchTest {
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ ElementType.FIELD, ElementType.PARAMETER })
