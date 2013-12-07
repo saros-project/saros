@@ -22,6 +22,7 @@ package de.fu_berlin.inf.dpp.project.internal;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -1034,9 +1035,7 @@ public final class SarosSession implements ISarosSession {
             }
             List<IResource> childResources = null;
             try {
-                childResources = ArrayUtils.getAdaptableObjects(
-                    ((IContainer) iResource).members(), IResource.class,
-                    Platform.getAdapterManager());
+                childResources = Arrays.asList(((IContainer) iResource).members());
             } catch (CoreException e) {
                 log.debug("Can't get children of Project/Folder. ", e);
             }

@@ -7,6 +7,7 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.jivesoftware.smack.XMPPException;
@@ -56,7 +56,6 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.EnterProjectNamePage;
-import de.fu_berlin.inf.dpp.util.ArrayUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
@@ -193,8 +192,9 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 useVersionControl, this.monitor.newChild(10));
 
             transmitter.sendToSessionUser(ISarosSession.SESSION_CONNECTION_ID,
-                peer, ProjectNegotiationMissingFilesExtension.PROVIDER.create(new ProjectNegotiationMissingFilesExtension(
-                    sessionID, processID, missingFiles)));
+                peer, ProjectNegotiationMissingFilesExtension.PROVIDER
+                    .create(new ProjectNegotiationMissingFilesExtension(
+                        sessionID, processID, missingFiles)));
 
             awaitActivityQueueingActivation(this.monitor.newChild(0));
 
@@ -793,9 +793,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         if (resource instanceof IContainer) {
             // Recurse.
             try {
-                List<IResource> children = ArrayUtils.getAdaptableObjects(
-                    ((IContainer) resource).members(), IResource.class,
-                    Platform.getAdapterManager());
+                List<IResource> children = Arrays
+                    .asList(((IContainer) resource).members());
                 for (IResource child : children) {
                     if (remoteFileList.getPaths().contains(child.getFullPath()))
                         initVcState(child, vcs, monitor, remoteFileList);
