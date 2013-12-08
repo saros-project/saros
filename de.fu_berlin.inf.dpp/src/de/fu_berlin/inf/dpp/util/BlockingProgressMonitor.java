@@ -8,9 +8,9 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.ProgressMonitorWrapper;
 
 /**
- * A ProgressMonitor which can be waited upon.
+ * A ProgressMonitor which can be waited upon. </p> <s> Typical usage pattern:
  * 
- * Typical usage pattern:
+ * 
  * 
  * <pre>
  * BlockingProgressMonitor blockingMonitor = new BlockingProgressMonitor(monitor);
@@ -23,7 +23,15 @@ import org.eclipse.core.runtime.ProgressMonitorWrapper;
  *     Thread.currentThread().interrupt();
  * }
  * </pre>
+ * 
+ * </s>
+ * 
+ * Please use only the {@link #await(long)} method of that class.
+ * 
+ * @deprecated
  */
+
+@Deprecated
 public class BlockingProgressMonitor extends ProgressMonitorWrapper {
 
     protected CountDownLatch latch;
@@ -55,6 +63,13 @@ public class BlockingProgressMonitor extends ProgressMonitorWrapper {
         }
     }
 
+    /**
+     * @deprecated Can cause deadlocks or infinitive waits if the corresponding
+     *             logic fails to call {@link #done()} on the given monitor.
+     * 
+     * @throws InterruptedException
+     */
+    @Deprecated
     public void await() throws InterruptedException {
         this.latch.await();
     }
