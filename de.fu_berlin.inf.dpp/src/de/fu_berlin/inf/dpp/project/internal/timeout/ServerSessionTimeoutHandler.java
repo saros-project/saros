@@ -22,7 +22,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.internal.ActivitySequencer;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * Component for detecting network errors on the server side of a session.
@@ -176,7 +176,7 @@ public final class ServerSessionTimeoutHandler extends SessionTimeoutHandler {
 
         session.addListener(sessionEventListener);
 
-        workerThread = Utils.runSafeAsync("ServerSessionTimeoutWatchdog", LOG,
+        workerThread = ThreadUtils.runSafeAsync("ServerSessionTimeoutWatchdog", LOG,
             serverSessionTimeoutWatchdog);
     }
 

@@ -27,7 +27,7 @@ import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 @Component(module = "action")
 /**
@@ -105,7 +105,7 @@ public class RestrictToReadOnlyAccessAction extends Action implements
 
     @Override
     public void run() {
-        Utils.runSafeSync(log, new Runnable() {
+        ThreadUtils.runSafeSync(log, new Runnable() {
             @Override
             public void run() {
                 ISarosSession session = sessionManager.getSarosSession();

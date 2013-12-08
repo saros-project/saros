@@ -11,7 +11,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.project.internal.IActivitySequencerCallback;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * Abstract base class that is already capable of detecting and handling network
@@ -101,7 +101,7 @@ abstract class SessionTimeoutHandler implements Startable {
         String threadName = reason == null ? "" : reason;
 
         if (session.isHost()) {
-            Utils.runSafeAsync("RemoveUser" + threadName, LOG, new Runnable() {
+            ThreadUtils.runSafeAsync("RemoveUser" + threadName, LOG, new Runnable() {
                 @Override
                 public void run() {
                     User user = session.getUser(jid);
@@ -110,7 +110,7 @@ abstract class SessionTimeoutHandler implements Startable {
                 }
             });
         } else {
-            Utils.runSafeAsync("StopSession" + threadName, LOG, new Runnable() {
+            ThreadUtils.runSafeAsync("StopSession" + threadName, LOG, new Runnable() {
                 @Override
                 public void run() {
                     sessionManager.stopSarosSession();

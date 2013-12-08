@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.net;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.ConnectionListener;
 
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * A connection listener which forwards calls to a another ConnectionListener,
@@ -34,7 +34,7 @@ public class SafeConnectionListener implements ConnectionListener {
 
     @Override
     public void connectionClosed() {
-        Utils.runSafeSync(log, new Runnable() {
+        ThreadUtils.runSafeSync(log, new Runnable() {
             @Override
             public void run() {
                 toForwardTo.connectionClosed();
@@ -44,7 +44,7 @@ public class SafeConnectionListener implements ConnectionListener {
 
     @Override
     public void connectionClosedOnError(final Exception e) {
-        Utils.runSafeSync(log, new Runnable() {
+        ThreadUtils.runSafeSync(log, new Runnable() {
             @Override
             public void run() {
                 toForwardTo.connectionClosedOnError(e);
@@ -54,7 +54,7 @@ public class SafeConnectionListener implements ConnectionListener {
 
     @Override
     public void reconnectingIn(final int seconds) {
-        Utils.runSafeSync(log, new Runnable() {
+        ThreadUtils.runSafeSync(log, new Runnable() {
             @Override
             public void run() {
                 toForwardTo.reconnectingIn(seconds);
@@ -65,7 +65,7 @@ public class SafeConnectionListener implements ConnectionListener {
 
     @Override
     public void reconnectionFailed(final Exception e) {
-        Utils.runSafeSync(log, new Runnable() {
+        ThreadUtils.runSafeSync(log, new Runnable() {
             @Override
             public void run() {
                 toForwardTo.reconnectionFailed(e);
@@ -75,7 +75,7 @@ public class SafeConnectionListener implements ConnectionListener {
 
     @Override
     public void reconnectionSuccessful() {
-        Utils.runSafeSync(log, new Runnable() {
+        ThreadUtils.runSafeSync(log, new Runnable() {
             @Override
             public void run() {
                 toForwardTo.reconnectionSuccessful();

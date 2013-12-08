@@ -65,6 +65,7 @@ import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
 import de.fu_berlin.inf.dpp.util.StackTrace;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.pico.DotGraphMonitor;
 
@@ -323,7 +324,7 @@ public class Saros extends AbstractUIPlugin {
         }
 
         try {
-            Thread shutdownThread = Utils.runSafeAsync(
+            Thread shutdownThread = ThreadUtils.runSafeAsync(
                 "ShutdownProcess", log, new Runnable() { //$NON-NLS-1$
                     @Override
                     public void run() {
@@ -594,7 +595,7 @@ public class Saros extends AbstractUIPlugin {
      * @nonBlocking
      */
     public void asyncConnect() {
-        Utils.runSafeAsync("AsyncConnect", log, new Runnable() { //$NON-NLS-1$
+        ThreadUtils.runSafeAsync("AsyncConnect", log, new Runnable() { //$NON-NLS-1$
                 @Override
                 public void run() {
                     connect(false);

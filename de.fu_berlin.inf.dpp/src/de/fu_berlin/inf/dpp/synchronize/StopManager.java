@@ -33,6 +33,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.ObservableValue;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -229,7 +230,7 @@ public final class StopManager extends AbstractActivityProvider implements
         final LinkedList<Thread> threads = new LinkedList<Thread>();
 
         for (final User user : users) {
-            threads.add(Utils.runSafeAsync("BlockUser-" + user + "-" + cause,
+            threads.add(ThreadUtils.runSafeAsync("BlockUser-" + user + "-" + cause,
                 log, new Runnable() {
                     @Override
                     public void run() {

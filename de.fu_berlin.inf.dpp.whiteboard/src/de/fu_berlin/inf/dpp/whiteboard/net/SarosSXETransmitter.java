@@ -25,7 +25,7 @@ import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.SXEMessageType;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.net.ISXETransmitter;
@@ -111,7 +111,7 @@ public class SarosSXETransmitter implements ISXETransmitter {
 
 	@Override
 	public void sendAsync(final SXEMessage msg) {
-		sendingDispatch.submit(Utils.wrapSafe(log, new Runnable() {
+		sendingDispatch.submit(ThreadUtils.wrapSafe(log, new Runnable() {
 
 			@Override
 			public void run() {

@@ -25,6 +25,7 @@ import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.internal.extensions.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.extensions.XStreamExtensionProvider.XStreamIQPacket;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -144,7 +145,7 @@ public class SkypeManager implements IConnectionListener {
             return this.skypeNames.get(rqJID);
         }
 
-        Utils.runSafeAsync("GetSkypeURL", log, new Runnable() {
+        ThreadUtils.runSafeAsync("GetSkypeURL", log, new Runnable() {
             @Override
             public void run() {
                 getSkypeURL(rqJID);

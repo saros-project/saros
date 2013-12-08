@@ -15,7 +15,7 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.stf.server.STFController;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * An instance of this class is instantiated when Eclipse starts, after the
@@ -120,7 +120,7 @@ public class StartupSaros implements IStartup {
 
     private void startSTFController(final int port) {
 
-        Utils.runSafeAsync("STF-Controller-Starter", log, new Runnable() {
+        ThreadUtils.runSafeAsync("STF-Controller-Starter", log, new Runnable() {
             @Override
             public void run() {
                 try {

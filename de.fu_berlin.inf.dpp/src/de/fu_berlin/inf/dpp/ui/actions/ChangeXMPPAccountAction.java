@@ -27,7 +27,7 @@ import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * In addition to the connect/disconnect action, this allows the user to switch
@@ -184,7 +184,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator,
         if (account != null)
             accountService.setAccountActive(account);
 
-        Utils.runSafeAsync("ConnectAction", log, new Runnable() {
+        ThreadUtils.runSafeAsync("ConnectAction", log, new Runnable() {
             @Override
             public void run() {
                 try {
@@ -201,7 +201,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator,
     }
 
     private void disconnect() {
-        Utils.runSafeAsync("DisconnectAction", log, new Runnable() {
+        ThreadUtils.runSafeAsync("DisconnectAction", log, new Runnable() {
             @Override
             public void run() {
                 try {

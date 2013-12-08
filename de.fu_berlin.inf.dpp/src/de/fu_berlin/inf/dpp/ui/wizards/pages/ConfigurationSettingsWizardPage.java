@@ -33,7 +33,7 @@ import de.fu_berlin.inf.dpp.ui.util.LinkListener;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.IllustratedComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.decoration.EmptyText;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * Allows the user to enter general configuration parameters for use with Saros.
@@ -356,7 +356,7 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
         gatewayInfo.pack();
 
         // do not block during discovery
-        Utils.runSafeAsync("SettingsWizardDiscoverGateway", null,
+        ThreadUtils.runSafeAsync("SettingsWizardDiscoverGateway", null,
             new Runnable() {
 
                 @Override

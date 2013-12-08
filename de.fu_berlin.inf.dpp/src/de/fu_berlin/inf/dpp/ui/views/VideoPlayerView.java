@@ -72,6 +72,7 @@ import de.fu_berlin.inf.dpp.ui.actions.VideoSharingAction;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.ListExplanationComposite.ListExplanation;
 import de.fu_berlin.inf.dpp.ui.widgets.ListExplanatoryComposite;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing.Mode;
@@ -392,7 +393,7 @@ public class VideoPlayerView extends ViewPart implements VideoDisplay {
 
         @Override
         public void run() {
-            Utils.runSafeAsync("VideoChangeSourceAction", log, new Runnable() {
+            ThreadUtils.runSafeAsync("VideoChangeSourceAction", log, new Runnable() {
                 @Override
                 public void run() {
                     VideoSharingSession session = VideoPlayerView.this.videoSharingSessionObservable
@@ -426,7 +427,7 @@ public class VideoPlayerView extends ViewPart implements VideoDisplay {
 
         @Override
         public void run() {
-            Utils.runSafeAsync("VideoStopSession", log, new Runnable() {
+            ThreadUtils.runSafeAsync("VideoStopSession", log, new Runnable() {
                 @Override
                 public void run() {
                     VideoSharingSession session = VideoPlayerView.this.videoSharingSessionObservable
@@ -460,7 +461,7 @@ public class VideoPlayerView extends ViewPart implements VideoDisplay {
 
         @Override
         public void run() {
-            Utils.runSafeAsync("VideoPauseAction", log, new Runnable() {
+            ThreadUtils.runSafeAsync("VideoPauseAction", log, new Runnable() {
                 @Override
                 public void run() {
                     VideoSharingSession session = VideoPlayerView.this.videoSharingSessionObservable

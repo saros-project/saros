@@ -13,7 +13,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.PongExtension;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ActivitySequencer;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * Component for detecting network errors on the client side of a session.
@@ -118,7 +118,7 @@ public final class ClientSessionTimeoutHandler extends SessionTimeoutHandler {
         receiver.addPacketListener(pingPacketListener,
             PingExtension.PROVIDER.getPacketFilter(currentSessionID));
 
-        workerThread = Utils.runSafeAsync("ClientSessionTimeoutWatchdog", LOG,
+        workerThread = ThreadUtils.runSafeAsync("ClientSessionTimeoutWatchdog", LOG,
             clientSessionTimeoutWatchdog);
     }
 

@@ -26,7 +26,7 @@ import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * A action for skyping other JIDs.
@@ -96,14 +96,14 @@ public class SkypeAction extends Action implements Disposable {
      */
     @Override
     public void run() {
-        Utils.runSafeSync(log, new Runnable() {
+        ThreadUtils.runSafeSync(log, new Runnable() {
             @Override
             public void run() {
                 final List<JID> participants = SelectionRetrieverFactory
                     .getSelectionRetriever(JID.class).getSelection();
 
                 if (participants.size() == 1) {
-                    Utils.runSafeAsync("SkypeAction", log, new Runnable() { //$NON-NLS-1$
+                    ThreadUtils.runSafeAsync("SkypeAction", log, new Runnable() { //$NON-NLS-1$
                             @Override
                             public void run() {
                                 SWTUtils.runSafeSWTSync(log, new Runnable() {

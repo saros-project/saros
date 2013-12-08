@@ -22,7 +22,7 @@ import de.fu_berlin.inf.dpp.observables.VoIPSessionObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * <p>
@@ -107,7 +107,7 @@ public class AudioServiceManager {
 
             // shutdown Recorder, Player, Encoder + Decoder
             if (audioSenderRunnable != null)
-                Utils.runSafeSync(log, new Runnable() {
+                ThreadUtils.runSafeSync(log, new Runnable() {
                     @Override
                     public void run() {
                         audioSenderRunnable.stop();
@@ -116,7 +116,7 @@ public class AudioServiceManager {
                 });
 
             if (audioReceiverRunnable != null)
-                Utils.runSafeSync(log, new Runnable() {
+                ThreadUtils.runSafeSync(log, new Runnable() {
                     @Override
                     public void run() {
                         audioReceiverRunnable.stop();
@@ -192,7 +192,7 @@ public class AudioServiceManager {
 
             log.debug("Starting new VoIP Session...");
 
-            Utils.runSafeAsync("VoIPSession", log, new Runnable() {
+            ThreadUtils.runSafeAsync("VoIPSession", log, new Runnable() {
                 @Override
                 public void run() {
                     startSession(session);
@@ -250,13 +250,13 @@ public class AudioServiceManager {
         if (recordDeviceOk) {
             audioSenderRunnable = new AudioSenderRunnable(
                 session.getOutputStream(0), this, preferenceUtils);
-            Utils.runSafeAsync("AudioSender", log, audioSenderRunnable);
+            ThreadUtils.runSafeAsync("AudioSender", log, audioSenderRunnable);
         }
 
         if (playbackDeviceOk) {
             audioReceiverRunnable = new AudioReceiverRunnable(
                 session.getInputStream(0), this, preferenceUtils);
-            Utils.runSafeAsync("AudioReceiver", log, audioReceiverRunnable);
+            ThreadUtils.runSafeAsync("AudioReceiver", log, audioReceiverRunnable);
         }
     }
 

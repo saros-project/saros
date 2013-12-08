@@ -21,7 +21,7 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.dialogs.FeedbackDialog;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * The FeedbackManager registers himself as a listener with the
@@ -128,7 +128,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
          * ever wants to count the number of declined dialogs, threading
          * problems must be newly considered.
          */
-        Utils.runSafeAsync("ShowFeedbackDialog", log, new Runnable() {
+        ThreadUtils.runSafeAsync("ShowFeedbackDialog", log, new Runnable() {
 
             @Override
             public void run() {

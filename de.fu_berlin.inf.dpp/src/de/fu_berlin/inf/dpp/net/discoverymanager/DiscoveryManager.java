@@ -28,7 +28,7 @@ import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.StackTrace;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * This class is responsible for performing ServiceDiscovery for features such
@@ -319,7 +319,7 @@ public class DiscoveryManager implements Disposable {
         if (!async)
             return queryFeatureSupport(jid, namespace);
 
-        threadPoolExecutor.execute(Utils.wrapSafe(LOG, new Runnable() {
+        threadPoolExecutor.execute(ThreadUtils.wrapSafe(LOG, new Runnable() {
             @Override
             public void run() {
                 queryFeatureSupport(jid, namespace);

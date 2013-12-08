@@ -39,6 +39,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager.StreamPacket;
 import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager.StreamPath;
 import de.fu_berlin.inf.dpp.util.ThreadAccessRecorder;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -606,7 +607,7 @@ public class StreamSession implements Disposable {
                         if (StreamSession.this.resendThread[streamID] != null)
                             // another one waits already
                             return null;
-                        StreamSession.this.resendThread[streamID] = Utils
+                        StreamSession.this.resendThread[streamID] = ThreadUtils
                             .runSafeAsync(StreamSession.this.toString()
                                 + "-dataWaiter-" + streamID, log,
                                 new Runnable() {

@@ -17,7 +17,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.Messages;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * This manager is responsible for handling {@link Permission} changes.
@@ -123,13 +123,13 @@ public class PermissionManager extends AbstractActivityProvider implements
         };
 
         if (user.isHost()) {
-            synchronizer.syncExec(Utils.wrapSafe(log, fireActivityrunnable));
+            synchronizer.syncExec(ThreadUtils.wrapSafe(log, fireActivityrunnable));
 
         } else {
             StartHandle startHandle = sarosSession.getStopManager().stop(user,
                 Messages.SarosSession_performing_permission_change, progress);
 
-            synchronizer.syncExec(Utils.wrapSafe(log, fireActivityrunnable));
+            synchronizer.syncExec(ThreadUtils.wrapSafe(log, fireActivityrunnable));
 
             if (!startHandle.start())
                 log.error("Didn't unblock. "

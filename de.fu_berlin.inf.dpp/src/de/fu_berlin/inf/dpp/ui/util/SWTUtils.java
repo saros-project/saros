@@ -17,6 +17,7 @@ import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
 import de.fu_berlin.inf.dpp.util.StackTrace;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 public class SWTUtils {
@@ -136,7 +137,7 @@ public class SWTUtils {
      */
     public static void runSafeSWTAsync(final Logger log, final Runnable runnable) {
         try {
-            getDisplay().asyncExec(Utils.wrapSafe(log, runnable));
+            getDisplay().asyncExec(ThreadUtils.wrapSafe(log, runnable));
         } catch (SWTException e) {
             if (!PlatformUI.getWorkbench().isClosing())
                 throw e;
@@ -185,7 +186,7 @@ public class SWTUtils {
 
     public static void runSafeSWTSync(final Logger log, final Runnable runnable) {
         try {
-            getDisplay().syncExec(Utils.wrapSafe(log, runnable));
+            getDisplay().syncExec(ThreadUtils.wrapSafe(log, runnable));
         } catch (SWTException e) {
             if (!PlatformUI.getWorkbench().isClosing())
                 throw e;

@@ -25,7 +25,7 @@ import de.fu_berlin.inf.dpp.concurrent.management.TransformationResult;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.util.StackTrace;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * This handler is responsible for handling the correct thread access when
@@ -241,7 +241,7 @@ public final class ActivityHandler implements Startable {
      * words, the transformation would be applied to an out-dated state.
      */
     public void handleOutgoingActivities(final List<IActivity> activities) {
-        synchronizer.syncExec(Utils.wrapSafe(LOG, new Runnable() {
+        synchronizer.syncExec(ThreadUtils.wrapSafe(LOG, new Runnable() {
 
             @Override
             public void run() {
@@ -263,7 +263,7 @@ public final class ActivityHandler implements Startable {
         if (DISPATCH_MODE == DISPATCH_MODE_ASYNC)
             return;
 
-        dispatchThread = Utils.runSafeAsync("ActivityDispatcher", LOG,
+        dispatchThread = ThreadUtils.runSafeAsync("ActivityDispatcher", LOG,
             dispatchThreadRunnable);
     }
 
@@ -384,9 +384,9 @@ public final class ActivityHandler implements Startable {
                 + " activities [mode = " + DISPATCH_MODE + "] : " + activities);
 
         if (DISPATCH_MODE == DISPATCH_MODE_SYNC)
-            synchronizer.syncExec(Utils.wrapSafe(LOG, transformingRunnable));
+            synchronizer.syncExec(ThreadUtils.wrapSafe(LOG, transformingRunnable));
         else
-            synchronizer.asyncExec(Utils.wrapSafe(LOG, transformingRunnable));
+            synchronizer.asyncExec(ThreadUtils.wrapSafe(LOG, transformingRunnable));
     }
 
     /**

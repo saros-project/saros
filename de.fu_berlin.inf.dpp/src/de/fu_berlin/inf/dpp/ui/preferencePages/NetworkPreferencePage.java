@@ -34,7 +34,7 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /** @author Stefan Rossbach */
 
@@ -398,7 +398,7 @@ public final class NetworkPreferencePage extends PreferencePage implements
             gatewayInfo.pack();
             gatewayInfo.setVisible(true);
 
-            Utils.runSafeAsync("NetworkPageUPnPDiscoverer", null,
+            ThreadUtils.runSafeAsync("NetworkPageUPnPDiscoverer", null,
                 new Runnable() {
 
                     @Override

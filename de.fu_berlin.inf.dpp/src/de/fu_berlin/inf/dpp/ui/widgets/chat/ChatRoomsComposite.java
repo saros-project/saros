@@ -45,7 +45,7 @@ import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.ui.widgets.ListExplanationComposite.ListExplanation;
 import de.fu_berlin.inf.dpp.ui.widgets.ListExplanatoryComposite;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * This component shows chat he right side of the {@link SarosView}
@@ -161,7 +161,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
              * now CARL joins the session and BOB leaves afterwards, ALICE and
              * CARLs MUC is broken !
              */
-            Utils.runSafeAsync("JoinMUC", log, new Runnable() {
+            ThreadUtils.runSafeAsync("JoinMUC", log, new Runnable() {
                 @Override
                 public void run() {
                     synchronized (mucCreationLock) {

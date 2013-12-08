@@ -15,7 +15,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * Business logic for handling Leave Message
@@ -138,7 +138,7 @@ public class LeaveAndKickHandler {
          * must be run async. otherwise the user list synchronization will time
          * out as we block the packet receive thread here
          */
-        Utils.runSafeAsync("RemoveUser-" + user, log, new Runnable() {
+        ThreadUtils.runSafeAsync("RemoveUser-" + user, log, new Runnable() {
             @Override
             public void run() {
                 sarosSession.removeUser(user);
@@ -149,7 +149,7 @@ public class LeaveAndKickHandler {
 
     private void stopSession(final ISarosSession session, final String topic,
         final String reason) {
-        Utils.runSafeAsync("StopSessionOnHostLeave", log, new Runnable() {
+        ThreadUtils.runSafeAsync("StopSessionOnHostLeave", log, new Runnable() {
             @Override
             public void run() {
                 sessionManager.stopSarosSession();

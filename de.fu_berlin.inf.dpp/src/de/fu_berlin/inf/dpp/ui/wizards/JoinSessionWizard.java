@@ -45,7 +45,7 @@ import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.ShowDescriptionPage;
 import de.fu_berlin.inf.dpp.ui.wizards.utils.EnterProjectNamePageUtils;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 
 /**
@@ -152,7 +152,7 @@ public class JoinSessionWizard extends Wizard {
 
     @Override
     public boolean performCancel() {
-        Utils.runSafeAsync("CancelJoinSessionWizard", log, new Runnable() {
+        ThreadUtils.runSafeAsync("CancelJoinSessionWizard", log, new Runnable() {
             @Override
             public void run() {
                 process.localCancel(null, CancelOption.NOTIFY_PEER);

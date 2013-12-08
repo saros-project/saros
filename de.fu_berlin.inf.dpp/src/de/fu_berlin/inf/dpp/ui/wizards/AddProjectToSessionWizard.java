@@ -56,7 +56,7 @@ import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.EnterProjectNamePage;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 public class AddProjectToSessionWizard extends Wizard {
 
@@ -345,7 +345,7 @@ public class AddProjectToSessionWizard extends Wizard {
                 Messages.AddProjectToSessionWizard_leave_session_text, false)) {
                 return false;
             }
-            Utils.runSafeAsync("CancelAddProjectWizard", log, new Runnable() {
+            ThreadUtils.runSafeAsync("CancelAddProjectWizard", log, new Runnable() {
                 @Override
                 public void run() {
                     process.localCancel(null, CancelOption.NOTIFY_PEER);

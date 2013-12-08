@@ -32,7 +32,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing.Codec;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing.VideoSharingSession;
 import de.fu_berlin.inf.dpp.videosharing.exceptions.EncoderInitializationException;
@@ -109,7 +109,7 @@ public abstract class Encoder implements Runnable {
             throw new IllegalStateException();
         isEncoding = true;
 
-        encoderThread = Utils.runSafeAsync("VideosharingEncoder", log, this);
+        encoderThread = ThreadUtils.runSafeAsync("VideosharingEncoder", log, this);
 
         encodingLatch.countDown();
 

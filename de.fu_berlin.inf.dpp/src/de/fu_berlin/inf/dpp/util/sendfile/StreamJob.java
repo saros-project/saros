@@ -28,7 +28,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import de.fu_berlin.inf.dpp.exceptions.StreamException;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession.StreamSessionListener;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * Abstract {@link Job} for using {@link StreamSession}s. It contains a set up
@@ -99,7 +99,7 @@ public abstract class StreamJob extends Job {
         @Override
         public void sessionStopped() {
             StreamJob.this.stopped = true;
-            Utils.runSafeAsync("StreamSessionStopper", log, new Runnable() {
+            ThreadUtils.runSafeAsync("StreamSessionStopper", log, new Runnable() {
                 @Override
                 public void run() {
                     StreamJob.this.cancel();

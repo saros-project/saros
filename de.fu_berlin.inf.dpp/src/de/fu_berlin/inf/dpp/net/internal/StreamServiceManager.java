@@ -77,6 +77,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
@@ -232,9 +233,9 @@ public class StreamServiceManager implements Startable {
 
     protected void startThreads() {
         sender = new PacketSender();
-        Utils.runSafeAsync("StreamServiceManagerSender", log, sender);
+        ThreadUtils.runSafeAsync("StreamServiceManagerSender", log, sender);
         receiver = new PacketReceiver();
-        Utils.runSafeAsync("StreamServiceManagerReceiver", log, receiver);
+        ThreadUtils.runSafeAsync("StreamServiceManagerReceiver", log, receiver);
         stopSessionExecutor = Executors.newScheduledThreadPool(5,
             new NamedThreadFactory("StreamSessionStopper-"));
 
@@ -398,7 +399,7 @@ public class StreamServiceManager implements Startable {
             sender.sendPacket(transferDescription,
                 StreamMetaPacketData.STOP.getIdentifier());
 
-        Runnable stopThread = Utils.wrapSafe(log, new SessionKiller(session));
+        Runnable stopThread = ThreadUtils.wrapSafe(log, new SessionKiller(session));
 
         if (stopSessionExecutor != null) {
             stopSessionExecutor.schedule(stopThread, SESSION_SHUTDOWN_LIMIT,
@@ -1384,7 +1385,7 @@ public class StreamServiceManager implements Startable {
                  * Ask service for accept and send decision to client. When
                  * accepted, a new session will be created.
                  */
-                negotiatesToUser.execute(Utils.wrapSafe(log, new Runnable() {
+                negotiatesToUser.execute(ThreadUtils.wrapSafe(log, new Runnable() {
                     @Override
                     public void run() {
                         log.debug("Starting session request to service");
@@ -1426,7 +1427,7 @@ public class StreamServiceManager implements Startable {
                                 // can not create, not connected
                                 newSession.dispose();
 
-                            sessionDispatcher.execute(Utils.wrapSafe(log,
+                            sessionDispatcher.execute(ThreadUtils.wrapSafe(log,
                                 new Runnable() {
                                     @Override
                                     public void run() {
@@ -1468,7 +1469,7 @@ public class StreamServiceManager implements Startable {
                     log.error("Session " + session + " already stopped.");
                     return;
                 }
-                Runnable stopThread = Utils.wrapSafe(log, new SessionKiller(
+                Runnable stopThread = ThreadUtils.wrapSafe(log, new SessionKiller(
                     session));
                 session.shutdown = stopThread;
 

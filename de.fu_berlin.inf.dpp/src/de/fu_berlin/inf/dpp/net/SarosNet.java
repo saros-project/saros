@@ -25,7 +25,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.stun.IStunService;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.net.util.NetworkingUtils;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * This class is responsible for establishing XMPP connections and notifying
@@ -183,7 +183,7 @@ public class SarosNet {
          * connection attempt, currently it is only UPNP discovery
          */
 
-        Utils.runSafeAsync("SearchUPNP", LOG, new Runnable() {
+        ThreadUtils.runSafeAsync("SearchUPNP", LOG, new Runnable() {
             @Override
             public void run() {
                 if (upnpService != null)
@@ -441,7 +441,7 @@ public class SarosNet {
          * to the XMPP server is established
          */
         if (stunService != null && stunServer != null) {
-            Utils.runSafeAsync("StunAddProxys", LOG, new Runnable() {
+            ThreadUtils.runSafeAsync("StunAddProxys", LOG, new Runnable() {
                 @Override
                 public void run() {
                     Collection<InetSocketAddress> addresses = stunService
@@ -458,7 +458,7 @@ public class SarosNet {
 
         if (gatewayDeviceID != null && upnpService != null) {
             final String gatewayDeviceIDToFind = gatewayDeviceID;
-            Utils.runSafeAsync("CreatePortMapping", LOG, new Runnable() {
+            ThreadUtils.runSafeAsync("CreatePortMapping", LOG, new Runnable() {
                 @Override
                 public void run() {
                     synchronized (portMappingLock) {

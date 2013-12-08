@@ -42,7 +42,7 @@ import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.util.FileUtils;
 import de.fu_berlin.inf.dpp.util.Pair;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * Offers convenient methods for collaboration actions like sharing a project
@@ -153,7 +153,7 @@ public class CollaborationUtils {
         if (!reallyLeave)
             return;
 
-        Utils.runSafeAsync("StopSession", LOG, new Runnable() {
+        ThreadUtils.runSafeAsync("StopSession", LOG, new Runnable() {
             @Override
             public void run() {
                 sessionManager.stopSarosSession();
@@ -184,7 +184,7 @@ public class CollaborationUtils {
         if (projectResources.isEmpty())
             return;
 
-        Utils.runSafeAsync("AddResourceToSession", LOG, new Runnable() {
+        ThreadUtils.runSafeAsync("AddResourceToSession", LOG, new Runnable() {
             @Override
             public void run() {
 
@@ -218,7 +218,7 @@ public class CollaborationUtils {
             return;
         }
 
-        Utils.runSafeAsync("AddContactToSession", LOG, new Runnable() {
+        ThreadUtils.runSafeAsync("AddContactToSession", LOG, new Runnable() {
             @Override
             public void run() {
 

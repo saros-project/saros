@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * Action which triggers the viewport of the local user to be changed to a local
@@ -80,7 +80,7 @@ public class JumpToUserWithWriteAccessPositionAction extends Action implements
      */
     @Override
     public void run() {
-        Utils.runSafeSync(log, new Runnable() {
+        ThreadUtils.runSafeSync(log, new Runnable() {
             @Override
             public void run() {
                 List<User> participants = SelectionRetrieverFactory

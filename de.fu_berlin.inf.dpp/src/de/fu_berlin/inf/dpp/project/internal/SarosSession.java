@@ -103,6 +103,7 @@ import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.util.ArrayUtils;
 import de.fu_berlin.inf.dpp.util.StackTrace;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -366,7 +367,7 @@ public final class SarosSession implements ISarosSession {
         if (user == null || permission == null)
             throw new IllegalArgumentException();
 
-        synchronizer.syncExec(Utils.wrapSafe(log, new Runnable() {
+        synchronizer.syncExec(ThreadUtils.wrapSafe(log, new Runnable() {
             @Override
             public void run() {
                 user.setPermission(permission);
@@ -451,7 +452,7 @@ public final class SarosSession implements ISarosSession {
             }
         }
 
-        synchronizer.syncExec(Utils.wrapSafe(log, new Runnable() {
+        synchronizer.syncExec(ThreadUtils.wrapSafe(log, new Runnable() {
             @Override
             public void run() {
                 listenerDispatch.userJoined(user);
@@ -473,7 +474,7 @@ public final class SarosSession implements ISarosSession {
          */
         projectMapper.addMissingProjectsToUser(user);
 
-        synchronizer.syncExec(Utils.wrapSafe(log, new Runnable() {
+        synchronizer.syncExec(ThreadUtils.wrapSafe(log, new Runnable() {
             @Override
             public void run() {
                 listenerDispatch.userStartedQueuing(user);
@@ -487,7 +488,7 @@ public final class SarosSession implements ISarosSession {
         log.info("user " + user
             + " now has Projects and can process IResourceActivities");
 
-        synchronizer.syncExec(Utils.wrapSafe(log, new Runnable() {
+        synchronizer.syncExec(ThreadUtils.wrapSafe(log, new Runnable() {
             @Override
             public void run() {
                 listenerDispatch.userFinishedProjectNegotiation(user);
@@ -543,7 +544,7 @@ public final class SarosSession implements ISarosSession {
             }
         }
 
-        synchronizer.syncExec(Utils.wrapSafe(log, new Runnable() {
+        synchronizer.syncExec(ThreadUtils.wrapSafe(log, new Runnable() {
             @Override
             public void run() {
                 listenerDispatch.userLeft(user);
@@ -888,7 +889,7 @@ public final class SarosSession implements ISarosSession {
         final FileActivity needBasedFileActivity = FileActivity.created(
             getLocalUser(), path, Purpose.NEEDS_BASED_SYNC);
 
-        synchronizer.syncExec(Utils.wrapSafe(log, new Runnable() {
+        synchronizer.syncExec(ThreadUtils.wrapSafe(log, new Runnable() {
 
             @Override
             public void run() {

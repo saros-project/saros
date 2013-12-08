@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.novocode.naf.swt.custom.BalloonWindow;
 
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 public class BalloonNotification {
 
@@ -121,7 +121,7 @@ public class BalloonNotification {
         }
 
         // Runnable that will close the window after time has been expired
-        final Runnable closeWindow = Utils.wrapSafe(log, new Runnable() {
+        final Runnable closeWindow = ThreadUtils.wrapSafe(log, new Runnable() {
 
             @Override
             public void run() {

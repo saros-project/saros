@@ -26,7 +26,7 @@ import java.io.ObjectInputStream;
 import org.apache.log4j.Logger;
 import org.picocontainer.Disposable;
 
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing.VideoSharingSession;
 import de.fu_berlin.inf.dpp.videosharing.activities.SessionErrorVideoActivity;
@@ -54,7 +54,7 @@ public class ActivityManager implements Disposable {
         this.imageSource = imageSource;
         this.videoSharingSession = videoSharingSession;
         this.objectIn = objectIn;
-        activityReceiverThread = Utils.runSafeAsync(
+        activityReceiverThread = ThreadUtils.runSafeAsync(
             "VideoSharingActivityReceiver", log, receiver);
     }
 

@@ -45,6 +45,7 @@ import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesExtension;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.ActivityUtils;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -267,7 +268,7 @@ public class ActivitySequencer implements Startable {
 
         started = true;
 
-        activitySendThread = Utils.runSafeAsync("ActivitySender", LOG,
+        activitySendThread = ThreadUtils.runSafeAsync("ActivitySender", LOG,
             activitySender);
     }
 

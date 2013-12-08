@@ -27,7 +27,7 @@ import java.io.OutputStream;
 import org.apache.log4j.Logger;
 import org.picocontainer.Disposable;
 
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing.VideoSharingSession;
 import de.fu_berlin.inf.dpp.videosharing.encode.Encoder;
 
@@ -60,9 +60,9 @@ public class ConnectionManager implements Disposable {
         this.videoSharingSession = videoSharingSession;
         this.encoderManager = new EncoderManager();
         this.decodingStatisticManager = new DecodingStatisticManager();
-        encoderManagerThread = Utils.runSafeAsync("EncoderManager", log,
+        encoderManagerThread = ThreadUtils.runSafeAsync("EncoderManager", log,
             encoderManager);
-        decodingStatisticManagerThread = Utils.runSafeAsync(
+        decodingStatisticManagerThread = ThreadUtils.runSafeAsync(
             "DecodingStatisticManager", log, decodingStatisticManager);
     }
 

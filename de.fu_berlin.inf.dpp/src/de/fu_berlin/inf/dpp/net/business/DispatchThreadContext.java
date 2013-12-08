@@ -8,7 +8,7 @@ import org.picocontainer.Disposable;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * The ExecutorService under which all incoming activityDataObjects should be
@@ -34,7 +34,7 @@ public class DispatchThreadContext implements Disposable {
      * JupiterServer.
      */
     public void executeAsDispatch(Runnable runnable) {
-        dispatch.submit(Utils.wrapSafe(log, runnable));
+        dispatch.submit(ThreadUtils.wrapSafe(log, runnable));
     }
 
     public ExecutorService getDispatchExecutor() {

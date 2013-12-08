@@ -48,7 +48,7 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.VideoPlayerView;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import de.fu_berlin.inf.dpp.videosharing.activities.ImageSourceSwitchModeVideoActivity;
 import de.fu_berlin.inf.dpp.videosharing.activities.SessionErrorVideoActivity;
 import de.fu_berlin.inf.dpp.videosharing.activities.SessionVideoActivity;
@@ -509,7 +509,7 @@ public class VideoSharing {
 
             decoder.startDecoder();
 
-            errorThread = Utils.runSafeAsync("VideoSharingErrorReceiver", log,
+            errorThread = ThreadUtils.runSafeAsync("VideoSharingErrorReceiver", log,
                 new Runnable() {
                     @Override
                     public void run() {

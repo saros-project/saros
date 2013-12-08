@@ -7,7 +7,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.SXEMessageType;
 
@@ -57,7 +57,7 @@ public class SXEIncomingSynchronizationProcess extends SXESynchronization {
 		 * dispatching listener thread when awaiting answers (could not process
 		 * incoming messages, deadlock)
 		 */
-		Utils.runSafeAsync("Incoming whiteboard synchronization process", log,
+		ThreadUtils.runSafeAsync("Incoming whiteboard synchronization process", log,
 				new Runnable() {
 
 					@Override
