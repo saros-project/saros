@@ -1,21 +1,13 @@
 package de.fu_berlin.inf.dpp.util;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.io.Writer;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
@@ -30,15 +22,11 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.jivesoftware.smackx.bytestreams.BytestreamSession;
 
-import bmsi.util.Diff;
-import bmsi.util.DiffPrint;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.net.JID;
 
@@ -378,88 +366,6 @@ public final class Utils {
             IOUtils.closeQuietly(bos);
             monitor.done();
         }
-    }
-
-    // NO LONGER USED
-    /**
-     * Print the difference between the contents of the given file and the given
-     * inputBytes to the given log.
-     */
-    public static void logDiff(Logger log, JID from, SPath path,
-        byte[] inputBytes, IFile file) {
-        try {
-            if (file == null) {
-                log.error("No file given", new StackTrace());
-                return;
-            }
-
-            if (!file.exists()) {
-                log.info("File on disk is missing: " + file);
-                return;
-            }
-
-            if (inputBytes == null) {
-                log.info("File on disk is to be deleted:" + file);
-                return;
-            }
-
-            // get stream from old file
-            InputStream oldStream = file.getContents();
-            InputStream newStream = new ByteArrayInputStream(inputBytes);
-
-            // read Lines from
-            Object[] oldContent = readLinesAndEscapeNewlines(oldStream);
-            Object[] newContent = readLinesAndEscapeNewlines(newStream);
-
-            // Calculate diff of the two files
-            Diff diff = new Diff(oldContent, newContent);
-            Diff.Change script = diff.diff_2(false);
-
-            // log diff
-            DiffPrint.UnifiedPrint print = new DiffPrint.UnifiedPrint(
-                oldContent, newContent);
-            Writer writer = new StringWriter();
-            print.setOutput(writer);
-            print.print_script(script);
-
-            String diffAsString = writer.toString();
-            if (diffAsString.trim().length() == 0) {
-                log.error("No inconsistency found in file [" + from.getName()
-                    + "] " + path);
-            } else {
-                log.info("Diff of inconsistency: \nPath: " + path + "\n"
-                    + diffAsString);
-            }
-        } catch (CoreException e) {
-            log.error("Can't read file content", e);
-        } catch (IOException e) {
-            log.error("Can't convert file content to String", e);
-        }
-    }
-
-    // NO LONGER USED
-    /**
-     * Reads the given stream into an array of lines while retaining and
-     * escaping the line delimiters.
-     */
-    public static String[] readLinesAndEscapeNewlines(InputStream stream)
-        throws IOException {
-
-        List<String> result = new ArrayList<String>();
-        String data = IOUtils.toString(stream);
-        Matcher matcher = Pattern.compile("\\r\\n|\\r|\\n").matcher(data);
-        int previousEnd = 0;
-        while (matcher.find()) {
-            // Extract line and escape line delimiter.
-            result.add(data.substring(previousEnd, matcher.start())
-                + escapeForLogging(matcher.group()));
-            previousEnd = matcher.end();
-        }
-        // If there is no line delimiter after the last line...
-        if (previousEnd != data.length()) {
-            result.add(data.substring(previousEnd, data.length()));
-        }
-        return result.toArray(new String[result.size()]);
     }
 
     /**

@@ -1,12 +1,8 @@
 package de.fu_berlin.inf.dpp.util;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Random;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -36,14 +32,5 @@ public class UtilTest {
 
         assertEquals(shortString, shortResult);
         assertEquals(longString, longResult);
-    }
-
-    @Test
-    public void testReadLines() throws IOException {
-        String source = "a\nb\rc\r\nd";
-        InputStream stream = new ByteArrayInputStream(source.getBytes());
-        String[] expected = new String[] { "a\\n", "b\\r", "c\\r\\n", "d" };
-        String[] actual = Utils.readLinesAndEscapeNewlines(stream);
-        assertTrue(Arrays.equals(expected, actual));
     }
 }
