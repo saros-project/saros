@@ -25,7 +25,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
-import org.jivesoftware.smackx.bytestreams.BytestreamSession;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -378,22 +377,6 @@ public final class Utils {
                 "could not deserialize object data: "
                     + Arrays.toString(serialized), e);
             return null;
-        }
-    }
-
-    // only used by Socks5Transport
-    /**
-     * Closes a bytestreamSession without error output.
-     * 
-     * @param stream
-     */
-    public static void closeQuietly(BytestreamSession stream) {
-        if (stream == null)
-            return;
-        try {
-            stream.close();
-        } catch (Exception e) {
-            //
         }
     }
 }

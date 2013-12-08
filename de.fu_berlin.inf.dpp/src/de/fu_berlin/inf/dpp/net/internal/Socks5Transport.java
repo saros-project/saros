@@ -34,7 +34,6 @@ import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Transport class for SOCKS5 bytestreams. When a Request is received always it
@@ -128,7 +127,7 @@ public class Socks5Transport extends ByteStreamTransport {
             @Override
             public void run() {
                 try {
-                    Utils.closeQuietly(future.get());
+                    closeQuietly(future.get());
                 } catch (InterruptedException e) {
                     // nothing to do here
                 } catch (ExecutionException e) {
@@ -221,13 +220,13 @@ public class Socks5Transport extends ByteStreamTransport {
                 + "but at least the server allows bidirectional connections. (using "
                 + (preferInSession ? "incoming session" : "outgoing session")
                 + ")");
-            Utils.closeQuietly(preferInSession ? outSession : inSession);
+            closeQuietly(preferInSession ? outSession : inSession);
             return session;
         }
 
         if (inSession == null || outSession == null) {
-            Utils.closeQuietly(inSession);
-            Utils.closeQuietly(outSession);
+            closeQuietly(inSession);
+            closeQuietly(outSession);
             throw new IOException(
                 "Could only establish one unidirectional connection but need two for wrapping.");
         }
@@ -337,7 +336,7 @@ public class Socks5Transport extends ByteStreamTransport {
         if (exchanger == null) {
             LOG.warn(prefix()
                 + "Received response connection without a running connect");
-            Utils.closeQuietly(inSession);
+            closeQuietly(inSession);
             return;
         }
 
@@ -347,11 +346,11 @@ public class Socks5Transport extends ByteStreamTransport {
         } catch (InterruptedException e) {
             LOG.debug(prefix()
                 + "Wrapping bidirectional stream was interrupted.");
-            Utils.closeQuietly(inSession);
+            closeQuietly(inSession);
         } catch (TimeoutException e) {
             LOG.error(prefix()
                 + "Wrapping bidirectional stream timed out in Request! Shouldn't have happened.");
-            Utils.closeQuietly(inSession);
+            closeQuietly(inSession);
         }
 
     }
@@ -436,7 +435,7 @@ public class Socks5Transport extends ByteStreamTransport {
             if (outSession.isDirect()) {
                 LOG.debug(prefix()
                     + "newly established session is direct! Discarding the other.");
-                Utils.closeQuietly(inSession);
+                closeQuietly(inSession);
                 configureSocks5Socket(outSession);
 
                 return new BinaryChannelConnection(new JID(peer),
@@ -562,7 +561,7 @@ public class Socks5Transport extends ByteStreamTransport {
                 if (inSession.isDirect()) {
                     LOG.debug(prefix()
                         + "response connection is direct! Discarding the other.");
-                    Utils.closeQuietly(outSession);
+                    closeQuietly(outSession);
                     configureSocks5Socket(inSession);
 
                     return new BinaryChannelConnection(new JID(peer),
@@ -571,7 +570,7 @@ public class Socks5Transport extends ByteStreamTransport {
                 }
 
             } catch (TimeoutException e) {
-                Utils.closeQuietly(outSession);
+                closeQuietly(outSession);
                 String msg = "waiting for a response session timed out ("
                     + TARGET_RESPONSE_TIMEOUT + "ms)";
                 if (exception != null)
@@ -793,5 +792,15 @@ public class Socks5Transport extends ByteStreamTransport {
 
     private static boolean isResponse(BytestreamRequest request) {
         return request.getSessionID().startsWith(RESPONSE_SESSION_ID_PREFIX);
+    }
+
+    private static void closeQuietly(BytestreamSession stream) {
+        if (stream == null)
+            return;
+        try {
+            stream.close();
+        } catch (Exception e) {
+            // NOP
+        }
     }
 }
