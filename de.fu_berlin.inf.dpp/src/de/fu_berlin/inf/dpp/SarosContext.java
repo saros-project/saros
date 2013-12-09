@@ -37,6 +37,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.StartActivityQueuingResponse
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserFinishedProjectNegotiationExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListReceivedExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.VersionExchangeExtension;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.pico.ChildContainer;
 import de.fu_berlin.inf.dpp.util.pico.ChildContainerProvider;
@@ -124,6 +125,9 @@ public class SarosContext implements ISarosContext {
 
             Class.forName(StartActivityQueuingRequest.class.getName());
             Class.forName(StartActivityQueuingResponse.class.getName());
+
+            Class.forName(VersionExchangeExtension.class.getName());
+
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }

@@ -24,6 +24,7 @@ import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
+import de.fu_berlin.inf.dpp.net.internal.extensions.VersionExchangeExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.extensions.XStreamExtensionProvider.XStreamIQPacket;
 
@@ -137,6 +138,49 @@ public class VersionManager {
     private final ITransmitter transmitter;
     private final IReceiver receiver;
 
+    // HACK always respond we are too old because this is the new protocol that
+    // is not supported in this version
+    private final PacketListener versionRequestListener = new PacketListener() {
+
+        @Override
+        public void processPacket(Packet packet) {
+
+            log.debug("received version request from " + packet.getFrom());
+
+            VersionExchangeExtension versionExchangeRequest = VersionExchangeExtension.PROVIDER
+                .getPayload(packet);
+
+            if (versionExchangeRequest == null) {
+                log.warn("cannot reply to version request, packet is malformed");
+                return;
+            }
+
+            VersionExchangeExtension versionExchangeResponse = new VersionExchangeExtension();
+
+            versionExchangeResponse.set("version", version.toString());
+            versionExchangeResponse.set("compatibility",
+            /* TOO_OLD */"1");
+
+            versionExchangeResponse.set("id", versionExchangeRequest.get("id"));
+
+            IQ reply = VersionExchangeExtension.PROVIDER
+                .createIQ(versionExchangeResponse);
+            reply.setType(IQ.Type.RESULT);
+            reply.setTo(packet.getFrom());
+
+            try {
+                transmitter.sendPacket(reply);
+            } catch (IOException e) {
+                log.error(
+                    "could not send version response to " + packet.getFrom(), e);
+            }
+
+            log.debug("send version response to " + packet.getFrom());
+
+        }
+
+    };
+
     public VersionManager(@SarosVersion Version version,
         final IReceiver receiver, final ITransmitter transmitter) {
 
@@ -181,6 +225,16 @@ public class VersionManager {
 
             }
         }));
+
+        receiver.addPacketListener(versionRequestListener, new AndFilter(
+            VersionExchangeExtension.PROVIDER.getIQFilter(),
+            new PacketFilter() {
+                @Override
+                public boolean accept(Packet packet) {
+                    return ((IQ) packet).getType() == IQ.Type.GET;
+
+                }
+            }));
 
         initializeCompatibilityChart();
     }
