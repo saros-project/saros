@@ -3,8 +3,6 @@ package de.fu_berlin.inf.dpp.net.internal.extensions;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-import de.fu_berlin.inf.dpp.versioning.VersionManager.VersionInfo;
-
 @XStreamAlias(/* SessionNegotiationOffering */"SNOF")
 public class InvitationOfferingExtension extends InvitationExtension {
 
@@ -15,17 +13,17 @@ public class InvitationOfferingExtension extends InvitationExtension {
     private String sessionID;
 
     @XStreamAlias("version")
-    private VersionInfo versionInfo;
+    private String version;
 
     @XStreamAlias("description")
     private String description;
 
     public InvitationOfferingExtension(String invitationID, String sessionID,
-        VersionInfo versionInfo, String description) {
+        String version, String description) {
         super(invitationID);
 
         this.sessionID = sessionID;
-        this.versionInfo = versionInfo;
+        this.version = version;
         this.description = description;
     }
 
@@ -43,8 +41,8 @@ public class InvitationOfferingExtension extends InvitationExtension {
      * 
      * @return
      */
-    public VersionInfo getVersionInfo() {
-        return versionInfo;
+    public String getVersion() {
+        return version;
     }
 
     /**

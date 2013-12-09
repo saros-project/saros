@@ -20,7 +20,6 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.ProjectNegotiationOfferingEx
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.Utils;
-import de.fu_berlin.inf.dpp.versioning.VersionManager.VersionInfo;
 
 /**
  * Business Logic for handling incoming Session- and ProjectNegotiation requests
@@ -65,14 +64,13 @@ public class InvitationHandler {
 
                 String sessionID = invitation.getSessionID();
                 String invitationID = invitation.getNegotiationID();
-                VersionInfo versionInfo = invitation.getVersionInfo();
+                String version = invitation.getVersion();
                 String description = invitation.getDescription();
 
                 log.info("received invitation from " + Utils.prefix(fromJID)
                     + " [invitation id: " + invitationID + ", "
-                    + "session id: " + sessionID + ", " + "version: "
-                    + versionInfo.version + ", " + "compability: "
-                    + versionInfo.compatibility + "]");
+                    + "session id: " + sessionID + ", " + "version: " + version
+                    + "]");
 
                 /**
                  * @JTourBusStop 7, Invitation Process:
@@ -92,7 +90,7 @@ public class InvitationHandler {
                     transmitter.sendMessageToUser(fromJID, response);
 
                     sessionManager.invitationReceived(fromJID, sessionID,
-                        invitationID, versionInfo, description);
+                        invitationID, version, description);
                 } else {
                     // TODO This text should be replaced with a cancel ID
                     PacketExtension response = CancelInviteExtension.PROVIDER

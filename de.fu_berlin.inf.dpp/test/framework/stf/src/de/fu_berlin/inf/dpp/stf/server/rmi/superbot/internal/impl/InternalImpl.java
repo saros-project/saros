@@ -28,10 +28,10 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.launching.IVMInstall;
 import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jdt.launching.LibraryLocation;
-import org.osgi.framework.Version;
 
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.internal.IInternal;
+import de.fu_berlin.inf.dpp.versioning.Version;
 import de.fu_berlin.inf.dpp.versioning.VersionManager;
 
 public final class InternalImpl extends StfRemoteObject implements IInternal {
@@ -75,8 +75,7 @@ public final class InternalImpl extends StfRemoteObject implements IInternal {
 
     private InternalImpl() {
         try {
-            versionField = VersionManager.class
-                .getDeclaredField("version");
+            versionField = VersionManager.class.getDeclaredField("version");
             versionField.setAccessible(true);
         } catch (SecurityException e) {
             log.error("reflection failed", e);

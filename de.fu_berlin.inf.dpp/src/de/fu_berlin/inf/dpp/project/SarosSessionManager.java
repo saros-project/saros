@@ -47,9 +47,9 @@ import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.invitation.OutgoingProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.OutgoingSessionNegotiation;
 import de.fu_berlin.inf.dpp.invitation.ProcessListener;
-import de.fu_berlin.inf.dpp.invitation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
+import de.fu_berlin.inf.dpp.invitation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.invitation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
@@ -63,7 +63,6 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.StackTrace;
-import de.fu_berlin.inf.dpp.versioning.VersionManager.VersionInfo;
 
 /**
  * The SessionManager is responsible for initiating new Saros sessions and for
@@ -375,7 +374,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     @Override
     public void invitationReceived(JID from, String sessionID,
-        String invitationID, VersionInfo versionInfo, String description) {
+        String invitationID, String version, String description) {
 
         INegotiationHandler handler = negotiationHandler;
 
@@ -402,7 +401,7 @@ public class SarosSessionManager implements ISarosSessionManager {
                 sessionIDObservable.setValue(sessionID);
 
                 process = new IncomingSessionNegotiation(this, from,
-                    versionInfo, invitationID, description, sarosContext);
+                    version, invitationID, description, sarosContext);
 
                 process.setProcessListener(processListener);
                 currentSessionNegotiations.addInvitationProcess(process);

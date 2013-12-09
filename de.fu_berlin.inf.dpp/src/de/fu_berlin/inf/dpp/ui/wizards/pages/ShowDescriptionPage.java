@@ -1,7 +1,5 @@
 package de.fu_berlin.inf.dpp.ui.wizards.pages;
 
-import java.text.MessageFormat;
-
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
@@ -13,7 +11,6 @@ import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.versioning.VersionManager;
-import de.fu_berlin.inf.dpp.versioning.VersionManager.VersionInfo;
 
 /**
  * A wizard page that displays the name of the inviter and the description
@@ -64,30 +61,5 @@ public class ShowDescriptionPage extends WizardPage {
         inviterText.setText(completeDescription);
 
         setControl(composite);
-
-        /*
-         * Show compatibility issues and inform the user what to do (but the
-         * user can always proceed).
-         */
-        VersionInfo remoteVersion = sessionNegotiation.getRemoteVersionInfo();
-
-        String remoteSarosVersion = remoteVersion.version.toString();
-        switch (remoteVersion.compatibility) {
-
-        case TOO_NEW:
-            setMessage(MessageFormat.format(
-                Messages.ShowDescriptionPage_error_too_new,
-                versionManager.getVersion(), remoteSarosVersion), WARNING);
-            break;
-
-        case OK:
-            break;
-
-        case TOO_OLD:
-        default:
-            setMessage(MessageFormat.format(
-                Messages.ShowDescriptionPage_error_too_old, versionManager
-                    .getVersion().toString(), remoteSarosVersion), WARNING);
-        }
     }
 }

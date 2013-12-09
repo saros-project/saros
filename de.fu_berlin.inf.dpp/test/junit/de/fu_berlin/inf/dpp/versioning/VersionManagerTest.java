@@ -30,15 +30,12 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.osgi.framework.Version;
 
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.test.fakes.net.FakeConnectionFactory;
 import de.fu_berlin.inf.dpp.test.fakes.net.FakeConnectionFactory.FakeConnectionFactoryResult;
-import de.fu_berlin.inf.dpp.versioning.VersionManager;
-import de.fu_berlin.inf.dpp.versioning.VersionManager.VersionInfo;
 
 public class VersionManagerTest {
 
@@ -68,57 +65,61 @@ public class VersionManagerTest {
 
     private void init(Version local, Version remote) {
 
-        versionManagerLocal = new VersionManager(local, aliceReceiver,
-            aliceTransmitter);
+        versionManagerLocal = new VersionManager(local.toString(),
+            aliceReceiver, aliceTransmitter);
 
-        versionManagerRemote = new VersionManager(remote, bobReceiver,
-            bobTransmitter);
+        versionManagerRemote = new VersionManager(remote.toString(),
+            bobReceiver, bobTransmitter);
     }
 
     @Test
     public void testVersionsSame() {
 
-        Version local = new Version("1.1.1.r1");
-        Version remote = new Version("1.1.1.r1");
+        Version local = Version.parseVersion("1.1.1.r1");
+        Version remote = Version.parseVersion("1.1.1.r1");
 
         init(local, remote);
 
-        VersionInfo info = versionManagerLocal.determineCompatibility(bobJID);
+        VersionCompatibilityResult result = versionManagerLocal
+            .determineVersionCompatibility(bobJID);
 
-        assertEquals(Compatibility.OK, info.compatibility);
+        assertEquals(Compatibility.OK, result.getCompatibility());
     }
 
     @Test
     public void testlocalVersionsTooOld() {
 
-        Version local = new Version("1.1.1.r1");
-        Version remote = new Version("1.1.2.r1");
+        Version local = Version.parseVersion("1.1.1.r1");
+        Version remote = Version.parseVersion("1.1.2.r1");
 
         init(local, remote);
 
-        VersionInfo info = versionManagerLocal.determineCompatibility(bobJID);
+        VersionCompatibilityResult result = versionManagerLocal
+            .determineVersionCompatibility(bobJID);
 
-        assertEquals(Compatibility.TOO_OLD, info.compatibility);
+        assertEquals(Compatibility.TOO_OLD, result.getCompatibility());
     }
 
     @Test
     public void testlocalVersionsTooNew() {
 
-        Version local = new Version("1.1.2.r1");
-        Version remote = new Version("1.1.1.r1");
+        Version local = Version.parseVersion("1.1.2.r1");
+        Version remote = Version.parseVersion("1.1.1.r1");
 
         init(local, remote);
 
-        VersionInfo info = versionManagerLocal.determineCompatibility(bobJID);
+        VersionCompatibilityResult result = versionManagerLocal
+            .determineVersionCompatibility(bobJID);
 
-        assertEquals(Compatibility.TOO_NEW, info.compatibility);
+        assertEquals(Compatibility.TOO_NEW, result.getCompatibility());
     }
 
     @SuppressWarnings("unchecked")
     @Test
     public void testLocalVersionTooNewButCompatible() throws Exception {
-        Version local = new Version("999999.1.2.r1");
-        Version remote = new Version("999999.1.1.r1");
+
+        Version local = Version.parseVersion("999999.1.2.r1");
+        Version remote = Version.parseVersion("999999.1.1.r1");
 
         init(local, remote);
 
@@ -132,35 +133,30 @@ public class VersionManagerTest {
 
         chart.put(local, Arrays.asList(remote));
 
-        VersionInfo info = new VersionInfo();
-        info.version = remote;
-
-        info.compatibility = versionManagerRemote.determineCompatibility(
-            remote, local);
-
         assertEquals(Compatibility.TOO_OLD,
             versionManagerRemote.determineCompatibility(remote, local));
 
         assertEquals(Compatibility.OK,
-            versionManagerLocal.determineCompatibility(info).compatibility);
+            versionManagerLocal.determineCompatibility(local, remote));
 
         // do the "real" network check:
 
-        VersionInfo remoteInfo = versionManagerRemote
-            .determineCompatibility(aliceJID);
+        VersionCompatibilityResult resultRemote = versionManagerRemote
+            .determineVersionCompatibility(aliceJID);
 
-        VersionInfo localInfo = versionManagerLocal
-            .determineCompatibility(bobJID);
+        VersionCompatibilityResult resultLocal = versionManagerLocal
+            .determineVersionCompatibility(bobJID);
 
-        assertEquals(localInfo.compatibility, remoteInfo.compatibility);
+        assertEquals(resultLocal.getCompatibility(),
+            resultRemote.getCompatibility());
 
     }
 
     @SuppressWarnings("unchecked")
     @Test
     public void testLocalVersionTooOldButCompatible() throws Exception {
-        Version local = new Version("1999999.1.1.r1");
-        Version remote = new Version("1999999.1.2.r1");
+        Version local = Version.parseVersion("1999999.1.1.r1");
+        Version remote = Version.parseVersion("1999999.1.2.r1");
 
         init(local, remote);
 
@@ -174,26 +170,21 @@ public class VersionManagerTest {
 
         chart.put(remote, Arrays.asList(local));
 
-        VersionInfo info = new VersionInfo();
-        info.version = remote;
-
-        info.compatibility = versionManagerRemote.determineCompatibility(
-            remote, local);
-
         assertEquals(Compatibility.TOO_OLD,
             versionManagerLocal.determineCompatibility(local, remote));
 
         assertEquals(Compatibility.OK,
-            versionManagerLocal.determineCompatibility(info).compatibility);
+            versionManagerRemote.determineCompatibility(remote, local));
 
         // do the "real" network check:
 
-        VersionInfo remoteInfo = versionManagerRemote
-            .determineCompatibility(aliceJID);
+        VersionCompatibilityResult resultRemote = versionManagerRemote
+            .determineVersionCompatibility(aliceJID);
 
-        VersionInfo localInfo = versionManagerLocal
-            .determineCompatibility(bobJID);
+        VersionCompatibilityResult resultLocal = versionManagerLocal
+            .determineVersionCompatibility(bobJID);
 
-        assertEquals(localInfo.compatibility, remoteInfo.compatibility);
+        assertEquals(resultLocal.getCompatibility(),
+            resultRemote.getCompatibility());
     }
 }

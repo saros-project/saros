@@ -33,8 +33,8 @@ import de.fu_berlin.inf.dpp.project.internal.ColorNegotiationHook;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.versioning.Compatibility;
+import de.fu_berlin.inf.dpp.versioning.VersionCompatibilityResult;
 import de.fu_berlin.inf.dpp.versioning.VersionManager;
-import de.fu_berlin.inf.dpp.versioning.VersionManager.VersionInfo;
 
 /*
  * IMPORTANT: All messages in the cancellation exception are SHOWN to the end user !
@@ -51,7 +51,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
     private ISarosSession sarosSession;
 
-    private VersionInfo remoteVersionInfo;
+    private String localVersion;
 
     private SarosPacketCollector invitationAcceptedCollector;
     private SarosPacketCollector invitationAcknowledgedCollector;
@@ -259,11 +259,12 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
         log.debug(this + " : checking version compatibility");
         monitor.setTaskName("Checking version compatibility...");
 
-        VersionInfo versionInfo = versionManager.determineCompatibility(peer);
+        VersionCompatibilityResult result = versionManager
+            .determineVersionCompatibility(peer);
 
         checkCancellation(CancelOption.DO_NOT_NOTIFY_PEER);
 
-        if (versionInfo == null) {
+        if (result == null) {
             log.error(this + " : could not obtain remote Saros version");
             throw new LocalCancellationException(
                 "Could not obtain the version of the Saros plugin from "
@@ -271,7 +272,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
                 CancelOption.DO_NOT_NOTIFY_PEER);
         }
 
-        Compatibility comp = versionInfo.compatibility;
+        Compatibility comp = result.getCompatibility();
 
         if (comp != Compatibility.OK && !IGNORE_VERSION_COMPATIBILITY) {
             log.error(this + " : Saros versions are not compatible");
@@ -279,9 +280,9 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
                 "The Saros plugin of "
                     + peerNickname
                     + " (Version "
-                    + versionInfo.version
+                    + result.getRemoteVersion()
                     + ") is not compatible with your installed Saros plugin (Version "
-                    + versionManager.getVersion() + ")",
+                    + result.getLocalVersion() + ")",
                 CancelOption.DO_NOT_NOTIFY_PEER);
         }
 
@@ -290,7 +291,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
         else
             log.warn(this + " : Saros versions are not compatible");
 
-        remoteVersionInfo = versionInfo;
+        localVersion = result.getLocalVersion().toString();
     }
 
     /**
@@ -303,18 +304,8 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
         log.debug(this + " : sending invitation");
         checkCancellation(CancelOption.DO_NOT_NOTIFY_PEER);
 
-        VersionInfo localVersionInfo = new VersionInfo();
-
-        assert remoteVersionInfo != null;
-
-        localVersionInfo.version = versionManager.getVersion();
-
-        // if remote version is too new we are too old and vice versa
-        localVersionInfo.compatibility = remoteVersionInfo.compatibility
-            .invert();
-
         InvitationOfferingExtension invitationOffering = new InvitationOfferingExtension(
-            invitationID, sarosSession.getID(), localVersionInfo, description);
+            invitationID, sarosSession.getID(), localVersion, description);
 
         transmitter.sendMessageToUser(peer,
             InvitationOfferingExtension.PROVIDER.create(invitationOffering));

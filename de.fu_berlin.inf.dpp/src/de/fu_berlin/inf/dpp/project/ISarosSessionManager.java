@@ -13,7 +13,6 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.invitation.FileList;
 import de.fu_berlin.inf.dpp.invitation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.versioning.VersionManager.VersionInfo;
 
 /**
  * An interface behind which the {@link SarosSessionManager} hides its
@@ -85,13 +84,13 @@ public interface ISarosSessionManager {
      *            the unique session ID of the inviter side
      * @param invitationID
      *            a unique identifier for the negotiation process
-     * @param versionInfo
-     *            information of the inviter side
+     * @param version
+     *            remote Saros version of the inviter side
      * @param description
      *            what this session invitation is about
      */
     public void invitationReceived(JID from, String sessionID,
-        String invitationID, VersionInfo versionInfo, String description);
+        String invitationID, String version, String description);
 
     /**
      * Will start sharing all projects of the current session with a

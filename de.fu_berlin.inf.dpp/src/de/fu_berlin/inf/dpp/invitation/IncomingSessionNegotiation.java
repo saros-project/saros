@@ -23,7 +23,6 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ColorNegotiationHook;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
-import de.fu_berlin.inf.dpp.versioning.VersionManager.VersionInfo;
 
 /*
  * IMPORTANT: All messages in the cancellation exception are SHOWN to the end user !
@@ -37,7 +36,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
     private JoinSessionWizard inInvitationUI;
     private ISarosSession sarosSession;
 
-    private VersionInfo remoteVersionInfo;
+    private String remoteVersion;
 
     private boolean running;
 
@@ -45,13 +44,13 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
     private SarosPacketCollector invitationAcknowledgedCollector;
 
     public IncomingSessionNegotiation(ISarosSessionManager sessionManager,
-        JID from, VersionInfo remoteVersionInfo, String invitationID,
+        JID from, String remoteVersion, String invitationID,
         String description, ISarosContext sarosContext) {
 
         super(invitationID, from, description, sarosContext);
 
         this.sessionManager = sessionManager;
-        this.remoteVersionInfo = remoteVersionInfo;
+        this.remoteVersion = remoteVersion;
     }
 
     @Override
@@ -91,8 +90,8 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
     /**
      * Returns the Saros version of the remote side.
      */
-    public VersionInfo getRemoteVersionInfo() {
-        return remoteVersionInfo;
+    public String getRemoteVersion() {
+        return remoteVersion;
     }
 
     public synchronized void setInvitationUI(JoinSessionWizard inInvitationUI) {
