@@ -32,7 +32,7 @@ import org.osgi.framework.Version;
 
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.internal.IInternal;
-import de.fu_berlin.inf.dpp.util.VersionManager;
+import de.fu_berlin.inf.dpp.versioning.VersionManager;
 
 public final class InternalImpl extends StfRemoteObject implements IInternal {
 

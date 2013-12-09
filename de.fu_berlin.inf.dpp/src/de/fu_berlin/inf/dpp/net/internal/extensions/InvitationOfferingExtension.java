@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.net.internal.extensions;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
+import de.fu_berlin.inf.dpp.versioning.VersionManager.VersionInfo;
 
 @XStreamAlias(/* SessionNegotiationOffering */"SNOF")
 public class InvitationOfferingExtension extends InvitationExtension {

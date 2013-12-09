@@ -32,9 +32,9 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ColorNegotiationHook;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.util.Utils;
-import de.fu_berlin.inf.dpp.util.VersionManager;
-import de.fu_berlin.inf.dpp.util.VersionManager.Compatibility;
-import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
+import de.fu_berlin.inf.dpp.versioning.VersionManager;
+import de.fu_berlin.inf.dpp.versioning.VersionManager.Compatibility;
+import de.fu_berlin.inf.dpp.versioning.VersionManager.VersionInfo;
 
 /*
  * IMPORTANT: All messages in the cancellation exception are SHOWN to the end user !

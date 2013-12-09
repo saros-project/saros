@@ -13,7 +13,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.invitation.FileList;
 import de.fu_berlin.inf.dpp.invitation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
+import de.fu_berlin.inf.dpp.versioning.VersionManager.VersionInfo;
 
 /**
  * An interface behind which the {@link SarosSessionManager} hides its

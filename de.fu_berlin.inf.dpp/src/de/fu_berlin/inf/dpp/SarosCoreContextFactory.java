@@ -51,8 +51,8 @@ import de.fu_berlin.inf.dpp.project.SarosRosterListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ColorNegotiationHook;
 import de.fu_berlin.inf.dpp.project.internal.FollowingActivitiesManager;
-import de.fu_berlin.inf.dpp.util.VersionManager;
 import de.fu_berlin.inf.dpp.util.sendfile.FileStreamService;
+import de.fu_berlin.inf.dpp.versioning.VersionManager;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharingService;
 
 /**

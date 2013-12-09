@@ -20,7 +20,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.ProjectNegotiationOfferingEx
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.Utils;
-import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
+import de.fu_berlin.inf.dpp.versioning.VersionManager.VersionInfo;
 
 /**
  * Business Logic for handling incoming Session- and ProjectNegotiation requests

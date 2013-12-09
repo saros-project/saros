@@ -23,7 +23,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ColorNegotiationHook;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
-import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
+import de.fu_berlin.inf.dpp.versioning.VersionManager.VersionInfo;
 
 /*
  * IMPORTANT: All messages in the cancellation exception are SHOWN to the end user !

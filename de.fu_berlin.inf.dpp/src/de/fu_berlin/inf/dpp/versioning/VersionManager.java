@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.util;
+package de.fu_berlin.inf.dpp.versioning;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,7 +29,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.XStreamExtensionProvider.XSt
 
 /**
  * Component for figuring out whether two Saros plug-in instances with known
- * Bundle Version strings are compatible.
+ * Version are compatible.
  * 
  * This class does not use a {@link Comparator#compare(Object, Object)}, because
  * results might not be symmetrical (we only note whether current Version is A
@@ -37,7 +37,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.XStreamExtensionProvider.XSt
  * their perspective are compatible with us) and transitive (if Version A is too
  * old for B, Version B too old for C, then A might be still OK for C).
  */
-@Component(module = "misc")
+@Component(module = "core")
 public class VersionManager {
 
     private static final Logger log = Logger.getLogger(VersionManager.class);
@@ -137,10 +137,10 @@ public class VersionManager {
     private final ITransmitter transmitter;
     private final IReceiver receiver;
 
-    public VersionManager(@SarosVersion String version,
+    public VersionManager(@SarosVersion Version version,
         final IReceiver receiver, final ITransmitter transmitter) {
 
-        this.version = /* HACK */Version.parseVersion(version);
+        this.version = version;
         this.receiver = receiver;
         this.transmitter = transmitter;
 

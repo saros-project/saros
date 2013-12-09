@@ -34,9 +34,9 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
-import de.fu_berlin.inf.dpp.invitation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
+import de.fu_berlin.inf.dpp.invitation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.Messages;
@@ -46,7 +46,7 @@ import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.ShowDescriptionPage;
 import de.fu_berlin.inf.dpp.ui.wizards.utils.EnterProjectNamePageUtils;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
-import de.fu_berlin.inf.dpp.util.VersionManager;
+import de.fu_berlin.inf.dpp.versioning.VersionManager;
 
 /**
  * A wizard that guides the user through an incoming invitation process.
@@ -152,12 +152,13 @@ public class JoinSessionWizard extends Wizard {
 
     @Override
     public boolean performCancel() {
-        ThreadUtils.runSafeAsync("CancelJoinSessionWizard", log, new Runnable() {
-            @Override
-            public void run() {
-                process.localCancel(null, CancelOption.NOTIFY_PEER);
-            }
-        });
+        ThreadUtils.runSafeAsync("CancelJoinSessionWizard", log,
+            new Runnable() {
+                @Override
+                public void run() {
+                    process.localCancel(null, CancelOption.NOTIFY_PEER);
+                }
+            });
         return true;
     }
 

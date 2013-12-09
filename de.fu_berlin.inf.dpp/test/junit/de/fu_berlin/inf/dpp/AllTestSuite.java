@@ -38,7 +38,9 @@ de.fu_berlin.inf.dpp.synchronize.TestSuite.class,
 
 de.fu_berlin.inf.dpp.ui.model.roster.TestSuite.class,
 
-de.fu_berlin.inf.dpp.util.TestSuite.class
+de.fu_berlin.inf.dpp.util.TestSuite.class,
+
+de.fu_berlin.inf.dpp.versioning.TestSuite.class
 
 })
 public class AllTestSuite {

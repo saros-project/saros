@@ -12,8 +12,8 @@ import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.util.VersionManager;
-import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
+import de.fu_berlin.inf.dpp.versioning.VersionManager;
+import de.fu_berlin.inf.dpp.versioning.VersionManager.VersionInfo;
 
 /**
  * A wizard page that displays the name of the inviter and the description

@@ -12,7 +12,7 @@ import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.stf.shared.Constants;
-import de.fu_berlin.inf.dpp.util.VersionManager;
+import de.fu_berlin.inf.dpp.versioning.VersionManager;
 
 public abstract class StfRemoteObject implements Constants {
 

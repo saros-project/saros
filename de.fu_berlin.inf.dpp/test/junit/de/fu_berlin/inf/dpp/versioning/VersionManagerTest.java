@@ -19,7 +19,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package de.fu_berlin.inf.dpp.util;
+package de.fu_berlin.inf.dpp.versioning;
 
 import static org.junit.Assert.assertEquals;
 
@@ -37,8 +37,9 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.test.fakes.net.FakeConnectionFactory;
 import de.fu_berlin.inf.dpp.test.fakes.net.FakeConnectionFactory.FakeConnectionFactoryResult;
-import de.fu_berlin.inf.dpp.util.VersionManager.Compatibility;
-import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
+import de.fu_berlin.inf.dpp.versioning.VersionManager;
+import de.fu_berlin.inf.dpp.versioning.VersionManager.Compatibility;
+import de.fu_berlin.inf.dpp.versioning.VersionManager.VersionInfo;
 
 public class VersionManagerTest {
 
@@ -66,7 +67,7 @@ public class VersionManagerTest {
         bobTransmitter = result.getTransmitter(bobJID);
     }
 
-    private void init(String local, String remote) {
+    private void init(Version local, Version remote) {
 
         versionManagerLocal = new VersionManager(local, aliceReceiver,
             aliceTransmitter);
@@ -78,7 +79,10 @@ public class VersionManagerTest {
     @Test
     public void testVersionsSame() {
 
-        init("1.1.1.r1", "1.1.1.r1");
+        Version local = new Version("1.1.1.r1");
+        Version remote = new Version("1.1.1.r1");
+
+        init(local, remote);
 
         VersionInfo info = versionManagerLocal.determineCompatibility(bobJID);
 
@@ -88,7 +92,10 @@ public class VersionManagerTest {
     @Test
     public void testlocalVersionsTooOld() {
 
-        init("1.1.1.r1", "1.1.2.r1");
+        Version local = new Version("1.1.1.r1");
+        Version remote = new Version("1.1.2.r1");
+
+        init(local, remote);
 
         VersionInfo info = versionManagerLocal.determineCompatibility(bobJID);
 
@@ -98,7 +105,10 @@ public class VersionManagerTest {
     @Test
     public void testlocalVersionsTooNew() {
 
-        init("1.1.2.r1", "1.1.1.r1");
+        Version local = new Version("1.1.2.r1");
+        Version remote = new Version("1.1.1.r1");
+
+        init(local, remote);
 
         VersionInfo info = versionManagerLocal.determineCompatibility(bobJID);
 
@@ -111,7 +121,7 @@ public class VersionManagerTest {
         Version local = new Version("999999.1.2.r1");
         Version remote = new Version("999999.1.1.r1");
 
-        init(local.toString(), remote.toString());
+        init(local, remote);
 
         Field f = versionManagerLocal.getClass().getDeclaredField(
             "compatibilityChart");
@@ -153,7 +163,7 @@ public class VersionManagerTest {
         Version local = new Version("1999999.1.1.r1");
         Version remote = new Version("1999999.1.2.r1");
 
-        init(local.toString(), remote.toString());
+        init(local, remote);
 
         Field f = versionManagerLocal.getClass().getDeclaredField(
             "compatibilityChart");
