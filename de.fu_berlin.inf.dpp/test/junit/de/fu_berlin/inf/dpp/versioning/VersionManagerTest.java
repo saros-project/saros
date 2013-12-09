@@ -38,7 +38,6 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.test.fakes.net.FakeConnectionFactory;
 import de.fu_berlin.inf.dpp.test.fakes.net.FakeConnectionFactory.FakeConnectionFactoryResult;
 import de.fu_berlin.inf.dpp.versioning.VersionManager;
-import de.fu_berlin.inf.dpp.versioning.VersionManager.Compatibility;
 import de.fu_berlin.inf.dpp.versioning.VersionManager.VersionInfo;
 
 public class VersionManagerTest {
