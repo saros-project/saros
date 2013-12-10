@@ -547,6 +547,11 @@
             id="de.fu_berlin.inf.dpp.ui.commands.OpenSarosPreferences"
             name="%command.name.4">
       </command>
+            <command
+            categoryId="org.eclipse.ui.category.project"
+            id="de.fu_berlin.inf.dpp.ui.commands.AddXMPPAccount"
+            name="Add Account...">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -561,6 +566,10 @@
       <handler
             class="de.fu_berlin.inf.dpp.ui.commandHandlers.CreateXMPPAccountHandler"
             commandId="de.fu_berlin.inf.dpp.ui.commands.CreateXMPPAccount">
+      </handler>
+      <handler
+            class="de.fu_berlin.inf.dpp.ui.commandHandlers.AddXMPPAccountHandler"
+            commandId="de.fu_berlin.inf.dpp.ui.commands.AddXMPPAccount">
       </handler>
       <handler
             class="de.fu_berlin.inf.dpp.ui.commandHandlers.AddBuddyHandler"
@@ -759,6 +768,11 @@
             </separator>
             <command
                   commandId="de.fu_berlin.inf.dpp.ui.commands.CreateXMPPAccount"
+                  icon="icons/elcl16/xmpp_create_account_tsk.png"
+                  style="push">
+            </command>
+            <command
+                  commandId="de.fu_berlin.inf.dpp.ui.commands.AddXMPPAccount"
                   icon="icons/elcl16/xmpp_create_account_tsk.png"
                   style="push">
             </command>
