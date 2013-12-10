@@ -3,12 +3,15 @@ package de.fu_berlin.inf.dpp.ui.preferencePages;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.picocontainer.annotations.Inject;
@@ -41,9 +44,16 @@ public final class AppearancePreferencePage extends PreferencePage implements
 
     private ColorChooser colorChooser;
 
-    private int chosenFavoriteColorId = DEFAULT_COLOR_ID;
+    private int chosenFavoriteColorID = DEFAULT_COLOR_ID;
 
-    private Button showContributionAnnotationButton;
+    private Button showBalloonNotifications;
+    private Button showContributionAnnotation;
+
+    private Button enableSoundEvents;
+    private Button playSoundEventChatMessageSent;
+    private Button playSoundEventChatMessageReceived;
+    private Button playSoundEventContactComesOnline;
+    private Button playSoundEventContactGoesOffline;
 
     public AppearancePreferencePage() {
         SarosPluginContext.initComponent(this);
@@ -57,17 +67,38 @@ public final class AppearancePreferencePage extends PreferencePage implements
 
     @Override
     public final boolean performOk() {
-        if (chosenFavoriteColorId != DEFAULT_COLOR_ID) {
+        if (chosenFavoriteColorID != DEFAULT_COLOR_ID) {
             preferenceStore.setValue(
                 PreferenceConstants.FAVORITE_SESSION_COLOR_ID,
-                chosenFavoriteColorId);
+                chosenFavoriteColorID);
         }
 
-        boolean showContribAnno = showContributionAnnotationButton
-            .getSelection();
+        preferenceStore.setValue(
+            PreferenceConstants.ENABLE_BALLOON_NOTIFICATION,
+            showBalloonNotifications.getSelection());
 
         preferenceStore.setValue(
-            PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS, showContribAnno);
+            PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS,
+            showContributionAnnotation.getSelection());
+
+        preferenceStore.setValue(PreferenceConstants.SOUND_ENABLED,
+            enableSoundEvents.getSelection());
+
+        preferenceStore.setValue(
+            PreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_SENT,
+            playSoundEventChatMessageSent.getSelection());
+
+        preferenceStore.setValue(
+            PreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_RECEIVED,
+            playSoundEventChatMessageReceived.getSelection());
+
+        preferenceStore.setValue(
+            PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_ONLINE,
+            playSoundEventContactComesOnline.getSelection());
+
+        preferenceStore.setValue(
+            PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_OFFLINE,
+            playSoundEventContactGoesOffline.getSelection());
 
         return super.performOk();
     }
@@ -81,8 +112,30 @@ public final class AppearancePreferencePage extends PreferencePage implements
 
         preferenceStore
             .setToDefault(PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS);
-        showContributionAnnotationButton.setSelection(preferenceStore
+        showContributionAnnotation.setSelection(preferenceStore
             .getBoolean(PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS));
+
+        preferenceStore
+            .setToDefault(PreferenceConstants.ENABLE_BALLOON_NOTIFICATION);
+
+        showBalloonNotifications.setSelection(preferenceStore
+            .getBoolean(PreferenceConstants.ENABLE_BALLOON_NOTIFICATION));
+
+        preferenceStore.setToDefault(PreferenceConstants.SOUND_ENABLED);
+
+        preferenceStore
+            .setToDefault(PreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_SENT);
+
+        preferenceStore
+            .setToDefault(PreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_RECEIVED);
+
+        preferenceStore
+            .setToDefault(PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_ONLINE);
+
+        preferenceStore
+            .setToDefault(PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_OFFLINE);
+
+        initializeSoundButtons();
 
         super.performDefaults();
     }
@@ -91,42 +144,116 @@ public final class AppearancePreferencePage extends PreferencePage implements
     protected Control createContents(Composite parent) {
         Composite composite = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout(1, true);
+        layout.verticalSpacing = 15;
         composite.setLayout(layout);
 
-        createColorGroup(composite);
-        createAnnotationsVisibleControl(composite);
+        createSoundNotificationGroup(composite);
+        createVisibleInformationGroup(composite);
+        createVisualAppearanceGroup(composite);
         return composite;
     }
 
-    private void createAnnotationsVisibleControl(Composite parent) {
-        final Group annotationsGroup = new Group(parent, SWT.NONE);
-        annotationsGroup
-            .setText(Messages.AppearancePreferencePage_annotations_group_label);
-        annotationsGroup.setLayout(new GridLayout(1, false));
-        annotationsGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
-            false));
+    private void createVisibleInformationGroup(Composite parent) {
+        final Group group = new Group(parent, SWT.NONE);
+        group.setText("Visual Information");
+        group.setLayout(new GridLayout(1, false));
+        group.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
-        showContributionAnnotationButton = new Button(annotationsGroup,
-            SWT.CHECK);
-        showContributionAnnotationButton
+        showBalloonNotifications = new Button(group, SWT.CHECK);
+        showBalloonNotifications
+            .setText(Messages.AppearancePreferencePage_enable_balloon_notifications);
+
+        showBalloonNotifications.setSelection(preferenceStore
+            .getBoolean(PreferenceConstants.ENABLE_BALLOON_NOTIFICATION));
+
+        showContributionAnnotation = new Button(group, SWT.CHECK);
+        showContributionAnnotation
             .setText(Messages.AppearancePreferencePage_enable_contribution_annotation);
-        showContributionAnnotationButton
+
+        showContributionAnnotation
             .setToolTipText(Messages.AppearancePreferencePage_show_contribution_annotations_tooltip);
 
-        boolean isContribAnnoVisible = preferenceStore
-            .getBoolean(PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS);
-        showContributionAnnotationButton.setSelection(isContribAnnoVisible);
+        showContributionAnnotation.setSelection(preferenceStore
+            .getBoolean(PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS));
     }
 
-    private void createColorGroup(Composite parent) {
-        final Group colorGroup = new Group(parent, SWT.NONE);
+    private void createSoundNotificationGroup(Composite parent) {
+        final Group group = new Group(parent, SWT.NONE);
 
-        colorGroup.setText(Messages.AppearancePreferencePage_color);
-        colorGroup.setLayout(new GridLayout(1, false));
-        colorGroup
-            .setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+        group.setText("Sound Notifications");
+        group.setLayout(new GridLayout(1, false));
+        group.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
-        colorChooser = new ColorChooser(colorGroup, SWT.NONE);
+        enableSoundEvents = new Button(group, SWT.CHECK);
+        enableSoundEvents.setText("Enabled Sound Notifications");
+
+        enableSoundEvents.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                updateSoundEventButtonStates();
+            }
+        });
+
+        Composite soundEvents = new Composite(group, SWT.NONE);
+        GridLayout layout = new GridLayout(4, false);
+        layout.horizontalSpacing = 8;
+        layout.marginWidth = 0;
+
+        soundEvents.setLayout(layout);
+
+        // row 1
+
+        // col 1
+        Label chatEvents = new Label(soundEvents, SWT.NONE);
+        chatEvents.setText("Chat");
+
+        playSoundEventChatMessageReceived = new Button(soundEvents, SWT.CHECK);
+
+        // col 2
+        playSoundEventChatMessageReceived.setText("receiving message");
+
+        // col 3
+        Label contactEvents = new Label(soundEvents, SWT.NONE);
+        contactEvents.setText("Contacts");
+
+        // col 4
+        playSoundEventContactComesOnline = new Button(soundEvents, SWT.CHECK);
+
+        playSoundEventContactComesOnline.setText("going online");
+
+        // row 2
+
+        // col 1 dummy
+        new Label(soundEvents, SWT.NONE);
+
+        // col 2
+        playSoundEventChatMessageSent = new Button(soundEvents, SWT.CHECK);
+
+        playSoundEventChatMessageSent.setText("sending message");
+
+        // col 3 dummy
+        new Label(soundEvents, SWT.NONE);
+
+        // col 4
+
+        playSoundEventContactGoesOffline = new Button(soundEvents, SWT.CHECK);
+
+        playSoundEventContactGoesOffline.setText("going offline");
+
+        initializeSoundButtons();
+
+    }
+
+    private void createVisualAppearanceGroup(Composite parent) {
+        final Group group = new Group(parent, SWT.NONE);
+
+        group.setText("Visual Appearance");
+        group.setLayout(new GridLayout(1, false));
+        group.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+        new Label(group, SWT.NONE).setText("Set Preferred Color");
+
+        colorChooser = new ColorChooser(group, SWT.NONE);
 
         int currentColor = preferenceStore
             .getInt(PreferenceConstants.FAVORITE_SESSION_COLOR_ID);
@@ -136,10 +263,39 @@ public final class AppearancePreferencePage extends PreferencePage implements
         ColorSelectionListener colorSelectionListener = new ColorSelectionListener() {
             @Override
             public void selectionChanged(int colorId) {
-                chosenFavoriteColorId = colorId;
+                chosenFavoriteColorID = colorId;
             }
         };
 
         colorChooser.addSelectionListener(colorSelectionListener);
+    }
+
+    private void initializeSoundButtons() {
+
+        enableSoundEvents.setSelection(preferenceStore
+            .getBoolean(PreferenceConstants.SOUND_ENABLED));
+
+        playSoundEventChatMessageSent.setSelection(preferenceStore
+            .getBoolean(PreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_SENT));
+
+        playSoundEventChatMessageReceived.setSelection(preferenceStore
+            .getBoolean(PreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_RECEIVED));
+
+        playSoundEventContactComesOnline.setSelection(preferenceStore
+            .getBoolean(PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_ONLINE));
+
+        playSoundEventContactGoesOffline.setSelection(preferenceStore
+            .getBoolean(PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_OFFLINE));
+
+        updateSoundEventButtonStates();
+    }
+
+    private void updateSoundEventButtonStates() {
+        boolean enabled = enableSoundEvents.getSelection();
+
+        playSoundEventChatMessageSent.setEnabled(enabled);
+        playSoundEventChatMessageReceived.setEnabled(enabled);
+        playSoundEventContactComesOnline.setEnabled(enabled);
+        playSoundEventContactGoesOffline.setEnabled(enabled);
     }
 }

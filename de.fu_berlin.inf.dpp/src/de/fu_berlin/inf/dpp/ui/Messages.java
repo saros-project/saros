@@ -34,7 +34,6 @@ public class Messages extends NLS {
 
     public static String AdvancedPreferencePage_description;
     public static String AdvancedPreferencePage_show_xmpp_debug;
-    public static String AdvancedPreferencePage_enable_balloon_notifications;
     public static String AdvancedPreferencePage_skip_synchronization;
     public static String AdvancedPreferencePage_enable_videosharing;
     public static String AdvancedPreferencePage_enable_voip;
@@ -43,6 +42,7 @@ public class Messages extends NLS {
     public static String AppearancePreferencePage_color;
     public static String AppearancePreferencePage_annotations_group_label;
     public static String AppearancePreferencePage_enable_contribution_annotation;
+    public static String AppearancePreferencePage_enable_balloon_notifications;
     public static String AppearancePreferencePage_show_contribution_annotations_tooltip;
 
     public static String ChangeColorAction_message_text;

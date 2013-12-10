@@ -46,14 +46,6 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
     @Inject
     private MixerManager mixerManager;
 
-    private BooleanFieldEditor enableSoundEvents;
-
-    private BooleanFieldEditor playSoundEventChatMessageSent;
-    private BooleanFieldEditor playSoundEventChatMessageReceived;
-
-    private BooleanFieldEditor playSoundEventContactComesOnline;
-    private BooleanFieldEditor playSoundEventContactGoesOffline;
-
     private StringFieldEditor chatserver;
     private BooleanFieldEditor useCustomChatServer;
     private StringFieldEditor skypeName;
@@ -105,26 +97,6 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
         soundGroup.setLayoutData(soundGridData);
         chatGroup.setLayoutData(chatGridData);
         voipGroup.setLayoutData(voipGridData);
-
-        enableSoundEvents = new BooleanFieldEditor(
-            PreferenceConstants.SOUND_ENABLED, "Enable sound events",
-            soundGroup);
-
-        playSoundEventChatMessageSent = new BooleanFieldEditor(
-            PreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_SENT,
-            "Play notification when sending a message", soundGroup);
-
-        playSoundEventChatMessageReceived = new BooleanFieldEditor(
-            PreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_RECEIVED,
-            "Play notification when receiving a message", soundGroup);
-
-        playSoundEventContactComesOnline = new BooleanFieldEditor(
-            PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_ONLINE,
-            "Play notification when contact comes online", soundGroup);
-
-        playSoundEventContactGoesOffline = new BooleanFieldEditor(
-            PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_OFFLINE,
-            "Play notification when contact goes offline", soundGroup);
 
         chatServerGroup = new Composite(chatGroup, SWT.NONE);
         chatServerGroup.setLayout(new GridLayout(2, false));
@@ -196,12 +168,6 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
 
         audioRecordDevices.setEnabled(enabled, voipGroup);
 
-        addField(enableSoundEvents);
-        addField(playSoundEventChatMessageSent);
-        addField(playSoundEventChatMessageReceived);
-        addField(playSoundEventContactComesOnline);
-        addField(playSoundEventContactGoesOffline);
-
         addField(chatserver);
         addField(useCustomChatServer);
         addField(skypeName);
@@ -221,8 +187,6 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
             useCustomChatServer.setEnabled(!chatserver.getStringValue()
                 .isEmpty(), chatGroup);
         }
-
-        updateSoundEventEditors();
     }
 
     @Override
@@ -241,15 +205,13 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
                 String serverName = event.getNewValue().toString();
                 useCustomChatServer
                     .setEnabled(!serverName.isEmpty(), chatGroup);
-            } else if (field == enableSoundEvents)
-                updateSoundEventEditors();
+            }
         }
     }
 
     @Override
     protected void performDefaults() {
         super.performDefaults();
-        updateSoundEventEditors();
     }
 
     private String[][] getRecordMixerNames() {
@@ -290,14 +252,5 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
             outputArray[i][1] = inputArray[i];
         }
         return outputArray;
-    }
-
-    private void updateSoundEventEditors() {
-        boolean enabled = enableSoundEvents.getBooleanValue();
-
-        playSoundEventChatMessageSent.setEnabled(enabled, soundGroup);
-        playSoundEventChatMessageReceived.setEnabled(enabled, soundGroup);
-        playSoundEventContactComesOnline.setEnabled(enabled, soundGroup);
-        playSoundEventContactGoesOffline.setEnabled(enabled, soundGroup);
     }
 }

@@ -57,11 +57,6 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
                 { "Prompt", MessageDialogWithToggle.PROMPT } },
             getFieldEditorParent(), true));
 
-        addField(new BooleanFieldEditor(
-            PreferenceConstants.ENABLE_BALLOON_NOTIFICATION,
-            Messages.AdvancedPreferencePage_enable_balloon_notifications,
-            getFieldEditorParent()));
-
         if (debugMode) {
             addField(new BooleanFieldEditor(PreferenceConstants.DEBUG,
                 Messages.AdvancedPreferencePage_show_xmpp_debug,
