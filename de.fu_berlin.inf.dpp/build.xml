@@ -93,7 +93,7 @@
 
 			<!-- exclude GUI classes  -->
 			<excludeClasses regex=".*\.ui\..*" />
-
+			
 			<!-- exclude classes ending in Test -->
 			<excludeClasses regex=".*Test" />
 
@@ -122,18 +122,18 @@
 		<mkdir dir="${junit.report.dir}" />
 
 		<junit printsummary="yes" fork="yes" forkmode="perBatch">
-			<sysproperty key="de.fu_berlin.dpp.test.xmpp.useExternalServer" value="true" />
-			<sysproperty key="de.fu_berlin.dpp.test.xmpp.serverAddress" value="saros-eclipse1" />
+
 			<sysproperty key="net.sourceforge.cobertura.datafile" value="${cobertura.datafile}" />
 			<classpath>
+				
+				<!-- must be included first because it contains patches for some third party libraries (see ext-src directory) -->				
+				<fileset dir="${instr.dir}">
+					<include name="*.jar" />
+				</fileset>
 
 				<!-- include the test lib directory first because of some library issues -->
 				<fileset erroronmissingdir="false" dir="${test.lib.dir}" />
 				<fileset erroronmissingdir="false" dir="${lib.dir}" />
-
-				<fileset dir="${instr.dir}">
-					<include name="*.jar" />
-				</fileset>
 
 				<fileset dir="${eclipse.dir}/plugins">
 					<include name="*.jar" />
@@ -162,7 +162,7 @@
 
 	<target name="findbugs">
 		<mkdir dir="${findbugs.report.dir}" />
-		<findbugs home="${findbugs.home}" output="xml" outputFile="${findbugs.reportfile}" effort="max" jvmargs="-Xmx256m">
+		<findbugs home="${findbugs.home}" output="xml" outputFile="${findbugs.reportfile}" effort="max" jvmargs="-Xmx256m" >
 			<sourcePath path="${src.dir}" />
 			<class location="${bin.dir}" />
 			</findbugs>
@@ -170,7 +170,7 @@
 
 	<target name="pmd">
 		<mkdir dir="${pmd.report.dir}" />
-		<pmd rulesetfiles="rulesets/basic.xml,rulesets/unusedcode.xml,rulesets/imports.xml,rulesets/naming.xml">
+		<pmd rulesetfiles="rulesets/basic.xml,rulesets/unusedcode.xml,rulesets/imports.xml">
 			<formatter type="xml" toFile="${pmd.reportfile}"/>
 			<fileset dir="${src.dir}">
 				<include name="**/*.java"/>
