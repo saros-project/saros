@@ -65,7 +65,7 @@ public interface IEditorAPI {
      * Sets the text selection in given editor.
      */
     public void setSelection(IEditorPart editorPart, ITextSelection selection,
-        User source, boolean follow);
+        User source);
 
     /**
      * Returns the current text selection for given editor.
@@ -99,11 +99,6 @@ public interface IEditorAPI {
      */
     public void setViewportAnnotation(IEditorPart editorPart,
         ILineRange lineRange, User user);
-
-    /**
-     * Try to make sure the given viewport is visible in the given editor
-     */
-    public void reveal(IEditorPart editorPart, ILineRange lineRange);
 
     /**
      * @return Return the viewport for given editor or null, if this editorPart

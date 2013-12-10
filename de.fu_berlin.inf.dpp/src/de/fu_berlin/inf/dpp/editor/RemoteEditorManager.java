@@ -277,6 +277,24 @@ public class RemoteEditorManager {
     }
 
     /**
+     * @return the viewport of the given user in the currently active editor or
+     *         <code>null</code> if the user has no active editor.
+     */
+    public ILineRange getViewport(User user) {
+        if (sarosSession.getLocalUser().equals(user)) {
+            throw new IllegalArgumentException(
+                "Viewport of the local user was queried.");
+        }
+
+        RemoteEditor activeEditor = getEditorState(user).getActiveEditor();
+
+        if (activeEditor == null)
+            return null;
+
+        return activeEditor.getViewport();
+    }
+
+    /**
      * Clears all state information associated with the given user.
      */
     public void removeUser(User participant) {

@@ -815,8 +815,8 @@ public class EditorManager extends AbstractActivityProvider {
             if (viewer.getTopIndexStartOffset() <= cursorOffset
                 && cursorOffset <= viewer.getBottomIndexEndOffset()) {
 
-                editorAPI.setSelection(editorPart, new TextSelection(
-                    cursorOffset, 0), user, user.equals(getFollowedUser()));
+                TextSelection selection = new TextSelection(cursorOffset, 0);
+                editorAPI.setSelection(editorPart, selection, user);
             }
         }
 
@@ -845,8 +845,11 @@ public class EditorManager extends AbstractActivityProvider {
         Set<IEditorPart> editors = EditorManager.this.editorPool
             .getEditors(path);
         for (IEditorPart editorPart : editors) {
-            this.editorAPI.setSelection(editorPart, textSelection, user,
-                user.equals(getFollowedUser()));
+            this.editorAPI.setSelection(editorPart, textSelection, user);
+
+            if (user.equals(getFollowedUser())) {
+                adjustViewport(user, editorPart, textSelection);
+            }
         }
 
         /*
@@ -896,10 +899,11 @@ public class EditorManager extends AbstractActivityProvider {
         ILineRange lineRange = viewport.getLineRange();
         for (IEditorPart editorPart : editors) {
             if (following || user.hasWriteAccess())
-                this.editorAPI.setViewportAnnotation(editorPart, lineRange,
-                    user);
-            if (following)
-                this.editorAPI.reveal(editorPart, lineRange);
+                this.editorAPI.setViewportAnnotation(editorPart, lineRange, user);
+
+            if (following) {
+                adjustViewport(user, editorPart, lineRange);
+            }
         }
         /*
          * inform all registered ISharedEditorListeners about a change in
@@ -1714,7 +1718,7 @@ public class EditorManager extends AbstractActivityProvider {
 
             ITextSelection selection = remoteEditor.getSelection();
             if (selection != null) {
-                editorAPI.setSelection(editorPart, selection, user, false);
+                editorAPI.setSelection(editorPart, selection, user);
             }
         }
     }
@@ -1763,7 +1767,7 @@ public class EditorManager extends AbstractActivityProvider {
             return;
         }
 
-        this.editorAPI.reveal(newEditor, viewport);
+        adjustViewport(jumpTo, newEditor, viewport);
 
         /*
          * inform all registered ISharedEditorListeners about this jump
@@ -1919,5 +1923,164 @@ public class EditorManager extends AbstractActivityProvider {
      */
     private void registerCustomAnnotations() {
         // add method calls here
+    }
+
+    /**
+     * Adjusts the viewport in Follow Mode. This function should be called if
+     * the followed user's selection changes.
+     * 
+     * @param followedUser
+     *            User who is followed
+     * @param editorPart
+     *            EditorPart of the open Editor
+     * @param selection
+     *            text selection of the followed user
+     */
+    private void adjustViewport(User followedUser, IEditorPart editorPart,
+        ITextSelection selection) {
+        if (selection == null)
+            return;
+
+        // range can be null
+        ILineRange range = remoteEditorManager.getViewport(followedUser);
+        adjustViewport(editorPart, range, selection);
+    }
+
+    /**
+     * Adjusts the viewport in Follow Mode. This function should be called if
+     * the followed user's viewport changes.
+     * 
+     * @param followedUser
+     *            User who is followed
+     * @param editorPart
+     *            EditorPart of the open Editor
+     * @param range
+     *            viewport of the followed user
+     */
+    private void adjustViewport(User followedUser, IEditorPart editorPart,
+        ILineRange range) {
+        if (range == null)
+            return;
+
+        // selection can be null
+        ITextSelection selection = remoteEditorManager
+            .getSelection(followedUser);
+        adjustViewport(editorPart, range, selection);
+    }
+
+    /**
+     * Adjusts viewport. Focus is set on the center of the range, but priority
+     * is given to selected lines. Either range or selection can be null, but
+     * not both.
+     * 
+     * @param editorPart
+     *            EditorPart of the open Editor
+     * @param range
+     *            viewport of the followed user. Can be <code>null</code>.
+     * @param selection
+     *            text selection of the followed user. Can be <code>null</code>.
+     * 
+     */
+    private void adjustViewport(IEditorPart editorPart, ILineRange range,
+        ITextSelection selection) {
+        ITextViewer viewer = EditorAPI.getViewer(editorPart);
+        if (viewer == null)
+            return;
+
+        IDocument document = viewer.getDocument();
+        ILineRange localViewport = EditorAPI.getViewport(viewer);
+
+        if (localViewport == null || document == null)
+            return;
+
+        int lines = document.getNumberOfLines();
+        int rangeTop = 0;
+        int rangeBottom = 0;
+        int selectionTop = 0;
+        int selectionBottom = 0;
+
+        if (selection != null) {
+            try {
+                selectionTop = document.getLineOfOffset(selection.getOffset());
+                selectionBottom = document.getLineOfOffset(selection
+                    .getOffset() + selection.getLength());
+            } catch (BadLocationException e) {
+                // should never be reached
+                log.error("Invalid line selection: offset: "
+                    + selection.getOffset() + ", length: "
+                    + selection.getLength());
+
+                selection = null;
+            }
+        }
+
+        if (range != null) {
+            if (range.getStartLine() == -1) {
+                range = null;
+            } else {
+                rangeTop = Math.min(lines - 1, range.getStartLine());
+                rangeBottom = Math.min(lines - 1, rangeTop + range.getNumberOfLines());
+            }
+        }
+
+        if (range == null && selection == null)
+            return;
+
+        // top line of the new viewport
+        int topPosition;
+        int localLines = localViewport.getNumberOfLines();
+        int remoteLines = rangeBottom - rangeTop;
+        int sizeDiff = remoteLines - localLines;
+
+        // initializations finished
+
+        if (range == null || selection == null) {
+            topPosition = (rangeTop + rangeBottom + selectionTop + selectionBottom) / 2;
+            viewer.setTopIndex(topPosition);
+            return;
+        }
+
+        /*
+         * usually the viewport of the follower and the viewport of the followed
+         * user will have the same center (this calculation). Exceptions may be
+         * made below.
+         */
+        int center = (rangeTop + rangeBottom) / 2;
+        topPosition = center - localLines / 2;
+
+        if (sizeDiff <= 0) {
+            // no further examination necessary when the local viewport is the
+            // larger one
+            viewer.setTopIndex(Math.max(0, Math.min(topPosition, lines)));
+            return;
+        }
+
+        boolean selectionTopInvisible = (selectionTop < rangeTop + sizeDiff / 2);
+        boolean selectionBottomInvisible = (selectionBottom > rangeBottom
+            - sizeDiff / 2 - 1);
+
+        if (rangeTop == 0
+            && !(selectionTop <= rangeBottom && selectionTop > rangeBottom
+                - sizeDiff)) {
+            // scrolled to the top and no selection at the bottom of range
+            topPosition = 0;
+
+        } else if (rangeBottom == lines - 1
+            && !(selectionBottom >= rangeTop && selectionBottom < rangeTop
+                + sizeDiff)) {
+            // scrolled to the bottom and no selection at the top of range
+            topPosition = lines - localLines;
+
+        } else if (selectionTopInvisible && selectionBottom >= rangeTop) {
+            // making selection at top of range visible
+            topPosition = Math.max(rangeTop, selectionTop);
+
+        } else if (selectionBottomInvisible && selectionTop <= rangeBottom) {
+            // making selection at bottom of range visible
+            topPosition = Math.min(rangeBottom, selectionBottom) - localLines
+                + 1;
+        }
+
+        viewer.setTopIndex(Math.max(0, Math.min(topPosition, lines)));
     }
 }
