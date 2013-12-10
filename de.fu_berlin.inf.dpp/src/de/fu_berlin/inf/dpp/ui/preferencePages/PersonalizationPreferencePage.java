@@ -33,8 +33,8 @@ import de.fu_berlin.inf.dpp.ui.widgets.ColorChooser.ColorSelectionListener;
  * @author Vera Schlemm
  */
 @Component(module = "prefs")
-public final class AppearancePreferencePage extends PreferencePage implements
-    IWorkbenchPreferencePage {
+public final class PersonalizationPreferencePage extends PreferencePage
+    implements IWorkbenchPreferencePage {
 
     // TODO move to a central class
     private static int DEFAULT_COLOR_ID = -1;
@@ -55,9 +55,9 @@ public final class AppearancePreferencePage extends PreferencePage implements
     private Button playSoundEventContactComesOnline;
     private Button playSoundEventContactGoesOffline;
 
-    public AppearancePreferencePage() {
+    public PersonalizationPreferencePage() {
         SarosPluginContext.initComponent(this);
-        setDescription(Messages.AppearancePreferencePage_appearance_settings);
+        setDescription(Messages.PersonalizationPreferencePage_description);
     }
 
     @Override
@@ -155,23 +155,24 @@ public final class AppearancePreferencePage extends PreferencePage implements
 
     private void createVisibleInformationGroup(Composite parent) {
         final Group group = new Group(parent, SWT.NONE);
-        group.setText("Visual Information");
+        group
+            .setText(Messages.PersonalizationPreferencePage_visible_information_group_text);
         group.setLayout(new GridLayout(1, false));
         group.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
         showBalloonNotifications = new Button(group, SWT.CHECK);
         showBalloonNotifications
-            .setText(Messages.AppearancePreferencePage_enable_balloon_notifications);
+            .setText(Messages.PersonalizationPreferencePage_enable_balloon_notifications);
 
         showBalloonNotifications.setSelection(preferenceStore
             .getBoolean(PreferenceConstants.ENABLE_BALLOON_NOTIFICATION));
 
         showContributionAnnotation = new Button(group, SWT.CHECK);
         showContributionAnnotation
-            .setText(Messages.AppearancePreferencePage_enable_contribution_annotation);
+            .setText(Messages.PersonalizationPreferencePage_enable_contribution_annotation);
 
         showContributionAnnotation
-            .setToolTipText(Messages.AppearancePreferencePage_show_contribution_annotations_tooltip);
+            .setToolTipText(Messages.PersonalizationPreferencePage_show_contribution_annotations_tooltip);
 
         showContributionAnnotation.setSelection(preferenceStore
             .getBoolean(PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS));
@@ -180,12 +181,14 @@ public final class AppearancePreferencePage extends PreferencePage implements
     private void createSoundNotificationGroup(Composite parent) {
         final Group group = new Group(parent, SWT.NONE);
 
-        group.setText("Sound Notifications");
+        group
+            .setText(Messages.PersonalizationPreferencePage_sound_notification_group_text);
         group.setLayout(new GridLayout(1, false));
         group.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
         enableSoundEvents = new Button(group, SWT.CHECK);
-        enableSoundEvents.setText("Enabled Sound Notifications");
+        enableSoundEvents
+            .setText(Messages.PersonalizationPreferencePage_enable_sound_button_text);
 
         enableSoundEvents.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -205,21 +208,25 @@ public final class AppearancePreferencePage extends PreferencePage implements
 
         // col 1
         Label chatEvents = new Label(soundEvents, SWT.NONE);
-        chatEvents.setText("Chat");
+        chatEvents
+            .setText(Messages.PersonalizationPreferencePage_sound_notification_chat_label_text);
 
         playSoundEventChatMessageReceived = new Button(soundEvents, SWT.CHECK);
 
         // col 2
-        playSoundEventChatMessageReceived.setText("receiving message");
+        playSoundEventChatMessageReceived
+            .setText(Messages.PersonalizationPreferencePage_enable_sound_on_message_receive_button_text);
 
         // col 3
         Label contactEvents = new Label(soundEvents, SWT.NONE);
-        contactEvents.setText("Contacts");
+        contactEvents
+            .setText(Messages.PersonalizationPreferencePage_sound_notification_contacts_label_text);
 
         // col 4
         playSoundEventContactComesOnline = new Button(soundEvents, SWT.CHECK);
 
-        playSoundEventContactComesOnline.setText("going online");
+        playSoundEventContactComesOnline
+            .setText(Messages.PersonalizationPreferencePage_enable_sound_on_contact_goes_online_button_text);
 
         // row 2
 
@@ -229,7 +236,8 @@ public final class AppearancePreferencePage extends PreferencePage implements
         // col 2
         playSoundEventChatMessageSent = new Button(soundEvents, SWT.CHECK);
 
-        playSoundEventChatMessageSent.setText("sending message");
+        playSoundEventChatMessageSent
+            .setText(Messages.PersonalizationPreferencePage_enable_sound_on_message_send_button_text);
 
         // col 3 dummy
         new Label(soundEvents, SWT.NONE);
@@ -238,7 +246,8 @@ public final class AppearancePreferencePage extends PreferencePage implements
 
         playSoundEventContactGoesOffline = new Button(soundEvents, SWT.CHECK);
 
-        playSoundEventContactGoesOffline.setText("going offline");
+        playSoundEventContactGoesOffline
+            .setText(Messages.PersonalizationPreferencePage_enable_sound_on_contact_goes_offline_button_text);
 
         initializeSoundButtons();
 
@@ -247,11 +256,13 @@ public final class AppearancePreferencePage extends PreferencePage implements
     private void createVisualAppearanceGroup(Composite parent) {
         final Group group = new Group(parent, SWT.NONE);
 
-        group.setText("Visual Appearance");
+        group
+            .setText(Messages.PersonalizationPreferencePage_visible_appearance_group_text);
         group.setLayout(new GridLayout(1, false));
         group.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
-        new Label(group, SWT.NONE).setText("Set Preferred Color");
+        new Label(group, SWT.NONE)
+            .setText(Messages.PersonalizationPreferencePage_visible_appearance_set_color_label_text);
 
         colorChooser = new ColorChooser(group, SWT.NONE);
 

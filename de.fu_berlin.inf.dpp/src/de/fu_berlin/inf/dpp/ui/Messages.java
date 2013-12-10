@@ -38,13 +38,6 @@ public class Messages extends NLS {
     public static String AdvancedPreferencePage_enable_videosharing;
     public static String AdvancedPreferencePage_enable_voip;
 
-    public static String AppearancePreferencePage_appearance_settings;
-    public static String AppearancePreferencePage_color;
-    public static String AppearancePreferencePage_annotations_group_label;
-    public static String AppearancePreferencePage_enable_contribution_annotation;
-    public static String AppearancePreferencePage_enable_balloon_notifications;
-    public static String AppearancePreferencePage_show_contribution_annotations_tooltip;
-
     public static String ChangeColorAction_message_text;
     public static String ChangeColorAction_message_title;
     public static String ChangeColorAction_title;
@@ -94,7 +87,6 @@ public class Messages extends NLS {
     public static String CollaborationUtils_insufficient_privileges;
     public static String CollaborationUtils_insufficient_privileges_text;
 
-    public static String PublicXMPPServerComposite_more_information;
     public static String ConfigurationSettingsWizardPage_0;
     public static String ConfigurationSettingsWizardPage_button_autoconnect;
     public static String ConfigurationSettingsWizardPage_button_portmapping;
@@ -346,6 +338,24 @@ public class Messages extends NLS {
     public static String NetworkPreferencePage_upnp_label_Text;
     public static String NewContactAction_tooltip;
 
+    public static String PersonalizationPreferencePage_description;
+    public static String PersonalizationPreferencePage_enable_balloon_notifications;
+    public static String PersonalizationPreferencePage_enable_contribution_annotation;
+    public static String PersonalizationPreferencePage_show_contribution_annotations_tooltip;
+    public static String PersonalizationPreferencePage_enable_sound_button_text;
+    public static String PersonalizationPreferencePage_enable_sound_on_contact_goes_offline_button_text;
+    public static String PersonalizationPreferencePage_enable_sound_on_contact_goes_online_button_text;
+    public static String PersonalizationPreferencePage_enable_sound_on_message_receive_button_text;
+    public static String PersonalizationPreferencePage_enable_sound_on_message_send_button_text;
+    public static String PersonalizationPreferencePage_sound_notification_chat_label_text;
+    public static String PersonalizationPreferencePage_sound_notification_contacts_label_text;
+    public static String PersonalizationPreferencePage_sound_notification_group_text;
+    public static String PersonalizationPreferencePage_visible_appearance_group_text;
+    public static String PersonalizationPreferencePage_visible_appearance_set_color_label_text;
+    public static String PersonalizationPreferencePage_annotations_group_label;
+    public static String PersonalizationPreferencePage_color;
+    public static String PersonalizationPreferencePage_visible_information_group_text;
+
     public static String ProjectSelectionWizardPage_description;
     public static String ProjectSelectionWizardPage_selected_no_project;
     public static String ProjectSelectionWizardPage_title;
@@ -353,6 +363,9 @@ public class Messages extends NLS {
     public static String ProjectShareBuddies_menuItem_no_contacts_available_text;
 
     public static String ProjectShareProjects_no_projects_in_workspace;
+
+    public static String PublicXMPPServerComposite_more_information;
+
     public static String RenameContactAction_new_nickname_dialog_title;
     public static String RenameContactAction_rename_current_nickname_message;
     public static String RenameContactAction_rename_message;

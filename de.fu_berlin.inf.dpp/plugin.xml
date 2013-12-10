@@ -90,6 +90,12 @@
             name="%page.name.3">
       </page>
       <page
+      		category="de.fu_berlin.inf.dpp.preferences"
+      		class="de.fu_berlin.inf.dpp.ui.preferencePages.PersonalizationPreferencePage"
+      		id="de.fu_berlin.inf.dpp.preferences.personalization"
+      		name="Personalization">
+      </page>
+      <page
             category="de.fu_berlin.inf.dpp.preferences"
             class="de.fu_berlin.inf.dpp.videosharing.preferences.VideoSharingPreferencePage"
             id="de.fu_berlin.inf.dpp.videosharing.preferences.VideoSharingPreferencePage"
@@ -124,12 +130,6 @@
             class="de.fu_berlin.inf.dpp.videosharing.preferences.ScreenPreferencePage"
             id="de.fu_berlin.inf.dpp.videosharing.preferences.ScreenPreferencePage"
             name="%page.name.9">
-      </page>
-      <page
-      		category="de.fu_berlin.inf.dpp.preferences"
-      		class="de.fu_berlin.inf.dpp.ui.preferencePages.AppearancePreferencePage"
-      		id="de.fu_berlin.inf.dpp.preferences.appearance"
-      		name="%page.name.appearance">
       </page>
    </extension>
    <extension
