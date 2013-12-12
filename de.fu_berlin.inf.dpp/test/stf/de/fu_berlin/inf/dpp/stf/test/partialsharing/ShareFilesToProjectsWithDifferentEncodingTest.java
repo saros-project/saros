@@ -59,24 +59,59 @@ public class ShareFilesToProjectsWithDifferentEncodingTest extends StfTestCase {
 
     }
 
+    // FIMXE move to another test package as this has nothing to do with partial
+    // sharing
+    @Test
+    public void testChangeFileEncodingInFullSharedProject() throws Exception {
+
+        /*
+         * Important for full sharing: There is some "magic" involved here.
+         * Invoking changeFileEncoding after sync. will also change the file
+         * with the encoding settings on BOBs side which is then transmitted to
+         * ALICEs side which will "corrupt" (this is actually not a bug, but a
+         * dangerous operation) the file on her side too ! Even if this file is
+         * not transmitted, changing the encoding will trigger a save activity
+         * so ALICE gets -> garbage text apply + save activity = garbage on
+         * ALICE disk !!!
+         */
+
+        createProjects("UTF-8", "UTF-8");
+
+        Util.buildSessionSequentially("foo", TypeOfCreateProject.EXIST_PROJECT,
+            ALICE, BOB);
+
+        BOB.superBot().views().packageExplorerView()
+            .waitUntilResourceIsShared("foo/Herr Mannelig.txt");
+
+        ALICE.superBot().views().packageExplorerView()
+            .selectFile("foo", "Herr Mannelig.txt").open();
+        ALICE.remoteBot().editor("Herr Mannelig.txt").waitUntilIsActive();
+
+        BOB.superBot().views().packageExplorerView()
+            .selectFile("foo", "Herr Mannelig.txt").open();
+        BOB.remoteBot().editor("Herr Mannelig.txt").waitUntilIsActive();
+
+        BOB.superBot().internal()
+            .changeFileEncoding("foo", "Herr Mannelig.txt", "US-ASCII");
+
+        // Will not work, the text will change exactly 4 TIMES !
+        // BOB.controlBot().getNetworkManipulator()
+        // .synchronizeOnActivityQueue(ALICE.getJID(), 10000);
+
+        Thread.sleep(10000);
+
+        // assert at least both have the same "garbage"
+
+        assertEquals(ALICE.remoteBot().editor("Herr Mannelig.txt").getText(),
+            BOB.remoteBot().editor("Herr Mannelig.txt").getText());
+    }
+
     @Test
     public void testShareFilesWithDifferentProjectEncodingsAndRecovery()
         throws Exception {
 
         createProjects("UTF-8", "UTF-8");
 
-        /*
-         * There is some "magic" involved here. Encodings for the project and
-         * its files are stored in a file in the '.settings' folder. Because we
-         * do not share this file from the beginning, invoking
-         * changeFileEncoding after sync. will also change the file with the
-         * encoding settings on BOBs side which is then transmitted to ALICEs
-         * side which will "corrupt" (this is actually not a bug, but a
-         * dangerous operation) the file on her side too ! Even if this file is
-         * not transmitted, changing the encoding will trigger a save activity
-         * so ALICE gets -> garbage text apply + save activity = garbage on
-         * ALICE disk !!!
-         */
         BOB.superBot().internal()
             .changeFileEncoding("foo", "Herr Mannelig.txt", "US-ASCII");
 

@@ -113,9 +113,9 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
         boolean contentChange = isContentChange(delta);
         switch (kind) {
         case IResourceDelta.CHANGED:
-            if (contentChange) {
+            if (contentChange)
                 contentChanged(resource);
-            }
+
             return;
 
         case IResourceDelta.ADDED:
@@ -249,15 +249,20 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     /**
      * Adds a FileActivity.created if the file is not currently in any open
      * editor. We ignore opened files because otherwise we might send CHANGED
-     * events for files that are also handled by the editor manager.
+     * events for files that are also handled by the editor manager. We also
+     * ignore files that are not part of the current sharing.
      * 
      * @param resource
      */
     private void contentChanged(IResource resource) {
-        SPath spath = new SPath(resource);
-        if (editorManager.isOpened(spath)) {
+
+        final SPath spath = new SPath(resource);
+
+        if (!sarosSession.isShared(resource))
             return;
-        }
+
+        if (editorManager.isOpened(spath))
+            return;
 
         log.debug("Resource " + resource.getName() + " changed");
         try {
