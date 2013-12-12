@@ -103,7 +103,9 @@ public interface ISarosSessionManager {
     public void startSharingProjects(JID user);
 
     /**
-     * Invites a user to the shared project.
+     * Invites a user to a running session. Does nothing if no session is
+     * running, the user is already part of the session or is currently in the
+     * invitation process.
      * 
      * @param toInvite
      *            the JID of the user that is to be invited.

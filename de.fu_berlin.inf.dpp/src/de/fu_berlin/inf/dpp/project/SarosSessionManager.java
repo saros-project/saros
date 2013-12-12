@@ -400,8 +400,8 @@ public class SarosSessionManager implements ISarosSessionManager {
 
                 sessionIDObservable.setValue(sessionID);
 
-                process = new IncomingSessionNegotiation(this, from,
-                    version, invitationID, description, sarosContext);
+                process = new IncomingSessionNegotiation(this, from, version,
+                    invitationID, description, sarosContext);
 
                 process.setProcessListener(processListener);
                 currentSessionNegotiations.addInvitationProcess(process);
@@ -461,7 +461,6 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     @Override
     public void invite(JID toInvite, String description) {
-        ISarosSession sarosSession = sarosSessionObservable.getValue();
 
         INegotiationHandler handler = negotiationHandler;
 
@@ -474,13 +473,29 @@ public class SarosSessionManager implements ISarosSessionManager {
 
         synchronized (this) {
             if (!startStopSessionLock.tryLock()) {
-                log.warn("could not start an invitation because the current session is about to stop");
+                log.warn("could not start an invitation because the current session is about to start or stop");
                 return;
             }
 
             try {
-                process = new OutgoingSessionNegotiation(toInvite,
-                    sarosSession, description, sarosContext);
+
+                ISarosSession session = getSarosSession();
+
+                if (session == null)
+                    return;
+
+                /*
+                 * this assumes that a user is added to the session before the
+                 * negotiation terminates !
+                 */
+                if (session.getResourceQualifiedJID(toInvite) != null)
+                    return;
+
+                if (currentSessionNegotiations.isInSessionNegotiation(toInvite))
+                    return;
+
+                process = new OutgoingSessionNegotiation(toInvite, session,
+                    description, sarosContext);
 
                 process.setProcessListener(processListener);
                 currentSessionNegotiations.addInvitationProcess(process);

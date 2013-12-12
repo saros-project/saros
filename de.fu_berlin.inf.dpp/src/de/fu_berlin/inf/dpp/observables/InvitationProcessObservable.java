@@ -20,6 +20,8 @@ import de.fu_berlin.inf.dpp.net.JID;
  * InvitationProcesses.
  */
 @Component(module = "observables")
+// TODO remove the ID part here, there should only be one invitation per JID
+// TODO rename to SessionNegotiationProcessObservable
 public class InvitationProcessObservable {
 
     private static Logger log = Logger
@@ -51,6 +53,20 @@ public class InvitationProcessObservable {
                 return process;
 
         return null;
+    }
+
+    /**
+     * Returns if the a user with the given {@linkplain JID} is currently in a
+     * session negotiation process.
+     * 
+     * @param jid
+     *            the JID of the user
+     * @return <code>true</code> if the user is currently in a session
+     *         negotiation process, <code>false</code> otherwise
+     */
+    public synchronized boolean isInSessionNegotiation(JID jid) {
+        List<SessionNegotiation> currentProcesses = processes.get(jid);
+        return currentProcesses != null && !currentProcesses.isEmpty();
     }
 
     /**
