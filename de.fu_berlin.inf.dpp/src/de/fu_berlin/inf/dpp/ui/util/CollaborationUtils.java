@@ -354,15 +354,24 @@ public class CollaborationUtils {
 
             additionalFilesForPartialSharing.clear();
 
+            /*
+             * we need this file otherwise creating a new project on the remote
+             * will produce garbage because the project nature is not set /
+             * updated correctly
+             */
             IFile projectFile = project.getFile(".project");
-            IFile classpathFile = project.getFile(".classpath");
-            IFolder settingsFolder = project.getFolder(".settings");
 
             if (projectFile.exists())
                 additionalFilesForPartialSharing.add(projectFile);
 
-            if (classpathFile.exists())
-                additionalFilesForPartialSharing.add(classpathFile);
+            // do not include them, this is causing malfunctions if developers
+            // do
+            // not use variables in their classpath but absolute paths.
+
+            // IFile classpathFile = project.getFile(".classpath");
+
+            // if (classpathFile.exists())
+            // additionalFilesForPartialSharing.add(classpathFile);
 
             /*
              * FIXME adding files from this folder may "corrupt" a lot of remote
@@ -374,6 +383,8 @@ public class CollaborationUtils {
              * possible to change the encoding of files independently of the
              * project encoding settings.
              */
+
+            IFolder settingsFolder = project.getFolder(".settings");
 
             if (settingsFolder.exists() /* remove to execute block */&& false) {
 
