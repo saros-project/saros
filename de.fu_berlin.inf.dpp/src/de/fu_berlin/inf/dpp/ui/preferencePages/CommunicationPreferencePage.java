@@ -54,7 +54,6 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
     private BooleanFieldEditor audio_dtx;
     private ComboFieldEditor audioQuality;
 
-    private Group soundGroup;
     private Group chatGroup;
     private Group voipGroup;
     private Composite chatServerGroup;
@@ -73,20 +72,14 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
 
     @Override
     protected void createFieldEditors() {
-        soundGroup = new Group(getFieldEditorParent(), SWT.NONE);
         chatGroup = new Group(getFieldEditorParent(), SWT.NONE);
         voipGroup = new Group(getFieldEditorParent(), SWT.NONE);
 
-        GridData soundGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
         GridData chatGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
         GridData voipGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 
-        soundGridData.horizontalSpan = 2;
         chatGridData.horizontalSpan = 2;
         voipGridData.horizontalSpan = 2;
-
-        soundGroup.setText("Sounds");
-        soundGroup.setLayout(new GridLayout(1, false));
 
         chatGroup.setText("Chat");
         chatGroup.setLayout(new GridLayout(2, false));
@@ -94,7 +87,6 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
         voipGroup.setText("VoIP");
         voipGroup.setLayout(new GridLayout(2, false));
 
-        soundGroup.setLayoutData(soundGridData);
         chatGroup.setLayoutData(chatGridData);
         voipGroup.setLayoutData(voipGridData);
 
