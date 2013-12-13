@@ -14,13 +14,14 @@ import org.eclipse.ui.actions.NewProjectAction;
 
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.ui.wizards.AddContactWizard;
+import de.fu_berlin.inf.dpp.ui.wizards.AddContactsToSessionWizard;
+import de.fu_berlin.inf.dpp.ui.wizards.AddResourcesToSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.AddXMPPAccountWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.CreateXMPPAccountWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.EditXMPPAccountWizard;
-import de.fu_berlin.inf.dpp.ui.wizards.AddContactsToSessionWizard;
-import de.fu_berlin.inf.dpp.ui.wizards.AddResourcesToSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.StartSessionWizard;
+import de.fu_berlin.inf.dpp.ui.wizards.dialogs.ConfigurationWizardDialog;
 
 /**
  * Utility class for {@link IWizard}s
@@ -104,7 +105,32 @@ public class WizardUtils {
      * @return the wizard if it was successfully finished; null otherwise
      */
     public static ConfigurationWizard openSarosConfigurationWizard() {
-        return openWizardSuccessfully(new ConfigurationWizard());
+        final ConfigurationWizard wizard = new ConfigurationWizard();
+
+        /*
+         * must open the wizard with a ConfigurationWizardDialog because of an
+         * extra Create Account button in the WizardDialog button bar
+         */
+        try {
+            int code = SWTUtils.runSWTSync(new Callable<Integer>() {
+                @Override
+                public Integer call() {
+                    WizardDialog wizardDialog = new ConfigurationWizardDialog(
+                        null, wizard);
+                    wizardDialog.setHelpAvailable(false);
+                    return wizardDialog.open();
+                }
+            });
+
+            if (code != Window.OK)
+                return null;
+
+        } catch (Exception e) {
+            log.warn("Error opening wizard " + wizard.getWindowTitle(), e);
+            return null;
+        }
+
+        return wizard;
     }
 
     /**
@@ -161,16 +187,16 @@ public class WizardUtils {
     }
 
     /**
-     * Opens a {@link AddResourcesToSessionWizard} in the SWT thread and
-     * returns the displayed instance in case of success.
+     * Opens a {@link AddResourcesToSessionWizard} in the SWT thread and returns
+     * the displayed instance in case of success.
      */
     public static AddResourcesToSessionWizard openAddResourcesToSessionWizard() {
         return openWizardSuccessfully(new AddResourcesToSessionWizard());
     }
 
     /**
-     * Opens a {@link AddContactsToSessionWizard} in the SWT thread and
-     * returns the displayed instance in case of success.
+     * Opens a {@link AddContactsToSessionWizard} in the SWT thread and returns
+     * the displayed instance in case of success.
      */
     public static AddContactsToSessionWizard openAddContactsToSessionWizard() {
         return openWizardSuccessfully(new AddContactsToSessionWizard());

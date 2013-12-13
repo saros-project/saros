@@ -6,11 +6,8 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.picocontainer.annotations.Inject;
 
@@ -19,7 +16,6 @@ import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.SimpleNoteComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.wizard.EnterXMPPAccountComposite;
 import de.fu_berlin.inf.dpp.ui.wizards.CreateXMPPAccountWizard;
@@ -38,7 +34,6 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
     @Inject
     private XMPPAccountStore accountStore;
 
-    private Button createAccountButton;
     private EnterXMPPAccountComposite enterXMPPAccountComposite;
 
     /**
@@ -87,17 +82,13 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
 
         composite.setLayout(new GridLayout(1, false));
 
-        createAccountButton = new Button(composite, SWT.PUSH);
-        createAccountButton
-            .setText(Messages.EnterXMPPAccountWizardPage_create_new_account);
+        SimpleNoteComposite noteComposite = new SimpleNoteComposite(composite,
+            SWT.BORDER, SWT.ICON_INFORMATION,
+            Messages.EnterXMPPAccountWizardPage_info_already_created_account);
 
-        createAccountButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                openCreateXMPPAccountWizard();
-            }
-
-        });
+        noteComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
+            false));
+        noteComposite.setSpacing(8);
 
         enterXMPPAccountComposite = new EnterXMPPAccountComposite(composite,
             SWT.NONE);
@@ -107,14 +98,6 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
 
         enterXMPPAccountComposite.setUsingTLS(true);
         enterXMPPAccountComposite.setUsingSASL(true);
-
-        SimpleNoteComposite noteComposite = new SimpleNoteComposite(composite,
-            SWT.BORDER, SWT.ICON_INFORMATION,
-            Messages.EnterXMPPAccountWizardPage_info_already_created_account);
-
-        noteComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
-            false));
-        noteComposite.setSpacing(8);
 
         hookListeners();
         updatePageCompletion();
@@ -148,35 +131,28 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
     }
 
     /**
-     * Opens a {@link CreateXMPPAccountWizard} and takes over the created
+     * Fills out the account credentials required by this page using the given
      * account.
+     * 
+     * @param account
+     *            the account whose credentials to use
+     * @param disableInput
+     *            if <code>true</code> it will no longer be possible to fill out
+     *            the credentials manually, in other words the user input fields
+     *            for inserting account credentials will be disabled
      */
-    private void openCreateXMPPAccountWizard() {
-        getContainer().getShell().setVisible(false);
+    public void setAccount(XMPPAccount account, boolean disableInput) {
+        if (account == null)
+            return;
 
-        CreateXMPPAccountWizard createXMPPAccountWizard = WizardUtils
-            .openCreateXMPPAccountWizard(false);
-
-        if (createXMPPAccountWizard != null
-            && createXMPPAccountWizard.getCreatedXMPPAccount() != null) {
-            isXMPPAccountCreated = true;
-
-            XMPPAccount account = createXMPPAccountWizard
-                .getCreatedXMPPAccount();
-
-            createAccountButton.setEnabled(false);
-            enterXMPPAccountComposite.setEnabled(false);
-            enterXMPPAccountComposite.setJID(new JID(account.getUsername(),
-                account.getDomain()));
-            enterXMPPAccountComposite.setPassword(account.getPassword());
-            enterXMPPAccountComposite.setServer("");
-            enterXMPPAccountComposite.setPort("");
-            enterXMPPAccountComposite.setUsingTLS(true);
-            enterXMPPAccountComposite.setUsingSASL(true);
-        }
-
-        getContainer().getShell().setVisible(true);
-        getContainer().getShell().setFocus();
+        enterXMPPAccountComposite.setEnabled(!disableInput);
+        enterXMPPAccountComposite.setJID(new JID(account.getUsername(), account
+            .getDomain()));
+        enterXMPPAccountComposite.setPassword(account.getPassword());
+        enterXMPPAccountComposite.setServer("");
+        enterXMPPAccountComposite.setPort("");
+        enterXMPPAccountComposite.setUsingTLS(true);
+        enterXMPPAccountComposite.setUsingSASL(true);
     }
 
     private void updatePageCompletion() {

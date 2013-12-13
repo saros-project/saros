@@ -21,13 +21,11 @@ package de.fu_berlin.inf.dpp.ui.wizards;
 
 import org.bitlet.weupnp.GatewayDevice;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.StatisticManagerConfiguration;
-import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
@@ -42,9 +40,6 @@ import de.fu_berlin.inf.dpp.ui.wizards.pages.ConfigurationSummaryWizardPage;
  * @author bkahlert
  */
 public class ConfigurationWizard extends AddXMPPAccountWizard {
-
-    @Inject
-    private IUPnPService upnpService;
 
     private ConfigurationSettingsWizardPage configurationSettingsWizardPage = new ConfigurationSettingsWizardPage();
     private ConfigurationSummaryWizardPage configurationSummaryWizardPage = new ConfigurationSummaryWizardPage();
