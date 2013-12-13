@@ -52,8 +52,13 @@ public class ShowDescriptionPage extends WizardPage {
         Composite composite = new Composite(parent, SWT.NONE);
         composite.setLayout(new GridLayout(2, false));
 
-        String completeDescription = RosterUtils.getNickname(null,
-            sessionNegotiation.getPeer())
+        String nickname = RosterUtils.getNickname(null,
+            sessionNegotiation.getPeer());
+
+        if (nickname == null)
+            nickname = sessionNegotiation.getPeer().getBase();
+
+        String completeDescription = nickname
             + " has invited you to a Saros session with the currently shared project(s):\n"
             + sessionNegotiation.getDescription();
 

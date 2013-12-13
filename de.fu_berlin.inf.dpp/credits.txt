@@ -17,19 +17,24 @@ This project uses the following libraries:
 	* Hamcrest - BSD
 	
 
-This is a list of people (in no particular order) who have been part of the 
+This is a list of people (in alphabetical order) who have been part of the 
 Saros team over the years and have contributed to the product: 
 	* Alena Kiwitt
 	* Alexander Narweleit 	
 	* Alexander Waldmann
 	* Andreas Haferburg
+	* Andrej Szaffranietz
+	* Arndt Lasarzik
 	* Arsenij Solovjev
+	* Bernd Bieber
 	* Bjoern Gustavs
 	* Björn Kahlert
 	* Christian Dohnert
 	* Christoph Jacob
+	* Christoph Krüger
 	* Christoph Viebig
 	* Christopher Oezbek
+	* Conrad Läßig
 	* Edna Rosen
 	* Eike Starkmann
 	* Florian Pütz
@@ -45,6 +50,7 @@ Saros team over the years and have contributed to the product:
 	* Lin Chen
 	* Lisa Dohrmann
 	* Marc Rintsch
+	* Maria Formisano
 	* Maria Spiering
 	* Meike Johannsen
 	* Michael Jurke
@@ -58,6 +64,7 @@ Saros team over the years and have contributed to the product:
 	* Patrick Steinhardt
 	* Philipp Cordes
 	* Riad Djemili
+	* Richard Möhn
 	* Sandor Szücs
 	* Sebastian Bauch
 	* Sebastian Starroske

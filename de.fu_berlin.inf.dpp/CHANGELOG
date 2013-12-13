@@ -1,3 +1,53 @@
+13.12.6
+=======
+
+[GUI] Logic of follow mode toolbar button is changed
+[GUI] Removed "random" auto follow option
+[GUI|UX] Detailed sound playback selection
+[UI] Non-Host users can't add projects to sessions anymore
+[GUI] show the nickname of the inviter on the invitation page
+[UI] Invitation Wizard now properly displays partially shared projects
+[GUI] cleaned up the "Create Account form"
+[GUI] Name tags on cursor of remote users
+[GUI] Inconsistency icon now "flashes" on detected inconsistency 
+[GUI] New and more comprehensible inconsistency icons
+[GUI] Rename "buddy" to "contact" because not everyone is a buddy 
+[GUI] Placed the host on top of the roster during a running session
+[GUI] Moved Contribution Annotation Setting to Saros > Appearance
+[UI] Better error descriptions in case of connecting errors
+[GUI] Show error dialogs after the wizard has closed
+
+[FEATURE] Hyperlinks for chat communication
+[FEATURE] #91 Other users can now be removed from sessions by the host
+
+[FIX] #605 Saros doesn't reliably detect a broken internet connection
+[FIX] #609 Fixed sizes for all wizards causes not visible elements
+[FIX] #335 Fatal error of a user does not remove them from session
+[FIX] #798 Fixed changes for a shared project *without* asking the user
+[FIX] #634 Shared icon annotation missing for files on host side
+[FIX] #226 After a connection error, Saros infinitly tried to reconnect
+[FIX] #436 Can't reconnect after connection error
+[FIX] #799 Finish button is not enabled when restoring file selections
+[FIX] #808 Fixed Inconsistencies after invitation
+[FIX] #807 Beep notification doesn't work when receiving a chat message
+[FIX] #735 Fixed corrupted files error while negotiation process
+[FIX] #749 Resources could be changed during project negotiation
+[FIX] #787 Needbased backup calculates checksums of dirty files
+[FIX] #732 No feedback when checksums are calculated
+[FIX] #795 Existing Contribution Annotations are not updated after a color change
+[FIX] #684 Fixed problems with wrong Connection States
+[FIX] #697 Change "buddy" to "contact"
+[FIX] #776 Colors in the Chat view did not match participants' colors
+[FIX] Playing sound does now work again
+[FIX] The VCS(version control system) support feature is working again
+[FIX] Users could now reset the option to stop an empty session on the host side
+[FIX] Remote users now can see, when the local user opens a non-shared file
+[FIX] User color square is no longer hidden
+[FIX] The host of a session can now invoke permission changes to himself
+[FIX] Fixed error display during "add project" rejection
+[FIX] Fixed destroying of the Eclipse History for files
+[FIX] Prevent execution of unnecessary changes on files with equal content
+
 13.3.22
 =======
 
