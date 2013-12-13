@@ -1,10 +1,8 @@
 package de.fu_berlin.inf.dpp.editor.internal;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,14 +22,9 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.ITextViewerExtension5;
 import org.eclipse.jface.text.ITextViewerExtension6;
-import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.TextViewer;
-import org.eclipse.jface.text.source.Annotation;
-import org.eclipse.jface.text.source.IAnnotationModel;
-import org.eclipse.jface.text.source.IAnnotationModelExtension;
 import org.eclipse.jface.text.source.ILineRange;
-import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.LineRange;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.custom.VerifyKeyListener;
@@ -50,18 +43,12 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.ide.ResourceUtil;
-import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IEditorStatusLine;
 import org.eclipse.ui.texteditor.ITextEditor;
-import org.picocontainer.annotations.Nullable;
 
-import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
-import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
-import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
 import de.fu_berlin.inf.dpp.ui.dialogs.WarningMessageDialog;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
@@ -81,11 +68,11 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
 @Component(module = "core")
 public class EditorAPI implements IEditorAPI {
 
+    private static final Logger log = Logger.getLogger(EditorAPI.class);
+
     public EditorAPI() {
 
     }
-
-    private static final Logger log = Logger.getLogger(EditorAPI.class);
 
     protected final VerifyKeyListener keyVerifier = new VerifyKeyListener() {
         @Override
@@ -373,125 +360,6 @@ public class EditorAPI implements IEditorAPI {
         return resource;
     }
 
-    /**
-     * This implementation does not really set the selection but rather adds an
-     * selection annotation.
-     * 
-     */
-    @Override
-    public void setSelection(IEditorPart editorPart, ITextSelection selection,
-        User source) {
-
-        if (!(editorPart instanceof ITextEditor)) {
-            return;
-        }
-
-        ITextEditor textEditor = (ITextEditor) editorPart;
-
-        IDocumentProvider docProvider = textEditor.getDocumentProvider();
-
-        if (docProvider != null) {
-            IEditorInput input = textEditor.getEditorInput();
-            IAnnotationModel model = docProvider.getAnnotationModel(input);
-
-            if (model == null) {
-                return;
-            }
-            if (selection.isEmpty()) {
-                setSelectionAnnotation(source, model, null, null);
-                return;
-            }
-
-            /*
-             * If the selection's length is 0 it will be displayed as a cursor.
-             * It is moved one character to the left if the offset is at the end
-             * of the line but not already at the start of the line. So the
-             * cursor is not displayed in completely empty lines. :-(
-             */
-            int offset = selection.getOffset();
-            int length = selection.getLength();
-            boolean isCursor = length == 0;
-
-            if (isCursor) {
-                IDocument document = docProvider.getDocument(input);
-                if (document != null && document.getLength() != 0) {
-                    try {
-                        IRegion lineInfo = document
-                            .getLineInformationOfOffset(offset);
-                        int lineLength = lineInfo.getLength();
-                        if (lineLength != 0) {
-                            // Cursor visible if line has content.
-                            length = 1;
-                            if (offset == (lineInfo.getOffset() + lineLength)) {
-                                // Move one position left if at end of line.
-                                offset--;
-                            }
-                        }
-                    } catch (BadLocationException e) {
-                        // Ignored intentionally.
-                    }
-                }
-            }
-
-            setSelectionAnnotation(source, model, new SelectionAnnotation(
-                source, isCursor), new Position(offset, length));
-        }
-    }
-
-    public static Iterable<Annotation> toIterable(final IAnnotationModel model) {
-        return new Iterable<Annotation>() {
-            @Override
-            @SuppressWarnings("unchecked")
-            public Iterator<Annotation> iterator() {
-                return model.getAnnotationIterator();
-            }
-        };
-    }
-
-    protected void setSelectionAnnotation(User source, IAnnotationModel model,
-        @Nullable SarosAnnotation newAnnotation, @Nullable Position position) {
-
-        if ((newAnnotation == null) != (position == null)) {
-            throw new IllegalArgumentException(
-                "Either both Annotation and Position must be null or non-null");
-        }
-
-        for (Annotation annotation : toIterable(model)) {
-
-            if (!(annotation instanceof SelectionAnnotation)) {
-                continue;
-            }
-
-            SarosAnnotation oldAnnotation = (SarosAnnotation) annotation;
-
-            /*
-             * We only remove an annotation if its user and annotationType are
-             * identical. Unfortunately the TYPE is not public so we avoid using
-             * it by comparing the class. This works but is not as nice as it
-             * could be (this part of the method is likely to be refactored in
-             * the nearest future).
-             */
-            if (oldAnnotation.getSource().equals(source)
-                && (newAnnotation == null || oldAnnotation.getClass().equals(
-                    newAnnotation.getClass()))) {
-                // If model supports IAnnotationModelExtension we can
-                // just update the existing annotation.
-                if (newAnnotation != null
-                    && model instanceof IAnnotationModelExtension) {
-                    IAnnotationModelExtension extension = (IAnnotationModelExtension) model;
-                    extension.replaceAnnotations(
-                        new Annotation[] { oldAnnotation },
-                        Collections.singletonMap(newAnnotation, position));
-                    return;
-                }
-                model.removeAnnotation(annotation);
-            }
-        }
-
-        if (newAnnotation != null)
-            model.addAnnotation(newAnnotation, position);
-    }
-
     public static int getLine(ITextViewerExtension5 viewer, int offset) {
         return viewer.widgetLineOfWidgetOffset(viewer
             .modelOffset2WidgetOffset(offset));
@@ -650,72 +518,6 @@ public class EditorAPI implements IEditorAPI {
             return null;
 
         return getViewport(textViewer);
-    }
-
-    @Override
-    public void setViewportAnnotation(IEditorPart editorPart,
-        ILineRange lineRange, User user) {
-
-        int top = lineRange.getStartLine();
-        int bottom = top + lineRange.getNumberOfLines();
-
-        ITextViewer viewer = EditorAPI.getViewer(editorPart);
-
-        updateViewportAnnotation(viewer, top, bottom, user);
-    }
-
-    @SuppressWarnings("unchecked")
-    private void updateViewportAnnotation(ITextViewer viewer, int top,
-        int bottom, User source) {
-
-        if (!(viewer instanceof ISourceViewer)) {
-            return;
-        }
-
-        IAnnotationModel model = ((ISourceViewer) viewer).getAnnotationModel();
-
-        if (model == null) {
-            return;
-        }
-
-        // remove the ViewportAnnotations of the given user
-        for (Iterator<Annotation> it = model.getAnnotationIterator(); it
-            .hasNext();) {
-            Annotation annotation = it.next();
-            if (annotation instanceof ViewportAnnotation) {
-                if (((ViewportAnnotation) annotation).getSource()
-                    .equals(source))
-                    model.removeAnnotation(annotation);
-            }
-        }
-
-        // calculate the new position of the annotation and add it to the model
-        IDocument document = viewer.getDocument();
-        try {
-            int lines = document.getNumberOfLines();
-            top = Math.max(0, Math.min(lines - 1, top));
-            bottom = Math.max(0, Math.min(lines - 1, bottom));
-
-            int start = document.getLineOffset(top);
-            int end = document.getLineOffset(bottom);
-
-            if (start == -1)
-                throw new BadLocationException("Start line -1");
-
-            if (end == -1 || end < start)
-                throw new BadLocationException("End line -1 or less than start");
-
-            ViewportAnnotation va = new ViewportAnnotation(source);
-
-            if (lines > 1)
-                va.setMoreThanOneLine(true);
-
-            SarosAnnotation annotation = va;
-            Position position = new Position(start, end - start);
-            model.addAnnotation(annotation, position);
-        } catch (BadLocationException e) {
-            log.warn("Internal Error:", e);
-        }
     }
 
     /**

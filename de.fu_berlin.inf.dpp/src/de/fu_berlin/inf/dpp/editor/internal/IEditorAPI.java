@@ -6,7 +6,6 @@ import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.ui.IEditorPart;
 
-import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 
@@ -62,12 +61,6 @@ public interface IEditorAPI {
     public IEditorPart getActiveEditor();
 
     /**
-     * Sets the text selection in given editor.
-     */
-    public void setSelection(IEditorPart editorPart, ITextSelection selection,
-        User source);
-
-    /**
      * Returns the current text selection for given editor.
      * 
      * @param editorPart
@@ -85,20 +78,6 @@ public interface IEditorAPI {
      *         referenced via a path in the project.
      */
     public SPath getEditorPath(IEditorPart editorPart);
-
-    /**
-     * Updates the ViewportAnnotation, which indicates the visible lines in a
-     * remote user's editor.
-     * 
-     * @param editorPart
-     *            {@link IEditorPart} for which the ViewportAnnotation are set.
-     * @param lineRange
-     *            Visible lines for the remote user.
-     * @param user
-     *            {@link User} for whom the ViewportAnnotations are updated.
-     */
-    public void setViewportAnnotation(IEditorPart editorPart,
-        ILineRange lineRange, User user);
 
     /**
      * @return Return the viewport for given editor or null, if this editorPart
