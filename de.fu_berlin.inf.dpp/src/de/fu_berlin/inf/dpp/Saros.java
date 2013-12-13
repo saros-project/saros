@@ -116,6 +116,12 @@ public class Saros extends AbstractUIPlugin {
     public final static String NAMESPACE = SAROS;
 
     /**
+     * Sub-namespace for the server. It is used advertise when a server is
+     * active.
+     */
+    public static final String NAMESPACE_SERVER = NAMESPACE + ".server"; //$NON-NLS-1$
+
+    /**
      * The name of the resource identifier used by Saros when connecting to the
      * XMPP server (for instance when logging in as john@doe.com, Saros will
      * connect using john@doe.com/Saros)

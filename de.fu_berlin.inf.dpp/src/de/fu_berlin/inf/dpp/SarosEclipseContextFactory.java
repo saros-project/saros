@@ -27,7 +27,10 @@ import de.fu_berlin.inf.dpp.synchronize.internal.SWTSynchronizer;
 import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.eventhandler.HostLeftAloneInSessionHandler;
+import de.fu_berlin.inf.dpp.ui.eventhandler.JoinSessionRejectedHandler;
+import de.fu_berlin.inf.dpp.ui.eventhandler.JoinSessionRequestHandler;
 import de.fu_berlin.inf.dpp.ui.eventhandler.NegotiationHandler;
+import de.fu_berlin.inf.dpp.ui.eventhandler.ServerPreferenceHandler;
 import de.fu_berlin.inf.dpp.ui.eventhandler.UserStatusChangeHandler;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing;
 
@@ -70,6 +73,9 @@ public class SarosEclipseContextFactory extends AbstractSarosContextFactory {
         Component.create(HostLeftAloneInSessionHandler.class),
         Component.create(NegotiationHandler.class),
         Component.create(UserStatusChangeHandler.class),
+        Component.create(JoinSessionRequestHandler.class),
+        Component.create(JoinSessionRejectedHandler.class),
+        Component.create(ServerPreferenceHandler.class),
 
         // Cache support
         /*

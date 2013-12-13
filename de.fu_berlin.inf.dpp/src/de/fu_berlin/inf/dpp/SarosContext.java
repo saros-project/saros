@@ -26,6 +26,8 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationAcknowledgedExtens
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationCompletedExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationOfferingExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationParameterExchangeExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.JoinSessionRejectedExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.JoinSessionRequestExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.KickUserExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveSessionExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PingExtension;
@@ -127,6 +129,9 @@ public class SarosContext implements ISarosContext {
             Class.forName(StartActivityQueuingResponse.class.getName());
 
             Class.forName(VersionExchangeExtension.class.getName());
+
+            Class.forName(JoinSessionRequestExtension.class.getName());
+            Class.forName(JoinSessionRejectedExtension.class.getName());
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }

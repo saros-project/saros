@@ -67,6 +67,8 @@ public class PreferenceConstants {
 
     public static final String DISABLE_VERSION_CONTROL = "disable_version_control";
 
+    public static final String SERVER_ACTIVATED = "server_activated";
+
     /*
      * Preferences of the feedback preferences page
      * 
