@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.text.MessageFormat;
@@ -499,45 +500,33 @@ public class Saros extends AbstractUIPlugin {
     }
 
     /**
-     * Returns @link{IProxyService} if there is a registered service otherwise
-     * null.
+     * Returns the Eclipse {@linkplain ProxyInfo proxy information} for the
+     * given host or <code>null</code> if it is not available
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    protected IProxyService getProxyService() {
+    private ProxyInfo getProxyInfo(String host) {
+
+        URI hostURI;
+
+        try {
+            hostURI = new URI(host);
+        } catch (URISyntaxException e) {
+            return null;
+        }
+
         BundleContext bundleContext = getBundle().getBundleContext();
+
         ServiceReference serviceReference = bundleContext
             .getServiceReference(IProxyService.class.getName());
-        return (IProxyService) bundleContext.getService(serviceReference);
-    }
 
-    /**
-     * Returns a @link{ProxyInfo}, if a configuration of a proxy for the given
-     * host is available. If @link{IProxyData} is of type
-     * 
-     * @link{IProxyData.HTTP_PROXY_TYPE it tries to use Smacks
-     * @link{ProxyInfo.forHttpProxy and if it is of type
-     * @link{IProxyData.SOCKS_PROXY_TYPE then it tries to use Smacks
-     * @link{ProxyInfo.forSocks5Proxy otherwise it returns null.
-     * 
-     * @param host
-     *            The host to which you want to connect to.
-     * 
-     * @return Returns a @link{ProxyInfo} if available otherwise null.
-     * 
-     * @SuppressWarnings("deprecation") -> getProxyDataForHost replacement is
-     *                                  only available in Eclipse 3.5
-     */
-    @SuppressWarnings("deprecation")
-    public ProxyInfo getProxyInfo(String host) {
-        IProxyService ips = getProxyService();
-        if (ips == null || !ips.isProxiesEnabled())
+        IProxyService proxyService = (IProxyService) bundleContext
+            .getService(serviceReference);
+
+        if (proxyService == null || !proxyService.isProxiesEnabled())
             return null;
 
-        for (IProxyData pd : ips.getProxyDataForHost(host)) {
-            if (IProxyData.HTTP_PROXY_TYPE.equals(pd.getType())) {
-                return ProxyInfo.forHttpProxy(pd.getHost(), pd.getPort(),
-                    pd.getUserId(), pd.getPassword());
-            } else if (IProxyData.SOCKS_PROXY_TYPE.equals(pd.getType())) {
+        for (IProxyData pd : proxyService.select(hostURI)) {
+            if (IProxyData.SOCKS_PROXY_TYPE.equals(pd.getType())) {
                 return ProxyInfo.forSocks5Proxy(pd.getHost(), pd.getPort(),
                     pd.getUserId(), pd.getPassword());
             }
