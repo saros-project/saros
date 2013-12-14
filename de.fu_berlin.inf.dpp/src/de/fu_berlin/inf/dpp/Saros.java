@@ -642,6 +642,8 @@ public class Saros extends AbstractUIPlugin {
         boolean useTLS = account.useTLS();
         boolean useSASL = account.useSASL();
 
+        sarosNet.disconnect();
+
         sarosNet.configure(NAMESPACE, RESOURCE,
             preferenceUtils.isDebugEnabled(),
             preferenceUtils.isLocalSOCKS5ProxyEnabled(),
@@ -653,7 +655,7 @@ public class Saros extends AbstractUIPlugin {
         Exception connectionError = null;
 
         try {
-            getSarosNet().connect(
+            sarosNet.connect(
                 createConnectionConfiguration(domain, server, port, useTLS,
                     useSASL), username, password);
         } catch (Exception e) {
