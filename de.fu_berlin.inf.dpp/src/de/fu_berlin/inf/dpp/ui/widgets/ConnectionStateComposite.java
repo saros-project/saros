@@ -123,7 +123,16 @@ public class ConnectionStateComposite extends Composite {
         case CONNECTING:
             return Messages.ConnectionStateComposite_connecting;
         case CONNECTED:
-            JID jid = new JID(sarosNet.getConnection().getUser());
+            JID jid = sarosNet.getMyJID();
+
+            /*
+             * as we run async the return value may not be the same as described
+             * in the javadoc so an error or something else may occurred in the
+             * meantime
+             */
+            if (jid == null)
+                return Messages.ConnectionStateComposite_error_unknown;
+
             String displayText = jid.getBase()
                 + Messages.ConnectionStateComposite_connected;
             return displayText;
