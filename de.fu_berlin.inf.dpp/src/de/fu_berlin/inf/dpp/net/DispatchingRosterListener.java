@@ -10,8 +10,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.packet.Presence;
 
-import de.fu_berlin.inf.dpp.project.SarosRosterListener;
-
 /**
  * Dispatches {@link IRosterListener} events to registered listeners. <br>
  * Concurrency: If an event is being dispatched while a listener is added or
@@ -78,15 +76,7 @@ public class DispatchingRosterListener implements IRosterListener {
     }
 
     public void add(IRosterListener rosterListener) {
-        /*
-         * put this listener always to the front because it updates existing
-         * user objects from the current session which may be used by the GUI
-         * when the roster have changed
-         */
-        if (rosterListener instanceof SarosRosterListener)
-            listeners.add(0, rosterListener);
-        else
-            listeners.add(rosterListener);
+        listeners.add(rosterListener);
     }
 
     public void remove(IRosterListener rosterListener) {

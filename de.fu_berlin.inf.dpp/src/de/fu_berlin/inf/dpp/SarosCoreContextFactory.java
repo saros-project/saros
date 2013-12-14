@@ -47,7 +47,6 @@ import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.observables.VideoSessionObservable;
 import de.fu_berlin.inf.dpp.observables.VoIPSessionObservable;
-import de.fu_berlin.inf.dpp.project.SarosRosterListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ColorNegotiationHook;
 import de.fu_berlin.inf.dpp.project.internal.FollowingActivitiesManager;
@@ -102,7 +101,6 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
 
         Component.create(RosterTracker.class),
         Component.create(SarosNet.class),
-        Component.create(SarosRosterListener.class),
         Component.create(SkypeManager.class),
 
         // broken by any means ...
