@@ -409,10 +409,11 @@ public class SarosNet {
          */
         SmackConfiguration.setPacketReplyTimeout(packetReplyTimeout);
 
+        SmackConfiguration.setLocalSocks5ProxyEnabled(isProxyEnabled);
+
         if (!isProxyEnabled)
             return; // we are done, STUN and UPNP only affect Socks5
 
-        SmackConfiguration.setLocalSocks5ProxyEnabled(true);
         SmackConfiguration.setLocalSocks5ProxyPort(proxyPort);
 
         final Socks5Proxy proxy = Socks5Proxy.getSocks5Proxy();
