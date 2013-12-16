@@ -2,8 +2,10 @@ package de.fu_berlin.inf.dpp.editor.internal;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
@@ -13,6 +15,7 @@ import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.texteditor.IDocumentProvider;
@@ -22,7 +25,9 @@ import de.fu_berlin.inf.dpp.editor.annotations.RemoteCursorAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
+import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.session.User;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.Predicate;
 
 /**
@@ -36,8 +41,42 @@ public class LocationAnnotationManager {
 
     private AnnotationModelHelper annotationModelHelper;
 
-    public LocationAnnotationManager() {
+    private boolean fillUpEnabled;
+
+    public LocationAnnotationManager(IPreferenceStore preferenceStore) {
         annotationModelHelper = new AnnotationModelHelper();
+
+        fillUpEnabled = preferenceStore
+            .getBoolean(PreferenceConstants.SHOW_SELECTIONFILLUP_ANNOTATIONS);
+    }
+
+    /**
+     * Listens for changes to the preferences whether to show
+     * {@link SelectionFillUpAnnotation}s.
+     * 
+     * In principle, this class could also listen to preference changes
+     * directly. But since we want to remove existing annotations when the
+     * option is disabled, and this class doesn't have access to all open
+     * editors, we leave the actual listening to a class that does.
+     * 
+     * @param event
+     * @param allEditors
+     *            not used (yet)
+     */
+    public void propertyChange(final PropertyChangeEvent event,
+        final Set<IEditorPart> allEditors) {
+
+        if (!PreferenceConstants.SHOW_SELECTIONFILLUP_ANNOTATIONS.equals(event
+            .getProperty()))
+            return;
+
+        SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
+
+            @Override
+            public void run() {
+                fillUpEnabled = Boolean.valueOf(event.getNewValue().toString());
+            }
+        });
     }
 
     /**

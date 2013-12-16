@@ -42,6 +42,8 @@ import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.LineRange;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.part.FileEditorInput;
@@ -180,6 +182,14 @@ public class EditorManager extends AbstractActivityProvider {
 
     private final CustomAnnotationManager customAnnotationManager = new CustomAnnotationManager();
 
+    private final IPropertyChangeListener annotationPreferenceListener = new IPropertyChangeListener() {
+        @Override
+        public void propertyChange(final PropertyChangeEvent event) {
+            locationAnnotationManager.propertyChange(event,
+                editorPool.getAllEditors());
+        }
+    };
+
     private IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
         @Override
         public void receive(EditorActivity editorActivity) {
@@ -313,12 +323,16 @@ public class EditorManager extends AbstractActivityProvider {
 
             sarosSession.addActivityProvider(EditorManager.this);
             annotationModelHelper = new AnnotationModelHelper();
-            locationAnnotationManager = new LocationAnnotationManager();
+            locationAnnotationManager = new LocationAnnotationManager(
+                preferenceStore);
             contributionAnnotationManager = new ContributionAnnotationManager(
                 newSarosSession, preferenceStore);
             remoteEditorManager = new RemoteEditorManager(sarosSession);
             remoteWriteAccessManager = new RemoteWriteAccessManager(
                 sarosSession);
+
+            preferenceStore
+                .addPropertyChangeListener(annotationPreferenceListener);
 
             SWTUtils.runSafeSWTSync(log, new Runnable() {
                 @Override
@@ -342,6 +356,9 @@ public class EditorManager extends AbstractActivityProvider {
                     setFollowing(null);
 
                     editorAPI.removeEditorPartListener(EditorManager.this);
+
+                    preferenceStore
+                        .removePropertyChangeListener(annotationPreferenceListener);
 
                     /*
                      * First need to remove the annotations and then clear the
@@ -926,7 +943,6 @@ public class EditorManager extends AbstractActivityProvider {
          * viewport
          */
         editorListenerDispatch.viewportChanged(viewport);
-
     }
 
     protected void execActivated(User user, SPath path) {

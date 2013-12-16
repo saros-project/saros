@@ -140,6 +140,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
         prefs.setValue(PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS,
             "true");
+        prefs.setValue(PreferenceConstants.SHOW_SELECTIONFILLUP_ANNOTATIONS,
+            "false"); // set to "false" because of poor performance
     }
 
     private static interface PreferenceHolderWrapper {

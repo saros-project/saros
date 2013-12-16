@@ -298,6 +298,8 @@ public class Messages extends NLS {
     public static String PersonalizationPreferencePage_enable_balloon_notifications;
     public static String PersonalizationPreferencePage_enable_contribution_annotation;
     public static String PersonalizationPreferencePage_show_contribution_annotations_tooltip;
+    public static String PersonalizationPreferencePage_enable_selectionfillup_annotation;
+    public static String PersonalizationPreferencePage_show_selectionfillup_annotations_tooltip;
     public static String PersonalizationPreferencePage_enable_sound_button_text;
     public static String PersonalizationPreferencePage_enable_sound_on_contact_goes_offline_button_text;
     public static String PersonalizationPreferencePage_enable_sound_on_contact_goes_online_button_text;

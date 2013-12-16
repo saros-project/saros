@@ -48,6 +48,7 @@ public final class PersonalizationPreferencePage extends PreferencePage
 
     private Button showBalloonNotifications;
     private Button showContributionAnnotation;
+    private Button showSelectionFillUpAnnotation;
 
     private Button enableSoundEvents;
     private Button playSoundEventChatMessageSent;
@@ -81,6 +82,10 @@ public final class PersonalizationPreferencePage extends PreferencePage
             PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS,
             showContributionAnnotation.getSelection());
 
+        preferenceStore.setValue(
+            PreferenceConstants.SHOW_SELECTIONFILLUP_ANNOTATIONS,
+            showSelectionFillUpAnnotation.getSelection());
+
         preferenceStore.setValue(PreferenceConstants.SOUND_ENABLED,
             enableSoundEvents.getSelection());
 
@@ -111,15 +116,20 @@ public final class PersonalizationPreferencePage extends PreferencePage
         colorChooser.selectColor(DEFAULT_COLOR_ID);
 
         preferenceStore
+            .setToDefault(PreferenceConstants.ENABLE_BALLOON_NOTIFICATION);
+
+        showBalloonNotifications.setSelection(preferenceStore
+            .getBoolean(PreferenceConstants.ENABLE_BALLOON_NOTIFICATION));
+
+        preferenceStore
             .setToDefault(PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS);
         showContributionAnnotation.setSelection(preferenceStore
             .getBoolean(PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS));
 
         preferenceStore
-            .setToDefault(PreferenceConstants.ENABLE_BALLOON_NOTIFICATION);
-
-        showBalloonNotifications.setSelection(preferenceStore
-            .getBoolean(PreferenceConstants.ENABLE_BALLOON_NOTIFICATION));
+            .setToDefault(PreferenceConstants.SHOW_SELECTIONFILLUP_ANNOTATIONS);
+        showSelectionFillUpAnnotation.setSelection(preferenceStore
+            .getBoolean(PreferenceConstants.SHOW_SELECTIONFILLUP_ANNOTATIONS));
 
         preferenceStore.setToDefault(PreferenceConstants.SOUND_ENABLED);
 
@@ -176,6 +186,16 @@ public final class PersonalizationPreferencePage extends PreferencePage
 
         showContributionAnnotation.setSelection(preferenceStore
             .getBoolean(PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS));
+
+        showSelectionFillUpAnnotation = new Button(group, SWT.CHECK);
+        showSelectionFillUpAnnotation
+            .setText(Messages.PersonalizationPreferencePage_enable_selectionfillup_annotation);
+
+        showSelectionFillUpAnnotation
+            .setToolTipText(Messages.PersonalizationPreferencePage_show_selectionfillup_annotations_tooltip);
+
+        showSelectionFillUpAnnotation.setSelection(preferenceStore
+            .getBoolean(PreferenceConstants.SHOW_SELECTIONFILLUP_ANNOTATIONS));
     }
 
     private void createSoundNotificationGroup(Composite parent) {
