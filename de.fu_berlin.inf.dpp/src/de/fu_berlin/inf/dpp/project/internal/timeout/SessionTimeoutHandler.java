@@ -101,21 +101,23 @@ abstract class SessionTimeoutHandler implements Startable {
         String threadName = reason == null ? "" : reason;
 
         if (session.isHost()) {
-            ThreadUtils.runSafeAsync("RemoveUser" + threadName, LOG, new Runnable() {
-                @Override
-                public void run() {
-                    User user = session.getUser(jid);
-                    if (user != null)
-                        session.removeUser(user);
-                }
-            });
+            ThreadUtils.runSafeAsync("RemoveUser" + threadName, LOG,
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        User user = session.getUser(jid);
+                        if (user != null)
+                            session.removeUser(user);
+                    }
+                });
         } else {
-            ThreadUtils.runSafeAsync("StopSession" + threadName, LOG, new Runnable() {
-                @Override
-                public void run() {
-                    sessionManager.stopSarosSession();
-                }
-            });
+            ThreadUtils.runSafeAsync("StopSession" + threadName, LOG,
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        sessionManager.stopSarosSession();
+                    }
+                });
         }
     }
 }

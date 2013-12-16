@@ -32,8 +32,8 @@ public class ChecksumErrorActivityTest extends AbstractActivityTest {
                 for (String recoveryID : recoveryIDs) {
                     ChecksumErrorActivity cea;
                     try {
-                        cea = new ChecksumErrorActivity(source, target,
-                            paths, recoveryID);
+                        cea = new ChecksumErrorActivity(source, target, paths,
+                            recoveryID);
                     } catch (IllegalArgumentException e) {
                         continue;
                     }

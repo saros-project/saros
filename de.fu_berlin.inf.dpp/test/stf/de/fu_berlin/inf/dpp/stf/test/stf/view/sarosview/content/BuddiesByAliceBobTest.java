@@ -44,10 +44,12 @@ public class BuddiesByAliceBobTest extends StfTestCase {
 
     @Test
     public void testAddExistingBuddy() throws RemoteException {
-        assertTrue(ALICE.superBot().views().sarosView().isInContactList(BOB.getJID()));
+        assertTrue(ALICE.superBot().views().sarosView()
+            .isInContactList(BOB.getJID()));
         ALICE.superBot().views().sarosView().selectBuddies()
             .addContact(BOB.getJID());
-        assertTrue(ALICE.superBot().views().sarosView().isInContactList(BOB.getJID()));
+        assertTrue(ALICE.superBot().views().sarosView()
+            .isInContactList(BOB.getJID()));
     }
 
     /**
@@ -71,17 +73,20 @@ public class BuddiesByAliceBobTest extends StfTestCase {
      */
     @Test
     public void renameBuddy() throws RemoteException {
-        assertTrue(ALICE.superBot().views().sarosView().isInContactList(BOB.getJID()));
+        assertTrue(ALICE.superBot().views().sarosView()
+            .isInContactList(BOB.getJID()));
         ALICE.superBot().views().sarosView().selectContact(BOB.getJID())
             .rename(BOB.getName());
 
-        assertTrue(ALICE.superBot().views().sarosView().isInContactList(BOB.getJID()));
+        assertTrue(ALICE.superBot().views().sarosView()
+            .isInContactList(BOB.getJID()));
         assertTrue(ALICE.superBot().views().sarosView()
             .getNickname(BOB.getJID()).equals(BOB.getName()));
 
         ALICE.superBot().views().sarosView().selectContact(BOB.getJID())
             .rename("new name");
-        assertTrue(ALICE.superBot().views().sarosView().isInContactList(BOB.getJID()));
+        assertTrue(ALICE.superBot().views().sarosView()
+            .isInContactList(BOB.getJID()));
         assertTrue(ALICE.superBot().views().sarosView()
             .getNickname(BOB.getJID()).equals("new name"));
     }
@@ -89,11 +94,15 @@ public class BuddiesByAliceBobTest extends StfTestCase {
     @Test
     public void addBuddy() throws Exception {
         Util.removeTestersFromContactList(ALICE, BOB);
-        assertFalse(ALICE.superBot().views().sarosView().isInContactList(BOB.getJID()));
-        assertFalse(BOB.superBot().views().sarosView().isInContactList(ALICE.getJID()));
+        assertFalse(ALICE.superBot().views().sarosView()
+            .isInContactList(BOB.getJID()));
+        assertFalse(BOB.superBot().views().sarosView()
+            .isInContactList(ALICE.getJID()));
         Util.addTestersToContactList(ALICE, BOB);
-        assertTrue(ALICE.superBot().views().sarosView().isInContactList(BOB.getJID()));
-        assertTrue(BOB.superBot().views().sarosView().isInContactList(ALICE.getJID()));
+        assertTrue(ALICE.superBot().views().sarosView()
+            .isInContactList(BOB.getJID()));
+        assertTrue(BOB.superBot().views().sarosView()
+            .isInContactList(ALICE.getJID()));
     }
 
     /**
@@ -111,10 +120,13 @@ public class BuddiesByAliceBobTest extends StfTestCase {
      */
     @Test
     public void deleteBuddy() throws Exception {
-        assertTrue(ALICE.superBot().views().sarosView().isInContactList(BOB.getJID()));
+        assertTrue(ALICE.superBot().views().sarosView()
+            .isInContactList(BOB.getJID()));
         Util.removeTestersFromContactList(ALICE, BOB);
-        assertFalse(ALICE.superBot().views().sarosView().isInContactList(BOB.getJID()));
-        assertFalse(BOB.superBot().views().sarosView().isInContactList(ALICE.getJID()));
+        assertFalse(ALICE.superBot().views().sarosView()
+            .isInContactList(BOB.getJID()));
+        assertFalse(BOB.superBot().views().sarosView()
+            .isInContactList(ALICE.getJID()));
         Thread.sleep(5000);
     }
 

@@ -19,8 +19,8 @@ public class FakeConnectionFactory {
 
         private Map<JID, IReceiver> receivers;
 
-        private FakeConnectionFactoryResult(Map<JID, ITransmitter> transmitters,
-            Map<JID, IReceiver> receivers) {
+        private FakeConnectionFactoryResult(
+            Map<JID, ITransmitter> transmitters, Map<JID, IReceiver> receivers) {
             this.transmitters = transmitters;
             this.receivers = receivers;
         }
@@ -51,7 +51,8 @@ public class FakeConnectionFactory {
         this.jids = new HashSet<JID>(Arrays.asList(jids));
     }
 
-    public FakeConnectionFactory withThreadedReceiver(DispatchThreadContext context) {
+    public FakeConnectionFactory withThreadedReceiver(
+        DispatchThreadContext context) {
         this.context = context;
         useThreadedReceiver = true;
         return this;

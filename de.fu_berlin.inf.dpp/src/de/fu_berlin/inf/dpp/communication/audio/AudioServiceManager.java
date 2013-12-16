@@ -256,7 +256,8 @@ public class AudioServiceManager {
         if (playbackDeviceOk) {
             audioReceiverRunnable = new AudioReceiverRunnable(
                 session.getInputStream(0), this, preferenceUtils);
-            ThreadUtils.runSafeAsync("AudioReceiver", log, audioReceiverRunnable);
+            ThreadUtils.runSafeAsync("AudioReceiver", log,
+                audioReceiverRunnable);
         }
     }
 

@@ -79,8 +79,7 @@ public class JupiterClient {
     public synchronized ChecksumActivity withTimestamp(
         ChecksumActivity checksumActivity) {
 
-        return get(checksumActivity.getPath()).withTimestamp(
-            checksumActivity);
+        return get(checksumActivity.getPath()).withTimestamp(checksumActivity);
     }
 
 }

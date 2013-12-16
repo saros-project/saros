@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.feedback;
 
-
 /**
  * Parent class for FeedbackManager and StatisticManager
  */

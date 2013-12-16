@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.invitation;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-
 /**
  * This class contains all the information that the remote user needs during a
  * project negotiation. The {@link FileList} of the whole project, the project

@@ -202,7 +202,7 @@ public class Saros extends AbstractUIPlugin {
 
         try {
             InputStream sarosProperties = Saros.class.getClassLoader()
-                .getResourceAsStream("saros.properties"); //$NON-NLS-1$ 
+                .getResourceAsStream("saros.properties"); //$NON-NLS-1$
 
             if (sarosProperties == null) {
                 LogLog

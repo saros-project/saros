@@ -408,8 +408,7 @@ public class Jupiter implements Algorithm {
 
     }
 
-    public ChecksumActivity withTimestamp(
-        ChecksumActivity checksumActivity) {
+    public ChecksumActivity withTimestamp(ChecksumActivity checksumActivity) {
         return checksumActivity.withTimestamp(this.vectorTime);
     }
 }

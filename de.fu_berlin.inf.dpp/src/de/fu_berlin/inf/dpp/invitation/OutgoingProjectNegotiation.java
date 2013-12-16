@@ -244,8 +244,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 + peer + " while waiting for the file list",
                 CancelOption.DO_NOT_NOTIFY_PEER);
 
-        List<FileList> remoteFileLists = ProjectNegotiationMissingFilesExtension.PROVIDER.getPayload(
-            packet).getFileLists();
+        List<FileList> remoteFileLists = ProjectNegotiationMissingFilesExtension.PROVIDER
+            .getPayload(packet).getFileLists();
 
         log.debug(this + " : remote file list has been received");
 
@@ -412,8 +412,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
     private void createCollectors() {
         remoteFileListResponseCollector = xmppReceiver
-            .createCollector(ProjectNegotiationMissingFilesExtension.PROVIDER.getPacketFilter(
-                sessionID, processID));
+            .createCollector(ProjectNegotiationMissingFilesExtension.PROVIDER
+                .getPacketFilter(sessionID, processID));
 
         startActivityQueuingResponseCollector = xmppReceiver
             .createCollector(StartActivityQueuingResponse.PROVIDER

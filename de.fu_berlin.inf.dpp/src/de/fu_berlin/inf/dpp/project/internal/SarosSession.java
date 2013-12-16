@@ -42,7 +42,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Platform;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.annotations.Inject;
 
@@ -101,7 +100,6 @@ import de.fu_berlin.inf.dpp.project.internal.timeout.ServerSessionTimeoutHandler
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
-import de.fu_berlin.inf.dpp.util.ArrayUtils;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -1036,7 +1034,8 @@ public final class SarosSession implements ISarosSession {
             }
             List<IResource> childResources = null;
             try {
-                childResources = Arrays.asList(((IContainer) iResource).members());
+                childResources = Arrays.asList(((IContainer) iResource)
+                    .members());
             } catch (CoreException e) {
                 log.debug("Can't get children of Project/Folder. ", e);
             }

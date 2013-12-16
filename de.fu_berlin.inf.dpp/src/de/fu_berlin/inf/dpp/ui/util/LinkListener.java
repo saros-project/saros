@@ -8,7 +8,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Listener;
 
-
 /**
  * A simple Listener that handles link selection events by opening the link text
  * in an external browser. Is supposed to be used with {@link Link}. <br>

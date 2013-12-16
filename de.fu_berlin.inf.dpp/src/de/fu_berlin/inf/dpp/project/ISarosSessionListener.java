@@ -71,7 +71,8 @@ public interface ISarosSessionListener {
      *            cancellation
      * 
      */
-    public void postOutgoingInvitationCompleted(IProgressMonitor monitor, User user);
+    public void postOutgoingInvitationCompleted(IProgressMonitor monitor,
+        User user);
 
     /**
      * Is fired when a new session is about to start.

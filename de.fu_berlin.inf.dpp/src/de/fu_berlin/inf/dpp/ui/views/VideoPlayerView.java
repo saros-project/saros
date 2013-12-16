@@ -72,6 +72,7 @@ import de.fu_berlin.inf.dpp.ui.actions.VideoSharingAction;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.ListExplanationComposite.ListExplanation;
 import de.fu_berlin.inf.dpp.ui.widgets.ListExplanatoryComposite;
+import de.fu_berlin.inf.dpp.ui.widgets.SimpleExplanatoryComposite;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
@@ -393,16 +394,17 @@ public class VideoPlayerView extends ViewPart implements VideoDisplay {
 
         @Override
         public void run() {
-            ThreadUtils.runSafeAsync("VideoChangeSourceAction", log, new Runnable() {
-                @Override
-                public void run() {
-                    VideoSharingSession session = VideoPlayerView.this.videoSharingSessionObservable
-                        .getValue();
-                    if (session != null) {
-                        session.requestChangeImageSourceMode();
+            ThreadUtils.runSafeAsync("VideoChangeSourceAction", log,
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        VideoSharingSession session = VideoPlayerView.this.videoSharingSessionObservable
+                            .getValue();
+                        if (session != null) {
+                            session.requestChangeImageSourceMode();
+                        }
                     }
-                }
-            });
+                });
         }
     }
 

@@ -78,25 +78,22 @@ public class ActivityQueuer {
 
                     EditorActivityDataObject eado = (EditorActivityDataObject) pado;
 
-                    if (!alreadyRememberedEditorADO(editorADOs, path,
-                        source) && eado.getType() != Type.ACTIVATED) {
+                    if (!alreadyRememberedEditorADO(editorADOs, path, source)
+                        && eado.getType() != Type.ACTIVATED) {
                         activitiesThatWillBeExecuted
                             .add(new EditorActivityDataObject(eado.getSource(),
                                 Type.ACTIVATED, path));
                     }
 
-                    rememberEditorADO(editorADOs, path,
-                        source);
+                    rememberEditorADO(editorADOs, path, source);
                 } else if (pado instanceof JupiterActivityDataObject
-                    && !alreadyRememberedEditorADO(editorADOs, path,
-                        source)) {
+                    && !alreadyRememberedEditorADO(editorADOs, path, source)) {
 
                     activitiesThatWillBeExecuted
                         .add(new EditorActivityDataObject(pado.getSource(),
                             Type.ACTIVATED, path));
 
-                    rememberEditorADO(editorADOs, path,
-                        source);
+                    rememberEditorADO(editorADOs, path, source);
                 }
                 activitiesThatWillBeExecuted.add(pado);
             }
@@ -162,15 +159,14 @@ public class ActivityQueuer {
     }
 
     private boolean alreadyRememberedEditorADO(
-        Map<SPathDataObject, List<JID>> editorADOs,
-        SPathDataObject spdo, JID jid) {
+        Map<SPathDataObject, List<JID>> editorADOs, SPathDataObject spdo,
+        JID jid) {
 
         List<JID> jids = editorADOs.get(spdo);
         return jids != null && jids.contains(jid);
     }
 
-    private void rememberEditorADO(
-        Map<SPathDataObject, List<JID>> editorADOs,
+    private void rememberEditorADO(Map<SPathDataObject, List<JID>> editorADOs,
         SPathDataObject spdo, JID jid) {
         List<JID> jids = editorADOs.get(spdo);
 

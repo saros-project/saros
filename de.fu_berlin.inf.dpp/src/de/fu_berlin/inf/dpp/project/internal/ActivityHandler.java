@@ -384,9 +384,11 @@ public final class ActivityHandler implements Startable {
                 + " activities [mode = " + DISPATCH_MODE + "] : " + activities);
 
         if (DISPATCH_MODE == DISPATCH_MODE_SYNC)
-            synchronizer.syncExec(ThreadUtils.wrapSafe(LOG, transformingRunnable));
+            synchronizer.syncExec(ThreadUtils.wrapSafe(LOG,
+                transformingRunnable));
         else
-            synchronizer.asyncExec(ThreadUtils.wrapSafe(LOG, transformingRunnable));
+            synchronizer.asyncExec(ThreadUtils.wrapSafe(LOG,
+                transformingRunnable));
     }
 
     /**

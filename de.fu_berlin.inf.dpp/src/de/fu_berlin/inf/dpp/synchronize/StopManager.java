@@ -230,27 +230,27 @@ public final class StopManager extends AbstractActivityProvider implements
         final LinkedList<Thread> threads = new LinkedList<Thread>();
 
         for (final User user : users) {
-            threads.add(ThreadUtils.runSafeAsync("BlockUser-" + user + "-" + cause,
-                log, new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            if (monitor.isCanceled())
-                                return;
+            threads.add(ThreadUtils.runSafeAsync("BlockUser-" + user + "-"
+                + cause, log, new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        if (monitor.isCanceled())
+                            return;
 
-                            StartHandle startHandle = stop(user, cause, monitor);
-                            resultingHandles.add(startHandle);
-                            log.debug("added " + startHandle
-                                + " to resulting handles.");
-                        } catch (CancellationException e) {
-                            log.debug("user canceled the stopping");
-                            monitor.setCanceled(true);
-                        } catch (InterruptedException e) {
-                            log.debug("canceling because of an InterruptedException");
-                            monitor.setCanceled(true);
-                        }
+                        StartHandle startHandle = stop(user, cause, monitor);
+                        resultingHandles.add(startHandle);
+                        log.debug("added " + startHandle
+                            + " to resulting handles.");
+                    } catch (CancellationException e) {
+                        log.debug("user canceled the stopping");
+                        monitor.setCanceled(true);
+                    } catch (InterruptedException e) {
+                        log.debug("canceling because of an InterruptedException");
+                        monitor.setCanceled(true);
                     }
-                }));
+                }
+            }));
         }
 
         /**

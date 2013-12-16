@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
-
 import de.fu_berlin.inf.dpp.User;
 
 /**

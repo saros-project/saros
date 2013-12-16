@@ -88,7 +88,7 @@ public class TextSelectionActivityDataObject extends
     @Override
     public IActivity getActivity(ISarosSession sarosSession) {
         return new TextSelectionActivity(sarosSession.getUser(getSource()),
-            offset, length, (getPath() != null ? getPath().toSPath(sarosSession)
-                : null));
+            offset, length, (getPath() != null ? getPath()
+                .toSPath(sarosSession) : null));
     }
 }

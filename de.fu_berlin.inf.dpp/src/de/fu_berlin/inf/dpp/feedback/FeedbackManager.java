@@ -257,7 +257,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
                 @Override
                 public Boolean call() {
                     Dialog dialog = new FeedbackDialog(SWTUtils.getShell(),
-                        FeedbackManager.this, message);
+                        message);
                     return dialog.open() == Window.OK;
                 }
 

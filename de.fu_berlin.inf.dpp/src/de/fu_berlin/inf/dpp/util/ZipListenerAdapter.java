@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.util;
 
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

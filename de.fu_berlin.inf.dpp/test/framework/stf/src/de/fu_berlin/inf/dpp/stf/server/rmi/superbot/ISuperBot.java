@@ -117,7 +117,8 @@ public interface ISuperBot extends Remote {
         throws RemoteException;
 
     /**
-     * Confirms the shell with title {@link StfRemoteObject#SHELL_ADD_CONTACT_WIZARD}.
+     * Confirms the shell with title
+     * {@link StfRemoteObject#SHELL_ADD_CONTACT_WIZARD}.
      * 
      * @param baseJIDOfinvitees
      * @throws RemoteException
@@ -134,7 +135,8 @@ public interface ISuperBot extends Remote {
     public void confirmShellClosingTheSession() throws RemoteException;
 
     /**
-     * Confirm the shell with title {@link StfRemoteObject#SHELL_ADD_CONTACT_WIZARD}
+     * Confirm the shell with title
+     * {@link StfRemoteObject#SHELL_ADD_CONTACT_WIZARD}
      * 
      * @param jid
      *            {@link JID}

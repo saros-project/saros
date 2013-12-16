@@ -142,8 +142,8 @@ public class RemoveUserAction extends Action {
     private void updateEnablement() {
         ISarosSession currentSession = session;
 
-        List<User> users = SelectionRetrieverFactory
-            .getSelectionRetriever(User.class).getSelection();
+        List<User> users = SelectionRetrieverFactory.getSelectionRetriever(
+            User.class).getSelection();
 
         setEnabled(currentSession != null && currentSession.isHost()
             && canRemoveUsers(users));

@@ -36,16 +36,11 @@ public class FeedbackDialog extends MessageDialog {
     /** check box to let the user toggle "don't ask me again" */
     protected Button checkButton;
 
-    protected FeedbackManager feedbackManager;
-
-    public FeedbackDialog(Shell parentShell, FeedbackManager feedbackManager,
-        String message) {
+    public FeedbackDialog(Shell parentShell, String message) {
         // create MessageDialog with title and message, buttons are
         // added later
         super(parentShell, FEEDBACK_TITLE, null, message,
             MessageDialog.QUESTION, null, -1);
-
-        this.feedbackManager = feedbackManager;
     }
 
     @Override
@@ -122,6 +117,6 @@ public class FeedbackDialog extends MessageDialog {
      * the automatic feedback requests.
      */
     protected void updatePreferences() {
-        feedbackManager.setFeedbackDisabled(checkButton.getSelection());
+        FeedbackManager.setFeedbackDisabled(checkButton.getSelection());
     }
 }

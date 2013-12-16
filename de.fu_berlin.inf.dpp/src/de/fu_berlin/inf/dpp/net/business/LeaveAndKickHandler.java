@@ -37,8 +37,10 @@ public class LeaveAndKickHandler {
 
         @Override
         public void sessionStarted(ISarosSession session) {
-            receiver.addPacketListener(leaveExtensionListener,
-                LeaveSessionExtension.PROVIDER.getPacketFilter(session.getID()));
+            receiver
+                .addPacketListener(leaveExtensionListener,
+                    LeaveSessionExtension.PROVIDER.getPacketFilter(session
+                        .getID()));
 
             receiver.addPacketListener(kickExtensionListener,
                 KickUserExtension.PROVIDER.getPacketFilter(session.getID()));

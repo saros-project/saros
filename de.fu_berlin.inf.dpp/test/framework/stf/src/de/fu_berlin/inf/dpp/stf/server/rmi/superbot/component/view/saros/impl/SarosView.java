@@ -209,7 +209,8 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
      **********************************************/
 
     @Override
-    public IContextMenusInContactListArea selectBuddies() throws RemoteException {
+    public IContextMenusInContactListArea selectBuddies()
+        throws RemoteException {
         initBuddiesContextMenuWrapper(Pattern.quote((NODE_CONTACTS)));
         return ContextMenusInContactListArea.getInstance();
     }
@@ -640,7 +641,8 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
 
     private void initBuddiesContextMenuWrapper(String... treeItemNodes) {
         ContextMenusInContactListArea.getInstance().setTree(tree);
-        ContextMenusInContactListArea.getInstance().setTreeItemNodes(treeItemNodes);
+        ContextMenusInContactListArea.getInstance().setTreeItemNodes(
+            treeItemNodes);
         ContextMenusInContactListArea.getInstance().setSarosView(this);
     }
 }

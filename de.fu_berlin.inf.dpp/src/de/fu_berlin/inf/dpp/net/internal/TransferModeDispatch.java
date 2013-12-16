@@ -36,15 +36,14 @@ public class TransferModeDispatch implements ITransferModeListener {
     }
 
     @Override
-    public synchronized void transferFinished(JID jid,
-        NetTransferMode newMode, boolean incoming, long sizeTransferred,
-        long sizeUncompressed, long transmissionMillisecs) {
+    public synchronized void transferFinished(JID jid, NetTransferMode newMode,
+        boolean incoming, long sizeTransferred, long sizeUncompressed,
+        long transmissionMillisecs) {
 
         for (ITransferModeListener listener : listeners) {
             try {
                 listener.transferFinished(jid, newMode, incoming,
-                    sizeTransferred, sizeUncompressed,
-                    transmissionMillisecs);
+                    sizeTransferred, sizeUncompressed, transmissionMillisecs);
             } catch (RuntimeException e) {
                 log.error("Listener crashed: ", e);
             }

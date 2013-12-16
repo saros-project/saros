@@ -38,9 +38,10 @@ public class VCSActivityDataObject extends AbstractProjectActivityDataObject {
 
     @Override
     public IActivity getActivity(ISarosSession sarosSession) {
-        final VCSActivity vcsActivity = new VCSActivity(sarosSession.getUser(getSource()),
-            type, (getPath() != null ? getPath()
-                .toSPath(sarosSession) : null), url, directory, param1);
+        final VCSActivity vcsActivity = new VCSActivity(
+            sarosSession.getUser(getSource()), type,
+            (getPath() != null ? getPath().toSPath(sarosSession) : null), url,
+            directory, param1);
 
         vcsActivity.containedActivity.ensureCapacity(containedActivity.size());
         for (IActivityDataObject ado : containedActivity) {

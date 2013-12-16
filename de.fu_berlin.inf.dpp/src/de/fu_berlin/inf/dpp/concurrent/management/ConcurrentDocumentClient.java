@@ -206,8 +206,7 @@ public class ConcurrentDocumentClient {
         try {
             return jupiterClient.isCurrent(checksumActivity);
         } catch (TransformationException e) {
-            log.error("Error during transformation of: "
-                + checksumActivity, e);
+            log.error("Error during transformation of: " + checksumActivity, e);
             // TODO this should trigger a consistency recovery. Difficult :-(
             return false;
         }

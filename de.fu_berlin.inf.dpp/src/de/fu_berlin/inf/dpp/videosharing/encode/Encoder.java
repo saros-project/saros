@@ -109,7 +109,8 @@ public abstract class Encoder implements Runnable {
             throw new IllegalStateException();
         isEncoding = true;
 
-        encoderThread = ThreadUtils.runSafeAsync("VideosharingEncoder", log, this);
+        encoderThread = ThreadUtils.runSafeAsync("VideosharingEncoder", log,
+            this);
 
         encodingLatch.countDown();
 

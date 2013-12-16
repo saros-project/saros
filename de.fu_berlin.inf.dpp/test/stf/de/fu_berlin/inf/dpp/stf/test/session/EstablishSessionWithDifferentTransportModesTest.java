@@ -30,7 +30,8 @@ import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
  * This test class ensures that it is possible to establish and running sessions
  * with different network transports(Socks5 Direct/Mediated and IBB).
  */
-public class EstablishSessionWithDifferentTransportModesTest extends StfTestCase {
+public class EstablishSessionWithDifferentTransportModesTest extends
+    StfTestCase {
 
     @BeforeClass
     public static void selectTesters() throws Exception {

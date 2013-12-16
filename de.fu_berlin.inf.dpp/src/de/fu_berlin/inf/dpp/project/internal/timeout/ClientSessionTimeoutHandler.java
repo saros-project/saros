@@ -118,8 +118,8 @@ public final class ClientSessionTimeoutHandler extends SessionTimeoutHandler {
         receiver.addPacketListener(pingPacketListener,
             PingExtension.PROVIDER.getPacketFilter(currentSessionID));
 
-        workerThread = ThreadUtils.runSafeAsync("ClientSessionTimeoutWatchdog", LOG,
-            clientSessionTimeoutWatchdog);
+        workerThread = ThreadUtils.runSafeAsync("ClientSessionTimeoutWatchdog",
+            LOG, clientSessionTimeoutWatchdog);
     }
 
     @Override

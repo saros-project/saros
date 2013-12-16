@@ -146,8 +146,8 @@ public abstract class Decoder implements Runnable, Disposable {
      */
     public void startDecoder() {
         if (decoderThread == null)
-            decoderThread = ThreadUtils
-                .runSafeAsync("VideoSharingDecoder", log, this);
+            decoderThread = ThreadUtils.runSafeAsync("VideoSharingDecoder",
+                log, this);
     }
 
     @Override

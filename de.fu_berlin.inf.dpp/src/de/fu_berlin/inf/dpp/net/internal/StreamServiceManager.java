@@ -399,7 +399,8 @@ public class StreamServiceManager implements Startable {
             sender.sendPacket(transferDescription,
                 StreamMetaPacketData.STOP.getIdentifier());
 
-        Runnable stopThread = ThreadUtils.wrapSafe(log, new SessionKiller(session));
+        Runnable stopThread = ThreadUtils.wrapSafe(log, new SessionKiller(
+            session));
 
         if (stopSessionExecutor != null) {
             stopSessionExecutor.schedule(stopThread, SESSION_SHUTDOWN_LIMIT,
@@ -1385,74 +1386,79 @@ public class StreamServiceManager implements Startable {
                  * Ask service for accept and send decision to client. When
                  * accepted, a new session will be created.
                  */
-                negotiatesToUser.execute(ThreadUtils.wrapSafe(log, new Runnable() {
-                    @Override
-                    public void run() {
-                        log.debug("Starting session request to service");
+                negotiatesToUser.execute(ThreadUtils.wrapSafe(log,
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            log.debug("Starting session request to service");
 
-                        boolean startSession = false;
-                        try {
-                            startSession = service.sessionRequest(from,
-                                initiationDescription);
-                        } catch (Exception e) {
-                            log.error("Service crashed: ", e);
-                        }
-
-                        if (startSession) {
-                            log.debug("Service accepted, try to create session");
-
-                            final StreamSession newSession;
-                            synchronized (sessions) {
-                                if (sessions.containsKey(streamPath)) {
-                                    log.warn("Session already created, received INIT twice: "
-                                        + streamPath);
-                                    return;
-                                }
-                                newSession = new StreamSession(
-                                    StreamServiceManager.this, service,
-                                    transferDescription.getSender(),
-                                    // FIMXE IS THIS RIGHT ?!
-                                    transferDescription.getSender(),
-                                    streamPath.sessionID, initiationDescription);
-
+                            boolean startSession = false;
+                            try {
+                                startSession = service.sessionRequest(from,
+                                    initiationDescription);
+                            } catch (Exception e) {
+                                log.error("Service crashed: ", e);
                             }
 
-                            if (sender != null) {
-                                sender.sendPacket(
-                                    newSession.getTransferDescription(),
-                                    StreamMetaPacketData.ACCEPT.getIdentifier());
-                                log.debug("Accept-packet send.");
-                                sessions.put(streamPath, newSession);
-                            } else
-                                // can not create, not connected
-                                newSession.dispose();
+                            if (startSession) {
+                                log.debug("Service accepted, try to create session");
 
-                            sessionDispatcher.execute(ThreadUtils.wrapSafe(log,
-                                new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        service.startSession(newSession);
-                                        log.debug("Session started");
+                                final StreamSession newSession;
+                                synchronized (sessions) {
+                                    if (sessions.containsKey(streamPath)) {
+                                        log.warn("Session already created, received INIT twice: "
+                                            + streamPath);
+                                        return;
                                     }
-                                }));
-                        } else {
-                            log.debug("Session rejected, will send reject-packet.");
-
-                            if (sender != null) {
-                                sender.sendPacket(TransferDescription
-                                    .createStreamMetaTransferDescription(
+                                    newSession = new StreamSession(
+                                        StreamServiceManager.this,
+                                        service,
                                         transferDescription.getSender(),
-                                        transferDescription.getRecipient(),
-                                        streamPath.toString(),
-                                        sarosSessionID.getValue()),
-                                    StreamMetaPacketData.REJECT.getIdentifier());
+                                        // FIMXE IS THIS RIGHT ?!
+                                        transferDescription.getSender(),
+                                        streamPath.sessionID,
+                                        initiationDescription);
 
-                                log.debug("Reject-packet send.");
+                                }
+
+                                if (sender != null) {
+                                    sender.sendPacket(newSession
+                                        .getTransferDescription(),
+                                        StreamMetaPacketData.ACCEPT
+                                            .getIdentifier());
+                                    log.debug("Accept-packet send.");
+                                    sessions.put(streamPath, newSession);
+                                } else
+                                    // can not create, not connected
+                                    newSession.dispose();
+
+                                sessionDispatcher.execute(ThreadUtils.wrapSafe(
+                                    log, new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            service.startSession(newSession);
+                                            log.debug("Session started");
+                                        }
+                                    }));
+                            } else {
+                                log.debug("Session rejected, will send reject-packet.");
+
+                                if (sender != null) {
+                                    sender.sendPacket(TransferDescription
+                                        .createStreamMetaTransferDescription(
+                                            transferDescription.getSender(),
+                                            transferDescription.getRecipient(),
+                                            streamPath.toString(),
+                                            sarosSessionID.getValue()),
+                                        StreamMetaPacketData.REJECT
+                                            .getIdentifier());
+
+                                    log.debug("Reject-packet send.");
+                                }
                             }
-                        }
 
-                    }
-                }));
+                        }
+                    }));
 
                 break;
             case STOP:
@@ -1469,8 +1475,8 @@ public class StreamServiceManager implements Startable {
                     log.error("Session " + session + " already stopped.");
                     return;
                 }
-                Runnable stopThread = ThreadUtils.wrapSafe(log, new SessionKiller(
-                    session));
+                Runnable stopThread = ThreadUtils.wrapSafe(log,
+                    new SessionKiller(session));
                 session.shutdown = stopThread;
 
                 stopSessionExecutor.schedule(stopThread,

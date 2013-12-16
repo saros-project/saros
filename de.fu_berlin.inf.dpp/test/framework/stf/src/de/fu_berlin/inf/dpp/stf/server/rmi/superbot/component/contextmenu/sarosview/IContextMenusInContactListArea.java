@@ -5,7 +5,8 @@ import java.rmi.RemoteException;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.submenu.IWorkTogetherOnContextMenu;
 
-public interface IContextMenusInContactListArea extends IContextMenusInSarosView {
+public interface IContextMenusInContactListArea extends
+    IContextMenusInSarosView {
 
     public void delete() throws RemoteException;
 

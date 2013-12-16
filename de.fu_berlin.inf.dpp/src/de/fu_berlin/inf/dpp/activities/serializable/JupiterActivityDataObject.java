@@ -77,7 +77,7 @@ public class JupiterActivityDataObject extends
     @Override
     public IActivity getActivity(ISarosSession sarosSession) {
         return new JupiterActivity(timestamp, operation,
-            sarosSession.getUser(getSource()),
-            getPath() != null ? getPath().toSPath(sarosSession) : null);
+            sarosSession.getUser(getSource()), getPath() != null ? getPath()
+                .toSPath(sarosSession) : null);
     }
 }

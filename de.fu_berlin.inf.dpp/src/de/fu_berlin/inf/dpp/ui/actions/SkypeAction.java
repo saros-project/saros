@@ -103,7 +103,8 @@ public class SkypeAction extends Action implements Disposable {
                     .getSelectionRetriever(JID.class).getSelection();
 
                 if (participants.size() == 1) {
-                    ThreadUtils.runSafeAsync("SkypeAction", log, new Runnable() { //$NON-NLS-1$
+                    ThreadUtils.runSafeAsync(
+                        "SkypeAction", log, new Runnable() { //$NON-NLS-1$
                             @Override
                             public void run() {
                                 SWTUtils.runSafeSWTSync(log, new Runnable() {

@@ -123,13 +123,15 @@ public class PermissionManager extends AbstractActivityProvider implements
         };
 
         if (user.isHost()) {
-            synchronizer.syncExec(ThreadUtils.wrapSafe(log, fireActivityrunnable));
+            synchronizer.syncExec(ThreadUtils.wrapSafe(log,
+                fireActivityrunnable));
 
         } else {
             StartHandle startHandle = sarosSession.getStopManager().stop(user,
                 Messages.SarosSession_performing_permission_change, progress);
 
-            synchronizer.syncExec(ThreadUtils.wrapSafe(log, fireActivityrunnable));
+            synchronizer.syncExec(ThreadUtils.wrapSafe(log,
+                fireActivityrunnable));
 
             if (!startHandle.start())
                 log.error("Didn't unblock. "

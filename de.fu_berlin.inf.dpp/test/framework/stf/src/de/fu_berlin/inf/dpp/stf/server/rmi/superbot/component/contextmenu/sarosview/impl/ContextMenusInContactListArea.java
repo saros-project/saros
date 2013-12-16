@@ -14,8 +14,8 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosv
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.submenu.impl.WorkTogetherOnContextMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.impl.SuperBot;
 
-public final class ContextMenusInContactListArea extends ContextMenusInSarosView
-    implements IContextMenusInContactListArea {
+public final class ContextMenusInContactListArea extends
+    ContextMenusInSarosView implements IContextMenusInContactListArea {
 
     private static final ContextMenusInContactListArea INSTANCE = new ContextMenusInContactListArea();
 

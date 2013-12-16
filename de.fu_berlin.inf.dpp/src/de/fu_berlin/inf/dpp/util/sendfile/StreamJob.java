@@ -99,20 +99,22 @@ public abstract class StreamJob extends Job {
         @Override
         public void sessionStopped() {
             StreamJob.this.stopped = true;
-            ThreadUtils.runSafeAsync("StreamSessionStopper", log, new Runnable() {
-                @Override
-                public void run() {
-                    StreamJob.this.cancel();
-                    try {
-                        StreamJob.this.readyToStop.await(30, TimeUnit.SECONDS);
-                    } catch (InterruptedException e) {
-                        log.error("Not designed to be interrupted");
-                        Thread.currentThread().interrupt();
+            ThreadUtils.runSafeAsync("StreamSessionStopper", log,
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        StreamJob.this.cancel();
+                        try {
+                            StreamJob.this.readyToStop.await(30,
+                                TimeUnit.SECONDS);
+                        } catch (InterruptedException e) {
+                            log.error("Not designed to be interrupted");
+                            Thread.currentThread().interrupt();
+                        }
+                        if (StreamJob.this.streamSession != null)
+                            StreamJob.this.streamSession.shutdownFinished();
                     }
-                    if (StreamJob.this.streamSession != null)
-                        StreamJob.this.streamSession.shutdownFinished();
-                }
-            });
+                });
 
         }
 

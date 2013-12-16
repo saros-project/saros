@@ -345,12 +345,13 @@ public class AddProjectToSessionWizard extends Wizard {
                 Messages.AddProjectToSessionWizard_leave_session_text, false)) {
                 return false;
             }
-            ThreadUtils.runSafeAsync("CancelAddProjectWizard", log, new Runnable() {
-                @Override
-                public void run() {
-                    process.localCancel(null, CancelOption.NOTIFY_PEER);
-                }
-            });
+            ThreadUtils.runSafeAsync("CancelAddProjectWizard", log,
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        process.localCancel(null, CancelOption.NOTIFY_PEER);
+                    }
+                });
         }
         isExceptionCancel = false;
         return true;

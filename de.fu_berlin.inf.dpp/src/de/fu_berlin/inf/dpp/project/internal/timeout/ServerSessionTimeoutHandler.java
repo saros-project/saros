@@ -176,8 +176,8 @@ public final class ServerSessionTimeoutHandler extends SessionTimeoutHandler {
 
         session.addListener(sessionEventListener);
 
-        workerThread = ThreadUtils.runSafeAsync("ServerSessionTimeoutWatchdog", LOG,
-            serverSessionTimeoutWatchdog);
+        workerThread = ThreadUtils.runSafeAsync("ServerSessionTimeoutWatchdog",
+            LOG, serverSessionTimeoutWatchdog);
     }
 
     @Override

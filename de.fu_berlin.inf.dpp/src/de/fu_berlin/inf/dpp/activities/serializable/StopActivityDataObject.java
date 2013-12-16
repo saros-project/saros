@@ -100,7 +100,7 @@ public class StopActivityDataObject extends AbstractActivityDataObject {
     @Override
     public IActivity getActivity(ISarosSession sarosSession) {
         return new StopActivity(sarosSession.getUser(getSource()),
-            sarosSession.getUser(initiator), sarosSession.getUser(affected), type,
-            state, stopActivityID);
+            sarosSession.getUser(initiator), sarosSession.getUser(affected),
+            type, state, stopActivityID);
     }
 }

@@ -509,8 +509,8 @@ public class VideoSharing {
 
             decoder.startDecoder();
 
-            errorThread = ThreadUtils.runSafeAsync("VideoSharingErrorReceiver", log,
-                new Runnable() {
+            errorThread = ThreadUtils.runSafeAsync("VideoSharingErrorReceiver",
+                log, new Runnable() {
                     @Override
                     public void run() {
                         try {
