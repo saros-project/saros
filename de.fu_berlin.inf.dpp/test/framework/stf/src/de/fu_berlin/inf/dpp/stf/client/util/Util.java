@@ -423,6 +423,7 @@ public class Util {
                 tester.superBot().views().sarosView()
                     .addContact(contact.getJID());
                 contact.superBot().confirmShellRequestOfSubscriptionReceived();
+                tester.superBot().confirmShellRequestOfSubscriptionReceived();
             }
         }
     }

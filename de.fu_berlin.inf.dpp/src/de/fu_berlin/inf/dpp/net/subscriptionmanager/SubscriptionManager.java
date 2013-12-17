@@ -4,7 +4,6 @@ import java.text.MessageFormat;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.RosterEntry;
@@ -12,6 +11,7 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.packet.Presence.Type;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
@@ -19,8 +19,6 @@ import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SafePacketListener;
 import de.fu_berlin.inf.dpp.net.SarosNet;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 
 /**
  * This is class is responsible for handling XMPP subscriptions requests.
@@ -37,9 +35,9 @@ public class SubscriptionManager {
 
     private Connection connection = null;
 
-    private CopyOnWriteArrayList<SubscriptionManagerListener> subscriptionManagerListeners = new CopyOnWriteArrayList<SubscriptionManagerListener>();
+    private final CopyOnWriteArrayList<SubscriptionManagerListener> subscriptionListeners = new CopyOnWriteArrayList<SubscriptionManagerListener>();
 
-    private IConnectionListener connectionListener = new IConnectionListener() {
+    private final IConnectionListener connectionListener = new IConnectionListener() {
         @Override
         public void connectionStateChanged(Connection connection,
             ConnectionState connectionSate) {
@@ -51,7 +49,7 @@ public class SubscriptionManager {
         }
     };
 
-    private PacketListener packetListener = new SafePacketListener(log,
+    private final PacketListener packetListener = new SafePacketListener(log,
         new PacketListener() {
             @Override
             public void processPacket(Packet packet) {
@@ -77,12 +75,63 @@ public class SubscriptionManager {
             connection.removePacketListener(packetListener);
     }
 
+    /**
+     * Changes the subscription state for the given contact to
+     * {@link Type#subscribed} allowing this contact to see the online and
+     * offline status of the currently connected user.
+     * 
+     * @param jid
+     *            the {@linkplain JID} of the contact
+     * 
+     * @param requestSubscription
+     *            if <code>true</code> the contact a subscription request to the
+     *            given contact will be made
+     * 
+     * @return <code>true</code> if the operation was successful or
+     *         <code>false</code> if an error occurred or not connected to an
+     *         XMPP server
+     */
+    public synchronized boolean addSubscription(JID jid,
+        boolean requestSubscription) {
+        if (connection == null)
+            return false;
+
+        boolean success = true;
+        success &= sendSubscribedPresence(jid);
+
+        if (requestSubscription)
+            success &= requestSubscription(jid);
+
+        return success;
+    }
+
+    /**
+     * Changes the subscription state for the given contact to
+     * {@link Type#unsubscribed} disallowing this contact to see the online and
+     * offline status of the currently connected user. This method may also be
+     * called to reject a subscription request from a contact.
+     * 
+     * @param jid
+     *            the {@linkplain JID} of the contact
+     * 
+     * @return <code>true</code> if the operation was successful or
+     *         <code>false</code> if an error occurred or not connected to an
+     *         XMPP server
+     */
+
+    public synchronized boolean removeSubscription(JID jid) {
+        if (connection == null)
+            return false;
+
+        return sendUnsubscribedPresence(jid);
+    }
+
     /*
      * TODO the RFC states that we should send presence replies for subscribed
      * and unsubscribed presences ... check if this this handled correctly by
      * the server or we would create an infinite loop
      */
-    private synchronized void processPresence(Presence presence) {
+    private void processPresence(Presence presence) {
 
         if (presence.getFrom() == null)
             return;
@@ -109,113 +158,80 @@ public class SubscriptionManager {
             log.debug("contact requests to subscribe to us: "
                 + presence.getFrom());
 
-            /*
-             * Notify listeners; if at least one set the autoSubscribe flag to
-             * true, do not ask the user for confirmation
-             */
-            boolean autoSubscribe = notifySubscriptionReceived(new JID(
-                presence.getFrom()));
-
-            // ask user for confirmation of subscription
-            if (autoSubscribe)
-                handleSubscriptionRequest(presence);
-            else
-                askUserForSubscriptionConfirmation(presence);
-
+            notifySubscriptionReceived(new JID(presence.getFrom()));
             break;
 
         case unsubscribe:
             log.debug("contact requests to unsubscribe from us: "
                 + presence.getFrom());
-            acknowledgeUnsubscribingRequest(presence);
+            removeSubscription(new JID(presence.getFrom()));
             break;
         default:
             // do nothing
         }
     }
 
-    private synchronized void handleSubscriptionRequest(Presence from) {
-        acknowledgeSubscriptionRequest(from);
-        requestSubscription(from);
-    }
+    private synchronized boolean requestSubscription(JID jid) {
+        boolean error = false;
 
-    private synchronized void requestSubscription(Presence to) {
-        RosterEntry entry = connection.getRoster().getEntry(to.getFrom());
+        RosterEntry entry = connection.getRoster().getEntry(jid.getBase());
 
         try {
             if (entry != null)
-                sendPresence(Presence.Type.subscribe, to.getFrom());
+                sendPresence(Presence.Type.subscribe, jid.getBase());
             else
                 // will send a subscribe presence
-                connection.getRoster().createEntry(to.getFrom(), null, null);
+                connection.getRoster().createEntry(jid.getBase(), null, null);
 
         } catch (XMPPException e) {
             log.error("adding user to roster failed", e);
-            return;
+            error = true;
         } catch (IllegalStateException e) {
             log.error(
                 "cannot add user to roster, not connected to a XMPP server", e);
-            return;
+            error = true;
         }
+
+        return error;
     }
 
-    private synchronized void acknowledgeSubscriptionRequest(Presence to) {
+    private boolean sendSubscribedPresence(JID jid) {
+        boolean error = false;
+
         try {
-            sendPresence(Presence.Type.subscribed, to.getFrom());
+            sendPresence(Presence.Type.subscribed, jid.getBase());
         } catch (IllegalStateException e) {
             log.error(
                 "failed to send subscribe message, not connected to a XMPP server",
                 e);
+
+            error = true;
         }
+
+        return error;
     }
 
-    private synchronized void acknowledgeUnsubscribingRequest(Presence presence) {
+    private boolean sendUnsubscribedPresence(JID jid) {
+        boolean error = false;
+
         try {
-            sendPresence(Presence.Type.unsubscribed, presence.getFrom());
+            sendPresence(Presence.Type.unsubscribed, jid.getBase());
         } catch (IllegalStateException e) {
             log.error(
                 "failed to send unsubscribed message, not connected to a XMPP server",
                 e);
+
+            error = true;
         }
+
+        return error;
     }
 
-    private synchronized void sendPresence(Presence.Type type, String to) {
+    private void sendPresence(Presence.Type type, String to) {
         Presence presence = new Presence(type);
         presence.setTo(to);
         presence.setFrom(connection.getUser());
         connection.sendPacket(presence);
-    }
-
-    // FIXME REMOVE THIS METHOD FROM THE CLASS !!! Belongs to the UI, not to the
-    // logic
-
-    private void askUserForSubscriptionConfirmation(final Presence presence) {
-
-        SWTUtils.runSafeSWTAsync(log, new Runnable() {
-            @Override
-            public void run() {
-                boolean accept = MessageDialog.openConfirm(
-                    SWTUtils.getShell(),
-                    Messages.SubscriptionManager_incoming_subscription_request_title,
-                    MessageFormat
-                        .format(
-                            Messages.SubscriptionManager_incoming_subscription_request_message,
-                            new JID(presence.getFrom()).getBareJID()));
-
-                if (accept)
-                    handleSubscriptionRequest(presence);
-                else {
-                    try {
-                        sendPresence(Presence.Type.unsubscribed,
-                            presence.getFrom());
-                    } catch (IllegalStateException e) {
-                        log.warn(
-                            "failed to send unsubscribe message, not connected to a XMPP server",
-                            e);
-                    }
-                }
-            }
-        });
     }
 
     /**
@@ -225,8 +241,7 @@ public class SubscriptionManager {
      */
     public void addSubscriptionManagerListener(
         SubscriptionManagerListener subscriptionManagerListener) {
-        this.subscriptionManagerListeners
-            .addIfAbsent(subscriptionManagerListener);
+        subscriptionListeners.addIfAbsent(subscriptionManagerListener);
     }
 
     /**
@@ -236,23 +251,18 @@ public class SubscriptionManager {
      */
     public void removeSubscriptionManagerListener(
         SubscriptionManagerListener subscriptionManagerListener) {
-        this.subscriptionManagerListeners.remove(subscriptionManagerListener);
+        subscriptionListeners.remove(subscriptionManagerListener);
     }
 
     /**
      * Notify all {@link SubscriptionManagerListener}s about an updated feature
      * support.
      * 
-     * @return true if subscription request should automatically answered
      */
-    private boolean notifySubscriptionReceived(JID jid) {
-        boolean autoSubscribe = false;
-        for (SubscriptionManagerListener subscriptionManagerListener : this.subscriptionManagerListeners) {
-            IncomingSubscriptionEvent event = new IncomingSubscriptionEvent(jid);
+    private void notifySubscriptionReceived(JID jid) {
+        IncomingSubscriptionEvent event = new IncomingSubscriptionEvent(jid);
+
+        for (SubscriptionManagerListener subscriptionManagerListener : subscriptionListeners)
             subscriptionManagerListener.subscriptionReceived(event);
-            if (event.autoSubscribe)
-                autoSubscribe = true;
-        }
-        return autoSubscribe;
     }
 }

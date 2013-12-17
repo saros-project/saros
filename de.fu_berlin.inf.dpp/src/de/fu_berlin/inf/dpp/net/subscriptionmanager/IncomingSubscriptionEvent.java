@@ -11,13 +11,7 @@ public class IncomingSubscriptionEvent {
     /**
      * The contact who sent the subscription request
      */
-    protected JID contact;
-
-    /**
-     * If set to true the throwing {@link SubscriptionManager} will
-     * automatically subscribe.
-     */
-    public boolean autoSubscribe = false;
+    private JID contact;
 
     public IncomingSubscriptionEvent(JID contact) {
         super();

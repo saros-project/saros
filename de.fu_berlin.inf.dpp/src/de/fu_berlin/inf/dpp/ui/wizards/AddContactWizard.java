@@ -34,9 +34,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
-import de.fu_berlin.inf.dpp.net.subscriptionmanager.IncomingSubscriptionEvent;
 import de.fu_berlin.inf.dpp.net.subscriptionmanager.SubscriptionManager;
-import de.fu_berlin.inf.dpp.net.subscriptionmanager.SubscriptionManagerListener;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
@@ -90,19 +88,6 @@ public class AddContactWizard extends Wizard {
             return true;
         }
 
-        /*
-         * Listeners that sets the autoSubscribe flag to true and removes itself
-         * from the subscriptionManager.
-         */
-        final SubscriptionManagerListener subscriptionManagerListener = new SubscriptionManagerListener() {
-            @Override
-            public void subscriptionReceived(IncomingSubscriptionEvent event) {
-                if (jid.equals(event.getContact()))
-                    event.autoSubscribe = true;
-                subscriptionManager.removeSubscriptionManagerListener(this);
-            }
-        };
-
         try {
             getContainer().run(true, false, new IRunnableWithProgress() {
                 @Override
@@ -113,13 +98,6 @@ public class AddContactWizard extends Wizard {
                         IProgressMonitor.UNKNOWN);
 
                     try {
-                        /*
-                         * Register for incoming subscription request from
-                         * subscription response.
-                         */
-                        subscriptionManager
-                            .addSubscriptionManagerListener(subscriptionManagerListener);
-
                         RosterUtils.addToRoster(sarosNet.getConnection(), jid,
                             nickname);
 
@@ -136,14 +114,10 @@ public class AddContactWizard extends Wizard {
         } catch (InvocationTargetException e) {
             log.warn(e.getCause().getMessage(), e.getCause());
             addContactWizardPage.setErrorMessage(e.getMessage());
-            subscriptionManager
-                .removeSubscriptionManagerListener(subscriptionManagerListener);
             // Leave the wizard open
             return false;
         } catch (InterruptedException e) {
             log.error("uninterruptable context was interrupted", e);
-            subscriptionManager
-                .removeSubscriptionManagerListener(subscriptionManagerListener);
         }
 
         // Close the wizard
