@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net.subscriptionmanager;
+package de.fu_berlin.inf.dpp.net.subscription;
 
 /**
  * Listener for {@link SubscriptionManager} events

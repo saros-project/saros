@@ -6,9 +6,9 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.subscriptionmanager.IncomingSubscriptionEvent;
-import de.fu_berlin.inf.dpp.net.subscriptionmanager.SubscriptionManager;
-import de.fu_berlin.inf.dpp.net.subscriptionmanager.SubscriptionManagerListener;
+import de.fu_berlin.inf.dpp.net.subscription.IncomingSubscriptionEvent;
+import de.fu_berlin.inf.dpp.net.subscription.SubscriptionManager;
+import de.fu_berlin.inf.dpp.net.subscription.SubscriptionManagerListener;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 
