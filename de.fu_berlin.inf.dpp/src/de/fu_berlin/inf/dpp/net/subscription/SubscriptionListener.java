@@ -1,13 +1,16 @@
 package de.fu_berlin.inf.dpp.net.subscription;
 
+import de.fu_berlin.inf.dpp.net.JID;
+
 /**
  * Listener for {@link SubscriptionHandler} events
  */
 public interface SubscriptionListener {
     /**
-     * Gets called whenever an incoming subscription was received.
+     * Gets called whenever an incoming subscription request is received.
      * 
-     * @param event
+     * @param jid
+     *            the {@linkplain JID} of the contact who requested subscription
      */
-    public void subscriptionReceived(IncomingSubscriptionEvent event);
+    public void subscriptionRequestReceived(JID jid);
 }

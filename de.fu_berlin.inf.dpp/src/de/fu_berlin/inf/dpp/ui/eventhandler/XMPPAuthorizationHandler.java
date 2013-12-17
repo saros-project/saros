@@ -6,7 +6,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.subscription.IncomingSubscriptionEvent;
 import de.fu_berlin.inf.dpp.net.subscription.SubscriptionHandler;
 import de.fu_berlin.inf.dpp.net.subscription.SubscriptionListener;
 import de.fu_berlin.inf.dpp.ui.Messages;
@@ -25,12 +24,12 @@ public class XMPPAuthorizationHandler {
     private final SubscriptionListener subscriptionListener = new SubscriptionListener() {
 
         @Override
-        public void subscriptionReceived(final IncomingSubscriptionEvent event) {
+        public void subscriptionRequestReceived(final JID jid) {
 
             SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
                 @Override
                 public void run() {
-                    handleAuthorizationRequest(event.getContact());
+                    handleAuthorizationRequest(jid);
                 }
             });
         }
@@ -40,7 +39,7 @@ public class XMPPAuthorizationHandler {
         final SubscriptionHandler subscriptionHandler) {
         this.subscriptionHandler = subscriptionHandler;
         this.subscriptionHandler
-            .addSubscriptionManagerListener(subscriptionListener);
+            .addSubscriptionListener(subscriptionListener);
     }
 
     private void handleAuthorizationRequest(final JID jid) {

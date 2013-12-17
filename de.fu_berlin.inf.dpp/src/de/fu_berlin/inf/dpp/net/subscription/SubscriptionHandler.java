@@ -30,7 +30,7 @@ import de.fu_berlin.inf.dpp.net.SarosNet;
  */
 @Component(module = "net")
 public class SubscriptionHandler {
-    private static final Logger log = Logger
+    private static final Logger LOG = Logger
         .getLogger(SubscriptionHandler.class);
 
     private Connection connection = null;
@@ -49,7 +49,7 @@ public class SubscriptionHandler {
         }
     };
 
-    private final PacketListener packetListener = new SafePacketListener(log,
+    private final PacketListener packetListener = new SafePacketListener(LOG,
         new PacketListener() {
             @Override
             public void processPacket(Packet packet) {
@@ -143,26 +143,26 @@ public class SubscriptionHandler {
                     + "{0}, condition: {1}, message: {2}", presence.getFrom(),
                 presence.getError().getCondition(), presence.getError()
                     .getMessage());
-            log.warn(message);
+            LOG.warn(message);
             return;
 
         case subscribed:
-            log.debug("contact subscribed to us: " + presence.getFrom());
+            LOG.debug("contact subscribed to us: " + presence.getFrom());
             break;
 
         case unsubscribed:
-            log.debug("contact unsubscribed from us: " + presence.getFrom());
+            LOG.debug("contact unsubscribed from us: " + presence.getFrom());
             break;
 
         case subscribe:
-            log.debug("contact requests to subscribe to us: "
+            LOG.debug("contact requests to subscribe to us: "
                 + presence.getFrom());
 
             notifySubscriptionReceived(new JID(presence.getFrom()));
             break;
 
         case unsubscribe:
-            log.debug("contact requests to unsubscribe from us: "
+            LOG.debug("contact requests to unsubscribe from us: "
                 + presence.getFrom());
             removeSubscription(new JID(presence.getFrom()));
             break;
@@ -184,10 +184,10 @@ public class SubscriptionHandler {
                 connection.getRoster().createEntry(jid.getBase(), null, null);
 
         } catch (XMPPException e) {
-            log.error("adding user to roster failed", e);
+            LOG.error("adding user to roster failed", e);
             error = true;
         } catch (IllegalStateException e) {
-            log.error(
+            LOG.error(
                 "cannot add user to roster, not connected to a XMPP server", e);
             error = true;
         }
@@ -201,7 +201,7 @@ public class SubscriptionHandler {
         try {
             sendPresence(Presence.Type.subscribed, jid.getBase());
         } catch (IllegalStateException e) {
-            log.error(
+            LOG.error(
                 "failed to send subscribe message, not connected to a XMPP server",
                 e);
 
@@ -217,7 +217,7 @@ public class SubscriptionHandler {
         try {
             sendPresence(Presence.Type.unsubscribed, jid.getBase());
         } catch (IllegalStateException e) {
-            log.error(
+            LOG.error(
                 "failed to send unsubscribed message, not connected to a XMPP server",
                 e);
 
@@ -237,21 +237,19 @@ public class SubscriptionHandler {
     /**
      * Adds a {@link SubscriptionListener}
      * 
-     * @param subscriptionManagerListener
+     * @param listener
      */
-    public void addSubscriptionManagerListener(
-        SubscriptionListener subscriptionManagerListener) {
-        subscriptionListeners.addIfAbsent(subscriptionManagerListener);
+    public void addSubscriptionListener(SubscriptionListener listener) {
+        subscriptionListeners.addIfAbsent(listener);
     }
 
     /**
      * Removes a {@link SubscriptionListener}
      * 
-     * @param subscriptionManagerListener
+     * @param listener
      */
-    public void removeSubscriptionManagerListener(
-        SubscriptionListener subscriptionManagerListener) {
-        subscriptionListeners.remove(subscriptionManagerListener);
+    public void removeSubscriptionListener(SubscriptionListener listener) {
+        subscriptionListeners.remove(listener);
     }
 
     /**
@@ -259,10 +257,8 @@ public class SubscriptionHandler {
      * support.
      * 
      */
-    private void notifySubscriptionReceived(JID jid) {
-        IncomingSubscriptionEvent event = new IncomingSubscriptionEvent(jid);
-
+    private void notifySubscriptionReceived(final JID jid) {
         for (SubscriptionListener subscriptionManagerListener : subscriptionListeners)
-            subscriptionManagerListener.subscriptionReceived(event);
+            subscriptionManagerListener.subscriptionRequestReceived(jid);
     }
 }
