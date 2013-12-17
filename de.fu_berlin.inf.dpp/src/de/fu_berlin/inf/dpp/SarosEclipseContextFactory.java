@@ -31,6 +31,7 @@ import de.fu_berlin.inf.dpp.ui.eventhandler.JoinSessionRejectedHandler;
 import de.fu_berlin.inf.dpp.ui.eventhandler.JoinSessionRequestHandler;
 import de.fu_berlin.inf.dpp.ui.eventhandler.NegotiationHandler;
 import de.fu_berlin.inf.dpp.ui.eventhandler.ServerPreferenceHandler;
+import de.fu_berlin.inf.dpp.ui.eventhandler.SessionStatusRequestHandler;
 import de.fu_berlin.inf.dpp.ui.eventhandler.UserStatusChangeHandler;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing;
 
@@ -76,6 +77,7 @@ public class SarosEclipseContextFactory extends AbstractSarosContextFactory {
         Component.create(JoinSessionRequestHandler.class),
         Component.create(JoinSessionRejectedHandler.class),
         Component.create(ServerPreferenceHandler.class),
+        Component.create(SessionStatusRequestHandler.class),
 
         // Cache support
         /*
