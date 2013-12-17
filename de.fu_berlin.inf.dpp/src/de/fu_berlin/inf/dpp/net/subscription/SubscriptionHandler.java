@@ -29,13 +29,13 @@ import de.fu_berlin.inf.dpp.net.SarosNet;
  * @author bkahlert
  */
 @Component(module = "net")
-public class SubscriptionManager {
+public class SubscriptionHandler {
     private static final Logger log = Logger
-        .getLogger(SubscriptionManager.class);
+        .getLogger(SubscriptionHandler.class);
 
     private Connection connection = null;
 
-    private final CopyOnWriteArrayList<SubscriptionManagerListener> subscriptionListeners = new CopyOnWriteArrayList<SubscriptionManagerListener>();
+    private final CopyOnWriteArrayList<SubscriptionListener> subscriptionListeners = new CopyOnWriteArrayList<SubscriptionListener>();
 
     private final IConnectionListener connectionListener = new IConnectionListener() {
         @Override
@@ -57,7 +57,7 @@ public class SubscriptionManager {
             }
         });
 
-    public SubscriptionManager(SarosNet sarosNet) {
+    public SubscriptionHandler(SarosNet sarosNet) {
         sarosNet.addListener(connectionListener);
     }
 
@@ -235,34 +235,34 @@ public class SubscriptionManager {
     }
 
     /**
-     * Adds a {@link SubscriptionManagerListener}
+     * Adds a {@link SubscriptionListener}
      * 
      * @param subscriptionManagerListener
      */
     public void addSubscriptionManagerListener(
-        SubscriptionManagerListener subscriptionManagerListener) {
+        SubscriptionListener subscriptionManagerListener) {
         subscriptionListeners.addIfAbsent(subscriptionManagerListener);
     }
 
     /**
-     * Removes a {@link SubscriptionManagerListener}
+     * Removes a {@link SubscriptionListener}
      * 
      * @param subscriptionManagerListener
      */
     public void removeSubscriptionManagerListener(
-        SubscriptionManagerListener subscriptionManagerListener) {
+        SubscriptionListener subscriptionManagerListener) {
         subscriptionListeners.remove(subscriptionManagerListener);
     }
 
     /**
-     * Notify all {@link SubscriptionManagerListener}s about an updated feature
+     * Notify all {@link SubscriptionListener}s about an updated feature
      * support.
      * 
      */
     private void notifySubscriptionReceived(JID jid) {
         IncomingSubscriptionEvent event = new IncomingSubscriptionEvent(jid);
 
-        for (SubscriptionManagerListener subscriptionManagerListener : subscriptionListeners)
+        for (SubscriptionListener subscriptionManagerListener : subscriptionListeners)
             subscriptionManagerListener.subscriptionReceived(event);
     }
 }

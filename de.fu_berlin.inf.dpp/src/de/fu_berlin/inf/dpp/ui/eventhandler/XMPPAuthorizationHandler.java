@@ -7,8 +7,8 @@ import org.eclipse.jface.dialogs.MessageDialog;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.subscription.IncomingSubscriptionEvent;
-import de.fu_berlin.inf.dpp.net.subscription.SubscriptionManager;
-import de.fu_berlin.inf.dpp.net.subscription.SubscriptionManagerListener;
+import de.fu_berlin.inf.dpp.net.subscription.SubscriptionHandler;
+import de.fu_berlin.inf.dpp.net.subscription.SubscriptionListener;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 
@@ -20,9 +20,9 @@ public class XMPPAuthorizationHandler {
     private static final Logger LOG = Logger
         .getLogger(XMPPAuthorizationHandler.class);
 
-    private final SubscriptionManager subscriptionHandler;
+    private final SubscriptionHandler subscriptionHandler;
 
-    private final SubscriptionManagerListener subscriptionListener = new SubscriptionManagerListener() {
+    private final SubscriptionListener subscriptionListener = new SubscriptionListener() {
 
         @Override
         public void subscriptionReceived(final IncomingSubscriptionEvent event) {
@@ -37,7 +37,7 @@ public class XMPPAuthorizationHandler {
     };
 
     public XMPPAuthorizationHandler(
-        final SubscriptionManager subscriptionHandler) {
+        final SubscriptionHandler subscriptionHandler) {
         this.subscriptionHandler = subscriptionHandler;
         this.subscriptionHandler
             .addSubscriptionManagerListener(subscriptionListener);

@@ -35,7 +35,7 @@ import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.stun.IStunService;
 import de.fu_berlin.inf.dpp.net.stun.internal.StunServiceImpl;
-import de.fu_berlin.inf.dpp.net.subscription.SubscriptionManager;
+import de.fu_berlin.inf.dpp.net.subscription.SubscriptionHandler;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPAccess;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.net.upnp.internal.UPnPAccessImpl;
@@ -114,7 +114,7 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
         Component.create(IStunService.class, StunServiceImpl.class),
 
         // broken - uses SWT GUI stuff
-        Component.create(SubscriptionManager.class),
+        Component.create(SubscriptionHandler.class),
 
         // broken - uses SWT GUI stuff
         Component.create(IUPnPService.class, UPnPServiceImpl.class),
