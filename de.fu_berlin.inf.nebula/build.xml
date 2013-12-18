@@ -132,8 +132,6 @@
 				<fileset erroronmissingdir="false" dir="${test.lib.dir}" />
 				<fileset erroronmissingdir="false" dir="${lib.dir}" />
 
-				<!-- ant4eclipse's buildPlugin-task finds the core jar file automatically in the workspace.
-				However, this does not work for testing, so we amend the classpath accordingly. --> 
 				<fileset dir="${workspaceDirectory}/de.fu_berlin.inf.dpp.core/build/plugins">
 					<include name="*.jar" />
 				</fileset>

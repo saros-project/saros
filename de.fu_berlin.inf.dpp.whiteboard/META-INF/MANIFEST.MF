@@ -10,6 +10,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.views,
  org.eclipse.ui.editors,
  org.eclipse.jface.text,
+ de.fu_berlin.inf.dpp.core,
  de.fu_berlin.inf.dpp
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,

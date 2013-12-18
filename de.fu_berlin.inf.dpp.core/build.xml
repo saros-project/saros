@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+
+<project name="saros-core" basedir="." default="build" xmlns:ant4eclipse="antlib:org.ant4eclipse">
+
+	<!-- define ant-contrib macros -->
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+	
+	<!-- define ant4eclipse tasks -->
+	<taskdef uri="antlib:org.ant4eclipse" resource="org/ant4eclipse/antlib.xml" />
+
+	<!-- import the ant4eclipse pde macros -->
+	<import file="${ant4eclipse.dir}/macros/a4e-pde-macros.xml" />
+
+	<!-- define the workspace location here -->
+	<property name="workspaceDirectory" value="${basedir}/.." />	
+	
+	<property name="build.dir" value="${basedir}/build" />
+	
+	<ant4eclipse:targetPlatform id="saros.target.platform">
+		<!-- additional.plugin.dir is auto. expanded to additional.plugin.dir/plugins by this task -->
+		<location dir="${additional.plugin.dir}" />
+	</ant4eclipse:targetPlatform>
+	
+	<!-- Targets -->
+
+	<target name="clean">
+		<delete dir="${build.dir}" />
+	</target>
+	
+	<target name="build">
+		<mkdir dir="${build.dir}" />
+		<buildPlugin workspaceDirectory="${workspaceDirectory}" projectName="${plugin.name}" targetplatformid="saros.target.platform" destination="${build.dir}" />
+	</target>
+	
+	<target name="test">
+		<echo>Nothing to test yet.</echo>
+	</target>
+
+</project>
