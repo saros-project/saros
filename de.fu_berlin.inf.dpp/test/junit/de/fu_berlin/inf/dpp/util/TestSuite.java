@@ -4,8 +4,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ UtilTest.class, NamedThreadFactoryTest.class,
-    PairTest.class, ArrayUtilsTest.class, ActivityUtilsTest.class,
+@Suite.SuiteClasses({ NamedThreadFactoryTest.class, PairTest.class,
+    ArrayUtilsTest.class, ActivityUtilsTest.class,
     ThreadAccessRecorderTest.class })
 public class TestSuite {
     // the class remains completely empty,

@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.util.ArrayList;
@@ -14,6 +15,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.zip.DataFormatException;
+import java.util.zip.Deflater;
+import java.util.zip.Inflater;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
@@ -46,6 +50,8 @@ import de.fu_berlin.inf.dpp.util.Utils;
 public class DataTransferManager implements IConnectionListener {
     private static final Logger log = Logger
         .getLogger(DataTransferManager.class);
+
+    private static final int CHUNKSIZE = 16 * 1024;
 
     private static final String DEFAULT_CONNECTION_ID = "default";
 
@@ -113,7 +119,7 @@ public class DataTransferManager implements IConnectionListener {
                 long compressedPayloadLenght = payload.length;
 
                 try {
-                    payload = Utils.inflate(payload, null);
+                    payload = inflate(payload);
                 } catch (IOException e) {
                     log.error("could not decompress transfer object payload", e);
                     return;
@@ -261,7 +267,7 @@ public class DataTransferManager implements IConnectionListener {
             long sizeUncompressed = payload.length;
 
             if (transferData.compressContent())
-                payload = Utils.deflate(payload, null);
+                payload = deflate(payload);
 
             long transferStartTime = System.currentTimeMillis();
             connection.send(transferData, payload);
@@ -598,5 +604,44 @@ public class DataTransferManager implements IConnectionListener {
             connectionIdentifier = DEFAULT_CONNECTION_ID;
 
         return connectionIdentifier.concat(":").concat(jid.toString());
+    }
+
+    private static byte[] deflate(byte[] input) {
+
+        Deflater compressor = new Deflater(Deflater.DEFLATED);
+        compressor.setInput(input);
+        compressor.finish();
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream(input.length);
+
+        byte[] buf = new byte[CHUNKSIZE];
+
+        while (!compressor.finished()) {
+            int count = compressor.deflate(buf);
+            bos.write(buf, 0, count);
+        }
+
+        return bos.toByteArray();
+    }
+
+    private static byte[] inflate(byte[] input) throws IOException {
+
+        ByteArrayOutputStream bos;
+        Inflater decompressor = new Inflater();
+
+        decompressor.setInput(input, 0, input.length);
+        bos = new ByteArrayOutputStream(input.length);
+
+        byte[] buf = new byte[CHUNKSIZE];
+
+        try {
+            while (!decompressor.finished()) {
+                int count = decompressor.inflate(buf);
+                bos.write(buf, 0, count);
+            }
+            return bos.toByteArray();
+        } catch (DataFormatException e) {
+            throw new IOException("failed to inflate data", e);
+        }
     }
 }

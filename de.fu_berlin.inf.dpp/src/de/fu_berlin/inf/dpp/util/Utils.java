@@ -1,29 +1,21 @@
 package de.fu_berlin.inf.dpp.util;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.zip.DataFormatException;
-import java.util.zip.Deflater;
-import java.util.zip.Inflater;
 
 import org.apache.commons.codec.BinaryDecoder;
 import org.apache.commons.codec.BinaryEncoder;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.net.URLCodec;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
@@ -216,73 +208,6 @@ public final class Utils {
             return false;
         } else
             return true;
-    }
-
-    public static final int CHUNKSIZE = 16 * 1024;
-
-    /**
-     * Compresses the given byte array using a Java Deflater.
-     */
-    public static byte[] deflate(byte[] input, IProgressMonitor monitor) {
-
-        if (monitor == null)
-            monitor = new NullProgressMonitor();
-
-        monitor.beginTask("Deflate bytearray", input.length / CHUNKSIZE + 1);
-
-        Deflater compressor = new Deflater(Deflater.DEFLATED);
-        compressor.setInput(input);
-        compressor.finish();
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(input.length);
-
-        byte[] buf = new byte[CHUNKSIZE];
-        while (!compressor.finished() && !monitor.isCanceled()) {
-            int count = compressor.deflate(buf);
-            bos.write(buf, 0, count);
-            monitor.worked(1);
-        }
-        IOUtils.closeQuietly(bos);
-
-        monitor.done();
-
-        return bos.toByteArray();
-    }
-
-    /**
-     * Uncompresses the given byte array using a Java Inflater.
-     * 
-     * @throws IOException
-     *             If the operation fails (because the given byte array does not
-     *             contain data accepted by the inflater)
-     */
-    public static byte[] inflate(byte[] input, IProgressMonitor monitor)
-        throws IOException {
-
-        if (monitor == null)
-            monitor = new NullProgressMonitor();
-
-        monitor.beginTask("Inflate bytearray", input.length / CHUNKSIZE + 1);
-
-        ByteArrayOutputStream bos;
-        Inflater decompressor = new Inflater();
-        decompressor.setInput(input, 0, input.length);
-        bos = new ByteArrayOutputStream(input.length);
-        byte[] buf = new byte[CHUNKSIZE];
-
-        try {
-            while (!decompressor.finished() && !monitor.isCanceled()) {
-                int count = decompressor.inflate(buf);
-                bos.write(buf, 0, count);
-                monitor.worked(1);
-            }
-            return bos.toByteArray();
-        } catch (DataFormatException ex) {
-            log.error("Failed to inflate bytearray", ex);
-            throw new IOException(ex);
-        } finally {
-            IOUtils.closeQuietly(bos);
-            monitor.done();
-        }
     }
 
     /**
