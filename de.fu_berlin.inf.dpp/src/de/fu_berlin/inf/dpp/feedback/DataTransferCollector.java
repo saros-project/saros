@@ -82,35 +82,31 @@ public class DataTransferCollector extends AbstractStatisticCollector {
 
     protected List<TransferEvent> transferEvents = new ArrayList<TransferEvent>();
 
+    private final ITransferModeListener dataTransferlistener = new ITransferModeListener() {
+
+        @Override
+        public void clear() {
+            // do nothing
+        }
+
+        @Override
+        public void transferFinished(JID jid, NetTransferMode newMode,
+            boolean incoming, long sizeTransferred, long sizeUncompressed,
+            long transmissionMillisecs) {
+            transferEvents.add(new TransferEvent(newMode, incoming,
+                sizeTransferred, sizeUncompressed, transmissionMillisecs));
+        }
+
+        @Override
+        public void connectionChanged(JID jid, IByteStreamConnection connection) {
+            // do nothing
+        }
+    };
+
     public DataTransferCollector(StatisticManager statisticManager,
         ISarosSession session, DataTransferManager dataTransferManager) {
         super(statisticManager, session);
         this.dataTransferManager = dataTransferManager;
-
-        // TODO: remove listener...
-        this.dataTransferManager.getTransferModeDispatch().add(
-            new ITransferModeListener() {
-
-                @Override
-                public void clear() {
-                    // do nothing
-                }
-
-                @Override
-                public void transferFinished(JID jid, NetTransferMode newMode,
-                    boolean incoming, long sizeTransferred,
-                    long sizeUncompressed, long transmissionMillisecs) {
-                    transferEvents.add(new TransferEvent(newMode, incoming,
-                        sizeTransferred, sizeUncompressed,
-                        transmissionMillisecs));
-                }
-
-                @Override
-                public void connectionChanged(JID jid,
-                    IByteStreamConnection connection) {
-                    // do nothing
-                }
-            });
     }
 
     @Override
@@ -146,12 +142,13 @@ public class DataTransferCollector extends AbstractStatisticCollector {
     }
 
     @Override
-    protected void doOnSessionEnd(ISarosSession sarosSession) {
-        // Do nothing
+    protected void doOnSessionStart(ISarosSession sarosSession) {
+        dataTransferManager.getTransferModeDispatch().add(dataTransferlistener);
     }
 
     @Override
-    protected void doOnSessionStart(ISarosSession sarosSession) {
-        // Do nothing
+    protected void doOnSessionEnd(ISarosSession sarosSession) {
+        dataTransferManager.getTransferModeDispatch().remove(
+            dataTransferlistener);
     }
 }
