@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.ui.expressions;
 import org.eclipse.core.expressions.PropertyTester;
 
 import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 
 /**
  * Adds tests to the {@link ISarosSession}. <br/>
@@ -14,7 +15,8 @@ public class SarosSessionPropertyTester extends PropertyTester {
     @Override
     public boolean test(Object receiver, String property, Object[] args,
         Object expectedValue) {
-        if (receiver instanceof ISarosSession) {
+        // do not check the interface as we might get the NullSarosSession
+        if (receiver instanceof SarosSession) {
             ISarosSession sarosSession = (ISarosSession) receiver;
             if ("isHost".equals(property)) {
                 return sarosSession.isHost();
