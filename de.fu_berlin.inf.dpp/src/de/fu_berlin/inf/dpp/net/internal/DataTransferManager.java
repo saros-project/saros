@@ -48,6 +48,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
  */
 @Component(module = "net")
 public class DataTransferManager implements IConnectionListener {
+
     private static final Logger log = Logger
         .getLogger(DataTransferManager.class);
 
@@ -106,13 +107,14 @@ public class DataTransferManager implements IConnectionListener {
             if (!dispatchPacket)
                 return;
 
-            log.trace("["
-                + transferObject.getTransferMode()
-                + "] received incoming transfer object: "
-                + description
-                + ", throughput: "
-                + Utils.throughput(transferObject.getCompressedSize(),
-                    transferObject.getTransferDuration()));
+            if (log.isTraceEnabled())
+                log.trace("["
+                    + transferObject.getTransferMode()
+                    + "] received incoming transfer object: "
+                    + description
+                    + ", throughput: "
+                    + Utils.throughput(transferObject.getCompressedSize(),
+                        transferObject.getTransferDuration()));
 
             if (transferObject.getTransferDescription().compressContent()) {
                 byte[] payload = transferObject.getPayload();
@@ -368,7 +370,10 @@ public class DataTransferManager implements IConnectionListener {
             }
 
             if (connection != null) {
-                log.trace("Reuse bytestream connection " + connection.getMode());
+                if (log.isTraceEnabled())
+                    log.trace("Reuse bytestream connection "
+                        + connection.getMode());
+
                 return connection;
             }
         }
