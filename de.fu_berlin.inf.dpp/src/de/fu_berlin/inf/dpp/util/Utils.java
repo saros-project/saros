@@ -1,14 +1,8 @@
 package de.fu_berlin.inf.dpp.util;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 
-import org.apache.commons.codec.BinaryDecoder;
-import org.apache.commons.codec.BinaryEncoder;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.EncoderException;
-import org.apache.commons.codec.net.URLCodec;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
@@ -23,64 +17,8 @@ public final class Utils {
 
     private static final Logger log = Logger.getLogger(Utils.class);
 
-    private static final URLCodec URL_CODEC = new URLCodec();
-
     private Utils() {
         // no instantiation allowed
-    }
-
-    private static String escape(String toEscape, BinaryEncoder encoder) {
-
-        byte[] toEncode;
-        try {
-            toEncode = toEscape.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            toEncode = toEscape.getBytes();
-        }
-
-        byte[] encoded = {};
-        try {
-            encoded = encoder.encode(toEncode);
-        } catch (EncoderException e) {
-            log.error("can not escape", e);
-        }
-
-        try {
-            return new String(encoded, "UTF-8");
-        } catch (UnsupportedEncodingException e1) {
-            return new String(encoded);
-        }
-    }
-
-    private static String unescape(String toUnescape, BinaryDecoder decoder) {
-
-        byte[] toDecode;
-        try {
-            toDecode = toUnescape.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            toDecode = toUnescape.getBytes();
-        }
-
-        byte[] decoded = {};
-        try {
-            decoded = decoder.decode(toDecode);
-        } catch (DecoderException e) {
-            log.error("can not unescape", e);
-        }
-
-        try {
-            return new String(decoded, "UTF-8");
-        } catch (UnsupportedEncodingException e1) {
-            return new String(decoded);
-        }
-    }
-
-    public static String urlEscape(String toEscape) {
-        return escape(toEscape, URL_CODEC);
-    }
-
-    public static String urlUnescape(String toUnescape) {
-        return unescape(toUnescape, URL_CODEC);
     }
 
     /**

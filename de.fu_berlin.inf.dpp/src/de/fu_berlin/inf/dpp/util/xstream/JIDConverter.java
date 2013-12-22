@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.util.xstream;
 import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 public class JIDConverter extends AbstractSingleValueConverter {
 
@@ -15,12 +14,12 @@ public class JIDConverter extends AbstractSingleValueConverter {
 
     @Override
     public Object fromString(String str) {
-        return new JID(Utils.urlUnescape(str));
+        return new JID(URLCodec.decode(str));
     }
 
     @Override
     public String toString(Object obj) {
-        return Utils.urlEscape(((JID) obj).toString());
+        return URLCodec.encode(((JID) obj).toString());
     }
 
 }
