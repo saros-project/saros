@@ -37,7 +37,6 @@ import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * @author rdjemili
@@ -126,7 +125,7 @@ public abstract class SessionNegotiation extends CancelableProcess {
         if (cause.getCancelOption() != CancelOption.NOTIFY_PEER)
             return;
 
-        log.debug("notifying remote contact " + Utils.prefix(getPeer())
+        log.debug("notifying remote contact " + getPeer()
             + " of the local cancellation");
 
         PacketExtension notification = CancelInviteExtension.PROVIDER

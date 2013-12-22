@@ -87,7 +87,6 @@ import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.util.BlockingProgressMonitor;
 import de.fu_berlin.inf.dpp.util.Predicate;
 import de.fu_berlin.inf.dpp.util.StackTrace;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * The EditorManager is responsible for handling all editors in a DPP-session.
@@ -1700,7 +1699,7 @@ public class EditorManager extends AbstractActivityProvider {
             return;
 
         if (activeEditor == null) {
-            log.info(Utils.prefix(jumpTo.getJID()) + "has no editor open");
+            log.info(jumpTo.getJID() + " has no editor open");
 
             // changed waldmann, 22.01.2012: this balloon Notification became
             // annoying as the awareness information, which file is opened is
@@ -1725,8 +1724,8 @@ public class EditorManager extends AbstractActivityProvider {
         ILineRange viewport = activeEditor.getViewport();
 
         if (viewport == null) {
-            log.warn(Utils.prefix(jumpTo.getJID())
-                + "has no viewport in editor: " + activeEditor.getPath());
+            log.warn(jumpTo.getJID() + " has no viewport in editor: "
+                + activeEditor.getPath());
             return;
         }
 

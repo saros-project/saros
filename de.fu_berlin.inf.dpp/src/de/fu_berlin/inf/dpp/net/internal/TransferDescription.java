@@ -10,7 +10,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * A TransferDescription contains all necessary information for dealing with
@@ -57,11 +56,11 @@ public class TransferDescription {
     public String toString() {
 
         if (STREAM_DATA.equals(type)) {
-            return "Stream data from " + Utils.prefix(sender) + ": stream= "
-                + archivePath + " [SID=" + sessionID + "]";
+            return "Stream data from " + sender + ": stream= " + archivePath
+                + " [SID=" + sessionID + "]";
         } else if (STREAM_META.equals(type)) {
-            return "Stream metadata from " + Utils.prefix(sender)
-                + ": stream= " + archivePath + " [SID=" + sessionID + "]";
+            return "Stream metadata from " + sender + ": stream= "
+                + archivePath + " [SID=" + sessionID + "]";
         } else {
             StringBuilder sb = new StringBuilder("Bytestream transfer. type="
                 + type + " namespace=" + namespace);

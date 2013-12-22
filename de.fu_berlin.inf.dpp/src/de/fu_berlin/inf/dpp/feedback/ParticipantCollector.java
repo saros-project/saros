@@ -13,7 +13,6 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * A Collector class that collects for each number of users the time they were
@@ -61,25 +60,22 @@ public class ParticipantCollector extends AbstractStatisticCollector {
         @Override
         public void userJoined(User user) {
             ++currentNumberOfParticipants;
-            // handle the event with the former number of users
             handleUserEvent(currentNumberOfParticipants - 1);
-            // add the new user to the set
+
             users.add(user);
 
-            log.info(Utils.prefix(user.getJID())
-                + "joined - session now contains "
+            log.info(user + " joined - session now contains "
                 + currentNumberOfParticipants + " users");
         }
 
         @Override
         public void userLeft(User user) {
             --currentNumberOfParticipants;
-            // handle the event with the former number of users
+
             handleUserEvent(currentNumberOfParticipants + 1);
 
-            log.info(Utils.prefix(user.getJID())
-                + "left - session now contains " + currentNumberOfParticipants
-                + " users");
+            log.info(user + " left - session now contains "
+                + currentNumberOfParticipants + " users");
         }
 
     };

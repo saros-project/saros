@@ -33,7 +33,6 @@ import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * ITransmitter implementation using XMPP, IBB streams and Socks5 streams for
@@ -103,7 +102,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         try {
             sendPacket(message);
         } catch (IOException e) {
-            log.error("could not send message to " + Utils.prefix(recipient), e);
+            log.error("could not send message to " + recipient, e);
         }
     }
 

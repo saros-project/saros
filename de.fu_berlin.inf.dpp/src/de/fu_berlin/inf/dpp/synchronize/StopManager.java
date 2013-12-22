@@ -34,7 +34,6 @@ import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.ObservableValue;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * The @StopManager class is used to coordinate blocking of user input between
@@ -346,7 +345,7 @@ public final class StopManager extends AbstractActivityProvider implements
         fireActivity(stopActivity);
 
         // Block until user acknowledged
-        log.debug("Waiting for acknowledgment " + Utils.prefix(user.getJID()));
+        log.debug("Waiting for acknowledgment " + user);
         reentrantLock.lock();
         try {
             while (expectedAcknowledgments.contains(expectedAck)
@@ -365,7 +364,7 @@ public final class StopManager extends AbstractActivityProvider implements
                 handle.start();
                 throw new CancellationException();
             }
-            log.debug("Acknowledgment arrived " + Utils.prefix(user.getJID()));
+            log.debug("Acknowledgment arrived " + user);
         } catch (InterruptedException e) {
             handle.start();
             throw new InterruptedException();

@@ -19,7 +19,6 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationOfferingExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ProjectNegotiationOfferingExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Business Logic for handling incoming Session- and ProjectNegotiation requests
@@ -56,8 +55,7 @@ public class InvitationHandler {
                     .getPayload(packet);
 
                 if (invitation == null) {
-                    log.warn("received invitation from "
-                        + Utils.prefix(fromJID)
+                    log.warn("received invitation from " + fromJID
                         + " that contains malformed payload");
                     return;
                 }
@@ -67,7 +65,7 @@ public class InvitationHandler {
                 String version = invitation.getVersion();
                 String description = invitation.getDescription();
 
-                log.info("received invitation from " + Utils.prefix(fromJID)
+                log.info("received invitation from " + fromJID
                     + " [invitation id: " + invitationID + ", "
                     + "session id: " + sessionID + ", " + "version: " + version
                     + "]");
@@ -115,8 +113,7 @@ public class InvitationHandler {
                     .getPayload(packet);
 
                 if (projectNegotiation == null) {
-                    log.warn("received project negotiation from "
-                        + Utils.prefix(fromJID)
+                    log.warn("received project negotiation from " + fromJID
                         + " that contains malformed payload");
                     return;
                 }
@@ -127,8 +124,7 @@ public class InvitationHandler {
                     .getProjectNegotiationData();
 
                 if (!sessionIDObservable.getValue().equals(sessionID)) {
-                    log.warn("received project negotiation from "
-                        + Utils.prefix(fromJID)
+                    log.warn("received project negotiation from " + fromJID
                         + " that is not in the same session");
                     return;
                 }

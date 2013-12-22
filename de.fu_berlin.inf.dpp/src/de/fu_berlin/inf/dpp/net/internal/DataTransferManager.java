@@ -279,9 +279,8 @@ public class DataTransferManager implements IConnectionListener {
                 System.currentTimeMillis() - transferStartTime);
         } catch (IOException e) {
             log.error(
-                Utils.prefix(transferData.getRecipient()) + "failed to send "
-                    + transferData + " with " + connection.getMode() + ":"
-                    + e.getMessage(), e);
+                transferData.getRecipient() + " failed to send " + transferData
+                    + " with " + connection.getMode() + ":" + e.getMessage(), e);
             throw e;
         }
     }
@@ -407,17 +406,20 @@ public class DataTransferManager implements IConnectionListener {
                     connection = transport.connect(connectionID, peer);
                     break;
                 } catch (IOException e) {
-                    log.error(Utils.prefix(peer) + " failed to connect using "
-                        + transport.toString() + ": " + e.getMessage(), e);
+                    log.error(
+                        peer + " failed to connect using "
+                            + transport.toString() + ": " + e.getMessage(), e);
                 } catch (InterruptedException e) {
                     IOException io = new InterruptedIOException(
                         "connecting cancelled: " + e.getMessage());
                     io.initCause(e);
                     throw io;
                 } catch (Exception e) {
-                    log.error(Utils.prefix(peer) + " failed to connect using "
-                        + transport.toString()
-                        + " because of an unknown error: " + e.getMessage(), e);
+                    log.error(
+                        peer + " failed to connect using "
+                            + transport.toString()
+                            + " because of an unknown error: " + e.getMessage(),
+                        e);
                 }
             }
 
@@ -428,7 +430,7 @@ public class DataTransferManager implements IConnectionListener {
                 return connection;
             }
 
-            throw new IOException("could not connect to: " + Utils.prefix(peer));
+            throw new IOException("could not connect to: " + peer);
         } finally {
             synchronized (currentOutgoingConnectionEstablishments) {
                 currentOutgoingConnectionEstablishments

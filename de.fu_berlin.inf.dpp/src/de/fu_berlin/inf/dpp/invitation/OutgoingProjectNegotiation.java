@@ -41,7 +41,6 @@ import de.fu_berlin.inf.dpp.project.IChecksumCache;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.util.FileZipper;
-import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.ZipProgressMonitor;
 
 public class OutgoingProjectNegotiation extends ProjectNegotiation {
@@ -323,8 +322,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
     private void startUsers(List<StartHandle> startHandles) {
         for (StartHandle startHandle : startHandles) {
-            log.debug(this + " : restarting user "
-                + Utils.prefix(startHandle.getUser().getJID()));
+            log.debug(this + " : restarting user " + startHandle.getUser());
             startHandle.start();
         }
     }

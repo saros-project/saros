@@ -102,7 +102,6 @@ import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * TODO Review if SarosSession, ConcurrentDocumentManager, ActivitySequencer all
@@ -421,8 +420,8 @@ public final class SarosSession implements ISarosSession {
         JID jid = user.getJID();
         user.setInSession(true);
         if (participants.putIfAbsent(jid, user) != null) {
-            log.error("user " + Utils.prefix(jid)
-                + " added twice to SarosSession", new StackTrace());
+            log.error("user " + user + " added twice to SarosSession",
+                new StackTrace());
             throw new IllegalArgumentException();
         }
 
@@ -457,7 +456,7 @@ public final class SarosSession implements ISarosSession {
             }
         }));
 
-        log.info("user " + Utils.prefix(jid) + " joined session");
+        log.info("user " + user + " joined session");
     }
 
     @Override
@@ -556,7 +555,7 @@ public final class SarosSession implements ISarosSession {
         transferManager.closeConnection(ISarosSession.SESSION_CONNECTION_ID,
             jid);
 
-        log.info("user " + Utils.prefix(jid) + " left session");
+        log.info("user " + user + " left session");
     }
 
     @Override

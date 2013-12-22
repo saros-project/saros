@@ -23,7 +23,6 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.internal.ActivityHandler.QueueItem;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * The ConcurrentDocumentServer is responsible for coordinating all
@@ -162,8 +161,7 @@ public class ConcurrentDocumentServer implements Startable {
             User to = sarosSession.getUser(jid);
 
             if (to == null) {
-                log.error("unknown user in transformation result: "
-                    + Utils.prefix(jid));
+                log.error("unknown user in transformation result: " + jid);
                 continue;
             }
 
@@ -187,7 +185,7 @@ public class ConcurrentDocumentServer implements Startable {
 
         assert sarosSession.isHost();
 
-        log.debug("Resetting jupiter server for " + Utils.prefix(jid) + ": "
+        log.debug("Resetting jupiter server for " + jid + ": "
             + path.toString());
         this.server.reset(path, jid);
     }
@@ -215,8 +213,7 @@ public class ConcurrentDocumentServer implements Startable {
             User to = sarosSession.getUser(jid);
 
             if (to == null) {
-                log.error("unknown user in transformation result: "
-                    + Utils.prefix(jid));
+                log.error("unknown user in transformation result: " + jid);
                 continue;
             }
 

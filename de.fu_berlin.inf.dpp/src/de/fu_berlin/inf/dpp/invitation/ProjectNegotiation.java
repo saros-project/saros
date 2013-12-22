@@ -118,7 +118,7 @@ public abstract class ProjectNegotiation extends CancelableProcess {
         if (cause.getCancelOption() != CancelOption.NOTIFY_PEER)
             return;
 
-        log.debug("notifying remote contact " + Utils.prefix(getPeer())
+        log.debug("notifying remote contact " + getPeer()
             + " of the local project negotiation cancellation");
 
         PacketExtension notification = CancelProjectNegotiationExtension.PROVIDER

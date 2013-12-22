@@ -46,7 +46,6 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesExtension;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.ActivityUtils;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * The ActivitySequencer is responsible for making sure that transformed
@@ -521,7 +520,7 @@ public class ActivitySequencer implements Startable {
                 sequenceNumber));
 
         String msg = "send (" + String.format("%03d", activities.size()) + ") "
-            + Utils.prefix(recipient) + activities;
+            + recipient + " -> " + activities;
 
         // only log on debug level if there is more than a checksum
         if (ActivityUtils.containsChecksumsOnly(activities))

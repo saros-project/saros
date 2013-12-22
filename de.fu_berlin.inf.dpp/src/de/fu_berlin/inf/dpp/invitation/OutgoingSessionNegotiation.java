@@ -31,7 +31,6 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ColorNegotiationHook;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
-import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.versioning.Compatibility;
 import de.fu_berlin.inf.dpp.versioning.VersionCompatibilityResult;
 import de.fu_berlin.inf.dpp.versioning.VersionManager;
@@ -479,7 +478,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
         synchronized (CancelableProcess.SHARED_LOCK) {
 
             sarosSession.addUser(user);
-            log.debug(this + " : added " + Utils.prefix(peer)
+            log.debug(this + " : added " + peer
                 + " to the current session, colorID: " + clientColorID);
 
             /* *

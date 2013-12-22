@@ -13,7 +13,6 @@ import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 @Component(module = "net")
 public class CancelInviteHandler {
@@ -55,8 +54,7 @@ public class CancelInviteHandler {
             return;
         }
 
-        log.debug("Inv" + Utils.prefix(sender)
-            + ": Received invitation cancel message");
+        log.debug("Inv" + sender + " : Received invitation cancel message");
 
         invitationProcess.remoteCancel(errorMsg);
     }

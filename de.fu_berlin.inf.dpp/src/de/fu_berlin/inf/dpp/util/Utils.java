@@ -8,8 +8,6 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Platform;
 
-import de.fu_berlin.inf.dpp.net.JID;
-
 /**
  * Static Utility functions
  */
@@ -94,15 +92,6 @@ public final class Utils {
         sb.append("  Hardware Architecture: " + hardware);
 
         return sb.toString();
-    }
-
-    // should be moved to JID class
-    public static String prefix(JID jid) {
-        if (jid == null) {
-            return "[Unknown] ";
-        } else {
-            return "[" + jid.toString() + "] ";
-        }
     }
 
     /**

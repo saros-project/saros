@@ -13,7 +13,6 @@ import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 public class CancelProjectSharingHandler {
 
@@ -69,8 +68,7 @@ public class CancelProjectSharingHandler {
         ProjectNegotiation process = projectExchangeProcesses
             .getProjectExchangeProcess(sender);
         if (process != null) {
-            log.debug("Inv" + Utils.prefix(sender)
-                + ": Received invitation cancel message");
+            log.debug("Inv" + sender + " : Received invitation cancel message");
             process.remoteCancel(errorMsg);
         } else {
             log.warn("Inv[unkown user]: Received invitation cancel message");

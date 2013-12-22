@@ -31,7 +31,6 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.util.StackTrace;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * The RemoteProgressManager is responsible for showing progress bars on the
@@ -78,8 +77,8 @@ public class RemoteProgressManager {
             // Run async, so we can continue to receive messages over the
             // network. Run as a job, so that it can be run in background
             // for remote hosts
-            Job job = new Job("Observing remote progress for "
-                + Utils.prefix(source.getJID())) {
+            // FIXME NICKNAME !!!
+            Job job = new Job("Observing remote progress for " + source) {
                 @Override
                 protected IStatus run(IProgressMonitor monitor) {
                     try {

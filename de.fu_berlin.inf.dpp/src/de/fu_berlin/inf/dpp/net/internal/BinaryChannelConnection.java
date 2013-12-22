@@ -20,7 +20,6 @@ import org.jivesoftware.smackx.bytestreams.BytestreamSession;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * BinaryChannelConnection is a class that encapsulates a bidirectional
@@ -387,6 +386,6 @@ public class BinaryChannelConnection implements IByteStreamConnection {
 
     @Override
     public String toString() {
-        return getMode().toString() + " " + Utils.prefix(peer);
+        return getMode().toString() + " " + peer;
     }
 }

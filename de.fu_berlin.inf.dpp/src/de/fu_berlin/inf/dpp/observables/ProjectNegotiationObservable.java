@@ -9,7 +9,6 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.util.StackTrace;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Observable which keeps track of all ProjectNegotiationProcesses currently
@@ -68,18 +67,17 @@ public class ProjectNegotiationObservable {
             log.error(
                 "An internal error occurred:"
                     + " An existing ProjectNegotiation process with "
-                    + Utils.prefix(oldProcess.getPeer())
-                    + " was replaced by a new one", new StackTrace());
+                    + oldProcess.getPeer() + " was replaced by a new one",
+                new StackTrace());
         }
     }
 
     public synchronized void removeProjectExchangeProcess(
         ProjectNegotiation process) {
         if (this.processes.remove(process.getPeer()) == null) {
-            log.error(
-                "An internal error occurred:" + " No ProjectNegotiation with "
-                    + Utils.prefix(process.getPeer()) + " could be found",
-                new StackTrace());
+            log.error("An internal error occurred:"
+                + " No ProjectNegotiation with " + process.getPeer()
+                + " could be found", new StackTrace());
         }
     }
 
