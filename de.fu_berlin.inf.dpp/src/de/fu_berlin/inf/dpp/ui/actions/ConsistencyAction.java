@@ -31,7 +31,6 @@ import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
-import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
 /*
@@ -194,7 +193,16 @@ public class ConsistencyAction extends Action implements Disposable {
             @Override
             public void run() {
 
-                String files = Utils.toOSString(paths);
+                StringBuilder sb = new StringBuilder();
+
+                for (SPath path : paths) {
+                    if (sb.length() > 0)
+                        sb.append(", ");
+
+                    sb.append(path.getFullPath().toOSString());
+                }
+
+                String files = sb.toString();
 
                 // set tooltip
                 setToolTipText(MessageFormat.format(

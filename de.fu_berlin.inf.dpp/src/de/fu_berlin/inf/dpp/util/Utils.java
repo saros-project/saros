@@ -1,11 +1,8 @@
 package de.fu_berlin.inf.dpp.util;
 
 import java.io.File;
-import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.Set;
 
 import org.apache.commons.codec.BinaryDecoder;
 import org.apache.commons.codec.BinaryEncoder;
@@ -13,12 +10,10 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.net.URLCodec;
 import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Platform;
 
-import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
@@ -137,21 +132,6 @@ public final class Utils {
          */
     }
 
-    /**
-     * Return a string representation of the given paths suitable for debugging
-     * by joining their OS dependent full path representation by ', '
-     */
-    public static String toOSString(final Set<SPath> paths) {
-        StringBuilder sb = new StringBuilder();
-        for (SPath path : paths) {
-            if (sb.length() > 0)
-                sb.append(", ");
-
-            sb.append(path.getFullPath().toOSString());
-        }
-        return sb.toString();
-    }
-
     private static String getEclipsePlatformInfo() {
         return Platform.getBundle("org.eclipse.core.runtime").getVersion()
             .toString();
@@ -267,41 +247,5 @@ public final class Utils {
         format += seconds > 0 ? String
             .format(minutes > 0 ? "%02d" : "%d", secs) + "s" : "";
         return format;
-    }
-
-    /**
-     * Serializes a {@link Serializable}. Errors are logged to {@link Utils#log}
-     * .
-     * 
-     * @param object
-     *            {@link Serializable} to serialize
-     * @return the serialized data or <code>null</code> (when not serializable)
-     */
-    public static byte[] serialize(Serializable object) {
-        try {
-            return SerializationUtils.serialize(object);
-        } catch (RuntimeException e) {
-            log.error("could not serialize object: " + object, e);
-            return null;
-        }
-    }
-
-    /**
-     * Restores a serialized {@link Serializable}. Errors are logged to
-     * {@link Utils#log}.
-     * 
-     * @param serialized
-     *            serialized {@link Object}
-     * @return deserialized {@link Object} or <code>null</code>
-     */
-    public static Object deserialize(byte[] serialized) {
-        try {
-            return SerializationUtils.deserialize(serialized);
-        } catch (RuntimeException e) {
-            log.error(
-                "could not deserialize object data: "
-                    + Arrays.toString(serialized), e);
-            return null;
-        }
     }
 }

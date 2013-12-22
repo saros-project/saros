@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,6 +45,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.SerializationUtils;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.PacketListener;
@@ -524,7 +526,7 @@ public class StreamServiceManager implements Startable {
             initiationID);
 
         if (initiationDescription != null) {
-            byte[] serializedInitial = Utils.serialize(initiationDescription);
+            byte[] serializedInitial = serialize(initiationDescription);
             if (serializedInitial == null)
                 log.warn("Given serializable is not serializable! "
                     + initiationDescription);
@@ -847,7 +849,7 @@ public class StreamServiceManager implements Startable {
             byte[] serialized = new byte[data.length - 2];
             System.arraycopy(data, 2, serialized, 0, serialized.length);
 
-            return Utils.deserialize(serialized);
+            return deserialize(serialized);
         }
 
         /**
@@ -858,7 +860,7 @@ public class StreamServiceManager implements Startable {
          * @return
          */
         protected byte[] serializeInto(Serializable o) {
-            byte[] serialized = Utils.serialize(o);
+            byte[] serialized = serialize(o);
             if (serialized == null)
                 return new byte[] { this.identifier };
 
@@ -1777,4 +1779,29 @@ public class StreamServiceManager implements Startable {
 
     }
 
+    /**
+     * @return serialized {@link Object} or <code>null</code>
+     */
+    private static byte[] serialize(Serializable object) {
+        try {
+            return SerializationUtils.serialize(object);
+        } catch (RuntimeException e) {
+            log.error("could not serialize object: " + object, e);
+            return null;
+        }
+    }
+
+    /**
+     * @return deserialized {@link Object} or <code>null</code>
+     */
+    private static Object deserialize(byte[] serialized) {
+        try {
+            return SerializationUtils.deserialize(serialized);
+        } catch (RuntimeException e) {
+            log.error(
+                "could not deserialize object data: "
+                    + Arrays.toString(serialized), e);
+            return null;
+        }
+    }
 }
