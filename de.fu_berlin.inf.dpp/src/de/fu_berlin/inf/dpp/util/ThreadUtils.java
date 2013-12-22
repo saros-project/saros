@@ -20,8 +20,7 @@ public class ThreadUtils {
      * 
      * @param log
      *            The log to print any exception messages thrown which occur
-     *            when running the given runnable. If null, the
-     *            {@link Utils#log} is used.
+     *            when running the given runnable or <code>null</code>
      * 
      */
     public static Runnable wrapSafe(Logger log, final Runnable runnable) {

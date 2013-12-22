@@ -22,7 +22,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
 
 public class SWTUtils {
 
-    public static final Logger log = Logger.getLogger(Utils.class);
+    private static final Logger LOG = Logger.getLogger(Utils.class);
 
     private static class CallableResult<T> {
         private T result;
@@ -50,7 +50,7 @@ public class SWTUtils {
         try {
             url = new URL(urlString);
         } catch (MalformedURLException e) {
-            log.error("Couldn't parse URL from string " + urlString, e);
+            LOG.error("Couldn't parse URL from string " + urlString, e);
             return false;
         }
 
@@ -65,7 +65,7 @@ public class SWTUtils {
             browser.openURL(url);
             return true;
         } catch (Exception e) {
-            log.error("Couldn't open internal Browser", e);
+            LOG.error("Couldn't open internal Browser", e);
             return false;
         }
     }
@@ -84,7 +84,7 @@ public class SWTUtils {
         try {
             url = new URL(urlString);
         } catch (MalformedURLException e) {
-            log.error("Couldn't parse URL from string " + urlString, e);
+            LOG.error("Couldn't parse URL from string " + urlString, e);
             return false;
         }
 
@@ -96,7 +96,7 @@ public class SWTUtils {
             browser.openURL(url);
             return true;
         } catch (Exception e) {
-            log.error("Couldn't open external browser", e);
+            LOG.error("Couldn't open external browser", e);
             return false;
         }
 
@@ -142,7 +142,7 @@ public class SWTUtils {
             if (!PlatformUI.getWorkbench().isClosing())
                 throw e;
 
-            log.warn("could not execute runnable " + runnable
+            LOG.warn("could not execute runnable " + runnable
                 + ", UI thread is not available", new StackTrace());
         }
     }
@@ -155,7 +155,7 @@ public class SWTUtils {
 
         final SWTUtils.CallableResult<T> result = new SWTUtils.CallableResult<T>();
 
-        SWTUtils.runSafeSWTSync(log, new Runnable() {
+        SWTUtils.runSafeSWTSync(LOG, new Runnable() {
             @Override
             public void run() {
                 try {
@@ -191,7 +191,7 @@ public class SWTUtils {
             if (!PlatformUI.getWorkbench().isClosing())
                 throw e;
 
-            log.warn("could not execute runnable " + runnable
+            LOG.warn("could not execute runnable " + runnable
                 + ", UI thread is not available", new StackTrace());
         }
     }
