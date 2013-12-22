@@ -10,6 +10,7 @@ import org.jivesoftware.smackx.bytestreams.BytestreamManager;
 import org.jivesoftware.smackx.bytestreams.BytestreamRequest;
 
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.NetTransferMode;
 
 /**
  * Abstract skeleton for different transport methods.
@@ -68,8 +69,8 @@ public abstract class ByteStreamTransport implements ITransport {
         @Override
         public void incomingBytestreamRequest(BytestreamRequest request) {
 
-            LOG.debug("received request to establish a " + getNetTransferMode()
-                + " bytestream connection to " + request.getFrom());
+            LOG.debug("received request to establish a  bytestream connection to "
+                + request.getFrom() + " [" + this + "]");
 
             try {
 
@@ -84,7 +85,7 @@ public abstract class ByteStreamTransport implements ITransport {
 
                 if (listener == null) {
                     LOG.warn("closing bytestream connection " + connection
-                        + " because transport " + getNetTransferMode()
+                        + " because transport " + this
                         + " was uninitilized during connection establishment");
                     connection.close();
                     return;
@@ -179,4 +180,5 @@ public abstract class ByteStreamTransport implements ITransport {
      */
     abstract protected BytestreamManager createManager(Connection connection);
 
+    abstract protected NetTransferMode getNetTransferMode();
 }

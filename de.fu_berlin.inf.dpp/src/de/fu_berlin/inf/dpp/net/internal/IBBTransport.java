@@ -27,4 +27,8 @@ public class IBBTransport extends ByteStreamTransport {
         return NetTransferMode.IBB;
     }
 
+    @Override
+    public String toString() {
+        return "IBBTransport";
+    }
 }

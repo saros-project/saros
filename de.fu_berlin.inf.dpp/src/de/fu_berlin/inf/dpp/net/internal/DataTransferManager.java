@@ -400,26 +400,21 @@ public class DataTransferManager implements IConnectionListener {
 
             for (ITransport transport : transportModesToUse) {
                 log.info("establishing connection to " + peer.getBase()
-                    + " from " + connectionJID + " using "
-                    + transport.getNetTransferMode());
+                    + " from " + connectionJID + " using " + transport);
                 try {
                     connection = transport.connect(connectionID, peer);
                     break;
                 } catch (IOException e) {
-                    log.error(
-                        peer + " failed to connect using "
-                            + transport.toString() + ": " + e.getMessage(), e);
+                    log.error(peer + " failed to connect using " + transport
+                        + ": " + e.getMessage(), e);
                 } catch (InterruptedException e) {
                     IOException io = new InterruptedIOException(
                         "connecting cancelled: " + e.getMessage());
                     io.initCause(e);
                     throw io;
                 } catch (Exception e) {
-                    log.error(
-                        peer + " failed to connect using "
-                            + transport.toString()
-                            + " because of an unknown error: " + e.getMessage(),
-                        e);
+                    log.error(peer + " failed to connect using " + transport
+                        + " because of an unknown error: " + e.getMessage(), e);
                 }
             }
 

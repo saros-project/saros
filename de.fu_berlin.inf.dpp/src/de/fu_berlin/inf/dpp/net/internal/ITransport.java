@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.jivesoftware.smack.Connection;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.NetTransferMode;
 
 /**
  * This interface is used to define various transport methods (probably only XEP
@@ -54,12 +53,4 @@ public interface ITransport {
      * not able to establish connections via {@link #connect}.
      */
     public void uninitialize();
-
-    /**
-     * Returns the {@linkplain NetTransferMode transport mode} that the
-     * transport is using to establish connections.
-     * 
-     * @return
-     */
-    public NetTransferMode getNetTransferMode();
 }

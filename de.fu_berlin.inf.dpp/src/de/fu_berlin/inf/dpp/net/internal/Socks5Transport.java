@@ -628,7 +628,8 @@ public class Socks5Transport extends ByteStreamTransport {
 
     @Override
     public NetTransferMode getNetTransferMode() {
-        return NetTransferMode.SOCKS5;
+        throw new IllegalStateException(
+            "transfer mode is determined during connection establishment");
     }
 
     @Override
@@ -731,7 +732,7 @@ public class Socks5Transport extends ByteStreamTransport {
     }
 
     private String prefix() {
-        return "[" + getNetTransferMode().name() + "] ";
+        return "[SOCKS5Transport] ";
     }
 
     private long getNextNegotiationID() {
@@ -802,5 +803,10 @@ public class Socks5Transport extends ByteStreamTransport {
         } catch (Exception e) {
             // NOP
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Socks5Transport";
     }
 }

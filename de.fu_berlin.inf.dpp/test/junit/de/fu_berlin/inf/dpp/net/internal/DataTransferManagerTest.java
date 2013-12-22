@@ -54,16 +54,16 @@ public class DataTransferManagerTest {
 
             connectionID = connectionIdentifier;
 
-            ChannelConnection connection = new ChannelConnection(peer,
-                getNetTransferMode(), listener);
+            ChannelConnection connection = new ChannelConnection(peer, mode,
+                listener);
 
             establishedConnections.add(connection);
             return connection;
         }
 
         public synchronized void announceIncomingRequest(JID peer) {
-            ChannelConnection connection = new ChannelConnection(peer,
-                getNetTransferMode(), listener);
+            ChannelConnection connection = new ChannelConnection(peer, mode,
+                listener);
 
             establishedConnections.add(connection);
             listener.connectionChanged(connectionID, peer, connection, true);
@@ -80,11 +80,6 @@ public class DataTransferManagerTest {
         public void uninitialize() {
             this.listener = null;
 
-        }
-
-        @Override
-        public NetTransferMode getNetTransferMode() {
-            return mode;
         }
 
         public synchronized List<ChannelConnection> getEstablishedConnections() {
@@ -285,9 +280,6 @@ public class DataTransferManagerTest {
                 mainTransport.connect(EasyMock.isA(String.class),
                     EasyMock.isA(JID.class))).andThrow(new IOException())
             .anyTimes();
-
-        EasyMock.expect(mainTransport.getNetTransferMode())
-            .andReturn(NetTransferMode.SOCKS5_DIRECT).anyTimes();
 
         mainTransport.initialize(EasyMock.isA(Connection.class),
             EasyMock.isA(IByteStreamConnectionListener.class));

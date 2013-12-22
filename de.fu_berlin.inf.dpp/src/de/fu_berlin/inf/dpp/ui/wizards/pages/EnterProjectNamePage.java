@@ -145,7 +145,6 @@ public class EnterProjectNamePage extends WizardPage {
                 .getImageDescriptor("icons/wizban/socks5m.png"));
             break;
 
-        case SOCKS5:
         case SOCKS5_DIRECT:
             setDescription(Messages.EnterProjectNamePage_description_direct_filetranfser);
             setImageDescriptor(ImageManager
@@ -153,10 +152,7 @@ public class EnterProjectNamePage extends WizardPage {
             break;
 
         case NONE:
-            // no bytestream connection established yet (small filelist transfer
-            // before was done by chat willingly), so we cant say something
-            // about the transfer type so we don't give a message to not
-            // worry/confuse the user
+            // lost data connection
             break;
 
         case IBB:
