@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.Wizard;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Registration;
 import org.jivesoftware.smack.packet.XMPPError;
 import org.picocontainer.annotations.Inject;
 
@@ -123,8 +124,12 @@ public class CreateXMPPAccountWizard extends Wizard {
                         IProgressMonitor.UNKNOWN);
 
                     try {
-                        RosterUtils.createAccount(cachedServer, cachedUsername,
-                            cachedPassword);
+                        Registration registration = RosterUtils.createAccount(
+                            cachedServer, cachedUsername, cachedPassword);
+
+                        if (registration != null)
+                            createAndThrowXMPPException(registration,
+                                cachedUsername);
 
                         log.debug("Account creation succeeded: username="
                             + cachedUsername + ", server=" + cachedServer);
@@ -244,5 +249,32 @@ public class CreateXMPPAccountWizard extends Wizard {
             message = "An unknown error occured. Please register on provider's website.";
 
         return message;
+    }
+
+    private void createAndThrowXMPPException(Registration registration,
+        String username) throws XMPPException {
+
+        final String errorMessage;
+
+        if (registration.getError() != null) {
+            errorMessage = "No in-band registration. Please create account on provider's website.";
+        } else if (registration.getAttributes().containsKey("registered")) {
+            errorMessage = "Account " + username
+                + " already exists on the server.";
+        } else if (!registration.getAttributes().containsKey("username")) {
+            if (registration.getInstructions() != null) {
+                errorMessage = "Registration via Saros not possible.\n\n"
+                    + "Please follow these instructions:\n"
+                    + registration.getInstructions();
+            } else {
+                errorMessage = "Registration via Saros not possible.\n\n"
+                    + "Please see the server's web site for\n"
+                    + "informations for how to create an account.";
+            }
+        } else {
+            errorMessage = "No in-band registration. Please create account on provider's website.";
+        }
+
+        throw new XMPPException(errorMessage);
     }
 }

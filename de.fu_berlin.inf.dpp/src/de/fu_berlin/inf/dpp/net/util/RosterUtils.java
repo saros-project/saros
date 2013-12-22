@@ -108,74 +108,49 @@ public class RosterUtils {
      *            for the new account
      * @param password
      *            for the new account
+     * @return <code>null</code> if the account was registered, otherwise a
+     *         {@link Registration description} is returned which may containing
+     *         additional information on how to register an account on the given
+     *         XMPP server or an error code
+     * 
+     * @see Registration#getError()
      * @throws XMPPException
      *             exception that occurs while registering
      */
-    public static void createAccount(String server, String username,
+    public static Registration createAccount(String server, String username,
         String password) throws XMPPException {
 
         Connection connection = new XMPPConnection(server);
 
-        connection.connect();
-
-        String errorMessage = isAccountCreationPossible(connection, username);
-
-        if (errorMessage != null)
-            throw new XMPPException(errorMessage);
-
-        AccountManager manager = connection.getAccountManager();
-        manager.createAccount(username, password);
-
-        connection.disconnect();
-    }
-
-    /**
-     * Checks whether a {@link Roster} account with the given username on the
-     * given server can be created.
-     * <p>
-     * <b>IMPORTANT:</b> Returns null if the account creation is possible.
-     * 
-     * @param connection
-     *            to the server to check
-     * @param username
-     *            to be used for account creation
-     * @return null if account creation is possible; otherwise error message
-     *         which describes why the account creation can not be perfomed.
-     */
-    public static String isAccountCreationPossible(Connection connection,
-        String username) {
-        String errorMessage = null;
-
-        Registration registration = null;
         try {
-            registration = getRegistrationInfo(username, connection);
-        } catch (XMPPException e) {
-            log.error("Server " + connection.getHost()
-                + " does not support XEP-0077"
-                + " (In-Band Registration) properly:", e);
-        }
-        if (registration != null && registration.getError() != null) {
-            if (registration.getAttributes().containsKey("registered")) {
-                errorMessage = "Account " + username
-                    + " already exists on the server.";
-            } else if (!registration.getAttributes().containsKey("username")) {
-                if (registration.getInstructions() != null) {
-                    errorMessage = "Registration via Saros not possible.\n\n"
-                        + "Please follow these instructions:\n"
-                        + registration.getInstructions();
-                } else {
-                    errorMessage = "Registration via Saros not possible.\n\n"
-                        + "Please see the server's web site for\n"
-                        + "informations for how to create an account.";
-                }
-            } else {
-                errorMessage = "No in-band registration. Please create account on provider's website.";
-                log.warn("Unknow registration error: "
-                    + registration.getError().getMessage());
+            connection.connect();
+
+            Registration registration = getRegistrationInfo(connection,
+                username);
+
+            if (registration != null) {
+
+                // no in band registration
+                if (registration.getError() != null)
+                    return registration;
+
+                // already registered
+                if (registration.getAttributes().containsKey("registered"))
+                    return registration;
+
+                // redirect
+                if (registration.getAttributes().size() == 1
+                    && registration.getAttributes().containsKey("instructions"))
+                    return registration;
             }
+
+            AccountManager manager = connection.getAccountManager();
+            manager.createAccount(username, password);
+        } finally {
+            connection.disconnect();
         }
 
-        return errorMessage;
+        return null;
     }
 
     /**
@@ -234,22 +209,26 @@ public class RosterUtils {
      * http://xmpp.org/extensions/xep-0077.html
      */
     public static synchronized Registration getRegistrationInfo(
-        String toRegister, Connection connection) throws XMPPException {
+        Connection connection, String toRegister) throws XMPPException {
         Registration reg = new Registration();
         reg.setTo(connection.getServiceName());
         reg.setFrom(toRegister);
         PacketFilter filter = new AndFilter(new PacketIDFilter(
             reg.getPacketID()), new PacketTypeFilter(IQ.class));
         PacketCollector collector = connection.createPacketCollector(filter);
-        connection.sendPacket(reg);
-        IQ result = (IQ) collector.nextResult(SmackConfiguration
-            .getPacketReplyTimeout());
 
-        // Stop queuing results
-        collector.cancel();
+        final IQ result;
+
+        try {
+            connection.sendPacket(reg);
+            result = (IQ) collector.nextResult(SmackConfiguration
+                .getPacketReplyTimeout());
+
+        } finally {
+            collector.cancel();
+        }
 
         if (result == null) {
-            // TODO This exception is shown incorrectly to the user!!
             throw new XMPPException("No response from server.");
         } else if (result.getType() == IQ.Type.ERROR) {
             throw new XMPPException(result.getError());
