@@ -9,7 +9,6 @@ import de.fu_berlin.inf.dpp.net.ITransferModeListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
-import de.fu_berlin.inf.dpp.net.internal.IByteStreamConnection;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
@@ -36,22 +35,17 @@ public class DataTransferCollector extends AbstractStatisticCollector {
     private final ITransferModeListener dataTransferlistener = new ITransferModeListener() {
 
         @Override
-        public void clear() {
-            // do nothing
-        }
-
-        @Override
-        public void transferFinished(JID jid, NetTransferMode newMode,
+        public void transferFinished(JID jid, NetTransferMode mode,
             boolean incoming, long sizeTransferred, long sizeUncompressed,
             long transmissionMillisecs) {
 
             // see processGatheredData
             synchronized (DataTransferCollector.this) {
-                TransferStatisticHolder holder = statistic.get(newMode);
+                TransferStatisticHolder holder = statistic.get(mode);
 
                 if (holder == null) {
                     holder = new TransferStatisticHolder();
-                    statistic.put(newMode, holder);
+                    statistic.put(mode, holder);
                 }
 
                 holder.bytesTransferred += sizeTransferred;
@@ -63,7 +57,7 @@ public class DataTransferCollector extends AbstractStatisticCollector {
         }
 
         @Override
-        public void connectionChanged(JID jid, IByteStreamConnection connection) {
+        public void transferModeChanged(JID jid, NetTransferMode mode) {
             // do nothing
         }
     };
@@ -95,12 +89,11 @@ public class DataTransferCollector extends AbstractStatisticCollector {
 
     @Override
     protected void doOnSessionStart(ISarosSession sarosSession) {
-        dataTransferManager.getTransferModeDispatch().add(dataTransferlistener);
+        dataTransferManager.addTransferModeListener(dataTransferlistener);
     }
 
     @Override
     protected void doOnSessionEnd(ISarosSession sarosSession) {
-        dataTransferManager.getTransferModeDispatch().remove(
-            dataTransferlistener);
+        dataTransferManager.removeTransferModeListener(dataTransferlistener);
     }
 }

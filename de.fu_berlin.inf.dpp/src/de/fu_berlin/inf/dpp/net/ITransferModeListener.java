@@ -1,15 +1,11 @@
 package de.fu_berlin.inf.dpp.net;
 
-import de.fu_berlin.inf.dpp.net.internal.IByteStreamConnection;
-
 /**
  * This interface can be implemented to be informed about file transfers being
  * finished by the DataTransferManager (for instance to collect statistics about
  * incoming file transfers).
- * 
+ * <p>
  * CAUTION 1: This listener is not informed if a file transfer fails!
- * 
- * CAUTION 2: transmissionMillisecs includes unpacking/de-compressing of data.
  */
 public interface ITransferModeListener {
 
@@ -27,24 +23,17 @@ public interface ITransferModeListener {
      *            The size of the received data after (potentially)
      *            decompression in byte
      */
-    public void transferFinished(JID jid, NetTransferMode newMode,
+    public void transferFinished(JID jid, NetTransferMode mode,
         boolean incoming, long sizeTransferred, long sizeUncompressed,
         long transmissionMillisecs);
 
     /**
-     * Method called when the DataTransfer connection changed.
+     * Gets called when the {@linkplain NetTransferMode transfer mode} changed.
      * 
      * @param jid
-     *            the peer for which the connection changed
-     * @param connection
-     *            maybenull if the connection was closed
+     *            the peer for which the transfer mode changed
+     * @param mode
+     *            the mode currently used for transfer
      */
-    public void connectionChanged(JID jid, IByteStreamConnection connection);
-
-    /**
-     * Is called when the transferMode information is reset (probably because
-     * the connection changed)
-     */
-    public void clear();
-
+    public void transferModeChanged(JID jid, NetTransferMode mode);
 }

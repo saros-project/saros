@@ -31,6 +31,7 @@ import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.IPacketInterceptor;
 import de.fu_berlin.inf.dpp.net.IReceiver;
+import de.fu_berlin.inf.dpp.net.ITransferModeListener;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
@@ -171,14 +172,16 @@ public class DataTransferManager implements IConnectionListener {
                 connection.initialize();
             }
 
-            transferModeDispatch.connectionChanged(peer, connection);
+            transferModeDispatch
+                .transferModeChanged(peer, connection.getMode());
         }
 
         @Override
         public void connectionClosed(String connectionID, JID peer,
             IByteStreamConnection connection) {
             closeConnection(connectionID, peer);
-            transferModeDispatch.connectionChanged(peer, null);
+            transferModeDispatch
+                .transferModeChanged(peer, NetTransferMode.NONE);
         }
     };
 
@@ -199,6 +202,14 @@ public class DataTransferManager implements IConnectionListener {
         this.initTransports();
 
         sarosNet.addListener(this);
+    }
+
+    public void addTransferModeListener(ITransferModeListener listener) {
+        transferModeDispatch.add(listener);
+    }
+
+    public void removeTransferModeListener(ITransferModeListener listener) {
+        transferModeDispatch.remove(listener);
     }
 
     public void sendData(String connectionID,
@@ -301,10 +312,6 @@ public class DataTransferManager implements IConnectionListener {
             throw new NullPointerException("peer is null");
 
         connectInternal(connectionID, peer);
-    }
-
-    public TransferModeDispatch getTransferModeDispatch() {
-        return transferModeDispatch;
     }
 
     /**
@@ -533,7 +540,6 @@ public class DataTransferManager implements IConnectionListener {
                 + connections.toString());
 
         connections.clear();
-        transferModeDispatch.clear();
 
         connection = null;
     }
