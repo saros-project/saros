@@ -42,11 +42,6 @@ public class SarosSessionStub implements ISarosSession {
     }
 
     @Override
-    public void stop() {
-        throw new RuntimeException("Unexpected call to Stub");
-    }
-
-    @Override
     public void start() {
         throw new RuntimeException("Unexpected call to Stub");
 

@@ -212,11 +212,6 @@ public interface ISarosSession {
     public void start();
 
     /**
-     * FOR INTERNAL USE ONLY !
-     */
-    public void stop();
-
-    /**
      * <p>
      * Given a resource qualified JID, this method will return the user which
      * has the identical ID including resource.

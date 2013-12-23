@@ -612,8 +612,14 @@ public final class SarosSession implements ISarosSession {
 
     }
 
+    /**
+     * Stops this session and performing cleanup as necessary. All remote users
+     * will also be notified about the local session stop.
+     * 
+     * @throws IllegalStateException
+     *             if the session is already stopped or was not started at all
+     */
     // FIMXE synchronization
-    @Override
     public void stop() {
         if (!started || stopped) {
             throw new IllegalStateException();

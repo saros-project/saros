@@ -109,11 +109,6 @@ public class NullSarosSession implements ISarosSession {
     }
 
     @Override
-    public void stop() {
-        log.warn("unexpected method call");
-    }
-
-    @Override
     public User getUser(JID jid) {
         log.warn("unexpected method call");
         return null;
