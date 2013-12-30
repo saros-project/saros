@@ -12,6 +12,7 @@ import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.RosterGroup;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.packet.Presence.Mode;
 import org.jivesoftware.smack.packet.RosterPacket;
 import org.jivesoftware.smack.packet.RosterPacket.ItemType;
 import org.picocontainer.annotations.Inject;
@@ -111,16 +112,31 @@ public class RosterEntryElement extends TreeElement {
         final Presence presence = roster.getPresence(jid.getBase());
         boolean sarosSupported = isSarosSupported();
 
-        if (presence.isAvailable()) {
-            if (presence.isAway()) {
-                return sarosSupported ? ImageManager.ICON_USER_SAROS_AWAY
-                    : ImageManager.ICON_CONTACT_AWAY;
-            } else {
-                return sarosSupported ? ImageManager.ICON_CONTACT_SAROS_SUPPORT
-                    : ImageManager.ICON_CONTACT;
-            }
-        } else {
+        if (!presence.isAvailable())
             return ImageManager.ICON_CONTACT_OFFLINE;
+
+        Mode mode = presence.getMode();
+
+        if (mode == null)
+            // see Presence#getMode();
+            mode = Mode.available;
+
+        // TODO add icons for different modes
+        switch (mode) {
+        case away:
+            //$FALL-THROUGH$
+        case dnd:
+            //$FALL-THROUGH$
+        case xa:
+            return sarosSupported ? ImageManager.ICON_USER_SAROS_AWAY
+                : ImageManager.ICON_CONTACT_AWAY;
+        case chat:
+            //$FALL-THROUGH$
+        case available:
+            //$FALL-THROUGH$
+        default:
+            return sarosSupported ? ImageManager.ICON_CONTACT_SAROS_SUPPORT
+                : ImageManager.ICON_CONTACT;
         }
     }
 
