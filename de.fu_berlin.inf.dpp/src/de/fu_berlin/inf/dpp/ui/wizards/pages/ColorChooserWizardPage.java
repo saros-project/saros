@@ -6,8 +6,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
+import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
-import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.ui.widgets.ColorChooser;
 import de.fu_berlin.inf.dpp.ui.widgets.ColorChooser.ColorSelectionListener;
 
@@ -40,8 +40,7 @@ public class ColorChooserWizardPage extends WizardPage {
         ColorSelectionListener listener = new ColorSelectionListener() {
             @Override
             public void selectionChanged(int colorId) {
-                setPageComplete(colorId >= 0
-                    && colorId < SarosSession.MAX_USERCOLORS);
+                setPageComplete(colorId >= 0 && colorId < SarosAnnotation.SIZE);
                 selectedColor = colorId;
             }
         };

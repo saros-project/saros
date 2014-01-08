@@ -7,7 +7,6 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.test.mocks.SarosMocks;
 
 public class ChangeColorActivityTest extends AbstractActivityTest {
@@ -34,7 +33,7 @@ public class ChangeColorActivityTest extends AbstractActivityTest {
     public void testConversion() {
         for (User affected : affectedList) {
             for (User target : targets) {
-                for (int colorID = 0; colorID < SarosSession.MAX_USERCOLORS; colorID++) {
+                for (int colorID = 0; colorID < 5; colorID++) {
                     ChangeColorActivity cca;
                     try {
                         cca = new ChangeColorActivity(source, target, affected,

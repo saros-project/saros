@@ -111,8 +111,6 @@ public final class SarosSession implements ISarosSession {
 
     private static final Logger log = Logger.getLogger(SarosSession.class);
 
-    public static final int MAX_USERCOLORS = 5;
-
     @Inject
     private UISynchronizer synchronizer;
 

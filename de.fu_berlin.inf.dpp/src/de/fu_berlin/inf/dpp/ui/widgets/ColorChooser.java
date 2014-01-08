@@ -18,7 +18,6 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 
 public class ColorChooser extends Composite {
 
@@ -39,7 +38,7 @@ public class ColorChooser extends Composite {
      * An array holding the color rectangles (color labels)
      */
     protected ArrayList<ColorLabel> colorLabels = new ArrayList<ColorLabel>(
-        SarosSession.MAX_USERCOLORS);
+        SarosAnnotation.SIZE);
 
     /**
      * Updates all subscribers that selection has changed
@@ -84,7 +83,7 @@ public class ColorChooser extends Composite {
 
         setLayout(layout);
 
-        for (int colorId = 0; colorId < SarosSession.MAX_USERCOLORS; colorId++) {
+        for (int colorId = 0; colorId < SarosAnnotation.SIZE; colorId++) {
             ColorLabel label = createColorLabel(this, style, colorId);
             label.setPreferredSize(50, 50);
             colorLabels.add(label);
@@ -130,7 +129,7 @@ public class ColorChooser extends Composite {
 
         selection = -1;
 
-        if (colorId < 0 || colorId >= SarosSession.MAX_USERCOLORS)
+        if (colorId < 0 || colorId >= SarosAnnotation.SIZE)
             return false;
 
         colorLabels.get(colorId).setSelected(true);

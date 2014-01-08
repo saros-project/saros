@@ -17,7 +17,6 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 
 public class ColorIDSetTest {
 
@@ -115,7 +114,7 @@ public class ColorIDSetTest {
 
         assertFalse("0 should not be available as it is used by Alice",
             set.isAvailable(0));
-        for (int i = 1; i < SarosSession.MAX_USERCOLORS; i++) {
+        for (int i = 1; i < 5; i++) {
             assertTrue(i + " should be available.", set.isAvailable(i));
         }
     }

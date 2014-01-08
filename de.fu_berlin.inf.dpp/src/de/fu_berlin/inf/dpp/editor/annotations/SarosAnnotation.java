@@ -10,7 +10,6 @@ import org.eclipse.ui.texteditor.AnnotationPreference;
 import org.eclipse.ui.texteditor.AnnotationPreferenceLookup;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 
 /**
  * Abstract base class for {@link Annotation}s.
@@ -19,6 +18,12 @@ import de.fu_berlin.inf.dpp.project.internal.SarosSession;
  */
 public abstract class SarosAnnotation extends Annotation {
     private static final Logger log = Logger.getLogger(SarosAnnotation.class);
+
+    /**
+     * Constant representing the amount of configured annotations for each Saros
+     * annotation type in the plugin.xml file.
+     */
+    public static final int SIZE = 5;
 
     /**
      * Source of this annotation (JID).
@@ -119,7 +124,7 @@ public abstract class SarosAnnotation extends Annotation {
         final String[] annotationTypesToReset = { SelectionAnnotation.TYPE,
             ViewportAnnotation.TYPE, ContributionAnnotation.TYPE };
 
-        for (int i = 0; i <= SarosSession.MAX_USERCOLORS; ++i) {
+        for (int i = 0; i <= SIZE; ++i) {
 
             for (String annotationType : annotationTypesToReset) {
 
@@ -153,7 +158,7 @@ public abstract class SarosAnnotation extends Annotation {
 
         final String colorIDSuffix;
 
-        if (colorID < 0 || colorID >= SarosSession.MAX_USERCOLORS)
+        if (colorID < 0 || colorID >= SIZE)
             colorIDSuffix = "default";
         else
             colorIDSuffix = String.valueOf(colorID + 1);

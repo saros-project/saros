@@ -56,7 +56,6 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 
@@ -94,7 +93,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
         .synchronizedMap(new HashMap<User, Set<IResource>>());
 
     // add +1 for default color
-    private final MemoryImageDescriptor[] imageDescriptors = new MemoryImageDescriptor[SarosSession.MAX_USERCOLORS + 1];
+    private final MemoryImageDescriptor[] imageDescriptors = new MemoryImageDescriptor[SarosAnnotation.SIZE + 1];
 
     /** Default image descriptor index pointing to a neutral color. */
     private final int defaultImageDescriptorIndex = imageDescriptors.length - 1;
@@ -325,7 +324,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
         int colorID = user.getColorID();
 
-        if (colorID < 0 || colorID >= SarosSession.MAX_USERCOLORS)
+        if (colorID < 0 || colorID >= SarosAnnotation.SIZE)
             return imageDescriptors[defaultImageDescriptorIndex];
 
         return imageDescriptors[colorID];
@@ -335,7 +334,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
     private void initializeImageDescriptors() {
         Image tintImage = ImageManager.getImage(IMAGE_PATH);
 
-        for (int i = 0; i <= SarosSession.MAX_USERCOLORS; i++) {
+        for (int i = 0; i <= SarosAnnotation.SIZE; i++) {
             Color tintColor = SarosAnnotation.getUserColor(i);
             Image tintedImage = tintImage(tintImage, tintColor);
             imageDescriptors[i] = new MemoryImageDescriptor(
