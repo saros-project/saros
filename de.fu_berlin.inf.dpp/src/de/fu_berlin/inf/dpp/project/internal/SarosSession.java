@@ -1139,16 +1139,12 @@ public final class SarosSession implements ISarosSession {
 
     @Override
     public void changeColor(int colorID) {
-        if (colorID < 0 || colorID >= MAX_USERCOLORS)
-            throw new IllegalArgumentException("color id '" + colorID
-                + "'  must be in range of 0 <= id < " + MAX_USERCOLORS);
-
         changeColorManager.changeColorID(colorID);
     }
 
     @Override
-    public Set<Integer> getAvailableColors() {
-        return changeColorManager.getAvailableColors();
+    public Set<Integer> getUnavailableColors() {
+        return changeColorManager.getUsedColorIDs();
     }
 
     @Override

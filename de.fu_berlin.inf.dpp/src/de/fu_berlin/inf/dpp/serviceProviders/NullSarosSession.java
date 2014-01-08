@@ -289,7 +289,7 @@ public class NullSarosSession implements ISarosSession {
     }
 
     @Override
-    public Set<Integer> getAvailableColors() {
+    public Set<Integer> getUnavailableColors() {
         log.warn("unexpected method call");
         return null;
     }

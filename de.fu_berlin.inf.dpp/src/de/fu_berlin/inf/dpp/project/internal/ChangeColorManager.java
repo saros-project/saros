@@ -3,6 +3,8 @@ package de.fu_berlin.inf.dpp.project.internal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -50,7 +52,8 @@ public class ChangeColorManager extends AbstractActivityProvider implements
      * As it is possible that the same color id is taken during invitation
      * multiple times we must use a counter for each id.
      */
-    private final int[] availableColors;
+
+    private final Map<Integer, Integer> usedColorIDs = new HashMap<Integer, Integer>();
 
     private final AbstractActivityReceiver receiver = new AbstractActivityReceiver() {
 
@@ -104,10 +107,6 @@ public class ChangeColorManager extends AbstractActivityProvider implements
         this.sarosSession = sarosSession;
         this.editorManager = editorManager;
         this.colorIDSetStorage = colorIDSetStorage;
-
-        assert SarosSession.MAX_USERCOLORS >= 0;
-
-        availableColors = new int[SarosSession.MAX_USERCOLORS];
     }
 
     @Override
@@ -155,24 +154,18 @@ public class ChangeColorManager extends AbstractActivityProvider implements
     }
 
     /**
-     * Returns a snapshot of the currently available (not in use) color IDs.
+     * Returns a snapshot of the currently in use color IDs.
      * 
      * @return
      */
-    public synchronized Set<Integer> getAvailableColors() {
-
-        Set<Integer> available = new HashSet<Integer>();
-        for (int i = 0; i < availableColors.length; i++) {
-            if (availableColors[i] == 0)
-                available.add(i);
-        }
-
-        return available;
+    public synchronized Set<Integer> getUsedColorIDs() {
+        return new HashSet<Integer>(usedColorIDs.keySet());
     }
 
     /**
      * Changes the color id for the current local user. The change is done
-     * asynchronously and may not be available immediately.
+     * asynchronously and may not be available immediately. Negative color id
+     * values will result in the next available color id.
      * 
      * @param colorID
      *            the new color ID for the current session
@@ -281,7 +274,7 @@ public class ChangeColorManager extends AbstractActivityProvider implements
             ColorIDSet colorIDSet = colorIDSetStorage
                 .getColorIDSet(asJIDCollection(currentUsers));
 
-            resolveColorConflicts: do {
+            resolveColorConflicts: {
 
                 // no conflict = OK
                 if (isOptimalColorAssignment(assignedColors)) {
@@ -342,7 +335,7 @@ public class ChangeColorManager extends AbstractActivityProvider implements
 
                 log.debug("color conflict resolve result = RESOLVED");
 
-            } while (false); // this loop acts as GOTO replacement
+            } // END resolveColorConflicts
 
             log.debug("new color assignment: " + assignedColors);
 
@@ -391,13 +384,14 @@ public class ChangeColorManager extends AbstractActivityProvider implements
             && isValidColorAssignment(assignedColors);
     }
 
-    private boolean isValidColorAssignment(Map<User, Integer> assignedColors) {
+    private synchronized boolean isValidColorAssignment(
+        Map<User, Integer> assignedColors) {
         return isUnique(assignedColors.values())
             && !assignedColors.containsValue(UserColorID.UNKNOWN);
     }
 
-    private void applyStoredColors(Map<User, Integer> assignedColors,
-        ColorIDSet colorIDSet) {
+    private synchronized void applyStoredColors(
+        Map<User, Integer> assignedColors, ColorIDSet colorIDSet) {
 
         for (Map.Entry<User, Integer> e : assignedColors.entrySet()) {
             e.setValue(colorIDSet.getColor(e.getKey().getJID()));
@@ -414,7 +408,7 @@ public class ChangeColorManager extends AbstractActivityProvider implements
      * 
      * @param assignedColors
      */
-    private void autoAssignColors(Map<User, Integer> assignedColors) {
+    private synchronized void autoAssignColors(Map<User, Integer> assignedColors) {
         List<User> usersToAutoAssignColors = new ArrayList<User>();
 
         for (Map.Entry<User, Integer> entry : assignedColors.entrySet()) {
@@ -432,7 +426,7 @@ public class ChangeColorManager extends AbstractActivityProvider implements
         }
     }
 
-    private Map<User, Integer> getLastKnownFavoriteColors(
+    private synchronized Map<User, Integer> getLastKnownFavoriteColors(
         Map<User, Integer> assignedColors, ColorIDSet colorIDSet) {
         Map<User, Integer> lastKnownFavoriteColors = new LinkedHashMap<User, Integer>();
 
@@ -498,7 +492,7 @@ public class ChangeColorManager extends AbstractActivityProvider implements
         if (colorID < 0)
             assert !UserColorID.isValid(colorID) : "negative color id must not be valid";
 
-        return colorID >= 0 && colorID < SarosSession.MAX_USERCOLORS;
+        return UserColorID.isValid(colorID);
     }
 
     /**
@@ -506,21 +500,31 @@ public class ChangeColorManager extends AbstractActivityProvider implements
      */
     private synchronized int getNextAvailableColorID() {
 
-        for (int i = 0; i < availableColors.length; i++) {
-            if (availableColors[i] == 0) {
-                removeColorIdFromPool(i);
-                return i;
-            }
+        List<Integer> usedColorIDs = new ArrayList<Integer>(getUsedColorIDs());
+
+        Collections.sort(usedColorIDs);
+
+        int unusedColorID = 0;
+
+        for (int usedColorID : usedColorIDs) {
+            if (!isValidColorID(usedColorID))
+                continue;
+
+            if (unusedColorID < usedColorID)
+                break;
+
+            unusedColorID = usedColorID + 1;
         }
 
-        return SarosSession.MAX_USERCOLORS;
+        removeColorIdFromPool(unusedColorID);
+        return unusedColorID;
     }
 
     private synchronized boolean isColorIDAvailable(int colorID) {
         if (!isValidColorID(colorID))
             return false;
 
-        return availableColors[colorID] == 0;
+        return !usedColorIDs.containsKey(colorID);
 
     }
 
@@ -532,16 +536,27 @@ public class ChangeColorManager extends AbstractActivityProvider implements
         if (!isValidColorID(colorID))
             return;
 
-        availableColors[colorID]--;
+        Integer colorIDUseCount = usedColorIDs.get(colorID);
 
-        if (availableColors[colorID] < 0) {
+        if (colorIDUseCount == null) {
             log.warn("color id: " + colorID
                 + " was added although it was never removed");
-            availableColors[colorID] = 0;
+            colorIDUseCount = 0;
+        } else {
+            colorIDUseCount--;
         }
 
         log.trace("color id: " + colorID + " is currently used "
-            + availableColors[colorID] + " times");
+            + colorIDUseCount + " times");
+
+        /*
+         * remove the colorID to ensure that getNextAvailableColorID returns
+         * correct values
+         */
+        if (colorIDUseCount == 0) {
+            usedColorIDs.remove(colorID);
+        } else
+            usedColorIDs.put(colorID, colorIDUseCount);
     }
 
     /**
@@ -552,10 +567,17 @@ public class ChangeColorManager extends AbstractActivityProvider implements
         if (!isValidColorID(colorID))
             return;
 
-        availableColors[colorID]++;
+        Integer colorIDUseCount = usedColorIDs.get(colorID);
+
+        if (colorIDUseCount == null)
+            colorIDUseCount = 0;
+
+        colorIDUseCount++;
 
         log.trace("color id: " + colorID + " is currently used "
-            + availableColors[colorID] + " times");
+            + colorIDUseCount + " times");
+
+        usedColorIDs.put(colorID, colorIDUseCount);
     }
 
     private synchronized void updateColorSet(Collection<User> users) {

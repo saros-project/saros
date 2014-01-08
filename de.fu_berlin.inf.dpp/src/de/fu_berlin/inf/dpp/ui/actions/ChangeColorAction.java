@@ -89,7 +89,7 @@ public final class ChangeColorAction extends Action implements Disposable {
 
         int colorID = wizard.getChosenColor();
 
-        if (session.getAvailableColors().contains(colorID))
+        if (!session.getUnavailableColors().contains(colorID))
             session.changeColor(colorID);
         else
             MessageDialog.openInformation(SWTUtils.getShell(),

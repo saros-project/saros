@@ -282,11 +282,11 @@ public interface ISarosSession {
     public ConcurrentDocumentClient getConcurrentDocumentClient();
 
     /**
-     * Returns a snapshot of the currently available (not in use) color IDs.
+     * Returns a snapshot of the currently unavailable (in use) color ids.
      * 
      * @return
      */
-    public Set<Integer> getAvailableColors();
+    public Set<Integer> getUnavailableColors();
 
     /**
      * FOR INTERNAL USE ONLY !
@@ -476,14 +476,11 @@ public interface ISarosSession {
     public StopManager getStopManager();
 
     /**
-     * Changes the color for the current session.
+     * Changes the color for the current session. The color change is performed
+     * on the session host and may therefore result in a different color id.
      * 
      * @param colorID
-     *            the new color id that should be used to select the new color
-     * 
-     * @throws IllegalArgumentException
-     *             if the color id is negative or exceeds the available color id
-     *             limit
+     *            the new color id that should be used during the session
      */
     public void changeColor(int colorID);
 

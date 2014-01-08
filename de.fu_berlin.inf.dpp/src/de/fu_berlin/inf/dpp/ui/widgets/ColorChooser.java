@@ -146,12 +146,12 @@ public class ColorChooser extends Composite {
     public void updateColorEnablement() {
         ISarosSession session = sessionManager.getSarosSession();
 
-        Set<Integer> freeColors = session != null ? session
-            .getAvailableColors() : new HashSet<Integer>();
+        Set<Integer> unavailableColors = session != null ? session
+            .getUnavailableColors() : new HashSet<Integer>();
 
         for (int colorId = 0; colorId < colorLabels.size(); colorId++) {
             ColorLabel colorLabel = colorLabels.get(colorId);
-            colorLabel.setEnabled(freeColors.contains(colorId));
+            colorLabel.setEnabled(!unavailableColors.contains(colorId));
         }
     }
 

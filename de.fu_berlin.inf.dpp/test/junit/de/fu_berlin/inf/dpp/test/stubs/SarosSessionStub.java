@@ -289,7 +289,7 @@ public class SarosSessionStub implements ISarosSession {
     }
 
     @Override
-    public Set<Integer> getAvailableColors() {
+    public Set<Integer> getUnavailableColors() {
         throw new RuntimeException("Unexpected call to Stub");
     }
 
