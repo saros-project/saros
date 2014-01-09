@@ -45,14 +45,12 @@ import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
-import de.fu_berlin.inf.dpp.observables.VideoSessionObservable;
 import de.fu_berlin.inf.dpp.observables.VoIPSessionObservable;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ColorNegotiationHook;
 import de.fu_berlin.inf.dpp.project.internal.FollowingActivitiesManager;
 import de.fu_berlin.inf.dpp.util.sendfile.FileStreamService;
 import de.fu_berlin.inf.dpp.versioning.VersionManager;
-import de.fu_berlin.inf.dpp.videosharing.VideoSharingService;
 
 /**
  * This is the basic core factory for Saros. All components that are created by
@@ -109,7 +107,6 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
         // streaming services
         Component.create(FileStreamService.class),
         Component.create(AudioService.class),
-        Component.create(VideoSharingService.class),
 
         Component.create(IStunService.class, StunServiceImpl.class),
 
@@ -130,7 +127,6 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
         Component.create(SessionIDObservable.class),
         Component.create(SarosSessionObservable.class),
         Component.create(VoIPSessionObservable.class),
-        Component.create(VideoSessionObservable.class),
         Component.create(AwarenessInformationCollector.class),
         Component.create(FollowingActivitiesManager.class),
 

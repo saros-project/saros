@@ -95,42 +95,6 @@
       		id="de.fu_berlin.inf.dpp.preferences.personalization"
       		name="Personalization">
       </page>
-      <page
-            category="de.fu_berlin.inf.dpp.preferences"
-            class="de.fu_berlin.inf.dpp.videosharing.preferences.VideoSharingPreferencePage"
-            id="de.fu_berlin.inf.dpp.videosharing.preferences.VideoSharingPreferencePage"
-            name="%page.name.4">
-      </page>
-      <page
-            category="de.fu_berlin.inf.dpp.videosharing.preferences.VideoSharingPreferencePage"
-            class="de.fu_berlin.inf.dpp.videosharing.preferences.EncoderPreferencePage"
-            id="de.fu_berlin.inf.dpp.videosharing.preferences.EncoderPreferencePage"
-            name="%page.name.5">
-      </page>
-      <page
-            category="de.fu_berlin.inf.dpp.videosharing.preferences.EncoderPreferencePage"
-            class="de.fu_berlin.inf.dpp.videosharing.preferences.XugglerEncoderPreferencePage"
-            id="de.fu_berlin.inf.dpp.videosharing.preferences.XugglerEncoderPreferencePage"
-            name="%page.name.6">
-      </page>
-      <page
-            category="de.fu_berlin.inf.dpp.videosharing.preferences.EncoderPreferencePage"
-            class="de.fu_berlin.inf.dpp.videosharing.preferences.ImageTileEncoderPreferencePage"
-            id="de.fu_berlin.inf.dpp.videosharing.preferences.ImageTileEncoderPreferencePage"
-            name="%page.name.7">
-      </page>
-      <page
-            category="de.fu_berlin.inf.dpp.videosharing.preferences.VideoSharingPreferencePage"
-            class="de.fu_berlin.inf.dpp.videosharing.preferences.VideoPlayerPreferencePage"
-            id="de.fu_berlin.inf.dpp.videosharing.preferences.VideoPlayerPreferencePage"
-            name="%page.name.8">
-      </page>
-      <page
-            category="de.fu_berlin.inf.dpp.videosharing.preferences.VideoSharingPreferencePage"
-            class="de.fu_berlin.inf.dpp.videosharing.preferences.ScreenPreferencePage"
-            id="de.fu_berlin.inf.dpp.videosharing.preferences.ScreenPreferencePage"
-            name="%page.name.9">
-      </page>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

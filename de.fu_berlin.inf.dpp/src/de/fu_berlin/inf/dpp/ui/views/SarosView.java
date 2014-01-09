@@ -91,7 +91,6 @@ import de.fu_berlin.inf.dpp.ui.actions.RenameContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.RestrictToReadOnlyAccessAction;
 import de.fu_berlin.inf.dpp.ui.actions.SendFileAction;
 import de.fu_berlin.inf.dpp.ui.actions.SkypeAction;
-import de.fu_berlin.inf.dpp.ui.actions.VideoSharingAction;
 import de.fu_berlin.inf.dpp.ui.actions.VoIPAction;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterEntryElement;
 import de.fu_berlin.inf.dpp.ui.sounds.SoundManager;
@@ -519,7 +518,6 @@ public class SarosView extends ViewPart {
                     manager.add(new Separator());
                     manager.add(getAction(OpenChatAction.class));
                     manager.add(getAction(SendFileAction.class));
-                    manager.add(getAction(VideoSharingAction.class));
                     manager.add(getAction(VoIPAction.class));
                 }
             }
@@ -657,7 +655,6 @@ public class SarosView extends ViewPart {
         registerAction(new FollowThisPersonAction());
         registerAction(new JumpToUserWithWriteAccessPositionAction());
         registerAction(new SendFileAction());
-        registerAction(new VideoSharingAction());
         registerAction(new VoIPAction());
         registerAction(new ChangeColorAction());
         registerAction(new RemoveUserAction());

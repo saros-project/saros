@@ -44,7 +44,6 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
-import de.fu_berlin.inf.dpp.ui.views.VideoPlayerView;
 
 /**
  * Some helper functionality to interface with Eclipse.
@@ -75,21 +74,6 @@ public class SarosUI {
 
     protected void bringToFrontView(String view) {
         showView(view, IWorkbenchPage.VIEW_VISIBLE);
-    }
-
-    /**
-     * @swt
-     */
-    public void createVideoPlayerView() {
-        if (SWTUtils.findView(VideoPlayerView.ID) == null)
-            createView(VideoPlayerView.ID);
-    }
-
-    /**
-     * @swt
-     */
-    public void activateVideoPlayerView() {
-        activateView(VideoPlayerView.ID);
     }
 
     protected void activateView(String view) {

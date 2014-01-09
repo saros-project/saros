@@ -31,9 +31,6 @@ import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 import de.fu_berlin.inf.dpp.feedback.AbstractFeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.FeedbackInterval;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
-import de.fu_berlin.inf.dpp.videosharing.VideoSharing;
-import de.fu_berlin.inf.dpp.videosharing.preferences.VideoSharingPreferenceHelper;
-import de.fu_berlin.inf.dpp.videosharing.source.Screen;
 
 /**
  * Class used to initialize default preference values.
@@ -125,39 +122,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         prefs.setValue(PreferenceConstants.AUDIO_ENABLE_DTX, true);
         prefs.setValue(PreferenceConstants.AUDIO_SAMPLERATE, "44100");
         prefs.setValue(PreferenceConstants.AUDIO_QUALITY_LEVEL, "8");
-
-        // videosharing
-
-        prefs.setValue(PreferenceConstants.VIDEOSHARING_ENABLED, false);
-        prefs.setValue(PreferenceConstants.ENCODING_VIDEO_FRAMERATE, 5);
-        prefs.setValue(PreferenceConstants.ENCODING_VIDEO_RESOLUTION,
-            VideoSharingPreferenceHelper.RESOLUTIONS[2][1]);
-        prefs.setValue(PreferenceConstants.ENCODING_VIDEO_WIDTH, 320);
-        prefs.setValue(PreferenceConstants.ENCODING_VIDEO_HEIGHT, 240);
-        prefs.setValue(PreferenceConstants.ENCODING_MAX_BITRATE, 512000);
-        prefs.setValue(PreferenceConstants.ENCODING_CODEC,
-            VideoSharing.Codec.IMAGE.name());
-
-        prefs.setValue(PreferenceConstants.XUGGLER_CONTAINER_FORMAT, "flv");
-        prefs.setValue(PreferenceConstants.XUGGLER_CODEC, "libx264");
-        prefs.setValue(PreferenceConstants.XUGGLER_USE_VBV, false);
-
-        prefs.setValue(PreferenceConstants.IMAGE_TILE_CODEC, "png");
-        prefs.setValue(PreferenceConstants.IMAGE_TILE_QUALITY, 60);
-        prefs.setValue(PreferenceConstants.IMAGE_TILE_COLORS, 256);
-        prefs.setValue(PreferenceConstants.IMAGE_TILE_DITHER, true);
-        prefs.setValue(PreferenceConstants.IMAGE_TILE_SERPENTINE, false);
-
-        prefs.setValue(PreferenceConstants.PLAYER_RESAMPLE, false);
-        prefs.setValue(PreferenceConstants.PLAYER_KEEP_ASPECT_RATIO, true);
-
-        prefs.setValue(PreferenceConstants.SCREEN_INITIAL_MODE,
-            Screen.Mode.FOLLOW_MOUSE.name());
-        prefs.setValue(PreferenceConstants.SCREEN_MOUSE_AREA_QUALITY,
-            VideoSharingPreferenceHelper.ZOOM_LEVELS[0][1]);
-        prefs.setValue(PreferenceConstants.SCREEN_MOUSE_AREA_WIDTH, 320);
-        prefs.setValue(PreferenceConstants.SCREEN_MOUSE_AREA_HEIGHT, 240);
-        prefs.setValue(PreferenceConstants.SCREEN_SHOW_MOUSEPOINTER, true);
 
         /*
          * Initially 50/50 distribution Roster/Chatpart in saros view

@@ -34,7 +34,6 @@ import de.fu_berlin.inf.dpp.ui.eventhandler.ServerPreferenceHandler;
 import de.fu_berlin.inf.dpp.ui.eventhandler.SessionStatusRequestHandler;
 import de.fu_berlin.inf.dpp.ui.eventhandler.UserStatusChangeHandler;
 import de.fu_berlin.inf.dpp.ui.eventhandler.XMPPAuthorizationHandler;
-import de.fu_berlin.inf.dpp.videosharing.VideoSharing;
 
 /**
  * Factory used for creating the Saros context when running as Eclipse plugin.
@@ -68,7 +67,6 @@ public class SarosEclipseContextFactory extends AbstractSarosContextFactory {
         Component.create(AudioServiceManager.class),
         Component.create(MixerManager.class),
         Component.create(UndoManager.class),
-        Component.create(VideoSharing.class),
         Component.create(RemoteProgressManager.class),
 
         // UI handlers

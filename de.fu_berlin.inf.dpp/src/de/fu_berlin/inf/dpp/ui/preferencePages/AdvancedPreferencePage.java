@@ -68,11 +68,6 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
                 getFieldEditorParent()));
         }
 
-        addField(new BooleanFieldEditor(
-            PreferenceConstants.VIDEOSHARING_ENABLED,
-            Messages.AdvancedPreferencePage_enable_videosharing,
-            getFieldEditorParent()));
-
         addField(new BooleanFieldEditor(PreferenceConstants.VOIP_ENABLED,
             Messages.AdvancedPreferencePage_enable_voip, getFieldEditorParent()));
 
