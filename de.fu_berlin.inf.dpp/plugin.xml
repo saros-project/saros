@@ -12,13 +12,6 @@
             name="%category.name.0">
       </category>
      <view
-            category="de.fu_berlin.inf.dpp.Saros"
-            class="de.fu_berlin.inf.dpp.ui.views.VideoPlayerView"
-            icon="icons/view16/video_misc.png"
-            id="de.fu_berlin.inf.dpp.ui.views.VideoPlayerView"
-            name="%view.name"
-            restorable="true"/>
-     <view
            category="de.fu_berlin.inf.dpp.Saros"
            class="de.fu_berlin.inf.dpp.ui.views.SarosView"
            icon="icons/view16/saros_misc.png"
