@@ -134,31 +134,9 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     }
 
     @Override
-    public void shareYourScreenWithUser(JID jid) throws RemoteException {
-        selectParticipant(jid, "you cannot share a screen with youself");
-        clickToolbarButtonWithTooltip(TB_SHARE_SCREEN_WITH_BUDDY);
-    }
-
-    public void stopSessionWithBuddy(JID jid) throws RemoteException {
-        selectParticipant(jid, "you cannot stop a screen session with youself");
-        clickToolbarButtonWithTooltip(TB_STOP_SESSION_WITH_BUDDY);
-    }
-
-    @Override
     public void sendFileToUser(JID jid) throws RemoteException {
         selectParticipant(jid, "you cannot send a file to youself");
         clickToolbarButtonWithTooltip(TB_SEND_A_FILE_TO_SELECTED_BUDDY);
-    }
-
-    @Override
-    public void startVoIPSessionWithUser(JID jid) throws RemoteException {
-        selectParticipant(jid, "you cannot start a VoIP session with youself");
-        clickToolbarButtonWithTooltip(TB_START_VOIP_SESSION);
-        if (RemoteWorkbenchBot.getInstance().shell(SHELL_ERROR_IN_SAROS_PLUGIN)
-            .isActive()) {
-            RemoteWorkbenchBot.getInstance().shell(SHELL_ERROR_IN_SAROS_PLUGIN)
-                .confirm(OK);
-        }
     }
 
     @Override

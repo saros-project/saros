@@ -266,26 +266,6 @@ public interface ISarosView extends Remote {
      */
 
     /**
-     * Performs the action "Share your screen with selected buddy" which should
-     * be activated by clicking the tool bar button with the tooltip text
-     * {@link StfRemoteObject#TB_SHARE_SCREEN_WITH_BUDDY} on the session view.
-     * <p>
-     * <b>Attention:</b>
-     * <ol>
-     * <li>Makes sure, the session view is open and active.</li>
-     * <li>All iterative triggered events by the action should be handled in the
-     * method(exclude remote triggered events).</li>
-     * </ol>
-     * 
-     * @param jid
-     *            the {@link JID} of the user with whom you want to share your
-     *            screen.
-     * @throws RemoteException
-     */
-
-    public void shareYourScreenWithUser(JID jid) throws RemoteException;
-
-    /**
      * Performs the action "Send a file to selected buddy" which should be
      * activated by clicking the tool bar button with the tooltip text
      * {@link StfRemoteObject#TB_SEND_A_FILE_TO_SELECTED_BUDDY} on the session
@@ -308,29 +288,6 @@ public interface ISarosView extends Remote {
      * @throws RemoteException
      */
     public void sendFileToUser(JID jid) throws RemoteException;
-
-    /**
-     * Performs the action "Start a VoIP session" which should be activated by
-     * clicking the tool bar button with the tooltip text
-     * {@link StfRemoteObject#TB_SEND_A_FILE_TO_SELECTED_BUDDY} on the session
-     * view.
-     * <p>
-     * <b>Attention:</b>
-     * <ol>
-     * <li>Makes sure, the session view is open and active.</li>
-     * <li>All iterative triggered events by the action should be handled in the
-     * method(exclude remote triggered events). E.g. a popup window.</li>
-     * </ol>
-     * 
-     * TODO: this function isn't complete yet.
-     * 
-     * 
-     * @param jid
-     *            the {@link JID} of the user with whom you want to share your
-     *            screen.
-     * @throws RemoteException
-     */
-    public void startVoIPSessionWithUser(JID jid) throws RemoteException;
 
     /**
      * performs the action "Leave the session" which should be activated by

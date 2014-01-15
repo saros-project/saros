@@ -205,25 +205,6 @@ public final class SarosPreferences extends StfRemoteObject implements
     }
 
     @Override
-    public void setupSettingForScreensharing(int encoder, int videoResolution,
-        int bandWidth, int capturedArea) throws RemoteException {
-        clickMenuSarosPreferences();
-
-        SWTBotShell shell = new SWTBot().shell(SHELL_PREFERNCES);
-
-        shell.activate();
-
-        shell.bot().tree().expandNode(NODE_SAROS, NODE_SAROS_SCREENSHARING)
-            .select();
-        shell.bot().ccomboBox(0).setSelection(encoder);
-        shell.bot().ccomboBox(1).setSelection(videoResolution);
-
-        shell.bot().button(APPLY).click();
-        shell.bot().button(OK).click();
-        shell.bot().waitUntil(SarosConditions.isShellClosed(shell));
-    }
-
-    @Override
     public void enableIBBOnlyTransfer() throws RemoteException {
         setIBBOnlyTransfer(true);
     }

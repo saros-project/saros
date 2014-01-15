@@ -247,13 +247,6 @@ public interface Constants {
 
     public static final String NODE_SAROS_COMMUNICATION = get("node_Saros_Communication");
 
-    public static final String NODE_SAROS_SCREENSHARING = get("node_Saros_screensharing");
-    public static final String NODE_SAROS_SCREENSHARING_DESKTOP = get("node_Saros_screensharing_desktop");
-    public static final String NODE_SAROS_SCREENSHARING_ENCODER = get("node_Saros_screensharing_encoder");
-    public static final String NODE_SAROS_SCREENSHARING_ENCODER_IMAGE_TILE = get("node_Saros_screensharing_encoder_image_tile");
-    public static final String NODE_SAROS_SCREENSHARING_ENCODER_XUGGLER = get("node_Saros_screensharing_encoder_xuggler");
-    public static final String NODE_SAROS_SCREENSHARING_REMOTE_SCREEN_VIEW = get("node_Saros_screensharing_remote_screen_view");
-
     public static final String NODE_SAROS_NETWORK = get("node_saros_network");
     public static final String PREF_NODE_SAROS_NETWORK_TRANSPORT_MODE_GROUP = get("NetworkPreferencePage_connection_established");
     public static final String PREF_NODE_SAROS_NETWORK_TRANSPORT_MODE_SOCKS5_MEDIATED_CHECKBOX = get("NetworkPreferencePage_buttonOnlyAllowMediatedSocks5_text");
@@ -324,10 +317,7 @@ public interface Constants {
     public static final String TB_DISCONNECT = get("tb_disconnect");
     public static final String TB_ADD_NEW_CONTACT = get("NewContactAction_tooltip");
     public static final String TB_CONNECT = get("tb_connect");
-    public static final String TB_SHARE_SCREEN_WITH_BUDDY = get("tb_share_screen_with_buddy");
-    public static final String TB_STOP_SESSION_WITH_BUDDY = get("tb_stop_session_with_user");
     public static final String TB_SEND_A_FILE_TO_SELECTED_BUDDY = get("tb_send_a_file_to_selected_buddy");
-    public static final String TB_START_VOIP_SESSION = get("tb_start_a_voip_session");
     public static final String TB_NO_INCONSISTENCIES = get("tb_no_inconsistencies");
     public static final String TB_INCONSISTENCY_DETECTED = get("tb_inconsistency_detected_in");
     public static final String TB_RESTRICT_INVITEES_TO_READ_ONLY_ACCESS = get("tb_restrict_invitees_to_read_only_access");
@@ -345,21 +335,6 @@ public interface Constants {
     public static final String READ_ONLY_ACCESS = get("read_only_access");
     public static final String FOLLOW_MODE_ENABLED = get("follow_mode_enabled");
     public static final String FOLLOW_MODE_PAUSED = get("follow_mode_paused");
-
-    /* *********************************************
-     * 
-     * View Remote Screen
-     * 
-     * ********************************************
-     */
-    // View infos
-    public static final String VIEW_REMOTE_SCREEN = get("view_remote_screen");
-    public static final String VIEW_REMOTE_SCREEN_ID = get("view_remote_screen_id");
-
-    public static final String TB_CHANGE_MODE_IMAGE_SOURCE = get("tb_change_mode_of_image_source");
-    public static final String TB_STOP_RUNNING_SESSION = get("tb_stop_running_session");
-    public static final String TB_RESUME = get("tb_resume");
-    public static final String TB_PAUSE = get("tb_pause");
 
     /* *********************************************
      * 

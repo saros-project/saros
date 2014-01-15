@@ -104,25 +104,6 @@ public interface ISarosPreferences extends Remote {
 
     /**********************************************
      * 
-     * setting for screensharing
-     * 
-     **********************************************/
-    /**
-     * modify the setting for screensharing with GUI, which should be done with
-     * the following steps:
-     * <ol>
-     * <li>Click menu "Saros" -> "Preferences"</li>
-     * <li>In the right Saros-Screensharing-page modifiy the encoder and
-     * videoResolution with the given parameters.</li>
-     * </ol>
-     * 
-     * @throws RemoteException
-     */
-    public void setupSettingForScreensharing(int encoder, int videoResolution,
-        int bandWidth, int capturedArea) throws RemoteException;
-
-    /**********************************************
-     * 
      * setting for Feedback
      * 
      **********************************************/

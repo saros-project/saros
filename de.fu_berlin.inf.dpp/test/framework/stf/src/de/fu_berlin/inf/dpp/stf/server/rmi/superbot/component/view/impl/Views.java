@@ -13,9 +13,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.IProg
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl.ConsoleView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl.PackageExplorerView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl.ProgressView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.IRSView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.ISarosView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl.RSView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl.SarosView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.whiteboard.ISarosWhiteboardView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.whiteboard.impl.SarosWhiteboardView;
@@ -43,17 +41,6 @@ public final class Views extends StfRemoteObject implements IViews {
         bot.viewByTitle(VIEW_SAROS_WHITEBOARD).show();
         return SarosWhiteboardView.getInstance().setView(
             bot.viewByTitle(VIEW_SAROS_WHITEBOARD), bot);
-    }
-
-    @Override
-    public IRSView remoteScreenView() throws RemoteException {
-
-        SWTWorkbenchBot bot = new SWTWorkbenchBot();
-        RemoteWorkbenchBot.getInstance().openViewById(VIEW_REMOTE_SCREEN_ID);
-        RemoteWorkbenchBot.getInstance().view(VIEW_REMOTE_SCREEN).show();
-        bot.viewByTitle(VIEW_REMOTE_SCREEN).show();
-        return RSView.getInstance()
-            .setView(bot.viewByTitle(VIEW_REMOTE_SCREEN));
     }
 
     @Override
