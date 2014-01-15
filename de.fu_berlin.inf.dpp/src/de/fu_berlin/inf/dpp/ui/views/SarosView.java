@@ -410,9 +410,6 @@ public class SarosView extends ViewPart {
     }
 
     protected void addToolBarItems(IToolBarManager toolBar) {
-        boolean isDebug = false;
-        assert (isDebug = true) == true;
-
         toolBar.add(getAction(ChangeXMPPAccountAction.class));
         toolBar.add(getAction(NewContactAction.class));
         toolBar.add(getAction(OpenPreferencesAction.class));
@@ -449,7 +446,11 @@ public class SarosView extends ViewPart {
                 if (buddies.size() == 0)
                     return;
 
-                manager.add(getAction(SkypeAction.class));
+                /*
+                 * disabled because feature does not work properly(current
+                 * version 14.1.31)
+                 */
+                // manager.add(getAction(SkypeAction.class));
                 manager.add(new Separator());
                 manager.add(getAction(OpenChatAction.class));
                 manager.add(getAction(SendFileAction.class));
