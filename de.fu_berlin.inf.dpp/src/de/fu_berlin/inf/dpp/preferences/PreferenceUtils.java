@@ -1,26 +1,17 @@
 package de.fu_berlin.inf.dpp.preferences;
 
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioFormat.Encoding;
-import javax.sound.sampled.Mixer;
-
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.xiph.speex.spi.SpeexEncoding;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.communication.audio.MixerManager;
 import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 
 @Component(module = "prefs")
 public class PreferenceUtils {
 
     private IPreferenceStore preferenceStore;
-    private MixerManager mixerManager;
 
-    public PreferenceUtils(IPreferenceStore preferenceStore,
-        MixerManager mixerManager) {
+    public PreferenceUtils(IPreferenceStore preferenceStore) {
         this.preferenceStore = preferenceStore;
-        this.mixerManager = mixerManager;
     }
 
     public boolean isDebugEnabled() {
@@ -134,51 +125,6 @@ public class PreferenceUtils {
             !value);
     }
 
-    public Mixer getRecordingMixer() {
-        return mixerManager.getMixerByName(preferenceStore
-            .getString(PreferenceConstants.AUDIO_RECORD_DEVICE));
-    }
-
-    public Mixer getPlaybackMixer() {
-        return mixerManager.getMixerByName(preferenceStore
-            .getString(PreferenceConstants.AUDIO_PLAYBACK_DEVICE));
-    }
-
-    public AudioFormat getEncodingFormat() {
-        Encoding encoding;
-        float sampleRate = Float.parseFloat(preferenceStore
-            .getString(PreferenceConstants.AUDIO_SAMPLERATE));
-        int quality = Integer.parseInt(preferenceStore
-            .getString(PreferenceConstants.AUDIO_QUALITY_LEVEL));
-        boolean vbr = preferenceStore.getBoolean(PreferenceConstants.AUDIO_VBR);
-
-        Encoding encodingsVbr[] = new Encoding[] { SpeexEncoding.SPEEX_VBR0,
-            SpeexEncoding.SPEEX_VBR1, SpeexEncoding.SPEEX_VBR2,
-            SpeexEncoding.SPEEX_VBR3, SpeexEncoding.SPEEX_VBR4,
-            SpeexEncoding.SPEEX_VBR5, SpeexEncoding.SPEEX_VBR6,
-            SpeexEncoding.SPEEX_VBR7, SpeexEncoding.SPEEX_VBR8,
-            SpeexEncoding.SPEEX_VBR9, SpeexEncoding.SPEEX_VBR10 };
-
-        Encoding encodingsCbr[] = new Encoding[] { SpeexEncoding.SPEEX_Q0,
-            SpeexEncoding.SPEEX_Q1, SpeexEncoding.SPEEX_Q2,
-            SpeexEncoding.SPEEX_Q3, SpeexEncoding.SPEEX_Q4,
-            SpeexEncoding.SPEEX_Q5, SpeexEncoding.SPEEX_Q6,
-            SpeexEncoding.SPEEX_Q7, SpeexEncoding.SPEEX_Q8,
-            SpeexEncoding.SPEEX_Q9, SpeexEncoding.SPEEX_Q10 };
-
-        if (vbr) {
-            encoding = encodingsVbr[quality];
-        } else {
-            encoding = encodingsCbr[quality];
-        }
-        return new AudioFormat(encoding, sampleRate, 16, 1, 2, sampleRate,
-            false);
-    }
-
-    public boolean isDtxEnabled() {
-        return preferenceStore.getBoolean(PreferenceConstants.AUDIO_ENABLE_DTX);
-    }
-
     public boolean isLocalSOCKS5ProxyEnabled() {
         return !preferenceStore
             .getBoolean(PreferenceConstants.LOCAL_SOCKS5_PROXY_DISABLED);
@@ -198,10 +144,6 @@ public class PreferenceUtils {
 
     public void setNeedsBasedSyncEnabled(boolean value) {
         preferenceStore.setValue(PreferenceConstants.NEEDS_BASED_SYNC, value);
-    }
-
-    public boolean isVOIPEnabled() {
-        return preferenceStore.getBoolean(PreferenceConstants.VOIP_ENABLED);
     }
 
     /**

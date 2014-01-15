@@ -309,7 +309,7 @@ public class DataTransferManagerTest {
         PreferenceInitializer.setPreferences(store);
         store.setValue(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT, true);
 
-        PreferenceUtils preferenceUtil = new PreferenceUtils(store, null);
+        PreferenceUtils preferenceUtil = new PreferenceUtils(store);
 
         ITransport mainTransport = new Transport(NetTransferMode.SOCKS5_DIRECT);
         ITransport fallbackTransport = new Transport(NetTransferMode.IBB);

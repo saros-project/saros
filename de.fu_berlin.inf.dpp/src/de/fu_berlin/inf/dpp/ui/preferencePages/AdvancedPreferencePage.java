@@ -68,9 +68,6 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
                 getFieldEditorParent()));
         }
 
-        addField(new BooleanFieldEditor(PreferenceConstants.VOIP_ENABLED,
-            Messages.AdvancedPreferencePage_enable_voip, getFieldEditorParent()));
-
         if (Boolean.getBoolean("de.fu_berlin.inf.dpp.server.SUPPORTED")) {
             addField(new BooleanFieldEditor(
                 PreferenceConstants.SERVER_ACTIVATED,

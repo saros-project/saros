@@ -78,7 +78,6 @@ import de.fu_berlin.inf.dpp.feedback.SelectionCollector;
 import de.fu_berlin.inf.dpp.feedback.SessionDataCollector;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.feedback.TextEditCollector;
-import de.fu_berlin.inf.dpp.feedback.VoIPCollector;
 import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -1220,7 +1219,6 @@ public final class SarosSession implements ISarosSession {
         sessionContainer.addComponent(JumpFeatureUsageCollector.class);
         sessionContainer.addComponent(FollowModeCollector.class);
         sessionContainer.addComponent(SelectionCollector.class);
-        sessionContainer.addComponent(VoIPCollector.class);
         sessionContainer.addComponent(ProjectCollector.class);
 
         // Feedback

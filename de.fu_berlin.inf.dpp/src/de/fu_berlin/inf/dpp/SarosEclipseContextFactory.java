@@ -9,8 +9,6 @@ import org.osgi.service.prefs.Preferences;
 import org.picocontainer.BindKey;
 import org.picocontainer.MutablePicoContainer;
 
-import de.fu_berlin.inf.dpp.communication.audio.AudioServiceManager;
-import de.fu_berlin.inf.dpp.communication.audio.MixerManager;
 import de.fu_berlin.inf.dpp.concurrent.undo.UndoManager;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogServer;
@@ -64,8 +62,6 @@ public class SarosEclipseContextFactory extends AbstractSarosContextFactory {
         Component.create(PreferenceUtils.class),
         Component.create(SarosUI.class),
         Component.create(SessionViewOpener.class),
-        Component.create(AudioServiceManager.class),
-        Component.create(MixerManager.class),
         Component.create(UndoManager.class),
         Component.create(RemoteProgressManager.class),
 

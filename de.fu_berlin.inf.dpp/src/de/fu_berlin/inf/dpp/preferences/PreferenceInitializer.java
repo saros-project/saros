@@ -117,12 +117,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         prefs.setValue(PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_OFFLINE,
             true);
 
-        prefs.setValue(PreferenceConstants.VOIP_ENABLED, false);
-        prefs.setValue(PreferenceConstants.AUDIO_VBR, true);
-        prefs.setValue(PreferenceConstants.AUDIO_ENABLE_DTX, true);
-        prefs.setValue(PreferenceConstants.AUDIO_SAMPLERATE, "44100");
-        prefs.setValue(PreferenceConstants.AUDIO_QUALITY_LEVEL, "8");
-
         /*
          * Initially 50/50 distribution Roster/Chatpart in saros view
          */

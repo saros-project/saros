@@ -128,26 +128,6 @@ public class PreferenceConstants {
 
     public static final String SOUND_ENABLED = "sound.enabled";
 
-    public static final String VOIP_ENABLED = "voip.enabled";
-
-    /** Audio quality level (1-10, 10 is best) **/
-    public static final String AUDIO_QUALITY_LEVEL = "AUDIO_QUALITY_LEVEL";
-
-    /** Checkbox if variable bit rate encoding is used */
-    public static final String AUDIO_VBR = "AUDIO_VBR";
-
-    /** Sample rate for audio encoder **/
-    public static final String AUDIO_SAMPLERATE = "AUDIO_SAMPLERATE";
-
-    /** Checkbox if discontinues transmission transmission is used */
-    public static final String AUDIO_ENABLE_DTX = "AUDIO_ENABLE_DTX";
-
-    /** Record device for VoIP **/
-    public static final String AUDIO_RECORD_DEVICE = "AUDIO_RECORD_DEVICE";
-
-    /** Playback device for VoIP **/
-    public static final String AUDIO_PLAYBACK_DEVICE = "AUDIO_PLAYBACK_DEVICE";
-
     /* Sound Events */
 
     public static final String SOUND_PLAY_EVENT_MESSAGE_SENT = "sound.play.event.message.sent";

@@ -8,7 +8,6 @@ import org.picocontainer.MutablePicoContainer;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.communication.SkypeManager;
-import de.fu_berlin.inf.dpp.communication.audio.AudioService;
 import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatService;
 import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCNegotiationManager;
 import de.fu_berlin.inf.dpp.communication.chat.single.SingleUserChatService;
@@ -106,7 +105,6 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
 
         // streaming services
         Component.create(FileStreamService.class),
-        Component.create(AudioService.class),
 
         Component.create(IStunService.class, StunServiceImpl.class),
 

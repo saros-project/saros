@@ -19,8 +19,6 @@ import org.picocontainer.injectors.ConstructorInjection;
 import de.fu_berlin.inf.dpp.ISarosContextBindings;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.communication.audio.AudioServiceManager;
-import de.fu_berlin.inf.dpp.communication.audio.IAudioServiceListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -95,32 +93,6 @@ public class StatisticCollectorTest {
         return editorManager;
     }
 
-    private static AudioServiceManager createAudioServiceManagerMock(
-        final List<Object> listeners) {
-        AudioServiceManager manager = EasyMock
-            .createMock(AudioServiceManager.class);
-        manager.addAudioListener(EasyMock.isA(IAudioServiceListener.class));
-        EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
-
-            @Override
-            public Object answer() throws Throwable {
-                listeners.add(EasyMock.getCurrentArguments()[0]);
-                return null;
-            }
-        }).anyTimes();
-        manager.removeAudioListener(EasyMock.isA(IAudioServiceListener.class));
-        EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
-
-            @Override
-            public Object answer() throws Throwable {
-                listeners.remove(EasyMock.getCurrentArguments()[0]);
-                return null;
-            }
-        }).anyTimes();
-        EasyMock.replay(manager);
-        return manager;
-    }
-
     @Test
     public void testCollectorRegistrationAndDestruction() {
 
@@ -139,11 +111,6 @@ public class StatisticCollectorTest {
         final List<Object> editorListeners = new LinkedList<Object>();
         EditorManager editorManager = createEditorManagerMock(editorListeners);
         container.addComponent(EditorManager.class, editorManager);
-
-        // audo service manager
-        final List<Object> audioListeners = new LinkedList<Object>();
-        AudioServiceManager audioManager = createAudioServiceManagerMock(audioListeners);
-        container.addComponent(AudioServiceManager.class, audioManager);
 
         final IPreferenceStore store = new MemoryPreferenceStore();
         final Preferences preferences = new MemoryPreferences();
@@ -173,7 +140,6 @@ public class StatisticCollectorTest {
         container.addComponent(JumpFeatureUsageCollector.class);
         container.addComponent(FollowModeCollector.class);
         container.addComponent(SelectionCollector.class);
-        container.addComponent(VoIPCollector.class);
 
         container.addComponent(BindKey.bindKey(String.class,
             ISarosContextBindings.SarosVersion.class), "0815");
@@ -186,20 +152,19 @@ public class StatisticCollectorTest {
         // Verify that the collectors are available
         StatisticManager manager = container
             .getComponent(StatisticManager.class);
-        Assert.assertEquals(9, manager.getAvailableCollectorCount());
+        Assert.assertEquals(8, manager.getAvailableCollectorCount());
         Assert.assertEquals(0, manager.getActiveCollectorCount());
 
         // Verify that they are active now
         container.start();
-        Assert.assertEquals(9, manager.getAvailableCollectorCount());
-        Assert.assertEquals(9, manager.getActiveCollectorCount());
+        Assert.assertEquals(8, manager.getAvailableCollectorCount());
+        Assert.assertEquals(8, manager.getActiveCollectorCount());
 
         // Verify that they are not active anymore
         container.stop();
-        Assert.assertEquals(9, manager.getAvailableCollectorCount());
+        Assert.assertEquals(8, manager.getAvailableCollectorCount());
         Assert.assertEquals(0, manager.getActiveCollectorCount());
         Assert.assertTrue(sessionListeners.isEmpty());
         Assert.assertTrue(editorListeners.isEmpty());
-        Assert.assertTrue(audioListeners.isEmpty());
     }
 }

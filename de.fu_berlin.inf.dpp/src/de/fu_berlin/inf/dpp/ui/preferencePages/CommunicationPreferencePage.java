@@ -1,12 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.preferencePages;
 
-import java.util.Collections;
-import java.util.List;
-
-import javax.sound.sampled.Mixer;
-
 import org.eclipse.jface.preference.BooleanFieldEditor;
-import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -23,39 +17,21 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.communication.audio.MixerManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
-import de.fu_berlin.inf.dpp.ui.Messages;
 
 //FIXME the layout of this page is completely BROKEN !!!
 @Component(module = "prefs")
 public class CommunicationPreferencePage extends FieldEditorPreferencePage
     implements IWorkbenchPreferencePage {
 
-    // TODO put this into the preference store
-    private static final String[] AUDIO_SAMPLE_RATE = new String[] { "44100",
-        "32000", "16000" };
-
-    private static final String[][] AUDIO_QUALITY_VALUES = { { "0", "0" },
-        { "1", "1" }, { "2", "2" }, { "3", "3" }, { "4", "4" }, { "5", "5" },
-        { "6", "6" }, { "7", "7" }, { "8", "8" }, { "9", "9" }, { "10", "10" } };
-
     @Inject
     private IPreferenceStore prefs;
-
-    @Inject
-    private MixerManager mixerManager;
 
     private StringFieldEditor chatserver;
     private BooleanFieldEditor useCustomChatServer;
     private StringFieldEditor skypeName;
 
-    private BooleanFieldEditor audio_vbr;
-    private BooleanFieldEditor audio_dtx;
-    private ComboFieldEditor audioQuality;
-
     private Group chatGroup;
-    private Group voipGroup;
     private Composite chatServerGroup;
 
     public CommunicationPreferencePage() {
@@ -73,7 +49,6 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
     @Override
     protected void createFieldEditors() {
         chatGroup = new Group(getFieldEditorParent(), SWT.NONE);
-        voipGroup = new Group(getFieldEditorParent(), SWT.NONE);
 
         GridData chatGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
         GridData voipGridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
@@ -84,11 +59,7 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
         chatGroup.setText("Chat");
         chatGroup.setLayout(new GridLayout(2, false));
 
-        voipGroup.setText("VoIP");
-        voipGroup.setLayout(new GridLayout(2, false));
-
         chatGroup.setLayoutData(chatGridData);
-        voipGroup.setLayoutData(voipGridData);
 
         chatServerGroup = new Composite(chatGroup, SWT.NONE);
         chatServerGroup.setLayout(new GridLayout(2, false));
@@ -106,70 +77,9 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
         skypeName = new StringFieldEditor(PreferenceConstants.SKYPE_USERNAME,
             "Skype name:", getFieldEditorParent());
 
-        audioQuality = new ComboFieldEditor(
-            PreferenceConstants.AUDIO_QUALITY_LEVEL,
-            "Audio Quality Level (0-10) - 10 is best", AUDIO_QUALITY_VALUES,
-            voipGroup);
-
-        ComboFieldEditor audioSamplerate = new ComboFieldEditor(
-            PreferenceConstants.AUDIO_SAMPLERATE, "Audio Samplerate (kHz)",
-            get2dArray(AUDIO_SAMPLE_RATE), voipGroup);
-
-        audio_vbr = new BooleanFieldEditor(
-            PreferenceConstants.AUDIO_VBR,
-            "Use Variable Bitrate (gives a better quality-to-space ratio, but may introduce a delay)",
-            voipGroup);
-
-        audio_dtx = new BooleanFieldEditor(
-            PreferenceConstants.AUDIO_ENABLE_DTX,
-            "Use Discontinuous Transmission (silence is not transmitted - only works with variable bitrate)",
-            voipGroup);
-
-        audio_dtx.setEnabled(prefs.getBoolean(PreferenceConstants.AUDIO_VBR),
-            voipGroup);
-
-        boolean enabled = true;
-
-        String[][] playbackMixers = getPlaybackMixerNames();
-
-        if (playbackMixers == null) {
-            playbackMixers = new String[][] { { "N/A",
-                Messages.CommunicationPreferencePage_unknown } };
-            enabled = false;
-        }
-
-        ComboFieldEditor audioPlaybackDevices = new ComboFieldEditor(
-            PreferenceConstants.AUDIO_PLAYBACK_DEVICE, "Audio Playback Device",
-            playbackMixers, voipGroup);
-
-        audioPlaybackDevices.setEnabled(enabled, voipGroup);
-
-        enabled = true;
-
-        String[][] recordMixers = getRecordMixerNames();
-
-        if (recordMixers == null) {
-            recordMixers = new String[][] { { "N/A",
-                Messages.CommunicationPreferencePage_unknown } };
-            enabled = false;
-        }
-
-        ComboFieldEditor audioRecordDevices = new ComboFieldEditor(
-            PreferenceConstants.AUDIO_RECORD_DEVICE, "Audio Record Device",
-            recordMixers, voipGroup);
-
-        audioRecordDevices.setEnabled(enabled, voipGroup);
-
         addField(chatserver);
         addField(useCustomChatServer);
         addField(skypeName);
-        addField(audioQuality);
-        addField(audioSamplerate);
-        addField(audio_vbr);
-        addField(audio_dtx);
-        addField(audioPlaybackDevices);
-        addField(audioRecordDevices);
-
     }
 
     @Override
@@ -187,12 +97,7 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
         if (event.getSource() instanceof FieldEditor) {
             FieldEditor field = (FieldEditor) event.getSource();
 
-            if (field.getPreferenceName().equals(PreferenceConstants.AUDIO_VBR)) {
-                if (event.getNewValue() instanceof Boolean) {
-                    Boolean newValue = (Boolean) event.getNewValue();
-                    audio_dtx.setEnabled(newValue, voipGroup);
-                }
-            } else if (field.getPreferenceName().equals(
+            if (field.getPreferenceName().equals(
                 PreferenceConstants.CUSTOM_MUC_SERVICE)) {
                 String serverName = event.getNewValue().toString();
                 useCustomChatServer
@@ -204,45 +109,5 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
     @Override
     protected void performDefaults() {
         super.performDefaults();
-    }
-
-    private String[][] getRecordMixerNames() {
-        return getMixerNames(0);
-    }
-
-    private String[][] getPlaybackMixerNames() {
-        return getMixerNames(1);
-    }
-
-    @SuppressWarnings("unchecked")
-    private String[][] getMixerNames(int type) {
-        List<Mixer.Info> mixerInfo;
-        if (type == 0)
-            mixerInfo = mixerManager.getRecordingMixers();
-        else if (type == 1)
-            mixerInfo = mixerManager.getPlaybackMixers();
-        else
-            mixerInfo = Collections.EMPTY_LIST;
-
-        if (mixerInfo.isEmpty())
-            return null;
-
-        String[][] devices = new String[mixerInfo.size()][2];
-        for (int i = 0; i < mixerInfo.size(); i++) {
-            devices[i][0] = mixerInfo.get(i).getName();
-            devices[i][1] = mixerInfo.get(i).getName();
-        }
-
-        return devices;
-
-    }
-
-    private String[][] get2dArray(String[] inputArray) {
-        String outputArray[][] = new String[inputArray.length][2];
-        for (int i = 0; i < inputArray.length; i++) {
-            outputArray[i][0] = inputArray[i];
-            outputArray[i][1] = inputArray[i];
-        }
-        return outputArray;
     }
 }
