@@ -56,7 +56,9 @@ public class ElementModelLayoutEditPolicy extends
 	@Override
 	protected Command createAddCommand(EditPart child, Object constraint) {
 		ElementRecordAddCommand command = null;
-		log.trace("Create Add Command " + child);
+
+		if (log.isTraceEnabled())
+			log.trace("Create Add Command " + child);
 
 		if (child instanceof ElementRecordPart) {
 			LayoutElementRecord parent = (LayoutElementRecord) getHost()
@@ -92,7 +94,8 @@ public class ElementModelLayoutEditPolicy extends
 	protected Command createChangeConstraintCommand(EditPart child,
 			Object constraint) {
 
-		log.trace("Create Change Constraint Command " + child);
+		if (log.isTraceEnabled())
+			log.trace("Create Change Constraint Command " + child);
 
 		ElementRecordChangeLayoutCommand command = null;
 
@@ -112,8 +115,9 @@ public class ElementModelLayoutEditPolicy extends
 	@Override
 	protected Command getCreateCommand(CreateRequest request) {
 
-		log.trace("Create Command " + request.getLocation() + " "
-				+ request.getSize());
+		if (log.isTraceEnabled())
+			log.trace("Create Command " + request.getLocation() + " "
+					+ request.getSize());
 
 		if (request.getType() == REQ_CREATE
 				&& getHost() instanceof ElementRecordPart) {
@@ -165,8 +169,10 @@ public class ElementModelLayoutEditPolicy extends
 
 	@Override
 	protected Command getCreateTextboxCommand(CreateTextBoxRequest request) {
-		log.trace("Create Textbox Command " + request.getLocation() + " "
-				+ request.getSize());
+
+		if (log.isTraceEnabled())
+			log.trace("Create Textbox Command " + request.getLocation() + " "
+					+ request.getSize());
 
 		if (request.getType() == REQ_CREATE_TEXTBOX
 				&& getHost() instanceof ElementRecordPart) {
@@ -212,8 +218,9 @@ public class ElementModelLayoutEditPolicy extends
 	@Override
 	protected Command getCreatePointListCommand(CreatePointlistRequest request) {
 
-		log.trace(request.getType() + " Create PointList Command "
-				+ Arrays.toString(request.getPoints().toIntArray()));
+		if (log.isTraceEnabled())
+			log.trace(request.getType() + " Create PointList Command "
+					+ Arrays.toString(request.getPoints().toIntArray()));
 
 		if ((request.getType() == REQ_CREATE_POINTLIST || request.getType() == REQ_CREATE_LINE)
 				&& getHost() instanceof ElementRecordPart) {
@@ -249,9 +256,10 @@ public class ElementModelLayoutEditPolicy extends
 		EditPart part = getHost().getViewer().getEditPartFactory()
 				.createEditPart(getHost(), createRequest.getNewObject());
 
-		log.trace("Create Size on drop feedback EditPart:" + part
-				+ " is AbstractGraphicalEditPart:"
-				+ (part instanceof AbstractGraphicalEditPart));
+		if (log.isTraceEnabled())
+			log.trace("Create Size on drop feedback EditPart:" + part
+					+ " is AbstractGraphicalEditPart:"
+					+ (part instanceof AbstractGraphicalEditPart));
 
 		if (part instanceof AbstractGraphicalEditPart) {
 			IFigure figure = ((AbstractGraphicalEditPart) part).getFigure();
@@ -260,9 +268,11 @@ public class ElementModelLayoutEditPolicy extends
 			figure.setBackgroundColor(new Color(null, ColorUtils
 					.getRGBBackgroundColor()));
 
-			log.trace("Figure is Shape: " + (figure instanceof Shape));
-			log.trace("Figure BG Color:" + figure.getBackgroundColor()
-					+ " Foreground Color:" + figure.getForegroundColor());
+			if (log.isTraceEnabled()) {
+				log.trace("Figure is Shape: " + (figure instanceof Shape));
+				log.trace("Figure BG Color:" + figure.getBackgroundColor()
+						+ " Foreground Color:" + figure.getForegroundColor());
+			}
 			addFeedback(figure);
 			return figure;
 		} else
