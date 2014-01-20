@@ -20,15 +20,12 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.MessageFormat;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
@@ -36,130 +33,296 @@ import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
+import org.jivesoftware.smack.Connection;
+import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smackx.filetransfer.FileTransferListener;
+import org.jivesoftware.smackx.filetransfer.FileTransferManager;
+import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
+import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
+import de.fu_berlin.inf.dpp.net.ConnectionState;
+import de.fu_berlin.inf.dpp.net.IConnectionListener;
+import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
+import de.fu_berlin.inf.dpp.ui.jobs.IncomingFileTransferJob;
+import de.fu_berlin.inf.dpp.ui.jobs.OutgoingFileTransferJob;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
-import de.fu_berlin.inf.dpp.util.sendfile.FileStreamService;
-import de.fu_berlin.inf.dpp.util.sendfile.SendFileJob;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
- * Action for sending a file among participants.
+ * Action for sending and receiving a file over XMPP.
  * 
- * @author s-lau
+ * @author srossbach
+ */
+/*
+ * TODO the receiving and file transfer creation part is misplaced here ... wrap
+ * those calls and put them in the dpp.net package e.g XMPPFileTransfer class
+ * hiding the need for tracking the XMPPConnection status etc.
+ */
+
+/*
+ * FIXME as the roster currently does not support multiple resources it can be
+ * random which presence will receive the file
  */
 public class SendFileAction extends Action implements Disposable {
-    private static final Logger log = Logger.getLogger(SendFileAction.class);
 
     public static final String ACTION_ID = SendFileAction.class.getName();
 
-    protected ISelectionListener selectionListener = new ISelectionListener() {
+    private static final Logger LOG = Logger.getLogger(SendFileAction.class);
+
+    // static smack ****
+    static {
+        OutgoingFileTransfer.setResponseTimeout(5 * 60 * 1000);
+    }
+
+    private FileTransferListener fileTransferListener = new FileTransferListener() {
+
+        @Override
+        public void fileTransferRequest(final FileTransferRequest request) {
+
+            final String description = request.getDescription();
+
+            if (description != null
+                && description
+                    .startsWith(ProjectNegotiation.ARCHIVE_TRANSFER_ID))
+                return;
+
+            SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
+                @Override
+                public void run() {
+                    handleIncomingFileTransferRequest(request);
+                }
+            });
+        }
+
+    };
+
+    private ISelectionListener selectionListener = new ISelectionListener() {
         @Override
         public void selectionChanged(IWorkbenchPart part, ISelection selection) {
             updateEnablement();
         }
     };
 
-    @Inject
-    protected ISarosSessionManager sessionManager;
+    private IConnectionListener connectionListener = new IConnectionListener() {
+        @Override
+        public void connectionStateChanged(final Connection connection,
+            final ConnectionState state) {
+            SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
+
+                @Override
+                public void run() {
+
+                    switch (state) {
+                    case CONNECTING:
+                        break;
+                    case CONNECTED:
+                        updateFileTransferManager(connection);
+                        break;
+                    case DISCONNECTING:
+                    case ERROR:
+                    case NOT_CONNECTED:
+                        updateFileTransferManager(null);
+                        break;
+                    }
+
+                    updateEnablement();
+                }
+            });
+        }
+    };
 
     @Inject
-    protected StreamServiceManager streamServiceManager;
+    private SarosNet network;
 
-    @Inject
-    protected FileStreamService fileStreamService;
+    private FileTransferManager fileTransferManager;
+
+    private Connection connection;
 
     public SendFileAction() {
         super(Messages.SendFileAction_title);
         SarosPluginContext.initComponent(this);
 
-        fileStreamService.hookAction(this);
         setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
             .getImageDescriptor(ISharedImages.IMG_OBJ_FILE));
         setId(ACTION_ID);
         setToolTipText(Messages.SendFileAction_tooltip);
-        setEnabled(false);
 
         SarosPluginContext.initComponent(this);
 
         SelectionUtils.getSelectionService().addSelectionListener(
             selectionListener);
-        updateEnablement();
-    }
 
-    protected void updateEnablement() {
-        List<User> participants = SelectionRetrieverFactory
-            .getSelectionRetriever(User.class).getSelection();
-        setEnabled(sessionManager.getSarosSession() != null
-            && participants.size() == 1 && !participants.get(0).isLocal());
+        network.addListener(connectionListener);
+        updateFileTransferManager(network.getConnection());
+
+        updateEnablement();
     }
 
     @Override
     public void run() {
-        List<User> participants = null;
-        try {
-            participants = SelectionRetrieverFactory.getSelectionRetriever(
-                User.class).getSelection();
-            if (participants.size() != 1) {
-                log.warn("More than one participant selected."); //$NON-NLS-1$
-                return;
-            }
-        } catch (NullPointerException e) {
-            this.setEnabled(false);
-        } catch (Exception e) {
-            if (!PlatformUI.getWorkbench().isClosing())
-                log.error("Unexcepted error while updating enablement", e); //$NON-NLS-1$
-        }
 
-        if (participants == null)
+        if (!canRun())
             return;
 
-        // prompt to choose a file
-        FileDialog fd = new FileDialog(SWTUtils.getShell(), SWT.OPEN);
+        final JID jid = getSelectedJID();
+
+        final FileDialog fd = new FileDialog(SWTUtils.getShell(), SWT.OPEN);
         fd.setText(Messages.SendFileAction_filedialog_text);
-        String filename = fd.open();
+
+        final String filename = fd.open();
+
         if (filename == null)
             return;
 
-        // try to access file
-        File file = new File(filename);
-        InputStream in = null;
+        final File file = new File(filename);
 
-        try {
-            in = new FileInputStream(file);
-        } catch (FileNotFoundException e) {
-            DialogUtils.showErrorPopup(log,
-                Messages.SendFileAction_error_cannot_read_file_title,
-                MessageFormat.format(
-                    Messages.SendFileAction_error_cannot_read_file_message,
-                    filename), e, null);
+        if (file.isDirectory())
             return;
-        } finally {
-            if (in != null)
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    log.warn("unable to close file:" + filename, e); //$NON-NLS-1$
-                }
-        }
 
-        SendFileJob job = new SendFileJob(streamServiceManager,
-            fileStreamService, participants.get(0), file);
+        // connection changes are executed while the dialog is open !
+        if (fileTransferManager == null)
+            return;
+
+        final OutgoingFileTransfer transfer = fileTransferManager
+            .createOutgoingFileTransfer(jid.getRAW());
+
+        Job job = new OutgoingFileTransferJob(transfer, file, jid);
         job.setUser(true);
         job.schedule();
     }
 
     @Override
     public void dispose() {
+        network.removeListener(connectionListener);
+
         SelectionUtils.getSelectionService().removeSelectionListener(
             selectionListener);
     }
 
+    private void updateEnablement() {
+        setEnabled(canRun());
+    }
+
+    private boolean canRun() {
+        return fileTransferManager != null && getSelectedJID() != null;
+    }
+
+    private JID getSelectedJID() {
+        List<User> sessionUsers = SelectionRetrieverFactory
+            .getSelectionRetriever(User.class).getSelection();
+
+        List<JID> contacts = SelectionRetrieverFactory.getSelectionRetriever(
+            JID.class).getSelection();
+
+        // currently only one transfer per click (maybe improved later)
+        if (contacts.size() + sessionUsers.size() != 1)
+            return null;
+
+        if (sessionUsers.size() == 1 && sessionUsers.get(0).isLocal())
+            return null;
+
+        if (contacts.size() == 1 && !isOnline(contacts.get(0)))
+            return null;
+
+        if (sessionUsers.size() == 1)
+            return sessionUsers.get(0).getJID();
+
+        // FIXME see TODO at class level ... this currently does not work well
+        // if (contacts.size() == 1 && !isOnline(contacts.get(0)))
+        // return null;
+        // return contacts.get(0);
+
+        // workaround
+        if (connection == null)
+            return null;
+
+        Presence presence = connection.getRoster().getPresence(
+            contacts.get(0).getBase());
+
+        if (!presence.isAvailable() || presence.getFrom() == null)
+            return null;
+
+        return new JID(presence.getFrom());
+    }
+
+    private void updateFileTransferManager(Connection connection) {
+        if (connection == null) {
+            if (fileTransferManager != null)
+                fileTransferManager
+                    .removeFileTransferListener(fileTransferListener);
+
+            fileTransferManager = null;
+        } else {
+            fileTransferManager = new FileTransferManager(connection);
+            fileTransferManager.addFileTransferListener(fileTransferListener);
+        }
+
+        this.connection = connection;
+    }
+
+    private boolean isOnline(JID jid) {
+        if (connection == null)
+            return false;
+
+        return connection.getRoster().getPresenceResource(jid.getRAW())
+            .isAvailable();
+    }
+
+    // TODO popping up dialogs can create a very bad UX but we have currently no
+    // other awareness methods
+    private void handleIncomingFileTransferRequest(
+        final FileTransferRequest request) {
+
+        final String filename = request.getFileName();
+        final long fileSize = request.getFileSize();
+        final JID jid = new JID(request.getRequestor());
+
+        String nickname = RosterUtils.getNickname(null, jid);
+
+        if (nickname == null)
+            nickname = new JID(request.getRequestor()).getBase();
+
+        final boolean accept = MessageDialog.openQuestion(SWTUtils.getShell(),
+            "File Transfer Request",
+            nickname + " wants to send a file." + "\nName: " + filename
+                + "\nSize: " + Utils.formatByte(fileSize)
+                + (fileSize < 1000 ? "yte" : "") + "\n\nAccept the file?");
+
+        if (!accept) {
+            request.reject();
+            return;
+        }
+
+        final FileDialog fd = new FileDialog(SWTUtils.getShell(), SWT.SAVE);
+        fd.setText(Messages.SendFileAction_filedialog_text);
+        fd.setOverwrite(true);
+        fd.setFileName(filename);
+
+        final String destination = fd.open();
+
+        if (destination == null) {
+            request.reject();
+            return;
+        }
+
+        final File file = new File(destination);
+
+        if (file.isDirectory()) {
+            request.reject();
+            return;
+        }
+
+        Job job = new IncomingFileTransferJob(request, file, jid);
+        job.setUser(true);
+        job.schedule();
+    }
 }

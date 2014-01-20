@@ -155,7 +155,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 }
                 zipArchives.add(zipArchive);
 
-                sendArchive(zipArchive, peer, processID, monitor);
+                sendArchive(zipArchive, peer, ARCHIVE_TRANSFER_ID + processID,
+                    monitor);
             }
 
             User user = sarosSession.getUser(peer);

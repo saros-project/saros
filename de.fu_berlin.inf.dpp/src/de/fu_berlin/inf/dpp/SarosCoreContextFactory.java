@@ -48,7 +48,6 @@ import de.fu_berlin.inf.dpp.observables.VoIPSessionObservable;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ColorNegotiationHook;
 import de.fu_berlin.inf.dpp.project.internal.FollowingActivitiesManager;
-import de.fu_berlin.inf.dpp.util.sendfile.FileStreamService;
 import de.fu_berlin.inf.dpp.versioning.VersionManager;
 
 /**
@@ -102,9 +101,6 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
 
         // broken by any means ...
         Component.create(StreamServiceManager.class),
-
-        // streaming services
-        Component.create(FileStreamService.class),
 
         Component.create(IStunService.class, StunServiceImpl.class),
 

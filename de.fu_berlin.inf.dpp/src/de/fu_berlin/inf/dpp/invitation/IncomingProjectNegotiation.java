@@ -167,7 +167,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         fileReplacementInProgressObservable.startReplacement();
 
         ArchiveTransferListener archiveTransferListener = new ArchiveTransferListener(
-            processID);
+            ARCHIVE_TRANSFER_ID + processID);
 
         Exception exception = null;
 

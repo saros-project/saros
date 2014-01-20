@@ -37,6 +37,9 @@ import de.fu_berlin.inf.dpp.util.Utils;
  */
 public abstract class ProjectNegotiation extends CancelableProcess {
 
+    /** Prefix part of the id used in the SMACK XMPP file transfer protocol. */
+    public static final String ARCHIVE_TRANSFER_ID = "saros-dpp-pn-server-client-archive/";
+
     private static final Logger log = Logger
         .getLogger(ProjectNegotiation.class);
 

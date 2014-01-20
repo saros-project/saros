@@ -452,6 +452,7 @@ public class SarosView extends ViewPart {
                 manager.add(getAction(SkypeAction.class));
                 manager.add(new Separator());
                 manager.add(getAction(OpenChatAction.class));
+                manager.add(getAction(SendFileAction.class));
                 manager.add(getAction(RenameContactAction.class));
                 manager.add(getAction(DeleteContactAction.class));
             }
