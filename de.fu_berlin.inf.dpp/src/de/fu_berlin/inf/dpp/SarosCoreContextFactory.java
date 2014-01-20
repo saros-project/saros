@@ -29,7 +29,6 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.IBBTransport;
 import de.fu_berlin.inf.dpp.net.internal.ITransport;
 import de.fu_berlin.inf.dpp.net.internal.Socks5Transport;
-import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager;
 import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.stun.IStunService;
@@ -44,7 +43,6 @@ import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
-import de.fu_berlin.inf.dpp.observables.VoIPSessionObservable;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ColorNegotiationHook;
 import de.fu_berlin.inf.dpp.project.internal.FollowingActivitiesManager;
@@ -99,15 +97,10 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
         Component.create(SarosNet.class),
         Component.create(SkypeManager.class),
 
-        // broken by any means ...
-        Component.create(StreamServiceManager.class),
-
         Component.create(IStunService.class, StunServiceImpl.class),
 
-        // broken - uses SWT GUI stuff
         Component.create(SubscriptionHandler.class),
 
-        // broken - uses SWT GUI stuff
         Component.create(IUPnPService.class, UPnPServiceImpl.class),
         Component.create(IUPnPAccess.class, UPnPAccessImpl.class),
         Component.create(IReceiver.class, XMPPReceiver.class),
@@ -120,7 +113,6 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
         Component.create(IsInconsistentObservable.class),
         Component.create(SessionIDObservable.class),
         Component.create(SarosSessionObservable.class),
-        Component.create(VoIPSessionObservable.class),
         Component.create(AwarenessInformationCollector.class),
         Component.create(FollowingActivitiesManager.class),
 
