@@ -46,6 +46,9 @@ public class SXEOutgoingSynchronizationProcess extends SXESynchronization {
 	public void start(IProgressMonitor monitor) {
 		try {
 
+			monitor.beginTask("Initializing Whiteboard session...",
+					IProgressMonitor.UNKNOWN);
+
 			log.debug(prefix() + " send state-offer to " + peer);
 
 			/* send state-offer and wait for accept-state or refuse-state */
@@ -113,6 +116,8 @@ public class SXEOutgoingSynchronizationProcess extends SXESynchronization {
 			log.debug(prefix()
 					+ "Unexpected Exception in Whitebaord synchronization: "
 					+ e);
+		} finally {
+			monitor.done();
 		}
 
 	}
