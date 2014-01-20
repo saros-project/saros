@@ -16,7 +16,6 @@ import de.fu_berlin.inf.dpp.editor.colorstorage.ColorIDSetStorage;
 import de.fu_berlin.inf.dpp.invitation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.business.CancelInviteHandler;
@@ -120,13 +119,7 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
         Component.create(CancelInviteHandler.class),
         Component.create(CancelProjectSharingHandler.class),
         Component.create(InvitationHandler.class),
-        Component.create(LeaveAndKickHandler.class),
-
-        // FIXME: remove all extensions providers here !
-
-        // Extension Providers
-        Component
-            .create(IncomingTransferObject.IncomingTransferObjectExtensionProvider.class), };
+        Component.create(LeaveAndKickHandler.class), };
 
     @Override
     public void createComponents(MutablePicoContainer container) {

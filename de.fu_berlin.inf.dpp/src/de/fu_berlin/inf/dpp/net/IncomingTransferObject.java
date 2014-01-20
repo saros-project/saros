@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.net;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
-import de.fu_berlin.inf.dpp.net.internal.extensions.XStreamExtensionProvider;
 
 @Component(module = "net")
 public interface IncomingTransferObject {
@@ -26,13 +25,6 @@ public interface IncomingTransferObject {
      * object.
      */
     public NetTransferMode getTransferMode();
-
-    public static class IncomingTransferObjectExtensionProvider extends
-        XStreamExtensionProvider<IncomingTransferObject> {
-        public IncomingTransferObjectExtensionProvider() {
-            super("incomingTransferObject");
-        }
-    }
 
     /**
      * Returns the size of the payload in bytes before decompression.

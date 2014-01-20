@@ -23,18 +23,15 @@ import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
-import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
-import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector.CancelHook;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 
 @Component(module = "net")
 public class XMPPReceiver implements IReceiver {
 
     private static final Logger LOG = Logger.getLogger(XMPPReceiver.class);
-
-    private final IncomingTransferObjectExtensionProvider incomingExtProv;
 
     private final DispatchThreadContext dispatchThreadContext;
 
@@ -71,11 +68,9 @@ public class XMPPReceiver implements IReceiver {
     };
 
     public XMPPReceiver(DispatchThreadContext dispatchThreadContext,
-        XMPPConnectionService connectionService,
-        IncomingTransferObjectExtensionProvider incomingExtProv) {
+        XMPPConnectionService connectionService) {
 
         this.dispatchThreadContext = dispatchThreadContext;
-        this.incomingExtProv = incomingExtProv;
         this.parser = new MXParser();
 
         connectionService.addListener(connectionListener);
@@ -124,10 +119,6 @@ public class XMPPReceiver implements IReceiver {
             @Override
             public void run() {
 
-                // StreamServiceManager forward
-                if (forwardTransferObject(transferObject))
-                    return;
-
                 Packet packet = convertTransferObjectToPacket(transferObject);
 
                 if (packet != null)
@@ -155,63 +146,6 @@ public class XMPPReceiver implements IReceiver {
                 listener.processPacket(packet);
             }
         }
-    }
-
-    /**
-     * Forwards the transfer object to all registered listeners by wrapping the
-     * transfer object into a packet extension.
-     * 
-     * @return <code>true</code> if the transfer object was processed by a
-     *         listener, <code>false</code> otherwise
-     * 
-     * @sarosThread must be called from the Dispatch Thread
-     */
-    /*
-     * Note: left as a separate method because of different functionality.
-     * Furthermore the next refactoring step is to incorporate an
-     * IncomingTransferObject listener. It does not make sense to convert it to
-     * a packet first.
-     */
-    private boolean forwardTransferObject(IncomingTransferObject transferObject) {
-        Map<PacketListener, PacketFilter> copy;
-
-        Packet packet = wrapTransferObject(transferObject);
-
-        synchronized (listeners) {
-            copy = new HashMap<PacketListener, PacketFilter>(listeners);
-        }
-
-        boolean processed = false;
-
-        for (Entry<PacketListener, PacketFilter> entry : copy.entrySet()) {
-            PacketListener listener = entry.getKey();
-            PacketFilter filter = entry.getValue();
-
-            if (filter == null || filter.accept(packet)) {
-                listener.processPacket(packet);
-                processed = true;
-            }
-        }
-
-        return processed;
-    }
-
-    // FIXME doc: what kind of extension !
-    /**
-     * Creates a new packet that contains the transfer object as packet
-     * extension.
-     */
-    private Packet wrapTransferObject(IncomingTransferObject transferObject) {
-
-        TransferDescription description = transferObject
-            .getTransferDescription();
-
-        Packet packet = new Message();
-        packet.setPacketID(Packet.ID_NOT_AVAILABLE);
-        packet.setFrom(description.getSender().toString());
-        packet.addExtension(incomingExtProv.create(transferObject));
-        return packet;
-
     }
 
     /**

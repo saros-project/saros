@@ -24,26 +24,13 @@ public class TransferDescription {
         // NOP
     }
 
-    /**
-     * data in a stream
-     */
-    public static final String STREAM_DATA = "stream-data";
-    /**
-     * meta data for a stream
-     */
-    public static final String STREAM_META = "stream-meta";
-
     private String type;
 
     private String namespace;
 
-    private String sessionID;
-
     private JID recipient;
 
     private JID sender;
-
-    private String archivePath;
 
     private long size;
 
@@ -54,50 +41,11 @@ public class TransferDescription {
 
     @Override
     public String toString() {
-
-        if (STREAM_DATA.equals(type)) {
-            return "Stream data from " + sender + ": stream= " + archivePath
-                + " [SID=" + sessionID + "]";
-        } else if (STREAM_META.equals(type)) {
-            return "Stream metadata from " + sender + ": stream= "
-                + archivePath + " [SID=" + sessionID + "]";
-        } else {
-            StringBuilder sb = new StringBuilder("Bytestream transfer. type="
-                + type + " namespace=" + namespace);
-
-            if (sessionID != null)
-                sb.append(" [SID=" + sessionID + "]");
-
-            return sb.toString();
-        }
+        return "Bytestream transfer. type=" + type + " namespace=" + namespace;
     }
 
     public static TransferDescription createCustomTransferDescription() {
         return new TransferDescription();
-    }
-
-    public static TransferDescription createStreamDataTransferDescription(
-        JID recipient, JID sender, String sessionID, String streamPath) {
-
-        TransferDescription result = new TransferDescription();
-        result.recipient = recipient;
-        result.sender = sender;
-        result.type = STREAM_DATA;
-        result.sessionID = sessionID;
-        result.archivePath = streamPath;
-        result.compress = true;
-
-        return result;
-    }
-
-    public static TransferDescription createStreamMetaTransferDescription(
-        JID recipient, JID sender, String streamPath, String sessionID) {
-        TransferDescription result = createStreamDataTransferDescription(
-            recipient, sender, sessionID, streamPath);
-
-        result.type = STREAM_META;
-
-        return result;
     }
 
     public static byte[] toByteArray(TransferDescription description)
@@ -108,9 +56,6 @@ public class TransferDescription {
 
         out.writeUTF(description.type != null ? description.type : "");
         out.writeUTF(description.namespace != null ? description.namespace : "");
-        out.writeUTF(description.sessionID != null ? description.sessionID : "");
-        out.writeUTF(description.archivePath != null ? description.archivePath
-            : "");
 
         out.writeUTF(description.recipient != null ? description.recipient
             .toString() : "");
@@ -133,8 +78,6 @@ public class TransferDescription {
 
         description.type = in.readUTF();
         description.namespace = in.readUTF();
-        description.sessionID = in.readUTF();
-        description.archivePath = in.readUTF();
 
         description.recipient = new JID(in.readUTF());
         description.sender = new JID(in.readUTF());
@@ -180,24 +123,6 @@ public class TransferDescription {
 
     public JID getSender() {
         return sender;
-    }
-
-    TransferDescription setSessionID(String sessionID) {
-        this.sessionID = sessionID;
-        return this;
-    }
-
-    public String getSessionID() {
-        return sessionID;
-    }
-
-    TransferDescription setArchivePath(String archivePath) {
-        this.archivePath = archivePath;
-        return this;
-    }
-
-    public String getArchivePath() {
-        return archivePath;
     }
 
     TransferDescription setCompressContent(boolean compress) {
