@@ -56,7 +56,7 @@ import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
@@ -140,7 +140,7 @@ public class Saros extends AbstractUIPlugin {
 
     protected IUPnPService upnpService;
 
-    protected SarosNet sarosNet;
+    protected XMPPConnectionService sarosNet;
 
     /**
      * To print an architecture diagram at the end of the plug-in life-cycle
@@ -271,7 +271,7 @@ public class Saros extends AbstractUIPlugin {
          * must invoked here otherwise some components will fail to initialize
          * due NPE... see getSarosNet()
          */
-        sarosNet = sarosContext.getComponent(SarosNet.class);
+        sarosNet = sarosContext.getComponent(XMPPConnectionService.class);
         sessionManager = sarosContext.getComponent(ISarosSessionManager.class);
         xmppAccountStore = sarosContext.getComponent(XMPPAccountStore.class);
         preferenceUtils = sarosContext.getComponent(PreferenceUtils.class);
@@ -488,13 +488,13 @@ public class Saros extends AbstractUIPlugin {
     }
 
     /**
-     * @deprecated inject {@link SarosNet} and not {@link Saros} to obtain a
+     * @deprecated inject {@link XMPPConnectionService} and not {@link Saros} to obtain a
      *             reference
      * 
      * @return
      */
     @Deprecated
-    public SarosNet getSarosNet() {
+    public XMPPConnectionService getSarosNet() {
         return sarosNet;
     }
 

@@ -23,7 +23,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -60,7 +60,7 @@ public class ConsistencyWatchdogServer extends Job {
     protected final HashMap<SPath, DocumentChecksum> docsChecksums = new HashMap<SPath, DocumentChecksum>();
 
     @Inject
-    protected SarosNet sarosNet;
+    protected XMPPConnectionService connectionService;
 
     @Inject
     protected EditorManager editorManager;
@@ -167,7 +167,7 @@ public class ConsistencyWatchdogServer extends Job {
         assert sarosSession.isHost() : "This job is intended to be run on host side!";
 
         // If connection is closed, checking does not make sense...
-        if (sarosNet.getConnectionState() != ConnectionState.CONNECTED) {
+        if (connectionService.getConnectionState() != ConnectionState.CONNECTED) {
             // Reschedule the next run in 30 seconds
             schedule(30000);
             return Status.OK_STATUS;

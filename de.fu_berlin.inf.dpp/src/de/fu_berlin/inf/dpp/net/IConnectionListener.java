@@ -23,7 +23,7 @@ import org.jivesoftware.smack.Connection;
 
 /**
  * A listener for changes to the current connection state. Use
- * {@link SarosNet#addListener(IConnectionListener)} to attach it.
+ * {@link XMPPConnectionService#addListener(IConnectionListener)} to attach it.
  * 
  * @author rdjemili
  */
@@ -37,7 +37,7 @@ public interface IConnectionListener {
      * @param newState
      *            the new state of the connection. If the new state is
      *            <code>ERROR</code>, you can use
-     *            {@link SarosNet#getConnectionError()} to get the error
+     *            {@link XMPPConnectionService#getConnectionError()} to get the error
      *            message.
      */
     public void connectionStateChanged(Connection connection,

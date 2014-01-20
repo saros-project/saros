@@ -35,7 +35,7 @@ import de.fu_berlin.inf.dpp.net.ITransferModeListener;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -190,7 +190,7 @@ public class DataTransferManager implements IConnectionListener {
         private IByteStreamConnection in;
     }
 
-    public DataTransferManager(SarosNet sarosNet, IReceiver receiver,
+    public DataTransferManager(XMPPConnectionService connectionService, IReceiver receiver,
         @Nullable @Socks5Transport ITransport mainTransport,
         @Nullable @IBBTransport ITransport fallbackTransport,
         @Nullable PreferenceUtils preferenceUtils) {
@@ -201,7 +201,7 @@ public class DataTransferManager implements IConnectionListener {
         this.preferenceUtils = preferenceUtils;
         this.initTransports();
 
-        sarosNet.addListener(this);
+        connectionService.addListener(this);
     }
 
     public void addTransferModeListener(ITransferModeListener listener) {

@@ -32,7 +32,7 @@ import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 
 /**
  * ITransmitter implementation using XMPP, IBB streams and Socks5 streams for
@@ -53,8 +53,8 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
     private Connection connection;
 
-    public XMPPTransmitter(DataTransferManager dataManager, SarosNet sarosNet) {
-        sarosNet.addListener(this);
+    public XMPPTransmitter(DataTransferManager dataManager, XMPPConnectionService connectionService) {
+        connectionService.addListener(this);
         this.dataManager = dataManager;
     }
 

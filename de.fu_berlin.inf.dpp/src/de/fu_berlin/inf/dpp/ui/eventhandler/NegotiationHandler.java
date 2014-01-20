@@ -23,7 +23,7 @@ import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.invitation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.project.INegotiationHandler;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
@@ -66,7 +66,7 @@ public class NegotiationHandler implements INegotiationHandler {
         public OutgoingInvitationJob(OutgoingSessionNegotiation process) {
             super(MessageFormat.format(
                 Messages.NegotiationHandler_inviting_user,
-                User.getHumanReadableName(network, process.getPeer())));
+                User.getHumanReadableName(connectionService, process.getPeer())));
             this.process = process;
             this.peer = process.getPeer().getBase();
 
@@ -157,7 +157,7 @@ public class NegotiationHandler implements INegotiationHandler {
         protected IStatus run(IProgressMonitor monitor) {
             try {
                 ProjectNegotiation.Status status = process.start(monitor);
-                String peerName = User.getHumanReadableName(network, new JID(
+                String peerName = User.getHumanReadableName(connectionService, new JID(
                     peer));
 
                 final String message;
@@ -212,12 +212,12 @@ public class NegotiationHandler implements INegotiationHandler {
 
     private final ISarosSessionManager sessionManager;
 
-    private final SarosNet network;
+    private final XMPPConnectionService connectionService;
 
     public NegotiationHandler(ISarosSessionManager sessionManager,
-        SarosNet network, SarosUI sarosUI) {
+        XMPPConnectionService connectionService, SarosUI sarosUI) {
         this.sarosUI = sarosUI;
-        this.network = network;
+        this.connectionService = connectionService;
         this.sessionManager = sessionManager;
         this.sessionManager.setNegotiationHandler(this);
     }

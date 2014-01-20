@@ -13,7 +13,7 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.communication.chat.single.SingleUserChatService;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.model.rosterSession.UserElement;
@@ -24,7 +24,7 @@ import de.fu_berlin.inf.dpp.ui.widgets.chat.ChatRoomsComposite;
 public class OpenChatAction extends Action implements Disposable {
 
     @Inject
-    private SarosNet sarosNet;
+    private XMPPConnectionService connectionService;
 
     @Inject
     private SingleUserChatService chatService;
@@ -54,7 +54,7 @@ public class OpenChatAction extends Action implements Disposable {
 
     @Override
     public void run() {
-        Connection connection = sarosNet.getConnection();
+        Connection connection = connectionService.getConnection();
         if (connection == null)
             return;
 
@@ -81,7 +81,7 @@ public class OpenChatAction extends Action implements Disposable {
     }
 
     private void updateEnablement() {
-        Connection connection = sarosNet.getConnection();
+        Connection connection = connectionService.getConnection();
         if (connection == null) {
             setEnabled(false);
             return;

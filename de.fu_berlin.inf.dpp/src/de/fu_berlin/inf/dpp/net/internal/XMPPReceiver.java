@@ -24,7 +24,7 @@ import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector.CancelHook;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
@@ -71,14 +71,14 @@ public class XMPPReceiver implements IReceiver {
     };
 
     public XMPPReceiver(DispatchThreadContext dispatchThreadContext,
-        SarosNet sarosNet,
+        XMPPConnectionService connectionService,
         IncomingTransferObjectExtensionProvider incomingExtProv) {
 
         this.dispatchThreadContext = dispatchThreadContext;
         this.incomingExtProv = incomingExtProv;
         this.parser = new MXParser();
 
-        sarosNet.addListener(connectionListener);
+        connectionService.addListener(connectionListener);
     }
 
     @Override

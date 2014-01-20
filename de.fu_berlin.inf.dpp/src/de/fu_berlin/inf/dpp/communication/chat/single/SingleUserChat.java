@@ -18,7 +18,7 @@ import de.fu_berlin.inf.dpp.communication.chat.ChatElement;
 import de.fu_berlin.inf.dpp.communication.chat.ChatElement.ChatElementType;
 import de.fu_berlin.inf.dpp.communication.chat.ChatHistory;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 
 /**
@@ -27,7 +27,7 @@ import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 public class SingleUserChat extends AbstractChat {
     private static final Logger LOG = Logger.getLogger(SingleUserChat.class);
 
-    private SarosNet sarosNet;
+    private XMPPConnectionService connectionService;
 
     private final ChatStateListener chatStateListener = new ChatStateListener() {
 
@@ -60,8 +60,8 @@ public class SingleUserChat extends AbstractChat {
 
     private boolean isConnected;
 
-    SingleUserChat(SarosNet sarosNet) {
-        this.sarosNet = sarosNet;
+    SingleUserChat(XMPPConnectionService connectionService) {
+        this.connectionService = connectionService;
     }
 
     /**
@@ -210,7 +210,7 @@ public class SingleUserChat extends AbstractChat {
             participant = new JID(chat.getParticipant());
         }
 
-        String nickname = RosterUtils.getNickname(sarosNet, participant);
+        String nickname = RosterUtils.getNickname(connectionService, participant);
 
         return nickname != null ? nickname : participant.getBareJID()
             .toString();

@@ -8,7 +8,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.stf.shared.Constants;
@@ -26,8 +26,8 @@ public abstract class StfRemoteObject implements Constants {
         return context.getComponent(Saros.class);
     }
 
-    protected SarosNet getSarosNet() {
-        return context.getComponent(SarosNet.class);
+    protected XMPPConnectionService getConnectionService() {
+        return context.getComponent(XMPPConnectionService.class);
     }
 
     protected ISarosSessionManager getSessionManager() {

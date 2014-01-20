@@ -54,7 +54,7 @@ import de.fu_berlin.inf.dpp.invitation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
@@ -116,7 +116,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     private final ProjectNegotiationObservable currentProjectNegotiations;
 
-    private SarosNet sarosNet;
+    private XMPPConnectionService connectionService;
 
     private final List<ISarosSessionListener> sarosSessionListeners = new CopyOnWriteArrayList<ISarosSessionListener>();
 
@@ -151,19 +151,19 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
     };
 
-    public SarosSessionManager(SarosNet sarosNet,
+    public SarosSessionManager(XMPPConnectionService connectionService,
         SarosSessionObservable sarosSessionObservable,
         SessionIDObservable sessionID,
         InvitationProcessObservable currentSessionNegotiations,
         ProjectNegotiationObservable currentProjectNegotiations,
         PreferenceUtils preferenceUtils) {
-        this.sarosNet = sarosNet;
+        this.connectionService = connectionService;
         this.sarosSessionObservable = sarosSessionObservable;
         this.sessionIDObservable = sessionID;
         this.currentSessionNegotiations = currentSessionNegotiations;
         this.currentProjectNegotiations = currentProjectNegotiations;
         this.preferenceUtils = preferenceUtils;
-        this.sarosNet.addListener(listener);
+        this.connectionService.addListener(listener);
     }
 
     @Override

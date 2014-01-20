@@ -18,7 +18,7 @@ import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SafePacketListener;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 
 /**
  * This is class is responsible for handling XMPP subscriptions requests.
@@ -57,8 +57,8 @@ public class SubscriptionHandler {
             }
         });
 
-    public SubscriptionHandler(SarosNet sarosNet) {
-        sarosNet.addListener(connectionListener);
+    public SubscriptionHandler(XMPPConnectionService connectionService) {
+        connectionService.addListener(connectionListener);
     }
 
     private synchronized void prepareConnection(Connection connection) {

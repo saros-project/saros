@@ -27,7 +27,7 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.ui.model.ITreeElement;
 import de.fu_berlin.inf.dpp.ui.model.TreeLabelProvider;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterCheckStateProvider;
@@ -66,7 +66,7 @@ public class ContactSelectionComposite extends
     protected List<ContactSelectionListener> contactSelectionListeners = new ArrayList<ContactSelectionListener>();
 
     @Inject
-    protected SarosNet sarosNet;
+    protected XMPPConnectionService connectionService;
 
     protected final IConnectionListener connectionListener = new IConnectionListener() {
         @Override
@@ -74,7 +74,7 @@ public class ContactSelectionComposite extends
             ConnectionState newState) {
             switch (newState) {
             case CONNECTED:
-                ViewerUtils.setInput(getViewer(), sarosNet.getRoster());
+                ViewerUtils.setInput(getViewer(), connectionService.getRoster());
                 ViewerUtils.expandAll(getViewer());
                 break;
             case NOT_CONNECTED:
@@ -114,11 +114,11 @@ public class ContactSelectionComposite extends
 
         getViewer().getControl()
             .setLayoutData(LayoutUtils.createFillGridData());
-        getViewer().setInput(sarosNet.getRoster());
+        getViewer().setInput(connectionService.getRoster());
 
         ViewerUtils.expandAll(getViewer());
 
-        sarosNet.addListener(connectionListener);
+        connectionService.addListener(connectionListener);
 
         getViewer().addCheckStateListener(checkStateListener);
 
@@ -129,8 +129,8 @@ public class ContactSelectionComposite extends
                 if (viewer != null)
                     viewer.removeCheckStateListener(checkStateListener);
 
-                if (sarosNet != null)
-                    sarosNet.removeListener(connectionListener);
+                if (connectionService != null)
+                    connectionService.removeListener(connectionListener);
             }
         });
     }
@@ -172,7 +172,7 @@ public class ContactSelectionComposite extends
         List<RosterEntryElement> elementsToCheck = new ArrayList<RosterEntryElement>();
 
         for (JID contact : contacts) {
-            elementsToCheck.add(new RosterEntryElement(sarosNet.getRoster(),
+            elementsToCheck.add(new RosterEntryElement(connectionService.getRoster(),
                 contact));
         }
 

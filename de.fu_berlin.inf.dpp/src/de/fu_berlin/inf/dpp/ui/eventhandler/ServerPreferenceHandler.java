@@ -7,7 +7,7 @@ import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 
 public class ServerPreferenceHandler {
@@ -36,11 +36,11 @@ public class ServerPreferenceHandler {
         }
     };
 
-    public ServerPreferenceHandler(SarosNet sarosNet,
+    public ServerPreferenceHandler(XMPPConnectionService connectionService,
         IPreferenceStore preferenceStore) {
         this.preferenceStore = preferenceStore;
 
-        sarosNet.addListener(connectionListener);
+        connectionService.addListener(connectionListener);
     }
 
     private void addServerFeature(Connection connection) {

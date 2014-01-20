@@ -117,7 +117,7 @@ public class RenameContactAction extends Action {
                      */
                     // Compare the plain-JID portion of the XMPP address
                     if (!new JID(selectedRosterEntries.get(0).getUser())
-                        .equals(saros.getSarosNet().getMyJID())) {
+                        .equals(saros.getSarosNet().getJID())) {
                         rosterEntry = selectedRosterEntries.get(0);
                     }
                 }

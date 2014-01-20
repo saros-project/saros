@@ -41,7 +41,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
@@ -71,7 +71,7 @@ public class DeleteContactAction extends Action implements Disposable {
     };
 
     @Inject
-    protected SarosNet sarosNet;
+    protected XMPPConnectionService connectionService;
 
     @Inject
     protected ISarosSessionManager sessionManager;
@@ -88,7 +88,7 @@ public class DeleteContactAction extends Action implements Disposable {
 
         SarosPluginContext.initComponent(this);
 
-        sarosNet.addListener(connectionListener);
+        connectionService.addListener(connectionListener);
         SelectionUtils.getSelectionService().addSelectionListener(
             selectionListener);
         updateEnablement();
@@ -98,7 +98,7 @@ public class DeleteContactAction extends Action implements Disposable {
         try {
             List<JID> contacts = SelectionRetrieverFactory
                 .getSelectionRetriever(JID.class).getSelection();
-            this.setEnabled(sarosNet.isConnected() && contacts.size() == 1);
+            this.setEnabled(connectionService.isConnected() && contacts.size() == 1);
         } catch (NullPointerException e) {
             this.setEnabled(false);
         } catch (Exception e) {
@@ -171,7 +171,7 @@ public class DeleteContactAction extends Action implements Disposable {
                 toString(rosterEntry)))) {
 
             try {
-                RosterUtils.removeFromRoster(sarosNet.getConnection(),
+                RosterUtils.removeFromRoster(connectionService.getConnection(),
                     rosterEntry);
             } catch (XMPPException e) {
                 log.error("could not delete contact " + toString(rosterEntry) //$NON-NLS-1$
@@ -184,6 +184,6 @@ public class DeleteContactAction extends Action implements Disposable {
     public void dispose() {
         SelectionUtils.getSelectionService().removeSelectionListener(
             selectionListener);
-        sarosNet.removeListener(connectionListener);
+        connectionService.removeListener(connectionListener);
     }
 }

@@ -47,7 +47,7 @@ import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.jobs.IncomingFileTransferJob;
@@ -141,7 +141,7 @@ public class SendFileAction extends Action implements Disposable {
     };
 
     @Inject
-    private SarosNet network;
+    private XMPPConnectionService connectionService;
 
     private FileTransferManager fileTransferManager;
 
@@ -161,8 +161,8 @@ public class SendFileAction extends Action implements Disposable {
         SelectionUtils.getSelectionService().addSelectionListener(
             selectionListener);
 
-        network.addListener(connectionListener);
-        updateFileTransferManager(network.getConnection());
+        connectionService.addListener(connectionListener);
+        updateFileTransferManager(connectionService.getConnection());
 
         updateEnablement();
     }
@@ -202,7 +202,7 @@ public class SendFileAction extends Action implements Disposable {
 
     @Override
     public void dispose() {
-        network.removeListener(connectionListener);
+        connectionService.removeListener(connectionListener);
 
         SelectionUtils.getSelectionService().removeSelectionListener(
             selectionListener);

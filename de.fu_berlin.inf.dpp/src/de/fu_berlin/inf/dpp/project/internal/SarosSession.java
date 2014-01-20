@@ -81,7 +81,7 @@ import de.fu_berlin.inf.dpp.feedback.TextEditCollector;
 import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.extensions.KickUserExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveSessionExtension;
@@ -121,7 +121,7 @@ public final class SarosSession implements ISarosSession {
     private ITransmitter transmitter;
 
     @Inject
-    private SarosNet sarosNet;
+    private XMPPConnectionService connectionService;
 
     @Inject
     private PreferenceUtils preferenceUtils;
@@ -1168,7 +1168,7 @@ public final class SarosSession implements ISarosSession {
         this.sarosContext = context;
 
         // FIXME that should be passed in !
-        JID localUserJID = sarosNet.getMyJID();
+        JID localUserJID = connectionService.getJID();
 
         assert localUserJID != null;
 

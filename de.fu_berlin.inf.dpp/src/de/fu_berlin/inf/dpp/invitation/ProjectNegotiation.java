@@ -22,7 +22,7 @@ import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelProjectNegotiationExtension;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -58,7 +58,7 @@ public abstract class ProjectNegotiation extends CancelableProcess {
     protected final String sessionID;
 
     @Inject
-    protected SarosNet sarosNet;
+    protected XMPPConnectionService connectionService;
 
     @Inject
     protected IReceiver xmppReceiver;
@@ -90,7 +90,7 @@ public abstract class ProjectNegotiation extends CancelableProcess {
         this.sessionID = sessionID;
         sarosContext.initComponent(this);
 
-        Connection connection = sarosNet.getConnection();
+        Connection connection = connectionService.getConnection();
 
         if (connection != null)
             fileTransferManager = new FileTransferManager(connection);

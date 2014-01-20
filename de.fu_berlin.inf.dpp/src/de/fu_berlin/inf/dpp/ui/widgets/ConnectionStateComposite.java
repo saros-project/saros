@@ -16,7 +16,7 @@ import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.FontUtils;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
@@ -31,7 +31,7 @@ public class ConnectionStateComposite extends Composite {
     private static final String CONNECTED_TOOLTIP = Messages.ConnectionStateComposite_tooltip_connected;
 
     @Inject
-    private SarosNet sarosNet;
+    private XMPPConnectionService connectionService;
 
     @Inject
     private @SarosVersion
@@ -49,7 +49,7 @@ public class ConnectionStateComposite extends Composite {
         public void connectionStateChanged(final Connection connection,
             final ConnectionState state) {
 
-            final Exception error = sarosNet.getConnectionError();
+            final Exception error = connectionService.getConnectionError();
 
             SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
                 @Override
@@ -80,16 +80,16 @@ public class ConnectionStateComposite extends Composite {
 
         setBackground(getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
 
-        updateLabel(sarosNet.getConnectionState(),
-            sarosNet.getConnectionError());
+        updateLabel(connectionService.getConnectionState(),
+            connectionService.getConnectionError());
 
-        sarosNet.addListener(connectionListener);
+        connectionService.addListener(connectionListener);
     }
 
     @Override
     public void dispose() {
         super.dispose();
-        sarosNet.removeListener(connectionListener);
+        connectionService.removeListener(connectionListener);
     }
 
     private void updateLabel(ConnectionState state, Exception error) {
@@ -123,7 +123,7 @@ public class ConnectionStateComposite extends Composite {
         case CONNECTING:
             return Messages.ConnectionStateComposite_connecting;
         case CONNECTED:
-            JID jid = sarosNet.getMyJID();
+            JID jid = connectionService.getJID();
 
             /*
              * as we run async the return value may not be the same as described

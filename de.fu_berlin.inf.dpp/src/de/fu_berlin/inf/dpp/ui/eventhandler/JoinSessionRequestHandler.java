@@ -13,7 +13,6 @@ import org.jivesoftware.smack.packet.Packet;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.internal.extensions.JoinSessionRejectedExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.JoinSessionRequestExtension;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
@@ -51,7 +50,7 @@ public final class JoinSessionRequestHandler {
     };
 
     public JoinSessionRequestHandler(ISarosSessionManager sessionManager,
-        SarosNet network, ITransmitter transmitter, IReceiver receiver,
+        ITransmitter transmitter, IReceiver receiver,
         IPreferenceStore preferenceStore) {
         this.sessionManager = sessionManager;
         this.transmitter = transmitter;

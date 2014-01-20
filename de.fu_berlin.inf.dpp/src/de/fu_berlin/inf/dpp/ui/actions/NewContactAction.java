@@ -28,7 +28,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
@@ -36,7 +36,7 @@ import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 public class NewContactAction extends Action implements Disposable {
 
     @Inject
-    private SarosNet sarosNet;
+    private XMPPConnectionService sarosNet;
 
     private final IConnectionListener connectionListener = new IConnectionListener() {
         @Override

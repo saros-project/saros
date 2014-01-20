@@ -21,7 +21,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.test.util.MemoryPreferenceStore;
@@ -44,7 +44,7 @@ public class ContributionAnnotationManagerTest {
         PowerMock.mockStaticPartial(User.class, "getHumanReadableName");
 
         EasyMock.expect(
-            User.getHumanReadableName(EasyMock.anyObject(SarosNet.class),
+            User.getHumanReadableName(EasyMock.anyObject(XMPPConnectionService.class),
                 EasyMock.anyObject(JID.class))).andStubReturn("user");
 
         PowerMock.replay(User.class, sessionMock);

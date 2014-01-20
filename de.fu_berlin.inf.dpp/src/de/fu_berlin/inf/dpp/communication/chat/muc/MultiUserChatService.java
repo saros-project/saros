@@ -36,7 +36,7 @@ import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCNegotiationMan
 import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferences;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
@@ -76,10 +76,10 @@ public class MultiUserChatService extends AbstractChatService {
     /**
      * Construct a new MultiUserChat.
      * 
-     * @param sarosNet
+     * @param connectionService
      */
-    public MultiUserChatService(SarosNet sarosNet) {
-        sarosNet.addListener(listener);
+    public MultiUserChatService(XMPPConnectionService connectionService) {
+        connectionService.addListener(listener);
     }
 
     /**

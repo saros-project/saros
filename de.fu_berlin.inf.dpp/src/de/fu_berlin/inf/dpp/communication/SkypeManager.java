@@ -21,7 +21,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.internal.extensions.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.extensions.XStreamExtensionProvider.XStreamIQPacket;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
@@ -48,7 +48,7 @@ public class SkypeManager implements IConnectionListener {
 
     protected final Map<JID, String> skypeNames = new HashMap<JID, String>();
 
-    private final SarosNet sarosNet;
+    private final XMPPConnectionService connectionService;
     private final IPreferenceStore preferenceStore;
 
     private PacketListener packetListener = new PacketListener() {
@@ -64,7 +64,7 @@ public class SkypeManager implements IConnectionListener {
                 reply.setPacketID(iq.getPacketID());
                 reply.setTo(iq.getFrom());
 
-                sarosNet.getConnection().sendPacket(reply);
+                connectionService.getConnection().sendPacket(reply);
             }
             if (iq.getType() == IQ.Type.SET) {
                 String skypeName = iq.getPayload();
@@ -80,10 +80,10 @@ public class SkypeManager implements IConnectionListener {
         }
     };
 
-    public SkypeManager(SarosNet sarosNet, IPreferenceStore preferenceStore) {
-        this.sarosNet = sarosNet;
+    public SkypeManager(XMPPConnectionService sarosNet, IPreferenceStore preferenceStore) {
+        this.connectionService = sarosNet;
         this.preferenceStore = preferenceStore;
-        this.sarosNet.addListener(this);
+        this.connectionService.addListener(this);
 
         /**
          * Register for our preference store, so we can be notified if the Skype
@@ -112,7 +112,7 @@ public class SkypeManager implements IConnectionListener {
      */
     public String getSkypeURLNonBlock(String jid) {
 
-        Connection connection = sarosNet.getConnection();
+        Connection connection = connectionService.getConnection();
         if (connection == null)
             return null;
 
@@ -172,7 +172,7 @@ public class SkypeManager implements IConnectionListener {
      */
     public String getSkypeURL(String jid) {
 
-        Connection connection = sarosNet.getConnection();
+        Connection connection = connectionService.getConnection();
         if (connection == null)
             return null;
 
@@ -203,7 +203,7 @@ public class SkypeManager implements IConnectionListener {
      */
     public String getSkypeURL(JID rqJID) {
 
-        Connection connection = sarosNet.getConnection();
+        Connection connection = connectionService.getConnection();
 
         if (connection == null)
             return null;
@@ -233,7 +233,7 @@ public class SkypeManager implements IConnectionListener {
      * TODO SS only send to those, that we know use Saros.
      */
     public void publishSkypeIQ(String newSkypeName) {
-        Connection connection = sarosNet.getConnection();
+        Connection connection = connectionService.getConnection();
 
         if (connection == null)
             return;

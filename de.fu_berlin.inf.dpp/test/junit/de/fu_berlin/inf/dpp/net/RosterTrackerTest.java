@@ -53,7 +53,7 @@ public class RosterTrackerTest {
         replay(mockConnection);
         replay(mockRoster);
 
-        RosterTracker tracker = new RosterTracker(createMock(SarosNet.class));
+        RosterTracker tracker = new RosterTracker(createMock(XMPPConnectionService.class));
         tracker.connectionStateChanged(mockConnection,
             ConnectionState.CONNECTING);
 
@@ -66,7 +66,7 @@ public class RosterTrackerTest {
 
     @Test
     public void testEmptyRosterGetPresence() {
-        RosterTracker tracker = new RosterTracker(createMock(SarosNet.class));
+        RosterTracker tracker = new RosterTracker(createMock(XMPPConnectionService.class));
 
         assertFalse("this iterator must not have any elements", tracker
             .getPresences(new JID("bla")).iterator().hasNext());
@@ -74,7 +74,7 @@ public class RosterTrackerTest {
 
     @Test
     public void testEmptyRosterGetAvailablePresences() {
-        RosterTracker tracker = new RosterTracker(createMock(SarosNet.class));
+        RosterTracker tracker = new RosterTracker(createMock(XMPPConnectionService.class));
 
         assertFalse("this iterator must not have any elements", tracker
             .getAvailablePresences(new JID("bla")).iterator().hasNext());
@@ -82,13 +82,13 @@ public class RosterTrackerTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetAvailablePresencesWithNullJid() {
-        RosterTracker tracker = new RosterTracker(createMock(SarosNet.class));
+        RosterTracker tracker = new RosterTracker(createMock(XMPPConnectionService.class));
         tracker.getAvailablePresences(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetPresencesWithNullJid() {
-        RosterTracker tracker = new RosterTracker(createMock(SarosNet.class));
+        RosterTracker tracker = new RosterTracker(createMock(XMPPConnectionService.class));
         tracker.getPresences(null);
     }
 
@@ -103,7 +103,7 @@ public class RosterTrackerTest {
         replay(mockConnection);
         replay(mockRoster);
 
-        RosterTracker tracker = new RosterTracker(createMock(SarosNet.class));
+        RosterTracker tracker = new RosterTracker(createMock(XMPPConnectionService.class));
 
         tracker.connectionStateChanged(mockConnection,
             ConnectionState.CONNECTING);
@@ -129,7 +129,7 @@ public class RosterTrackerTest {
         replay(mockConnection);
         replay(mockRoster);
 
-        RosterTracker tracker = new RosterTracker(createMock(SarosNet.class));
+        RosterTracker tracker = new RosterTracker(createMock(XMPPConnectionService.class));
 
         tracker.connectionStateChanged(mockConnection,
             ConnectionState.CONNECTING);
@@ -165,7 +165,7 @@ public class RosterTrackerTest {
         replay(mockConnection);
         replay(mockRoster);
 
-        RosterTracker tracker = new RosterTracker(createMock(SarosNet.class));
+        RosterTracker tracker = new RosterTracker(createMock(XMPPConnectionService.class));
 
         tracker.connectionStateChanged(mockConnection,
             ConnectionState.CONNECTING);
@@ -195,7 +195,7 @@ public class RosterTrackerTest {
         replay(mockConnection);
         replay(mockRoster);
 
-        RosterTracker tracker = new RosterTracker(createMock(SarosNet.class));
+        RosterTracker tracker = new RosterTracker(createMock(XMPPConnectionService.class));
         int size = tracker.listener.listeners.size();
         tracker.addRosterListener((IRosterListener) mockListener);
         assertEquals("The listener wasn't added to the list.", size + 1,

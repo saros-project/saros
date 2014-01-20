@@ -32,7 +32,7 @@ import de.fu_berlin.inf.dpp.invitation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
@@ -87,7 +87,7 @@ public abstract class SessionNegotiation extends CancelableProcess {
         sarosContext.initComponent(this);
 
         String nickname = RosterUtils.getNickname(
-            sarosContext.getComponent(SarosNet.class), peer);
+            sarosContext.getComponent(XMPPConnectionService.class), peer);
 
         peerNickname = nickname == null ? peer.getBareJID().toString()
             : nickname;

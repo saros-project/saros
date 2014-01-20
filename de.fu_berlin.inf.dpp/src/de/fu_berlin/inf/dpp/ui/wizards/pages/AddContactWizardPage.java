@@ -16,7 +16,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.FontUtils;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
@@ -43,7 +43,7 @@ public class AddContactWizardPage extends WizardPage {
     public static final String DESCRIPTION = "Enter the XMPP/Jabber ID of the contact you want to add.";
 
     @Inject
-    protected SarosNet sarosNet;
+    protected XMPPConnectionService connectionService;
 
     protected JIDCombo jidCombo;
 
@@ -133,7 +133,7 @@ public class AddContactWizardPage extends WizardPage {
     }
 
     protected void updatePageCompletion() {
-        JID ownJid = sarosNet.getMyJID();
+        JID ownJid = connectionService.getJID();
         JID foreignJid = getContact();
 
         if (foreignJid.isValid() && !foreignJid.equals(ownJid)
@@ -144,7 +144,7 @@ public class AddContactWizardPage extends WizardPage {
 
             wasJIDValid = true;
 
-            Roster roster = sarosNet.getRoster();
+            Roster roster = connectionService.getRoster();
             if (roster != null && roster.contains(foreignJid.getBase())) {
                 setMessage(Messages.roster_alreadyadded_errorMessage
                     + "\n" + Messages.wizard_finish_noeffect, //$NON-NLS-1$

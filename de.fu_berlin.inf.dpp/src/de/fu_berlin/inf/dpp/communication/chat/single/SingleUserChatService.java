@@ -21,7 +21,7 @@ import de.fu_berlin.inf.dpp.communication.chat.IChat;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 
 public class SingleUserChatService extends AbstractChatService {
 
@@ -114,7 +114,7 @@ public class SingleUserChatService extends AbstractChatService {
 
     };
 
-    private SarosNet sarosNet;
+    private XMPPConnectionService connectionService;
 
     private Map<JID, SingleUserChat> currentChats = new HashMap<JID, SingleUserChat>();
 
@@ -124,10 +124,10 @@ public class SingleUserChatService extends AbstractChatService {
     private String userJID;
     private boolean connected;
 
-    public SingleUserChatService(SarosNet sarosNet) {
+    public SingleUserChatService(XMPPConnectionService connectionService) {
         this.connected = false;
-        this.sarosNet = sarosNet;
-        sarosNet.addListener(connectionLister);
+        this.connectionService = connectionService;
+        connectionService.addListener(connectionLister);
     }
 
     /**
@@ -169,7 +169,7 @@ public class SingleUserChatService extends AbstractChatService {
         if (createdChat == null) {
             LOG.trace("creating new chat between " + userJID + " <->" + jid);
 
-            createdChat = new SingleUserChat(sarosNet);
+            createdChat = new SingleUserChat(connectionService);
 
             createdChat.initChat(userJID, chat, chatStateManager);
             createdChat.setConnected(true);

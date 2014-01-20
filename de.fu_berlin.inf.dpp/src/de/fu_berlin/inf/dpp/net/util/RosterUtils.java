@@ -26,7 +26,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 
 /**
  * Utility class for classic {@link Roster} operations
@@ -37,7 +37,7 @@ public class RosterUtils {
     private static final Logger log = Logger.getLogger(RosterUtils.class);
 
     @Inject
-    private static SarosNet defaultNetwork;
+    private static XMPPConnectionService defaultConnectionService;
 
     /*
      * HACK this should be initialized in a better way and removed if resolving
@@ -53,7 +53,7 @@ public class RosterUtils {
     }
 
     /**
-     * @param sarosNet
+     * @param connectionService
      *            network component that should be used to resolve the nickname
      *            or <code>null</code> to use the default one
      * @param jid
@@ -62,15 +62,15 @@ public class RosterUtils {
      *         or null if the current roster is not available or the nickname
      *         has not been set.
      */
-    public static String getNickname(SarosNet sarosNet, JID jid) {
+    public static String getNickname(XMPPConnectionService connectionService, JID jid) {
 
-        if (sarosNet == null)
-            sarosNet = defaultNetwork;
+        if (connectionService == null)
+            connectionService = defaultConnectionService;
 
-        if (sarosNet == null)
+        if (connectionService == null)
             return null;
 
-        Connection connection = sarosNet.getConnection();
+        Connection connection = connectionService.getConnection();
         if (connection == null)
             return null;
 

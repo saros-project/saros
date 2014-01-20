@@ -68,7 +68,7 @@ import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterAdapter;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
@@ -239,7 +239,7 @@ public class SarosView extends ViewPart {
     protected RosterTracker rosterTracker;
 
     @Inject
-    protected SarosNet network;
+    protected XMPPConnectionService connectionService;
 
     private static volatile boolean showBalloonNotifications;
 
@@ -404,7 +404,7 @@ public class SarosView extends ViewPart {
         getSite().setSelectionProvider(buddySessionViewer);
 
         rosterTracker.addRosterListener(rosterListenerBuddys);
-        rosterListenerBuddys.rosterChanged(network.getRoster());
+        rosterListenerBuddys.rosterChanged(connectionService.getRoster());
 
         getViewSite().getPage().addPartListener(partListener);
     }

@@ -48,7 +48,7 @@ import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
@@ -106,9 +106,9 @@ public class SarosSessionTest {
         }
     }
 
-    static private SarosNet createSarosNetMock() {
-        SarosNet net = EasyMock.createMock(SarosNet.class);
-        net.getMyJID();
+    static private XMPPConnectionService createConnectionServiceMock() {
+        XMPPConnectionService net = EasyMock.createMock(XMPPConnectionService.class);
+        net.getJID();
         EasyMock.expectLastCall().andAnswer(new IAnswer<JID>() {
 
             @Override
@@ -175,7 +175,7 @@ public class SarosSessionTest {
         PreferenceInitializer.setPreferences(preferences);
 
         // Special/Proper mocks
-        container.addComponent(SarosNet.class, createSarosNetMock());
+        container.addComponent(XMPPConnectionService.class, createConnectionServiceMock());
         container.addComponent(Saros.class, createSarosMock(store));
         container.addComponent(DataTransferManager.class,
             createDataTransferManagerMock());

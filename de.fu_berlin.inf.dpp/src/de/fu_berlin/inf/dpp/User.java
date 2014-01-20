@@ -20,7 +20,7 @@
 package de.fu_berlin.inf.dpp;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 
 /**
@@ -218,12 +218,12 @@ public class User {
      * Returns the alias for the user (if any set) with JID in brackets,
      * Example: "Alice (alice@saros-con.imp.fu-berlin.de)"
      * 
-     * @param sarosNet
+     * @param connectionService
      * @param user
      * @return
      */
-    public static String getHumanReadableName(SarosNet sarosNet, JID user) {
-        String nickName = RosterUtils.getNickname(sarosNet, user);
+    public static String getHumanReadableName(XMPPConnectionService connectionService, JID user) {
+        String nickName = RosterUtils.getNickname(connectionService, user);
         String jidBase = user.getBase();
         if (nickName != null && !nickName.equals(jidBase)) {
             jidBase = nickName + " (" + jidBase + ")";

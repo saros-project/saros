@@ -30,11 +30,13 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 /**
  * This class is responsible for establishing XMPP connections and notifying
  * registered listeners about the state of the current connection.
+ * <p>
+ * In addition it will also setup an Socks5 server if configured and use UPnP if
+ * possible to ensure that the Socks5 server is reachable.
  */
-// FIXME synchronization of the whole connect / disconnect logic !!!
 @Component(module = "net")
-public class SarosNet {
-    private static final Logger LOG = Logger.getLogger(SarosNet.class);
+public class XMPPConnectionService {
+    private static final Logger LOG = Logger.getLogger(XMPPConnectionService.class);
 
     // DO NOT CHANGE THE CONTENT OF THIS STRING, NEVER NEVER NEVER !!!
     private static final String PORT_MAPPING_DESCRIPTION = "Saros Socks5 TCP";
@@ -91,7 +93,7 @@ public class SarosNet {
 
         @Override
         public void connectionClosedOnError(Exception e) {
-            synchronized (SarosNet.this) {
+            synchronized (XMPPConnectionService.this) {
                 LOG.error("XMPP connection error: ", e);
                 setConnectionState(ConnectionState.ERROR, e);
                 disconnectInternal();
@@ -116,7 +118,7 @@ public class SarosNet {
         }
     };
 
-    public SarosNet(@Nullable IUPnPService upnpService,
+    public XMPPConnectionService(@Nullable IUPnPService upnpService,
         @Nullable IStunService stunService) {
         this.upnpService = upnpService;
         this.stunService = stunService;
@@ -205,7 +207,7 @@ public class SarosNet {
      * @return the resource qualified JID of the current connection or
      *         <code>null</code> if not connected to a server
      */
-    public JID getMyJID() {
+    public JID getJID() {
         return localJID;
     }
 

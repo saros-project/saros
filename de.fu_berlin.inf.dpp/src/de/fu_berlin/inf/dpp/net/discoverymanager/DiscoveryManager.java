@@ -25,7 +25,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
@@ -60,7 +60,7 @@ public class DiscoveryManager implements Disposable {
     private final Map<String, DiscoverInfoWrapper> cache = Collections
         .synchronizedMap(new HashMap<String, DiscoverInfoWrapper>());
 
-    private final SarosNet network;
+    private final XMPPConnectionService connectionService;
 
     private final RosterTracker rosterTracker;
 
@@ -161,8 +161,8 @@ public class DiscoveryManager implements Disposable {
         }
     };
 
-    public DiscoveryManager(SarosNet network, RosterTracker rosterTracker) {
-        this.network = network;
+    public DiscoveryManager(XMPPConnectionService connectionService, RosterTracker rosterTracker) {
+        this.connectionService = connectionService;
         this.rosterTracker = rosterTracker;
         this.rosterTracker.addRosterListener(rosterListener);
     }
@@ -428,7 +428,7 @@ public class DiscoveryManager implements Disposable {
             return null;
         }
 
-        final Connection connection = network.getConnection();
+        final Connection connection = connectionService.getConnection();
 
         if (connection == null) {
             LOG.warn("cannot not perform a service discovery because not connected to a XMPP server");

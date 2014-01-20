@@ -35,7 +35,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.subscription.SubscriptionHandler;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
@@ -57,7 +57,7 @@ public class AddContactWizard extends Wizard {
     public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_ADD_CONTACT;
 
     @Inject
-    protected SarosNet sarosNet;
+    protected XMPPConnectionService connectionService;
 
     @Inject
     protected SubscriptionHandler subscriptionManager;
@@ -128,7 +128,7 @@ public class AddContactWizard extends Wizard {
                         IProgressMonitor.UNKNOWN);
 
                     try {
-                        addToRoster(sarosNet.getConnection(), jid, nickname);
+                        addToRoster(connectionService.getConnection(), jid, nickname);
 
                         cachedContact = jid;
                     } catch (CancellationException e) {

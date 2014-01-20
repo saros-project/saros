@@ -11,7 +11,7 @@ import org.jivesoftware.smack.packet.Presence;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
@@ -32,9 +32,9 @@ public class LocalPresenceTracker {
 
     private Thread awayAnnouncer = null;
 
-    public LocalPresenceTracker(SarosNet sarosNet) {
+    public LocalPresenceTracker(XMPPConnectionService connectionService) {
 
-        sarosNet.addListener(new IConnectionListener() {
+        connectionService.addListener(new IConnectionListener() {
 
             @Override
             public void connectionStateChanged(Connection connection,

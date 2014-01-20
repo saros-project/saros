@@ -30,7 +30,7 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
@@ -69,7 +69,7 @@ public class BuddySessionDisplayComposite extends ViewerComposite<TreeViewer> {
         .getLogger(BuddySessionDisplayComposite.class);
 
     @Inject
-    private SarosNet sarosNet;
+    private XMPPConnectionService connectionService;
 
     @Inject
     private ISarosSessionManager sarosSessionManager;
@@ -177,7 +177,7 @@ public class BuddySessionDisplayComposite extends ViewerComposite<TreeViewer> {
         updateViewer();
         getViewer().expandAll();
 
-        sarosNet.addListener(connectionListener);
+        connectionService.addListener(connectionListener);
         sarosSessionManager.addSarosSessionListener(sarosSessionListener);
 
         ISarosSession session = sarosSessionManager.getSarosSession();
@@ -196,8 +196,8 @@ public class BuddySessionDisplayComposite extends ViewerComposite<TreeViewer> {
                         .removeSarosSessionListener(sarosSessionListener);
                 }
 
-                if (sarosNet != null)
-                    sarosNet.removeListener(connectionListener);
+                if (connectionService != null)
+                    connectionService.removeListener(connectionListener);
 
                 filter = null;
             }
@@ -337,7 +337,7 @@ public class BuddySessionDisplayComposite extends ViewerComposite<TreeViewer> {
     private void updateViewer() {
         checkWidget();
 
-        Roster roster = sarosNet.getRoster();
+        Roster roster = connectionService.getRoster();
 
         if (roster != null)
             cachedRoster = roster;

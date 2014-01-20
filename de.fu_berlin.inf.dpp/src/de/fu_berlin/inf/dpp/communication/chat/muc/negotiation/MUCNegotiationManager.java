@@ -11,7 +11,7 @@ import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.invitation.hooks.ISessionNegotiationHook;
 import de.fu_berlin.inf.dpp.invitation.hooks.SessionNegotiationHookManager;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
@@ -43,7 +43,7 @@ public class MUCNegotiationManager {
 
     protected MUCSessionPreferences sessionPreferences;
 
-    protected SarosNet sarosNet;
+    protected XMPPConnectionService connectionService;
 
     private Random random = new Random();
 
@@ -88,10 +88,10 @@ public class MUCNegotiationManager {
     };
 
     public MUCNegotiationManager(SessionIDObservable sessionID,
-        @Nullable SarosNet sarosNet, IPreferenceStore preferences,
+        @Nullable XMPPConnectionService connectionService, IPreferenceStore preferences,
         SessionNegotiationHookManager hooks) {
         this.sessionID = sessionID;
-        this.sarosNet = sarosNet;
+        this.connectionService = connectionService;
         this.preferences = preferences;
         this.password = String.valueOf(random.nextInt());
 
@@ -142,8 +142,8 @@ public class MUCNegotiationManager {
             && !customMUCService.isEmpty())
             return customMUCService;
 
-        if (sarosNet != null) {
-            Connection connection = sarosNet.getConnection();
+        if (connectionService != null) {
+            Connection connection = connectionService.getConnection();
 
             if (connection != null)
                 service = RosterUtils.getMultiUserChatService(connection,

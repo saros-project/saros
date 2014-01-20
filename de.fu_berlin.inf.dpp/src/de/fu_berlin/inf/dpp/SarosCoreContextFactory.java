@@ -18,7 +18,7 @@ import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.business.CancelInviteHandler;
 import de.fu_berlin.inf.dpp.net.business.CancelProjectSharingHandler;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
@@ -94,7 +94,7 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
                 Socks5Transport.class),
 
         Component.create(RosterTracker.class),
-        Component.create(SarosNet.class),
+        Component.create(XMPPConnectionService.class),
         Component.create(SkypeManager.class),
 
         Component.create(IStunService.class, StunServiceImpl.class),

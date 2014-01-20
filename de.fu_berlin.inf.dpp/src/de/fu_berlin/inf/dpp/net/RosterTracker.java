@@ -32,8 +32,8 @@ public class RosterTracker implements IConnectionListener {
     // saros.getSarosNet().addListener(this);
     // }
 
-    public RosterTracker(SarosNet sarosNet) {
-        sarosNet.addListener(this);
+    public RosterTracker(XMPPConnectionService connectionService) {
+        connectionService.addListener(this);
     }
 
     /**
