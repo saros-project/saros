@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="patches"/>
-	<classpathentry kind="src" path="src"/>
+	<classpathentry excluding="**/package-info.java" kind="src" path="src"/>
 	<classpathentry exported="true" kind="lib" path="lib/smack.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/smackx.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/smackx-jingle.jar"/>
