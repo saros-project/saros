@@ -8,10 +8,7 @@
 	<classpathentry kind="src" path="test/junit"/>
 	<classpathentry kind="src" path="ext-src"/>
 	<classpathentry kind="src" path="test/framework/stf/src"/>
-	<classpathentry kind="lib" path="lib/commons-io-2.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/picocontainer-2.11.2.jar" sourcepath="lib/picocontainer-2.11.2-sources.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-codec-1.3.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-lang-2.4.jar" sourcepath="lib/commons-lang-2.4-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.hamcrest_1.1.0.v20090501071000.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.hamcrest.core_1.1.0.v20090501071000.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.hamcrest.integration_1.1.0.v20090501071000.jar"/>
