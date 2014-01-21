@@ -6,6 +6,10 @@ Bundle-Version: 1.0.0.DEVEL
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: de.fu_berlin.inf.dpp.net,
  de.fu_berlin.inf.dpp.synchronize,
+ org.apache.log4j,
+ org.apache.log4j.config,
+ org.apache.log4j.helpers,
+ org.apache.log4j.spi,
  org.jivesoftware.smack,
  org.jivesoftware.smack.debugger,
  org.jivesoftware.smack.filter,
@@ -26,4 +30,5 @@ Export-Package: de.fu_berlin.inf.dpp.net,
 Bundle-ClassPath: .,
  lib/smack.jar,
  lib/smackx.jar,
- lib/smackx-debug.jar
+ lib/smackx-debug.jar,
+ lib/log4j-1.2.15.jar
