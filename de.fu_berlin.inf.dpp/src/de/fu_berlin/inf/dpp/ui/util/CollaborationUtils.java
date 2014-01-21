@@ -3,14 +3,12 @@ package de.fu_berlin.inf.dpp.ui.util;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.RandomAccess;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -299,27 +297,22 @@ public class CollaborationUtils {
         if (sarosSession != null)
             selectedResources.removeAll(sarosSession.getSharedResources());
 
-        // do not sort LinkedLists which would be a complete overkill
-        if (!(selectedResources instanceof RandomAccess))
-            selectedResources = new ArrayList<IResource>(selectedResources);
+        final int resourcesSize = selectedResources.size();
+
+        IResource[] preSortedResources = new IResource[resourcesSize];
+
+        int frontIdx = 0;
+        int backIdx = resourcesSize - 1;
 
         // move projects to the front so the algorithm is working as expected
-        Collections.sort(selectedResources, new Comparator<IResource>() {
-
-            @Override
-            public int compare(IResource a, IResource b) {
-                if (a.getType() == b.getType())
-                    return 0;
-
-                if (a.getType() == IResource.PROJECT)
-                    return -1;
-
-                return 1;
-            }
-
-        });
-
         for (IResource resource : selectedResources) {
+            if (resource.getType() == IResource.PROJECT)
+                preSortedResources[frontIdx++] = resource;
+            else
+                preSortedResources[backIdx--] = resource;
+        }
+
+        for (IResource resource : preSortedResources) {
 
             if (resource.getType() == IResource.PROJECT) {
                 projectsResources.put((IProject) resource, null);
