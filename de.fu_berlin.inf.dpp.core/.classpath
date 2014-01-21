@@ -2,6 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="patches"/>
 	<classpathentry excluding="**/package-info.java" kind="src" path="src"/>
+	<classpathentry kind="src" output="bin_test" path="test/junit"/>
 	<classpathentry exported="true" kind="lib" path="lib/smack.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/smackx.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/smackx-jingle.jar"/>
@@ -16,5 +17,11 @@
 	<classpathentry exported="true" kind="lib" path="lib/weupnp.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="test/lib/cglib-nodep-2.2.2.jar"/>
+	<classpathentry kind="lib" path="test/lib/easymock-3.1.jar"/>
+	<classpathentry kind="lib" path="test/lib/javassist-3.18.0-GA.jar"/>
+	<classpathentry kind="lib" path="test/lib/objenesis-1.2.jar"/>
+	<classpathentry kind="lib" path="test/lib/powermock-easymock-1.5.1-full.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

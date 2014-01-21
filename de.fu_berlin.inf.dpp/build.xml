@@ -118,7 +118,7 @@
 	<target name="test" depends="instrument">
 		<mkdir dir="${junit.report.dir}" />
 
-		<junit printsummary="yes" fork="yes" forkmode="perBatch">
+		<junit printsummary="yes" fork="yes" forkmode="once">
 
 			<sysproperty key="net.sourceforge.cobertura.datafile" value="${cobertura.datafile}" />
 			<classpath>
@@ -170,7 +170,7 @@
 
 	<target name="findbugs">
 		<mkdir dir="${findbugs.report.dir}" />
-		<findbugs home="${findbugs.home}" output="xml" outputFile="${findbugs.reportfile}" effort="max" jvmargs="-Xmx256m" >
+		<findbugs home="${findbugs.home}" output="xml" outputFile="${findbugs.reportfile}" effort="default" jvmargs="-Xmx256m" >
 			<sourcePath path="${src.dir}" />
 			<class location="${bin.dir}" />
 			</findbugs>
