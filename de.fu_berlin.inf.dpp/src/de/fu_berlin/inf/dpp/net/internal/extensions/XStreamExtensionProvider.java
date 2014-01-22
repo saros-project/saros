@@ -76,6 +76,7 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider,
         this.namespace = NAMESPACE;
 
         xstream = new XStream();
+        xstream.setClassLoader(getClass().getClassLoader());
         xstream.registerConverter(BooleanConverter.BINARY);
         xstream.registerConverter(new IPathConverter());
         xstream.processAnnotations(XStreamPacketExtension.class);
@@ -208,7 +209,7 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider,
             result.provider = this;
             return result;
         } catch (RuntimeException e) {
-            log.error("Malformed data received!", e);
+            log.error("unmarshalling data failed", e);
             return new DropSilentlyPacketExtension();
         }
     }
@@ -283,7 +284,7 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider,
             result.provider = this;
             return new XStreamIQPacket<T>(result);
         } catch (RuntimeException e) {
-            log.error("Malformed data received!", e);
+            log.error("unmarshalling data failed!", e);
             return null;
         }
 
