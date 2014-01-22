@@ -17,7 +17,6 @@ import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.jivesoftware.smack.Connection;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.net.ConnectionState;
@@ -300,31 +299,23 @@ public class DataTransferManagerTest {
     }
 
     @Test
-    @Ignore("DTM currently does not support configuration")
     public void testForceIBBOnly() throws Exception {
 
-        // IPreferenceStore store = new MemoryPreferenceStore();
-        // PreferenceInitializer.setPreferences(store);
-        // store.setValue(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT, true);
-        //
-        // PreferenceUtils preferenceUtil = new PreferenceUtils(store);
-        //
-        // ITransport mainTransport = new
-        // Transport(NetTransferMode.SOCKS5_DIRECT);
-        // ITransport fallbackTransport = new Transport(NetTransferMode.IBB);
-        //
-        // DataTransferManager dtm = new
-        // DataTransferManager(connectionServiceStub, null,
-        // mainTransport, fallbackTransport, preferenceUtil);
-        //
-        // connectionListener.getValue().connectionStateChanged(connectionMock,
-        // ConnectionState.CONNECTED);
-        //
-        // dtm.connect(new JID("foo@bar.com"));
-        //
-        // assertEquals("only IBB transport should be used",
-        // NetTransferMode.IBB,
-        // dtm.getTransferMode(new JID("foo@bar.com")));
+        ITransport mainTransport = new Transport(NetTransferMode.SOCKS5_DIRECT);
+        ITransport fallbackTransport = new Transport(NetTransferMode.IBB);
+
+        DataTransferManager dtm = new DataTransferManager(
+            connectionServiceStub, null, mainTransport, fallbackTransport);
+
+        dtm.setTransport(DataTransferManager.IBB_TRANSPORT);
+
+        connectionListener.getValue().connectionStateChanged(connectionMock,
+            ConnectionState.CONNECTED);
+
+        dtm.connect(new JID("foo@bar.com"));
+
+        assertEquals("only IBB transport should be used", NetTransferMode.IBB,
+            dtm.getTransferMode(new JID("foo@bar.com")));
 
     }
 

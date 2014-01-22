@@ -57,6 +57,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
@@ -141,6 +142,8 @@ public class Saros extends AbstractUIPlugin {
     protected IUPnPService upnpService;
 
     protected XMPPConnectionService sarosNet;
+
+    private DataTransferManager transferManager;
 
     /**
      * To print an architecture diagram at the end of the plug-in life-cycle
@@ -276,6 +279,7 @@ public class Saros extends AbstractUIPlugin {
         xmppAccountStore = sarosContext.getComponent(XMPPAccountStore.class);
         preferenceUtils = sarosContext.getComponent(PreferenceUtils.class);
         upnpService = sarosContext.getComponent(IUPnPService.class);
+        transferManager = sarosContext.getComponent(DataTransferManager.class);
 
         // Make sure that all components in the container are
         // instantiated
@@ -488,8 +492,8 @@ public class Saros extends AbstractUIPlugin {
     }
 
     /**
-     * @deprecated inject {@link XMPPConnectionService} and not {@link Saros} to obtain a
-     *             reference
+     * @deprecated inject {@link XMPPConnectionService} and not {@link Saros} to
+     *             obtain a reference
      * 
      * @return
      */
@@ -654,6 +658,12 @@ public class Saros extends AbstractUIPlugin {
         Exception connectionError = null;
 
         try {
+
+            if (preferenceUtils.forceFileTranserByChat())
+                transferManager.setTransport(DataTransferManager.IBB_TRANSPORT);
+            else
+                transferManager.setTransport(/* use all */-1);
+
             sarosNet.connect(
                 createConnectionConfiguration(domain, server, port, useTLS,
                     useSASL), username, password);

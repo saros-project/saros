@@ -50,6 +50,9 @@ import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 @Component(module = "net")
 public class DataTransferManager implements IConnectionListener {
 
+    public static final int IBB_TRANSPORT = 1;
+    public static final int SOCKS5_TRANSPORT = 2;
+
     private static final Logger log = Logger
         .getLogger(DataTransferManager.class);
 
@@ -65,13 +68,13 @@ public class DataTransferManager implements IConnectionListener {
 
     private Connection connection;
 
+    private int transportMask = -1;
+
     private final IReceiver receiver;
 
     private final ITransport mainTransport;
 
     private final ITransport fallbackTransport;
-
-    // private final PreferenceUtils preferenceUtils;
 
     private final Map<String, ConnectionHolder> connections = Collections
         .synchronizedMap(new HashMap<String, ConnectionHolder>());
@@ -191,13 +194,11 @@ public class DataTransferManager implements IConnectionListener {
     public DataTransferManager(XMPPConnectionService connectionService,
         IReceiver receiver,
         @Nullable @Socks5Transport ITransport mainTransport,
-        @Nullable @IBBTransport ITransport fallbackTransport
-    /* @Nullable PreferenceUtils preferenceUtils */) {
+        @Nullable @IBBTransport ITransport fallbackTransport) {
 
         this.receiver = receiver;
         this.fallbackTransport = fallbackTransport;
         this.mainTransport = mainTransport;
-        // this.preferenceUtils = preferenceUtils;
         this.initTransports();
 
         connectionService.addListener(this);
@@ -344,6 +345,19 @@ public class DataTransferManager implements IConnectionListener {
     }
 
     /**
+     * Sets the transport that should be used to establish direct connections.
+     * The transports will be used on the next successful connection to a XMPP
+     * server and will not affect the transports that are currently used.
+     * 
+     * @param transportMask
+     *            bit wise OR mask that contain the transport to use, -1 for all
+     *            available transports or 0 for no transport at all
+     */
+    public synchronized void setTransport(int transportMask) {
+        this.transportMask = transportMask;
+    }
+
+    /**
      * @deprecated
      */
     @Deprecated
@@ -442,17 +456,20 @@ public class DataTransferManager implements IConnectionListener {
     }
 
     private void initTransports() {
-        boolean forceIBBOnly = false;
+        boolean useIBB;
+        boolean useSocks5;
 
-        // if (preferenceUtils != null)
-        // forceIBBOnly = preferenceUtils.forceFileTranserByChat();
+        synchronized (this) {
+            useIBB = (transportMask & IBB_TRANSPORT) != 0;
+            useSocks5 = (transportMask & SOCKS5_TRANSPORT) != 0;
+        }
 
         availableTransports.clear();
 
-        if (!forceIBBOnly && mainTransport != null)
-            availableTransports.add(0, mainTransport);
+        if (useSocks5 && mainTransport != null)
+            availableTransports.add(mainTransport);
 
-        if (fallbackTransport != null)
+        if (useIBB && fallbackTransport != null)
             availableTransports.add(fallbackTransport);
 
         log.debug("used transport order for the current XMPP connection: "
