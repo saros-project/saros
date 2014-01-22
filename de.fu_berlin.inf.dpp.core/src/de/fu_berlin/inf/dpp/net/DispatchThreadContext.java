@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net.business;
+package de.fu_berlin.inf.dpp.net;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.net;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -10,7 +11,6 @@ import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.packet.Presence;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * The RosterTracker is responsible for offering a convenient access for
@@ -103,14 +103,21 @@ public class RosterTracker implements IConnectionListener {
      * unavailable presence if the user is not online or an empty list if no
      * roster is available.
      */
-    public Iterable<Presence> getPresences(JID from) {
+    public List<Presence> getPresences(JID from) {
         if (from == null)
             throw new IllegalArgumentException("JID cannot be null");
 
         if (roster == null)
             return Collections.emptyList();
 
-        return Utils.asIterable(roster.getPresences(from.toString()));
+        final List<Presence> presences = new ArrayList<Presence>();
+
+        final Iterator<Presence> it = roster.getPresences(from.toString());
+
+        while (it.hasNext())
+            presences.add(it.next());
+
+        return presences;
     }
 
     /**

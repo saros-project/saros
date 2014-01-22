@@ -5,11 +5,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import de.fu_berlin.inf.dpp.Saros;
-
 /**
  * The single instance of this class per application is created by PicoContainer
- * in the central plug-in class {@link Saros}
+ * in the central application context.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = { ElementType.TYPE })

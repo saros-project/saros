@@ -36,8 +36,6 @@ import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * This class is responsible for handling all transfers of binary data. It
@@ -47,6 +45,8 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * @author coezbek
  * @author jurke
  */
+// FIXME it is currently not possible to configure the transport modes (result
+// of a move to Saros core)
 @Component(module = "net")
 public class DataTransferManager implements IConnectionListener {
 
@@ -71,7 +71,7 @@ public class DataTransferManager implements IConnectionListener {
 
     private final ITransport fallbackTransport;
 
-    private final PreferenceUtils preferenceUtils;
+    // private final PreferenceUtils preferenceUtils;
 
     private final Map<String, ConnectionHolder> connections = Collections
         .synchronizedMap(new HashMap<String, ConnectionHolder>());
@@ -109,13 +109,11 @@ public class DataTransferManager implements IConnectionListener {
                 return;
 
             if (log.isTraceEnabled())
-                log.trace("["
-                    + transferObject.getTransferMode()
-                    + "] received incoming transfer object: "
-                    + description
-                    + ", throughput: "
-                    + Utils.throughput(transferObject.getCompressedSize(),
-                        transferObject.getTransferDuration()));
+                log.trace("[" + transferObject.getTransferMode()
+                    + "] received incoming transfer object: " + description
+                    + ", size: " + transferObject.getCompressedSize()
+                    + ", RX time: " + transferObject.getTransferDuration()
+                    + " ms");
 
             if (transferObject.getTransferDescription().compressContent()) {
                 byte[] payload = transferObject.getPayload();
@@ -190,15 +188,16 @@ public class DataTransferManager implements IConnectionListener {
         private IByteStreamConnection in;
     }
 
-    public DataTransferManager(XMPPConnectionService connectionService, IReceiver receiver,
+    public DataTransferManager(XMPPConnectionService connectionService,
+        IReceiver receiver,
         @Nullable @Socks5Transport ITransport mainTransport,
-        @Nullable @IBBTransport ITransport fallbackTransport,
-        @Nullable PreferenceUtils preferenceUtils) {
+        @Nullable @IBBTransport ITransport fallbackTransport
+    /* @Nullable PreferenceUtils preferenceUtils */) {
 
         this.receiver = receiver;
         this.fallbackTransport = fallbackTransport;
         this.mainTransport = mainTransport;
-        this.preferenceUtils = preferenceUtils;
+        // this.preferenceUtils = preferenceUtils;
         this.initTransports();
 
         connectionService.addListener(this);
@@ -445,8 +444,8 @@ public class DataTransferManager implements IConnectionListener {
     private void initTransports() {
         boolean forceIBBOnly = false;
 
-        if (preferenceUtils != null)
-            forceIBBOnly = preferenceUtils.forceFileTranserByChat();
+        // if (preferenceUtils != null)
+        // forceIBBOnly = preferenceUtils.forceFileTranserByChat();
 
         availableTransports.clear();
 

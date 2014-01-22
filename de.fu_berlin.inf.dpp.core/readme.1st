@@ -5,7 +5,12 @@ Rules:
 Patches for third party libraries have to be put into the "patches source folder" and must not be placed into
 the third party library jar as already compiled class file.
 
-2. Exporting rules (OSGi/Eclipse only)
+2. Exporting rules for the core
+
+Do NOT export internal/impl packages. If you need to export those packages the
+component you want to use either needs an interface or is misplaced in the internal/impl package.
+
+3. Exporting rules for 3rd party libraries (OSGi/Eclipse only)
 
 It is a good practice to either export all packages from a third party library or none at all.
 

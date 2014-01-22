@@ -33,6 +33,7 @@ import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
  * 
  * @author bkahlert
  */
+// FIXME due to the hack this class cannot currently moved to the Saros core
 public class RosterUtils {
     private static final Logger log = Logger.getLogger(RosterUtils.class);
 
@@ -62,7 +63,8 @@ public class RosterUtils {
      *         or null if the current roster is not available or the nickname
      *         has not been set.
      */
-    public static String getNickname(XMPPConnectionService connectionService, JID jid) {
+    public static String getNickname(XMPPConnectionService connectionService,
+        JID jid) {
 
         if (connectionService == null)
             connectionService = defaultConnectionService;
