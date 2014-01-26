@@ -727,8 +727,23 @@ public class Socks5Transport extends ByteStreamTransport {
             ((Socket) socket.get(session)).setTcpNoDelay(TCP_NODELAY);
             LOG.debug("nagle algorithm for socket disabled: " + TCP_NODELAY);
         } catch (Exception e) {
-            LOG.warn("could not modifiy socket options", e);
+            LOG.warn("could not modifiy TCP_NODELAY socket option", e);
         }
+
+        /*
+         * HACK to ensure that all pending data is written on socket close, see
+         * SarosSession.stop()
+         */
+        final int lingerTimeout = 10000;
+
+        try {
+            ((Socket) socket.get(session)).setSoLinger(true, lingerTimeout);
+            LOG.debug("socket is configued with SO_LINGER timout: "
+                + lingerTimeout + " ms");
+        } catch (Exception e) {
+            LOG.warn("could not modifiy SO_LINGER socket option", e);
+        }
+
     }
 
     private String prefix() {
