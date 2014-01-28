@@ -46,8 +46,8 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.ui.sounds.SoundManager;
 import de.fu_berlin.inf.dpp.ui.sounds.SoundPlayer;
+import de.fu_berlin.inf.dpp.ui.sounds.Sounds;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.ExplanationComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.events.CharacterEnteredEvent;
@@ -220,13 +220,12 @@ public class ChatControl extends Composite {
                     if (!isOwnJID(sender)) {
 
                         if (playMessageReceivedSound) {
-                            SoundPlayer
-                                .playSound(SoundManager.MESSAGE_RECEIVED);
+                            SoundPlayer.playSound(Sounds.MESSAGE_RECEIVED);
                         }
 
                         incrementUnseenMessages();
                     } else if (playMessageSentSound) {
-                        SoundPlayer.playSound(SoundManager.MESSAGE_SENT);
+                        SoundPlayer.playSound(Sounds.MESSAGE_SENT);
                     }
                 }
             });

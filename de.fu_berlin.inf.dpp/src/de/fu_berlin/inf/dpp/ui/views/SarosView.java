@@ -92,8 +92,8 @@ import de.fu_berlin.inf.dpp.ui.actions.RestrictToReadOnlyAccessAction;
 import de.fu_berlin.inf.dpp.ui.actions.SendFileAction;
 import de.fu_berlin.inf.dpp.ui.actions.SkypeAction;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterEntryElement;
-import de.fu_berlin.inf.dpp.ui.sounds.SoundManager;
 import de.fu_berlin.inf.dpp.ui.sounds.SoundPlayer;
+import de.fu_berlin.inf.dpp.ui.sounds.Sounds;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
@@ -149,12 +149,12 @@ public class SarosView extends ViewPart {
 
             if ((lastPresence == null || !lastPresence.isAvailable())
                 && presence.isAvailable() && playAvailableSound) {
-                SoundPlayer.playSound(SoundManager.USER_ONLINE);
+                SoundPlayer.playSound(Sounds.USER_ONLINE);
             }
 
             if ((lastPresence != null) && lastPresence.isAvailable()
                 && !presence.isAvailable() && playUnavailableSound) {
-                SoundPlayer.playSound(SoundManager.USER_OFFLINE);
+                SoundPlayer.playSound(Sounds.USER_OFFLINE);
             }
         }
     };
