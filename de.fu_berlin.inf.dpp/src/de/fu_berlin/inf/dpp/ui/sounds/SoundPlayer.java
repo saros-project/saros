@@ -33,76 +33,71 @@ public class SoundPlayer {
         SarosPluginContext.initComponent(new SoundPlayer());
     }
 
-    public static void playSound(final String fileName) {
+    public static void playSound(final String filename) {
 
         if (store == null
             || !store.getBoolean(PreferenceConstants.SOUND_ENABLED)) {
             return;
-        } else {
+        }
 
-            ThreadUtils.runSafeAsync("SoundPlayer", log, new Runnable() {
-                @Override
-                public void run() {
+        ThreadUtils.runSafeAsync("SoundPlayer", log, new Runnable() {
+            @Override
+            public void run() {
+                playSoundInternal(filename);
+            }
+        });
+    }
 
-                    File soundFile = SoundManager.getSoundFile(fileName);
-                    if ((soundFile == null) || !soundFile.exists()) {
-                        log.warn("Wave file not found at " + fileName);
-                        return;
-                    }
+    private static void playSoundInternal(final String filename) {
+        File soundFile = SoundManager.getSoundFile(filename);
+        if ((soundFile == null) || !soundFile.exists()) {
+            log.warn("Wave file not found at " + filename);
+            return;
+        }
 
-                    AudioInputStream audioInputStream = null;
-                    try {
-                        audioInputStream = AudioSystem
-                            .getAudioInputStream(soundFile);
-                    } catch (UnsupportedAudioFileException e1) {
-                        log.warn("Unsupported File: " + fileName, e1);
-                        return;
-                    } catch (IOException e1) {
-                        log.error(
-                            "IO-Error while getting AudioInputStream for "
-                                + fileName, e1);
-                        return;
-                    }
+        AudioInputStream audioInputStream = null;
+        try {
+            audioInputStream = AudioSystem.getAudioInputStream(soundFile);
+        } catch (UnsupportedAudioFileException e1) {
+            log.warn("Unsupported File: " + filename, e1);
+            return;
+        } catch (IOException e1) {
+            log.error(
+                "IO-Error while getting AudioInputStream for " + filename, e1);
+            return;
+        }
 
-                    AudioFormat format = audioInputStream.getFormat();
-                    SourceDataLine auline = null;
-                    DataLine.Info info = new DataLine.Info(
-                        SourceDataLine.class, format);
+        AudioFormat format = audioInputStream.getFormat();
+        SourceDataLine auline = null;
+        DataLine.Info info = new DataLine.Info(SourceDataLine.class, format);
 
-                    try {
-                        auline = (SourceDataLine) AudioSystem.getLine(info);
-                        auline.open(format);
-                    } catch (LineUnavailableException e) {
-                        log.error("No Audioline available for " + fileName, e);
-                        return;
-                    } catch (Exception e) {
-                        log.error("unknowen error while playing sound:"
-                            + fileName, e);
-                        return;
-                    }
+        try {
+            auline = (SourceDataLine) AudioSystem.getLine(info);
+            auline.open(format);
+        } catch (LineUnavailableException e) {
+            log.error("No Audioline available for " + filename, e);
+            return;
+        } catch (Exception e) {
+            log.error("unknowen error while playing sound:" + filename, e);
+            return;
+        }
 
-                    auline.start();
-                    int nBytesRead = 0;
-                    byte[] abData = new byte[EXTERNAL_BUFFER_SIZE];
+        auline.start();
+        int nBytesRead = 0;
+        byte[] abData = new byte[EXTERNAL_BUFFER_SIZE];
 
-                    try {
-                        while (nBytesRead != -1) {
-                            nBytesRead = audioInputStream.read(abData, 0,
-                                abData.length);
-                            if (nBytesRead >= 0)
-                                auline.write(abData, 0, nBytesRead);
-                        }
-                    } catch (IOException e) {
-                        log.error(
-                            "IO-Error while write auline for " + fileName, e);
-                        return;
-                    } finally {
-                        auline.drain();
-                        auline.close();
-                    }
-
-                }
-            });
+        try {
+            while (nBytesRead != -1) {
+                nBytesRead = audioInputStream.read(abData, 0, abData.length);
+                if (nBytesRead >= 0)
+                    auline.write(abData, 0, nBytesRead);
+            }
+        } catch (IOException e) {
+            log.error("IO-Error while write auline for " + filename, e);
+            return;
+        } finally {
+            auline.drain();
+            auline.close();
         }
     }
 }
