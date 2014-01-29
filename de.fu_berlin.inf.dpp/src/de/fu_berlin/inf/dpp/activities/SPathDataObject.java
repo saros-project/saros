@@ -63,19 +63,14 @@ public class SPathDataObject {
     }
 
     /**
-     * Returns the IPath associated with this SPath.
-     * 
-     * @return The IPath associated with this SPath.
-     */
-    public IPath getIPath() {
-        return path;
-    }
-
-    /**
      * Returns the project ID of the associated SPath.
      * 
      * @return The project ID of the associated SPath.
+     * 
+     * @deprecated An SPathDataObject only represents serialized data and so no
+     *             logic should be performed on those objects.
      */
+    @Deprecated
     public String getProjectID() {
         return projectID;
     }
