@@ -2,14 +2,14 @@ package de.fu_berlin.inf.dpp.activities;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.util.xstream.IPathConverter;
+import de.fu_berlin.inf.dpp.util.xstream.UrlEncodingStringConverter;
 
 /**
  * "Stupid" Data Object for transmitting an SPath. Serialized using XStream.
@@ -21,10 +21,15 @@ public class SPathDataObject {
     @XStreamAsAttribute
     protected String projectID;
 
+    /*
+     * TODO srossbach: check if the URL encoding is really needed. I just
+     * encoded several stuff an XStream correctly escaped invalid XML
+     * characters.
+     */
     @XStreamAlias("p")
     @XStreamAsAttribute
-    @XStreamConverter(IPathConverter.class)
-    protected IPath path;
+    @XStreamConverter(UrlEncodingStringConverter.class)
+    protected String path;
 
     @XStreamAlias("e")
     @XStreamAsAttribute
@@ -40,7 +45,7 @@ public class SPathDataObject {
      *            may be <code>null</code> if this SPathDataObject represents a
      *            resource path
      */
-    public SPathDataObject(String projectID, IPath path, String editorType) {
+    public SPathDataObject(String projectID, String path, String editorType) {
 
         this.projectID = projectID;
         this.path = path;
@@ -59,7 +64,7 @@ public class SPathDataObject {
                 "SPathDataObject cannot be connected to SarosSession because its ID is unknown: "
                     + projectID);
 
-        return new SPath(project, path);
+        return new SPath(project, Path.fromPortableString(path));
     }
 
     /**
@@ -78,8 +83,7 @@ public class SPathDataObject {
     @Override
     public String toString() {
         return "SPathDataObject [editorType=" + editorType + ", path="
-            + (path != null ? path.toPortableString() : null) + ", projectID="
-            + projectID + "]";
+            + (path != null ? path : null) + ", projectID=" + projectID + "]";
     }
 
     @Override

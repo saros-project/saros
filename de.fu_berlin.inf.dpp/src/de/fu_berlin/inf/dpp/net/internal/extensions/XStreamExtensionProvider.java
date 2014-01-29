@@ -40,7 +40,7 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import com.thoughtworks.xstream.converters.basic.BooleanConverter;
 import com.thoughtworks.xstream.io.xml.CompactWriter;
 
-import de.fu_berlin.inf.dpp.util.xstream.IPathConverter;
+import de.fu_berlin.inf.dpp.util.xstream.UrlEncodingStringConverter;
 import de.fu_berlin.inf.dpp.util.xstream.XppReader;
 
 /**
@@ -78,7 +78,7 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider,
         xstream = new XStream();
         xstream.setClassLoader(getClass().getClassLoader());
         xstream.registerConverter(BooleanConverter.BINARY);
-        xstream.registerConverter(new IPathConverter());
+        xstream.registerConverter(new UrlEncodingStringConverter());
         xstream.processAnnotations(XStreamPacketExtension.class);
         xstream.processAnnotations(classes);
         xstream.alias(elementName, XStreamPacketExtension.class);

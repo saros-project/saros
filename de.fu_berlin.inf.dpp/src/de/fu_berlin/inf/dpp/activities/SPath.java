@@ -88,7 +88,8 @@ public class SPath {
                 "Trying to send a SPath which refers to a file in project which is not shared: "
                     + this);
 
-        return new SPathDataObject(id, projectRelativePath, editorType);
+        return new SPathDataObject(id, projectRelativePath.toPortableString(),
+            editorType);
     }
 
     /**

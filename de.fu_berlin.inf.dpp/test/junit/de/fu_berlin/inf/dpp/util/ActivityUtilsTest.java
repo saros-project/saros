@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.activities.SPathDataObject;
@@ -26,8 +24,8 @@ public class ActivityUtilsTest {
     private final JID aliceJID = new JID("alice@junit");
     private final JID bobJID = new JID("bob@junit");
 
-    private final IPath fooPath = new Path("foo");
-    private final IPath barPath = new Path("bar");
+    private final String fooPath = "foo";
+    private final String barPath = "bar";
 
     private final String fooProject = "foo";
     private final String barProject = "bar";

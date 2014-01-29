@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.core.runtime.Path;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -32,13 +31,13 @@ public class ActivityQueuerTest {
     private static final String NOT_SHARED_PROJECT_ID = "4321";
 
     private static final SPathDataObject FOO_PATH_SHARED_PROJECT = new SPathDataObject(
-        SHARED_PROJECT_ID, Path.fromOSString("foo"), "editorType");
+        SHARED_PROJECT_ID, "foo", "editorType");
 
     private static final SPathDataObject BAR_PATH_SHARED_PROJECT = new SPathDataObject(
-        SHARED_PROJECT_ID, Path.fromOSString("bar"), "editorType");
+        SHARED_PROJECT_ID, "bar", "editorType");
 
     private static final SPathDataObject PATH_TO_NOT_SHARED_PROJECT = new SPathDataObject(
-        NOT_SHARED_PROJECT_ID, Path.fromOSString("unshared"), "editorType");
+        NOT_SHARED_PROJECT_ID, "unshared", "editorType");
 
     private ActivityQueuer activityQueuer;
 
