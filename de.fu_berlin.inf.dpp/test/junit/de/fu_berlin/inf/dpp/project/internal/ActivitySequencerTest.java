@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.project.internal;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -148,6 +149,38 @@ public class ActivitySequencerTest {
 
         sequencer.start();
         sequencer.stop();
+    }
+
+    @Test(timeout = 30000, expected = IllegalStateException.class)
+    public void testMultipleStarts() {
+        ActivitySequencer sequencer = new ActivitySequencer(sessionStubAlice,
+            aliceTransmitter, aliceReceiver, null);
+
+        for (int i = 0; i < Integer.MAX_VALUE; i++)
+            sequencer.start();
+    }
+
+    @Test(timeout = 30000, expected = IllegalStateException.class)
+    public void testStopWithoutStart() {
+        ActivitySequencer sequencer = new ActivitySequencer(sessionStubAlice,
+            aliceTransmitter, aliceReceiver, null);
+
+        sequencer.stop();
+    }
+
+    @Test(timeout = 30000)
+    public void testMultipleStops() {
+        ActivitySequencer sequencer = new ActivitySequencer(sessionStubAlice,
+            aliceTransmitter, aliceReceiver, null);
+
+        sequencer.start();
+        try {
+            sequencer.stop();
+            sequencer.stop();
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("stopping the sequencer multiple times should not raise any exception");
+        }
     }
 
     @Test(timeout = 30000)

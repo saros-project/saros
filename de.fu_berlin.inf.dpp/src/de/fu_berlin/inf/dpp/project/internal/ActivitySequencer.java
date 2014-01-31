@@ -61,6 +61,9 @@ public class ActivitySequencer implements Startable {
     private static final Logger LOG = Logger.getLogger(ActivitySequencer.class
         .getName());
 
+    /** join timeout when stopping this component */
+    private static final long TIMEOUT = 30000;
+
     /**
      * Sequence numbers for outgoing and incoming activity data objects start
      * with this value.
@@ -187,9 +190,9 @@ public class ActivitySequencer implements Startable {
     private volatile IActivitySequencerCallback callback;
 
     private boolean started = false;
+    private boolean stopped = false;
 
     private boolean stopSending = false;
-
     private final String currentSessionID;
 
     private Thread activitySendThread;
@@ -222,7 +225,7 @@ public class ActivitySequencer implements Startable {
 
     /**
      * Starts the sequencer. After the sequencer is started activities can be
-     * send and received.
+     * send and received. The sequencer can only be started once.
      * 
      * @throws IllegalStateException
      *             if the sequencer is already started
@@ -232,8 +235,12 @@ public class ActivitySequencer implements Startable {
     @Override
     public void start() {
 
-        if (started)
-            throw new IllegalStateException("sequencer is already started");
+        synchronized (this) {
+            if (started)
+                throw new IllegalStateException("sequencer is already started");
+
+            started = true;
+        }
 
         /* *
          * 
@@ -265,8 +272,6 @@ public class ActivitySequencer implements Startable {
         receiver.addPacketListener(activitiesPacketListener,
             ActivitiesExtension.PROVIDER.getPacketFilter(currentSessionID));
 
-        started = true;
-
         activitySendThread = ThreadUtils.runSafeAsync("ActivitySender", LOG,
             activitySender);
     }
@@ -276,29 +281,42 @@ public class ActivitySequencer implements Startable {
      * longer be send and received.
      * 
      * @throws IllegalStateException
-     *             if the sequencer is already stopped
+     *             if the sequencer is not started
      * @see #start()
      */
     @Override
     public void stop() {
 
-        if (!started)
-            throw new IllegalStateException("sequencer is not started");
+        synchronized (this) {
+            if (!started)
+                throw new IllegalStateException("sequencer is not started");
+
+            if (stopped)
+                return;
+
+            stopped = true;
+        }
 
         receiver.removePacketListener(activitiesPacketListener);
 
-        while (true) {
-            try {
-                synchronized (bufferedOutgoingActivities) {
-                    stopSending = true;
-                    bufferedOutgoingActivities.notifyAll();
-                }
-                activitySendThread.join();
-                break;
-            } catch (InterruptedException e) {
-                //
-            }
+        synchronized (bufferedOutgoingActivities) {
+            stopSending = true;
+            bufferedOutgoingActivities.notifyAll();
         }
+
+        boolean isStoppingInterrupted = false;
+
+        try {
+            activitySendThread.join(TIMEOUT);
+        } catch (InterruptedException e) {
+            LOG.warn("interrupted while waiting for "
+                + activitySendThread.getName() + " thread to terminate");
+
+            isStoppingInterrupted = true;
+        }
+
+        if (activitySendThread.isAlive())
+            LOG.error(activitySendThread.getName() + " thread is still running");
 
         synchronized (bufferedOutgoingActivities) {
             bufferedOutgoingActivities.clear();
@@ -309,9 +327,10 @@ public class ActivitySequencer implements Startable {
             bufferedIncomingActivities.clear();
         }
 
-        stopSending = false;
         activitySendThread = null;
-        started = false;
+
+        if (isStoppingInterrupted)
+            Thread.currentThread().interrupt();
     }
 
     public void setCallback(IActivitySequencerCallback callback) {
@@ -328,7 +347,7 @@ public class ActivitySequencer implements Startable {
 
         List<IActivityDataObject> serializedActivities = new ArrayList<IActivityDataObject>();
 
-        synchronized (this) {
+        synchronized (bufferedIncomingActivities) {
             ActivityBuffer<SequencedActivity> buffer = bufferedIncomingActivities
                 .get(sender);
 
