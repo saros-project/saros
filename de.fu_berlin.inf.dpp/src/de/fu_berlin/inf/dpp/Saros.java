@@ -62,6 +62,7 @@ import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.stf.server.STFController;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
@@ -253,18 +254,19 @@ public class Saros extends AbstractUIPlugin {
 
         super.start(context);
 
+        setupLoggers();
+
+        sarosVersion = getBundle().getVersion().toString();
+
+        log.info("Starting Saros " + sarosVersion + " running:\n"
+            + Utils.getPlatformInfo());
+
         sarosContext = new SarosContext(new SarosEclipseContextFactory(this,
             new SarosCoreContextFactory()), dotMonitor);
 
         SarosPluginContext.setSarosContext(sarosContext);
 
-        sarosVersion = getBundle().getVersion().toString();
-
         sarosFeatureID = SAROS + "_" + sarosVersion; //$NON-NLS-1$
-
-        setupLoggers();
-        log.info("Starting Saros " + sarosVersion + " running:\n"
-            + Utils.getPlatformInfo());
 
         // Remove the Bundle if an instance of it was already registered
         sarosContext.removeComponent(Bundle.class);
@@ -466,16 +468,29 @@ public class Saros extends AbstractUIPlugin {
     }
 
     protected void setupLoggers() {
+        /*
+         * HACK this is not the way OSGi works but it currently fulfill its
+         * purpose
+         */
+        final ClassLoader contextClassLoader = Thread.currentThread()
+            .getContextClassLoader();
+
         try {
+            // change the context class loader so Log4J will find the appenders
+            Thread.currentThread().setContextClassLoader(
+                STFController.class.getClassLoader());
 
             PropertyConfigurator.configure(Saros.class.getClassLoader()
                 .getResource("saros.log4j.properties")); //$NON-NLS-1$
-
-            log = Logger.getLogger("de.fu_berlin.inf.dpp"); //$NON-NLS-1$
-        } catch (SecurityException e) {
-            System.err.println("Could not start logging:"); //$NON-NLS-1$
+        } catch (RuntimeException e) {
+            System.err.println("initializing log support failed"); //$NON-NLS-1$
             e.printStackTrace();
+        } finally {
+            Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
+
+        log = Logger.getLogger("de.fu_berlin.inf.dpp"); //$NON-NLS-1$
+
     }
 
     /**

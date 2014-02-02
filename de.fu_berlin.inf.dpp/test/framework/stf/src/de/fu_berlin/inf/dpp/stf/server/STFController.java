@@ -108,8 +108,23 @@ public class STFController {
 
         LogManager.resetConfiguration();
 
-        PropertyConfigurator.configure(STFController.class.getClassLoader()
-            .getResource("saros_testmode.log4j.properties"));
+        /*
+         * HACK this is not the way OSGi works but it currently fulfill its
+         * purpose
+         */
+        final ClassLoader contextClassLoader = Thread.currentThread()
+            .getContextClassLoader();
+
+        try {
+            // change the context class loader so Log4J will find the appenders
+            Thread.currentThread().setContextClassLoader(
+                STFController.class.getClassLoader());
+
+            PropertyConfigurator.configure(STFController.class.getClassLoader()
+                .getResource("saros_testmode.log4j.properties"));
+        } finally {
+            Thread.currentThread().setContextClassLoader(contextClassLoader);
+        }
 
         performConfigurationCheck();
 
