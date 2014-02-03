@@ -28,26 +28,11 @@ public class FileSubmitter {
     private static final Logger log = Logger.getLogger(FileSubmitter.class
         .getName());
 
-    /**
-     * the host part of our Apache Tomcat server. This URL should point to a
-     * CNAME to make statistics server transitions independent of the release
-     * cycle. There are two legacy URLs which were in use before. Clients not
-     * updated may still try these: "https://projects.mi.fu-berlin.de/saros/"
-     * (was a redirect, obviously broken for months as of 2010/03)
-     * "http://brazzaville.imp.fu-berlin.de:5900/" (was broken for some weeks as
-     * of 2010/03)
-     */
-    private static final String SERVER_URL = "http://saros-statistics.imp.fu-berlin.de/";
+    private static final String STATISTIC_UPLOAD_URL = System
+        .getProperty("de.fu_berlin.inf.dpp.feedback.STATISTIC_UPLOAD_URL");
 
-    /** the path of the servlet that is supposed to handle the upload */
-    private static final String SERVLET_PATH = "SarosStatisticServer/fileupload";
-
-    /*
-     * the Tomcat servlet is able to fetch the parameters from the URL, so we do
-     * not need to add them to the POST message body
-     */
-    private static final String STATISTIC_ID_PARAM = "?id=1";
-    private static final String ERROR_LOG_ID_PARAM = "?id=2";
+    private static final String ERROR_LOG_UPLOAD_URL = System
+        .getProperty("de.fu_berlin.inf.dpp.feedback.ERROR_LOG_UPLOAD_URL");
 
     /** Value for connection timeout */
     private static final int TIMEOUT = 30000;
@@ -66,8 +51,12 @@ public class FileSubmitter {
     public static void uploadStatisticFile(File file, IProgressMonitor monitor)
         throws IOException {
 
-        uploadFile(file, SERVER_URL + SERVLET_PATH + STATISTIC_ID_PARAM,
-            monitor);
+        if (STATISTIC_UPLOAD_URL == null) {
+            log.warn("statistic upload url is not configured, cannot upload statistic file");
+            return;
+        }
+
+        uploadFile(file, STATISTIC_UPLOAD_URL, monitor);
     }
 
     /**
@@ -93,8 +82,12 @@ public class FileSubmitter {
         FileZipper.zipFiles(Collections.singletonList(file), archive, true,
             null);
 
-        uploadFile(archive, SERVER_URL + SERVLET_PATH + ERROR_LOG_ID_PARAM,
-            monitor);
+        if (ERROR_LOG_UPLOAD_URL == null) {
+            log.warn("error log upload url is not configured, cannot upload error log file");
+            return;
+        }
+
+        uploadFile(archive, ERROR_LOG_UPLOAD_URL, monitor);
 
     }
 
