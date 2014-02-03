@@ -19,7 +19,7 @@ public class SoundPlayer {
     private static final Logger LOG = Logger.getLogger(SoundPlayer.class);
 
     // 16 Bit, 44.1 kHz, 2 seconds
-    private static final int BUFFER_SIZE = 16 * 44100 * 2;
+    private static final int BUFFER_SIZE = 2 * 44100 * 2;
 
     private SoundPlayer() {
         // NOP
