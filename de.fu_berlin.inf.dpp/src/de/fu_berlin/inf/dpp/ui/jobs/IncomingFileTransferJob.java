@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.jobs;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -48,10 +47,6 @@ public final class IncomingFileTransferJob extends FileTransferJob {
             transfer.recieveFile(file);
             final IStatus status = monitorFileTransfer(transfer, monitor);
 
-            // TODO UX this may be to annoying
-            if (status.getCode() == IStatus.OK)
-                showFileInOSGui(file);
-
             if (status.getCode() == IStatus.ERROR)
                 LOG.error(
                     "file transfer from " + jid + " failed: "
@@ -67,19 +62,6 @@ public final class IncomingFileTransferJob extends FileTransferJob {
                 "filetransfer failed", e);
         } finally {
             monitor.done();
-        }
-    }
-
-    private static void showFileInOSGui(File file) {
-        String osName = System.getProperty("os.name");
-        if (osName == null || !osName.toLowerCase().contains("windows"))
-            return;
-
-        try {
-            new ProcessBuilder("explorer.exe", "/select,"
-                + file.getAbsolutePath()).start();
-        } catch (IOException e) {
-            // ignore
         }
     }
 }

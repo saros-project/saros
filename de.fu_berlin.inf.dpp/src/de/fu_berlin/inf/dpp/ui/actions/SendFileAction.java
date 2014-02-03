@@ -20,10 +20,14 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
@@ -323,6 +327,29 @@ public class SendFileAction extends Action implements Disposable {
 
         Job job = new IncomingFileTransferJob(request, file, jid);
         job.setUser(true);
+        job.addJobChangeListener(new JobChangeAdapter() {
+            @Override
+            public void done(IJobChangeEvent event) {
+                event.getJob().removeJobChangeListener(this);
+
+                // TODO UX this may be to annoying
+                if (event.getResult().getCode() == IStatus.OK)
+                    showFileInOSGui(file);
+            }
+        });
         job.schedule();
+    }
+
+    private static void showFileInOSGui(File file) {
+        String osName = System.getProperty("os.name");
+        if (osName == null || !osName.toLowerCase().contains("windows"))
+            return;
+
+        try {
+            new ProcessBuilder("explorer.exe", "/select,"
+                + file.getAbsolutePath()).start();
+        } catch (IOException e) {
+            // ignore
+        }
     }
 }
