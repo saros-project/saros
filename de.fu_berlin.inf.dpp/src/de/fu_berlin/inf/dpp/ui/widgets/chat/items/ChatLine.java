@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.ui.widgets.chat.items;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -166,9 +165,18 @@ public class ChatLine extends Composite {
 
     private boolean isValidURL(String urlString) {
         try {
-            URL url = new URL(urlString);
-            return !url.getHost().isEmpty();
-        } catch (MalformedURLException e) {
+            final URL url = new URL(urlString);
+            /*
+             * spec does not say anything about null but it seems some JVM
+             * distr. return null
+             */
+            final String host = url.getHost();
+            return host != null && !host.isEmpty();
+        } catch (Exception e) {
+            /*
+             * ignore just return false as a non decorated message is still
+             * better than no message at all
+             */
             return false;
         }
     }
