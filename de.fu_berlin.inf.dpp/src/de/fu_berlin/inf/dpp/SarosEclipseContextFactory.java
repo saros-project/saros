@@ -12,7 +12,6 @@ import org.picocontainer.MutablePicoContainer;
 import de.fu_berlin.inf.dpp.concurrent.undo.UndoManager;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogServer;
-import de.fu_berlin.inf.dpp.concurrent.watchdog.SessionViewOpener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
@@ -30,6 +29,7 @@ import de.fu_berlin.inf.dpp.ui.eventhandler.JoinSessionRequestHandler;
 import de.fu_berlin.inf.dpp.ui.eventhandler.NegotiationHandler;
 import de.fu_berlin.inf.dpp.ui.eventhandler.ServerPreferenceHandler;
 import de.fu_berlin.inf.dpp.ui.eventhandler.SessionStatusRequestHandler;
+import de.fu_berlin.inf.dpp.ui.eventhandler.SessionViewOpener;
 import de.fu_berlin.inf.dpp.ui.eventhandler.UserStatusChangeHandler;
 import de.fu_berlin.inf.dpp.ui.eventhandler.XMPPAuthorizationHandler;
 

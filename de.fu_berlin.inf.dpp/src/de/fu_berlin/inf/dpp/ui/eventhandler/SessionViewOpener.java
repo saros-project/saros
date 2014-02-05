@@ -1,21 +1,16 @@
-package de.fu_berlin.inf.dpp.concurrent.watchdog;
+package de.fu_berlin.inf.dpp.ui.eventhandler;
 
-import org.apache.log4j.Logger;
-
-import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
 /**
- * This class is responsible for opening the SessionView if an inconsistency has
- * been detected.
+ * This handler is responsible for opening the SessionView if an inconsistency
+ * has been detected.
  * 
  */
-@Component(module = "util")
 public class SessionViewOpener {
-    private static final Logger log = Logger.getLogger(SessionViewOpener.class
-        .getName());
 
     public SessionViewOpener(IsInconsistentObservable isInconsistentObservable,
         final SarosUI sarosUI) {
@@ -26,7 +21,7 @@ public class SessionViewOpener {
                     return;
                 }
 
-                SWTUtils.runSafeSWTSync(log, new Runnable() {
+                SWTUtils.runSafeSWTAsync(null, new Runnable() {
                     @Override
                     public void run() {
                         sarosUI.openSarosView();
