@@ -120,19 +120,27 @@ public final class RosterSessionContentProvider extends TreeContentProvider {
         }
     };
 
+    /*
+     * as we have a filter installed that will hide contacts from the contact
+     * list that are currently part of the session we must currently do a full
+     * refresh otherwise the viewer is not correctly updated
+     */
     private final ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
         @Override
         public void userLeft(User user) {
-            UserElement userElement = getUserElement(currentRoster, user);
-            if (userElement != null)
-                ViewerUtils.remove(viewer, userElement);
+            // UserElement userElement = getUserElement(currentRoster, user);
+            // if (userElement != null)
+            // ViewerUtils.remove(viewer, userElement);
+            ViewerUtils.refresh(viewer, true);
         }
 
         @Override
         public void userJoined(User user) {
-            UserElement userElement = getUserElement(currentRoster, user);
-            if (userElement != null)
-                ViewerUtils.add(viewer, sessionHeaderElement, userElement);
+            // UserElement userElement = getUserElement(currentRoster, user);
+            // if (userElement != null)
+            // ViewerUtils.add(viewer, sessionHeaderElement, userElement);
+
+            ViewerUtils.refresh(viewer, true);
 
             // FIXME expand the sessionHeaderElement not the whole viewer
             ViewerUtils.expandAll(viewer);
