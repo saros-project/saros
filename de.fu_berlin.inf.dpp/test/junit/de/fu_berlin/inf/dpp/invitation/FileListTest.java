@@ -30,8 +30,10 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import org.easymock.EasyMock;
 import org.eclipse.core.resources.IFile;
@@ -65,7 +67,15 @@ public class FileListTest {
 
     static {
         project = EasyMock.createNiceMock(IProject.class);
-        EasyMock.expect(project.getName()).andReturn("Foo").anyTimes();
+        EasyMock.expect(project.getName()).andStubReturn("Foo");
+
+        try {
+            EasyMock.expect(project.getDefaultCharset()).andStubReturn(
+                "US-ASCII");
+        } catch (CoreException e) {
+            // cannot happen as the mock is in recording mode
+        }
+
         EasyMock.replay(project);
 
         xstream.registerConverter(BooleanConverter.BINARY);
@@ -110,7 +120,8 @@ public class FileListTest {
 
     }
 
-    private IFile createFileMock(String path, String content) throws Exception {
+    private IFile createFileMock(String path, String content, String encoding)
+        throws Exception {
         IPath p = new Path(path);
         IPath f = new Path(project.getName() + "/" + path);
 
@@ -127,6 +138,13 @@ public class FileListTest {
         EasyMock.expect(fileMock.getType()).andStubReturn(IResource.FILE);
         EasyMock.expect(fileMock.getName()).andStubReturn(p.lastSegment());
         EasyMock.expect(fileMock.getFullPath()).andStubReturn(f);
+
+        try {
+            EasyMock.expect(fileMock.getCharset()).andStubReturn(encoding);
+        } catch (CoreException e) {
+            // cannot happen as the mock is in recording mode
+        }
+
         EasyMock.replay(fileMock);
         return fileMock;
     }
@@ -134,12 +152,14 @@ public class FileListTest {
     @Before
     public void setUp() throws Exception {
 
-        fileInRoot1 = createFileMock("root1", "fileInRoot1");
-        fileInRoot2 = createFileMock("root2", "fileInRoot2");
-        fileInSubDir1 = createFileMock("subdir/file1", "fileInSubDir1");
-        fileInSubDir2 = createFileMock("subdir/file2", "fileInSubDir2");
+        fileInRoot1 = createFileMock("root1", "fileInRoot1", "ISO-8859-1");
+        fileInRoot2 = createFileMock("root2", "fileInRoot2", "ISO-8859-1");
+        fileInSubDir1 = createFileMock("subdir/file1", "fileInSubDir1",
+            "UTF-16");
+        fileInSubDir2 = createFileMock("subdir/file2", "fileInSubDir2",
+            "UTF-16");
         fileInSubDir1changed = createFileMock("subdir/file1",
-            "changed fileInSubDir1");
+            "changed fileInSubDir1", "UTF-16");
 
         List<IResource> resources = new ArrayList<IResource>();
         resources.add(fileInRoot1);
@@ -162,6 +182,17 @@ public class FileListTest {
             null, false, null);
 
         emptyFileList = FileListFactory.createEmptyFileList();
+    }
+
+    @Test
+    public void testGetEncodings() {
+        Set<String> encodings = threeEntryList.getEncodings();
+
+        Set<String> expectedEncodings = new HashSet<String>(Arrays.asList(
+            "ISO-8859-1", "UTF-16"));
+
+        assertEquals("not all encodings were fetched", expectedEncodings,
+            encodings);
     }
 
     @Test

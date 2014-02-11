@@ -24,8 +24,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IContainer;
@@ -330,6 +332,8 @@ public class FileList {
     /** ID of Project this list of files belong to */
     private String projectID;
 
+    private Set<String> encodings = new HashSet<String>();
+
     private File root = new File("", null, true);
 
     MetaData getMetaData(IPath path) {
@@ -397,6 +401,10 @@ public class FileList {
         boolean useVersionControl, IProgressMonitor monitor)
         throws CoreException {
         this(useVersionControl);
+
+        if (container.getType() == IResource.PROJECT)
+            addEncoding(container.getDefaultCharset());
+
         container.refreshLocal(IResource.DEPTH_INFINITE, null);
         addMembers(Arrays.asList(container.members()), checksumCache, monitor);
     }
@@ -442,6 +450,16 @@ public class FileList {
 
     @XStreamOmitField
     private List<IPath> cachedList = null;
+
+    /**
+     * Returns all encodings (e.g UTF-8, US-ASCII) that are used by the files
+     * contained in this file list.
+     * 
+     * @return used encodings which may be empty if the encodings are not known
+     */
+    public Set<String> getEncodings() {
+        return new HashSet<String>(encodings);
+    }
 
     /**
      * @return a sorted list of all paths in this file list. The paths are
@@ -548,6 +566,7 @@ public class FileList {
                 data = new MetaData();
                 data.vcsInfo = info;
                 root.addPath(path, data, false);
+                addEncoding(((IFile) resource).getCharset());
                 break;
             case IResource.FOLDER:
                 stack.addAll(Arrays.asList(((IFolder) resource).members()));
@@ -638,5 +657,12 @@ public class FileList {
         Collections.sort(paths);
         toString = Arrays.toString(paths.toArray());
         return toString;
+    }
+
+    private void addEncoding(String charset) {
+        if (charset == null)
+            return;
+
+        encodings.add(charset);
     }
 }
