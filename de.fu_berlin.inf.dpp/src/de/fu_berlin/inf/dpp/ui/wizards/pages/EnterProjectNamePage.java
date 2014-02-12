@@ -4,12 +4,15 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -104,6 +107,8 @@ public class EnterProjectNamePage extends WizardPage {
 
     protected boolean flashState;
 
+    private final Set<String> unsupportedCharsets = new HashSet<String>();
+
     /**
      * 
      * @param remoteProjectNames
@@ -120,6 +125,11 @@ public class EnterProjectNamePage extends WizardPage {
         this.preferenceUtils = preferenceUtils;
         this.peer = peer;
         this.remoteProjectNames = remoteProjectNames;
+
+        // TODO show per project
+        for (FileList fileList : fileLists)
+            unsupportedCharsets.addAll(getUnsupportedCharsets(fileList
+                .getEncodings()));
 
         EnterProjectNamePageUtils.setPreferenceUtils(preferenceUtils);
 
@@ -593,19 +603,35 @@ public class EnterProjectNamePage extends WizardPage {
         }
         setErrorMessage(errorMessage);
 
-        findAndReportProjectArtifacts();
+        String warningMessage = findAndReportProjectArtifacts();
+
+        if (!unsupportedCharsets.isEmpty()) {
+            if (warningMessage == null)
+                warningMessage = "";
+            else
+                warningMessage += "\n";
+
+            warningMessage += "At least one remote project contains files with a character encoding that is not available on this Java platform."
+                + " Working on these projects may result in data loss or corruption.\n"
+                + "Following character encodings are not available: "
+                + StringUtils.join(unsupportedCharsets, ", ");
+        }
+
+        setMessage(warningMessage, WARNING);
     }
 
     /**
-     * Scans the current Eclipse Workspace for project artifacts and shows a
-     * warning message if it will find any.
+     * Scans the current Eclipse Workspace for project artifacts.
+     * 
+     * @return string containing a warning message if artifacts are found,
+     *         <code>null</code> otherwise
      */
-    private void findAndReportProjectArtifacts() {
+    private String findAndReportProjectArtifacts() {
         IPath workspacePath = ResourcesPlugin.getWorkspace().getRoot()
             .getLocation();
 
         if (workspacePath == null)
-            return;
+            return null;
 
         File workspaceDirectory = workspacePath.toFile();
 
@@ -629,8 +655,7 @@ public class EnterProjectNamePage extends WizardPage {
                 StringUtils.join(dirtyProjectNames, ", "));
         }
 
-        setMessage(warningMessage, WARNING);
-
+        return warningMessage;
     }
 
     protected void updateEnabled(String projectID) {
@@ -790,5 +815,23 @@ public class EnterProjectNamePage extends WizardPage {
             SarosView.showNotification(Messages.EnterProjectNamePage_faq,
                 Messages.EnterProjectNamePage_error_browser_open);
         }
+    }
+
+    /**
+     * Returns all charsets from a given set that are not available on the
+     * current JVM.
+     */
+    private Set<String> getUnsupportedCharsets(Set<String> charsets) {
+        Set<String> missingCharsets = new HashSet<String>();
+
+        for (String charset : charsets) {
+            try {
+                Charset.forName(charset);
+            } catch (Exception e) {
+                missingCharsets.add(charset);
+            }
+        }
+
+        return missingCharsets;
     }
 }
