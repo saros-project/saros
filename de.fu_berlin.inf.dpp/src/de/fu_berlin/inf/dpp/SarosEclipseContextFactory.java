@@ -11,7 +11,6 @@ import org.picocontainer.MutablePicoContainer;
 
 import de.fu_berlin.inf.dpp.concurrent.undo.UndoManager;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
-import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogServer;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
@@ -49,7 +48,6 @@ public class SarosEclipseContextFactory extends AbstractSarosContextFactory {
     private final Component[] components = new Component[] {
         // Core Managers
         Component.create(ConsistencyWatchdogClient.class),
-        Component.create(ConsistencyWatchdogServer.class),
         Component.create(EditorAPI.class),
         Component.create(EditorManager.class),
         Component.create(JDTFacade.class),

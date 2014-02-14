@@ -3,18 +3,17 @@ package de.fu_berlin.inf.dpp.concurrent.watchdog;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
-import org.picocontainer.annotations.Inject;
+import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
@@ -22,14 +21,13 @@ import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
-import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
+import de.fu_berlin.inf.dpp.synchronize.StopManager;
+import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
+import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * This class is an eclipse job run on the host side ONLY.
@@ -49,131 +47,136 @@ import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
  * 
  */
 @Component(module = "consistency")
-public class ConsistencyWatchdogServer extends Job {
+public class ConsistencyWatchdogServer extends AbstractActivityProvider
+    implements Startable, Blockable {
 
-    private static Logger log = Logger
+    private static final Logger LOG = Logger
         .getLogger(ConsistencyWatchdogServer.class);
 
-    protected static final long INTERVAL = 10000;
+    private static final long INTERVAL = 10000;
 
-    // this map holds for all open editors of all participants the checksums
-    protected final HashMap<SPath, DocumentChecksum> docsChecksums = new HashMap<SPath, DocumentChecksum>();
+    private ScheduledThreadPoolExecutor executor;
 
-    @Inject
-    protected XMPPConnectionService connectionService;
+    private ScheduledFuture<?> triggerChecksumFuture;
 
-    @Inject
-    protected EditorManager editorManager;
+    private final HashMap<SPath, DocumentChecksum> docsChecksums = new HashMap<SPath, DocumentChecksum>();
 
-    protected ISarosSessionManager sessionManager;
+    private final EditorManager editorManager;
 
-    protected ISarosSession sarosSession;
+    private final ISarosSession session;
 
-    private boolean locked = false;
+    private final StopManager stopManager;
 
-    protected final AbstractActivityProvider activityProvider = new AbstractActivityProvider() {
-        @Override
-        public void exec(IActivity activity) {
-            /* Needed to be able to dispatch activities */
-        }
-    };
+    private final UISynchronizer synchronizer;
 
-    private final Blockable executionState = new Blockable() {
+    private boolean locked;
+
+    private final Runnable checksumCalculationTrigger = new Runnable() {
 
         @Override
-        public void block() {
-
-            SWTUtils.runSafeSWTSync(log, new Runnable() {
+        public void run() {
+            synchronizer.syncExec(ThreadUtils.wrapSafe(LOG, new Runnable() {
                 @Override
                 public void run() {
-                    /*
-                     * set in SWT thread to ensure that all outstanding
-                     * activities are fired when we return
-                     */
-                    locked = true;
+                    if (locked)
+                        return;
+
+                    calculateChecksums();
                 }
-            });
+            }));
         }
-
-        @Override
-        public void unblock() {
-            locked = false;
-        }
-
     };
 
-    public ConsistencyWatchdogServer(ISarosSessionManager sessionManager) {
-        super("ConsistencyWatchdog");
-
-        this.sessionManager = sessionManager;
-
-        this.sessionManager
-            .addSarosSessionListener(new AbstractSarosSessionListener() {
-                @Override
-                public void sessionStarted(ISarosSession newSarosSession) {
-
-                    newSarosSession.addActivityProvider(activityProvider);
-                    if (newSarosSession.isHost()) {
-                        sarosSession = newSarosSession;
-                        sarosSession.getStopManager().addBlockable(
-                            executionState);
-
-                        log.debug("Starting consistency watchdog");
-                        if (!isSystem())
-                            setSystem(true);
-                        setPriority(Job.SHORT);
-                        schedule(10000);
-                    }
-                }
-
-                @Override
-                public void sessionEnded(ISarosSession oldSarosSession) {
-
-                    oldSarosSession.removeActivityProvider(activityProvider);
-
-                    if (sarosSession != null) {
-                        sarosSession.getStopManager().removeBlockable(
-                            executionState);
-                        // Cancel Job
-                        cancel();
-                        sarosSession = null;
-
-                        // Unregister from all documents
-                        for (DocumentChecksum document : docsChecksums.values()) {
-                            document.dispose();
-                        }
-                        docsChecksums.clear();
-                    }
-                }
-            });
+    public ConsistencyWatchdogServer(ISarosSession session,
+        EditorManager editorManager, StopManager stopManager,
+        UISynchronizer synchronizer) {
+        this.session = session;
+        this.editorManager = editorManager;
+        this.stopManager = stopManager;
+        this.synchronizer = synchronizer;
     }
 
     @Override
-    protected IStatus run(IProgressMonitor monitor) {
+    public void start() {
+        if (!session.isHost())
+            throw new IllegalStateException(
+                "component can only be run on host side");
 
-        try {
-            return runUnsafe(monitor);
-        } catch (RuntimeException e) {
-            log.error("Internal Error: ", e);
-            schedule(10000);
-            return Status.OK_STATUS;
-        }
+        session.addActivityProvider(this);
+        stopManager.addBlockable(this);
+
+        executor = new ScheduledThreadPoolExecutor(1, new NamedThreadFactory(
+            "Consistency-Watchdog-Server", false));
+
+        executor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
+
+        triggerChecksumFuture = executor.scheduleWithFixedDelay(
+            checksumCalculationTrigger, 0, INTERVAL, TimeUnit.MILLISECONDS);
+
     }
 
-    protected IStatus runUnsafe(IProgressMonitor monitor) {
-        if (sessionManager.getSarosSession() == null)
-            return Status.OK_STATUS;
+    @Override
+    public void stop() {
+        session.removeActivityProvider(this);
+        stopManager.removeBlockable(this);
 
-        assert sarosSession.isHost() : "This job is intended to be run on host side!";
+        triggerChecksumFuture.cancel(false);
+        executor.shutdown();
 
-        // If connection is closed, checking does not make sense...
-        if (connectionService.getConnectionState() != ConnectionState.CONNECTED) {
-            // Reschedule the next run in 30 seconds
-            schedule(30000);
-            return Status.OK_STATUS;
+        boolean isTerminated = false;
+        boolean isInterrupted = false;
+
+        try {
+            isTerminated = executor.awaitTermination(10000,
+                TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            LOG.warn("interrupted while waiting for consistency watchdog to terminate");
+            isInterrupted = true;
         }
 
-        Set<SPath> missingDocuments = new HashSet<SPath>(docsChecksums.keySet());
+        if (!isTerminated)
+            LOG.error("consistency watchdog is still running");
+
+        synchronizer.asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                for (DocumentChecksum document : docsChecksums.values())
+                    document.dispose();
+
+                docsChecksums.clear();
+            }
+        });
+
+        if (isInterrupted)
+            Thread.currentThread().interrupt();
+    }
+
+    @Override
+    public void exec(IActivity activity) {
+        // NOP
+    }
+
+    @Override
+    public void block() {
+        // sync here to ensure we do not send anything after we return
+        synchronizer.syncExec(new Runnable() {
+            @Override
+            public void run() {
+                locked = true;
+            }
+        });
+    }
+
+    @Override
+    public void unblock() {
+        // unlock lazy is sufficient as it does not matter if we miss one update
+        // cycle
+        locked = false;
+    }
+
+    // UI thread access only !
+    private void calculateChecksums() {
+        Set<SPath> missingDocuments = new HashSet<SPath>();
 
         Set<SPath> localEditors = editorManager.getLocallyOpenEditors();
         Set<SPath> remoteEditors = editorManager.getRemoteOpenEditors();
@@ -183,108 +186,90 @@ public class ConsistencyWatchdogServer extends Job {
 
         // Update Checksums for all open documents
         for (SPath docPath : allEditors) {
-
-            if (monitor.isCanceled())
-                return Status.CANCEL_STATUS;
-
             updateChecksum(missingDocuments, localEditors, remoteEditors,
                 docPath);
         }
 
-        // Unregister all documents that are no longer there
+        /*
+         * Unregister all document listeners for documents that are no longer
+         * there
+         */
         for (SPath missing : missingDocuments) {
-            docsChecksums.remove(missing).dispose();
+            DocumentChecksum checksum = docsChecksums.remove(missing);
+            if (checksum != null)
+                checksum.dispose();
         }
 
-        if (monitor.isCanceled())
-            return Status.CANCEL_STATUS;
-
-        // Reschedule the next run in INTERVAL ms
-        schedule(INTERVAL);
-        return Status.OK_STATUS;
     }
 
-    protected void updateChecksum(final Set<SPath> missingDocuments,
+    // UI thread access only !
+    private void updateChecksum(final Set<SPath> missingDocuments,
         final Set<SPath> localEditors, final Set<SPath> remoteEditors,
         final SPath docPath) {
 
-        SWTUtils.runSafeSWTSync(log, new Runnable() {
-            @Override
-            public void run() {
+        IFile file = docPath.getFile();
 
-                if (locked)
-                    return;
+        IDocument doc = null;
+        IDocumentProvider provider = null;
+        FileEditorInput input = null;
 
-                IFile file = docPath.getFile();
+        try {
 
-                IDocument doc;
-                IDocumentProvider provider = null;
-                FileEditorInput input = null;
-                if (!file.exists()) {
-                    doc = null;
-                } else {
-                    input = new FileEditorInput(file);
-                    provider = EditorManager.getDocumentProvider(input);
-                    try {
-                        provider.connect(input);
-                        doc = provider.getDocument(input);
-                    } catch (CoreException e) {
-                        log.warn("Could not check checksum of file "
-                            + docPath.toString());
-                        provider = null;
-                        doc = null;
-                    }
-                }
-
+            if (file.exists()) {
+                input = new FileEditorInput(file);
+                provider = EditorManager.getDocumentProvider(input);
                 try {
-                    // Null means that the document does not exist locally
-                    if (doc == null) {
-                        if (localEditors.contains(docPath)) {
-                            log.error("EditorManager is in an inconsistent state. "
-                                + "It is reporting a locally open editor but no"
-                                + " document could be found on disk: "
-                                + docPath);
-                        }
-                        if (!remoteEditors.contains(docPath)) {
-                            /*
-                             * Since remote users do not report this document as
-                             * open, they are right (and our EditorPool might be
-                             * confused)
-                             */
-                            return;
-                        }
-                    }
-
-                    // Update listener management
-                    missingDocuments.remove(docPath);
-
-                    DocumentChecksum checksum = docsChecksums.get(docPath);
-                    if (checksum == null) {
-                        checksum = new DocumentChecksum(docPath);
-                        docsChecksums.put(docPath, checksum);
-                    }
-
-                    /*
-                     * Potentially bind to null doc, which will set the Checksum
-                     * to represent a missing file (existsFile() == false)
-                     */
-                    checksum.bind(doc);
-                    checksum.update();
-
-                    // Send a checksum to everybody
-                    ChecksumActivity checksumActivity = new ChecksumActivity(
-                        sarosSession.getLocalUser(), checksum.getPath(),
-                        checksum.getHash(), checksum.getLength(), null);
-
-                    activityProvider.fireActivity(checksumActivity);
-
-                } finally {
-                    if (provider != null) {
-                        provider.disconnect(input);
-                    }
+                    provider.connect(input);
+                    doc = provider.getDocument(input);
+                } catch (CoreException e) {
+                    LOG.warn("could not check checksum of file " + docPath);
+                    provider = null;
                 }
-
             }
-        });
+
+            // Null means that the document does not exist locally
+            if (doc == null) {
+                missingDocuments.add(docPath);
+
+                if (localEditors.contains(docPath)) {
+                    LOG.error("EditorManager is in an inconsistent state. "
+                        + "It is reporting a locally open editor but no"
+                        + " document could be found in the underlying file system: "
+                        + docPath);
+                }
+                if (!remoteEditors.contains(docPath)) {
+                    /*
+                     * Since session participants do not report this document as
+                     * open, they are right (and our EditorPool might be
+                     * confused)
+                     */
+                    return;
+                }
+            }
+
+            DocumentChecksum checksum = docsChecksums.get(docPath);
+            if (checksum == null) {
+                checksum = new DocumentChecksum(docPath);
+                docsChecksums.put(docPath, checksum);
+            }
+
+            /*
+             * Potentially bind to null doc, which will set the Checksum to
+             * represent a missing file (existsFile() == false)
+             */
+            checksum.bind(doc);
+            checksum.update();
+
+            ChecksumActivity checksumActivity = new ChecksumActivity(
+                session.getLocalUser(), checksum.getPath(), checksum.getHash(),
+                checksum.getLength(), null);
+
+            fireActivity(checksumActivity);
+
+        } finally {
+            if (provider != null && input != null) {
+                provider.disconnect(input);
+            }
+        }
     }
 }

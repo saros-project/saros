@@ -65,6 +65,7 @@ import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogHandler;
+import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogServer;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.feedback.DataTransferCollector;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
@@ -1233,10 +1234,12 @@ public final class SarosSession implements ISarosSession {
             activityCallback);
         sessionContainer.addComponent(UserInformationHandler.class);
         // Timeout
-        if (isHost())
+        if (isHost()) {
+            sessionContainer.addComponent(ConsistencyWatchdogServer.class);
             sessionContainer.addComponent(ServerSessionTimeoutHandler.class);
-        else
+        } else {
             sessionContainer.addComponent(ClientSessionTimeoutHandler.class);
+        }
 
         // Force the creation of the above components.
         sessionContainer.getComponents();
