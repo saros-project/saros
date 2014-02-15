@@ -2,6 +2,8 @@ package de.fu_berlin.inf.dpp.concurrent.watchdog;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -176,36 +178,35 @@ public class ConsistencyWatchdogServer extends AbstractActivityProvider
 
     // UI thread access only !
     private void calculateChecksums() {
-        Set<SPath> missingDocuments = new HashSet<SPath>();
 
         Set<SPath> localEditors = editorManager.getLocallyOpenEditors();
         Set<SPath> remoteEditors = editorManager.getRemoteOpenEditors();
+
         Set<SPath> allEditors = new HashSet<SPath>();
+
         allEditors.addAll(localEditors);
         allEditors.addAll(remoteEditors);
 
-        // Update Checksums for all open documents
+        Iterator<Entry<SPath, DocumentChecksum>> it = docsChecksums.entrySet()
+            .iterator();
+
+        while (it.hasNext()) {
+            Entry<SPath, DocumentChecksum> entry = it.next();
+
+            if (!allEditors.contains(entry.getKey())) {
+                entry.getValue().dispose();
+                it.remove();
+            }
+        }
+
         for (SPath docPath : allEditors) {
-            updateChecksum(missingDocuments, localEditors, remoteEditors,
-                docPath);
+            updateChecksum(localEditors, remoteEditors, docPath);
         }
-
-        /*
-         * Unregister all document listeners for documents that are no longer
-         * there
-         */
-        for (SPath missing : missingDocuments) {
-            DocumentChecksum checksum = docsChecksums.remove(missing);
-            if (checksum != null)
-                checksum.dispose();
-        }
-
     }
 
     // UI thread access only !
-    private void updateChecksum(final Set<SPath> missingDocuments,
-        final Set<SPath> localEditors, final Set<SPath> remoteEditors,
-        final SPath docPath) {
+    private void updateChecksum(final Set<SPath> localEditors,
+        final Set<SPath> remoteEditors, final SPath docPath) {
 
         IFile file = docPath.getFile();
 
@@ -229,7 +230,6 @@ public class ConsistencyWatchdogServer extends AbstractActivityProvider
 
             // Null means that the document does not exist locally
             if (doc == null) {
-                missingDocuments.add(docPath);
 
                 if (localEditors.contains(docPath)) {
                     LOG.error("EditorManager is in an inconsistent state. "
@@ -237,6 +237,7 @@ public class ConsistencyWatchdogServer extends AbstractActivityProvider
                         + " document could be found in the underlying file system: "
                         + docPath);
                 }
+
                 if (!remoteEditors.contains(docPath)) {
                     /*
                      * Since session participants do not report this document as
@@ -248,6 +249,7 @@ public class ConsistencyWatchdogServer extends AbstractActivityProvider
             }
 
             DocumentChecksum checksum = docsChecksums.get(docPath);
+
             if (checksum == null) {
                 checksum = new DocumentChecksum(docPath);
                 docsChecksums.put(docPath, checksum);
