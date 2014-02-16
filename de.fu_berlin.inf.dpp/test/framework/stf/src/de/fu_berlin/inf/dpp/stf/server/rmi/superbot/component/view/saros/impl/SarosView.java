@@ -174,7 +174,11 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         WidgetUtil.getToolbarButtonWithRegex(view,
             Pattern.quote(TB_INCONSISTENCY_DETECTED) + ".*").click();
 
-        SWTBot bot = new SWTBot();
+        SWTBot bot;
+        bot = new SWTBot();
+        bot.shell(SHELL_CONFIRM_CONSISTENCY_RECOVERY).bot().button(OK).click();
+
+        bot = new SWTBot();
         bot.sleep(1000);
         bot.waitWhile(Conditions.shellIsActive(SHELL_PROGRESS_INFORMATION),
             SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);

@@ -344,6 +344,8 @@ public class Messages extends NLS {
     public static String UserElement_read_only;
     public static String UserElement_host;
 
+    public static String ConsistencyAction_confirm_dialog_title;
+
     public static String DeleteContactAction_confirm_message;
     public static String DeleteContactAction_confirm_title;
     public static String DeleteContactAction_delete_error_in_session;

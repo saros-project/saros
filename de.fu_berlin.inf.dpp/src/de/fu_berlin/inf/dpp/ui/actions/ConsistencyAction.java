@@ -7,17 +7,23 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -227,40 +233,54 @@ public class ConsistencyAction extends Action implements Disposable {
 
     @Override
     public void run() {
-        SWTUtils.runSafeSWTAsync(log, new Runnable() {
+        log.debug("user activated CW recovery."); //$NON-NLS-1$
 
-            @Override
-            public void run() {
-                log.debug("user activated CW recovery."); //$NON-NLS-1$
+        Shell shell = SWTUtils.getShell();
 
-                Shell dialogShell = SWTUtils.getShell();
-                if (dialogShell == null)
-                    dialogShell = new Shell();
+        final Set<SPath> paths = new HashSet<SPath>(
+            watchdogClient.getPathsWithWrongChecksums());
 
-                ProgressMonitorDialog dialog = new ProgressMonitorDialog(
-                    dialogShell);
-                try {
-                    dialog.run(true, true, new IRunnableWithProgress() {
-                        @Override
-                        public void run(IProgressMonitor monitor)
-                            throws InterruptedException {
+        String PID = Saros.SAROS;
 
-                            SubMonitor progress = SubMonitor.convert(monitor);
-                            progress
-                                .beginTask(
-                                    Messages.ConsistencyAction_progress_perform_recovery,
-                                    100);
-                            watchdogClient.runRecovery(progress.newChild(100));
-                            monitor.done();
-                        }
-                    });
-                } catch (InvocationTargetException e) {
-                    log.error("Exception not expected here.", e); //$NON-NLS-1$
-                } catch (InterruptedException e) {
-                    log.error("Exception not expected here.", e); //$NON-NLS-1$
+        MultiStatus multiStatus = new MultiStatus(
+            PID,
+            0,
+            "Please confirm workspace modifications.\n\n"
+                + "The recovery process will perform changes to files and folders of the current shared project(s).\n\n"
+                + "The affected files and folders may be either modified, created, or deleted.\n\n"
+                + "Press 'Details' for the affected files and folders.", null);
+
+        for (SPath path : paths)
+            multiStatus.add(new Status(IStatus.WARNING, PID, "project: "
+                + path.getProject().getName() + ", file:"
+                + path.getProjectRelativePath().toOSString()));
+
+        if (ErrorDialog.openError(shell, Messages.ConsistencyAction_confirm_dialog_title, null,
+            multiStatus, IStatus.WARNING) != Window.OK)
+            return;
+
+        ProgressMonitorDialog dialog = new ProgressMonitorDialog(shell);
+
+        try {
+            dialog.run(true, true, new IRunnableWithProgress() {
+                @Override
+                public void run(IProgressMonitor monitor)
+                    throws InterruptedException {
+
+                    SubMonitor progress = SubMonitor.convert(monitor);
+                    progress.beginTask(
+                        Messages.ConsistencyAction_progress_perform_recovery,
+                        100);
+                    watchdogClient.runRecovery(progress.newChild(100));
+                    monitor.done();
                 }
-            }
-        });
+            });
+        } catch (InvocationTargetException e) {
+            log.error("Exception not expected here.", e); //$NON-NLS-1$
+        } catch (InterruptedException e) {
+            log.error("Exception not expected here.", e); //$NON-NLS-1$
+        }
+
     }
 
     @Override

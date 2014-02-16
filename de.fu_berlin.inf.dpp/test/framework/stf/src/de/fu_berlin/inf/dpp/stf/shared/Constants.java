@@ -308,6 +308,7 @@ public interface Constants {
     public static final String SHELL_CLOSING_THE_SESSION = get("close_the_session");
     public static final String SHELL_CONFIRM_LEAVING_SESSION = get("confirm_leaving_session");
     public static final String SHELL_CONFIRM_DECLINE_INVITATION = get("shell_confirm_decline_invitation");
+    public static final String SHELL_CONFIRM_CONSISTENCY_RECOVERY = get("ConsistencyAction_confirm_dialog_title");
 
     /* *************************************************************
      * Saros View Toolbar Buttons
