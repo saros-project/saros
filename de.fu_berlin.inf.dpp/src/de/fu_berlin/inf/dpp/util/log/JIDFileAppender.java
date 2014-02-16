@@ -7,12 +7,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.FileAppender;
-import org.apache.log4j.helpers.LogLog;
 import org.apache.log4j.spi.LoggingEvent;
 import org.eclipse.core.runtime.Platform;
 import org.jivesoftware.smack.Connection;
 import org.picocontainer.annotations.Inject;
-import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
@@ -21,7 +19,6 @@ import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * FileAppender which can replace date patterns in the file name but also can
@@ -104,7 +101,7 @@ public class JIDFileAppender extends FileAppender {
         setJID(connectionService.getJID());
     }
 
-    protected synchronized void setJID(@Nullable JID newJID) {
+    protected synchronized void setJID(JID newJID) {
 
         if (newJID == null || newJID.equals(localJID))
             return;
@@ -139,9 +136,6 @@ public class JIDFileAppender extends FileAppender {
         String actualFileName = directory + File.separator
             + new SimpleDateFormat(format).format(new Date());
 
-        if (!Utils.mkdirs(actualFileName)) {
-            LogLog.error("Could not create dirs for " + actualFileName);
-        }
         setFile(actualFileName);
 
         // Open new file
