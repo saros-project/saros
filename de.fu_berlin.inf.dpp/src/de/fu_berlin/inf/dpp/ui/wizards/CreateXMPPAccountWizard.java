@@ -244,7 +244,7 @@ public class CreateXMPPAccountWizard extends Wizard {
             return null;
 
         if (error.getCode() == 409)
-            message = "The XMPP/Jabber account already exists.";
+            message = "The XMPP account already exists.";
         else
             message = "An unknown error occured. Please register on provider's website.";
 

@@ -19,7 +19,7 @@ public class PreferenceUtils {
     }
 
     /**
-     * Returns Saros's XMPP/Jabber server dns address.
+     * Returns Saros's XMPP server DNS address.
      * 
      * @return
      */

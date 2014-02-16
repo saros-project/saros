@@ -13,8 +13,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.After;
 import org.junit.BeforeClass;
@@ -155,8 +153,6 @@ public class HandleContactsTest extends StfTestCase {
     public void testAddNoValidContact() throws RemoteException {
         ALICE.remoteBot().view(VIEW_SAROS).toolbarButton(TB_ADD_NEW_CONTACT)
             .click();
-        Map<String, String> labelsAndTexts = new HashMap<String, String>();
-        labelsAndTexts.put("XMPP/Jabber ID", "BOB@bla");
 
         ALICE.remoteBot().waitUntilShellIsOpen(SHELL_ADD_CONTACT_WIZARD);
         IRemoteBotShell shell = ALICE.remoteBot().shell(

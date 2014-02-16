@@ -286,6 +286,7 @@ public class Messages extends NLS {
     public static String jid_example;
     public static String jid_format_errorMessage;
     public static String jid_longform;
+    public static String jid_shortform;
     public static String password_empty_errorMessage;
     public static String xmpp_saros_restriction_short;
     public static String roster_addself_errorMessage;

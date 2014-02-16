@@ -25,6 +25,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.widgets.decoration.JIDCombo;
 
 /**
@@ -58,7 +59,7 @@ public class EnterXMPPAccountComposite extends Composite {
          * Row 1: JID
          */
         Label jidLabel = new Label(this, SWT.NONE);
-        jidLabel.setText("XMPP/Jabber ID");
+        jidLabel.setText(Messages.jid_shortform);
 
         Combo jidCombo = new Combo(this, SWT.BORDER);
         jidCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
@@ -270,7 +271,7 @@ public class EnterXMPPAccountComposite extends Composite {
     }
 
     /**
-     * Returns true if the effectively used server is Saros's XMPP/Jabber server
+     * Returns true if the effectively used server is Saros's XMPP server
      */
     public boolean isSarosXMPPServer() {
         String server = getServer();

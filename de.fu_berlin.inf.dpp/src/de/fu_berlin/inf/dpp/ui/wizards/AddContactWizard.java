@@ -128,7 +128,8 @@ public class AddContactWizard extends Wizard {
                         IProgressMonitor.UNKNOWN);
 
                     try {
-                        addToRoster(connectionService.getConnection(), jid, nickname);
+                        addToRoster(connectionService.getConnection(), jid,
+                            nickname);
 
                         cachedContact = jid;
                     } catch (CancellationException e) {
@@ -190,7 +191,7 @@ public class AddContactWizard extends Wizard {
                                 .openQuestionMessageDialog(
                                     null,
                                     "Contact Unknown",
-                                    "You entered a valid XMPP/Jabber server.\n\n"
+                                    "You entered a valid XMPP server.\n\n"
                                         + "Unfortunately your entered JID is unknown to the server.\n"
                                         + "Please make sure you spelled the JID correctly.\n\n"
                                         + "Do you want to add the contact anyway?");
@@ -244,32 +245,32 @@ public class AddContactWizard extends Wizard {
 
         if (e.getMessage().contains("item-not-found")) {
             return new DialogContent("Contact Unknown",
-                "The contact is unknown to the XMPP/Jabber server.\n\n"
+                "The contact is unknown to the XMPP server.\n\n"
                     + "Do you want to add the contact anyway?",
-                "Contact unknown to XMPP/Jabber server.");
+                "Contact unknown to XMPP server.");
         }
 
         if (e.getMessage().contains("remote-server-not-found")) {
             return new DialogContent("Server Not Found",
-                "The responsible XMPP/Jabber server could not be found.\n\n"
+                "The responsible XMPP server could not be found.\n\n"
                     + "Do you want to add the contact anyway?",
-                "Unable to find the responsible XMPP/Jabber server.");
+                "Unable to find the responsible XMPP server.");
 
         }
 
         if (e.getMessage().contains("501")) {
             return new DialogContent(
                 "Unsupported Contact Status Check",
-                "The responsible XMPP/Jabber server does not support status requests.\n\n"
+                "The responsible XMPP server does not support status requests.\n\n"
                     + "If the contact exists you can still successfully add him.\n\n"
                     + "Do you want to try to add the contact?",
-                "Contact status check unsupported by XMPP/Jabber server.");
+                "Contact status check unsupported by XMPP server.");
         }
 
         if (e.getMessage().contains("503")) {
             return new DialogContent(
                 "Unknown Contact Status",
-                "For privacy reasons the XMPP/Jabber server does not reply to status requests.\n\n"
+                "For privacy reasons the XMPP server does not reply to status requests.\n\n"
                     + "If the contact exists you can still successfully add him.\n\n"
                     + "Do you want to try to add the contact?",
                 "Unable to check the contact status.");
@@ -278,10 +279,10 @@ public class AddContactWizard extends Wizard {
         if (e.getMessage().contains("No response from the server")) {
             return new DialogContent(
                 "Server Not Responding",
-                "The responsible XMPP/Jabber server is not connectable.\n"
+                "The responsible XMPP server is not connectable.\n"
                     + "The server is either inexistent or offline right now.\n\n"
                     + "Do you want to add the contact anyway?",
-                "The XMPP/Jabber server did not respond.");
+                "The XMPP server did not respond.");
         }
 
         return new DialogContent("Unknown Error",

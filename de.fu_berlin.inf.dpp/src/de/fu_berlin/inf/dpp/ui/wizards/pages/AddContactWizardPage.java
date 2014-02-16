@@ -40,7 +40,7 @@ import de.fu_berlin.inf.dpp.ui.widgets.decoration.JIDCombo;
 
 public class AddContactWizardPage extends WizardPage {
     public static final String TITLE = "Add Contact";
-    public static final String DESCRIPTION = "Enter the XMPP/Jabber ID of the contact you want to add.";
+    public static final String DESCRIPTION = "Enter the Jabber Identifier of the contact you want to add.";
 
     @Inject
     protected XMPPConnectionService connectionService;
@@ -82,7 +82,7 @@ public class AddContactWizardPage extends WizardPage {
         Label jidLabel = new Label(composite, SWT.NONE);
         gridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
         jidLabel.setLayoutData(gridData);
-        jidLabel.setText(Messages.jid_longform);
+        jidLabel.setText(Messages.jid_shortform);
 
         Combo jidCombo = new Combo(composite, SWT.BORDER);
         gridData = new GridData(SWT.FILL, SWT.CENTER, true, false);

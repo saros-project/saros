@@ -210,7 +210,7 @@ public interface Constants {
 
     public static final String CHATROOM_TAB_LABEL = get("ChatRoomsComposite_roundtable");
 
-    public static final String LABEL_XMPP_JABBER_ID = get("text_label_xmpp_jabber_id");
+    public static final String LABEL_XMPP_JABBER_ID = get("jid_shortform");
     public static final String LABEL_XMPP_JABBER_SERVER = get("text_label_xmpp_jabber_server");
     public static final String LABEL_USER_NAME = get("text_label_user_name");
     public static final String LABEL_PASSWORD = get("text_label_password");
@@ -222,7 +222,7 @@ public interface Constants {
     public static final String ERROR_MESSAGE_PASSWORDS_NOT_MATCH = get("CreateXMPPAccountWizardPage_error_password_no_match");
     public static final String ERROR_MESSAGE_COULD_NOT_CONNECT = get("error_message_could_not_connect");
     public static final String ERROR_MESSAGE_NOT_CONNECTED_TO_SERVER = get("error_message_not_connected_to_server");
-    public static final String ERROR_MESSAGE_ACCOUNT_ALREADY_EXISTS = get("error_message_account_already_exists");
+    public static final String ERROR_MESSAGE_ACCOUNT_ALREADY_EXISTS = get("account_exists_errorMessage");
     public static final String ERROR_MESSAGE_TOO_FAST_REGISTER_ACCOUNTS = get("error_message_too_fast_register_accounts");
     public static final String GROUP_EXISTING_ACCOUNT = get("group_existing_account");
     public static final String GROUP_TITLE_XMPP_JABBER_ACCOUNTS = get("group_title_xmpp_jabber_accounts_in_shell-saros-preferences");
@@ -328,7 +328,6 @@ public interface Constants {
     public static final String NODE_SESSION = get("SessionHeaderElement_session");
     public static final String NODE_NO_SESSION_RUNNING = get("SessionHeaderElement_no_session_running");
     public static final String HOST_INDICATION = get("UserElement_host");
-    public static final String LABEL_XMPP_JABBER_JID = get("text_label_xmpp_jabber_jid");
     public static final String GROUP_TITLE_CREATE_NEW_XMPP_JABBER_ACCOUNT = get("group_title_create_new_xmpp_jabber_account");
 
     // Permission: Write Access
