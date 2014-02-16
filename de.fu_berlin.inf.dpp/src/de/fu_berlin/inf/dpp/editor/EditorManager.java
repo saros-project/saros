@@ -787,13 +787,12 @@ public class EditorManager extends AbstractActivityProvider {
          * Disable documentListener temporarily to avoid being notified of the
          * change
          */
-        documentListener.enabled = false;
+        documentListener.setEnabled(false);
 
         replaceText(path, textEdit.getOffset(), textEdit.getReplacedText(),
             textEdit.getText(), user);
 
-        documentListener.enabled = true;
-
+        documentListener.setEnabled(true);
         /*
          * If the text edit ends in the visible region of a local editor, set
          * the cursor annotation.
