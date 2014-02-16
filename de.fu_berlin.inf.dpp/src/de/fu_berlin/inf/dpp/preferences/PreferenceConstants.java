@@ -63,8 +63,6 @@ public class PreferenceConstants {
 
     public static final String ENABLE_BALLOON_NOTIFICATION = "enable_balloon_notification";
 
-    public static final String SKIP_SYNC_SELECTABLE = "invitation.dialog.skip.enabled";
-
     public static final String DISABLE_VERSION_CONTROL = "disable_version_control";
 
     public static final String SERVER_ACTIVATED = "server_activated";

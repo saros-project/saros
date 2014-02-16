@@ -61,11 +61,6 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
             addField(new BooleanFieldEditor(PreferenceConstants.DEBUG,
                 Messages.AdvancedPreferencePage_show_xmpp_debug,
                 getFieldEditorParent()));
-
-            addField(new BooleanFieldEditor(
-                PreferenceConstants.SKIP_SYNC_SELECTABLE,
-                Messages.AdvancedPreferencePage_skip_synchronization,
-                getFieldEditorParent()));
         }
 
         if (Boolean.getBoolean("de.fu_berlin.inf.dpp.server.SUPPORTED")) {

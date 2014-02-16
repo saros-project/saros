@@ -24,7 +24,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -82,8 +81,6 @@ public class EnterProjectNamePage extends WizardPage {
     protected Map<String, Text> newProjectNameTexts = new HashMap<String, Text>();
 
     protected Map<String, String> errorProjectNames = new LinkedHashMap<String, String>();
-
-    protected Map<String, Button> skipCheckBoxes = new HashMap<String, Button>();
 
     protected Map<String, Button> copyCheckboxes = new HashMap<String, Button>();
 
@@ -422,20 +419,6 @@ public class EnterProjectNamePage extends WizardPage {
             }
             createUpdateProjectGroup(tabComposite, newProjectName,
                 fileList.getProjectID());
-
-            if (preferenceUtils.isSkipSyncSelectable()) {
-                Button skipCheckBox = new Button(tabComposite, SWT.CHECK);
-                skipCheckBox
-                    .setText(Messages.EnterProjectNamePage_skip_synchronizing);
-                skipCheckBox.setSelection(false);
-                skipCheckBox.addSelectionListener(new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent e) {
-                        updatePageComplete(fileList.getProjectID());
-                    }
-                });
-                skipCheckBoxes.put(fileList.getProjectID(), skipCheckBox);
-            }
         }
 
         Composite vcsComposite = new Composite(composite, SWT.NONE);
@@ -688,13 +671,6 @@ public class EnterProjectNamePage extends WizardPage {
 
         String errorMessage = null;
 
-        if (isSyncSkippingSelected(projectID)) {
-            setMessage(Messages.EnterProjectNamePage_skip_synchronizing_warn,
-                IMessageProvider.WARNING);
-        } else {
-            setMessage(null);
-        }
-
         if (!isUpdateSelected(projectID)) {
             // Delete previous value first, to prevent the compare with it's own
             // value
@@ -783,24 +759,13 @@ public class EnterProjectNamePage extends WizardPage {
     }
 
     /**
-     * Returns whether the user has selected to skip synchronization
-     */
-    public boolean isSyncSkippingSelected(String projectID) {
-        if (preferenceUtils.isSkipSyncSelectable()) {
-            return this.skipCheckBoxes.get(projectID).getSelection();
-        }
-        return false;
-    }
-
-    /**
      * @return <code>true</code> if the synchronization options chosen by the
      *         user could lead to overwriting project resources,
      *         <code>false</code> otherwise.
      */
     public boolean overwriteResources(String projectID) {
         if (isUpdateSelected(projectID)
-            && !copyCheckboxes.get(projectID).getSelection()
-            && !isSyncSkippingSelected(projectID)) {
+            && !copyCheckboxes.get(projectID).getSelection()) {
             return true;
         }
         return false;

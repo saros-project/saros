@@ -85,7 +85,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         prefs.setValue(PreferenceConstants.AUTO_STOP_EMPTY_SESSION,
             MessageDialogWithToggle.PROMPT);
 
-        prefs.setValue(PreferenceConstants.SKIP_SYNC_SELECTABLE, false);
         prefs.setValue(PreferenceConstants.ENABLE_BALLOON_NOTIFICATION, true);
 
         prefs.setValue(

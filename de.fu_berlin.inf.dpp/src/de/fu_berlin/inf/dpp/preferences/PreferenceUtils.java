@@ -101,11 +101,6 @@ public class PreferenceUtils {
             return port;
     }
 
-    public boolean isSkipSyncSelectable() {
-        return preferenceStore
-            .getBoolean(PreferenceConstants.SKIP_SYNC_SELECTABLE);
-    }
-
     public boolean forceFileTranserByChat() {
         return preferenceStore
             .getBoolean(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT);
