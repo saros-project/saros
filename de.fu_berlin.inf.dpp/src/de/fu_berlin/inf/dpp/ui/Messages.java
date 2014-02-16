@@ -35,8 +35,6 @@ public class Messages extends NLS {
     public static String AdvancedPreferencePage_description;
     public static String AdvancedPreferencePage_show_xmpp_debug;
     public static String AdvancedPreferencePage_skip_synchronization;
-    public static String AdvancedPreferencePage_enable_videosharing;
-    public static String AdvancedPreferencePage_enable_voip;
     public static String AdvancedPreferencePage_activate_server;
 
     public static String ChangeColorAction_message_text;
@@ -77,9 +75,6 @@ public class Messages extends NLS {
     public static String CollaborationUtils_confirm_leaving;
     public static String CollaborationUtils_confirm_leaving_text;
     public static String CollaborationUtils_partial;
-    public static String CollaborationUtils_project_plural_ending;
-    public static String CollaborationUtils_project_singular_ending;
-    public static String CollaborationUtils_user_invited_to_saros_session;
     public static String CollaborationUtils_confirm_need_based;
     public static String CollaborationUtils_confirm_need_based_text;
     public static String CollaborationUtils_confirm_need_based_file;
@@ -178,7 +173,6 @@ public class Messages extends NLS {
     public static String EnterProjectNamePage_unknown_transport_method;
     public static String EnterProjectNamePage_use_existing_project;
 
-    public static String EnterXMPPAccountWizardPage_create_new_account;
     public static String EnterXMPPAccountWizardPage_description;
     public static String EnterXMPPAccountWizardPage_info_already_created_account;
     public static String EnterXMPPAccountWizardPage_title;
@@ -226,46 +220,11 @@ public class Messages extends NLS {
     public static String SarosUI_permission_change;
     public static String SarosUI_permission_failed;
     public static String SarosUI_permission_failed_text;
-    public static String SendFileAction_dialog_choose_location_title;
-    public static String SendFileAction_dialog_file_exists_message;
-    public static String SendFileAction_dialog_file_exists_title;
-    public static String SendFileAction_dialog_incoming_file_transfer_message;
-    public static String SendFileAction_dialog_incoming_file_transfer_title;
-    public static String SendFileAction_error_cannot_open_file_message;
-    public static String SendFileAction_error_cannot_open_file_title;
-    public static String SendFileAction_error_cannot_read_file_message;
-    public static String SendFileAction_error_cannot_read_file_title;
-    public static String SendFileAction_error_file_transfer_rejected_text;
-    public static String SendFileAction_error_no_connection_establish_text;
-    public static String SendFileAction_error_receiving_file_text;
-    public static String SendFileAction_error_timed_out_text;
+
     public static String SendFileAction_filedialog_text;
-    public static String SendFileAction_monitor_canceled_text;
-    public static String SendFileAction_monitor_choose_location_text;
-    public static String SendFileAction_monitor_could_not_receive_whole_file_text;
-    public static String SendFileAction_monitor_lost_connection_text;
-    public static String SendFileAction_monitor_not_sent_whole_file_text;
-    public static String SendFileAction_monitor_notifying_text;
-    public static String SendFileAction_monitor_opening_text;
-    public static String SendFileAction_monitor_receiver_left_during_transfer_text;
-    public static String SendFileAction_monitor_receiving_text;
-    public static String SendFileAction_monitor_sending_text;
-    public static String SendFileAction_monitor_set_up_session_text;
-    public static String SendFileAction_monitor_start_receive_file;
-    public static String SendFileAction_monitor_start_sending_text;
-    public static String SendFileAction_monitor_successful_received_file_text;
-    public static String SendFileAction_monitor_successful_sent_text;
-    public static String SendFileAction_receive_title;
-    public static String SendFileAction_send_file_job_text;
-    public static String SendFileAction_status_cannot_open_file;
-    public static String SendFileAction_status_cannot_receive_file_text;
-    public static String SendFileAction_status_could_not_create_session_text;
-    public static String SendFileAction_status_receiving_text;
-    public static String SendFileAction_status_unexpected_error;
-    public static String SendFileAction_status_unexpected_error_text;
     public static String SendFileAction_title;
     public static String SendFileAction_tooltip;
-    public static String SendFileAction_unexpected_error;
+
     public static String SessionHeaderElement_no_session_running;
     public static String SessionHeaderElement_session;
 
@@ -274,14 +233,10 @@ public class Messages extends NLS {
     public static String ShareProjectWizard_title;
 
     public static String ShowDescriptionPage_description;
-    public static String ShowDescriptionPage_error_too_new;
-    public static String ShowDescriptionPage_error_too_old;
     public static String ShowDescriptionPage_title;
     public static String ShowDescriptionPage_title2;
     public static String SkypeAction_title;
     public static String SkypeAction_tooltip;
-    public static String StoppedAction_title;
-    public static String StoppedAction_tooltip;
     // TODO names for ui.wirzard.pages
     public static String jid_example;
     public static String jid_format_errorMessage;
@@ -314,7 +269,6 @@ public class Messages extends NLS {
     public static String NetworkPreferencePage_connection_established;
     public static String NetworkPreferencePage_device;
     public static String NetworkPreferencePage_device_ip;
-    public static String NetworkPreferencePage_discover_upnp;
     public static String NetworkPreferencePage_discover_upnp_gateway;
     public static String NetworkPreferencePage_external_ip;
     public static String NetworkPreferencePage_local_ip;
@@ -354,8 +308,6 @@ public class Messages extends NLS {
     public static String PersonalizationPreferencePage_sound_notification_group_text;
     public static String PersonalizationPreferencePage_visible_appearance_group_text;
     public static String PersonalizationPreferencePage_visible_appearance_set_color_label_text;
-    public static String PersonalizationPreferencePage_annotations_group_label;
-    public static String PersonalizationPreferencePage_color;
     public static String PersonalizationPreferencePage_visible_information_group_text;
 
     public static String ProjectSelectionWizardPage_description;
@@ -365,8 +317,6 @@ public class Messages extends NLS {
     public static String ProjectShareBuddies_menuItem_no_contacts_available_text;
 
     public static String ProjectShareProjects_no_projects_in_workspace;
-
-    public static String PublicXMPPServerComposite_more_information;
 
     public static String RenameContactAction_new_nickname_dialog_title;
     public static String RenameContactAction_rename_current_nickname_message;
@@ -394,33 +344,6 @@ public class Messages extends NLS {
     public static String UserElement_read_only;
     public static String UserElement_host;
 
-    public static String VideoPlayerView_bitrate;
-    public static String VideoPlayerView_bitrate_text;
-    public static String VideoPlayerView_change_image_source;
-    public static String VideoPlayerView_dly;
-    public static String VideoPlayerView_dly_text;
-    public static String VideoPlayerView_fps;
-    public static String VideoPlayerView_fps_text;
-    public static String VideoPlayerView_howTo_intro;
-    public static String VideoPlayerView_howTo_step_1;
-    public static String VideoPlayerView_howTo_step_2;
-    public static String VideoPlayerView_howTo_step_3;
-    public static String VideoPlayerView_pause;
-    public static String VideoPlayerView_rendering_too_slow;
-    public static String VideoPlayerView_resume;
-    public static String VideoPlayerView_stop_session;
-    public static String VideoSharingAction_error_could_not_establish_screensharing_text;
-    public static String VideoSharingAction_start_session_tooltip;
-    public static String VideoSharingAction_stop_session_tooltip;
-    public static String VideoSharingAction_title;
-    public static String VoIPAction_error_playback_device_configured_wrong_text;
-    public static String VoIPAction_job_title;
-    public static String VoIPAction_start_session_tooltip;
-    public static String VoIPAction_stop_session_tooltip;
-    public static String VoIPAction_title;
-    public static String VoIPAction_warning_no_record_device_text;
-    public static String VoIPAction_warning_no_record_device_title;
-    public static String CommunicationPreferencePage_unknown;
     public static String DeleteContactAction_confirm_message;
     public static String DeleteContactAction_confirm_title;
     public static String DeleteContactAction_delete_error_in_session;
