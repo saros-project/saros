@@ -235,7 +235,6 @@ public interface Constants {
     public static final String CHECKBOX_DISABLE_VERSION_CONTROL = get("checkbox_label_disable_version_control_support_in_shell-saros-preferences");
     public static final String CHECKBOX_ENABLE_CONCURRENT_UNDO = get("checkbox_label_enable_concurrent_undo_shell-saros-preferences");
     public static final String CHECKBOX_START_FOLLOW_MODE = get("checkbox_label_start_in_follow_mode_in_shell-saros-preferences");
-    public static final String CHECKBOX_NEEDS_BASED_SYNC = get("checkbox_label_enable_needs_based_synchronisation_in_shell-saros-preferences");
     public static final String REMOVE_ACCOUNT_DIALOG_TITLE = get("GeneralPreferencePage_REMOVE_ACCOUNT_DIALOG_TITLE");
     public static final String ACTIVATE_ACCOUNT_DIALOG_TITLE = get("GeneralPreferencePage_ACTIVATE_ACCOUNT_DIALOG_TITLE");
 

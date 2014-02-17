@@ -184,7 +184,5 @@ public interface ISarosPreferences extends Remote {
      */
     public void disableIBBOnlyTransfer() throws RemoteException;
 
-    public void setNeedBasedActivated(boolean activate) throws RemoteException;
-
     public void restoreDefaults() throws RemoteException;
 }
