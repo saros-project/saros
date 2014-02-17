@@ -28,6 +28,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.text.MessageFormat;
+import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
@@ -662,11 +663,17 @@ public class Saros extends AbstractUIPlugin {
 
         sarosNet.disconnect();
 
+        List<String> socks5Candidates = preferenceUtils.getSocks5Candidates();
+
+        if (socks5Candidates.isEmpty())
+            socks5Candidates = null;
+
         sarosNet.configure(NAMESPACE, RESOURCE,
             preferenceUtils.isDebugEnabled(),
             preferenceUtils.isLocalSOCKS5ProxyEnabled(),
-            preferenceUtils.getFileTransferPort(),
+            preferenceUtils.getFileTransferPort(), socks5Candidates,
             preferenceUtils.getAutoPortmappingGatewayID(),
+            preferenceUtils.useExternalGatewayAddress(),
             preferenceUtils.getStunIP(), preferenceUtils.getStunPort(),
             preferenceUtils.isAutoPortmappingEnabled());
 

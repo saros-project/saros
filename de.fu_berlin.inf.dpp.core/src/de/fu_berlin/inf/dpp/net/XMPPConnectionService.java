@@ -36,7 +36,8 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
  */
 @Component(module = "net")
 public class XMPPConnectionService {
-    private static final Logger LOG = Logger.getLogger(XMPPConnectionService.class);
+    private static final Logger LOG = Logger
+        .getLogger(XMPPConnectionService.class);
 
     // DO NOT CHANGE THE CONTENT OF THIS STRING, NEVER NEVER NEVER !!!
     private static final String PORT_MAPPING_DESCRIPTION = "Saros Socks5 TCP";
@@ -58,11 +59,15 @@ public class XMPPConnectionService {
     /** The current gateway device to use for port mapping or <code>null</code>. */
     private GatewayDevice device;
 
+    private boolean useExternalGatewayDeviceAddress;
+
     /**
      * The listening port of the current Socks5Proxy. Is <b>-1</b> if the proxy
      * is not running.
      */
     private int socks5ProxyPort;
+
+    private List<String> proxyAddresses;
 
     private final Object portMappingLock = new Object();
 
@@ -141,9 +146,16 @@ public class XMPPConnectionService {
      *            true to enable Socks5Proxy
      * @param proxyPort
      *            Socks5Proxy port
+     * @param proxyAddresses
+     *            collection of addresses (either host name or ip address) for
+     *            the local Socks5 proxy, if <code>null</code> the addresses
+     *            will be determined automatically at proxy start
      * @param gatewayDeviceID
      *            the USN of a UPNP compatible gateways device to perform port
      *            mapping on or <code>null</code>
+     * @param useExternalGatewayDeviceAddress
+     *            if <code>true</code> the external (ip) address of the gateway
+     *            will be included into the Socks5 proxy addresses
      * @param stunServer
      *            STUN server address or <code>null</code> if STUN discovery
      *            should not be performed
@@ -153,7 +165,8 @@ public class XMPPConnectionService {
     public synchronized void configure(final String namespace,
         final String resource, final boolean enableDebug,
         final boolean proxyEnabled, final int proxyPort,
-        final String gatewayDeviceID, final String stunServer,
+        final Collection<String> proxyAddresses, final String gatewayDeviceID,
+        final boolean useExternalGatewayDeviceAddress, final String stunServer,
         final int stunPort, boolean enablePortMapping) {
 
         if (isConnected())
@@ -164,8 +177,10 @@ public class XMPPConnectionService {
         this.namespace = namespace;
         this.resource = resource;
         this.proxyPort = proxyPort;
+        this.proxyAddresses = new ArrayList<String>(proxyAddresses);
         this.isProxyEnabled = proxyEnabled;
         this.gatewayDeviceID = gatewayDeviceID;
+        this.useExternalGatewayDeviceAddress = useExternalGatewayDeviceAddress;
         this.stunServer = stunServer;
         this.stunPort = stunPort;
 
@@ -428,12 +443,17 @@ public class XMPPConnectionService {
 
         List<String> interfaceAddresses = new ArrayList<String>();
 
-        for (InetAddress interfaceAddress : NetworkingUtils
-            .getAllNonLoopbackLocalIPAdresses(true)) {
-            interfaceAddresses.add(interfaceAddress.getHostAddress());
+        if (proxyAddresses != null) {
+            interfaceAddresses.addAll(proxyAddresses);
+            LOG.debug("using preconfigured addresses: " + interfaceAddresses);
+        } else {
+            for (InetAddress interfaceAddress : NetworkingUtils
+                .getAllNonLoopbackLocalIPAdresses(true)) {
+                interfaceAddresses.add(interfaceAddress.getHostAddress());
+            }
+            LOG.debug("using discovered addresses: " + interfaceAddresses);
         }
 
-        LOG.debug("found interface addresses: " + interfaceAddresses);
         proxy.replaceLocalAddresses(interfaceAddresses);
 
         /*
@@ -509,6 +529,9 @@ public class XMPPConnectionService {
                             device = null;
                             return;
                         }
+
+                        if (!useExternalGatewayDeviceAddress)
+                            return;
 
                         InetAddress externalAddress = upnpService
                             .getExternalAddress(device);

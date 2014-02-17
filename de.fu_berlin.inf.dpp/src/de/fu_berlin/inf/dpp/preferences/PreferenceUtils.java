@@ -1,5 +1,9 @@
 package de.fu_berlin.inf.dpp.preferences;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -55,6 +59,29 @@ public class PreferenceUtils {
     public boolean isAutoPortmappingEnabled() {
         return preferenceStore.getString(
             PreferenceConstants.AUTO_PORTMAPPING_DEVICEID).isEmpty() == false;
+    }
+
+    /**
+     * Returns the Socks5 candidates for the Socks5 proxy.
+     * 
+     * @return
+     */
+    public List<String> getSocks5Candidates() {
+        String addresses = preferenceStore
+            .getString(PreferenceConstants.LOCAL_SOCKS5_PROXY_CANDIDATES);
+
+        return new ArrayList<String>(Arrays.asList(addresses.split(",")));
+    }
+
+    /**
+     * Returns whether the external address of the gateway should be used as a
+     * Socks5 candidate or not.
+     * 
+     * @return
+     */
+    public boolean useExternalGatewayAddress() {
+        return preferenceStore
+            .getBoolean(PreferenceConstants.LOCAL_SOCKS5_PROXY_USE_UPNP_EXTERNAL_ADDRESS);
     }
 
     /**

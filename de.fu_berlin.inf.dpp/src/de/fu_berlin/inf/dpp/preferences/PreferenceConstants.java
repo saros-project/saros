@@ -55,6 +55,10 @@ public class PreferenceConstants {
 
     public static final String LOCAL_SOCKS5_PROXY_DISABLED = " local_socks5_proxy_disabled";
 
+    public static final String LOCAL_SOCKS5_PROXY_USE_UPNP_EXTERNAL_ADDRESS = "local_socks5_proxy_use_upnp_external_address";
+
+    public static final String LOCAL_SOCKS5_PROXY_CANDIDATES = "local_socks5_proxy_candidates";
+
     public static final String STUN = "stun_server";
 
     public static final String STUN_PORT = "stun_server_port";

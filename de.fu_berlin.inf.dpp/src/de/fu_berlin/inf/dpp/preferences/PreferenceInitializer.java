@@ -72,6 +72,12 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         prefs.setValue(PreferenceConstants.USE_NEXT_PORTS_FOR_FILE_TRANSFER,
             true);
         prefs.setValue(PreferenceConstants.LOCAL_SOCKS5_PROXY_DISABLED, false);
+
+        prefs.setValue(
+            PreferenceConstants.LOCAL_SOCKS5_PROXY_USE_UPNP_EXTERNAL_ADDRESS,
+            true);
+
+        prefs.setValue(PreferenceConstants.LOCAL_SOCKS5_PROXY_CANDIDATES, "");
         prefs.setValue(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT, false);
 
         prefs.setValue(PreferenceConstants.STUN, "stunserver.org");

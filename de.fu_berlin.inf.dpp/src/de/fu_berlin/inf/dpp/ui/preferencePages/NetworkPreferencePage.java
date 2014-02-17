@@ -4,11 +4,13 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.bitlet.weupnp.GatewayDevice;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -30,6 +32,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
+import de.fu_berlin.inf.dpp.net.util.NetworkingUtils;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -61,6 +64,10 @@ public final class NetworkPreferencePage extends PreferencePage implements
 
     private Text stunIPAddressText;
     private Text stunPortText;
+
+    private Text localSocks5CandidatesText;
+    private Button buttonIncludeUPNPGatewayAddress;
+    private Button buttonQueryLocalCandidates;
 
     public NetworkPreferencePage() {
 
@@ -113,6 +120,14 @@ public final class NetworkPreferencePage extends PreferencePage implements
         getPreferenceStore().setValue(
             PreferenceConstants.USE_NEXT_PORTS_FOR_FILE_TRANSFER,
             buttonAllowAlternativeSocks5Port.getSelection());
+
+        getPreferenceStore().setValue(
+            PreferenceConstants.LOCAL_SOCKS5_PROXY_CANDIDATES,
+            localSocks5CandidatesText.getText());
+
+        getPreferenceStore().setValue(
+            PreferenceConstants.LOCAL_SOCKS5_PROXY_USE_UPNP_EXTERNAL_ADDRESS,
+            buttonIncludeUPNPGatewayAddress.getSelection());
 
         getPreferenceStore().setValue(PreferenceConstants.STUN, stunIPAddress);
 
@@ -172,6 +187,7 @@ public final class NetworkPreferencePage extends PreferencePage implements
             .setText(Messages.NetworkPreferencePage_upnp_label_Text);
 
         createUpnpGroup(composite);
+        createAdvancedSocks5Group(composite);
 
         initialize();
 
@@ -201,6 +217,14 @@ public final class NetworkPreferencePage extends PreferencePage implements
         buttonAllowAlternativeSocks5Port.setSelection(saros
             .getPreferenceStore().getBoolean(
                 PreferenceConstants.USE_NEXT_PORTS_FOR_FILE_TRANSFER));
+
+        localSocks5CandidatesText.setText(getPreferenceStore().getString(
+            PreferenceConstants.LOCAL_SOCKS5_PROXY_CANDIDATES));
+
+        buttonIncludeUPNPGatewayAddress
+            .setSelection(getPreferenceStore()
+                .getBoolean(
+                    PreferenceConstants.LOCAL_SOCKS5_PROXY_USE_UPNP_EXTERNAL_ADDRESS));
 
         // upnp gateway information is handled by the UpnpManager !
 
@@ -234,6 +258,15 @@ public final class NetworkPreferencePage extends PreferencePage implements
             .getPreferenceStore().getDefaultBoolean(
                 PreferenceConstants.USE_NEXT_PORTS_FOR_FILE_TRANSFER));
 
+        localSocks5CandidatesText
+            .setText(getPreferenceStore().getDefaultString(
+                PreferenceConstants.LOCAL_SOCKS5_PROXY_CANDIDATES));
+
+        buttonIncludeUPNPGatewayAddress
+            .setSelection(getPreferenceStore()
+                .getDefaultBoolean(
+                    PreferenceConstants.LOCAL_SOCKS5_PROXY_USE_UPNP_EXTERNAL_ADDRESS));
+
         for (TableItem item : upnpDevicesTable.getItems())
             item.setChecked(false);
 
@@ -247,6 +280,9 @@ public final class NetworkPreferencePage extends PreferencePage implements
         buttonOnlyAllowMediatedSocks5.setEnabled(false);
         localSocks5PortText.setEnabled(false);
         buttonAllowAlternativeSocks5Port.setEnabled(false);
+        localSocks5CandidatesText.setEnabled(false);
+        buttonIncludeUPNPGatewayAddress.setEnabled(false);
+        buttonQueryLocalCandidates.setEnabled(false);
 
         if (buttonOnlyAllowIBB.getSelection()) {
             buttonOnlyAllowIBB.setEnabled(true);
@@ -262,7 +298,9 @@ public final class NetworkPreferencePage extends PreferencePage implements
         buttonOnlyAllowMediatedSocks5.setEnabled(true);
         localSocks5PortText.setEnabled(true);
         buttonAllowAlternativeSocks5Port.setEnabled(true);
-
+        localSocks5CandidatesText.setEnabled(true);
+        buttonIncludeUPNPGatewayAddress.setEnabled(true);
+        buttonQueryLocalCandidates.setEnabled(true);
     }
 
     private Group createUpnpGroup(Composite parent) {
@@ -387,6 +425,82 @@ public final class NetworkPreferencePage extends PreferencePage implements
         stunPortText = new Text(group, SWT.SINGLE | SWT.BORDER);
         stunPortText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
             false));
+
+        return group;
+    }
+
+    private Group createAdvancedSocks5Group(Composite parent) {
+        Group group = new Group(parent, SWT.NONE);
+
+        group.setText("Additional Socks5 Proxy options");
+
+        GridLayout gridLayout = new GridLayout();
+        gridLayout.numColumns = 3;
+        gridLayout.makeColumnsEqualWidth = false;
+
+        group.setLayout(gridLayout);
+        group.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+        Label socks5CandidatesLabel = new Label(group, SWT.CENTER);
+        socks5CandidatesLabel.setText("Socks5 candidates:");
+        socks5CandidatesLabel
+            .setToolTipText("Comma separated list of Socks5 candidates (IP addresses or host names) that should be used during Socks5 connection establishment.\nLeave blank to use all local available IP addresses as candidates.");
+
+        socks5CandidatesLabel.setLayoutData(new GridData(SWT.BEGINNING,
+            SWT.CENTER, false, false));
+
+        localSocks5CandidatesText = new Text(group, SWT.SINGLE | SWT.BORDER);
+        localSocks5CandidatesText.setLayoutData(new GridData(SWT.FILL,
+            SWT.CENTER, true, false));
+
+        buttonQueryLocalCandidates = new Button(group, SWT.PUSH);
+
+        buttonQueryLocalCandidates
+            .addSelectionListener(new SelectionListener() {
+
+                @Override
+                public void widgetDefaultSelected(SelectionEvent event) {
+                    // NOP
+                }
+
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    try {
+                        List<InetAddress> addresses = NetworkingUtils
+                            .getAllNonLoopbackLocalIPAdresses(true);
+
+                        List<String> ipLiterals = new ArrayList<String>();
+
+                        for (InetAddress address : addresses)
+                            ipLiterals.add(address.getHostAddress());
+
+                        localSocks5CandidatesText.setText(StringUtils.join(
+                            ipLiterals, ", "));
+
+                    } catch (Exception e) {
+                        // ignore
+                        return;
+                    }
+                }
+            });
+
+        buttonQueryLocalCandidates.setLayoutData(new GridData(SWT.END,
+            SWT.CENTER, false, false));
+
+        buttonQueryLocalCandidates.setText("Query local Socks5 candidates");
+
+        buttonIncludeUPNPGatewayAddress = new Button(group, SWT.CHECK);
+
+        buttonIncludeUPNPGatewayAddress
+            .setText("Include external IP address of UPNP gateway(s)");
+
+        buttonIncludeUPNPGatewayAddress
+            .setToolTipText("If checked the external IP address of the selected UPNP gateways(s) will be included in the Socks5 candidate list");
+
+        GridData data = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
+
+        data.horizontalSpan = 3;
+        buttonIncludeUPNPGatewayAddress.setLayoutData(data);
 
         return group;
     }
