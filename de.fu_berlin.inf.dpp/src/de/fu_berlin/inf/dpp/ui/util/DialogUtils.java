@@ -6,12 +6,8 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
-
-import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.ui.dialogs.RememberDecisionMessageDialog;
 
 public class DialogUtils {
 
@@ -147,45 +143,6 @@ public class DialogUtils {
             dialogMessage, MessageDialog.QUESTION, new String[] {
                 IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL }, 0);
         return openWindow(md) == 0;
-    }
-
-    /**
-     * Ask the User a given question. It pops up a {@link MessageDialog} with
-     * given title and message. It stores the decision in the
-     * {@link PreferenceStore} it the checkbox is selected.
-     * 
-     * @param saros
-     *            is needed to set the selection to preference store
-     * @param preferenceName
-     *            constant where to store in the preference store
-     * 
-     * @return boolean indicating whether the user said Yes or No
-     */
-    public static boolean popUpRememberDecisionDialog(final String title,
-        final String message, final Saros saros, final String preferenceName) {
-        try {
-            return SWTUtils.runSWTSync(new Callable<Boolean>() {
-                @Override
-                public Boolean call() {
-                    RememberDecisionMessageDialog dialog = new RememberDecisionMessageDialog(
-                        SWTUtils.getShell(), title, null, message,
-                        MessageDialog.QUESTION, new String[] {
-                            IDialogConstants.YES_LABEL,
-                            IDialogConstants.NO_LABEL }, 0);
-                    int result = dialog.open();
-                    if (dialog.isRememberDecision()) {
-                        saros.getPreferenceStore().setValue(preferenceName,
-                            Boolean.toString(result == 0));
-                    }
-
-                    return result == 0;
-                }
-            });
-        } catch (Exception e) {
-            log.error("An internal error ocurred while trying"
-                + " to open the question dialog.");
-            return false;
-        }
     }
 
     /**

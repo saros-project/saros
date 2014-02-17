@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.ui.dialogs;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -56,7 +55,7 @@ public class ErrorMessageDialog {
      *            "An unspecified error occurred" is printed, which is not very
      *            desirable)
      */
-    public static void showErrorMessage(@Nullable String exceptionMessage) {
+    public static void showErrorMessage(String exceptionMessage) {
 
         if ((exceptionMessage == null) || exceptionMessage.trim().length() == 0) {
             exceptionMessage = Messages.ErrorMessageDialog_error_unspecified;

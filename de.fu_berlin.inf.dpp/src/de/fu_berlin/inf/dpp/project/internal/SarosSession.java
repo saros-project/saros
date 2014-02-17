@@ -19,13 +19,11 @@
  */
 package de.fu_berlin.inf.dpp.project.internal;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -46,14 +44,12 @@ import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.ISarosContext;
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
-import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.IResourceActivity;
@@ -66,7 +62,6 @@ import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogHandler;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogServer;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.feedback.DataTransferCollector;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
@@ -114,8 +109,6 @@ public final class SarosSession implements ISarosSession {
     private UISynchronizer synchronizer;
 
     /* Dependencies */
-    @Inject
-    private Saros saros;
 
     @Inject
     private ITransmitter transmitter;
@@ -131,9 +124,6 @@ public final class SarosSession implements ISarosSession {
 
     @Inject
     private ProjectNegotiationObservable projectNegotiationObservable;
-
-    @Inject
-    private EditorManager editorManager;
 
     private final ISarosContext sarosContext;
 
@@ -160,9 +150,6 @@ public final class SarosSession implements ISarosSession {
 
     // KARL HELD YOU ARE MY WTF GUY !!!
     private List<IResource> selectedResources = new ArrayList<IResource>();
-
-    /** Files shared with NeedBased feature **/
-    private Set<SPath> needBasedPathsList = new HashSet<SPath>();
 
     private final MutablePicoContainer sessionContainer;
 
@@ -746,13 +733,6 @@ public final class SarosSession implements ISarosSession {
             return;
         }
 
-        /*
-         * If the need based synchronization is not disabled, process this
-         * JupiterActivity.
-         */
-        if (activity instanceof JupiterActivity)
-            needBasedSynchronization(((JupiterActivity) activity), recipients);
-
         // avoid consistency control during project negotiation to relieve the
         // general transmission process
         if (isInProjectNegotiation(activity)
@@ -765,8 +745,7 @@ public final class SarosSession implements ISarosSession {
             && (activity instanceof TextSelectionActivity
                 || activity instanceof ViewportActivity || activity instanceof JupiterActivity)) {
             IResourceActivity resActivity = (IResourceActivity) activity;
-            if (!needBasedPathsList.contains(resActivity.getPath())
-                && !isShared(resActivity.getPath().getResource()))
+            if (!isShared(resActivity.getPath().getResource()))
                 return;
         }
 
@@ -821,101 +800,6 @@ public final class SarosSession implements ISarosSession {
     }
 
     /**
-     * Method to enable the need based sync.
-     * 
-     * @param jupiterActivity
-     *            {@link JupiterActivity} that triggers the need based
-     *            synchronization
-     * @param toWhom
-     */
-    private void needBasedSynchronization(JupiterActivity jupiterActivity,
-        List<User> toWhom) {
-
-        // the whole feature will be removed
-        if (true)
-            return;
-
-        if (jupiterActivity == null)
-            throw new IllegalArgumentException();
-
-        final SPath path = jupiterActivity.getPath();
-        final IProject project = path.getProject();
-        final String needBasedSetting = "";
-
-        if (!isOwnedProject(project))
-            return;
-
-        if (isShared(path.getFile()))
-            return;
-
-        /* FIMXE CONSTANT ! */
-        if (needBasedSetting.equals("false"))
-            return;
-
-        if (needBasedPathsList.contains(path))
-            return;
-
-        if (true)
-            return;
-
-        needBasedPathsList.add(path);
-
-        try {
-            sendSingleFile(path);
-        } catch (IOException e) {
-            needBasedPathsList.remove(path);
-            log.error("file could not be found or read, despite existing: "
-                + path, e);
-        }
-    }
-
-    /**
-     * 
-     * This Method enables a reliable way to automatically synchronize single
-     * Files to all other session participants.
-     * 
-     * @param path
-     *            identifies the file to synchronize to all session participants
-     * @throws IOException
-     *             if the file determined by the path could not be read
-     * @throws FileNotFoundException
-     *             if the file determined by the path does not exist
-     */
-    private void sendSingleFile(final SPath path) throws IOException {
-
-        if (path == null)
-            throw new IllegalArgumentException("path is null");
-
-        final FileActivity needBasedFileActivity = FileActivity.created(
-            getLocalUser(), path, Purpose.NEEDS_BASED_SYNC);
-
-        synchronizer.syncExec(ThreadUtils.wrapSafe(log, new Runnable() {
-
-            @Override
-            public void run() {
-                for (final User recipient : getRemoteUsers()) {
-
-                    if (isHost())
-                        concurrentDocumentServer.reset(recipient.getJID(), path);
-                    else
-                        concurrentDocumentClient.reset(path);
-
-                    // TODO do not bypass the ActivityHandler !
-                    sendActivity(Collections.singletonList(recipient),
-                        needBasedFileActivity);
-
-                    /*
-                     * Notify the session participants of your activated editor.
-                     * This is mandatory to avoid inconsistencies with the
-                     * editor manager and by that with the follow mode.
-                     */
-                    editorManager.sendPartActivated();
-                }
-            }
-        }));
-    }
-
-    /**
      * Method to update the project mapper when changes on shared files oder
      * folders happened.
      * 
@@ -934,8 +818,7 @@ public final class SarosSession implements ISarosSession {
             SPath path = fileActivity.getPath();
             IFile file = path.getFile();
 
-            if (isInProjectNegotiation(fileActivity)
-                && !fileActivity.isNeedBased()) {
+            if (isInProjectNegotiation(fileActivity)) {
                 return false;
             }
 

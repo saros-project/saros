@@ -23,7 +23,6 @@ import static java.text.MessageFormat.format;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
@@ -67,7 +66,6 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
-import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.FileUtils;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
@@ -437,6 +435,11 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
             return;
 
         try {
+            /*
+             * FIXME this will lockout everything. File changes made in the
+             * meantime from another background job are not recognized. See
+             * AddMultipleFilesTest STF test which fails randomly.
+             */
             fileReplacementInProgressObservable.startReplacement();
 
             log.trace("execing " + activity.toString() + " in "
@@ -462,11 +465,6 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
 
         if (activity.isRecovery()) {
             handleFileRecovery(activity);
-            return;
-        }
-
-        if (activity.isNeedBased()) {
-            handleNeedBased(activity);
             return;
         }
 
@@ -528,60 +526,6 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
             editorManager.openEditor(path);
 
         consistencyWatchdogClient.performCheck(path);
-    }
-
-    private void handleNeedBased(FileActivity activity) throws CoreException {
-        IFile file = activity.getPath().getFile();
-        SPath path = activity.getPath();
-
-        boolean wasOpenedEditor = editorManager.isOpenEditor(path);
-
-        Long remoteChecksum = activity.getChecksum();
-        Long localChecksum = null;
-
-        if (file.exists()) {
-            try {
-                localChecksum = FileUtils.checksum(file);
-            } catch (IOException e) {
-                log.warn("could not generate checksum for file: " + file, e);
-            }
-        }
-
-        /*
-         * FIMXE ALWAYS ASK THE USER IF WE OVERWRITE / MODIFY FILES EVEN IF THE
-         * CONTENT IS THE SAME !
-         */
-        if (wasOpenedEditor
-            || (file.exists() && !remoteChecksum.equals(localChecksum))) {
-
-            boolean backupFile = CollaborationUtils
-                .needBasedFileHandlingDialog(activity.getSource()
-                    .getHumanReadableName(), file.getName(), true);
-
-            try {
-                if (wasOpenedEditor) {
-                    editorManager.saveLazy(path);
-                    editorManager.closeEditor(path);
-                }
-
-                if (backupFile)
-                    FileUtils.backupFile(file, new NullProgressMonitor());
-
-            } catch (FileNotFoundException e) {
-                log.error("File could not be found, despite existing: " + path,
-                    e);
-            }
-        } else {
-            // WTF ? this only pops up a balloon notification
-            CollaborationUtils.needBasedFileHandlingDialog(activity.getSource()
-                .getHumanReadableName(), file.getName(), false);
-        }
-
-        handleFileCreation(activity);
-        sarosSession.getConcurrentDocumentClient().reset(path);
-
-        if (wasOpenedEditor)
-            editorManager.openEditor(path);
     }
 
     private void handleFileMove(FileActivity activity) throws CoreException {

@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.ui.util;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,9 +32,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
-import de.fu_berlin.inf.dpp.ui.BalloonNotification;
 import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.util.FileUtils;
 import de.fu_berlin.inf.dpp.util.Pair;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
@@ -404,39 +401,6 @@ public class CollaborationUtils {
                 : new ArrayList<IResource>(entry.getValue()));
 
         return resources;
-    }
-
-    /**
-     * Method to ask the participants who received a need based file whether to
-     * overwrite or backup the own file in workspace.
-     * 
-     * @param fileName
-     * @param userName
-     * @param showDialog
-     *            <b>true</b> opens a {@link MessageDialog}, <b>false</b> opens
-     *            a {@link BalloonNotification}
-     * 
-     * @return <b>true</b> The user wants to backup the file. (just in case
-     *         {@link MessageDialog} is used)<br>
-     *         <b>false</b> The user wants to overwrite the file. (just in case
-     *         {@link MessageDialog} is used)
-     */
-    public static boolean needBasedFileHandlingDialog(String userName,
-        String fileName, boolean showDialog) {
-        String message = MessageFormat.format(
-            Messages.CollaborationUtils_confirm_need_based_file_text, userName,
-            fileName);
-        String messageBalloon = MessageFormat.format(
-            Messages.CollaborationUtils_confirm_need_based_file_balloon_text,
-            userName, fileName);
-        if (showDialog) {
-            return DialogUtils.popUpCustomQuestion(
-                Messages.CollaborationUtils_confirm_need_based_file, message,
-                new String[] { "Create Backup", "Overwrite" }, false);
-        } else {
-            SarosView.showNotification("New file in session!", messageBalloon);
-            return true;
-        }
     }
 
     private static String format(long size) {

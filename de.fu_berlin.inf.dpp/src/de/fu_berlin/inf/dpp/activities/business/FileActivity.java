@@ -20,7 +20,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
      * of a consistency recovery and those used as regular activities.
      */
     public static enum Purpose {
-        ACTIVITY, RECOVERY, NEEDS_BASED_SYNC;
+        ACTIVITY, RECOVERY;
     }
 
     public static enum Type {
@@ -230,10 +230,6 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
 
     public boolean isRecovery() {
         return Purpose.RECOVERY.equals(purpose);
-    }
-
-    public boolean isNeedBased() {
-        return Purpose.NEEDS_BASED_SYNC.equals(purpose);
     }
 
     public long getChecksum() {
