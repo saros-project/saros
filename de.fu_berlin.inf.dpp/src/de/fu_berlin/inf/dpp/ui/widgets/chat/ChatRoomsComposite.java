@@ -117,11 +117,6 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         }
     };
 
-    /*
-     * TODO: see
-     * https://sourceforge.net/tracker/?func=detail&aid=3102858&group_id
-     * =167540&atid=843362
-     */
     @Inject
     protected EditorManager editorManager;
 

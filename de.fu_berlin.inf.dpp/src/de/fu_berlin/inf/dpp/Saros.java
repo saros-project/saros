@@ -189,7 +189,7 @@ public class Saros extends AbstractUIPlugin {
      * @JTourBusStop 4, Invitation Process:
      * 
      *               If you haven't already read about PicoContainer, stop and
-     *               do so now (www.picocontainer.org).
+     *               do so now (http://picocontainer.codehaus.org).
      * 
      *               Saros uses PicoContainer to manage dependencies on our
      *               behalf. The SarosContext class encapsulates our usage of

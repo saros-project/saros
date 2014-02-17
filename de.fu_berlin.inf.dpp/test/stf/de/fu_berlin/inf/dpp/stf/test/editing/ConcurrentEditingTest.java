@@ -31,9 +31,8 @@ public class ConcurrentEditingTest extends StfTestCase {
      * @throws RemoteException
      * @throws InterruptedException
      * 
-     * @see <a
-     *      href="https://sourceforge.net/tracker/?func=detail&aid=3098992&group_id=167540&atid=843359">Bug
-     *      tracker entry 3098992</a>
+     * @see <a href="https://sourceforge.net/p/dpp/bugs/419/">Bug tracker entry
+     *      419</a>
      */
     @Test
     public void testBugInconsistencyConcurrentEditing() throws Exception,

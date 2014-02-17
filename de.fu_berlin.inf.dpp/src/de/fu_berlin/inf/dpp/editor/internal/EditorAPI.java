@@ -197,12 +197,8 @@ public class EditorAPI implements IEditorAPI {
                 IEditorDescriptor descriptor = IDE.getEditorDescriptor(file);
                 if (descriptor.isOpenExternal()) {
                     /*
-                     * WORK-AROUND for #2807684: Editors are opened externally
-                     * erroneously
-                     * 
-                     * <a href=
-                     * "https://sourceforge.net/tracker/?func=detail&aid=2807684&group_id=167540&atid=843359"
-                     * ></a>
+                     * WORK-AROUND for #224: Editors are opened externally
+                     * erroneously (http://sourceforge.net/p/dpp/bugs/224)
                      * 
                      * TODO Open as an internal editor
                      */
