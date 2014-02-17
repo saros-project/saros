@@ -22,7 +22,6 @@ package de.fu_berlin.inf.dpp.project.internal;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +46,6 @@ import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
@@ -74,14 +72,12 @@ import de.fu_berlin.inf.dpp.feedback.SelectionCollector;
 import de.fu_berlin.inf.dpp.feedback.SessionDataCollector;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.feedback.TextEditCollector;
-import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.extensions.KickUserExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveSessionExtension;
-import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
@@ -121,9 +117,6 @@ public final class SarosSession implements ISarosSession {
 
     @Inject
     private DataTransferManager transferManager;
-
-    @Inject
-    private ProjectNegotiationObservable projectNegotiationObservable;
 
     private final ISarosContext sarosContext;
 
@@ -733,12 +726,6 @@ public final class SarosSession implements ISarosSession {
             return;
         }
 
-        // avoid consistency control during project negotiation to relieve the
-        // general transmission process
-        if (isInProjectNegotiation(activity)
-            && activity instanceof ChecksumActivity)
-            return;
-
         // avoid sending of unwanted editor related activities
 
         if (activity instanceof IResourceActivity
@@ -768,38 +755,6 @@ public final class SarosSession implements ISarosSession {
     }
 
     /**
-     * Convenient method to determine if Project of given {@link IActivity} is
-     * currently transmitted.
-     * 
-     * @param activity
-     * @return <b>true</b> if the activity is send during a project transmission<br>
-     *         <b>false</b> if no transmission is running
-     */
-    private boolean isInProjectNegotiation(IActivity activity) {
-        if (activity == null)
-            throw new IllegalArgumentException();
-
-        if (!(activity instanceof IResourceActivity))
-            return false;
-
-        SPath path = ((IResourceActivity) activity).getPath();
-        if (path == null)
-            return false;
-
-        // determine if we are in a transmission process with our project
-        Collection<ProjectNegotiation> projectNegotiations = projectNegotiationObservable
-            .getProcesses().values();
-        Set<String> projectIDs = null;
-        for (ProjectNegotiation projectNegotiation : projectNegotiations) {
-            projectIDs = projectNegotiation.getProjectNames().keySet();
-        }
-        if (projectIDs != null) {
-            return projectIDs.contains(getProjectID(path.getProject()));
-        }
-        return false;
-    }
-
-    /**
      * Method to update the project mapper when changes on shared files oder
      * folders happened.
      * 
@@ -808,7 +763,7 @@ public final class SarosSession implements ISarosSession {
      * @return <code>true</code> if the activity should be send to the user,
      *         <code>false</code> otherwise
      */
-    protected boolean updatePartialSharedResources(IActivity activity) {
+    private boolean updatePartialSharedResources(IActivity activity) {
         if (!(activity instanceof FileActivity)
             && !(activity instanceof FolderActivity))
             return true;
@@ -817,10 +772,6 @@ public final class SarosSession implements ISarosSession {
             FileActivity fileActivity = ((FileActivity) activity);
             SPath path = fileActivity.getPath();
             IFile file = path.getFile();
-
-            if (isInProjectNegotiation(fileActivity)) {
-                return false;
-            }
 
             if (file == null)
                 return true;
@@ -982,16 +933,6 @@ public final class SarosSession implements ISarosSession {
     @Override
     public boolean isCompletelyShared(IProject project) {
         return projectMapper.isCompletelyShared(project);
-    }
-
-    private boolean isOwnedProject(IProject iProject) {
-        List<IProject> ownedProjects = projectMapper
-            .getOwnedProjects(getLocalUser().getJID());
-
-        if (ownedProjects == null)
-            return false;
-
-        return ownedProjects.contains(iProject);
     }
 
     @Override
