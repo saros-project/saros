@@ -8,8 +8,8 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 
+import de.fu_berlin.inf.dpp.misc.xstream.UrlEncodingStringConverter;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.util.xstream.UrlEncodingStringConverter;
 
 /**
  * "Stupid" Data Object for transmitting an SPath. Serialized using XStream.

@@ -4,8 +4,8 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 
+import de.fu_berlin.inf.dpp.misc.xstream.JIDConverter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.util.xstream.JIDConverter;
 
 @XStreamAlias(/* ProjectNegotiationCompleted */"PNCMP")
 public class UserFinishedProjectNegotiationExtension extends

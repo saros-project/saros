@@ -40,8 +40,8 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import com.thoughtworks.xstream.converters.basic.BooleanConverter;
 import com.thoughtworks.xstream.io.xml.CompactWriter;
 
-import de.fu_berlin.inf.dpp.util.xstream.UrlEncodingStringConverter;
-import de.fu_berlin.inf.dpp.util.xstream.XppReader;
+import de.fu_berlin.inf.dpp.misc.xstream.UrlEncodingStringConverter;
+import de.fu_berlin.inf.dpp.misc.xstream.XppReader;
 
 /**
  * Flexible extension provider using XStream to serialize arbitrary data

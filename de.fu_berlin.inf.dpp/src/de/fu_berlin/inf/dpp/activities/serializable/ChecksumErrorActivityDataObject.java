@@ -31,9 +31,9 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumErrorActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.misc.xstream.JIDConverter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.util.xstream.JIDConverter;
 
 /**
  * A Checksum Error is a notification send to the host and peers by a user, who

@@ -33,8 +33,8 @@ import com.thoughtworks.xstream.annotations.XStreamConverter;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
+import de.fu_berlin.inf.dpp.misc.xstream.UrlEncodingStringConverter;
 import de.fu_berlin.inf.dpp.util.Utils;
-import de.fu_berlin.inf.dpp.util.xstream.UrlEncodingStringConverter;
 
 /**
  * The DeleteOperation is used to hold a text together with its position that is

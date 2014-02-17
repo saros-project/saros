@@ -28,9 +28,9 @@ import com.thoughtworks.xstream.annotations.XStreamConverter;
 import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.PermissionActivity;
+import de.fu_berlin.inf.dpp.misc.xstream.JIDConverter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.util.xstream.JIDConverter;
 
 /**
  * A {@link PermissionActivityDataObject} indicates that a user has a new

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.util.xstream;
+package de.fu_berlin.inf.dpp.misc.xstream;
 
 import java.nio.charset.Charset;
 

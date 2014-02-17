@@ -11,9 +11,9 @@ import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Type;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.RecoveryFileActivity;
+import de.fu_berlin.inf.dpp.misc.xstream.JIDConverter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.util.xstream.JIDConverter;
 
 /**
  * Subclass of FileActivityDataObject that is used during the Recovery-Process

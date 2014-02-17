@@ -8,9 +8,9 @@ import com.thoughtworks.xstream.annotations.XStreamConverter;
 
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.StartFollowingActivity;
+import de.fu_berlin.inf.dpp.misc.xstream.JIDConverter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.util.xstream.JIDConverter;
 
 /**
  * DataObject for the event that a user started following another user

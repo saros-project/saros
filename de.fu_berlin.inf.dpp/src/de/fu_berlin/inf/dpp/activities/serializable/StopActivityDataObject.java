@@ -10,9 +10,9 @@ import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.StopActivity;
 import de.fu_berlin.inf.dpp.activities.business.StopActivity.State;
 import de.fu_berlin.inf.dpp.activities.business.StopActivity.Type;
+import de.fu_berlin.inf.dpp.misc.xstream.JIDConverter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.util.xstream.JIDConverter;
 
 /**
  * A StopActivityDataObject is used for signaling to a user that he should be

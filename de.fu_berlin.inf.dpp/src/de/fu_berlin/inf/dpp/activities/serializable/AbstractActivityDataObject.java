@@ -6,8 +6,8 @@ import org.apache.log4j.Logger;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 
+import de.fu_berlin.inf.dpp.misc.xstream.JIDConverter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.util.xstream.JIDConverter;
 
 // TODO [MR] Add some information what needs to be done to add a new activityDataObject.
 public abstract class AbstractActivityDataObject implements IActivityDataObject {
