@@ -133,14 +133,6 @@ public class PreferenceUtils {
         return preferenceStore.getInt(PreferenceConstants.STUN_PORT);
     }
 
-    public String isNeedsBasedSyncEnabled() {
-        return preferenceStore.getString(PreferenceConstants.NEEDS_BASED_SYNC);
-    }
-
-    public void setNeedsBasedSyncEnabled(boolean value) {
-        preferenceStore.setValue(PreferenceConstants.NEEDS_BASED_SYNC, value);
-    }
-
     /**
      * Returns the favorite color ID that should be used during a session.
      * 

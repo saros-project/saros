@@ -73,7 +73,6 @@ public final class GeneralPreferencePage extends FieldEditorPreferencePage
     public static final String FOLLOW_MODE_TEXT = Messages.GeneralPreferencePage_FOLLOW_MODE_TEXT;
     public static final String CONCURRENT_UNDO_TEXT = Messages.GeneralPreferencePage_CONCURRENT_UNDO_TEXT;
     public static final String DISABLE_VERSION_CONTROL_TEXT = Messages.GeneralPreferencePage_DISABLE_VERSION_CONTROL_TEXT;
-    public static final String NEEDS_BASED_SYNC_TEXT = Messages.GeneralPreferencePage_ENABLE_NEEDS_BASED_SYNC_TEXT;
 
     // icons
     public static final Image ADD_IMAGE = ImageManager
@@ -115,7 +114,6 @@ public final class GeneralPreferencePage extends FieldEditorPreferencePage
         createAutomaticConnectField(this.parent);
         createVersionControlPreferences(this.parent);
         createConcurrentUndoField(this.parent);
-        createNeedsBasesSyncPreferences(this.parent);
     }
 
     /*
@@ -347,11 +345,6 @@ public final class GeneralPreferencePage extends FieldEditorPreferencePage
     private void createConcurrentUndoField(Composite group) {
         addField(new BooleanFieldEditor(PreferenceConstants.CONCURRENT_UNDO,
             CONCURRENT_UNDO_TEXT, group));
-    }
-
-    protected void createNeedsBasesSyncPreferences(Composite group) {
-        addField(new BooleanFieldEditor(PreferenceConstants.NEEDS_BASED_SYNC,
-            NEEDS_BASED_SYNC_TEXT, group));
     }
 
     @Override

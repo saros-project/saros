@@ -66,7 +66,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         prefs.setValue(PreferenceConstants.AUTO_CONNECT, true);
         prefs.setValue(PreferenceConstants.AUTO_PORTMAPPING_DEVICEID, "");
         prefs.setValue(PreferenceConstants.GATEWAYCHECKPERFORMED, false);
-        prefs.setValue(PreferenceConstants.NEEDS_BASED_SYNC, "undefined");
         prefs.setValue(PreferenceConstants.SKYPE_USERNAME, "");
         prefs.setValue(PreferenceConstants.DEBUG, false);
         prefs.setValue(PreferenceConstants.FILE_TRANSFER_PORT, 7777);

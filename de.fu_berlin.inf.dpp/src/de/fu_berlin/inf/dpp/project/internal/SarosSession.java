@@ -99,7 +99,6 @@ import de.fu_berlin.inf.dpp.project.internal.timeout.ClientSessionTimeoutHandler
 import de.fu_berlin.inf.dpp.project.internal.timeout.ServerSessionTimeoutHandler;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
-import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
@@ -832,13 +831,16 @@ public final class SarosSession implements ISarosSession {
     private void needBasedSynchronization(JupiterActivity jupiterActivity,
         List<User> toWhom) {
 
+        // the whole feature will be removed
+        if (true)
+            return;
+
         if (jupiterActivity == null)
             throw new IllegalArgumentException();
 
         final SPath path = jupiterActivity.getPath();
         final IProject project = path.getProject();
-        final String needBasedSetting = preferenceUtils
-            .isNeedsBasedSyncEnabled().toLowerCase();
+        final String needBasedSetting = "";
 
         if (!isOwnedProject(project))
             return;
@@ -853,10 +855,7 @@ public final class SarosSession implements ISarosSession {
         if (needBasedPathsList.contains(path))
             return;
 
-        /* FIMXE CONSTANT ! */
-        if (needBasedSetting.equals("undefined")
-        /* FIMXE opens dialog & static* method ! */
-        && (!CollaborationUtils.activateNeedBasedSynchronization(saros)))
+        if (true)
             return;
 
         needBasedPathsList.add(path);

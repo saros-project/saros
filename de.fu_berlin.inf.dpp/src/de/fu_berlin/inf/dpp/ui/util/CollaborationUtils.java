@@ -23,7 +23,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.swt.widgets.Shell;
 import org.picocontainer.annotations.Inject;
 
@@ -31,7 +30,6 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
@@ -406,25 +404,6 @@ public class CollaborationUtils {
                 : new ArrayList<IResource>(entry.getValue()));
 
         return resources;
-    }
-
-    /**
-     * Method to ask for the decision of a user, if he wanted to activate the
-     * need based synchronization.
-     * 
-     * @param saros
-     *            Saros instance is needed to store decision in
-     *            {@link PreferenceStore}.
-     * @return <b>true</b> if the user decides to activate the need based
-     *         synchronization<br>
-     *         <b>false</b> in the case the user decides not to use the need
-     *         based synchronization
-     */
-    public static boolean activateNeedBasedSynchronization(Saros saros) {
-        return (DialogUtils.popUpRememberDecisionDialog(
-            Messages.CollaborationUtils_confirm_need_based,
-            Messages.CollaborationUtils_confirm_need_based_text, saros,
-            PreferenceConstants.NEEDS_BASED_SYNC));
     }
 
     /**
