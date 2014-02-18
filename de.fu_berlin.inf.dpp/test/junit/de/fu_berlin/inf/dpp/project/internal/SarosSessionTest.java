@@ -49,13 +49,12 @@ import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
-import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.preferences.PreferenceInitializer;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
@@ -107,7 +106,8 @@ public class SarosSessionTest {
     }
 
     static private XMPPConnectionService createConnectionServiceMock() {
-        XMPPConnectionService net = EasyMock.createMock(XMPPConnectionService.class);
+        XMPPConnectionService net = EasyMock
+            .createMock(XMPPConnectionService.class);
         net.getJID();
         EasyMock.expectLastCall().andAnswer(new IAnswer<JID>() {
 
@@ -175,7 +175,8 @@ public class SarosSessionTest {
         PreferenceInitializer.setPreferences(preferences);
 
         // Special/Proper mocks
-        container.addComponent(XMPPConnectionService.class, createConnectionServiceMock());
+        container.addComponent(XMPPConnectionService.class,
+            createConnectionServiceMock());
         container.addComponent(Saros.class, createSarosMock(store));
         container.addComponent(DataTransferManager.class,
             createDataTransferManagerMock());
@@ -228,7 +229,6 @@ public class SarosSessionTest {
         container.addComponent(SessionIDObservable.class);
         container.addComponent(FeedbackManager.class);
         container.addComponent(FileReplacementInProgressObservable.class);
-        container.addComponent(JDTFacade.class);
     }
 
     @After

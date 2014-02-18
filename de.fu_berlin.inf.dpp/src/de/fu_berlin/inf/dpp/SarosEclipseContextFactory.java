@@ -13,7 +13,6 @@ import de.fu_berlin.inf.dpp.concurrent.undo.UndoManager;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.IChecksumCache;
 import de.fu_berlin.inf.dpp.project.internal.ChecksumCacheImpl;
@@ -50,7 +49,6 @@ public class SarosEclipseContextFactory extends AbstractSarosContextFactory {
         Component.create(ConsistencyWatchdogClient.class),
         Component.create(EditorAPI.class),
         Component.create(EditorManager.class),
-        Component.create(JDTFacade.class),
         // disabled because of privacy violations
         // see
         // http://opus.haw-hamburg.de/volltexte/2011/1391/pdf/ba_krassmann_online.pdf
