@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.preferences;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -70,7 +69,18 @@ public class PreferenceUtils {
         String addresses = preferenceStore
             .getString(PreferenceConstants.LOCAL_SOCKS5_PROXY_CANDIDATES);
 
-        return new ArrayList<String>(Arrays.asList(addresses.split(",")));
+        List<String> result = new ArrayList<String>();
+
+        for (String address : addresses.split(",")) {
+            address = address.trim();
+
+            if (address.isEmpty())
+                continue;
+
+            result.add(address);
+        }
+
+        return result;
     }
 
     /**

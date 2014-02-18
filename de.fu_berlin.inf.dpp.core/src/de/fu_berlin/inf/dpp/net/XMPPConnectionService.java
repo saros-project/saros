@@ -445,13 +445,20 @@ public class XMPPConnectionService {
 
         if (proxyAddresses != null) {
             interfaceAddresses.addAll(proxyAddresses);
-            LOG.debug("using preconfigured addresses: " + interfaceAddresses);
-        } else {
+
+            if (interfaceAddresses.isEmpty())
+                LOG.warn("Socks5 preconfigured addresses list is empty, using autodetect mode");
+            else
+                LOG.debug("using preconfigured addresses: "
+                    + interfaceAddresses);
+        }
+
+        if (interfaceAddresses.isEmpty()) {
             for (InetAddress interfaceAddress : NetworkingUtils
                 .getAllNonLoopbackLocalIPAdresses(true)) {
                 interfaceAddresses.add(interfaceAddress.getHostAddress());
             }
-            LOG.debug("using discovered addresses: " + interfaceAddresses);
+            LOG.debug("using autodetected addresses: " + interfaceAddresses);
         }
 
         proxy.replaceLocalAddresses(interfaceAddresses);
