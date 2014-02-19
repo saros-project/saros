@@ -177,7 +177,12 @@ public class XMPPConnectionService {
         this.namespace = namespace;
         this.resource = resource;
         this.proxyPort = proxyPort;
-        this.proxyAddresses = new ArrayList<String>(proxyAddresses);
+
+        if (proxyAddresses != null)
+            this.proxyAddresses = new ArrayList<String>(proxyAddresses);
+        else
+            this.proxyAddresses = null;
+
         this.isProxyEnabled = proxyEnabled;
         this.gatewayDeviceID = gatewayDeviceID;
         this.useExternalGatewayDeviceAddress = useExternalGatewayDeviceAddress;
