@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.XMPPError;
 import org.jivesoftware.smackx.bytestreams.BytestreamManager;
 import org.jivesoftware.smackx.bytestreams.BytestreamRequest;
 import org.jivesoftware.smackx.bytestreams.BytestreamSession;
@@ -501,8 +502,8 @@ public class Socks5Transport extends ByteStreamTransport {
         if (manager == null || listener == null)
             throw new IOException(this + " transport is not initialized");
 
-        LOG.debug(prefix() + "establishing new connection to " + peer
-            + verboseLocalProxyInfo());
+        LOG.debug(prefix() + "establishing connection to " + peer
+            + verboseLocalProxyInfo() + "...");
 
         // before establishing, we have to put the exchanger to the map
         Exchanger<Socks5BytestreamSession> exchanger = new Exchanger<Socks5BytestreamSession>();
@@ -530,27 +531,53 @@ public class Socks5Transport extends ByteStreamTransport {
                 }
 
                 LOG.debug(prefix()
-                    + "session is mediated. Waiting for peer to connect ...");
+                    + "connection/session is mediated, performing additional connection optimization...");
 
             } catch (IOException e) {
                 exception = e;
+                LOG.warn(prefix() + "could not establish a connection to "
+                    + peer + " due to an error in the socket communictation", e);
             } catch (XMPPException e) {
                 exception = e;
+                XMPPError error = e.getXMPPError();
+
+                if (error != null && error.getCode() == 406) {
+                    LOG.warn(prefix()
+                        + "could not establish a connection to "
+                        + peer
+                        + ", remote Socks5 transport is disabled or encountered an error: "
+                        + e.getMessage());
+                    /*
+                     * quit here as it makes no sense to wait for the remote
+                     * side to connect because this will never happen !
+                     */
+                    throw e;
+                } else if (error != null && error.getCode() == 404) {
+                    LOG.warn(prefix()
+                        + "could not establish a connection to "
+                        + peer
+                        + ", remote side could not connect to any offered stream hosts: "
+                        + e.getMessage());
+                } else {
+                    LOG.error(prefix() + "cound not establish a connection to "
+                        + peer, e);
+                }
             } catch (Exception e) {
+                // FIXME handle the InterruptedException correctly !
+                exception = e;
+
                 /*
                  * catch any possible RuntimeException because we must wait for
                  * the peer that may attempt to connect
                  */
-                exception = e;
+                LOG.error(
+                    prefix() + "could not connect to " + peer
+                        + " because of an internal error: "
+                        + exception.getMessage(), e);
             }
 
-            if (exception != null) {
-
-                LOG.warn(prefix() + "could not connect to " + peer
-                    + " because: " + exception.getMessage()
-                    + ". Waiting for peer to connect ...");
-            }
-
+            LOG.debug(prefix() + "waiting for " + peer
+                + " to establish a connection...");
             Socks5BytestreamSession inSession = null;
 
             // else wait for request
