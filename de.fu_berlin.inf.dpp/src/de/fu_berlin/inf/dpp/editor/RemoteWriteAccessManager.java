@@ -18,6 +18,7 @@ import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivityReceiver;
+import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
@@ -149,7 +150,7 @@ public class RemoteWriteAccessManager {
 
         assert !connectedUserWithWriteAccessFiles.contains(path);
 
-        IFile file = path.getFile();
+        IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
         if (!file.exists()) {
             log.error("Attempting to connect to file which"
                 + " is not available locally: " + path, new StackTrace());
@@ -180,7 +181,7 @@ public class RemoteWriteAccessManager {
 
         connectedUserWithWriteAccessFiles.remove(path);
 
-        IFile file = path.getFile();
+        IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
         FileEditorInput input = new FileEditorInput(file);
         IDocumentProvider provider = EditorManager.getDocumentProvider(input);
         provider.disconnect(input);

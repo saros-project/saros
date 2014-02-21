@@ -36,6 +36,7 @@ import de.fu_berlin.inf.dpp.activities.business.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
 import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
@@ -354,7 +355,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
     protected boolean isInconsistent(ChecksumActivity checksum) {
 
         SPath path = checksum.getPath();
-        IFile file = path.getFile();
+        IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
 
         if (!checksum.existsFile()) {
             /*

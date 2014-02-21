@@ -63,6 +63,12 @@ import de.fu_berlin.inf.dpp.activities.business.VCSActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
+import de.fu_berlin.inf.dpp.filesystem.EclipseFolderImpl;
+import de.fu_berlin.inf.dpp.filesystem.EclipsePathImpl;
+import de.fu_berlin.inf.dpp.filesystem.EclipseProjectImpl;
+import de.fu_berlin.inf.dpp.filesystem.EclipseResourceImpl;
+import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
@@ -232,7 +238,7 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
         for (IResourceDelta projectDelta : projectDeltas) {
             assert projectDelta.getResource() instanceof IProject;
             IProject project = (IProject) projectDelta.getResource();
-            if (!sarosSession.isShared(project))
+            if (!sarosSession.isShared(ResourceAdapterFactory.create(project)))
                 continue;
 
             if (!checkOpenClosed(project))
@@ -242,7 +248,7 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
                 continue;
 
             SharedProject sharedProject = sarosSession
-                .getSharedProject(project);
+                .getSharedProject(ResourceAdapterFactory.create(project));
 
             VCSAdapter vcs = useVersionControl ? VCSAdapter.getAdapter(project)
                 : null;
@@ -291,7 +297,8 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
     }
 
     protected boolean checkOpenClosed(IProject project) {
-        SharedProject sharedProject = sarosSession.getSharedProject(project);
+        SharedProject sharedProject = sarosSession
+            .getSharedProject(ResourceAdapterFactory.create(project));
 
         boolean isProjectOpen = project.isOpen();
         if (sharedProject.updateProjectIsOpen(isProjectOpen)) {
@@ -319,7 +326,8 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
      * @return
      */
     protected boolean checkVCSConnection(IProject project) {
-        SharedProject sharedProject = sarosSession.getSharedProject(project);
+        SharedProject sharedProject = sarosSession
+            .getSharedProject(ResourceAdapterFactory.create(project));
 
         VCSAdapter vcs = VCSAdapter.getAdapter(project);
         VCSAdapter oldVcs = sharedProject.getVCSAdapter();
@@ -330,7 +338,7 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
                 boolean deleteContent = oldVcs == null
                     || !oldVcs.hasLocalCache(project);
                 VCSActivity activity = VCSActivity.disconnect(sarosSession,
-                    project, deleteContent);
+                    ResourceAdapterFactory.create(project), deleteContent);
                 pendingActivities.enter(activity);
                 sharedProject.updateRevision(null);
                 sharedProject.updateVcsUrl(null);
@@ -349,8 +357,8 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
                 String directory = info.url
                     .substring(repositoryString.length());
                 VCSActivity activity = VCSActivity.connect(sarosSession,
-                    project, repositoryString, directory,
-                    vcs.getProviderID(project));
+                    ResourceAdapterFactory.create(project), repositoryString,
+                    directory, vcs.getProviderID(project));
                 pendingActivities.enter(activity);
                 sharedProject.updateVcsUrl(info.url);
                 sharedProject.updateRevision(info.revision);
@@ -484,7 +492,8 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
 
     private void handleFileRecovery(FileActivity activity) throws CoreException {
         SPath path = activity.getPath();
-        IFile file = path.getFile();
+        IFile file = ((EclipseFileImpl) activity.getPath().getFile())
+            .getDelegate();
 
         boolean wasOpenedEditor = editorManager.isOpenEditor(path);
 
@@ -529,10 +538,14 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
     }
 
     private void handleFileMove(FileActivity activity) throws CoreException {
-        IPath newFilePath = activity.getPath().getFile().getFullPath();
-        IResource oldResource = activity.getOldPath().getFile();
+        IPath newFilePath = ((EclipsePathImpl) activity.getPath().getFile()
+            .getFullPath()).getDelegate();
 
-        FileUtils.mkdirs(activity.getPath().getFile());
+        IResource oldResource = ((EclipseFileImpl) activity.getOldPath()
+            .getFile()).getDelegate();
+
+        FileUtils.mkdirs(((EclipseFileImpl) activity.getPath().getFile())
+            .getDelegate());
         FileUtils.move(newFilePath, oldResource);
 
         if (activity.getContents() == null)
@@ -542,7 +555,8 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
     }
 
     private void handleFileDeletion(FileActivity activity) throws CoreException {
-        IFile file = activity.getPath().getFile();
+        IFile file = ((EclipseFileImpl) activity.getPath().getFile())
+            .getDelegate();
 
         if (file.exists())
             FileUtils.delete(file);
@@ -552,7 +566,8 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
     }
 
     private void handleFileCreation(FileActivity activity) throws CoreException {
-        IFile file = activity.getPath().getFile();
+        IFile file = ((EclipseFileImpl) activity.getPath().getFile())
+            .getDelegate();
 
         byte[] actualContent = FileUtils.getLocalFileContent(file);
         byte[] newContent = activity.getContents();
@@ -569,8 +584,8 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
 
         SPath path = activity.getPath();
 
-        IFolder folder = path.getProject().getFolder(
-            path.getProjectRelativePath());
+        IFolder folder = ((EclipseFolderImpl) path.getProject().getFolder(
+            path.getProjectRelativePath())).getDelegate();
 
         if (activity.getType() == FolderActivity.Type.CREATED) {
             FileUtils.create(folder);
@@ -587,8 +602,13 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
     protected void exec(VCSActivity activity) {
         final VCSActivity.Type activityType = activity.getType();
         SPath path = activity.getPath();
-        final IResource resource = path.getResource();
-        final IProject project = path.getProject();
+
+        final IResource resource = ((EclipseResourceImpl) path.getResource())
+            .getDelegate();
+
+        final IProject project = ((EclipseProjectImpl) path.getProject())
+            .getDelegate();
+
         final String url = activity.getURL();
         final String directory = activity.getDirectory();
         final String revision = activity.getParam1();

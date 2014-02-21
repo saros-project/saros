@@ -12,7 +12,6 @@ import java.util.Random;
 import java.util.concurrent.CancellationException;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -30,6 +29,10 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
+import de.fu_berlin.inf.dpp.filesystem.EclipseProjectImpl;
+import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
@@ -386,7 +389,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
          * if (outInvitationUI.confirmProjectSave(peer)) getOpenEditors =>
          * filter per Project => if dirty ask to save
          */
-        EditorAPI.saveProject(project, false);
+        EditorAPI.saveProject(((EclipseProjectImpl) project).getDelegate(),
+            false);
 
         String prefix = projectID + projectIDDelimiter;
 
@@ -396,7 +400,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             if (toSend.size() > 0) {
                 tempArchive = File.createTempFile(prefix, ".zip");
 
-                FileZipper.createProjectZipArchive(project, toSend,
+                FileZipper.createProjectZipArchive(
+                    ((EclipseProjectImpl) project).getDelegate(), toSend,
                     tempArchive, new ZipProgressMonitor(monitor, toSend.size(),
                         true));
             }
@@ -479,8 +484,12 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 String projectID = sarosSession.getProjectID(project);
                 String projectName = project.getName();
 
+                List<IResource> projectResources = sarosSession
+                    .getSharedResources(project);
+
                 FileList projectFileList = FileListFactory.createFileList(
-                    project, sarosSession.getSharedResources(project),
+                    ((EclipseProjectImpl) project).getDelegate(),
+                    ResourceAdapterFactory.convertBack(projectResources),
                     checksumCache, sarosSession.useVersionControl(),
                     subMonitor.newChild(1));
 

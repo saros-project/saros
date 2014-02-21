@@ -10,6 +10,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
+import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.FileUtils;
 
@@ -53,7 +54,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
     public static FileActivity created(User source, SPath path, Purpose purpose)
         throws IOException {
 
-        IFile file = path.getFile();
+        IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
         Long checksum = FileUtils.checksum(file);
         byte[] content = FileUtils.getLocalFileContent(file);
 
@@ -82,7 +83,8 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
 
         byte[] content = null;
         if (contentChange) {
-            content = FileUtils.getLocalFileContent(destPath.getFile());
+            content = FileUtils.getLocalFileContent(((EclipseFileImpl) destPath
+                .getFile()).getDelegate());
         }
         return new FileActivity(source, Type.MOVED, destPath, sourcePath,
             content, Purpose.ACTIVITY, null);

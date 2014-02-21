@@ -34,6 +34,7 @@ import org.tigris.subversion.svnclientadapter.SVNUrl;
 
 import de.fu_berlin.inf.dpp.activities.business.VCSActivity;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.invitation.FileList;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ProjectDeltaVisitor;
@@ -87,14 +88,16 @@ class SubclipseAdapter extends VCSAdapter {
         VCSResourceInfo info = getResourceInfo(resource);
         String url = info.url;
         String revision = getCurrentRevisionString(resource);
-        return VCSActivity.switch_(sarosSession, resource, url, revision);
+        return VCSActivity.switch_(sarosSession,
+            ResourceAdapterFactory.create(resource), url, revision);
     }
 
     @Override
     public VCSActivity getUpdateActivity(ISarosSession sarosSession,
         IResource resource) {
         String revision = getCurrentRevisionString(resource);
-        return VCSActivity.update(sarosSession, resource, revision);
+        return VCSActivity.update(sarosSession,
+            ResourceAdapterFactory.create(resource), revision);
     }
 
     public String getCurrentRevisionString(IResource resource) {

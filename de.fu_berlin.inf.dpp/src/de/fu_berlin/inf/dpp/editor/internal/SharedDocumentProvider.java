@@ -9,6 +9,7 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -117,6 +118,7 @@ public class SharedDocumentProvider extends TextFileDocumentProvider {
 
         IFileEditorInput fileEditorInput = (IFileEditorInput) element;
 
-        return sarosSession.isShared(fileEditorInput.getFile().getProject());
+        return sarosSession.isShared(ResourceAdapterFactory
+            .create(fileEditorInput.getFile().getProject()));
     }
 }

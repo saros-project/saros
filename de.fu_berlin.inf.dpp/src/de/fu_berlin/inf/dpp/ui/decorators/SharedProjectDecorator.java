@@ -33,6 +33,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
@@ -121,7 +122,7 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
 
         IResource resource = (IResource) element;
 
-        if (!currentSession.isShared(resource))
+        if (!currentSession.isShared(ResourceAdapterFactory.create(resource)))
             return;
 
         decoration.addOverlay(SharedProjectDecorator.PROJECT_DESCRIPTOR,
@@ -129,7 +130,8 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
 
         if (resource.getType() == IResource.PROJECT) {
             boolean isCompletelyShared = currentSession
-                .isCompletelyShared(resource.getProject());
+                .isCompletelyShared(ResourceAdapterFactory.create(resource
+                    .getProject()));
 
             decoration
                 .addSuffix(isCompletelyShared ? Messages.SharedProjectDecorator_shared

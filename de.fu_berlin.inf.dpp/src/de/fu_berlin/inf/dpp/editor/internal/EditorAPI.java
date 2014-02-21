@@ -46,6 +46,8 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
+import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.ui.dialogs.WarningMessageDialog;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
@@ -168,7 +170,7 @@ public class EditorAPI implements IEditorAPI {
      */
     @Override
     public IEditorPart openEditor(SPath path, boolean activate) {
-        IFile file = path.getFile();
+        IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
 
         if (!file.exists()) {
             log.error("EditorAPI cannot open file which does not exist: "
@@ -673,6 +675,6 @@ public class EditorAPI implements IEditorAPI {
             log.warn("Could not get path from resource " + resource);
         }
 
-        return new SPath(resource);
+        return new SPath(ResourceAdapterFactory.create(resource));
     }
 }

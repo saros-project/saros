@@ -33,6 +33,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
+import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
@@ -495,10 +496,12 @@ public abstract class BaseResourceSelectionComposite extends
             ISarosSession sarosSession = sessionManager.getSarosSession();
             if (sarosSession != null) {
                 if (element instanceof IFile || element instanceof IFolder) {
-                    return !sarosSession.isShared((IResource) element);
+                    return !sarosSession.isShared(ResourceAdapterFactory
+                        .create((IResource) element));
                 } else if (element instanceof IProject) {
                     return !(sarosSession
-                        .isCompletelyShared((IProject) element));
+                        .isCompletelyShared(ResourceAdapterFactory
+                            .create((IProject) element)));
                 }
             }
             return true;

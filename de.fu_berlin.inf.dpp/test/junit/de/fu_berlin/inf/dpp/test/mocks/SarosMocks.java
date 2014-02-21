@@ -83,25 +83,11 @@ public class SarosMocks {
     }
 
     /**
-     * Creates a mocked SPath for a specific file (including its SPathDataObject
-     * "twin")
-     * 
-     * @return a replayed PowerMock
-     */
-    public static SPath mockSPath(IFile file) {
-        SPath path = prepareMockSPath();
-        EasyMock.expect(path.getFile()).andStubReturn(file);
-        PowerMock.replay(path);
-
-        return path;
-    }
-
-    /**
      * Creates a mocked IFile with specific content
      * 
      * @param data
      *            the expected return value for {@link IFile#getContents()}
-     * @return a replayed EasyMock
+     * @return a IFile mock in recording state
      */
     public static IFile mockExistingIFile(byte[] data) {
         IFile file = EasyMock.createMock(IFile.class);
@@ -112,8 +98,6 @@ public class SarosMocks {
             // consumed, cannot happen
         }
         EasyMock.expect(file.exists()).andStubReturn(Boolean.TRUE);
-        EasyMock.replay(file);
-
         return file;
     }
 

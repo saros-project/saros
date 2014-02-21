@@ -30,6 +30,7 @@ import de.fu_berlin.inf.dpp.activities.business.RecoveryFileActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
 import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
@@ -204,7 +205,7 @@ public class ConsistencyWatchdogHandler implements Startable {
         try {
             for (SPath path : checksumError.getPaths()) {
                 progress.subTask("Recovering file: "
-                    + path.getProjectRelativePath().lastSegment());
+                    + path.getProjectRelativePath());
                 recoverFile(checksumError.getSource(), sarosSession, path,
                     progress.newChild(1));
             }
@@ -227,7 +228,7 @@ public class ConsistencyWatchdogHandler implements Startable {
 
         progress.beginTask("Handling file: " + path.toString(), 10);
 
-        IFile file = path.getFile();
+        IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
 
         // Save document before sending to client
         if (file.exists()) {

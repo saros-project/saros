@@ -9,8 +9,6 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 import de.fu_berlin.inf.dpp.User;
@@ -20,6 +18,9 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
+import de.fu_berlin.inf.dpp.filesystem.IPath;
+import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 
 public class JupiterSimulator {
 
@@ -34,7 +35,7 @@ public class JupiterSimulator {
 
         IProject project = createMock(IProject.class);
         replay(project);
-        IPath path = new Path("test");
+        IPath path = ResourceAdapterFactory.create(new Path("test"));
 
         client = new Peer(new Jupiter(true), document, project, path);
         server = new Peer(new Jupiter(false), document, project, path);

@@ -72,6 +72,8 @@ import de.fu_berlin.inf.dpp.editor.internal.CustomAnnotationManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.LocationAnnotationManager;
+import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
+import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
@@ -772,7 +774,7 @@ public class EditorManager extends AbstractActivityProvider {
         log.trace("EditorManager.execTextEdit invoked");
 
         SPath path = textEdit.getPath();
-        IFile file = path.getFile();
+        IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
 
         if (!file.exists()) {
             log.error("TextEditActivity refers to file which"
@@ -1047,9 +1049,10 @@ public class EditorManager extends AbstractActivityProvider {
 
         // Is the new editor part supported by Saros (and inside the project)
         // and the Resource accessible (we don't want to report stale files)?
+        IResource resource = editorAPI.getEditorResource(editorPart);
+
         if (!isSharedEditor(editorPart)
-            || !sarosSession.isShared(this.editorAPI
-                .getEditorResource(editorPart))
+            || !sarosSession.isShared(ResourceAdapterFactory.create(resource))
             || !editorAPI.getEditorResource(editorPart).isAccessible()) {
             generateEditorActivated(null);
             // follower switched to another unshared editor or closed followed
@@ -1264,7 +1267,8 @@ public class EditorManager extends AbstractActivityProvider {
         if (resource == null)
             return false;
 
-        return this.sarosSession.isShared(resource.getProject());
+        return this.sarosSession.isShared(ResourceAdapterFactory
+            .create(resource.getProject()));
     }
 
     /**
@@ -1295,7 +1299,7 @@ public class EditorManager extends AbstractActivityProvider {
     protected void replaceText(SPath path, int offset, String replacedText,
         String text, User source) {
 
-        IFile file = path.getFile();
+        IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
         FileEditorInput input = new FileEditorInput(file);
         IDocumentProvider provider = getDocumentProvider(input);
 
@@ -1405,7 +1409,7 @@ public class EditorManager extends AbstractActivityProvider {
      */
     public boolean isDirty(SPath path) throws FileNotFoundException {
 
-        IFile file = path.getFile();
+        IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
 
         if (file == null || !file.exists()) {
             throw new FileNotFoundException("File not found: " + path);
@@ -1437,7 +1441,7 @@ public class EditorManager extends AbstractActivityProvider {
      */
     public void saveText(SPath path) {
 
-        IFile file = path.getFile();
+        IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
 
         log.trace("EditorManager.saveText (" + file.getName() + ") invoked");
 

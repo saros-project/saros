@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.easymock.EasyMock;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,6 +16,8 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import de.fu_berlin.inf.dpp.ISarosContext;
+import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
@@ -92,7 +92,8 @@ public class SarosSessionManagerTest {
     @Before
     public void setUp() throws Exception {
         SarosSession session = PowerMock.createNiceMock(SarosSession.class);
-        XMPPConnectionService network = PowerMock.createNiceMock(XMPPConnectionService.class);
+        XMPPConnectionService network = PowerMock
+            .createNiceMock(XMPPConnectionService.class);
 
         PreferenceUtils preferences = PowerMock
             .createNiceMock(PreferenceUtils.class);

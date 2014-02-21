@@ -41,6 +41,7 @@ import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
+import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -202,7 +203,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             // all resources from that project
             for (Entry<String, IProject> entry : localProjects.entrySet()) {
                 sarosSession.addProjectOwnership(entry.getKey(),
-                    entry.getValue(), jid);
+                    ResourceAdapterFactory.create(entry.getValue()), jid);
                 sarosSession.enableQueuing(entry.getKey());
             }
 
@@ -233,10 +234,14 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                     for (IPath iPath : paths) {
                         dependentResources.add(iProject.findMember(iPath));
                     }
-                    sarosSession.addSharedResources(iProject, projectID,
-                        dependentResources);
+
+                    sarosSession.addSharedResources(
+                        ResourceAdapterFactory.create(iProject), projectID,
+                        ResourceAdapterFactory.convertTo(dependentResources));
                 } else {
-                    sarosSession.addSharedResources(iProject, projectID, null);
+                    sarosSession.addSharedResources(
+                        ResourceAdapterFactory.create(iProject), projectID,
+                        null);
                 }
 
                 sessionManager.projectAdded(projectID);
@@ -557,7 +562,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
          */
         for (Entry<String, IProject> entry : localProjects.entrySet())
             sarosSession.removeProjectOwnership(entry.getKey(),
-                entry.getValue(), jid);
+                ResourceAdapterFactory.create(entry.getValue()), jid);
 
         // The session might have been stopped already, if not we will stop it.
         if (sarosSession.getProjectResourcesMapping().keySet().isEmpty()

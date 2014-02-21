@@ -50,6 +50,7 @@ import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
+import de.fu_berlin.inf.dpp.filesystem.EclipseResourceImpl;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -164,7 +165,8 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
             if (path != null) {
                 activeEditorResources.put(user,
-                    getResources(path.getResource()));
+                    getResources(((EclipseResourceImpl) path.getResource())
+                        .getDelegate()));
             }
 
             updateImageDescriptorMapping();

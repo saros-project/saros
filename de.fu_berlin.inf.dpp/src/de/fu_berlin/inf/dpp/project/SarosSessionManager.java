@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.project;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -31,9 +32,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.jivesoftware.smack.Connection;
 import org.picocontainer.annotations.Inject;
@@ -41,6 +39,8 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.invitation.FileList;
 import de.fu_berlin.inf.dpp.invitation.IncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
@@ -243,9 +243,9 @@ public class SarosSessionManager implements ISarosSessionManager {
 
                 if (!project.isOpen()) {
                     try {
-                        project.open(null);
-                    } catch (CoreException e) {
-                        log.debug("an error occur while opening project: "
+                        project.open();
+                    } catch (IOException e) {
+                        log.error("an error occur while opening project: "
                             + project.getName(), e);
                         continue;
                     }
@@ -549,9 +549,10 @@ public class SarosSessionManager implements ISarosSessionManager {
 
             if (!project.isOpen()) {
                 try {
-                    project.open(null);
-                } catch (CoreException e1) {
-                    log.debug("An error occur while opening project", e1);
+                    project.open();
+                } catch (IOException e) {
+                    log.error("an error occur while opening project: "
+                        + project.getName(), e);
                     continue;
                 }
             }

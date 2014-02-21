@@ -21,6 +21,7 @@ import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.EditorListener;
+import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
@@ -153,7 +154,8 @@ class EditorPool {
             return null;
         }
 
-        if (!sarosSession.isShared(file.getProject())) {
+        if (!sarosSession.isShared(ResourceAdapterFactory.create(file
+            .getProject()))) {
             log.warn("File is from incorrect project: " + file.getProject()
                 + " should be " + sarosSession + ": " + file, new StackTrace());
         }
@@ -162,7 +164,7 @@ class EditorPool {
         if (path == null) {
             log.warn("Could not find path for editor " + editorPart.getTitle());
         }
-        return new SPath(file);
+        return new SPath(ResourceAdapterFactory.create(file));
     }
 
     /**
@@ -201,7 +203,8 @@ class EditorPool {
             return null;
         }
 
-        if (!sarosSession.isShared(file.getProject())) {
+        if (!sarosSession.isShared(ResourceAdapterFactory.create(file
+            .getProject()))) {
             log.warn("File is from incorrect project: " + file.getProject()
                 + " should be " + sarosSession + ": " + file, new StackTrace());
         }
@@ -213,7 +216,8 @@ class EditorPool {
         }
 
         // TODO Remove should remove empty HashSets
-        if (!getEditors(new SPath(file)).remove(editorPart)) {
+        if (!getEditors(new SPath(ResourceAdapterFactory.create(file))).remove(
+            editorPart)) {
             log.error("EditorPart was never added to the EditorPool: "
                 + editorPart.getTitle());
             return null;

@@ -13,7 +13,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.eclipse.core.resources.IProject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,6 +40,7 @@ import de.fu_berlin.inf.dpp.activities.business.VCSActivity;
 import de.fu_berlin.inf.dpp.activities.business.ViewportActivity;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
+import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.internal.ActivityHandler.QueueItem;
 import de.fu_berlin.inf.dpp.test.fakes.synchonize.NonUISynchronizer;

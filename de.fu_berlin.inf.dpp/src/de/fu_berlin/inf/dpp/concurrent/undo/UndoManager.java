@@ -48,6 +48,7 @@ import de.fu_berlin.inf.dpp.concurrent.undo.OperationHistory.Type;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
+import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
@@ -558,7 +559,8 @@ public class UndoManager extends AbstractActivityProvider implements Disposable 
         List<ITextOperation> textOps = activity.toOperation()
             .getTextOperations();
 
-        IFile file = currentActiveEditor.getFile();
+        IFile file = ((EclipseFileImpl) currentActiveEditor.getFile())
+            .getDelegate();
 
         FileEditorInput input = new FileEditorInput(file);
         IDocumentProvider provider = EditorManager.getDocumentProvider(input);

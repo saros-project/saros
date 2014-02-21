@@ -25,6 +25,7 @@ import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
+import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.bot.condition.SarosConditions;
@@ -339,7 +340,7 @@ public final class PackageExplorerView extends StfRemoteObject implements
             throw new IllegalStateException(
                 "cannot query shared resource status without a running session");
 
-        return session.isShared(resource);
+        return session.isShared(ResourceAdapterFactory.create(resource));
     }
 
     @Override

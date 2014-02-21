@@ -16,6 +16,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
@@ -80,7 +81,8 @@ public class ResourceChangeValidator extends ModelProvider {
             }
 
             if (resource instanceof IProject) {
-                if (!sarosSession.isShared(resource))
+                if (!sarosSession.isShared(ResourceAdapterFactory
+                    .create(resource)))
                     return false;
 
                 if (delta.getKind() == IResourceDelta.REMOVED) {

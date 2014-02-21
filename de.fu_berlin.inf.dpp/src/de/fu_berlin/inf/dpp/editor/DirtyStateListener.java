@@ -10,6 +10,7 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IElementStateListener;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.AutoHashMap;
@@ -50,7 +51,9 @@ public class DirtyStateListener implements IElementStateListener {
         final IFile file = ((FileEditorInput) element).getFile();
         final ISarosSession sarosSession = editorManager.sarosSession;
 
-        if (sarosSession == null || !sarosSession.isShared(file.getProject())) {
+        if (sarosSession == null
+            || !sarosSession.isShared(ResourceAdapterFactory.create(file
+                .getProject()))) {
             return;
         }
 
@@ -66,7 +69,8 @@ public class DirtyStateListener implements IElementStateListener {
 
                 EditorManager.log.debug("Dirty state reset for: "
                     + file.toString());
-                editorManager.sendEditorActivitySaved(new SPath(file));
+                editorManager.sendEditorActivitySaved(new SPath(
+                    ResourceAdapterFactory.create(file)));
             }
         });
     }

@@ -31,6 +31,8 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Type;
+import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.util.FileUtils;
 
 @RunWith(PowerMockRunner.class)
@@ -70,10 +72,13 @@ public class SharedResourcesManagerTest {
             }
         });
         expect(file.exists()).andStubReturn(Boolean.TRUE);
+        expect(file.getType()).andStubReturn(IResource.FILE);
+        expect(file.getAdapter(IFile.class)).andStubReturn(file);
         replay(file);
 
         path = createMock(SPath.class);
-        expect(path.getFile()).andStubReturn(file);
+        expect(path.getFile()).andStubReturn(
+            ResourceAdapterFactory.create(file));
         replay(path);
     }
 

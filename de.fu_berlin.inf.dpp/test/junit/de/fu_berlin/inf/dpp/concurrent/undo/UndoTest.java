@@ -4,7 +4,6 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Path;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +15,8 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.concurrent.undo.OperationHistory.Type;
+import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 
 /**
  * testing TextOperationHistory and UndoManager
@@ -38,8 +39,10 @@ public class UndoTest {
         replay(project);
         undoManager = new UndoManager();
         history = undoManager.getHistory();
-        path1 = new SPath(project, new Path("path1"));
-        path2 = new SPath(project, new Path("path2"));
+        path1 = new SPath(project, ResourceAdapterFactory.create(new Path(
+            "path1")));
+        path2 = new SPath(project, ResourceAdapterFactory.create(new Path(
+            "path2")));
     }
 
     protected Operation nop() {

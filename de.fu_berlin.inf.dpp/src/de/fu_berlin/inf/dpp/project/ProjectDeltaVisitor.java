@@ -22,6 +22,7 @@ import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.business.IResourceActivity;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 
 /**
  * Visits the resource changes in a shared project.<br>
@@ -201,7 +202,7 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
     protected void add(IResource resource) {
         sharedProject.add(resource);
-        final SPath spath = new SPath(resource);
+        final SPath spath = new SPath(ResourceAdapterFactory.create(resource));
 
         if (resource instanceof IFile) {
             try {
@@ -218,18 +219,22 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     protected void move(IResource resource, IPath oldFullPath,
         IProject oldProject, boolean contentChange) throws IOException {
         sharedProject.move(resource, oldFullPath);
-        addActivity(FileActivity.moved(user, new SPath(resource), new SPath(
-            oldProject, oldFullPath.removeFirstSegments(1)), contentChange));
+        addActivity(FileActivity.moved(
+            user,
+            new SPath(ResourceAdapterFactory.create(resource)),
+            new SPath(ResourceAdapterFactory.create(oldProject),
+                ResourceAdapterFactory.create(oldFullPath
+                    .removeFirstSegments(1))), contentChange));
     }
 
     protected void remove(IResource resource) {
         sharedProject.remove(resource);
         if (resource instanceof IFile) {
-            addActivity(FileActivity.removed(user, new SPath(resource),
-                Purpose.ACTIVITY));
+            addActivity(FileActivity.removed(user, new SPath(
+                ResourceAdapterFactory.create(resource)), Purpose.ACTIVITY));
         } else {
             addActivity(new FolderActivity(user, FolderActivity.Type.REMOVED,
-                new SPath(resource)));
+                new SPath(ResourceAdapterFactory.create(resource))));
         }
     }
 
@@ -256,9 +261,9 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
      */
     private void contentChanged(IResource resource) {
 
-        final SPath spath = new SPath(resource);
+        final SPath spath = new SPath(ResourceAdapterFactory.create(resource));
 
-        if (!sarosSession.isShared(resource))
+        if (!sarosSession.isShared(ResourceAdapterFactory.create(resource)))
             return;
 
         if (editorManager.isOpened(spath))

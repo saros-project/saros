@@ -28,6 +28,8 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.filesystem.EclipseProjectImpl;
+import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
@@ -83,7 +85,7 @@ public class CollaborationUtils {
                     IProgressMonitor.UNKNOWN);
 
                 try {
-                    sessionManager.startSession(newResources);
+                    sessionManager.startSession(convert(newResources));
                     Set<JID> participantsToAdd = new HashSet<JID>(contacts);
 
                     ISarosSession session = sessionManager.getSarosSession();
@@ -182,7 +184,8 @@ public class CollaborationUtils {
             public void run() {
 
                 if (sarosSession.hasWriteAccess()) {
-                    sessionManager.addResourcesToSession(projectResources);
+                    sessionManager
+                        .addResourcesToSession(convert(projectResources));
                     return;
                 }
 
@@ -238,26 +241,29 @@ public class CollaborationUtils {
      */
     private static String getShareProjectDescription(ISarosSession sarosSession) {
 
-        Set<IProject> projects = sarosSession.getProjects();
+        Set<de.fu_berlin.inf.dpp.filesystem.IProject> projects = sarosSession
+            .getProjects();
 
         StringBuilder result = new StringBuilder();
 
-        for (IProject project : projects) {
+        for (de.fu_berlin.inf.dpp.filesystem.IProject project : projects) {
 
             Pair<Long, Long> fileCountAndSize;
 
             if (sarosSession.isCompletelyShared(project)) {
                 fileCountAndSize = FileUtils.getFileCountAndSize(
-                    Collections.singletonList(project), true,
-                    IContainer.EXCLUDE_DERIVED);
+                    Collections.singletonList(((EclipseProjectImpl) project)
+                        .getDelegate()), true, IContainer.EXCLUDE_DERIVED);
 
                 result.append(String.format(
                     "\nProject: %s, Files: %d, Size: %s", project.getName(),
                     fileCountAndSize.v, format(fileCountAndSize.p)));
             } else {
-                fileCountAndSize = FileUtils.getFileCountAndSize(
-                    sarosSession.getSharedResources(project), false,
-                    IResource.NONE);
+                List<IResource> resources = ResourceAdapterFactory
+                    .convertBack(sarosSession.getSharedResources(project));
+
+                fileCountAndSize = FileUtils.getFileCountAndSize(resources,
+                    false, IResource.NONE);
 
                 result.append(String.format(
                     "\nProject: %s, Files: %s, Size: %s", project.getName()
@@ -416,5 +422,17 @@ public class CollaborationUtils {
 
         return String.format(Locale.US, "%.2f GB", size
             / (1000F * 1000F * 1000F));
+    }
+
+    private static Map<de.fu_berlin.inf.dpp.filesystem.IProject, List<de.fu_berlin.inf.dpp.filesystem.IResource>> convert(
+        Map<IProject, List<IResource>> data) {
+
+        Map<de.fu_berlin.inf.dpp.filesystem.IProject, List<de.fu_berlin.inf.dpp.filesystem.IResource>> result = new HashMap<de.fu_berlin.inf.dpp.filesystem.IProject, List<de.fu_berlin.inf.dpp.filesystem.IResource>>();
+
+        for (Entry<IProject, List<IResource>> entry : data.entrySet())
+            result.put(ResourceAdapterFactory.create(entry.getKey()),
+                ResourceAdapterFactory.convertTo(entry.getValue()));
+
+        return result;
     }
 }

@@ -23,6 +23,7 @@ import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
 import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
@@ -208,7 +209,7 @@ public class ConsistencyWatchdogServer extends AbstractActivityProvider
     private void updateChecksum(final Set<SPath> localEditors,
         final Set<SPath> remoteEditors, final SPath docPath) {
 
-        IFile file = docPath.getFile();
+        IFile file = ((EclipseFileImpl) docPath.getFile()).getDelegate();
 
         IDocument doc = null;
         IDocumentProvider provider = null;

@@ -1,13 +1,14 @@
 package de.fu_berlin.inf.dpp.activities;
 
 import org.apache.commons.lang.ObjectUtils;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Path;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 
+import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.misc.xstream.UrlEncodingStringConverter;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
@@ -64,7 +65,8 @@ public class SPathDataObject {
                 "SPathDataObject cannot be connected to SarosSession because its ID is unknown: "
                     + projectID);
 
-        return new SPath(project, Path.fromPortableString(path));
+        return new SPath(project, ResourceAdapterFactory.create(Path
+            .fromPortableString(path)));
     }
 
     /**

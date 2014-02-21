@@ -1,7 +1,9 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
+import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.isA;
+import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -21,6 +23,8 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Type;
+import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.test.mocks.SarosMocks;
 import de.fu_berlin.inf.dpp.util.FileUtils;
 
@@ -35,7 +39,18 @@ public class RecoveryFileActivityTest extends FileActivityTest {
         setupDefaultMocks();
 
         file = SarosMocks.mockExistingIFile(data);
-        newPath = SarosMocks.mockSPath(file);
+        expect(file.exists()).andStubReturn(Boolean.TRUE);
+        expect(file.getType()).andStubReturn(IResource.FILE);
+        expect(file.getAdapter(IFile.class)).andStubReturn(file);
+        replay(file);
+
+        newPath = SarosMocks.prepareMockSPath();
+
+        expect(newPath.getFile()).andStubReturn(
+            ResourceAdapterFactory.create(file));
+
+        PowerMock.replay(newPath);
+
         paths = toListPlusNull(newPath);
 
         mockStaticPartial(FileUtils.class, "checksum");

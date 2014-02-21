@@ -32,12 +32,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.annotations.Inject;
@@ -72,6 +66,11 @@ import de.fu_berlin.inf.dpp.feedback.SelectionCollector;
 import de.fu_berlin.inf.dpp.feedback.SessionDataCollector;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.feedback.TextEditCollector;
+import de.fu_berlin.inf.dpp.filesystem.IContainer;
+import de.fu_berlin.inf.dpp.filesystem.IFile;
+import de.fu_berlin.inf.dpp.filesystem.IFolder;
+import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
@@ -230,7 +229,7 @@ public final class SarosSession implements ISarosSession {
         List<IResource> dependentResources) {
         if (!isCompletelyShared(project) && dependentResources != null) {
             for (IResource iResource : dependentResources) {
-                if (iResource instanceof IFolder) {
+                if (iResource.getType() == IResource.FOLDER) {
                     addMembers(iResource, dependentResources);
                 }
             }
@@ -861,7 +860,8 @@ public final class SarosSession implements ISarosSession {
 
     private void addMembers(IResource iResource,
         List<IResource> dependentResources) {
-        if (iResource instanceof IFolder || iResource instanceof IProject) {
+        if (iResource.getType() == IResource.FOLDER
+            || iResource.getType() == IResource.PROJECT) {
 
             if (!isShared(iResource)) {
                 selectedResources.add(iResource);
@@ -872,15 +872,15 @@ public final class SarosSession implements ISarosSession {
             try {
                 childResources = Arrays.asList(((IContainer) iResource)
                     .members());
-            } catch (CoreException e) {
-                log.debug("Can't get children of Project/Folder. ", e);
+            } catch (IOException e) {
+                log.error("Can't get children of Project/Folder. ", e);
             }
             if (childResources != null && (childResources.size() > 0)) {
                 for (IResource childResource : childResources) {
                     addMembers(childResource, dependentResources);
                 }
             }
-        } else if (iResource instanceof IFile) {
+        } else if (iResource.getType() == IResource.FILE) {
             if (!isShared(iResource)) {
                 selectedResources.add(iResource);
             }

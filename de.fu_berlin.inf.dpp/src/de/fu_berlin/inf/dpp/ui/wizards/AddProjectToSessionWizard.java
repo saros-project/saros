@@ -38,6 +38,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
+import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.invitation.FileList;
 import de.fu_berlin.inf.dpp.invitation.FileListDiff;
 import de.fu_berlin.inf.dpp.invitation.FileListFactory;
@@ -49,6 +50,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.IChecksumCache;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
@@ -470,6 +472,14 @@ public class AddProjectToSessionWizard extends Wizard {
         throws CoreException {
         Map<String, FileListDiff> modifiedResources = new HashMap<String, FileListDiff>();
 
+        ISarosSession session = sessionManager.getSarosSession();
+
+        // FIXME the wizard should handle the case that the session may stop in
+        // the meantime !
+
+        if (session == null)
+            throw new IllegalStateException("no session running");
+
         SubMonitor subMonitor = SubMonitor.convert(monitor,
             "Searching for files that will be modified...",
             projectMapping.size() * 2);
@@ -477,19 +487,25 @@ public class AddProjectToSessionWizard extends Wizard {
         for (Map.Entry<String, IProject> entry : projectMapping.entrySet()) {
 
             String projectID = entry.getKey();
-            IProject project = entry.getValue();
+            IProject eclipseProject = entry.getValue();
 
             FileListDiff diff;
 
-            if (!project.isOpen())
-                project.open(null);
+            if (!eclipseProject.isOpen())
+                eclipseProject.open(null);
 
-            FileList remoteFileList = this.process.getRemoteFileList(projectID);
+            FileList remoteFileList = process.getRemoteFileList(projectID);
 
-            if (sessionManager.getSarosSession().isShared(project)) {
+            de.fu_berlin.inf.dpp.filesystem.IProject project = ResourceAdapterFactory
+                .create(eclipseProject);
+
+            if (session.isShared(project)) {
+
+                List<org.eclipse.core.resources.IResource> eclipseResources = ResourceAdapterFactory
+                    .convertBack(session.getSharedResources(project));
+
                 FileList sharedFileList = FileListFactory.createFileList(
-                    project, sessionManager.getSarosSession()
-                        .getSharedResources(project), checksumCache, true,
+                    eclipseProject, eclipseResources, checksumCache, true,
                     subMonitor.newChild(1, SubMonitor.SUPPRESS_ALL_LABELS));
 
                 // FIXME FileList objects should be immutable after creation
@@ -497,8 +513,8 @@ public class AddProjectToSessionWizard extends Wizard {
             } else
                 subMonitor.worked(1);
 
-            diff = FileListDiff.diff(FileListFactory.createFileList(project,
-                null, checksumCache, true,
+            diff = FileListDiff.diff(FileListFactory.createFileList(
+                eclipseProject, null, checksumCache, true,
                 subMonitor.newChild(1, SubMonitor.SUPPRESS_ALL_LABELS)),
                 remoteFileList);
 
@@ -507,7 +523,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
             if (!diff.getRemovedPaths().isEmpty()
                 || !diff.getAlteredPaths().isEmpty()) {
-                modifiedResources.put(project.getName(), diff);
+                modifiedResources.put(eclipseProject.getName(), diff);
             }
         }
         return modifiedResources;

@@ -12,12 +12,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.easymock.EasyMock;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 public class SarosProjectMapperTest {
@@ -265,8 +265,7 @@ public class SarosProjectMapperTest {
 
         IResource resourceMock = EasyMock.createNiceMock(IResource.class);
         EasyMock.expect(resourceMock.getProject()).andStubReturn(projectMock);
-        EasyMock.expect(resourceMock.isDerived(IResource.CHECK_ANCESTORS))
-            .andReturn(true);
+        EasyMock.expect(resourceMock.isDerived(true)).andReturn(true);
 
         EasyMock.replay(resourceMock);
 

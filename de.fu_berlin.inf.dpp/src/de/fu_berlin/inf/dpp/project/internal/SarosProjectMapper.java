@@ -10,10 +10,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SharedProject;
@@ -424,7 +424,7 @@ class SarosProjectMapper {
 
         if (isCompletelyShared(project))
             // TODO how should partial sharing handle this case ?
-            return !resource.isDerived(IResource.CHECK_ANCESTORS);
+            return !resource.isDerived(true);
         else
             return partiallySharedResourceMapping.get(project).contains(
                 resource);
