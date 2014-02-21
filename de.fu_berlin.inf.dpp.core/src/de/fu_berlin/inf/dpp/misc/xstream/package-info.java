@@ -9,8 +9,4 @@
  * </code>
  */
 
-package de.fu_berlin.inf.dpp.util.xstream;
-
-import com.thoughtworks.xstream.annotations.XStreamConverter;
-
-import de.fu_berlin.inf.dpp.util.xstream.JIDConverter;
+package de.fu_berlin.inf.dpp.misc.xstream;
