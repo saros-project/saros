@@ -11,6 +11,7 @@ import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Type;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.RecoveryFileActivity;
+import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.misc.xstream.JIDConverter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -38,12 +39,12 @@ public class RecoveryFileActivityDataObject extends FileActivityDataObject
     }
 
     @Override
-    public IActivity getActivity(ISarosSession sarosSession) {
+    public IActivity getActivity(ISarosSession sarosSession,
+        IPathFactory pathFactory) {
         return new RecoveryFileActivity(sarosSession.getUser(getSource()),
-            sarosSession.getUser(target), getType(),
-            path.toSPath(sarosSession),
-            (oldPath != null ? oldPath.toSPath(sarosSession) : null), data,
-            checksum);
+            sarosSession.getUser(target), getType(), path.toSPath(sarosSession,
+                pathFactory), (oldPath != null ? oldPath.toSPath(sarosSession,
+                pathFactory) : null), data, checksum);
     }
 
     @Override

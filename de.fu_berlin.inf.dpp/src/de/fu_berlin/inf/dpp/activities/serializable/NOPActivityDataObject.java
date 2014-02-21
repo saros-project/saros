@@ -4,6 +4,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.NOPActivity;
+import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
@@ -21,7 +22,8 @@ public class NOPActivityDataObject extends AbstractActivityDataObject {
     }
 
     @Override
-    public IActivity getActivity(ISarosSession sarosSession) {
+    public IActivity getActivity(ISarosSession sarosSession,
+        IPathFactory pathFactory) {
         return new NOPActivity(sarosSession.getUser(source),
             sarosSession.getUser(target), id);
     }

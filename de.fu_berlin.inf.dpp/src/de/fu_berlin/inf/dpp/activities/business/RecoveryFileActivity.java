@@ -6,6 +6,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.RecoveryFileActivityDataObject;
+import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
@@ -39,11 +40,12 @@ public class RecoveryFileActivity extends FileActivity implements
     }
 
     @Override
-    public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
+    public IActivityDataObject getActivityDataObject(
+        ISarosSession sarosSession, IPathFactory pathFactory) {
         return new RecoveryFileActivityDataObject(source.getJID(),
-            target.getJID(), type, newPath.toSPathDataObject(sarosSession),
-            (oldPath != null ? oldPath.toSPathDataObject(sarosSession) : null),
-            data, checksum);
+            target.getJID(), type, newPath.toSPathDataObject(sarosSession,
+                pathFactory), (oldPath != null ? oldPath.toSPathDataObject(
+                sarosSession, pathFactory) : null), data, checksum);
     }
 
     /**

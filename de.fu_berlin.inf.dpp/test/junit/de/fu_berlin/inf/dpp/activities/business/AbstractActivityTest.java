@@ -14,6 +14,7 @@ import org.junit.BeforeClass;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
+import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.test.mocks.SarosMocks;
@@ -27,6 +28,14 @@ public abstract class AbstractActivityTest {
      * about {@link #source} and {@link #target}.
      */
     protected ISarosSession sarosSession;
+
+    /**
+     * Needed for conversions between Activities and ActivityDataObjets. Knows
+     * nothing and just return default values (0, false, null) for all method
+     * invocation.
+     */
+    private IPathFactory pathFactory;
+
     /**
      * The standard source for all Activities
      */
@@ -68,12 +77,14 @@ public abstract class AbstractActivityTest {
      * default mocks are {@link #sarosSession}, {@link #source}, and
      * {@link #target}.)<br>
      * The two User mocks are replayed (see {@link SarosMocks#mockUser(JID)}).
-     * However, {@link #sarosSession} is <i>not</i> replayed yet (for futher
+     * However, {@link #sarosSession} is <i>not</i> replayed yet (for further
      * amendments, such as additional users). So don't forget to call
      * {@link #replayDefaultMocks()} before actually using {@link #sarosSession}
      * .
      */
     protected void setupDefaultMocks() {
+        pathFactory = EasyMock.createNiceMock(IPathFactory.class);
+
         sarosSession = EasyMock.createMock(ISarosSession.class);
 
         JID sourceJid = new JID(LOCAL_USER);
@@ -91,7 +102,7 @@ public abstract class AbstractActivityTest {
      * Replays the default mocks ({@link #sarosSession})
      */
     protected void replayDefaultMocks() {
-        EasyMock.replay(sarosSession);
+        EasyMock.replay(sarosSession, pathFactory);
     }
 
     /**
@@ -133,8 +144,9 @@ public abstract class AbstractActivityTest {
      * outcome with the original and asserts equality.
      */
     protected void testConversionAndBack(IActivity orig) {
-        IActivityDataObject ado = orig.getActivityDataObject(sarosSession);
-        IActivity copy = ado.getActivity(sarosSession);
+        IActivityDataObject ado = orig.getActivityDataObject(sarosSession,
+            pathFactory);
+        IActivity copy = ado.getActivity(sarosSession, pathFactory);
 
         assertEquals("conversion failed for: " + orig, orig, copy);
 

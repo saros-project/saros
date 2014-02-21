@@ -8,6 +8,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
+import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 public class ViewportActivity extends AbstractActivity implements
@@ -99,8 +100,9 @@ public class ViewportActivity extends AbstractActivity implements
     }
 
     @Override
-    public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
+    public IActivityDataObject getActivityDataObject(
+        ISarosSession sarosSession, IPathFactory pathFactory) {
         return new ViewportActivityDataObject(getSource().getJID(), topIndex,
-            bottomIndex, path.toSPathDataObject(sarosSession));
+            bottomIndex, path.toSPathDataObject(sarosSession, pathFactory));
     }
 }

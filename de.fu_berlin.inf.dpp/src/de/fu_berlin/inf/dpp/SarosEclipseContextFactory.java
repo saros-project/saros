@@ -13,6 +13,8 @@ import de.fu_berlin.inf.dpp.concurrent.undo.UndoManager;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
+import de.fu_berlin.inf.dpp.filesystem.EclipsePathFactory;
+import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.IChecksumCache;
 import de.fu_berlin.inf.dpp.project.internal.ChecksumCacheImpl;
@@ -78,6 +80,9 @@ public class SarosEclipseContextFactory extends AbstractSarosContextFactory {
          */
         Component.create(IChecksumCache.class, new ChecksumCacheImpl(
             new FileContentNotifierBridge())),
+
+        // Saros Core Path Support
+        Component.create(IPathFactory.class, EclipsePathFactory.class),
 
         // SWT EDT support
         Component.create(UISynchronizer.class, SWTSynchronizer.class) };

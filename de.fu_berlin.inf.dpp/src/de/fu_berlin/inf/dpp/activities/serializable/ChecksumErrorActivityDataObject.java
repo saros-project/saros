@@ -31,6 +31,7 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumErrorActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.misc.xstream.JIDConverter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -63,12 +64,13 @@ public class ChecksumErrorActivityDataObject extends AbstractActivityDataObject 
     }
 
     @Override
-    public IActivity getActivity(ISarosSession sarosSession) {
+    public IActivity getActivity(ISarosSession sarosSession,
+        IPathFactory pathFactory) {
         ArrayList<SPath> sPaths = null;
         if (this.paths != null) {
             sPaths = new ArrayList<SPath>();
             for (SPathDataObject path : this.paths) {
-                sPaths.add(path.toSPath(sarosSession));
+                sPaths.add(path.toSPath(sarosSession, pathFactory));
             }
         }
         return new ChecksumErrorActivity(sarosSession.getUser(getSource()),

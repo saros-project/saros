@@ -11,6 +11,7 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
+import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.FileUtils;
 
@@ -239,10 +240,11 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
     }
 
     @Override
-    public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
+    public IActivityDataObject getActivityDataObject(
+        ISarosSession sarosSession, IPathFactory pathFactory) {
         return new FileActivityDataObject(getSource().getJID(), type,
-            newPath.toSPathDataObject(sarosSession),
-            (oldPath != null ? oldPath.toSPathDataObject(sarosSession) : null),
-            data, purpose, checksum);
+            newPath.toSPathDataObject(sarosSession, pathFactory),
+            (oldPath != null ? oldPath.toSPathDataObject(sarosSession,
+                pathFactory) : null), data, purpose, checksum);
     }
 }

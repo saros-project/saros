@@ -10,6 +10,7 @@ import org.powermock.api.easymock.PowerMock;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.SPathDataObject;
+import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
@@ -60,10 +61,11 @@ public class SarosMocks {
         SPathDataObject pathDO = EasyMock.createMock(SPathDataObject.class);
 
         EasyMock.expect(
-            path.toSPathDataObject(EasyMock.isA(ISarosSession.class)))
-            .andStubReturn(pathDO);
-        EasyMock.expect(pathDO.toSPath(EasyMock.isA(ISarosSession.class)))
-            .andStubReturn(path);
+            path.toSPathDataObject(EasyMock.isA(ISarosSession.class),
+                EasyMock.isA(IPathFactory.class))).andStubReturn(pathDO);
+        EasyMock.expect(
+            pathDO.toSPath(EasyMock.isA(ISarosSession.class),
+                EasyMock.isA(IPathFactory.class))).andStubReturn(path);
 
         EasyMock.replay(pathDO);
 

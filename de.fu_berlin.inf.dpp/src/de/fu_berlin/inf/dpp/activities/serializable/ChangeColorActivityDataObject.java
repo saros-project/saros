@@ -6,6 +6,7 @@ import com.thoughtworks.xstream.annotations.XStreamConverter;
 
 import de.fu_berlin.inf.dpp.activities.business.ChangeColorActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.misc.xstream.JIDConverter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -53,7 +54,7 @@ public class ChangeColorActivityDataObject extends AbstractActivityDataObject {
      * {@inheritDoc}
      */
     @Override
-    public IActivity getActivity(ISarosSession session) {
+    public IActivity getActivity(ISarosSession session, IPathFactory pathFactory) {
         return new ChangeColorActivity(session.getUser(getSource()),
             session.getUser(target), session.getUser(affected), colorID);
     }

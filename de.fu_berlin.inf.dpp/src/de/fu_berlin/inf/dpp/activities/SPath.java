@@ -5,6 +5,7 @@ import org.apache.commons.lang.ObjectUtils;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
+import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -59,11 +60,16 @@ public class SPath {
      * 
      * @param path
      *            maybe <code>null</code> to represent "no editor"
+     * @throws IllegalArgumentException
+     *             if the path is not relative
      */
     public SPath(IProject project, IPath path) {
         if (project == null)
             throw new IllegalArgumentException(
                 "SPath must be initialized with an IProject");
+
+        if (path.isAbsolute())
+            throw new IllegalArgumentException("path is absolute: " + path);
 
         this.project = project;
         this.projectRelativePath = path;
@@ -80,7 +86,8 @@ public class SPath {
     /**
      * Turns this SPath into an SPathDataObject representing it globally.
      */
-    public SPathDataObject toSPathDataObject(ISarosSession sarosSession) {
+    public SPathDataObject toSPathDataObject(ISarosSession sarosSession,
+        IPathFactory pathFactory) {
 
         String id = sarosSession.getProjectID(project);
         if (id == null)
@@ -88,8 +95,8 @@ public class SPath {
                 "Trying to send a SPath which refers to a file in project which is not shared: "
                     + this);
 
-        return new SPathDataObject(id, projectRelativePath.toPortableString(),
-            editorType);
+        return new SPathDataObject(id,
+            pathFactory.fromPath(projectRelativePath), editorType);
     }
 
     /**

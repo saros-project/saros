@@ -9,6 +9,8 @@ public interface IPath {
 
     public IPath append(IPath path);
 
+    public boolean isAbsolute();
+
     public boolean isPrefixOf(IPath path);
 
     public String toOSString();

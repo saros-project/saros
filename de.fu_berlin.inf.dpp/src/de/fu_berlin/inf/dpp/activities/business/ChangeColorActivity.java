@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.activities.business;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.serializable.ChangeColorActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
+import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
@@ -52,7 +53,8 @@ public class ChangeColorActivity extends AbstractActivity implements
      * {@inheritDoc}
      */
     @Override
-    public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
+    public IActivityDataObject getActivityDataObject(
+        ISarosSession sarosSession, IPathFactory pathFactory) {
         return new ChangeColorActivityDataObject(getSource().getJID(),
             target.getJID(), affected.getJID(), colorID);
     }

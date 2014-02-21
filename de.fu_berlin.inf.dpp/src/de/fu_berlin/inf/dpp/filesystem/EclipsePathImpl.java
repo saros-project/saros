@@ -18,6 +18,11 @@ public class EclipsePathImpl implements IPath {
     }
 
     @Override
+    public boolean isAbsolute() {
+        return delegate.isAbsolute();
+    }
+
+    @Override
     public boolean isPrefixOf(IPath path) {
         return delegate.isPrefixOf(((EclipsePathImpl) path).getDelegate());
     }

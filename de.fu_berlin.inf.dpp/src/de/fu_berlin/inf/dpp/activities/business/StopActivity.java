@@ -5,6 +5,7 @@ import org.apache.commons.lang.ObjectUtils;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.StopActivityDataObject;
+import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
@@ -174,7 +175,8 @@ public class StopActivity extends AbstractActivity implements ITargetedActivity 
     }
 
     @Override
-    public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
+    public IActivityDataObject getActivityDataObject(
+        ISarosSession sarosSession, IPathFactory pathFactory) {
         return new StopActivityDataObject(getSource().getJID(),
             initiator.getJID(), affected.getJID(), type, state, stopActivityID);
     }

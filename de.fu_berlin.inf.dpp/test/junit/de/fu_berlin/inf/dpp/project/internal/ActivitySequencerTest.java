@@ -216,7 +216,8 @@ public class ActivitySequencerTest {
 
         aliceSequencer.sendActivity(Collections
             .singletonList(bobUserInAliceSession), new NOPActivity(aliceUser,
-            bobUserInAliceSession, 0).getActivityDataObject(sessionStubAlice));
+            bobUserInAliceSession, 0).getActivityDataObject(sessionStubAlice,
+            null));
 
         aliceSequencer.flush(bobUserInAliceSession);
 
@@ -250,8 +251,8 @@ public class ActivitySequencerTest {
         for (int i = 0; i < activityCount; i++)
             aliceSequencer.sendActivity(Collections
                 .singletonList(bobUserInAliceSession), new NOPActivity(
-                aliceUser, bobUserInAliceSession, i)
-                .getActivityDataObject(sessionStubAlice));
+                aliceUser, bobUserInAliceSession, i).getActivityDataObject(
+                sessionStubAlice, null));
 
         aliceSequencer.flush(bobUserInAliceSession);
 
@@ -263,7 +264,7 @@ public class ActivitySequencerTest {
 
         for (int i = 0; i < activityCount; i++) {
             NOPActivity activity = (NOPActivity) receivedActivities.get(i)
-                .getActivity(sessionStubBob);
+                .getActivity(sessionStubBob, null);
             assertEquals("activity is out of order", i, activity.getID());
         }
     }
@@ -290,7 +291,8 @@ public class ActivitySequencerTest {
 
         aliceSequencer.sendActivity(Collections
             .singletonList(bobUserInAliceSession), new NOPActivity(aliceUser,
-            bobUserInAliceSession, 0).getActivityDataObject(sessionStubAlice));
+            bobUserInAliceSession, 0).getActivityDataObject(sessionStubAlice,
+            null));
 
         aliceSequencer.flush(bobUserInAliceSession);
 
@@ -324,7 +326,8 @@ public class ActivitySequencerTest {
 
         aliceSequencer.sendActivity(Collections
             .singletonList(bobUserInAliceSession), new NOPActivity(aliceUser,
-            bobUserInAliceSession, 0).getActivityDataObject(sessionStubAlice));
+            bobUserInAliceSession, 0).getActivityDataObject(sessionStubAlice,
+            null));
 
         aliceSequencer.flush(bobUserInAliceSession);
 
@@ -360,7 +363,8 @@ public class ActivitySequencerTest {
 
         aliceSequencer.sendActivity(Collections
             .singletonList(bobUserInAliceSession), new NOPActivity(aliceUser,
-            bobUserInAliceSession, 0).getActivityDataObject(sessionStubAlice));
+            bobUserInAliceSession, 0).getActivityDataObject(sessionStubAlice,
+            null));
 
         aliceSequencer.flush(bobUserInAliceSession);
 

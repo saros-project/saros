@@ -8,6 +8,7 @@ import com.thoughtworks.xstream.annotations.XStreamConverter;
 
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.StartFollowingActivity;
+import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.misc.xstream.JIDConverter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -30,7 +31,8 @@ public class StartFollowingActivityDataObject extends
     }
 
     @Override
-    public IActivity getActivity(ISarosSession sharedProject) {
+    public IActivity getActivity(ISarosSession sharedProject,
+        IPathFactory pathFactory) {
         return new StartFollowingActivity(sharedProject.getUser(getSource()),
             sharedProject.getUser(target));
     }

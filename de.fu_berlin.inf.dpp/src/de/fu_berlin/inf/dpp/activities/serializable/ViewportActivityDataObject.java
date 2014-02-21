@@ -8,6 +8,7 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.ViewportActivity;
+import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
@@ -77,9 +78,10 @@ public class ViewportActivityDataObject extends
     }
 
     @Override
-    public IActivity getActivity(ISarosSession sarosSession) {
+    public IActivity getActivity(ISarosSession sarosSession,
+        IPathFactory pathFactory) {
         return new ViewportActivity(sarosSession.getUser(getSource()),
             topIndex, bottomIndex, (getPath() != null ? getPath().toSPath(
-                sarosSession) : null));
+                sarosSession, pathFactory) : null));
     }
 }

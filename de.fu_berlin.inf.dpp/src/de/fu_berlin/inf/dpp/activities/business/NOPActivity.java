@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.activities.business;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.NOPActivityDataObject;
+import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 public final class NOPActivity extends AbstractActivity implements
@@ -27,7 +28,8 @@ public final class NOPActivity extends AbstractActivity implements
     }
 
     @Override
-    public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
+    public IActivityDataObject getActivityDataObject(
+        ISarosSession sarosSession, IPathFactory pathFactory) {
         return new NOPActivityDataObject(getSource().getJID(), target.getJID(),
             id);
     }

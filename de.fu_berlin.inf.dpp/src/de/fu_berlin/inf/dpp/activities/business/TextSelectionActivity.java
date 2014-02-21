@@ -27,6 +27,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
+import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 public class TextSelectionActivity extends AbstractActivity implements
@@ -107,8 +108,9 @@ public class TextSelectionActivity extends AbstractActivity implements
     }
 
     @Override
-    public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
+    public IActivityDataObject getActivityDataObject(
+        ISarosSession sarosSession, IPathFactory pathFactory) {
         return new TextSelectionActivityDataObject(getSource().getJID(),
-            offset, length, path.toSPathDataObject(sarosSession));
+            offset, length, path.toSPathDataObject(sarosSession, pathFactory));
     }
 }

@@ -10,6 +10,7 @@ import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.StopActivity;
 import de.fu_berlin.inf.dpp.activities.business.StopActivity.State;
 import de.fu_berlin.inf.dpp.activities.business.StopActivity.Type;
+import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.misc.xstream.JIDConverter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -98,7 +99,8 @@ public class StopActivityDataObject extends AbstractActivityDataObject {
     }
 
     @Override
-    public IActivity getActivity(ISarosSession sarosSession) {
+    public IActivity getActivity(ISarosSession sarosSession,
+        IPathFactory pathFactory) {
         return new StopActivity(sarosSession.getUser(getSource()),
             sarosSession.getUser(initiator), sarosSession.getUser(affected),
             type, state, stopActivityID);

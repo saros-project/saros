@@ -69,6 +69,7 @@ import de.fu_berlin.inf.dpp.feedback.TextEditCollector;
 import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
+import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
@@ -116,6 +117,8 @@ public final class SarosSession implements ISarosSession {
 
     @Inject
     private DataTransferManager transferManager;
+
+    private final IPathFactory pathFactory;
 
     private final ISarosContext sarosContext;
 
@@ -694,7 +697,7 @@ public final class SarosSession implements ISarosSession {
 
         for (IActivityDataObject ado : activityQueuer.process(ados)) {
             try {
-                activities.add(ado.getActivity(this));
+                activities.add(ado.getActivity(this, pathFactory));
             } catch (IllegalArgumentException e) {
                 log.error("could not deserialize activity data object: " + ado,
                     e);
@@ -747,7 +750,7 @@ public final class SarosSession implements ISarosSession {
 
         try {
             activitySequencer.sendActivity(recipients,
-                activity.getActivityDataObject(this));
+                activity.getActivityDataObject(this, pathFactory));
         } catch (IllegalArgumentException e) {
             log.warn("could not serialize activity: " + activity, e);
         }
@@ -985,6 +988,9 @@ public final class SarosSession implements ISarosSession {
         int hostColorID) {
 
         context.initComponent(this);
+
+        this.pathFactory = context.getComponent(IPathFactory.class);
+
         this.sessionID = context.getComponent(SessionIDObservable.class)
             .getValue();
         this.projectMapper = new SarosProjectMapper(this);

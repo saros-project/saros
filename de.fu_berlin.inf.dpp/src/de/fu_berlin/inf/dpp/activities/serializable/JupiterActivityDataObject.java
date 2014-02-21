@@ -9,6 +9,7 @@ import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
+import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
@@ -75,9 +76,10 @@ public class JupiterActivityDataObject extends
     }
 
     @Override
-    public IActivity getActivity(ISarosSession sarosSession) {
+    public IActivity getActivity(ISarosSession sarosSession,
+        IPathFactory pathFactory) {
         return new JupiterActivity(timestamp, operation,
             sarosSession.getUser(getSource()), getPath() != null ? getPath()
-                .toSPath(sarosSession) : null);
+                .toSPath(sarosSession, pathFactory) : null);
     }
 }

@@ -12,6 +12,7 @@ import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Type;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
@@ -108,11 +109,12 @@ public class FileActivityDataObject extends AbstractProjectActivityDataObject {
     }
 
     @Override
-    public IActivity getActivity(ISarosSession sarosSession) {
+    public IActivity getActivity(ISarosSession sarosSession,
+        IPathFactory pathFactory) {
         SPathDataObject newPath = getPath();
         return new FileActivity(sarosSession.getUser(source), type,
-            (newPath != null ? newPath.toSPath(sarosSession) : null),
-            (oldPath != null ? oldPath.toSPath(sarosSession) : null), data,
-            purpose, checksum);
+            (newPath != null ? newPath.toSPath(sarosSession, pathFactory)
+                : null), (oldPath != null ? oldPath.toSPath(sarosSession,
+                pathFactory) : null), data, purpose, checksum);
     }
 }

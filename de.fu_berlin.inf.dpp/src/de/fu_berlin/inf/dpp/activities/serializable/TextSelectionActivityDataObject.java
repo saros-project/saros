@@ -27,6 +27,7 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.TextSelectionActivity;
+import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
@@ -86,9 +87,10 @@ public class TextSelectionActivityDataObject extends
     }
 
     @Override
-    public IActivity getActivity(ISarosSession sarosSession) {
+    public IActivity getActivity(ISarosSession sarosSession,
+        IPathFactory pathFactory) {
         return new TextSelectionActivity(sarosSession.getUser(getSource()),
-            offset, length, (getPath() != null ? getPath()
-                .toSPath(sarosSession) : null));
+            offset, length, (getPath() != null ? getPath().toSPath(
+                sarosSession, pathFactory) : null));
     }
 }

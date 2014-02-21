@@ -9,6 +9,7 @@ import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.business.FolderActivity.Type;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
@@ -59,8 +60,10 @@ public class FolderActivityDataObject extends AbstractProjectActivityDataObject 
     }
 
     @Override
-    public IActivity getActivity(ISarosSession sarosSession) {
+    public IActivity getActivity(ISarosSession sarosSession,
+        IPathFactory pathFactory) {
         return new FolderActivity(sarosSession.getUser(getSource()), type,
-            (getPath() != null ? getPath().toSPath(sarosSession) : null));
+            (getPath() != null ? getPath().toSPath(sarosSession, pathFactory)
+                : null));
     }
 }

@@ -7,6 +7,7 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.ChecksumActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
+import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
@@ -155,9 +156,10 @@ public class ChecksumActivity extends AbstractActivity implements
     }
 
     @Override
-    public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
+    public IActivityDataObject getActivityDataObject(
+        ISarosSession sarosSession, IPathFactory pathFactory) {
         return new ChecksumActivityDataObject(getSource().getJID(),
-            (path != null ? path.toSPathDataObject(sarosSession) : null), hash,
-            length, jupiterTimestamp);
+            (path != null ? path.toSPathDataObject(sarosSession, pathFactory)
+                : null), hash, length, jupiterTimestamp);
     }
 }

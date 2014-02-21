@@ -8,6 +8,7 @@ import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.JupiterActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
+import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
@@ -91,9 +92,10 @@ public class JupiterActivity extends AbstractActivity implements
     }
 
     @Override
-    public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
+    public IActivityDataObject getActivityDataObject(
+        ISarosSession sarosSession, IPathFactory pathFactory) {
         return new JupiterActivityDataObject(timestamp, operation, getSource()
-            .getJID(), (path != null ? path.toSPathDataObject(sarosSession)
-            : null));
+            .getJID(), (path != null ? path.toSPathDataObject(sarosSession,
+            pathFactory) : null));
     }
 }

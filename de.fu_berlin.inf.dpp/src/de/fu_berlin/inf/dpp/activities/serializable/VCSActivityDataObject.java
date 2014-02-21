@@ -10,6 +10,7 @@ import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.business.VCSActivity;
 import de.fu_berlin.inf.dpp.activities.business.VCSActivity.Type;
+import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
@@ -37,16 +38,17 @@ public class VCSActivityDataObject extends AbstractProjectActivityDataObject {
     }
 
     @Override
-    public IActivity getActivity(ISarosSession sarosSession) {
+    public IActivity getActivity(ISarosSession sarosSession,
+        IPathFactory pathFactory) {
         final VCSActivity vcsActivity = new VCSActivity(
             sarosSession.getUser(getSource()), type,
-            (getPath() != null ? getPath().toSPath(sarosSession) : null), url,
-            directory, param1);
+            (getPath() != null ? getPath().toSPath(sarosSession, pathFactory)
+                : null), url, directory, param1);
 
         vcsActivity.containedActivity.ensureCapacity(containedActivity.size());
         for (IActivityDataObject ado : containedActivity) {
             vcsActivity.containedActivity.add((IResourceActivity) ado
-                .getActivity(sarosSession));
+                .getActivity(sarosSession, pathFactory));
         }
         return vcsActivity;
     }
