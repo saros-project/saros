@@ -1,4 +1,5 @@
 bin/
+bin_test/
 /de.fu_berlin.inf.dpp.update/logs.zip
 /de.fu_berlin.inf.dpp.update/features/
 /de.fu_berlin.inf.dpp.update/plugins/
