@@ -12,10 +12,10 @@ import org.eclipse.core.resources.IFile;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Type;
+import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.test.mocks.SarosMocks;
 
 public class RecoveryFileActivityTest extends FileActivityTest {

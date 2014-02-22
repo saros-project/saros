@@ -1,8 +1,8 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter;
 
-import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
+import de.fu_berlin.inf.dpp.session.User;
 
 public interface Algorithm {
 

@@ -30,7 +30,6 @@ import org.jivesoftware.smackx.ChatState;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.communication.chat.ChatElement;
 import de.fu_berlin.inf.dpp.communication.chat.ChatElement.ChatElementType;
 import de.fu_berlin.inf.dpp.communication.chat.IChat;
@@ -46,6 +45,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.sounds.SoundPlayer;
 import de.fu_berlin.inf.dpp.ui.sounds.Sounds;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;

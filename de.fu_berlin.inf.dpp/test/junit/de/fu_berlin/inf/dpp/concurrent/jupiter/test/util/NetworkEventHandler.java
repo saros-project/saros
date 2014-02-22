@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
 
-import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.session.User;
 
 /**
  * handler for simulated network events.

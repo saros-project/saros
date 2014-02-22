@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
-import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.session.User;
 
 /**
  * This is an interface for activities that are only sent to a specific set of

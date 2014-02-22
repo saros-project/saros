@@ -1,7 +1,7 @@
 package de.fu_berlin.inf.dpp.project.internal;
 
-import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.session.User;
 
 /**
  * Simple callback interface for monitoring events that occur in the

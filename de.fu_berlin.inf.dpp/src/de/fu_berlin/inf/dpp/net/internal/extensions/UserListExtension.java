@@ -5,9 +5,9 @@ import java.util.List;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.session.User;
+import de.fu_berlin.inf.dpp.session.User.Permission;
 
 @XStreamAlias(/* UserListStatusUpdate */"ULSUP")
 public class UserListExtension extends SarosSessionPacketExtension {

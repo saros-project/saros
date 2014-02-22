@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.ui.expressions;
 
 import org.eclipse.core.expressions.PropertyTester;
 
-import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.session.User;
 
 /**
  * Adds test to {@link User} instances.

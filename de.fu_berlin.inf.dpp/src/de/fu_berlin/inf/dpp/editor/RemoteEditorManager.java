@@ -13,7 +13,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.source.ILineRange;
 
-import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
@@ -22,6 +21,7 @@ import de.fu_berlin.inf.dpp.activities.business.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.business.ViewportActivity;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.session.User;
 
 /**
  * This class contains the state of the editors, viewports and selections of all

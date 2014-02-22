@@ -21,12 +21,12 @@ package de.fu_berlin.inf.dpp.activities.business;
 
 import org.apache.commons.lang.ObjectUtils;
 
-import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.PermissionActivityDataObject;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.session.User;
+import de.fu_berlin.inf.dpp.session.User.Permission;
 
 /**
  * A PermissionActivity indicates that a {@link User} has a new

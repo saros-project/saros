@@ -27,8 +27,6 @@ import java.util.Map;
 import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.ui.IEditorPart;
 
-import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -37,6 +35,8 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.session.User;
+import de.fu_berlin.inf.dpp.session.User.Permission;
 
 /**
  * This collector collects information about selections made by users with

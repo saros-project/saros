@@ -21,7 +21,7 @@ package de.fu_berlin.inf.dpp.project;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.session.User;
 
 /**
  * A listener for SarosSession life-cycle related events.

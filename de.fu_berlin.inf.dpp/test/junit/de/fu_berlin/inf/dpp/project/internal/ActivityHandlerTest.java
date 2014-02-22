@@ -17,7 +17,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.ChangeColorActivity;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
@@ -43,6 +42,7 @@ import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.internal.ActivityHandler.QueueItem;
+import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.test.fakes.synchonize.NonUISynchronizer;
 
 public class ActivityHandlerTest {

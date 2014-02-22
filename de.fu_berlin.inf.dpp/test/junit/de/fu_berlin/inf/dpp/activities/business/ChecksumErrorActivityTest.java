@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.test.mocks.SarosMocks;
 
 public class ChecksumErrorActivityTest extends AbstractActivityTest {

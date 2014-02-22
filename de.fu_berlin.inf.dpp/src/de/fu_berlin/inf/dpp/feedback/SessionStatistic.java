@@ -35,7 +35,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import de.fu_berlin.inf.dpp.User.Permission;
+import de.fu_berlin.inf.dpp.session.User.Permission;
 
 /**
  * The SessionStatistic class wraps a Properties object in which the gathered

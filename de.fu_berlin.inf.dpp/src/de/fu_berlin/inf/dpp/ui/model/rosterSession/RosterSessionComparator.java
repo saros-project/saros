@@ -4,7 +4,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 
-import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.model.ITreeElement;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterComparator;
 

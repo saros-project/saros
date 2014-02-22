@@ -8,11 +8,11 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.User;
 
 /**
  * A Collector class that collects for each number of users the time they were

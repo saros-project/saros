@@ -17,11 +17,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp;
+package de.fu_berlin.inf.dpp.session;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 
 /**
  * A user is a representation of a person sitting in front of an eclipse
@@ -222,22 +221,28 @@ public class User {
      * @param user
      * @return
      */
-    public static String getHumanReadableName(XMPPConnectionService connectionService, JID user) {
-        String nickName = RosterUtils.getNickname(connectionService, user);
-        String jidBase = user.getBase();
-        if (nickName != null && !nickName.equals(jidBase)) {
-            jidBase = nickName + " (" + jidBase + ")";
-        }
-        return jidBase;
+    public static String getHumanReadableName(
+        XMPPConnectionService connectionService, JID user) {
+        // FIXME: code got broken when moved into the core
+
+        // String nickName = RosterUtils.getNickname(connectionService, user);
+        // String jidBase = user.getBase();
+        // if (nickName != null && !nickName.equals(jidBase)) {
+        // jidBase = nickName + " (" + jidBase + ")";
+        // }
+        // return jidBase;
+
+        return user.getName();
     }
 
     public String getShortHumanReadableName() {
 
-        String nickName = RosterUtils.getNickname(null, getJID());
-
-        if (nickName != null && !nickName.equals(getJID().getBase())) {
-            return nickName;
-        }
+        // FIXME: code got broken when moved into the core
+        // String nickName = RosterUtils.getNickname(null, getJID());
+        //
+        // if (nickName != null && !nickName.equals(getJID().getBase())) {
+        // return nickName;
+        // }
 
         return getJID().getName();
     }

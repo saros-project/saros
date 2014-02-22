@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.project;
 
-import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.session.User;
 
 /**
  * Abstract {@link ISharedProjectListener} that does nothing in all the methods.

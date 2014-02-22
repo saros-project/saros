@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.ProgressActivity.ProgressAction;
+import de.fu_berlin.inf.dpp.session.User;
 
 public class ProgressActivityTest extends AbstractActivityTest {
 

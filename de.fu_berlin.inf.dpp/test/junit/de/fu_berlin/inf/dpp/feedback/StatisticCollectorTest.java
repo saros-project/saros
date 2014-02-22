@@ -18,7 +18,6 @@ import org.picocontainer.injectors.ConstructorInjection;
 
 import de.fu_berlin.inf.dpp.ISarosContextBindings;
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -27,6 +26,7 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceInitializer;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.internal.SarosSessionTest;
+import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.test.util.MemoryPreferenceStore;
 import de.fu_berlin.inf.dpp.test.util.MemoryPreferences;
 

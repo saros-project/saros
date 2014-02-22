@@ -5,10 +5,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.ui.IEditorPart;
 
-import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.business.ViewportActivity;
+import de.fu_berlin.inf.dpp.session.User;
 
 /**
  * {@link ISharedEditorListener} which can dispatch to a changing set of

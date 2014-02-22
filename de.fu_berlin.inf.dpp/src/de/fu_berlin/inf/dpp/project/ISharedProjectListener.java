@@ -19,8 +19,8 @@
  */
 package de.fu_berlin.inf.dpp.project;
 
-import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.User.Permission;
+import de.fu_berlin.inf.dpp.session.User;
+import de.fu_berlin.inf.dpp.session.User.Permission;
 
 /**
  * Listens for events that can happen during a Saros session. For life-cycle

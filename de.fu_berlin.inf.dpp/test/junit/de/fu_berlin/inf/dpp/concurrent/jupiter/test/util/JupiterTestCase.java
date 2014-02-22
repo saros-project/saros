@@ -8,8 +8,8 @@ import static org.junit.Assert.assertEquals;
 import org.apache.log4j.PropertyConfigurator;
 import org.junit.Before;
 
-import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.session.User;
 
 public abstract class JupiterTestCase {
 

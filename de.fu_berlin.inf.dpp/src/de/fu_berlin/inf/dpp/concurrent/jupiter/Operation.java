@@ -2,10 +2,10 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter;
 
 import java.util.List;
 
-import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.ITextOperation;
+import de.fu_berlin.inf.dpp.session.User;
 
 /**
  * An Operation is a representation of a user Activity for the use by an

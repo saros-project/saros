@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.activities.business;
 
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.session.User;
 
 public class StartFollowingActivityTest extends AbstractActivityTest {
 

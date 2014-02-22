@@ -10,7 +10,7 @@ import org.eclipse.ui.console.IPatternMatchListenerDelegate;
 import org.eclipse.ui.console.PatternMatchEvent;
 import org.eclipse.ui.console.TextConsole;
 
-import de.fu_berlin.inf.dpp.User.Permission;
+import de.fu_berlin.inf.dpp.session.User.Permission;
 
 /**
  * A console listener for the SVN console, which doesn't do anything but logging

@@ -1,7 +1,7 @@
 package de.fu_berlin.inf.dpp.editor.annotations;
 
-import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.User.Permission;
+import de.fu_berlin.inf.dpp.session.User;
+import de.fu_berlin.inf.dpp.session.User.Permission;
 
 /**
  * Marks text selected by both users with {@link Permission#WRITE_ACCESS} and

@@ -8,9 +8,9 @@ import java.util.List;
 
 import org.apache.commons.lang.ObjectUtils;
 
-import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.project.internal.ActivityHandler.QueueItem;
+import de.fu_berlin.inf.dpp.session.User;
 
 public class TransformationResult {
 
