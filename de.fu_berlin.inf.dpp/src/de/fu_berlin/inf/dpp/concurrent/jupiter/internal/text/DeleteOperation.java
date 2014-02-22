@@ -24,6 +24,7 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -34,7 +35,6 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
 import de.fu_berlin.inf.dpp.misc.xstream.UrlEncodingStringConverter;
 import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * The DeleteOperation is used to hold a text together with its position that is
@@ -96,9 +96,11 @@ public class DeleteOperation implements ITextOperation {
      */
     @Override
     public String toString() {
-        return "Delete(" + this.position + ",'"
-            + Utils.escapeForLogging(StringUtils.abbreviate(this.text, 150))
-            + "')";
+        return "Delete("
+            + this.position
+            + ",'"
+            + StringEscapeUtils.escapeJava(StringUtils.abbreviate(this.text,
+                150)) + "')";
     }
 
     @Override

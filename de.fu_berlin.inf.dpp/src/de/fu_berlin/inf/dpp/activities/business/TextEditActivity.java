@@ -20,6 +20,7 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
 import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -33,7 +34,6 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * An immutable TextEditActivity.
@@ -99,9 +99,9 @@ public class TextEditActivity extends AbstractActivity implements
 
     @Override
     public String toString() {
-        String newText = Utils.escapeForLogging(StringUtils.abbreviate(text,
-            150));
-        String oldText = Utils.escapeForLogging(StringUtils.abbreviate(
+        String newText = StringEscapeUtils.escapeJava(StringUtils.abbreviate(
+            text, 150));
+        String oldText = StringEscapeUtils.escapeJava(StringUtils.abbreviate(
             replacedText, 150));
         return "TextEditActivity(offset: " + offset + ", new: '" + newText
             + "', old: '" + oldText + "', path: " + path + ", src: "

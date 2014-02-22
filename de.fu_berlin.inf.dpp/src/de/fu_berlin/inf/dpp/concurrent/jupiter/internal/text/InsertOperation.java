@@ -24,6 +24,7 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -34,7 +35,6 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
 import de.fu_berlin.inf.dpp.misc.xstream.UrlEncodingStringConverter;
 import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * The InsertOperation is used to hold a text together with its position index.
@@ -145,9 +145,11 @@ public class InsertOperation implements ITextOperation {
      */
     @Override
     public String toString() {
-        return "Insert(" + this.position + ",'"
-            + Utils.escapeForLogging(StringUtils.abbreviate(this.text, 150))
-            + "'," + this.origin + ")";
+        return "Insert("
+            + this.position
+            + ",'"
+            + StringEscapeUtils.escapeJava(StringUtils.abbreviate(this.text,
+                150)) + "'," + this.origin + ")";
     }
 
     @Override

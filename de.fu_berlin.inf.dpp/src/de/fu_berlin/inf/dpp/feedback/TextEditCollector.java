@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -38,7 +39,6 @@ import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * <p>
@@ -229,7 +229,7 @@ public class TextEditCollector extends AbstractStatisticCollector {
             if (log.isTraceEnabled()) {
                 log.trace(String.format("Recieved chars written from %s "
                     + "(whitespaces omitted): %s [%s]", user.getJID(),
-                    textLength, Utils.escapeForLogging(text)));
+                    textLength, StringEscapeUtils.escapeJava(text)));
             }
 
             if (textLength > 0) {

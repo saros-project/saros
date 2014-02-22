@@ -2,8 +2,6 @@ package de.fu_berlin.inf.dpp.util;
 
 import java.util.Iterator;
 
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Platform;
 
@@ -44,27 +42,6 @@ public final class Utils {
                 return it;
             }
         };
-    }
-
-    /**
-     * Utility method similar to {@link ObjectUtils#equals(Object, Object)},
-     * which causes a compile error if the second parameter is not a subclass of
-     * the first.
-     */
-    public static <V, K extends V> boolean equals(V object1, K object2) {
-        return ObjectUtils.equals(object1, object2);
-    }
-
-    public static String escapeForLogging(String s) {
-        if (s == null)
-            return null;
-
-        return StringEscapeUtils.escapeJava(s);
-        /*
-         * // Try to put nice symbols for non-readable characters sometime
-         * return s.replace(' ', '\uc2b7').replace('\t',
-         * '\uc2bb').replace('\n','\uc2b6').replace('\r', '\uc2a4');
-         */
     }
 
     private static String getEclipsePlatformInfo() {
