@@ -35,6 +35,7 @@ import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
+import de.fu_berlin.inf.dpp.util.FileUtils;
 
 /**
  * This component is responsible for handling Consistency Errors on the host
@@ -250,9 +251,15 @@ public class ConsistencyWatchdogHandler implements Startable {
         if (file.exists()) {
 
             try {
+
+                byte[] content = FileUtils.getLocalFileContent(file);
+
+                if (content == null)
+                    throw new IOException();
+
                 // Send the file to client
                 activityProvider.fireActivity(RecoveryFileActivity.created(
-                    user, path, from));
+                    user, path, content, from));
 
                 // Immediately follow up with a new checksum
                 IDocument doc;

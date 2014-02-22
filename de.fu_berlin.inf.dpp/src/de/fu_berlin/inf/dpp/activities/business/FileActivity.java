@@ -1,19 +1,15 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 import org.apache.commons.lang.ObjectUtils;
-import org.eclipse.core.resources.IFile;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
-import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.util.FileUtils;
 
 public class FileActivity extends AbstractActivity implements IResourceActivity {
 
@@ -39,28 +35,20 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
     protected final SPath oldPath;
     protected final Purpose purpose;
     protected final byte[] data;
-    protected final Long checksum;
 
     /**
      * Utility method for creating a FileActivity of type {@link Type#CREATED}
      * for a given path.
      * 
-     * This method will make a snapshot copy of the file at this point in time.
-     * 
      * @param path
-     *            The path of the file to copy the data from.
-     * @throws IOException
-     *             If an error occurs while reading the file.
+     *            path referencing the newly created file
+     * @param content
+     *            content of the file denoted by the path
      */
-    public static FileActivity created(User source, SPath path, Purpose purpose)
-        throws IOException {
-
-        IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
-        Long checksum = FileUtils.checksum(file);
-        byte[] content = FileUtils.getLocalFileContent(file);
-
+    public static FileActivity created(User source, SPath path, byte[] content,
+        Purpose purpose) {
         return new FileActivity(source, Type.CREATED, path, null, content,
-            purpose, checksum);
+            purpose);
     }
 
     /**
@@ -73,22 +61,16 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
      *            path where the file moved to
      * @param sourcePath
      *            path where the file moved from
-     * @param contentChange
-     *            if true, a snapshot copy is made of the file at the
-     *            destination path and sent as part of the Activity.
-     * @throws IOException
-     *             the new content of the file could not be read
+     * @param content
+     *            content of the file denoted by the path, may be
+     *            <code>null</code> to indicate that the file content was not
+     *            changed when moved
      */
     public static FileActivity moved(User source, SPath destPath,
-        SPath sourcePath, boolean contentChange) throws IOException {
+        SPath sourcePath, byte[] content) {
 
-        byte[] content = null;
-        if (contentChange) {
-            content = FileUtils.getLocalFileContent(((EclipseFileImpl) destPath
-                .getFile()).getDelegate());
-        }
         return new FileActivity(source, Type.MOVED, destPath, sourcePath,
-            content, Purpose.ACTIVITY, null);
+            content, Purpose.ACTIVITY);
     }
 
     /**
@@ -99,8 +81,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
      */
     public static FileActivity removed(User source, SPath path, Purpose purpose) {
 
-        return new FileActivity(source, Type.REMOVED, path, null, null,
-            purpose, null);
+        return new FileActivity(source, Type.REMOVED, path, null, null, purpose);
     }
 
     /**
@@ -120,7 +101,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
      *            {@link Type#CREATED} and {@link Type#MOVED})
      */
     public FileActivity(User source, Type type, SPath newPath, SPath oldPath,
-        byte[] data, Purpose purpose, Long checksum) {
+        byte[] data, Purpose purpose) {
 
         super(source);
 
@@ -151,7 +132,6 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
         this.oldPath = oldPath;
         this.data = data;
         this.purpose = purpose;
-        this.checksum = checksum;
     }
 
     @Override
@@ -235,16 +215,12 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
         return Purpose.RECOVERY.equals(purpose);
     }
 
-    public long getChecksum() {
-        return checksum;
-    }
-
     @Override
     public IActivityDataObject getActivityDataObject(
         ISarosSession sarosSession, IPathFactory pathFactory) {
         return new FileActivityDataObject(getSource().getJID(), type,
             newPath.toSPathDataObject(sarosSession, pathFactory),
             (oldPath != null ? oldPath.toSPathDataObject(sarosSession,
-                pathFactory) : null), data, purpose, checksum);
+                pathFactory) : null), data, purpose);
     }
 }

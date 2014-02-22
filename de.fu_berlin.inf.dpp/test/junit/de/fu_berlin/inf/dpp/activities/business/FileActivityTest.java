@@ -18,7 +18,6 @@ import de.fu_berlin.inf.dpp.util.FileUtils;
 public class FileActivityTest extends AbstractResourceActivityTest {
 
     protected static final byte[] data = new byte[] { 'a', 'b', 'c' };
-    protected long checksum = 12345L;
 
     @Test
     @Override
@@ -28,24 +27,21 @@ public class FileActivityTest extends AbstractResourceActivityTest {
         List<SPath> oldPaths = toListPlusNull(SarosMocks.mockSPath());
         List<byte[]> datas = toListPlusNull(data);
         List<Purpose> purposes = toListPlusNull(Purpose.values());
-        List<Long> checksums = toListPlusNull(new Long(1024L));
 
         for (Type type : types) {
             for (SPath newPath : paths) {
                 for (SPath oldPath : oldPaths) {
                     for (byte[] data : datas) {
                         for (Purpose purpose : purposes) {
-                            for (Long checksum : checksums) {
-                                FileActivity f;
-                                try {
-                                    f = new FileActivity(source, type, newPath,
-                                        oldPath, data, purpose, checksum);
-                                } catch (IllegalArgumentException e) {
-                                    continue;
-                                }
-
-                                testConversionAndBack(f);
+                            FileActivity f;
+                            try {
+                                f = new FileActivity(source, type, newPath,
+                                    oldPath, data, purpose);
+                            } catch (IllegalArgumentException e) {
+                                continue;
                             }
+
+                            testConversionAndBack(f);
                         }
                     }
                 }

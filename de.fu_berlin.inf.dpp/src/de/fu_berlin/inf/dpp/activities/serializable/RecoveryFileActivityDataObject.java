@@ -30,10 +30,9 @@ public class RecoveryFileActivityDataObject extends FileActivityDataObject
     protected JID target;
 
     public RecoveryFileActivityDataObject(JID source, JID target, Type type,
-        SPathDataObject newPath, SPathDataObject oldPath, byte[] data,
-        Long checksum) {
+        SPathDataObject newPath, SPathDataObject oldPath, byte[] data) {
 
-        super(source, type, newPath, oldPath, data, Purpose.RECOVERY, checksum);
+        super(source, type, newPath, oldPath, data, Purpose.RECOVERY);
 
         this.target = target;
     }
@@ -44,7 +43,7 @@ public class RecoveryFileActivityDataObject extends FileActivityDataObject
         return new RecoveryFileActivity(sarosSession.getUser(getSource()),
             sarosSession.getUser(target), getType(), path.toSPath(sarosSession,
                 pathFactory), (oldPath != null ? oldPath.toSPath(sarosSession,
-                pathFactory) : null), data, checksum);
+                pathFactory) : null), data);
     }
 
     @Override

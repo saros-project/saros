@@ -1,7 +1,5 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
-import java.io.IOException;
-
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
@@ -24,9 +22,9 @@ public class RecoveryFileActivity extends FileActivity implements
     private User target;
 
     public RecoveryFileActivity(User source, User target, Type type,
-        SPath newPath, SPath oldPath, byte[] data, Long checksum) {
+        SPath newPath, SPath oldPath, byte[] data) {
 
-        super(source, type, newPath, oldPath, data, Purpose.RECOVERY, checksum);
+        super(source, type, newPath, oldPath, data, Purpose.RECOVERY);
 
         if (target == null)
             throw new IllegalArgumentException("target must not be null");
@@ -45,7 +43,7 @@ public class RecoveryFileActivity extends FileActivity implements
         return new RecoveryFileActivityDataObject(source.getJID(),
             target.getJID(), type, newPath.toSPathDataObject(sarosSession,
                 pathFactory), (oldPath != null ? oldPath.toSPathDataObject(
-                sarosSession, pathFactory) : null), data, checksum);
+                sarosSession, pathFactory) : null), data);
     }
 
     /**
@@ -59,14 +57,15 @@ public class RecoveryFileActivity extends FileActivity implements
      *            The User that has created this Activity.
      * @param path
      *            The SPath of the affected resource.
+     * @param content
+     *            content of the file denoted by the path
      * @param target
      *            The User this Activity will be send to.
-     * @throws IOException
      */
     public static RecoveryFileActivity created(User source, SPath path,
-        User target) throws IOException {
+        byte[] content, User target) {
 
-        FileActivity fileActivity = FileActivity.created(source, path,
+        FileActivity fileActivity = FileActivity.created(source, path, content,
             Purpose.RECOVERY);
 
         return createFromFileActivity(fileActivity, target);
@@ -112,7 +111,6 @@ public class RecoveryFileActivity extends FileActivity implements
             throw new IllegalArgumentException();
         }
         return new RecoveryFileActivity(activity.source, target, activity.type,
-            activity.newPath, activity.oldPath, activity.data,
-            activity.checksum);
+            activity.newPath, activity.oldPath, activity.data);
     }
 }

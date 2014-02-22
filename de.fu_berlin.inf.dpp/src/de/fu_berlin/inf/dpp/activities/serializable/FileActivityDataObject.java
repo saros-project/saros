@@ -29,8 +29,6 @@ public class FileActivityDataObject extends AbstractProjectActivityDataObject {
 
     protected byte[] data;
 
-    protected Long checksum;
-
     /**
      * Generic constructor for {@link FileActivityDataObject}s
      * 
@@ -49,7 +47,7 @@ public class FileActivityDataObject extends AbstractProjectActivityDataObject {
      */
     public FileActivityDataObject(JID source, Type type,
         SPathDataObject newPath, SPathDataObject oldPath, byte[] data,
-        Purpose purpose, Long checksum) {
+        Purpose purpose) {
 
         super(source, newPath);
 
@@ -57,7 +55,6 @@ public class FileActivityDataObject extends AbstractProjectActivityDataObject {
         this.oldPath = oldPath;
         this.data = data;
         this.purpose = purpose;
-        this.checksum = checksum;
     }
 
     public Type getType() {
@@ -115,6 +112,6 @@ public class FileActivityDataObject extends AbstractProjectActivityDataObject {
         return new FileActivity(sarosSession.getUser(source), type,
             (newPath != null ? newPath.toSPath(sarosSession, pathFactory)
                 : null), (oldPath != null ? oldPath.toSPath(sarosSession,
-                pathFactory) : null), data, purpose, checksum);
+                pathFactory) : null), data, purpose);
     }
 }

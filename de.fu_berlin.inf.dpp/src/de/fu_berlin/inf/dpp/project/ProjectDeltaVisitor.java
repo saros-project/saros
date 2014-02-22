@@ -23,6 +23,9 @@ import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.business.IResourceActivity;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
+import de.fu_berlin.inf.dpp.util.FileUtils;
+
+/* TODO refactor the error handling, either handle Core/IOExceptions in all methods or throw them up to handle them only in one place */
 
 /**
  * Visits the resource changes in a shared project.<br>
@@ -204,12 +207,17 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
         sharedProject.add(resource);
         final SPath spath = new SPath(ResourceAdapterFactory.create(resource));
 
-        if (resource instanceof IFile) {
-            try {
-                addActivity(FileActivity.created(user, spath, Purpose.ACTIVITY));
-            } catch (IOException e) {
-                log.error("Couldn't access file " + spath);
-            }
+        if (resource.getType() == IResource.FILE) {
+            byte[] content = FileUtils.getLocalFileContent((IFile) resource
+                .getAdapter(IFile.class));
+
+            if (content == null)
+                log.error("could not read contents of file: "
+                    + resource.getFullPath());
+            else
+                addActivity(FileActivity.created(user, spath, content,
+                    Purpose.ACTIVITY));
+
         } else {
             addActivity(new FolderActivity(user, FolderActivity.Type.CREATED,
                 spath));
@@ -219,12 +227,25 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     protected void move(IResource resource, IPath oldFullPath,
         IProject oldProject, boolean contentChange) throws IOException {
         sharedProject.move(resource, oldFullPath);
+
+        byte[] content = null;
+
+        if (contentChange) {
+            assert resource.getType() == IResource.FILE;
+
+            content = FileUtils.getLocalFileContent((IFile) resource
+                .getAdapter(IFile.class));
+
+            if (content == null)
+                throw new IOException();
+        }
+
         addActivity(FileActivity.moved(
             user,
             new SPath(ResourceAdapterFactory.create(resource)),
             new SPath(ResourceAdapterFactory.create(oldProject),
                 ResourceAdapterFactory.create(oldFullPath
-                    .removeFirstSegments(1))), contentChange));
+                    .removeFirstSegments(1))), content));
     }
 
     protected void remove(IResource resource) {
@@ -270,13 +291,18 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
             return;
 
         log.debug("Resource " + resource.getName() + " changed");
-        try {
-            addActivity(FileActivity.created(user, spath, Purpose.ACTIVITY));
-        } catch (IOException e) {
-            log.warn("Resource could not be read for sending to peers:"
-                + resource.getLocation(), e);
-            return;
-        }
+
+        assert resource.getType() == IResource.FILE;
+
+        byte[] content = FileUtils.getLocalFileContent((IFile) resource
+            .getAdapter(IFile.class));
+
+        if (content == null)
+            log.error("could not read contents of file: "
+                + resource.getFullPath());
+        else
+            addActivity(FileActivity.created(user, spath, content,
+                Purpose.ACTIVITY));
     }
 
     /**
