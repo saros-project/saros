@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.core.runtime.Path;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,8 +19,8 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.JupiterTestCase;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.PathFake;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -54,8 +53,7 @@ public class SplitOperationTest {
     public void setUp() {
         project = createMock(IProject.class);
         replay(project);
-        path = new SPath(project,
-            ResourceAdapterFactory.create(new Path("path")));
+        path = new SPath(project, new PathFake("path"));
     }
 
     @Test

@@ -6,11 +6,8 @@ import static org.easymock.EasyMock.replay;
 import java.util.HashMap;
 import java.util.PriorityQueue;
 
-import org.eclipse.core.runtime.Path;
-
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
@@ -24,7 +21,7 @@ public class NetworkSimulator {
 
     public IProject project;
 
-    public IPath path = ResourceAdapterFactory.create(new Path("dummy"));
+    public IPath path = new PathFake("dummy");
 
     protected PriorityQueue<NetworkRequest> sendQueue = new PriorityQueue<NetworkRequest>();
 

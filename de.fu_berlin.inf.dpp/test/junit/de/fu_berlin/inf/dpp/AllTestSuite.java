@@ -8,12 +8,6 @@ import org.junit.runners.Suite;
 
 de.fu_berlin.inf.dpp.accountManagement.TestSuite.class,
 
-de.fu_berlin.inf.dpp.activities.business.TestSuite.class,
-
-de.fu_berlin.inf.dpp.concurrent.TestSuite.class,
-
-de.fu_berlin.inf.dpp.concurrent.jupiter.test.puzzles.TestSuite.class,
-
 de.fu_berlin.inf.dpp.concurrent.undo.TestSuite.class,
 
 de.fu_berlin.inf.dpp.editor.colorstorage.TestSuite.class,
@@ -23,10 +17,6 @@ de.fu_berlin.inf.dpp.editor.internal.TestSuite.class,
 de.fu_berlin.inf.dpp.feedback.TestSuite.class,
 
 de.fu_berlin.inf.dpp.invitation.TestSuite.class,
-
-de.fu_berlin.inf.dpp.net.TestSuite.class,
-
-de.fu_berlin.inf.dpp.net.internal.TestSuite.class,
 
 de.fu_berlin.inf.dpp.net.internal.extensions.TestSuite.class,
 

@@ -9,7 +9,6 @@ import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.eclipse.core.runtime.Path;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
@@ -19,9 +18,9 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.Document;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.JupiterTestCase;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.PathFake;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.session.User;
 
 public class SimpleJupiterDocumentTest extends JupiterTestCase {
@@ -36,7 +35,7 @@ public class SimpleJupiterDocumentTest extends JupiterTestCase {
         IProject project = createMock(IProject.class);
         replay(project);
 
-        IPath path = ResourceAdapterFactory.create(new Path("dummy"));
+        IPath path = new PathFake("dummy");
 
         Document doc = new Document("abc", project, path);
         assertEquals("abc", doc.getDocument());
