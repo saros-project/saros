@@ -24,8 +24,6 @@ de.fu_berlin.inf.dpp.project.TestSuite.class,
 
 de.fu_berlin.inf.dpp.project.internal.TestSuite.class,
 
-de.fu_berlin.inf.dpp.synchronize.TestSuite.class,
-
 de.fu_berlin.inf.dpp.ui.model.roster.TestSuite.class,
 
 de.fu_berlin.inf.dpp.util.TestSuite.class,
