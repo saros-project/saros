@@ -3,18 +3,12 @@ package de.fu_berlin.inf.dpp.activities.business;
 import java.util.List;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Type;
 import de.fu_berlin.inf.dpp.test.mocks.SarosMocks;
-import de.fu_berlin.inf.dpp.util.FileUtils;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(FileUtils.class)
 public class FileActivityTest extends AbstractResourceActivityTest {
 
     protected static final byte[] data = new byte[] { 'a', 'b', 'c' };

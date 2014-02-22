@@ -8,7 +8,6 @@ import static org.junit.Assert.fail;
 import java.util.List;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.eclipse.core.resources.IFile;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,8 +19,7 @@ import de.fu_berlin.inf.dpp.test.mocks.SarosMocks;
 
 public class RecoveryFileActivityTest extends FileActivityTest {
 
-    protected IFile file;
-    protected SPath newPath;
+    private SPath newPath;
 
     @Override
     @Before
