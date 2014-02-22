@@ -371,12 +371,6 @@ public interface ISarosSession {
     public boolean useVersionControl();
 
     /**
-     * Returns the {@link SharedProject} associated with the {@link IProject}
-     * <code>project</code>, or <code>null</code> if the project is not shared.
-     */
-    public SharedProject getSharedProject(IProject project);
-
-    /**
      * Returns the global ID of the project.
      * 
      * @return the global ID of the project or <code>null</code> if this project
@@ -404,13 +398,6 @@ public interface ISarosSession {
      */
     public void addSharedResources(IProject project, String projectID,
         List<IResource> dependentResources);
-
-    /**
-     * Returns all shared Projects in their current state
-     * 
-     * @return
-     */
-    public List<SharedProject> getSharedProjects();
 
     /**
      * Returns all shared resources in this session.

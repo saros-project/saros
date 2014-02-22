@@ -81,7 +81,6 @@ import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.SharedProject;
 import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
 import de.fu_berlin.inf.dpp.project.internal.timeout.ClientSessionTimeoutHandler;
 import de.fu_berlin.inf.dpp.project.internal.timeout.ServerSessionTimeoutHandler;
@@ -163,6 +162,9 @@ public final class SarosSession implements ISarosSession {
     private boolean stopped = false;
 
     private final ActivityQueuer activityQueuer;
+
+    // HACK to be able to move most parts to core
+    private final SharedResourcesManager resourceManager;
 
     private final IActivityListener activityListener = new IActivityListener() {
 
@@ -251,6 +253,8 @@ public final class SarosSession implements ISarosSession {
             if (dependentResources != null)
                 projectMapper.addResources(project, dependentResources);
 
+            // HACK
+            resourceManager.projectAdded(project);
         } else {
             if (dependentResources == null)
                 // upgrade the project to a completely shared project
@@ -901,18 +905,6 @@ public final class SarosSession implements ISarosSession {
     }
 
     @Override
-    public SharedProject getSharedProject(IProject project) {
-        if (!isShared(project))
-            return null;
-        return projectMapper.getSharedProject(projectMapper.getID(project));
-    }
-
-    @Override
-    public List<SharedProject> getSharedProjects() {
-        return projectMapper.getSharedProjects();
-    }
-
-    @Override
     public String getProjectID(IProject project) {
         return projectMapper.getID(project);
     }
@@ -940,18 +932,22 @@ public final class SarosSession implements ISarosSession {
     @Override
     public void addProjectOwnership(String projectID, IProject project,
         JID ownerJID) {
-        if (projectMapper.getSharedProject(projectID) == null) {
+        if (projectMapper.getProject(projectID) == null) {
             projectMapper.addProject(projectID, project, true);
             projectMapper.addOwnership(ownerJID, project);
+            // HACK
+            resourceManager.projectAdded(project);
         }
     }
 
     @Override
     public void removeProjectOwnership(String projectID, IProject project,
         JID ownerJID) {
-        if (projectMapper.getSharedProject(projectID) != null) {
+        if (projectMapper.getProject(projectID) != null) {
             projectMapper.removeOwnership(ownerJID, project);
             projectMapper.removeProject(projectID);
+            // HACK
+            resourceManager.projectRemoved(project);
         }
     }
 
@@ -992,7 +988,7 @@ public final class SarosSession implements ISarosSession {
 
         this.sessionID = context.getComponent(SessionIDObservable.class)
             .getValue();
-        this.projectMapper = new SarosProjectMapper(this);
+        this.projectMapper = new SarosProjectMapper();
         this.activityQueuer = new ActivityQueuer();
         this.sarosContext = context;
 
@@ -1071,6 +1067,10 @@ public final class SarosSession implements ISarosSession {
 
         // Force the creation of the above components.
         sessionContainer.getComponents();
+
+        // HACK
+        resourceManager = sessionContainer
+            .getComponent(SharedResourcesManager.class);
 
         concurrentDocumentServer = sessionContainer
             .getComponent(ConcurrentDocumentServer.class);

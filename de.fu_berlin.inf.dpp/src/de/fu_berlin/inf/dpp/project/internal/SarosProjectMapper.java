@@ -14,8 +14,6 @@ import org.apache.log4j.Logger;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.SharedProject;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -75,24 +73,14 @@ class SarosProjectMapper {
      */
     private HashMap<IProject, Set<IResource>> partiallySharedResourceMapping = new HashMap<IProject, Set<IResource>>();
 
-    /** Mapping from project IDs to {@link SharedProject} instances */
-    /*
-     * FIXME the naming is bad ... but as long as this "mapper" also tracks the
-     * resources of partially shared projects their is no easy way to use
-     * meaningful names without creating ambiguity.
-     */
-    private Map<String, SharedProject> sharedProjectResources = new HashMap<String, SharedProject>();
-
     /** Set containing the currently completely shared projects. */
     private Set<IProject> completelySharedProjects = new HashSet<IProject>();
 
     /** Set containing the currently partially shared projects. */
     private Set<IProject> partiallySharedProjects = new HashSet<IProject>();
 
-    private final ISarosSession session;
-
-    SarosProjectMapper(ISarosSession session) {
-        this.session = session;
+    SarosProjectMapper() {
+        // NOP
     }
 
     /**
@@ -188,8 +176,6 @@ class SarosProjectMapper {
         else
             partiallySharedResourceMapping.put(project, null);
 
-        sharedProjectResources.put(id, new SharedProject(project, session));
-
         LOG.debug("added project " + project + " with ID " + id
             + " [completely shared:" + !isPartially + "]");
     }
@@ -218,8 +204,6 @@ class SarosProjectMapper {
         idToProjectMapping.remove(id);
         projectToIDMapping.remove(project);
         partiallySharedResourceMapping.remove(project);
-        SharedProject sharedProject = sharedProjectResources.remove(id);
-        sharedProject.delete();
 
         LOG.debug("removed project " + project + " with ID " + id);
 
@@ -469,14 +453,6 @@ class SarosProjectMapper {
      */
     public synchronized int size() {
         return idToProjectMapping.size();
-    }
-
-    public synchronized SharedProject getSharedProject(String projectID) {
-        return sharedProjectResources.get(projectID);
-    }
-
-    public synchronized List<SharedProject> getSharedProjects() {
-        return new ArrayList<SharedProject>(sharedProjectResources.values());
     }
 
     /**

@@ -21,7 +21,6 @@ import org.eclipse.team.core.subscribers.ISubscriberChangeEvent;
 import org.eclipse.team.core.subscribers.ISubscriberChangeListener;
 import org.eclipse.team.core.subscribers.Subscriber;
 
-import de.fu_berlin.inf.dpp.filesystem.EclipseProjectImpl;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
@@ -209,8 +208,7 @@ public class SharedProject {
         }
     };
 
-    public SharedProject(de.fu_berlin.inf.dpp.filesystem.IProject project,
-        ISarosSession sarosSession) {
+    public SharedProject(IProject project, ISarosSession sarosSession) {
 
         assert sarosSession != null;
         assert project != null;
@@ -218,13 +216,7 @@ public class SharedProject {
 
         this.sarosSession = sarosSession;
 
-        // FIXME dirty hack to allow testing
-        if (!(project instanceof EclipseProjectImpl)) {
-            this.project = null;
-            return;
-        }
-
-        this.project = ((EclipseProjectImpl) project).getDelegate();
+        this.project = project;
 
         projectIsOpen.update(project.isOpen());
 

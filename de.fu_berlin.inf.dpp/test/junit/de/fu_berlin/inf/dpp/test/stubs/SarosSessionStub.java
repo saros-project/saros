@@ -16,7 +16,6 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.SharedProject;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
@@ -107,11 +106,6 @@ public class SarosSessionStub implements ISarosSession {
     }
 
     public ITransmitter getTransmitter() {
-        throw new RuntimeException("Unexpected call to Stub");
-    }
-
-    @Override
-    public SharedProject getSharedProject(IProject project) {
         throw new RuntimeException("Unexpected call to Stub");
     }
 
@@ -207,11 +201,6 @@ public class SarosSessionStub implements ISarosSession {
     public void addActivityProvider(IActivityProvider provider) {
         throw new RuntimeException("Unexpected call to Stub");
 
-    }
-
-    @Override
-    public List<SharedProject> getSharedProjects() {
-        throw new RuntimeException("Unexpected call to Stub");
     }
 
     public void execQueuedActivities() {

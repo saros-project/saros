@@ -18,22 +18,14 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 public class SarosProjectMapperTest {
 
-    private ISarosSession sessionMock;
     private SarosProjectMapper mapper;
 
     @Before
     public void setUp() {
-
-        sessionMock = EasyMock.createNiceMock(ISarosSession.class);
-        EasyMock.expect(sessionMock.useVersionControl()).andStubReturn(false);
-        EasyMock.expect(sessionMock.hasWriteAccess()).andStubReturn(false);
-        EasyMock.replay(sessionMock);
-
-        mapper = new SarosProjectMapper(sessionMock);
+        mapper = new SarosProjectMapper();
     }
 
     @Test(expected = NullPointerException.class)

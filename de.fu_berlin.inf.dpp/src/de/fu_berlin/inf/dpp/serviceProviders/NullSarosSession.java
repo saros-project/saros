@@ -17,7 +17,6 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.SharedProject;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
@@ -196,12 +195,6 @@ public class NullSarosSession implements ISarosSession {
     }
 
     @Override
-    public SharedProject getSharedProject(IProject project) {
-        log.warn("unexpected method call");
-        return null;
-    }
-
-    @Override
     public String getProjectID(IProject project) {
         log.warn("unexpected method call");
         return null;
@@ -218,12 +211,6 @@ public class NullSarosSession implements ISarosSession {
         List<IResource> dependentResources) {
         log.warn("unexpected method call");
 
-    }
-
-    @Override
-    public List<SharedProject> getSharedProjects() {
-        log.warn("unexpected method call");
-        return null;
     }
 
     @Override

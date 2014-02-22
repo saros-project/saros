@@ -25,7 +25,10 @@ import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IContainer;
@@ -124,6 +127,8 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
 
     protected final StopManager stopManager;
 
+    private final Map<IProject, SharedProject> sharedProjects = Collections
+        .synchronizedMap(new HashMap<IProject, SharedProject>());
     /**
      * Should return <code>true</code> while executing resource changes to avoid
      * an infinite resource event loop.
@@ -247,8 +252,10 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
             if (useVersionControl && !checkVCSConnection(project))
                 continue;
 
-            SharedProject sharedProject = sarosSession
-                .getSharedProject(ResourceAdapterFactory.create(project));
+            SharedProject sharedProject = sharedProjects.get(project);
+
+            if (sharedProject == null)
+                continue;
 
             VCSAdapter vcs = useVersionControl ? VCSAdapter.getAdapter(project)
                 : null;
@@ -297,8 +304,11 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
     }
 
     protected boolean checkOpenClosed(IProject project) {
-        SharedProject sharedProject = sarosSession
-            .getSharedProject(ResourceAdapterFactory.create(project));
+
+        SharedProject sharedProject = sharedProjects.get(project);
+
+        if (sharedProject == null)
+            return false;
 
         boolean isProjectOpen = project.isOpen();
         if (sharedProject.updateProjectIsOpen(isProjectOpen)) {
@@ -326,8 +336,11 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
      * @return
      */
     protected boolean checkVCSConnection(IProject project) {
-        SharedProject sharedProject = sarosSession
-            .getSharedProject(ResourceAdapterFactory.create(project));
+
+        SharedProject sharedProject = sharedProjects.get(project);
+
+        if (sharedProject == null)
+            return true;
 
         VCSAdapter vcs = VCSAdapter.getAdapter(project);
         VCSAdapter oldVcs = sharedProject.getVCSAdapter();
@@ -667,6 +680,27 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
             throw new IllegalStateException(e);
         } catch (InterruptedException e) {
             log.error("Code not designed to be interrupted!");
+        }
+    }
+
+    // HACK
+    public void projectAdded(de.fu_berlin.inf.dpp.filesystem.IProject project) {
+        synchronized (sharedProjects) {
+            IProject eclipseProject = ((EclipseProjectImpl) project)
+                .getDelegate();
+            sharedProjects.put(eclipseProject, new SharedProject(
+                eclipseProject, sarosSession));
+        }
+    }
+
+    // HACK
+    public void projectRemoved(de.fu_berlin.inf.dpp.filesystem.IProject project) {
+        synchronized (sharedProjects) {
+
+            SharedProject sharedProject = sharedProjects
+                .remove(((EclipseProjectImpl) project).getDelegate());
+            if (sharedProject != null)
+                sharedProject.delete();
         }
     }
 }
