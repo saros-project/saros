@@ -1440,7 +1440,7 @@
       <definition
             id="de.fu_berlin.inf.dpp.ui.definitions.isParticipant">
          <adapt
-               type="de.fu_berlin.inf.dpp.User">
+               type="de.fu_berlin.inf.dpp.session.User">
          </adapt>
       </definition>
       <definition
@@ -1473,7 +1473,7 @@
       <definition
             id="de.fu_berlin.inf.dpp.ui.definitions.participantIsRemote">
          <adapt
-               type="de.fu_berlin.inf.dpp.User">
+               type="de.fu_berlin.inf.dpp.session.User">
             <test
                   property="de.fu_berlin.inf.dpp.isRemote">
             </test>
@@ -1482,7 +1482,7 @@
       <definition
             id="de.fu_berlin.inf.dpp.ui.definitions.participantsHasWriteAccess">
          <adapt
-               type="de.fu_berlin.inf.dpp.User">
+               type="de.fu_berlin.inf.dpp.session.User">
             <test
                   property="de.fu_berlin.inf.dpp.hasWriteAccess">
             </test>
@@ -1608,7 +1608,7 @@
             id="de.fu_berlin.inf.dpp.propertyTesters.ParticipantPropertyTester"
             namespace="de.fu_berlin.inf.dpp"
             properties="hasWriteAccess,isRemote"
-            type="de.fu_berlin.inf.dpp.User">
+            type="de.fu_berlin.inf.dpp.session.User">
       </propertyTester>
    </extension>
    <extension
@@ -1634,21 +1634,21 @@
             adaptableType="de.fu_berlin.inf.dpp.ui.model.rosterSession.UserElement"
             class="de.fu_berlin.inf.dpp.ui.model.rosterSession.RosterSessionAdapterFactory">
          <adapter
-               type="de.fu_berlin.inf.dpp.User">
+               type="de.fu_berlin.inf.dpp.session.User">
          </adapter>
       </factory>
       <factory
             adaptableType="de.fu_berlin.inf.dpp.ui.model.rosterSession.AwarenessInformationTreeElement"
             class="de.fu_berlin.inf.dpp.ui.model.rosterSession.RosterSessionAdapterFactory">
          <adapter
-               type="de.fu_berlin.inf.dpp.User">
+               type="de.fu_berlin.inf.dpp.session.User">
          </adapter>
       </factory>
       <factory
             adaptableType="de.fu_berlin.inf.dpp.ui.model.rosterSession.FollowModeInformationTreeElement"
             class="de.fu_berlin.inf.dpp.ui.model.rosterSession.RosterSessionAdapterFactory">
          <adapter
-               type="de.fu_berlin.inf.dpp.User">
+               type="de.fu_berlin.inf.dpp.session.User">
          </adapter>
       </factory>
    </extension>
