@@ -1,7 +1,7 @@
 package de.fu_berlin.inf.dpp.concurrent.watchdog;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.util.ObservableValue;
+import de.fu_berlin.inf.dpp.observables.ObservableValue;
 
 /**
  * This observable contains whether the ConsistencyWatchdogClient has detected

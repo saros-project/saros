@@ -2,7 +2,7 @@
  * Created on 20.01.2005
  *
  */
-package de.fu_berlin.inf.dpp.util;
+package de.fu_berlin.inf.dpp.observables;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -65,8 +65,7 @@ public class ObservableValue<T> {
      * 
      * would trigger a call to all listeners.
      * 
-     * @return Returns true if the setting of the variable was successful (this
-     *         is used for a {@link VetoableObservableValue}).
+     * @return Returns true if the setting of the variable was successful.
      * 
      */
     public boolean setValue(T newValue) {

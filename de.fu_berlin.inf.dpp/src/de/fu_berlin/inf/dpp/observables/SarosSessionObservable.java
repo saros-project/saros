@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.observables;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.util.ObservableValue;
 
 /**
  * This observable contains the ISarosSession that is currently open or null if
