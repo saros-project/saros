@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp.net.internal.extensions;
+package de.fu_berlin.inf.dpp.net;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -52,16 +52,46 @@ import de.fu_berlin.inf.dpp.misc.xstream.XppReader;
 public class XStreamExtensionProvider<T> implements PacketExtensionProvider,
     IQProvider {
 
-    private static final Logger log = Logger
+    private static final Logger LOG = Logger
         .getLogger(XStreamExtensionProvider.class);
 
-    public static final String NAMESPACE = "de.fu_berlin.inf.dpp";
+    private static volatile String currentNamespace;
+
+    private static volatile ClassLoader currentClassloader;
 
     protected final String namespace;
 
     protected final String elementName;
 
-    protected final XStream xstream;
+    private final XStream xstream;
+
+    /**
+     * Sets the namespace that should be used when a new provider is created.
+     * </p> <b>Important:</b> The namespace must not contain invalid XML
+     * characters.
+     * 
+     * @param namespace
+     *            the namespace to use
+     * @see #XStreamExtensionProvider(String, Class...)
+     */
+    public static void setNameSpace(String namespace) {
+        currentNamespace = namespace;
+    }
+
+    /**
+     * Sets the class loader to use when a new provider is created. This class
+     * loader will be used by {@link XStream} to unmarshal the given packet
+     * extension.
+     * 
+     * @param classLoader
+     *            the class loader to use or <code>null</code> to use the class
+     *            loader the provider was loaded with
+     * 
+     * @see #XStreamExtensionProvider(String, Class...)
+     */
+    public static void setClassLoader(ClassLoader classLoader) {
+        currentClassloader = classLoader;
+    }
 
     /**
      * Create a new XStreamExtensionProvider using the given elementName as the
@@ -72,11 +102,25 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider,
      * be unable to decode the extension !
      */
     public XStreamExtensionProvider(String elementName, Class<?>... classes) {
+
+        String namespace = currentNamespace;
+
+        if (namespace == null)
+            throw new NullPointerException(
+                "initialization missing, namespace to use is null");
+
+        ClassLoader classLoader = currentClassloader;
+
         this.elementName = elementName;
-        this.namespace = NAMESPACE;
+        this.namespace = namespace;
 
         xstream = new XStream();
-        xstream.setClassLoader(getClass().getClassLoader());
+
+        if (classLoader != null)
+            xstream.setClassLoader(classLoader);
+        else
+            xstream.setClassLoader(getClass().getClassLoader());
+
         xstream.registerConverter(BooleanConverter.BINARY);
         xstream.registerConverter(new UrlEncodingStringConverter());
         xstream.processAnnotations(XStreamPacketExtension.class);
@@ -173,7 +217,7 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider,
     /**
      * PacketFilter for Packets which contain a PacketExtension matching the
      * {@link XStreamExtensionProvider#elementName} and
-     * {@link XStreamExtensionProvider#NAMESPACE}.
+     * {@link XStreamExtensionProvider#namespace}.
      */
     public PacketFilter getPacketFilter() {
         return new PacketExtensionFilter(getElementName(), getNamespace());
@@ -209,7 +253,7 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider,
             result.provider = this;
             return result;
         } catch (RuntimeException e) {
-            log.error("unmarshalling data failed", e);
+            LOG.error("unmarshalling data failed", e);
             return new DropSilentlyPacketExtension();
         }
     }
@@ -284,9 +328,30 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider,
             result.provider = this;
             return new XStreamIQPacket<T>(result);
         } catch (RuntimeException e) {
-            log.error("unmarshalling data failed!", e);
+            LOG.error("unmarshalling data failed", e);
             return null;
         }
 
+    }
+
+    private static class DropSilentlyPacketExtension implements PacketExtension {
+
+        @Override
+        public String getElementName() {
+            return "drop";
+        }
+
+        @Override
+        public String getNamespace() {
+            return "drop";
+        }
+
+        @Override
+        public String toXML() {
+            StringBuilder buf = new StringBuilder();
+            buf.append("<").append(getElementName()).append(" xmlns=\"")
+                .append(getNamespace()).append("\"/>");
+            return buf.toString();
+        }
     }
 }

@@ -19,6 +19,7 @@ import org.picocontainer.injectors.Reinjector;
 
 import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
+import de.fu_berlin.inf.dpp.net.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelProjectNegotiationExtension;
@@ -70,6 +71,8 @@ public class SarosContext implements ISarosContext {
 
     private static final Logger log = Logger.getLogger(SarosContext.class);
 
+    private static final String PACKET_EXTENSION_NAMESPACE = "de.fu_berlin.inf.dpp";
+
     private final DotGraphMonitor dotMonitor;
 
     private final ISarosContextFactory factory;
@@ -91,9 +94,9 @@ public class SarosContext implements ISarosContext {
         init();
     }
 
-    // TODO move to the network layer
     private void installPacketExtensionProviders() {
 
+        XStreamExtensionProvider.setNameSpace(PACKET_EXTENSION_NAMESPACE);
         /* *
          * 
          * @JTourBusStop 6, Creating custom network messages, Installing the

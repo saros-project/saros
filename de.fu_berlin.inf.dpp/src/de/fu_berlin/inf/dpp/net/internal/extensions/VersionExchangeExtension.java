@@ -5,6 +5,8 @@ import java.util.Map;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
+import de.fu_berlin.inf.dpp.net.XStreamExtensionProvider;
+
 /**
  * Packet containing data for exchanging version details. This packet extension
  * is <b>NOT</b> affected by the current Saros Extension protocol version

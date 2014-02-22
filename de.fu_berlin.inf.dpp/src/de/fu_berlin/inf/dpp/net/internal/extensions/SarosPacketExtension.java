@@ -7,6 +7,8 @@ import org.jivesoftware.smack.packet.Packet;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
+import de.fu_berlin.inf.dpp.net.XStreamExtensionProvider;
+
 /* *
  * 
  * @JTourBusStop 1, Creating custom network messages, Packet Extensions:

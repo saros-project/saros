@@ -14,10 +14,15 @@ import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
+import de.fu_berlin.inf.dpp.net.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 
 public class UserInformationHandlerTest {
+
+    static {
+        XStreamExtensionProvider.setNameSpace("foo");
+    }
 
     private final List<User> emptyUserList = Collections.emptyList();
 

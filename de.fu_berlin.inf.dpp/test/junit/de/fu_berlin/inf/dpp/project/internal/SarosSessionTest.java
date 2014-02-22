@@ -51,6 +51,7 @@ import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
+import de.fu_berlin.inf.dpp.net.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
@@ -67,6 +68,10 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ StatisticManager.class, ResourcesPlugin.class })
 public class SarosSessionTest {
+
+    static {
+        XStreamExtensionProvider.setNameSpace("foo");
+    }
 
     private static final String SAROS_SESSION_ID = "SAROS_SESSION_TEST";
 
