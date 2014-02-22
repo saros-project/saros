@@ -21,6 +21,9 @@ import org.eclipse.team.core.subscribers.ISubscriberChangeEvent;
 import org.eclipse.team.core.subscribers.ISubscriberChangeListener;
 import org.eclipse.team.core.subscribers.Subscriber;
 
+import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;

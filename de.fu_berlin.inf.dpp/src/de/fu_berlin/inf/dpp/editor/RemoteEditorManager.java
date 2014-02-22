@@ -11,7 +11,9 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.source.ILineRange;
+import org.eclipse.jface.text.source.LineRange;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
@@ -20,7 +22,7 @@ import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.business.ViewportActivity;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -196,15 +198,21 @@ public class RemoteEditorManager {
             @Override
             public void receive(ViewportActivity viewportActivity) {
 
-                setViewport(viewportActivity.getPath(),
-                    viewportActivity.getLineRange());
+                ILineRange lineRange = new LineRange(
+                    viewportActivity.getStartLine(),
+                    viewportActivity.getNumberOfLines());
+
+                setViewport(viewportActivity.getPath(), lineRange);
             }
 
             @Override
             public void receive(TextSelectionActivity textSelectionActivity) {
 
-                setSelection(textSelectionActivity.getPath(),
-                    textSelectionActivity.getSelection());
+                ITextSelection selection = new TextSelection(
+                    textSelectionActivity.getOffset(),
+                    textSelectionActivity.getLength());
+
+                setSelection(textSelectionActivity.getPath(), selection);
             }
         };
 

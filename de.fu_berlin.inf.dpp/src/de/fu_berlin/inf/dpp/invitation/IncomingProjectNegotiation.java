@@ -53,7 +53,7 @@ import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.IChecksumCache;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.EnterProjectNamePage;

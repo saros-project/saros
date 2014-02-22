@@ -14,8 +14,8 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.extensions.SessionStatusRequestExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.SessionStatusResponseExtension;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 
 public final class SessionStatusRequestHandler {

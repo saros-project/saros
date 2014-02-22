@@ -16,8 +16,8 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.extensions.JoinSessionRejectedExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.JoinSessionRequestExtension;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 

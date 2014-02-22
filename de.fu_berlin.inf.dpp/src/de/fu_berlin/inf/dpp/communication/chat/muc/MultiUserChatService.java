@@ -37,7 +37,7 @@ import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPrefere
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 
 /**
  * This class manages the creation and destruction of {@link MultiUserChat}s.

@@ -22,13 +22,13 @@ import de.fu_berlin.inf.dpp.activities.business.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.ProgressActivity;
 import de.fu_berlin.inf.dpp.activities.business.ProgressActivity.ProgressAction;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
-import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.AbstractActivityProvider;
+import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 

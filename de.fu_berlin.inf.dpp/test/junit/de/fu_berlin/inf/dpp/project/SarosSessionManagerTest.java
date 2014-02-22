@@ -25,6 +25,7 @@ import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ SarosSession.class, SarosSessionManager.class })

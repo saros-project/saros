@@ -12,6 +12,7 @@ import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.jface.window.Window;
 import org.picocontainer.Startable;
 
+import de.fu_berlin.inf.dpp.activities.QueueItem;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
@@ -21,10 +22,9 @@ import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.concurrent.management.TransformationResult;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
-import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
@@ -58,24 +58,6 @@ public final class ActivityHandler implements Startable {
             dispatchModeToUse = DISPATCH_MODE_SYNC;
 
         DISPATCH_MODE = dispatchModeToUse;
-    }
-
-    public static class QueueItem {
-
-        public final List<User> recipients;
-        public final IActivity activity;
-
-        public QueueItem(List<User> recipients, IActivity activity) {
-            if (recipients.size() == 0)
-                LOG.fatal("empty list of recipients in constructor",
-                    new StackTrace());
-            this.recipients = recipients;
-            this.activity = activity;
-        }
-
-        public QueueItem(User host, IActivity activity) {
-            this(Collections.singletonList(host), activity);
-        }
     }
 
     private final LinkedBlockingQueue<List<IActivity>> dispatchQueue = new LinkedBlockingQueue<List<IActivity>>();

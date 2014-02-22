@@ -12,9 +12,9 @@ import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
 
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ProjectDeltaVisitor;
 import de.fu_berlin.inf.dpp.project.SharedProject;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 
 /**
  * Visits the resource changes in a shared SVN project.<br>

@@ -10,9 +10,9 @@ import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PingExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PongExtension;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ActivitySequencer;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**

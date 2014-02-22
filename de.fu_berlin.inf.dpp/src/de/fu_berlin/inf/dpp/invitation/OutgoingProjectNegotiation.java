@@ -40,7 +40,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.ProjectNegotiationOfferingEx
 import de.fu_berlin.inf.dpp.net.internal.extensions.StartActivityQueuingRequest;
 import de.fu_berlin.inf.dpp.net.internal.extensions.StartActivityQueuingResponse;
 import de.fu_berlin.inf.dpp.project.IChecksumCache;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.util.FileZipper;

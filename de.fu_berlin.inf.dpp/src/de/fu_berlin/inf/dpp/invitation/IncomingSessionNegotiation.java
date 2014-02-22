@@ -19,9 +19,9 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationAcceptedExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationAcknowledgedExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationCompletedExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationParameterExchangeExtension;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ColorNegotiationHook;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
 
 /*

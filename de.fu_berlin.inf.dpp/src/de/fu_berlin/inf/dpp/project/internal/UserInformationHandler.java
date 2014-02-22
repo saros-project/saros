@@ -22,7 +22,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.UserFinishedProjectNegotiati
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension.UserListEntry;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListReceivedExtension;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**

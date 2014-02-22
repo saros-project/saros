@@ -22,6 +22,7 @@ import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.business.IResourceActivity;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.util.FileUtils;
 

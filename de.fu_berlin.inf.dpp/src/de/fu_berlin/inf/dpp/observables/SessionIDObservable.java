@@ -1,7 +1,7 @@
 package de.fu_berlin.inf.dpp.observables;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 
 /**
  * Observable containing the ID of the SarosSession in which the local user is

@@ -16,11 +16,11 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PingExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PongExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
-import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.internal.ActivitySequencer;
+import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 

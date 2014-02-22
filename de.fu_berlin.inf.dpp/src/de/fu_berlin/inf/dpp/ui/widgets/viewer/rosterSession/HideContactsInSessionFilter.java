@@ -5,7 +5,7 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.jivesoftware.smack.Roster;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterEntryElement;
 
 /**

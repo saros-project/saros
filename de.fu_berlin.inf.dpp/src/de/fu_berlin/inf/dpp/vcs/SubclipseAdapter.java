@@ -36,9 +36,9 @@ import de.fu_berlin.inf.dpp.activities.business.VCSActivity;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.invitation.FileList;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ProjectDeltaVisitor;
 import de.fu_berlin.inf.dpp.project.SharedProject;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 
 /**
  * Adapter for Subclipse 1.6.

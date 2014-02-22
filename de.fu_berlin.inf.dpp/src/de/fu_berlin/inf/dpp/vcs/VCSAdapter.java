@@ -15,9 +15,9 @@ import org.eclipse.team.core.synchronize.SyncInfo;
 import de.fu_berlin.inf.dpp.activities.business.VCSActivity;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.invitation.FileList;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ProjectDeltaVisitor;
 import de.fu_berlin.inf.dpp.project.SharedProject;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 
 /**
  * Interface to an adapter for a Version Control System (Team Provider).

@@ -9,7 +9,7 @@ import de.fu_berlin.inf.dpp.net.ITransferModeListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 
 /**
  * Collects information about the amount of data transfered with the different

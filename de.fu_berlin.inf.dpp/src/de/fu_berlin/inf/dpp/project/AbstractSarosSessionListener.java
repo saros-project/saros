@@ -21,6 +21,7 @@ package de.fu_berlin.inf.dpp.project;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**

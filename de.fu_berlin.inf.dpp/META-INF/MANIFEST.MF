@@ -60,10 +60,6 @@ Export-Package: de.fu_berlin.inf.dpp;
  de.fu_berlin.inf.dpp.communication.chat.muc,
  de.fu_berlin.inf.dpp.communication.chat.muc.negotiation,
  de.fu_berlin.inf.dpp.concurrent,
- de.fu_berlin.inf.dpp.concurrent.jupiter,
- de.fu_berlin.inf.dpp.concurrent.jupiter.internal,
- de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text,
- de.fu_berlin.inf.dpp.concurrent.management,
  de.fu_berlin.inf.dpp.editor;
   uses:="org.eclipse.jface.text,
    org.eclipse.core.runtime,

@@ -11,7 +11,7 @@ import org.eclipse.ui.texteditor.IElementStateListener;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.AutoHashMap;
 

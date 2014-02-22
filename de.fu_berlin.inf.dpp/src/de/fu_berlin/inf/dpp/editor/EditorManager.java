@@ -41,6 +41,7 @@ import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.text.source.LineRange;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.part.FileEditorInput;
@@ -73,14 +74,14 @@ import de.fu_berlin.inf.dpp.editor.internal.LocationAnnotationManager;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
-import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
-import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
-import de.fu_berlin.inf.dpp.project.IActivityProvider;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.AbstractActivityProvider;
+import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.session.IActivityProvider;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
@@ -257,8 +258,9 @@ public class EditorManager extends AbstractActivityProvider {
             if (locallyActiveEditor == null)
                 return;
             if (localViewport != null) {
-                fireActivity(new ViewportActivity(localUser, localViewport,
-                    locallyActiveEditor));
+                fireActivity(new ViewportActivity(localUser,
+                    localViewport.getStartLine(),
+                    localViewport.getNumberOfLines(), locallyActiveEditor));
             } else {
                 log.warn("No viewport for locallyActivateEditor: "
                     + locallyActiveEditor);
@@ -592,7 +594,7 @@ public class EditorManager extends AbstractActivityProvider {
             this.localViewport = viewport;
 
         fireActivity(new ViewportActivity(sarosSession.getLocalUser(),
-            viewport, path));
+            viewport.getStartLine(), viewport.getNumberOfLines(), path));
 
         editorListenerDispatch.viewportGenerated(part, viewport, path);
 
@@ -892,8 +894,11 @@ public class EditorManager extends AbstractActivityProvider {
                  */
                 int userWithWriteAccessCursor = userWithWriteAccessSelection
                     .getEndLine();
-                int top = viewport.getTopIndex();
-                int bottom = viewport.getBottomIndex();
+
+                int top = viewport.getStartLine();
+                int bottom = viewport.getStartLine()
+                    + viewport.getNumberOfLines();
+
                 following = following
                     && (userWithWriteAccessCursor < top || userWithWriteAccessCursor > bottom);
             }
@@ -901,7 +906,10 @@ public class EditorManager extends AbstractActivityProvider {
 
         Set<IEditorPart> editors = this.editorPool.getEditors(viewport
             .getPath());
-        ILineRange lineRange = viewport.getLineRange();
+
+        ILineRange lineRange = new LineRange(viewport.getStartLine(),
+            viewport.getNumberOfLines());
+
         for (IEditorPart editorPart : editors) {
             if (following || user.hasWriteAccess())
                 locationAnnotationManager.setViewportForUser(user, editorPart,

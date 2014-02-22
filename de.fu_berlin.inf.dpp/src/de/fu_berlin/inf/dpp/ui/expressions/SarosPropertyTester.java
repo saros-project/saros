@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.ui.expressions;
 import org.eclipse.core.expressions.PropertyTester;
 
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 
 /**
  * Adds tests to the {@link ISarosSession}. <br/>

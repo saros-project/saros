@@ -10,9 +10,9 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelProjectNegotiationExtension;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 
 public class CancelProjectSharingHandler {
 

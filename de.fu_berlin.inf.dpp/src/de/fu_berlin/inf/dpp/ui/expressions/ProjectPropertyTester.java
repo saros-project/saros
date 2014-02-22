@@ -7,8 +7,8 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 
 /**
  * Adds tests to the {@link IResource}. <br/>

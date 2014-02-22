@@ -26,10 +26,10 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationCompletedExtension
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationOfferingExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationParameterExchangeExtension;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ColorNegotiationHook;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.versioning.Compatibility;
 import de.fu_berlin.inf.dpp.versioning.VersionCompatibilityResult;

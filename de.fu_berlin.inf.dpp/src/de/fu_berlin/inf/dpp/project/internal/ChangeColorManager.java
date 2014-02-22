@@ -23,10 +23,10 @@ import de.fu_berlin.inf.dpp.editor.colorstorage.ColorIDSet;
 import de.fu_berlin.inf.dpp.editor.colorstorage.ColorIDSetStorage;
 import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
-import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.AbstractActivityProvider;
+import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**

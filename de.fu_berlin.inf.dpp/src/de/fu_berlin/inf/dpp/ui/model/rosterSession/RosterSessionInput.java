@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.ui.model.rosterSession;
 
 import org.jivesoftware.smack.Roster;
 
-import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.rosterSession.BuddySessionDisplayComposite;
 
 /**

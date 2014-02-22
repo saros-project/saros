@@ -73,6 +73,8 @@ import de.fu_berlin.inf.dpp.filesystem.EclipseProjectImpl;
 import de.fu_berlin.inf.dpp.filesystem.EclipseResourceImpl;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
+import de.fu_berlin.inf.dpp.session.AbstractActivityProvider;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;

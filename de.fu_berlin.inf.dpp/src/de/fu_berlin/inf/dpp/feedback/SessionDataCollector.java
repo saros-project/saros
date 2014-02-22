@@ -25,7 +25,7 @@ import de.fu_berlin.inf.dpp.ISarosContextBindings.PlatformVersion;
 import de.fu_berlin.inf.dpp.ISarosContextBindings.SarosVersion;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 
 /**
  * Collects some general session data (session time, session ID, session count),

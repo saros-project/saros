@@ -17,7 +17,7 @@ import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**

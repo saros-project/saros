@@ -19,7 +19,7 @@ import org.picocontainer.Startable;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.ui.preferencePages.FeedbackPreferencePage;
 
 /**

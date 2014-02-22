@@ -12,6 +12,7 @@ import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.invitation.FileList;
 import de.fu_berlin.inf.dpp.invitation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
