@@ -37,7 +37,7 @@ import de.fu_berlin.inf.dpp.communication.chat.IChatListener;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.net.util.RosterUtils;
+import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
@@ -492,7 +492,7 @@ public class ChatControl extends Composite {
     }
 
     private String getNickname(JID jid) {
-        String name = RosterUtils.getNickname(connectionService, jid);
+        String name = XMPPUtils.getNickname(connectionService, jid);
 
         if (name == null)
             name = jid.getBase().toString();

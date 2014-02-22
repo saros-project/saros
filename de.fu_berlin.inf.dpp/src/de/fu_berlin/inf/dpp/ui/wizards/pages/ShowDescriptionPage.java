@@ -7,7 +7,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
 import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
-import de.fu_berlin.inf.dpp.net.util.RosterUtils;
+import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.versioning.VersionManager;
@@ -52,7 +52,7 @@ public class ShowDescriptionPage extends WizardPage {
         Composite composite = new Composite(parent, SWT.NONE);
         composite.setLayout(new GridLayout(2, false));
 
-        String nickname = RosterUtils.getNickname(null,
+        String nickname = XMPPUtils.getNickname(null,
             sessionNegotiation.getPeer());
 
         if (nickname == null)

@@ -35,7 +35,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
-import de.fu_berlin.inf.dpp.net.util.RosterUtils;
+import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
@@ -124,7 +124,7 @@ public class CreateXMPPAccountWizard extends Wizard {
                         IProgressMonitor.UNKNOWN);
 
                     try {
-                        Registration registration = RosterUtils.createAccount(
+                        Registration registration = XMPPUtils.createAccount(
                             cachedServer, cachedUsername, cachedPassword);
 
                         if (registration != null)

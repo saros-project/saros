@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.communication.chat.ChatElement.ChatElementType;
 import de.fu_berlin.inf.dpp.communication.chat.ChatHistory;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.net.util.RosterUtils;
+import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 
 /**
  * This object represents a chat with a single user.
@@ -210,7 +210,7 @@ public class SingleUserChat extends AbstractChat {
             participant = new JID(chat.getParticipant());
         }
 
-        String nickname = RosterUtils.getNickname(connectionService, participant);
+        String nickname = XMPPUtils.getNickname(connectionService, participant);
 
         return nickname != null ? nickname : participant.getBareJID()
             .toString();

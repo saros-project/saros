@@ -21,6 +21,7 @@ package de.fu_berlin.inf.dpp.session;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
+import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 
 /**
  * A user is a representation of a person sitting in front of an eclipse
@@ -223,26 +224,22 @@ public class User {
      */
     public static String getHumanReadableName(
         XMPPConnectionService connectionService, JID user) {
-        // FIXME: code got broken when moved into the core
 
-        // String nickName = RosterUtils.getNickname(connectionService, user);
-        // String jidBase = user.getBase();
-        // if (nickName != null && !nickName.equals(jidBase)) {
-        // jidBase = nickName + " (" + jidBase + ")";
-        // }
-        // return jidBase;
+        String nickName = XMPPUtils.getNickname(connectionService, user);
+        String jidBase = user.getBase();
 
-        return user.getName();
+        if (nickName != null && !nickName.equals(jidBase))
+            jidBase = nickName + " (" + jidBase + ")";
+
+        return jidBase;
     }
 
     public String getShortHumanReadableName() {
 
-        // FIXME: code got broken when moved into the core
-        // String nickName = RosterUtils.getNickname(null, getJID());
-        //
-        // if (nickName != null && !nickName.equals(getJID().getBase())) {
-        // return nickName;
-        // }
+        String nickName = XMPPUtils.getNickname(null, getJID());
+
+        if (nickName != null && !nickName.equals(getJID().getBase()))
+            return nickName;
 
         return getJID().getName();
     }

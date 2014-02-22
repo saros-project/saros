@@ -33,11 +33,12 @@ import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.XMPPException;
 import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.subscription.SubscriptionHandler;
-import de.fu_berlin.inf.dpp.net.util.RosterUtils;
+import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
@@ -180,7 +181,8 @@ public class AddContactWizard extends Wizard {
             throw new NullPointerException("jid is null");
 
         try {
-            boolean jidOnServer = RosterUtils.isJIDonServer(connection, jid);
+            boolean jidOnServer = XMPPUtils.isJIDonServer(connection, jid,
+                Saros.RESOURCE);
             if (!jidOnServer) {
                 boolean cancel = false;
                 try {

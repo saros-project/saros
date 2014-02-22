@@ -18,6 +18,7 @@ import org.picocontainer.injectors.ProviderAdapter;
 import org.picocontainer.injectors.Reinjector;
 
 import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelProjectNegotiationExtension;
@@ -42,6 +43,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.UserFinishedProjectNegotiati
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListReceivedExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.VersionExchangeExtension;
+import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.pico.ChildContainer;
 import de.fu_berlin.inf.dpp.util.pico.ChildContainerProvider;
@@ -178,6 +180,9 @@ public class SarosContext implements ISarosContext {
         reinjector = new Reinjector(container);
 
         installPacketExtensionProviders();
+
+        XMPPUtils.setDefaultConnectionService(container
+            .getComponent(XMPPConnectionService.class));
 
         // additional initialization
 

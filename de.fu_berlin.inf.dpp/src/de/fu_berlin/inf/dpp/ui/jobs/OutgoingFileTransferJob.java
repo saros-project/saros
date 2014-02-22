@@ -13,7 +13,7 @@ import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.util.RosterUtils;
+import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 
 /**
  * This job is intended to be used with a pending outgoing
@@ -43,7 +43,7 @@ public final class OutgoingFileTransferJob extends FileTransferJob {
     @Override
     protected IStatus run(IProgressMonitor monitor) {
 
-        String nickname = RosterUtils.getNickname(null, jid);
+        String nickname = XMPPUtils.getNickname(null, jid);
 
         if (nickname == null)
             nickname = jid.getBase();

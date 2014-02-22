@@ -21,7 +21,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManager;
-import de.fu_berlin.inf.dpp.net.util.RosterUtils;
+import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.model.ITreeElement;
@@ -73,7 +73,7 @@ public class RosterEntryElement extends TreeElement {
 
         RosterEntry rosterEntry = this.getRosterEntry();
         styledString.append((rosterEntry == null) ? jid.toString()
-            : RosterUtils.getDisplayableName(rosterEntry));
+            : XMPPUtils.getDisplayableName(rosterEntry));
 
         final Presence presence = roster.getPresence(jid.getBase());
 

@@ -41,7 +41,7 @@ import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.net.util.RosterUtils;
+import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
@@ -171,7 +171,7 @@ public class DeleteContactAction extends Action implements Disposable {
                 toString(rosterEntry)))) {
 
             try {
-                RosterUtils.removeFromRoster(connectionService.getConnection(),
+                XMPPUtils.removeFromRoster(connectionService.getConnection(),
                     rosterEntry);
             } catch (XMPPException e) {
                 log.error("could not delete contact " + toString(rosterEntry) //$NON-NLS-1$

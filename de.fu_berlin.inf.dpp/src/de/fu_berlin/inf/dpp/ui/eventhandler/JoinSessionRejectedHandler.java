@@ -7,7 +7,7 @@ import org.jivesoftware.smack.packet.Packet;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.extensions.JoinSessionRejectedExtension;
-import de.fu_berlin.inf.dpp.net.util.RosterUtils;
+import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 
@@ -44,7 +44,7 @@ public final class JoinSessionRejectedHandler {
     private void handleRejection(JID from,
         JoinSessionRejectedExtension extension) {
 
-        String name = RosterUtils.getNickname(null, from);
+        String name = XMPPUtils.getNickname(null, from);
 
         if (name == null) {
             name = from.getBase();

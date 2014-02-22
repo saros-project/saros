@@ -12,7 +12,7 @@ import org.picocontainer.annotations.Nullable;
 import de.fu_berlin.inf.dpp.invitation.hooks.ISessionNegotiationHook;
 import de.fu_berlin.inf.dpp.invitation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.net.util.RosterUtils;
+import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 
@@ -146,7 +146,7 @@ public class MUCNegotiationManager {
             Connection connection = connectionService.getConnection();
 
             if (connection != null)
-                service = RosterUtils.getMultiUserChatService(connection,
+                service = XMPPUtils.getMultiUserChatService(connection,
                     connection.getServiceName());
         }
 

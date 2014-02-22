@@ -21,35 +21,32 @@ import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.packet.DiscoverInfo.Identity;
 import org.jivesoftware.smackx.packet.DiscoverItems;
 import org.jivesoftware.smackx.search.UserSearch;
-import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 
 /**
- * Utility class for classic {@link Roster} operations
+ * Utility class for classic XMPP operations
  * 
- * @author bkahlert
  */
-// FIXME due to the hack this class cannot currently moved to the Saros core
-public class RosterUtils {
-    private static final Logger log = Logger.getLogger(RosterUtils.class);
 
-    @Inject
-    private static XMPPConnectionService defaultConnectionService;
+public class XMPPUtils {
+    private static final Logger log = Logger.getLogger(XMPPUtils.class);
 
-    /*
-     * HACK this should be initialized in a better way and removed if resolving
-     * nicknames is removed from the User class
+    private static volatile XMPPConnectionService defaultConnectionService;
+
+    /**
+     * Sets the default connection service that should be used when no
+     * connection is used for various utility methods offered by this class.
+     * 
+     * @param connectionService
      */
-
-    static {
-        SarosPluginContext.initComponent(new RosterUtils());
+    public static void setDefaultConnectionService(
+        XMPPConnectionService connectionService) {
+        defaultConnectionService = connectionService;
     }
 
-    private RosterUtils() {
+    private XMPPUtils() {
         // no public instantiation allowed
     }
 
@@ -182,8 +179,8 @@ public class RosterUtils {
      * @throws XMPPException
      *             if the service discovery failed
      */
-    public static boolean isJIDonServer(Connection connection, JID jid)
-        throws XMPPException {
+    public static boolean isJIDonServer(Connection connection, JID jid,
+        String resourceHint) throws XMPPException {
 
         ServiceDiscoveryManager sdm = ServiceDiscoveryManager
             .getInstanceFor(connection);
@@ -191,8 +188,9 @@ public class RosterUtils {
         boolean discovered = sdm.discoverInfo(jid.getRAW()).getIdentities()
             .hasNext();
 
-        if (!discovered && jid.isBareJID())
-            discovered = sdm.discoverInfo(jid.getBase() + "/" + Saros.RESOURCE)
+        if (!discovered && jid.isBareJID() && resourceHint != null
+            && resourceHint.isEmpty())
+            discovered = sdm.discoverInfo(jid.getBase() + "/" + resourceHint)
                 .getIdentities().hasNext();
 
         return discovered;

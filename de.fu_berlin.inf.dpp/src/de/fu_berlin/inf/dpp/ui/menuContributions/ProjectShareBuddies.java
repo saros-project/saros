@@ -21,7 +21,7 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManager;
-import de.fu_berlin.inf.dpp.net.util.RosterUtils;
+import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterEntryElement;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
@@ -86,8 +86,8 @@ public class ProjectShareBuddies extends ContributionItem {
         Arrays.sort(rosterEntries, new Comparator<RosterEntry>() {
             @Override
             public int compare(RosterEntry o1, RosterEntry o2) {
-                String name1 = RosterUtils.getDisplayableName(o1);
-                String name2 = RosterUtils.getDisplayableName(o2);
+                String name1 = XMPPUtils.getDisplayableName(o1);
+                String name2 = XMPPUtils.getDisplayableName(o2);
                 return name1.compareToIgnoreCase(name2);
             }
         });
