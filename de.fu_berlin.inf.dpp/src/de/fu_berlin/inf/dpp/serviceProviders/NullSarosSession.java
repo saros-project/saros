@@ -6,7 +6,6 @@ import java.util.Set;
 import java.util.concurrent.CancellationException;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IProgressMonitor;
 
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
@@ -48,9 +47,8 @@ public class NullSarosSession implements ISarosSession {
     }
 
     @Override
-    public void initiatePermissionChange(User user, Permission newPermission,
-        IProgressMonitor progress) throws CancellationException,
-        InterruptedException {
+    public void initiatePermissionChange(User user, Permission newPermission)
+        throws CancellationException, InterruptedException {
         log.warn("unexpected method call");
     }
 

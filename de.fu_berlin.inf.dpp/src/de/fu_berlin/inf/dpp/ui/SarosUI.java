@@ -144,11 +144,11 @@ public class SarosUI {
                         progress.beginTask(Messages.SarosUI_permission_change,
                             IProgressMonitor.UNKNOWN);
 
-                        session.initiatePermissionChange(user, newPermission,
-                            progress);
-
+                        session.initiatePermissionChange(user, newPermission);
+                        // FIXME run this at least 2 times and if this still
+                        // does not succeed kick the user
                     } catch (CancellationException e) {
-                        log.warn("permission change failed because user canceled the permission change"); //$NON-NLS-1$
+                        log.warn("permission change failed because user did not respond"); //$NON-NLS-1$
                         SWTUtils.runSafeSWTSync(log, new Runnable() {
                             @Override
                             public void run() {

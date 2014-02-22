@@ -1,10 +1,8 @@
 package de.fu_berlin.inf.dpp.synchronize;
 
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IProgressMonitor;
 
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.util.StackTrace;
@@ -79,8 +77,6 @@ public class StartHandle {
      * Notifies the StopManager, that the operation for which this StartHandle
      * was returned by a call to stop has finished.
      * 
-     * @param progress
-     *            A progress monitor used to cancel the operation.
      * 
      * @return <code>true</code>, if the stopped user continued working or false
      *         if other StartHandles exist for this user, which have not been
@@ -88,11 +84,10 @@ public class StartHandle {
      * 
      * @blocking waits until the blocked user acknowledged the start
      * 
-     * @Throws IllegalStateException if start() is called twice on the same
-     *         handle.
-     * @Throws CancellationException
+     * @throws IllegalStateException
+     *             if start() is called twice on the same handle.
      */
-    public boolean startAndAwait(final IProgressMonitor progress) {
+    public boolean startAndAwait() {
 
         log.debug("Called startAndAwait on " + user);
 
@@ -101,30 +96,30 @@ public class StartHandle {
                 "start can only be called once per StartHandle");
 
         if (stopManager.resumeStartHandle(this))
-            return await(progress);
+            return await();
 
         return false;
     }
 
     /**
-     * Waits until the StartHandle is acknowledged or the waiting is canceled
-     * using the given progress monitor.
+     * Waits until the StartHandle is acknowledged or the waiting timed out.
      * 
      * Returns whether the handle was acknowledged or not
      * 
-     * @Throws CancellationException
      */
-    public boolean await(final IProgressMonitor progress) {
+    public boolean await() {
+
+        long timeoutToExceed = System.currentTimeMillis() + StopManager.TIMEOUT;
+
         try {
-            while (!acknowledged.get() && !progress.isCanceled()
+            while (!acknowledged.get()
+                && (System.currentTimeMillis() < timeoutToExceed)
                 && user.isInSarosSession())
                 Thread.sleep(stopManager.MILLISTOWAIT);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             log.error("Code not designed to be interruptable", e);
         }
-        if (progress.isCanceled())
-            throw new CancellationException();
 
         return acknowledged.get();
     }

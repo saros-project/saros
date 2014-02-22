@@ -155,11 +155,10 @@ public class ConsistencyWatchdogHandler implements Startable {
         try {
 
             startHandles = sarosSession.getStopManager().stop(
-                sarosSession.getUsers(), "Consistency recovery",
-                progress.newChild(200));
+                sarosSession.getUsers(), "Consistency recovery");
 
             progress.subTask("Sending files to client...");
-            recoverFiles(checksumError, progress.newChild(700));
+            recoverFiles(checksumError, progress.newChild(900));
 
             /*
              * We have to start the StartHandle of the inconsistent user first
@@ -181,7 +180,8 @@ public class ConsistencyWatchdogHandler implements Startable {
                 log.error("could not find start handle"
                     + " of the inconsistent user");
             } else {
-                inconsistentStartHandle.startAndAwait(progress.newChild(200));
+                // FIXME evaluate the return value
+                inconsistentStartHandle.startAndAwait();
                 startHandles.remove(inconsistentStartHandle);
             }
         } finally {

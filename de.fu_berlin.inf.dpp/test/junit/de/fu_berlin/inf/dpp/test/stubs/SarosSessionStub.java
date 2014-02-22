@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
@@ -97,9 +95,8 @@ public class SarosSessionStub implements ISarosSession {
     }
 
     @Override
-    public void initiatePermissionChange(User user, Permission newPermission,
-        IProgressMonitor progress) throws CancellationException,
-        InterruptedException {
+    public void initiatePermissionChange(User user, Permission newPermission)
+        throws CancellationException, InterruptedException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }

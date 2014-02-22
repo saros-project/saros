@@ -13,13 +13,9 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
@@ -60,6 +56,9 @@ public final class StopManager extends AbstractActivityProvider implements
     // Waits MILLISTOWAIT ms until the next test for progress cancellation
     public final int MILLISTOWAIT = 100;
 
+    /** Timeout to abort waiting for a response */
+    static final long TIMEOUT = 20000;
+
     protected List<Blockable> blockables = new CopyOnWriteArrayList<Blockable>();
 
     protected ObservableValue<Boolean> blocked = new ObservableValue<Boolean>(
@@ -82,21 +81,16 @@ public final class StopManager extends AbstractActivityProvider implements
         .synchronizedMap(new HashMap<String, StartHandle>());
 
     /**
-     * Blocking mechanism. The call to stop wants to block until the
-     * acknowledgment for the StopActivity arrives at our anonymous
-     * {@link AbstractActivityReceiver} implementation. We use a wait condition
-     * for that. There might be multiple threads that wait for this event to
-     * happen. The lock is not used to protect any data structure.
-     */
-    protected Lock reentrantLock = new ReentrantLock();
-    protected final Condition acknowledged = reentrantLock.newCondition();
-
-    /**
      * For every initiated StopActivity (type: LockRequest) there is one
      * acknowledgment expected.
      */
-    protected Set<StopActivity> expectedAcknowledgments = Collections
+    private Set<StopActivity> expectedAcknowledgments = Collections
         .synchronizedSet(new HashSet<StopActivity>());
+
+    /**
+     * Indicates of the component is stopped;
+     */
+    private boolean isStopped = false;
 
     public StopManager(ISarosSession session) {
         this.sarosSession = session;
@@ -125,7 +119,8 @@ public final class StopManager extends AbstractActivityProvider implements
             assert sarosSession != null;
 
             User user = stopActivity.getRecipient();
-            if (!user.isInSarosSession() || user.isRemote())
+
+            if (user.isRemote())
                 throw new IllegalArgumentException(
                     "Received StopActivity which is not for the local user");
 
@@ -146,26 +141,29 @@ public final class StopManager extends AbstractActivityProvider implements
                     return;
                 }
                 if (stopActivity.getState() == State.ACKNOWLEDGED) {
-                    if (!expectedAcknowledgments.contains(stopActivity)) {
-                        log.warn("Received unexpected StopActivity: "
-                            + stopActivity);
-                        return;
-                    }
+                    synchronized (StopManager.this) {
 
-                    /**
-                     * Remove from the expectedAcknowledgements set and inform
-                     * who ever has been waiting for that to happen. Warn if the
-                     * removal is failing besides the above check.
-                     */
-                    if (!expectedAcknowledgments.remove(stopActivity)) {
-                        log.warn("Received unexpected "
-                            + "StopActivity acknowledgement: " + stopActivity);
-                        return;
-                    }
+                        if (!expectedAcknowledgments.contains(stopActivity)) {
+                            log.warn("Received unexpected StopActivity: "
+                                + stopActivity);
+                            return;
+                        }
 
-                    reentrantLock.lock();
-                    acknowledged.signalAll();
-                    reentrantLock.unlock();
+                        /**
+                         * Remove from the expectedAcknowledgements set and
+                         * inform who ever has been waiting for that to happen.
+                         * Warn if the removal is failing besides the above
+                         * check.
+                         */
+                        if (!expectedAcknowledgments.remove(stopActivity)) {
+                            log.warn("Received unexpected "
+                                + "StopActivity acknowledgement: "
+                                + stopActivity);
+                            return;
+                        }
+
+                        StopManager.this.notifyAll();
+                    }
                     return;
                 }
             }
@@ -208,25 +206,22 @@ public final class StopManager extends AbstractActivityProvider implements
      *            the cause for stopping as it is displayed in the progress
      *            monitor
      * 
-     * @param monitor
-     *            The caller is expected to call beginTask and done on the given
-     *            SubMonitor
-     * 
-     * @noSWT This method mustn't be called from the SWT thread.
+     * @noGUI this method must not be called from the GUI thread.
      * 
      * @blocking returning after the given users acknowledged the stop
      * 
-     * @cancelable This method can be canceled by the user
      * 
      * @throws CancellationException
+     *             if the timeout is exceeded
      */
     public List<StartHandle> stop(final Collection<User> users,
-        final String cause, final IProgressMonitor monitor)
-        throws CancellationException {
+        final String cause) throws CancellationException {
 
         final List<StartHandle> resultingHandles = Collections
             .synchronizedList(new LinkedList<StartHandle>());
         final LinkedList<Thread> threads = new LinkedList<Thread>();
+
+        final AtomicBoolean isTimeout = new AtomicBoolean(false);
 
         for (final User user : users) {
             threads.add(ThreadUtils.runSafeAsync("BlockUser-" + user + "-"
@@ -234,19 +229,17 @@ public final class StopManager extends AbstractActivityProvider implements
                 @Override
                 public void run() {
                     try {
-                        if (monitor.isCanceled())
-                            return;
-
-                        StartHandle startHandle = stop(user, cause, monitor);
+                        StartHandle startHandle = stop(user, cause);
                         resultingHandles.add(startHandle);
                         log.debug("added " + startHandle
                             + " to resulting handles.");
                     } catch (CancellationException e) {
-                        log.debug("user canceled the stopping");
-                        monitor.setCanceled(true);
+                        isTimeout.set(true);
+                        log.error("user " + user + " did not respond");
                     } catch (InterruptedException e) {
-                        log.debug("canceling because of an InterruptedException");
-                        monitor.setCanceled(true);
+                        isTimeout.set(true);
+                        log.error("waiting for response of user " + user
+                            + " was interrupted");
                     }
                 }
             }));
@@ -271,9 +264,9 @@ public final class StopManager extends AbstractActivityProvider implements
             }
         }
 
-        if (monitor.isCanceled()) {
+        if (isTimeout.get()) {
             // Restart the already stopped users
-            log.debug("Monitor was canceled. Restarting already stopped users.");
+            log.error("some users do not respond, restarting already stopped users");
             for (StartHandle startHandle : resultingHandles)
                 startHandle.start();
             throw new CancellationException();
@@ -305,22 +298,17 @@ public final class StopManager extends AbstractActivityProvider implements
      *            the cause for stopping as it is displayed in the progress
      *            monitor
      * 
-     * @param progress
-     *            The caller is expected to call beginTask and done on the given
-     *            SubMonitor
-     * 
-     * @noSWT This method mustn't be called from the SWT thread.
+     * @noGUI this method must not be called from the GUI thread.
      * 
      * @blocking returning after the given user acknowledged the stop
      * 
-     * @cancelable This method can be canceled by the user
      * 
      * @throws CancellationException
+     *             if the timeout is exceeded
      * @throws InterruptedException
      */
-    public StartHandle stop(User user, String cause,
-        final IProgressMonitor progress) throws CancellationException,
-        InterruptedException {
+    public StartHandle stop(User user, String cause)
+        throws CancellationException, InterruptedException {
         assert sarosSession != null;
 
         // Creating StopActivity for asking user to stop
@@ -345,32 +333,57 @@ public final class StopManager extends AbstractActivityProvider implements
         fireActivity(stopActivity);
 
         // Block until user acknowledged
-        log.debug("Waiting for acknowledgment " + user);
-        reentrantLock.lock();
-        try {
-            while (expectedAcknowledgments.contains(expectedAck)
-                && !progress.isCanceled() && user.isInSarosSession()) {
-                if (acknowledged.await(MILLISTOWAIT, TimeUnit.MILLISECONDS)) {
-                    continue; /*
-                               * Used to make FindBugs happy that we don't do
-                               * anything if we are woken up
-                               */
+
+        long timeoutToExceed = System.currentTimeMillis() + StopManager.TIMEOUT;
+
+        boolean isInterrupted = false;
+        boolean acknowledged = false;
+        synchronized (this) {
+            while ((System.currentTimeMillis() < timeoutToExceed)
+                && user.isInSarosSession()) {
+
+                acknowledged = !expectedAcknowledgments.contains(expectedAck);
+
+                if (acknowledged && isStopped) {
+                    acknowledged = false;
+                    break;
+                }
+
+                if (acknowledged)
+                    break;
+
+                try {
+                    wait(1000);
+                } catch (InterruptedException e) {
+                    isInterrupted = true;
+                    break;
                 }
             }
-            // The monitor was canceled or the user has left the session.
-            if (expectedAcknowledgments.contains(expectedAck)) {
-                log.warn("No acknowlegment arrived, gave up waiting");
-                expectedAcknowledgments.remove(expectedAck);
-                handle.start();
-                throw new CancellationException();
-            }
-            log.debug("Acknowledgment arrived " + user);
-        } catch (InterruptedException e) {
+        }
+
+        // clean up
+        expectedAcknowledgments.remove(expectedAck);
+
+        /*
+         * the user did respond or we got interrupted ... do not care to check
+         * if the user is still in session ... just try to resume ... it does
+         * not matter if it fails
+         */
+
+        if (isInterrupted) {
             handle.start();
             throw new InterruptedException();
-        } finally {
-            reentrantLock.unlock();
         }
+
+        if (!acknowledged) {
+            log.warn("No acknowlegment arrived, gave up waiting");
+
+            handle.start();
+            throw new CancellationException();
+        }
+
+        log.debug("Acknowledgment arrived " + user);
+
         return handle;
     }
 
@@ -381,8 +394,8 @@ public final class StopManager extends AbstractActivityProvider implements
      * @param lock
      *            if true the session gets locked, else it gets unlocked
      */
-    // TODO: Make private when StoppedAction is removed.
-    public void lockSession(boolean lock) {
+
+    private void lockSession(boolean lock) {
         for (Blockable blockable : blockables) {
             if (lock)
                 blockable.block();
@@ -513,24 +526,19 @@ public final class StopManager extends AbstractActivityProvider implements
         return blocked;
     }
 
-    public void sessionStopped() {
-        lockSession(false);
-        clearExpectedAcknowledgments();
-    }
-
     private void clearExpectedAcknowledgments() {
         /**
          * Clear the expectedAcknowledgements and inform the threads that are
          * blocked in the stop method that there will be no response.
          */
-        reentrantLock.lock();
-        try {
+        synchronized (this) {
             expectedAcknowledgments.clear();
-            acknowledged.signalAll();
-        } finally {
-            reentrantLock.unlock();
+            isStopped = true;
+            notifyAll();
         }
     }
+
+    private Object resumeLock = new Object();
 
     /**
      * Resume the StartHandle and remove it from internal lists.
@@ -538,10 +546,16 @@ public final class StopManager extends AbstractActivityProvider implements
      * @param startHandle
      * @return Returns true if the last handle for the user has been removed.
      */
+    /*
+     * TODO decrease lock time
+     */
+
     synchronized boolean resumeStartHandle(StartHandle startHandle) {
-        removeStartHandle(startHandle);
-        initiateUnlock(startHandle);
-        return getStartHandles(startHandle.getUser()).isEmpty();
+        synchronized (resumeLock) {
+            removeStartHandle(startHandle);
+            initiateUnlock(startHandle);
+            return getStartHandles(startHandle.getUser()).isEmpty();
+        }
     }
 
     @Override
@@ -560,6 +574,7 @@ public final class StopManager extends AbstractActivityProvider implements
     @Override
     public void stop() {
         sarosSession.removeActivityProvider(this);
-        sessionStopped();
+        lockSession(false);
+        clearExpectedAcknowledgments();
     }
 }

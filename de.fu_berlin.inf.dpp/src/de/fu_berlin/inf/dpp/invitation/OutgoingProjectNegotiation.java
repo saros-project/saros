@@ -314,7 +314,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
          */
         try {
             startHandles = sarosSession.getStopManager().stop(usersToStop,
-                "Synchronizing invitation", monitor);
+                "Synchronizing invitation");
         } catch (CancellationException e) {
             checkCancellation(CancelOption.NOTIFY_PEER);
             return null;

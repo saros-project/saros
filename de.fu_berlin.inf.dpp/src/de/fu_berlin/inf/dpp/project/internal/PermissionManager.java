@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.project.internal;
 import java.util.concurrent.CancellationException;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
@@ -12,7 +11,6 @@ import de.fu_berlin.inf.dpp.activities.business.PermissionActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.Messages;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
@@ -93,8 +91,6 @@ public class PermissionManager extends AbstractActivityProvider implements
      *            The user who's {@link Permission} has to be changed
      * @param newPermission
      *            The new {@link Permission} of the user
-     * @param progress
-     *            The Monitor that shows the progress of the Operation
      * @param synchronizer
      *            An Abstraction of the SWT-Thread
      * 
@@ -104,9 +100,8 @@ public class PermissionManager extends AbstractActivityProvider implements
      */
 
     public void initiatePermissionChange(final User user,
-        final Permission newPermission, IProgressMonitor progress,
-        UISynchronizer synchronizer) throws CancellationException,
-        InterruptedException {
+        final Permission newPermission, UISynchronizer synchronizer)
+        throws CancellationException, InterruptedException {
 
         final User localUser = sarosSession.getLocalUser();
 
@@ -128,7 +123,7 @@ public class PermissionManager extends AbstractActivityProvider implements
 
         } else {
             StartHandle startHandle = sarosSession.getStopManager().stop(user,
-                Messages.SarosSession_performing_permission_change, progress);
+                "Permission change");
 
             synchronizer.syncExec(ThreadUtils.wrapSafe(log,
                 fireActivityrunnable));

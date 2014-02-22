@@ -24,8 +24,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
@@ -91,16 +89,13 @@ public interface ISarosSession {
      *            The user whose {@link Permission} has to be changed
      * @param newPermission
      *            The new {@link Permission} of the user
-     * @param progress
-     *            The Monitor that shows the progress of the Operation
      * 
      * 
      * @throws CancellationException
      * @throws InterruptedException
      */
-    public void initiatePermissionChange(User user, Permission newPermission,
-        IProgressMonitor progress) throws CancellationException,
-        InterruptedException;
+    public void initiatePermissionChange(User user, Permission newPermission)
+        throws CancellationException, InterruptedException;
 
     /**
      * Set the {@link Permission} of the given user.

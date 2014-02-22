@@ -136,7 +136,7 @@ public class User {
 
     @Override
     public String toString() {
-        return jid.getName();
+        return jid.toString();
     }
 
     @Override

@@ -32,7 +32,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.annotations.Inject;
 
@@ -326,15 +325,15 @@ public final class SarosSession implements ISarosSession {
 
     @Override
     public void initiatePermissionChange(final User user,
-        final Permission newPermission, IProgressMonitor progress)
-        throws CancellationException, InterruptedException {
+        final Permission newPermission) throws CancellationException,
+        InterruptedException {
 
         if (!localUser.isHost())
             throw new IllegalStateException(
                 "only the host can initiate permission changes");
 
         permissionManager.initiatePermissionChange(user, newPermission,
-            progress, synchronizer);
+            synchronizer);
     }
 
     @Override
