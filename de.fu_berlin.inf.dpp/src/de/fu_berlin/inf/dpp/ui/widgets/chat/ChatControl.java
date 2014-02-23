@@ -46,6 +46,7 @@ import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.session.User;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.sounds.SoundPlayer;
 import de.fu_berlin.inf.dpp.ui.sounds.Sounds;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -442,8 +443,29 @@ public class ChatControl extends Composite {
          */
         JID jid = element.getSender().getBareJID();
         Color color = getColorForJID(jid);
-        chatDisplay.addChatLine(jid, getNickname(jid), color,
-            element.toString(), element.getDate());
+        ChatElementType type = element.getChatElementType();
+
+        String message = null;
+
+        switch (type) {
+        case MESSAGE:
+            message = element.getMessage().getBody();
+            break;
+        case JOIN:
+            message = Messages.ChatRoomsComposite_joined_the_chat;
+            break;
+        case LEAVE:
+            message = Messages.ChatRoomsComposite_left_the_chat;
+            break;
+        case MESSAGERECEPTION:
+        case STATECHANGE:
+        default:
+            // NOP
+            return;
+        }
+
+        chatDisplay.addChatLine(jid, getNickname(jid), color, message,
+            element.getDate());
     }
 
     /**

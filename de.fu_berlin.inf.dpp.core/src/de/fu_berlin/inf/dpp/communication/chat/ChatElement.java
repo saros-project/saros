@@ -6,7 +6,6 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smackx.ChatState;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.ui.Messages;
 
 /**
  * Chat element class representing entries in the {@link ChatHistory}.
@@ -20,44 +19,23 @@ public class ChatElement {
         /**
          * Used to represent a chat message.
          */
-        MESSAGE {
-        },
+        MESSAGE,
         /**
          * Used to represent a 'user joined'-notification.
          */
-        JOIN {
-            @Override
-            public String toString() {
-                return Messages.ChatRoomsComposite_joined_the_chat;
-            }
-        },
+        JOIN,
         /**
          * Used to represent a 'user left'-notification.
          */
-        LEAVE {
-            @Override
-            public String toString() {
-                return Messages.ChatRoomsComposite_left_the_chat;
-            }
-        },
+        LEAVE,
         /**
          * Used to represent a confirmation for received messages.
          */
-        MESSAGERECEPTION {
-            @Override
-            public String toString() {
-                return "";
-            }
-        },
+        MESSAGERECEPTION,
         /**
          * Used to represent a change of the {@link ChatState}.
          */
-        STATECHANGE {
-            @Override
-            public String toString() {
-                return "";
-            }
-        }
+        STATECHANGE
     }
 
     private String message;
@@ -191,12 +169,6 @@ public class ChatElement {
      */
     @Override
     public String toString() {
-        switch (type) {
-        case MESSAGE:
-            return message;
-        default:
-            return type.toString();
-        }
+        return type.toString();
     }
-
 }
