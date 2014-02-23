@@ -12,13 +12,8 @@ import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.serializable.EditorActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.XStreamExtensionProvider;
 
 public class ActivitiesExtensionProviderTest {
-
-    static {
-        XStreamExtensionProvider.setNameSpace("foo");
-    }
 
     @Test
     public void testNoPrettyPrintInMarshalledObjects() throws Exception {

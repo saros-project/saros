@@ -55,8 +55,6 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider,
     private static final Logger LOG = Logger
         .getLogger(XStreamExtensionProvider.class);
 
-    private static volatile String currentNamespace;
-
     private static volatile ClassLoader currentClassloader;
 
     protected final String namespace;
@@ -64,19 +62,6 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider,
     protected final String elementName;
 
     private final XStream xstream;
-
-    /**
-     * Sets the namespace that should be used when a new provider is created.
-     * </p> <b>Important:</b> The namespace must not contain invalid XML
-     * characters.
-     * 
-     * @param namespace
-     *            the namespace to use
-     * @see #XStreamExtensionProvider(String, Class...)
-     */
-    public static void setNameSpace(String namespace) {
-        currentNamespace = namespace;
-    }
 
     /**
      * Sets the class loader to use when a new provider is created. This class
@@ -87,27 +72,26 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider,
      *            the class loader to use or <code>null</code> to use the class
      *            loader the provider was loaded with
      * 
-     * @see #XStreamExtensionProvider(String, Class...)
+     * @see #XStreamExtensionProvider(String, String, Class...)
      */
     public static void setClassLoader(ClassLoader classLoader) {
         currentClassloader = classLoader;
     }
 
     /**
-     * Create a new XStreamExtensionProvider using the given elementName as the
-     * XML root element. The Provider is able to understand the given classes,
-     * which should be annotated using XStream annotations. <br/>
+     * Create a new XStreamExtensionProvider using the given element name as the
+     * XML root element with the given namespace. The Provider is able to
+     * understand the given classes, which should be annotated using XStream
+     * annotations. <br/>
      * <br/>
-     * <b>Important</b>: use valid XML element names or the receiving side will
-     * be unable to decode the extension !
+     * <b>Important</b>: use valid XML element names and namcespaces or the
+     * receiving side will be unable to decode the extension !
      */
-    public XStreamExtensionProvider(String elementName, Class<?>... classes) {
-
-        String namespace = currentNamespace;
+    public XStreamExtensionProvider(String namespace, String elementName,
+        Class<?>... classes) {
 
         if (namespace == null)
-            throw new NullPointerException(
-                "initialization missing, namespace to use is null");
+            throw new NullPointerException("namespace is null");
 
         ClassLoader classLoader = currentClassloader;
 

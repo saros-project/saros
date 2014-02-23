@@ -31,6 +31,8 @@ public abstract class SarosPacketExtension {
     // keep this short as it is included in every packet extension !
     public static final String VERSION = "SPXV1";
 
+    public static final String EXTENSION_NAMESPACE = "de.fu_berlin.inf.dpp";
+
     @XStreamAlias("v")
     @XStreamAsAttribute
     private final String version = VERSION;
@@ -39,7 +41,7 @@ public abstract class SarosPacketExtension {
         extends XStreamExtensionProvider<T> {
 
         public Provider(String elementName, Class<?>... classes) {
-            super(elementName, classes);
+            super(EXTENSION_NAMESPACE, elementName, classes);
         }
 
         @Override

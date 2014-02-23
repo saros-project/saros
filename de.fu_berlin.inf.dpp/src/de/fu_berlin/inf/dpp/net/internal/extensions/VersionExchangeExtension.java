@@ -57,7 +57,8 @@ public class VersionExchangeExtension {
         XStreamExtensionProvider<VersionExchangeExtension> {
 
         private Provider() {
-            super("verex", VersionExchangeExtension.class);
+            super(SarosPacketExtension.EXTENSION_NAMESPACE, "verex",
+                VersionExchangeExtension.class);
         }
     }
 }

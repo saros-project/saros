@@ -24,6 +24,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.net.XStreamExtensionProvider.XStreamIQPacket;
+import de.fu_berlin.inf.dpp.net.internal.extensions.SarosPacketExtension;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -44,7 +45,7 @@ public class SkypeManager implements IConnectionListener {
     private final Logger log = Logger.getLogger(SkypeManager.class);
 
     protected XStreamExtensionProvider<String> skypeProvider = new XStreamExtensionProvider<String>(
-        "skypeInfo");
+        SarosPacketExtension.EXTENSION_NAMESPACE, "skypeInfo");
 
     protected final Map<JID, String> skypeNames = new HashMap<JID, String>();
 
@@ -80,7 +81,8 @@ public class SkypeManager implements IConnectionListener {
         }
     };
 
-    public SkypeManager(XMPPConnectionService sarosNet, IPreferenceStore preferenceStore) {
+    public SkypeManager(XMPPConnectionService sarosNet,
+        IPreferenceStore preferenceStore) {
         this.connectionService = sarosNet;
         this.preferenceStore = preferenceStore;
         this.connectionService.addListener(this);

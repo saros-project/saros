@@ -23,17 +23,12 @@ import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.test.fakes.net.FakeConnectionFactory;
 import de.fu_berlin.inf.dpp.test.fakes.net.FakeConnectionFactory.FakeConnectionFactoryResult;
 import de.fu_berlin.inf.dpp.test.stubs.SarosSessionStub;
 
 public class ActivitySequencerTest {
-
-    static {
-        XStreamExtensionProvider.setNameSpace("foo");
-    }
 
     private static class SequencerSessionStub extends SarosSessionStub {
 
