@@ -10,8 +10,8 @@ import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 
+import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatPreferences;
 import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChat;
-import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferences;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.ChatControl;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.events.CharacterEnteredEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.events.ChatClearedEvent;
@@ -54,7 +54,7 @@ public class ChatRoomParticipant {
             String username = usernames[i];
             String password = passwords[i];
 
-            MUCSessionPreferences preferences = new MUCSessionPreferences(
+            MultiUserChatPreferences preferences = new MultiUserChatPreferences(
                 server, "demo", "");
 
             ChatControl chatControl = new ChatControl(null, new MultiUserChat(

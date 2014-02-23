@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.communication.chat.muc.states;
+package de.fu_berlin.inf.dpp.communication.chat.muc;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,9 +30,9 @@ import de.fu_berlin.inf.dpp.net.JID;
  * @author mariaspg
  * @author bkahlert
  */
-public class MUCStateManager {
-    private static final Logger log = Logger.getLogger(MUCStateManager.class);
-    protected static final Map<MultiUserChat, MUCStateManager> managers = new WeakHashMap<MultiUserChat, MUCStateManager>();
+class MultiUserChatStateManager {
+    private static final Logger log = Logger.getLogger(MultiUserChatStateManager.class);
+    protected static final Map<MultiUserChat, MultiUserChatStateManager> managers = new WeakHashMap<MultiUserChat, MultiUserChatStateManager>();
 
     /**
      * Official name for the chat states feature
@@ -45,14 +45,14 @@ public class MUCStateManager {
     private static final String CHATSTATES_FEATURE = "http://jabber.org/protocol/chatstates";
 
     /**
-     * Returns the {@link MUCStateManager} associated to the
+     * Returns the {@link MultiUserChatStateManager} associated to the
      * {@link MultiUserChat}. Creates one if it does not yet exist.
      * 
      * @param connection
      * @param muc
      * @return
      */
-    public static MUCStateManager getInstance(final Connection connection,
+    public static MultiUserChatStateManager getInstance(final Connection connection,
         final MultiUserChat muc) {
 
         if (connection == null) {
@@ -60,9 +60,9 @@ public class MUCStateManager {
         }
 
         synchronized (managers) {
-            MUCStateManager manager = managers.get(muc);
+            MultiUserChatStateManager manager = managers.get(muc);
             if (manager == null) {
-                manager = new MUCStateManager(connection, muc);
+                manager = new MultiUserChatStateManager(connection, muc);
                 managers.put(muc, manager);
             }
             return manager;
@@ -76,7 +76,7 @@ public class MUCStateManager {
 
     /**
      * Checks every incoming {@link Message} for the {@link PacketExtension}
-     * {@link MUCStateManager#CHATSTATES_FEATURE} and notifies all
+     * {@link MultiUserChatStateManager#CHATSTATES_FEATURE} and notifies all
      * {@link IChatListener}s in case of a {@link ChatState} change.
      */
     protected PacketListener incomingMessageInterceptor = new PacketListener() {
@@ -109,7 +109,7 @@ public class MUCStateManager {
         }
     };
 
-    protected MUCStateManager(Connection connection, MultiUserChat muc) {
+    protected MultiUserChatStateManager(Connection connection, MultiUserChat muc) {
         log.setLevel(Level.TRACE);
 
         this.connection = connection;

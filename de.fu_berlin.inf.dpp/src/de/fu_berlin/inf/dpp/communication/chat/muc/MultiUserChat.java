@@ -23,8 +23,6 @@ import de.fu_berlin.inf.dpp.communication.chat.AbstractChat;
 import de.fu_berlin.inf.dpp.communication.chat.ChatElement;
 import de.fu_berlin.inf.dpp.communication.chat.ChatElement.ChatElementType;
 import de.fu_berlin.inf.dpp.communication.chat.IChatListener;
-import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferences;
-import de.fu_berlin.inf.dpp.communication.chat.muc.states.MUCStateManager;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.Messages;
 
@@ -46,9 +44,9 @@ public class MultiUserChat extends AbstractChat {
     /** the user of the current connection */
     private JID user;
     /**
-     * {@link MUCSessionPreferences} this {@link MultiUserChat} uses
+     * {@link MultiUserChatPreferences} this {@link MultiUserChat} uses
      */
-    private MUCSessionPreferences preferences;
+    private MultiUserChatPreferences preferences;
 
     /**
      * Saves whether this {@link MultiUserChat} instance created the
@@ -69,9 +67,9 @@ public class MultiUserChat extends AbstractChat {
     private HashMap<JID, ChatState> participants = new HashMap<JID, ChatState>();
 
     /**
-     * {@link MUCStateManager} used for {@link ChatState} events
+     * {@link MultiUserChatStateManager} used for {@link ChatState} events
      */
-    private MUCStateManager mucStateManager;
+    private MultiUserChatStateManager mucStateManager;
 
     /**
      * {@link IChatListener} used for {@link ChatState} propagation
@@ -158,14 +156,14 @@ public class MultiUserChat extends AbstractChat {
      * @param communicationPreferences
      */
     public MultiUserChat(Connection connection,
-        MUCSessionPreferences communicationPreferences) {
+        MultiUserChatPreferences communicationPreferences) {
         this.connection = connection;
         this.preferences = communicationPreferences;
     }
 
     /**
      * Connects to a {@link MultiUserChat} on the base of the passed
-     * {@link MUCSessionPreferences}.
+     * {@link MultiUserChatPreferences}.
      * 
      * @return true if the room has been created and joined; false if it only
      *         has been joined
@@ -178,7 +176,7 @@ public class MultiUserChat extends AbstractChat {
         if (preferences == null)
             throw new IllegalStateException("No comPrefs found!");
         createdRoom = createAndJoinMUC();
-        mucStateManager = MUCStateManager.getInstance(connection, muc);
+        mucStateManager = MultiUserChatStateManager.getInstance(connection, muc);
         mucStateManager.addMUCStateListener(mucStateListener);
         muc.addMessageListener(packetListener);
         return createdRoom;
@@ -233,7 +231,7 @@ public class MultiUserChat extends AbstractChat {
 
     /**
      * Creates and joins the {@link MultiUserChat} on the base of the passed
-     * {@link MUCSessionPreferences}.
+     * {@link MultiUserChatPreferences}.
      * 
      * @throws XMPPException
      *             TODO connect should be split into create and join; bkahlert
@@ -382,12 +380,12 @@ public class MultiUserChat extends AbstractChat {
     }
 
     /**
-     * Returns the {@link MUCSessionPreferences} used for this
+     * Returns the {@link MultiUserChatPreferences} used for this
      * {@link MultiUserChat}
      * 
      * @return
      */
-    public MUCSessionPreferences getPreferences() {
+    public MultiUserChatPreferences getPreferences() {
         return preferences;
     }
 

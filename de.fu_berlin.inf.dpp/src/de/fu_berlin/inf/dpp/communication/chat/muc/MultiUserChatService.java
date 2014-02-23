@@ -33,7 +33,6 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.chat.AbstractChatService;
 import de.fu_berlin.inf.dpp.communication.chat.IChat;
 import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCNegotiationManager;
-import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferences;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
@@ -91,7 +90,7 @@ public class MultiUserChatService extends AbstractChatService {
      * @return multi user chat of the session
      */
     public IChat createChat(ISarosSession session) {
-        MUCSessionPreferences preferences = session.isHost() ? negotiatingManager
+        MultiUserChatPreferences preferences = session.isHost() ? negotiatingManager
             .getOwnPreferences() : negotiatingManager.getSessionPreferences();
 
         return createChat(preferences);
@@ -100,7 +99,7 @@ public class MultiUserChatService extends AbstractChatService {
     /**
      * Connects to a {@link MultiUserChat}. Automatically (if necessary) created
      * and joins the {@link MultiUserChat} based on the
-     * {@link MUCSessionPreferences}.
+     * {@link MultiUserChatPreferences}.
      * 
      * @param preferences
      * @return an {@link IChat} interface for the created chat or
@@ -109,7 +108,7 @@ public class MultiUserChatService extends AbstractChatService {
     /*
      * TODO connectMUC should be split into create and join; bkahlert 2010/11/23
      */
-    public IChat createChat(MUCSessionPreferences preferences) {
+    public IChat createChat(MultiUserChatPreferences preferences) {
         Connection connection = this.connection.get();
 
         if (connection == null) {

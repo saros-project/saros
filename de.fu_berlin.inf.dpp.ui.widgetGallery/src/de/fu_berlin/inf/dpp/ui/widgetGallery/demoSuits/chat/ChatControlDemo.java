@@ -14,9 +14,9 @@ import org.eclipse.swt.widgets.Display;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.communication.chat.ChatElement;
+import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatPreferences;
 import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChat;
 import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatService;
-import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferences;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
@@ -172,7 +172,7 @@ public class ChatControlDemo extends AbstractDemo {
         SimpleExplanatoryComposite explanatoryComposite = new SimpleExplanatoryComposite(
             parent, style);
 
-        MUCSessionPreferences preferences = new MUCSessionPreferences(null,
+        MultiUserChatPreferences preferences = new MultiUserChatPreferences(null,
             "demoRoom", "password");
 
         this.chatControl = new ChatControl(null, new MultiUserChat(null,

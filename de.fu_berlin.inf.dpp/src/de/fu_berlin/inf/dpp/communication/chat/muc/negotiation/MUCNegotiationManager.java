@@ -9,6 +9,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.jivesoftware.smack.Connection;
 import org.picocontainer.annotations.Nullable;
 
+import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatPreferences;
 import de.fu_berlin.inf.dpp.invitation.hooks.ISessionNegotiationHook;
 import de.fu_berlin.inf.dpp.invitation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
@@ -41,7 +42,7 @@ public class MUCNegotiationManager {
 
     protected String password;
 
-    protected MUCSessionPreferences sessionPreferences;
+    protected MultiUserChatPreferences sessionPreferences;
 
     protected XMPPConnectionService connectionService;
 
@@ -64,7 +65,7 @@ public class MUCNegotiationManager {
             Map<String, String> input) {
             // We don't think about the client's preferences. We are the host,
             // so our settings are settled.
-            MUCSessionPreferences ownPreferences = getOwnPreferences();
+            MultiUserChatPreferences ownPreferences = getOwnPreferences();
 
             Map<String, String> map = new HashMap<String, String>();
             map.put(KEY_PASSWORD, ownPreferences.getPassword());
@@ -76,7 +77,7 @@ public class MUCNegotiationManager {
 
         @Override
         public void applyActualParameters(Map<String, String> settings) {
-            setSessionPreferences(new MUCSessionPreferences(
+            setSessionPreferences(new MultiUserChatPreferences(
                 settings.get(KEY_SERVICE), settings.get(KEY_ROOMNAME),
                 settings.get(KEY_PASSWORD)));
         }
@@ -102,15 +103,15 @@ public class MUCNegotiationManager {
      * Load communication settings from PreferenceStore and generate chat room
      * and chat room password.
      */
-    public MUCSessionPreferences getOwnPreferences() {
-        return new MUCSessionPreferences(getMUCService(), "SAROS"
+    public MultiUserChatPreferences getOwnPreferences() {
+        return new MultiUserChatPreferences(getMUCService(), "SAROS"
             + sessionID.getValue(), password);
     }
 
     /**
      * @return temporarily session preferences
      */
-    public MUCSessionPreferences getSessionPreferences() {
+    public MultiUserChatPreferences getSessionPreferences() {
         return sessionPreferences;
     }
 
@@ -120,7 +121,7 @@ public class MUCNegotiationManager {
      * @param remotePreferences
      *            received communication settings
      */
-    public void setSessionPreferences(MUCSessionPreferences remotePreferences) {
+    public void setSessionPreferences(MultiUserChatPreferences remotePreferences) {
         log.debug("Got hosts Communication Config: server "
             + remotePreferences.getService() + " room "
             + remotePreferences.getRoomName() + " pw "

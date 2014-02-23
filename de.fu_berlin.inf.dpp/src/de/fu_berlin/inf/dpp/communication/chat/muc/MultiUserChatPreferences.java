@@ -1,11 +1,9 @@
-package de.fu_berlin.inf.dpp.communication.chat.muc.negotiation;
-
-import org.jivesoftware.smackx.muc.MultiUserChat;
+package de.fu_berlin.inf.dpp.communication.chat.muc;
 
 /**
- * Preferences for a {@link MultiUserChat}
+ * Preferences for a {@link MultiUserChat} session.
  */
-public final class MUCSessionPreferences {
+public final class MultiUserChatPreferences {
 
     private String service;
     private String roomName;
@@ -26,7 +24,7 @@ public final class MUCSessionPreferences {
      * @param password
      *            the password for the room
      */
-    public MUCSessionPreferences(String service, String roomName,
+    public MultiUserChatPreferences(String service, String roomName,
         String password) {
         this.service = service;
         this.roomName = roomName;
@@ -68,7 +66,8 @@ public final class MUCSessionPreferences {
      * 
      * @return the name of the room or <code>null</code> if no service was
      *         provided
-     * @see MultiUserChat#MultiUserChat(org.jivesoftware.smack.Connection,
+     * @see org.jivesoftware.smackx.muc
+     *      .MultiUserChat#MultiUserChat(org.jivesoftware.smack.Connection,
      *      String)
      */
     public String getRoom() {

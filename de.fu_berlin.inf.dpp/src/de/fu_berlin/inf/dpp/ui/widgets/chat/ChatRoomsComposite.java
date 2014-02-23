@@ -25,9 +25,9 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.communication.chat.IChat;
 import de.fu_berlin.inf.dpp.communication.chat.IChatServiceListener;
+import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatPreferences;
 import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChat;
 import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatService;
-import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferences;
 import de.fu_berlin.inf.dpp.communication.chat.single.SingleUserChatService;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
@@ -310,7 +310,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
             if (!(chat instanceof MultiUserChat))
                 return;
 
-            MUCSessionPreferences preferences = ((MultiUserChat) chat)
+            MultiUserChatPreferences preferences = ((MultiUserChat) chat)
                 .getPreferences();
 
             String mucService = preferences.getService();
