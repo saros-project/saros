@@ -169,7 +169,7 @@ public class SingleUserChatService extends AbstractChatService {
         if (createdChat == null) {
             LOG.trace("creating new chat between " + userJID + " <->" + jid);
 
-            createdChat = new SingleUserChat(connectionService);
+            createdChat = new SingleUserChat();
 
             createdChat.initChat(userJID, chat, chatStateManager);
             createdChat.setConnected(true);

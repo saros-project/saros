@@ -27,16 +27,13 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.ChatState;
-import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.chat.AbstractChatService;
 import de.fu_berlin.inf.dpp.communication.chat.IChat;
-import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCNegotiationManager;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
 
 /**
  * This class manages the creation and destruction of {@link MultiUserChat}s.
@@ -49,9 +46,6 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 public class MultiUserChatService extends AbstractChatService {
     private static final Logger log = Logger
         .getLogger(MultiUserChatService.class);
-
-    @Inject
-    MUCNegotiationManager negotiatingManager;
 
     private Set<MultiUserChat> chats = new HashSet<MultiUserChat>();
 
@@ -79,21 +73,6 @@ public class MultiUserChatService extends AbstractChatService {
      */
     public MultiUserChatService(XMPPConnectionService connectionService) {
         connectionService.addListener(listener);
-    }
-
-    /**
-     * Connects to the session's {@link MultiUserChat}. Automatically (if
-     * necessary) created and joins the {@link MultiUserChat}.
-     * 
-     * @param session
-     *            session the multi user chat should belong to
-     * @return multi user chat of the session
-     */
-    public IChat createChat(ISarosSession session) {
-        MultiUserChatPreferences preferences = session.isHost() ? negotiatingManager
-            .getOwnPreferences() : negotiatingManager.getSessionPreferences();
-
-        return createChat(preferences);
     }
 
     /**
@@ -153,7 +132,7 @@ public class MultiUserChatService extends AbstractChatService {
     @Override
     public void destroyChat(IChat chat) {
         assert chat != null;
-        log.debug("Leaving multi user chat " + chat.getTitle() + ".");
+        log.debug("leaving multi user chat " + chat);
 
         chats.remove(chat);
 

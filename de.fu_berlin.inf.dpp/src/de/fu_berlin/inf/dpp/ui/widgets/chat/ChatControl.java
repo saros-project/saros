@@ -639,7 +639,7 @@ public class ChatControl extends Composite {
             }
             missedMessages++;
             chatRooms.getChatTab(chat).setText(
-                "(" + missedMessages + ") " + chat.getTitle());
+                "(" + missedMessages + ") " + chatRooms.getChatTabName(chat));
         }
     }
 
@@ -647,7 +647,7 @@ public class ChatControl extends Composite {
         if (missedMessages > 0) {
             toggleChatBoldFontStyle();
             missedMessages = 0;
-            chatRooms.getChatTab(chat).setText(chat.getTitle());
+            chatRooms.getChatTab(chat).setText(chatRooms.getChatTabName(chat));
         }
     }
 

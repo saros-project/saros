@@ -15,13 +15,6 @@ import de.fu_berlin.inf.dpp.net.JID;
 public interface IChat {
 
     /**
-     * Returns the identifying title.
-     * 
-     * @return the identifying title
-     */
-    public String getTitle();
-
-    /**
      * Returns the JID of the local user.
      * 
      * @return the JID of the local user

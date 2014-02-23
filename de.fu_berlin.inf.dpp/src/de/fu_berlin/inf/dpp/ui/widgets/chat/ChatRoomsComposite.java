@@ -25,9 +25,10 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.communication.chat.IChat;
 import de.fu_berlin.inf.dpp.communication.chat.IChatServiceListener;
-import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatPreferences;
 import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChat;
+import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatPreferences;
 import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatService;
+import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCNegotiationManager;
 import de.fu_berlin.inf.dpp.communication.chat.single.SingleUserChatService;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
@@ -35,6 +36,7 @@ import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterAdapter;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
+import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
@@ -166,7 +168,11 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
                 public void run() {
                     synchronized (mucCreationLock) {
                         mucCreationStart.countDown();
-                        multiUserChatService.createChat(session);
+                        /*
+                         * ignore return value, we will be notified by the
+                         * listener before this call even returns
+                         */
+                        createChat(session);
                     }
                 }
             });
@@ -236,6 +242,9 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
     @Inject
     protected SingleUserChatService singleUserChatService;
+
+    @Inject
+    private MUCNegotiationManager mucNegotiationManager;
 
     protected DisposeListener disposeListener = new DisposeListener() {
 
@@ -453,7 +462,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         else
             chatTab = new CTabItem(chatRooms, SWT.CLOSE);
 
-        chatTab.setText(chat.getTitle());
+        chatTab.setText(getChatTabName(chat));
         chatTab.setImage(chatViewImage);
         chatTab.setData(chat);
         chatTab.setControl(control);
@@ -511,7 +520,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
             if (!Collections.disjoint(jids, chat.getParticipants())) {
                 control.updateDisplayNames();
-                tab.setText(chat.getTitle());
+                tab.setText(getChatTabName(chat));
             }
         }
     }
@@ -568,5 +577,39 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
         hideExplanation();
 
+    }
+
+    /**
+     * Connects to the session's {@link MultiUserChat}. Automatically (if
+     * necessary) created and joins the {@link MultiUserChat}.
+     * 
+     * @param session
+     *            session the multi user chat should belong to
+     * @return multi user chat of the session
+     */
+    private IChat createChat(ISarosSession session) {
+        MultiUserChatPreferences preferences = session.isHost() ? mucNegotiationManager
+            .getOwnPreferences() : mucNegotiationManager
+            .getSessionPreferences();
+
+        return multiUserChatService.createChat(preferences);
+    }
+
+    /**
+     * Returns the name for the given chat that would be used as caption for a
+     * chat tab.
+     * 
+     * @param chat
+     * @return
+     */
+    public String getChatTabName(IChat chat) {
+
+        if (chat instanceof MultiUserChat)
+            return Messages.ChatRoomsComposite_roundtable;
+        else {
+            JID jid = chat.getParticipants().iterator().next();
+            String nickname = XMPPUtils.getNickname(null, jid);
+            return nickname == null ? jid.getBase() : nickname;
+        }
     }
 }

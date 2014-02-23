@@ -18,16 +18,12 @@ import de.fu_berlin.inf.dpp.communication.chat.ChatElement;
 import de.fu_berlin.inf.dpp.communication.chat.ChatElement.ChatElementType;
 import de.fu_berlin.inf.dpp.communication.chat.ChatHistory;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 
 /**
  * This object represents a chat with a single user.
  */
 public class SingleUserChat extends AbstractChat {
     private static final Logger LOG = Logger.getLogger(SingleUserChat.class);
-
-    private XMPPConnectionService connectionService;
 
     private final ChatStateListener chatStateListener = new ChatStateListener() {
 
@@ -60,8 +56,8 @@ public class SingleUserChat extends AbstractChat {
 
     private boolean isConnected;
 
-    SingleUserChat(XMPPConnectionService connectionService) {
-        this.connectionService = connectionService;
+    SingleUserChat() {
+        // NOP
     }
 
     /**
@@ -131,33 +127,21 @@ public class SingleUserChat extends AbstractChat {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public synchronized JID getJID() {
         return new JID(userJID);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public synchronized Set<JID> getParticipants() {
         return Collections.singleton(new JID(chat.getParticipant()));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public synchronized String getThreadID() {
         return chat.getThreadID();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void sendMessage(Message message) throws XMPPException {
         Chat currentChat;
@@ -172,9 +156,6 @@ public class SingleUserChat extends AbstractChat {
         chatStateListener.processMessage(currentChat, message);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void sendMessage(String text) throws XMPPException {
         String participant;
@@ -191,29 +172,10 @@ public class SingleUserChat extends AbstractChat {
         sendMessage(message);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public synchronized void setCurrentState(ChatState newState)
         throws XMPPException {
         chatStateManager.setCurrentState(newState, chat);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getTitle() {
-        JID participant;
-        synchronized (SingleUserChat.this) {
-            participant = new JID(chat.getParticipant());
-        }
-
-        String nickname = XMPPUtils.getNickname(connectionService, participant);
-
-        return nickname != null ? nickname : participant.getBareJID()
-            .toString();
     }
 
     /**

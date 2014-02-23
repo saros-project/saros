@@ -24,7 +24,6 @@ import de.fu_berlin.inf.dpp.communication.chat.ChatElement;
 import de.fu_berlin.inf.dpp.communication.chat.ChatElement.ChatElementType;
 import de.fu_berlin.inf.dpp.communication.chat.IChatListener;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.ui.Messages;
 
 /**
  * This class encapsulates Smacks {@link MultiUserChat} and offers
@@ -176,7 +175,8 @@ public class MultiUserChat extends AbstractChat {
         if (preferences == null)
             throw new IllegalStateException("No comPrefs found!");
         createdRoom = createAndJoinMUC();
-        mucStateManager = MultiUserChatStateManager.getInstance(connection, muc);
+        mucStateManager = MultiUserChatStateManager
+            .getInstance(connection, muc);
         mucStateManager.addMUCStateListener(mucStateListener);
         muc.addMessageListener(packetListener);
         return createdRoom;
@@ -464,15 +464,6 @@ public class MultiUserChat extends AbstractChat {
             }
         }
         return count;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getTitle() {
-        /* TODO: return proper title, as there could be multiple MUCs. */
-        return Messages.ChatRoomsComposite_roundtable;
     }
 
     /**
