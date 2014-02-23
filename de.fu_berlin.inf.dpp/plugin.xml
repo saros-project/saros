@@ -1587,7 +1587,7 @@
             id="de.fu_berlin.inf.dpp.propertyTesters.SarosSessionPropertyTester"
             namespace="de.fu_berlin.inf.dpp"
             properties="isHost,hasWriteAccess"
-            type="de.fu_berlin.inf.dpp.project.ISarosSession">
+            type="de.fu_berlin.inf.dpp.session.ISarosSession">
       </propertyTester>
       <propertyTester
             class="de.fu_berlin.inf.dpp.ui.expressions.ProjectPropertyTester"
