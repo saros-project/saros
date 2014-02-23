@@ -15,8 +15,8 @@ import org.picocontainer.injectors.AnnotatedFieldInjection;
 import org.picocontainer.injectors.ProviderAdapter;
 import org.picocontainer.injectors.Reinjector;
 
-import de.fu_berlin.inf.dpp.util.pico.ChildContainer;
-import de.fu_berlin.inf.dpp.util.pico.ChildContainerProvider;
+import de.fu_berlin.inf.dpp.misc.pico.ChildContainer;
+import de.fu_berlin.inf.dpp.misc.pico.ChildContainerProvider;
 
 /**
  * PicoContainer is used for resolving object dependencies. In this context, a

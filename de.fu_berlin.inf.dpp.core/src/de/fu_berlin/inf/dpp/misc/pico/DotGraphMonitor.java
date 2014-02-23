@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.util.pico;
+package de.fu_berlin.inf.dpp.misc.pico;
 
 /*****************************************************************************
  * Copyright (C) PicoContainer Organization. All rights reserved.            *

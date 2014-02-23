@@ -57,6 +57,7 @@ import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
+import de.fu_berlin.inf.dpp.misc.pico.DotGraphMonitor;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
@@ -70,7 +71,6 @@ import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
-import de.fu_berlin.inf.dpp.util.pico.DotGraphMonitor;
 
 /**
  * The main plug-in of Saros.

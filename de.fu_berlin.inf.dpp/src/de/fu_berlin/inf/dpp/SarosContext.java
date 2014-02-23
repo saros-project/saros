@@ -18,6 +18,9 @@ import org.picocontainer.injectors.ProviderAdapter;
 import org.picocontainer.injectors.Reinjector;
 
 import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;
+import de.fu_berlin.inf.dpp.misc.pico.ChildContainer;
+import de.fu_berlin.inf.dpp.misc.pico.ChildContainerProvider;
+import de.fu_berlin.inf.dpp.misc.pico.DotGraphMonitor;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
@@ -45,9 +48,6 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.UserListReceivedExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.VersionExchangeExtension;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.util.StackTrace;
-import de.fu_berlin.inf.dpp.util.pico.ChildContainer;
-import de.fu_berlin.inf.dpp.util.pico.ChildContainerProvider;
-import de.fu_berlin.inf.dpp.util.pico.DotGraphMonitor;
 
 /**
  * Encapsulates a {@link org.picocontainer.PicoContainer} and its Saros-specific

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.util.pico;
+package de.fu_berlin.inf.dpp.misc.pico;
 
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.injectors.Provider;
