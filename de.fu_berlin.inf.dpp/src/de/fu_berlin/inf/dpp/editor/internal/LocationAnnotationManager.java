@@ -18,6 +18,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import de.fu_berlin.inf.dpp.editor.annotations.RemoteCursorAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
@@ -65,6 +66,8 @@ public class LocationAnnotationManager {
         if (model == null) {
             return;
         }
+
+        // TODO Make use of AnnotationModelHelper.replaceAnnotationsInModel()
 
         int top = lineRange.getStartLine();
         int bottom = top + lineRange.getNumberOfLines();
@@ -140,8 +143,9 @@ public class LocationAnnotationManager {
      * Create or update annotations related to text selections made by remote
      * users.
      * 
-     * In case there is no actual selection (just a blinking cursor) the
-     * annotation will be one character wide.
+     * Such selections consist of a highlight (one character wide, if there is
+     * no actual text selection) and a vertical line that resembles the local
+     * text cursor.
      * 
      * @param source
      *            The remote user who made the text selection (or to whom the
@@ -179,32 +183,44 @@ public class LocationAnnotationManager {
         int length = selection.getLength();
         boolean isCursor = length == 0;
 
+        // TODO For better performance: Currently, all selection-related
+        // annotations are created and replaced individually. Since the access
+        // to the annotation model tends to be slow and the replacement may take
+        // place in batches, one could first create all new selection-related
+        // annotations and replace them at once.
+
         if (isCursor) {
-            if (offset >= 1) {
+            if (offset > 0) {
                 /*
-                 * Highlight the character before the cursor in the light color
-                 * of the user. Does nothing if offset is the beginning of an
-                 * line
+                 * Highlight the character left of the cursor in the light color
+                 * of the user.
                  */
                 setSelectionAnnotation(source, isCursor, new Position(
                     offset - 1, 1), model);
             } else {
                 /*
-                 * We have to draw this highlighting of the character before the
-                 * cursor even if it isn't visible at all to prevent ghosting of
-                 * the highlight when jumping to the beginning of the file
+                 * We have to draw this "highlight" even though it's not visible
+                 * at all. This is to prevent ghosting of the highlight when
+                 * jumping to the beginning of the file (offset == 0).
                  */
                 setSelectionAnnotation(source, isCursor, new Position(0, 0),
                     model);
             }
         } else {
             /*
-             * Highlight the last character in a selection of a remote user in
-             * the remote user's light color.
+             * Highlight the selection of a remote user in the remote user's
+             * light color.
              */
             setSelectionAnnotation(source, isCursor, new Position(offset,
                 length), model);
         }
+
+        /*
+         * Draw a cursor at the cursor position of other user in the current
+         * session. When there is a selection, the cursor will be shown at the
+         * end of it.
+         */
+        setRemoteCursorAnnotation(source, new Position(offset + length), model);
     }
 
     /**
@@ -227,7 +243,7 @@ public class LocationAnnotationManager {
             new Predicate<Annotation>() {
                 @Override
                 public boolean evaluate(Annotation annotation) {
-                    return (annotation instanceof SelectionAnnotation)
+                    return (annotation instanceof SelectionAnnotation || annotation instanceof RemoteCursorAnnotation)
                         && ((SarosAnnotation) annotation).getSource().equals(
                             user);
                 }
@@ -246,6 +262,17 @@ public class LocationAnnotationManager {
     }
 
     /**
+     * Helper function to create an add an annotation that marks the current
+     * text cursor position (see {@link RemoteCursorAnnotation}).
+     */
+    private void setRemoteCursorAnnotation(User user, Position position,
+        IAnnotationModel annotationModel) {
+
+        setAnnotationForSelection(new RemoteCursorAnnotation(user), position,
+            annotationModel);
+    }
+
+    /**
      * Sets annotations related to selections made by remote users.
      * 
      * @param newAnnotation
@@ -257,7 +284,7 @@ public class LocationAnnotationManager {
      *            {@link IAnnotationModel} that maintains the annotations for
      *            the opened document.
      */
-    private void setAnnotationForSelection(SelectionAnnotation newAnnotation,
+    private void setAnnotationForSelection(final SarosAnnotation newAnnotation,
         Position position, IAnnotationModel model) {
 
         if (newAnnotation == null || position == null) {
@@ -265,13 +292,12 @@ public class LocationAnnotationManager {
                 "Both newAnnotation and position must not be null");
         }
 
-        final User user = newAnnotation.getSource();
-
         Predicate<Annotation> predicate = new Predicate<Annotation>() {
             @Override
             public boolean evaluate(Annotation annotation) {
-                return (annotation instanceof SelectionAnnotation)
-                    && ((SarosAnnotation) annotation).getSource().equals(user);
+                return annotation.getType().equals(newAnnotation.getType())
+                    && ((SarosAnnotation) annotation).getSource().equals(
+                        newAnnotation.getSource());
             }
         };
 

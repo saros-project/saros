@@ -64,6 +64,8 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.RemoteEditorManager.RemoteEditor;
 import de.fu_berlin.inf.dpp.editor.RemoteEditorManager.RemoteEditorState;
 import de.fu_berlin.inf.dpp.editor.annotations.ContributionAnnotation;
+import de.fu_berlin.inf.dpp.editor.annotations.RemoteCursorAnnotation;
+import de.fu_berlin.inf.dpp.editor.annotations.RemoteCursorStrategy;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.editor.internal.AnnotationModelHelper;
 import de.fu_berlin.inf.dpp.editor.internal.ContributionAnnotationManager;
@@ -1895,7 +1897,10 @@ public class EditorManager extends AbstractActivityProvider {
      * registerDrawingStrategy()} .
      */
     private void registerCustomAnnotations() {
-        // add method calls here
+        customAnnotationManager.registerAnnotation(RemoteCursorAnnotation.TYPE,
+            0);
+        customAnnotationManager.registerDrawingStrategy(
+            RemoteCursorAnnotation.TYPE, new RemoteCursorStrategy());
     }
 
     /**
