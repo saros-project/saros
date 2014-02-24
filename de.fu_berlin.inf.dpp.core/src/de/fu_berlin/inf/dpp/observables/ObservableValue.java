@@ -15,7 +15,7 @@ import java.util.Set;
  */
 public class ObservableValue<T> {
 
-    Set<ValueChangeListener<? super T>> nonVetoables = new HashSet<ValueChangeListener<? super T>>();
+    Set<ValueChangeListener<? super T>> listeners = new HashSet<ValueChangeListener<? super T>>();
 
     T variable;
 
@@ -23,8 +23,7 @@ public class ObservableValue<T> {
      * Create a new ObservableValue with the given initial value.
      */
     public ObservableValue(T initialValue) {
-        super();
-        this.variable = initialValue;
+        variable = initialValue;
     }
 
     /**
@@ -32,7 +31,7 @@ public class ObservableValue<T> {
      * calls the listener with the current value.
      */
     public void addAndNotify(ValueChangeListener<? super T> listener) {
-        nonVetoables.add(listener);
+        listeners.add(listener);
         listener.setValue(variable);
     }
 
@@ -44,11 +43,11 @@ public class ObservableValue<T> {
      * 
      */
     public void add(ValueChangeListener<? super T> listener) {
-        nonVetoables.add(listener);
+        listeners.add(listener);
     }
 
     public void remove(ValueChangeListener<? super T> listener) {
-        nonVetoables.remove(listener);
+        listeners.remove(listener);
     }
 
     /**
@@ -59,41 +58,16 @@ public class ObservableValue<T> {
      * value of the ObservableValue from the listener.
      * 
      * Note: The listeners are called, even if the newValue is not changed! Thus
-     * calling
-     * 
-     * setValue(getValue())
-     * 
-     * would trigger a call to all listeners.
-     * 
-     * @return Returns true if the setting of the variable was successful.
-     * 
+     * calling <code>setValue(getValue());</code> would trigger a call to all
+     * listeners.
      */
-    public boolean setValue(T newValue) {
-        return setValue(newValue, null);
-    }
-
-    /**
-     * Utility function for {@link ObservableValue#setValue(Object)} which
-     * excludes the given listener to be notified of the change.
-     * 
-     * This is useful, when the change originated from a component which does
-     * not need to be updated again (to avoid a cycle).
-     * 
-     */
-    public boolean setValue(T newValue, ValueChangeListener<? super T> exclude) {
-        this.variable = newValue;
-        for (ValueChangeListener<? super T> vpl : nonVetoables) {
-            if (vpl == exclude)
-                continue;
+    public void setValue(T newValue) {
+        variable = newValue;
+        for (ValueChangeListener<? super T> vpl : listeners) {
             vpl.setValue(newValue);
         }
-        return true;
     }
 
-    /**
-     * 
-     * @return
-     */
     public T getValue() {
         return variable;
     }
