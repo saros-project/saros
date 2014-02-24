@@ -87,6 +87,7 @@ public final class StopManager extends AbstractActivityProvider implements
     private Set<StopActivity> expectedAcknowledgments = Collections
         .synchronizedSet(new HashSet<StopActivity>());
 
+    private final Object notificationLock = new Object();
     /**
      * Indicates of the component is stopped;
      */
@@ -141,7 +142,7 @@ public final class StopManager extends AbstractActivityProvider implements
                     return;
                 }
                 if (stopActivity.getState() == State.ACKNOWLEDGED) {
-                    synchronized (StopManager.this) {
+                    synchronized (notificationLock) {
 
                         if (!expectedAcknowledgments.contains(stopActivity)) {
                             log.warn("Received unexpected StopActivity: "
@@ -162,7 +163,7 @@ public final class StopManager extends AbstractActivityProvider implements
                             return;
                         }
 
-                        StopManager.this.notifyAll();
+                        notificationLock.notifyAll();
                     }
                     return;
                 }
@@ -338,7 +339,7 @@ public final class StopManager extends AbstractActivityProvider implements
 
         boolean isInterrupted = false;
         boolean acknowledged = false;
-        synchronized (this) {
+        synchronized (notificationLock) {
             while ((System.currentTimeMillis() < timeoutToExceed)
                 && user.isInSarosSession()) {
 
@@ -353,7 +354,7 @@ public final class StopManager extends AbstractActivityProvider implements
                     break;
 
                 try {
-                    wait(1000);
+                    notificationLock.wait(1000);
                 } catch (InterruptedException e) {
                     isInterrupted = true;
                     break;
@@ -499,13 +500,19 @@ public final class StopManager extends AbstractActivityProvider implements
         return getStartHandles(startHandle.getUser()).remove(startHandle);
     }
 
-    private synchronized List<StartHandle> getStartHandles(User user) {
+    private List<StartHandle> getStartHandles(User user) {
 
-        List<StartHandle> result = startHandles.get(user);
-        if (result == null) {
-            result = new CopyOnWriteArrayList<StartHandle>();
-            startHandles.put(user, result);
+        List<StartHandle> result;
+
+        synchronized (startHandles) {
+            result = startHandles.get(user);
+
+            if (result == null) {
+                result = new CopyOnWriteArrayList<StartHandle>();
+                startHandles.put(user, result);
+            }
         }
+
         return result;
     }
 
@@ -550,7 +557,7 @@ public final class StopManager extends AbstractActivityProvider implements
      * TODO decrease lock time
      */
 
-    synchronized boolean resumeStartHandle(StartHandle startHandle) {
+    boolean resumeStartHandle(StartHandle startHandle) {
         synchronized (resumeLock) {
             removeStartHandle(startHandle);
             initiateUnlock(startHandle);
