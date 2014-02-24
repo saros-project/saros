@@ -200,7 +200,7 @@ public final class ActivityHandler implements Startable {
      * 
      *               This function will transform activities and then forward
      *               them to the callback. E.g. this will turn TextEditActivity
-     *               into Jupiter actitivities.
+     *               into Jupiter activities.
      * 
      *               Saros uses a client-server-architecture. All activities
      *               will first be send to the server located at the Host. The

@@ -159,8 +159,8 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
              * 
              *               (5a) [client side, see subsequent stops]
              * 
-             *               (5b) Wait for the client's whishlist of the
-             *               session's parameters (e.g. his own favourite
+             *               (5b) Wait for the client's wishlist of the
+             *               session's parameters (e.g. his own favorite
              *               color).
              * 
              *               (6a) Consider these preferences and send the

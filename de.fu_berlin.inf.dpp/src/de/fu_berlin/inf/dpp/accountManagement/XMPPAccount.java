@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.accountManagement;
 import java.io.Serializable;
 
 /**
- * Representation of a XMPP-Account.
+ * Representation of an XMPP account.
  * 
  * @author Sebastian Schlaak
  * @author Stefan Rossbach

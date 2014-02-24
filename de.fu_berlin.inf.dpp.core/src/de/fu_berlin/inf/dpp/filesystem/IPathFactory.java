@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.filesystem;
 
 /**
  * An interface for implementing a factory that is able to convert {@link IPath
- * path} objects to their string representation and vice versa. Implementation
+ * path} objects to their string representation and vice versa. Implementations
  * must throw the given {@link RuntimeException runtime exceptions} as declared
  * in the method signatures.
  */
@@ -18,8 +18,8 @@ public interface IPathFactory {
      * @throws NullPointerException
      *             if path is <code>null</code>
      * @throws IllegalArgumentException
-     *             if the path is not relative (e.g is presents a full path like
-     *             /etc/init.d/)
+     *             if the path is not relative (e.g it presents a full path like
+     *             <code>/etc/init.d/</code>)
      */
     public String fromPath(IPath path);
 

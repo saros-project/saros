@@ -7,8 +7,8 @@ import de.fu_berlin.inf.dpp.invitation.OutgoingSessionNegotiation;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 
 /**
- * A SessionNegotiationHook is a component that whishes to take part in the
- * SessionNegotiation. On the client side, this might be in the form of whishes
+ * A SessionNegotiationHook is a component that wishes to take part in the
+ * SessionNegotiation. On the client side, this might be in the form of wishes
  * (during the {@link IncomingSessionNegotiation}), which may then be considered
  * by the host (during the {@link OutgoingSessionNegotiation}). The settings
  * determined by the host need to be applied on the client side.
@@ -34,7 +34,7 @@ public interface ISessionNegotiationHook {
      * 
      * During the invitation this method will be called on the <b>client</b>
      * side (see {@link IncomingSessionNegotiation}). The client may use this
-     * oppurtunity to tell the host (inviter) his preferences concerning the
+     * opportunity to tell the host (inviter) his preferences concerning the
      * session parameters.
      * 
      * @return The settings in form of [Key, Value] pairs. If <code>null</code>,

@@ -586,7 +586,7 @@ public class StopManagerTest {
 
         /*
          * do not synchronize this listener or some test cases will end in a
-         * deadlock ... this is mainly because we do not not use a thread which
+         * deadlock ... this is mainly because we do not use a thread which
          * would be present in a real execution environment
          */
         return new IActivityListener() {

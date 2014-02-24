@@ -82,9 +82,9 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider,
      * Create a new XStreamExtensionProvider using the given element name as the
      * XML root element with the given namespace. The Provider is able to
      * understand the given classes, which should be annotated using XStream
-     * annotations. <br/>
-     * <br/>
-     * <b>Important</b>: use valid XML element names and namcespaces or the
+     * annotations.
+     * <p>
+     * <b>Important</b>: use valid XML element names and namespaces or the
      * receiving side will be unable to decode the extension !
      */
     public XStreamExtensionProvider(String namespace, String elementName,

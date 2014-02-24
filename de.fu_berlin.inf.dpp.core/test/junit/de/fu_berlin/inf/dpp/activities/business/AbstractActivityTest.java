@@ -31,8 +31,8 @@ public abstract class AbstractActivityTest {
 
     /**
      * Needed for conversions between Activities and ActivityDataObjets. Knows
-     * nothing and just return default values (0, false, null) for all method
-     * invocation.
+     * nothing and just returns default values (0, false, null) for all method
+     * invocations.
      */
     private IPathFactory pathFactory;
 

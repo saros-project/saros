@@ -126,7 +126,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
              * 
              *               (4b) Send acceptance to host.
              * 
-             *               (5a) Create "whishlist" with session's parameters
+             *               (5a) Create "wishlist" with session's parameters
              *               (e.g. preferred color) and send it.
              * 
              *               (6b) Wait for host's response.
