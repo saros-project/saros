@@ -22,15 +22,11 @@ public class RosterTracker implements IConnectionListener {
 
     static final Logger log = Logger.getLogger(RosterTracker.class);
 
-    protected Connection connection;
+    private Connection connection;
 
-    protected Roster roster;
+    private volatile Roster roster;
 
-    protected DispatchingRosterListener listener = new DispatchingRosterListener();
-
-    // public RosterTracker(Saros saros) {
-    // saros.getSarosNet().addListener(this);
-    // }
+    private DispatchingRosterListener listener = new DispatchingRosterListener();
 
     public RosterTracker(XMPPConnectionService connectionService) {
         connectionService.addListener(this);
@@ -58,44 +54,47 @@ public class RosterTracker implements IConnectionListener {
         listener.remove(rosterListener);
     }
 
-    protected void prepareConnection(Connection connection) {
+    private void prepareConnection(Connection connection) {
         this.connection = connection;
         setRoster(this.connection.getRoster());
     }
 
-    protected void disposeConnection() {
+    private void disposeConnection() {
         setRoster(null);
         this.connection = null;
     }
 
     @Override
     public void connectionStateChanged(Connection connection,
-        ConnectionState newState) {
-        if (newState == ConnectionState.CONNECTING) {
+        ConnectionState state) {
+        if (state == ConnectionState.CONNECTING) {
             prepareConnection(connection);
         } else if (this.connection != null
-            && newState != ConnectionState.CONNECTED) {
+            && state != ConnectionState.CONNECTED) {
             disposeConnection();
         }
     }
 
-    protected void setRoster(Roster newRoster) {
+    private void setRoster(Roster roster) {
 
-        // Unregister from current roster (if set)
-        if (this.roster != null) {
+        if (this.roster != null)
             this.roster.removeRosterListener(listener);
-        }
 
-        this.roster = newRoster;
+        if (roster != null)
+            roster.addRosterListener(listener);
 
-        // Register to new roster (if set)
-        if (this.roster != null) {
-            // TODO This is too late, we might miss Roster events... reload?
-            this.roster.addRosterListener(listener);
+        this.roster = roster;
 
-            // TODO Inform the listeners about the roster being set to null?
-            listener.rosterChanged(this.roster);
-        }
+        listener.rosterChanged(this.roster);
+    }
+
+    /**
+     * Returns the roster that this tracker is currently using.
+     * 
+     * @return the current roster or <code>null</code> if no roster is available
+     */
+    public Roster getRoster() {
+        return roster;
     }
 
     /**
@@ -107,12 +106,15 @@ public class RosterTracker implements IConnectionListener {
         if (from == null)
             throw new IllegalArgumentException("JID cannot be null");
 
-        if (roster == null)
+        final Roster currentRoster = roster;
+
+        if (currentRoster == null)
             return Collections.emptyList();
 
         final List<Presence> presences = new ArrayList<Presence>();
 
-        final Iterator<Presence> it = roster.getPresences(from.toString());
+        final Iterator<Presence> it = currentRoster.getPresences(from
+            .toString());
 
         while (it.hasNext())
             presences.add(it.next());
@@ -127,13 +129,9 @@ public class RosterTracker implements IConnectionListener {
      * An empty list is returned if no presence for the given JID is online.
      */
     public List<JID> getAvailablePresences(JID from) {
-        if (from == null)
-            throw new IllegalArgumentException("JID cannot be null");
 
-        if (roster == null)
-            return Collections.emptyList();
+        List<JID> result = new ArrayList<JID>();
 
-        List<JID> result = new ArrayList<JID>(10);
         for (Presence presence : getPresences(from)) {
             if (!presence.isAvailable())
                 continue;
