@@ -143,7 +143,7 @@ public class Saros extends AbstractUIPlugin {
 
     protected IUPnPService upnpService;
 
-    protected XMPPConnectionService sarosNet;
+    protected XMPPConnectionService connectionService;
 
     private DataTransferManager transferManager;
 
@@ -277,7 +277,7 @@ public class Saros extends AbstractUIPlugin {
          * must invoked here otherwise some components will fail to initialize
          * due NPE... see getSarosNet()
          */
-        sarosNet = sarosContext.getComponent(XMPPConnectionService.class);
+        connectionService = sarosContext.getComponent(XMPPConnectionService.class);
         sessionManager = sarosContext.getComponent(ISarosSessionManager.class);
         xmppAccountStore = sarosContext.getComponent(XMPPAccountStore.class);
         preferenceUtils = sarosContext.getComponent(PreferenceUtils.class);
@@ -515,7 +515,7 @@ public class Saros extends AbstractUIPlugin {
      */
     @Deprecated
     public XMPPConnectionService getSarosNet() {
-        return sarosNet;
+        return connectionService;
     }
 
     /**
@@ -661,14 +661,14 @@ public class Saros extends AbstractUIPlugin {
         boolean useTLS = account.useTLS();
         boolean useSASL = account.useSASL();
 
-        sarosNet.disconnect();
+        connectionService.disconnect();
 
         List<String> socks5Candidates = preferenceUtils.getSocks5Candidates();
 
         if (socks5Candidates.isEmpty())
             socks5Candidates = null;
 
-        sarosNet.configure(NAMESPACE, RESOURCE,
+        connectionService.configure(NAMESPACE, RESOURCE,
             preferenceUtils.isDebugEnabled(),
             preferenceUtils.isLocalSOCKS5ProxyEnabled(),
             preferenceUtils.getFileTransferPort(), socks5Candidates,
@@ -686,7 +686,7 @@ public class Saros extends AbstractUIPlugin {
             else
                 transferManager.setTransport(/* use all */-1);
 
-            sarosNet.connect(
+            connectionService.connect(
                 createConnectionConfiguration(domain, server, port, useTLS,
                     useSASL), username, password);
         } catch (Exception e) {
