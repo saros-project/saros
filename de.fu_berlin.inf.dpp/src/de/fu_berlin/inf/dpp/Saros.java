@@ -60,7 +60,6 @@ import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 import de.fu_berlin.inf.dpp.misc.pico.DotGraphMonitor;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
-import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
@@ -128,22 +127,26 @@ public class Saros extends AbstractUIPlugin {
      * The name of the resource identifier used by Saros when connecting to the
      * XMPP server (for instance when logging in as john@doe.com, Saros will
      * connect using john@doe.com/Saros)
+     * 
+     * @deprecated Do not use this resource identifier to build a fully
+     *             qualified Jabber identifier, e.g the logic connects to a XMPP
+     *             server as foo@bar/Saros but the assigned Jabber identifier
+     *             may be something like foo@bar/Saros765E18ED !
      */
+    @Deprecated
     public final static String RESOURCE = "Saros"; //$NON-NLS-1$
 
     private String sarosVersion;
 
     private String sarosFeatureID;
 
-    protected ISarosSessionManager sessionManager;
+    private ISarosSessionManager sessionManager;
 
-    protected XMPPAccountStore xmppAccountStore;
+    private XMPPAccountStore xmppAccountStore;
 
-    protected PreferenceUtils preferenceUtils;
+    private PreferenceUtils preferenceUtils;
 
-    protected IUPnPService upnpService;
-
-    protected XMPPConnectionService connectionService;
+    private XMPPConnectionService connectionService;
 
     private DataTransferManager transferManager;
 
@@ -277,11 +280,11 @@ public class Saros extends AbstractUIPlugin {
          * must invoked here otherwise some components will fail to initialize
          * due NPE... see getSarosNet()
          */
-        connectionService = sarosContext.getComponent(XMPPConnectionService.class);
+        connectionService = sarosContext
+            .getComponent(XMPPConnectionService.class);
         sessionManager = sarosContext.getComponent(ISarosSessionManager.class);
         xmppAccountStore = sarosContext.getComponent(XMPPAccountStore.class);
         preferenceUtils = sarosContext.getComponent(PreferenceUtils.class);
-        upnpService = sarosContext.getComponent(IUPnPService.class);
         transferManager = sarosContext.getComponent(DataTransferManager.class);
 
         // Make sure that all components in the container are
