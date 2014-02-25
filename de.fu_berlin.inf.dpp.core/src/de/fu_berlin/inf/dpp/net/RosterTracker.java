@@ -1,9 +1,11 @@
 package de.fu_berlin.inf.dpp.net;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
@@ -18,18 +20,61 @@ import de.fu_berlin.inf.dpp.annotations.Component;
  * whether the connection is changed.
  */
 @Component(module = "net")
-public class RosterTracker implements IConnectionListener {
+public class RosterTracker {
 
-    static final Logger log = Logger.getLogger(RosterTracker.class);
+    private static final Logger LOG = Logger.getLogger(RosterTracker.class);
 
     private Connection connection;
 
     private volatile Roster roster;
 
-    private DispatchingRosterListener listener = new DispatchingRosterListener();
+    private List<IRosterListener> listeners = new CopyOnWriteArrayList<IRosterListener>();
+
+    private final IConnectionListener connectionListener = new IConnectionListener() {
+
+        @Override
+        public void connectionStateChanged(Connection connection,
+            ConnectionState state) {
+            if (state == ConnectionState.CONNECTING) {
+                prepareConnection(connection);
+            } else if (state != ConnectionState.CONNECTED) {
+                disposeConnection();
+            }
+        }
+
+    };
+
+    private final IRosterListener forwarder = new IRosterListener() {
+
+        @Override
+        public void entriesAdded(Collection<String> addresses) {
+            forwardEntriesAdded(addresses);
+        }
+
+        @Override
+        public void entriesDeleted(Collection<String> addresses) {
+            forwardEntriesDeleted(addresses);
+        }
+
+        @Override
+        public void entriesUpdated(Collection<String> addresses) {
+            forwardEntriesUpdated(addresses);
+        }
+
+        @Override
+        public void presenceChanged(Presence presence) {
+            forwardPresenceChanged(presence);
+        }
+
+        @Override
+        public void rosterChanged(Roster roster) {
+            forwardRosterChanged(roster);
+        }
+
+    };
 
     public RosterTracker(XMPPConnectionService connectionService) {
-        connectionService.addListener(this);
+        connectionService.addListener(connectionListener);
     }
 
     /**
@@ -40,7 +85,7 @@ public class RosterTracker implements IConnectionListener {
      *            a roster listener.
      */
     public void addRosterListener(IRosterListener rosterListener) {
-        listener.add(rosterListener);
+        listeners.add(rosterListener);
     }
 
     /**
@@ -51,41 +96,7 @@ public class RosterTracker implements IConnectionListener {
      *            a roster listener.
      */
     public void removeRosterListener(IRosterListener rosterListener) {
-        listener.remove(rosterListener);
-    }
-
-    private void prepareConnection(Connection connection) {
-        this.connection = connection;
-        setRoster(this.connection.getRoster());
-    }
-
-    private void disposeConnection() {
-        setRoster(null);
-        this.connection = null;
-    }
-
-    @Override
-    public void connectionStateChanged(Connection connection,
-        ConnectionState state) {
-        if (state == ConnectionState.CONNECTING) {
-            prepareConnection(connection);
-        } else if (this.connection != null
-            && state != ConnectionState.CONNECTED) {
-            disposeConnection();
-        }
-    }
-
-    private void setRoster(Roster roster) {
-
-        if (this.roster != null)
-            this.roster.removeRosterListener(listener);
-
-        if (roster != null)
-            roster.addRosterListener(listener);
-
-        this.roster = roster;
-
-        listener.rosterChanged(this.roster);
+        listeners.remove(rosterListener);
     }
 
     /**
@@ -138,12 +149,87 @@ public class RosterTracker implements IConnectionListener {
 
             String rjid = presence.getFrom();
             if (rjid == null) {
-                log.error("presence.getFrom() is null");
+                LOG.error("presence.getFrom() is null");
                 continue;
             }
             result.add(new JID(rjid));
         }
 
         return result;
+    }
+
+    private void prepareConnection(Connection connection) {
+        this.connection = connection;
+        setRoster(this.connection.getRoster());
+    }
+
+    private void disposeConnection() {
+        if (this.connection != null)
+            setRoster(null);
+
+        this.connection = null;
+    }
+
+    private void setRoster(Roster roster) {
+
+        if (this.roster != null)
+            this.roster.removeRosterListener(forwarder);
+
+        if (roster != null)
+            roster.addRosterListener(forwarder);
+
+        this.roster = roster;
+
+        forwarder.rosterChanged(this.roster);
+    }
+
+    private void forwardEntriesAdded(Collection<String> addresses) {
+        for (IRosterListener listener : listeners) {
+            try {
+                listener.entriesAdded(addresses);
+            } catch (RuntimeException e) {
+                LOG.error("invoking listener: " + listener + " failed", e);
+            }
+        }
+    }
+
+    private void forwardEntriesDeleted(Collection<String> addresses) {
+        for (IRosterListener listener : listeners) {
+            try {
+                listener.entriesDeleted(addresses);
+            } catch (RuntimeException e) {
+                LOG.error("invoking listener: " + listener + " failed", e);
+            }
+        }
+    }
+
+    private void forwardEntriesUpdated(Collection<String> addresses) {
+        for (IRosterListener listener : this.listeners) {
+            try {
+                listener.entriesUpdated(addresses);
+            } catch (RuntimeException e) {
+                LOG.error("invoking listener: " + listener + " failed", e);
+            }
+        }
+    }
+
+    private void forwardPresenceChanged(Presence presence) {
+        for (IRosterListener listener : listeners) {
+            try {
+                listener.presenceChanged(presence);
+            } catch (RuntimeException e) {
+                LOG.error("invoking listener: " + listener + " failed", e);
+            }
+        }
+    }
+
+    private void forwardRosterChanged(Roster roster) {
+        for (IRosterListener listener : listeners) {
+            try {
+                listener.rosterChanged(roster);
+            } catch (RuntimeException e) {
+                LOG.error("invoking listener: " + listener + " failed", e);
+            }
+        }
     }
 }

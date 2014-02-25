@@ -14,10 +14,13 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import org.easymock.Capture;
+import org.easymock.EasyMock;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.Presence;
+import org.junit.Before;
 import org.junit.Test;
 
 public class RosterTrackerTest {
@@ -43,10 +46,29 @@ public class RosterTrackerTest {
         createPresence("dave", Presence.Type.available),
         createPresence(null, Presence.Type.available));
 
+    private XMPPConnectionService connectionServiceMock;
+
+    private Capture<IConnectionListener> connectionListener = new Capture<IConnectionListener>();
+
+    private XMPPConnectionService createXMPPConnectionServiceMock(
+        Capture<IConnectionListener> connectionListener) {
+        XMPPConnectionService net = EasyMock
+            .createMock(XMPPConnectionService.class);
+        net.addListener(EasyMock.and(EasyMock.isA(IConnectionListener.class),
+            EasyMock.capture(connectionListener)));
+        EasyMock.expectLastCall().once();
+        EasyMock.replay(net);
+        return net;
+    }
+
+    @Before
+    public void setUp() {
+        connectionServiceMock = createXMPPConnectionServiceMock(connectionListener);
+    }
+
     @Test
     public void testEmptyRosterGetPresence() {
-        RosterTracker tracker = new RosterTracker(
-            createMock(XMPPConnectionService.class));
+        RosterTracker tracker = new RosterTracker(connectionServiceMock);
 
         assertFalse("this iterator must not have any elements", tracker
             .getPresences(new JID("bla")).iterator().hasNext());
@@ -54,8 +76,7 @@ public class RosterTrackerTest {
 
     @Test
     public void testEmptyRosterGetAvailablePresences() {
-        RosterTracker tracker = new RosterTracker(
-            createMock(XMPPConnectionService.class));
+        RosterTracker tracker = new RosterTracker(connectionServiceMock);
 
         assertFalse("this iterator must not have any elements", tracker
             .getAvailablePresences(new JID("bla")).iterator().hasNext());
@@ -63,15 +84,13 @@ public class RosterTrackerTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetAvailablePresencesWithNullJid() {
-        RosterTracker tracker = new RosterTracker(
-            createMock(XMPPConnectionService.class));
+        RosterTracker tracker = new RosterTracker(connectionServiceMock);
         tracker.getAvailablePresences(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetPresencesWithNullJid() {
-        RosterTracker tracker = new RosterTracker(
-            createMock(XMPPConnectionService.class));
+        RosterTracker tracker = new RosterTracker(connectionServiceMock);
         tracker.getPresences(null);
     }
 
@@ -86,13 +105,12 @@ public class RosterTrackerTest {
         replay(mockConnection);
         replay(mockRoster);
 
-        RosterTracker tracker = new RosterTracker(
-            createMock(XMPPConnectionService.class));
+        RosterTracker tracker = new RosterTracker(connectionServiceMock);
 
-        tracker.connectionStateChanged(mockConnection,
+        connectionListener.getValue().connectionStateChanged(mockConnection,
             ConnectionState.CONNECTING);
 
-        tracker.connectionStateChanged(mockConnection,
+        connectionListener.getValue().connectionStateChanged(mockConnection,
             ConnectionState.CONNECTED);
 
         tracker.getPresences(new JID("devil"));
@@ -113,13 +131,12 @@ public class RosterTrackerTest {
         replay(mockConnection);
         replay(mockRoster);
 
-        RosterTracker tracker = new RosterTracker(
-            createMock(XMPPConnectionService.class));
+        RosterTracker tracker = new RosterTracker(connectionServiceMock);
 
-        tracker.connectionStateChanged(mockConnection,
+        connectionListener.getValue().connectionStateChanged(mockConnection,
             ConnectionState.CONNECTING);
 
-        tracker.connectionStateChanged(mockConnection,
+        connectionListener.getValue().connectionStateChanged(mockConnection,
             ConnectionState.CONNECTED);
 
         Iterator<JID> p = tracker.getAvailablePresences(new JID("devil"))
@@ -151,22 +168,21 @@ public class RosterTrackerTest {
         replay(mockConnection);
         replay(mockRoster);
 
-        RosterTracker tracker = new RosterTracker(
-            createMock(XMPPConnectionService.class));
+        RosterTracker tracker = new RosterTracker(connectionServiceMock);
 
-        tracker.connectionStateChanged(mockConnection,
+        connectionListener.getValue().connectionStateChanged(mockConnection,
             ConnectionState.CONNECTING);
 
         assertTrue("roster must be available on connection state 'CONNECTING'",
             tracker.getRoster() != null);
 
-        tracker.connectionStateChanged(mockConnection,
+        connectionListener.getValue().connectionStateChanged(mockConnection,
             ConnectionState.CONNECTED);
 
         assertTrue("roster must be available on connection state 'CONNECTED'",
             tracker.getRoster() != null);
 
-        tracker.connectionStateChanged(mockConnection,
+        connectionListener.getValue().connectionStateChanged(mockConnection,
             ConnectionState.DISCONNECTING);
 
         assertFalse(
