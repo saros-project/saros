@@ -81,9 +81,9 @@ public class SkypeManager implements IConnectionListener {
         }
     };
 
-    public SkypeManager(XMPPConnectionService sarosNet,
+    public SkypeManager(XMPPConnectionService connectionService,
         IPreferenceStore preferenceStore) {
-        this.connectionService = sarosNet;
+        this.connectionService = connectionService;
         this.preferenceStore = preferenceStore;
         this.connectionService.addListener(this);
 

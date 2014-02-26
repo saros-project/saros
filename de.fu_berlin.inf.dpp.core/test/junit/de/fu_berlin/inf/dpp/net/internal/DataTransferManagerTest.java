@@ -192,7 +192,7 @@ public class DataTransferManagerTest {
         EasyMock.replay(connectionMock);
     }
 
-    private XMPPConnectionService createSarosNetMock(
+    private XMPPConnectionService createConnectionsServiceMock(
         Capture<IConnectionListener> connectionListener) {
         XMPPConnectionService net = EasyMock
             .createMock(XMPPConnectionService.class);
@@ -205,7 +205,7 @@ public class DataTransferManagerTest {
 
     @Before
     public void setUp() {
-        connectionServiceStub = createSarosNetMock(connectionListener);
+        connectionServiceStub = createConnectionsServiceMock(connectionListener);
     }
 
     @Test(expected = NullPointerException.class)
