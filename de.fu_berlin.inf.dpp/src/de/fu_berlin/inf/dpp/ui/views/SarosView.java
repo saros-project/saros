@@ -76,6 +76,7 @@ import de.fu_berlin.inf.dpp.ui.BalloonNotification;
 import de.fu_berlin.inf.dpp.ui.actions.ChangeColorAction;
 import de.fu_berlin.inf.dpp.ui.actions.ChangeXMPPAccountAction;
 import de.fu_berlin.inf.dpp.ui.actions.ConsistencyAction;
+import de.fu_berlin.inf.dpp.ui.actions.ContactAvailabilityAction;
 import de.fu_berlin.inf.dpp.ui.actions.DeleteContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.Disposable;
 import de.fu_berlin.inf.dpp.ui.actions.FollowModeAction;
@@ -438,12 +439,12 @@ public class SarosView extends ViewPart {
                     return;
 
                 /*
-                 * Do not display the following actions if no buddies are
+                 * Do not display the following actions if no contacts are
                  * selected.
                  */
-                List<JID> buddies = SelectionRetrieverFactory
+                List<JID> contacts = SelectionRetrieverFactory
                     .getSelectionRetriever(JID.class).getSelection();
-                if (buddies.size() == 0)
+                if (contacts.size() == 0)
                     return;
 
                 /*
@@ -456,6 +457,7 @@ public class SarosView extends ViewPart {
                 manager.add(getAction(SendFileAction.class));
                 manager.add(getAction(RenameContactAction.class));
                 manager.add(getAction(DeleteContactAction.class));
+                manager.add(getAction(ContactAvailabilityAction.class));
             }
         });
     }
@@ -662,6 +664,7 @@ public class SarosView extends ViewPart {
         registerAction(new SkypeAction());
         registerAction(new RenameContactAction());
         registerAction(new DeleteContactAction());
+        registerAction(new ContactAvailabilityAction());
 
         // ContextMenus Both
         registerAction(new OpenChatAction(chatRooms));
