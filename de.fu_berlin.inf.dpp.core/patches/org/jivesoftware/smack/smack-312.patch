@@ -1,8 +1,8 @@
-diff --git a/de.fu_berlin.inf.dpp/ext-src/org/jivesoftware/smack/Roster.java b/de.fu_berlin.inf.dpp/ext-src/org/jivesoftware/smack/Roster.java
-index fbd0bd5..e1d095f 100644
---- a/de.fu_berlin.inf.dpp/ext-src/org/jivesoftware/smack/Roster.java
-+++ b/de.fu_berlin.inf.dpp/ext-src/org/jivesoftware/smack/Roster.java
-@@ -921,19 +921,17 @@
+diff --git a/de.fu_berlin.inf.dpp.core/patches/org/jivesoftware/smack/Roster.java b/de.fu_berlin.inf.dpp.core/patches/org/jivesoftware/smack/Roster.java
+index f6be4e2..c2e0b03 100644
+--- a/de.fu_berlin.inf.dpp.core/patches/org/jivesoftware/smack/Roster.java
++++ b/de.fu_berlin.inf.dpp.core/patches/org/jivesoftware/smack/Roster.java
+@@ -914,19 +914,17 @@
                          // Keep note that an entry has been added
                          addedEntries.add(item.getUser());
                      } else {

@@ -1,7 +1,7 @@
 /**
  * $RCSfile$
- * $Revision: 12087 $
- * $Date: 2011-03-10 03:30:53 -0800 (Thu, 10 Mar 2011) $
+ * $Revision$
+ * $Date$
  *
  * Copyright 2003-2007 Jive Software.
  *
@@ -643,13 +643,6 @@ public class Roster {
     }
 
     /**
-     * Cleans up all resources used by the roster.
-     */
-    void cleanup() {
-        rosterListeners.clear();
-    }
-
-    /**
      * Returns the key to use in the presenceMap for a fully qualified XMPP ID.
      * The roster can contain any valid address format such us
      * "domain/resource", "user@domain" or "user@domain/resource". If the roster
@@ -921,8 +914,6 @@ public class Roster {
                         // Keep note that an entry has been added
                         addedEntries.add(item.getUser());
                     } else {
-                        // If the entry was in then list then update its state
-                        // with the new values
                         // If new item is different then update it and keep note
                         // We have also to check if only the group names have
                         // changed from the item
