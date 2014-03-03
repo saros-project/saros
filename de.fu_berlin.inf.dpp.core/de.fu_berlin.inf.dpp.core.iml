@@ -10,7 +10,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="smack" level="project" />
     <orderEntry type="library" exported="" name="smackx-debug" level="project" />
-    <orderEntry type="library" exported="" name="smackx-jingle" level="project" />
     <orderEntry type="library" exported="" name="smackx" level="project" />
     <orderEntry type="library" exported="" name="xstream-1.4-20101008.163445-1" level="project" />
     <orderEntry type="library" exported="" name="xpp3-1.1.4c" level="project" />
