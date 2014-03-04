@@ -17,6 +17,10 @@ import org.jivesoftware.smack.filter.PacketIDFilter;
 import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Registration;
+import org.jivesoftware.smackx.Form;
+import org.jivesoftware.smackx.FormField;
+import org.jivesoftware.smackx.ReportedData;
+import org.jivesoftware.smackx.ReportedData.Row;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.packet.DiscoverInfo.Identity;
 import org.jivesoftware.smackx.packet.DiscoverItems;
@@ -181,6 +185,9 @@ public class XMPPUtils {
      */
     public static boolean isJIDonServer(Connection connection, JID jid,
         String resourceHint) throws XMPPException {
+
+        if (isListedInUserDirectory(connection, jid))
+            return true;
 
         ServiceDiscoveryManager sdm = ServiceDiscoveryManager
             .getInstanceFor(connection);
@@ -347,5 +354,78 @@ public class XMPPUtils {
         }
 
         return null;
+    }
+
+    /**
+     * Tries to find the user in the user directory of the server. This method
+     * may fail for different XMPP Server implementation, because the 'user'
+     * variable is not mandatory neither that it must be named 'user'. Currently
+     * works with ejabberd XMPP servers.
+     */
+
+    // TODO: remove this method, add more logic and let the GUI handle search
+    // stuff
+
+    // Smack does not uses generics for Row.getValues(String variable)
+    @SuppressWarnings("unchecked")
+    private static boolean isListedInUserDirectory(Connection connection,
+        JID jid) {
+
+        String userDirectoryService = null;
+
+        try {
+            userDirectoryService = getUserDirectoryService(connection,
+                connection.getServiceName());
+
+            if (userDirectoryService == null)
+                return false;
+
+            UserSearch search = new UserSearch();
+
+            Form form = search.getSearchForm(connection, userDirectoryService);
+
+            String userFieldVariable = null;
+
+            for (Iterator<FormField> it = form.getFields(); it.hasNext();) {
+                FormField formField = it.next();
+
+                if ("user".equalsIgnoreCase(formField.getVariable())) {
+                    userFieldVariable = formField.getVariable();
+                    break;
+                }
+            }
+
+            if (userFieldVariable == null)
+                return false;
+
+            Form answerForm = form.createAnswerForm();
+
+            answerForm.setAnswer(userFieldVariable, jid.getName());
+
+            ReportedData data = search.sendSearchForm(connection, answerForm,
+                userDirectoryService);
+
+            for (Iterator<Row> it = data.getRows(); it.hasNext();) {
+
+                Row row = it.next();
+
+                Iterator<String> vit = row.getValues("jid");
+
+                if (vit == null)
+                    continue;
+
+                while (vit.hasNext()) {
+                    JID returnedJID = new JID(vit.next());
+                    if (jid.equals(returnedJID))
+                        return true;
+                }
+            }
+
+            return false;
+        } catch (XMPPException e) {
+            log.error("searching in the user directory + '"
+                + userDirectoryService + "' failed", e);
+            return false;
+        }
     }
 }
