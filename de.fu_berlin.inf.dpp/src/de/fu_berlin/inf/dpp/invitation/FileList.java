@@ -405,7 +405,6 @@ public class FileList {
         if (container.getType() == IResource.PROJECT)
             addEncoding(container.getDefaultCharset());
 
-        container.refreshLocal(IResource.DEPTH_INFINITE, null);
         addMembers(Arrays.asList(container.members()), checksumCache, monitor);
     }
 

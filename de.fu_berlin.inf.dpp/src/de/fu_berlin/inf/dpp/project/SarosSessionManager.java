@@ -246,10 +246,17 @@ public class SarosSessionManager implements ISarosSessionManager {
                     try {
                         project.open();
                     } catch (IOException e) {
-                        log.error("an error occur while opening project: "
+                        log.error("an error occured while opening project: "
                             + project.getName(), e);
                         continue;
                     }
+                }
+
+                try {
+                    if (resourcesList == null)
+                        project.refreshLocal();
+                } catch (IOException e) {
+                    log.warn("could not refresh project: " + project, e);
                 }
 
                 String projectID = String.valueOf(SESSION_ID_GENERATOR
@@ -552,10 +559,17 @@ public class SarosSessionManager implements ISarosSessionManager {
                 try {
                     project.open();
                 } catch (IOException e) {
-                    log.error("an error occur while opening project: "
+                    log.error("an error occurred while opening project: "
                         + project.getName(), e);
                     continue;
                 }
+            }
+
+            try {
+                if (resourcesList == null && !session.isShared(project))
+                    project.refreshLocal();
+            } catch (IOException e) {
+                log.warn("could not refresh project: " + project, e);
             }
 
             // side effect: non shared projects are always partial -.-

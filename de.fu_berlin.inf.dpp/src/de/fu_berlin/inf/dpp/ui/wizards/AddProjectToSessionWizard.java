@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.wizards;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -498,6 +499,17 @@ public class AddProjectToSessionWizard extends Wizard {
 
             de.fu_berlin.inf.dpp.filesystem.IProject project = ResourceAdapterFactory
                 .create(eclipseProject);
+
+            /*
+             * do not refresh already partially shared projects as this may
+             * trigger resource change events
+             */
+            try {
+                if (!session.isShared(project))
+                    project.refreshLocal();
+            } catch (IOException e) {
+                log.warn("could not refresh project: " + project, e);
+            }
 
             if (session.isShared(project)) {
 
