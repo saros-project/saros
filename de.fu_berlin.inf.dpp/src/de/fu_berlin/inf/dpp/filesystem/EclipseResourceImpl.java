@@ -1,5 +1,9 @@
 package de.fu_berlin.inf.dpp.filesystem;
 
+import java.io.IOException;
+
+import org.eclipse.core.runtime.CoreException;
+
 public class EclipseResourceImpl implements IResource {
 
     protected final org.eclipse.core.resources.IResource delegate;
@@ -106,6 +110,16 @@ public class EclipseResourceImpl implements IResource {
 
         return delegate
             .isDerived(org.eclipse.core.resources.IResource.CHECK_ANCESTORS);
+    }
+
+    @Override
+    public void refreshLocal() throws IOException {
+        try {
+            delegate.refreshLocal(
+                org.eclipse.core.resources.IResource.DEPTH_INFINITE, null);
+        } catch (CoreException e) {
+            throw new IOException(e);
+        }
     }
 
     @Override
