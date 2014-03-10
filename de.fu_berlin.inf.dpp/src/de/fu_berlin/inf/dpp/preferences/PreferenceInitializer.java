@@ -121,6 +121,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         prefs.setValue(PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_OFFLINE,
             true);
 
+        // consolesharing
+        prefs.setValue(PreferenceConstants.CONSOLESHARING_ENABLED, false);
+
         /*
          * Initially 50/50 distribution Roster/Chatpart in saros view
          */

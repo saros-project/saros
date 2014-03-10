@@ -69,6 +69,12 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
                 Messages.AdvancedPreferencePage_activate_server,
                 getFieldEditorParent()));
         }
+
+        addField(new BooleanFieldEditor(
+            PreferenceConstants.CONSOLESHARING_ENABLED,
+            Messages.AdvancedPreferencePage_enable_consolesharing,
+            getFieldEditorParent()));
+
     }
 
     @Override
