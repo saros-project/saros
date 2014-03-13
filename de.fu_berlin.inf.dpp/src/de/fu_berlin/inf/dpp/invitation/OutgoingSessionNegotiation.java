@@ -18,7 +18,7 @@ import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.invitation.hooks.ISessionNegotiationHook;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
-import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManager;
+import de.fu_berlin.inf.dpp.net.discovery.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationAcceptedExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationAcknowledgedExtension;

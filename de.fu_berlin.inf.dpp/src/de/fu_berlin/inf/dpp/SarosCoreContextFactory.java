@@ -23,7 +23,7 @@ import de.fu_berlin.inf.dpp.net.business.CancelInviteHandler;
 import de.fu_berlin.inf.dpp.net.business.CancelProjectSharingHandler;
 import de.fu_berlin.inf.dpp.net.business.InvitationHandler;
 import de.fu_berlin.inf.dpp.net.business.LeaveAndKickHandler;
-import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManager;
+import de.fu_berlin.inf.dpp.net.discovery.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.IBBTransport;
 import de.fu_berlin.inf.dpp.net.internal.ITransport;

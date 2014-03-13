@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net.discoverymanager;
+package de.fu_berlin.inf.dpp.net.discovery;
 
 import java.util.ArrayList;
 import java.util.Collection;
