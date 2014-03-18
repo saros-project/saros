@@ -14,7 +14,7 @@ import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.session.IActivityProvider;
+import de.fu_berlin.inf.dpp.session.IActivityProducerAndConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.session.User;
@@ -153,13 +153,15 @@ public class NullSarosSession implements ISarosSession {
     }
 
     @Override
-    public void addActivityProvider(IActivityProvider provider) {
+    public void addActivityProducerAndConsumer(
+        IActivityProducerAndConsumer producerAndConsumer) {
         log.warn("unexpected method call");
 
     }
 
     @Override
-    public void removeActivityProvider(IActivityProvider provider) {
+    public void removeActivityProducerAndConsumer(
+        IActivityProducerAndConsumer producerAndConsumer) {
         log.warn("unexpected method call");
 
     }

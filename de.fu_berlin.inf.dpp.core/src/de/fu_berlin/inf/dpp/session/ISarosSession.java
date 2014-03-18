@@ -288,19 +288,21 @@ public interface ISarosSession {
     public void exec(List<IActivityDataObject> activityDataObjects);
 
     /**
-     * Adds an {@link IActivityProvider} and also registers itself as
-     * {@link IActivityListener} at the given provider.
+     * Adds an {@link IActivityProducerAndConsumer} and also registers itself as
+     * {@link IActivityListener} at the given IActivityProducerAndConsumer.
      * 
-     * If the given provider was already added this method does not add it again
-     * but silently returns.
+     * If the given IActivityProducerAndConsumer was already added this method
+     * does not add it again but silently returns.
      */
-    public void addActivityProvider(IActivityProvider provider);
+    public void addActivityProducerAndConsumer(
+        IActivityProducerAndConsumer producerAndConsumer);
 
     /**
-     * Removes the given provider and deregisters itself as
-     * {@link IActivityListener} on that provider.
+     * Removes the given IActivityProducerAndConsumer and deregisters itself as
+     * {@link IActivityListener} on that IActivityProducerAndConsumer.
      */
-    public void removeActivityProvider(IActivityProvider provider);
+    public void removeActivityProducerAndConsumer(
+        IActivityProducerAndConsumer producerAndConsumer);
 
     /**
      * Returns a list of all users in this session which have

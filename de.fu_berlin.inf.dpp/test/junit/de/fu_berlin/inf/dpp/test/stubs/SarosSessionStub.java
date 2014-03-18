@@ -13,7 +13,7 @@ import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.session.IActivityProvider;
+import de.fu_berlin.inf.dpp.session.IActivityProducerAndConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.session.User;
@@ -68,7 +68,8 @@ public class SarosSessionStub implements ISarosSession {
     }
 
     @Override
-    public void removeActivityProvider(IActivityProvider provider) {
+    public void removeActivityProducerAndConsumer(
+        IActivityProducerAndConsumer producerAndConsumer) {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
@@ -198,7 +199,8 @@ public class SarosSessionStub implements ISarosSession {
     }
 
     @Override
-    public void addActivityProvider(IActivityProvider provider) {
+    public void addActivityProducerAndConsumer(
+        IActivityProducerAndConsumer producerAndConsumer) {
         throw new RuntimeException("Unexpected call to Stub");
 
     }

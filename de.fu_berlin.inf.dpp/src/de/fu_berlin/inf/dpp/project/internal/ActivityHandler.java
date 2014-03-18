@@ -209,9 +209,8 @@ public final class ActivityHandler implements Startable {
      */
 
     /**
-     * Transforms and determines the recipients of the activities. The
-     * {@linkplain IActivityHandlerCallback callback} will be notified about the
-     * results.
+     * Transforms the activities and forwards the result to
+     * {@linkplain IActivityHandlerCallback callback}
      * 
      * @param activities
      *            an <b>immutable</b> list containing the activities
@@ -377,9 +376,10 @@ public final class ActivityHandler implements Startable {
      * This method is responsible for directing activities received at the
      * server to the various clients.
      * 
+     * 
      * @param activities
      *            A list of incoming activities
-     * @return A number of targeted activities.
+     * @return A number of activities as a TransformationResult
      */
     private TransformationResult directServerActivities(
         List<IActivity> activities) {
