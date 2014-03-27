@@ -57,38 +57,6 @@ public interface ITransmitter {
     public void sendPacket(Packet packet) throws IOException;
 
     /**
-     * <p>
-     * Sends the given {@link PacketExtension} to the given {@link JID}. The
-     * recipient has to be in the session or the extension will not be sent.
-     * </p>
-     * 
-     * <p>
-     * If the extension's raw data (bytes) is longer than
-     * {@value #MAX_XMPP_MESSAGE_SIZE} or if there is a peer-to-peer bytestream
-     * to the recipient the extension will be sent using the bytestream. Else it
-     * will be sent by chat.
-     * </p>
-     * 
-     * <p>
-     * <s>Note: Does NOT ensure that peers receive messages in order because
-     * there may be two completely different communication ways. See
-     * {@link de.fu_berlin.inf.dpp.project.internal.ActivitySequencer} for
-     * details.</s> There is currently only one communication way enabled !
-     * </p>
-     * 
-     * @param recipient
-     * @param extension
-     * @throws IOException
-     *             if sending by bytestreams fails and the extension raw data is
-     *             longer than {@value #MAX_XMPP_MESSAGE_SIZE}
-     * 
-     * @deprecated use {@link #sendToSessionUser(String, JID, PacketExtension)}
-     */
-    @Deprecated
-    public void sendToSessionUser(JID recipient, PacketExtension extension)
-        throws IOException;
-
-    /**
      * Sends the given {@link PacketExtension} to the given {@link JID}.
      * 
      * @param connectionID
