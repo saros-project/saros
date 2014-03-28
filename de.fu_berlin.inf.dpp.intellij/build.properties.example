@@ -1,0 +1,6 @@
+path.variable.m2_repo=/home/gallan/.m2/repository
+path.variable.maven_repository=/home/gallan/.m2/repository
+jdk.home.1.7=/home/gallan/dev/jdks/jdk1.7.0_07
+jdk.home.idea_sdk=/home/gallan/dev/intellij/idea-IU-129.451
+idea.home=/home/gallan/dev/intellij/idea-IU-129.451
+javac2.instrumentation.includeJavaRuntime=false

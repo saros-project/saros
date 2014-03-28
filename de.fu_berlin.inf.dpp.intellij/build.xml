@@ -1,0 +1,526 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="saros-i" default="all">
+  
+  
+  <property file="build.properties"/>
+  <!-- Uncomment the following property if no tests compilation is needed -->
+  <!-- 
+  <property name="skip.tests" value="true"/>
+   -->
+  
+  <!-- Compiler options -->
+  
+  <property name="compiler.debug" value="on"/>
+  <property name="compiler.generate.no.warnings" value="off"/>
+  <property name="compiler.args" value=""/>
+  <property name="compiler.max.memory" value="128m"/>
+  <patternset id="ignored.files">
+    <exclude name="**/CVS/**"/>
+    <exclude name="**/SCCS/**"/>
+    <exclude name="**/RCS/**"/>
+    <exclude name="**/rcs/**"/>
+    <exclude name="**/.DS_Store/**"/>
+    <exclude name="**/.svn/**"/>
+    <exclude name="**/.pyc/**"/>
+    <exclude name="**/.pyo/**"/>
+    <exclude name="**/*.pyc/**"/>
+    <exclude name="**/*.pyo/**"/>
+    <exclude name="**/.git/**"/>
+    <exclude name="**/*.hprof/**"/>
+    <exclude name="**/_svn/**"/>
+    <exclude name="**/.hg/**"/>
+    <exclude name="**/*.lib/**"/>
+    <exclude name="**/*~/**"/>
+    <exclude name="**/__pycache__/**"/>
+    <exclude name="**/.bundle/**"/>
+    <exclude name="**/*.rbc/**"/>
+  </patternset>
+  <patternset id="library.patterns">
+    <include name="*.zip"/>
+    <include name="*.apk"/>
+    <include name="*.war"/>
+    <include name="*.egg"/>
+    <include name="*.ear"/>
+    <include name="*.ane"/>
+    <include name="*.swc"/>
+    <include name="*.jar"/>
+  </patternset>
+  <patternset id="compiler.resources">
+    <exclude name="**/?*.java"/>
+    <exclude name="**/?*.form"/>
+    <exclude name="**/?*.class"/>
+    <exclude name="**/?*.groovy"/>
+    <exclude name="**/?*.scala"/>
+    <exclude name="**/?*.flex"/>
+    <exclude name="**/?*.kt"/>
+    <exclude name="**/?*.clj"/>
+  </patternset>
+  
+  <!-- JDK definitions -->
+  
+  <property name="jdk.bin.1.7" value="${jdk.home.1.7}/bin"/>
+  <path id="jdk.classpath.1.7">
+    <fileset dir="${jdk.home.1.7}">
+      <include name="jre/lib/resources.jar"/>
+      <include name="jre/lib/javaws.jar"/>
+      <include name="jre/lib/jce.jar"/>
+      <include name="jre/lib/charsets.jar"/>
+      <include name="jre/lib/management-agent.jar"/>
+      <include name="jre/lib/rt.jar"/>
+      <include name="jre/lib/deploy.jar"/>
+      <include name="jre/lib/jfr.jar"/>
+      <include name="jre/lib/jsse.jar"/>
+      <include name="jre/lib/jfxrt.jar"/>
+      <include name="jre/lib/plugin.jar"/>
+      <include name="jre/lib/ext/dnsns.jar"/>
+      <include name="jre/lib/ext/sunec.jar"/>
+      <include name="jre/lib/ext/sunpkcs11.jar"/>
+      <include name="jre/lib/ext/zipfs.jar"/>
+      <include name="jre/lib/ext/sunjce_provider.jar"/>
+      <include name="jre/lib/ext/localedata.jar"/>
+    </fileset>
+  </path>
+  
+  <property name="jdk.bin.idea_sdk" value="${jdk.home.idea_sdk}/../../jdks/jdk1.7.0_07/bin"/>
+  <path id="jdk.classpath.idea_sdk">
+    <fileset dir="${jdk.home.idea_sdk}">
+      <include name="../../jdks/jdk1.7.0_07/jre/lib/resources.jar"/>
+      <include name="../../jdks/jdk1.7.0_07/jre/lib/javaws.jar"/>
+      <include name="../../jdks/jdk1.7.0_07/jre/lib/jce.jar"/>
+      <include name="../../jdks/jdk1.7.0_07/jre/lib/charsets.jar"/>
+      <include name="../../jdks/jdk1.7.0_07/jre/lib/management-agent.jar"/>
+      <include name="../../jdks/jdk1.7.0_07/jre/lib/rt.jar"/>
+      <include name="../../jdks/jdk1.7.0_07/jre/lib/deploy.jar"/>
+      <include name="../../jdks/jdk1.7.0_07/jre/lib/jfr.jar"/>
+      <include name="../../jdks/jdk1.7.0_07/jre/lib/jsse.jar"/>
+      <include name="../../jdks/jdk1.7.0_07/jre/lib/jfxrt.jar"/>
+      <include name="../../jdks/jdk1.7.0_07/jre/lib/plugin.jar"/>
+      <include name="../../jdks/jdk1.7.0_07/jre/lib/ext/dnsns.jar"/>
+      <include name="../../jdks/jdk1.7.0_07/jre/lib/ext/sunec.jar"/>
+      <include name="../../jdks/jdk1.7.0_07/jre/lib/ext/sunpkcs11.jar"/>
+      <include name="../../jdks/jdk1.7.0_07/jre/lib/ext/zipfs.jar"/>
+      <include name="../../jdks/jdk1.7.0_07/jre/lib/ext/sunjce_provider.jar"/>
+      <include name="../../jdks/jdk1.7.0_07/jre/lib/ext/localedata.jar"/>
+      <include name="lib/protobuf-2.4.1.jar"/>
+      <include name="lib/resources.jar"/>
+      <include name="lib/jcip-annotations.jar"/>
+      <include name="lib/rhino-js-1_7R4.jar"/>
+      <include name="lib/trang-core.jar"/>
+      <include name="lib/resolver.jar"/>
+      <include name="lib/groovy-all-2.0.6.jar"/>
+      <include name="lib/optimizedFileManager.jar"/>
+      <include name="lib/jdkAnnotations.jar"/>
+      <include name="lib/log4j.jar"/>
+      <include name="lib/xml-apis.jar"/>
+      <include name="lib/javac2.jar"/>
+      <include name="lib/trove4j_src.jar"/>
+      <include name="lib/alloy.jar"/>
+      <include name="lib/swingx-core-1.6.2.jar"/>
+      <include name="lib/asm-tree-3.0.jar"/>
+      <include name="lib/jasper21_rt.jar"/>
+      <include name="lib/picocontainer.jar"/>
+      <include name="lib/netty-3.6.2.Final.jar"/>
+      <include name="lib/boot.jar"/>
+      <include name="lib/openapi.jar"/>
+      <include name="lib/asm4-all.jar"/>
+      <include name="lib/proxy-vole_20120920.jar"/>
+      <include name="lib/util.jar"/>
+      <include name="lib/jps-server.jar"/>
+      <include name="lib/icons.jar"/>
+      <include name="lib/commons-logging-1.1.1.jar"/>
+      <include name="lib/freemarker.jar"/>
+      <include name="lib/jettison-1.3.2.jar"/>
+      <include name="lib/gson-2.2.1.jar"/>
+      <include name="lib/commons-httpclient-3.1-patched.jar"/>
+      <include name="lib/xerces.jar"/>
+      <include name="lib/idea-jsp-openapi.jar"/>
+      <include name="lib/jsp-api.jar"/>
+      <include name="lib/guava-12.0.jar"/>
+      <include name="lib/velocity.jar"/>
+      <include name="lib/microba.jar"/>
+      <include name="lib/junit-4.10.jar"/>
+      <include name="lib/commons-codec-1.3.jar"/>
+      <include name="lib/jna-utils.jar"/>
+      <include name="lib/bootstrap.jar"/>
+      <include name="lib/jh.jar"/>
+      <include name="lib/batik.jar"/>
+      <include name="lib/automaton.jar"/>
+      <include name="lib/yjp-controller-api-redist.jar"/>
+      <include name="lib/serviceMessages.jar"/>
+      <include name="lib/jdom.jar"/>
+      <include name="lib/forms_rt.jar"/>
+      <include name="lib/annotations.jar"/>
+      <include name="lib/oromatcher.jar"/>
+      <include name="lib/jgoodies-common-1.2.1.jar"/>
+      <include name="lib/jgoodies-forms.jar"/>
+      <include name="lib/commons-net-3.1.jar"/>
+      <include name="lib/xpp3-1.1.4-min.jar"/>
+      <include name="lib/xstream-1.4.3.jar"/>
+      <include name="lib/xmlrpc-2.0.jar"/>
+      <include name="lib/winp-1.17-patched.jar"/>
+      <include name="lib/snappy-java-1.0.4.1.jar"/>
+      <include name="lib/ecj-4.2.1.jar"/>
+      <include name="lib/cglib-2.2.2.jar"/>
+      <include name="lib/jgoodies-looks-2.4.2.jar"/>
+      <include name="lib/sanselan-0.98-snapshot.jar"/>
+      <include name="lib/jna.jar"/>
+      <include name="lib/servlet-api.jar"/>
+      <include name="lib/cli-parser-1.1.jar"/>
+      <include name="lib/miglayout-swing.jar"/>
+      <include name="lib/trove4j.jar"/>
+      <include name="lib/asm-commons.jar"/>
+      <include name="lib/jing.jar"/>
+      <include name="lib/idea.jar"/>
+      <include name="lib/asm.jar"/>
+      <include name="lib/isorelax.jar"/>
+      <include name="lib/rngom-20051226-patched.jar"/>
+      <include name="lib/xbean.jar"/>
+      <include name="lib/nekohtml-1.9.14.jar"/>
+      <include name="lib/resources_en.jar"/>
+      <include name="lib/jsch-0.1.49.jar"/>
+      <include name="lib/idea_rt.jar"/>
+      <include name="lib/nanoxml-2.2.3.jar"/>
+      <include name="lib/jasper2_rt.jar"/>
+      <include name="lib/extensions.jar"/>
+      <include name="lib/jaxen-1.1.3.jar"/>
+      <include name="lib/jsr173_1.0_api.jar"/>
+      <include name="plugins/JavaEE/lib/javaee-openapi.jar"/>
+      <include name="plugins/JavaEE/lib/resources_en.jar"/>
+      <include name="plugins/JSF/lib/jsf-support.jar"/>
+      <include name="plugins/JSF/lib/resources_en.jar"/>
+      <include name="plugins/PersistenceSupport/lib/persistence-openapi.jar"/>
+      <include name="plugins/PersistenceSupport/lib/resources_en.jar"/>
+      <include name="plugins/DatabaseSupport/lib/database-openapi.jar"/>
+      <include name="plugins/DatabaseSupport/lib/resources_en.jar"/>
+      <include name="plugins/uml/lib/diagram-api.jar"/>
+    </fileset>
+  </path>
+  
+  <property name="project.jdk.home" value="${jdk.home.idea_sdk}"/>
+  <property name="project.jdk.bin" value="${jdk.bin.idea_sdk}"/>
+  <property name="project.jdk.classpath" value="jdk.classpath.idea_sdk"/>
+  
+  
+  <!-- Project Libraries -->
+  
+  <path id="library.commons-codec-1.3.classpath">
+    <pathelement location="${basedir}/../de.fu_berlin.inf.dpp.core/lib/commons-codec-1.3.jar"/>
+  </path>
+  
+  <path id="library.commons-io-2.0.1.classpath">
+    <pathelement location="${basedir}/../de.fu_berlin.inf.dpp.core/lib/commons-io-2.0.1.jar"/>
+  </path>
+  
+  <path id="library.commons-lang-2.4.classpath">
+    <pathelement location="${basedir}/../de.fu_berlin.inf.dpp.core/lib/commons-lang-2.4.jar"/>
+  </path>
+  
+  <path id="library.log4j-1.2.15.classpath">
+    <pathelement location="${basedir}/../de.fu_berlin.inf.dpp.core/lib/log4j-1.2.15.jar"/>
+  </path>
+  
+  <path id="library.picocontainer-2.11.2.classpath">
+    <pathelement location="${basedir}/../de.fu_berlin.inf.dpp.core/lib/picocontainer-2.11.2.jar"/>
+  </path>
+  
+  <path id="library.smack.classpath">
+    <pathelement location="${basedir}/../de.fu_berlin.inf.dpp.core/lib/smack-3.4.1-0cec571.jar"/>
+  </path>
+  
+  <path id="library.smackx-debug.classpath">
+    <pathelement location="${basedir}/../de.fu_berlin.inf.dpp.core/lib/smackx-debug-3.4.1-0cec571.jar"/>
+  </path>
+  
+  <path id="library.smackx.classpath">
+    <pathelement location="${basedir}/../de.fu_berlin.inf.dpp.core/lib/smackx-3.4.1-0cec571.jar"/>
+  </path>
+  
+  <path id="library.weupnp.classpath">
+    <pathelement location="${basedir}/../de.fu_berlin.inf.dpp.core/lib/weupnp.jar"/>
+  </path>
+  
+  <path id="library.xpp3-1.1.4c.classpath">
+    <pathelement location="${basedir}/../de.fu_berlin.inf.dpp.core/lib/xpp3-1.1.4c.jar"/>
+  </path>
+  
+  <path id="library.xstream-1.4-20101008.163445-1.classpath">
+    <pathelement location="${basedir}/../de.fu_berlin.inf.dpp.core/lib/xstream-1.4-20101008.163445-1.jar"/>
+  </path>
+  
+  
+  <!-- Global Libraries -->
+  <!-- Register Custom Compiler Taskdefs -->
+  <property name="javac2.home" value="${idea.home}/lib"/>
+  <path id="javac2.classpath">
+    <pathelement location="${javac2.home}/javac2.jar"/>
+    <pathelement location="${javac2.home}/jdom.jar"/>
+    <pathelement location="${javac2.home}/asm4-all.jar"/>
+    <pathelement location="${javac2.home}/jgoodies-forms.jar"/>
+  </path>
+  <target name="register.custom.compilers">
+    <taskdef name="javac2" classname="com.intellij.ant.Javac2" classpathref="javac2.classpath"/>
+    <taskdef name="instrumentIdeaExtensions" classname="com.intellij.ant.InstrumentIdeaExtensions" classpathref="javac2.classpath"/>
+  </target>
+  
+  <!-- Modules -->
+  
+  
+  <!-- Module de.fu_berlin.inf.dpp.core -->
+  
+  <dirname property="module.de.fu_berlin.inf.dpp.core.basedir" file="${ant.file}"/>
+  
+  
+  <property name="module.jdk.home.de.fu_berlin.inf.dpp.core" value="${jdk.home.1.7}"/>
+  <property name="module.jdk.bin.de.fu_berlin.inf.dpp.core" value="${jdk.bin.1.7}"/>
+  <property name="module.jdk.classpath.de.fu_berlin.inf.dpp.core" value="jdk.classpath.1.7"/>
+  
+  <property name="compiler.args.de.fu_berlin.inf.dpp.core" value="${compiler.args}"/>
+  
+  <property name="de.fu_berlin.inf.dpp.core.output.dir" value="${module.de.fu_berlin.inf.dpp.core.basedir}/bin/production/de.fu_berlin.inf.dpp.core"/>
+  <property name="de.fu_berlin.inf.dpp.core.testoutput.dir" value="${module.de.fu_berlin.inf.dpp.core.basedir}/bin/test/de.fu_berlin.inf.dpp.core"/>
+  
+  <path id="de.fu_berlin.inf.dpp.core.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="de.fu_berlin.inf.dpp.core.module.production.classpath">
+    <path refid="${module.jdk.classpath.de.fu_berlin.inf.dpp.core}"/>
+    <path refid="library.smack.classpath"/>
+    <path refid="library.smackx-debug.classpath"/>
+    <path refid="library.smackx.classpath"/>
+    <path refid="library.xstream-1.4-20101008.163445-1.classpath"/>
+    <path refid="library.xpp3-1.1.4c.classpath"/>
+    <path refid="library.weupnp.classpath"/>
+    <path refid="library.picocontainer-2.11.2.classpath"/>
+    <path refid="library.log4j-1.2.15.classpath"/>
+    <path refid="library.commons-lang-2.4.classpath"/>
+    <path refid="library.commons-io-2.0.1.classpath"/>
+    <path refid="library.commons-codec-1.3.classpath"/>
+  </path>
+  
+  <path id="de.fu_berlin.inf.dpp.core.runtime.production.module.classpath">
+    <pathelement location="${de.fu_berlin.inf.dpp.core.output.dir}"/>
+    <path refid="library.smack.classpath"/>
+    <path refid="library.smackx-debug.classpath"/>
+    <path refid="library.smackx.classpath"/>
+    <path refid="library.xstream-1.4-20101008.163445-1.classpath"/>
+    <path refid="library.xpp3-1.1.4c.classpath"/>
+    <path refid="library.weupnp.classpath"/>
+    <path refid="library.picocontainer-2.11.2.classpath"/>
+    <path refid="library.log4j-1.2.15.classpath"/>
+    <path refid="library.commons-lang-2.4.classpath"/>
+    <path refid="library.commons-io-2.0.1.classpath"/>
+    <path refid="library.commons-codec-1.3.classpath"/>
+  </path>
+  
+  <path id="de.fu_berlin.inf.dpp.core.module.classpath">
+    <path refid="${module.jdk.classpath.de.fu_berlin.inf.dpp.core}"/>
+    <pathelement location="${de.fu_berlin.inf.dpp.core.output.dir}"/>
+    <path refid="library.smack.classpath"/>
+    <path refid="library.smackx-debug.classpath"/>
+    <path refid="library.smackx.classpath"/>
+    <path refid="library.xstream-1.4-20101008.163445-1.classpath"/>
+    <path refid="library.xpp3-1.1.4c.classpath"/>
+    <path refid="library.weupnp.classpath"/>
+    <path refid="library.picocontainer-2.11.2.classpath"/>
+    <path refid="library.log4j-1.2.15.classpath"/>
+    <path refid="library.commons-lang-2.4.classpath"/>
+    <path refid="library.commons-io-2.0.1.classpath"/>
+    <path refid="library.commons-codec-1.3.classpath"/>
+  </path>
+  
+  <path id="de.fu_berlin.inf.dpp.core.runtime.module.classpath">
+    <pathelement location="${de.fu_berlin.inf.dpp.core.testoutput.dir}"/>
+    <pathelement location="${de.fu_berlin.inf.dpp.core.output.dir}"/>
+    <path refid="library.smack.classpath"/>
+    <path refid="library.smackx-debug.classpath"/>
+    <path refid="library.smackx.classpath"/>
+    <path refid="library.xstream-1.4-20101008.163445-1.classpath"/>
+    <path refid="library.xpp3-1.1.4c.classpath"/>
+    <path refid="library.weupnp.classpath"/>
+    <path refid="library.picocontainer-2.11.2.classpath"/>
+    <path refid="library.log4j-1.2.15.classpath"/>
+    <path refid="library.commons-lang-2.4.classpath"/>
+    <path refid="library.commons-io-2.0.1.classpath"/>
+    <path refid="library.commons-codec-1.3.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.de.fu_berlin.inf.dpp.core">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.de.fu_berlin.inf.dpp.core">
+    <patternset refid="excluded.from.module.de.fu_berlin.inf.dpp.core"/>
+  </patternset>
+  
+  <path id="de.fu_berlin.inf.dpp.core.module.sourcepath">
+    <dirset dir="${module.de.fu_berlin.inf.dpp.core.basedir}/../de.fu_berlin.inf.dpp.core">
+      <include name="src"/>
+      <include name="patches"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.de.fu_berlin.inf.dpp.core" depends="compile.module.de.fu_berlin.inf.dpp.core.production,compile.module.de.fu_berlin.inf.dpp.core.tests" description="Compile module de.fu_berlin.inf.dpp.core"/>
+  
+  <target name="compile.module.de.fu_berlin.inf.dpp.core.production" depends="register.custom.compilers" description="Compile module de.fu_berlin.inf.dpp.core; production classes">
+    <mkdir dir="${de.fu_berlin.inf.dpp.core.output.dir}"/>
+    <javac2 destdir="${de.fu_berlin.inf.dpp.core.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.de.fu_berlin.inf.dpp.core}/javac">
+      <compilerarg line="${compiler.args.de.fu_berlin.inf.dpp.core}"/>
+      <bootclasspath refid="de.fu_berlin.inf.dpp.core.module.bootclasspath"/>
+      <classpath refid="de.fu_berlin.inf.dpp.core.module.production.classpath"/>
+      <src refid="de.fu_berlin.inf.dpp.core.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.de.fu_berlin.inf.dpp.core"/>
+    </javac2>
+    
+    <copy todir="${de.fu_berlin.inf.dpp.core.output.dir}">
+      <fileset dir="${module.de.fu_berlin.inf.dpp.core.basedir}/../de.fu_berlin.inf.dpp.core/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+      <fileset dir="${module.de.fu_berlin.inf.dpp.core.basedir}/../de.fu_berlin.inf.dpp.core/patches">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.de.fu_berlin.inf.dpp.core.tests" depends="register.custom.compilers,compile.module.de.fu_berlin.inf.dpp.core.production" description="compile module de.fu_berlin.inf.dpp.core; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.de.fu_berlin.inf.dpp.core" description="cleanup module">
+    <delete dir="${de.fu_berlin.inf.dpp.core.output.dir}"/>
+    <delete dir="${de.fu_berlin.inf.dpp.core.testoutput.dir}"/>
+  </target>
+  
+  
+  <!-- Module de.fu_berlin.inf.dpp.intellij -->
+  
+  <dirname property="module.de.fu_berlin.inf.dpp.intellij.basedir" file="${ant.file}"/>
+  
+  
+  <property name="module.jdk.home.de.fu_berlin.inf.dpp.intellij" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.de.fu_berlin.inf.dpp.intellij" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.de.fu_berlin.inf.dpp.intellij" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.de.fu_berlin.inf.dpp.intellij" value="${compiler.args}"/>
+  
+  <property name="de.fu_berlin.inf.dpp.intellij.output.dir" value="${module.de.fu_berlin.inf.dpp.intellij.basedir}/bin/production/de.fu_berlin.inf.dpp.intellij"/>
+  <property name="de.fu_berlin.inf.dpp.intellij.testoutput.dir" value="${module.de.fu_berlin.inf.dpp.intellij.basedir}/bin/test/de.fu_berlin.inf.dpp.intellij"/>
+  
+  <path id="de.fu_berlin.inf.dpp.intellij.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="de.fu_berlin.inf.dpp.intellij.module.production.classpath">
+    <path refid="${module.jdk.classpath.de.fu_berlin.inf.dpp.intellij}"/>
+    <pathelement location="${de.fu_berlin.inf.dpp.core.output.dir}"/>
+    <path refid="library.smack.classpath"/>
+    <path refid="library.smackx-debug.classpath"/>
+    <path refid="library.smackx.classpath"/>
+    <path refid="library.xstream-1.4-20101008.163445-1.classpath"/>
+    <path refid="library.xpp3-1.1.4c.classpath"/>
+    <path refid="library.weupnp.classpath"/>
+    <path refid="library.picocontainer-2.11.2.classpath"/>
+    <path refid="library.log4j-1.2.15.classpath"/>
+    <path refid="library.commons-lang-2.4.classpath"/>
+    <path refid="library.commons-io-2.0.1.classpath"/>
+    <path refid="library.commons-codec-1.3.classpath"/>
+  </path>
+  
+  <path id="de.fu_berlin.inf.dpp.intellij.runtime.production.module.classpath">
+    <pathelement location="${de.fu_berlin.inf.dpp.intellij.output.dir}"/>
+    <path refid="de.fu_berlin.inf.dpp.core.runtime.production.module.classpath"/>
+  </path>
+  
+  <path id="de.fu_berlin.inf.dpp.intellij.module.classpath">
+    <path refid="${module.jdk.classpath.de.fu_berlin.inf.dpp.intellij}"/>
+    <pathelement location="${de.fu_berlin.inf.dpp.intellij.output.dir}"/>
+    <pathelement location="${de.fu_berlin.inf.dpp.core.testoutput.dir}"/>
+    <pathelement location="${de.fu_berlin.inf.dpp.core.output.dir}"/>
+    <path refid="library.smack.classpath"/>
+    <path refid="library.smackx-debug.classpath"/>
+    <path refid="library.smackx.classpath"/>
+    <path refid="library.xstream-1.4-20101008.163445-1.classpath"/>
+    <path refid="library.xpp3-1.1.4c.classpath"/>
+    <path refid="library.weupnp.classpath"/>
+    <path refid="library.picocontainer-2.11.2.classpath"/>
+    <path refid="library.log4j-1.2.15.classpath"/>
+    <path refid="library.commons-lang-2.4.classpath"/>
+    <path refid="library.commons-io-2.0.1.classpath"/>
+    <path refid="library.commons-codec-1.3.classpath"/>
+  </path>
+  
+  <path id="de.fu_berlin.inf.dpp.intellij.runtime.module.classpath">
+    <pathelement location="${de.fu_berlin.inf.dpp.intellij.testoutput.dir}"/>
+    <pathelement location="${de.fu_berlin.inf.dpp.intellij.output.dir}"/>
+    <path refid="de.fu_berlin.inf.dpp.core.runtime.module.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.de.fu_berlin.inf.dpp.intellij">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.de.fu_berlin.inf.dpp.intellij">
+    <patternset refid="excluded.from.module.de.fu_berlin.inf.dpp.intellij"/>
+  </patternset>
+  
+  <path id="de.fu_berlin.inf.dpp.intellij.module.sourcepath">
+    <dirset dir="${module.de.fu_berlin.inf.dpp.intellij.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.de.fu_berlin.inf.dpp.intellij" depends="compile.module.de.fu_berlin.inf.dpp.intellij.production,compile.module.de.fu_berlin.inf.dpp.intellij.tests" description="Compile module de.fu_berlin.inf.dpp.intellij"/>
+  
+  <target name="compile.module.de.fu_berlin.inf.dpp.intellij.production" depends="register.custom.compilers,compile.module.de.fu_berlin.inf.dpp.core" description="Compile module de.fu_berlin.inf.dpp.intellij; production classes">
+    <mkdir dir="${de.fu_berlin.inf.dpp.intellij.output.dir}"/>
+    <javac2 destdir="${de.fu_berlin.inf.dpp.intellij.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.de.fu_berlin.inf.dpp.intellij}/javac">
+      <compilerarg line="${compiler.args.de.fu_berlin.inf.dpp.intellij}"/>
+      <bootclasspath refid="de.fu_berlin.inf.dpp.intellij.module.bootclasspath"/>
+      <classpath refid="de.fu_berlin.inf.dpp.intellij.module.production.classpath"/>
+      <src refid="de.fu_berlin.inf.dpp.intellij.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.de.fu_berlin.inf.dpp.intellij"/>
+    </javac2>
+    
+    <copy todir="${de.fu_berlin.inf.dpp.intellij.output.dir}">
+      <fileset dir="${module.de.fu_berlin.inf.dpp.intellij.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.de.fu_berlin.inf.dpp.intellij.tests" depends="register.custom.compilers,compile.module.de.fu_berlin.inf.dpp.intellij.production" description="compile module de.fu_berlin.inf.dpp.intellij; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.de.fu_berlin.inf.dpp.intellij" description="cleanup module">
+    <delete dir="${de.fu_berlin.inf.dpp.intellij.output.dir}"/>
+    <delete dir="${de.fu_berlin.inf.dpp.intellij.testoutput.dir}"/>
+  </target>
+  
+  <property name="de.fu_berlin.inf.dpp.intellij.plugin.path.jar" value="${module.de.fu_berlin.inf.dpp.intellij.basedir}/de.fu_berlin.inf.dpp.intellij.jar"/>
+  
+  <!-- Build archive for plugin 'de.fu_berlin.inf.dpp.intellij' -->
+  <target name="plugin.build.jar.de.fu_berlin.inf.dpp.intellij" depends="compile.module.de.fu_berlin.inf.dpp.intellij" description="Build plugin archive for module &#39;de.fu_berlin.inf.dpp.intellij&#39;">
+    <jar destfile="${de.fu_berlin.inf.dpp.intellij.plugin.path.jar}" duplicate="preserve">
+      <zipfileset dir="${module.de.fu_berlin.inf.dpp.intellij.basedir}/bin/production/de.fu_berlin.inf.dpp.intellij"/>
+      <zipfileset file="${module.de.fu_berlin.inf.dpp.intellij.basedir}/META-INF/plugin.xml" prefix="META-INF"/>
+      <manifest>
+        <attribute name="Created-By" value="IntelliJ IDEA"/>
+        <attribute name="Manifest-Version" value="1.0"/>
+      </manifest>
+    </jar>
+  </target>
+  
+  <target name="init" description="Build initialization">
+    <!-- Perform any build initialization in this target -->
+  </target>
+  
+  <target name="clean" depends="clean.module.de.fu_berlin.inf.dpp.core, clean.module.de.fu_berlin.inf.dpp.intellij" description="cleanup all"/>
+  
+  <target name="build.modules" depends="init, clean, compile.module.de.fu_berlin.inf.dpp.core, plugin.build.jar.de.fu_berlin.inf.dpp.intellij" description="build all modules"/>
+  
+  <target name="all" depends="build.modules" description="build all"/>
+</project>
