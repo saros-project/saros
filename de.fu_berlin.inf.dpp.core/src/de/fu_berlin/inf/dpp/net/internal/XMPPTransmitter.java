@@ -53,10 +53,15 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
     private Connection connection;
 
-    public XMPPTransmitter(DataTransferManager dataManager,
-        XMPPConnectionService connectionService) {
+    public XMPPTransmitter(DataTransferManager dataManager, XMPPConnectionService connectionService) {
         connectionService.addListener(this);
         this.dataManager = dataManager;
+    }
+
+    @Override
+    public void sendToSessionUser(JID recipient, PacketExtension extension)
+        throws IOException {
+        sendToSessionUser(null, recipient, extension);
     }
 
     @Override
