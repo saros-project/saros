@@ -9,7 +9,7 @@ import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.PermissionActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.session.AbstractActivityProducerAndConsumer;
+import de.fu_berlin.inf.dpp.session.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
@@ -23,7 +23,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
  * @author rdjemili
  */
 @Component(module = "core")
-public class PermissionManager extends AbstractActivityProducerAndConsumer implements
+public class PermissionManager extends AbstractActivityProvider implements
     Startable {
     private final ISarosSession sarosSession;
 
@@ -44,12 +44,12 @@ public class PermissionManager extends AbstractActivityProducerAndConsumer imple
 
     @Override
     public void start() {
-        sarosSession.addActivityProducerAndConsumer(this);
+        sarosSession.addActivityProvider(this);
     }
 
     @Override
     public void stop() {
-        sarosSession.removeActivityProducerAndConsumer(this);
+        sarosSession.removeActivityProvider(this);
     }
 
     /**

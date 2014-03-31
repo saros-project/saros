@@ -26,7 +26,7 @@ import de.fu_berlin.inf.dpp.activities.business.StopActivity.State;
 import de.fu_berlin.inf.dpp.activities.business.StopActivity.Type;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.observables.ObservableValue;
-import de.fu_berlin.inf.dpp.session.AbstractActivityProducerAndConsumer;
+import de.fu_berlin.inf.dpp.session.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
@@ -46,8 +46,8 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
  * remove the block of remote users.
  */
 @Component(module = "core")
-public final class StopManager extends AbstractActivityProducerAndConsumer
-    implements Startable {
+public final class StopManager extends AbstractActivityProvider implements
+    Startable {
 
     private static final Logger log = Logger.getLogger(StopManager.class);
 
@@ -569,19 +569,18 @@ public final class StopManager extends AbstractActivityProducerAndConsumer
     public void start() {
         /**
          * @JTourBusStop 3, Activity sending, An example of an
-         *               IActivityProducerAndConsumer:
+         *               IActivityProvider:
          * 
-         *               This is the canonical way of registering an
-         *               IActivityProducerAndConsumer with the session. The
-         *               session will install a listener on this
-         *               IActivityProducerAndConsumer.
+         *               This is the canonical way of registering an activity
+         *               provider with the session. The session will install a
+         *               listener on this provider.
          */
-        sarosSession.addActivityProducerAndConsumer(this);
+        sarosSession.addActivityProvider(this);
     }
 
     @Override
     public void stop() {
-        sarosSession.removeActivityProducerAndConsumer(this);
+        sarosSession.removeActivityProvider(this);
         lockSession(false);
         clearExpectedAcknowledgments();
     }

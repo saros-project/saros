@@ -17,7 +17,7 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.AbstractActivityProducerAndConsumer;
+import de.fu_berlin.inf.dpp.session.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 
@@ -28,7 +28,7 @@ import de.fu_berlin.inf.dpp.session.User;
  * @author Alexander Waldmann (contact@net-corps.de)
  */
 @Component(module = "core")
-public class FollowingActivitiesManager extends AbstractActivityProducerAndConsumer {
+public class FollowingActivitiesManager extends AbstractActivityProvider {
 
     private static final Logger log = Logger
         .getLogger(FollowingActivitiesManager.class);
@@ -108,13 +108,13 @@ public class FollowingActivitiesManager extends AbstractActivityProducerAndConsu
         public void sessionStarted(ISarosSession session) {
             sarosSession = session;
             awarenessInformationCollector.flushFollowModes();
-            session.addActivityProducerAndConsumer(FollowingActivitiesManager.this);
+            session.addActivityProvider(FollowingActivitiesManager.this);
         }
 
         @Override
         public void sessionEnded(ISarosSession session) {
             awarenessInformationCollector.flushFollowModes();
-            session.removeActivityProducerAndConsumer(FollowingActivitiesManager.this);
+            session.removeActivityProvider(FollowingActivitiesManager.this);
             sarosSession = null;
         }
     };

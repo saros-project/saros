@@ -4,7 +4,7 @@ package de.fu_berlin.inf.dpp.activities.business;
  * @JTourBusStop 5, Activity creation, Triple dispatch interface:
  * 
  *               The below interface is used for the triple dispatch of the
- *               IActivityProducerAndConsumers. For a new IActivity implementation you will
+ *               activity providers. For a new IActivity implementation you will
  *               need to add a new receive overload to the interface and fix the
  *               compilation in the AbstractActivityReceiver class.
  */

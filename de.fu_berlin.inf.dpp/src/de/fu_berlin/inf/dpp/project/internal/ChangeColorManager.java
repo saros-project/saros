@@ -23,7 +23,7 @@ import de.fu_berlin.inf.dpp.editor.colorstorage.ColorIDSet;
 import de.fu_berlin.inf.dpp.editor.colorstorage.ColorIDSetStorage;
 import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.session.AbstractActivityProducerAndConsumer;
+import de.fu_berlin.inf.dpp.session.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
@@ -36,7 +36,7 @@ import de.fu_berlin.inf.dpp.session.User;
  * @author Stefan Rossbach
  */
 @Component(module = "core")
-public class ChangeColorManager extends AbstractActivityProducerAndConsumer implements
+public class ChangeColorManager extends AbstractActivityProvider implements
     Startable {
 
     private static final Logger log = Logger
@@ -143,13 +143,13 @@ public class ChangeColorManager extends AbstractActivityProducerAndConsumer impl
 
         }
 
-        sarosSession.addActivityProducerAndConsumer(this);
+        sarosSession.addActivityProvider(this);
         sarosSession.addListener(sessionListener);
     }
 
     @Override
     public synchronized void stop() {
-        sarosSession.removeActivityProducerAndConsumer(this);
+        sarosSession.removeActivityProvider(this);
         sarosSession.removeListener(sessionListener);
     }
 

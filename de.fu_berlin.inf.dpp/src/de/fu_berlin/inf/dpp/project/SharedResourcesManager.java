@@ -73,7 +73,7 @@ import de.fu_berlin.inf.dpp.filesystem.EclipseProjectImpl;
 import de.fu_berlin.inf.dpp.filesystem.EclipseResourceImpl;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
-import de.fu_berlin.inf.dpp.session.AbstractActivityProducerAndConsumer;
+import de.fu_berlin.inf.dpp.session.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
@@ -87,9 +87,8 @@ import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
  * handled by the EditorManager, that is for changes that aren't done by
  * entering text in a text editor. It creates and executes file, folder, and VCS
  * activities.<br>
- * TODO Extract AbstractActivityProducerAndConsumer functionality in another
- * class ResourceActivityProducerAndConsumer, rename to
- * SharedResourceChangeListener.
+ * TODO Extract AbstractActivityProvider functionality in another class
+ * ResourceActivityProvider, rename to SharedResourceChangeListener.
  */
 /*
  * For a good introduction to Eclipse's resource change notification mechanisms
@@ -97,8 +96,8 @@ import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
  * http://www.eclipse.org/articles/Article-Resource-deltas/resource-deltas.html
  */
 @Component(module = "core")
-public class SharedResourcesManager extends AbstractActivityProducerAndConsumer
-    implements IResourceChangeListener, Startable {
+public class SharedResourcesManager extends AbstractActivityProvider implements
+    IResourceChangeListener, Startable {
     /** The {@link IResourceChangeEvent}s we're going to register for. */
     /*
      * haferburg: We're really only interested in
@@ -159,8 +158,7 @@ public class SharedResourcesManager extends AbstractActivityProducerAndConsumer
 
     @Override
     public void start() {
-        sarosSession
-            .addActivityProducerAndConsumer(SharedResourcesManager.this);
+        sarosSession.addActivityProvider(SharedResourcesManager.this);
         stopManager.addBlockable(stopManagerListener);
         ResourcesPlugin.getWorkspace().addResourceChangeListener(this,
             INTERESTING_EVENTS);
@@ -169,7 +167,7 @@ public class SharedResourcesManager extends AbstractActivityProducerAndConsumer
     @Override
     public void stop() {
         ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
-        sarosSession.removeActivityProducerAndConsumer(this);
+        sarosSession.removeActivityProvider(this);
         stopManager.removeBlockable(stopManagerListener);
     }
 

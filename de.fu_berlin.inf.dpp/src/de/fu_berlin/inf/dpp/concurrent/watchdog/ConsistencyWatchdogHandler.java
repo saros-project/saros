@@ -29,7 +29,7 @@ import de.fu_berlin.inf.dpp.activities.business.RecoveryFileActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
-import de.fu_berlin.inf.dpp.session.AbstractActivityProducerAndConsumer;
+import de.fu_berlin.inf.dpp.session.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
@@ -58,7 +58,7 @@ public class ConsistencyWatchdogHandler implements Startable {
         }
     };
 
-    protected final AbstractActivityProducerAndConsumer activityProducerAndConsumer = new AbstractActivityProducerAndConsumer() {
+    protected final AbstractActivityProvider activityProvider = new AbstractActivityProvider() {
         @Override
         public void exec(IActivity activity) {
             if (!sarosSession.isHost())
@@ -69,12 +69,12 @@ public class ConsistencyWatchdogHandler implements Startable {
 
     @Override
     public void start() {
-        sarosSession.addActivityProducerAndConsumer(activityProducerAndConsumer);
+        sarosSession.addActivityProvider(activityProvider);
     }
 
     @Override
     public void stop() {
-        sarosSession.removeActivityProducerAndConsumer(activityProducerAndConsumer);
+        sarosSession.removeActivityProvider(activityProvider);
     }
 
     public ConsistencyWatchdogHandler(ISarosSession sarosSession,
@@ -211,7 +211,7 @@ public class ConsistencyWatchdogHandler implements Startable {
             }
 
             // Tell the user that we sent all files
-            activityProducerAndConsumer.fireActivity(new ChecksumErrorActivity(
+            activityProvider.fireActivity(new ChecksumErrorActivity(
                 sarosSession.getLocalUser(), checksumError.getSource(), null,
                 checksumError.getRecoveryID()));
         } finally {
@@ -257,7 +257,7 @@ public class ConsistencyWatchdogHandler implements Startable {
                     throw new IOException();
 
                 // Send the file to client
-                activityProducerAndConsumer.fireActivity(RecoveryFileActivity.created(
+                activityProvider.fireActivity(RecoveryFileActivity.created(
                     user, path, content, from));
 
                 // Immediately follow up with a new checksum
@@ -273,7 +273,7 @@ public class ConsistencyWatchdogHandler implements Startable {
                     checksum.bind(doc);
                     checksum.update();
 
-                    activityProducerAndConsumer.fireActivity(new ChecksumActivity(user,
+                    activityProvider.fireActivity(new ChecksumActivity(user,
                         path, checksum.getHash(), checksum.getLength(), null));
                 } catch (CoreException e) {
                     log.warn("Could not check checksum of file "
@@ -289,9 +289,9 @@ public class ConsistencyWatchdogHandler implements Startable {
         } else {
             // TODO Warn the user...
             // Tell the client to delete the file
-            activityProducerAndConsumer.fireActivity(RecoveryFileActivity.removed(user,
+            activityProvider.fireActivity(RecoveryFileActivity.removed(user,
                 path, from));
-            activityProducerAndConsumer.fireActivity(ChecksumActivity.missing(user, path));
+            activityProvider.fireActivity(ChecksumActivity.missing(user, path));
 
             progress.worked(8);
         }

@@ -52,9 +52,9 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.AbstractActivityProducerAndConsumer;
+import de.fu_berlin.inf.dpp.session.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.session.IActivityListener;
-import de.fu_berlin.inf.dpp.session.IActivityProducerAndConsumer;
+import de.fu_berlin.inf.dpp.session.IActivityProvider;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -72,7 +72,7 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
  * Saros.class.
  */
 @Component(module = "undo")
-public class UndoManager extends AbstractActivityProducerAndConsumer implements Disposable {
+public class UndoManager extends AbstractActivityProvider implements Disposable {
 
     private static final Logger log = Logger.getLogger(UndoManager.class);
 
@@ -105,7 +105,7 @@ public class UndoManager extends AbstractActivityProducerAndConsumer implements 
 
     protected EditorManager editorManager;
 
-    protected List<IActivityProducerAndConsumer> producerAndConsumers = new LinkedList<IActivityProducerAndConsumer>();
+    protected List<IActivityProvider> providers = new LinkedList<IActivityProvider>();
 
     protected SPath currentActiveEditor = null;
 
@@ -263,7 +263,7 @@ public class UndoManager extends AbstractActivityProducerAndConsumer implements 
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
             undoHistory.clear();
-            newSarosSession.addActivityProducerAndConsumer(UndoManager.this);
+            newSarosSession.addActivityProvider(UndoManager.this);
             enabled = preferences.isConcurrentUndoActivated();
             eclipseHistory.addOperationApprover(operationBlocker);
             UndoManager.this.sarosSession = newSarosSession;
@@ -271,7 +271,7 @@ public class UndoManager extends AbstractActivityProducerAndConsumer implements 
 
         @Override
         public void sessionEnded(ISarosSession oldSarosSession) {
-            oldSarosSession.removeActivityProducerAndConsumer(UndoManager.this);
+            oldSarosSession.removeActivityProvider(UndoManager.this);
             undoHistory.clear();
             enabled = false;
             eclipseHistory.removeOperationApprover(operationBlocker);
@@ -421,7 +421,7 @@ public class UndoManager extends AbstractActivityProducerAndConsumer implements 
         this.sessionManager = sessionManager;
 
         editorManager.addActivityListener(this.activityListener);
-        addProducerAndConsumer(editorManager);
+        addProvider(editorManager);
         this.editorManager = editorManager;
 
         editorManager.addSharedEditorListener(sharedEditorListener);
@@ -543,13 +543,13 @@ public class UndoManager extends AbstractActivityProducerAndConsumer implements 
         return this.undoHistory;
     }
 
-    public void addProducerAndConsumer(IActivityProducerAndConsumer producerAndConsumer) {
-        if (!producerAndConsumers.contains(producerAndConsumer))
-            producerAndConsumers.add(producerAndConsumer);
+    public void addProvider(IActivityProvider provider) {
+        if (!providers.contains(provider))
+            providers.add(provider);
     }
 
-    public void removeProducerAndConsumer(IActivityProducerAndConsumer producerAndConsumer) {
-        producerAndConsumers.remove(producerAndConsumer);
+    public void removeProvider(IActivityProvider provider) {
+        providers.remove(provider);
     }
 
     protected void fireActivity(TextEditActivity activity) {

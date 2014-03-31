@@ -83,9 +83,9 @@ import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.AbstractActivityProducerAndConsumer;
+import de.fu_berlin.inf.dpp.session.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
-import de.fu_berlin.inf.dpp.session.IActivityProducerAndConsumer;
+import de.fu_berlin.inf.dpp.session.IActivityProvider;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.session.User;
@@ -118,7 +118,7 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
  *         of activityDataObjects, dirty state management,...
  */
 @Component(module = "core")
-public class EditorManager extends AbstractActivityProducerAndConsumer {
+public class EditorManager extends AbstractActivityProvider {
 
     /**
      * @JTourBusStop 5, Some Basics:
@@ -323,7 +323,7 @@ public class EditorManager extends AbstractActivityProducerAndConsumer {
             hasWriteAccess = sarosSession.hasWriteAccess();
             sarosSession.addListener(sharedProjectListener);
 
-            sarosSession.addActivityProducerAndConsumer(EditorManager.this);
+            sarosSession.addActivityProvider(EditorManager.this);
             annotationModelHelper = new AnnotationModelHelper();
             locationAnnotationManager = new LocationAnnotationManager(
                 preferenceStore);
@@ -380,7 +380,7 @@ public class EditorManager extends AbstractActivityProducerAndConsumer {
                     dirtyStateListener.unregisterAll();
 
                     sarosSession.removeListener(sharedProjectListener);
-                    sarosSession.removeActivityProducerAndConsumer(EditorManager.this);
+                    sarosSession.removeActivityProvider(EditorManager.this);
 
                     sarosSession = null;
                     annotationModelHelper = null;
@@ -750,7 +750,7 @@ public class EditorManager extends AbstractActivityProducerAndConsumer {
     }
 
     /**
-     * @see IActivityProducerAndConsumer
+     * @see IActivityProvider
      * 
      * @swt This must be called from the SWT thread.
      */

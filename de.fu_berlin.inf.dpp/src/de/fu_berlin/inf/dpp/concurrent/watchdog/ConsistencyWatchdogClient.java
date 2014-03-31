@@ -39,7 +39,7 @@ import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.AbstractActivityProducerAndConsumer;
+import de.fu_berlin.inf.dpp.session.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
@@ -59,7 +59,7 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
  * recover from an inconsistency. See {@link #runRecovery(SubMonitor)}
  */
 @Component(module = "consistency")
-public class ConsistencyWatchdogClient extends AbstractActivityProducerAndConsumer {
+public class ConsistencyWatchdogClient extends AbstractActivityProvider {
 
     private static Logger log = Logger
         .getLogger(ConsistencyWatchdogClient.class);
@@ -109,7 +109,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducerAndConsum
             pathsWithWrongChecksums.clear();
             inconsistencyToResolve.setValue(false);
 
-            newSarosSession.addActivityProducerAndConsumer(ConsistencyWatchdogClient.this);
+            newSarosSession.addActivityProvider(ConsistencyWatchdogClient.this);
             newSarosSession.addListener(sharedProjectListener);
         }
 
@@ -117,7 +117,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducerAndConsum
         public void sessionEnded(ISarosSession oldSarosSession) {
 
             oldSarosSession
-                .removeActivityProducerAndConsumer(ConsistencyWatchdogClient.this);
+                .removeActivityProvider(ConsistencyWatchdogClient.this);
             oldSarosSession.removeListener(sharedProjectListener);
 
             latestChecksums.clear();
