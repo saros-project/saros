@@ -15,12 +15,22 @@ public abstract class EclipseContainerImpl extends EclipseResourceImpl
     }
 
     @Override
+    public boolean exists(IPath path) {
+        return getDelegate().exists(((EclipsePathImpl) path)
+            .getDelegate());
+    }
+
+    @Override
     public IResource[] members() throws IOException {
+        return members(org.eclipse.core.resources.IResource.NONE);
+    }
+
+    @Override
+    public IResource[] members(int memberFlags) throws IOException {
         org.eclipse.core.resources.IResource[] resources;
 
         try {
-            resources = ((org.eclipse.core.resources.IContainer) delegate)
-                .members();
+            resources = getDelegate().members(memberFlags);
 
             List<IResource> result = new ArrayList<IResource>(resources.length);
             ResourceAdapterFactory.convertTo(Arrays.asList(resources), result);
@@ -29,6 +39,26 @@ public abstract class EclipseContainerImpl extends EclipseResourceImpl
         } catch (CoreException e) {
             throw new IOException(e);
         }
+    }
+
+    @Override
+    public String getDefaultCharset() throws IOException {
+        try {
+            return getDelegate().getDefaultCharset();
+        } catch (CoreException e) {
+            throw new IOException(e);
+        }
+    }
+
+    /**
+     * Returns the original {@link org.eclipse.core.resources.IContainer
+     * IContainer} object.
+     * 
+     * @return
+     */
+    @Override
+    public org.eclipse.core.resources.IContainer getDelegate() {
+        return (org.eclipse.core.resources.IContainer) delegate;
     }
 
 }

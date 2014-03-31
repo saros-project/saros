@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
 
+import java.io.File;
+
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 
 public class PathFake implements IPath {
@@ -58,5 +60,65 @@ public class PathFake implements IPath {
         } else if (!name.equals(other.name))
             return false;
         return true;
+    }
+
+    @Override
+    public String lastSegment() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean hasTrailingSeparator() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int segmentCount() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public IPath removeLastSegments(int count) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String[] segments() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public IPath append(String path) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public IPath addTrailingSeparator() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public IPath addFileExtension(String extension) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public IPath removeFileExtension() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public IPath makeAbsolute() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public File toFile() {
+        throw new UnsupportedOperationException();
     }
 }

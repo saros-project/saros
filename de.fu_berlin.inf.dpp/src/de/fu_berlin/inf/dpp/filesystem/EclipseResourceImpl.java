@@ -1,7 +1,9 @@
 package de.fu_berlin.inf.dpp.filesystem;
 
 import java.io.IOException;
+import java.net.URI;
 
+import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
 
 public class EclipseResourceImpl implements IResource {
@@ -65,16 +67,6 @@ public class EclipseResourceImpl implements IResource {
         return new EclipsePathImpl(delegate.getProjectRelativePath());
     }
 
-    /**
-     * Returns the original {@link org.eclipse.core.resources.IResource
-     * IResource} object.
-     * 
-     * @return
-     */
-    public org.eclipse.core.resources.IResource getDelegate() {
-        return delegate;
-    }
-
     @Override
     public int getType() {
         int type = delegate.getType();
@@ -120,6 +112,74 @@ public class EclipseResourceImpl implements IResource {
         } catch (CoreException e) {
             throw new IOException(e);
         }
+    }
+
+    @Override
+    public boolean isDerived() {
+        return delegate.isDerived();
+    }
+
+    @Override
+    public void delete(int updateFlags) throws IOException {
+        try {
+            delegate.delete(updateFlags, null);
+        } catch (CoreException e) {
+            throw new IOException(e);
+        }
+    }
+
+    @Override
+    public void move(IPath destination, boolean force) throws IOException {
+        try {
+            delegate.move(((EclipsePathImpl) destination).getDelegate(), force,
+                null);
+        } catch (CoreException e) {
+            throw new IOException(e);
+        }
+    }
+
+    @Override
+    public IResourceAttributes getResourceAttributes() {
+        ResourceAttributes attributes = delegate.getResourceAttributes();
+
+        if (attributes == null)
+            return null;
+
+        return new EclipseResourceAttributesImpl(attributes);
+    }
+
+    @Override
+    public void setResourceAttributes(IResourceAttributes attributes)
+        throws IOException {
+
+        ResourceAttributes attr = ((EclipseResourceAttributesImpl) attributes)
+            .getDelegate();
+
+        try {
+            delegate.setResourceAttributes(attr);
+        } catch (CoreException e) {
+            throw new IOException(e);
+        }
+    }
+
+    @Override
+    public URI getLocationURI() {
+        return delegate.getLocationURI();
+    }
+
+    @Override
+    public Object getAdapter(Class<? extends IResource> clazz) {
+        return delegate.getAdapter(clazz);
+    }
+
+    /**
+     * Returns the original {@link org.eclipse.core.resources.IResource
+     * IResource} object.
+     * 
+     * @return
+     */
+    public org.eclipse.core.resources.IResource getDelegate() {
+        return delegate;
     }
 
     @Override

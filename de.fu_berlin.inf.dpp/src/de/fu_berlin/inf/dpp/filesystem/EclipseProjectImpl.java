@@ -13,47 +13,46 @@ public class EclipseProjectImpl extends EclipseContainerImpl implements
 
     @Override
     public IResource findMember(IPath path) {
-        org.eclipse.core.resources.IResource resource = ((org.eclipse.core.resources.IProject) delegate)
+        org.eclipse.core.resources.IResource resource = getDelegate()
             .findMember(((EclipsePathImpl) path).getDelegate());
+
+        if (resource == null)
+            return null;
 
         return ResourceAdapterFactory.create(resource);
     }
 
     @Override
     public IFile getFile(String name) {
-        return new EclipseFileImpl(
-            ((org.eclipse.core.resources.IProject) delegate).getFile(name));
+        return new EclipseFileImpl(getDelegate().getFile(name));
     }
 
     @Override
     public IFile getFile(IPath path) {
-        return new EclipseFileImpl(
-            ((org.eclipse.core.resources.IProject) delegate)
-                .getFile(((EclipsePathImpl) path).getDelegate()));
+        return new EclipseFileImpl(getDelegate().getFile(
+            ((EclipsePathImpl) path).getDelegate()));
     }
 
     @Override
     public IFolder getFolder(String name) {
-        return new EclipseFolderImpl(
-            ((org.eclipse.core.resources.IProject) delegate).getFolder(name));
+        return new EclipseFolderImpl(getDelegate().getFolder(name));
     }
 
     @Override
     public IFolder getFolder(IPath path) {
-        return new EclipseFolderImpl(
-            ((org.eclipse.core.resources.IProject) delegate)
-                .getFolder(((EclipsePathImpl) path).getDelegate()));
+        return new EclipseFolderImpl(getDelegate().getFolder(
+            ((EclipsePathImpl) path).getDelegate()));
     }
 
     @Override
     public boolean isOpen() {
-        return ((org.eclipse.core.resources.IProject) delegate).isOpen();
+        return getDelegate().isOpen();
     }
 
     @Override
     public void open() throws IOException {
         try {
-            ((org.eclipse.core.resources.IProject) delegate).open(null);
+            getDelegate().open(null);
         } catch (CoreException e) {
             throw new IOException(e);
         }

@@ -1,9 +1,31 @@
 package de.fu_berlin.inf.dpp.filesystem;
 
+import java.io.IOException;
+
+import org.eclipse.core.runtime.CoreException;
+
 public class EclipseFolderImpl extends EclipseContainerImpl implements IFolder {
 
     EclipseFolderImpl(org.eclipse.core.resources.IFolder delegate) {
         super(delegate);
+    }
+
+    @Override
+    public void create(int updateFlags, boolean local) throws IOException {
+        try {
+            getDelegate().create(updateFlags, local, null);
+        } catch (CoreException e) {
+            throw new IOException(e);
+        }
+    }
+
+    @Override
+    public void create(boolean force, boolean local) throws IOException {
+        try {
+            getDelegate().create(force, local, null);
+        } catch (CoreException e) {
+            throw new IOException(e);
+        }
     }
 
     /**

@@ -22,47 +22,13 @@
 
 package de.fu_berlin.inf.dpp.filesystem;
 
-import java.io.File;
-
 /**
  * This interface is under development. It currently equals its Eclipse
  * counterpart. If not mentioned otherwise all offered method are equivalent to
  * their Eclipse counterpart.
  */
-public interface IPath {
+public interface IResourceAttributes {
+    public boolean isReadOnly();
 
-    public IPath append(IPath path);
-
-    public String lastSegment();
-
-    public boolean hasTrailingSeparator();
-
-    public boolean isPrefixOf(IPath path);
-
-    public int segmentCount();
-
-    public IPath removeLastSegments(int count);
-
-    public boolean isEmpty();
-
-    public String[] segments();
-
-    public IPath append(String path);
-
-    public IPath addTrailingSeparator();
-
-    public IPath addFileExtension(String extension);
-
-    public IPath removeFileExtension();
-
-    public IPath makeAbsolute();
-
-    public boolean isAbsolute();
-
-    public String toPortableString();
-
-    public String toOSString();
-
-    public File toFile();
-
+    public void setReadOnly(boolean readOnly);
 }
