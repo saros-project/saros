@@ -2,10 +2,6 @@ package de.fu_berlin.inf.dpp.invitation.hooks;
 
 import java.util.Map;
 
-import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
-import de.fu_berlin.inf.dpp.invitation.OutgoingSessionNegotiation;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-
 /**
  * A SessionNegotiationHook is a component that wishes to take part in the
  * SessionNegotiation. On the client side, this might be in the form of wishes
