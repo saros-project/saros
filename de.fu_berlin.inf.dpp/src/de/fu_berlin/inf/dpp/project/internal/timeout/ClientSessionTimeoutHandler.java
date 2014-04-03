@@ -6,10 +6,10 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
 
+import de.fu_berlin.inf.dpp.communication.extensions.PingExtension;
+import de.fu_berlin.inf.dpp.communication.extensions.PongExtension;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.internal.extensions.PingExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.PongExtension;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;

@@ -8,6 +8,8 @@ import org.junit.runners.Suite;
 
 de.fu_berlin.inf.dpp.activities.business.TestSuite.class,
 
+de.fu_berlin.inf.dpp.communication.extensions.TestSuite.class,
+
 de.fu_berlin.inf.dpp.concurrent.TestSuite.class,
 
 de.fu_berlin.inf.dpp.concurrent.jupiter.test.puzzles.TestSuite.class,

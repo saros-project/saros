@@ -4,7 +4,10 @@ import java.util.List;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
+import de.fu_berlin.inf.dpp.communication.extensions.ProjectNegotiationExtension;
 import de.fu_berlin.inf.dpp.invitation.FileList;
+
+//TODO Move to core (package communication.extensions)
 
 @XStreamAlias(/* ProjectNegotiationMissingFiles */"PNMF")
 public class ProjectNegotiationMissingFilesExtension extends

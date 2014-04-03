@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net.internal.extensions;
+package de.fu_berlin.inf.dpp.communication.extensions;
 
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.PacketFilter;

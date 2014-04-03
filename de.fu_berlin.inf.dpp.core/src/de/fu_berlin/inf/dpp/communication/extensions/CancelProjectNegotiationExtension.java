@@ -1,29 +1,29 @@
-package de.fu_berlin.inf.dpp.net.internal.extensions;
+package de.fu_berlin.inf.dpp.communication.extensions;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-/* *
- * 
+/**
  * @JTourBusStop 3, Creating custom network messages, Providing hints for
- * XStream:
+ *               XStream:
  * 
- * As those packet extensions must be converted to XML we use the XStream to
- * accomplish this and so avoiding the need of writing custom serialization
- * and deserialization code. Please note that XStream uses the terms
- * marshall and unmarshall which are synonyms.
+ *               As those packet extensions must be converted to XML we use the
+ *               XStream to accomplish this and so avoiding the need of writing
+ *               custom serialization and deserialization code. Please note that
+ *               XStream uses the terms marshall and unmarshall which are
+ *               synonyms.
  * 
- * First you MUST assign a unique alias to the class that contains the data
- * that should be marshalled. This is necessary to ensure that the class can
- * still be unmarshalled on the receiver side even if the class had been
- * renamed in future Saros versions but the compatibility between those
- * version has not been changed.
+ *               First you MUST assign a unique alias to the class that contains
+ *               the data that should be marshalled. This is necessary to ensure
+ *               that the class can still be unmarshalled on the receiver side
+ *               even if the class had been renamed in future Saros versions but
+ *               the compatibility between those version has not been changed.
  * 
- * You just have to attach an @XStreamAlias annotation to the class with an
- * alias name. Please keep that name very short as it is included in the XML
- * output.
+ *               You just have to attach an @XStreamAlias annotation to the
+ *               class with an alias name. Please keep that name very short as
+ *               it is included in the XML output.
  * 
- * Furthermore you should "format" the XML output by adding XStream specific
- * annotations to the class fields.
+ *               Furthermore you should "format" the XML output by adding
+ *               XStream specific annotations to the class fields.
  */
 
 @XStreamAlias(/* ProjectNegotiationCancel */"PNCL")

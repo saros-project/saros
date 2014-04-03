@@ -18,8 +18,6 @@ de.fu_berlin.inf.dpp.feedback.TestSuite.class,
 
 de.fu_berlin.inf.dpp.invitation.TestSuite.class,
 
-de.fu_berlin.inf.dpp.net.internal.extensions.TestSuite.class,
-
 de.fu_berlin.inf.dpp.project.TestSuite.class,
 
 de.fu_berlin.inf.dpp.project.internal.TestSuite.class,

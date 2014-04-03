@@ -7,12 +7,12 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
 
+import de.fu_berlin.inf.dpp.communication.extensions.SessionStatusRequestExtension;
+import de.fu_berlin.inf.dpp.communication.extensions.SessionStatusResponseExtension;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.extensions.SessionStatusRequestExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.SessionStatusResponseExtension;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;

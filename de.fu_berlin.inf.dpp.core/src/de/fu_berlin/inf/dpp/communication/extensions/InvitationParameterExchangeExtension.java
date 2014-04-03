@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp.net.internal.extensions;
+package de.fu_berlin.inf.dpp.communication.extensions;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +32,8 @@ import de.fu_berlin.inf.dpp.net.JID;
  * both sides.
  */
 
+// TODO Move to core (package communication.extensions)
+
 @XStreamAlias(/* SessionNegotiationParameterExchange */"SNPE")
 public class InvitationParameterExchangeExtension extends InvitationExtension {
 
@@ -42,7 +44,7 @@ public class InvitationParameterExchangeExtension extends InvitationExtension {
 
     /**
      * Stores the hook-specific settings for transmission. For each hook, these
-     * are reperesented as a <code>Map&lt;String, String&gt;</code>.
+     * are represented as a <code>Map&lt;String, String&gt;</code>.
      */
     /*
      * Currently, the mapping from "hook" to "setting" is done via the hook's

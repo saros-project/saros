@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net.internal.extensions;
+package de.fu_berlin.inf.dpp.communication.extensions;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

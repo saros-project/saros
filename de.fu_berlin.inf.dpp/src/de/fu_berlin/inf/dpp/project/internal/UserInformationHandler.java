@@ -14,14 +14,14 @@ import org.jivesoftware.smack.packet.PacketExtension;
 import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.communication.extensions.UserFinishedProjectNegotiationExtension;
+import de.fu_berlin.inf.dpp.communication.extensions.UserListExtension;
+import de.fu_berlin.inf.dpp.communication.extensions.UserListReceivedExtension;
+import de.fu_berlin.inf.dpp.communication.extensions.UserListExtension.UserListEntry;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
-import de.fu_berlin.inf.dpp.net.internal.extensions.UserFinishedProjectNegotiationExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension.UserListEntry;
-import de.fu_berlin.inf.dpp.net.internal.extensions.UserListReceivedExtension;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 

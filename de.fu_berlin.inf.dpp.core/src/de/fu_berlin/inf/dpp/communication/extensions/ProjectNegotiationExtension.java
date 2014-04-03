@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net.internal.extensions;
+package de.fu_berlin.inf.dpp.communication.extensions;
 
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
@@ -30,13 +30,12 @@ public abstract class ProjectNegotiationExtension extends
             super(elementName, classes);
         }
 
-        /* *
-         * 
+        /**
          * @JTourBusStop 5, Creating custom network messages, Extending the
-         * packet filter:
+         *               packet filter:
          * 
-         * It might be necessary to extends the packet filter so here is the
-         * basic example how to extend it properly.
+         *               It might be necessary to extends the packet filter so
+         *               here is the basic example how to extend it properly.
          */
 
         public PacketFilter getPacketFilter(final String sessionID,
