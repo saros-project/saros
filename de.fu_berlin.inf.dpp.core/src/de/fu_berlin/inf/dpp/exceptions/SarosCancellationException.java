@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.exceptions;
 
-/*
+/**
  * Exception used for signaling that a user (local or remote) canceled an
  * operation
  */

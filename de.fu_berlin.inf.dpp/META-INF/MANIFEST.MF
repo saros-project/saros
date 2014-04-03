@@ -73,7 +73,6 @@ Export-Package: de.fu_berlin.inf.dpp;
    org.eclipse.jface.util,
    org.eclipse.swt.widgets",
  de.fu_berlin.inf.dpp.editor.internal,
- de.fu_berlin.inf.dpp.exceptions,
  de.fu_berlin.inf.dpp.invitation;
   uses:="org.eclipse.core.runtime,
    de.fu_berlin.inf.dpp,
