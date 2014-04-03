@@ -53,7 +53,8 @@ public final class ColorIDSet implements Serializable {
      * @param jids
      *            a set of JIDs
      */
-    ColorIDSet(Collection<JID> jids) {
+    // TODO Make package-private once ColorIDSetStorage is in Core.
+    public ColorIDSet(Collection<JID> jids) {
         assignedUserColorIDs = new HashMap<JID, UserColorID>();
         for (JID jid : jids)
             assignedUserColorIDs.put(jid, new UserColorID());
@@ -168,7 +169,8 @@ public final class ColorIDSet implements Serializable {
     /**
      * Resets the timestamp to the current system.
      */
-    void resetTimestamp() {
+    // TODO Make package-private once ColorIDSetStorage is in Core.
+    public void resetTimestamp() {
         timestamp = System.currentTimeMillis();
     }
 
@@ -188,7 +190,8 @@ public final class ColorIDSet implements Serializable {
      * @param jid
      * @param colorID
      */
-    void setColor(JID jid, int colorID) throws IllegalArgumentException {
+    // TODO Make package-private once ColorIDSetStorage is in Core.
+    public void setColor(JID jid, int colorID) throws IllegalArgumentException {
         if (containsColorConflicts(jid, colorID))
             throw new IllegalArgumentException(
                 "a color ID is set multiple times");
@@ -206,7 +209,9 @@ public final class ColorIDSet implements Serializable {
      * @param jid
      * @param colorID
      */
-    void setFavoriteColor(JID jid, int colorID) throws IllegalArgumentException {
+    // TODO Make package-private once ColorIDSetStorage is in Core.
+    public void setFavoriteColor(JID jid, int colorID)
+        throws IllegalArgumentException {
 
         if (!assignedUserColorIDs.containsKey(jid))
             throw new IllegalArgumentException(jid
@@ -260,7 +265,8 @@ public final class ColorIDSet implements Serializable {
      * @param jids
      * @return
      */
-    ColorIDSet extendSet(Collection<JID> jids) {
+    // TODO Make package-private once ColorIDSetStorage is in Core.
+    public ColorIDSet extendSet(Collection<JID> jids) {
         Map<JID, UserColorID> newColorIDs = new HashMap<JID, UserColorID>();
 
         newColorIDs.putAll(assignedUserColorIDs);
