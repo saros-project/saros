@@ -2,15 +2,12 @@ package de.fu_berlin.inf.dpp.util;
 
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Platform;
 
 /**
  * Static Utility functions
  */
 public final class Utils {
-
-    private static final Logger log = Logger.getLogger(Utils.class);
 
     private Utils() {
         // no instantiation allowed

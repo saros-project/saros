@@ -78,7 +78,7 @@ public class SarosPacketCollector implements PacketListener {
 
     /**
      * Returns the next available packet. The method call will block (not
-     * return) until a packet is available or the <tt>timeout</tt> has elapased.
+     * return) until a packet is available or the <tt>timeout</tt> has elapsed.
      * If the timeout elapses without a result (or the thread is interrupted),
      * <tt>null</tt> will be returned.
      * 
@@ -117,8 +117,7 @@ public class SarosPacketCollector implements PacketListener {
      * @param packet
      *            the packet to process
      * @singleThreaded should only be accessed by the single threaded executer
-     *                 of
-     *                 {@link de.fu_berlin.inf.dpp.net.business.DispatchThreadContext}
+     *                 of {@link de.fu_berlin.inf.dpp.net.DispatchThreadContext}
      * 
      */
     @Override

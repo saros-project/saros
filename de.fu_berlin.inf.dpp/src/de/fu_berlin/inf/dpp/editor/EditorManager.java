@@ -1865,9 +1865,18 @@ public class EditorManager extends AbstractActivityProvider {
         for (IEditorPart editorPart : EditorAPI.getOpenEditors()) {
             IResource resource = editorAPI.getEditorResource(editorPart);
 
+            /*
+             * TODO Is null an actual possibility?
+             */
             if (resource == null)
                 continue;
 
+            /*
+             * TODO This "equals" is likely to fail because "resource" will
+             * always be a pure Eclipse object, and not a wrapped one. Verify
+             * that assumption, and do something about it (maybe alter {@link
+             * EditorAPI#getEditorResource()}.
+             */
             if (resource.equals(path.getResource()))
                 return true;
 
@@ -1900,6 +1909,12 @@ public class EditorManager extends AbstractActivityProvider {
 
         for (IEditorPart iEditorPart : EditorAPI.getOpenEditors()) {
             IResource resource = this.editorAPI.getEditorResource(iEditorPart);
+            /*
+             * TODO This "equals" is likely to fail because "resource" will
+             * always be a pure Eclipse object, and not a wrapped one. Verify
+             * that assumption, and do something about it (maybe alter {@link
+             * EditorAPI#getEditorResource()}.
+             */
             if (resource.equals(path.getResource())) {
                 editorAPI.closeEditor(iEditorPart);
             }

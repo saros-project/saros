@@ -31,7 +31,6 @@ import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 
 /**
  * Utility class for classic XMPP operations
- * 
  */
 
 public class XMPPUtils {
@@ -131,6 +130,9 @@ public class XMPPUtils {
             Registration registration = getRegistrationInfo(connection,
                 username);
 
+            /*
+             * TODO registration cannot be null, can it?
+             */
             if (registration != null) {
 
                 // no in band registration
@@ -255,7 +257,7 @@ public class XMPPUtils {
      * @return the service for the user directory or <code>null</code> if it
      *         could not be determined
      * 
-     * @See {@link UserSearch#getSearchForm(Connection con, String searchService)}
+     * @See {@link UserSearch#getSearchForm(Connection, String)}
      */
     public static String getUserDirectoryService(Connection connection,
         String service) {
@@ -365,9 +367,6 @@ public class XMPPUtils {
 
     // TODO: remove this method, add more logic and let the GUI handle search
     // stuff
-
-    // Smack does not uses generics for Row.getValues(String variable)
-    @SuppressWarnings("unchecked")
     private static boolean isListedInUserDirectory(Connection connection,
         JID jid) {
 

@@ -128,7 +128,7 @@ public abstract class ByteStreamTransport implements ITransport {
             throw new IOException(this + " transport is not initialized");
 
         return new BinaryChannelConnection(new JID(peer), connectionIdentifier,
-            manager.establishSession(peer.toString(), connectionIdentifier),
+            manager.establishSession(peer, connectionIdentifier),
             getNetTransferMode(), listener);
     }
 

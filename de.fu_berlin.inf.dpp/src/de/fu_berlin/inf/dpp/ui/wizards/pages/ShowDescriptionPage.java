@@ -10,7 +10,6 @@ import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.versioning.VersionManager;
 
 /**
  * A wizard page that displays the name of the inviter and the description
@@ -20,13 +19,9 @@ public class ShowDescriptionPage extends WizardPage {
 
     private IncomingSessionNegotiation sessionNegotiation;
 
-    private VersionManager versionManager;
-
-    public ShowDescriptionPage(VersionManager versionManager,
-        IncomingSessionNegotiation sessionNegotiation) {
+    public ShowDescriptionPage(IncomingSessionNegotiation sessionNegotiation) {
         super(Messages.ShowDescriptionPage_title);
         this.sessionNegotiation = sessionNegotiation;
-        this.versionManager = versionManager;
 
         setTitle(Messages.ShowDescriptionPage_title2);
         setDescription(Messages.ShowDescriptionPage_description);
@@ -44,7 +39,6 @@ public class ShowDescriptionPage extends WizardPage {
     public void dispose() {
         super.dispose();
         sessionNegotiation = null;
-        versionManager = null;
     }
 
     @Override

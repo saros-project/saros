@@ -9,11 +9,7 @@ import java.util.Set;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 
-import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
-
 public class EnterProjectNamePageUtils {
-
-    static PreferenceUtils preferenceUtils;
 
     /**
      * Stores the unique project ID if a project is once shared in session. This
@@ -136,9 +132,5 @@ public class EnterProjectNamePageUtils {
             alreadySharedProjectIDs.add(projectID);
             return false;
         }
-    }
-
-    public static void setPreferenceUtils(PreferenceUtils preferenceUtils) {
-        EnterProjectNamePageUtils.preferenceUtils = preferenceUtils;
     }
 }

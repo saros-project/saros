@@ -517,7 +517,7 @@ public class ChatControl extends Composite {
         String name = XMPPUtils.getNickname(connectionService, jid);
 
         if (name == null)
-            name = jid.getBase().toString();
+            name = jid.getBase();
 
         return name;
     }

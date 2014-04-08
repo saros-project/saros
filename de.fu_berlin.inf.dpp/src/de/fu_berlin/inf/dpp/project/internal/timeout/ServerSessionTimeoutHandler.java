@@ -15,7 +15,6 @@ import de.fu_berlin.inf.dpp.communication.extensions.PongExtension;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
@@ -157,8 +156,7 @@ public final class ServerSessionTimeoutHandler extends SessionTimeoutHandler {
 
     public ServerSessionTimeoutHandler(ISarosSession session,
         ISarosSessionManager sessionManager, ActivitySequencer sequencer,
-        ITransmitter transmitter, IReceiver receiver,
-        SessionIDObservable sessionID) {
+        ITransmitter transmitter, IReceiver receiver) {
         super(session, sessionManager, sequencer, transmitter, receiver);
     }
 

@@ -128,8 +128,6 @@ public class EnterProjectNamePage extends WizardPage {
             unsupportedCharsets.addAll(getUnsupportedCharsets(fileList
                 .getEncodings()));
 
-        EnterProjectNamePageUtils.setPreferenceUtils(preferenceUtils);
-
         this.fileLists = fileLists;
 
         setPageComplete(false);

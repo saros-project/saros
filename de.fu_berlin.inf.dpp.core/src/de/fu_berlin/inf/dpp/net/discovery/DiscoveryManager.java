@@ -161,7 +161,8 @@ public class DiscoveryManager implements Disposable {
         }
     };
 
-    public DiscoveryManager(XMPPConnectionService connectionService, RosterTracker rosterTracker) {
+    public DiscoveryManager(XMPPConnectionService connectionService,
+        RosterTracker rosterTracker) {
         this.connectionService = connectionService;
         this.rosterTracker = rosterTracker;
         this.rosterTracker.addRosterListener(rosterListener);
@@ -393,6 +394,11 @@ public class DiscoveryManager implements Disposable {
             notifyFeatureSupportUpdated(rqJID, namespace,
                 disco.containsFeature(namespace));
 
+            /*
+             * TODO This does not make much sense. Either the two branches
+             * should in fact do different things, or the if-else construction
+             * can be removed.
+             */
             if (supported != null && !supported)
                 supported = disco.containsFeature(namespace);
             else

@@ -92,7 +92,6 @@ public class UserElement extends TreeElement {
         final String read_only = Messages.UserElement_read_only;
         final String following = Messages.UserElement_following;
         final String following_paused = Messages.UserElement_following_paused;
-        final String joining = Messages.UserElement_joining;
         final String host = Messages.UserElement_host;
 
         /*

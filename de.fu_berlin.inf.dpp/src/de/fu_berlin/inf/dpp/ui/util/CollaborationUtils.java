@@ -295,6 +295,10 @@ public class CollaborationUtils {
 
         Map<IProject, Set<IResource>> projectsResources = new HashMap<IProject, Set<IResource>>();
 
+        /*
+         * TODO Check whether this works, because the different IResources look
+         * like they are conflicting here.
+         */
         if (sarosSession != null)
             selectedResources.removeAll(sarosSession.getSharedResources());
 

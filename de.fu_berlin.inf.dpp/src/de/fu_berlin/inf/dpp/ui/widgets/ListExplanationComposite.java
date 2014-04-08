@@ -189,6 +189,10 @@ public class ListExplanationComposite extends ExplanationComposite {
      */
     public void setExplanation(ListExplanation listExplanation) {
 
+        /*
+         * TODO If we allow listExplanation to be null here, we will get a NPE
+         * in the ctor of ListExplanationContentComposite.
+         */
         this.setImage((listExplanation != null) ? listExplanation.explanationImage
             : null);
 

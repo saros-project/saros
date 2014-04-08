@@ -82,7 +82,7 @@ public class ImageUtils {
     /**
      * Returns a new scaled image. new Image must be disposed after use.
      * 
-     * @param image
+     * @param imageData
      * @param width
      * @param height
      * @return

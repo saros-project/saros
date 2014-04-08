@@ -12,7 +12,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.picocontainer.Startable;
 
@@ -200,7 +199,7 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
      * IRunnableWithProgress to report feedback of the execution in the active
      * workbench windows status bar.
      * 
-     * @see FileSubmitter#uploadErrorLog(String, String, File, SubMonitor)
+     * @see FileSubmitter#uploadErrorLog(String, String, File, IProgressMonitor)
      * 
      * @nonblocking
      * @cancelable

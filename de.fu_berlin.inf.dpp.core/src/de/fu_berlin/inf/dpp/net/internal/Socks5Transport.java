@@ -640,8 +640,7 @@ public class Socks5Transport extends ByteStreamTransport {
         if (manager == null)
             throw new IOException(this + " transport is not initialized");
 
-        return manager.establishSession(peer.toString(),
-            getResponseSessionID(sessionID));
+        return manager.establishSession(peer, getResponseSessionID(sessionID));
     }
 
     @Override

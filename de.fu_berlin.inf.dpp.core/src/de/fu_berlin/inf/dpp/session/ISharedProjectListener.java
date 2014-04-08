@@ -19,6 +19,8 @@
  */
 package de.fu_berlin.inf.dpp.session;
 
+import de.fu_berlin.inf.dpp.session.User.Permission;
+
 /**
  * Listens for events that can happen during a Saros session. For life-cycle
  * events like the start and end of sessions use the
@@ -40,7 +42,7 @@ public interface ISharedProjectListener {
      * to represent the new state.
      * 
      * @param user
-     *            the user who's {@link Permission} changed.
+     *            the user whose {@link Permission} changed.
      */
     public void permissionChanged(User user);
 

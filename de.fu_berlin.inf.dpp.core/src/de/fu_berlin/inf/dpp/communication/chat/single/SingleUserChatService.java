@@ -114,8 +114,6 @@ public class SingleUserChatService extends AbstractChatService {
 
     };
 
-    private XMPPConnectionService connectionService;
-
     private Map<JID, SingleUserChat> currentChats = new HashMap<JID, SingleUserChat>();
 
     private ChatManager chatManager;
@@ -126,7 +124,6 @@ public class SingleUserChatService extends AbstractChatService {
 
     public SingleUserChatService(XMPPConnectionService connectionService) {
         this.connected = false;
-        this.connectionService = connectionService;
         connectionService.addListener(connectionLister);
     }
 
