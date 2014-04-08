@@ -8,7 +8,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import de.fu_berlin.inf.dpp.project.IChecksumCache;
+import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 
 public class FileListFactory {
 

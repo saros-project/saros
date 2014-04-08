@@ -1,6 +1,4 @@
-package de.fu_berlin.inf.dpp.project;
-
-import de.fu_berlin.inf.dpp.project.internal.FileContentNotifierBridge;
+package de.fu_berlin.inf.dpp.filesystem;
 
 /**
  * An interface that can be used to access checksums. So they do not need to be

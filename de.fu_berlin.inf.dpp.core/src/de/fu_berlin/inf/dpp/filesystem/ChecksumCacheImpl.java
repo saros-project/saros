@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.project.internal;
+package de.fu_berlin.inf.dpp.filesystem;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-
-import de.fu_berlin.inf.dpp.project.IChecksumCache;
 
 /**
  * @author Stefan Rossbach
