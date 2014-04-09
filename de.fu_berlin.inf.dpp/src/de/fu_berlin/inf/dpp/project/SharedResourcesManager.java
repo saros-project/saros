@@ -58,7 +58,6 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
-import de.fu_berlin.inf.dpp.activities.business.FileActivity.Type;
 import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.IResourceActivity;
@@ -510,8 +509,6 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
         IFile file = ((EclipseFileImpl) activity.getPath().getFile())
             .getDelegate();
 
-        boolean wasOpenedEditor = editorManager.isOpenEditor(path);
-
         log.debug("performing recovery for file: "
             + activity.getPath().getFullPath());
 
@@ -523,10 +520,10 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
             log.warn("file " + file + " no longer exists");
         }
 
-        if (wasOpenedEditor)
-            editorManager.closeEditor(path);
+        boolean editorWasOpen = editorManager.isOpenEditor(path);
 
-        wasOpenedEditor &= activity.getType() != Type.REMOVED;
+        if (editorWasOpen)
+            editorManager.closeEditor(path);
 
         FileActivity.Type type = activity.getType();
 
@@ -540,13 +537,13 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
                     + " is not supported");
         } finally {
             /*
-             * always reset Jupiter or we will get into trouble because the
-             * vector time is already reseted on the host
+             * always reset Jupiter algorithm, because upon receiving that
+             * activity, it was already reset on the host side
              */
             sarosSession.getConcurrentDocumentClient().reset(path);
         }
 
-        if (wasOpenedEditor)
+        if (editorWasOpen && type != FileActivity.Type.REMOVED)
             editorManager.openEditor(path);
 
         consistencyWatchdogClient.performCheck(path);

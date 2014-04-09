@@ -131,9 +131,10 @@ public interface IEditorAPI {
     public SPath getActiveEditorPath();
 
     /**
-     * Returns the resource currently displayed in the given editorPart, this
-     * maybe null if the given editor is not operating on a resource or has
-     * several resources (TeamEditor for instance).
+     * Returns the resource currently displayed in the given editorPart.
+     * 
+     * @return Can be <code>null</code>, e.g. if the given editorPart is not
+     *         operating on a resource, or has several resources.
      */
     public IResource getEditorResource(IEditorPart editorPart);
 

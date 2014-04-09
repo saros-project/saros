@@ -1848,39 +1848,29 @@ public class EditorManager extends AbstractActivityProvider {
     }
 
     /**
-     * Convenient method to determine if a file is currently opened as an
+     * Convenience method for determining whether a file is currently open in an
      * editor.
      * 
      * @param path
-     *            Path of the file to check if it is opened.
-     * @return <ul>
-     *         <li><b>true</b> if the file is opened in workspace
-     *         <li><b>false</b> if there is no opened editor for that file
-     *         </ul>
+     *            path of the file to check
+     * @return <code>true</code> if there is an open editor for this file,
+     *         <code>false</code> otherwise
      */
     public boolean isOpenEditor(SPath path) {
         if (path == null)
-            throw new NullPointerException("path is null");
+            throw new IllegalArgumentException("path must not be null");
 
         for (IEditorPart editorPart : EditorAPI.getOpenEditors()) {
             IResource resource = editorAPI.getEditorResource(editorPart);
 
-            /*
-             * TODO Is null an actual possibility?
-             */
             if (resource == null)
                 continue;
 
-            /*
-             * TODO This "equals" is likely to fail because "resource" will
-             * always be a pure Eclipse object, and not a wrapped one. Verify
-             * that assumption, and do something about it (maybe alter {@link
-             * EditorAPI#getEditorResource()}.
-             */
-            if (resource.equals(path.getResource()))
+            if (ResourceAdapterFactory.create(resource).equals(
+                path.getResource()))
                 return true;
-
         }
+
         return false;
     }
 
@@ -1898,26 +1888,24 @@ public class EditorManager extends AbstractActivityProvider {
     }
 
     /**
-     * Close the editor window of given {@link SPath}.
+     * Close the editor of given {@link SPath}.
      * 
      * @param path
-     *            Path of the Editor to close.
+     *            Path of the file of which the editor should be closed
      */
     public void closeEditor(SPath path) {
         if (path == null)
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("path must not be null");
 
         for (IEditorPart iEditorPart : EditorAPI.getOpenEditors()) {
-            IResource resource = this.editorAPI.getEditorResource(iEditorPart);
-            /*
-             * TODO This "equals" is likely to fail because "resource" will
-             * always be a pure Eclipse object, and not a wrapped one. Verify
-             * that assumption, and do something about it (maybe alter {@link
-             * EditorAPI#getEditorResource()}.
-             */
-            if (resource.equals(path.getResource())) {
+            IResource resource = editorAPI.getEditorResource(iEditorPart);
+
+            if (resource == null)
+                continue;
+
+            if (ResourceAdapterFactory.create(resource).equals(
+                path.getResource()))
                 editorAPI.closeEditor(iEditorPart);
-            }
         }
     }
 
