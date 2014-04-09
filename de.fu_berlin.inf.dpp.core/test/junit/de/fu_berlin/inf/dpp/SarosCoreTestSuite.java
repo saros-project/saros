@@ -23,7 +23,7 @@ de.fu_berlin.inf.dpp.net.TestSuite.class,
 de.fu_berlin.inf.dpp.net.internal.TestSuite.class,
 
 de.fu_berlin.inf.dpp.synchronize.TestSuite.class })
-public class AllTestSuite {
+public class SarosCoreTestSuite {
     // the class remains completely empty,
     // being used only as a holder for the above annotations
 }
