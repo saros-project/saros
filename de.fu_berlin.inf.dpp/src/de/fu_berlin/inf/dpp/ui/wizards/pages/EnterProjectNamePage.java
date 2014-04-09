@@ -7,11 +7,12 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -23,14 +24,10 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -38,19 +35,20 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 
 import de.fu_berlin.inf.dpp.invitation.FileList;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.preferencePages.GeneralPreferencePage;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
-import de.fu_berlin.inf.dpp.ui.wizards.utils.EnterProjectNamePageUtils;
+import de.fu_berlin.inf.dpp.ui.widgets.wizard.ProjectOptionComposite;
+import de.fu_berlin.inf.dpp.ui.widgets.wizard.events.ProjectNameChangedEvent;
+import de.fu_berlin.inf.dpp.ui.widgets.wizard.events.ProjectOptionListener;
 
 /**
  * A wizard page that allows to enter the new project name or to choose to
@@ -58,66 +56,44 @@ import de.fu_berlin.inf.dpp.ui.wizards.utils.EnterProjectNamePageUtils;
  */
 public class EnterProjectNamePage extends WizardPage {
 
-    /*
-     * IMPORTANT: for every Map in this class that the key is the projectID.
-     * Exceptions from that rule have to be declared!
-     * 
-     * IMPORTANT: refactor this code, make every a tab a composite with its own
-     * class to get rid of this hash map nightmare! The code is currently hardly
-     * maintainable!
-     */
-
     private static final Logger log = Logger
         .getLogger(EnterProjectNamePage.class.getName());
 
-    protected final List<FileList> fileLists;
-    protected final JID peer;
-    protected final Map<String, String> remoteProjectNames;
+    private final List<FileList> fileLists;
+    private final JID peer;
 
-    protected Map<String, Label> newProjectNameLabels = new HashMap<String, Label>();
+    private final ISarosSession session;
 
-    protected Map<String, Button> projCopies = new HashMap<String, Button>();
+    private final Map<String, String> remoteProjectNames;
+    private final Map<String, ProjectOptionComposite> projectOptionComposites = new HashMap<String, ProjectOptionComposite>();
 
-    protected Map<String, Text> newProjectNameTexts = new HashMap<String, Text>();
+    /** Map containing the current error messages for every project id. */
+    private Map<String, String> currentErrors = new HashMap<String, String>();
 
-    protected Map<String, String> errorProjectNames = new LinkedHashMap<String, String>();
+    private Button disableVCSCheckbox;
 
-    protected Map<String, Button> copyCheckboxes = new HashMap<String, Button>();
+    private DataTransferManager dataTransferManager;
 
-    protected Map<String, Text> copyToBeforeUpdateTexts = new HashMap<String, Text>();
+    private PreferenceUtils preferenceUtils;
 
-    protected Map<String, Button> projUpdates = new HashMap<String, Button>();
-
-    protected Map<String, Text> updateProjectTexts = new HashMap<String, Text>();
-
-    protected Map<String, Button> browseUpdateProjectButtons = new HashMap<String, Button>();
-
-    protected Map<String, Label> updateProjectNameLabels = new HashMap<String, Label>();
-
-    protected Map<String, String> reservedProjectNames = new HashMap<String, String>();
-
-    protected Button disableVCSCheckbox;
-
-    protected DataTransferManager dataTransferManager;
-
-    protected PreferenceUtils preferenceUtils;
-
-    protected boolean flashState;
+    private boolean flashState;
 
     private final Set<String> unsupportedCharsets = new HashSet<String>();
 
     /**
-     * 
      * @param remoteProjectNames
      *            since the <code>projectID</code> is no longer the name of the
      *            project this mapping is necessary to display the names on
      *            host/inviter side instead of ugly random numbers projectID =>
      *            projectName
      */
-    public EnterProjectNamePage(DataTransferManager dataTransferManager,
+    public EnterProjectNamePage(ISarosSession session,
+        DataTransferManager dataTransferManager,
         PreferenceUtils preferenceUtils, List<FileList> fileLists, JID peer,
         Map<String, String> remoteProjectNames) {
+
         super(Messages.EnterProjectNamePage_title);
+        this.session = session;
         this.dataTransferManager = dataTransferManager;
         this.preferenceUtils = preferenceUtils;
         this.peer = peer;
@@ -132,13 +108,384 @@ public class EnterProjectNamePage extends WizardPage {
 
         setPageComplete(false);
         setTitle(Messages.EnterProjectNamePage_title2);
+    }
 
+    /**
+     * Returns the name of the project to use during the shared session.
+     * 
+     * Caution: This project will be synchronized with the data from the host
+     * and all local changes will be lost.
+     */
+    public String getTargetProjectName(String projectID) {
+        return projectOptionComposites.get(projectID).getProjectName();
+    }
+
+    public boolean useVersionControl() {
+        return !disableVCSCheckbox.getSelection();
+    }
+
+    /**
+     * @return <code>true</code> if the synchronization option chosen by the
+     *         user could lead to overwriting project resources,
+     *         <code>false</code> otherwise.
+     */
+    public boolean overwriteResources(String projectID) {
+        return projectOptionComposites.get(projectID).useExistingProject();
+    }
+
+    @Override
+    public void performHelp() {
+        try {
+            Desktop.getDesktop().browse(
+                URI.create(Messages.EnterProjectNamePage_saros_url));
+        } catch (IOException e) {
+            SarosView.showNotification(Messages.EnterProjectNamePage_faq,
+                Messages.EnterProjectNamePage_error_browser_open);
+        }
+    }
+
+    @Override
+    public void createControl(Composite parent) {
+        GridData gridData;
+
+        Composite composite = new Composite(parent, SWT.NONE);
+        setControl(composite);
+
+        composite.setLayout(new GridLayout());
+
+        gridData = new GridData(SWT.BEGINNING, SWT.FILL, false, false);
+        composite.setLayoutData(gridData);
+
+        TabFolder tabFolder = new TabFolder(composite, SWT.TOP);
+
+        /*
+         * grabExcessHorizontalSpace must be true or the tab folder will not
+         * display a scroll bar if the wizard is resized
+         */
+        gridData = new GridData(SWT.BEGINNING, SWT.BEGINNING, true, false);
+
+        /*
+         * FIXME this does not work and the wizard may "explode" if too many
+         * remote projects are presented
+         */
+        gridData.widthHint = 400;
+        tabFolder.setLayoutData(gridData);
+
+        for (final FileList fileList : fileLists) {
+
+            final String projectID = fileList.getProjectID();
+
+            TabItem tabItem = new TabItem(tabFolder, SWT.NONE);
+            tabItem.setText(remoteProjectNames.get(projectID));
+
+            ProjectOptionComposite tabComposite = new ProjectOptionComposite(
+                tabFolder, projectID);
+
+            tabItem.setControl(tabComposite);
+
+            projectOptionComposites.put(projectID, tabComposite);
+        }
+
+        Composite vcsComposite = new Composite(composite, SWT.NONE);
+        vcsComposite.setLayout(new GridLayout());
+
+        disableVCSCheckbox = new Button(vcsComposite, SWT.CHECK);
+        disableVCSCheckbox
+            .setText(GeneralPreferencePage.DISABLE_VERSION_CONTROL_TEXT);
+        disableVCSCheckbox.setSelection(!preferenceUtils.useVersionControl());
+
+        Button explainButton = new Button(vcsComposite, SWT.PUSH);
+        explainButton.setText("Explain");
+
+        final Label explanation = new Label(vcsComposite, SWT.NONE);
+        explanation.setEnabled(false);
+        explanation.setText(Messages.Explain_version_control);
+        explanation.setVisible(false);
+        explainButton.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                explanation.setVisible(true);
+            }
+        });
+        explainButton.pack();
+        explanation.pack();
+        updateConnectionStatus();
+
+        attachListeners();
+
+        // invokes updatePageComplete for every project id
+        preselectProjectNames();
+    }
+
+    private void attachListeners() {
+        for (ProjectOptionComposite composite : projectOptionComposites
+            .values()) {
+
+            composite.addProjectOptionListener(new ProjectOptionListener() {
+                @Override
+                public void projectNameChanged(ProjectNameChangedEvent event) {
+                    updatePageComplete(event.projectID);
+                }
+            });
+        }
+    }
+
+    /**
+     * Checks if the project options for the given project id are valid.
+     * 
+     * @return an error message if the options are not valid, otherwise the
+     *         error message is <code>null</code>
+     */
+    private String isProjectSelectionValid(String projectID) {
+
+        ProjectOptionComposite projectOptionComposite = projectOptionComposites
+            .get(projectID);
+
+        String projectName = projectOptionComposite.getProjectName();
+
+        if (projectName.isEmpty())
+            return Messages.EnterProjectNamePage_set_project_name
+                + " for remote project " + remoteProjectNames.get(projectID);
+
+        IStatus status = ResourcesPlugin.getWorkspace().validateName(
+            projectName, IResource.PROJECT);
+
+        if (!status.isOK())
+            // FIXME display remote project name
+            return status.getMessage();
+
+        List<String> currentProjectNames = getCurrentProjectNames(projectID);
+
+        if (currentProjectNames.contains(projectName))
+            // FIXME display the project ... do not let the user guess
+            return MessageFormat.format(
+                Messages.EnterProjectNamePage_error_projectname_in_use,
+                projectName);
+
+        IProject project = ResourcesPlugin.getWorkspace().getRoot()
+            .getProject(projectName);
+
+        if (projectOptionComposite.useExistingProject() && !project.exists())
+            // FIXME crap error message
+            return Messages.EnterProjectNamePage_error_wrong_name + " "
+                + projectOptionComposite.getProjectName();
+
+        if (!projectOptionComposite.useExistingProject() && project.exists())
+            // FIXME we are working with tabs ! always display the remote
+            // project name
+            return MessageFormat.format(
+                Messages.EnterProjectNamePage_error_projectname_exists,
+                projectName);
+
+        return null;
+    }
+
+    private void updatePageComplete(String currentProjectID) {
+
+        // first update all others because errors may be no longer valid
+
+        for (String projectID : projectOptionComposites.keySet()) {
+            if (projectID.equals(currentProjectID))
+                continue;
+
+            updateProjectSelectionStatus(projectID);
+        }
+
+        /*
+         * this assumes the focus on the project option composite with the
+         * current project id !
+         */
+
+        currentErrors.remove(currentProjectID);
+
+        /*
+         * do not generate errors for empty project names as long as the user is
+         * on the current tab as it would be confusing
+         */
+        if (projectOptionComposites.get(currentProjectID).getProjectName()
+            .isEmpty()) {
+            showLatestErrorMessage();
+            setPageComplete(false);
+            return;
+        }
+
+        updateProjectSelectionStatus(currentProjectID);
+
+        if (!currentErrors.isEmpty()) {
+            showLatestErrorMessage();
+            setPageComplete(false);
+            return;
+        }
+
+        setErrorMessage(null);
+
+        String warningMessage = findAndReportProjectArtifacts();
+
+        if (!unsupportedCharsets.isEmpty()) {
+            if (warningMessage == null)
+                warningMessage = "";
+            else
+                warningMessage += "\n";
+
+            warningMessage += "At least one remote project contains files "
+                + "with a character encoding that is not available on this "
+                + "Java platform. "
+                + "Working on these projects may result in data loss or "
+                + "corruption.\n"
+                + "The following character encodings are not available: "
+                + StringUtils.join(unsupportedCharsets, ", ");
+        }
+
+        setMessage(warningMessage, WARNING);
+
+        setPageComplete(true);
+    }
+
+    /**
+     * Shows the 'latest' error message (random) if there is currently anyone in
+     * the wizard page. If there is no error message present the error message
+     * status of the wizard page is cleared.
+     */
+    private void showLatestErrorMessage() {
+        if (!currentErrors.isEmpty())
+            setErrorMessage(currentErrors.entrySet().iterator().next()
+                .getValue());
+        else
+            setErrorMessage(null);
+    }
+
+    private void updateProjectSelectionStatus(String projectID) {
+        String errorMessage = isProjectSelectionValid(projectID);
+
+        if (errorMessage != null)
+            currentErrors.put(projectID, errorMessage);
+        else
+            currentErrors.remove(projectID);
+    }
+
+    /**
+     * Scans the current Eclipse Workspace for project artifacts.
+     * 
+     * @return string containing a warning message if artifacts are found,
+     *         <code>null</code> otherwise
+     */
+    private String findAndReportProjectArtifacts() {
+        IPath workspacePath = ResourcesPlugin.getWorkspace().getRoot()
+            .getLocation();
+
+        if (workspacePath == null)
+            return null;
+
+        File workspaceDirectory = workspacePath.toFile();
+
+        List<String> dirtyProjectNames = new ArrayList<String>();
+
+        for (ProjectOptionComposite composite : projectOptionComposites
+            .values()) {
+
+            if (composite.useExistingProject())
+                continue;
+
+            String projectName = composite.getProjectName();
+
+            if (projectName.isEmpty())
+                continue;
+
+            if (new File(workspaceDirectory, projectName).exists())
+                dirtyProjectNames.add(projectName);
+        }
+
+        String warningMessage = null;
+
+        if (!dirtyProjectNames.isEmpty()) {
+            warningMessage = MessageFormat.format(
+                Messages.EnterProjectNamePage_warning_project_artifacts_found,
+                StringUtils.join(dirtyProjectNames, ", "));
+        }
+
+        return warningMessage;
+    }
+
+    /**
+     * Preselect project names for the remote projects. This method will either
+     * use an existing shared project and disable the option to change the
+     * preselected values or just generate a unique project name for new
+     * projects.
+     * <p>
+     * This method does <b>not</b> preselect values for existing projects unless
+     * they are already shared ! This can do more harm than indented when the
+     * user is so eager and just ignores all warnings that will be presented
+     * before he can finish the wizard.
+     */
+
+    private void preselectProjectNames() {
+
+        final Set<String> reservedProjectNames = new HashSet<String>();
+
+        for (Entry<String, ProjectOptionComposite> entry : projectOptionComposites
+            .entrySet()) {
+
+            String projectID = entry.getKey();
+            ProjectOptionComposite projectOptionComposite = entry.getValue();
+
+            de.fu_berlin.inf.dpp.filesystem.IProject project = session
+                .getProject(projectID);
+
+            if (project == null)
+                continue;
+
+            projectOptionComposite.setProjectName(true, project.getName());
+            projectOptionComposite.setEnabled(false);
+            reservedProjectNames.add(project.getName());
+        }
+
+        for (Entry<String, ProjectOptionComposite> entry : projectOptionComposites
+            .entrySet()) {
+
+            String projectID = entry.getKey();
+            ProjectOptionComposite projectOptionComposite = entry.getValue();
+
+            de.fu_berlin.inf.dpp.filesystem.IProject project = session
+                .getProject(projectID);
+
+            if (project != null)
+                continue;
+
+            String projectNameProposal = findProjectNameProposal(
+                remoteProjectNames.get(projectID),
+                reservedProjectNames.toArray(new String[0]));
+
+            projectOptionComposite.setProjectName(false, projectNameProposal);
+            reservedProjectNames.add(projectNameProposal);
+        }
+    }
+
+    private List<String> getCurrentProjectNames(String... projectIDsToExclude) {
+        final List<String> currentProjectNames = new ArrayList<String>();
+
+        final Set<String> excludedProjectIDs = new HashSet<String>(
+            Arrays.asList(projectIDsToExclude));
+
+        for (Entry<String, ProjectOptionComposite> entry : projectOptionComposites
+            .entrySet()) {
+
+            String projectID = entry.getKey();
+            ProjectOptionComposite projectOptionComposite = entry.getValue();
+
+            if (excludedProjectIDs.contains(projectID))
+                continue;
+
+            currentProjectNames.add(projectOptionComposite.getProjectName());
+        }
+
+        return currentProjectNames;
     }
 
     /**
      * get transfer mode and set header information of the wizard.
      */
-    protected void updateConnectionStatus() {
+    private void updateConnectionStatus() {
 
         switch (dataTransferManager.getTransferMode(this.peer)) {
         case SOCKS5_MEDIATED:
@@ -164,7 +511,6 @@ public class EnterProjectNamePage extends WizardPage {
             String speedInfo = "";
 
             if (preferenceUtils.forceFileTranserByChat()) {
-
                 setDescription(MessageFormat
                     .format(
                         Messages.EnterProjectNamePage_direct_filetransfer_deactivated,
@@ -179,7 +525,6 @@ public class EnterProjectNamePage extends WizardPage {
         default:
             setDescription(Messages.EnterProjectNamePage_unknown_transport_method);
             break;
-
         }
     }
 
@@ -187,7 +532,7 @@ public class EnterProjectNamePage extends WizardPage {
      * Starts and maintains a timer that will flash two IBB logos to make the
      * user aware of the warning.
      */
-    protected void startIBBLogoFlash() {
+    private void startIBBLogoFlash() {
 
         final Timer timer = new Timer();
 
@@ -219,565 +564,87 @@ public class EnterProjectNamePage extends WizardPage {
     }
 
     /**
-     * Create components of create new project area for EnterProjectNamePage
-     */
-    protected void createNewProjectGroup(Composite workArea, String projectID) {
-
-        Composite projectGroup = new Composite(workArea, SWT.NONE);
-        GridLayout layout = new GridLayout();
-        layout.numColumns = 3;
-        layout.makeColumnsEqualWidth = false;
-        layout.marginWidth = 0;
-        projectGroup.setLayout(layout);
-        GridData data = new GridData(GridData.FILL_HORIZONTAL);
-        data.horizontalIndent = 10;
-
-        projectGroup.setLayoutData(data);
-
-        Label newProjectNameLabel = new Label(projectGroup, SWT.NONE);
-        newProjectNameLabel.setText(Messages.EnterProjectNamePage_project_name);
-        this.newProjectNameLabels.put(projectID, newProjectNameLabel);
-
-        Text newProjectNameText = new Text(projectGroup, SWT.BORDER);
-        newProjectNameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL
-            | GridData.GRAB_HORIZONTAL));
-        newProjectNameText.setFocus();
-        if (!this.newProjectNameTexts.keySet().contains(projectID)) {
-            newProjectNameText.setText(EnterProjectNamePageUtils
-                .findProjectNameProposal(
-                    this.remoteProjectNames.get(projectID),
-                    this.reservedProjectNames.values().toArray(new String[0])));
-
-            this.newProjectNameTexts.put(projectID, newProjectNameText);
-            this.reservedProjectNames.put(projectID,
-                newProjectNameText.getText());
-        } else {
-            newProjectNameText.setText(this.newProjectNameTexts.get(projectID)
-                .toString());
-
-            this.newProjectNameTexts.put(projectID, newProjectNameText);
-        }
-    }
-
-    /**
-     * Create components of update area for EnterProjectNamePage wizard.
-     */
-    protected void createUpdateProjectGroup(Composite workArea,
-        String updateProjectName, final String projectID) {
-
-        Composite projectGroup = new Composite(workArea, SWT.NONE);
-
-        GridLayout layout = new GridLayout();
-        layout.numColumns = 4;
-        layout.makeColumnsEqualWidth = false;
-        layout.marginWidth = 0;
-        projectGroup.setLayout(layout);
-
-        GridData data = new GridData(GridData.FILL_HORIZONTAL);
-        data.horizontalIndent = 10;
-        projectGroup.setLayoutData(data);
-
-        Label updateProjectNameLabel = new Label(projectGroup, SWT.NONE);
-        updateProjectNameLabel
-            .setText(Messages.EnterProjectNamePage_project_name);
-        updateProjectNameLabel.setEnabled(false);
-        this.updateProjectNameLabels.put(projectID, updateProjectNameLabel);
-
-        Text updateProjectText = new Text(projectGroup, SWT.BORDER);
-        updateProjectText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL
-            | GridData.GRAB_HORIZONTAL));
-        updateProjectText.setFocus();
-        updateProjectText.setEnabled(false);
-        updateProjectText.setText(updateProjectName);
-        this.updateProjectTexts.put(projectID, updateProjectText);
-
-        Button browseUpdateProjectButton = new Button(projectGroup, SWT.PUSH);
-        browseUpdateProjectButton.setText(Messages.EnterProjectNamePage_browse);
-        setButtonLayoutData(browseUpdateProjectButton);
-        browseUpdateProjectButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                String projectName = getProjectDialog(Messages.EnterProjectNamePage_select_project_for_update);
-                if (projectName != null)
-                    EnterProjectNamePage.this.updateProjectTexts.get(projectID)
-                        .setText(projectName);
-            }
-        });
-        this.browseUpdateProjectButtons.put(projectID,
-            browseUpdateProjectButton);
-
-        Composite optionsGroup = new Composite(workArea, SWT.NONE);
-        layout = new GridLayout();
-        layout.numColumns = 2;
-        layout.marginLeft = 20;
-        layout.makeColumnsEqualWidth = false;
-        layout.marginWidth = 0;
-
-        optionsGroup.setLayout(layout);
-        optionsGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        Button copyCheckbox = new Button(optionsGroup, SWT.CHECK);
-        copyCheckbox.setText(Messages.EnterProjectNamePage_create_copy);
-        copyCheckbox.setSelection(false);
-        copyCheckbox.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                updateEnabled(projectID);
-            }
-        });
-        this.copyCheckboxes.put(projectID, copyCheckbox);
-
-        Text copyToBeforeUpdateText = new Text(optionsGroup, SWT.BORDER);
-        copyToBeforeUpdateText.setLayoutData(new GridData(
-            GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
-
-        copyToBeforeUpdateText.setText(EnterProjectNamePageUtils
-            .findProjectNameProposal(this.remoteProjectNames.get(projectID)
-                + "-copy")); //$NON-NLS-1$
-
-        this.copyToBeforeUpdateTexts.put(projectID, copyToBeforeUpdateText);
-
-        /* as this feature is currently broken, do not display it */
-        copyCheckbox.setVisible(false);
-        copyToBeforeUpdateText.setVisible(false);
-    }
-
-    /**
-     * Browse dialog to select project for copy.
-     * 
-     * Returns null if the dialog was canceled.
-     */
-    public String getProjectDialog(String title) {
-        ContainerSelectionDialog dialog = new ContainerSelectionDialog(
-            getShell(), null, false, title);
-
-        dialog.open();
-        Object[] result = dialog.getResult();
-
-        if (result == null || result.length == 0) {
-            return null;
-        }
-
-        return ResourcesPlugin.getWorkspace().getRoot()
-            .findMember((Path) result[0]).getProject().getName();
-    }
-
-    @Override
-    public void createControl(Composite parent) {
-        // Create the root control
-
-        Composite composite = new Composite(parent, SWT.NONE);
-
-        GridLayout layout = new GridLayout();
-        composite.setLayout(layout);
-
-        Composite tabs = new Composite(composite, SWT.NONE);
-        tabs.setLayout(layout);
-
-        TabFolder tabFolder = new TabFolder(tabs, SWT.BORDER);
-
-        setControl(composite);
-
-        for (String projectID : this.remoteProjectNames.keySet()) {
-            log.debug(projectID + ": " + this.remoteProjectNames.get(projectID));
-        }
-
-        for (final FileList fileList : this.fileLists) {
-            TabItem tabItem = new TabItem(tabFolder, SWT.NONE);
-            tabItem
-                .setText(this.remoteProjectNames.get(fileList.getProjectID()));
-
-            Composite tabComposite = new Composite(tabFolder, SWT.NONE);
-            tabComposite.setLayout(new GridLayout());
-            GridData gridData = new GridData(GridData.FILL_VERTICAL);
-            gridData.verticalIndent = 20;
-            tabComposite.setLayoutData(gridData);
-
-            tabItem.setControl(tabComposite);
-            boolean selection = EnterProjectNamePageUtils.autoUpdateProject(
-                fileList.getProjectID(),
-                this.remoteProjectNames.get(fileList.getProjectID()));
-
-            Button projCopy = new Button(tabComposite, SWT.RADIO);
-            projCopy.setText(Messages.EnterProjectNamePage_create_new_project);
-            projCopy.setSelection(!selection);
-            this.projCopies.put(fileList.getProjectID(), projCopy);
-
-            createNewProjectGroup(tabComposite, fileList.getProjectID());
-
-            Button projUpd = new Button(tabComposite, SWT.RADIO);
-            projUpd.setText(Messages.EnterProjectNamePage_use_existing_project);
-            projUpd.setSelection(selection);
-            this.projUpdates.put(fileList.getProjectID(), projUpd);
-
-            String newProjectName = "";
-            if (selection) {
-                newProjectName = this.remoteProjectNames.get(fileList
-                    .getProjectID());
-            }
-            createUpdateProjectGroup(tabComposite, newProjectName,
-                fileList.getProjectID());
-        }
-
-        Composite vcsComposite = new Composite(composite, SWT.NONE);
-        vcsComposite.setLayout(layout);
-        disableVCSCheckbox = new Button(vcsComposite, SWT.CHECK);
-        disableVCSCheckbox
-            .setText(GeneralPreferencePage.DISABLE_VERSION_CONTROL_TEXT);
-        disableVCSCheckbox.setSelection(!preferenceUtils.useVersionControl());
-
-        Button explainButton = new Button(vcsComposite, SWT.PUSH);
-        explainButton.setText("Explain");
-
-        final Label explanation = new Label(vcsComposite, SWT.NONE);
-        explanation.setEnabled(false);
-        explanation.setText(Messages.Explain_version_control);
-        explanation.setVisible(false);
-        explainButton.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                explanation.setVisible(true);
-            }
-        });
-        explainButton.pack();
-        explanation.pack();
-
-        updateConnectionStatus();
-
-        for (FileList fileList : this.fileLists) {
-            attachListeners(fileList.getProjectID());
-            updateEnabled(fileList.getProjectID());
-        }
-    }
-
-    public boolean isUpdateSelected(String projectID) {
-        return this.projUpdates.get(projectID).getSelection();
-    }
-
-    protected void attachListeners(final String projectID) {
-
-        ModifyListener m = new ModifyListener() {
-            @Override
-            public void modifyText(ModifyEvent e) {
-                updatePageComplete(projectID);
-            }
-        };
-
-        this.newProjectNameTexts.get(projectID).addModifyListener(m);
-        this.updateProjectTexts.get(projectID).addModifyListener(m);
-        this.copyToBeforeUpdateTexts.get(projectID).addModifyListener(m);
-
-        SelectionAdapter s = new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                updateEnabled(projectID);
-            }
-        };
-
-        this.projCopies.get(projectID).addSelectionListener(s);
-
-        this.projUpdates.get(projectID).addSelectionListener(
-            new SelectionListener() {
-
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-
-                    // remove the reserved name, because it's not used anymore
-                    // and
-                    // should not be included in tests anymore
-                    EnterProjectNamePage.this.reservedProjectNames
-                        .remove(projectID);
-
-                    // quickly scan for existing project with the same name
-                    Button projUpd = EnterProjectNamePage.this.projUpdates
-                        .get(projectID);
-                    Text updateProjectText = EnterProjectNamePage.this.updateProjectTexts
-                        .get(projectID);
-                    if (projUpd.getSelection()
-                        && !EnterProjectNamePageUtils
-                            .projectNameIsUnique(EnterProjectNamePage.this.remoteProjectNames
-                                .get(projectID))) {
-                        updateProjectText
-                            .setText(EnterProjectNamePage.this.remoteProjectNames
-                                .get(projectID));
-                    }
-
-                }
-
-                @Override
-                public void widgetDefaultSelected(SelectionEvent e) {
-                    // do nothing
-                }
-            });
-
-        s.widgetSelected(null);
-    }
-
-    /**
-     * Sets page messages and disables finish button in case of the given
-     * project name already exists. If no errors occur the finish button will be
-     * enabled.
+     * Tests if the given project name does not already exist in the current
+     * workspace.
      * 
      * @param projectName
-     *            project name for which to test. Must not be null.
+     *            the name of the project
+     * @param reservedProjectNames
+     *            further project names that are already reserved even if the
+     *            projects do not exist physically
+     * @return <code>true</code> if the project name does not exist in the
+     *         current workspace and does not exist in the reserved project
+     *         names, <code>false</code> if the project name is an empty string
+     *         or the project already exists in the current workspace
      */
-    protected String setPageCompleteTargetProject(String projectName,
-        String projectID) {
+    private boolean projectNameIsUnique(String projectName,
+        String... reservedProjectNames) {
 
-        String errorMessage = null;
+        if (projectName == null)
+            throw new NullPointerException("projectName is null");
 
-        IStatus status = ResourcesPlugin.getWorkspace().validateName(
-            projectName, IResource.PROJECT);
+        if (projectName.length() == 0)
+            return false;
 
-        if (projectName.length() == 0) {
-            errorMessage = Messages.EnterProjectNamePage_set_project_name;
-            this.errorProjectNames.put(projectID, errorMessage);
-        } else if (!status.isOK()) {
-            errorMessage = status.getMessage();
-            this.errorProjectNames.put(projectID, errorMessage);
-        } else {
-            if (EnterProjectNamePageUtils.projectNameIsUnique(projectName,
-                this.reservedProjectNames.values().toArray(new String[0]))) {
-                this.errorProjectNames.remove(projectID);
-            } else if (!EnterProjectNamePageUtils
-                .projectNameIsUnique(projectName)) {
-                // Project with name exists already in workspace
-                errorMessage = MessageFormat.format(
-                    Messages.EnterProjectNamePage_error_projectname_exists,
-                    projectName);
-                this.errorProjectNames.put(projectID, errorMessage);
-            } else {
-                // Project with name has already been declared
-                errorMessage = MessageFormat.format(
-                    Messages.EnterProjectNamePage_error_projectname_in_use,
-                    projectName);
-                this.errorProjectNames.put(projectID, errorMessage);
+        Set<IProject> projects = new HashSet<IProject>(
+            Arrays.asList(ResourcesPlugin.getWorkspace().getRoot()
+                .getProjects()));
+
+        for (String reservedProjectName : reservedProjectNames) {
+            projects.add(ResourcesPlugin.getWorkspace().getRoot()
+                .getProject(reservedProjectName));
+        }
+
+        return !projects.contains(ResourcesPlugin.getWorkspace().getRoot()
+            .getProject(projectName));
+    }
+
+    /**
+     * Proposes a project name based on the existing project names in the
+     * current workspace. The proposed project name is unique.
+     * 
+     * @param projectName
+     *            project name which shall be checked
+     * @param reservedProjectNames
+     *            additional project names that should not be returned when
+     *            finding a name proposal for a project
+     * @return a unique project name based on the original project name
+     */
+    private String findProjectNameProposal(String projectName,
+        String... reservedProjectNames) {
+
+        int idx;
+
+        for (idx = projectName.length() - 1; idx >= 0
+            && Character.isDigit(projectName.charAt(idx)); idx--) {
+            // NOP
+        }
+
+        String newProjectName;
+
+        if (idx < 0)
+            newProjectName = "";
+        else
+            newProjectName = projectName.substring(0, idx + 1);
+
+        if (idx == projectName.length() - 1)
+            idx = 2;
+        else {
+            try {
+                idx = Integer.valueOf(projectName.substring(idx + 1));
+            } catch (NumberFormatException e) {
+                idx = 2;
             }
         }
 
-        this.updatePageState(errorMessage);
-        return errorMessage;
-    }
+        projectName = newProjectName;
 
-    /**
-     * Updates the error message if any others still exist, otherwise activates
-     * the finish button. This method also auto updates the warning message.
-     * 
-     * If the project name is correct, no error message should exist and it is
-     * set to null. If null and there is a fault in any of the other tabs the
-     * errorMessage is replaced by one of the current errors.
-     * 
-     * @param errorMessage
-     *            the error message or <code>null</code> to clear the error
-     *            message
-     */
-    protected void updatePageState(String errorMessage) {
-        if (this.errorProjectNames.isEmpty()) {
-            setPageComplete(true);
-        } else {
-            if (errorMessage == null && !this.errorProjectNames.isEmpty()) {
-                errorMessage = this.errorProjectNames.entrySet().iterator()
-                    .next().getValue();
-            }
-            setPageComplete(false);
-        }
-        setErrorMessage(errorMessage);
-
-        String warningMessage = findAndReportProjectArtifacts();
-
-        if (!unsupportedCharsets.isEmpty()) {
-            if (warningMessage == null)
-                warningMessage = "";
-            else
-                warningMessage += "\n";
-
-            warningMessage += "At least one remote project contains files with a character encoding that is not available on this Java platform."
-                + " Working on these projects may result in data loss or corruption.\n"
-                + "Following character encodings are not available: "
-                + StringUtils.join(unsupportedCharsets, ", ");
+        while (!projectNameIsUnique(projectName, reservedProjectNames)) {
+            projectName = newProjectName + idx;
+            idx++;
         }
 
-        setMessage(warningMessage, WARNING);
-    }
-
-    /**
-     * Scans the current Eclipse Workspace for project artifacts.
-     * 
-     * @return string containing a warning message if artifacts are found,
-     *         <code>null</code> otherwise
-     */
-    private String findAndReportProjectArtifacts() {
-        IPath workspacePath = ResourcesPlugin.getWorkspace().getRoot()
-            .getLocation();
-
-        if (workspacePath == null)
-            return null;
-
-        File workspaceDirectory = workspacePath.toFile();
-
-        List<String> dirtyProjectNames = new ArrayList<String>();
-
-        for (String projectID : remoteProjectNames.keySet()) {
-            if (isUpdateSelected(projectID))
-                continue;
-
-            String projectName = newProjectNameTexts.get(projectID).getText();
-
-            if (new File(workspaceDirectory, projectName).exists())
-                dirtyProjectNames.add(projectName);
-        }
-
-        String warningMessage = null;
-
-        if (!dirtyProjectNames.isEmpty()) {
-            warningMessage = MessageFormat.format(
-                Messages.EnterProjectNamePage_warning_project_artifacts_found,
-                StringUtils.join(dirtyProjectNames, ", "));
-        }
-
-        return warningMessage;
-    }
-
-    protected void updateEnabled(String projectID) {
-
-        boolean updateSelected = !this.projCopies.get(projectID).getSelection();
-        boolean copySelected = this.copyCheckboxes.get(projectID)
-            .getSelection();
-
-        this.newProjectNameTexts.get(projectID).setEnabled(!updateSelected);
-        this.newProjectNameLabels.get(projectID).setEnabled(!updateSelected);
-
-        this.updateProjectTexts.get(projectID).setEnabled(updateSelected);
-        this.browseUpdateProjectButtons.get(projectID).setEnabled(
-            updateSelected);
-        this.updateProjectNameLabels.get(projectID).setEnabled(updateSelected);
-        this.copyCheckboxes.get(projectID).setEnabled(updateSelected);
-        this.copyToBeforeUpdateTexts.get(projectID).setEnabled(
-            updateSelected && copySelected);
-
-        updatePageComplete(projectID);
-    }
-
-    /**
-     * Updates the page for the given projectID
-     * 
-     * @param projectID
-     *            for which the page shall be updated. Must not be null.
-     */
-    protected void updatePageComplete(String projectID) {
-
-        String errorMessage = null;
-
-        if (!isUpdateSelected(projectID)) {
-            // Delete previous value first, to prevent the compare with it's own
-            // value
-            this.reservedProjectNames.remove(projectID);
-
-            setPageCompleteTargetProject(this.newProjectNameTexts
-                .get(projectID).getText(), projectID);
-
-            this.reservedProjectNames.put(projectID, this.newProjectNameTexts
-                .get(projectID).getText());
-        } else {
-            String newText = this.updateProjectTexts.get(projectID).getText();
-
-            if (newText.length() == 0) {
-                errorMessage = MessageFormat.format(
-                    Messages.EnterProjectNamePage_error_set_projectname2,
-                    this.remoteProjectNames.get(projectID));
-                this.errorProjectNames.put(projectID, errorMessage);
-
-            } else {
-
-                if (ResourcesPlugin.getWorkspace().getRoot()
-                    .getProject(newText).exists()) {
-
-                    if (this.copyCheckboxes.get(projectID).getSelection()) {
-                        errorMessage = setPageCompleteTargetProject(
-                            this.copyToBeforeUpdateTexts.get(projectID)
-                                .getText(), projectID);
-                    } else {
-                        this.errorProjectNames.remove(projectID);
-                    }
-
-                } else {
-                    errorMessage = MessageFormat.format(
-                        Messages.EnterProjectNamePage_error_wrong_name,
-                        this.updateProjectTexts.get(projectID).getText());
-                    this.errorProjectNames.put(projectID, errorMessage);
-                }
-            }
-
-            this.updatePageState(errorMessage);
-        }
-    }
-
-    /**
-     * Returns the name of the project to use during the shared session.
-     * 
-     * Caution: This project will be synchronized with the data from the host
-     * and all local changes will be lost.
-     * 
-     * Will return null if the getSourceProject() should be overwritten.
-     * 
-     * TODO will never return null... Change behavior of "accept"
-     */
-    public String getTargetProjectName(String projectID) {
-        if (isUpdateSelected(projectID)) {
-            if (this.copyCheckboxes.get(projectID).getSelection()) {
-                return this.copyToBeforeUpdateTexts.get(projectID).getText();
-            } else {
-                return this.updateProjectTexts.get(projectID).getText();
-            }
-        } else {
-            return this.newProjectNameTexts.get(projectID).getText();
-        }
-    }
-
-    public boolean useVersionControl() {
-        return !disableVCSCheckbox.getSelection();
-    }
-
-    /**
-     * Will return the project corresponding to the
-     * <code><b>projectID</b></code> to use as a base version during
-     * synchronization or null if the user wants to start synchronization from
-     * scratch.
-     * 
-     */
-    public IProject getSourceProject(String projectID) {
-
-        if (isUpdateSelected(projectID)) {
-            return ResourcesPlugin.getWorkspace().getRoot()
-                .getProject(this.updateProjectTexts.get(projectID).getText());
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * @return <code>true</code> if the synchronization options chosen by the
-     *         user could lead to overwriting project resources,
-     *         <code>false</code> otherwise.
-     */
-    public boolean overwriteResources(String projectID) {
-        if (isUpdateSelected(projectID)
-            && !copyCheckboxes.get(projectID).getSelection()) {
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public void performHelp() {
-        try {
-            Desktop.getDesktop().browse(
-                URI.create(Messages.EnterProjectNamePage_saros_url));
-        } catch (IOException e) {
-            SarosView.showNotification(Messages.EnterProjectNamePage_faq,
-                Messages.EnterProjectNamePage_error_browser_open);
-        }
+        return projectName;
     }
 
     /**

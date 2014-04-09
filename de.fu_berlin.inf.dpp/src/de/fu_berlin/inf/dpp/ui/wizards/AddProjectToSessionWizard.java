@@ -15,6 +15,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -135,23 +136,34 @@ public class AddProjectToSessionWizard extends Wizard {
 
     @Override
     public void addPages() {
-        this.namePage = new EnterProjectNamePage(dataTransferManager,
+        ISarosSession session = sessionManager.getSarosSession();
+
+        if (session == null)
+            return;
+
+        namePage = new EnterProjectNamePage(session, dataTransferManager,
             preferenceUtils, fileLists, peer, this.remoteProjectNames);
+
         addPage(namePage);
     }
 
     @Override
     public boolean performFinish() {
 
+        if (namePage == null)
+            return true;
+
         final Map<String, IProject> sources = new HashMap<String, IProject>();
         final Map<String, String> projectNames = new HashMap<String, String>();
         final boolean useVersionControl = namePage.useVersionControl();
 
         for (FileList fList : this.fileLists) {
-            sources.put(fList.getProjectID(),
-                namePage.getSourceProject(fList.getProjectID()));
-            projectNames.put(fList.getProjectID(),
-                namePage.getTargetProjectName(fList.getProjectID()));
+            String projectName = namePage.getTargetProjectName(fList
+                .getProjectID());
+
+            projectNames.put(fList.getProjectID(), projectName);
+            sources.put(fList.getProjectID(), ResourcesPlugin.getWorkspace()
+                .getRoot().getProject(projectName));
         }
 
         List<IProject> existingProjects = new ArrayList<IProject>();
