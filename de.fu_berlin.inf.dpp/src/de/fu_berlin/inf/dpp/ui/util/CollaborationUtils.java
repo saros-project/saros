@@ -276,31 +276,30 @@ public class CollaborationUtils {
     }
 
     /**
-     * Decides if selected resource is a complete shared project in contrast to
-     * partial shared ones. The result is stored in {@link HashMap}:
+     * Determines which of the the selected resources belong to fully shared
+     * projects or to partially shared ones. The result is returned as a
+     * {@link Map} of the following structure:
      * <ul>
-     * <li>complete shared project: {@link IProject} --> null
-     * <li>partial shared project: {@link IProject} --> List<IResource>
+     * <li>fully shared project: {@link IProject} --> <code>null</code>
+     * <li>partially shared project: {@link IProject} -->
+     * <code>List&lt;{@link IResource}&gt;</code>
      * </ul>
-     * Adds to partial shared projects additional files which are needed for
-     * proper project synchronization.
+     * In case of partially shared project, this method also adds files and
+     * folders that are needed for a consistent project on the receiver's side,
+     * even when there were not selected by the user (e.g ".project" files).
      * 
      * @param selectedResources
      * @param sarosSession
      * @return
-     * 
      */
     private static Map<IProject, List<IResource>> acquireResources(
         List<IResource> selectedResources, ISarosSession sarosSession) {
 
-        Map<IProject, Set<IResource>> projectsResources = new HashMap<IProject, Set<IResource>>();
-
-        /*
-         * TODO Check whether this works, because the different IResources look
-         * like they are conflicting here.
-         */
-        if (sarosSession != null)
-            selectedResources.removeAll(sarosSession.getSharedResources());
+        if (sarosSession != null) {
+            List<IResource> sharedResources = ResourceAdapterFactory
+                .convertBack(sarosSession.getSharedResources());
+            selectedResources.removeAll(sharedResources);
+        }
 
         final int resourcesSize = selectedResources.size();
 
@@ -317,8 +316,9 @@ public class CollaborationUtils {
                 preSortedResources[backIdx--] = resource;
         }
 
-        for (IResource resource : preSortedResources) {
+        Map<IProject, Set<IResource>> projectsResources = new HashMap<IProject, Set<IResource>>();
 
+        for (IResource resource : preSortedResources) {
             if (resource.getType() == IResource.PROJECT) {
                 projectsResources.put((IProject) resource, null);
                 continue;
