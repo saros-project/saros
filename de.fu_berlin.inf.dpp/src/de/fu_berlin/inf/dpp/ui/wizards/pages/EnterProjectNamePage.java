@@ -577,7 +577,7 @@ public class EnterProjectNamePage extends WizardPage {
      *         names, <code>false</code> if the project name is an empty string
      *         or the project already exists in the current workspace
      */
-    private boolean projectNameIsUnique(String projectName,
+    boolean projectNameIsUnique(String projectName,
         String... reservedProjectNames) {
 
         if (projectName == null)
@@ -610,7 +610,7 @@ public class EnterProjectNamePage extends WizardPage {
      *            finding a name proposal for a project
      * @return a unique project name based on the original project name
      */
-    private String findProjectNameProposal(String projectName,
+    String findProjectNameProposal(String projectName,
         String... reservedProjectNames) {
 
         int idx;
