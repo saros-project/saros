@@ -56,6 +56,24 @@ public class ResourceAdapterFactory {
     }
 
     /**
+     * Converts a Saros Core file system resource to a Eclipse resource.
+     * 
+     * @param resource
+     *            a Saros Core resource
+     * @return the corresponding Eclipse
+     *         {@linkplain org.eclipse.core.resources.IResource resource} or
+     *         <code>null</code> if resource is <code>null</code>
+     */
+    public static org.eclipse.core.resources.IResource convertBack(
+        IResource resource) {
+
+        if (resource == null)
+            return null;
+
+        return ((EclipseResourceImpl) resource).getDelegate();
+    }
+
+    /**
      * Converts a collection of Saros Core file system resources to Eclipse
      * resources.The elements contained in the returned list have the same order
      * as returned by the iterator of the collection.

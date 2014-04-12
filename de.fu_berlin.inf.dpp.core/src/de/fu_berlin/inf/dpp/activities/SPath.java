@@ -175,7 +175,10 @@ public class SPath {
     }
 
     /**
-     * Returns the IResource represented by this SPath.
+     * Returns the {@linkplain IResource resource} represented by this SPath.
+     * 
+     * @return the resource represented by this SPath or <code>null</code> if
+     *         the resource does not exist locally
      */
     public IResource getResource() {
         return project.findMember(projectRelativePath);
