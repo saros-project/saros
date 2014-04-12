@@ -166,7 +166,7 @@ public class BasicWidgetTreeTest extends StfTestCase {
     @Test
     public void existsTreeItemWithRegexsInView2() throws RemoteException {
         ALICE.superBot().views().sarosView()
-            .connectWith(ALICE.getJID(), ALICE.getPassword());
+            .connectWith(ALICE.getJID(), ALICE.getPassword(), false);
         assertTrue(ALICE.remoteBot().view(VIEW_SAROS).bot().tree()
             .selectTreeItem(NODE_CONTACTS)
             .existsSubItemWithRegex(Pattern.quote(BOB.getName()) + ".*"));
@@ -242,7 +242,7 @@ public class BasicWidgetTreeTest extends StfTestCase {
     @Test
     public void existsContextOfTreeItemInView() throws RemoteException {
         ALICE.superBot().views().sarosView()
-            .connectWith(ALICE.getJID(), ALICE.getPassword());
+            .connectWith(ALICE.getJID(), ALICE.getPassword(), false);
         assertTrue(ALICE.remoteBot().view(VIEW_SAROS).bot().tree()
             .selectTreeItemWithRegex(NODE_CONTACTS, BOB.getName() + ".*")
             .existsContextMenu(CM_RENAME));
@@ -261,7 +261,7 @@ public class BasicWidgetTreeTest extends StfTestCase {
     @Test
     public void isContextOfTreeItemInViewEnabled() throws RemoteException {
         ALICE.superBot().views().sarosView()
-            .connectWith(ALICE.getJID(), ALICE.getPassword());
+            .connectWith(ALICE.getJID(), ALICE.getPassword(), false);
         ALICE.superBot().views().sarosView().waitUntilIsConnected();
         assertTrue(ALICE.remoteBot().view(VIEW_SAROS).bot().tree()
             .selectTreeItemWithRegex(NODE_CONTACTS, BOB.getName() + ".*")
@@ -271,7 +271,7 @@ public class BasicWidgetTreeTest extends StfTestCase {
     @Test
     public void clickContextsOfTreeItemInView() throws RemoteException {
         ALICE.superBot().views().sarosView()
-            .connectWith(ALICE.getJID(), ALICE.getPassword());
+            .connectWith(ALICE.getJID(), ALICE.getPassword(), false);
         ALICE.remoteBot().view(VIEW_SAROS).bot().tree()
             .selectTreeItemWithRegex(NODE_CONTACTS, BOB.getName() + ".*")
             .clickContextMenu(CM_RENAME);

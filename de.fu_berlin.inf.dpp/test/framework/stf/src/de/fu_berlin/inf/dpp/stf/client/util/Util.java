@@ -710,7 +710,7 @@ public class Util {
         for (AbstractTester tester : invitees)
             if (!tester.superBot().views().sarosView().isInSession())
                 tester.superBot().views().sarosView()
-                    .connectWith(tester.getJID(), tester.getPassword());
+                    .connectWith(tester.getJID(), tester.getPassword(), false);
 
         if (!inviter.superBot().views().sarosView().isInSession()) {
 

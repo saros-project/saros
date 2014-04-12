@@ -51,7 +51,7 @@ public class SortBuddiesOnlineOverOfflineTest extends StfTestCase {
         checkBuddiesOrder(buddies, 1);
 
         BOB.superBot().views().sarosView()
-            .connectWith(BOB.getJID(), BOB.getPassword());
+            .connectWith(BOB.getJID(), BOB.getPassword(), false);
         BOB.superBot().views().sarosView().waitUntilIsConnected();
 
         // wait for roster update

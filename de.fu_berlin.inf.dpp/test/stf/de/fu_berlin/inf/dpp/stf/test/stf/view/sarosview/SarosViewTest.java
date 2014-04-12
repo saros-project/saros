@@ -38,14 +38,14 @@ public class SarosViewTest extends StfTestCase {
     @Test
     public void connect() throws RemoteException {
         ALICE.superBot().views().sarosView()
-            .connectWith(ALICE.getJID(), ALICE.getPassword());
+            .connectWith(ALICE.getJID(), ALICE.getPassword(), true);
         assertEquals(true, ALICE.superBot().views().sarosView().isConnected());
     }
 
     @Test
     public void connectWith() throws RemoteException {
         ALICE.superBot().views().sarosView()
-            .connectWith(BOB.getJID(), BOB.getPassword());
+            .connectWith(BOB.getJID(), BOB.getPassword(), false);
 
         assertEquals(true, ALICE.superBot().views().sarosView().isConnected());
 
@@ -55,14 +55,14 @@ public class SarosViewTest extends StfTestCase {
 
     @Test
     public void connectWithActiveAccount() throws RemoteException {
-        ALICE.superBot().views().sarosView().connectWithActiveAccount();
+        ALICE.superBot().views().sarosView().connect();
         assertTrue(ALICE.superBot().views().sarosView().isConnected());
     }
 
     @Test
     public void disconnect() throws RemoteException {
         ALICE.superBot().views().sarosView()
-            .connectWith(ALICE.getJID(), ALICE.getPassword());
+            .connectWith(ALICE.getJID(), ALICE.getPassword(), true);
         ALICE.superBot().views().sarosView().disconnect();
         assertEquals(false, ALICE.superBot().views().sarosView().isConnected());
     }

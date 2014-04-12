@@ -52,11 +52,13 @@ public interface IAccountManipulator extends Remote {
      *            the username of the account to activate
      * @param domain
      *            the domain name of the account to active
+     * @return <code>true</code> if the account was successfully activated,
+     *         <code>false</code> if the account is already active
      * @throws RemoteException
      *             if the account does not exist in the current
      *             {@link XMPPAccountStore}
      */
-    public void activateAccount(String username, String domain)
+    public boolean activateAccount(String username, String domain)
         throws RemoteException;
 
 }

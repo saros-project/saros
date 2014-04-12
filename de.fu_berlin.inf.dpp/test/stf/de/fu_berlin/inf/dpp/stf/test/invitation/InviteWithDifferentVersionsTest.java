@@ -31,7 +31,7 @@ public class InviteWithDifferentVersionsTest extends StfTestCase {
         BOB.superBot().internal().changeSarosVersion("1.1.1");
 
         BOB.superBot().views().sarosView()
-            .connectWith(BOB.getJID(), BOB.getPassword());
+            .connectWith(BOB.getJID(), BOB.getPassword(), true);
 
         BOB.superBot().views().sarosView().waitUntilIsConnected();
 

@@ -81,17 +81,31 @@ public class AccountManipulatorImpl extends StfRemoteObject implements
     }
 
     @Override
-    public void activateAccount(String username, String domain)
+    public boolean activateAccount(String username, String domain)
         throws RemoteException {
 
-        XMPPAccountStore accountStore = getXmppAccountStore();
+        final XMPPAccountStore accountStore = getXmppAccountStore();
+
+        XMPPAccount activeAccount = null;
+
+        try {
+            activeAccount = accountStore.getActiveAccount();
+        } catch (IllegalStateException e) {
+            // ignore
+        }
 
         for (XMPPAccount account : accountStore.getAllAccounts()) {
             if (account.getUsername().equals(username)
                 && account.getDomain().equals(domain)) {
-                LOG.debug("activating account: " + account);
-                accountStore.setAccountActive(account);
-                return;
+
+                if (!account.equals(activeAccount)) {
+                    LOG.debug("activating account: " + account);
+                    accountStore.setAccountActive(account);
+                } else {
+                    LOG.debug("account is already activated: " + account);
+                }
+
+                return !account.equals(activeAccount);
             }
         }
 

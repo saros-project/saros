@@ -239,6 +239,7 @@ public class SessionAliceBobTest extends StfTestCase {
         leaveSessionHostFirst(ALICE);
         assertFalse(ALICE.superBot().views().sarosView().isInSession());
         assertFalse(BOB.superBot().views().sarosView().isInSession());
+        Thread.sleep(10000);
     }
 
     /**

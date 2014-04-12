@@ -31,23 +31,28 @@ public interface ISarosView extends Remote {
      * ********************************************
      */
     /**
-     * Connects with the given JID and waits until the tester is connected to
-     * the server.
+     * Connects with the given JID if not already connected with the given JID
+     * and waits until the tester is connected to the server.
      * 
      * @param jid
      *            see {@link JID}
      * @param password
+     * @param forceReconnect
+     *            if set to <code>true</code> the current connection will be
+     *            disconnected first regardless of the JID to use
      * @throws RemoteException
      */
-    public void connectWith(JID jid, String password) throws RemoteException;
+    public void connectWith(JID jid, String password, boolean forceReconnect)
+        throws RemoteException;
 
     /**
      * Connects with the current active account and waits until the tester is
-     * connected to the server.
+     * connected to the server. If a connection is already established the
+     * connection will be disconnected first.
      * 
      * @throws RemoteException
      */
-    public void connectWithActiveAccount() throws RemoteException;
+    public void connect() throws RemoteException;
 
     /**
      * Clicks the tool bar button "Disconnect" and waits until the tester is

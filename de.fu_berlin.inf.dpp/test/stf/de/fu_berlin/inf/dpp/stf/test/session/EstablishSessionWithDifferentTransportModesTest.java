@@ -101,7 +101,7 @@ public class EstablishSessionWithDifferentTransportModesTest extends
 
     private static void connectTesters() throws Exception {
         for (AbstractTester tester : getCurrentTesters()) {
-            tester.superBot().views().sarosView().connectWithActiveAccount();
+            tester.superBot().views().sarosView().connect();
         }
     }
 

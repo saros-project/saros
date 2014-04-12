@@ -133,7 +133,7 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
     @Test
     public void testAddBuddy() throws RemoteException {
         ALICE.superBot().views().sarosView()
-            .connectWith(ALICE.getJID(), ALICE.getPassword());
+            .connectWith(ALICE.getJID(), ALICE.getPassword(), false);
         ALICE.remoteBot().activateWorkbench();
         ALICE.remoteBot().menu(MENU_SAROS).menu(MENU_ADD_CONTACT).click();
         ALICE.superBot().confirmShellAddContact(BOB.getJID());

@@ -322,7 +322,7 @@ public abstract class StfTestCase {
                         tester.getPassword(), tester.getDomain());
 
                 tester.superBot().views().sarosView()
-                    .connectWith(tester.getJID(), tester.getPassword());
+                    .connectWith(tester.getJID(), tester.getPassword(), true);
             } catch (Exception e) {
                 exception = e;
             }

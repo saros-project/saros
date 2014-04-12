@@ -69,13 +69,19 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     }
 
     @Override
-    public void connectWith(JID jid, String password) throws RemoteException {
+    public void connectWith(JID jid, String password, boolean forceReconnect)
+        throws RemoteException {
 
         ControlBotImpl.getInstance().getAccountManipulator()
             .addAccount(jid.getName(), password, jid.getDomain());
 
-        ControlBotImpl.getInstance().getAccountManipulator()
+        boolean activated = ControlBotImpl.getInstance()
+            .getAccountManipulator()
             .activateAccount(jid.getName(), jid.getDomain());
+
+        // already connected with the given account
+        if (!forceReconnect && isConnected() && !activated)
+            return;
 
         if (isConnected()) {
             clickToolbarButtonWithTooltip(TB_DISCONNECT);
@@ -87,15 +93,16 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     }
 
     @Override
-    public void connectWithActiveAccount() throws RemoteException {
-        if (isDisconnected()) {
-            if (getXmppAccountStore().isEmpty())
-                throw new RuntimeException(
-                    "unable to connect with the active account, it does not exists");
+    public void connect() throws RemoteException {
+        if (isConnected())
+            disconnect();
 
-            clickToolbarButtonWithTooltip(TB_CONNECT);
-            waitUntilIsConnected();
-        }
+        if (getXmppAccountStore().isEmpty())
+            throw new RuntimeException(
+                "unable to connect with the active account, it does not exists");
+
+        clickToolbarButtonWithTooltip(TB_CONNECT);
+        waitUntilIsConnected();
     }
 
     @Override
