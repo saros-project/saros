@@ -16,6 +16,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
+import de.fu_berlin.inf.dpp.invitation.ProcessTools;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -43,6 +44,11 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.RecordDataObject
  * 
  */
 public class SarosSXETransmitter implements ISXETransmitter {
+
+	/**
+	 * Max. waiting time for responses from other whiteboard instances
+	 */
+	private static final long SXE_TIMEOUT = 30000L;
 
 	/**
 	 * Interval to poll receiving
@@ -158,12 +164,21 @@ public class SarosSXETransmitter implements ISXETransmitter {
 
 		try {
 			sendWithoutDispatch(msg);
+			long startTime = System.currentTimeMillis();
 
 			do {
 				packet = collector.nextResult(SXE_TIMEOUT_INTERVAL);
 
 				if (monitor.isCanceled())
 					throw new LocalCancellationException();
+
+				if (System.currentTimeMillis() - startTime > SXE_TIMEOUT) {
+					String warn = "Received no answer from " + msg.getTo()
+							+ ", giving up...";
+					log.warn(warn);
+					throw new LocalCancellationException(warn,
+							ProcessTools.CancelOption.DO_NOT_NOTIFY_PEER);
+				}
 
 			} while (packet == null);
 
