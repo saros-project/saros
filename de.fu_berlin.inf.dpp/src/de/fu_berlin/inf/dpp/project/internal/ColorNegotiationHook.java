@@ -5,6 +5,7 @@ import java.util.Map;
 
 import de.fu_berlin.inf.dpp.invitation.hooks.ISessionNegotiationHook;
 import de.fu_berlin.inf.dpp.invitation.hooks.SessionNegotiationHookManager;
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 
@@ -40,7 +41,7 @@ public class ColorNegotiationHook implements ISessionNegotiationHook {
     }
 
     @Override
-    public Map<String, String> considerClientPreferences(
+    public Map<String, String> considerClientPreferences(JID client,
         Map<String, String> input) {
         String hostColor = Integer.toString(sessionManager.getSarosSession()
             .getLocalUser().getColorID());

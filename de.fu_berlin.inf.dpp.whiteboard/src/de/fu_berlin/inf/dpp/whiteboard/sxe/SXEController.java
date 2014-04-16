@@ -45,7 +45,7 @@ public class SXEController extends AbstractSXEMessageHandler {
 
 	private static final Logger log = Logger.getLogger(SXEController.class);
 
-	protected enum State {
+	public enum State {
 		DISCONNECTED, INIT, CONNECTING, CONNECTED;
 	}
 

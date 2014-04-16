@@ -102,7 +102,9 @@ public class InvitationParameterExchangeExtension extends InvitationExtension {
      * @param hook
      *            The hook of which the settings should be retrieved.
      * @return The settings for the <code>hook</code> represented as [Key,
-     *         Value] pairs (not <code>null</code>).
+     *         Value] pairs. Will be <code>null</code>, if the communication
+     *         partner (i.e. either the invited client, or the inviting host)
+     *         does not possess the <code>hook</code>.
      */
     public Map<String, String> getHookSettings(ISessionNegotiationHook hook) {
         return hookSettings.get(hook.getIdentifier());

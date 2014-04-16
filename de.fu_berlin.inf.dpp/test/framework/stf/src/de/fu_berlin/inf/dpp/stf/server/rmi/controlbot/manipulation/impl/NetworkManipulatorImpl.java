@@ -482,13 +482,13 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
     // ISarosSessionListener interface implementation
 
     @Override
-    public void preIncomingInvitationCompleted(IProgressMonitor monitor) {
+    public void preIncomingInvitationCompleted(ISarosSession sarosSession, IProgressMonitor monitor) {
         // NOP
     }
 
     @Override
-    public void postOutgoingInvitationCompleted(IProgressMonitor monitor,
-        User user) {
+    public void postOutgoingInvitationCompleted(ISarosSession sarosSession,
+        User user, IProgressMonitor monitor) {
         // NOP
     }
 

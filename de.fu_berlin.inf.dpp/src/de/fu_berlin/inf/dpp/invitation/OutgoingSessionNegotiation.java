@@ -160,8 +160,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
              *               (5a) [client side, see subsequent stops]
              * 
              *               (5b) Wait for the client's wishlist of the
-             *               session's parameters (e.g. his own favorite
-             *               color).
+             *               session's parameters (e.g. his own favorite color).
              * 
              *               (6a) Consider these preferences and send the
              *               settled session parameters back to the client.
@@ -399,12 +398,12 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
             Map<String, String> preferredSettings = clientParameters
                 .getHookSettings(hook);
             Map<String, String> actualSettings = hook
-                .considerClientPreferences(preferredSettings);
+                .considerClientPreferences(peer, preferredSettings);
 
             hostParameters.saveHookSettings(hook, actualSettings);
 
             // HACK A User object representing the client needs to access these
-            // to values in completeInvitation(). Color management should work
+            // two values in completeInvitation(). Color management should work
             // differently.
             if (hook instanceof ColorNegotiationHook) {
                 clientColorID = Integer.parseInt(actualSettings

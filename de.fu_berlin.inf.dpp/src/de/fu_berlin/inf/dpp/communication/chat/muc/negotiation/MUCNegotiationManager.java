@@ -12,6 +12,7 @@ import org.picocontainer.annotations.Nullable;
 import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatPreferences;
 import de.fu_berlin.inf.dpp.invitation.hooks.ISessionNegotiationHook;
 import de.fu_berlin.inf.dpp.invitation.hooks.SessionNegotiationHookManager;
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
@@ -61,7 +62,7 @@ public class MUCNegotiationManager {
         }
 
         @Override
-        public Map<String, String> considerClientPreferences(
+        public Map<String, String> considerClientPreferences(JID client,
             Map<String, String> input) {
             // We don't think about the client's preferences. We are the host,
             // so our settings are settled.
@@ -89,8 +90,8 @@ public class MUCNegotiationManager {
     };
 
     public MUCNegotiationManager(SessionIDObservable sessionID,
-        @Nullable XMPPConnectionService connectionService, IPreferenceStore preferences,
-        SessionNegotiationHookManager hooks) {
+        @Nullable XMPPConnectionService connectionService,
+        IPreferenceStore preferences, SessionNegotiationHookManager hooks) {
         this.sessionID = sessionID;
         this.connectionService = connectionService;
         this.preferences = preferences;

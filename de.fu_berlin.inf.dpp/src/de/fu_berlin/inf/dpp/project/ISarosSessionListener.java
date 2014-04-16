@@ -41,12 +41,15 @@ public interface ISarosSessionListener {
      * TODO: remove this method as soon as external components like the
      * whiteboard are maintained in another way (i.e. a component interface)
      * 
+     * @param session
+     *            The corresponding session
      * @param monitor
      *            the invitation process's monitor to track process and
      *            cancellation
      * 
      */
-    public void preIncomingInvitationCompleted(IProgressMonitor monitor);
+    public void preIncomingInvitationCompleted(ISarosSession session,
+        IProgressMonitor monitor);
 
     /**
      * Is fired after invitation complete but for every peer the host invited.
@@ -62,13 +65,15 @@ public interface ISarosSessionListener {
      * TODO: remove this method as soon as external components like the
      * whiteboard are maintained in another way (i.e. a component interface)
      * 
+     * @param session
+     *            The corresponding session
      * @param monitor
      *            the invitation process's monitor to track process and
      *            cancellation
      * 
      */
-    public void postOutgoingInvitationCompleted(IProgressMonitor monitor,
-        User user);
+    public void postOutgoingInvitationCompleted(ISarosSession session,
+        User user, IProgressMonitor monitor);
 
     /**
      * Is fired when a new session is about to start.
