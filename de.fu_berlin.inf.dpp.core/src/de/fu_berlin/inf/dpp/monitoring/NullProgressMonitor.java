@@ -1,0 +1,31 @@
+package de.fu_berlin.inf.dpp.monitoring;
+
+public class NullProgressMonitor implements IProgressMonitor {
+
+    private volatile boolean canceled = false;
+
+    @Override
+    public void subTask(String task) {
+        // NOP
+    }
+
+    @Override
+    public void worked(int amount) {
+        // NOP
+    }
+
+    @Override
+    public void setCanceled(boolean canceled) {
+        this.canceled = canceled;
+    }
+
+    @Override
+    public boolean isCanceled() {
+        return canceled;
+    }
+
+    @Override
+    public void beginTask(String string, int size) {
+        // NOP
+    }
+}
