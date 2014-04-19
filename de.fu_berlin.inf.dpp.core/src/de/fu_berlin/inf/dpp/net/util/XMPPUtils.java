@@ -22,6 +22,7 @@ import org.jivesoftware.smackx.FormField;
 import org.jivesoftware.smackx.ReportedData;
 import org.jivesoftware.smackx.ReportedData.Row;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
+import org.jivesoftware.smackx.packet.DiscoverInfo;
 import org.jivesoftware.smackx.packet.DiscoverInfo.Identity;
 import org.jivesoftware.smackx.packet.DiscoverItems;
 import org.jivesoftware.smackx.search.UserSearch;
@@ -198,9 +199,10 @@ public class XMPPUtils {
             .hasNext();
 
         if (!discovered && jid.isBareJID() && resourceHint != null
-            && resourceHint.isEmpty())
+            && !resourceHint.isEmpty()) {
             discovered = sdm.discoverInfo(jid.getBase() + "/" + resourceHint)
                 .getIdentities().hasNext();
+        }
 
         return discovered;
     }
@@ -275,17 +277,25 @@ public class XMPPUtils {
         }
 
         Iterator<DiscoverItems.Item> iter = items.getItems();
+
         while (iter.hasNext()) {
             DiscoverItems.Item item = iter.next();
+
             try {
-                Iterator<Identity> identities = manager.discoverInfo(
-                    item.getEntityID()).getIdentities();
+                DiscoverInfo info = manager.discoverInfo(item.getEntityID());
+
+                if (!info.containsFeature("jabber:iq:search"))
+                    continue;
+
+                Iterator<Identity> identities = info.getIdentities();
+
                 while (identities.hasNext()) {
                     Identity identity = identities.next();
                     if ("user".equalsIgnoreCase(identity.getType())) {
                         return item.getEntityID();
                     }
                 }
+
             } catch (XMPPException e) {
                 log.warn("could not query identity: " + item.getEntityID(), e);
             }
@@ -367,6 +377,7 @@ public class XMPPUtils {
 
     // TODO: remove this method, add more logic and let the GUI handle search
     // stuff
+
     private static boolean isListedInUserDirectory(Connection connection,
         JID jid) {
 
