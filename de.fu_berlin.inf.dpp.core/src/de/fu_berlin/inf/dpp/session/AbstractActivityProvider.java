@@ -1,22 +1,18 @@
 package de.fu_berlin.inf.dpp.session;
 
-import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 
 // TODO Split up into Producer and Consumer
-public abstract class AbstractActivityProvider implements IActivityProvider,
-    IActivityConsumer, IActivityProducer {
+public abstract class AbstractActivityProvider implements IActivityProvider {
 
-    protected List<IActivityListener> activityListeners = new CopyOnWriteArrayList<IActivityListener>();
+    protected CopyOnWriteArrayList<IActivityListener> activityListeners = new CopyOnWriteArrayList<IActivityListener>();
 
     @Override
     public void addActivityListener(IActivityListener listener) {
         assert listener != null;
-        if (!activityListeners.contains(listener)) {
-            this.activityListeners.add(listener);
-        }
+        activityListeners.addIfAbsent(listener);
     }
 
     @Override
@@ -24,7 +20,7 @@ public abstract class AbstractActivityProvider implements IActivityProvider,
 
     @Override
     public void removeActivityListener(IActivityListener listener) {
-        this.activityListeners.remove(listener);
+        activityListeners.remove(listener);
     }
 
     /**
