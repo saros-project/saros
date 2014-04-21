@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -18,6 +19,7 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
+import de.fu_berlin.inf.dpp.net.internal.BinaryChannelConnection.IDPool;
 
 public class BinaryChannelConnectionTest {
 
@@ -206,6 +208,25 @@ public class BinaryChannelConnectionTest {
         assertTrue("remote side crashed", received.getCount() == 0);
 
         assertArrayEquals("fragmentation error", bytesToSend, receivedBytes);
+
+    }
+
+    @Test
+    public void testIDPool() {
+
+        IDPool pool = new IDPool();
+
+        for (int i = 0; i < 32; i++)
+            assertEquals(i, pool.nextID());
+
+        assertEquals(-1, pool.nextID());
+
+        pool.freeID(31);
+        pool.freeID(0);
+
+        assertEquals(0, pool.nextID());
+        assertEquals(31, pool.nextID());
+        assertEquals(-1, pool.nextID());
 
     }
 }

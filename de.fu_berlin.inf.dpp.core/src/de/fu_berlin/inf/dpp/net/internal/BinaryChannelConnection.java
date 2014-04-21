@@ -12,7 +12,6 @@ import java.net.ProtocolException;
 import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smackx.bytestreams.BytestreamSession;
@@ -27,7 +26,9 @@ import de.fu_berlin.inf.dpp.net.NetTransferMode;
  * The threading requirements of this class are the following:
  * 
  * send() is a reentrant method for sending data. Any number of threads can call
- * it in parallel.
+ * it in parallel. </p> <b>Note:</b> The maximum number of concurrent threads is
+ * 32 !
+ * 
  * 
  * @author sszuecs
  * @author coezbek
@@ -59,7 +60,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
 
     private final String connectionID;
 
-    private AtomicInteger nextFragmentId = new AtomicInteger(0);
+    private IDPool idPool = new IDPool();
 
     private boolean connected;
     private boolean initialized;
@@ -198,8 +199,12 @@ public class BinaryChannelConnection implements IByteStreamConnection {
         if (!isConnected())
             throw new EOFException("connection is closed");
 
+        final int fragmentId = idPool.nextID();
+
+        if (fragmentId < 0)
+            throw new IOException("concurrent access threshold exeeded");
+
         try {
-            int fragmentId = nextFragmentId.getAndIncrement() & 0x7FFF;
 
             byte[] descData = TransferDescription.toByteArray(data);
 
@@ -213,6 +218,8 @@ public class BinaryChannelConnection implements IByteStreamConnection {
         } catch (IOException e) {
             close();
             throw e;
+        } finally {
+            idPool.freeID(fragmentId);
         }
     }
 
@@ -268,7 +275,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
 
                 if (oldTransferObject != null)
                     throw new IOException(
-                        "replaced an transfer object that is still transmitted");
+                        "replaced a XMPP extension that is still transmitted");
                 break;
 
             case Opcode.DATA:
@@ -381,5 +388,37 @@ public class BinaryChannelConnection implements IByteStreamConnection {
     @Override
     public String toString() {
         return getMode().toString() + " " + peer;
+    }
+
+    static class IDPool {
+
+        private final int MAX_ID = 32;
+        private int pool = 0; // 32 ids
+
+        // see
+        // http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogDeBruijn
+        private final static int LOG_2_TABLE[] = { 0, 1, 28, 2, 29, 14, 24, 3,
+            30, 22, 20, 15, 25, 17, 4, 8, 31, 27, 13, 23, 21, 19, 16, 7, 26,
+            12, 18, 6, 11, 5, 10, 9 };
+
+        public synchronized int nextID() {
+
+            final int bitIdx = Integer.lowestOneBit(~pool);
+
+            if (bitIdx == 0)
+                return -1;
+
+            pool |= bitIdx;
+
+            return LOG_2_TABLE[(bitIdx * 0x077CB531) >>> 27];
+        }
+
+        public synchronized void freeID(int id) {
+            if (id < 0 || id >= MAX_ID)
+                return;
+
+            int bitIdx = 1 << id;
+            pool &= (~bitIdx);
+        }
     }
 }
