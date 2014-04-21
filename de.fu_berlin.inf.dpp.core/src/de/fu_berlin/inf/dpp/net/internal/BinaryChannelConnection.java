@@ -17,7 +17,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smackx.bytestreams.BytestreamSession;
 
-import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
 
@@ -66,7 +65,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
     private boolean initialized;
 
     private Map<Integer, ByteArrayOutputStream> pendingFragmentedPackets = new HashMap<Integer, ByteArrayOutputStream>();
-    private Map<Integer, BinaryChannelTransferObject> pendingTransferObjects = new HashMap<Integer, BinaryChannelTransferObject>();
+    private Map<Integer, BinaryXMPPExtension> pendingXMPPExtensions = new HashMap<Integer, BinaryXMPPExtension>();
 
     private DataInputStream inputStream;
     private DataOutputStream outputStream;
@@ -87,8 +86,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
             log.debug(connection + " ReceiverThread started.");
             try {
                 while (!isInterrupted())
-                    listener
-                        .addIncomingTransferObject(receiveIncomingTransferObject());
+                    listener.receive(readNextXMPPExtension());
 
             } catch (SocketException e) {
                 log.debug(connection + " connection closed locally: "
@@ -219,19 +217,15 @@ public class BinaryChannelConnection implements IByteStreamConnection {
     }
 
     /**
-     * Reads the next incoming transfer object. The payload of this object may
-     * not completely received at this point !
+     * Reads the next XMPP extension.
      * 
      * @return returns the next incoming transfer object
      * 
      * @throws IOException
      *             If the associated socket broke, while reading or if the
      *             socket has already been disposed.
-     * @throws ClassNotFoundException
-     *             If the data sent from the other side could not be decoded.
      */
-    private IncomingTransferObject receiveIncomingTransferObject()
-        throws IOException, ClassNotFoundException {
+    private BinaryXMPPExtension readNextXMPPExtension() throws IOException {
 
         while (!Thread.currentThread().isInterrupted()) {
 
@@ -268,9 +262,9 @@ public class BinaryChannelConnection implements IByteStreamConnection {
                 TransferDescription transferDescription = TransferDescription
                     .fromByteArray(transferDescriptionData);
 
-                BinaryChannelTransferObject oldTransferObject = pendingTransferObjects
-                    .put(fragmentId, new BinaryChannelTransferObject(
-                        transferMode, transferDescription, chunks));
+                BinaryXMPPExtension oldTransferObject = pendingXMPPExtensions
+                    .put(fragmentId, new BinaryXMPPExtension(transferMode,
+                        transferDescription, chunks));
 
                 if (oldTransferObject != null)
                     throw new IOException(
@@ -307,12 +301,12 @@ public class BinaryChannelConnection implements IByteStreamConnection {
                 out.write(payload);
                 out.flush();
 
-                if (!pendingTransferObjects.get(fragmentId).isLastChunk())
+                if (!pendingXMPPExtensions.get(fragmentId).isLastChunk())
                     break;
 
                 pendingFragmentedPackets.remove(fragmentId);
 
-                BinaryChannelTransferObject fullyReceivedTransferObject = pendingTransferObjects
+                BinaryXMPPExtension fullyReceivedTransferObject = pendingXMPPExtensions
                     .remove(fragmentId);
 
                 payload = out.toByteArray();

@@ -1,9 +1,8 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
-import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
 
-public class BinaryChannelTransferObject implements IncomingTransferObject {
+public final class BinaryXMPPExtension {
 
     private TransferDescription transferDescription;
 
@@ -14,7 +13,7 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
     private long tranferDuration;
     private NetTransferMode transferMode;
 
-    public BinaryChannelTransferObject(NetTransferMode transferMode,
+    public BinaryXMPPExtension(NetTransferMode transferMode,
         TransferDescription transferDescription, int chunkCount) {
         this.transferMode = transferMode;
         this.transferDescription = transferDescription;
@@ -24,43 +23,61 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
         tranferDuration = System.currentTimeMillis();
     }
 
-    @Override
-    public byte[] getPayload() {
+    /**
+     * Returns the XMPP packet extension in binary form. </p> <b>Note:</b>The
+     * returned byte array <b>must not</b> be modified directly.
+     */
+    byte[] getPayload() {
         return payload;
     }
 
-    @Override
+    /**
+     * Returns the transfer description of this transfer object.
+     */
+    // public for STF
     public TransferDescription getTransferDescription() {
         return transferDescription;
     }
 
-    @Override
-    public NetTransferMode getTransferMode() {
+    /**
+     * 
+     * Returns the {@link NetTransferMode} that was used to receive theXMPP
+     * packet extension.
+     */
+    NetTransferMode getTransferMode() {
         return transferMode;
     }
 
-    @Override
-    public long getCompressedSize() {
+    /**
+     * Returns the size of the XMPP packet extension in bytes before
+     * decompression.
+     */
+    long getCompressedSize() {
         return transferredSize;
     }
 
-    @Override
-    public long getUncompressedSize() {
+    /**
+     * Returns the size of the XMPP packet extension in bytes after
+     * decompression.
+     */
+    long getUncompressedSize() {
         return uncompressedSize;
     }
 
-    @Override
-    public long getTransferDuration() {
+    /**
+     * Returns the time in milliseconds until the transfer was completed.
+     */
+    long getTransferDuration() {
         return tranferDuration;
     }
 
     /**
-     * Sets the payload for this transfer object.
+     * Sets the data for this XMPP packet extension.
      * 
      * @param originalSize
-     *            the original size of the payload (received data)
+     *            the original size of the received data
      * @param data
-     *            the payload data
+     *            the binary form of the XMPP packet extension
      * 
      * @throws IllegalStateException
      *             if there are still missing chunks, see also

@@ -16,7 +16,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
 
@@ -78,8 +77,7 @@ public class BinaryChannelConnectionTest {
         }
 
         @Override
-        public abstract void addIncomingTransferObject(
-            IncomingTransferObject incomingTransferObject);
+        public abstract void receive(BinaryXMPPExtension extension);
     }
 
     private BytestreamSession aliceSession;
@@ -111,8 +109,7 @@ public class BinaryChannelConnectionTest {
             "alice@baumeister.de"), "junit", aliceSession,
             NetTransferMode.SOCKS5_DIRECT, new StreamConnectionListener() {
                 @Override
-                public void addIncomingTransferObject(
-                    final IncomingTransferObject incomingTransferObject) {
+                public void receive(final BinaryXMPPExtension extension) {
                     // NOP
                 }
             });
@@ -121,9 +118,8 @@ public class BinaryChannelConnectionTest {
             "bob@baumeister.de"), "junit", bobSession,
             NetTransferMode.SOCKS5_DIRECT, new StreamConnectionListener() {
                 @Override
-                public void addIncomingTransferObject(
-                    final IncomingTransferObject incomingTransferObject) {
-                    receivedBytes = incomingTransferObject.getPayload();
+                public void receive(final BinaryXMPPExtension extension) {
+                    receivedBytes = extension.getPayload();
                     received.countDown();
                 }
             });
@@ -169,8 +165,7 @@ public class BinaryChannelConnectionTest {
             "alice@baumeister.de"), "junit", aliceSession,
             NetTransferMode.SOCKS5_DIRECT, new StreamConnectionListener() {
                 @Override
-                public void addIncomingTransferObject(
-                    final IncomingTransferObject incomingTransferObject) {
+                public void receive(final BinaryXMPPExtension extension) {
                     // NOP
                 }
             });
@@ -179,9 +174,8 @@ public class BinaryChannelConnectionTest {
             "bob@baumeister.de"), "junit", bobSession,
             NetTransferMode.SOCKS5_DIRECT, new StreamConnectionListener() {
                 @Override
-                public void addIncomingTransferObject(
-                    final IncomingTransferObject incomingTransferObject) {
-                    receivedBytes = incomingTransferObject.getPayload();
+                public void receive(final BinaryXMPPExtension extension) {
+                    receivedBytes = extension.getPayload();
                     received.countDown();
                 }
             });

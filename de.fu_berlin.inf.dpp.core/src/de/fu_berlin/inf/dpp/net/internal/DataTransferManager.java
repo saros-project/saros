@@ -32,7 +32,6 @@ import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.IPacketInterceptor;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransferModeListener;
-import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
@@ -87,39 +86,28 @@ public class DataTransferManager implements IConnectionListener {
 
     private final IByteStreamConnectionListener byteStreamConnectionListener = new IByteStreamConnectionListener() {
 
-        /**
-         * Adds an incoming transfer.
-         * 
-         * @param transferObject
-         *            An IncomingTransferObject that has the TransferDescription
-         *            as content to provide information of the incoming transfer
-         *            to upper layers.
-         */
         @Override
-        public void addIncomingTransferObject(
-            final IncomingTransferObject transferObject) {
+        public void receive(final BinaryXMPPExtension extension) {
 
-            final TransferDescription description = transferObject
+            final TransferDescription description = extension
                 .getTransferDescription();
 
             boolean dispatchPacket = true;
 
             for (IPacketInterceptor packetInterceptor : packetInterceptors)
-                dispatchPacket &= packetInterceptor
-                    .receivedPacket(transferObject);
+                dispatchPacket &= packetInterceptor.receivedPacket(extension);
 
             if (!dispatchPacket)
                 return;
 
             if (log.isTraceEnabled())
-                log.trace("[" + transferObject.getTransferMode()
+                log.trace("[" + extension.getTransferMode()
                     + "] received incoming transfer object: " + description
-                    + ", size: " + transferObject.getCompressedSize()
-                    + ", RX time: " + transferObject.getTransferDuration()
-                    + " ms");
+                    + ", size: " + extension.getCompressedSize()
+                    + ", RX time: " + extension.getTransferDuration() + " ms");
 
-            if (transferObject.getTransferDescription().compressContent()) {
-                byte[] payload = transferObject.getPayload();
+            if (extension.getTransferDescription().compressContent()) {
+                byte[] payload = extension.getPayload();
                 long compressedPayloadLenght = payload.length;
 
                 try {
@@ -130,17 +118,15 @@ public class DataTransferManager implements IConnectionListener {
                 }
 
                 // FIXME change method signature
-                ((BinaryChannelTransferObject) transferObject).setPayload(
-                    compressedPayloadLenght, payload);
+                extension.setPayload(compressedPayloadLenght, payload);
             }
 
             transferModeDispatch.transferFinished(description.getSender(),
-                transferObject.getTransferMode(), true,
-                transferObject.getCompressedSize(),
-                transferObject.getUncompressedSize(),
-                transferObject.getTransferDuration());
+                extension.getTransferMode(), true,
+                extension.getCompressedSize(), extension.getUncompressedSize(),
+                extension.getTransferDuration());
 
-            receiver.processTransferObject(transferObject);
+            receiver.processBinaryXMPPExtension(extension);
         }
 
         @Override
@@ -582,14 +568,12 @@ public class DataTransferManager implements IConnectionListener {
     /**
      * Left over and <b>MUST</b> only used by the STF
      * 
+     * @param extension
      * @deprecated
-     * @param incomingTransferObject
      */
     @Deprecated
-    public void addIncomingTransferObject(
-        IncomingTransferObject incomingTransferObject) {
-        byteStreamConnectionListener
-            .addIncomingTransferObject(incomingTransferObject);
+    public void addIncomingTransferObject(BinaryXMPPExtension extension) {
+        byteStreamConnectionListener.receive(extension);
     }
 
     /**

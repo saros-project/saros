@@ -23,7 +23,6 @@ import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector.CancelHook;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
@@ -111,15 +110,14 @@ public class XMPPReceiver implements IReceiver {
     }
 
     @Override
-    public void processTransferObject(
-        final IncomingTransferObject transferObject) {
+    public void processBinaryXMPPExtension(final BinaryXMPPExtension extension) {
 
         dispatchThreadContext.executeAsDispatch(new Runnable() {
 
             @Override
             public void run() {
 
-                Packet packet = convertTransferObjectToPacket(transferObject);
+                Packet packet = convertBinaryXMPPExtension(extension);
 
                 if (packet != null)
                     forwardPacket(packet);
@@ -149,15 +147,15 @@ public class XMPPReceiver implements IReceiver {
     }
 
     /**
-     * Deserializes the payload of an {@link IncomingTransferObject} back to its
+     * Deserializes the payload of an {@link BinaryXMPPExtension} back to its
      * original {@link PacketExtension} and returns a new packet containing the
      * deserialized packet extension.
      * 
      * This method is <b>not</b> thread safe and <b>must not</b> accessed by
      * multiple threads concurrently.
      */
-    private Packet convertTransferObjectToPacket(
-        IncomingTransferObject transferObject) {
+    private Packet convertBinaryXMPPExtension(
+        BinaryXMPPExtension transferObject) {
 
         TransferDescription description = transferObject
             .getTransferDescription();

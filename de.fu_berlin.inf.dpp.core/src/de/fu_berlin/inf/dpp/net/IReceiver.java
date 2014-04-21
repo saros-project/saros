@@ -4,6 +4,8 @@ import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
 
+import de.fu_berlin.inf.dpp.net.internal.BinaryXMPPExtension;
+
 public interface IReceiver {
 
     /**
@@ -63,12 +65,8 @@ public interface IReceiver {
     public SarosPacketCollector createCollector(PacketFilter filter);
 
     /**
-     * Transforms a transfer object back into a packet and dispatches the given
-     * packet to all registered packet listeners.
-     * 
-     * @param transferObject
-     *            the transfer object to dispatch
+     * FOR INTERNAL USE
      */
-    public void processTransferObject(IncomingTransferObject transferObject);
+    public void processBinaryXMPPExtension(BinaryXMPPExtension extension);
 
 }

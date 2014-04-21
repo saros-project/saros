@@ -9,9 +9,9 @@ import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
 
 import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector.CancelHook;
+import de.fu_berlin.inf.dpp.net.internal.BinaryXMPPExtension;
 
 class NonThreadedReceiver implements IReceiver {
 
@@ -54,7 +54,7 @@ class NonThreadedReceiver implements IReceiver {
     }
 
     @Override
-    public void processTransferObject(IncomingTransferObject transferObject) {
-        // NOP
+    public void processBinaryXMPPExtension(final BinaryXMPPExtension extension) {
+        throw new UnsupportedOperationException();
     }
 }

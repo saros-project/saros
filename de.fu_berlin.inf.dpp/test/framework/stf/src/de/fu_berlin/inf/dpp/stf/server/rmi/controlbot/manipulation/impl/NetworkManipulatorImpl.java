@@ -17,8 +17,8 @@ import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.NOPActivity;
 import de.fu_berlin.inf.dpp.net.IPacketInterceptor;
-import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.BinaryXMPPExtension;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.IActivityListener;
@@ -72,7 +72,7 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
      * map that contains the current incoming packets for the given JID that are
      * currently not dispatched
      **/
-    private ConcurrentHashMap<JID, ConcurrentLinkedQueue<IncomingTransferObject>> blockedIncomingSessionPackets = new ConcurrentHashMap<JID, ConcurrentLinkedQueue<IncomingTransferObject>>();
+    private ConcurrentHashMap<JID, ConcurrentLinkedQueue<BinaryXMPPExtension>> blockedIncomingSessionPackets = new ConcurrentHashMap<JID, ConcurrentLinkedQueue<BinaryXMPPExtension>>();
 
     /**
      * map that contains the current incoming packets for the given JID that are
@@ -90,7 +90,7 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
     private IPacketInterceptor sessionPacketInterceptor = new IPacketInterceptor() {
 
         @Override
-        public boolean receivedPacket(IncomingTransferObject object) {
+        public boolean receivedPacket(BinaryXMPPExtension object) {
 
             JID jid = object.getTransferDescription().getSender();
             LOG.trace("intercepting incoming packet from: " + jid);
@@ -111,7 +111,7 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
             if (blockIncomingPackets || blockAllIncomingSessionPackets) {
 
                 blockedIncomingSessionPackets.putIfAbsent(jid,
-                    new ConcurrentLinkedQueue<IncomingTransferObject>());
+                    new ConcurrentLinkedQueue<BinaryXMPPExtension>());
 
                 LOG.trace("queuing incoming packet: " + object);
                 blockedIncomingSessionPackets.get(jid).add(object);
@@ -240,9 +240,9 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
         blockIncomingSessionPackets.put(jid, false);
 
         blockedIncomingSessionPackets.putIfAbsent(jid,
-            new ConcurrentLinkedQueue<IncomingTransferObject>());
+            new ConcurrentLinkedQueue<BinaryXMPPExtension>());
 
-        Queue<IncomingTransferObject> pendingIncomingPackets = blockedIncomingSessionPackets
+        Queue<BinaryXMPPExtension> pendingIncomingPackets = blockedIncomingSessionPackets
             .get(jid);
 
         /*
@@ -264,7 +264,7 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
 
         while (!pendingIncomingPackets.isEmpty()) {
             try {
-                IncomingTransferObject object = pendingIncomingPackets.remove();
+                BinaryXMPPExtension object = pendingIncomingPackets.remove();
 
                 LOG.trace("dispatching blocked packet: " + object);
 

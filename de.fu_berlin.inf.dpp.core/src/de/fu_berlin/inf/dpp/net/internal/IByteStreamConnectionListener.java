@@ -1,18 +1,21 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
-import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
  * Listener interface used by ITransport and IBytestreamConnection to notify
- * about established or changed connections and incoming objects.
+ * about established or changed connections and incoming XMPP extensions.
  * 
  * @author jurke
  */
 public interface IByteStreamConnectionListener {
 
-    public void addIncomingTransferObject(
-        final IncomingTransferObject incomingTransferObject);
+    /**
+     * Gets called when a {@linkplain BinaryXMPPExtension} was received.
+     * 
+     * @param extension
+     */
+    public void receive(final BinaryXMPPExtension extension);
 
     public void connectionClosed(String connectionID, JID remoteJID,
         IByteStreamConnection connection);
