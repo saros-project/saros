@@ -24,6 +24,27 @@ public abstract class AbstractActivityProvider implements IActivityProvider {
     }
 
     /**
+     * Adds itself to the session as both {@link IActivityProducer} and
+     * {@link IActivityConsumer}.
+     * 
+     * @see #uninstallProvider(ISarosSession)
+     */
+    protected final void installProvider(ISarosSession session) {
+        session.addActivityConsumer(this);
+        session.addActivityProducer(this);
+    }
+
+    /**
+     * Removes itself from the session
+     * 
+     * @see #installProvider(ISarosSession)
+     */
+    protected final void uninstallProvider(ISarosSession session) {
+        session.removeActivityConsumer(this);
+        session.removeActivityProducer(this);
+    }
+
+    /**
      * @JTourBusStop 2, Activity sending, The abstract class to extend:
      * 
      *               But instead of implementing the IActivityProvider interface

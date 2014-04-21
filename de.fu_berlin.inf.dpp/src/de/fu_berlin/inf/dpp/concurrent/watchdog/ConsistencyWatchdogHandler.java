@@ -40,7 +40,8 @@ import de.fu_berlin.inf.dpp.util.FileUtils;
  * This component is responsible for handling Consistency Errors on the host
  */
 @Component(module = "consistency")
-public class ConsistencyWatchdogHandler implements Startable {
+public class ConsistencyWatchdogHandler extends AbstractActivityProvider
+    implements Startable {
 
     private static Logger log = Logger
         .getLogger(ConsistencyWatchdogHandler.class);
@@ -58,23 +59,14 @@ public class ConsistencyWatchdogHandler implements Startable {
         }
     };
 
-    protected final AbstractActivityProvider activityProvider = new AbstractActivityProvider() {
-        @Override
-        public void exec(IActivity activity) {
-            if (!sarosSession.isHost())
-                return;
-            activity.dispatch(activityReceiver);
-        }
-    };
-
     @Override
     public void start() {
-        sarosSession.addActivityProvider(activityProvider);
+        installProvider(sarosSession);
     }
 
     @Override
     public void stop() {
-        sarosSession.removeActivityProvider(activityProvider);
+        uninstallProvider(sarosSession);
     }
 
     public ConsistencyWatchdogHandler(ISarosSession sarosSession,
@@ -82,6 +74,13 @@ public class ConsistencyWatchdogHandler implements Startable {
         this.sarosSession = sarosSession;
         this.editorManager = editorManager;
         this.watchdogClient = watchdogClient;
+    }
+
+    @Override
+    public void exec(IActivity activity) {
+        if (!sarosSession.isHost())
+            return;
+        activity.dispatch(activityReceiver);
     }
 
     /**
@@ -211,9 +210,8 @@ public class ConsistencyWatchdogHandler implements Startable {
             }
 
             // Tell the user that we sent all files
-            activityProvider.fireActivity(new ChecksumErrorActivity(
-                sarosSession.getLocalUser(), checksumError.getSource(), null,
-                checksumError.getRecoveryID()));
+            fireActivity(new ChecksumErrorActivity(sarosSession.getLocalUser(),
+                checksumError.getSource(), null, checksumError.getRecoveryID()));
         } finally {
             progress.done();
         }
@@ -257,8 +255,8 @@ public class ConsistencyWatchdogHandler implements Startable {
                     throw new IOException();
 
                 // Send the file to client
-                activityProvider.fireActivity(RecoveryFileActivity.created(
-                    user, path, content, from));
+                fireActivity(RecoveryFileActivity.created(user, path, content,
+                    from));
 
                 // Immediately follow up with a new checksum
                 IDocument doc;
@@ -273,8 +271,8 @@ public class ConsistencyWatchdogHandler implements Startable {
                     checksum.bind(doc);
                     checksum.update();
 
-                    activityProvider.fireActivity(new ChecksumActivity(user,
-                        path, checksum.getHash(), checksum.getLength(), null));
+                    fireActivity(new ChecksumActivity(user, path,
+                        checksum.getHash(), checksum.getLength(), null));
                 } catch (CoreException e) {
                     log.warn("Could not check checksum of file "
                         + path.toString());
@@ -289,13 +287,11 @@ public class ConsistencyWatchdogHandler implements Startable {
         } else {
             // TODO Warn the user...
             // Tell the client to delete the file
-            activityProvider.fireActivity(RecoveryFileActivity.removed(user,
-                path, from));
-            activityProvider.fireActivity(ChecksumActivity.missing(user, path));
+            fireActivity(RecoveryFileActivity.removed(user, path, from));
+            fireActivity(ChecksumActivity.missing(user, path));
 
             progress.worked(8);
         }
         progress.done();
     }
-
 }

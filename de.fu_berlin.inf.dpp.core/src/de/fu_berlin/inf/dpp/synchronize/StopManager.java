@@ -575,12 +575,12 @@ public final class StopManager extends AbstractActivityProvider implements
          *               provider with the session. The session will install a
          *               listener on this provider.
          */
-        sarosSession.addActivityProvider(this);
+        installProvider(sarosSession);
     }
 
     @Override
     public void stop() {
-        sarosSession.removeActivityProvider(this);
+        uninstallProvider(sarosSession);
         lockSession(false);
         clearExpectedAcknowledgments();
     }

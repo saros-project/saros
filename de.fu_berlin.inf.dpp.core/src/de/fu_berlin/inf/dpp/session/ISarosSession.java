@@ -38,8 +38,8 @@ import de.fu_berlin.inf.dpp.synchronize.StopManager;
 
 /**
  * A Saros session consists of one or more shared projects, which are the
- * central concept of the Saros plugin. They are associated with Eclipse
- * projects and make them available for synchronous/real-time collaboration.
+ * central concept of the Saros plugin. They are associated with projects and
+ * make them available for synchronous/real-time collaboration.
  * 
  * @author rdjemili
  */
@@ -178,7 +178,7 @@ public interface ISarosSession {
 
     /**
      * Adds the given shared project listener. This call is ignored if the
-     * listener is all a listener of this shared project.
+     * listener is already a listener of this session.
      * 
      * @param listener
      *            The listener that is to be added.
@@ -187,7 +187,7 @@ public interface ISarosSession {
 
     /**
      * Removes the given shared project listener. This call is ignored if the
-     * listener doesn't belongs to the current listeners of this shared project.
+     * listener does not belong to the current listeners of this session.
      * 
      * @param listener
      *            the listener that is to be removed.
@@ -288,19 +288,59 @@ public interface ISarosSession {
     public void exec(List<IActivityDataObject> activityDataObjects);
 
     /**
-     * Adds an {@link IActivityProvider} and also registers itself as
-     * {@link IActivityListener} at the given provider.
+     * Adds an {@link IActivityProducer} so the production of its activities
+     * will be noticed.
      * 
-     * If the given provider was already added this method does not add it again
-     * but silently returns.
+     * @param producer
+     *            The session will register an {@link IActivityListener} on this
+     *            producer. It is expected that the producer will inform that
+     *            listener about new activities via
+     *            {@link IActivityListener#activityCreated(de.fu_berlin.inf.dpp.activities.business.IActivity)
+     *            activityCreated()}.
+     * 
+     * @see #removeActivityProducer(IActivityProducer)
      */
-    public void addActivityProvider(IActivityProvider provider);
+    public void addActivityProducer(IActivityProducer producer);
 
     /**
-     * Removes the given provider and deregisters itself as
-     * {@link IActivityListener} on that provider.
+     * Removes an {@link IActivityProducer} from the session.
+     * 
+     * @param producer
+     *            The session will unregister its {@link IActivityListener} from
+     *            this producer and it is expected that the producer no longer
+     *            calls
+     *            {@link IActivityListener#activityCreated(de.fu_berlin.inf.dpp.activities.business.IActivity)
+     *            activityCreated()}.
+     * 
+     * @see #addActivityProducer(IActivityProducer)
      */
-    public void removeActivityProvider(IActivityProvider provider);
+    public void removeActivityProducer(IActivityProducer producer);
+
+    /**
+     * Adds an {@link IActivityConsumer} so it will be called when an activity
+     * is to be executed locally.
+     * 
+     * @param consumer
+     *            The
+     *            {@link IActivityConsumer#exec(de.fu_berlin.inf.dpp.activities.business.IActivity)
+     *            exec()} method of this consumer will be called. "Consume" is
+     *            not meant in a destructive way: all consumers will be called
+     *            for every activity.
+     * 
+     * @see #removeActivityConsumer(IActivityConsumer)
+     */
+    public void addActivityConsumer(IActivityConsumer consumer);
+
+    /**
+     * Removes an {@link IActivityConsumer} from the session
+     * 
+     * @param consumer
+     *            This consumer will no longer be called when an activity is to
+     *            be executed locally.
+     * 
+     * @see #addActivityConsumer(IActivityConsumer)
+     */
+    public void removeActivityConsumer(IActivityConsumer consumer);
 
     /**
      * Returns a list of all users in this session which have

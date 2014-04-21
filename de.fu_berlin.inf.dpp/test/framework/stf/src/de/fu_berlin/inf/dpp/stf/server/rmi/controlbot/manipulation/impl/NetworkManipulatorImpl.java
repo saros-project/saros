@@ -21,8 +21,9 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.BinaryXMPPExtension;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityListener;
-import de.fu_berlin.inf.dpp.session.IActivityProvider;
+import de.fu_berlin.inf.dpp.session.IActivityProducer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
@@ -33,7 +34,8 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation.INetworkManip
  * @author Stefan Rossbach
  */
 public final class NetworkManipulatorImpl extends StfRemoteObject implements
-    INetworkManipulator, IActivityProvider, ISarosSessionListener {
+    INetworkManipulator, IActivityConsumer, IActivityProducer,
+    ISarosSessionListener {
 
     private static final Logger LOG = Logger
         .getLogger(NetworkManipulatorImpl.class);
@@ -495,8 +497,8 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
     @Override
     public void sessionStarting(ISarosSession session) {
         this.session = session;
-        this.session.addActivityProvider(this);
-
+        this.session.addActivityProducer(this);
+        this.session.addActivityConsumer(this);
     }
 
     @Override
@@ -506,8 +508,10 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
 
     @Override
     public void sessionEnding(ISarosSession session) {
-        if (this.session != null)
-            this.session.removeActivityProvider(this);
+        if (this.session != null) {
+            this.session.removeActivityProducer(this);
+            this.session.removeActivityConsumer(this);
+        }
         this.session = null;
     }
 

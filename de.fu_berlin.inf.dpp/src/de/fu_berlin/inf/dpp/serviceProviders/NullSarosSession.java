@@ -14,7 +14,8 @@ import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.session.IActivityProvider;
+import de.fu_berlin.inf.dpp.session.IActivityConsumer;
+import de.fu_berlin.inf.dpp.session.IActivityProducer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.session.User;
@@ -148,18 +149,6 @@ public class NullSarosSession implements ISarosSession {
     }
 
     public void sendActivity(List<User> recipient, IActivity activity) {
-        log.warn("unexpected method call");
-
-    }
-
-    @Override
-    public void addActivityProvider(IActivityProvider provider) {
-        log.warn("unexpected method call");
-
-    }
-
-    @Override
-    public void removeActivityProvider(IActivityProvider provider) {
         log.warn("unexpected method call");
 
     }
@@ -310,6 +299,26 @@ public class NullSarosSession implements ISarosSession {
     public String getID() {
         log.warn("unexpected method call");
         return null;
+    }
+
+    @Override
+    public void addActivityProducer(IActivityProducer producer) {
+        log.warn("unexpected method call");
+    }
+
+    @Override
+    public void removeActivityProducer(IActivityProducer producer) {
+        log.warn("unexpected method call");
+    }
+
+    @Override
+    public void addActivityConsumer(IActivityConsumer consumer) {
+        log.warn("unexpected method call");
+    }
+
+    @Override
+    public void removeActivityConsumer(IActivityConsumer consumer) {
+        log.warn("unexpected method call");
     }
 
 }

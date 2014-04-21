@@ -44,12 +44,12 @@ public class PermissionManager extends AbstractActivityProvider implements
 
     @Override
     public void start() {
-        sarosSession.addActivityProvider(this);
+        installProvider(sarosSession);
     }
 
     @Override
     public void stop() {
-        sarosSession.removeActivityProvider(this);
+        uninstallProvider(sarosSession);
     }
 
     /**

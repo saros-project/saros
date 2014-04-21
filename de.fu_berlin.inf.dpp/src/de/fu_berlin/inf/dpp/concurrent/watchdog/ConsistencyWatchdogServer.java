@@ -104,7 +104,7 @@ public class ConsistencyWatchdogServer extends AbstractActivityProvider
             throw new IllegalStateException(
                 "component can only be run on host side");
 
-        session.addActivityProvider(this);
+        installProvider(session);
         stopManager.addBlockable(this);
 
         executor = new ScheduledThreadPoolExecutor(1, new NamedThreadFactory(
@@ -119,7 +119,7 @@ public class ConsistencyWatchdogServer extends AbstractActivityProvider
 
     @Override
     public void stop() {
-        session.removeActivityProvider(this);
+        uninstallProvider(session);
         stopManager.removeBlockable(this);
 
         triggerChecksumFuture.cancel(false);

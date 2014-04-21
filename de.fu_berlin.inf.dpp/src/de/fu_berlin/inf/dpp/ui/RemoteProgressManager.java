@@ -37,7 +37,7 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
  * machines of other users.
  */
 @Component(module = "core")
-public class RemoteProgressManager {
+public class RemoteProgressManager extends AbstractActivityProvider {
 
     private static final Logger log = Logger
         .getLogger(RemoteProgressManager.class);
@@ -206,13 +206,6 @@ public class RemoteProgressManager {
         }
     };
 
-    protected AbstractActivityProvider activityProvider = new AbstractActivityProvider() {
-        @Override
-        public void exec(IActivity activity) {
-            activity.dispatch(activityReceiver);
-        }
-    };
-
     protected ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
         @Override
         public void userLeft(User user) {
@@ -228,15 +221,13 @@ public class RemoteProgressManager {
         @Override
         public void sessionStarted(ISarosSession newSharedProject) {
             sarosSession = newSharedProject;
-
-            newSharedProject.addActivityProvider(activityProvider);
+            installProvider(sarosSession);
             newSharedProject.addListener(sharedProjectListener);
         }
 
         @Override
         public void sessionEnded(ISarosSession oldSarosSession) {
-
-            oldSarosSession.removeActivityProvider(activityProvider);
+            uninstallProvider(oldSarosSession);
             oldSarosSession.removeListener(sharedProjectListener);
             for (RemoteProgress progress : progressDialogs.values()) {
                 progress.close();
@@ -250,6 +241,11 @@ public class RemoteProgressManager {
     public RemoteProgressManager(ISarosSessionManager sessionManager) {
         this.sessionManager = sessionManager;
         this.sessionManager.addSarosSessionListener(sessionListener);
+    }
+
+    @Override
+    public void exec(IActivity activity) {
+        activity.dispatch(activityReceiver);
     }
 
     protected SimpleDateFormat format = new SimpleDateFormat("HHmmssSS");
@@ -350,9 +346,8 @@ public class RemoteProgressManager {
                 List<User> recipients, String progressID, int workCurrent,
                 int workTotal, String taskName, ProgressAction action) {
                 for (User target : recipients) {
-                    activityProvider.fireActivity(new ProgressActivity(source,
-                        target, progressID, workCurrent, workTotal, taskName,
-                        action));
+                    fireActivity(new ProgressActivity(source, target,
+                        progressID, workCurrent, workTotal, taskName, action));
                 }
 
             }
@@ -389,16 +384,15 @@ public class RemoteProgressManager {
 
                 // report to remote monitor!
                 this.totalWorked = totalWorked;
-                activityProvider.fireActivity(new ProgressActivity(localUser,
-                    target, progressID, 0, totalWorked, name,
-                    ProgressAction.BEGINTASK));
+                fireActivity(new ProgressActivity(localUser, target,
+                    progressID, 0, totalWorked, name, ProgressAction.BEGINTASK));
             }
 
             @Override
             public void done() {
                 monitor.done();
-                activityProvider.fireActivity(new ProgressActivity(localUser,
-                    target, progressID, 0, 0, null, ProgressAction.DONE));
+                fireActivity(new ProgressActivity(localUser, target,
+                    progressID, 0, 0, null, ProgressAction.DONE));
             }
 
             /**
@@ -420,8 +414,8 @@ public class RemoteProgressManager {
             @Override
             public void setCanceled(boolean value) {
                 // waldmann: yep this is a TODO
-                activityProvider.fireActivity(new ProgressActivity(localUser,
-                    target, progressID, worked, totalWorked, "Cancellation",
+                fireActivity(new ProgressActivity(localUser, target,
+                    progressID, worked, totalWorked, "Cancellation",
                     ProgressAction.CANCEL));
                 monitor.setCanceled(value);
             }
@@ -429,16 +423,16 @@ public class RemoteProgressManager {
             @Override
             public void setTaskName(String name) {
                 monitor.setTaskName(name);
-                activityProvider.fireActivity(new ProgressActivity(localUser,
-                    target, progressID, worked, totalWorked, name,
+                fireActivity(new ProgressActivity(localUser, target,
+                    progressID, worked, totalWorked, name,
                     ProgressAction.SETTASKNAME));
             }
 
             @Override
             public void subTask(String name) {
                 monitor.subTask(name);
-                activityProvider.fireActivity(new ProgressActivity(localUser,
-                    target, progressID, worked, totalWorked, name,
+                fireActivity(new ProgressActivity(localUser, target,
+                    progressID, worked, totalWorked, name,
                     ProgressAction.SUBTASK));
             }
 
@@ -452,8 +446,8 @@ public class RemoteProgressManager {
                             .format(
                                 "Worked ({0})is greater than totalWork ({1}). Forgot to call beginTask?",
                                 worked, totalWorked), new StackTrace());
-                activityProvider.fireActivity(new ProgressActivity(localUser,
-                    target, progressID, worked, totalWorked, null,
+                fireActivity(new ProgressActivity(localUser, target,
+                    progressID, worked, totalWorked, null,
                     ProgressAction.UPDATE));
             }
         };

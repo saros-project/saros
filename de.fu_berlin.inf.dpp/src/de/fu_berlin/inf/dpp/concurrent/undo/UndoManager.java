@@ -67,9 +67,10 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
  * the first Undo the Undo button stays activated, even if there is nothing to
  * undo. This is caused by design because we cancel the regular Eclipse Undo
  * operation. So there is always something to undo in the Eclipse History and
- * the button is never deactivated. TODO This UndoManager is switched off
- * currently. To activate it it has to be added to the PicoContainer in
- * Saros.class.
+ * the button is never deactivated.
+ * <p>
+ * TODO This UndoManager is switched off currently. To activate it it has to be
+ * added to the PicoContainer in Saros.class.
  */
 @Component(module = "undo")
 public class UndoManager extends AbstractActivityProvider implements Disposable {
@@ -105,6 +106,10 @@ public class UndoManager extends AbstractActivityProvider implements Disposable 
 
     protected EditorManager editorManager;
 
+    /**
+     * TODO This field is not used (except for adding and removing items).
+     * Consider removing it after you consulted to history of this class.
+     */
     protected List<IActivityProvider> providers = new LinkedList<IActivityProvider>();
 
     protected SPath currentActiveEditor = null;
@@ -262,8 +267,8 @@ public class UndoManager extends AbstractActivityProvider implements Disposable 
 
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
+            installProvider(newSarosSession);
             undoHistory.clear();
-            newSarosSession.addActivityProvider(UndoManager.this);
             enabled = preferences.isConcurrentUndoActivated();
             eclipseHistory.addOperationApprover(operationBlocker);
             UndoManager.this.sarosSession = newSarosSession;
@@ -271,7 +276,7 @@ public class UndoManager extends AbstractActivityProvider implements Disposable 
 
         @Override
         public void sessionEnded(ISarosSession oldSarosSession) {
-            oldSarosSession.removeActivityProvider(UndoManager.this);
+            uninstallProvider(oldSarosSession);
             undoHistory.clear();
             enabled = false;
             eclipseHistory.removeOperationApprover(operationBlocker);

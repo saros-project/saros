@@ -80,8 +80,9 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
 import de.fu_berlin.inf.dpp.project.internal.timeout.ClientSessionTimeoutHandler;
 import de.fu_berlin.inf.dpp.project.internal.timeout.ServerSessionTimeoutHandler;
+import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityListener;
-import de.fu_berlin.inf.dpp.session.IActivityProvider;
+import de.fu_berlin.inf.dpp.session.IActivityProducer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.session.User;
@@ -126,7 +127,9 @@ public final class SarosSession implements ISarosSession {
 
     private final ActivityHandler activityHandler;
 
-    private final CopyOnWriteArrayList<IActivityProvider> activityProviders = new CopyOnWriteArrayList<IActivityProvider>();
+    private final CopyOnWriteArrayList<IActivityProducer> activityProducers = new CopyOnWriteArrayList<IActivityProducer>();
+
+    private final CopyOnWriteArrayList<IActivityConsumer> activityConsumers = new CopyOnWriteArrayList<IActivityConsumer>();
 
     /* Instance fields */
     private final User localUser;
@@ -197,12 +200,12 @@ public final class SarosSession implements ISarosSession {
             /**
              * @JTourBusStop 10, Activity sending, Local Execution:
              * 
-             *               Afterwards every registered Activity Provider is
+             *               Afterwards every registered ActivityConsumer is
              *               informed about the remote activity that should be
              *               executed locally.
              */
-            for (IActivityProvider executor : activityProviders) {
-                executor.exec(activity);
+            for (IActivityConsumer consumer : activityConsumers) {
+                consumer.exec(activity);
                 updatePartialSharedResources(activity);
             }
         }
@@ -843,15 +846,25 @@ public final class SarosSession implements ISarosSession {
     }
 
     @Override
-    public void addActivityProvider(IActivityProvider provider) {
-        if (activityProviders.addIfAbsent(provider))
-            provider.addActivityListener(this.activityListener);
+    public void addActivityProducer(IActivityProducer producer) {
+        if (activityProducers.addIfAbsent(producer))
+            producer.addActivityListener(activityListener);
     }
 
     @Override
-    public void removeActivityProvider(IActivityProvider provider) {
-        activityProviders.remove(provider);
-        provider.removeActivityListener(this.activityListener);
+    public void removeActivityProducer(IActivityProducer producer) {
+        if (activityProducers.remove(producer))
+            producer.removeActivityListener(activityListener);
+    }
+
+    @Override
+    public void addActivityConsumer(IActivityConsumer consumer) {
+        activityConsumers.addIfAbsent(consumer);
+    }
+
+    @Override
+    public void removeActivityConsumer(IActivityConsumer consumer) {
+        activityConsumers.remove(consumer);
     }
 
     @Override
@@ -1106,6 +1119,6 @@ public final class SarosSession implements ISarosSession {
      * @return the size of the internal activity providers collection
      */
     public int getActivityProviderCount() {
-        return activityProviders.size();
+        return Math.max(activityConsumers.size(), activityProducers.size());
     }
 }

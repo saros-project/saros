@@ -85,7 +85,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
-import de.fu_berlin.inf.dpp.session.IActivityProvider;
+import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.session.User;
@@ -323,7 +323,7 @@ public class EditorManager extends AbstractActivityProvider {
             hasWriteAccess = sarosSession.hasWriteAccess();
             sarosSession.addListener(sharedProjectListener);
 
-            sarosSession.addActivityProvider(EditorManager.this);
+            installProvider(sarosSession);
             annotationModelHelper = new AnnotationModelHelper();
             locationAnnotationManager = new LocationAnnotationManager(
                 preferenceStore);
@@ -380,7 +380,7 @@ public class EditorManager extends AbstractActivityProvider {
                     dirtyStateListener.unregisterAll();
 
                     sarosSession.removeListener(sharedProjectListener);
-                    sarosSession.removeActivityProvider(EditorManager.this);
+                    uninstallProvider(sarosSession);
 
                     sarosSession = null;
                     annotationModelHelper = null;
@@ -750,7 +750,7 @@ public class EditorManager extends AbstractActivityProvider {
     }
 
     /**
-     * @see IActivityProvider
+     * @see IActivityConsumer
      * 
      * @swt This must be called from the SWT thread.
      */

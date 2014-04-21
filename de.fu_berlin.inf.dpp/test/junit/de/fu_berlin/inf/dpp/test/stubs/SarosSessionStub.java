@@ -13,7 +13,8 @@ import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.session.IActivityProvider;
+import de.fu_berlin.inf.dpp.session.IActivityConsumer;
+import de.fu_berlin.inf.dpp.session.IActivityProducer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.session.User;
@@ -63,12 +64,6 @@ public class SarosSessionStub implements ISarosSession {
 
     @Override
     public void removeListener(ISharedProjectListener listener) {
-        throw new RuntimeException("Unexpected call to Stub");
-
-    }
-
-    @Override
-    public void removeActivityProvider(IActivityProvider provider) {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
@@ -197,12 +192,6 @@ public class SarosSessionStub implements ISarosSession {
 
     }
 
-    @Override
-    public void addActivityProvider(IActivityProvider provider) {
-        throw new RuntimeException("Unexpected call to Stub");
-
-    }
-
     public void execQueuedActivities() {
         throw new RuntimeException("Unexpected call to Stub");
     }
@@ -308,6 +297,26 @@ public class SarosSessionStub implements ISarosSession {
 
     @Override
     public String getID() {
+        throw new RuntimeException("Unexpected call to Stub");
+    }
+
+    @Override
+    public void addActivityProducer(IActivityProducer producer) {
+        throw new RuntimeException("Unexpected call to Stub");
+    }
+
+    @Override
+    public void removeActivityProducer(IActivityProducer producer) {
+        throw new RuntimeException("Unexpected call to Stub");
+    }
+
+    @Override
+    public void addActivityConsumer(IActivityConsumer consumer) {
+        throw new RuntimeException("Unexpected call to Stub");
+    }
+
+    @Override
+    public void removeActivityConsumer(IActivityConsumer consumer) {
         throw new RuntimeException("Unexpected call to Stub");
     }
 }

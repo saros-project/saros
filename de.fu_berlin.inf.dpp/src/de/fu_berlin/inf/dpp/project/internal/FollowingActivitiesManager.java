@@ -108,13 +108,13 @@ public class FollowingActivitiesManager extends AbstractActivityProvider {
         public void sessionStarted(ISarosSession session) {
             sarosSession = session;
             awarenessInformationCollector.flushFollowModes();
-            session.addActivityProvider(FollowingActivitiesManager.this);
+            installProvider(sarosSession);
         }
 
         @Override
         public void sessionEnded(ISarosSession session) {
             awarenessInformationCollector.flushFollowModes();
-            session.removeActivityProvider(FollowingActivitiesManager.this);
+            uninstallProvider(sarosSession);
             sarosSession = null;
         }
     };

@@ -157,7 +157,7 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
 
     @Override
     public void start() {
-        sarosSession.addActivityProvider(SharedResourcesManager.this);
+        installProvider(sarosSession);
         stopManager.addBlockable(stopManagerListener);
         ResourcesPlugin.getWorkspace().addResourceChangeListener(this,
             INTERESTING_EVENTS);
@@ -166,7 +166,7 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
     @Override
     public void stop() {
         ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
-        sarosSession.removeActivityProvider(this);
+        uninstallProvider(sarosSession);
         stopManager.removeBlockable(stopManagerListener);
     }
 

@@ -109,15 +109,13 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
             pathsWithWrongChecksums.clear();
             inconsistencyToResolve.setValue(false);
 
-            newSarosSession.addActivityProvider(ConsistencyWatchdogClient.this);
+            installProvider(newSarosSession);
             newSarosSession.addListener(sharedProjectListener);
         }
 
         @Override
         public void sessionEnded(ISarosSession oldSarosSession) {
-
-            oldSarosSession
-                .removeActivityProvider(ConsistencyWatchdogClient.this);
+            uninstallProvider(oldSarosSession);
             oldSarosSession.removeListener(sharedProjectListener);
 
             latestChecksums.clear();

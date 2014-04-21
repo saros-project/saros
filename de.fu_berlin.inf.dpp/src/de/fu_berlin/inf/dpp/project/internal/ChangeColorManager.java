@@ -142,14 +142,13 @@ public class ChangeColorManager extends AbstractActivityProvider implements
             }
 
         }
-
-        sarosSession.addActivityProvider(this);
+        installProvider(sarosSession);
         sarosSession.addListener(sessionListener);
     }
 
     @Override
     public synchronized void stop() {
-        sarosSession.removeActivityProvider(this);
+        uninstallProvider(sarosSession);
         sarosSession.removeListener(sessionListener);
     }
 
