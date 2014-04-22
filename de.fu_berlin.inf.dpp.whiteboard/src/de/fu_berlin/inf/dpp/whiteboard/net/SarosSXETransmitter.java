@@ -217,8 +217,7 @@ public class SarosSXETransmitter implements ISXETransmitter {
 	 * Registers the controller to receive state-offer messages and to start the
 	 * invitation process
 	 */
-	public void enableInvitation(final SXEController controller,
-			final IProgressMonitor monitor) {
+	public void enableInvitation(final SXEController controller) {
 
 		invitationListener = new PacketListener() {
 			@Override
@@ -231,7 +230,7 @@ public class SarosSXETransmitter implements ISXETransmitter {
 						controller, SarosSXETransmitter.this,
 						extension.getMessage());
 
-				inv.start(monitor);
+				inv.start();
 			}
 		};
 

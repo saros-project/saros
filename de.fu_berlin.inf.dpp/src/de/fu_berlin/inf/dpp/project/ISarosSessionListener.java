@@ -33,25 +33,6 @@ import de.fu_berlin.inf.dpp.session.User;
 public interface ISarosSessionListener {
 
     /**
-     * Is fired after the session is fully established, but not yet confirmed.
-     * <p>
-     * Can be used by session components to initialize an invitee's
-     * synchronization process.
-     * 
-     * TODO: remove this method as soon as external components like the
-     * whiteboard are maintained in another way (i.e. a component interface)
-     * 
-     * @param session
-     *            The corresponding session
-     * @param monitor
-     *            the invitation process's monitor to track process and
-     *            cancellation
-     * 
-     */
-    public void preIncomingInvitationCompleted(ISarosSession session,
-        IProgressMonitor monitor);
-
-    /**
      * Is fired after invitation complete but for every peer the host invited.
      * At this state, the session is fully established and confirmed but the
      * outgoing session negotiation job is still running.

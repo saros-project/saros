@@ -685,19 +685,6 @@ public class SarosSessionManager implements ISarosSessionManager {
     }
 
     @Override
-    public void preIncomingInvitationCompleted(IProgressMonitor monitor) {
-        try {
-            for (ISarosSessionListener sarosSessionListener : sarosSessionListeners) {
-                sarosSessionListener.preIncomingInvitationCompleted(
-                    sarosSessionObservable.getValue(), monitor);
-            }
-        } catch (RuntimeException e) {
-            log.error("Internal error in notifying listener"
-                + " of an incoming invitation: ", e);
-        }
-    }
-
-    @Override
     public void postOutgoingInvitationCompleted(IProgressMonitor monitor,
         User user) {
         try {

@@ -32,11 +32,6 @@ import de.fu_berlin.inf.dpp.session.User;
 public class AbstractSarosSessionListener implements ISarosSessionListener {
 
     @Override
-    public void preIncomingInvitationCompleted(ISarosSession sarosSession, IProgressMonitor monitor) {
-        // do nothing
-    }
-
-    @Override
     public void postOutgoingInvitationCompleted(ISarosSession sarosSession,
         User user, IProgressMonitor monitor) {
         // do nothing

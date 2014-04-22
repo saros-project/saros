@@ -67,30 +67,6 @@ public class WhiteboardManager {
 	 */
 	protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
 
-		private void setupColorAndTransmitter(ISarosSession session) {
-			RGB color = SarosAnnotation.getUserColor(session.getLocalUser())
-					.getRGB();
-			ColorUtils.setForegroundColor(color);
-
-			sxeTransmitter = new SarosSXETransmitter(session);
-			controller.initNetwork(sxeTransmitter);
-		}
-
-		@Override
-		public void preIncomingInvitationCompleted(ISarosSession session,
-				IProgressMonitor monitor) {
-
-			if (!hostHasWhiteboard) {
-				LOG.debug("Skip Whiteboard preparation because session host has no Whiteboard");
-				return;
-			}
-
-			LOG.debug("Preparing Whiteboard for receiving an invitation");
-
-			setupColorAndTransmitter(session);
-			sxeTransmitter.enableInvitation(controller, monitor);
-		}
-
 		@Override
 		public void postOutgoingInvitationCompleted(ISarosSession session,
 				User user, IProgressMonitor monitor) {
@@ -120,6 +96,21 @@ public class WhiteboardManager {
 		}
 
 		@Override
+		public void sessionStarted(ISarosSession session) {
+
+			if (!hostHasWhiteboard) {
+				LOG.debug("Skip Whiteboard preparation because session host has no Whiteboard");
+				return;
+			}
+
+			LOG.debug("Preparing Whiteboard for receiving an invitation");
+
+			setupColorAndTransmitter(session);
+			sxeTransmitter.enableInvitation(controller);
+
+		}
+
+		@Override
 		public void sessionEnded(ISarosSession session) {
 			hostHasWhiteboard = false;
 			hasWhiteboard.clear();
@@ -135,7 +126,7 @@ public class WhiteboardManager {
 	};
 
 	/**
-	 * This hook determines whether there is are Whiteboard counterparts on the
+	 * This hook determines whether there are Whiteboard counterparts on the
 	 * remote sides to communicate with. The result will be stored in
 	 * {@link #hasWhiteboard} and {@link #hostHasWhiteboard}.
 	 */
@@ -201,6 +192,15 @@ public class WhiteboardManager {
 		LOG.debug("WhiteboardManager instantiated");
 
 		controller = new SXEController(new GEFRecordFactory());
+	}
+
+	private void setupColorAndTransmitter(ISarosSession session) {
+		RGB color = SarosAnnotation.getUserColor(session.getLocalUser())
+				.getRGB();
+		ColorUtils.setForegroundColor(color);
+
+		sxeTransmitter = new SarosSXETransmitter(session);
+		controller.initNetwork(sxeTransmitter);
 	}
 
 	public ISXEMessageHandler getSXEMessageHandler() {

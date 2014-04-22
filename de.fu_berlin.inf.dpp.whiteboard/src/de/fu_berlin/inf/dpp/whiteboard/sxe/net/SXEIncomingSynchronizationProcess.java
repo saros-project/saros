@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.whiteboard.sxe.net;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -51,14 +51,14 @@ public class SXEIncomingSynchronizationProcess extends SXESynchronization {
 	 * de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXESynchronization#start(org.
 	 * eclipse.core.runtime.IProgressMonitor)
 	 */
-	public void start(final IProgressMonitor monitor) {
+	public void start() {
 		/*
 		 * Has to run in another thread because else this would block Smack
 		 * dispatching listener thread when awaiting answers (could not process
 		 * incoming messages, deadlock)
 		 */
-		ThreadUtils.runSafeAsync("Incoming whiteboard synchronization process", log,
-				new Runnable() {
+		ThreadUtils.runSafeAsync("Incoming whiteboard synchronization process",
+				log, new Runnable() {
 
 					@Override
 					public void run() {
@@ -95,8 +95,9 @@ public class SXEIncomingSynchronizationProcess extends SXESynchronization {
 									+ "queue incoming records from now");
 
 							final SXEMessage stateMessage = controller
-									.getTransmitter().sendAndAwait(monitor,
-											msg, SXEMessageType.STATE);
+									.getTransmitter().sendAndAwait(
+											new NullProgressMonitor(), msg,
+											SXEMessageType.STATE);
 
 							log.debug(prefix() + "state received");
 

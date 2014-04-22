@@ -292,12 +292,6 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
         sarosSession.start();
         sessionManager.sessionStarted(sarosSession);
 
-        /*
-         * Only the Witheboard plugin uses this listener to enable incoming
-         * requests
-         */
-        sessionManager.preIncomingInvitationCompleted(monitor);
-
         log.debug(this + " : invitation has completed successfully");
     }
 

@@ -163,11 +163,6 @@ public interface ISarosSessionManager {
     void sessionStarted(ISarosSession sarosSession);
 
     /**
-     * Call this on the client after the invitation has been completed.
-     */
-    void preIncomingInvitationCompleted(IProgressMonitor monitor);
-
-    /**
      * Call this on the host after the invitation was accepted and has been
      * completed.
      */
