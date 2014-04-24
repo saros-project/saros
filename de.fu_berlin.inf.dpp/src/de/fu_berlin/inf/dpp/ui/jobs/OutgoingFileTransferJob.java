@@ -29,15 +29,13 @@ public final class OutgoingFileTransferJob extends FileTransferJob {
 
     private final OutgoingFileTransfer transfer;
     private final File file;
-    private final JID jid;
 
     public OutgoingFileTransferJob(OutgoingFileTransfer transfer, File file,
         JID jid) {
-        super("File Transfer");
+        super("File Transfer", jid);
         setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.TRUE);
         this.transfer = transfer;
         this.file = file;
-        this.jid = jid;
     }
 
     @Override
@@ -81,19 +79,13 @@ public final class OutgoingFileTransferJob extends FileTransferJob {
             monitor.done();
             monitor.beginTask("Sending file " + file.getName(), 100);
 
-            final IStatus status = monitorFileTransfer(transfer, monitor);
-
-            if (status.getCode() == IStatus.ERROR)
-                LOG.error(
-                    "file transfer to " + jid + " failed: "
-                        + status.getMessage(), status.getException());
-
-            return status;
+            return monitorTransfer(transfer, monitor);
         } catch (RuntimeException e) {
             LOG.error("internal error in file transfer", e);
             throw e;
         } catch (XMPPException e) {
             LOG.error("file transfer failed: " + jid, e);
+
             return new Status(IStatus.ERROR, Saros.SAROS,
                 "file transfer failed", e);
         } finally {
