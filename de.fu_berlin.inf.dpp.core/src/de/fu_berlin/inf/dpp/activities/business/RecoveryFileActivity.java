@@ -40,7 +40,7 @@ public class RecoveryFileActivity extends FileActivity implements
     @Override
     public IActivityDataObject getActivityDataObject(
         ISarosSession sarosSession, IPathFactory pathFactory) {
-        return new RecoveryFileActivityDataObject(source.getJID(),
+        return new RecoveryFileActivityDataObject(getSource().getJID(),
             target.getJID(), type, newPath.toSPathDataObject(sarosSession,
                 pathFactory), (oldPath != null ? oldPath.toSPathDataObject(
                 sarosSession, pathFactory) : null), data);
@@ -110,7 +110,7 @@ public class RecoveryFileActivity extends FileActivity implements
         if (activity.purpose != Purpose.RECOVERY) {
             throw new IllegalArgumentException();
         }
-        return new RecoveryFileActivity(activity.source, target, activity.type,
-            activity.newPath, activity.oldPath, activity.data);
+        return new RecoveryFileActivity(activity.getSource(), target,
+            activity.type, activity.newPath, activity.oldPath, activity.data);
     }
 }

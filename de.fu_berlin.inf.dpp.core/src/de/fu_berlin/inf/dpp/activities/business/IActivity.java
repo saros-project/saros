@@ -64,7 +64,9 @@ public interface IActivity {
      *               Control pattern.
      */
     /**
-     * Returns the the user which has caused this activity.
+     * Returns the user who caused this activity.
+     * 
+     * @return not <code>null</code>
      */
     public User getSource();
 

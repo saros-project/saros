@@ -77,10 +77,8 @@ public class TwoWayJupiterServerDocument implements NetworkEventHandler,
         JupiterActivity jupiterActivity = algorithm.generateJupiterActivity(op,
             server, null);
         /* sent to client */
-        connection
-            .sendOperation(new NetworkRequest(server,
-                TwoWayJupiterClientDocument.client.getJID(), jupiterActivity,
-                delay));
+        connection.sendOperation(new NetworkRequest(jupiterActivity,
+            TwoWayJupiterClientDocument.client.getJID(), delay));
     }
 
     public void sendOperation(Operation op, int delay) {

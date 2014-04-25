@@ -6,7 +6,7 @@ import de.fu_berlin.inf.dpp.session.User;
 
 // TODO [MR] Add some information what needs to be done to add a new activityDataObject.
 public abstract class AbstractActivity implements IActivity {
-    protected final User source;
+    private final User source;
 
     /**
      * @JTourBusStop 2, Activity creation, The abstract class to extend from:
@@ -14,6 +14,10 @@ public abstract class AbstractActivity implements IActivity {
      *               A new activity implementation should inherit this class.
      */
 
+    /**
+     * @param source
+     *            Must not be <code>null</code>
+     */
     public AbstractActivity(User source) {
         if (source == null)
             throw new IllegalArgumentException("Source cannot be null");

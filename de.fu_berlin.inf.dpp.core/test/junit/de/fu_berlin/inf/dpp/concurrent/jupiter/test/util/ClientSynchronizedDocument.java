@@ -90,8 +90,8 @@ public class ClientSynchronizedDocument implements NetworkEventHandler,
             user, null);
 
         /* 3. send operation. */
-        connection.sendOperation(new NetworkRequest(this.user, remoteJid,
-            jupiterActivity, delay));
+        connection.sendOperation(new NetworkRequest(jupiterActivity, remoteJid,
+            delay));
     }
 
     public void receiveNetworkEvent(JupiterActivity jupiterActivity) {

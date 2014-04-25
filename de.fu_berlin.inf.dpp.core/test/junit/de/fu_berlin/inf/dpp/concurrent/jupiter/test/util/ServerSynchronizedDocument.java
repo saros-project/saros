@@ -44,31 +44,11 @@ public class ServerSynchronizedDocument implements JupiterServer,
         return user;
     }
 
-    /**
-     * Receive operation between server and client as two-way protocol.
-     */
-    public Operation receiveOperation(JupiterActivity jupiterActivity) {
-        Operation op = null;
-        try {
-            log.debug("Operation before OT:"
-                + jupiterActivity.getOperation().toString() + " "
-                + algorithm.getTimestamp());
-            /* 1. transform operation. */
-            op = algorithm.receiveJupiterActivity(jupiterActivity);
-            log.debug("Operation after OT: " + op.toString() + " "
-                + algorithm.getTimestamp());
-
-            /* 2. execution on server document */
-            doc.execOperation(op);
-        } catch (TransformationException e) {
-            // TODO Raise an error
-            e.printStackTrace();
-        }
-        return op;
-    }
-
     private synchronized Operation receiveOperation(
-        JupiterActivity jupiterActivity, JID jid) {
+        JupiterActivity jupiterActivity) {
+
+        JID jid = jupiterActivity.getSource().getJID();
+
         while (accessDenied) {
             try {
                 log.debug("wait for semaphore.");
@@ -154,15 +134,8 @@ public class ServerSynchronizedDocument implements JupiterServer,
             this.user, null);
         /* sent to client */
         // connection.sendOperation(jid, req,delay);
-        connection.sendOperation(new NetworkRequest(this.user, jid,
-            jupiterActivity, delay));
-
-    }
-
-    public void receiveNetworkEvent(JupiterActivity jupiterActivity) {
-        log.info("receive operation : "
-            + jupiterActivity.getOperation().toString());
-        receiveOperation(jupiterActivity);
+        connection
+            .sendOperation(new NetworkRequest(jupiterActivity, jid, delay));
 
     }
 
@@ -185,7 +158,7 @@ public class ServerSynchronizedDocument implements JupiterServer,
 
     @Override
     public void receiveNetworkEvent(NetworkRequest req) {
-        receiveOperation(req.getJupiterActivity(), req.getFrom().getJID());
+        receiveOperation(req.getJupiterActivity());
     }
 
     public Algorithm getAlgorithm() {
