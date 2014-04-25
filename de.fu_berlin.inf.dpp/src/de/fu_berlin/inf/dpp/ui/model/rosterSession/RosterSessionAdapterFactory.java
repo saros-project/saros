@@ -36,25 +36,15 @@ public class RosterSessionAdapterFactory implements IAdapterFactory {
     @Override
     @SuppressWarnings("rawtypes")
     public Object getAdapter(Object adaptableObject, Class adapterType) {
-        if (adaptableObject instanceof UserElement) {
-            if (adapterType == User.class) {
-                return ((UserElement) adaptableObject).getUser();
-            }
-        }
+        if (adapterType != User.class)
+            return null;
 
-        if (adaptableObject instanceof AwarenessInformationTreeElement) {
-            if (adapterType == User.class) {
-                return ((AwarenessInformationTreeElement) adaptableObject)
-                    .getUser();
-            }
-        }
+        if (adaptableObject instanceof UserElement)
+            return ((UserElement) adaptableObject).getUser();
 
-        if (adaptableObject instanceof FollowModeInformationTreeElement) {
-            if (adapterType == User.class) {
-                return ((FollowModeInformationTreeElement) adaptableObject)
-                    .getUser();
-            }
-        }
+        if (adaptableObject instanceof AwarenessInformationTreeElement)
+            return ((AwarenessInformationTreeElement) adaptableObject)
+                .getUser();
 
         return null;
     }

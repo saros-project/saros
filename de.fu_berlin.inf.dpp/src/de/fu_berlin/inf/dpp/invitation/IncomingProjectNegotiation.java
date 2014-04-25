@@ -461,19 +461,17 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         throws IOException, LocalCancellationException {
         IProject newLocalProject = baseProject;
         FileList remoteFileList = projectInfo.getFileList();
+
         // if the baseProject already exists
         if (newLocalProject != null) {
-            if (newLocalProject.getName().equals(newProjectName)) {
-                // TODO the project could be managed by a different Team
-                // provider
-                if (vcs != null && !vcs.isManaged(newLocalProject)
-                    && !projectInfo.isPartial()) {
-                    String repositoryRoot = remoteFileList.getRepositoryRoot();
-                    final String url = remoteFileList.getProjectInfo().url;
-                    String directory = url.substring(repositoryRoot.length());
-                    vcs.connect(newLocalProject, repositoryRoot, directory,
-                        monitor);
-                }
+            // TODO Consider other Team providers
+            if (newLocalProject.getName().equals(newProjectName) && vcs != null
+                && !vcs.isManaged(newLocalProject) && !projectInfo.isPartial()) {
+                
+                String repositoryRoot = remoteFileList.getRepositoryRoot();
+                String directory = remoteFileList.getProjectInfo().url
+                    .substring(repositoryRoot.length());
+                vcs.connect(newLocalProject, repositoryRoot, directory, monitor);
             }
             return newLocalProject;
         }

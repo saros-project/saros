@@ -235,9 +235,9 @@ public final class SarosSession implements ISarosSession {
     public void addSharedResources(IProject project, String projectID,
         List<IResource> dependentResources) {
         if (!isCompletelyShared(project) && dependentResources != null) {
-            for (IResource iResource : dependentResources) {
-                if (iResource.getType() == IResource.FOLDER) {
-                    addMembers(iResource, dependentResources);
+            for (IResource resource : dependentResources) {
+                if (resource.getType() == IResource.FOLDER) {
+                    addMembers(resource);
                 }
             }
             if (selectedResources != null) {
@@ -877,31 +877,30 @@ public final class SarosSession implements ISarosSession {
         return projectMapper.getPartiallySharedResources();
     }
 
-    private void addMembers(IResource iResource,
-        List<IResource> dependentResources) {
-        if (iResource.getType() == IResource.FOLDER
-            || iResource.getType() == IResource.PROJECT) {
+    /**
+     * Recursively add non-shared resources
+     * 
+     * @param resource
+     *            of type {@link IResource#FOLDER} or {@link IResource#FILE}
+     */
+    private void addMembers(IResource resource) {
+        if (isShared(resource))
+            return;
 
-            if (!isShared(iResource)) {
-                selectedResources.add(iResource);
-            } else {
-                return;
-            }
+        selectedResources.add(resource);
+
+        if (resource.getType() == IResource.FOLDER) {
             List<IResource> childResources = null;
             try {
-                childResources = Arrays.asList(((IContainer) iResource)
+                childResources = Arrays.asList(((IContainer) resource)
                     .members());
             } catch (IOException e) {
-                log.error("Can't get children of Project/Folder. ", e);
+                log.error("Can't get children of folder " + resource, e);
+                return;
             }
-            if (childResources != null && (childResources.size() > 0)) {
-                for (IResource childResource : childResources) {
-                    addMembers(childResource, dependentResources);
-                }
-            }
-        } else if (iResource.getType() == IResource.FILE) {
-            if (!isShared(iResource)) {
-                selectedResources.add(iResource);
+
+            for (IResource childResource : childResources) {
+                addMembers(childResource);
             }
         }
     }

@@ -66,9 +66,4 @@ public class FollowModeInformationTreeElement extends
     public Image getImage() {
         return ImageManager.ICON_USER_SAROS_FOLLOWMODE;
     }
-
-    @Override
-    public Object getUser() {
-        return this.user;
-    }
 }
