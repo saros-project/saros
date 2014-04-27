@@ -234,189 +234,189 @@
   <!-- Modules -->
   
   
-  <!-- Module de.fu_berlin.inf.dpp.core -->
+  <!-- Module core -->
   
-  <dirname property="module.de.fu_berlin.inf.dpp.core.basedir" file="${ant.file}"/>
+  <dirname property="module.core.basedir" file="${ant.file}"/>
   
   
-  <property name="module.jdk.home.de.fu_berlin.inf.dpp.core" value="${jdk.home}"/>
-  <property name="module.jdk.bin.de.fu_berlin.inf.dpp.core" value="${jdk.bin}"/>
-  <property name="module.jdk.classpath.de.fu_berlin.inf.dpp.core" value="jdk.classpath"/>
+  <property name="module.jdk.home.core" value="${jdk.home}"/>
+  <property name="module.jdk.bin.core" value="${jdk.bin}"/>
+  <property name="module.jdk.classpath.core" value="jdk.classpath"/>
   
-  <property name="compiler.args.de.fu_berlin.inf.dpp.core" value="${compiler.args}"/>
+  <property name="compiler.args.core" value="${compiler.args}"/>
   
-  <property name="de.fu_berlin.inf.dpp.core.output.dir" value="${module.de.fu_berlin.inf.dpp.core.basedir}/bin/production/de.fu_berlin.inf.dpp.core"/>
-  <property name="de.fu_berlin.inf.dpp.core.testoutput.dir" value="${module.de.fu_berlin.inf.dpp.core.basedir}/bin/test/de.fu_berlin.inf.dpp.core"/>
+  <property name="core.output.dir" value="${module.core.basedir}/bin/production/core"/>
+  <property name="core.testoutput.dir" value="${module.core.basedir}/bin/test/core"/>
   
-  <path id="de.fu_berlin.inf.dpp.core.module.bootclasspath">
+  <path id="core.module.bootclasspath">
     <!-- Paths to be included in compilation bootclasspath -->
   </path>
   
-  <path id="de.fu_berlin.inf.dpp.core.module.production.classpath">
-    <path refid="${module.jdk.classpath.de.fu_berlin.inf.dpp.core}"/>
+  <path id="core.module.production.classpath">
+    <path refid="${module.jdk.classpath.core}"/>
     <path refid="libraries.classpath"/>
   </path>
   
-  <path id="de.fu_berlin.inf.dpp.core.runtime.production.module.classpath">
-    <pathelement location="${de.fu_berlin.inf.dpp.core.output.dir}"/>
+  <path id="core.runtime.production.module.classpath">
+    <pathelement location="${core.output.dir}"/>
     <path refid="libraries.classpath"/>
   </path>
   
-  <path id="de.fu_berlin.inf.dpp.core.module.classpath">
-    <path refid="${module.jdk.classpath.de.fu_berlin.inf.dpp.core}"/>
-    <pathelement location="${de.fu_berlin.inf.dpp.core.output.dir}"/>
+  <path id="core.module.classpath">
+    <path refid="${module.jdk.classpath.core}"/>
+    <pathelement location="${core.output.dir}"/>
     <path refid="libraries.classpath"/>
   </path>
   
-  <path id="de.fu_berlin.inf.dpp.core.runtime.module.classpath">
-    <pathelement location="${de.fu_berlin.inf.dpp.core.testoutput.dir}"/>
-    <pathelement location="${de.fu_berlin.inf.dpp.core.output.dir}"/>
+  <path id="core.runtime.module.classpath">
+    <pathelement location="${core.testoutput.dir}"/>
+    <pathelement location="${core.output.dir}"/>
     <path refid="libraries.classpath"/>
   </path>
   
   
-  <patternset id="excluded.from.module.de.fu_berlin.inf.dpp.core">
+  <patternset id="excluded.from.module.core">
     <patternset refid="ignored.files"/>
   </patternset>
   
-  <patternset id="excluded.from.compilation.de.fu_berlin.inf.dpp.core">
-    <patternset refid="excluded.from.module.de.fu_berlin.inf.dpp.core"/>
+  <patternset id="excluded.from.compilation.core">
+    <patternset refid="excluded.from.module.core"/>
   </patternset>
   
-  <path id="de.fu_berlin.inf.dpp.core.module.sourcepath">
-    <dirset dir="${module.de.fu_berlin.inf.dpp.core.basedir}/../de.fu_berlin.inf.dpp.core">
+  <path id="core.module.sourcepath">
+    <dirset dir="${module.core.basedir}/../de.fu_berlin.inf.dpp.core">
       <include name="src"/>
       <include name="patches"/>
     </dirset>
   </path>
   
   
-  <target name="compile.module.de.fu_berlin.inf.dpp.core" depends="compile.module.de.fu_berlin.inf.dpp.core.production,compile.module.de.fu_berlin.inf.dpp.core.tests" description="Compile module de.fu_berlin.inf.dpp.core"/>
+  <target name="compile.module.core" depends="compile.module.core.production,compile.module.core.tests" description="Compile module core"/>
   
-  <target name="compile.module.de.fu_berlin.inf.dpp.core.production" depends="register.custom.compilers" description="Compile module de.fu_berlin.inf.dpp.core; production classes">
-    <mkdir dir="${de.fu_berlin.inf.dpp.core.output.dir}"/>
-    <javac2 destdir="${de.fu_berlin.inf.dpp.core.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.de.fu_berlin.inf.dpp.core}/javac">
-      <compilerarg line="${compiler.args.de.fu_berlin.inf.dpp.core}"/>
-      <bootclasspath refid="de.fu_berlin.inf.dpp.core.module.bootclasspath"/>
-      <classpath refid="de.fu_berlin.inf.dpp.core.module.production.classpath"/>
-      <src refid="de.fu_berlin.inf.dpp.core.module.sourcepath"/>
-      <patternset refid="excluded.from.compilation.de.fu_berlin.inf.dpp.core"/>
+  <target name="compile.module.core.production" depends="register.custom.compilers" description="Compile module core; production classes">
+    <mkdir dir="${core.output.dir}"/>
+    <javac2 destdir="${core.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.core}/javac">
+      <compilerarg line="${compiler.args.core}"/>
+      <bootclasspath refid="core.module.bootclasspath"/>
+      <classpath refid="core.module.production.classpath"/>
+      <src refid="core.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.core"/>
     </javac2>
     
-    <copy todir="${de.fu_berlin.inf.dpp.core.output.dir}">
-      <fileset dir="${module.de.fu_berlin.inf.dpp.core.basedir}/../de.fu_berlin.inf.dpp.core/src">
+    <copy todir="${core.output.dir}">
+      <fileset dir="${module.core.basedir}/../de.fu_berlin.inf.dpp.core/src">
         <patternset refid="compiler.resources"/>
         <type type="file"/>
       </fileset>
-      <fileset dir="${module.de.fu_berlin.inf.dpp.core.basedir}/../de.fu_berlin.inf.dpp.core/patches">
+      <fileset dir="${module.core.basedir}/../de.fu_berlin.inf.dpp.core/patches">
         <patternset refid="compiler.resources"/>
         <type type="file"/>
       </fileset>
     </copy>
   </target>
   
-  <target name="compile.module.de.fu_berlin.inf.dpp.core.tests" depends="register.custom.compilers,compile.module.de.fu_berlin.inf.dpp.core.production" description="compile module de.fu_berlin.inf.dpp.core; test classes" unless="skip.tests"/>
+  <target name="compile.module.core.tests" depends="register.custom.compilers,compile.module.core.production" description="compile module core; test classes" unless="skip.tests"/>
   
-  <target name="clean.module.de.fu_berlin.inf.dpp.core" description="cleanup module">
-    <delete dir="${de.fu_berlin.inf.dpp.core.output.dir}"/>
-    <delete dir="${de.fu_berlin.inf.dpp.core.testoutput.dir}"/>
+  <target name="clean.module.core" description="cleanup module">
+    <delete dir="${core.output.dir}"/>
+    <delete dir="${core.testoutput.dir}"/>
   </target>
   
   
-  <!-- Module de.fu_berlin.inf.dpp.intellij -->
+  <!-- Module intellij -->
   
-  <dirname property="module.de.fu_berlin.inf.dpp.intellij.basedir" file="${ant.file}"/>
+  <dirname property="module.intellij.basedir" file="${ant.file}"/>
   
   
-  <property name="module.jdk.home.de.fu_berlin.inf.dpp.intellij" value="${project.jdk.home}"/>
-  <property name="module.jdk.bin.de.fu_berlin.inf.dpp.intellij" value="${project.jdk.bin}"/>
-  <property name="module.jdk.classpath.de.fu_berlin.inf.dpp.intellij" value="${project.jdk.classpath}"/>
+  <property name="module.jdk.home.intellij" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.intellij" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.intellij" value="${project.jdk.classpath}"/>
   
-  <property name="compiler.args.de.fu_berlin.inf.dpp.intellij" value="${compiler.args}"/>
+  <property name="compiler.args.intellij" value="${compiler.args}"/>
   
-  <property name="de.fu_berlin.inf.dpp.intellij.output.dir" value="${module.de.fu_berlin.inf.dpp.intellij.basedir}/bin/production/de.fu_berlin.inf.dpp.intellij"/>
-  <property name="de.fu_berlin.inf.dpp.intellij.testoutput.dir" value="${module.de.fu_berlin.inf.dpp.intellij.basedir}/bin/test/de.fu_berlin.inf.dpp.intellij"/>
-  <property name="de.fu_berlin.inf.dpp.intellij.artifacts.dir" value="${module.de.fu_berlin.inf.dpp.intellij.basedir}/bin/artifacts/de.fu_berlin.inf.dpp.intellij"/>
+  <property name="intellij.output.dir" value="${module.intellij.basedir}/bin/production/intellij"/>
+  <property name="intellij.testoutput.dir" value="${module.intellij.basedir}/bin/test/intellij"/>
+  <property name="intellij.artifacts.dir" value="${module.intellij.basedir}/bin/artifacts/intellij"/>
 
-  <path id="de.fu_berlin.inf.dpp.intellij.module.bootclasspath">
+  <path id="intellij.module.bootclasspath">
     <!-- Paths to be included in compilation bootclasspath -->
   </path>
   
-  <path id="de.fu_berlin.inf.dpp.intellij.module.production.classpath">
-    <path refid="${module.jdk.classpath.de.fu_berlin.inf.dpp.intellij}"/>
-    <pathelement location="${de.fu_berlin.inf.dpp.core.output.dir}"/>
+  <path id="intellij.module.production.classpath">
+    <path refid="${module.jdk.classpath.intellij}"/>
+    <pathelement location="${core.output.dir}"/>
     <path refid="libraries.classpath"/>
   </path>
   
-  <path id="de.fu_berlin.inf.dpp.intellij.runtime.production.module.classpath">
-    <pathelement location="${de.fu_berlin.inf.dpp.intellij.output.dir}"/>
-    <path refid="de.fu_berlin.inf.dpp.core.runtime.production.module.classpath"/>
+  <path id="intellij.runtime.production.module.classpath">
+    <pathelement location="${intellij.output.dir}"/>
+    <path refid="core.runtime.production.module.classpath"/>
   </path>
   
-  <path id="de.fu_berlin.inf.dpp.intellij.module.classpath">
-    <path refid="${module.jdk.classpath.de.fu_berlin.inf.dpp.intellij}"/>
-    <pathelement location="${de.fu_berlin.inf.dpp.intellij.output.dir}"/>
-    <pathelement location="${de.fu_berlin.inf.dpp.core.testoutput.dir}"/>
-    <pathelement location="${de.fu_berlin.inf.dpp.core.output.dir}"/>
+  <path id="intellij.module.classpath">
+    <path refid="${module.jdk.classpath.intellij}"/>
+    <pathelement location="${intellij.output.dir}"/>
+    <pathelement location="${core.testoutput.dir}"/>
+    <pathelement location="${core.output.dir}"/>
     <path refid="libraries.classpath"/>
   </path>
   
-  <path id="de.fu_berlin.inf.dpp.intellij.runtime.module.classpath">
-    <pathelement location="${de.fu_berlin.inf.dpp.intellij.testoutput.dir}"/>
-    <pathelement location="${de.fu_berlin.inf.dpp.intellij.output.dir}"/>
-    <path refid="de.fu_berlin.inf.dpp.core.runtime.module.classpath"/>
+  <path id="intellij.runtime.module.classpath">
+    <pathelement location="${intellij.testoutput.dir}"/>
+    <pathelement location="${intellij.output.dir}"/>
+    <path refid="core.runtime.module.classpath"/>
   </path>
   
   
-  <patternset id="excluded.from.module.de.fu_berlin.inf.dpp.intellij">
+  <patternset id="excluded.from.module.intellij">
     <patternset refid="ignored.files"/>
   </patternset>
   
-  <patternset id="excluded.from.compilation.de.fu_berlin.inf.dpp.intellij">
-    <patternset refid="excluded.from.module.de.fu_berlin.inf.dpp.intellij"/>
+  <patternset id="excluded.from.compilation.intellij">
+    <patternset refid="excluded.from.module.intellij"/>
   </patternset>
   
-  <path id="de.fu_berlin.inf.dpp.intellij.module.sourcepath">
-    <dirset dir="${module.de.fu_berlin.inf.dpp.intellij.basedir}">
+  <path id="intellij.module.sourcepath">
+    <dirset dir="${module.intellij.basedir}">
       <include name="src"/>
     </dirset>
   </path>
   
   
-  <target name="compile.module.de.fu_berlin.inf.dpp.intellij" depends="compile.module.de.fu_berlin.inf.dpp.intellij.production,compile.module.de.fu_berlin.inf.dpp.intellij.tests" description="Compile module de.fu_berlin.inf.dpp.intellij"/>
+  <target name="compile.module.intellij" depends="compile.module.intellij.production,compile.module.intellij.tests" description="Compile module intellij"/>
   
-  <target name="compile.module.de.fu_berlin.inf.dpp.intellij.production" depends="register.custom.compilers,compile.module.de.fu_berlin.inf.dpp.core" description="Compile module de.fu_berlin.inf.dpp.intellij; production classes">
-    <mkdir dir="${de.fu_berlin.inf.dpp.intellij.output.dir}"/>
-    <javac2 destdir="${de.fu_berlin.inf.dpp.intellij.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.de.fu_berlin.inf.dpp.intellij}/javac">
-      <compilerarg line="${compiler.args.de.fu_berlin.inf.dpp.intellij}"/>
-      <bootclasspath refid="de.fu_berlin.inf.dpp.intellij.module.bootclasspath"/>
-      <classpath refid="de.fu_berlin.inf.dpp.intellij.module.production.classpath"/>
-      <src refid="de.fu_berlin.inf.dpp.intellij.module.sourcepath"/>
-      <patternset refid="excluded.from.compilation.de.fu_berlin.inf.dpp.intellij"/>
+  <target name="compile.module.intellij.production" depends="register.custom.compilers,compile.module.core" description="Compile module intellij; production classes">
+    <mkdir dir="${intellij.output.dir}"/>
+    <javac2 destdir="${intellij.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.intellij}/javac">
+      <compilerarg line="${compiler.args.intellij}"/>
+      <bootclasspath refid="intellij.module.bootclasspath"/>
+      <classpath refid="intellij.module.production.classpath"/>
+      <src refid="intellij.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.intellij"/>
     </javac2>
     
-    <copy todir="${de.fu_berlin.inf.dpp.intellij.output.dir}">
-      <fileset dir="${module.de.fu_berlin.inf.dpp.intellij.basedir}/src">
+    <copy todir="${intellij.output.dir}">
+      <fileset dir="${module.intellij.basedir}/src">
         <patternset refid="compiler.resources"/>
         <type type="file"/>
       </fileset>
     </copy>
   </target>
   
-  <target name="compile.module.de.fu_berlin.inf.dpp.intellij.tests" depends="register.custom.compilers,compile.module.de.fu_berlin.inf.dpp.intellij.production" description="compile module de.fu_berlin.inf.dpp.intellij; test classes" unless="skip.tests"/>
+  <target name="compile.module.intellij.tests" depends="register.custom.compilers,compile.module.intellij.production" description="compile module intellij; test classes" unless="skip.tests"/>
   
-  <target name="clean.module.de.fu_berlin.inf.dpp.intellij" description="cleanup module">
-    <delete dir="${de.fu_berlin.inf.dpp.intellij.output.dir}"/>
-    <delete dir="${de.fu_berlin.inf.dpp.intellij.testoutput.dir}"/>
+  <target name="clean.module.intellij" description="cleanup module">
+    <delete dir="${intellij.output.dir}"/>
+    <delete dir="${intellij.testoutput.dir}"/>
   </target>
   
-  <property name="de.fu_berlin.inf.dpp.intellij.plugin.path.jar" value="${de.fu_berlin.inf.dpp.intellij.artifacts.dir}/de.fu_berlin.inf.dpp.intellij.jar"/>
+  <property name="intellij.plugin.path.jar" value="${intellij.artifacts.dir}/intellij.jar"/>
   
-  <!-- Build archive for plugin 'de.fu_berlin.inf.dpp.intellij' -->
-  <target name="plugin.build.jar.de.fu_berlin.inf.dpp.intellij" depends="compile.module.de.fu_berlin.inf.dpp.intellij" description="Build plugin archive for module &#39;de.fu_berlin.inf.dpp.intellij&#39;">
-    <jar destfile="${de.fu_berlin.inf.dpp.intellij.plugin.path.jar}" duplicate="preserve">
-      <zipfileset dir="${module.de.fu_berlin.inf.dpp.intellij.basedir}/bin/production/de.fu_berlin.inf.dpp.intellij"/>
-      <zipfileset file="${module.de.fu_berlin.inf.dpp.intellij.basedir}/META-INF/plugin.xml" prefix="META-INF"/>
+  <!-- Build archive for plugin 'intellij' -->
+  <target name="plugin.build.jar.intellij" depends="compile.module.intellij" description="Build plugin archive for module &#39;intellij&#39;">
+    <jar destfile="${intellij.plugin.path.jar}" duplicate="preserve">
+      <zipfileset dir="${module.intellij.basedir}/bin/production/intellij"/>
+      <zipfileset file="${module.intellij.basedir}/META-INF/plugin.xml" prefix="META-INF"/>
       <manifest>
         <attribute name="Created-By" value="IntelliJ IDEA"/>
         <attribute name="Manifest-Version" value="1.0"/>
@@ -428,9 +428,9 @@
     <!-- Perform any build initialization in this target -->
   </target>
   
-  <target name="clean" depends="clean.module.de.fu_berlin.inf.dpp.core, clean.module.de.fu_berlin.inf.dpp.intellij" description="cleanup all"/>
+  <target name="clean" depends="clean.module.core, clean.module.intellij" description="cleanup all"/>
   
-  <target name="build.modules" depends="init, clean, compile.module.de.fu_berlin.inf.dpp.core, plugin.build.jar.de.fu_berlin.inf.dpp.intellij" description="build all modules"/>
+  <target name="build.modules" depends="init, clean, compile.module.core, plugin.build.jar.intellij" description="build all modules"/>
   
   <target name="all" depends="build.modules" description="build all"/>
 </project>
