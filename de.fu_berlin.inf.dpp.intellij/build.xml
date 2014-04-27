@@ -197,6 +197,8 @@
   <property name="project.jdk.home" value="${jdk.home.idea_sdk}"/>
   <property name="project.jdk.bin" value="${jdk.bin.idea_sdk}"/>
   <property name="project.jdk.classpath" value="jdk.classpath.idea_sdk"/>
+
+  <property name="build.dir" value="${basedir}/bin"/>
   
   
   <!-- Project Libraries -->
@@ -242,9 +244,10 @@
   <property name="core.jdk.classpath" value="jdk.classpath"/>
   
   <property name="core.compiler.args" value="${compiler.args}"/>
-  
-  <property name="core.output.dir" value="${core.basedir}/bin/main/core"/>
-  <property name="core.testoutput.dir" value="${core.basedir}/bin/test/core"/>
+
+  <property name="core.build.dir" value="${build.dir}/core/"/>
+  <property name="core.output.dir" value="${core.build.dir}/main"/>
+  <property name="core.testoutput.dir" value="${core.build.dir}/test"/>
   
   <path id="core.bootclasspath">
     <!-- Paths to be included in compilation bootclasspath -->
@@ -283,7 +286,7 @@
       <patternset refid="excluded.from.compilation.core"/>
     </javac2>
     
-    <copy todir="${core.output.dir}">
+    <copy todir="${core.build.dir}">
       <fileset dir="${core.basedir}/../de.fu_berlin.inf.dpp.core/src">
         <patternset refid="compiler.resources"/>
         <type type="file"/>
@@ -313,10 +316,11 @@
   <property name="saros-i.jdk.classpath" value="${project.jdk.classpath}"/>
   
   <property name="saros-i.compiler.args" value="${compiler.args}"/>
-  
-  <property name="saros-i.output.dir" value="${saros-i.basedir}/bin/main/saros-i"/>
-  <property name="saros-i.testoutput.dir" value="${saros-i.basedir}/bin/test/saros-i"/>
-  <property name="saros-i.artifacts.dir" value="${saros-i.basedir}/bin/artifacts/saros-i"/>
+
+  <property name="saros-i.build.dir" value="${build.dir}/saros-i/"/>
+  <property name="saros-i.output.dir" value="${saros-i.build.dir}/main"/>
+  <property name="saros-i.testoutput.dir" value="${saros-i.build.dir}/test"/>
+  <property name="saros-i.artifacts.dir" value="${saros-i.build.dir}/artifacts"/>
 
   <path id="saros-i.bootclasspath">
     <!-- Paths to be included in compilation bootclasspath -->
@@ -336,13 +340,13 @@
     <patternset refid="excluded.from.saros-i"/>
   </patternset>
   
-  <path id="saros-i.sourcepath">
+  <path id="saros-i.main.sourcepath">
     <dirset dir="${saros-i.basedir}">
       <include name="src"/>
     </dirset>
   </path>
-  
-  
+
+
   <target name="compile.saros-i" depends="compile.saros-i.main,compile.saros-i.tests" description="Compile saros-i"/>
   
   <target name="compile.saros-i.main" depends="register.custom.compilers,compile.core" description="Compile saros-i; main classes">
@@ -351,7 +355,7 @@
       <compilerarg line="${saros-i.compiler.args}"/>
       <bootclasspath refid="saros-i.bootclasspath"/>
       <classpath refid="saros-i.main.classpath"/>
-      <src refid="saros-i.sourcepath"/>
+      <src refid="saros-i.main.sourcepath"/>
       <patternset refid="excluded.from.compilation.saros-i"/>
     </javac2>
     
@@ -362,12 +366,39 @@
       </fileset>
     </copy>
   </target>
-  
-  <target name="compile.saros-i.tests" depends="register.custom.compilers,compile.saros-i.main" description="compile saros-i; test classes" unless="skip.tests"/>
-  
+
+
+  <path id="saros-i.test.classpath">
+    <path refid="saros-i.main.classpath"/>
+    <pathelement location="${saros-i.output.dir}"/>
+  </path>
+
+  <path id="saros-i.test.sourcepath">
+    <dirset dir="${saros-i.basedir}">
+      <include name="test/junit"/>
+    </dirset>
+  </path>
+
+  <target name="compile.saros-i.tests" depends="register.custom.compilers,compile.saros-i.main" description="compile saros-i; test classes" unless="skip.tests">
+    <mkdir dir="${saros-i.testoutput.dir}"/>
+    <javac2 destdir="${saros-i.testoutput.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${saros-i.jdk.bin}/javac">
+      <compilerarg line="${saros-i.compiler.args}"/>
+      <bootclasspath refid="saros-i.bootclasspath"/>
+      <classpath refid="saros-i.test.classpath"/>
+      <src refid="saros-i.test.sourcepath"/>
+      <patternset refid="excluded.from.compilation.saros-i"/>
+    </javac2>
+
+    <copy todir="${saros-i.testoutput.dir}">
+      <fileset dir="${saros-i.basedir}/test/junit">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+
   <target name="clean.saros-i" description="cleanup saros-i">
-    <delete dir="${saros-i.output.dir}"/>
-    <delete dir="${saros-i.testoutput.dir}"/>
+    <delete dir="${saros-i.build.dir}"/>
   </target>
   
   <property name="saros-i.plugin.path.jar" value="${saros-i.artifacts.dir}/saros-i.jar"/>
@@ -375,7 +406,7 @@
   <!-- Build archive for plugin 'saros-i' -->
   <target name="plugin.build.jar.saros-i" depends="compile.saros-i" description="Build plugin archive for &#39;saros-i&#39;">
     <jar destfile="${saros-i.plugin.path.jar}" duplicate="preserve">
-      <zipfileset dir="${saros-i.basedir}/bin/main/saros-i"/>
+      <zipfileset dir="${saros-i.output.dir}"/>
       <zipfileset file="${saros-i.basedir}/META-INF/plugin.xml" prefix="META-INF"/>
       <manifest>
         <attribute name="Created-By" value="IntelliJ IDEA"/>
@@ -388,7 +419,9 @@
     <!-- Perform any build initialization in this target -->
   </target>
   
-  <target name="clean" depends="clean.core, clean.saros-i" description="cleanup all"/>
+  <target name="clean" depends="clean.core, clean.saros-i" description="cleanup all">
+    <delete dir="${build.dir}"/>
+  </target>
   
   <target name="build" depends="init, clean, compile.core, plugin.build.jar.saros-i" description="build all"/>
   
