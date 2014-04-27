@@ -283,10 +283,6 @@
   <property name="core.output.dir" value="${core.build.dir}/main"/>
   <property name="core.testoutput.dir" value="${core.build.dir}/test"/>
   
-  <path id="core.bootclasspath">
-    <!-- Paths to be included in compilation bootclasspath -->
-  </path>
-  
   <path id="core.main.classpath">
     <path refid="${core.jdk.classpath}"/>
     <path refid="libraries.classpath"/>
@@ -332,10 +328,6 @@
   <property name="saros-i.testoutput.dir" value="${saros-i.build.dir}/test"/>
   <property name="saros-i.artifacts.dir" value="${saros-i.build.dir}/artifacts"/>
 
-  <path id="saros-i.bootclasspath">
-    <!-- Paths to be included in compilation bootclasspath -->
-  </path>
-  
   <path id="saros-i.main.classpath">
     <path refid="${saros-i.jdk.classpath}"/>
     <pathelement location="${core.output.dir}"/>
