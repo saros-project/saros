@@ -118,7 +118,6 @@
       <include name="lib/swingx-core-1.6.2.jar"/>
       <include name="lib/asm-tree-3.0.jar"/>
       <include name="lib/jasper21_rt.jar"/>
-      <include name="lib/picocontainer.jar"/>
       <include name="lib/netty-3.6.2.Final.jar"/>
       <include name="lib/boot.jar"/>
       <include name="lib/openapi.jar"/>
@@ -155,7 +154,6 @@
       <include name="lib/jgoodies-forms.jar"/>
       <include name="lib/commons-net-3.1.jar"/>
       <include name="lib/xpp3-1.1.4-min.jar"/>
-      <include name="lib/xstream-1.4.3.jar"/>
       <include name="lib/xmlrpc-2.0.jar"/>
       <include name="lib/winp-1.17-patched.jar"/>
       <include name="lib/snappy-java-1.0.4.1.jar"/>
