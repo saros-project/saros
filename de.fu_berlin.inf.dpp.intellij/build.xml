@@ -203,6 +203,7 @@
 
   <property name="core.basedir" value="${basedir}/../de.fu_berlin.inf.dpp.core"/>
   <property name="core.libdir" value="${core.basedir}/lib"/>
+
   <path id="libraries.classpath">
     <pathelement location="${core.libdir}/commons-codec-1.3.jar"/>
     <pathelement location="${core.libdir}/commons-io-2.0.1.jar"/>
@@ -253,24 +254,6 @@
     <path refid="${core.jdk.classpath}"/>
     <path refid="libraries.classpath"/>
   </path>
-  
-  <path id="core.runtime.main.classpath">
-    <pathelement location="${core.output.dir}"/>
-    <path refid="libraries.classpath"/>
-  </path>
-  
-  <path id="core.classpath">
-    <path refid="${core.jdk.classpath}"/>
-    <pathelement location="${core.output.dir}"/>
-    <path refid="libraries.classpath"/>
-  </path>
-  
-  <path id="core.runtime.classpath">
-    <pathelement location="${core.testoutput.dir}"/>
-    <pathelement location="${core.output.dir}"/>
-    <path refid="libraries.classpath"/>
-  </path>
-  
   
   <patternset id="excluded.from.core">
     <patternset refid="ignored.files"/>
@@ -344,27 +327,7 @@
     <pathelement location="${core.output.dir}"/>
     <path refid="libraries.classpath"/>
   </path>
-  
-  <path id="saros-i.runtime.main.classpath">
-    <pathelement location="${saros-i.output.dir}"/>
-    <path refid="core.runtime.main.classpath"/>
-  </path>
-  
-  <path id="saros-i.classpath">
-    <path refid="${saros-i.jdk.classpath}"/>
-    <pathelement location="${saros-i.output.dir}"/>
-    <pathelement location="${core.testoutput.dir}"/>
-    <pathelement location="${core.output.dir}"/>
-    <path refid="libraries.classpath"/>
-  </path>
-  
-  <path id="saros-i.runtime.classpath">
-    <pathelement location="${saros-i.testoutput.dir}"/>
-    <pathelement location="${saros-i.output.dir}"/>
-    <path refid="core.runtime.classpath"/>
-  </path>
-  
-  
+
   <patternset id="excluded.from.saros-i">
     <patternset refid="ignored.files"/>
   </patternset>
