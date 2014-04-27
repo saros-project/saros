@@ -65,6 +65,8 @@
   </path>
   
   <property name="jdk.bin.idea_sdk" value="${jdk.bin}"/>
+
+  <property name="idea_sdk.lib.dir" value="${jdk.home.idea_sdk}/lib"/>
   <path id="jdk.classpath.idea_sdk">
     <fileset dir="${jdk.home.idea_sdk}"
              includes="${jdk.home}/**/*.jar, lib/**/*.jar, plugins/**/*.jar"
@@ -181,8 +183,7 @@
   <!-- saros-i -->
 
   <dirname property="saros-i.basedir" file="${ant.file}"/>
-  
-  
+
   <property name="saros-i.jdk.home" value="${project.jdk.home}"/>
   <property name="saros-i.jdk.bin" value="${project.jdk.bin}"/>
   <property name="saros-i.jdk.classpath" value="${project.jdk.classpath}"/>
@@ -198,6 +199,7 @@
     <path refid="${saros-i.jdk.classpath}"/>
     <pathelement location="${core.output.dir}"/>
     <path refid="libraries.classpath"/>
+    <path refid="jdk.classpath.idea_sdk"/>
   </path>
 
   <path id="saros-i.main.sourcepath">
@@ -225,17 +227,40 @@
     <pathelement location="${saros-i.output.dir}"/>
   </path>
 
+  <property name="saros-i.test.dir" value="${saros-i.basedir}/test/junit"/>
+
   <path id="saros-i.test.sourcepath">
-    <dirset dir="${saros-i.basedir}">
-      <include name="test/junit"/>
-    </dirset>
+    <dirset dir="${saros-i.test.dir}"/>
   </path>
 
   <target name="clean.saros-i" description="cleanup saros-i">
     <delete dir="${saros-i.build.dir}"/>
   </target>
-  
-  <property name="saros-i.plugin.path.jar" value="${saros-i.artifacts.dir}/saros-i.jar"/>
+
+  <property name="saros-i.junit.report.dir" value="${saros-i.build.dir}/junit"/>
+
+  <target name="test" depends="compile.saros-i.tests" description="run saros-i unit tests">
+    <mkdir dir="${saros-i.junit.report.dir}" />
+    <junit printsummary="yes" fork="yes" forkmode="once" haltonfailure="yes">
+
+      <classpath>
+        <pathelement location="${idea_sdk.lib.dir}/junit-4.10.jar"/>
+        <path refid="saros-i.test.classpath"/>
+        <pathelement path="${saros-i.testoutput.dir}"/>
+      </classpath>
+
+      <formatter type="xml" />
+
+      <batchtest todir="${saros-i.junit.report.dir}">
+        <fileset dir="${saros-i.test.dir}">
+          <exclude name="**/Abstract*.java"/>
+          <include name="**/*Test.java"/>
+        </fileset>
+      </batchtest>
+    </junit>
+  </target>
+
+    <property name="saros-i.plugin.path.jar" value="${saros-i.artifacts.dir}/saros-i.jar"/>
   
   <!-- Build archive for plugin 'saros-i' -->
   <target name="plugin.build.jar.saros-i" depends="compile.saros-i" description="Build plugin archive for &#39;saros-i&#39;">
