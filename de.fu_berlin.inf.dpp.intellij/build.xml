@@ -407,7 +407,8 @@
   
   <property name="de.fu_berlin.inf.dpp.intellij.output.dir" value="${module.de.fu_berlin.inf.dpp.intellij.basedir}/bin/production/de.fu_berlin.inf.dpp.intellij"/>
   <property name="de.fu_berlin.inf.dpp.intellij.testoutput.dir" value="${module.de.fu_berlin.inf.dpp.intellij.basedir}/bin/test/de.fu_berlin.inf.dpp.intellij"/>
-  
+  <property name="de.fu_berlin.inf.dpp.intellij.artifacts.dir" value="${module.de.fu_berlin.inf.dpp.intellij.basedir}/bin/artifacts/de.fu_berlin.inf.dpp.intellij"/>
+
   <path id="de.fu_berlin.inf.dpp.intellij.module.bootclasspath">
     <!-- Paths to be included in compilation bootclasspath -->
   </path>
@@ -500,7 +501,7 @@
     <delete dir="${de.fu_berlin.inf.dpp.intellij.testoutput.dir}"/>
   </target>
   
-  <property name="de.fu_berlin.inf.dpp.intellij.plugin.path.jar" value="${module.de.fu_berlin.inf.dpp.intellij.basedir}/de.fu_berlin.inf.dpp.intellij.jar"/>
+  <property name="de.fu_berlin.inf.dpp.intellij.plugin.path.jar" value="${de.fu_berlin.inf.dpp.intellij.artifacts.dir}/de.fu_berlin.inf.dpp.intellij.jar"/>
   
   <!-- Build archive for plugin 'de.fu_berlin.inf.dpp.intellij' -->
   <target name="plugin.build.jar.de.fu_berlin.inf.dpp.intellij" depends="compile.module.de.fu_berlin.inf.dpp.intellij" description="Build plugin archive for module &#39;de.fu_berlin.inf.dpp.intellij&#39;">
