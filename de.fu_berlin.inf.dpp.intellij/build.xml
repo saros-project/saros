@@ -242,19 +242,19 @@
   
   <property name="core.compiler.args" value="${compiler.args}"/>
   
-  <property name="core.output.dir" value="${core.basedir}/bin/production/core"/>
+  <property name="core.output.dir" value="${core.basedir}/bin/main/core"/>
   <property name="core.testoutput.dir" value="${core.basedir}/bin/test/core"/>
   
   <path id="core.bootclasspath">
     <!-- Paths to be included in compilation bootclasspath -->
   </path>
   
-  <path id="core.production.classpath">
+  <path id="core.main.classpath">
     <path refid="${core.jdk.classpath}"/>
     <path refid="libraries.classpath"/>
   </path>
   
-  <path id="core.runtime.production.classpath">
+  <path id="core.runtime.main.classpath">
     <pathelement location="${core.output.dir}"/>
     <path refid="libraries.classpath"/>
   </path>
@@ -288,14 +288,14 @@
   </path>
   
   
-  <target name="compile.core" depends="compile.core.production,compile.core.tests" description="Compile core"/>
+  <target name="compile.core" depends="compile.core.main,compile.core.tests" description="Compile core"/>
   
-  <target name="compile.core.production" depends="register.custom.compilers" description="Compile core; production classes">
+  <target name="compile.core.main" depends="register.custom.compilers" description="Compile core; main classes">
     <mkdir dir="${core.output.dir}"/>
     <javac2 destdir="${core.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${core.jdk.bin}/javac">
       <compilerarg line="${core.compiler.args}"/>
       <bootclasspath refid="core.bootclasspath"/>
-      <classpath refid="core.production.classpath"/>
+      <classpath refid="core.main.classpath"/>
       <src refid="core.sourcepath"/>
       <patternset refid="excluded.from.compilation.core"/>
     </javac2>
@@ -312,7 +312,7 @@
     </copy>
   </target>
   
-  <target name="compile.core.tests" depends="register.custom.compilers,compile.core.production" description="compile core; test classes" unless="skip.tests"/>
+  <target name="compile.core.tests" depends="register.custom.compilers,compile.core.main" description="compile core; test classes" unless="skip.tests"/>
   
   <target name="clean.core" description="cleanup core">
     <delete dir="${core.output.dir}"/>
@@ -331,7 +331,7 @@
   
   <property name="saros-i.compiler.args" value="${compiler.args}"/>
   
-  <property name="saros-i.output.dir" value="${saros-i.basedir}/bin/production/saros-i"/>
+  <property name="saros-i.output.dir" value="${saros-i.basedir}/bin/main/saros-i"/>
   <property name="saros-i.testoutput.dir" value="${saros-i.basedir}/bin/test/saros-i"/>
   <property name="saros-i.artifacts.dir" value="${saros-i.basedir}/bin/artifacts/saros-i"/>
 
@@ -339,15 +339,15 @@
     <!-- Paths to be included in compilation bootclasspath -->
   </path>
   
-  <path id="saros-i.production.classpath">
+  <path id="saros-i.main.classpath">
     <path refid="${saros-i.jdk.classpath}"/>
     <pathelement location="${core.output.dir}"/>
     <path refid="libraries.classpath"/>
   </path>
   
-  <path id="saros-i.runtime.production.classpath">
+  <path id="saros-i.runtime.main.classpath">
     <pathelement location="${saros-i.output.dir}"/>
-    <path refid="core.runtime.production.classpath"/>
+    <path refid="core.runtime.main.classpath"/>
   </path>
   
   <path id="saros-i.classpath">
@@ -380,14 +380,14 @@
   </path>
   
   
-  <target name="compile.saros-i" depends="compile.saros-i.production,compile.saros-i.tests" description="Compile saros-i"/>
+  <target name="compile.saros-i" depends="compile.saros-i.main,compile.saros-i.tests" description="Compile saros-i"/>
   
-  <target name="compile.saros-i.production" depends="register.custom.compilers,compile.core" description="Compile saros-i; production classes">
+  <target name="compile.saros-i.main" depends="register.custom.compilers,compile.core" description="Compile saros-i; main classes">
     <mkdir dir="${saros-i.output.dir}"/>
     <javac2 destdir="${saros-i.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${saros-i.jdk.bin}/javac">
       <compilerarg line="${saros-i.compiler.args}"/>
       <bootclasspath refid="saros-i.bootclasspath"/>
-      <classpath refid="saros-i.production.classpath"/>
+      <classpath refid="saros-i.main.classpath"/>
       <src refid="saros-i.sourcepath"/>
       <patternset refid="excluded.from.compilation.saros-i"/>
     </javac2>
@@ -400,7 +400,7 @@
     </copy>
   </target>
   
-  <target name="compile.saros-i.tests" depends="register.custom.compilers,compile.saros-i.production" description="compile saros-i; test classes" unless="skip.tests"/>
+  <target name="compile.saros-i.tests" depends="register.custom.compilers,compile.saros-i.main" description="compile saros-i; test classes" unless="skip.tests"/>
   
   <target name="clean.saros-i" description="cleanup saros-i">
     <delete dir="${saros-i.output.dir}"/>
@@ -412,7 +412,7 @@
   <!-- Build archive for plugin 'saros-i' -->
   <target name="plugin.build.jar.saros-i" depends="compile.saros-i" description="Build plugin archive for &#39;saros-i&#39;">
     <jar destfile="${saros-i.plugin.path.jar}" duplicate="preserve">
-      <zipfileset dir="${saros-i.basedir}/bin/production/saros-i"/>
+      <zipfileset dir="${saros-i.basedir}/bin/main/saros-i"/>
       <zipfileset file="${saros-i.basedir}/META-INF/plugin.xml" prefix="META-INF"/>
       <manifest>
         <attribute name="Created-By" value="IntelliJ IDEA"/>
