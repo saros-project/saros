@@ -323,100 +323,100 @@
   </target>
   
   
-  <!-- Module intellij -->
+  <!-- Module saros-i -->
   
-  <dirname property="module.intellij.basedir" file="${ant.file}"/>
+  <dirname property="module.saros-i.basedir" file="${ant.file}"/>
   
   
-  <property name="module.jdk.home.intellij" value="${project.jdk.home}"/>
-  <property name="module.jdk.bin.intellij" value="${project.jdk.bin}"/>
-  <property name="module.jdk.classpath.intellij" value="${project.jdk.classpath}"/>
+  <property name="module.jdk.home.saros-i" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.saros-i" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.saros-i" value="${project.jdk.classpath}"/>
   
-  <property name="compiler.args.intellij" value="${compiler.args}"/>
+  <property name="compiler.args.saros-i" value="${compiler.args}"/>
   
-  <property name="intellij.output.dir" value="${module.intellij.basedir}/bin/production/intellij"/>
-  <property name="intellij.testoutput.dir" value="${module.intellij.basedir}/bin/test/intellij"/>
-  <property name="intellij.artifacts.dir" value="${module.intellij.basedir}/bin/artifacts/intellij"/>
+  <property name="saros-i.output.dir" value="${module.saros-i.basedir}/bin/production/saros-i"/>
+  <property name="saros-i.testoutput.dir" value="${module.saros-i.basedir}/bin/test/saros-i"/>
+  <property name="saros-i.artifacts.dir" value="${module.saros-i.basedir}/bin/artifacts/saros-i"/>
 
-  <path id="intellij.module.bootclasspath">
+  <path id="saros-i.module.bootclasspath">
     <!-- Paths to be included in compilation bootclasspath -->
   </path>
   
-  <path id="intellij.module.production.classpath">
-    <path refid="${module.jdk.classpath.intellij}"/>
+  <path id="saros-i.module.production.classpath">
+    <path refid="${module.jdk.classpath.saros-i}"/>
     <pathelement location="${core.output.dir}"/>
     <path refid="libraries.classpath"/>
   </path>
   
-  <path id="intellij.runtime.production.module.classpath">
-    <pathelement location="${intellij.output.dir}"/>
+  <path id="saros-i.runtime.production.module.classpath">
+    <pathelement location="${saros-i.output.dir}"/>
     <path refid="core.runtime.production.module.classpath"/>
   </path>
   
-  <path id="intellij.module.classpath">
-    <path refid="${module.jdk.classpath.intellij}"/>
-    <pathelement location="${intellij.output.dir}"/>
+  <path id="saros-i.module.classpath">
+    <path refid="${module.jdk.classpath.saros-i}"/>
+    <pathelement location="${saros-i.output.dir}"/>
     <pathelement location="${core.testoutput.dir}"/>
     <pathelement location="${core.output.dir}"/>
     <path refid="libraries.classpath"/>
   </path>
   
-  <path id="intellij.runtime.module.classpath">
-    <pathelement location="${intellij.testoutput.dir}"/>
-    <pathelement location="${intellij.output.dir}"/>
+  <path id="saros-i.runtime.module.classpath">
+    <pathelement location="${saros-i.testoutput.dir}"/>
+    <pathelement location="${saros-i.output.dir}"/>
     <path refid="core.runtime.module.classpath"/>
   </path>
   
   
-  <patternset id="excluded.from.module.intellij">
+  <patternset id="excluded.from.module.saros-i">
     <patternset refid="ignored.files"/>
   </patternset>
   
-  <patternset id="excluded.from.compilation.intellij">
-    <patternset refid="excluded.from.module.intellij"/>
+  <patternset id="excluded.from.compilation.saros-i">
+    <patternset refid="excluded.from.module.saros-i"/>
   </patternset>
   
-  <path id="intellij.module.sourcepath">
-    <dirset dir="${module.intellij.basedir}">
+  <path id="saros-i.module.sourcepath">
+    <dirset dir="${module.saros-i.basedir}">
       <include name="src"/>
     </dirset>
   </path>
   
   
-  <target name="compile.module.intellij" depends="compile.module.intellij.production,compile.module.intellij.tests" description="Compile module intellij"/>
+  <target name="compile.module.saros-i" depends="compile.module.saros-i.production,compile.module.saros-i.tests" description="Compile module saros-i"/>
   
-  <target name="compile.module.intellij.production" depends="register.custom.compilers,compile.module.core" description="Compile module intellij; production classes">
-    <mkdir dir="${intellij.output.dir}"/>
-    <javac2 destdir="${intellij.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.intellij}/javac">
-      <compilerarg line="${compiler.args.intellij}"/>
-      <bootclasspath refid="intellij.module.bootclasspath"/>
-      <classpath refid="intellij.module.production.classpath"/>
-      <src refid="intellij.module.sourcepath"/>
-      <patternset refid="excluded.from.compilation.intellij"/>
+  <target name="compile.module.saros-i.production" depends="register.custom.compilers,compile.module.core" description="Compile module saros-i; production classes">
+    <mkdir dir="${saros-i.output.dir}"/>
+    <javac2 destdir="${saros-i.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.saros-i}/javac">
+      <compilerarg line="${compiler.args.saros-i}"/>
+      <bootclasspath refid="saros-i.module.bootclasspath"/>
+      <classpath refid="saros-i.module.production.classpath"/>
+      <src refid="saros-i.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.saros-i"/>
     </javac2>
     
-    <copy todir="${intellij.output.dir}">
-      <fileset dir="${module.intellij.basedir}/src">
+    <copy todir="${saros-i.output.dir}">
+      <fileset dir="${module.saros-i.basedir}/src">
         <patternset refid="compiler.resources"/>
         <type type="file"/>
       </fileset>
     </copy>
   </target>
   
-  <target name="compile.module.intellij.tests" depends="register.custom.compilers,compile.module.intellij.production" description="compile module intellij; test classes" unless="skip.tests"/>
+  <target name="compile.module.saros-i.tests" depends="register.custom.compilers,compile.module.saros-i.production" description="compile module saros-i; test classes" unless="skip.tests"/>
   
-  <target name="clean.module.intellij" description="cleanup module">
-    <delete dir="${intellij.output.dir}"/>
-    <delete dir="${intellij.testoutput.dir}"/>
+  <target name="clean.module.saros-i" description="cleanup module">
+    <delete dir="${saros-i.output.dir}"/>
+    <delete dir="${saros-i.testoutput.dir}"/>
   </target>
   
-  <property name="intellij.plugin.path.jar" value="${intellij.artifacts.dir}/intellij.jar"/>
+  <property name="saros-i.plugin.path.jar" value="${saros-i.artifacts.dir}/saros-i.jar"/>
   
-  <!-- Build archive for plugin 'intellij' -->
-  <target name="plugin.build.jar.intellij" depends="compile.module.intellij" description="Build plugin archive for module &#39;intellij&#39;">
-    <jar destfile="${intellij.plugin.path.jar}" duplicate="preserve">
-      <zipfileset dir="${module.intellij.basedir}/bin/production/intellij"/>
-      <zipfileset file="${module.intellij.basedir}/META-INF/plugin.xml" prefix="META-INF"/>
+  <!-- Build archive for plugin 'saros-i' -->
+  <target name="plugin.build.jar.saros-i" depends="compile.module.saros-i" description="Build plugin archive for module &#39;saros-i&#39;">
+    <jar destfile="${saros-i.plugin.path.jar}" duplicate="preserve">
+      <zipfileset dir="${module.saros-i.basedir}/bin/production/saros-i"/>
+      <zipfileset file="${module.saros-i.basedir}/META-INF/plugin.xml" prefix="META-INF"/>
       <manifest>
         <attribute name="Created-By" value="IntelliJ IDEA"/>
         <attribute name="Manifest-Version" value="1.0"/>
@@ -428,9 +428,9 @@
     <!-- Perform any build initialization in this target -->
   </target>
   
-  <target name="clean" depends="clean.module.core, clean.module.intellij" description="cleanup all"/>
+  <target name="clean" depends="clean.module.core, clean.module.saros-i" description="cleanup all"/>
   
-  <target name="build.modules" depends="init, clean, compile.module.core, plugin.build.jar.intellij" description="build all modules"/>
+  <target name="build.modules" depends="init, clean, compile.module.core, plugin.build.jar.saros-i" description="build all modules"/>
   
   <target name="all" depends="build.modules" description="build all"/>
 </project>
