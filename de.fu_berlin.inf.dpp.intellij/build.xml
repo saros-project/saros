@@ -200,52 +200,23 @@
   
   
   <!-- Project Libraries -->
-  
-  <path id="library.commons-codec-1.3.classpath">
-    <pathelement location="${basedir}/../de.fu_berlin.inf.dpp.core/lib/commons-codec-1.3.jar"/>
+
+  <property name="core.basedir" value="${basedir}/../de.fu_berlin.inf.dpp.core"/>
+  <property name="core.libdir" value="${core.basedir}/lib"/>
+  <path id="libraries.classpath">
+    <pathelement location="${core.libdir}/commons-codec-1.3.jar"/>
+    <pathelement location="${core.libdir}/commons-io-2.0.1.jar"/>
+    <pathelement location="${core.libdir}/commons-lang-2.4.jar"/>
+    <pathelement location="${core.libdir}/log4j-1.2.15.jar"/>
+    <pathelement location="${core.libdir}/picocontainer-2.11.2.jar"/>
+    <pathelement location="${core.libdir}/smack-3.4.1-0cec571.jar"/>
+    <pathelement location="${core.libdir}/smackx-debug-3.4.1-0cec571.jar"/>
+    <pathelement location="${core.libdir}/smackx-3.4.1-0cec571.jar"/>
+    <pathelement location="${core.libdir}/weupnp.jar"/>
+    <pathelement location="${core.libdir}/xpp3-1.1.4c.jar"/>
+    <pathelement location="${core.libdir}/xstream-1.4-20101008.163445-1.jar"/>
   </path>
-  
-  <path id="library.commons-io-2.0.1.classpath">
-    <pathelement location="${basedir}/../de.fu_berlin.inf.dpp.core/lib/commons-io-2.0.1.jar"/>
-  </path>
-  
-  <path id="library.commons-lang-2.4.classpath">
-    <pathelement location="${basedir}/../de.fu_berlin.inf.dpp.core/lib/commons-lang-2.4.jar"/>
-  </path>
-  
-  <path id="library.log4j-1.2.15.classpath">
-    <pathelement location="${basedir}/../de.fu_berlin.inf.dpp.core/lib/log4j-1.2.15.jar"/>
-  </path>
-  
-  <path id="library.picocontainer-2.11.2.classpath">
-    <pathelement location="${basedir}/../de.fu_berlin.inf.dpp.core/lib/picocontainer-2.11.2.jar"/>
-  </path>
-  
-  <path id="library.smack.classpath">
-    <pathelement location="${basedir}/../de.fu_berlin.inf.dpp.core/lib/smack-3.4.1-0cec571.jar"/>
-  </path>
-  
-  <path id="library.smackx-debug.classpath">
-    <pathelement location="${basedir}/../de.fu_berlin.inf.dpp.core/lib/smackx-debug-3.4.1-0cec571.jar"/>
-  </path>
-  
-  <path id="library.smackx.classpath">
-    <pathelement location="${basedir}/../de.fu_berlin.inf.dpp.core/lib/smackx-3.4.1-0cec571.jar"/>
-  </path>
-  
-  <path id="library.weupnp.classpath">
-    <pathelement location="${basedir}/../de.fu_berlin.inf.dpp.core/lib/weupnp.jar"/>
-  </path>
-  
-  <path id="library.xpp3-1.1.4c.classpath">
-    <pathelement location="${basedir}/../de.fu_berlin.inf.dpp.core/lib/xpp3-1.1.4c.jar"/>
-  </path>
-  
-  <path id="library.xstream-1.4-20101008.163445-1.classpath">
-    <pathelement location="${basedir}/../de.fu_berlin.inf.dpp.core/lib/xstream-1.4-20101008.163445-1.jar"/>
-  </path>
-  
-  
+
   <!-- Global Libraries -->
   <!-- Register Custom Compiler Taskdefs -->
   <property name="javac2.home" value="${idea.home}/lib"/>
@@ -283,64 +254,24 @@
   
   <path id="de.fu_berlin.inf.dpp.core.module.production.classpath">
     <path refid="${module.jdk.classpath.de.fu_berlin.inf.dpp.core}"/>
-    <path refid="library.smack.classpath"/>
-    <path refid="library.smackx-debug.classpath"/>
-    <path refid="library.smackx.classpath"/>
-    <path refid="library.xstream-1.4-20101008.163445-1.classpath"/>
-    <path refid="library.xpp3-1.1.4c.classpath"/>
-    <path refid="library.weupnp.classpath"/>
-    <path refid="library.picocontainer-2.11.2.classpath"/>
-    <path refid="library.log4j-1.2.15.classpath"/>
-    <path refid="library.commons-lang-2.4.classpath"/>
-    <path refid="library.commons-io-2.0.1.classpath"/>
-    <path refid="library.commons-codec-1.3.classpath"/>
+    <path refid="libraries.classpath"/>
   </path>
   
   <path id="de.fu_berlin.inf.dpp.core.runtime.production.module.classpath">
     <pathelement location="${de.fu_berlin.inf.dpp.core.output.dir}"/>
-    <path refid="library.smack.classpath"/>
-    <path refid="library.smackx-debug.classpath"/>
-    <path refid="library.smackx.classpath"/>
-    <path refid="library.xstream-1.4-20101008.163445-1.classpath"/>
-    <path refid="library.xpp3-1.1.4c.classpath"/>
-    <path refid="library.weupnp.classpath"/>
-    <path refid="library.picocontainer-2.11.2.classpath"/>
-    <path refid="library.log4j-1.2.15.classpath"/>
-    <path refid="library.commons-lang-2.4.classpath"/>
-    <path refid="library.commons-io-2.0.1.classpath"/>
-    <path refid="library.commons-codec-1.3.classpath"/>
+    <path refid="libraries.classpath"/>
   </path>
   
   <path id="de.fu_berlin.inf.dpp.core.module.classpath">
     <path refid="${module.jdk.classpath.de.fu_berlin.inf.dpp.core}"/>
     <pathelement location="${de.fu_berlin.inf.dpp.core.output.dir}"/>
-    <path refid="library.smack.classpath"/>
-    <path refid="library.smackx-debug.classpath"/>
-    <path refid="library.smackx.classpath"/>
-    <path refid="library.xstream-1.4-20101008.163445-1.classpath"/>
-    <path refid="library.xpp3-1.1.4c.classpath"/>
-    <path refid="library.weupnp.classpath"/>
-    <path refid="library.picocontainer-2.11.2.classpath"/>
-    <path refid="library.log4j-1.2.15.classpath"/>
-    <path refid="library.commons-lang-2.4.classpath"/>
-    <path refid="library.commons-io-2.0.1.classpath"/>
-    <path refid="library.commons-codec-1.3.classpath"/>
+    <path refid="libraries.classpath"/>
   </path>
   
   <path id="de.fu_berlin.inf.dpp.core.runtime.module.classpath">
     <pathelement location="${de.fu_berlin.inf.dpp.core.testoutput.dir}"/>
     <pathelement location="${de.fu_berlin.inf.dpp.core.output.dir}"/>
-    <path refid="library.smack.classpath"/>
-    <path refid="library.smackx-debug.classpath"/>
-    <path refid="library.smackx.classpath"/>
-    <path refid="library.xstream-1.4-20101008.163445-1.classpath"/>
-    <path refid="library.xpp3-1.1.4c.classpath"/>
-    <path refid="library.weupnp.classpath"/>
-    <path refid="library.picocontainer-2.11.2.classpath"/>
-    <path refid="library.log4j-1.2.15.classpath"/>
-    <path refid="library.commons-lang-2.4.classpath"/>
-    <path refid="library.commons-io-2.0.1.classpath"/>
-    <path refid="library.commons-codec-1.3.classpath"/>
+    <path refid="libraries.classpath"/>
   </path>
   
   
@@ -414,17 +345,7 @@
   <path id="de.fu_berlin.inf.dpp.intellij.module.production.classpath">
     <path refid="${module.jdk.classpath.de.fu_berlin.inf.dpp.intellij}"/>
     <pathelement location="${de.fu_berlin.inf.dpp.core.output.dir}"/>
-    <path refid="library.smack.classpath"/>
-    <path refid="library.smackx-debug.classpath"/>
-    <path refid="library.smackx.classpath"/>
-    <path refid="library.xstream-1.4-20101008.163445-1.classpath"/>
-    <path refid="library.xpp3-1.1.4c.classpath"/>
-    <path refid="library.weupnp.classpath"/>
-    <path refid="library.picocontainer-2.11.2.classpath"/>
-    <path refid="library.log4j-1.2.15.classpath"/>
-    <path refid="library.commons-lang-2.4.classpath"/>
-    <path refid="library.commons-io-2.0.1.classpath"/>
-    <path refid="library.commons-codec-1.3.classpath"/>
+    <path refid="libraries.classpath"/>
   </path>
   
   <path id="de.fu_berlin.inf.dpp.intellij.runtime.production.module.classpath">
@@ -437,17 +358,7 @@
     <pathelement location="${de.fu_berlin.inf.dpp.intellij.output.dir}"/>
     <pathelement location="${de.fu_berlin.inf.dpp.core.testoutput.dir}"/>
     <pathelement location="${de.fu_berlin.inf.dpp.core.output.dir}"/>
-    <path refid="library.smack.classpath"/>
-    <path refid="library.smackx-debug.classpath"/>
-    <path refid="library.smackx.classpath"/>
-    <path refid="library.xstream-1.4-20101008.163445-1.classpath"/>
-    <path refid="library.xpp3-1.1.4c.classpath"/>
-    <path refid="library.weupnp.classpath"/>
-    <path refid="library.picocontainer-2.11.2.classpath"/>
-    <path refid="library.log4j-1.2.15.classpath"/>
-    <path refid="library.commons-lang-2.4.classpath"/>
-    <path refid="library.commons-io-2.0.1.classpath"/>
-    <path refid="library.commons-codec-1.3.classpath"/>
+    <path refid="libraries.classpath"/>
   </path>
   
   <path id="de.fu_berlin.inf.dpp.intellij.runtime.module.classpath">
