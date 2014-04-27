@@ -422,8 +422,12 @@
   <target name="clean" depends="clean.core, clean.saros-i" description="cleanup all">
     <delete dir="${build.dir}"/>
   </target>
-  
-  <target name="build" depends="init, clean, compile.core, plugin.build.jar.saros-i" description="build all"/>
+
+  <target name="compile-main" depends="compile.core.main, compile.saros-i.main"/>
+  <target name="compile-tests" depends="compile.core.tests, compile.saros-i.tests"/>
+  <target name="compile" depends="compile-main, compile-tests"/>
+
+  <target name="build" depends="init, clean, compile, plugin.build.jar.saros-i" description="build all"/>
   
   <target name="all" depends="build" description="build all"/>
 </project>
