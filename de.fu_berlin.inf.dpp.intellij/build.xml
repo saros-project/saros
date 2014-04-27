@@ -231,181 +231,178 @@
     <taskdef name="instrumentIdeaExtensions" classname="com.intellij.ant.InstrumentIdeaExtensions" classpathref="javac2.classpath"/>
   </target>
   
-  <!-- Modules -->
+  <!-- core -->
+
+  <dirname property="core.basedir" file="${ant.file}"/>
+
+
+  <property name="core.jdk.home" value="${jdk.home}"/>
+  <property name="core.jdk.bin" value="${jdk.bin}"/>
+  <property name="core.jdk.classpath" value="jdk.classpath"/>
   
+  <property name="core.compiler.args" value="${compiler.args}"/>
   
-  <!-- Module core -->
+  <property name="core.output.dir" value="${core.basedir}/bin/production/core"/>
+  <property name="core.testoutput.dir" value="${core.basedir}/bin/test/core"/>
   
-  <dirname property="module.core.basedir" file="${ant.file}"/>
-  
-  
-  <property name="module.jdk.home.core" value="${jdk.home}"/>
-  <property name="module.jdk.bin.core" value="${jdk.bin}"/>
-  <property name="module.jdk.classpath.core" value="jdk.classpath"/>
-  
-  <property name="compiler.args.core" value="${compiler.args}"/>
-  
-  <property name="core.output.dir" value="${module.core.basedir}/bin/production/core"/>
-  <property name="core.testoutput.dir" value="${module.core.basedir}/bin/test/core"/>
-  
-  <path id="core.module.bootclasspath">
+  <path id="core.bootclasspath">
     <!-- Paths to be included in compilation bootclasspath -->
   </path>
   
-  <path id="core.module.production.classpath">
-    <path refid="${module.jdk.classpath.core}"/>
+  <path id="core.production.classpath">
+    <path refid="${core.jdk.classpath}"/>
     <path refid="libraries.classpath"/>
   </path>
   
-  <path id="core.runtime.production.module.classpath">
+  <path id="core.runtime.production.classpath">
     <pathelement location="${core.output.dir}"/>
     <path refid="libraries.classpath"/>
   </path>
   
-  <path id="core.module.classpath">
-    <path refid="${module.jdk.classpath.core}"/>
+  <path id="core.classpath">
+    <path refid="${core.jdk.classpath}"/>
     <pathelement location="${core.output.dir}"/>
     <path refid="libraries.classpath"/>
   </path>
   
-  <path id="core.runtime.module.classpath">
+  <path id="core.runtime.classpath">
     <pathelement location="${core.testoutput.dir}"/>
     <pathelement location="${core.output.dir}"/>
     <path refid="libraries.classpath"/>
   </path>
   
   
-  <patternset id="excluded.from.module.core">
+  <patternset id="excluded.from.core">
     <patternset refid="ignored.files"/>
   </patternset>
   
   <patternset id="excluded.from.compilation.core">
-    <patternset refid="excluded.from.module.core"/>
+    <patternset refid="excluded.from.core"/>
   </patternset>
   
-  <path id="core.module.sourcepath">
-    <dirset dir="${module.core.basedir}/../de.fu_berlin.inf.dpp.core">
+  <path id="core.sourcepath">
+    <dirset dir="${core.basedir}/../de.fu_berlin.inf.dpp.core">
       <include name="src"/>
       <include name="patches"/>
     </dirset>
   </path>
   
   
-  <target name="compile.module.core" depends="compile.module.core.production,compile.module.core.tests" description="Compile module core"/>
+  <target name="compile.core" depends="compile.core.production,compile.core.tests" description="Compile core"/>
   
-  <target name="compile.module.core.production" depends="register.custom.compilers" description="Compile module core; production classes">
+  <target name="compile.core.production" depends="register.custom.compilers" description="Compile core; production classes">
     <mkdir dir="${core.output.dir}"/>
-    <javac2 destdir="${core.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.core}/javac">
-      <compilerarg line="${compiler.args.core}"/>
-      <bootclasspath refid="core.module.bootclasspath"/>
-      <classpath refid="core.module.production.classpath"/>
-      <src refid="core.module.sourcepath"/>
+    <javac2 destdir="${core.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${core.jdk.bin}/javac">
+      <compilerarg line="${core.compiler.args}"/>
+      <bootclasspath refid="core.bootclasspath"/>
+      <classpath refid="core.production.classpath"/>
+      <src refid="core.sourcepath"/>
       <patternset refid="excluded.from.compilation.core"/>
     </javac2>
     
     <copy todir="${core.output.dir}">
-      <fileset dir="${module.core.basedir}/../de.fu_berlin.inf.dpp.core/src">
+      <fileset dir="${core.basedir}/../de.fu_berlin.inf.dpp.core/src">
         <patternset refid="compiler.resources"/>
         <type type="file"/>
       </fileset>
-      <fileset dir="${module.core.basedir}/../de.fu_berlin.inf.dpp.core/patches">
+      <fileset dir="${core.basedir}/../de.fu_berlin.inf.dpp.core/patches">
         <patternset refid="compiler.resources"/>
         <type type="file"/>
       </fileset>
     </copy>
   </target>
   
-  <target name="compile.module.core.tests" depends="register.custom.compilers,compile.module.core.production" description="compile module core; test classes" unless="skip.tests"/>
+  <target name="compile.core.tests" depends="register.custom.compilers,compile.core.production" description="compile core; test classes" unless="skip.tests"/>
   
-  <target name="clean.module.core" description="cleanup module">
+  <target name="clean.core" description="cleanup core">
     <delete dir="${core.output.dir}"/>
     <delete dir="${core.testoutput.dir}"/>
   </target>
   
   
-  <!-- Module saros-i -->
-  
-  <dirname property="module.saros-i.basedir" file="${ant.file}"/>
-  
-  
-  <property name="module.jdk.home.saros-i" value="${project.jdk.home}"/>
-  <property name="module.jdk.bin.saros-i" value="${project.jdk.bin}"/>
-  <property name="module.jdk.classpath.saros-i" value="${project.jdk.classpath}"/>
-  
-  <property name="compiler.args.saros-i" value="${compiler.args}"/>
-  
-  <property name="saros-i.output.dir" value="${module.saros-i.basedir}/bin/production/saros-i"/>
-  <property name="saros-i.testoutput.dir" value="${module.saros-i.basedir}/bin/test/saros-i"/>
-  <property name="saros-i.artifacts.dir" value="${module.saros-i.basedir}/bin/artifacts/saros-i"/>
+  <!-- saros-i -->
 
-  <path id="saros-i.module.bootclasspath">
+  <dirname property="saros-i.basedir" file="${ant.file}"/>
+  
+  
+  <property name="saros-i.jdk.home" value="${project.jdk.home}"/>
+  <property name="saros-i.jdk.bin" value="${project.jdk.bin}"/>
+  <property name="saros-i.jdk.classpath" value="${project.jdk.classpath}"/>
+  
+  <property name="saros-i.compiler.args" value="${compiler.args}"/>
+  
+  <property name="saros-i.output.dir" value="${saros-i.basedir}/bin/production/saros-i"/>
+  <property name="saros-i.testoutput.dir" value="${saros-i.basedir}/bin/test/saros-i"/>
+  <property name="saros-i.artifacts.dir" value="${saros-i.basedir}/bin/artifacts/saros-i"/>
+
+  <path id="saros-i.bootclasspath">
     <!-- Paths to be included in compilation bootclasspath -->
   </path>
   
-  <path id="saros-i.module.production.classpath">
-    <path refid="${module.jdk.classpath.saros-i}"/>
+  <path id="saros-i.production.classpath">
+    <path refid="${saros-i.jdk.classpath}"/>
     <pathelement location="${core.output.dir}"/>
     <path refid="libraries.classpath"/>
   </path>
   
-  <path id="saros-i.runtime.production.module.classpath">
+  <path id="saros-i.runtime.production.classpath">
     <pathelement location="${saros-i.output.dir}"/>
-    <path refid="core.runtime.production.module.classpath"/>
+    <path refid="core.runtime.production.classpath"/>
   </path>
   
-  <path id="saros-i.module.classpath">
-    <path refid="${module.jdk.classpath.saros-i}"/>
+  <path id="saros-i.classpath">
+    <path refid="${saros-i.jdk.classpath}"/>
     <pathelement location="${saros-i.output.dir}"/>
     <pathelement location="${core.testoutput.dir}"/>
     <pathelement location="${core.output.dir}"/>
     <path refid="libraries.classpath"/>
   </path>
   
-  <path id="saros-i.runtime.module.classpath">
+  <path id="saros-i.runtime.classpath">
     <pathelement location="${saros-i.testoutput.dir}"/>
     <pathelement location="${saros-i.output.dir}"/>
-    <path refid="core.runtime.module.classpath"/>
+    <path refid="core.runtime.classpath"/>
   </path>
   
   
-  <patternset id="excluded.from.module.saros-i">
+  <patternset id="excluded.from.saros-i">
     <patternset refid="ignored.files"/>
   </patternset>
   
   <patternset id="excluded.from.compilation.saros-i">
-    <patternset refid="excluded.from.module.saros-i"/>
+    <patternset refid="excluded.from.saros-i"/>
   </patternset>
   
-  <path id="saros-i.module.sourcepath">
-    <dirset dir="${module.saros-i.basedir}">
+  <path id="saros-i.sourcepath">
+    <dirset dir="${saros-i.basedir}">
       <include name="src"/>
     </dirset>
   </path>
   
   
-  <target name="compile.module.saros-i" depends="compile.module.saros-i.production,compile.module.saros-i.tests" description="Compile module saros-i"/>
+  <target name="compile.saros-i" depends="compile.saros-i.production,compile.saros-i.tests" description="Compile saros-i"/>
   
-  <target name="compile.module.saros-i.production" depends="register.custom.compilers,compile.module.core" description="Compile module saros-i; production classes">
+  <target name="compile.saros-i.production" depends="register.custom.compilers,compile.core" description="Compile saros-i; production classes">
     <mkdir dir="${saros-i.output.dir}"/>
-    <javac2 destdir="${saros-i.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.saros-i}/javac">
-      <compilerarg line="${compiler.args.saros-i}"/>
-      <bootclasspath refid="saros-i.module.bootclasspath"/>
-      <classpath refid="saros-i.module.production.classpath"/>
-      <src refid="saros-i.module.sourcepath"/>
+    <javac2 destdir="${saros-i.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${saros-i.jdk.bin}/javac">
+      <compilerarg line="${saros-i.compiler.args}"/>
+      <bootclasspath refid="saros-i.bootclasspath"/>
+      <classpath refid="saros-i.production.classpath"/>
+      <src refid="saros-i.sourcepath"/>
       <patternset refid="excluded.from.compilation.saros-i"/>
     </javac2>
     
     <copy todir="${saros-i.output.dir}">
-      <fileset dir="${module.saros-i.basedir}/src">
+      <fileset dir="${saros-i.basedir}/src">
         <patternset refid="compiler.resources"/>
         <type type="file"/>
       </fileset>
     </copy>
   </target>
   
-  <target name="compile.module.saros-i.tests" depends="register.custom.compilers,compile.module.saros-i.production" description="compile module saros-i; test classes" unless="skip.tests"/>
+  <target name="compile.saros-i.tests" depends="register.custom.compilers,compile.saros-i.production" description="compile saros-i; test classes" unless="skip.tests"/>
   
-  <target name="clean.module.saros-i" description="cleanup module">
+  <target name="clean.saros-i" description="cleanup saros-i">
     <delete dir="${saros-i.output.dir}"/>
     <delete dir="${saros-i.testoutput.dir}"/>
   </target>
@@ -413,10 +410,10 @@
   <property name="saros-i.plugin.path.jar" value="${saros-i.artifacts.dir}/saros-i.jar"/>
   
   <!-- Build archive for plugin 'saros-i' -->
-  <target name="plugin.build.jar.saros-i" depends="compile.module.saros-i" description="Build plugin archive for module &#39;saros-i&#39;">
+  <target name="plugin.build.jar.saros-i" depends="compile.saros-i" description="Build plugin archive for &#39;saros-i&#39;">
     <jar destfile="${saros-i.plugin.path.jar}" duplicate="preserve">
-      <zipfileset dir="${module.saros-i.basedir}/bin/production/saros-i"/>
-      <zipfileset file="${module.saros-i.basedir}/META-INF/plugin.xml" prefix="META-INF"/>
+      <zipfileset dir="${saros-i.basedir}/bin/production/saros-i"/>
+      <zipfileset file="${saros-i.basedir}/META-INF/plugin.xml" prefix="META-INF"/>
       <manifest>
         <attribute name="Created-By" value="IntelliJ IDEA"/>
         <attribute name="Manifest-Version" value="1.0"/>
@@ -428,9 +425,9 @@
     <!-- Perform any build initialization in this target -->
   </target>
   
-  <target name="clean" depends="clean.module.core, clean.module.saros-i" description="cleanup all"/>
+  <target name="clean" depends="clean.core, clean.saros-i" description="cleanup all"/>
   
-  <target name="build.modules" depends="init, clean, compile.module.core, plugin.build.jar.saros-i" description="build all modules"/>
+  <target name="build" depends="init, clean, compile.core, plugin.build.jar.saros-i" description="build all"/>
   
-  <target name="all" depends="build.modules" description="build all"/>
+  <target name="all" depends="build" description="build all"/>
 </project>
