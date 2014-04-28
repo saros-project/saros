@@ -37,6 +37,18 @@ public class ProjectOptionComposite extends Composite {
     private Text existingProjectNameText;
     private Button browseProjectsButton;
 
+    private final SelectionListener selectionListener = new SelectionListener() {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+            updateEnablement();
+        }
+
+        @Override
+        public void widgetDefaultSelected(SelectionEvent e) {
+            updateEnablement();
+        }
+    };
+
     public ProjectOptionComposite(final Composite parent,
         final String remoteProjectID) {
 
@@ -51,7 +63,7 @@ public class ProjectOptionComposite extends Composite {
         createNewProjectGroup();
         createUpdateProjectGroup();
 
-        updateEnablement(newProjectRadioButton);
+        updateEnablement();
     }
 
     @Override
@@ -145,17 +157,7 @@ public class ProjectOptionComposite extends Composite {
         gridData.horizontalSpan = 3;
 
         newProjectRadioButton.setLayoutData(gridData);
-        newProjectRadioButton.addSelectionListener(new SelectionListener() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                updateEnablement(newProjectRadioButton);
-            }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
-                updateEnablement(newProjectRadioButton);
-            }
-        });
+        newProjectRadioButton.addSelectionListener(selectionListener);
 
         /* Label */
         Label newProjectNameLabel = new Label(this, SWT.RIGHT);
@@ -197,18 +199,7 @@ public class ProjectOptionComposite extends Composite {
         gridData.horizontalSpan = 3;
 
         existingProjectRadioButton.setLayoutData(gridData);
-        existingProjectRadioButton
-            .addSelectionListener(new SelectionListener() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    updateEnablement(existingProjectRadioButton);
-                }
-
-                @Override
-                public void widgetDefaultSelected(SelectionEvent e) {
-                    updateEnablement(existingProjectRadioButton);
-                }
-            });
+        existingProjectRadioButton.addSelectionListener(selectionListener);
 
         /* Label */
         Label updateProjectNameLabel = new Label(this, SWT.RIGHT);
@@ -262,10 +253,11 @@ public class ProjectOptionComposite extends Composite {
     /**
      * Enables or disables the widgets of this composite depending on the
      * selection of the radio buttons. Then, all listeners are informed because
-     * the current project name has changed.
+     * the current project name -- i.e. the content of the active text box --
+     * has changed.
      */
-    private void updateEnablement(Button button) {
-        boolean updateSelected = (button == existingProjectRadioButton);
+    private void updateEnablement() {
+        boolean updateSelected = existingProjectRadioButton.getSelection();
 
         newProjectNameText.setEnabled(!updateSelected);
 
