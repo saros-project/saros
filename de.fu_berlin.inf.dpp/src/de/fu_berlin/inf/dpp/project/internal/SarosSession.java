@@ -719,7 +719,7 @@ public final class SarosSession implements ISarosSession {
 
         for (IActivityDataObject ado : activityQueuer.process(ados)) {
             try {
-                activities.add(ado.getActivity(this, pathFactory));
+                activities.add(ado.getActivity());
             } catch (IllegalArgumentException e) {
                 log.error("could not deserialize activity data object: " + ado,
                     e);
@@ -772,7 +772,7 @@ public final class SarosSession implements ISarosSession {
 
         try {
             activitySequencer.sendActivity(recipients,
-                activity.getActivityDataObject(this, pathFactory));
+                activity.getActivityDataObject());
         } catch (IllegalArgumentException e) {
             log.warn("could not serialize activity: " + activity, e);
         }

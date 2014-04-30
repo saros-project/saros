@@ -6,8 +6,6 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.ProgressActivity;
 import de.fu_berlin.inf.dpp.activities.business.ProgressActivity.ProgressAction;
-import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -56,8 +54,7 @@ public class ProgressActivityDataObject extends AbstractActivityDataObject {
     }
 
     @Override
-    public IActivity getActivity(ISarosSession sarosSession,
-        IPathFactory pathFactory) {
+    public IActivity getActivity() {
         return new ProgressActivity(getSource(), target, progressID,
             workCurrent, workTotal, taskName, action);
     }

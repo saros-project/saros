@@ -23,11 +23,8 @@ public class StopActivityTest extends AbstractActivityTest {
 
         JID jid = new JID(INITIATOR_USER);
         User initiator = SarosMocks.mockUser(jid);
-        SarosMocks.addUserToSession(sarosSession, initiator);
 
         initiators = toListPlusNull(initiator);
-
-        replayDefaultMocks();
     }
 
     @Test

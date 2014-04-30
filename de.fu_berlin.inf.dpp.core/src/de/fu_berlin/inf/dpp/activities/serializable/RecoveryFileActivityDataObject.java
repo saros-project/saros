@@ -10,8 +10,6 @@ import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Type;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.RecoveryFileActivity;
-import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -35,8 +33,7 @@ public class RecoveryFileActivityDataObject extends FileActivityDataObject
     }
 
     @Override
-    public IActivity getActivity(ISarosSession sarosSession,
-        IPathFactory pathFactory) {
+    public IActivity getActivity() {
         return new RecoveryFileActivity(getSource(), target, getType(), path,
             oldPath, data);
     }

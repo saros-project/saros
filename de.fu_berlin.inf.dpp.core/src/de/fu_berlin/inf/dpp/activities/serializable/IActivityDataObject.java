@@ -20,8 +20,6 @@
 package de.fu_berlin.inf.dpp.activities.serializable;
 
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
-import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -49,6 +47,5 @@ public interface IActivityDataObject {
      * Turn this IActivityDataObject (which is detached from a SarosSession)
      * into an IActivity, which is live within a session.
      */
-    public IActivity getActivity(ISarosSession sarosSession,
-        IPathFactory pathFactory);
+    public IActivity getActivity();
 }

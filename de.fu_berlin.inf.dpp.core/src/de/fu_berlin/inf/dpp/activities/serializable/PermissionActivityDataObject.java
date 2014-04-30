@@ -26,8 +26,6 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.PermissionActivity;
-import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 
@@ -92,8 +90,7 @@ public class PermissionActivityDataObject extends AbstractActivityDataObject {
     }
 
     @Override
-    public IActivity getActivity(ISarosSession sarosSession,
-        IPathFactory pathFactory) {
+    public IActivity getActivity() {
         return new PermissionActivity(getSource(), affectedUser, permission);
     }
 }

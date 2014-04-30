@@ -7,8 +7,6 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.StartFollowingActivity;
-import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -28,7 +26,7 @@ public class StartFollowingActivityDataObject extends
     }
 
     @Override
-    public IActivity getActivity(ISarosSession session, IPathFactory pathFactory) {
+    public IActivity getActivity() {
         return new StartFollowingActivity(getSource(), target);
     }
 

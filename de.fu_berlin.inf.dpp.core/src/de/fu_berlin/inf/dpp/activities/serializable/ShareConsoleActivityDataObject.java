@@ -4,8 +4,6 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.ShareConsoleActivity;
-import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 
 @XStreamAlias("shareConsoleActivity")
@@ -20,8 +18,7 @@ public class ShareConsoleActivityDataObject extends AbstractActivityDataObject {
     }
 
     @Override
-    public IActivity getActivity(ISarosSession sarosSession,
-        IPathFactory pathFactory) {
+    public IActivity getActivity() {
         return new ShareConsoleActivity(getSource(), consoleContent);
     }
 }

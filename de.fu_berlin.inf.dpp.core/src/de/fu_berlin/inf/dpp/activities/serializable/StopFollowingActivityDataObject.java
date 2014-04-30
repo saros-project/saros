@@ -4,8 +4,6 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.StopFollowingActivity;
-import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -19,8 +17,7 @@ public class StopFollowingActivityDataObject extends AbstractActivityDataObject 
     }
 
     @Override
-    public IActivity getActivity(ISarosSession sharedProject,
-        IPathFactory pathFactory) {
+    public IActivity getActivity() {
         return new StopFollowingActivity(getSource());
     }
 

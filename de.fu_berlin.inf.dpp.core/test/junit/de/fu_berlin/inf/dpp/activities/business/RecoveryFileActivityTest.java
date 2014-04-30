@@ -28,7 +28,6 @@ public class RecoveryFileActivityTest extends FileActivityTest {
 
         newPath = SarosMocks.mockSPath();
         paths = toListPlusNull(newPath);
-        replayDefaultMocks();
     }
 
     /**

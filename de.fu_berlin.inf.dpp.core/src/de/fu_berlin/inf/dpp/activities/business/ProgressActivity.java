@@ -4,8 +4,6 @@ import org.apache.commons.lang.ObjectUtils;
 
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ProgressActivityDataObject;
-import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -51,8 +49,7 @@ public class ProgressActivity extends AbstractActivity implements
     }
 
     @Override
-    public IActivityDataObject getActivityDataObject(
-        ISarosSession sarosSession, IPathFactory pathFactory) {
+    public IActivityDataObject getActivityDataObject() {
 
         return new ProgressActivityDataObject(getSource(), target, progressID,
             workCurrent, workTotal, taskName, action);

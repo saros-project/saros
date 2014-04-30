@@ -24,8 +24,6 @@ import org.apache.commons.lang.ObjectUtils;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
-import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 
 public class TextSelectionActivity extends AbstractActivity implements
@@ -102,8 +100,7 @@ public class TextSelectionActivity extends AbstractActivity implements
     }
 
     @Override
-    public IActivityDataObject getActivityDataObject(
-        ISarosSession sarosSession, IPathFactory pathFactory) {
+    public IActivityDataObject getActivityDataObject() {
         return new TextSelectionActivityDataObject(getSource(), offset, length,
             path);
     }

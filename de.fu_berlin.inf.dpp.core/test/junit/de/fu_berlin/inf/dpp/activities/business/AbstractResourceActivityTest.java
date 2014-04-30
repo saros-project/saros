@@ -28,8 +28,6 @@ public abstract class AbstractResourceActivityTest extends AbstractActivityTest 
         PowerMock.replay(path);
 
         paths = toListPlusNull(path);
-
-        replayDefaultMocks();
     }
 
 }

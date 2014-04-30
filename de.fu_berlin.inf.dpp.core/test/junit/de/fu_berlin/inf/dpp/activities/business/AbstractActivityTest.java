@@ -7,34 +7,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.easymock.EasyMock;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
-import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.test.mocks.SarosMocks;
 
 public abstract class AbstractActivityTest {
     private static final String LOCAL_USER = "local@user";
     private static final String REMOTE_USER = "alice@jabber.org";
-
-    /**
-     * Needed for conversions between Activities and ActivityDataObjets. Knows
-     * about {@link #source} and {@link #target}.
-     */
-    protected ISarosSession sarosSession;
-
-    /**
-     * Needed for conversions between Activities and ActivityDataObjets. Knows
-     * nothing and just returns default values (0, false, null) for all method
-     * invocations.
-     */
-    private IPathFactory pathFactory;
 
     /**
      * The standard source for all Activities
@@ -56,53 +40,26 @@ public abstract class AbstractActivityTest {
 
     /**
      * In case the concrete test class needs additional mocks, this method
-     * should be overridden in the following way:
-     * 
-     * <pre>
-     * setupDefaultMocks();
-     * 
-     * // setup (and replay) other mocks
-     * 
-     * replayDefaultMocks();
-     * </pre>
+     * should be overridden by calling <code>super.setup()<code>, too.
      */
     @Before
     public void setup() {
         setupDefaultMocks();
-        replayDefaultMocks();
     }
 
     /**
      * Creates the mocks that every Activity test case may use. (Currently, the
-     * default mocks are {@link #sarosSession}, {@link #source}, and
-     * {@link #target}.)<br>
-     * The two User mocks are replayed (see {@link SarosMocks#mockUser(JID)}).
-     * However, {@link #sarosSession} is <i>not</i> replayed yet (for further
-     * amendments, such as additional users). So don't forget to call
-     * {@link #replayDefaultMocks()} before actually using {@link #sarosSession}
-     * .
+     * default mocks are {@link #source} and {@link #target}, which are already
+     * replayed by {@link SarosMocks#mockUser(JID)}).
      */
     protected void setupDefaultMocks() {
-        pathFactory = EasyMock.createNiceMock(IPathFactory.class);
-
-        sarosSession = EasyMock.createMock(ISarosSession.class);
-
         JID sourceJid = new JID(LOCAL_USER);
         source = SarosMocks.mockUser(sourceJid);
-        SarosMocks.addUserToSession(sarosSession, source);
 
         JID targetJid = new JID(REMOTE_USER);
         target = SarosMocks.mockUser(targetJid);
-        SarosMocks.addUserToSession(sarosSession, target);
 
         targets = toListPlusNull(target);
-    }
-
-    /**
-     * Replays the default mocks ({@link #sarosSession})
-     */
-    protected void replayDefaultMocks() {
-        EasyMock.replay(sarosSession, pathFactory);
     }
 
     /**
@@ -144,9 +101,8 @@ public abstract class AbstractActivityTest {
      * outcome with the original and asserts equality.
      */
     protected void testConversionAndBack(IActivity orig) {
-        IActivityDataObject ado = orig.getActivityDataObject(sarosSession,
-            pathFactory);
-        IActivity copy = ado.getActivity(sarosSession, pathFactory);
+        IActivityDataObject ado = orig.getActivityDataObject();
+        IActivity copy = ado.getActivity();
 
         assertEquals("conversion failed for: " + orig, orig, copy);
 

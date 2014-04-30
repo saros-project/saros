@@ -21,11 +21,8 @@ public class ChangeColorActivityTest extends AbstractActivityTest {
 
         JID jidAffected = new JID(AFFECTED_USER);
         User affected = SarosMocks.mockUser(jidAffected);
-        SarosMocks.addUserToSession(sarosSession, affected);
 
         affectedList = toListPlusNull(affected);
-
-        replayDefaultMocks();
     }
 
     @Override

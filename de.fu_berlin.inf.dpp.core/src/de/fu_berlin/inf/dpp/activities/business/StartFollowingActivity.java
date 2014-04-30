@@ -2,8 +2,6 @@ package de.fu_berlin.inf.dpp.activities.business;
 
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.StartFollowingActivityDataObject;
-import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -30,8 +28,7 @@ public class StartFollowingActivity extends AbstractActivity {
     }
 
     @Override
-    public IActivityDataObject getActivityDataObject(
-        ISarosSession sarosSession, IPathFactory pathFactory) {
+    public IActivityDataObject getActivityDataObject() {
         return new StartFollowingActivityDataObject(getSource(), followedUser);
     }
 
