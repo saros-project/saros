@@ -28,8 +28,8 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.User;
 
 @XStreamAlias("textSelectionActivity")
 public class TextSelectionActivityDataObject extends
@@ -43,7 +43,7 @@ public class TextSelectionActivityDataObject extends
     @XStreamAsAttribute
     private final int length;
 
-    public TextSelectionActivityDataObject(JID source, int offset, int length,
+    public TextSelectionActivityDataObject(User source, int offset, int length,
         SPath path) {
 
         super(source, path);
@@ -89,7 +89,6 @@ public class TextSelectionActivityDataObject extends
     @Override
     public IActivity getActivity(ISarosSession sarosSession,
         IPathFactory pathFactory) {
-        return new TextSelectionActivity(sarosSession.getUser(getSource()),
-            offset, length, getPath());
+        return new TextSelectionActivity(getSource(), offset, length, getPath());
     }
 }

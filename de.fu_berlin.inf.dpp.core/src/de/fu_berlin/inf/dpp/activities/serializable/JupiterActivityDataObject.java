@@ -10,8 +10,8 @@ import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.User;
 
 /**
  * A JupiterActivityDataObject is an Activity that can be handled by the Jupiter
@@ -32,7 +32,7 @@ public class JupiterActivityDataObject extends
     protected final Operation operation;
 
     public JupiterActivityDataObject(Timestamp timestamp, Operation operation,
-        JID source, SPath path) {
+        User source, SPath path) {
 
         super(source, path);
 
@@ -78,7 +78,6 @@ public class JupiterActivityDataObject extends
     @Override
     public IActivity getActivity(ISarosSession sarosSession,
         IPathFactory pathFactory) {
-        return new JupiterActivity(timestamp, operation,
-            sarosSession.getUser(getSource()), getPath());
+        return new JupiterActivity(timestamp, operation, getSource(), getPath());
     }
 }

@@ -23,14 +23,12 @@ import org.apache.commons.lang.ObjectUtils;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.annotations.XStreamConverter;
 
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.PermissionActivity;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.misc.xstream.JIDConverter;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 
 /**
@@ -44,14 +42,13 @@ public class PermissionActivityDataObject extends AbstractActivityDataObject {
     protected final Permission permission;
 
     @XStreamAsAttribute
-    @XStreamConverter(JIDConverter.class)
-    protected final JID affectedUser;
+    protected final User affectedUser;
 
     /**
      * Creates a new PermissionActivityDataObject which indicates that the given
      * user should change into the given permission.
      */
-    public PermissionActivityDataObject(JID source, JID affectedUser,
+    public PermissionActivityDataObject(User source, User affectedUser,
         Permission permission) {
 
         super(source);
@@ -97,7 +94,6 @@ public class PermissionActivityDataObject extends AbstractActivityDataObject {
     @Override
     public IActivity getActivity(ISarosSession sarosSession,
         IPathFactory pathFactory) {
-        return new PermissionActivity(sarosSession.getUser(getSource()),
-            sarosSession.getUser(affectedUser), permission);
+        return new PermissionActivity(getSource(), affectedUser, permission);
     }
 }

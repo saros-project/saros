@@ -40,8 +40,8 @@ public class RecoveryFileActivity extends FileActivity implements
     @Override
     public IActivityDataObject getActivityDataObject(
         ISarosSession sarosSession, IPathFactory pathFactory) {
-        return new RecoveryFileActivityDataObject(getSource().getJID(),
-            target.getJID(), type, newPath, oldPath, data);
+        return new RecoveryFileActivityDataObject(getSource(), target, type,
+            newPath, oldPath, data);
     }
 
     /**

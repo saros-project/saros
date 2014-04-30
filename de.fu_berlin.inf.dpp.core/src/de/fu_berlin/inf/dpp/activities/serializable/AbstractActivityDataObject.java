@@ -4,10 +4,8 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
 
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.annotations.XStreamConverter;
 
-import de.fu_berlin.inf.dpp.misc.xstream.JIDConverter;
-import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.session.User;
 
 // TODO [MR] Add some information what needs to be done to add a new activityDataObject.
 public abstract class AbstractActivityDataObject implements IActivityDataObject {
@@ -17,10 +15,9 @@ public abstract class AbstractActivityDataObject implements IActivityDataObject 
         .getLogger(AbstractActivityDataObject.class.getName());
 
     @XStreamAsAttribute
-    @XStreamConverter(JIDConverter.class)
-    protected final JID source;
+    protected final User source;
 
-    public AbstractActivityDataObject(JID source) {
+    public AbstractActivityDataObject(User source) {
         if (source == null)
             throw new IllegalArgumentException("Source cannot be null");
 
@@ -28,7 +25,7 @@ public abstract class AbstractActivityDataObject implements IActivityDataObject 
     }
 
     @Override
-    public JID getSource() {
+    public User getSource() {
         return this.source;
     }
 

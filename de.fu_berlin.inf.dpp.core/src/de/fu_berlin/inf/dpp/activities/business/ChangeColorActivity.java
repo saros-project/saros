@@ -55,8 +55,8 @@ public class ChangeColorActivity extends AbstractActivity implements
     @Override
     public IActivityDataObject getActivityDataObject(
         ISarosSession sarosSession, IPathFactory pathFactory) {
-        return new ChangeColorActivityDataObject(getSource().getJID(),
-            target.getJID(), affected.getJID(), colorID);
+        return new ChangeColorActivityDataObject(getSource(), target, affected,
+            colorID);
     }
 
     @Override

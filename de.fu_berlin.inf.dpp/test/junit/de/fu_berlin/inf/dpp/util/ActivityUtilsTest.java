@@ -23,11 +23,14 @@ import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.session.User;
 
 public class ActivityUtilsTest {
 
-    private final JID aliceJID = new JID("alice@junit");
-    private final JID bobJID = new JID("bob@junit");
+    private final User alice = new User(new JID("alice@junit"), true, true,
+        0, 0);
+    private final User bob = new User(new JID("bob@junit"), false, false, 0,
+        0);
 
     private final IPath fooPath = ResourceAdapterFactory
         .create(new Path("foo"));
@@ -38,10 +41,10 @@ public class ActivityUtilsTest {
     private final IProject barProject = EasyMock.createMock(IProject.class);
 
     private final NOPActivityDataObject nopADO = new NOPActivityDataObject(
-        aliceJID, bobJID, 0);
+        alice, bob, 0);
 
     private final ChecksumActivityDataObject checksumADO = new ChecksumActivityDataObject(
-        aliceJID, new SPath(fooProject, fooPath), 0, 0, null);
+        alice, new SPath(fooProject, fooPath), 0, 0, null);
 
     @Test
     public void testContainsChecksumsOnly() {
@@ -79,54 +82,54 @@ public class ActivityUtilsTest {
         SPath barbarSPath = new SPath(barProject, barPath);
 
         TextSelectionActivityDataObject tsChange0ADO = new TextSelectionActivityDataObject(
-            aliceJID, 0, 1, foofooSPath);
+            alice, 0, 1, foofooSPath);
 
         TextSelectionActivityDataObject tsChange1ADO = new TextSelectionActivityDataObject(
-            aliceJID, 1, 1, foofooSPath);
+            alice, 1, 1, foofooSPath);
 
         TextSelectionActivityDataObject tsChange2ADO = new TextSelectionActivityDataObject(
-            aliceJID, 0, 1, foobarSPath);
+            alice, 0, 1, foobarSPath);
 
         TextSelectionActivityDataObject tsChange3ADO = new TextSelectionActivityDataObject(
-            aliceJID, 1, 1, foobarSPath);
+            alice, 1, 1, foobarSPath);
 
         TextSelectionActivityDataObject tsChange4ADO = new TextSelectionActivityDataObject(
-            aliceJID, 0, 1, barfooSPath);
+            alice, 0, 1, barfooSPath);
 
         TextSelectionActivityDataObject tsChange5ADO = new TextSelectionActivityDataObject(
-            aliceJID, 1, 1, barfooSPath);
+            alice, 1, 1, barfooSPath);
 
         TextSelectionActivityDataObject tsChange6ADO = new TextSelectionActivityDataObject(
-            aliceJID, 0, 1, barbarSPath);
+            alice, 0, 1, barbarSPath);
 
         TextSelectionActivityDataObject tsChange7ADO = new TextSelectionActivityDataObject(
-            aliceJID, 1, 1, barbarSPath);
+            alice, 1, 1, barbarSPath);
 
         // --------------------------------------------------------------------------------
 
         ViewportActivityDataObject vpChange0ADO = new ViewportActivityDataObject(
-            aliceJID, 0, 1, foofooSPath);
+            alice, 0, 1, foofooSPath);
 
         ViewportActivityDataObject vpChange1ADO = new ViewportActivityDataObject(
-            aliceJID, 1, 1, foofooSPath);
+            alice, 1, 1, foofooSPath);
 
         ViewportActivityDataObject vpChange2ADO = new ViewportActivityDataObject(
-            aliceJID, 0, 1, foobarSPath);
+            alice, 0, 1, foobarSPath);
 
         ViewportActivityDataObject vpChange3ADO = new ViewportActivityDataObject(
-            aliceJID, 1, 1, foobarSPath);
+            alice, 1, 1, foobarSPath);
 
         ViewportActivityDataObject vpChange4ADO = new ViewportActivityDataObject(
-            aliceJID, 0, 1, barfooSPath);
+            alice, 0, 1, barfooSPath);
 
         ViewportActivityDataObject vpChange5ADO = new ViewportActivityDataObject(
-            aliceJID, 1, 1, barfooSPath);
+            alice, 1, 1, barfooSPath);
 
         ViewportActivityDataObject vpChange6ADO = new ViewportActivityDataObject(
-            aliceJID, 0, 1, barbarSPath);
+            alice, 0, 1, barbarSPath);
 
         ViewportActivityDataObject vpChange7ADO = new ViewportActivityDataObject(
-            aliceJID, 1, 1, barbarSPath);
+            alice, 1, 1, barbarSPath);
 
         List<IActivityDataObject> ados = new ArrayList<IActivityDataObject>();
 

@@ -54,9 +54,8 @@ public class ProgressActivity extends AbstractActivity implements
     public IActivityDataObject getActivityDataObject(
         ISarosSession sarosSession, IPathFactory pathFactory) {
 
-        return new ProgressActivityDataObject(getSource().getJID(),
-            target.getJID(), progressID, workCurrent, workTotal, taskName,
-            action);
+        return new ProgressActivityDataObject(getSource(), target, progressID,
+            workCurrent, workTotal, taskName, action);
     }
 
     @Override

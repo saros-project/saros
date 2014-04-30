@@ -30,8 +30,7 @@ public final class NOPActivity extends AbstractActivity implements
     @Override
     public IActivityDataObject getActivityDataObject(
         ISarosSession sarosSession, IPathFactory pathFactory) {
-        return new NOPActivityDataObject(getSource().getJID(), target.getJID(),
-            id);
+        return new NOPActivityDataObject(getSource(), target, id);
     }
 
     public int getID() {

@@ -13,8 +13,8 @@ import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Type;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.User;
 
 @XStreamAlias("fileActivity")
 public class FileActivityDataObject extends AbstractProjectActivityDataObject {
@@ -45,7 +45,7 @@ public class FileActivityDataObject extends AbstractProjectActivityDataObject {
      *            data of the file to be created (only valid for creating and
      *            moving)
      */
-    public FileActivityDataObject(JID source, Type type, SPath newPath,
+    public FileActivityDataObject(User source, Type type, SPath newPath,
         SPath oldPath, byte[] data, Purpose purpose) {
 
         super(source, newPath);
@@ -107,7 +107,7 @@ public class FileActivityDataObject extends AbstractProjectActivityDataObject {
     @Override
     public IActivity getActivity(ISarosSession sarosSession,
         IPathFactory pathFactory) {
-        return new FileActivity(sarosSession.getUser(source), type, getPath(),
-            oldPath, data, purpose);
+        return new FileActivity(getSource(), type, getPath(), oldPath, data,
+            purpose);
     }
 }

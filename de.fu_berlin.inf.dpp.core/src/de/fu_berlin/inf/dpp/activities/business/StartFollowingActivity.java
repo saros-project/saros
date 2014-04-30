@@ -32,8 +32,7 @@ public class StartFollowingActivity extends AbstractActivity {
     @Override
     public IActivityDataObject getActivityDataObject(
         ISarosSession sarosSession, IPathFactory pathFactory) {
-        return new StartFollowingActivityDataObject(getSource().getJID(),
-            followedUser.getJID());
+        return new StartFollowingActivityDataObject(getSource(), followedUser);
     }
 
     @Override

@@ -99,7 +99,7 @@ public class ViewportActivity extends AbstractActivity implements
     @Override
     public IActivityDataObject getActivityDataObject(
         ISarosSession sarosSession, IPathFactory pathFactory) {
-        return new ViewportActivityDataObject(getSource().getJID(), startLine,
+        return new ViewportActivityDataObject(getSource(), startLine,
             numberOfLines, path);
     }
 }

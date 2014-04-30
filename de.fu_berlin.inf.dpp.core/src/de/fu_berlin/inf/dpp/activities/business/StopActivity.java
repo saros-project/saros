@@ -177,7 +177,7 @@ public class StopActivity extends AbstractActivity implements ITargetedActivity 
     @Override
     public IActivityDataObject getActivityDataObject(
         ISarosSession sarosSession, IPathFactory pathFactory) {
-        return new StopActivityDataObject(getSource().getJID(),
-            initiator.getJID(), affected.getJID(), type, state, stopActivityID);
+        return new StopActivityDataObject(getSource(), initiator, affected,
+            type, state, stopActivityID);
     }
 }

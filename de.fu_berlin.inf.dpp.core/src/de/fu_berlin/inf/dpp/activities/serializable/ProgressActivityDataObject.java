@@ -2,15 +2,13 @@ package de.fu_berlin.inf.dpp.activities.serializable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.annotations.XStreamConverter;
 
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.ProgressActivity;
 import de.fu_berlin.inf.dpp.activities.business.ProgressActivity.ProgressAction;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.misc.xstream.JIDConverter;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.User;
 
 /**
  * A {@link ProgressActivityDataObject} is used for communicating
@@ -34,10 +32,9 @@ public class ProgressActivityDataObject extends AbstractActivityDataObject {
     protected ProgressAction action;
 
     @XStreamAsAttribute
-    @XStreamConverter(JIDConverter.class)
-    protected JID target;
+    protected User target;
 
-    public ProgressActivityDataObject(JID source, JID target,
+    public ProgressActivityDataObject(User source, User target,
         String progressID, int workCurrent, int workTotal, String taskName,
         ProgressAction action) {
 
@@ -61,8 +58,7 @@ public class ProgressActivityDataObject extends AbstractActivityDataObject {
     @Override
     public IActivity getActivity(ISarosSession sarosSession,
         IPathFactory pathFactory) {
-        return new ProgressActivity(sarosSession.getUser(getSource()),
-            sarosSession.getUser(target), progressID, workCurrent, workTotal,
-            taskName, action);
+        return new ProgressActivity(getSource(), target, progressID,
+            workCurrent, workTotal, taskName, action);
     }
 }

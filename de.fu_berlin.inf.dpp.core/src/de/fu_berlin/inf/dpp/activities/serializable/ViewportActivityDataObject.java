@@ -7,8 +7,8 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.ViewportActivity;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.User;
 
 @XStreamAlias("viewportActivity")
 public class ViewportActivityDataObject extends
@@ -21,7 +21,7 @@ public class ViewportActivityDataObject extends
     @XStreamAsAttribute
     protected final int numberOfLines;
 
-    public ViewportActivityDataObject(JID source, int startLine,
+    public ViewportActivityDataObject(User source, int startLine,
         int numberOfLines, SPath path) {
 
         super(source, path);
@@ -67,7 +67,7 @@ public class ViewportActivityDataObject extends
     @Override
     public IActivity getActivity(ISarosSession sarosSession,
         IPathFactory pathFactory) {
-        return new ViewportActivity(sarosSession.getUser(getSource()),
-            startLine, numberOfLines, getPath());
+        return new ViewportActivity(getSource(), startLine, numberOfLines,
+            getPath());
     }
 }

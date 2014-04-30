@@ -4,7 +4,6 @@ import org.apache.commons.lang.ObjectUtils;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.annotations.XStreamConverter;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
@@ -12,9 +11,8 @@ import de.fu_berlin.inf.dpp.activities.business.FileActivity.Type;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.RecoveryFileActivity;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.misc.xstream.JIDConverter;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.User;
 
 /**
  * Subclass of FileActivityDataObject that is used during the Recovery-Process
@@ -26,10 +24,9 @@ public class RecoveryFileActivityDataObject extends FileActivityDataObject
     implements IActivityDataObject {
 
     @XStreamAsAttribute
-    @XStreamConverter(JIDConverter.class)
-    protected JID target;
+    protected User target;
 
-    public RecoveryFileActivityDataObject(JID source, JID target, Type type,
+    public RecoveryFileActivityDataObject(User source, User target, Type type,
         SPath newPath, SPath oldPath, byte[] data) {
 
         super(source, type, newPath, oldPath, data, Purpose.RECOVERY);
@@ -40,8 +37,8 @@ public class RecoveryFileActivityDataObject extends FileActivityDataObject
     @Override
     public IActivity getActivity(ISarosSession sarosSession,
         IPathFactory pathFactory) {
-        return new RecoveryFileActivity(sarosSession.getUser(getSource()),
-            sarosSession.getUser(target), getType(), path, oldPath, data);
+        return new RecoveryFileActivity(getSource(), target, getType(), path,
+            oldPath, data);
     }
 
     @Override

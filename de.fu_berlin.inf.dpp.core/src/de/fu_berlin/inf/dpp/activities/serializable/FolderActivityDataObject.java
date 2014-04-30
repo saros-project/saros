@@ -10,8 +10,8 @@ import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.business.FolderActivity.Type;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.User;
 
 @XStreamAlias("folderActivity")
 public class FolderActivityDataObject extends AbstractProjectActivityDataObject {
@@ -19,7 +19,7 @@ public class FolderActivityDataObject extends AbstractProjectActivityDataObject 
     @XStreamAsAttribute
     protected final Type type;
 
-    public FolderActivityDataObject(JID source, Type type, SPath path) {
+    public FolderActivityDataObject(User source, Type type, SPath path) {
         super(source, path);
 
         this.type = type;
@@ -62,7 +62,6 @@ public class FolderActivityDataObject extends AbstractProjectActivityDataObject 
     @Override
     public IActivity getActivity(ISarosSession sarosSession,
         IPathFactory pathFactory) {
-        return new FolderActivity(sarosSession.getUser(getSource()), type,
-            getPath());
+        return new FolderActivity(getSource(), type, getPath());
     }
 }

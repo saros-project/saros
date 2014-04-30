@@ -146,8 +146,8 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
         for (IResourceActivity a : containedActivity)
             ados.add(a.getActivityDataObject(sarosSession, pathFactory));
 
-        return new VCSActivityDataObject(getSource().getJID(), getType(), url,
-            path, directory, param1, ados);
+        return new VCSActivityDataObject(getSource(), getType(), url, path,
+            directory, param1, ados);
     }
 
     @Override

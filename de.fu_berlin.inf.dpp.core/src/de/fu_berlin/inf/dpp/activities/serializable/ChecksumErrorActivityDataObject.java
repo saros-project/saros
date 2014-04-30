@@ -23,16 +23,14 @@ import java.util.List;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.annotations.XStreamConverter;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumErrorActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.misc.xstream.JIDConverter;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.User;
 
 /**
  * A Checksum Error is a notification send to the host and peers by a user, who
@@ -42,8 +40,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 public class ChecksumErrorActivityDataObject extends AbstractActivityDataObject {
 
     @XStreamAsAttribute
-    @XStreamConverter(JIDConverter.class)
-    protected final JID target;
+    protected final User target;
 
     @XStreamAsAttribute
     protected String recoveryID;
@@ -51,7 +48,7 @@ public class ChecksumErrorActivityDataObject extends AbstractActivityDataObject 
     @XStreamImplicit
     protected List<SPath> paths;
 
-    public ChecksumErrorActivityDataObject(JID source, JID target,
+    public ChecksumErrorActivityDataObject(User source, User target,
         List<SPath> paths, String recoveryID) {
 
         super(source);
@@ -65,8 +62,7 @@ public class ChecksumErrorActivityDataObject extends AbstractActivityDataObject 
     public IActivity getActivity(ISarosSession sarosSession,
         IPathFactory pathFactory) {
 
-        return new ChecksumErrorActivity(sarosSession.getUser(getSource()),
-            sarosSession.getUser(target), paths, recoveryID);
+        return new ChecksumErrorActivity(getSource(), target, paths, recoveryID);
     }
 
     @Override

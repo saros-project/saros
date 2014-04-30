@@ -11,8 +11,8 @@ import de.fu_berlin.inf.dpp.activities.business.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.business.VCSActivity;
 import de.fu_berlin.inf.dpp.activities.business.VCSActivity.Type;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.User;
 
 @XStreamAlias("vcsActivity")
 public class VCSActivityDataObject extends AbstractProjectActivityDataObject {
@@ -24,8 +24,8 @@ public class VCSActivityDataObject extends AbstractProjectActivityDataObject {
     protected Type type;
     public Vector<IActivityDataObject> containedActivity;
 
-    public VCSActivityDataObject(JID source, VCSActivity.Type type, String url,
-        SPath path, String directory, String param1,
+    public VCSActivityDataObject(User source, VCSActivity.Type type,
+        String url, SPath path, String directory, String param1,
         Vector<IActivityDataObject> containedActivity) {
 
         super(source, path);
@@ -40,9 +40,8 @@ public class VCSActivityDataObject extends AbstractProjectActivityDataObject {
     @Override
     public IActivity getActivity(ISarosSession sarosSession,
         IPathFactory pathFactory) {
-        final VCSActivity vcsActivity = new VCSActivity(
-            sarosSession.getUser(getSource()), type, getPath(), url, directory,
-            param1);
+        final VCSActivity vcsActivity = new VCSActivity(getSource(), type,
+            getPath(), url, directory, param1);
 
         vcsActivity.containedActivity.ensureCapacity(containedActivity.size());
         for (IActivityDataObject ado : containedActivity) {

@@ -73,7 +73,7 @@ public class ActivityQueuer {
 
                 // path cannot be null, see for-loop below
                 SPath path = pado.getPath();
-                JID source = pado.getSource();
+                JID source = pado.getSource().getJID();
 
                 if (pado instanceof EditorActivityDataObject) {
 

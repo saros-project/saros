@@ -2,14 +2,12 @@ package de.fu_berlin.inf.dpp.activities.serializable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.annotations.XStreamConverter;
 
 import de.fu_berlin.inf.dpp.activities.business.ChangeColorActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.misc.xstream.JIDConverter;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.User;
 
 /**
  * Serializable representation of a ChangeColorActivity.
@@ -21,18 +19,16 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 public class ChangeColorActivityDataObject extends AbstractActivityDataObject {
 
     @XStreamAsAttribute
-    @XStreamConverter(JIDConverter.class)
-    protected final JID target;
+    protected final User target;
 
     @XStreamAsAttribute
-    @XStreamConverter(JIDConverter.class)
-    protected final JID affected;
+    protected final User affected;
 
     @XStreamAsAttribute
     protected final int colorID;
 
-    public ChangeColorActivityDataObject(JID source, JID target, JID affected,
-        int colorID) {
+    public ChangeColorActivityDataObject(User source, User target,
+        User affected, int colorID) {
 
         super(source);
 
@@ -55,8 +51,7 @@ public class ChangeColorActivityDataObject extends AbstractActivityDataObject {
      */
     @Override
     public IActivity getActivity(ISarosSession session, IPathFactory pathFactory) {
-        return new ChangeColorActivity(session.getUser(getSource()),
-            session.getUser(target), session.getUser(affected), colorID);
+        return new ChangeColorActivity(getSource(), target, affected, colorID);
     }
 
     @Override

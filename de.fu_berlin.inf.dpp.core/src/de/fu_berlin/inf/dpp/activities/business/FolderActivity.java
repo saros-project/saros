@@ -76,7 +76,7 @@ public class FolderActivity extends AbstractActivity implements
     @Override
     public IActivityDataObject getActivityDataObject(
         ISarosSession sarosSession, IPathFactory pathFactory) {
-        return new FolderActivityDataObject(getSource().getJID(), type, path);
+        return new FolderActivityDataObject(getSource(), type, path);
     }
 
 }

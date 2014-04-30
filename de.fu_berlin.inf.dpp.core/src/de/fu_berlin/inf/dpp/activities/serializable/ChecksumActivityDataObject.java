@@ -10,8 +10,8 @@ import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.User;
 
 /**
  * A checksum activityDataObject is used to communicate checksums from the host
@@ -55,7 +55,7 @@ public class ChecksumActivityDataObject extends
      *            The current jupiterTimestamp for this document, may be
      *            <code>null</code>
      */
-    public ChecksumActivityDataObject(JID source, SPath path, long hash,
+    public ChecksumActivityDataObject(User source, SPath path, long hash,
         long length, Timestamp jupiterTimestamp) {
 
         super(source, path);
@@ -106,7 +106,7 @@ public class ChecksumActivityDataObject extends
     @Override
     public IActivity getActivity(ISarosSession sarosSession,
         IPathFactory pathFactory) {
-        return new ChecksumActivity(sarosSession.getUser(getSource()),
-            getPath(), hash, length, jupiterTimestamp);
+        return new ChecksumActivity(getSource(), getPath(), hash, length,
+            jupiterTimestamp);
     }
 }

@@ -79,8 +79,8 @@ public class ChecksumErrorActivity extends AbstractActivity implements
     public IActivityDataObject getActivityDataObject(
         ISarosSession sarosSession, IPathFactory pathFactory) {
 
-        return new ChecksumErrorActivityDataObject(getSource().getJID(),
-            target.getJID(), paths, recoveryID);
+        return new ChecksumErrorActivityDataObject(getSource(), target, paths,
+            recoveryID);
     }
 
     @Override

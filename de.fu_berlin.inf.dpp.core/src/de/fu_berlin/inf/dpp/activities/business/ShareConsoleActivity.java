@@ -28,8 +28,7 @@ public class ShareConsoleActivity extends AbstractActivity {
     @Override
     public IActivityDataObject getActivityDataObject(
         ISarosSession sarosSession, IPathFactory pathFactory) {
-        return new ShareConsoleActivityDataObject(getSource().getJID(),
-            consoleContent);
+        return new ShareConsoleActivityDataObject(getSource(), consoleContent);
     }
 
     public String getConsoleContent() {

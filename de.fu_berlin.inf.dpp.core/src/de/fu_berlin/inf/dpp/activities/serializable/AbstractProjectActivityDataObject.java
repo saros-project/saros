@@ -5,7 +5,7 @@ import org.apache.commons.lang.ObjectUtils;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.session.User;
 
 public abstract class AbstractProjectActivityDataObject extends
     AbstractActivityDataObject {
@@ -13,7 +13,7 @@ public abstract class AbstractProjectActivityDataObject extends
     @XStreamAlias("p")
     protected SPath path;
 
-    public AbstractProjectActivityDataObject(JID source, SPath path) {
+    public AbstractProjectActivityDataObject(User source, SPath path) {
         super(source);
 
         this.path = path;

@@ -94,7 +94,7 @@ public class JupiterActivity extends AbstractActivity implements
     @Override
     public IActivityDataObject getActivityDataObject(
         ISarosSession sarosSession, IPathFactory pathFactory) {
-        return new JupiterActivityDataObject(timestamp, operation, getSource()
-            .getJID(), path);
+        return new JupiterActivityDataObject(timestamp, operation, getSource(),
+            path);
     }
 }

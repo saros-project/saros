@@ -158,7 +158,7 @@ public class ChecksumActivity extends AbstractActivity implements
     @Override
     public IActivityDataObject getActivityDataObject(
         ISarosSession sarosSession, IPathFactory pathFactory) {
-        return new ChecksumActivityDataObject(getSource().getJID(), path, hash,
-            length, jupiterTimestamp);
+        return new ChecksumActivityDataObject(getSource(), path, hash, length,
+            jupiterTimestamp);
     }
 }

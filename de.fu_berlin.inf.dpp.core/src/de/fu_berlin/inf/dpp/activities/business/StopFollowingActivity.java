@@ -30,7 +30,7 @@ public class StopFollowingActivity extends AbstractActivity {
     @Override
     public IActivityDataObject getActivityDataObject(
         ISarosSession sarosSession, IPathFactory pathFactory) {
-        return new StopFollowingActivityDataObject(getSource().getJID());
+        return new StopFollowingActivityDataObject(getSource());
     }
 
     @Override

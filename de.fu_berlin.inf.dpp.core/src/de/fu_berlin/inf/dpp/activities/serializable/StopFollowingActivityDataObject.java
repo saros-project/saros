@@ -5,8 +5,8 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.StopFollowingActivity;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.User;
 
 /**
  * DataObject for the event that a user stopped following another user
@@ -14,14 +14,14 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 @XStreamAlias("stopFollowingActivity")
 public class StopFollowingActivityDataObject extends AbstractActivityDataObject {
 
-    public StopFollowingActivityDataObject(JID source) {
+    public StopFollowingActivityDataObject(User source) {
         super(source);
     }
 
     @Override
     public IActivity getActivity(ISarosSession sharedProject,
         IPathFactory pathFactory) {
-        return new StopFollowingActivity(sharedProject.getUser(getSource()));
+        return new StopFollowingActivity(getSource());
     }
 
     @Override

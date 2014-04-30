@@ -104,7 +104,7 @@ public class TextSelectionActivity extends AbstractActivity implements
     @Override
     public IActivityDataObject getActivityDataObject(
         ISarosSession sarosSession, IPathFactory pathFactory) {
-        return new TextSelectionActivityDataObject(getSource().getJID(),
-            offset, length, path);
+        return new TextSelectionActivityDataObject(getSource(), offset, length,
+            path);
     }
 }

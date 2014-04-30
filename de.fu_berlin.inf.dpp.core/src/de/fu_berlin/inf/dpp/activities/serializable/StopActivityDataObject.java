@@ -4,16 +4,14 @@ import org.apache.commons.lang.ObjectUtils;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.annotations.XStreamConverter;
 
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.StopActivity;
 import de.fu_berlin.inf.dpp.activities.business.StopActivity.State;
 import de.fu_berlin.inf.dpp.activities.business.StopActivity.Type;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.misc.xstream.JIDConverter;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.User;
 
 /**
  * A StopActivityDataObject is used for signaling to a user that he should be
@@ -24,13 +22,11 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 public class StopActivityDataObject extends AbstractActivityDataObject {
 
     @XStreamAsAttribute
-    @XStreamConverter(JIDConverter.class)
-    protected JID initiator;
+    protected User initiator;
 
     // the user who has to be locked / unlocked
     @XStreamAsAttribute
-    @XStreamConverter(JIDConverter.class)
-    protected JID affected;
+    protected User affected;
 
     @XStreamAsAttribute
     protected Type type;
@@ -42,7 +38,7 @@ public class StopActivityDataObject extends AbstractActivityDataObject {
     @XStreamAsAttribute
     protected String stopActivityID;
 
-    public StopActivityDataObject(JID source, JID initiator, JID affected,
+    public StopActivityDataObject(User source, User initiator, User affected,
         Type type, State state, String stopActivityID) {
 
         super(source);
@@ -101,8 +97,7 @@ public class StopActivityDataObject extends AbstractActivityDataObject {
     @Override
     public IActivity getActivity(ISarosSession sarosSession,
         IPathFactory pathFactory) {
-        return new StopActivity(sarosSession.getUser(getSource()),
-            sarosSession.getUser(initiator), sarosSession.getUser(affected),
-            type, state, stopActivityID);
+        return new StopActivity(getSource(), initiator, affected, type, state,
+            stopActivityID);
     }
 }

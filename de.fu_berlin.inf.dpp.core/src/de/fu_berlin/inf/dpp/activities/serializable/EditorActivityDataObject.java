@@ -29,8 +29,8 @@ import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.business.EditorActivity.Type;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.User;
 
 /**
  * A text load activityDataObject activates a new resource. If the path is
@@ -49,7 +49,7 @@ public class EditorActivityDataObject extends AbstractProjectActivityDataObject 
      *            a valid project-relative path or <code>null</code> if former
      *            resource should be deactivated.
      */
-    public EditorActivityDataObject(JID source, Type type, SPath path) {
+    public EditorActivityDataObject(User source, Type type, SPath path) {
         super(source, path);
 
         this.type = type;
@@ -88,8 +88,7 @@ public class EditorActivityDataObject extends AbstractProjectActivityDataObject 
     @Override
     public IActivity getActivity(ISarosSession sarosSession,
         IPathFactory pathFactory) {
-        return new EditorActivity(sarosSession.getUser(getSource()), type,
-            getPath());
+        return new EditorActivity(getSource(), type, getPath());
     }
 
     @Deprecated

@@ -21,8 +21,8 @@ package de.fu_berlin.inf.dpp.activities.serializable;
 
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.User;
 
 /**
  * An interface for all things that occur in a shared project session such as
@@ -39,11 +39,11 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 public interface IActivityDataObject {
 
     /**
-     * Returns the JID of the user which has caused this activityDataObject.
+     * Returns the user which has caused this activityDataObject.
      * 
      * @return not <code>null</code>
      */
-    public JID getSource();
+    public User getSource();
 
     /**
      * Turn this IActivityDataObject (which is detached from a SarosSession)

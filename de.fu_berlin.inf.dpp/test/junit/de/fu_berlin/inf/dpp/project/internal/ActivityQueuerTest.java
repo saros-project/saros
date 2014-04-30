@@ -27,11 +27,13 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.session.User;
 
 public class ActivityQueuerTest {
 
-    private static final JID ALICE = new JID("Alice");
-    private static final JID BOB = new JID("Bob");
+    private static final User ALICE = new User(new JID("Alice"), true, true, 0,
+        0);
+    private static final User BOB = new User(new JID("Bob"), false, false, 0, 0);
 
     private static IProject SHARED_PROJECT;
     private static IProject NOT_SHARED_PROJECT;

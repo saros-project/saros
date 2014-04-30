@@ -4,14 +4,12 @@ import org.apache.commons.lang.ObjectUtils;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.annotations.XStreamConverter;
 
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.StartFollowingActivity;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.misc.xstream.JIDConverter;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.User;
 
 /**
  * DataObject for the event that a user started following another user
@@ -21,20 +19,17 @@ public class StartFollowingActivityDataObject extends
     AbstractActivityDataObject {
 
     @XStreamAsAttribute
-    @XStreamConverter(JIDConverter.class)
-    protected final JID target;
+    protected final User target;
 
-    public StartFollowingActivityDataObject(JID source, JID target) {
+    public StartFollowingActivityDataObject(User source, User target) {
         super(source);
 
         this.target = target;
     }
 
     @Override
-    public IActivity getActivity(ISarosSession sharedProject,
-        IPathFactory pathFactory) {
-        return new StartFollowingActivity(sharedProject.getUser(getSource()),
-            sharedProject.getUser(target));
+    public IActivity getActivity(ISarosSession session, IPathFactory pathFactory) {
+        return new StartFollowingActivity(getSource(), target);
     }
 
     @Override

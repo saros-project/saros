@@ -73,6 +73,7 @@ import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.misc.xstream.SPathConverter;
+import de.fu_berlin.inf.dpp.misc.xstream.UserConverter;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
@@ -214,6 +215,7 @@ public final class SarosSession implements ISarosSession {
     };
 
     private SPathConverter pathConverter;
+    private UserConverter userConverter;
 
     /**
      * Constructor for host.
@@ -602,6 +604,9 @@ public final class SarosSession implements ISarosSession {
         // TODO Pull that out
         pathConverter = new SPathConverter(this, pathFactory);
         ActivitiesExtension.PROVIDER.registerConverter(pathConverter);
+
+        userConverter = new UserConverter(this);
+        ActivitiesExtension.PROVIDER.registerConverter(userConverter);
     }
 
     /**
@@ -646,6 +651,7 @@ public final class SarosSession implements ISarosSession {
 
         // TODO Pull that out
         ActivitiesExtension.PROVIDER.unregisterConverter(pathConverter);
+        ActivitiesExtension.PROVIDER.unregisterConverter(userConverter);
     }
 
     @Override

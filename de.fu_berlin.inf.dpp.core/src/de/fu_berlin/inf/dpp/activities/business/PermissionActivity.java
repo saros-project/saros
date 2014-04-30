@@ -103,7 +103,7 @@ public class PermissionActivity extends AbstractActivity {
     @Override
     public IActivityDataObject getActivityDataObject(
         ISarosSession sarosSession, IPathFactory pathFactory) {
-        return new PermissionActivityDataObject(getSource().getJID(),
-            affectedUser.getJID(), permission);
+        return new PermissionActivityDataObject(getSource(), affectedUser,
+            permission);
     }
 }

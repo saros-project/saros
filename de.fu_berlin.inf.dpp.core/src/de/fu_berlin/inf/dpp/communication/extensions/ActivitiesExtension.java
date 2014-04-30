@@ -56,6 +56,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.session.User;
 
 @XStreamAlias("ADOS")
 public class ActivitiesExtension extends SarosSessionPacketExtension {
@@ -137,6 +138,8 @@ public class ActivitiesExtension extends SarosSessionPacketExtension {
 
             // Misc
                 JID.class,
+
+                User.class,
 
                 // Jupiter classes
 
