@@ -17,10 +17,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp.net;
+package de.fu_berlin.inf.dpp.misc.xstream;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
@@ -37,11 +39,12 @@ import org.xmlpull.v1.XmlPullParser;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
+import com.thoughtworks.xstream.converters.Converter;
+import com.thoughtworks.xstream.converters.ConverterMatcher;
+import com.thoughtworks.xstream.converters.SingleValueConverter;
+import com.thoughtworks.xstream.converters.SingleValueConverterWrapper;
 import com.thoughtworks.xstream.converters.basic.BooleanConverter;
 import com.thoughtworks.xstream.io.xml.CompactWriter;
-
-import de.fu_berlin.inf.dpp.misc.xstream.UrlEncodingStringConverter;
-import de.fu_berlin.inf.dpp.misc.xstream.XppReader;
 
 /**
  * Flexible extension provider using XStream to serialize arbitrary data
@@ -62,6 +65,8 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider,
     protected final String elementName;
 
     private final XStream xstream;
+
+    private Map<Class<? extends ConverterMatcher>, ReplaceableConverter> replaceables;
 
     /**
      * Sets the class loader to use when a new provider is created. This class
@@ -117,6 +122,65 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider,
         providerManager.addIQProvider(getElementName(), getNamespace(), this);
 
         // TODO Validate that elementName is a valid XML identifier
+
+        replaceables = new HashMap<Class<? extends ConverterMatcher>, ReplaceableConverter>();
+    }
+
+    /**
+     * Register additional {@link ConverterMatcher}s at runtime. This is useful
+     * if a converter cannot be used isolatedly, e.g. because it requires a
+     * running Saros session.
+     * 
+     * @param converter
+     *            The {@link ConverterMatcher} to be registered to XStream.
+     *            There can only be one instance per converter class. If a new
+     *            instance of an already registered class is registered, the old
+     *            instance will be replaced.
+     */
+    public void registerConverter(ConverterMatcher converter) {
+        Class<? extends ConverterMatcher> clazz = converter.getClass();
+
+        Converter input = null;
+        if (converter instanceof SingleValueConverter) {
+            input = new SingleValueConverterWrapper(
+                (SingleValueConverter) converter);
+        } else if (converter instanceof Converter) {
+            input = (Converter) converter;
+        } else {
+            LOG.error("Unexpected ConverterMatcher of " + clazz);
+            return;
+        }
+
+        if (replaceables.containsKey(clazz)) {
+            LOG.debug("Renewing existing converter of " + clazz);
+            replaceables.get(clazz).replace(input);
+            return;
+        }
+
+        LOG.debug("Registering new converter of " + clazz);
+
+        ReplaceableConverter replaceable = new ReplaceableConverter(input);
+        xstream.registerConverter(replaceable);
+        replaceables.put(clazz, replaceable);
+    }
+
+    /**
+     * Unregisters a previously registered {@link ConverterMatcher} from
+     * XStream.
+     * 
+     * @param converter
+     *            If this converter (more precisely: one of the same class) was
+     *            registered through
+     *            {@link #registerConverter(ConverterMatcher)}, it will no
+     *            longer be called by XStream. Otherwise, nothing happens.
+     */
+    public void unregisterConverter(ConverterMatcher converter) {
+        String id = converter.getClass().getName();
+
+        if (replaceables.containsKey(id)) {
+            LOG.debug("Unregistering (resetting) converter with ID " + id);
+            replaceables.get(id).reset();
+        }
     }
 
     public static class XStreamIQPacket<T> extends IQ {
