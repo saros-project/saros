@@ -13,8 +13,7 @@ import de.fu_berlin.inf.dpp.session.User;
  * A JupiterActivity is an Activity that can be handled by the Jupiter
  * Algorithm.
  */
-public class JupiterActivity extends AbstractActivity implements
-    IResourceActivity {
+public class JupiterActivity extends AbstractResourceActivity {
 
     /**
      * Timestamp that specifies the definition context of the enclosed
@@ -22,16 +21,14 @@ public class JupiterActivity extends AbstractActivity implements
      */
     private final Timestamp timestamp;
     private final Operation operation;
-    private final SPath path;
 
     public JupiterActivity(Timestamp timestamp, Operation operation,
         User source, SPath path) {
 
-        super(source);
+        super(source, path);
 
         this.timestamp = timestamp;
         this.operation = operation;
-        this.path = path;
     }
 
     public Operation getOperation() {
@@ -53,8 +50,6 @@ public class JupiterActivity extends AbstractActivity implements
 
         JupiterActivity other = (JupiterActivity) obj;
 
-        if (!ObjectUtils.equals(this.path, other.path))
-            return false;
         if (!ObjectUtils.equals(this.operation, other.operation))
             return false;
         if (!ObjectUtils.equals(this.timestamp, other.timestamp))
@@ -67,7 +62,6 @@ public class JupiterActivity extends AbstractActivity implements
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ObjectUtils.hashCode(path);
         result = prime * result + ObjectUtils.hashCode(operation);
         result = prime * result + ObjectUtils.hashCode(timestamp);
         return result;
@@ -80,11 +74,6 @@ public class JupiterActivity extends AbstractActivity implements
     }
 
     @Override
-    public SPath getPath() {
-        return this.path;
-    }
-
-    @Override
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
     }
@@ -92,6 +81,6 @@ public class JupiterActivity extends AbstractActivity implements
     @Override
     public IActivityDataObject getActivityDataObject() {
         return new JupiterActivityDataObject(timestamp, operation, getSource(),
-            path);
+            getPath());
     }
 }

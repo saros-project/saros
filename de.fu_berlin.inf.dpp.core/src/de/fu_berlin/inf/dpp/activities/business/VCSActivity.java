@@ -16,7 +16,7 @@ import de.fu_berlin.inf.dpp.session.User;
 /**
  * Activity for VCS operations like Switch, Update.
  */
-public class VCSActivity extends AbstractActivity implements IResourceActivity {
+public class VCSActivity extends AbstractResourceActivity {
 
     public enum Type {
         /**
@@ -55,7 +55,6 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
     protected Type type;
     protected String url;
     protected String directory;
-    protected SPath path;
     protected String param1;
 
     public Vector<IResourceActivity> containedActivity = new Vector<IResourceActivity>();
@@ -86,10 +85,9 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
     public VCSActivity(User source, Type type, SPath path, String url,
         String directory, String param1) {
 
-        super(source);
+        super(source, path);
 
         this.type = type;
-        this.path = path;
         this.url = url;
         this.directory = directory;
         this.param1 = param1;
@@ -144,13 +142,8 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
         for (IResourceActivity a : containedActivity)
             ados.add(a.getActivityDataObject());
 
-        return new VCSActivityDataObject(getSource(), getType(), url, path,
-            directory, param1, ados);
-    }
-
-    @Override
-    public SPath getPath() {
-        return path;
+        return new VCSActivityDataObject(getSource(), getType(), url,
+            getPath(), directory, param1, ados);
     }
 
     /**
@@ -233,7 +226,7 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
         if (type == Type.DISCONNECT)
             result += ", deleteContents: " + (param1 != null);
         else {
-            result += ", path: " + path;
+            result += ", path: " + getPath();
             if (type == Type.CONNECT || type == Type.SWITCH)
                 result += ", url: " + url;
             if (type == Type.CONNECT)
@@ -250,7 +243,6 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
         int result = super.hashCode();
         result = prime * result + ObjectUtils.hashCode(directory);
         result = prime * result + ObjectUtils.hashCode(param1);
-        result = prime * result + ObjectUtils.hashCode(path);
         result = prime * result + ObjectUtils.hashCode(type);
         result = prime * result + ObjectUtils.hashCode(url);
         return result;
@@ -274,8 +266,6 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
         if (!ObjectUtils.equals(this.param1, other.param1))
             return false;
         if (!ObjectUtils.equals(this.url, other.url))
-            return false;
-        if (!ObjectUtils.equals(this.path, other.path))
             return false;
 
         return true;

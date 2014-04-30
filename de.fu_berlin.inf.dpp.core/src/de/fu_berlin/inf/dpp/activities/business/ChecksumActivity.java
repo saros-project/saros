@@ -23,15 +23,13 @@ import de.fu_berlin.inf.dpp.session.User;
  * local user has already written additional text which invalidates the
  * checksum.
  */
-public class ChecksumActivity extends AbstractActivity implements
-    IResourceActivity {
+public class ChecksumActivity extends AbstractResourceActivity {
 
     /**
      * Constant used for representing a missing file
      */
     public static final int NON_EXISTING_DOC = -1;
 
-    protected final SPath path;
     protected final long hash;
     protected final long length;
     protected final Timestamp jupiterTimestamp;
@@ -58,9 +56,8 @@ public class ChecksumActivity extends AbstractActivity implements
     public ChecksumActivity(User source, SPath path, long hash, long length,
         Timestamp jupiterTimestamp) {
 
-        super(source);
+        super(source, path);
 
-        this.path = path;
         this.hash = hash;
         this.length = length;
         this.jupiterTimestamp = jupiterTimestamp;
@@ -79,21 +76,13 @@ public class ChecksumActivity extends AbstractActivity implements
      * Returns a copy of the ChecksumActivity with a new {@link Timestamp}.
      */
     public ChecksumActivity withTimestamp(Timestamp jupiterTimestamp) {
-        return new ChecksumActivity(getSource(), path, hash, length,
+        return new ChecksumActivity(getSource(), getPath(), hash, length,
             jupiterTimestamp);
-    }
-
-    /**
-     * Returns the path this checksum is about.
-     */
-    @Override
-    public SPath getPath() {
-        return this.path;
     }
 
     @Override
     public String toString() {
-        return "ChecksumActivity(path: " + path + ", hash: " + hash
+        return "ChecksumActivity(path: " + getPath() + ", hash: " + hash
             + ", length: " + length + ", jupiterTimestamp: " + jupiterTimestamp
             + ")";
     }
@@ -109,7 +98,6 @@ public class ChecksumActivity extends AbstractActivity implements
         int result = super.hashCode();
         result = prime * result + (int) (hash ^ (hash >>> 32));
         result = prime * result + (int) (length ^ (length >>> 32));
-        result = prime * result + ObjectUtils.hashCode(path);
         result = prime * result + ObjectUtils.hashCode(jupiterTimestamp);
         return result;
     }
@@ -128,8 +116,6 @@ public class ChecksumActivity extends AbstractActivity implements
         if (this.hash != other.hash)
             return false;
         if (this.length != other.length)
-            return false;
-        if (!ObjectUtils.equals(this.path, other.path))
             return false;
         if (!ObjectUtils.equals(this.jupiterTimestamp, other.jupiterTimestamp))
             return false;
@@ -155,7 +141,7 @@ public class ChecksumActivity extends AbstractActivity implements
 
     @Override
     public IActivityDataObject getActivityDataObject() {
-        return new ChecksumActivityDataObject(getSource(), path, hash, length,
-            jupiterTimestamp);
+        return new ChecksumActivityDataObject(getSource(), getPath(), hash,
+            length, jupiterTimestamp);
     }
 }

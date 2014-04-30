@@ -9,7 +9,7 @@ import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.session.User;
 
-public class FileActivity extends AbstractActivity implements IResourceActivity {
+public class FileActivity extends AbstractResourceActivity {
 
     /**
      * Enumeration used to distinguish file activities which are caused as part
@@ -29,7 +29,6 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
     }
 
     protected final Type type;
-    protected final SPath newPath;
     protected final SPath oldPath;
     protected final Purpose purpose;
     protected final byte[] data;
@@ -101,7 +100,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
     public FileActivity(User source, Type type, SPath newPath, SPath oldPath,
         byte[] data, Purpose purpose) {
 
-        super(source);
+        super(source, newPath);
 
         if (type == null)
             throw new IllegalArgumentException("type must not be null");
@@ -126,15 +125,9 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
         }
 
         this.type = type;
-        this.newPath = newPath;
         this.oldPath = oldPath;
         this.data = data;
         this.purpose = purpose;
-    }
-
-    @Override
-    public SPath getPath() {
-        return this.newPath;
     }
 
     /**
@@ -162,9 +155,9 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
     public String toString() {
         if (type == Type.MOVED)
             return "FileActivity(type: Moved, old path: " + oldPath
-                + ", new path: " + newPath + ")";
+                + ", new path: " + getPath() + ")";
 
-        return "FileActivity(type: " + type + ", path: " + newPath + ")";
+        return "FileActivity(type: " + type + ", path: " + getPath() + ")";
     }
 
     @Override
@@ -173,7 +166,6 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
         int result = super.hashCode();
         result = prime * result + Arrays.hashCode(data);
         result = prime * result + ObjectUtils.hashCode(oldPath);
-        result = prime * result + ObjectUtils.hashCode(newPath);
         result = prime * result + ObjectUtils.hashCode(type);
         result = prime * result + ObjectUtils.hashCode(purpose);
         return result;
@@ -196,8 +188,6 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
             return false;
         if (!ObjectUtils.equals(this.oldPath, other.oldPath))
             return false;
-        if (!ObjectUtils.equals(this.newPath, other.newPath))
-            return false;
         if (!Arrays.equals(this.data, other.data))
             return false;
 
@@ -215,7 +205,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
 
     @Override
     public IActivityDataObject getActivityDataObject() {
-        return new FileActivityDataObject(getSource(), type, newPath, oldPath,
-            data, purpose);
+        return new FileActivityDataObject(getSource(), type, getPath(),
+            oldPath, data, purpose);
     }
 }

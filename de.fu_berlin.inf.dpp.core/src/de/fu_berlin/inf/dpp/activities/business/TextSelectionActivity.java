@@ -19,29 +19,24 @@
  */
 package de.fu_berlin.inf.dpp.activities.business;
 
-import org.apache.commons.lang.ObjectUtils;
-
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
 import de.fu_berlin.inf.dpp.session.User;
 
-public class TextSelectionActivity extends AbstractActivity implements
-    IResourceActivity {
+public class TextSelectionActivity extends AbstractResourceActivity {
 
     protected final int offset;
     protected final int length;
-    protected final SPath path;
 
     public TextSelectionActivity(User source, int offset, int length, SPath path) {
-        super(source);
+        super(source, path);
 
         if (path == null)
             throw new IllegalArgumentException("path must not be null");
 
         this.offset = offset;
         this.length = length;
-        this.path = path;
     }
 
     public int getLength() {
@@ -53,15 +48,9 @@ public class TextSelectionActivity extends AbstractActivity implements
     }
 
     @Override
-    public SPath getPath() {
-        return this.path;
-    }
-
-    @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ObjectUtils.hashCode(path);
         result = prime * result + length;
         result = prime * result + offset;
         return result;
@@ -82,8 +71,6 @@ public class TextSelectionActivity extends AbstractActivity implements
             return false;
         if (this.length != other.length)
             return false;
-        if (!ObjectUtils.equals(this.path, other.path))
-            return false;
 
         return true;
     }
@@ -91,7 +78,7 @@ public class TextSelectionActivity extends AbstractActivity implements
     @Override
     public String toString() {
         return "TextSelectionActivity(offset: " + offset + ", length: "
-            + length + ", src: " + getSource() + ", path: " + path + ")";
+            + length + ", src: " + getSource() + ", path: " + getPath() + ")";
     }
 
     @Override
@@ -102,6 +89,6 @@ public class TextSelectionActivity extends AbstractActivity implements
     @Override
     public IActivityDataObject getActivityDataObject() {
         return new TextSelectionActivityDataObject(getSource(), offset, length,
-            path);
+            getPath());
     }
 }

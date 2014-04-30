@@ -1,30 +1,25 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
-import org.apache.commons.lang.ObjectUtils;
-
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
 import de.fu_berlin.inf.dpp.session.User;
 
-public class ViewportActivity extends AbstractActivity implements
-    IResourceActivity {
+public class ViewportActivity extends AbstractResourceActivity {
 
     protected final int startLine;
     protected final int numberOfLines;
-    protected final SPath path;
 
     public ViewportActivity(User source, int startLine, int numberOfLines,
         SPath path) {
 
-        super(source);
+        super(source, path);
 
         if (path == null)
             throw new IllegalArgumentException("path must not be null");
 
         this.startLine = Math.max(0, startLine);
         this.numberOfLines = Math.max(0, numberOfLines);
-        this.path = path;
     }
 
     /**
@@ -48,16 +43,10 @@ public class ViewportActivity extends AbstractActivity implements
     }
 
     @Override
-    public SPath getPath() {
-        return this.path;
-    }
-
-    @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + startLine;
-        result = prime * result + ObjectUtils.hashCode(path);
         result = prime * result + numberOfLines;
         return result;
     }
@@ -77,15 +66,13 @@ public class ViewportActivity extends AbstractActivity implements
             return false;
         if (this.numberOfLines != other.numberOfLines)
             return false;
-        if (!ObjectUtils.equals(this.path, other.path))
-            return false;
 
         return true;
     }
 
     @Override
     public String toString() {
-        return "ViewportActivity(path: " + path + ", range: (" + startLine
+        return "ViewportActivity(path: " + getPath() + ", range: (" + startLine
             + "," + (startLine + numberOfLines) + "))";
     }
 
@@ -97,6 +84,6 @@ public class ViewportActivity extends AbstractActivity implements
     @Override
     public IActivityDataObject getActivityDataObject() {
         return new ViewportActivityDataObject(getSource(), startLine,
-            numberOfLines, path);
+            numberOfLines, getPath());
     }
 }

@@ -38,15 +38,13 @@ import de.fu_berlin.inf.dpp.session.User;
  * 
  * @author rdjemili
  */
-public class TextEditActivity extends AbstractActivity implements
-    IResourceActivity {
+public class TextEditActivity extends AbstractResourceActivity {
 
     private static final Logger log = Logger.getLogger(TextEditActivity.class);
 
     protected final int offset;
     protected final String text;
     protected final String replacedText;
-    protected final SPath path;
 
     /**
      * @param offset
@@ -63,7 +61,7 @@ public class TextEditActivity extends AbstractActivity implements
     public TextEditActivity(User source, int offset, String text,
         String replacedText, SPath path) {
 
-        super(source);
+        super(source, path);
 
         if (text == null)
             throw new IllegalArgumentException("Text cannot be null");
@@ -75,7 +73,6 @@ public class TextEditActivity extends AbstractActivity implements
         this.offset = offset;
         this.text = text;
         this.replacedText = replacedText;
-        this.path = path;
     }
 
     public int getOffset() {
@@ -91,18 +88,13 @@ public class TextEditActivity extends AbstractActivity implements
     }
 
     @Override
-    public SPath getPath() {
-        return this.path;
-    }
-
-    @Override
     public String toString() {
         String newText = StringEscapeUtils.escapeJava(StringUtils.abbreviate(
             text, 150));
         String oldText = StringEscapeUtils.escapeJava(StringUtils.abbreviate(
             replacedText, 150));
         return "TextEditActivity(offset: " + offset + ", new: '" + newText
-            + "', old: '" + oldText + "', path: " + path + ", src: "
+            + "', old: '" + oldText + "', path: " + getPath() + ", src: "
             + getSource() + ")";
     }
 
@@ -110,7 +102,6 @@ public class TextEditActivity extends AbstractActivity implements
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ObjectUtils.hashCode(path);
         result = prime * result + offset;
         result = prime * result + ObjectUtils.hashCode(replacedText);
         result = prime * result + ObjectUtils.hashCode(text);
@@ -134,8 +125,6 @@ public class TextEditActivity extends AbstractActivity implements
             return false;
         if (!ObjectUtils.equals(this.text, other.text))
             return false;
-        if (!ObjectUtils.equals(this.path, other.path))
-            return false;
 
         return true;
     }
@@ -150,8 +139,9 @@ public class TextEditActivity extends AbstractActivity implements
     public boolean sameLike(Object obj) {
         if (obj instanceof TextEditActivity) {
             TextEditActivity other = (TextEditActivity) obj;
-            return (this.offset == other.offset) && (this.path != null)
-                && (other.path != null) && this.path.equals(other.path)
+            return (this.offset == other.offset) && (this.getPath() != null)
+                && (other.getPath() != null)
+                && this.getPath().equals(other.getPath())
                 && this.text.equals(other.text)
                 && (this.replacedText.equals(other.replacedText));
         }

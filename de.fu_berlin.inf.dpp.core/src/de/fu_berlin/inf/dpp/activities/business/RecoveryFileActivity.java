@@ -38,7 +38,7 @@ public class RecoveryFileActivity extends FileActivity implements
     @Override
     public IActivityDataObject getActivityDataObject() {
         return new RecoveryFileActivityDataObject(getSource(), target, type,
-            newPath, oldPath, data);
+            getPath(), oldPath, data);
     }
 
     /**
@@ -106,6 +106,6 @@ public class RecoveryFileActivity extends FileActivity implements
             throw new IllegalArgumentException();
         }
         return new RecoveryFileActivity(activity.getSource(), target,
-            activity.type, activity.newPath, activity.oldPath, activity.data);
+            activity.type, activity.getPath(), activity.oldPath, activity.data);
     }
 }
