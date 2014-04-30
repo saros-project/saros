@@ -100,6 +100,6 @@ public class ViewportActivity extends AbstractActivity implements
     public IActivityDataObject getActivityDataObject(
         ISarosSession sarosSession, IPathFactory pathFactory) {
         return new ViewportActivityDataObject(getSource().getJID(), startLine,
-            numberOfLines, path.toSPathDataObject(sarosSession, pathFactory));
+            numberOfLines, path);
     }
 }

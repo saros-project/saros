@@ -235,7 +235,7 @@ public class NullSarosSession implements ISarosSession {
     }
 
     @Override
-    public void addProjectOwnership(String projectID, IProject project,
+    public void addProjectMapping(String projectID, IProject project,
         JID ownerJID) {
         log.warn("unexpected method call");
     }
@@ -247,7 +247,7 @@ public class NullSarosSession implements ISarosSession {
     }
 
     @Override
-    public void removeProjectOwnership(String projectID, IProject project,
+    public void removeProjectMapping(String projectID, IProject project,
         JID ownerJID) {
         log.warn("unexpected method call");
     }
@@ -269,7 +269,7 @@ public class NullSarosSession implements ISarosSession {
     }
 
     @Override
-    public void enableQueuing(String projectId) {
+    public void enableQueuing(IProject project) {
         log.warn("unexpected method call");
     }
 

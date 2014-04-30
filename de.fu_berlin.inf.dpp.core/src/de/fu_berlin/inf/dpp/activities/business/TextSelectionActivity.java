@@ -105,6 +105,6 @@ public class TextSelectionActivity extends AbstractActivity implements
     public IActivityDataObject getActivityDataObject(
         ISarosSession sarosSession, IPathFactory pathFactory) {
         return new TextSelectionActivityDataObject(getSource().getJID(),
-            offset, length, path.toSPathDataObject(sarosSession, pathFactory));
+            offset, length, path);
     }
 }

@@ -4,8 +4,6 @@ import org.easymock.EasyMock;
 import org.powermock.api.easymock.PowerMock;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.SPathDataObject;
-import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
@@ -43,7 +41,7 @@ public class SarosMocks {
     }
 
     /**
-     * Creates a mocked SPath (including its SPathDataObject "twin").
+     * Creates a mocked SPath
      * 
      * The method {@link Object#toString()} is <i>not</i> mocked and may be
      * called (e.g. for logging/messages).
@@ -52,24 +50,12 @@ public class SarosMocks {
      *         {@link PowerMock#replay(Object...)}).
      */
     public static SPath prepareMockSPath() {
-        SPath path = PowerMock.createPartialMockForAllMethodsExcept(
-            SPath.class, "toString");
-        SPathDataObject pathDO = EasyMock.createMock(SPathDataObject.class);
-
-        EasyMock.expect(
-            path.toSPathDataObject(EasyMock.isA(ISarosSession.class),
-                EasyMock.isA(IPathFactory.class))).andStubReturn(pathDO);
-        EasyMock.expect(
-            pathDO.toSPath(EasyMock.isA(ISarosSession.class),
-                EasyMock.isA(IPathFactory.class))).andStubReturn(path);
-
-        EasyMock.replay(pathDO);
-
-        return path;
+        return PowerMock.createPartialMockForAllMethodsExcept(SPath.class,
+            "toString");
     }
 
     /**
-     * Creates a mocked SPath (including its SPathDataObject "twin")
+     * Creates a mocked SPath
      * 
      * @return a replayed PowerMock
      */

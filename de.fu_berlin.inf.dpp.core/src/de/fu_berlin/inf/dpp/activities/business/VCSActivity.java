@@ -5,7 +5,6 @@ import java.util.Vector;
 import org.apache.commons.lang.ObjectUtils;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.VCSActivityDataObject;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
@@ -140,15 +139,15 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
     @Override
     public IActivityDataObject getActivityDataObject(
         ISarosSession sarosSession, IPathFactory pathFactory) {
-        SPathDataObject sPathDataObject = (path == null) ? null : path
-            .toSPathDataObject(sarosSession, pathFactory);
+
         Vector<IActivityDataObject> ados = new Vector<IActivityDataObject>(
             containedActivity.size());
-        for (IResourceActivity a : containedActivity) {
+
+        for (IResourceActivity a : containedActivity)
             ados.add(a.getActivityDataObject(sarosSession, pathFactory));
-        }
+
         return new VCSActivityDataObject(getSource().getJID(), getType(), url,
-            sPathDataObject, directory, param1, ados);
+            path, directory, param1, ados);
     }
 
     @Override

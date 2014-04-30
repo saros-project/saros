@@ -131,8 +131,6 @@ public class EditorActivity extends AbstractActivity implements
     @Override
     public IActivityDataObject getActivityDataObject(
         ISarosSession sarosSession, IPathFactory pathFactory) {
-        return new EditorActivityDataObject(getSource().getJID(), type,
-            (path != null ? path.toSPathDataObject(sarosSession, pathFactory)
-                : null));
+        return new EditorActivityDataObject(getSource().getJID(), type, path);
     }
 }

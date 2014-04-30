@@ -4,7 +4,7 @@ import org.apache.commons.lang.ObjectUtils;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-import de.fu_berlin.inf.dpp.activities.SPathDataObject;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
@@ -32,7 +32,7 @@ public class JupiterActivityDataObject extends
     protected final Operation operation;
 
     public JupiterActivityDataObject(Timestamp timestamp, Operation operation,
-        JID source, SPathDataObject path) {
+        JID source, SPath path) {
 
         super(source, path);
 
@@ -79,7 +79,6 @@ public class JupiterActivityDataObject extends
     public IActivity getActivity(ISarosSession sarosSession,
         IPathFactory pathFactory) {
         return new JupiterActivity(timestamp, operation,
-            sarosSession.getUser(getSource()), getPath() != null ? getPath()
-                .toSPath(sarosSession, pathFactory) : null);
+            sarosSession.getUser(getSource()), getPath());
     }
 }

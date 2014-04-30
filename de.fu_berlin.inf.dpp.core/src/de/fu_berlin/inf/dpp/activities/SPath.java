@@ -2,13 +2,13 @@ package de.fu_berlin.inf.dpp.activities;
 
 import org.apache.commons.lang.ObjectUtils;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
 
 /**
  * Objects of this class point to a document in the *workspace*, possibly with
@@ -19,6 +19,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
  * 
  * @immutable SPaths are value objects and thus immutable.
  */
+@XStreamAlias("SPath")
 public class SPath {
 
     /**
@@ -59,7 +60,8 @@ public class SPath {
      * resource or editor identified by the given path in the given project.
      * 
      * @param path
-     *            maybe <code>null</code> to represent "no editor"
+     *            May be <code>null</code> to represent "no editor".<br>
+     *            <em>FIXME <code>path == null</code> causes a NPE</em>
      * @throws IllegalArgumentException
      *             if the path is not relative
      */
@@ -81,22 +83,6 @@ public class SPath {
      */
     public SPath(IResource resource) {
         this(resource.getProject(), resource.getProjectRelativePath());
-    }
-
-    /**
-     * Turns this SPath into an SPathDataObject representing it globally.
-     */
-    public SPathDataObject toSPathDataObject(ISarosSession sarosSession,
-        IPathFactory pathFactory) {
-
-        String id = sarosSession.getProjectID(project);
-        if (id == null)
-            throw new IllegalArgumentException(
-                "Trying to send a SPath which refers to a file in project which is not shared: "
-                    + this);
-
-        return new SPathDataObject(id,
-            pathFactory.fromPath(projectRelativePath), editorType);
     }
 
     /**

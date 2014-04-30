@@ -91,8 +91,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      */
     private Map<String, IProject> localProjects;
 
-    private JID jid;
-
     private final ISarosSession sarosSession;
 
     private boolean running;
@@ -108,7 +106,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         this.processID = processID;
         this.projectInfos = projectInfos;
         this.localProjects = new HashMap<String, IProject>();
-        this.jid = peer;
     }
 
     @Override
@@ -199,12 +196,22 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
             awaitActivityQueueingActivation(this.monitor.newChild(0));
 
-            // the user who sends this ProjectNegotiation is now responsible for
-            // all resources from that project
+            /*
+             * the user who sends this ProjectNegotiation is now responsible for
+             * the resources of the contained projects
+             */
             for (Entry<String, IProject> entry : localProjects.entrySet()) {
-                sarosSession.addProjectOwnership(entry.getKey(),
-                    ResourceAdapterFactory.create(entry.getValue()), jid);
-                sarosSession.enableQueuing(entry.getKey());
+                de.fu_berlin.inf.dpp.filesystem.IProject project = ResourceAdapterFactory
+                    .create(entry.getValue());
+
+                /*
+                 * TODO Move enable (and disable) queuing responsibility to
+                 * SarosSession, since the second call relies on the first one,
+                 * and the first one is never done without the second. (See also
+                 * finally block below.)
+                 */
+                sarosSession.addProjectMapping(entry.getKey(), project, peer);
+                sarosSession.enableQueuing(project);
             }
 
             transmitter.sendToSessionUser(ISarosSession.SESSION_CONNECTION_ID,
@@ -249,6 +256,10 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         } catch (Exception e) {
             exception = e;
         } finally {
+            /*
+             * TODO Move disable queuing responsibility to SarosSession (see
+             * todo above in for loop).
+             */
             sarosSession.disableQueuing();
 
             if (fileTransferManager != null)
@@ -467,7 +478,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             // TODO Consider other Team providers
             if (newLocalProject.getName().equals(newProjectName) && vcs != null
                 && !vcs.isManaged(newLocalProject) && !projectInfo.isPartial()) {
-                
+
                 String repositoryRoot = remoteFileList.getRepositoryRoot();
                 String directory = remoteFileList.getProjectInfo().url
                     .substring(repositoryRoot.length());
@@ -559,8 +570,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
          * properly !
          */
         for (Entry<String, IProject> entry : localProjects.entrySet())
-            sarosSession.removeProjectOwnership(entry.getKey(),
-                ResourceAdapterFactory.create(entry.getValue()), jid);
+            sarosSession.removeProjectMapping(entry.getKey(),
+                ResourceAdapterFactory.create(entry.getValue()), peer);
 
         // The session might have been stopped already, if not we will stop it.
         if (sarosSession.getProjectResourcesMapping().keySet().isEmpty()

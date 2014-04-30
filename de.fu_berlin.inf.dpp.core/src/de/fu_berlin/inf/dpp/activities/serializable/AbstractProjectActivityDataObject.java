@@ -4,16 +4,16 @@ import org.apache.commons.lang.ObjectUtils;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-import de.fu_berlin.inf.dpp.activities.SPathDataObject;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.net.JID;
 
 public abstract class AbstractProjectActivityDataObject extends
     AbstractActivityDataObject {
 
     @XStreamAlias("p")
-    protected SPathDataObject path;
+    protected SPath path;
 
-    public AbstractProjectActivityDataObject(JID source, SPathDataObject path) {
+    public AbstractProjectActivityDataObject(JID source, SPath path) {
         super(source);
 
         this.path = path;
@@ -22,7 +22,7 @@ public abstract class AbstractProjectActivityDataObject extends
     /**
      * @return may be <code>null</code>, depending on implementation
      */
-    public SPathDataObject getPath() {
+    public SPath getPath() {
         return path;
     }
 

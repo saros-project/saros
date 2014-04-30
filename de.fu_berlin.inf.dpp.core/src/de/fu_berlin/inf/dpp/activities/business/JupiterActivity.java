@@ -95,7 +95,6 @@ public class JupiterActivity extends AbstractActivity implements
     public IActivityDataObject getActivityDataObject(
         ISarosSession sarosSession, IPathFactory pathFactory) {
         return new JupiterActivityDataObject(timestamp, operation, getSource()
-            .getJID(), (path != null ? path.toSPathDataObject(sarosSession,
-            pathFactory) : null));
+            .getJID(), path);
     }
 }

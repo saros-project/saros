@@ -24,8 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 
-import de.fu_berlin.inf.dpp.activities.business.FileActivity;
-import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
+import de.fu_berlin.inf.dpp.activities.business.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
@@ -463,30 +462,41 @@ public interface ISarosSession {
     public List<IResource> getSharedResources(IProject project);
 
     /**
-     * Adds to the SarosProjectMapper the mapping of JID to project. This is
-     * done to identify the resources host.
+     * Stores a bidirectional mapping between <code>project</code> and
+     * <code>projectID</code>, and allows to identify the resources' owner.
+     * <p>
+     * This information is necessary for receiving (unserializing)
+     * resource-related activities.
      * 
      * @param projectID
-     *            ID of the project
+     *            Session-wide ID of the project
      * @param project
-     *            the IProject itself
+     *            the local representation of the project
      * @param ownerJID
      *            the inviter to this project
+     * 
+     * @see #removeProjectMapping(String, IProject, JID)
      */
-    public void addProjectOwnership(String projectID, IProject project,
+    public void addProjectMapping(String projectID, IProject project,
         JID ownerJID);
 
     /**
-     * Removes the mapping of the project from the SarosProjectMapper.
+     * Removes the bidirectional mapping <code>project</code> and
+     * <code>projectId</code> that was created by
+     * {@link #addProjectMapping(String, IProject, JID) addProjectMapping()} .
+     * <p>
+     * TODO Why are all three parameters needed here? This forces callers to
+     * store the mapping themselves (or retrieve it just before calling this
+     * method).
      * 
      * @param projectID
-     *            ID of the project
+     *            Session-wide ID of the project
      * @param project
-     *            the IProject itself
+     *            the local representation of the project
      * @param ownerJID
      *            the inviter to this project
      */
-    public void removeProjectOwnership(String projectID, IProject project,
+    public void removeProjectMapping(String projectID, IProject project,
         JID ownerJID);
 
     /**
@@ -507,19 +517,26 @@ public interface ISarosSession {
 
     /**
      * FOR INTERNAL USE ONLY !
+     * <p>
+     * Starts queuing of incoming {@linkplain IResourceActivity project-related
+     * activities}, since they cannot be applied before their corresponding
+     * project is received and extracted.
+     * <p>
+     * That queuing relies on an existing project-to-projectID mapping (see
+     * {@link #addProjectMapping(String, IProject, JID)}), otherwise incoming
+     * activities cannot be queued and will be lost.
      * 
-     * Starts queuing project related activities (e.g {@link FileActivity} or
-     * {@link JupiterActivity}) for a shared project.
+     * @param project
+     *            the project for which project-related activities should be
+     *            queued
      * 
-     * @param projectId
-     *            the id of the project for which project related activities
-     *            should be queued
+     * @see #disableQueuing()
      */
-    public void enableQueuing(String projectId);
+    public void enableQueuing(IProject project);
 
     /**
      * FOR INTERNAL USE ONLY !
-     * 
+     * <p>
      * Disables queuing for all shared projects and flushes all queued
      * activities.
      */

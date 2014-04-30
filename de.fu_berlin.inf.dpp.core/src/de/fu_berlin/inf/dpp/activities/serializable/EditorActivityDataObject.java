@@ -24,7 +24,7 @@ import org.apache.commons.lang.ObjectUtils;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-import de.fu_berlin.inf.dpp.activities.SPathDataObject;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.business.EditorActivity.Type;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
@@ -49,7 +49,7 @@ public class EditorActivityDataObject extends AbstractProjectActivityDataObject 
      *            a valid project-relative path or <code>null</code> if former
      *            resource should be deactivated.
      */
-    public EditorActivityDataObject(JID source, Type type, SPathDataObject path) {
+    public EditorActivityDataObject(JID source, Type type, SPath path) {
         super(source, path);
 
         this.type = type;
@@ -89,8 +89,7 @@ public class EditorActivityDataObject extends AbstractProjectActivityDataObject 
     public IActivity getActivity(ISarosSession sarosSession,
         IPathFactory pathFactory) {
         return new EditorActivity(sarosSession.getUser(getSource()), type,
-            (getPath() != null ? getPath().toSPath(sarosSession, pathFactory)
-                : null));
+            getPath());
     }
 
     @Deprecated

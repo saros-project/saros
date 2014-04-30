@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.fu_berlin.inf.dpp.activities.SPathDataObject;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.ChecksumActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
@@ -66,8 +66,8 @@ public class ActivityUtils {
 
         boolean[] dropDAOIdx = new boolean[activities.size()];
 
-        Map<SPathDataObject, Integer> selections = new HashMap<SPathDataObject, Integer>();
-        Map<SPathDataObject, Integer> viewports = new HashMap<SPathDataObject, Integer>();
+        Map<SPath, Integer> selections = new HashMap<SPath, Integer>();
+        Map<SPath, Integer> viewports = new HashMap<SPath, Integer>();
 
         /*
          * keep only the latest selection/viewport activities per project and
@@ -80,7 +80,7 @@ public class ActivityUtils {
 
             if (dao instanceof TextSelectionActivityDataObject) {
 
-                SPathDataObject daoPath = ((TextSelectionActivityDataObject) dao)
+                SPath daoPath = ((TextSelectionActivityDataObject) dao)
                     .getPath();
 
                 Integer idx = selections.get(daoPath);
@@ -90,8 +90,7 @@ public class ActivityUtils {
 
                 selections.put(daoPath, daoIdx);
             } else if (dao instanceof ViewportActivityDataObject) {
-                SPathDataObject daoPath = ((ViewportActivityDataObject) dao)
-                    .getPath();
+                SPath daoPath = ((ViewportActivityDataObject) dao).getPath();
 
                 Integer idx = viewports.get(daoPath);
 

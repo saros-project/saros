@@ -41,9 +41,7 @@ public class RecoveryFileActivity extends FileActivity implements
     public IActivityDataObject getActivityDataObject(
         ISarosSession sarosSession, IPathFactory pathFactory) {
         return new RecoveryFileActivityDataObject(getSource().getJID(),
-            target.getJID(), type, newPath.toSPathDataObject(sarosSession,
-                pathFactory), (oldPath != null ? oldPath.toSPathDataObject(
-                sarosSession, pathFactory) : null), data);
+            target.getJID(), type, newPath, oldPath, data);
     }
 
     /**

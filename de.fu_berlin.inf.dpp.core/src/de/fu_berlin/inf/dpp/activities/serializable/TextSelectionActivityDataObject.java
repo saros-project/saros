@@ -24,7 +24,7 @@ import org.apache.commons.lang.ObjectUtils;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-import de.fu_berlin.inf.dpp.activities.SPathDataObject;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
@@ -44,7 +44,7 @@ public class TextSelectionActivityDataObject extends
     private final int length;
 
     public TextSelectionActivityDataObject(JID source, int offset, int length,
-        SPathDataObject path) {
+        SPath path) {
 
         super(source, path);
 
@@ -90,7 +90,6 @@ public class TextSelectionActivityDataObject extends
     public IActivity getActivity(ISarosSession sarosSession,
         IPathFactory pathFactory) {
         return new TextSelectionActivity(sarosSession.getUser(getSource()),
-            offset, length, (getPath() != null ? getPath().toSPath(
-                sarosSession, pathFactory) : null));
+            offset, length, getPath());
     }
 }

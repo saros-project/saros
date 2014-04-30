@@ -114,6 +114,12 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 sendAndAwaitActivityQueueingActivation(monitor);
                 monitor.subTask("");
 
+                User user = sarosSession.getUser(peer);
+
+                if (user == null)
+                    throw new LocalCancellationException(null,
+                        CancelOption.DO_NOT_NOTIFY_PEER);
+
                 /*
                  * inform all listeners that the peer has started queuing and
                  * can therefore process IResourceActivities now
@@ -123,13 +129,6 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                  * activities at this time. Maybe change the description of the
                  * listener interface ?
                  */
-
-                User user = sarosSession.getUser(peer);
-
-                if (user == null)
-                    throw new LocalCancellationException(null,
-                        CancelOption.DO_NOT_NOTIFY_PEER);
-
                 sarosSession.userStartedQueuing(user);
 
                 zipArchives = createProjectArchives(fileLists, monitor);

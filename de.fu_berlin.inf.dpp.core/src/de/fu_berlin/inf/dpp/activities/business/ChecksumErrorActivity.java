@@ -19,13 +19,11 @@
  */
 package de.fu_berlin.inf.dpp.activities.business;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.ObjectUtils;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ChecksumErrorActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
@@ -80,16 +78,9 @@ public class ChecksumErrorActivity extends AbstractActivity implements
     @Override
     public IActivityDataObject getActivityDataObject(
         ISarosSession sarosSession, IPathFactory pathFactory) {
-        ArrayList<SPathDataObject> dataObjectPaths = null;
-        if (this.paths != null) {
-            dataObjectPaths = new ArrayList<SPathDataObject>();
-            for (SPath path : this.paths) {
-                dataObjectPaths.add(path.toSPathDataObject(sarosSession,
-                    pathFactory));
-            }
-        }
+
         return new ChecksumErrorActivityDataObject(getSource().getJID(),
-            target.getJID(), dataObjectPaths, recoveryID);
+            target.getJID(), paths, recoveryID);
     }
 
     @Override

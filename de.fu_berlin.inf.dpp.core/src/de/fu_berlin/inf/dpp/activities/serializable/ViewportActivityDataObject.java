@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.activities.serializable;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-import de.fu_berlin.inf.dpp.activities.SPathDataObject;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.ViewportActivity;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
@@ -22,7 +22,7 @@ public class ViewportActivityDataObject extends
     protected final int numberOfLines;
 
     public ViewportActivityDataObject(JID source, int startLine,
-        int numberOfLines, SPathDataObject path) {
+        int numberOfLines, SPath path) {
 
         super(source, path);
 
@@ -68,7 +68,6 @@ public class ViewportActivityDataObject extends
     public IActivity getActivity(ISarosSession sarosSession,
         IPathFactory pathFactory) {
         return new ViewportActivity(sarosSession.getUser(getSource()),
-            startLine, numberOfLines, (getPath() != null ? getPath().toSPath(
-                sarosSession, pathFactory) : null));
+            startLine, numberOfLines, getPath());
     }
 }

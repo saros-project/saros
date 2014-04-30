@@ -9,10 +9,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.easymock.EasyMock;
+import org.eclipse.core.runtime.Path;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.activities.SPathDataObject;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.serializable.EditorActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
@@ -21,25 +24,38 @@ import de.fu_berlin.inf.dpp.activities.serializable.NOPActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.StartFollowingActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterVectorTime;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
+import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.net.JID;
 
 public class ActivityQueuerTest {
 
     private static final JID ALICE = new JID("Alice");
     private static final JID BOB = new JID("Bob");
-    private static final String SHARED_PROJECT_ID = "1234";
-    private static final String NOT_SHARED_PROJECT_ID = "4321";
 
-    private static final SPathDataObject FOO_PATH_SHARED_PROJECT = new SPathDataObject(
-        SHARED_PROJECT_ID, "foo", "editorType");
+    private static IProject SHARED_PROJECT;
+    private static IProject NOT_SHARED_PROJECT;
 
-    private static final SPathDataObject BAR_PATH_SHARED_PROJECT = new SPathDataObject(
-        SHARED_PROJECT_ID, "bar", "editorType");
-
-    private static final SPathDataObject PATH_TO_NOT_SHARED_PROJECT = new SPathDataObject(
-        NOT_SHARED_PROJECT_ID, "unshared", "editorType");
+    private static SPath FOO_PATH_SHARED_PROJECT;
+    private static SPath BAR_PATH_SHARED_PROJECT;
+    private static SPath PATH_TO_NOT_SHARED_PROJECT;
 
     private ActivityQueuer activityQueuer;
+
+    @BeforeClass
+    public static void prepare() {
+        SHARED_PROJECT = EasyMock.createMock(IProject.class);
+        NOT_SHARED_PROJECT = EasyMock.createMock(IProject.class);
+
+        FOO_PATH_SHARED_PROJECT = new SPath(SHARED_PROJECT,
+            ResourceAdapterFactory.create(new Path("foo")));
+
+        BAR_PATH_SHARED_PROJECT = new SPath(SHARED_PROJECT,
+            ResourceAdapterFactory.create(new Path("bar")));
+
+        PATH_TO_NOT_SHARED_PROJECT = new SPath(NOT_SHARED_PROJECT,
+            ResourceAdapterFactory.create(new Path("unshared")));
+    }
 
     @Before
     public void setUp() {
@@ -70,7 +86,7 @@ public class ActivityQueuerTest {
         IActivityDataObject activityToBeQueued = createJupiterActivity(PATH_TO_NOT_SHARED_PROJECT);
         activities.add(activityToBeQueued);
 
-        activityQueuer.enableQueuing(NOT_SHARED_PROJECT_ID);
+        activityQueuer.enableQueuing(NOT_SHARED_PROJECT);
 
         List<IActivityDataObject> processedActivities = activityQueuer
             .process(activities);
@@ -110,7 +126,7 @@ public class ActivityQueuerTest {
 
     @Test
     public void testQueuingEnabledWithActivityWithoutPath() {
-        activityQueuer.enableQueuing(NOT_SHARED_PROJECT_ID);
+        activityQueuer.enableQueuing(NOT_SHARED_PROJECT);
 
         IActivityDataObject serializedEditorActivity = new EditorActivityDataObject(
             ALICE, EditorActivity.Type.ACTIVATED, null);
@@ -157,7 +173,7 @@ public class ActivityQueuerTest {
         List<IActivityDataObject> ados;
 
         activityQueuer = new ActivityQueuer();
-        activityQueuer.enableQueuing(SHARED_PROJECT_ID);
+        activityQueuer.enableQueuing(SHARED_PROJECT);
 
         activityQueuer.process(Collections.singletonList(fooJupiterADO));
         activityQueuer.disableQueuing();
@@ -178,7 +194,7 @@ public class ActivityQueuerTest {
         // ------------------------------------------
 
         activityQueuer = new ActivityQueuer();
-        activityQueuer.enableQueuing(SHARED_PROJECT_ID);
+        activityQueuer.enableQueuing(SHARED_PROJECT);
 
         activityQueuer.process(Collections.singletonList(fooClosedEditorADO));
         activityQueuer.disableQueuing();
@@ -195,7 +211,7 @@ public class ActivityQueuerTest {
         // ------------------------------------------
 
         activityQueuer = new ActivityQueuer();
-        activityQueuer.enableQueuing(SHARED_PROJECT_ID);
+        activityQueuer.enableQueuing(SHARED_PROJECT);
 
         activityQueuer.process(Collections.singletonList(fooSavedEditorADO));
         activityQueuer.disableQueuing();
@@ -212,7 +228,7 @@ public class ActivityQueuerTest {
         // ------------------------------------------
 
         activityQueuer = new ActivityQueuer();
-        activityQueuer.enableQueuing(SHARED_PROJECT_ID);
+        activityQueuer.enableQueuing(SHARED_PROJECT);
 
         activityQueuer.process(Arrays.asList(fooJupiterADO, fooSavedEditorADO,
             fooClosedEditorADO));
@@ -231,7 +247,7 @@ public class ActivityQueuerTest {
         // ------------------------------------------
 
         activityQueuer = new ActivityQueuer();
-        activityQueuer.enableQueuing(SHARED_PROJECT_ID);
+        activityQueuer.enableQueuing(SHARED_PROJECT);
 
         activityQueuer.process(Arrays.asList(fooJupiterADO, barJupiterADO));
         activityQueuer.disableQueuing();
@@ -265,7 +281,7 @@ public class ActivityQueuerTest {
             FOO_PATH_SHARED_PROJECT);
 
         activityQueuer = new ActivityQueuer();
-        activityQueuer.enableQueuing(SHARED_PROJECT_ID);
+        activityQueuer.enableQueuing(SHARED_PROJECT);
 
         activityQueuer.process(Arrays.asList(aliceJupiterADO, bobJupiterADO));
         activityQueuer.disableQueuing();
@@ -294,7 +310,7 @@ public class ActivityQueuerTest {
         return activities;
     }
 
-    private JupiterActivityDataObject createJupiterActivity(SPathDataObject path) {
+    private JupiterActivityDataObject createJupiterActivity(SPath path) {
         return new JupiterActivityDataObject(new JupiterVectorTime(0, 0),
             new NoOperation(), BOB, path);
     }

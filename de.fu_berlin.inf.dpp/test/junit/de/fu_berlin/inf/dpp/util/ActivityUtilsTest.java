@@ -9,14 +9,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.easymock.EasyMock;
+import org.eclipse.core.runtime.Path;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.activities.SPathDataObject;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.ChecksumActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.NOPActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
+import de.fu_berlin.inf.dpp.filesystem.IPath;
+import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.net.JID;
 
 public class ActivityUtilsTest {
@@ -24,17 +29,19 @@ public class ActivityUtilsTest {
     private final JID aliceJID = new JID("alice@junit");
     private final JID bobJID = new JID("bob@junit");
 
-    private final String fooPath = "foo";
-    private final String barPath = "bar";
+    private final IPath fooPath = ResourceAdapterFactory
+        .create(new Path("foo"));
+    private final IPath barPath = ResourceAdapterFactory
+        .create(new Path("bar"));
 
-    private final String fooProject = "foo";
-    private final String barProject = "bar";
+    private final IProject fooProject = EasyMock.createMock(IProject.class);
+    private final IProject barProject = EasyMock.createMock(IProject.class);
 
     private final NOPActivityDataObject nopADO = new NOPActivityDataObject(
         aliceJID, bobJID, 0);
 
     private final ChecksumActivityDataObject checksumADO = new ChecksumActivityDataObject(
-        aliceJID, new SPathDataObject(fooProject, fooPath, ""), 0, 0, null);
+        aliceJID, new SPath(fooProject, fooPath), 0, 0, null);
 
     @Test
     public void testContainsChecksumsOnly() {
@@ -63,67 +70,63 @@ public class ActivityUtilsTest {
     @Test
     public void testOptimize() {
 
-        SPathDataObject foofooSPDO = new SPathDataObject(fooProject, fooPath,
-            "");
+        SPath foofooSPath = new SPath(fooProject, fooPath);
 
-        SPathDataObject foobarSPDO = new SPathDataObject(fooProject, barPath,
-            "");
+        SPath foobarSPath = new SPath(fooProject, barPath);
 
-        SPathDataObject barfooSPDO = new SPathDataObject(barProject, fooPath,
-            "");
+        SPath barfooSPath = new SPath(barProject, fooPath);
 
-        SPathDataObject barbarSPDO = new SPathDataObject(barProject, barPath,
-            "");
+        SPath barbarSPath = new SPath(barProject, barPath);
 
         TextSelectionActivityDataObject tsChange0ADO = new TextSelectionActivityDataObject(
-            aliceJID, 0, 1, foofooSPDO);
+            aliceJID, 0, 1, foofooSPath);
 
         TextSelectionActivityDataObject tsChange1ADO = new TextSelectionActivityDataObject(
-            aliceJID, 1, 1, foofooSPDO);
+            aliceJID, 1, 1, foofooSPath);
 
         TextSelectionActivityDataObject tsChange2ADO = new TextSelectionActivityDataObject(
-            aliceJID, 0, 1, foobarSPDO);
+            aliceJID, 0, 1, foobarSPath);
 
         TextSelectionActivityDataObject tsChange3ADO = new TextSelectionActivityDataObject(
-            aliceJID, 1, 1, foobarSPDO);
+            aliceJID, 1, 1, foobarSPath);
 
         TextSelectionActivityDataObject tsChange4ADO = new TextSelectionActivityDataObject(
-            aliceJID, 0, 1, barfooSPDO);
+            aliceJID, 0, 1, barfooSPath);
 
         TextSelectionActivityDataObject tsChange5ADO = new TextSelectionActivityDataObject(
-            aliceJID, 1, 1, barfooSPDO);
+            aliceJID, 1, 1, barfooSPath);
 
         TextSelectionActivityDataObject tsChange6ADO = new TextSelectionActivityDataObject(
-            aliceJID, 0, 1, barbarSPDO);
+            aliceJID, 0, 1, barbarSPath);
 
         TextSelectionActivityDataObject tsChange7ADO = new TextSelectionActivityDataObject(
-            aliceJID, 1, 1, barbarSPDO);
+            aliceJID, 1, 1, barbarSPath);
 
         // --------------------------------------------------------------------------------
 
         ViewportActivityDataObject vpChange0ADO = new ViewportActivityDataObject(
-            aliceJID, 0, 1, foofooSPDO);
+            aliceJID, 0, 1, foofooSPath);
 
         ViewportActivityDataObject vpChange1ADO = new ViewportActivityDataObject(
-            aliceJID, 1, 1, foofooSPDO);
+            aliceJID, 1, 1, foofooSPath);
 
         ViewportActivityDataObject vpChange2ADO = new ViewportActivityDataObject(
-            aliceJID, 0, 1, foobarSPDO);
+            aliceJID, 0, 1, foobarSPath);
 
         ViewportActivityDataObject vpChange3ADO = new ViewportActivityDataObject(
-            aliceJID, 1, 1, foobarSPDO);
+            aliceJID, 1, 1, foobarSPath);
 
         ViewportActivityDataObject vpChange4ADO = new ViewportActivityDataObject(
-            aliceJID, 0, 1, barfooSPDO);
+            aliceJID, 0, 1, barfooSPath);
 
         ViewportActivityDataObject vpChange5ADO = new ViewportActivityDataObject(
-            aliceJID, 1, 1, barfooSPDO);
+            aliceJID, 1, 1, barfooSPath);
 
         ViewportActivityDataObject vpChange6ADO = new ViewportActivityDataObject(
-            aliceJID, 0, 1, barbarSPDO);
+            aliceJID, 0, 1, barbarSPath);
 
         ViewportActivityDataObject vpChange7ADO = new ViewportActivityDataObject(
-            aliceJID, 1, 1, barbarSPDO);
+            aliceJID, 1, 1, barbarSPath);
 
         List<IActivityDataObject> ados = new ArrayList<IActivityDataObject>();
 

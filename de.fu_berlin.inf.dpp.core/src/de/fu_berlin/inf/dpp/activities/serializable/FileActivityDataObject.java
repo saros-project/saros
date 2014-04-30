@@ -7,7 +7,7 @@ import org.apache.commons.lang.ObjectUtils;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-import de.fu_berlin.inf.dpp.activities.SPathDataObject;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Type;
@@ -22,7 +22,7 @@ public class FileActivityDataObject extends AbstractProjectActivityDataObject {
     @XStreamAsAttribute
     protected Type type;
 
-    protected SPathDataObject oldPath;
+    protected SPath oldPath;
 
     @XStreamAsAttribute
     protected Purpose purpose;
@@ -45,9 +45,8 @@ public class FileActivityDataObject extends AbstractProjectActivityDataObject {
      *            data of the file to be created (only valid for creating and
      *            moving)
      */
-    public FileActivityDataObject(JID source, Type type,
-        SPathDataObject newPath, SPathDataObject oldPath, byte[] data,
-        Purpose purpose) {
+    public FileActivityDataObject(JID source, Type type, SPath newPath,
+        SPath oldPath, byte[] data, Purpose purpose) {
 
         super(source, newPath);
 
@@ -108,10 +107,7 @@ public class FileActivityDataObject extends AbstractProjectActivityDataObject {
     @Override
     public IActivity getActivity(ISarosSession sarosSession,
         IPathFactory pathFactory) {
-        SPathDataObject newPath = getPath();
-        return new FileActivity(sarosSession.getUser(source), type,
-            (newPath != null ? newPath.toSPath(sarosSession, pathFactory)
-                : null), (oldPath != null ? oldPath.toSPath(sarosSession,
-                pathFactory) : null), data, purpose);
+        return new FileActivity(sarosSession.getUser(source), type, getPath(),
+            oldPath, data, purpose);
     }
 }

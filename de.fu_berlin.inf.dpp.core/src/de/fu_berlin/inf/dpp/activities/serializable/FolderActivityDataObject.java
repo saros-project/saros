@@ -5,7 +5,7 @@ import org.apache.commons.lang.ObjectUtils;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-import de.fu_berlin.inf.dpp.activities.SPathDataObject;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.business.FolderActivity.Type;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
@@ -19,7 +19,7 @@ public class FolderActivityDataObject extends AbstractProjectActivityDataObject 
     @XStreamAsAttribute
     protected final Type type;
 
-    public FolderActivityDataObject(JID source, Type type, SPathDataObject path) {
+    public FolderActivityDataObject(JID source, Type type, SPath path) {
         super(source, path);
 
         this.type = type;
@@ -63,7 +63,6 @@ public class FolderActivityDataObject extends AbstractProjectActivityDataObject 
     public IActivity getActivity(ISarosSession sarosSession,
         IPathFactory pathFactory) {
         return new FolderActivity(sarosSession.getUser(getSource()), type,
-            (getPath() != null ? getPath().toSPath(sarosSession, pathFactory)
-                : null));
+            getPath());
     }
 }

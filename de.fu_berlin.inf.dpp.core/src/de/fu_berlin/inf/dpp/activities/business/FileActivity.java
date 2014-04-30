@@ -218,9 +218,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
     @Override
     public IActivityDataObject getActivityDataObject(
         ISarosSession sarosSession, IPathFactory pathFactory) {
-        return new FileActivityDataObject(getSource().getJID(), type,
-            newPath.toSPathDataObject(sarosSession, pathFactory),
-            (oldPath != null ? oldPath.toSPathDataObject(sarosSession,
-                pathFactory) : null), data, purpose);
+        return new FileActivityDataObject(getSource().getJID(), type, newPath,
+            oldPath, data, purpose);
     }
 }

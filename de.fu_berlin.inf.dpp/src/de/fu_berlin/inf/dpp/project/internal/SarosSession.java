@@ -47,6 +47,7 @@ import de.fu_berlin.inf.dpp.activities.business.NOPActivity;
 import de.fu_berlin.inf.dpp.activities.business.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.business.ViewportActivity;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
+import de.fu_berlin.inf.dpp.communication.extensions.ActivitiesExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.KickUserExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.LeaveSessionExtension;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
@@ -71,6 +72,7 @@ import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.misc.xstream.SPathConverter;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
@@ -210,6 +212,8 @@ public final class SarosSession implements ISarosSession {
             }
         }
     };
+
+    private SPathConverter pathConverter;
 
     /**
      * Constructor for host.
@@ -595,6 +599,9 @@ public final class SarosSession implements ISarosSession {
         for (User user : getRemoteUsers())
             activitySequencer.registerUser(user);
 
+        // TODO Pull that out
+        pathConverter = new SPathConverter(this, pathFactory);
+        ActivitiesExtension.PROVIDER.registerConverter(pathConverter);
     }
 
     /**
@@ -636,6 +643,9 @@ public final class SarosSession implements ISarosSession {
         for (User user : getRemoteUsers())
             transferManager.closeConnection(
                 ISarosSession.SESSION_CONNECTION_ID, user.getJID());
+
+        // TODO Pull that out
+        ActivitiesExtension.PROVIDER.unregisterConverter(pathConverter);
     }
 
     @Override
@@ -942,7 +952,7 @@ public final class SarosSession implements ISarosSession {
     }
 
     @Override
-    public void addProjectOwnership(String projectID, IProject project,
+    public void addProjectMapping(String projectID, IProject project,
         JID ownerJID) {
         if (projectMapper.getProject(projectID) == null) {
             projectMapper.addProject(projectID, project, true);
@@ -953,7 +963,7 @@ public final class SarosSession implements ISarosSession {
     }
 
     @Override
-    public void removeProjectOwnership(String projectID, IProject project,
+    public void removeProjectMapping(String projectID, IProject project,
         JID ownerJID) {
         if (projectMapper.getProject(projectID) != null) {
             projectMapper.removeOwnership(ownerJID, project);
@@ -979,8 +989,8 @@ public final class SarosSession implements ISarosSession {
     }
 
     @Override
-    public void enableQueuing(String projectId) {
-        activityQueuer.enableQueuing(projectId);
+    public void enableQueuing(IProject project) {
+        activityQueuer.enableQueuing(project);
     }
 
     @Override

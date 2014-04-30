@@ -6,7 +6,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 
-import de.fu_berlin.inf.dpp.activities.SPathDataObject;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Type;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
@@ -30,7 +30,7 @@ public class RecoveryFileActivityDataObject extends FileActivityDataObject
     protected JID target;
 
     public RecoveryFileActivityDataObject(JID source, JID target, Type type,
-        SPathDataObject newPath, SPathDataObject oldPath, byte[] data) {
+        SPath newPath, SPath oldPath, byte[] data) {
 
         super(source, type, newPath, oldPath, data, Purpose.RECOVERY);
 
@@ -41,9 +41,7 @@ public class RecoveryFileActivityDataObject extends FileActivityDataObject
     public IActivity getActivity(ISarosSession sarosSession,
         IPathFactory pathFactory) {
         return new RecoveryFileActivity(sarosSession.getUser(getSource()),
-            sarosSession.getUser(target), getType(), path.toSPath(sarosSession,
-                pathFactory), (oldPath != null ? oldPath.toSPath(sarosSession,
-                pathFactory) : null), data);
+            sarosSession.getUser(target), getType(), path, oldPath, data);
     }
 
     @Override

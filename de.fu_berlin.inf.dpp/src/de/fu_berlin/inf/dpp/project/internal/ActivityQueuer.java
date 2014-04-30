@@ -7,12 +7,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import de.fu_berlin.inf.dpp.activities.SPathDataObject;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.EditorActivity.Type;
 import de.fu_berlin.inf.dpp.activities.serializable.AbstractProjectActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.EditorActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.JupiterActivityDataObject;
+import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
@@ -23,13 +24,13 @@ public class ActivityQueuer {
 
     private final List<AbstractProjectActivityDataObject> activityQueue;
 
-    private final Set<String> projectsThatShouldBeQueued;
+    private final Set<IProject> projectsThatShouldBeQueued;
 
     private boolean stopQueuing;
 
     public ActivityQueuer() {
         activityQueue = new ArrayList<AbstractProjectActivityDataObject>();
-        projectsThatShouldBeQueued = new HashSet<String>();
+        projectsThatShouldBeQueued = new HashSet<IProject>();
         stopQueuing = false;
     }
 
@@ -38,7 +39,7 @@ public class ActivityQueuer {
      * activities} and decides which activities should be queued. All resource
      * related {@linkplain AbstractProjectActivityDataObject project activities}
      * which relate to a project that is configured for queuing using
-     * {@link #enableQueuing(String)} will be queued. The method returns all
+     * {@link #enableQueuing(IProject)} will be queued. The method returns all
      * other activities which should not be queued.
      * 
      * If a flushing of the queue was previously requested by calling
@@ -66,12 +67,12 @@ public class ActivityQueuer {
              * fired on the remote sides.
              */
 
-            Map<SPathDataObject, List<JID>> editorADOs = new HashMap<SPathDataObject, List<JID>>();
+            Map<SPath, List<JID>> editorADOs = new HashMap<SPath, List<JID>>();
 
             for (AbstractProjectActivityDataObject pado : activityQueue) {
 
-                // path cannot be null, see handleProjectActivities
-                SPathDataObject path = pado.getPath();
+                // path cannot be null, see for-loop below
+                SPath path = pado.getPath();
                 JID source = pado.getSource();
 
                 if (pado instanceof EditorActivityDataObject) {
@@ -105,26 +106,33 @@ public class ActivityQueuer {
         }
 
         for (IActivityDataObject dataObject : activities) {
-
             if (dataObject instanceof AbstractProjectActivityDataObject) {
                 AbstractProjectActivityDataObject projectDataObject = (AbstractProjectActivityDataObject) dataObject;
-                handleProjectActivities(projectDataObject,
-                    activitiesThatWillBeExecuted);
-            } else {
-                activitiesThatWillBeExecuted.add(dataObject);
+
+                SPath path = projectDataObject.getPath();
+
+                // can't queue activities without path
+                if (path != null
+                    && projectsThatShouldBeQueued.contains(path.getProject())) {
+                    activityQueue.add(projectDataObject);
+                    continue;
+                }
             }
+
+            activitiesThatWillBeExecuted.add(dataObject);
         }
+
         return activitiesThatWillBeExecuted;
     }
 
     /**
      * Enables the queuing of {@link IActivityDataObject serialized activities}
-     * related to the project with the given id.
+     * related to the given project.
      * 
-     * @param projectId
+     * @param project
      */
-    public synchronized void enableQueuing(String projectId) {
-        projectsThatShouldBeQueued.add(projectId);
+    public synchronized void enableQueuing(IProject project) {
+        projectsThatShouldBeQueued.add(project);
         stopQueuing = false;
     }
 
@@ -144,35 +152,20 @@ public class ActivityQueuer {
         stopQueuing = true;
     }
 
-    private void handleProjectActivities(
-        AbstractProjectActivityDataObject projectDataObject,
-        List<IActivityDataObject> activitiesThatWillBeExecuted) {
-        SPathDataObject path = projectDataObject.getPath();
-        if (path == null) {
-            // can't queue without path
-            activitiesThatWillBeExecuted.add(projectDataObject);
-        } else if (projectsThatShouldBeQueued.contains(path.getProjectID())) {
-            activityQueue.add(projectDataObject);
-        } else {
-            activitiesThatWillBeExecuted.add(projectDataObject);
-        }
-    }
-
     private boolean alreadyRememberedEditorADO(
-        Map<SPathDataObject, List<JID>> editorADOs, SPathDataObject spdo,
-        JID jid) {
+        Map<SPath, List<JID>> editorADOs, SPath spath, JID jid) {
 
-        List<JID> jids = editorADOs.get(spdo);
+        List<JID> jids = editorADOs.get(spath);
         return jids != null && jids.contains(jid);
     }
 
-    private void rememberEditorADO(Map<SPathDataObject, List<JID>> editorADOs,
-        SPathDataObject spdo, JID jid) {
-        List<JID> jids = editorADOs.get(spdo);
+    private void rememberEditorADO(Map<SPath, List<JID>> editorADOs,
+        SPath spath, JID jid) {
+        List<JID> jids = editorADOs.get(spath);
 
         if (jids == null) {
             jids = new ArrayList<JID>();
-            editorADOs.put(spdo, jids);
+            editorADOs.put(spath, jids);
         }
 
         if (!jids.contains(jid))

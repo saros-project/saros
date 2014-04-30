@@ -5,7 +5,7 @@ import org.apache.commons.lang.ObjectUtils;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-import de.fu_berlin.inf.dpp.activities.SPathDataObject;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
@@ -55,8 +55,8 @@ public class ChecksumActivityDataObject extends
      *            The current jupiterTimestamp for this document, may be
      *            <code>null</code>
      */
-    public ChecksumActivityDataObject(JID source, SPathDataObject path,
-        long hash, long length, Timestamp jupiterTimestamp) {
+    public ChecksumActivityDataObject(JID source, SPath path, long hash,
+        long length, Timestamp jupiterTimestamp) {
 
         super(source, path);
 
@@ -107,7 +107,6 @@ public class ChecksumActivityDataObject extends
     public IActivity getActivity(ISarosSession sarosSession,
         IPathFactory pathFactory) {
         return new ChecksumActivity(sarosSession.getUser(getSource()),
-            (getPath() != null ? getPath().toSPath(sarosSession, pathFactory)
-                : null), hash, length, jupiterTimestamp);
+            getPath(), hash, length, jupiterTimestamp);
     }
 }

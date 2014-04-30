@@ -27,7 +27,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
-import de.fu_berlin.inf.dpp.activities.SPathDataObject;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.AbstractActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.AbstractProjectActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ChangeColorActivityDataObject;
@@ -153,7 +153,7 @@ public class ActivitiesExtension extends SarosSessionPacketExtension {
                 TimestampOperation.class,
 
                 // SPATH
-                SPathDataObject.class,
+                SPath.class,
 
                 // TODO check XStream doc if those two classes are really needed
                 AbstractActivityDataObject.class,

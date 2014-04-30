@@ -19,7 +19,6 @@
  */
 package de.fu_berlin.inf.dpp.activities.serializable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -28,7 +27,6 @@ import com.thoughtworks.xstream.annotations.XStreamConverter;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumErrorActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
@@ -51,10 +49,10 @@ public class ChecksumErrorActivityDataObject extends AbstractActivityDataObject 
     protected String recoveryID;
 
     @XStreamImplicit
-    protected List<SPathDataObject> paths;
+    protected List<SPath> paths;
 
     public ChecksumErrorActivityDataObject(JID source, JID target,
-        List<SPathDataObject> paths, String recoveryID) {
+        List<SPath> paths, String recoveryID) {
 
         super(source);
 
@@ -66,15 +64,9 @@ public class ChecksumErrorActivityDataObject extends AbstractActivityDataObject 
     @Override
     public IActivity getActivity(ISarosSession sarosSession,
         IPathFactory pathFactory) {
-        ArrayList<SPath> sPaths = null;
-        if (this.paths != null) {
-            sPaths = new ArrayList<SPath>();
-            for (SPathDataObject path : this.paths) {
-                sPaths.add(path.toSPath(sarosSession, pathFactory));
-            }
-        }
+
         return new ChecksumErrorActivity(sarosSession.getUser(getSource()),
-            sarosSession.getUser(target), sPaths, recoveryID);
+            sarosSession.getUser(target), paths, recoveryID);
     }
 
     @Override
