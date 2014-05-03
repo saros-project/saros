@@ -37,9 +37,9 @@ public interface ISuperBot extends Remote {
      */
 
     /**
-     * The shell with the title {@link StfRemoteObject#SHELL_ADD_PROJECT} should
-     * be appeared by the invitees' side during sharing session. This method
-     * confirm the shell using a new project.
+     * The shell with the title {@link StfRemoteObject#SHELL_ADD_PROJECTS}
+     * should be appeared by the invitees' side during sharing session. This
+     * method confirm the shell using a new project.
      * 
      * @throws RemoteException
      */
@@ -47,9 +47,9 @@ public interface ISuperBot extends Remote {
         throws RemoteException;
 
     /**
-     * The shell with the title {@link StfRemoteObject#SHELL_ADD_PROJECT} should
-     * be appeared by the invitees' side during sharing session. This method
-     * confirm the shell using an existed project.
+     * The shell with the title {@link StfRemoteObject#SHELL_ADD_PROJECTS}
+     * should be appeared by the invitees' side during sharing session. This
+     * method confirm the shell using an existed project.
      * 
      * @throws RemoteException
      */
@@ -57,9 +57,9 @@ public interface ISuperBot extends Remote {
         throws RemoteException;
 
     /**
-     * The shell with the title {@link StfRemoteObject#SHELL_ADD_PROJECT} should
-     * be appeared by the invitees' side during sharing session. This method
-     * confirm the shell using an existed project with copy.
+     * The shell with the title {@link StfRemoteObject#SHELL_ADD_PROJECTS}
+     * should be appeared by the invitees' side during sharing session. This
+     * method confirm the shell using an existed project with copy.
      * 
      * @throws RemoteException
      */
@@ -67,10 +67,10 @@ public interface ISuperBot extends Remote {
         String projectName) throws RemoteException;
 
     /**
-     * The shell with the title {@link StfRemoteObject#SHELL_ADD_PROJECT} should
-     * be appeared by the invitees' side during sharing session. This method
-     * confirm the shell. with the passed parameter "usingWhichProject" to
-     * decide using which project.
+     * The shell with the title {@link StfRemoteObject#SHELL_ADD_PROJECTS}
+     * should be appeared by the invitees' side during sharing session. This
+     * method confirm the shell. with the passed parameter "usingWhichProject"
+     * to decide using which project.
      * 
      * @throws RemoteException
      */
@@ -189,7 +189,7 @@ public interface ISuperBot extends Remote {
     /**
      * confirm the shell with title
      * {@link StfRemoteObject#SHELL_SESSION_INVITATION} and also the following
-     * shell with title {@link StfRemoteObject#SHELL_ADD_PROJECT}
+     * shell with title {@link StfRemoteObject#SHELL_ADD_PROJECTS}
      * 
      * @param projectName
      *            the name of shared project
@@ -201,9 +201,6 @@ public interface ISuperBot extends Remote {
     public void confirmShellSessionInvitationAndShellAddProject(
         String projectName, TypeOfCreateProject usingWhichProject)
         throws RemoteException;
-
-    public void confirmShellAddProjects(String projectName,
-        TypeOfCreateProject usingWhichProject) throws RemoteException;
 
     public void confirmShellRequestOfSubscriptionReceived()
         throws RemoteException;

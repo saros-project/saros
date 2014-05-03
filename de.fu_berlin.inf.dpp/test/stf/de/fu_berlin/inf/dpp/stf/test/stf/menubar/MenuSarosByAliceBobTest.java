@@ -160,8 +160,8 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
                 Constants.CLS1);
 
         ALICE.superBot().menuBar().saros().addProjects(Constants.PROJECT2);
-        BOB.superBot().confirmShellAddProjects(Constants.PROJECT2,
-            TypeOfCreateProject.NEW_PROJECT);
+        BOB.superBot().confirmShellAddProjectUsingWhichProject(
+            Constants.PROJECT2, TypeOfCreateProject.NEW_PROJECT);
 
         BOB.superBot()
             .views()

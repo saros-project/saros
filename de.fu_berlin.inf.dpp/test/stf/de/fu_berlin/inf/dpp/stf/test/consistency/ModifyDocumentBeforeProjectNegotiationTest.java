@@ -4,7 +4,7 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.CARL;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.ACCEPT;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_ADD_PROJECT;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_ADD_PROJECTS;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_SESSION_INVITATION;
 import static org.junit.Assert.assertEquals;
 
@@ -39,7 +39,7 @@ public class ModifyDocumentBeforeProjectNegotiationTest extends StfTestCase {
 
         CARL.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
 
-        CARL.remoteBot().waitLongUntilShellIsOpen(SHELL_ADD_PROJECT);
+        CARL.remoteBot().waitLongUntilShellIsOpen(SHELL_ADD_PROJECTS);
 
         // this test will fail if a jupiter proxy is added when bob is typing
         // text now

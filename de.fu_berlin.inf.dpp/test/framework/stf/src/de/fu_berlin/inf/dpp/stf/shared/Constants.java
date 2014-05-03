@@ -354,7 +354,6 @@ public interface Constants {
     public static final String SHELL_INVITATION_CANCELLED = get("shell_invitation_cancelled");
     public static final String SHELL_SESSION_INVITATION = get("shell_session_invitation");
     public static final String SHELL_ADD_PROJECTS = get("shell_add_projects");
-    public static final String SHELL_ADD_PROJECT = get("shell_add_project");
     public static final String SHELL_ADD_PROJECTS_TO_SESSION = get("shell_add_projects_to_session");
     public static final String SHELL_PROBLEM_OCCURRED = get("shell_problem_occurred");
     public static final String SHELL_WARNING_LOCAL_CHANGES_DELETED = get("shell_warning_local_changes_deleted");

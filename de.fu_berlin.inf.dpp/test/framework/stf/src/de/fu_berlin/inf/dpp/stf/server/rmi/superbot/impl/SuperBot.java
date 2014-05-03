@@ -6,7 +6,10 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swtbot.swt.finder.SWTBot;
+import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
+import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
@@ -61,10 +64,10 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         throws RemoteException {
 
         SWTBot bot = new SWTBot();
-        bot.waitUntil(Conditions.shellIsActive(SHELL_ADD_PROJECT),
+        bot.waitUntil(Conditions.shellIsActive(SHELL_ADD_PROJECTS),
             SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
 
-        SWTBotShell shell = bot.shell(SHELL_ADD_PROJECT);
+        SWTBotShell shell = bot.shell(SHELL_ADD_PROJECTS);
         shell.activate();
 
         shell.bot().radio(RADIO_CREATE_NEW_PROJECT).click();
@@ -77,11 +80,23 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
     public void confirmShellAddProjectUsingExistProject(String projectName)
         throws RemoteException {
         SWTBot bot = new SWTBot();
-        bot.waitUntil(Conditions.shellIsActive(SHELL_ADD_PROJECT),
+        bot.waitUntil(Conditions.shellIsActive(SHELL_ADD_PROJECTS),
             SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
 
-        SWTBotShell shell = bot.shell(SHELL_ADD_PROJECT);
+        SWTBotShell shell = bot.shell(SHELL_ADD_PROJECTS);
         shell.activate();
+
+        // see https://bugs.eclipse.org/bugs/show_bug.cgi?id=344484
+        // FIXME fix the bug in the SWTBot Framework, do not use a workaround
+        final Button radioButton = shell.bot().radio(RADIO_CREATE_NEW_PROJECT).widget;
+
+        UIThreadRunnable.syncExec(new VoidResult() {
+
+            @Override
+            public void run() {
+                radioButton.setSelection(false);
+            }
+        });
 
         shell.bot().radio(RADIO_USING_EXISTING_PROJECT).click();
         shell.bot().textWithLabel("Project name", 1).setText(projectName);
@@ -125,10 +140,10 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         String projectName) throws RemoteException {
 
         SWTBot bot = new SWTBot();
-        bot.waitUntil(Conditions.shellIsActive(SHELL_ADD_PROJECT),
+        bot.waitUntil(Conditions.shellIsActive(SHELL_ADD_PROJECTS),
             SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
 
-        SWTBotShell shell = bot.shell(SHELL_ADD_PROJECT);
+        SWTBotShell shell = bot.shell(SHELL_ADD_PROJECTS);
         shell.activate();
 
         shell.bot().radio("Use existing project").click();
@@ -143,10 +158,10 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
     public void confirmShellAddProjectUsingWhichProject(String projectName,
         TypeOfCreateProject usingWhichProject) throws RemoteException {
         SWTBot bot = new SWTBot();
-        bot.waitUntil(Conditions.shellIsActive(SHELL_ADD_PROJECT),
+        bot.waitUntil(Conditions.shellIsActive(SHELL_ADD_PROJECTS),
             SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
 
-        SWTBotShell shell = bot.shell(SHELL_ADD_PROJECT);
+        SWTBotShell shell = bot.shell(SHELL_ADD_PROJECTS);
         shell.activate();
 
         switch (usingWhichProject) {
@@ -391,38 +406,6 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
 
         confirmShellAddProjectUsingWhichProject(projectName, usingWhichProject);
         views().sarosView().waitUntilIsInSession();
-    }
-
-    @Override
-    public void confirmShellAddProjects(String projectName,
-        TypeOfCreateProject usingWhichProject) throws RemoteException {
-
-        SWTBot bot = new SWTBot();
-        bot.waitUntil(Conditions.shellIsActive(SHELL_ADD_PROJECTS),
-            SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
-
-        SWTBotShell shell = bot.shell(SHELL_ADD_PROJECTS);
-
-        switch (usingWhichProject) {
-        case NEW_PROJECT:
-            shell.bot().radio(RADIO_CREATE_NEW_PROJECT).click();
-            break;
-        case EXIST_PROJECT:
-            shell.bot().radio(RADIO_USING_EXISTING_PROJECT).click();
-            shell.bot().textWithLabel("Project name", 1).setText(projectName);
-            break;
-        case EXIST_PROJECT_WITH_COPY:
-            shell.bot().radio("Use existing project").click();
-            shell
-                .bot()
-                .checkBox(
-                    "Create copy for working distributed. New project name:")
-                .click();
-            break;
-        }
-
-        shell.bot().button(FINISH).click();
-        bot.waitUntil(Conditions.shellCloses(shell));
     }
 
     @Override
