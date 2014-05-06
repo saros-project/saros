@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="saros-i" default="all">
+  
+  
+  <property file="build.properties"/>
+  <!-- Uncomment the following property if no tests compilation is needed -->
+  <!-- 
+  <property name="skip.tests" value="true"/>
+   -->
+  
+  <!-- Compiler options -->
+  
+  <property name="compiler.debug" value="on"/>
+  <property name="compiler.generate.no.warnings" value="off"/>
+  <property name="compiler.args" value=""/>
+  <property name="compiler.max.memory" value="128m"/>
+
+  <patternset id="ignored.files">
+    <exclude name="**/CVS/**"/>
+    <exclude name="**/SCCS/**"/>
+    <exclude name="**/RCS/**"/>
+    <exclude name="**/rcs/**"/>
+    <exclude name="**/.DS_Store/**"/>
+    <exclude name="**/.svn/**"/>
+    <exclude name="**/.pyc/**"/>
+    <exclude name="**/.pyo/**"/>
+    <exclude name="**/*.pyc/**"/>
+    <exclude name="**/*.pyo/**"/>
+    <exclude name="**/.git/**"/>
+    <exclude name="**/*.hprof/**"/>
+    <exclude name="**/_svn/**"/>
+    <exclude name="**/.hg/**"/>
+    <exclude name="**/*.lib/**"/>
+    <exclude name="**/*~/**"/>
+    <exclude name="**/__pycache__/**"/>
+    <exclude name="**/.bundle/**"/>
+    <exclude name="**/*.rbc/**"/>
+  </patternset>
+  <patternset id="library.patterns">
+    <include name="*.zip"/>
+    <include name="*.apk"/>
+    <include name="*.war"/>
+    <include name="*.egg"/>
+    <include name="*.ear"/>
+    <include name="*.ane"/>
+    <include name="*.swc"/>
+    <include name="*.jar"/>
+  </patternset>
+  <patternset id="compiler.resources">
+    <exclude name="**/?*.java"/>
+    <exclude name="**/?*.form"/>
+    <exclude name="**/?*.class"/>
+    <exclude name="**/?*.groovy"/>
+    <exclude name="**/?*.scala"/>
+    <exclude name="**/?*.flex"/>
+    <exclude name="**/?*.kt"/>
+    <exclude name="**/?*.clj"/>
+  </patternset>
+  
+  <!-- JDK definitions -->
+  
+  <property name="jdk.bin" value="${jdk.home}/bin"/>
+  <path id="jdk.classpath">
+    <fileset dir="${jdk.home}" includes="jre/lib/**/*.jar" />
+  </path>
+  
+  <property name="jdk.bin.idea_sdk" value="${jdk.bin}"/>
+
+  <property name="idea_sdk.lib.dir" value="${jdk.home.idea_sdk}/lib"/>
+  <path id="jdk.classpath.idea_sdk">
+    <fileset dir="${jdk.home.idea_sdk}"
+             includes="${jdk.home}/**/*.jar, lib/**/*.jar, plugins/**/*.jar"
+             excludes="lib/xstream*.jar, lib/picocontainer.jar, plugins/**/smack.jar, plugins/**/smackx.jar"/>
+  </path>
+  
+  <property name="project.jdk.home" value="${jdk.home.idea_sdk}"/>
+  <property name="project.jdk.bin" value="${jdk.bin.idea_sdk}"/>
+  <property name="project.jdk.classpath" value="jdk.classpath.idea_sdk"/>
+
+  <property name="build.dir" value="${basedir}/bin"/>
+
+  <macrodef name="compile-java">
+    <attribute name="dest.dir"/>
+    <attribute name="java.executable" default="${jdk.bin}/javac"/>
+    <attribute name="compiler.args" default="${compiler.args}"/>
+    <attribute name="classpath"/>
+    <attribute name="sourcepath"/>
+
+    <sequential>
+      <mkdir dir="@{dest.dir}"/>
+
+      <javac2 destdir="@{dest.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}"
+              memorymaximumsize="${compiler.max.memory}" fork="true" executable="@{java.executable}">
+        <compilerarg line="@{compiler.args}"/>
+        <classpath refid="@{classpath}"/>
+        <src refid="@{sourcepath}"/>
+        <patternset refid="ignored.files"/>
+      </javac2>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="copy-resources">
+    <attribute name="dest.dir"/>
+    <attribute name="src.dir" />
+    <sequential>
+      <copy todir="@{dest.dir}">
+        <fileset dir="@{src.dir}">
+          <patternset refid="compiler.resources"/>
+          <type type="file"/>
+        </fileset>
+      </copy>
+    </sequential>
+  </macrodef>
+  
+  
+  <!-- Project Libraries -->
+
+  <property name="core.basedir" value="${basedir}/../de.fu_berlin.inf.dpp.core"/>
+  <property name="core.libdir" value="${core.basedir}/lib"/>
+
+  <path id="libraries.classpath">
+    <fileset dir="${core.libdir}" includes="*.jar"/>
+  </path>
+
+  <!-- Global Libraries -->
+  <!-- Register Custom Compiler Taskdefs -->
+  <property name="javac2.home" value="${idea.home}/lib"/>
+  <path id="javac2.classpath">
+    <pathelement location="${javac2.home}/javac2.jar"/>
+    <pathelement location="${javac2.home}/jdom.jar"/>
+    <pathelement location="${javac2.home}/asm4-all.jar"/>
+    <pathelement location="${javac2.home}/jgoodies-forms.jar"/>
+  </path>
+  <target name="register.custom.compilers">
+    <taskdef name="javac2" classname="com.intellij.ant.Javac2" classpathref="javac2.classpath"/>
+    <taskdef name="instrumentIdeaExtensions" classname="com.intellij.ant.InstrumentIdeaExtensions" classpathref="javac2.classpath"/>
+  </target>
+  
+  <!-- core -->
+
+  <dirname property="core.basedir" file="${ant.file}"/>
+
+
+  <property name="core.jdk.home" value="${jdk.home}"/>
+  <property name="core.jdk.bin" value="${jdk.bin}"/>
+  <property name="core.jdk.classpath" value="jdk.classpath"/>
+  
+  <property name="core.compiler.args" value="${compiler.args}"/>
+
+  <property name="core.build.dir" value="${build.dir}/core/"/>
+  <property name="core.output.dir" value="${core.build.dir}/main"/>
+  <property name="core.testoutput.dir" value="${core.build.dir}/test"/>
+  
+  <path id="core.main.classpath">
+    <path refid="${core.jdk.classpath}"/>
+    <path refid="libraries.classpath"/>
+  </path>
+  
+  <path id="core.main.sourcepath">
+    <dirset dir="${core.basedir}/../de.fu_berlin.inf.dpp.core">
+      <include name="src"/>
+      <include name="patches"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.core" depends="compile.core.main,compile.core.tests" description="Compile core"/>
+  
+  <target name="compile.core.main" depends="register.custom.compilers" description="Compile core; main classes">
+    <compile-java dest.dir="${core.output.dir}" classpath="core.main.classpath" sourcepath="core.main.sourcepath"/>
+    <copy-resources dest.dir="${core.build.dir}" src.dir="${core.basedir}/../de.fu_berlin.inf.dpp.core/src" />
+    <copy-resources dest.dir="${core.build.dir}" src.dir="${core.basedir}/../de.fu_berlin.inf.dpp.core/patches" />
+  </target>
+
+  <target name="compile.core.tests" depends="register.custom.compilers,compile.core.main" description="compile core; test classes" unless="skip.tests"/>
+  
+  <target name="clean.core" description="cleanup core">
+    <delete dir="${core.output.dir}"/>
+    <delete dir="${core.testoutput.dir}"/>
+  </target>
+  
+  
+  <!-- saros-i -->
+
+  <dirname property="saros-i.basedir" file="${ant.file}"/>
+
+  <property name="saros-i.jdk.home" value="${project.jdk.home}"/>
+  <property name="saros-i.jdk.bin" value="${project.jdk.bin}"/>
+  <property name="saros-i.jdk.classpath" value="${project.jdk.classpath}"/>
+  
+  <property name="saros-i.compiler.args" value="${compiler.args}"/>
+
+  <property name="saros-i.build.dir" value="${build.dir}/saros-i/"/>
+  <property name="saros-i.output.dir" value="${saros-i.build.dir}/main"/>
+  <property name="saros-i.testoutput.dir" value="${saros-i.build.dir}/test"/>
+  <property name="saros-i.artifacts.dir" value="${saros-i.build.dir}/artifacts"/>
+
+  <path id="saros-i.main.classpath">
+    <path refid="${saros-i.jdk.classpath}"/>
+    <pathelement location="${core.output.dir}"/>
+    <path refid="libraries.classpath"/>
+    <path refid="jdk.classpath.idea_sdk"/>
+  </path>
+
+  <path id="saros-i.main.sourcepath">
+    <dirset dir="${saros-i.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+
+
+  <target name="compile.saros-i" depends="compile.saros-i.main,compile.saros-i.tests" description="Compile saros-i"/>
+
+  <target name="compile.saros-i.main" depends="register.custom.compilers,compile.core" description="Compile saros-i; main classes">
+    <compile-java dest.dir="${saros-i.output.dir}" classpath="saros-i.main.classpath" sourcepath="saros-i.main.sourcepath"/>
+    <copy-resources dest.dir="${saros-i.output.dir}" src.dir="${saros-i.basedir}/src" />
+  </target>
+
+  <target name="compile.saros-i.tests" depends="register.custom.compilers,compile.saros-i.main" description="compile saros-i; test classes" unless="skip.tests">
+    <compile-java dest.dir="${saros-i.testoutput.dir}" classpath="saros-i.test.classpath" sourcepath="saros-i.test.sourcepath"/>
+    <copy-resources dest.dir="${saros-i.testoutput.dir}" src.dir="${saros-i.basedir}/test/junit" />
+  </target>
+
+
+  <path id="saros-i.test.classpath">
+    <path refid="saros-i.main.classpath"/>
+    <pathelement location="${saros-i.output.dir}"/>
+  </path>
+
+  <property name="saros-i.test.dir" value="${saros-i.basedir}/test/junit"/>
+
+  <path id="saros-i.test.sourcepath">
+    <dirset dir="${saros-i.test.dir}"/>
+  </path>
+
+  <target name="clean.saros-i" description="cleanup saros-i">
+    <delete dir="${saros-i.build.dir}"/>
+  </target>
+
+  <property name="saros-i.junit.report.dir" value="${saros-i.build.dir}/junit"/>
+
+  <target name="test" depends="compile.saros-i.tests" description="run saros-i unit tests">
+    <mkdir dir="${saros-i.junit.report.dir}" />
+    <junit printsummary="yes" fork="yes" forkmode="once" haltonfailure="yes">
+
+      <classpath>
+        <pathelement location="${idea_sdk.lib.dir}/junit-4.10.jar"/>
+        <path refid="saros-i.test.classpath"/>
+        <pathelement path="${saros-i.testoutput.dir}"/>
+      </classpath>
+
+      <formatter type="xml" />
+
+      <batchtest todir="${saros-i.junit.report.dir}">
+        <fileset dir="${saros-i.test.dir}">
+          <exclude name="**/Abstract*.java"/>
+          <include name="**/*Test.java"/>
+        </fileset>
+      </batchtest>
+    </junit>
+  </target>
+
+    <property name="saros-i.plugin.path.jar" value="${saros-i.artifacts.dir}/saros-i.jar"/>
+  
+  <!-- Build archive for plugin 'saros-i' -->
+  <target name="plugin.build.jar.saros-i" depends="compile.saros-i" description="Build plugin archive for &#39;saros-i&#39;">
+    <jar destfile="${saros-i.plugin.path.jar}" duplicate="preserve">
+      <zipfileset dir="${saros-i.output.dir}"/>
+      <zipfileset file="${saros-i.basedir}/META-INF/plugin.xml" prefix="META-INF"/>
+      <manifest>
+        <attribute name="Created-By" value="IntelliJ IDEA"/>
+        <attribute name="Manifest-Version" value="1.0"/>
+      </manifest>
+    </jar>
+  </target>
+  
+  <target name="init" description="Build initialization">
+    <!-- Perform any build initialization in this target -->
+  </target>
+  
+  <target name="clean" depends="clean.core, clean.saros-i" description="cleanup all">
+    <delete dir="${build.dir}"/>
+  </target>
+
+  <target name="compile-main" depends="compile.core.main, compile.saros-i.main"/>
+  <target name="compile-tests" depends="compile.core.tests, compile.saros-i.tests"/>
+  <target name="compile" depends="compile-main, compile-tests"/>
+
+  <target name="build" depends="init, clean, compile, plugin.build.jar.saros-i" description="build all"/>
+  
+  <target name="all" depends="build" description="build all"/>
+</project>
