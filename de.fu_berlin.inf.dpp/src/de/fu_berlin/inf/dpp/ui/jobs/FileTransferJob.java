@@ -10,8 +10,8 @@ import org.jivesoftware.smackx.filetransfer.FileTransfer.Error;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.monitoring.MonitorableFileTransfer;
-import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 import de.fu_berlin.inf.dpp.monitoring.MonitorableFileTransfer.TransferStatus;
+import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 import de.fu_berlin.inf.dpp.net.JID;
 
 abstract class FileTransferJob extends Job {
@@ -50,7 +50,7 @@ abstract class FileTransferJob extends Job {
             return Status.CANCEL_STATUS;
 
         case OK:
-            // fall trough
+            // fall through
         default:
             return Status.OK_STATUS;
         }

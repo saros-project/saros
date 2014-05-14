@@ -57,7 +57,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.EnterProjectNamePage;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.CoreUtils;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
@@ -906,6 +906,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
         try {
             transfer.recieveFile(archiveFile);
+
             monitorFileTransfer(transfer, monitor);
             transferFailed = false;
         } catch (XMPPException e) {
@@ -919,7 +920,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
         log.debug(this + " : stored archive in file "
             + archiveFile.getAbsolutePath() + ", size: "
-            + Utils.formatByte(archiveFile.length()));
+            + CoreUtils.formatByte(archiveFile.length()));
 
         return archiveFile;
     }

@@ -3,10 +3,8 @@ package de.fu_berlin.inf.dpp.invitation;
 import java.io.IOException;
 import java.util.Map;
 
-import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
@@ -20,14 +18,16 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
+import de.fu_berlin.inf.dpp.monitoring.MonitorableFileTransfer;
+import de.fu_berlin.inf.dpp.monitoring.MonitorableFileTransfer.TransferStatus;
+import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * 
@@ -160,85 +160,25 @@ public abstract class ProjectNegotiation extends CancelableProcess {
         IProgressMonitor monitor) throws SarosCancellationException,
         IOException {
 
-        if (monitor == null)
-            monitor = new NullProgressMonitor();
+        MonitorableFileTransfer mtf = new MonitorableFileTransfer(transfer,
+            ProgressMonitorAdapterFactory.convertTo(monitor));
+        TransferStatus transferStatus = mtf.monitorTransfer();
 
-        long fileSize = transfer.getFileSize();
-        int lastWorked = 0;
-
-        StopWatch watch = new StopWatch();
-        watch.start();
-
-        while (!transfer.isDone()) {
-            if (monitor.isCanceled()) {
-                transfer.cancel();
-                continue;
-            }
-
-            // may return -1 if the transfer has not yet started
-            long bytesWritten = transfer.getAmountWritten();
-
-            if (bytesWritten < 0)
-                bytesWritten = 0;
-
-            int worked = (int) ((100 * bytesWritten) / fileSize);
-            int delta = worked - lastWorked;
-
-            if (delta > 0) {
-                lastWorked = worked;
-                monitor.worked(delta);
-            }
-
-            long bytesPerSecond = watch.getTime();
-
-            if (bytesPerSecond > 0)
-                bytesPerSecond = (bytesWritten * 1000) / bytesPerSecond;
-
-            long secondsLeft = 0;
-
-            if (bytesPerSecond > 0)
-                secondsLeft = (fileSize - bytesWritten) / bytesPerSecond;
-
-            String remaingTime = "Remaining time: "
-                + (bytesPerSecond == 0 ? "N/A" : Utils
-                    .formatDuration(secondsLeft)
-                    + " ("
-                    + Utils.formatByte(bytesPerSecond) + "/s)");
-
-            monitor.subTask(remaingTime);
-
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                monitor.setCanceled(true);
-                continue;
-            }
-        }
-
-        org.jivesoftware.smackx.filetransfer.FileTransfer.Status status = transfer
-            .getStatus();
-
-        if (status
-            .equals(org.jivesoftware.smackx.filetransfer.FileTransfer.Status.complete))
+        // some information can be directly read from the returned status
+        if (transferStatus.equals(TransferStatus.OK))
             return;
 
-        if (status
-            .equals(org.jivesoftware.smackx.filetransfer.FileTransfer.Status.cancelled)
-            && monitor.isCanceled())
-            throw new LocalCancellationException();
-
-        if (status
-            .equals(org.jivesoftware.smackx.filetransfer.FileTransfer.Status.cancelled))
-            throw new RemoteCancellationException(null);
-
-        if (status
-            .equals(org.jivesoftware.smackx.filetransfer.FileTransfer.Status.error)) {
+        if (transferStatus.equals(TransferStatus.ERROR)) {
             FileTransfer.Error error = transfer.getError();
             throw new IOException(
                 error == null ? "unknown SMACK Filetransfer API error"
                     : error.getMessage(), transfer.getException());
         }
+
+        // other information needs to be read from the transfer object
+        if (transfer.getStatus().equals(FileTransfer.Status.cancelled)
+            && monitor.isCanceled())
+            throw new LocalCancellationException();
 
         throw new RemoteCancellationException(null);
     }

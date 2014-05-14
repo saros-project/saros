@@ -59,7 +59,7 @@ import de.fu_berlin.inf.dpp.ui.jobs.OutgoingFileTransferJob;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.CoreUtils;
 
 /**
  * Action for sending and receiving a file over XMPP.
@@ -298,7 +298,7 @@ public class SendFileAction extends Action implements Disposable {
         final boolean accept = MessageDialog.openQuestion(SWTUtils.getShell(),
             "File Transfer Request",
             nickname + " wants to send a file." + "\nName: " + filename
-                + "\nSize: " + Utils.formatByte(fileSize)
+                + "\nSize: " + CoreUtils.formatByte(fileSize)
                 + (fileSize < 1000 ? "yte" : "") + "\n\nAccept the file?");
 
         if (!accept) {
