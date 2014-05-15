@@ -64,7 +64,7 @@ import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 // MAJOR TODO refactor this class !!!
 public class IncomingProjectNegotiation extends ProjectNegotiation {
 
-    private static Logger log = Logger
+    private static final Logger LOG = Logger
         .getLogger(IncomingProjectNegotiation.class);
 
     private SubMonitor monitor;
@@ -86,6 +86,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     @Inject
     private FileReplacementInProgressObservable fileReplacementInProgressObservable;
+
     /**
      * maps the projectID to the project in workspace
      */
@@ -215,7 +216,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             }
 
             transmitter.sendToSessionUser(ISarosSession.SESSION_CONNECTION_ID,
-                getPeer(), StartActivityQueuingResponse.PROVIDER
+                peer, StartActivityQueuingResponse.PROVIDER
                     .create(new StartActivityQueuingResponse(sessionID,
                         processID)));
 
@@ -336,6 +337,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 // missing files for one project.
                 SubMonitor currentArchiveMonitor = zipStreamLoopMonitor
                     .newChild(100 / projectCount, SubMonitor.SUPPRESS_NONE);
+
                 /*
                  * For every entry (which is a zipArchive for a single project)
                  * we have to find out which project it is meant for. So we need
@@ -343,11 +345,11 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                  * 
                  * The archive name contains the projectID.
                  * 
-                 * archiveName = projectID + this.projectIDDelimiter +
-                 * randomNumber + '.zip'
+                 * archiveName = projectID + PROJECT_ID_DELIMITER + randomNumber
+                 * + '.zip'
                  */
                 String projectID = zipEntry.getName().substring(0,
-                    zipEntry.getName().indexOf(this.projectIDDelimiter));
+                    zipEntry.getName().indexOf(PROJECT_ID_DELIMITER));
 
                 IProject project = localProjects.get(projectID);
 
@@ -407,7 +409,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                     projectInfo = pInfo;
             }
             if (projectInfo == null) {
-                log.error("tried to add a project that wasn't shared");
+                LOG.error("tried to add a project that wasn't shared");
                 // this should never happen
                 continue;
             }
@@ -426,7 +428,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                  * JoinSessionWizard#performFinish().
                  */
                 if (EditorAPI.existUnsavedFiles(iProject)) {
-                    log.error("Unsaved files detected.");
+                    LOG.error("Unsaved files detected.");
                 }
             } else {
                 iProject = null;
@@ -437,13 +439,13 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
             checkCancellation(CancelOption.NOTIFY_PEER);
             if (vcs != null && !isPartialRemoteProject(projectID)) {
-                log.debug("initVcState");
+                LOG.debug("initVcState");
                 initVcState(localProject, vcs, lMonitor.newChild(40),
                     projectInfo.getFileList());
             }
             checkCancellation(CancelOption.NOTIFY_PEER);
 
-            log.debug("compute required Files for project " + projectName
+            LOG.debug("compute required Files for project " + projectName
                 + " with ID: " + projectID);
             FileList requiredFiles = computeRequiredFiles(localProject,
                 projectInfo.getFileList(), projectID, vcs,
@@ -511,7 +513,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                         newLocalProject = vcs.checkoutProject(newProjectName,
                             remoteFileList, remoteMonitor);
                     } else {
-                        log.error("No Saros session!");
+                        LOG.error("No Saros session!");
                     }
                 } catch (OperationCanceledException e) {
                     /*
@@ -656,7 +658,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
          */
 
         if (missingFiles.isEmpty()) {
-            log.debug(this + " : there are no files to synchronize.");
+            LOG.debug(this + " : there are no files to synchronize.");
             subMonitor.done();
             return FileListFactory.createEmptyFileList();
         }
@@ -682,7 +684,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     protected FileListDiff computeDiff(FileList localFileList,
         FileList remoteFileList, IProject currentLocalProject, String projectID)
         throws IOException {
-        log.debug(this + " : computing file list difference");
+        LOG.debug(this + " : computing file list difference");
 
         try {
             FileListDiff diff = FileListDiff
@@ -720,7 +722,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
         long startTime = System.currentTimeMillis();
 
-        log.debug(this + " : Writing archive to disk...");
+        LOG.debug(this + " : Writing archive to disk...");
         /*
          * TODO: calculate the ADLER32 checksums during decompression and add
          * them into the ChecksumCache. The insertion must be done after the
@@ -738,15 +740,10 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             throw new IOException(e.getMessage(), e.getCause());
         }
 
-        log.debug(String.format("Unpacked archive in %d s",
+        LOG.debug(String.format("Unpacked archive in %d s",
             (System.currentTimeMillis() - startTime) / 1000));
 
         // TODO: now add the checksums into the cache
-    }
-
-    @Override
-    public String getProcessID() {
-        return processID;
     }
 
     /**
@@ -793,11 +790,11 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             return;
         }
         if (!info.url.equals(url)) {
-            log.trace("Switching " + resource.getName() + " from " + info.url
+            LOG.trace("Switching " + resource.getName() + " from " + info.url
                 + " to " + url);
             vcs.switch_(resource, url, revision, monitor);
         } else if (!info.revision.equals(revision) && paths.contains(path)) {
-            log.trace("Updating " + resource.getName() + " from "
+            LOG.trace("Updating " + resource.getName() + " from "
                 + info.revision + " to " + revision);
             vcs.update(resource, revision, monitor);
         }
@@ -821,7 +818,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                  * the project is closed or the resource doesn't exist, both of
                  * which are impossible at this point.
                  */
-                log.error("Unknown error while trying to initialize the "
+                LOG.error("Unknown error while trying to initialize the "
                     + "children of " + resource.toString() + ".", e);
                 localCancel(
                     "Could not initialize the project's version control state, "
@@ -875,7 +872,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         SarosCancellationException {
 
         monitor.beginTask("Receiving archive file...", 100);
-        log.debug("waiting for incoming archive stream request");
+        LOG.debug("waiting for incoming archive stream request");
 
         monitor
             .subTask("Host is compressing project files. Waiting for the archive file...");
@@ -894,7 +891,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
         monitor.subTask("Receiving archive file...");
 
-        log.debug(this + " : receiving archive");
+        LOG.debug(this + " : receiving archive");
 
         IncomingFileTransfer transfer = archiveTransferListener.getRequest()
             .accept();
@@ -918,7 +915,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             monitor.done();
         }
 
-        log.debug(this + " : stored archive in file "
+        LOG.debug(this + " : stored archive in file "
             + archiveFile.getAbsolutePath() + ", size: "
             + CoreUtils.formatByte(archiveFile.length()));
 

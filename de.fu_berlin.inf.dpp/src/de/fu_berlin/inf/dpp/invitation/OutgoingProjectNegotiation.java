@@ -268,11 +268,6 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     }
 
     @Override
-    public String getProcessID() {
-        return this.processID;
-    }
-
-    @Override
     protected void executeCancellation() {
         if (sarosSession.getRemoteUsers().isEmpty())
             sessionManager.stopSarosSession();
@@ -391,7 +386,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         EditorAPI.saveProject(((EclipseProjectImpl) project).getDelegate(),
             false);
 
-        String prefix = projectID + projectIDDelimiter;
+        String prefix = projectID + PROJECT_ID_DELIMITER;
 
         File tempArchive = null;
 
@@ -531,7 +526,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             IProgressMonitor.UNKNOWN);
 
         transmitter.sendToSessionUser(ISarosSession.SESSION_CONNECTION_ID,
-            getPeer(), StartActivityQueuingRequest.PROVIDER
+            peer, StartActivityQueuingRequest.PROVIDER
                 .create(new StartActivityQueuingRequest(sessionID, processID)));
 
         Packet packet = collectPacket(startActivityQueuingResponseCollector,

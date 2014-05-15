@@ -30,18 +30,27 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 
 /**
- * 
- * 
  * This abstract class is the superclass for {@link OutgoingProjectNegotiation}
  * and {@link IncomingProjectNegotiation}.
  */
 public abstract class ProjectNegotiation extends CancelableProcess {
 
+    private static final Logger LOG = Logger
+        .getLogger(ProjectNegotiation.class);
+
     /** Prefix part of the id used in the SMACK XMPP file transfer protocol. */
     public static final String ARCHIVE_TRANSFER_ID = "saros-dpp-pn-server-client-archive/";
 
-    private static final Logger log = Logger
-        .getLogger(ProjectNegotiation.class);
+    /**
+     * While sending all the projects with a big archive containing the project
+     * archives, we create a temp-File. This file is named "projectID" +
+     * PROJECT_ID_DELIMITER + "a random number chosen by 'Java'" + ".zip" This
+     * delimiter is the string that separates projectID and this random number.
+     * Now we can assign the zip archive to the matching project.
+     * 
+     * WARNING: If changed compatibility is broken
+     */
+    protected static final String PROJECT_ID_DELIMITER = "&&&&";
 
     /**
      * Timeout for all packet exchanges during the project negotiation
@@ -52,13 +61,13 @@ public abstract class ProjectNegotiation extends CancelableProcess {
     protected String processID;
     protected JID peer;
 
-    @Inject
-    protected ITransmitter transmitter;
-
     protected final String sessionID;
 
     @Inject
     protected XMPPConnectionService connectionService;
+
+    @Inject
+    protected ITransmitter transmitter;
 
     @Inject
     protected IReceiver xmppReceiver;
@@ -66,20 +75,8 @@ public abstract class ProjectNegotiation extends CancelableProcess {
     /**
      * The file transfer manager can be <code>null</code> if no connection was
      * established or was lost when the class was instantiated.
-     * 
      */
     protected FileTransferManager fileTransferManager;
-
-    /**
-     * While sending all the projects with a big archive containing the project
-     * archives, we create a temp-File. This file is named "projectID" +
-     * projectIDDelimiter + "a random number chosen by 'Java'" + ".zip" This
-     * delimiter is the string that separates projectID and this random number.
-     * Now we can assign the zip archive to the matching project.
-     * 
-     * WARNING: If changed compatibility is broken
-     */
-    protected final String projectIDDelimiter = "&&&&";
 
     @Inject
     protected ISarosSessionManager sessionManager;
@@ -94,7 +91,6 @@ public abstract class ProjectNegotiation extends CancelableProcess {
 
         if (connection != null)
             fileTransferManager = new FileTransferManager(connection);
-
     }
 
     /**
@@ -104,7 +100,9 @@ public abstract class ProjectNegotiation extends CancelableProcess {
      */
     public abstract Map<String, String> getProjectNames();
 
-    public abstract String getProcessID();
+    public String getProcessID() {
+        return this.processID;
+    }
 
     public JID getPeer() {
         return this.peer;
@@ -121,7 +119,7 @@ public abstract class ProjectNegotiation extends CancelableProcess {
         if (cause.getCancelOption() != CancelOption.NOTIFY_PEER)
             return;
 
-        log.debug("notifying remote contact " + getPeer()
+        LOG.debug("notifying remote contact " + peer
             + " of the local project negotiation cancellation");
 
         PacketExtension notification = CancelProjectNegotiationExtension.PROVIDER
@@ -146,8 +144,9 @@ public abstract class ProjectNegotiation extends CancelableProcess {
      *            the progress monitor that is <b>already initialized</b> to
      *            consume <b>100 ticks</b> to use for reporting progress to the
      *            user. It is the caller's responsibility to call done() on the
-     *            given monitor. Accepts null, indicating that no progress
-     *            should be reported and that the operation cannot be cancelled.
+     *            given monitor. Accepts <code>null</code>, indicating that no
+     *            progress should be reported and that the operation cannot be
+     *            cancelled.
      * 
      * @throws SarosCancellationException
      *             if the transfer was aborted either on local side or remote
