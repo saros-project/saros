@@ -36,8 +36,9 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 @Component(module = "net")
 public class SkypeAction extends Action implements Disposable {
 
-    private static final Logger log = Logger.getLogger(SkypeAction.class
-        .getName());
+    public static final String ACTION_ID = SkypeAction.class.getName();
+
+    private static final Logger LOG = Logger.getLogger(SkypeAction.class);
 
     protected IPropertyChangeListener propertyChangeListener = new IPropertyChangeListener() {
         @Override
@@ -63,6 +64,7 @@ public class SkypeAction extends Action implements Disposable {
 
         SarosPluginContext.initComponent(this);
 
+        setId(ACTION_ID);
         setToolTipText(Messages.SkypeAction_tooltip);
         setImageDescriptor(new ImageDescriptor() {
             @Override
@@ -87,7 +89,7 @@ public class SkypeAction extends Action implements Disposable {
             this.setEnabled(false);
         } catch (Exception e) {
             if (!PlatformUI.getWorkbench().isClosing())
-                log.error("Unexcepted error while updating enablement", e); //$NON-NLS-1$
+                LOG.error("Unexcepted error while updating enablement", e); //$NON-NLS-1$
         }
     }
 
@@ -96,7 +98,7 @@ public class SkypeAction extends Action implements Disposable {
      */
     @Override
     public void run() {
-        ThreadUtils.runSafeSync(log, new Runnable() {
+        ThreadUtils.runSafeSync(LOG, new Runnable() {
             @Override
             public void run() {
                 final List<JID> participants = SelectionRetrieverFactory
@@ -104,10 +106,10 @@ public class SkypeAction extends Action implements Disposable {
 
                 if (participants.size() == 1) {
                     ThreadUtils.runSafeAsync(
-                        "SkypeAction", log, new Runnable() { //$NON-NLS-1$
+                        "SkypeAction", LOG, new Runnable() { //$NON-NLS-1$
                             @Override
                             public void run() {
-                                SWTUtils.runSafeSWTSync(log, new Runnable() {
+                                SWTUtils.runSafeSWTSync(LOG, new Runnable() {
                                     @Override
                                     public void run() {
                                         setEnabled(false);
@@ -117,7 +119,7 @@ public class SkypeAction extends Action implements Disposable {
                                     .getSkypeURL(participants.get(0)
                                         .getBareJID());
                                 if (skypeURL != null) {
-                                    SWTUtils.runSafeSWTSync(log,
+                                    SWTUtils.runSafeSWTSync(LOG,
                                         new Runnable() {
                                             @Override
                                             public void run() {
@@ -131,7 +133,7 @@ public class SkypeAction extends Action implements Disposable {
                             }
                         });
                 } else {
-                    log.warn("More than one participant selected."); //$NON-NLS-1$
+                    LOG.warn("More than one participant selected."); //$NON-NLS-1$
                 }
             }
         });

@@ -74,6 +74,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.BalloonNotification;
 import de.fu_berlin.inf.dpp.ui.actions.ChangeColorAction;
+import de.fu_berlin.inf.dpp.ui.actions.ChangeWriteAccessAction;
 import de.fu_berlin.inf.dpp.ui.actions.ChangeXMPPAccountAction;
 import de.fu_berlin.inf.dpp.ui.actions.ConsistencyAction;
 import de.fu_berlin.inf.dpp.ui.actions.ContactAvailabilityAction;
@@ -81,7 +82,6 @@ import de.fu_berlin.inf.dpp.ui.actions.DeleteContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.Disposable;
 import de.fu_berlin.inf.dpp.ui.actions.FollowModeAction;
 import de.fu_berlin.inf.dpp.ui.actions.FollowThisPersonAction;
-import de.fu_berlin.inf.dpp.ui.actions.GiveWriteAccessAction;
 import de.fu_berlin.inf.dpp.ui.actions.JumpToUserWithWriteAccessPositionAction;
 import de.fu_berlin.inf.dpp.ui.actions.LeaveSessionAction;
 import de.fu_berlin.inf.dpp.ui.actions.NewContactAction;
@@ -89,7 +89,6 @@ import de.fu_berlin.inf.dpp.ui.actions.OpenChatAction;
 import de.fu_berlin.inf.dpp.ui.actions.OpenPreferencesAction;
 import de.fu_berlin.inf.dpp.ui.actions.RemoveUserAction;
 import de.fu_berlin.inf.dpp.ui.actions.RenameContactAction;
-import de.fu_berlin.inf.dpp.ui.actions.RestrictToReadOnlyAccessAction;
 import de.fu_berlin.inf.dpp.ui.actions.SendFileAction;
 import de.fu_berlin.inf.dpp.ui.actions.SkypeAction;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterEntryElement;
@@ -127,7 +126,7 @@ import de.fu_berlin.inf.dpp.ui.widgets.viewer.session.XMPPSessionDisplayComposit
 @Component(module = "ui")
 public class SarosView extends ViewPart {
 
-    private static final Logger log = Logger.getLogger(SarosView.class);
+    private static final Logger LOG = Logger.getLogger(SarosView.class);
 
     public static final String ID = "de.fu_berlin.inf.dpp.ui.views.SarosView";
 
@@ -248,7 +247,19 @@ public class SarosView extends ViewPart {
 
     private static volatile boolean showBalloonNotifications;
 
-    private Map<Class<?>, IAction> registeredActions = new HashMap<Class<?>, IAction>();
+    /**
+     * Stores actions by their {@link IAction#getId() ID}, so they can (1) be
+     * {@linkplain #getAction(String) retrieved} and (2)
+     * {@linkplain Disposable#dispose() disposed} when and if necessary.
+     */
+    /*
+     * TODO What about having actions as (disposable and recreateable?)
+     * singletons? This map (together with register and get methods) would not
+     * be necessary, actions could be added to the menus at will (through a
+     * method that would remember only the disposable ones, so they can be
+     * disposed when necessary).
+     */
+    private Map<String, IAction> registeredActions = new HashMap<String, IAction>();
 
     public SarosView() {
         super();
@@ -419,14 +430,14 @@ public class SarosView extends ViewPart {
     }
 
     protected void addToolBarItems(IToolBarManager toolBar) {
-        toolBar.add(getAction(ChangeXMPPAccountAction.class));
-        toolBar.add(getAction(NewContactAction.class));
-        toolBar.add(getAction(OpenPreferencesAction.class));
+        toolBar.add(getAction(ChangeXMPPAccountAction.ACTION_ID));
+        toolBar.add(getAction(NewContactAction.ACTION_ID));
+        toolBar.add(getAction(OpenPreferencesAction.ACTION_ID));
         toolBar.add(new Separator());
-        toolBar.add(getAction(FollowModeAction.class));
-        toolBar.add(getAction(ConsistencyAction.class));
+        toolBar.add(getAction(FollowModeAction.ACTION_ID));
+        toolBar.add(getAction(ConsistencyAction.ACTION_ID));
         toolBar.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-        toolBar.add(getAction(LeaveSessionAction.class));
+        toolBar.add(getAction(LeaveSessionAction.ACTION_ID));
     }
 
     /**
@@ -461,11 +472,11 @@ public class SarosView extends ViewPart {
                  */
                 // manager.add(getAction(SkypeAction.class));
                 manager.add(new Separator());
-                manager.add(getAction(OpenChatAction.class));
-                manager.add(getAction(SendFileAction.class));
-                manager.add(getAction(RenameContactAction.class));
-                manager.add(getAction(DeleteContactAction.class));
-                manager.add(getAction(ContactAvailabilityAction.class));
+                manager.add(getAction(OpenChatAction.ACTION_ID));
+                manager.add(getAction(SendFileAction.ACTION_ID));
+                manager.add(getAction(RenameContactAction.ACTION_ID));
+                manager.add(getAction(DeleteContactAction.ACTION_ID));
+                manager.add(getAction(ContactAvailabilityAction.ACTION_ID));
             }
         });
     }
@@ -475,7 +486,13 @@ public class SarosView extends ViewPart {
      */
     protected void addSessionMenuItems(MenuManager menuManager) {
 
+        /*
+         * TODO The decision whether to show an entry at all is made here,
+         * whereas the decision whether to enable an entry is encapsulated in
+         * each action. That does not feel right.
+         */
         menuManager.addMenuListener(new IMenuListener() {
+
             @Override
             public void menuAboutToShow(IMenuManager manager) {
                 /*
@@ -508,27 +525,26 @@ public class SarosView extends ViewPart {
                     return;
 
                 if (participants.get(0).isLocal()) {
-                    manager.add(getAction(ChangeColorAction.class));
+                    manager.add(getAction(ChangeColorAction.ACTION_ID));
 
                     if (isHost) {
-                        manager.add(getAction(GiveWriteAccessAction.class));
-                        manager
-                            .add(getAction(RestrictToReadOnlyAccessAction.class));
+                        manager.add(ChangeWriteAccessAction.forWriteAccess);
+                        manager.add(ChangeWriteAccessAction.forReadOnly);
                     }
                 } else {
                     if (isHost) {
-                        manager.add(getAction(GiveWriteAccessAction.class));
-                        manager
-                            .add(getAction(RestrictToReadOnlyAccessAction.class));
-                        manager.add(getAction(RemoveUserAction.class));
+                        manager.add(ChangeWriteAccessAction.forWriteAccess);
+                        manager.add(ChangeWriteAccessAction.forReadOnly);
+
+                        manager.add(getAction(RemoveUserAction.ACTION_ID));
                         manager.add(new Separator());
                     }
-                    manager.add(getAction(FollowThisPersonAction.class));
+                    manager.add(getAction(FollowThisPersonAction.ACTION_ID));
                     manager
-                        .add(getAction(JumpToUserWithWriteAccessPositionAction.class));
+                        .add(getAction(JumpToUserWithWriteAccessPositionAction.ACTION_ID));
                     manager.add(new Separator());
-                    manager.add(getAction(OpenChatAction.class));
-                    manager.add(getAction(SendFileAction.class));
+                    manager.add(getAction(OpenChatAction.ACTION_ID));
+                    manager.add(getAction(SendFileAction.ACTION_ID));
                 }
             }
         });
@@ -591,7 +607,7 @@ public class SarosView extends ViewPart {
         if (!showBalloonNotifications)
             return;
 
-        SWTUtils.runSafeSWTAsync(log, new Runnable() {
+        SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
             @Override
             public void run() {
 
@@ -644,7 +660,7 @@ public class SarosView extends ViewPart {
      * become obsolete for a reason
      */
     public static void clearNotifications() {
-        SWTUtils.runSafeSWTAsync(log, new Runnable() {
+        SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
             @Override
             public void run() {
                 BalloonNotification.removeAllActiveNotifications();
@@ -660,8 +676,8 @@ public class SarosView extends ViewPart {
     private void createActions() {
 
         // ContextMenus Session
-        registerAction(new GiveWriteAccessAction());
-        registerAction(new RestrictToReadOnlyAccessAction());
+        registerAction(ChangeWriteAccessAction.forWriteAccess);
+        registerAction(ChangeWriteAccessAction.forReadOnly);
         registerAction(new FollowThisPersonAction());
         registerAction(new JumpToUserWithWriteAccessPositionAction());
         registerAction(new SendFileAction());
@@ -686,23 +702,23 @@ public class SarosView extends ViewPart {
         registerAction(new LeaveSessionAction());
     }
 
-    @SuppressWarnings("unchecked")
-    private <T extends IAction> T getAction(Class<T> clazz) {
-        IAction action = registeredActions.get(clazz);
+    private IAction getAction(String id) {
+        IAction action = registeredActions.get(id);
 
         if (action == null)
-            throw new IllegalArgumentException("an action with class "
-                + clazz.getName() + " is not registered");
+            throw new IllegalArgumentException("an action for id " + id
+                + " is not registered");
 
-        return (T) action;
+        return action;
     }
 
-    private <T extends IAction> T registerAction(T action) {
-        IAction oldAction = registeredActions.put(action.getClass(), action);
+    private IAction registerAction(IAction action) {
+        IAction oldAction = registeredActions.put(action.getId(), action);
 
         if (oldAction != null)
-            throw new IllegalArgumentException("tried to register action "
-                + action.getClass() + " more than once");
+            throw new IllegalArgumentException(
+                "tried to register action with id " + action.getId()
+                    + " more than once");
 
         return action;
     }

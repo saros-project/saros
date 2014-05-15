@@ -39,19 +39,22 @@ import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 
-/*
- * Please be aware of how we exploit the set***ImageDescriptor methods.
- * 
- * setImageDescriptor("foo") with setDisabledImageDescriptor(null)
- * 
- * will display a gray scaled "foo" if the action is disabled while
- * 
- * setImageDescriptor("foo") with setDisabledImageDescriptor("bar")
- * 
- * will display "bar" if the action is disabled
+/**
+ * Please be aware of how we exploit the set***ImageDescriptor methods:
+ * <p>
+ * <code>setImageDescriptor("foo")</code> with
+ * <code>setDisabledImageDescriptor(null)</code> will display a gray scaled
+ * "foo" if the action is disabled, <br>
+ * whereas <code>setImageDescriptor("foo")</code> with
+ * <code>setDisabledImageDescriptor("bar")</code> will display "bar" if the
+ * action is disabled.
  */
 @Component(module = "action")
 public class ConsistencyAction extends Action implements Disposable {
+
+    public static final String ACTION_ID = ConsistencyAction.class.getName();
+
+    private static final Logger LOG = Logger.getLogger(ConsistencyAction.class);
 
     private static final int MIN_ALPHA_VALUE = 64;
     private static final int MAX_ALPHA_VALUE = 255;
@@ -66,8 +69,6 @@ public class ConsistencyAction extends Action implements Disposable {
 
     private static final Image OUT_SYNC = ImageManager
         .getImage("icons/etool16/out_sync.png"); //$NON-NLS-1$;
-
-    private static final Logger log = Logger.getLogger(ConsistencyAction.class);
 
     private static class MemoryImageDescriptor extends ImageDescriptor {
 
@@ -118,8 +119,8 @@ public class ConsistencyAction extends Action implements Disposable {
 
     public ConsistencyAction() {
 
+        setId(ACTION_ID);
         setImageDescriptor(IN_SYNC);
-
         setToolTipText(Messages.ConsistencyAction_tooltip_no_inconsistency);
 
         SarosPluginContext.initComponent(this);
@@ -154,7 +155,7 @@ public class ConsistencyAction extends Action implements Disposable {
              * will grayscale the alpha scaled image and so it is possible that
              * nothing is displayed anymore
              */
-            SWTUtils.runSafeSWTAsync(log, new Runnable() {
+            SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
                 @Override
                 public void run() {
                     setImageDescriptor(IN_SYNC);
@@ -166,11 +167,11 @@ public class ConsistencyAction extends Action implements Disposable {
     private void handleConistencyChange(Boolean isInconsistent) {
 
         if (sarosSession.isHost() && isInconsistent) {
-            log.warn("No inconsistency should ever be reported" //$NON-NLS-1$
+            LOG.warn("No inconsistency should ever be reported" //$NON-NLS-1$
                 + " to the host"); //$NON-NLS-1$
             return;
         }
-        log.debug("Inconsistency indicator goes: " //$NON-NLS-1$
+        LOG.debug("Inconsistency indicator goes: " //$NON-NLS-1$
             + (isInconsistent ? "on" : "off")); //$NON-NLS-1$ //$NON-NLS-2$
 
         setEnabled(isInconsistent);
@@ -180,7 +181,7 @@ public class ConsistencyAction extends Action implements Disposable {
             return;
         }
 
-        SWTUtils.runSafeSWTSync(log, new Runnable() {
+        SWTUtils.runSafeSWTSync(LOG, new Runnable() {
 
             @Override
             public void run() {
@@ -195,7 +196,7 @@ public class ConsistencyAction extends Action implements Disposable {
         final Set<SPath> paths = new HashSet<SPath>(
             watchdogClient.getPathsWithWrongChecksums());
 
-        SWTUtils.runSafeSWTAsync(log, new Runnable() {
+        SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
             @Override
             public void run() {
 
@@ -233,7 +234,7 @@ public class ConsistencyAction extends Action implements Disposable {
 
     @Override
     public void run() {
-        log.debug("user activated CW recovery."); //$NON-NLS-1$
+        LOG.debug("user activated CW recovery."); //$NON-NLS-1$
 
         Shell shell = SWTUtils.getShell();
 
@@ -255,8 +256,9 @@ public class ConsistencyAction extends Action implements Disposable {
                 + path.getProject().getName() + ", file:"
                 + path.getProjectRelativePath().toOSString()));
 
-        if (ErrorDialog.openError(shell, Messages.ConsistencyAction_confirm_dialog_title, null,
-            multiStatus, IStatus.WARNING) != Window.OK)
+        if (ErrorDialog.openError(shell,
+            Messages.ConsistencyAction_confirm_dialog_title, null, multiStatus,
+            IStatus.WARNING) != Window.OK)
             return;
 
         ProgressMonitorDialog dialog = new ProgressMonitorDialog(shell);
@@ -276,9 +278,9 @@ public class ConsistencyAction extends Action implements Disposable {
                 }
             });
         } catch (InvocationTargetException e) {
-            log.error("Exception not expected here.", e); //$NON-NLS-1$
+            LOG.error("Exception not expected here.", e); //$NON-NLS-1$
         } catch (InterruptedException e) {
-            log.error("Exception not expected here.", e); //$NON-NLS-1$
+            LOG.error("Exception not expected here.", e); //$NON-NLS-1$
         }
 
     }

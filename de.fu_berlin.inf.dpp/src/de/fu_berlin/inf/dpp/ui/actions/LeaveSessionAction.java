@@ -44,6 +44,8 @@ import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
 @Component(module = "action")
 public class LeaveSessionAction extends Action implements Disposable {
 
+    public static final String ACTION_ID = LeaveSessionAction.class.getName();
+
     @Inject
     private ISarosSessionManager sessionManager;
 
@@ -60,6 +62,7 @@ public class LeaveSessionAction extends Action implements Disposable {
     };
 
     public LeaveSessionAction() {
+        setId(ACTION_ID);
         setToolTipText(Messages.LeaveSessionAction_leave_session_tooltip);
         setImageDescriptor(new ImageDescriptor() {
             @Override

@@ -28,6 +28,8 @@ import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactor
 
 public class RemoveUserAction extends Action {
 
+    public static final String ACTION_ID = RemoveUserAction.class.getName();
+
     private static final Logger LOG = Logger.getLogger(RemoveUserAction.class);
 
     @Inject
@@ -71,7 +73,8 @@ public class RemoveUserAction extends Action {
         super("Remove from Session");
         SarosPluginContext.initComponent(this);
 
-        this.setImageDescriptor(ImageManager
+        setId(ACTION_ID);
+        setImageDescriptor(ImageManager
             .getImageDescriptor("icons/elcl16/buddy_remove_tsk.png"));
 
         SelectionUtils.getSelectionService().addSelectionListener(

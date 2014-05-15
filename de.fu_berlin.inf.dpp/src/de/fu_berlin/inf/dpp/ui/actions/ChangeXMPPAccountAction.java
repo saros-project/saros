@@ -37,7 +37,10 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 public class ChangeXMPPAccountAction extends Action implements IMenuCreator,
     Disposable {
 
-    private static final Logger log = Logger
+    public static final String ACTION_ID = ChangeXMPPAccountAction.class
+        .getName();
+
+    private static final Logger LOG = Logger
         .getLogger(ChangeXMPPAccountAction.class);
 
     private Menu accountMenu;
@@ -59,7 +62,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator,
         @Override
         public void connectionStateChanged(final Connection connection,
             final ConnectionState state) {
-            SWTUtils.runSafeSWTAsync(log, new Runnable() {
+            SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
 
                 @Override
                 public void run() {
@@ -72,7 +75,10 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator,
 
     public ChangeXMPPAccountAction() {
         SarosPluginContext.initComponent(this);
-        this.setText(Messages.ChangeXMPPAccountAction_connect);
+
+        setText(Messages.ChangeXMPPAccountAction_connect);
+        setId(ACTION_ID);
+
         saros.getSarosNet().addListener(connectionListener);
         setMenuCreator(this);
         updateStatus(saros.getSarosNet().getConnectionState());
@@ -136,7 +142,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator,
                             "de.fu_berlin.inf.dpp.ui.commands.OpenSarosPreferences",
                             null);
                 } catch (Exception e) {
-                    log.debug("Could execute command", e);
+                    LOG.debug("Could execute command", e);
                 }
             }
         });
@@ -166,7 +172,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator,
             return;
         }
 
-        SWTUtils.runSafeSWTAsync(log, new Runnable() {
+        SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
             @Override
             public void run() {
                 boolean proceed = DialogUtils.openQuestionMessageDialog(
@@ -184,12 +190,12 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator,
         if (account != null)
             accountService.setAccountActive(account);
 
-        ThreadUtils.runSafeAsync("ConnectAction", log, new Runnable() {
+        ThreadUtils.runSafeAsync("ConnectAction", LOG, new Runnable() {
             @Override
             public void run() {
                 try {
                     if (running.getAndSet(true)) {
-                        log.info("User clicked too fast, running already a connect or disconnect.");
+                        LOG.info("User clicked too fast, running already a connect or disconnect.");
                         return;
                     }
                     saros.connect(false);
@@ -201,12 +207,12 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator,
     }
 
     private void disconnect() {
-        ThreadUtils.runSafeAsync("DisconnectAction", log, new Runnable() {
+        ThreadUtils.runSafeAsync("DisconnectAction", LOG, new Runnable() {
             @Override
             public void run() {
                 try {
                     if (running.getAndSet(true)) {
-                        log.info("User clicked too fast, running already a connect or disconnect.");
+                        LOG.info("User clicked too fast, running already a connect or disconnect.");
                         return;
                     }
                     saros.getSarosNet().disconnect();
@@ -264,7 +270,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator,
                 || state == ConnectionState.ERROR);
 
         } catch (RuntimeException e) {
-            log.error("Internal error in ChangeXMPPAccountAction:", e);
+            LOG.error("Internal error in ChangeXMPPAccountAction:", e);
         }
     }
 }

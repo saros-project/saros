@@ -35,6 +35,8 @@ import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 
 public class NewContactAction extends Action implements Disposable {
 
+    public static final String ACTION_ID = NewContactAction.class.getName();
+
     @Inject
     private XMPPConnectionService sarosNet;
 
@@ -47,6 +49,7 @@ public class NewContactAction extends Action implements Disposable {
     };
 
     public NewContactAction() {
+        setId(ACTION_ID);
         setToolTipText(Messages.NewContactAction_tooltip);
         setImageDescriptor(new ImageDescriptor() {
             @Override

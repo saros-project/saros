@@ -23,6 +23,8 @@ import de.fu_berlin.inf.dpp.ui.widgets.chat.ChatRoomsComposite;
 
 public class OpenChatAction extends Action implements Disposable {
 
+    public static final String ACTION_ID = OpenChatAction.class.getName();
+
     @Inject
     private XMPPConnectionService connectionService;
 
@@ -43,7 +45,8 @@ public class OpenChatAction extends Action implements Disposable {
         SarosPluginContext.initComponent(this);
         this.chatRoomsComposite = chatRoomsComposite;
 
-        this.setImageDescriptor(ImageManager
+        setId(ACTION_ID);
+        setImageDescriptor(ImageManager
             .getImageDescriptor("icons/view16/chat_misc.png"));
 
         SelectionUtils.getSelectionService().addSelectionListener(

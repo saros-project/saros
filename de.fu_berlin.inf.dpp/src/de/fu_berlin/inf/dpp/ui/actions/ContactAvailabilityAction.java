@@ -31,6 +31,9 @@ import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactor
 // TODO icons
 public class ContactAvailabilityAction extends Action implements Disposable {
 
+    public static final String ACTION_ID = ContactAvailabilityAction.class
+        .getName();
+
     private static final Logger LOG = Logger
         .getLogger(ContactAvailabilityAction.class);
 
@@ -75,6 +78,8 @@ public class ContactAvailabilityAction extends Action implements Disposable {
     public ContactAvailabilityAction() {
         super(UNAVAILABLE_TEXT);
         SarosPluginContext.initComponent(this);
+
+        setId(ACTION_ID);
 
         rosterTracker.addRosterListener(rosterListener);
         SelectionUtils.getSelectionService().addSelectionListener(

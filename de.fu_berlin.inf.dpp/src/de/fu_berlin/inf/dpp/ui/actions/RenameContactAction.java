@@ -54,8 +54,10 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
  */
 public class RenameContactAction extends Action {
 
-    private static final Logger log = Logger
-        .getLogger(RenameContactAction.class.getName());
+    public static final String ACTION_ID = RenameContactAction.class.getName();
+
+    private static final Logger LOG = Logger
+        .getLogger(RenameContactAction.class);
 
     protected IConnectionListener connectionListener = new IConnectionListener() {
         @Override
@@ -77,6 +79,8 @@ public class RenameContactAction extends Action {
 
     public RenameContactAction() {
         super(Messages.RenameContactAction_title);
+
+        setId(ACTION_ID);
         setToolTipText(Messages.RenameContactAction_tooltip);
         setImageDescriptor(ImageManager.ETOOL_EDIT);
 
@@ -98,13 +102,13 @@ public class RenameContactAction extends Action {
             this.setEnabled(false);
         } catch (Exception e) {
             if (!PlatformUI.getWorkbench().isClosing())
-                log.error("Unexcepted error while updating enablement", e); //$NON-NLS-1$
+                LOG.error("Unexcepted error while updating enablement", e); //$NON-NLS-1$
         }
     }
 
     @Override
     public void run() {
-        ThreadUtils.runSafeSync(log, new Runnable() {
+        ThreadUtils.runSafeSync(LOG, new Runnable() {
             @Override
             public void run() {
                 RosterEntry rosterEntry = null;
@@ -123,7 +127,7 @@ public class RenameContactAction extends Action {
                 }
 
                 if (rosterEntry == null) {
-                    log.error("RosterEntry should not be null at this point!"); //$NON-NLS-1$
+                    LOG.error("RosterEntry should not be null at this point!"); //$NON-NLS-1$
                     return;
                 }
 

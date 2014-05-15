@@ -52,8 +52,10 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 public class DeleteContactAction extends Action implements Disposable {
 
-    private static final Logger log = Logger
-        .getLogger(DeleteContactAction.class.getName());
+    public static final String ACTION_ID = DeleteContactAction.class.getName();
+
+    private static final Logger LOG = Logger
+        .getLogger(DeleteContactAction.class);
 
     protected IConnectionListener connectionListener = new IConnectionListener() {
         @Override
@@ -80,6 +82,8 @@ public class DeleteContactAction extends Action implements Disposable {
 
     public DeleteContactAction() {
         super(Messages.DeleteContactAction_title);
+
+        setId(ACTION_ID);
         setToolTipText(Messages.DeleteContactAction_tooltip);
 
         IWorkbench workbench = PlatformUI.getWorkbench();
@@ -98,12 +102,13 @@ public class DeleteContactAction extends Action implements Disposable {
         try {
             List<JID> contacts = SelectionRetrieverFactory
                 .getSelectionRetriever(JID.class).getSelection();
-            this.setEnabled(connectionService.isConnected() && contacts.size() == 1);
+            this.setEnabled(connectionService.isConnected()
+                && contacts.size() == 1);
         } catch (NullPointerException e) {
             this.setEnabled(false);
         } catch (Exception e) {
             if (!PlatformUI.getWorkbench().isClosing())
-                log.error("Unexcepted error while updating enablement", e); //$NON-NLS-1$
+                LOG.error("Unexcepted error while updating enablement", e); //$NON-NLS-1$
         }
     }
 
@@ -124,7 +129,7 @@ public class DeleteContactAction extends Action implements Disposable {
      */
     @Override
     public void run() {
-        ThreadUtils.runSafeSync(log, new Runnable() {
+        ThreadUtils.runSafeSync(LOG, new Runnable() {
             @Override
             public void run() {
                 runDeleteAction();
@@ -141,7 +146,7 @@ public class DeleteContactAction extends Action implements Disposable {
         }
 
         if (rosterEntry == null) {
-            log.error("RosterEntry should not be null at this point!"); //$NON-NLS-1$
+            LOG.error("RosterEntry should not be null at this point!"); //$NON-NLS-1$
             return;
         }
 
@@ -174,7 +179,7 @@ public class DeleteContactAction extends Action implements Disposable {
                 XMPPUtils.removeFromRoster(connectionService.getConnection(),
                     rosterEntry);
             } catch (XMPPException e) {
-                log.error("could not delete contact " + toString(rosterEntry) //$NON-NLS-1$
+                LOG.error("could not delete contact " + toString(rosterEntry) //$NON-NLS-1$
                     + ":", e); //$NON-NLS-1$
             }
         }

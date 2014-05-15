@@ -47,8 +47,7 @@ public class FollowModeAction extends Action implements IMenuCreator,
 
     public static final String ACTION_ID = FollowModeAction.class.getName();
 
-    private static final Logger LOG = Logger.getLogger(FollowModeAction.class
-        .getName());
+    private static final Logger LOG = Logger.getLogger(FollowModeAction.class);
 
     private ISelectionListener selectionListener = new ISelectionListener() {
         @Override
@@ -173,9 +172,7 @@ public class FollowModeAction extends Action implements IMenuCreator,
         SarosPluginContext.initComponent(this);
 
         setId(ACTION_ID);
-
         setText(Messages.FollowModeAction_enter_followmode);
-
         setMenuCreator(this);
 
         session = sessionManager.getSarosSession();

@@ -33,6 +33,8 @@ import de.fu_berlin.inf.dpp.ui.wizards.ColorChooserWizard;
 @Component(module = "action")
 public final class ChangeColorAction extends Action implements Disposable {
 
+    public static final String ACTION_ID = ChangeColorAction.class.getName();
+
     private ISelectionListener selectionListener = new ISelectionListener() {
         @Override
         public void selectionChanged(IWorkbenchPart part, ISelection selection) {
@@ -47,6 +49,7 @@ public final class ChangeColorAction extends Action implements Disposable {
         super(Messages.ChangeColorAction_title);
         SarosPluginContext.initComponent(this);
 
+        setId(ACTION_ID);
         setToolTipText(Messages.ChangeColorAction_tooltip);
 
         setImageDescriptor(ImageManager

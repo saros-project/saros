@@ -22,22 +22,21 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
+import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
-import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
- * Base class for changing the write access of a session participant (granting
- * write access, restricting to read-only).
- * <p>
- * TODO Introduce two static methods (one for each Permission) for creating
- * preconfigured objects, instead of having two subclasses. Change
- * {@link SarosView}, so it does not rely on distinct Action classes.
+ * Change the write access of a session participant (granting write access,
+ * restricting to read-only).
  */
-public abstract class ChangeWriteAccessAction extends Action implements
-    Disposable {
+public class ChangeWriteAccessAction extends Action implements Disposable {
+
+    public static final String ACTION_ID = ChangeWriteAccessAction.class
+        .getName();
 
     private static final Logger LOG = Logger
         .getLogger(ChangeWriteAccessAction.class);
@@ -77,12 +76,25 @@ public abstract class ChangeWriteAccessAction extends Action implements
         }
     };
 
-    public ChangeWriteAccessAction(Permission permission, String text,
+    public final static ChangeWriteAccessAction forWriteAccess = new ChangeWriteAccessAction(
+        Permission.WRITE_ACCESS, Messages.GiveWriteAccessAction_title,
+        Messages.GiveWriteAccessAction_tooltip,
+        ImageManager.ICON_CONTACT_SAROS_SUPPORT);
+
+    public final static ChangeWriteAccessAction forReadOnly = new ChangeWriteAccessAction(
+        Permission.READONLY_ACCESS,
+        Messages.RestrictToReadOnlyAccessAction_title,
+        Messages.RestrictToReadOnlyAccessAction_tooltip,
+        ImageManager.ICON_USER_SAROS_READONLY);
+
+    private ChangeWriteAccessAction(Permission permission, String text,
         String tooltip, final Image icon) {
 
         super(text);
 
         SarosPluginContext.initComponent(this);
+
+        setId(ACTION_ID + "." + permission);
 
         setImageDescriptor(new ImageDescriptor() {
             @Override

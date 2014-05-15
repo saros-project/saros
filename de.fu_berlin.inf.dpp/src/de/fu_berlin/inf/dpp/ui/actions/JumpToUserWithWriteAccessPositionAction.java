@@ -29,8 +29,11 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 public class JumpToUserWithWriteAccessPositionAction extends Action implements
     Disposable {
 
-    private static final Logger log = Logger
-        .getLogger(JumpToUserWithWriteAccessPositionAction.class.getName());
+    public static final String ACTION_ID = JumpToUserWithWriteAccessPositionAction.class
+        .getName();
+
+    private static final Logger LOG = Logger
+        .getLogger(JumpToUserWithWriteAccessPositionAction.class);
 
     protected ISelectionListener selectionListener = new ISelectionListener() {
         @Override
@@ -48,6 +51,7 @@ public class JumpToUserWithWriteAccessPositionAction extends Action implements
     public JumpToUserWithWriteAccessPositionAction() {
         super(Messages.JumpToUserWithWriteAccessPositionAction_title);
 
+        setId(ACTION_ID);
         setToolTipText(Messages.JumpToUserWithWriteAccessPositionAction_tooltip);
         setImageDescriptor(ImageManager
             .getImageDescriptor("icons/elcl16/jump.png")); //$NON-NLS-1$
@@ -71,7 +75,7 @@ public class JumpToUserWithWriteAccessPositionAction extends Action implements
             this.setEnabled(false);
         } catch (Exception e) {
             if (!PlatformUI.getWorkbench().isClosing())
-                log.error("Unexcepted error while updating enablement", e); //$NON-NLS-1$
+                LOG.error("Unexcepted error while updating enablement", e); //$NON-NLS-1$
         }
     }
 
@@ -80,7 +84,7 @@ public class JumpToUserWithWriteAccessPositionAction extends Action implements
      */
     @Override
     public void run() {
-        ThreadUtils.runSafeSync(log, new Runnable() {
+        ThreadUtils.runSafeSync(LOG, new Runnable() {
             @Override
             public void run() {
                 List<User> participants = SelectionRetrieverFactory
@@ -88,7 +92,7 @@ public class JumpToUserWithWriteAccessPositionAction extends Action implements
                 if (participants.size() == 1) {
                     editorManager.jumpToUser(participants.get(0));
                 } else {
-                    log.warn("More than one participant selected."); //$NON-NLS-1$
+                    LOG.warn("More than one participant selected."); //$NON-NLS-1$
                 }
             }
         });

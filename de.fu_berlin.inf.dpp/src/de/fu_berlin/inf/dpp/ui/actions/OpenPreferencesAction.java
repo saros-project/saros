@@ -9,14 +9,20 @@ import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 
 public class OpenPreferencesAction extends Action {
-    private static final Logger log = Logger
+
+    public static final String ACTION_ID = OpenPreferencesAction.class
+        .getName();
+
+    private static final Logger LOG = Logger
         .getLogger(OpenPreferencesAction.class);
 
     public OpenPreferencesAction() {
         super(Messages.OpenPreferencesAction_title);
-        this.setToolTipText(Messages.OpenPreferencesAction_tooltip);
-        this.setImageDescriptor(ImageManager.ELCL_OPEN_PREFERENCES);
-        this.setEnabled(true);
+
+        setId(ACTION_ID);
+        setToolTipText(Messages.OpenPreferencesAction_tooltip);
+        setImageDescriptor(ImageManager.ELCL_OPEN_PREFERENCES);
+        setEnabled(true);
     }
 
     @Override
@@ -29,7 +35,7 @@ public class OpenPreferencesAction extends Action {
                 "de.fu_berlin.inf.dpp.ui.commands.OpenSarosPreferences", //$NON-NLS-1$
                 null);
         } catch (Exception e) {
-            log.error("Could not execute command", e); //$NON-NLS-1$
+            LOG.error("Could not execute command", e); //$NON-NLS-1$
         }
     }
 }
