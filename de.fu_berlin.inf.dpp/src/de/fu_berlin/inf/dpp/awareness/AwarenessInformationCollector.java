@@ -92,7 +92,8 @@ public class AwarenessInformationCollector {
             && negotiation instanceof OutgoingProjectNegotiation) {
             /*
              * a negotiation is still running, i.e. the user is not 100% ready
-             * to work yet
+             * to work yet FIXME: there is no mechanism to notify about
+             * negotiation termination so this may display dirty data
              */
             details.add("in session synchronization");
         } else {
@@ -169,11 +170,12 @@ public class AwarenessInformationCollector {
         assert user != null;
 
         ISarosSession session = sarosSession.getValue();
+
         // should not be called outside of a running session
         if (session == null)
             return null;
-        JID resJID = session.getResourceQualifiedJID(user.getJID());
-        return resJID == null ? resJID : followModes.get(resJID);
+
+        return followModes.get(user.getJID());
     }
 
     /**
@@ -187,20 +189,17 @@ public class AwarenessInformationCollector {
         assert user != null;
 
         ISarosSession session = sarosSession.getValue();
+
         // should not be called outside of a running session
         if (session == null)
             return null;
 
-        JID userJID = session.getResourceQualifiedJID(user.getJID());
-        if (userJID == null)
-            return null;
+        JID followeeJID = followModes.get(user.getJID());
 
-        JID followeeJID = followModes.get(userJID);
         if (followeeJID == null)
             return null;
 
-        User followee = session.getUser(followeeJID);
-        return followee;
+        return session.getUser(followeeJID);
     }
 
     /**

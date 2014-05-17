@@ -241,7 +241,10 @@ public interface ISarosSession {
      * 
      * @return the resource qualified JID or <code>null</code> if no user is
      *         found with this JID
+     * @deprecated Do not use this method in new code, ensure you can obtain a
+     *             resource qualified JID and use {@link #getUser(JID)} instead.
      */
+    @Deprecated
     public JID getResourceQualifiedJID(JID jid);
 
     /**

@@ -408,7 +408,13 @@ public final class SarosSession implements ISarosSession {
         // TODO synchronize this method !
 
         JID jid = user.getJID();
+
+        if (!jid.isResourceQualifiedJID())
+            throw new IllegalArgumentException("network id of user " + user
+                + " is not unique, resource part of JID is missing");
+
         user.setInSession(true);
+
         if (participants.putIfAbsent(jid, user) != null) {
             log.error("user " + user + " added twice to SarosSession",
                 new StackTrace());
