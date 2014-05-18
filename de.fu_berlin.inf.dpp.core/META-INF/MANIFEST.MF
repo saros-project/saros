@@ -4,7 +4,8 @@ Bundle-Name: Saros Core
 Bundle-SymbolicName: de.fu_berlin.inf.dpp.core
 Bundle-Version: 1.0.0.DEVEL
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: com.thoughtworks.xstream,
+Export-Package: com.strangeberry.jmdns.tools,
+ com.thoughtworks.xstream,
  com.thoughtworks.xstream.annotations,
  com.thoughtworks.xstream.converters,
  com.thoughtworks.xstream.converters.basic,
@@ -62,6 +63,7 @@ Export-Package: com.thoughtworks.xstream,
  de.fu_berlin.inf.dpp.session,
  de.fu_berlin.inf.dpp.synchronize,
  de.fu_berlin.inf.dpp.util,
+ javax.jmdns,
  org.apache.commons.codec,
  org.apache.commons.codec.binary,
  org.apache.commons.codec.digest,
@@ -130,4 +132,5 @@ Bundle-ClassPath: .,
  lib/xstream-1.4-20101008.163445-1.jar,
  lib/xpp3-1.1.4c.jar,
  lib/picocontainer-2.11.2.jar,
- lib/weupnp.jar
+ lib/weupnp.jar,
+ lib/jmdns-3.4.1.jar

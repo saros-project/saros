@@ -100,7 +100,9 @@ import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.ui.widgets.ConnectionStateComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.ChatRoomsComposite;
+import de.fu_berlin.inf.dpp.ui.widgets.viewer.ViewerComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.rosterSession.BuddySessionDisplayComposite;
+import de.fu_berlin.inf.dpp.ui.widgets.viewer.session.MDNSSessionDisplayComposite;
 
 /**
  * @JTourBusStop 1, The Interface Tour:
@@ -128,6 +130,9 @@ public class SarosView extends ViewPart {
     private static final Logger log = Logger.getLogger(SarosView.class);
 
     public static final String ID = "de.fu_berlin.inf.dpp.ui.views.SarosView";
+
+    private static final boolean MDNS_MODE = Boolean
+        .getBoolean("de.fu_berlin.inf.dpp.net.ENABLE_MDNS");
 
     protected IRosterListener rosterListenerBuddys = new RosterAdapter() {
         /**
@@ -183,15 +188,13 @@ public class SarosView extends ViewPart {
 
         @Override
         public void partDeactivated(IWorkbenchPartReference partRef) {
-            if (buddySessionDisplayComposite != null
-                && !buddySessionDisplayComposite.isDisposed()) {
-                buddySessionDisplayComposite.getViewer().setSelection(
-                    new ISelection() {
-                        @Override
-                        public boolean isEmpty() {
-                            return true;
-                        }
-                    });
+            if (sessionDisplay != null && !sessionDisplay.isDisposed()) {
+                sessionDisplay.getViewer().setSelection(new ISelection() {
+                    @Override
+                    public boolean isEmpty() {
+                        return true;
+                    }
+                });
             }
         }
 
@@ -223,7 +226,8 @@ public class SarosView extends ViewPart {
     };
 
     protected Composite leftComposite;
-    protected BuddySessionDisplayComposite buddySessionDisplayComposite;
+
+    protected ViewerComposite<?> sessionDisplay;
 
     protected ChatRoomsComposite chatRooms;
 
@@ -309,13 +313,17 @@ public class SarosView extends ViewPart {
         connectionStateComposite.setLayoutData(LayoutUtils
             .createFillHGrabGridData());
 
-        buddySessionDisplayComposite = new BuddySessionDisplayComposite(
-            leftComposite, SWT.V_SCROLL);
-        buddySessionDisplayComposite.setLayoutData(LayoutUtils
-            .createFillGridData());
+        if (MDNS_MODE) {
+            sessionDisplay = new MDNSSessionDisplayComposite(leftComposite,
+                SWT.V_SCROLL);
+        } else {
+            sessionDisplay = new BuddySessionDisplayComposite(leftComposite,
+                SWT.V_SCROLL);
+        }
 
-        final Control control = buddySessionDisplayComposite.getViewer()
-            .getControl();
+        sessionDisplay.setLayoutData(LayoutUtils.createFillGridData());
+
+        final Control control = sessionDisplay.getViewer().getControl();
 
         control.addMouseListener(new MouseAdapter() {
             @Override
@@ -397,7 +405,7 @@ public class SarosView extends ViewPart {
         addSessionMenuItems(menuManager);
         addAdditionsSeparator(menuManager);
 
-        Viewer buddySessionViewer = buddySessionDisplayComposite.getViewer();
+        Viewer buddySessionViewer = sessionDisplay.getViewer();
         Menu menu = menuManager.createContextMenu(buddySessionViewer
             .getControl());
         buddySessionViewer.getControl().setMenu(menu);
