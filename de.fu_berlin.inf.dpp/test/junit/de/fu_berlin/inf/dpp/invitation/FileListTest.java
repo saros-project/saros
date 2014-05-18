@@ -21,28 +21,18 @@ package de.fu_berlin.inf.dpp.invitation;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.easymock.EasyMock;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.junit.Before;
 import org.junit.Test;
 
 import com.thoughtworks.xstream.XStream;
@@ -59,129 +49,13 @@ import com.thoughtworks.xstream.io.xml.CompactWriter;
  * FIXME FileList now uses IResource.getProject(), which isn't implemented yet
  * by FileStub, so any test
  */
-public class FileListTest {
-
-    private static IProject project;
+public class FileListTest extends AbstractFileListTest {
 
     private static XStream xstream = new XStream();
 
     static {
-        project = EasyMock.createNiceMock(IProject.class);
-        EasyMock.expect(project.getName()).andStubReturn("Foo");
-
-        try {
-            EasyMock.expect(project.getDefaultCharset()).andStubReturn(
-                "US-ASCII");
-        } catch (CoreException e) {
-            // cannot happen as the mock is in recording mode
-        }
-
-        EasyMock.replay(project);
-
         xstream.registerConverter(BooleanConverter.BINARY);
         xstream.processAnnotations(FileList.class);
-    }
-
-    private IFile fileInRoot1;
-    private IFile fileInRoot2;
-    private IFile fileInSubDir1;
-    private IFile fileInSubDir2;
-    private IFile fileInSubDir1changed;
-
-    private List<IResource> threeFileList = new ArrayList<IResource>();
-
-    private FileList threeEntryList;
-    private FileList fourEntryList; // contains one additional entry
-    // in respect to threeEntryList
-    private FileList modifiedFourEntryList; // contains one modified entry in
-    // respect to fourEntryList
-    private FileList emptyFileList;
-
-    // needed as the mocks will always return the same input stream instance
-    private static class ResetingInputStream extends InputStream {
-
-        private final String content;
-        private ByteArrayInputStream in;
-
-        public ResetingInputStream(String content) {
-            this.content = content;
-            in = new ByteArrayInputStream(this.content.getBytes());
-        }
-
-        @Override
-        public int read() throws IOException {
-            return in.read();
-        }
-
-        @Override
-        public void close() throws IOException {
-            in = new ByteArrayInputStream(this.content.getBytes());
-        }
-
-    }
-
-    private IFile createFileMock(String path, String content, String encoding)
-        throws Exception {
-        IPath p = new Path(path);
-        IPath f = new Path(project.getName() + "/" + path);
-
-        IFile fileMock;
-
-        fileMock = EasyMock.createMock(IFile.class);
-
-        EasyMock.expect(fileMock.getProject()).andStubReturn(project);
-        EasyMock.expect(fileMock.getProjectRelativePath()).andStubReturn(p);
-        EasyMock.expect(fileMock.getContents()).andStubReturn(
-            new ResetingInputStream(content));
-        EasyMock.expect(fileMock.isDerived()).andStubReturn(false);
-        EasyMock.expect(fileMock.exists()).andStubReturn(true);
-        EasyMock.expect(fileMock.getType()).andStubReturn(IResource.FILE);
-        EasyMock.expect(fileMock.getName()).andStubReturn(p.lastSegment());
-        EasyMock.expect(fileMock.getFullPath()).andStubReturn(f);
-
-        try {
-            EasyMock.expect(fileMock.getCharset()).andStubReturn(encoding);
-        } catch (CoreException e) {
-            // cannot happen as the mock is in recording mode
-        }
-
-        EasyMock.replay(fileMock);
-        return fileMock;
-    }
-
-    @Before
-    public void setUp() throws Exception {
-
-        fileInRoot1 = createFileMock("root1", "fileInRoot1", "ISO-8859-1");
-        fileInRoot2 = createFileMock("root2", "fileInRoot2", "ISO-8859-1");
-        fileInSubDir1 = createFileMock("subdir/file1", "fileInSubDir1",
-            "UTF-16");
-        fileInSubDir2 = createFileMock("subdir/file2", "fileInSubDir2",
-            "UTF-16");
-        fileInSubDir1changed = createFileMock("subdir/file1",
-            "changed fileInSubDir1", "UTF-16");
-
-        List<IResource> resources = new ArrayList<IResource>();
-        resources.add(fileInRoot1);
-        resources.add(fileInRoot2);
-        resources.add(fileInSubDir1);
-        threeFileList.addAll(resources);
-
-        threeEntryList = FileListFactory.createFileList(null, resources, null,
-            false, null);
-
-        resources.add(fileInSubDir2);
-
-        fourEntryList = FileListFactory.createFileList(null, resources, null,
-            false, null);
-
-        resources.remove(fileInSubDir1);
-        resources.add(fileInSubDir1changed);
-
-        modifiedFourEntryList = FileListFactory.createFileList(null, resources,
-            null, false, null);
-
-        emptyFileList = FileListFactory.createEmptyFileList();
     }
 
     @Test
@@ -196,103 +70,10 @@ public class FileListTest {
     }
 
     @Test
-    public void testGetFilePaths() {
+    public void testGetFilePaths() throws Exception {
         List<IPath> paths = threeEntryList.getPaths();
 
-        assertPaths(new String[] { "root1", "root2", "subdir/file1" }, paths);
-    }
-
-    // @Test
-    // public void testGetFileUnalteredPaths() {
-    // Collection<IPath> paths = threeEntryList.getUnalteredPaths();
-    //
-    // assertPaths(new String[] { "root1", "root2", "subdir/file1" }, paths);
-    // }
-
-    @Test
-    public void testDiffGetAddedFilePaths() {
-        Collection<IPath> paths = FileListDiff.diff(threeEntryList,
-            fourEntryList).getAddedPaths();
-
-        assertPaths(new String[] { "subdir/file2" }, paths);
-    }
-
-    @Test
-    public void testReversedDiffGetAddedFilePaths() {
-        Collection<IPath> paths = FileListDiff.diff(fourEntryList,
-            threeEntryList).getAddedPaths();
-
-        assertPaths(new String[] {}, paths);
-    }
-
-    @Test
-    public void testDiffGetRemovedFilePaths() {
-        Collection<IPath> paths = fourEntryList.diff(threeEntryList)
-            .getRemovedPaths();
-
-        assertPaths(new String[] { "subdir/file2" }, paths);
-    }
-
-    @Test
-    public void testReversedDiffGetRemovedFilePaths() {
-        Collection<IPath> paths = threeEntryList.diff(fourEntryList)
-            .getRemovedPaths();
-
-        assertPaths(new String[] {}, paths);
-    }
-
-    @Test
-    public void testDiffGetAlteredFilePaths() {
-        Collection<IPath> paths = fourEntryList.diff(modifiedFourEntryList)
-            .getAlteredPaths();
-
-        assertPaths(new String[] { "subdir/file1" }, paths);
-    }
-
-    @Test
-    public void testReversedDiffGetAlteredFilePaths() {
-        Collection<IPath> paths = modifiedFourEntryList.diff(fourEntryList)
-            .getAlteredPaths();
-
-        assertPaths(new String[] { "subdir/file1" }, paths);
-    }
-
-    @Test
-    public void testDiffGetAlteredFilesAddedFiles() {
-        Collection<IPath> paths = threeEntryList.diff(fourEntryList)
-            .getAlteredPaths();
-
-        assertPaths(new String[] {}, paths);
-    }
-
-    @Test
-    public void testDiffGetUnalteredFilePaths() {
-        Collection<IPath> paths = fourEntryList.diff(modifiedFourEntryList)
-            .getUnalteredPaths();
-
-        assertPaths(new String[] { "root1", "root2", "subdir/file2" }, paths);
-    }
-
-    @Test
-    public void testReversedDiffGetUnalteredFilePaths() {
-        Collection<IPath> paths = modifiedFourEntryList.diff(threeEntryList)
-            .getUnalteredPaths();
-
-        assertPaths(new String[] { "root1", "root2" }, paths);
-    }
-
-    @Test
-    // FIXME ndh: Needs checking.
-    public void testDiffGetFilePaths() {
-        Collection<IPath> paths = threeEntryList.diff(modifiedFourEntryList)
-            .getAddedPaths();
-
-        assertPaths(new String[] { "subdir/file2" }, paths);
-
-        paths = emptyFileList.diff(threeEntryList).getAddedPaths();
-        assertPaths(new String[] { "root1", "root2", "subdir/file1" }, paths);
-        paths = threeEntryList.diff(emptyFileList).getRemovedPaths();
-        assertPaths(new String[] { "root1", "root2", "subdir/file1" }, paths);
+        assertPaths(paths, ROOT1, ROOT2, SUBDIR_FILE1);
     }
 
     @Test
@@ -312,22 +93,8 @@ public class FileListTest {
         assertEquals(threeEntryList, replicated);
     }
 
-    private void assertPaths(String[] expected, Collection<IPath> actual) {
-        for (int i = 0; i < expected.length; i++) {
-            Path path = new Path(expected[i]);
-            assertTrue("Expected " + path + " to appear in: " + actual,
-                actual.contains(path));
-        }
-
-        assertEquals(
-            Arrays.toString(expected) + " != "
-                + Arrays.toString(actual.toArray()), expected.length,
-            actual.size());
-    }
-
     @Test
     public void testToXmlAndBack() throws Exception {
-
         List<IPath> files = new ArrayList<IPath>();
         StringBuilder builder = new StringBuilder();
         Random random = new Random();
