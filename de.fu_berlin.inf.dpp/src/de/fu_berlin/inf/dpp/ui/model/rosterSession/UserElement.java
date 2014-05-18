@@ -18,6 +18,8 @@ import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.model.TreeElement;
 import de.fu_berlin.inf.dpp.ui.util.SWTBoldStyler;
 
+//TODO move to *.ui.model.session
+
 /**
  * Wrapper for {@link UserElement} in use with {@link Viewer Viewers}
  * 

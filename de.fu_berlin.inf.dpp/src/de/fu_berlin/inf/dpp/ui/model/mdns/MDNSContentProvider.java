@@ -11,8 +11,6 @@ import javax.jmdns.ServiceInfo;
 import javax.jmdns.ServiceListener;
 
 import org.eclipse.jface.viewers.Viewer;
-import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.RosterGroup;
 
 import de.fu_berlin.inf.dpp.ui.model.TreeContentProvider;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -108,10 +106,6 @@ public final class MDNSContentProvider extends TreeContentProvider {
         mDNSServices.clear();
     }
 
-    /**
-     * Returns {@link RosterGroup}s followed by {@link RosterEntry}s which don't
-     * belong to any {@link RosterGroup}.
-     */
     @Override
     public Object[] getElements(final Object inputElement) {
 

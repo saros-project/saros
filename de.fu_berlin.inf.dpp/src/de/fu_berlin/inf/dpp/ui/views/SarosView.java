@@ -101,8 +101,8 @@ import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactor
 import de.fu_berlin.inf.dpp.ui.widgets.ConnectionStateComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.ChatRoomsComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.ViewerComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.rosterSession.BuddySessionDisplayComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.session.MDNSSessionDisplayComposite;
+import de.fu_berlin.inf.dpp.ui.widgets.viewer.session.XMPPSessionDisplayComposite;
 
 /**
  * @JTourBusStop 1, The Interface Tour:
@@ -134,12 +134,12 @@ public class SarosView extends ViewPart {
     private static final boolean MDNS_MODE = Boolean
         .getBoolean("de.fu_berlin.inf.dpp.net.ENABLE_MDNS");
 
-    protected IRosterListener rosterListenerBuddys = new RosterAdapter() {
+    private final IRosterListener rosterListener = new RosterAdapter() {
         /**
          * Stores the most recent presence for each user, so we can keep track
          * of away/available changes which should not update the RosterView.
          */
-        protected Map<String, Presence> lastPresenceMap = new HashMap<String, Presence>();
+        private Map<String, Presence> lastPresenceMap = new HashMap<String, Presence>();
 
         @Override
         public void presenceChanged(Presence presence) {
@@ -165,7 +165,7 @@ public class SarosView extends ViewPart {
         }
     };
 
-    protected IPartListener2 partListener = new IPartListener2() {
+    private final IPartListener2 partListener = new IPartListener2() {
         @Override
         public void partInputChanged(IWorkbenchPartReference partRef) {
             // do nothing
@@ -214,7 +214,7 @@ public class SarosView extends ViewPart {
         }
     };
 
-    protected IPropertyChangeListener propertyListener = new IPropertyChangeListener() {
+    private final IPropertyChangeListener propertyListener = new IPropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent event) {
             if (event.getProperty().equals(
@@ -317,7 +317,7 @@ public class SarosView extends ViewPart {
             sessionDisplay = new MDNSSessionDisplayComposite(leftComposite,
                 SWT.V_SCROLL);
         } else {
-            sessionDisplay = new BuddySessionDisplayComposite(leftComposite,
+            sessionDisplay = new XMPPSessionDisplayComposite(leftComposite,
                 SWT.V_SCROLL);
         }
 
@@ -412,8 +412,8 @@ public class SarosView extends ViewPart {
         getSite().registerContextMenu(menuManager, buddySessionViewer);
         getSite().setSelectionProvider(buddySessionViewer);
 
-        rosterTracker.addRosterListener(rosterListenerBuddys);
-        rosterListenerBuddys.rosterChanged(connectionService.getRoster());
+        rosterTracker.addRosterListener(rosterListener);
+        rosterListener.rosterChanged(connectionService.getRoster());
 
         getViewSite().getPage().addPartListener(partListener);
     }
@@ -566,7 +566,7 @@ public class SarosView extends ViewPart {
     public void dispose() {
         super.dispose();
 
-        rosterTracker.removeRosterListener(rosterListenerBuddys);
+        rosterTracker.removeRosterListener(rosterListener);
 
         for (IAction action : registeredActions.values())
             if (action instanceof Disposable)

@@ -4,10 +4,11 @@ import org.eclipse.core.runtime.IAdapterFactory;
 
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.session.User;
+import de.fu_berlin.inf.dpp.ui.model.session.SessionContentProvider;
 
 /**
  * Provides adapters for {@link SarosSession} entities which are provided by
- * {@link RosterSessionContentProvider}.
+ * {@link SessionContentProvider}.
  * <p>
  * E.g. let's you adapt {@link UserElement} to {@link User} with
  * 

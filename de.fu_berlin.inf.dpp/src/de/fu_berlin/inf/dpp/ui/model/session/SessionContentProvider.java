@@ -1,10 +1,11 @@
-package de.fu_berlin.inf.dpp.ui.model.rosterSession;
+package de.fu_berlin.inf.dpp.ui.model.session;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.jface.viewers.IContentProvider;
+import javax.jmdns.JmDNS;
+
 import org.eclipse.jface.viewers.Viewer;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
@@ -25,26 +26,24 @@ import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.session.User;
+import de.fu_berlin.inf.dpp.ui.model.HeaderElement;
 import de.fu_berlin.inf.dpp.ui.model.TreeContentProvider;
+import de.fu_berlin.inf.dpp.ui.model.mdns.MDNSContentProvider;
+import de.fu_berlin.inf.dpp.ui.model.mdns.session.MDNSHeaderElement;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterContentProvider;
+import de.fu_berlin.inf.dpp.ui.model.rosterSession.RosterHeaderElement;
+import de.fu_berlin.inf.dpp.ui.model.rosterSession.UserElement;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.ViewerUtils;
 
-/**
- * {@link IContentProvider} for use in conjunction with a {@link Roster roster}
- * input.
- * <p>
- * Automatically keeps track of changes of contacts.
- * 
- * @author bkahlert
- */
-public final class RosterSessionContentProvider extends TreeContentProvider {
+public class SessionContentProvider extends TreeContentProvider {
 
     private Viewer viewer;
-    private RosterContentProvider rosterContentProvider = new RosterContentProvider();
 
-    private SessionHeaderElement sessionHeaderElement;
-    private RosterHeaderElement rosterHeaderElement;
+    private TreeContentProvider additionalContentProvider;
+
+    private HeaderElement sessionHeaderElement;
+    private HeaderElement contentHeaderElement;
 
     private Roster currentRoster;
     private ISarosSession currentSession;
@@ -54,6 +53,17 @@ public final class RosterSessionContentProvider extends TreeContentProvider {
 
     @Inject
     private FollowingActivitiesManager followingActivitiesManager;
+
+    public SessionContentProvider(TreeContentProvider additionalContent) {
+        SarosPluginContext.initComponent(this);
+
+        this.additionalContentProvider = additionalContent;
+
+        editorManager.addSharedEditorListener(sharedEditorListener);
+        followingActivitiesManager
+            .addIinternalListener(followModeChangesListener);
+
+    }
 
     private final IFollowModeChangesListener followModeChangesListener = new IFollowModeChangesListener() {
 
@@ -154,30 +164,21 @@ public final class RosterSessionContentProvider extends TreeContentProvider {
         }
     };
 
-    public RosterSessionContentProvider() {
-        SarosPluginContext.initComponent(this);
-        editorManager.addSharedEditorListener(sharedEditorListener);
-        followingActivitiesManager
-            .addIinternalListener(followModeChangesListener);
-    }
-
     @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         this.viewer = viewer;
 
-        final Roster oldRoster = (oldInput instanceof RosterSessionInput) ? ((RosterSessionInput) oldInput)
-            .getRoster() : null;
+        final Roster oldRoster = getRoster(oldInput);
 
-        final Roster newRoster = currentRoster = (newInput instanceof RosterSessionInput) ? ((RosterSessionInput) newInput)
-            .getRoster() : null;
+        final Roster newRoster = currentRoster = getRoster(newInput);
 
-        final ISarosSession oldSession = (oldInput instanceof RosterSessionInput) ? ((RosterSessionInput) oldInput)
-            .getSarosSession() : null;
+        final ISarosSession oldSession = getSession(oldInput);
 
-        final ISarosSession newSession = currentSession = (newInput instanceof RosterSessionInput) ? ((RosterSessionInput) newInput)
-            .getSarosSession() : null;
+        final ISarosSession newSession = getSession(newInput);
 
-        rosterContentProvider.inputChanged(viewer, oldRoster, newRoster);
+        if (additionalContentProvider != null)
+            additionalContentProvider.inputChanged(viewer,
+                getContent(oldInput), getContent(newInput));
 
         if (oldRoster != null)
             oldRoster.removeRosterListener(rosterListener);
@@ -187,10 +188,10 @@ public final class RosterSessionContentProvider extends TreeContentProvider {
 
         disposeHeaderElements();
 
-        if (!(newInput instanceof RosterSessionInput))
+        if (!(newInput instanceof SessionInput))
             return;
 
-        createHeaders((RosterSessionInput) newInput);
+        createHeaders((SessionInput) newInput);
 
         if (newRoster != null)
             newRoster.addRosterListener(rosterListener);
@@ -204,20 +205,28 @@ public final class RosterSessionContentProvider extends TreeContentProvider {
         if (sessionHeaderElement != null)
             sessionHeaderElement.dispose();
 
-        if (rosterHeaderElement != null)
-            rosterHeaderElement.dispose();
+        if (contentHeaderElement != null)
+            contentHeaderElement.dispose();
 
         sessionHeaderElement = null;
-        rosterHeaderElement = null;
+        contentHeaderElement = null;
     }
 
-    private void createHeaders(RosterSessionInput input) {
+    // TODO abstract !
+    private void createHeaders(SessionInput input) {
 
         sessionHeaderElement = new SessionHeaderElement(viewer.getControl()
             .getFont(), input);
 
-        rosterHeaderElement = new RosterHeaderElement(viewer.getControl()
-            .getFont(), rosterContentProvider, input.getRoster());
+        if (additionalContentProvider instanceof RosterContentProvider) {
+            contentHeaderElement = new RosterHeaderElement(viewer.getControl()
+                .getFont(), (RosterContentProvider) additionalContentProvider,
+                (Roster) input.getCustomContent());
+        } else if (additionalContentProvider instanceof MDNSContentProvider) {
+            contentHeaderElement = new MDNSHeaderElement(viewer.getControl()
+                .getFont(), (MDNSContentProvider) additionalContentProvider,
+                (JmDNS) input.getCustomContent());
+        }
     }
 
     @Override
@@ -233,7 +242,8 @@ public final class RosterSessionContentProvider extends TreeContentProvider {
         followingActivitiesManager
             .removeIinternalListener(followModeChangesListener);
 
-        rosterContentProvider.dispose();
+        if (additionalContentProvider != null)
+            additionalContentProvider.dispose();
 
         disposeHeaderElements();
 
@@ -241,7 +251,7 @@ public final class RosterSessionContentProvider extends TreeContentProvider {
         currentSession = null;
         currentRoster = null;
         editorManager = null;
-        rosterContentProvider = null;
+        additionalContentProvider = null;
         followingActivitiesManager = null;
     }
 
@@ -252,7 +262,7 @@ public final class RosterSessionContentProvider extends TreeContentProvider {
     @Override
     public Object[] getElements(Object inputElement) {
 
-        if (!(inputElement instanceof RosterSessionInput))
+        if (!(inputElement instanceof SessionInput))
             return new Object[0];
 
         List<Object> elements = new ArrayList<Object>();
@@ -260,8 +270,8 @@ public final class RosterSessionContentProvider extends TreeContentProvider {
         if (sessionHeaderElement != null)
             elements.add(sessionHeaderElement);
 
-        if (rosterHeaderElement != null)
-            elements.add(rosterHeaderElement);
+        if (contentHeaderElement != null)
+            elements.add(contentHeaderElement);
 
         return elements.toArray();
     }
@@ -276,5 +286,32 @@ public final class RosterSessionContentProvider extends TreeContentProvider {
      */
     private UserElement getUserElement(Roster roster, User user) {
         return roster == null ? null : new UserElement(user, roster);
+    }
+
+    private ISarosSession getSession(Object input) {
+
+        if (!(input instanceof SessionInput))
+            return null;
+
+        return ((SessionInput) input).getSession();
+    }
+
+    private Roster getRoster(Object input) {
+        if (!(input instanceof SessionInput))
+            return null;
+
+        Object roster = ((SessionInput) input).getCustomContent();
+
+        if (roster instanceof Roster)
+            return (Roster) roster;
+
+        return null;
+    }
+
+    private Object getContent(Object input) {
+        if (!(input instanceof SessionInput))
+            return null;
+
+        return ((SessionInput) input).getCustomContent();
     }
 }

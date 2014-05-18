@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.widgets.viewer.rosterSession;
+package de.fu_berlin.inf.dpp.ui.widgets.viewer.session;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Platform;
@@ -37,10 +37,12 @@ import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.model.TreeLabelProvider;
-import de.fu_berlin.inf.dpp.ui.model.rosterSession.RosterSessionComparator;
-import de.fu_berlin.inf.dpp.ui.model.rosterSession.RosterSessionContentProvider;
-import de.fu_berlin.inf.dpp.ui.model.rosterSession.RosterSessionInput;
+import de.fu_berlin.inf.dpp.ui.model.roster.RosterComparator;
+import de.fu_berlin.inf.dpp.ui.model.roster.RosterContentProvider;
 import de.fu_berlin.inf.dpp.ui.model.rosterSession.UserElement;
+import de.fu_berlin.inf.dpp.ui.model.session.SessionComparator;
+import de.fu_berlin.inf.dpp.ui.model.session.SessionContentProvider;
+import de.fu_berlin.inf.dpp.ui.model.session.SessionInput;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.ui.util.PaintUtils;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -63,10 +65,10 @@ import de.fu_berlin.inf.dpp.ui.widgets.viewer.ViewerComposite;
  * @author bkahlert
  * 
  */
-public class BuddySessionDisplayComposite extends ViewerComposite<TreeViewer> {
+public class XMPPSessionDisplayComposite extends ViewerComposite<TreeViewer> {
 
     private static final Logger LOG = Logger
-        .getLogger(BuddySessionDisplayComposite.class);
+        .getLogger(XMPPSessionDisplayComposite.class);
 
     @Inject
     private XMPPConnectionService connectionService;
@@ -164,7 +166,7 @@ public class BuddySessionDisplayComposite extends ViewerComposite<TreeViewer> {
         }
     };
 
-    public BuddySessionDisplayComposite(Composite parent, int style) {
+    public XMPPSessionDisplayComposite(Composite parent, int style) {
         super(parent, style);
 
         SarosPluginContext.initComponent(this);
@@ -289,9 +291,11 @@ public class BuddySessionDisplayComposite extends ViewerComposite<TreeViewer> {
 
     @Override
     protected void configureViewer(TreeViewer viewer) {
-        viewer.setContentProvider(new RosterSessionContentProvider());
+        viewer.setContentProvider(new SessionContentProvider(
+            new RosterContentProvider()));
+
         viewer.setLabelProvider(new TreeLabelProvider());
-        viewer.setComparator(new RosterSessionComparator());
+        viewer.setComparator(new SessionComparator(new RosterComparator()));
         viewer.setUseHashlookup(true);
 
         /*
@@ -343,8 +347,8 @@ public class BuddySessionDisplayComposite extends ViewerComposite<TreeViewer> {
             cachedRoster = roster;
 
         getViewer().setInput(
-            new RosterSessionInput(cachedRoster, sarosSessionManager
-                .getSarosSession()));
+            new SessionInput(sarosSessionManager.getSarosSession(),
+                cachedRoster));
     }
 
     @Override

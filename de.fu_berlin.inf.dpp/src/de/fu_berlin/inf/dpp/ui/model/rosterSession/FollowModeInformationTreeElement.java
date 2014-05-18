@@ -9,6 +9,8 @@ import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 
+// TODO move to *.ui.model.session
+
 /**
  * This is a tree element that can be displayed as a child element of the user
  * entry in the Saros session view {@link Viewer Viewers} showing information

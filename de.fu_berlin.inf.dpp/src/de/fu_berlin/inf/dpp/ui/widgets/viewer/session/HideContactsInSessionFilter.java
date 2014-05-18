@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.widgets.viewer.rosterSession;
+package de.fu_berlin.inf.dpp.ui.widgets.viewer.session;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;

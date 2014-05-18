@@ -34,14 +34,17 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.model.TreeLabelProvider;
+import de.fu_berlin.inf.dpp.ui.model.mdns.MDNSComparator;
 import de.fu_berlin.inf.dpp.ui.model.mdns.MDNSContentProvider;
 import de.fu_berlin.inf.dpp.ui.model.rosterSession.UserElement;
+import de.fu_berlin.inf.dpp.ui.model.session.SessionComparator;
+import de.fu_berlin.inf.dpp.ui.model.session.SessionContentProvider;
+import de.fu_berlin.inf.dpp.ui.model.session.SessionInput;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.ui.util.PaintUtils;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.ViewerUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.ViewerComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.rosterSession.HideContactsInSessionFilter;
 
 public class MDNSSessionDisplayComposite extends ViewerComposite<TreeViewer> {
 
@@ -233,7 +236,10 @@ public class MDNSSessionDisplayComposite extends ViewerComposite<TreeViewer> {
 
     @Override
     protected void configureViewer(TreeViewer viewer) {
-        viewer.setContentProvider(new MDNSContentProvider());
+        viewer.setContentProvider(new SessionContentProvider(
+            new MDNSContentProvider()));
+
+        viewer.setComparator(new SessionComparator(new MDNSComparator()));
         viewer.setLabelProvider(new TreeLabelProvider());
         viewer.setUseHashlookup(true);
 
@@ -279,7 +285,8 @@ public class MDNSSessionDisplayComposite extends ViewerComposite<TreeViewer> {
 
     private void updateViewer() {
         checkWidget();
-        getViewer().setInput(jmDNS);
+        getViewer().setInput(
+            new SessionInput(sarosSessionManager.getSarosSession(), jmDNS));
     }
 
     @Override

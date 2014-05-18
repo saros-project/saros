@@ -7,6 +7,7 @@ import org.jivesoftware.smack.Roster;
 
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
+import de.fu_berlin.inf.dpp.ui.model.HeaderElement;
 import de.fu_berlin.inf.dpp.ui.model.TreeElement;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterContentProvider;
 
@@ -45,6 +46,6 @@ public class RosterHeaderElement extends HeaderElement {
 
     @Override
     public Object[] getChildren() {
-        return rosterContentProvider.getElements(this.roster);
+        return rosterContentProvider.getElements(roster);
     }
 }

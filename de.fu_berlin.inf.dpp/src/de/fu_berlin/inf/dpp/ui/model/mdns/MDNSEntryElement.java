@@ -18,6 +18,10 @@ public class MDNSEntryElement extends TreeElement {
         displayName = info.getName();
     }
 
+    public String getName() {
+        return qualifiedName;
+    }
+
     @Override
     public Image getImage() {
         return ImageManager.ICON_CONTACT_SAROS_SUPPORT;

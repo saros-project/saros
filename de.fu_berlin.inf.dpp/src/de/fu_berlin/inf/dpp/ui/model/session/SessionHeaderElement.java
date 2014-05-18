@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.model.rosterSession;
+package de.fu_berlin.inf.dpp.ui.model.session;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,12 +7,15 @@ import java.util.List;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
+import org.jivesoftware.smack.Roster;
 
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
+import de.fu_berlin.inf.dpp.ui.model.HeaderElement;
 import de.fu_berlin.inf.dpp.ui.model.TreeElement;
+import de.fu_berlin.inf.dpp.ui.model.rosterSession.UserElement;
 
 /**
  * Container {@link TreeElement} for a {@link SarosSession}
@@ -20,18 +23,18 @@ import de.fu_berlin.inf.dpp.ui.model.TreeElement;
  * @author bkahlert
  */
 public class SessionHeaderElement extends HeaderElement {
-    protected RosterSessionInput rosterSessionInput;
+    private final SessionInput input;
 
-    public SessionHeaderElement(Font font, RosterSessionInput rosterSessionInput) {
+    public SessionHeaderElement(Font font, SessionInput rosterSessionInput) {
         super(font);
-        this.rosterSessionInput = rosterSessionInput;
+        this.input = rosterSessionInput;
     }
 
     @Override
     public StyledString getStyledText() {
         StyledString styledString = new StyledString();
-        if (rosterSessionInput == null
-            || rosterSessionInput.getSarosSession() == null) {
+        if (input == null
+            || input.getSession() == null) {
             styledString.append(
                 Messages.SessionHeaderElement_no_session_running, boldStyler);
         } else {
@@ -48,21 +51,27 @@ public class SessionHeaderElement extends HeaderElement {
 
     @Override
     public boolean hasChildren() {
-        return rosterSessionInput != null
-            && rosterSessionInput.getSarosSession() != null;
+        return input != null
+            && input.getSession() != null;
     }
 
     @Override
     public Object[] getChildren() {
-        if (rosterSessionInput != null
-            && rosterSessionInput.getSarosSession() != null) {
+        if (input != null
+            && input.getSession() != null) {
             List<UserElement> userElements = new ArrayList<UserElement>();
 
-            Collection<User> users = rosterSessionInput.getSarosSession()
-                .getUsers();
+            Collection<User> users = input.getSession().getUsers();
+
+            final Object content = input.getCustomContent();
+
+            Roster roster = null;
+
+            if (content instanceof Roster)
+                roster = (Roster) content;
+
             for (User user : users) {
-                UserElement userElement = new UserElement(user,
-                    rosterSessionInput.getRoster());
+                UserElement userElement = new UserElement(user, roster);
                 userElements.add(userElement);
             }
 
@@ -78,7 +87,7 @@ public class SessionHeaderElement extends HeaderElement {
         int result = 1;
         result = prime
             * result
-            + ((rosterSessionInput == null) ? 0 : rosterSessionInput.hashCode());
+            + ((input == null) ? 0 : input.hashCode());
         return result;
     }
 
@@ -91,10 +100,10 @@ public class SessionHeaderElement extends HeaderElement {
         if (getClass() != obj.getClass())
             return false;
         SessionHeaderElement other = (SessionHeaderElement) obj;
-        if (rosterSessionInput == null) {
-            if (other.rosterSessionInput != null)
+        if (input == null) {
+            if (other.input != null)
                 return false;
-        } else if (!rosterSessionInput.equals(other.rosterSessionInput))
+        } else if (!input.equals(other.input))
             return false;
         return true;
     }
