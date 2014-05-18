@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.model.rosterSession;
+package de.fu_berlin.inf.dpp.ui.model.roster;
 
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Font;
@@ -9,7 +9,6 @@ import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.model.HeaderElement;
 import de.fu_berlin.inf.dpp.ui.model.TreeElement;
-import de.fu_berlin.inf.dpp.ui.model.roster.RosterContentProvider;
 
 /**
  * Container {@link TreeElement} for a {@link Roster}

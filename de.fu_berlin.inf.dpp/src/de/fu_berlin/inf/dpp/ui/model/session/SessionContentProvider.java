@@ -29,10 +29,9 @@ import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.model.HeaderElement;
 import de.fu_berlin.inf.dpp.ui.model.TreeContentProvider;
 import de.fu_berlin.inf.dpp.ui.model.mdns.MDNSContentProvider;
-import de.fu_berlin.inf.dpp.ui.model.mdns.session.MDNSHeaderElement;
+import de.fu_berlin.inf.dpp.ui.model.mdns.MDNSHeaderElement;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterContentProvider;
-import de.fu_berlin.inf.dpp.ui.model.rosterSession.RosterHeaderElement;
-import de.fu_berlin.inf.dpp.ui.model.rosterSession.UserElement;
+import de.fu_berlin.inf.dpp.ui.model.roster.RosterHeaderElement;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.ViewerUtils;
 

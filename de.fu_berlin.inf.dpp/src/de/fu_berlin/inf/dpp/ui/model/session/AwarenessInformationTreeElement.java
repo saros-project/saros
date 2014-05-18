@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.model.rosterSession;
+package de.fu_berlin.inf.dpp.ui.model.session;
 
 import java.util.Set;
 

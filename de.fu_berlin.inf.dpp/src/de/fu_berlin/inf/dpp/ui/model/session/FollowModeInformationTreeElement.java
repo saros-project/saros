@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.model.rosterSession;
+package de.fu_berlin.inf.dpp.ui.model.session;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.StyledString;
@@ -8,8 +8,6 @@ import org.eclipse.swt.graphics.Image;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
-
-// TODO move to *.ui.model.session
 
 /**
  * This is a tree element that can be displayed as a child element of the user

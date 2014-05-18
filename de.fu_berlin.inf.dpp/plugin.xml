@@ -1631,22 +1631,22 @@
          </adapter>
       </factory>
       <factory
-            adaptableType="de.fu_berlin.inf.dpp.ui.model.rosterSession.UserElement"
-            class="de.fu_berlin.inf.dpp.ui.model.rosterSession.RosterSessionAdapterFactory">
+            adaptableType="de.fu_berlin.inf.dpp.ui.model.session.UserElement"
+            class="de.fu_berlin.inf.dpp.ui.model.session.SessionContentAdapterFactory">
          <adapter
                type="de.fu_berlin.inf.dpp.session.User">
          </adapter>
       </factory>
       <factory
-            adaptableType="de.fu_berlin.inf.dpp.ui.model.rosterSession.AwarenessInformationTreeElement"
-            class="de.fu_berlin.inf.dpp.ui.model.rosterSession.RosterSessionAdapterFactory">
+            adaptableType="de.fu_berlin.inf.dpp.ui.model.session.AwarenessInformationTreeElement"
+            class="de.fu_berlin.inf.dpp.ui.model.session.SessionContentAdapterFactory">
          <adapter
                type="de.fu_berlin.inf.dpp.session.User">
          </adapter>
       </factory>
       <factory
-            adaptableType="de.fu_berlin.inf.dpp.ui.model.rosterSession.FollowModeInformationTreeElement"
-            class="de.fu_berlin.inf.dpp.ui.model.rosterSession.RosterSessionAdapterFactory">
+            adaptableType="de.fu_berlin.inf.dpp.ui.model.session.FollowModeInformationTreeElement"
+            class="de.fu_berlin.inf.dpp.ui.model.session.SessionContentAdapterFactory">
          <adapter
                type="de.fu_berlin.inf.dpp.session.User">
          </adapter>

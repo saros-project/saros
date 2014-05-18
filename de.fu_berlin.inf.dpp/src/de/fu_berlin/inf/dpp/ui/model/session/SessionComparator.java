@@ -6,7 +6,6 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.model.HeaderElement;
 import de.fu_berlin.inf.dpp.ui.model.ITreeElement;
-import de.fu_berlin.inf.dpp.ui.model.rosterSession.UserElement;
 
 /**
  * Comparator for {@link ITreeElement} for {@link SessionInput}.

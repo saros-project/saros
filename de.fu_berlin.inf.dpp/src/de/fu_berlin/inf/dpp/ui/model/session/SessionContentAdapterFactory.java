@@ -1,10 +1,9 @@
-package de.fu_berlin.inf.dpp.ui.model.rosterSession;
+package de.fu_berlin.inf.dpp.ui.model.session;
 
 import org.eclipse.core.runtime.IAdapterFactory;
 
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.ui.model.session.SessionContentProvider;
 
 /**
  * Provides adapters for {@link SarosSession} entities which are provided by
@@ -26,7 +25,7 @@ import de.fu_berlin.inf.dpp.ui.model.session.SessionContentProvider;
  * 
  * @author bkahlert
  */
-public class RosterSessionAdapterFactory implements IAdapterFactory {
+public class SessionContentAdapterFactory implements IAdapterFactory {
 
     @Override
     @SuppressWarnings("rawtypes")

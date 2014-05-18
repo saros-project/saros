@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.model.rosterSession;
+package de.fu_berlin.inf.dpp.ui.model.session;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,8 +17,6 @@ import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.model.TreeElement;
 import de.fu_berlin.inf.dpp.ui.util.SWTBoldStyler;
-
-//TODO move to *.ui.model.session
 
 /**
  * Wrapper for {@link UserElement} in use with {@link Viewer Viewers}

@@ -15,7 +15,6 @@ import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.model.HeaderElement;
 import de.fu_berlin.inf.dpp.ui.model.TreeElement;
-import de.fu_berlin.inf.dpp.ui.model.rosterSession.UserElement;
 
 /**
  * Container {@link TreeElement} for a {@link SarosSession}

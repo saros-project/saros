@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.model.mdns.session;
+package de.fu_berlin.inf.dpp.ui.model.mdns;
 
 import javax.jmdns.JmDNS;
 
@@ -8,7 +8,6 @@ import org.eclipse.swt.graphics.Image;
 
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.model.HeaderElement;
-import de.fu_berlin.inf.dpp.ui.model.mdns.MDNSContentProvider;
 
 public class MDNSHeaderElement extends HeaderElement {
 
