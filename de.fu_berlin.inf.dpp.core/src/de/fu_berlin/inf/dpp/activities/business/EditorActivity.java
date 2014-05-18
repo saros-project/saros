@@ -60,11 +60,6 @@ public class EditorActivity extends AbstractResourceActivity {
                 throw new IllegalArgumentException(
                     "Null path for non-activation type EditorActivity given.");
             }
-        } else {
-            if (path.getEditorType() == null) {
-                throw new IllegalArgumentException("No editor ID set on "
-                    + path + ".");
-            }
         }
 
         this.type = type;

@@ -45,17 +45,6 @@ public class SPath {
     protected IProject project;
 
     /**
-     * Type of the editor (plain text, Java, XML, ...).
-     * 
-     * Maybe <code>null</code>, when the SPath addresses a document and not a
-     * specific editor.
-     * 
-     * @TODO Change to something that can be used to identify different editor
-     *       types in Eclipse.
-     */
-    protected String editorType = "txt";
-
-    /**
      * Default constructor, initializing this SPath as a reference to the
      * resource or editor identified by the given path in the given project.
      * 
@@ -95,22 +84,10 @@ public class SPath {
         return projectRelativePath;
     }
 
-    /**
-     * Return the identifier of the editor which this SPath references. This
-     * identifier should be used to select one of several editors displaying the
-     * same resource.
-     * 
-     * TODO Make use of this information
-     */
-    public String getEditorType() {
-        return editorType;
-    }
-
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ObjectUtils.hashCode(editorType);
         result = prime * result + ObjectUtils.hashCode(projectRelativePath);
         result = prime * result + ObjectUtils.hashCode(project);
         return result;
@@ -120,18 +97,19 @@ public class SPath {
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
+
         if (obj == null)
             return false;
+
         if (!(obj instanceof SPath))
             return false;
 
         SPath other = (SPath) obj;
 
-        if (!ObjectUtils.equals(this.editorType, other.editorType))
-            return false;
         if (!ObjectUtils.equals(this.projectRelativePath,
             other.projectRelativePath))
             return false;
+
         if (!ObjectUtils.equals(this.project, other.project))
             return false;
 
@@ -140,9 +118,7 @@ public class SPath {
 
     @Override
     public String toString() {
-        return "SPath [editorType="
-            + editorType
-            + ", path="
+        return "SPath [path="
             + (projectRelativePath != null ? projectRelativePath
                 .toPortableString() : "<no path>") + ", project="
             + (project != null ? project.getName() : "<no project>") + "]";

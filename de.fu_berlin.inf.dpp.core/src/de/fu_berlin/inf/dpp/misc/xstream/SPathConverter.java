@@ -20,21 +20,21 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
  * <p>
  * <b>Example:</b> The XML representation of an {@link SPath} for a
  * {@linkplain IProject project} with id <code>"projA"</code> and a
- * {@linkplain IPath relative path} <code>"/src/Main.java"</code>:
+ * {@linkplain IPath relative path} <code>"src/Main.java"</code>:
  * 
  * <pre>
- * &lt;SPath i="projA" p="/src/Main.java" e="txt" /&gt;
+ * &lt;SPath i="projA" p="src/Main.java" /&gt;
  * </pre>
  */
 public class SPathConverter implements Converter {
 
     private static final Logger LOG = Logger.getLogger(SPathConverter.class);
 
-    private static final String EDITOR_TYPE = "e";
     private static final String PATH = "p";
     private static final String PROJECT_ID = "i";
-    private ISarosSession session;
-    private IPathFactory pathFactory;
+
+    private final ISarosSession session;
+    private final IPathFactory pathFactory;
 
     public SPathConverter(ISarosSession session, IPathFactory pathFactory) {
         this.session = session;
@@ -63,11 +63,9 @@ public class SPathConverter implements Converter {
 
         String p = URLCodec.encode(pathFactory.fromPath(spath
             .getProjectRelativePath()));
-        String e = spath.getEditorType();
 
         writer.addAttribute(PROJECT_ID, i);
         writer.addAttribute(PATH, p);
-        writer.addAttribute(EDITOR_TYPE, e);
     }
 
     @Override
@@ -76,7 +74,6 @@ public class SPathConverter implements Converter {
 
         String i = reader.getAttribute(PROJECT_ID);
         String p = URLCodec.decode(reader.getAttribute(PATH));
-        String e = reader.getAttribute(EDITOR_TYPE);
 
         IProject project = session.getProject(i);
         if (project == null) {
