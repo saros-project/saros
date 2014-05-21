@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp;
 
 import java.util.Arrays;
 
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -15,9 +16,11 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.filesystem.ChecksumCacheImpl;
 import de.fu_berlin.inf.dpp.filesystem.EclipsePathFactory;
+import de.fu_berlin.inf.dpp.filesystem.EclipseWorkspaceImpl;
 import de.fu_berlin.inf.dpp.filesystem.FileContentNotifierBridge;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
+import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.synchronize.internal.SWTSynchronizer;
@@ -80,6 +83,9 @@ public class SarosEclipseContextFactory extends AbstractSarosContextFactory {
          */
         Component.create(IChecksumCache.class, new ChecksumCacheImpl(
             new FileContentNotifierBridge())),
+
+        Component.create(IWorkspace.class, new EclipseWorkspaceImpl(
+            ResourcesPlugin.getWorkspace())),
 
         // Saros Core Path Support
         Component.create(IPathFactory.class, EclipsePathFactory.class),

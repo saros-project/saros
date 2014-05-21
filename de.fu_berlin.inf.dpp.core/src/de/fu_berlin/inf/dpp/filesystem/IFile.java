@@ -27,7 +27,7 @@ import java.io.InputStream;
 
 /**
  * This interface is under development. It currently equals its Eclipse
- * counterpart. If not mentioned otherwise all offered method are equivalent to
+ * counterpart. If not mentioned otherwise all offered methods are equivalent to
  * their Eclipse counterpart.
  */
 public interface IFile extends IResource {
