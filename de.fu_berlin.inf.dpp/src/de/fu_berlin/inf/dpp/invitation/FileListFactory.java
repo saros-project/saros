@@ -7,15 +7,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
+import de.fu_berlin.inf.dpp.filesystem.IFile;
+import de.fu_berlin.inf.dpp.filesystem.IFolder;
+import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.invitation.FileList.MetaData;
 import de.fu_berlin.inf.dpp.util.FileUtils;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
@@ -27,7 +27,7 @@ import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
  * {@link #createFileList(List) createFileList(List&lt;String&gt;)}), and an
  * expensive one, that rescans the whole project to gather all MetaData (
  * {@link #createFileList(IProject, List, IChecksumCache, boolean, IProgressMonitor)
- * createFileList(IProject, List&lt;IResource&gt;, ...)} ).
+ * createFileList(IProject, List&lt;IResource&gt;, ...)}).
  */
 public class FileListFactory {
 
@@ -47,8 +47,7 @@ public class FileListFactory {
 
     public static FileList createFileList(IProject project,
         List<IResource> resources, IChecksumCache checksumCache,
-        boolean useVersionControl, IProgressMonitor monitor)
-        throws CoreException {
+        boolean useVersionControl, IProgressMonitor monitor) throws IOException {
 
         FileListFactory fact = new FileListFactory(checksumCache, monitor);
         return fact.build(project, resources, useVersionControl);
@@ -79,7 +78,7 @@ public class FileListFactory {
     }
 
     private FileList build(IProject project, List<IResource> resources,
-        boolean useVersionControl) throws CoreException {
+        boolean useVersionControl) throws IOException {
 
         FileList list = new FileList(useVersionControl);
 
@@ -94,7 +93,7 @@ public class FileListFactory {
     }
 
     private void addMembersToList(FileList list, List<IResource> resources)
-        throws CoreException {
+        throws IOException {
 
         if (resources.size() == 0)
             return;
@@ -104,14 +103,20 @@ public class FileListFactory {
 
         if (list.useVersionControl()) {
             project = resources.get(0).getProject();
-            vcs = VCSAdapter.getAdapter(project);
+
+            org.eclipse.core.resources.IProject eclipseProject = (org.eclipse.core.resources.IProject) ResourceAdapterFactory
+                .convertBack(project);
+
+            vcs = VCSAdapter.getAdapter(eclipseProject);
 
             if (vcs != null) {
-                String providerID = vcs.getProviderID(project);
+                String providerID = vcs.getProviderID(eclipseProject);
 
                 list.setVcsProviderID(providerID);
-                list.setVcsRepositoryRoot(vcs.getRepositoryString(project));
-                list.setVcsRepositoryRoot(vcs.getCurrentResourceInfo(project));
+                list.setVcsRepositoryRoot(vcs
+                    .getRepositoryString(eclipseProject));
+                list.setVcsRepositoryRoot(vcs
+                    .getCurrentResourceInfo(eclipseProject));
                 /*
                  * FIXME we need to stop querying for VCS revisions the moment
                  * we reach the first exception
@@ -150,7 +155,8 @@ public class FileListFactory {
             VCSResourceInfo info = null;
 
             if (vcs != null)
-                info = vcs.getCurrentResourceInfo(resource);
+                info = vcs.getCurrentResourceInfo(ResourceAdapterFactory
+                    .convertBack(resource));
 
             assert !list.useVersionControl()
                 || (project != null && project.equals(resource.getProject()));

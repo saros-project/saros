@@ -639,18 +639,12 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         SubMonitor subMonitor = SubMonitor.convert(monitor,
             "Compute required Files...", 1);
 
-        FileListDiff filesToSynchronize = null;
-        FileList localFileList = null;
+        FileList localFileList = FileListFactory.createFileList(
+            ResourceAdapterFactory.create(currentLocalProject), null,
+            checksumCache, vcs != null, subMonitor.newChild(1));
 
-        try {
-            localFileList = FileListFactory.createFileList(currentLocalProject,
-                null, checksumCache, vcs != null, subMonitor.newChild(1));
-        } catch (CoreException e) {
-            throw new IOException(e.getMessage(), e.getCause());
-        }
-
-        filesToSynchronize = computeDiff(localFileList, remoteFileList,
-            currentLocalProject, projectID);
+        FileListDiff filesToSynchronize = computeDiff(localFileList,
+            remoteFileList, currentLocalProject, projectID);
 
         List<String> missingFiles = new ArrayList<String>();
         missingFiles.addAll(filesToSynchronize.getAddedPaths());

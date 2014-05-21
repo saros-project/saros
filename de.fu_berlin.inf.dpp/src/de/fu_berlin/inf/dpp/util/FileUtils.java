@@ -41,18 +41,22 @@ public class FileUtils {
 
     /**
      * Calculate Adler32 checksum for given file.
+     * <p>
+     * TODO This method's signature is a temporary "anomaly" in this class, and
+     * will be removed in future patches.
      * 
      * @return checksum of file
      * 
      * @throws IOException
      *             if checksum calculation has been failed.
      */
-    public static long checksum(IFile file) throws IOException {
+    public static long checksum(de.fu_berlin.inf.dpp.filesystem.IFile file)
+        throws IOException {
 
         InputStream in;
         try {
             in = file.getContents();
-        } catch (CoreException e) {
+        } catch (IOException e) {
             throw new IOException("failed to calculate checksum.", e);
         }
 

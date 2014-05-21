@@ -11,14 +11,15 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.easymock.EasyMock;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.junit.Before;
+
+import de.fu_berlin.inf.dpp.filesystem.IFile;
+import de.fu_berlin.inf.dpp.filesystem.IFolder;
+import de.fu_berlin.inf.dpp.filesystem.IPath;
+import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 
 public class AbstractFileListTest {
     /*
@@ -44,7 +45,7 @@ public class AbstractFileListTest {
         try {
             EasyMock.expect(project.getDefaultCharset()).andStubReturn(
                 "US-ASCII");
-        } catch (CoreException e) {
+        } catch (IOException e) {
             // cannot happen as the mock is in recording mode
         }
 
@@ -131,8 +132,9 @@ public class AbstractFileListTest {
     }
 
     protected IFile createFileMock(String path, String content, String encoding) {
-        IPath p = new Path(path);
-        IPath f = new Path(project.getName() + "/" + path);
+        IPath p = ResourceAdapterFactory.create(new Path(path));
+        IPath f = ResourceAdapterFactory.create(new Path(project.getName()
+            + "/" + path));
 
         IFile fileMock = EasyMock.createMock(IFile.class);
 
@@ -148,7 +150,7 @@ public class AbstractFileListTest {
             EasyMock.expect(fileMock.getContents()).andStubReturn(
                 new ResetingInputStream(content));
             EasyMock.expect(fileMock.getCharset()).andStubReturn(encoding);
-        } catch (CoreException e) {
+        } catch (IOException e) {
             // cannot happen as the mock is in recording mode
         }
 
@@ -157,8 +159,9 @@ public class AbstractFileListTest {
     }
 
     protected IFolder createFolderMock(String path) {
-        IPath p = new Path(path);
-        IPath f = new Path(project.getName() + "/" + path);
+        IPath p = ResourceAdapterFactory.create(new Path(path));
+        IPath f = ResourceAdapterFactory.create(new Path(project.getName()
+            + "/" + path));
 
         IFolder folderMock = EasyMock.createMock(IFolder.class);
 
@@ -173,7 +176,7 @@ public class AbstractFileListTest {
         try {
             EasyMock.expect(folderMock.members()).andStubReturn(
                 new IResource[0]);
-        } catch (CoreException e) {
+        } catch (IOException e) {
             // cannot happen as the mock is in recording mode
         }
 

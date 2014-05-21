@@ -22,6 +22,7 @@ package de.fu_berlin.inf.dpp.invitation;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
+import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +31,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.eclipse.core.runtime.CoreException;
 import org.junit.Test;
 
 import com.thoughtworks.xstream.XStream;
@@ -75,7 +75,7 @@ public class FileListTest extends AbstractFileListTest {
     }
 
     @Test
-    public void testEquals() throws CoreException {
+    public void testEquals() throws IOException {
         FileList sameFileList = FileListFactory.createFileList(null,
             threeFileList, null, false, null);
         assertEquals(threeEntryList, sameFileList);

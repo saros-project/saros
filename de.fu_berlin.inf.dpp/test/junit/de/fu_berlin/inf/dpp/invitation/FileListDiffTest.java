@@ -3,8 +3,9 @@ package de.fu_berlin.inf.dpp.invitation;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.resources.IResource;
 import org.junit.Test;
+
+import de.fu_berlin.inf.dpp.filesystem.IResource;
 
 public class FileListDiffTest extends AbstractFileListTest {
 

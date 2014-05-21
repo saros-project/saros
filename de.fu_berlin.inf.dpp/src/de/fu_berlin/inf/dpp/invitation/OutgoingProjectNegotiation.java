@@ -12,7 +12,6 @@ import java.util.Random;
 import java.util.concurrent.CancellationException;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
@@ -32,8 +31,6 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.EclipseProjectImpl;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
@@ -474,27 +471,22 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 throw new LocalCancellationException(null,
                     CancelOption.DO_NOT_NOTIFY_PEER);
             try {
-                String projectID = sarosSession.getProjectID(project);
-                String projectName = project.getName();
-
-                List<IResource> projectResources = sarosSession
-                    .getSharedResources(project);
-
                 FileList projectFileList = FileListFactory.createFileList(
-                    ((EclipseProjectImpl) project).getDelegate(),
-                    ResourceAdapterFactory.convertBack(projectResources),
+                    project, sarosSession.getSharedResources(project),
                     checksumCache, sarosSession.useVersionControl(),
                     subMonitor.newChild(1));
 
-                projectFileList.setProjectID(projectID);
                 boolean partial = !sarosSession.isCompletelyShared(project);
 
+                String projectID = sarosSession.getProjectID(project);
+                projectFileList.setProjectID(projectID);
+
                 ProjectNegotiationData pInfo = new ProjectNegotiationData(
-                    projectID, projectName, partial, projectFileList);
+                    projectID, project.getName(), partial, projectFileList);
 
                 pInfos.add(pInfo);
 
-            } catch (CoreException e) {
+            } catch (IOException e) {
                 /*
                  * avoid that the error is send to remote side (which is default
                  * for IOExceptions) at this point because the remote side has

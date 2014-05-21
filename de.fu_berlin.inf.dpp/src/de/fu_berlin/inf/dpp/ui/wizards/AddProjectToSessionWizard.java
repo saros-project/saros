@@ -480,7 +480,7 @@ public class AddProjectToSessionWizard extends Wizard {
      */
     private Map<String, FileListDiff> calculateModifiedResources(
         Map<String, IProject> projectMapping, IProgressMonitor monitor)
-        throws CoreException {
+        throws IOException {
         Map<String, FileListDiff> modifiedResources = new HashMap<String, FileListDiff>();
 
         ISarosSession session = sessionManager.getSarosSession();
@@ -498,17 +498,11 @@ public class AddProjectToSessionWizard extends Wizard {
         for (Map.Entry<String, IProject> entry : projectMapping.entrySet()) {
 
             String projectID = entry.getKey();
-            IProject eclipseProject = entry.getValue();
-
-            FileListDiff diff;
-
-            if (!eclipseProject.isOpen())
-                eclipseProject.open(null);
-
-            FileList remoteFileList = process.getRemoteFileList(projectID);
-
             de.fu_berlin.inf.dpp.filesystem.IProject project = ResourceAdapterFactory
-                .create(eclipseProject);
+                .create(entry.getValue());
+
+            if (!project.isOpen())
+                project.open();
 
             /*
              * do not refresh already partially shared projects as this may
@@ -521,13 +515,12 @@ public class AddProjectToSessionWizard extends Wizard {
                 log.warn("could not refresh project: " + project, e);
             }
 
+            FileList remoteFileList = process.getRemoteFileList(projectID);
+
             if (session.isShared(project)) {
-
-                List<org.eclipse.core.resources.IResource> eclipseResources = ResourceAdapterFactory
-                    .convertBack(session.getSharedResources(project));
-
                 FileList sharedFileList = FileListFactory.createFileList(
-                    eclipseProject, eclipseResources, checksumCache, true,
+                    project, session.getSharedResources(project),
+                    checksumCache, true,
                     subMonitor.newChild(1, SubMonitor.SUPPRESS_ALL_LABELS));
 
                 // FIXME FileList objects should be immutable after creation
@@ -535,9 +528,9 @@ public class AddProjectToSessionWizard extends Wizard {
             } else
                 subMonitor.worked(1);
 
-            diff = FileListDiff.diff(FileListFactory.createFileList(
-                eclipseProject, null, checksumCache, true,
-                subMonitor.newChild(1, SubMonitor.SUPPRESS_ALL_LABELS)),
+            FileListDiff diff = FileListDiff.diff(FileListFactory
+                .createFileList(project, null, checksumCache, true,
+                    subMonitor.newChild(1, SubMonitor.SUPPRESS_ALL_LABELS)),
                 remoteFileList);
 
             if (process.isPartialRemoteProject(projectID))
@@ -545,7 +538,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
             if (!diff.getRemovedPaths().isEmpty()
                 || !diff.getAlteredPaths().isEmpty()) {
-                modifiedResources.put(eclipseProject.getName(), diff);
+                modifiedResources.put(project.getName(), diff);
             }
         }
         return modifiedResources;
