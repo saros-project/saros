@@ -17,12 +17,10 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
  * class to be converted, and XStream will always use the converter registered
  * most recently, but that is a memory leak.)
  */
-class ReplaceableConverter implements Converter {
+class ReplaceableConverter extends Replaceable<Converter> implements Converter {
 
     private static final Logger LOG = Logger
         .getLogger(ReplaceableConverter.class);
-    private Converter delegate;
-    private boolean isReset;
 
     /**
      * Wraps any {@link Converter} so this object can be registered to XStream
@@ -30,52 +28,16 @@ class ReplaceableConverter implements Converter {
      * {@linkplain #replace(Converter) replaced}.
      */
     public ReplaceableConverter(Converter converter) {
-        if (converter == null)
-            throw new IllegalArgumentException("converter must not be null");
-
-        this.delegate = converter;
-        this.isReset = false;
+        super(converter);
     }
+
+    /** Implementations of {@link Converter} */
 
     /**
-     * Deactivates this converter.
-     * <p>
-     * This ensures that calls from XStream do not reach the delegate, which can
-     * therefore be in any state. However, since XStream calls
-     * {@link ConverterMatcher#canConvert(Class) canConvert()} lazily, the
-     * delegate should expect such a call at any time.
-     * 
-     * @see #isReset()
+     * Since XStream calls {@link ConverterMatcher#canConvert(Class)
+     * canConvert()} lazily, the delegate should expect such a call at any time,
+     * i.e. even when {@link #isReset()} returns <code>true</code>.
      */
-    public synchronized void reset() {
-        this.isReset = true;
-    }
-
-    /**
-     * @return <code>false</code> after construction, <code>true</code> after
-     *         {@link #reset()} was called, <code>false</code> again after
-     *         {@link #replace(Converter)} was called.
-     */
-    synchronized boolean isReset() {
-        return isReset;
-    }
-
-    /**
-     * Replaces the current {@link #delegate converter} with the given one. Does
-     * nothing if the given converter is <code>null</code>.
-     * 
-     * @see #isReset()
-     */
-    public synchronized void replace(Converter with) {
-        if (with == null)
-            return;
-
-        this.delegate = with;
-        this.isReset = false;
-    }
-
-    /* Implementations of {@link Converter} */
-
     @SuppressWarnings("rawtypes")
     @Override
     public synchronized boolean canConvert(Class clazz) {
@@ -86,7 +48,7 @@ class ReplaceableConverter implements Converter {
     public synchronized void marshal(Object value,
         HierarchicalStreamWriter writer, MarshallingContext context) {
 
-        if (isReset) {
+        if (isReset()) {
             LOG.debug("Tried to marshal " + value + " with inactive converter "
                 + delegate);
             return;
@@ -99,7 +61,7 @@ class ReplaceableConverter implements Converter {
     public synchronized Object unmarshal(HierarchicalStreamReader reader,
         UnmarshallingContext context) {
 
-        if (isReset) {
+        if (isReset()) {
             LOG.debug("Tried to unmarshal with inactive converter " + delegate);
             return null;
         }

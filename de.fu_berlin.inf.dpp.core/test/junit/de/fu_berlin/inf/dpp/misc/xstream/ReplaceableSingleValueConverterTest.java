@@ -12,10 +12,11 @@ import org.junit.Test;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
+import com.thoughtworks.xstream.converters.SingleValueConverter;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
-public class ReplaceableConverterTest {
+public class ReplaceableSingleValueConverterTest {
 
     private static class Dummy {
         //
@@ -24,32 +25,33 @@ public class ReplaceableConverterTest {
     @Test
     public void reset() {
         /* Mocks */
-        Converter c1 = EasyMock.createMock(Converter.class);
+        SingleValueConverter c1 = EasyMock
+            .createMock(SingleValueConverter.class);
         expect(c1.canConvert(Dummy.class)).andStubReturn(true);
 
-        c1.marshal(isA(Object.class), isA(HierarchicalStreamWriter.class),
-            isA(MarshallingContext.class));
-        EasyMock.expectLastCall().once();
+        EasyMock.expect(c1.toString(isA(Object.class))).andReturn("dummy")
+            .once();
 
         EasyMock.replay(c1);
 
         /* XStream config */
         XStream xstream = new XStream(new DomDriver());
-        ReplaceableConverter resetable = new ReplaceableConverter(c1);
+        ReplaceableSingleValueConverter resetable = new ReplaceableSingleValueConverter(
+            c1);
         xstream.registerConverter(resetable);
 
         /* Test it */
-        assertFalse("ReplaceableConverter was not properly set up",
+        assertFalse("ReplaceableSingleValueConverter was not properly set up",
             resetable.isReset());
 
         assertNotNull("Converter cannot convert", xstream.toXML(new Dummy()));
 
         resetable.reset();
-        assertTrue("ReplaceableConverter was not properly reset",
+        assertTrue("ReplaceableSingleValueConverter was not properly reset",
             resetable.isReset());
 
         /*
-         * This call should not reach the converter.
+         * This call should not reach the actual converter.
          */
         xstream.toXML(new Dummy());
 

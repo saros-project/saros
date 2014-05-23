@@ -4,7 +4,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ ReplaceableConverterTest.class, SPathConverterTest.class,
+@Suite.SuiteClasses({ ReplaceableConverterTest.class,
+    ReplaceableSingleValueConverterTest.class, SPathConverterTest.class,
     UserConverterTest.class })
 public class TestSuite {
     // the class remains completely empty,
