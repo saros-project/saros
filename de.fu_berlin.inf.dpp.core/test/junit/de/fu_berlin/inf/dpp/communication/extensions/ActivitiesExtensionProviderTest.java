@@ -9,8 +9,7 @@ import org.jivesoftware.smack.packet.PacketExtension;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
-import de.fu_berlin.inf.dpp.activities.serializable.EditorActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.session.User;
 
@@ -20,13 +19,13 @@ public class ActivitiesExtensionProviderTest {
     public void testNoPrettyPrintInMarshalledObjects() throws Exception {
         User user = new User(new JID("alice@test"), true, true, 0, 0);
 
-        IActivityDataObject activityDataObject = new EditorActivityDataObject(
-            user, EditorActivity.Type.ACTIVATED, null);
+        IActivity activity = new EditorActivity(user,
+            EditorActivity.Type.ACTIVATED, null);
 
-        List<IActivityDataObject> activities = new ArrayList<IActivityDataObject>();
+        List<IActivity> activities = new ArrayList<IActivity>();
 
-        activities.add(activityDataObject);
-        activities.add(activityDataObject);
+        activities.add(activity);
+        activities.add(activity);
 
         PacketExtension extension = ActivitiesExtension.PROVIDER
             .create(new ActivitiesExtension("Session-ID", activities, 0));

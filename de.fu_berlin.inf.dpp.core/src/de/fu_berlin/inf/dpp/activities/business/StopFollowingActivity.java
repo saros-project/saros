@@ -1,8 +1,7 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.StopFollowingActivityDataObject;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -15,6 +14,7 @@ import de.fu_berlin.inf.dpp.session.User;
  * 
  * @author Alexander Waldmann (contact@net-corps.de)
  */
+@XStreamAlias("stopFollowingActivity")
 public class StopFollowingActivity extends AbstractActivity {
     public StopFollowingActivity(User source) {
         super(source);
@@ -26,16 +26,7 @@ public class StopFollowingActivity extends AbstractActivity {
     }
 
     @Override
-    public IActivityDataObject getActivityDataObject() {
-        return new StopFollowingActivityDataObject(getSource());
-    }
-
-    @Override
     public String toString() {
         return "StopFollowingActivity(" + getSource() + ")";
-    }
-
-    public SPath getPath() {
-        return null;
     }
 }

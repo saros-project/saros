@@ -11,9 +11,7 @@ import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
- * The ExecutorService under which all incoming activityDataObjects should be
- * executed.
- * 
+ * The ExecutorService under which all incoming activities should be executed.
  */
 @Component(module = "core")
 public class DispatchThreadContext implements Disposable {

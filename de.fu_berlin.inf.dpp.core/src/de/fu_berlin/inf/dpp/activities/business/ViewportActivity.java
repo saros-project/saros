@@ -1,13 +1,20 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
 import de.fu_berlin.inf.dpp.session.User;
 
+@XStreamAlias("viewportActivity")
 public class ViewportActivity extends AbstractResourceActivity {
 
+    @XStreamAlias("o")
+    @XStreamAsAttribute
     protected final int startLine;
+
+    @XStreamAlias("l")
+    @XStreamAsAttribute
     protected final int numberOfLines;
 
     public ViewportActivity(User source, int startLine, int numberOfLines,
@@ -20,6 +27,11 @@ public class ViewportActivity extends AbstractResourceActivity {
 
         this.startLine = Math.max(0, startLine);
         this.numberOfLines = Math.max(0, numberOfLines);
+    }
+
+    @Override
+    public boolean isValid() {
+        return super.isValid() && (getPath() != null);
     }
 
     /**
@@ -79,11 +91,5 @@ public class ViewportActivity extends AbstractResourceActivity {
     @Override
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
-    }
-
-    @Override
-    public IActivityDataObject getActivityDataObject() {
-        return new ViewportActivityDataObject(getSource(), startLine,
-            numberOfLines, getPath());
     }
 }

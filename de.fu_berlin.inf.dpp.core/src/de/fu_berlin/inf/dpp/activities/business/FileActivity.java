@@ -4,11 +4,13 @@ import java.util.Arrays;
 
 import org.apache.commons.lang.ObjectUtils;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.session.User;
 
+@XStreamAlias("fileActivity")
 public class FileActivity extends AbstractResourceActivity {
 
     /**
@@ -28,9 +30,14 @@ public class FileActivity extends AbstractResourceActivity {
         MOVED
     }
 
+    @XStreamAsAttribute
     protected final Type type;
+
     protected final SPath oldPath;
+
+    @XStreamAsAttribute
     protected final Purpose purpose;
+
     protected final byte[] data;
 
     /**
@@ -130,6 +137,13 @@ public class FileActivity extends AbstractResourceActivity {
         this.purpose = purpose;
     }
 
+    @Override
+    public boolean isValid() {
+        /* oldPath == null is only unexpected for Type.MOVED */
+        return super.isValid() && (getPath() != null)
+            && (oldPath != null || type != Type.MOVED);
+    }
+
     /**
      * Returns the old/source path in case this Activity represents a moving of
      * files.
@@ -201,11 +215,5 @@ public class FileActivity extends AbstractResourceActivity {
 
     public boolean isRecovery() {
         return Purpose.RECOVERY.equals(purpose);
-    }
-
-    @Override
-    public IActivityDataObject getActivityDataObject() {
-        return new FileActivityDataObject(getSource(), type, getPath(),
-            oldPath, data, purpose);
     }
 }

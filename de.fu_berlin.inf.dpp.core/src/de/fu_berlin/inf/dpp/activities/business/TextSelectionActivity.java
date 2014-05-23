@@ -19,14 +19,21 @@
  */
 package de.fu_berlin.inf.dpp.activities.business;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
 import de.fu_berlin.inf.dpp.session.User;
 
+@XStreamAlias("textSelectionActivity")
 public class TextSelectionActivity extends AbstractResourceActivity {
 
+    @XStreamAlias("o")
+    @XStreamAsAttribute
     protected final int offset;
+
+    @XStreamAlias("l")
+    @XStreamAsAttribute
     protected final int length;
 
     public TextSelectionActivity(User source, int offset, int length, SPath path) {
@@ -37,6 +44,11 @@ public class TextSelectionActivity extends AbstractResourceActivity {
 
         this.offset = offset;
         this.length = length;
+    }
+
+    @Override
+    public boolean isValid() {
+        return super.isValid() && (getPath() != null);
     }
 
     public int getLength() {
@@ -84,11 +96,5 @@ public class TextSelectionActivity extends AbstractResourceActivity {
     @Override
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
-    }
-
-    @Override
-    public IActivityDataObject getActivityDataObject() {
-        return new TextSelectionActivityDataObject(getSource(), offset, length,
-            getPath());
     }
 }

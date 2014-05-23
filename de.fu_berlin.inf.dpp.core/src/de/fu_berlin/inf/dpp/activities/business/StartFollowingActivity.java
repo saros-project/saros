@@ -1,7 +1,8 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
-import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.StartFollowingActivityDataObject;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -10,7 +11,10 @@ import de.fu_berlin.inf.dpp.session.User;
  * 
  * @author Alexander Waldmann (contact@net-corps.de)
  */
+@XStreamAlias("startFollowingActivity")
 public class StartFollowingActivity extends AbstractActivity {
+
+    @XStreamAsAttribute
     protected final User followedUser;
 
     public StartFollowingActivity(User source, User followedUser) {
@@ -23,13 +27,13 @@ public class StartFollowingActivity extends AbstractActivity {
     }
 
     @Override
-    public void dispatch(IActivityReceiver receiver) {
-        receiver.receive(this);
+    public boolean isValid() {
+        return super.isValid() && (followedUser != null);
     }
 
     @Override
-    public IActivityDataObject getActivityDataObject() {
-        return new StartFollowingActivityDataObject(getSource(), followedUser);
+    public void dispatch(IActivityReceiver receiver) {
+        receiver.receive(this);
     }
 
     @Override
@@ -41,5 +45,4 @@ public class StartFollowingActivity extends AbstractActivity {
     public User getFollowedUser() {
         return followedUser;
     }
-
 }

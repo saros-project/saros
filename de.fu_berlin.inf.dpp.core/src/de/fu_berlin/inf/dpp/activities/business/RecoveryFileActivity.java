@@ -1,8 +1,9 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.RecoveryFileActivityDataObject;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -14,9 +15,11 @@ import de.fu_berlin.inf.dpp.session.User;
  * it is only intended as a separation between FileActivities that are sent to a
  * singleUser and those send to every User
  */
+@XStreamAlias("recoveryFileActivity")
 public class RecoveryFileActivity extends FileActivity implements
     ITargetedActivity {
 
+    @XStreamAsAttribute
     private User target;
 
     public RecoveryFileActivity(User source, User target, Type type,
@@ -31,14 +34,13 @@ public class RecoveryFileActivity extends FileActivity implements
     }
 
     @Override
-    public User getTarget() {
-        return target;
+    public boolean isValid() {
+        return super.isValid() && (target != null);
     }
 
     @Override
-    public IActivityDataObject getActivityDataObject() {
-        return new RecoveryFileActivityDataObject(getSource(), target, type,
-            getPath(), oldPath, data);
+    public User getTarget() {
+        return target;
     }
 
     /**

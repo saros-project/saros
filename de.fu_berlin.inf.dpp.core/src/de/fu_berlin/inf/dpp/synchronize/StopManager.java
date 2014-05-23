@@ -390,7 +390,7 @@ public final class StopManager extends AbstractActivityProvider implements
 
     /**
      * The goal of this method is to ensure that the local user cannot cause any
-     * editing activityDataObjects (FileActivities and TextEditActivities).
+     * editing activities (FileActivities and TextEditActivities).
      * 
      * @param lock
      *            if true the session gets locked, else it gets unlocked

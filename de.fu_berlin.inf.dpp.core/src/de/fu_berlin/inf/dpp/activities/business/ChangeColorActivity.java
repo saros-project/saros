@@ -1,7 +1,8 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
-import de.fu_berlin.inf.dpp.activities.serializable.ChangeColorActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -11,11 +12,28 @@ import de.fu_berlin.inf.dpp.session.User;
  * @author tobi
  * @author Stefan Rossbach
  */
+@XStreamAlias("changeColorActivity")
 public class ChangeColorActivity extends AbstractActivity implements
     ITargetedActivity {
 
+    /**
+     * @JTourBusStop 3, Activity creation, Creating another representation:
+     * 
+     *               TODO Rework this tour.
+     */
+    /**
+     * @JTourBusStop 4, Activity creation, Going back to the IActivity:
+     * 
+     *               TODO Rework this tour.
+     */
+
+    @XStreamAsAttribute
     protected final User target;
+
+    @XStreamAsAttribute
     protected final User affected;
+
+    @XStreamAsAttribute
     protected final int colorID;
 
     public ChangeColorActivity(User source, User target, User affected,
@@ -34,26 +52,13 @@ public class ChangeColorActivity extends AbstractActivity implements
     }
 
     @Override
-    public void dispatch(IActivityReceiver receiver) {
-        receiver.receive(this);
+    public boolean isValid() {
+        return super.isValid() && (target != null) && (affected != null);
     }
 
-    /**
-     * @JTourBusStop 3, Activity creation, Creating another representation:
-     * 
-     *               The SarosSession will turn instances of IActivity into
-     *               instances of IActivityDataObject before passing them to the
-     *               ActivitySequencer. The reason for now is that the IActivity
-     *               instances might use types that can not be easily
-     *               serialized, e.g. an instance of a User.
-     */
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public IActivityDataObject getActivityDataObject() {
-        return new ChangeColorActivityDataObject(getSource(), target, affected,
-            colorID);
+    public void dispatch(IActivityReceiver receiver) {
+        receiver.receive(this);
     }
 
     @Override
@@ -66,7 +71,9 @@ public class ChangeColorActivity extends AbstractActivity implements
      * Returns the user that color id should be changed
      * 
      * @return the affected user or <code>null</code> if the user is no longer
-     *         part of the session
+     *         part of the session. <br>
+     *         <i>TODO Cannot be null, since field is final and ctor prevents
+     *         null value</i>
      */
     public User getAffected() {
         return affected;

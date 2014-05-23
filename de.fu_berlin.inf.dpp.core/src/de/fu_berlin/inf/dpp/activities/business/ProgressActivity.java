@@ -2,24 +2,35 @@ package de.fu_berlin.inf.dpp.activities.business;
 
 import org.apache.commons.lang.ObjectUtils;
 
-import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.ProgressActivityDataObject;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
  * A {@link ProgressActivity} is used for controlling a progress bar at a remote
  * peer.
- * 
  */
+@XStreamAlias("progressActivity")
 public class ProgressActivity extends AbstractActivity implements
     ITargetedActivity {
 
-    protected User target;
+    @XStreamAsAttribute
     protected String progressID;
+
+    @XStreamAsAttribute
     protected int workCurrent;
+
+    @XStreamAsAttribute
     protected int workTotal;
+
     protected String taskName;
+
+    @XStreamAsAttribute
     protected ProgressAction action;
+
+    @XStreamAsAttribute
+    protected User target;
 
     public enum ProgressAction {
         BEGINTASK, SUBTASK, SETTASKNAME, UPDATE, DONE, CANCEL;
@@ -42,17 +53,15 @@ public class ProgressActivity extends AbstractActivity implements
     }
 
     @Override
+    public boolean isValid() {
+        return super.isValid() && (target != null);
+    }
+
+    @Override
     public String toString() {
         return "ProgressActivity(source: " + getSource() + ", target: "
             + target + ", id: " + progressID + ", work: " + workCurrent + "/"
             + workTotal + ", task: " + taskName + ", action: " + action + ")";
-    }
-
-    @Override
-    public IActivityDataObject getActivityDataObject() {
-
-        return new ProgressActivityDataObject(getSource(), target, progressID,
-            workCurrent, workTotal, taskName, action);
     }
 
     @Override

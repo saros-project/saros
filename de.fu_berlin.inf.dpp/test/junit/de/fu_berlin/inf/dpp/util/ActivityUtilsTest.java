@@ -14,11 +14,11 @@ import org.eclipse.core.runtime.Path;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.serializable.ChecksumActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.NOPActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
+import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.business.NOPActivity;
+import de.fu_berlin.inf.dpp.activities.business.TextSelectionActivity;
+import de.fu_berlin.inf.dpp.activities.business.ViewportActivity;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
@@ -27,10 +27,9 @@ import de.fu_berlin.inf.dpp.session.User;
 
 public class ActivityUtilsTest {
 
-    private final User alice = new User(new JID("alice@junit"), true, true,
-        0, 0);
-    private final User bob = new User(new JID("bob@junit"), false, false, 0,
+    private final User alice = new User(new JID("alice@junit"), true, true, 0,
         0);
+    private final User bob = new User(new JID("bob@junit"), false, false, 0, 0);
 
     private final IPath fooPath = ResourceAdapterFactory
         .create(new Path("foo"));
@@ -40,34 +39,33 @@ public class ActivityUtilsTest {
     private final IProject fooProject = EasyMock.createMock(IProject.class);
     private final IProject barProject = EasyMock.createMock(IProject.class);
 
-    private final NOPActivityDataObject nopADO = new NOPActivityDataObject(
-        alice, bob, 0);
+    private final NOPActivity nop = new NOPActivity(alice, bob, 0);
 
-    private final ChecksumActivityDataObject checksumADO = new ChecksumActivityDataObject(
-        alice, new SPath(fooProject, fooPath), 0, 0, null);
+    private final ChecksumActivity checksumADO = new ChecksumActivity(alice,
+        new SPath(fooProject, fooPath), 0, 0, null);
 
     @Test
     public void testContainsChecksumsOnly() {
 
-        List<IActivityDataObject> emtpyADOs = Collections.emptyList();
-        List<IActivityDataObject> checksumADOs = new ArrayList<IActivityDataObject>();
-        List<IActivityDataObject> randomADOs = new ArrayList<IActivityDataObject>();
+        List<IActivity> emtpy = Collections.emptyList();
+        List<IActivity> checksum = new ArrayList<IActivity>();
+        List<IActivity> random = new ArrayList<IActivity>();
 
-        checksumADOs.add(checksumADO);
-
-        randomADOs.add(checksumADO);
-        randomADOs.add(nopADO);
+        checksum.add(checksumADO);
+        random.add(checksumADO);
+        random.add(nop);
 
         assertFalse(
-            "must return false on a collection with at least one non checksum ADO",
-            ActivityUtils.containsChecksumsOnly(randomADOs));
+            "must return false on a collection with at least one non checksum activity",
+            ActivityUtils.containsChecksumsOnly(random));
 
-        assertFalse("must return false on a collection without a checksum ADO",
-            ActivityUtils.containsChecksumsOnly(emtpyADOs));
+        assertFalse(
+            "must return false on a collection without a checksum activity",
+            ActivityUtils.containsChecksumsOnly(emtpy));
 
         assertTrue(
-            "must return true on a collection containing only checksum ADOs",
-            ActivityUtils.containsChecksumsOnly(checksumADOs));
+            "must return true on a collection containing only checksum activities",
+            ActivityUtils.containsChecksumsOnly(checksum));
     }
 
     @Test
@@ -81,119 +79,119 @@ public class ActivityUtilsTest {
 
         SPath barbarSPath = new SPath(barProject, barPath);
 
-        TextSelectionActivityDataObject tsChange0ADO = new TextSelectionActivityDataObject(
-            alice, 0, 1, foofooSPath);
+        TextSelectionActivity tsChange0 = new TextSelectionActivity(alice, 0,
+            1, foofooSPath);
 
-        TextSelectionActivityDataObject tsChange1ADO = new TextSelectionActivityDataObject(
-            alice, 1, 1, foofooSPath);
+        TextSelectionActivity tsChange1 = new TextSelectionActivity(alice, 1,
+            1, foofooSPath);
 
-        TextSelectionActivityDataObject tsChange2ADO = new TextSelectionActivityDataObject(
-            alice, 0, 1, foobarSPath);
+        TextSelectionActivity tsChange2 = new TextSelectionActivity(alice, 0,
+            1, foobarSPath);
 
-        TextSelectionActivityDataObject tsChange3ADO = new TextSelectionActivityDataObject(
-            alice, 1, 1, foobarSPath);
+        TextSelectionActivity tsChange3 = new TextSelectionActivity(alice, 1,
+            1, foobarSPath);
 
-        TextSelectionActivityDataObject tsChange4ADO = new TextSelectionActivityDataObject(
-            alice, 0, 1, barfooSPath);
+        TextSelectionActivity tsChange4 = new TextSelectionActivity(alice, 0,
+            1, barfooSPath);
 
-        TextSelectionActivityDataObject tsChange5ADO = new TextSelectionActivityDataObject(
-            alice, 1, 1, barfooSPath);
+        TextSelectionActivity tsChange5 = new TextSelectionActivity(alice, 1,
+            1, barfooSPath);
 
-        TextSelectionActivityDataObject tsChange6ADO = new TextSelectionActivityDataObject(
-            alice, 0, 1, barbarSPath);
+        TextSelectionActivity tsChange6 = new TextSelectionActivity(alice, 0,
+            1, barbarSPath);
 
-        TextSelectionActivityDataObject tsChange7ADO = new TextSelectionActivityDataObject(
-            alice, 1, 1, barbarSPath);
+        TextSelectionActivity tsChange7 = new TextSelectionActivity(alice, 1,
+            1, barbarSPath);
 
         // --------------------------------------------------------------------------------
 
-        ViewportActivityDataObject vpChange0ADO = new ViewportActivityDataObject(
-            alice, 0, 1, foofooSPath);
+        ViewportActivity vpChange0 = new ViewportActivity(alice, 0, 1,
+            foofooSPath);
 
-        ViewportActivityDataObject vpChange1ADO = new ViewportActivityDataObject(
-            alice, 1, 1, foofooSPath);
+        ViewportActivity vpChange1 = new ViewportActivity(alice, 1, 1,
+            foofooSPath);
 
-        ViewportActivityDataObject vpChange2ADO = new ViewportActivityDataObject(
-            alice, 0, 1, foobarSPath);
+        ViewportActivity vpChange2 = new ViewportActivity(alice, 0, 1,
+            foobarSPath);
 
-        ViewportActivityDataObject vpChange3ADO = new ViewportActivityDataObject(
-            alice, 1, 1, foobarSPath);
+        ViewportActivity vpChange3 = new ViewportActivity(alice, 1, 1,
+            foobarSPath);
 
-        ViewportActivityDataObject vpChange4ADO = new ViewportActivityDataObject(
-            alice, 0, 1, barfooSPath);
+        ViewportActivity vpChange4 = new ViewportActivity(alice, 0, 1,
+            barfooSPath);
 
-        ViewportActivityDataObject vpChange5ADO = new ViewportActivityDataObject(
-            alice, 1, 1, barfooSPath);
+        ViewportActivity vpChange5 = new ViewportActivity(alice, 1, 1,
+            barfooSPath);
 
-        ViewportActivityDataObject vpChange6ADO = new ViewportActivityDataObject(
-            alice, 0, 1, barbarSPath);
+        ViewportActivity vpChange6 = new ViewportActivity(alice, 0, 1,
+            barbarSPath);
 
-        ViewportActivityDataObject vpChange7ADO = new ViewportActivityDataObject(
-            alice, 1, 1, barbarSPath);
+        ViewportActivity vpChange7 = new ViewportActivity(alice, 1, 1,
+            barbarSPath);
 
-        List<IActivityDataObject> ados = new ArrayList<IActivityDataObject>();
+        List<IActivity> activities = new ArrayList<IActivity>();
 
-        ados.add(tsChange0ADO);
-        ados.add(nopADO);
-        ados.add(tsChange1ADO);
-        ados.add(nopADO);
-        ados.add(tsChange2ADO);
-        ados.add(nopADO);
-        ados.add(tsChange3ADO);
-        ados.add(nopADO);
-        ados.add(tsChange4ADO);
-        ados.add(nopADO);
-        ados.add(tsChange5ADO);
-        ados.add(nopADO);
-        ados.add(tsChange6ADO);
-        ados.add(nopADO);
-        ados.add(tsChange7ADO);
-        ados.add(nopADO);
-        ados.add(vpChange0ADO);
-        ados.add(nopADO);
-        ados.add(vpChange1ADO);
-        ados.add(nopADO);
-        ados.add(vpChange2ADO);
-        ados.add(nopADO);
-        ados.add(vpChange3ADO);
-        ados.add(nopADO);
-        ados.add(vpChange4ADO);
-        ados.add(nopADO);
-        ados.add(vpChange5ADO);
-        ados.add(nopADO);
-        ados.add(vpChange6ADO);
-        ados.add(nopADO);
-        ados.add(vpChange7ADO);
-        ados.add(nopADO);
+        activities.add(tsChange0);
+        activities.add(nop);
+        activities.add(tsChange1);
+        activities.add(nop);
+        activities.add(tsChange2);
+        activities.add(nop);
+        activities.add(tsChange3);
+        activities.add(nop);
+        activities.add(tsChange4);
+        activities.add(nop);
+        activities.add(tsChange5);
+        activities.add(nop);
+        activities.add(tsChange6);
+        activities.add(nop);
+        activities.add(tsChange7);
+        activities.add(nop);
+        activities.add(vpChange0);
+        activities.add(nop);
+        activities.add(vpChange1);
+        activities.add(nop);
+        activities.add(vpChange2);
+        activities.add(nop);
+        activities.add(vpChange3);
+        activities.add(nop);
+        activities.add(vpChange4);
+        activities.add(nop);
+        activities.add(vpChange5);
+        activities.add(nop);
+        activities.add(vpChange6);
+        activities.add(nop);
+        activities.add(vpChange7);
+        activities.add(nop);
 
-        List<IActivityDataObject> optimizedADOs = ActivityUtils.optimize(ados);
+        List<IActivity> optimized = ActivityUtils.optimize(activities);
 
-        assertEquals("ADOs are not optimized optimal", /* NOP */
-            16 + /* TS */4 + /* VP */4, optimizedADOs.size());
+        assertEquals("activities are not optimally optimized", /* NOP */
+            16 + /* TS */4 + /* VP */4, optimized.size());
 
-        assertRange(0, 0, optimizedADOs, nopADO);
-        assertRange(1, 1, optimizedADOs, tsChange1ADO);
-        assertRange(2, 3, optimizedADOs, nopADO);
-        assertRange(4, 4, optimizedADOs, tsChange3ADO);
-        assertRange(5, 6, optimizedADOs, nopADO);
-        assertRange(7, 7, optimizedADOs, tsChange5ADO);
-        assertRange(8, 9, optimizedADOs, nopADO);
-        assertRange(10, 10, optimizedADOs, tsChange7ADO);
-        assertRange(11, 12, optimizedADOs, nopADO);
-        assertRange(13, 13, optimizedADOs, vpChange1ADO);
-        assertRange(14, 15, optimizedADOs, nopADO);
-        assertRange(16, 16, optimizedADOs, vpChange3ADO);
-        assertRange(17, 18, optimizedADOs, nopADO);
-        assertRange(19, 19, optimizedADOs, vpChange5ADO);
-        assertRange(20, 21, optimizedADOs, nopADO);
-        assertRange(22, 22, optimizedADOs, vpChange7ADO);
-        assertRange(23, 23, optimizedADOs, nopADO);
+        assertRange(0, 0, optimized, nop);
+        assertRange(1, 1, optimized, tsChange1);
+        assertRange(2, 3, optimized, nop);
+        assertRange(4, 4, optimized, tsChange3);
+        assertRange(5, 6, optimized, nop);
+        assertRange(7, 7, optimized, tsChange5);
+        assertRange(8, 9, optimized, nop);
+        assertRange(10, 10, optimized, tsChange7);
+        assertRange(11, 12, optimized, nop);
+        assertRange(13, 13, optimized, vpChange1);
+        assertRange(14, 15, optimized, nop);
+        assertRange(16, 16, optimized, vpChange3);
+        assertRange(17, 18, optimized, nop);
+        assertRange(19, 19, optimized, vpChange5);
+        assertRange(20, 21, optimized, nop);
+        assertRange(22, 22, optimized, vpChange7);
+        assertRange(23, 23, optimized, nop);
     }
 
-    private void assertRange(int l, int h, List<IActivityDataObject> ados,
-        IActivityDataObject ado) {
+    private void assertRange(int l, int h, List<IActivity> activities,
+        IActivity activity) {
         for (int i = l; i <= h; i++)
-            assertSame("optimization resulted in wrong ADOs order", ado,
-                ados.get(i));
+            assertSame("optimization resulted in wrong activity order",
+                activity, activities.get(i));
     }
 }

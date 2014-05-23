@@ -46,7 +46,6 @@ import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.activities.business.NOPActivity;
 import de.fu_berlin.inf.dpp.activities.business.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.business.ViewportActivity;
-import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.communication.extensions.ActivitiesExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.KickUserExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.LeaveSessionExtension;
@@ -714,19 +713,19 @@ public final class SarosSession implements ISarosSession {
      */
 
     @Override
-    public void exec(List<IActivityDataObject> ados) {
-        final List<IActivity> activities = new ArrayList<IActivity>();
+    public void exec(List<IActivity> activities) {
+        final List<IActivity> valid = new ArrayList<IActivity>();
 
-        for (IActivityDataObject ado : activityQueuer.process(ados)) {
-            try {
-                activities.add(ado.getActivity());
-            } catch (IllegalArgumentException e) {
-                log.error("could not deserialize activity data object: " + ado,
-                    e);
-            }
+        // Check every incoming activity for validity
+        for (IActivity activity : activities) {
+            if (activity.isValid())
+                valid.add(activity);
+            else
+                log.error("could not handle incoming activity: " + activity);
         }
 
-        activityHandler.handleIncomingActivities(activities);
+        List<IActivity> processed = activityQueuer.process(valid);
+        activityHandler.handleIncomingActivities(processed);
     }
 
     /*
@@ -771,8 +770,7 @@ public final class SarosSession implements ISarosSession {
             return;
 
         try {
-            activitySequencer.sendActivity(recipients,
-                activity.getActivityDataObject());
+            activitySequencer.sendActivity(recipients, activity);
         } catch (IllegalArgumentException e) {
             log.warn("could not serialize activity: " + activity, e);
         }

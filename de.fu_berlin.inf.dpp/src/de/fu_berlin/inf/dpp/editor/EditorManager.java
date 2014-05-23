@@ -114,8 +114,8 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
  *         issues
  * 
  *         TODO CO This class contains too many different concerns: TextEdits,
- *         Editor opening and closing, Parsing of activityDataObjects, executing
- *         of activityDataObjects, dirty state management,...
+ *         Editor opening and closing, Parsing of activities, executing of
+ *         activities, dirty state management,...
  */
 @Component(module = "core")
 public class EditorManager extends AbstractActivityProvider {

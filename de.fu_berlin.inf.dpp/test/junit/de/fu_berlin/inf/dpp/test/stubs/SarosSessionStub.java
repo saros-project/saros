@@ -6,7 +6,6 @@ import java.util.Set;
 import java.util.concurrent.CancellationException;
 
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
-import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
@@ -170,7 +169,7 @@ public class SarosSessionStub implements ISarosSession {
     }
 
     @Override
-    public void exec(List<IActivityDataObject> activityDataObjects) {
+    public void exec(List<IActivity> activities) {
         throw new RuntimeException("Unexpected call to Stub");
 
     }

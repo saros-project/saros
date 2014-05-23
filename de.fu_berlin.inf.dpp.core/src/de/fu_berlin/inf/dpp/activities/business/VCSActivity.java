@@ -4,9 +4,10 @@ import java.util.Vector;
 
 import org.apache.commons.lang.ObjectUtils;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.VCSActivityDataObject;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
@@ -16,6 +17,7 @@ import de.fu_berlin.inf.dpp.session.User;
 /**
  * Activity for VCS operations like Switch, Update.
  */
+@XStreamAlias("vcsActivity")
 public class VCSActivity extends AbstractResourceActivity {
 
     public enum Type {
@@ -52,10 +54,12 @@ public class VCSActivity extends AbstractResourceActivity {
         UPDATE,
     }
 
-    protected Type type;
+    protected String param1;
     protected String url;
     protected String directory;
-    protected String param1;
+
+    @XStreamAsAttribute
+    protected Type type;
 
     public Vector<IResourceActivity> containedActivity = new Vector<IResourceActivity>();
 
@@ -131,19 +135,6 @@ public class VCSActivity extends AbstractResourceActivity {
     @Override
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
-    }
-
-    @Override
-    public IActivityDataObject getActivityDataObject() {
-
-        Vector<IActivityDataObject> ados = new Vector<IActivityDataObject>(
-            containedActivity.size());
-
-        for (IResourceActivity a : containedActivity)
-            ados.add(a.getActivityDataObject());
-
-        return new VCSActivityDataObject(getSource(), getType(), url,
-            getPath(), directory, param1, ados);
     }
 
     /**

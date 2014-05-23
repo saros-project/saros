@@ -2,23 +2,31 @@ package de.fu_berlin.inf.dpp.activities.business;
 
 import org.apache.commons.lang.ObjectUtils;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.session.User;
 
 public abstract class AbstractResourceActivity extends AbstractActivity
     implements IResourceActivity {
 
-    /*
-     * TODO path must never be null for IResourceActivities. Add a
-     * StatusActivity for informing remote users that no shared resource is
-     * active anymore.
-     */
+    @XStreamAlias("p")
     private final SPath path;
 
     public AbstractResourceActivity(User source, SPath path) {
         super(source);
 
         this.path = path;
+    }
+
+    @Override
+    public boolean isValid() {
+        /*
+         * TODO path must never be null for IResourceActivities. Add a
+         * StatusActivity for informing remote users that no shared resource is
+         * active anymore.
+         */
+        return super.isValid() /* && (path != null) */;
     }
 
     @Override

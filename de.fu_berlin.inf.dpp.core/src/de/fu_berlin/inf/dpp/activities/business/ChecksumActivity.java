@@ -2,9 +2,10 @@ package de.fu_berlin.inf.dpp.activities.business;
 
 import org.apache.commons.lang.ObjectUtils;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.serializable.ChecksumActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.session.User;
 
@@ -23,6 +24,7 @@ import de.fu_berlin.inf.dpp.session.User;
  * local user has already written additional text which invalidates the
  * checksum.
  */
+@XStreamAlias("checksumActivity")
 public class ChecksumActivity extends AbstractResourceActivity {
 
     /**
@@ -30,8 +32,13 @@ public class ChecksumActivity extends AbstractResourceActivity {
      */
     public static final int NON_EXISTING_DOC = -1;
 
+    @XStreamAsAttribute
     protected final long hash;
+
+    @XStreamAsAttribute
     protected final long length;
+
+    @XStreamAsAttribute
     protected final Timestamp jupiterTimestamp;
 
     /**
@@ -137,11 +144,5 @@ public class ChecksumActivity extends AbstractResourceActivity {
 
     public boolean existsFile() {
         return !(this.length == NON_EXISTING_DOC && this.hash == NON_EXISTING_DOC);
-    }
-
-    @Override
-    public IActivityDataObject getActivityDataObject() {
-        return new ChecksumActivityDataObject(getSource(), getPath(), hash,
-            length, jupiterTimestamp);
     }
 }

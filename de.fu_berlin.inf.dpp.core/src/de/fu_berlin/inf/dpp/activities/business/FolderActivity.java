@@ -2,17 +2,20 @@ package de.fu_berlin.inf.dpp.activities.business;
 
 import org.apache.commons.lang.ObjectUtils;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.serializable.FolderActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.session.User;
 
+@XStreamAlias("folderActivity")
 public class FolderActivity extends AbstractResourceActivity {
 
     public static enum Type {
         CREATED, REMOVED
     }
 
+    @XStreamAsAttribute
     protected final Type type;
 
     public FolderActivity(User source, Type type, SPath path) {
@@ -59,10 +62,4 @@ public class FolderActivity extends AbstractResourceActivity {
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
     }
-
-    @Override
-    public IActivityDataObject getActivityDataObject() {
-        return new FolderActivityDataObject(getSource(), type, getPath());
-    }
-
 }

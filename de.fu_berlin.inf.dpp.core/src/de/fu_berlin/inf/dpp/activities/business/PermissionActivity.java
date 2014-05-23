@@ -21,8 +21,9 @@ package de.fu_berlin.inf.dpp.activities.business;
 
 import org.apache.commons.lang.ObjectUtils;
 
-import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.PermissionActivityDataObject;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 
@@ -30,9 +31,13 @@ import de.fu_berlin.inf.dpp.session.User.Permission;
  * A PermissionActivity indicates that a {@link User} has a new
  * {@link Permission}.
  */
+@XStreamAlias("permissionActivity")
 public class PermissionActivity extends AbstractActivity {
 
+    @XStreamAsAttribute
     protected final Permission permission;
+
+    @XStreamAsAttribute
     protected final User affectedUser;
 
     /**
@@ -49,6 +54,11 @@ public class PermissionActivity extends AbstractActivity {
 
         this.affectedUser = affectedUser;
         this.permission = permission;
+    }
+
+    @Override
+    public boolean isValid() {
+        return super.isValid() && (affectedUser != null);
     }
 
     @Override
@@ -96,11 +106,5 @@ public class PermissionActivity extends AbstractActivity {
     @Override
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
-    }
-
-    @Override
-    public IActivityDataObject getActivityDataObject() {
-        return new PermissionActivityDataObject(getSource(), affectedUser,
-            permission);
     }
 }

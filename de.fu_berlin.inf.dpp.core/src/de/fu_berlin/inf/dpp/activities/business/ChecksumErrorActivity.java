@@ -23,9 +23,11 @@ import java.util.List;
 
 import org.apache.commons.lang.ObjectUtils;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
+
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.serializable.ChecksumErrorActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -36,12 +38,18 @@ import de.fu_berlin.inf.dpp.session.User;
  * sent the last FileActivity (with {@link FileActivity#isRecovery()} being set
  * related to this checksum recovery.
  */
+@XStreamAlias("checksumErrorActivity")
 public class ChecksumErrorActivity extends AbstractActivity implements
     ITargetedActivity {
 
-    protected List<SPath> paths;
-    protected String recoveryID;
+    @XStreamAsAttribute
     private User target;
+
+    @XStreamAsAttribute
+    protected String recoveryID;
+
+    @XStreamImplicit
+    protected List<SPath> paths;
 
     public ChecksumErrorActivity(User source, User target, List<SPath> paths,
         String recoveryID) {
@@ -54,6 +62,11 @@ public class ChecksumErrorActivity extends AbstractActivity implements
         this.target = target;
         this.paths = paths;
         this.recoveryID = recoveryID;
+    }
+
+    @Override
+    public boolean isValid() {
+        return super.isValid() && (target != null);
     }
 
     public List<SPath> getPaths() {
@@ -71,13 +84,6 @@ public class ChecksumErrorActivity extends AbstractActivity implements
     @Override
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
-    }
-
-    @Override
-    public IActivityDataObject getActivityDataObject() {
-
-        return new ChecksumErrorActivityDataObject(getSource(), target, paths,
-            recoveryID);
     }
 
     @Override

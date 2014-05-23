@@ -7,40 +7,39 @@ import java.util.List;
 import java.util.Map;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.serializable.ChecksumActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
+import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.business.TextSelectionActivity;
+import de.fu_berlin.inf.dpp.activities.business.ViewportActivity;
 
 /**
- * Class contains static helper methods for {@link IActivityDataObject ADOs}.
+ * Class contains static helper methods for {@link IActivity activities}.
  */
 public class ActivityUtils {
 
     /**
      * Checks if the give collections contains only
-     * {@linkplain ChecksumActivityDataObject checksum ADOs}.
+     * {@linkplain ChecksumActivity checksum activities}.
      * 
      * @param activities
-     *            collection containing {@linkplain IActivityDataObject ADOs}
-     * @return <code>true</code> if the collection contains only checksum ADOs,
-     *         <code>false</code> otherwise
+     *            collection containing {@linkplain IActivity activities}
+     * @return <code>true</code> if the collection contains only checksum
+     *         activities, <code>false</code> otherwise
      */
-    public static boolean containsChecksumsOnly(
-        Collection<IActivityDataObject> activities) {
+    public static boolean containsChecksumsOnly(Collection<IActivity> activities) {
 
         if (activities.isEmpty())
             return false;
 
-        for (IActivityDataObject a : activities)
-            if (!(a instanceof ChecksumActivityDataObject))
+        for (IActivity a : activities)
+            if (!(a instanceof ChecksumActivity))
                 return false;
 
         return true;
     }
 
     /**
-     * Tries to reduce the number of {@link IActivityDataObject ADOs} so that:
+     * Tries to reduce the number of {@link IActivity activities} so that:
      * <p>
      * 
      * <pre>
@@ -54,17 +53,15 @@ public class ActivityUtils {
      * </pre>
      * 
      * @param activities
-     *            a collection containing the ADOs to optimize
-     * @return a list which may contains a reduced amount of ADOs
+     *            a collection containing the activities to optimize
+     * @return a list which may contains a reduced amount of activities
      */
 
-    public static List<IActivityDataObject> optimize(
-        Collection<IActivityDataObject> activities) {
+    public static List<IActivity> optimize(Collection<IActivity> activities) {
 
-        List<IActivityDataObject> result = new ArrayList<IActivityDataObject>(
-            activities.size());
+        List<IActivity> result = new ArrayList<IActivity>(activities.size());
 
-        boolean[] dropDAOIdx = new boolean[activities.size()];
+        boolean[] dropActivityIdx = new boolean[activities.size()];
 
         Map<SPath, Integer> selections = new HashMap<SPath, Integer>();
         Map<SPath, Integer> viewports = new HashMap<SPath, Integer>();
@@ -74,40 +71,38 @@ public class ActivityUtils {
          * path
          */
 
-        int daoIdx = 0;
+        int activityIdx = 0;
 
-        for (IActivityDataObject dao : activities) {
+        for (IActivity activity : activities) {
 
-            if (dao instanceof TextSelectionActivityDataObject) {
+            if (activity instanceof TextSelectionActivity) {
+                SPath path = ((TextSelectionActivity) activity).getPath();
 
-                SPath daoPath = ((TextSelectionActivityDataObject) dao)
-                    .getPath();
-
-                Integer idx = selections.get(daoPath);
+                Integer idx = selections.get(path);
 
                 if (idx != null)
-                    dropDAOIdx[idx] = true;
+                    dropActivityIdx[idx] = true;
 
-                selections.put(daoPath, daoIdx);
-            } else if (dao instanceof ViewportActivityDataObject) {
-                SPath daoPath = ((ViewportActivityDataObject) dao).getPath();
+                selections.put(path, activityIdx);
+            } else if (activity instanceof ViewportActivity) {
+                SPath path = ((ViewportActivity) activity).getPath();
 
-                Integer idx = viewports.get(daoPath);
+                Integer idx = viewports.get(path);
 
                 if (idx != null)
-                    dropDAOIdx[idx] = true;
+                    dropActivityIdx[idx] = true;
 
-                viewports.put(daoPath, daoIdx);
+                viewports.put(path, activityIdx);
             }
 
-            daoIdx++;
+            activityIdx++;
         }
 
-        daoIdx = 0;
+        activityIdx = 0;
 
-        for (IActivityDataObject dao : activities)
-            if (!dropDAOIdx[daoIdx++])
-                result.add(dao);
+        for (IActivity activity : activities)
+            if (!dropActivityIdx[activityIdx++])
+                result.add(activity);
 
         return result;
     }

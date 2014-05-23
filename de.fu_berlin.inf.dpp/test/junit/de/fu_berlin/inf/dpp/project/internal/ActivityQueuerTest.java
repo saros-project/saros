@@ -17,11 +17,10 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
-import de.fu_berlin.inf.dpp.activities.serializable.EditorActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.JupiterActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.NOPActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.StartFollowingActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
+import de.fu_berlin.inf.dpp.activities.business.NOPActivity;
+import de.fu_berlin.inf.dpp.activities.business.StartFollowingActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterVectorTime;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
@@ -66,9 +65,9 @@ public class ActivityQueuerTest {
 
     @Test
     public void testQueuingDisabled() {
-        List<IActivityDataObject> activities = createSomeActivities();
+        List<IActivity> activities = createSomeActivities();
 
-        List<IActivityDataObject> processedActivities = activityQueuer
+        List<IActivity> processedActivities = activityQueuer
             .process(activities);
 
         assertListsAreEqual(activities, processedActivities);
@@ -76,29 +75,30 @@ public class ActivityQueuerTest {
 
     @Test
     public void testQueuingEnabled() {
-        List<IActivityDataObject> activities = createSomeActivities();
+        List<IActivity> activities = createSomeActivities();
 
-        List<IActivityDataObject> expectedActivities = new ArrayList<IActivityDataObject>(
+        List<IActivity> expectedActivities = new ArrayList<IActivity>(
             activities);
 
-        // see testHackForBug808 ... we are generating missing ADOs if necessary
-        final IActivityDataObject expectedEditorADO = new EditorActivityDataObject(
-            BOB, EditorActivity.Type.ACTIVATED, PATH_TO_NOT_SHARED_PROJECT);
+        // see testHackForBug808 ... we are generating missing activities if
+        // necessary
+        final IActivity expectedEA = new EditorActivity(BOB,
+            EditorActivity.Type.ACTIVATED, PATH_TO_NOT_SHARED_PROJECT);
 
-        IActivityDataObject activityToBeQueued = createJupiterActivity(PATH_TO_NOT_SHARED_PROJECT);
+        IActivity activityToBeQueued = createJupiterActivity(PATH_TO_NOT_SHARED_PROJECT);
         activities.add(activityToBeQueued);
 
         activityQueuer.enableQueuing(NOT_SHARED_PROJECT);
 
-        List<IActivityDataObject> processedActivities = activityQueuer
+        List<IActivity> processedActivities = activityQueuer
             .process(activities);
 
         assertFalse(processedActivities.contains(activityToBeQueued));
         assertListsAreEqual(expectedActivities, processedActivities);
 
-        IActivityDataObject activityNotToBeQueued = createJupiterActivity(FOO_PATH_SHARED_PROJECT);
+        IActivity activityNotToBeQueued = createJupiterActivity(FOO_PATH_SHARED_PROJECT);
 
-        List<IActivityDataObject> notQueuedActivities = activityQueuer
+        List<IActivity> notQueuedActivities = activityQueuer
             .process(Collections.singletonList(activityNotToBeQueued));
 
         assertTrue("queued activity that should not be queued",
@@ -108,15 +108,14 @@ public class ActivityQueuerTest {
             notQueuedActivities.size());
 
         // flush queue
-        IActivityDataObject nopActivity = new NOPActivityDataObject(ALICE,
-            ALICE, 0);
+        IActivity nopActivity = new NOPActivity(ALICE, ALICE, 0);
 
         activityQueuer.disableQueuing();
 
         processedActivities.addAll(activityQueuer.process(Collections
             .singletonList(nopActivity)));
 
-        expectedActivities.add(expectedEditorADO);
+        expectedActivities.add(expectedEA);
         expectedActivities.add(activityToBeQueued);
         expectedActivities.add(nopActivity);
         assertListsAreEqual(expectedActivities, processedActivities);
@@ -130,8 +129,8 @@ public class ActivityQueuerTest {
     public void testQueuingEnabledWithActivityWithoutPath() {
         activityQueuer.enableQueuing(NOT_SHARED_PROJECT);
 
-        IActivityDataObject serializedEditorActivity = new EditorActivityDataObject(
-            ALICE, EditorActivity.Type.ACTIVATED, null);
+        IActivity serializedEditorActivity = new EditorActivity(ALICE,
+            EditorActivity.Type.ACTIVATED, null);
 
         /*
          * does this make sense ? user opened file X (path != null), closed file
@@ -139,7 +138,7 @@ public class ActivityQueuerTest {
          * opened Y opened See EditorManager#partActivated
          */
 
-        List<IActivityDataObject> processedActivities = activityQueuer
+        List<IActivity> processedActivities = activityQueuer
             .process(Collections.singletonList(serializedEditorActivity));
 
         assertEquals("activities with null path must not be queued", 1,
@@ -150,29 +149,29 @@ public class ActivityQueuerTest {
     // http://sourceforge.net/p/dpp/bugs/808/
     @Test
     public void testHackForBug808() {
-        final IActivityDataObject fooExpectedEditorADO = new EditorActivityDataObject(
-            ALICE, EditorActivity.Type.ACTIVATED, FOO_PATH_SHARED_PROJECT);
+        final IActivity fooExpectedEditorADO = new EditorActivity(ALICE,
+            EditorActivity.Type.ACTIVATED, FOO_PATH_SHARED_PROJECT);
 
-        final IActivityDataObject barExpectedEditorADO = new EditorActivityDataObject(
-            ALICE, EditorActivity.Type.ACTIVATED, BAR_PATH_SHARED_PROJECT);
+        final IActivity barExpectedEditorADO = new EditorActivity(ALICE,
+            EditorActivity.Type.ACTIVATED, BAR_PATH_SHARED_PROJECT);
 
-        final IActivityDataObject fooClosedEditorADO = new EditorActivityDataObject(
-            ALICE, EditorActivity.Type.CLOSED, FOO_PATH_SHARED_PROJECT);
+        final IActivity fooClosedEditorADO = new EditorActivity(ALICE,
+            EditorActivity.Type.CLOSED, FOO_PATH_SHARED_PROJECT);
 
-        final IActivityDataObject fooSavedEditorADO = new EditorActivityDataObject(
-            ALICE, EditorActivity.Type.CLOSED, FOO_PATH_SHARED_PROJECT);
+        final IActivity fooSavedEditorADO = new EditorActivity(ALICE,
+            EditorActivity.Type.CLOSED, FOO_PATH_SHARED_PROJECT);
 
-        final List<IActivityDataObject> flush = Collections.emptyList();
+        final List<IActivity> flush = Collections.emptyList();
 
-        final IActivityDataObject fooJupiterADO = new JupiterActivityDataObject(
+        final IActivity fooJupiterADO = new JupiterActivity(
             new JupiterVectorTime(0, 0), new NoOperation(), ALICE,
             FOO_PATH_SHARED_PROJECT);
 
-        final IActivityDataObject barJupiterADO = new JupiterActivityDataObject(
+        final IActivity barJupiterADO = new JupiterActivity(
             new JupiterVectorTime(0, 0), new NoOperation(), ALICE,
             BAR_PATH_SHARED_PROJECT);
 
-        List<IActivityDataObject> ados;
+        List<IActivity> activities;
 
         activityQueuer = new ActivityQueuer();
         activityQueuer.enableQueuing(SHARED_PROJECT);
@@ -180,18 +179,18 @@ public class ActivityQueuerTest {
         activityQueuer.process(Collections.singletonList(fooJupiterADO));
         activityQueuer.disableQueuing();
 
-        ados = activityQueuer.process(flush);
+        activities = activityQueuer.process(flush);
 
-        IActivityDataObject a = ados.get(0);
+        IActivity a = activities.get(0);
 
         fooExpectedEditorADO.equals(a);
 
-        assertEquals("editor ADO was not added", 2, ados.size());
+        assertEquals("editor ADO was not added", 2, activities.size());
 
         assertEquals("wrong (Editor)ADO was inserted", fooExpectedEditorADO,
-            ados.get(0));
+            activities.get(0));
 
-        ados.clear();
+        activities.clear();
 
         // ------------------------------------------
 
@@ -201,14 +200,14 @@ public class ActivityQueuerTest {
         activityQueuer.process(Collections.singletonList(fooClosedEditorADO));
         activityQueuer.disableQueuing();
 
-        ados = activityQueuer.process(flush);
+        activities = activityQueuer.process(flush);
 
-        assertEquals("editor ADO was not added", 2, ados.size());
+        assertEquals("editor ADO was not added", 2, activities.size());
 
         assertEquals("wrong (Editor)ADO was inserted", fooExpectedEditorADO,
-            ados.get(0));
+            activities.get(0));
 
-        ados.clear();
+        activities.clear();
 
         // ------------------------------------------
 
@@ -218,14 +217,14 @@ public class ActivityQueuerTest {
         activityQueuer.process(Collections.singletonList(fooSavedEditorADO));
         activityQueuer.disableQueuing();
 
-        ados = activityQueuer.process(flush);
+        activities = activityQueuer.process(flush);
 
-        assertEquals("editor ADO was not added", 2, ados.size());
+        assertEquals("editor ADO was not added", 2, activities.size());
 
         assertEquals("wrong (Editor)ADO was inserted", fooExpectedEditorADO,
-            ados.get(0));
+            activities.get(0));
 
-        ados.clear();
+        activities.clear();
 
         // ------------------------------------------
 
@@ -236,15 +235,15 @@ public class ActivityQueuerTest {
             fooClosedEditorADO));
         activityQueuer.disableQueuing();
 
-        ados = activityQueuer.process(flush);
+        activities = activityQueuer.process(flush);
 
         assertEquals("editor ADO was either not added or added to many times",
-            4, ados.size());
+            4, activities.size());
 
         assertEquals("wrong (Editor)ADO was inserted", fooExpectedEditorADO,
-            ados.get(0));
+            activities.get(0));
 
-        ados.clear();
+        activities.clear();
 
         // ------------------------------------------
 
@@ -254,31 +253,31 @@ public class ActivityQueuerTest {
         activityQueuer.process(Arrays.asList(fooJupiterADO, barJupiterADO));
         activityQueuer.disableQueuing();
 
-        ados = activityQueuer.process(flush);
+        activities = activityQueuer.process(flush);
 
-        assertEquals("editor ADO was not added two times", 4, ados.size());
+        assertEquals("editor ADO was not added two times", 4, activities.size());
 
         assertEquals("wrong (Editor)ADO was inserted", fooExpectedEditorADO,
-            ados.get(0));
+            activities.get(0));
 
         assertEquals("wrong (Editor)ADO was inserted", barExpectedEditorADO,
-            ados.get(2));
+            activities.get(2));
 
-        ados.clear();
+        activities.clear();
 
         // ------------------------------------------
 
-        final IActivityDataObject aliceExpectedEditorADO = new EditorActivityDataObject(
-            ALICE, EditorActivity.Type.ACTIVATED, FOO_PATH_SHARED_PROJECT);
+        final IActivity aliceExpectedEditorADO = new EditorActivity(ALICE,
+            EditorActivity.Type.ACTIVATED, FOO_PATH_SHARED_PROJECT);
 
-        final IActivityDataObject bobExpectedEditorADO = new EditorActivityDataObject(
-            BOB, EditorActivity.Type.ACTIVATED, FOO_PATH_SHARED_PROJECT);
+        final IActivity bobExpectedEditorADO = new EditorActivity(BOB,
+            EditorActivity.Type.ACTIVATED, FOO_PATH_SHARED_PROJECT);
 
-        final IActivityDataObject aliceJupiterADO = new JupiterActivityDataObject(
+        final IActivity aliceJupiterADO = new JupiterActivity(
             new JupiterVectorTime(0, 0), new NoOperation(), ALICE,
             FOO_PATH_SHARED_PROJECT);
 
-        final IActivityDataObject bobJupiterADO = new JupiterActivityDataObject(
+        final IActivity bobJupiterADO = new JupiterActivity(
             new JupiterVectorTime(0, 0), new NoOperation(), BOB,
             FOO_PATH_SHARED_PROJECT);
 
@@ -288,37 +287,37 @@ public class ActivityQueuerTest {
         activityQueuer.process(Arrays.asList(aliceJupiterADO, bobJupiterADO));
         activityQueuer.disableQueuing();
 
-        ados = activityQueuer.process(flush);
+        activities = activityQueuer.process(flush);
 
-        assertEquals("editor ADO was not added two times", 4, ados.size());
+        assertEquals("editor ADO was not added two times", 4, activities.size());
 
         assertEquals("wrong (Editor)ADO was inserted", aliceExpectedEditorADO,
-            ados.get(0));
+            activities.get(0));
 
         assertEquals("wrong (Editor)ADO was inserted", bobExpectedEditorADO,
-            ados.get(2));
+            activities.get(2));
     }
 
-    private List<IActivityDataObject> createSomeActivities() {
-        IActivityDataObject startFollowingActivity = new StartFollowingActivityDataObject(
-            ALICE, BOB);
+    private List<IActivity> createSomeActivities() {
+        IActivity startFollowingActivity = new StartFollowingActivity(ALICE,
+            BOB);
 
-        IActivityDataObject jupiterActivity = createJupiterActivity(FOO_PATH_SHARED_PROJECT);
+        IActivity jupiterActivity = createJupiterActivity(FOO_PATH_SHARED_PROJECT);
 
-        List<IActivityDataObject> activities = new ArrayList<IActivityDataObject>();
+        List<IActivity> activities = new ArrayList<IActivity>();
         activities.add(startFollowingActivity);
         activities.add(jupiterActivity);
 
         return activities;
     }
 
-    private JupiterActivityDataObject createJupiterActivity(SPath path) {
-        return new JupiterActivityDataObject(new JupiterVectorTime(0, 0),
+    private JupiterActivity createJupiterActivity(SPath path) {
+        return new JupiterActivity(new JupiterVectorTime(0, 0),
             new NoOperation(), BOB, path);
     }
 
-    private void assertListsAreEqual(List<IActivityDataObject> expected,
-        List<IActivityDataObject> actual) {
+    private void assertListsAreEqual(List<IActivity> expected,
+        List<IActivity> actual) {
         assertEquals(expected.size(), actual.size());
         for (int i = 0; i < expected.size(); i++) {
             assertEquals(expected.get(i), actual.get(i));

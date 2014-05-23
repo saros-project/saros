@@ -18,8 +18,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.NOPActivity;
-import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -32,7 +32,7 @@ public class ActivitySequencerTest {
 
     private static class SequencerSessionStub extends SarosSessionStub {
 
-        private List<IActivityDataObject> receivedActivityDataObjects = new ArrayList<IActivityDataObject>();
+        private List<IActivity> receivedActivities = new ArrayList<IActivity>();
 
         private Set<User> users = new HashSet<User>();
 
@@ -73,9 +73,8 @@ public class ActivitySequencerTest {
         }
 
         @Override
-        public synchronized void exec(
-            List<IActivityDataObject> activityDataObjects) {
-            receivedActivityDataObjects.addAll(activityDataObjects);
+        public synchronized void exec(List<IActivity> activities) {
+            receivedActivities.addAll(activities);
         }
 
         @Override
@@ -83,9 +82,8 @@ public class ActivitySequencerTest {
             return id == null ? "0815" : id;
         }
 
-        public synchronized List<IActivityDataObject> getReceivedActivities() {
-            return new ArrayList<IActivityDataObject>(
-                receivedActivityDataObjects);
+        public synchronized List<IActivity> getReceivedActivities() {
+            return new ArrayList<IActivity>(receivedActivities);
         }
     }
 
@@ -216,7 +214,7 @@ public class ActivitySequencerTest {
 
         aliceSequencer.sendActivity(Collections
             .singletonList(bobUserInAliceSession), new NOPActivity(aliceUser,
-            bobUserInAliceSession, 0).getActivityDataObject());
+            bobUserInAliceSession, 0));
 
         aliceSequencer.flush(bobUserInAliceSession);
 
@@ -248,21 +246,20 @@ public class ActivitySequencerTest {
         bobSequencer.registerUser(aliceUserInBobSession);
 
         for (int i = 0; i < activityCount; i++)
-            aliceSequencer.sendActivity(Collections
-                .singletonList(bobUserInAliceSession), new NOPActivity(
-                aliceUser, bobUserInAliceSession, i).getActivityDataObject());
+            aliceSequencer.sendActivity(
+                Collections.singletonList(bobUserInAliceSession),
+                new NOPActivity(aliceUser, bobUserInAliceSession, i));
 
         aliceSequencer.flush(bobUserInAliceSession);
 
-        List<IActivityDataObject> receivedActivities = sessionStubBob
+        List<IActivity> receivedActivities = sessionStubBob
             .getReceivedActivities();
 
         assertEquals("not all activies received", activityCount,
             receivedActivities.size());
 
         for (int i = 0; i < activityCount; i++) {
-            NOPActivity activity = (NOPActivity) receivedActivities.get(i)
-                .getActivity();
+            NOPActivity activity = (NOPActivity) receivedActivities.get(i);
             assertEquals("activity is out of order", i, activity.getID());
         }
     }
@@ -289,11 +286,11 @@ public class ActivitySequencerTest {
 
         aliceSequencer.sendActivity(Collections
             .singletonList(bobUserInAliceSession), new NOPActivity(aliceUser,
-            bobUserInAliceSession, 0).getActivityDataObject());
+            bobUserInAliceSession, 0));
 
         aliceSequencer.flush(bobUserInAliceSession);
 
-        List<IActivityDataObject> receivedActivities = sessionStubBob
+        List<IActivity> receivedActivities = sessionStubBob
             .getReceivedActivities();
 
         assertEquals(
@@ -323,11 +320,11 @@ public class ActivitySequencerTest {
 
         aliceSequencer.sendActivity(Collections
             .singletonList(bobUserInAliceSession), new NOPActivity(aliceUser,
-            bobUserInAliceSession, 0).getActivityDataObject());
+            bobUserInAliceSession, 0));
 
         aliceSequencer.flush(bobUserInAliceSession);
 
-        List<IActivityDataObject> receivedActivities = sessionStubBob
+        List<IActivity> receivedActivities = sessionStubBob
             .getReceivedActivities();
 
         assertEquals(
@@ -359,11 +356,11 @@ public class ActivitySequencerTest {
 
         aliceSequencer.sendActivity(Collections
             .singletonList(bobUserInAliceSession), new NOPActivity(aliceUser,
-            bobUserInAliceSession, 0).getActivityDataObject());
+            bobUserInAliceSession, 0));
 
         aliceSequencer.flush(bobUserInAliceSession);
 
-        List<IActivityDataObject> receivedActivities = sessionStubBob
+        List<IActivity> receivedActivities = sessionStubBob
             .getReceivedActivities();
 
         assertEquals(

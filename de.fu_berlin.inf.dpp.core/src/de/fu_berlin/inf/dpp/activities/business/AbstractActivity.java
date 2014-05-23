@@ -2,10 +2,13 @@ package de.fu_berlin.inf.dpp.activities.business;
 
 import org.apache.commons.lang.ObjectUtils;
 
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
 import de.fu_berlin.inf.dpp.session.User;
 
-// TODO [MR] Add some information what needs to be done to add a new activityDataObject.
 public abstract class AbstractActivity implements IActivity {
+
+    @XStreamAsAttribute
     private final User source;
 
     /**
@@ -23,6 +26,11 @@ public abstract class AbstractActivity implements IActivity {
             throw new IllegalArgumentException("Source cannot be null");
 
         this.source = source;
+    }
+
+    @Override
+    public boolean isValid() {
+        return source != null;
     }
 
     @Override

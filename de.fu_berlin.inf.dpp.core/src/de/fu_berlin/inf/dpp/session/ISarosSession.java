@@ -24,8 +24,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 
+import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.IResourceActivity;
-import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
@@ -284,7 +284,7 @@ public interface ISarosSession {
     /**
      * FOR INTERNAL USE ONLY !
      */
-    public void exec(List<IActivityDataObject> activityDataObjects);
+    public void exec(List<IActivity> activities);
 
     /**
      * Adds an {@link IActivityProducer} so the production of its activities

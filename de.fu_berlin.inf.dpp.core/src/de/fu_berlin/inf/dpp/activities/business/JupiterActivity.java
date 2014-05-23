@@ -2,9 +2,9 @@ package de.fu_berlin.inf.dpp.activities.business;
 
 import org.apache.commons.lang.ObjectUtils;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.JupiterActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.session.User;
@@ -13,13 +13,17 @@ import de.fu_berlin.inf.dpp.session.User;
  * A JupiterActivity is an Activity that can be handled by the Jupiter
  * Algorithm.
  */
+@XStreamAlias("jupiterActivity")
 public class JupiterActivity extends AbstractResourceActivity {
 
     /**
      * Timestamp that specifies the definition context of the enclosed
      * operation.
      */
+    @XStreamAlias("t")
     private final Timestamp timestamp;
+
+    @XStreamAlias("o")
     private final Operation operation;
 
     public JupiterActivity(Timestamp timestamp, Operation operation,
@@ -76,11 +80,5 @@ public class JupiterActivity extends AbstractResourceActivity {
     @Override
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
-    }
-
-    @Override
-    public IActivityDataObject getActivityDataObject() {
-        return new JupiterActivityDataObject(timestamp, operation, getSource(),
-            getPath());
     }
 }

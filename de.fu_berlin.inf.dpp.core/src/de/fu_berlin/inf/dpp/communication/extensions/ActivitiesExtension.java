@@ -28,27 +28,25 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.serializable.AbstractActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.AbstractProjectActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.ChangeColorActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.ChecksumActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.ChecksumErrorActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.EditorActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.FolderActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.JupiterActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.NOPActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.PermissionActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.ProgressActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.RecoveryFileActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.ShareConsoleActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.StartFollowingActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.StopActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.StopFollowingActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.VCSActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.business.ChangeColorActivity;
+import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
+import de.fu_berlin.inf.dpp.activities.business.ChecksumErrorActivity;
+import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
+import de.fu_berlin.inf.dpp.activities.business.FileActivity;
+import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
+import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
+import de.fu_berlin.inf.dpp.activities.business.NOPActivity;
+import de.fu_berlin.inf.dpp.activities.business.PermissionActivity;
+import de.fu_berlin.inf.dpp.activities.business.ProgressActivity;
+import de.fu_berlin.inf.dpp.activities.business.RecoveryFileActivity;
+import de.fu_berlin.inf.dpp.activities.business.ShareConsoleActivity;
+import de.fu_berlin.inf.dpp.activities.business.StartFollowingActivity;
+import de.fu_berlin.inf.dpp.activities.business.StopActivity;
+import de.fu_berlin.inf.dpp.activities.business.StopFollowingActivity;
+import de.fu_berlin.inf.dpp.activities.business.TextSelectionActivity;
+import de.fu_berlin.inf.dpp.activities.business.VCSActivity;
+import de.fu_berlin.inf.dpp.activities.business.ViewportActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterVectorTime;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
@@ -64,7 +62,7 @@ public class ActivitiesExtension extends SarosSessionPacketExtension {
     public static final Provider PROVIDER = new Provider();
 
     @XStreamImplicit
-    private final List<IActivityDataObject> activityDataObjects;
+    private final List<IActivity> activities;
 
     @XStreamAlias("seq")
     @XStreamAsAttribute
@@ -73,47 +71,43 @@ public class ActivitiesExtension extends SarosSessionPacketExtension {
     /**
      * Creates an object that can be transformed into a
      * {@linkplain PacketExtension} using the provider of this extension. All
-     * object parameters <b>must be</b> not <code>null</code>.
+     * object parameters <b>must not be <code>null</code></b>.
      * 
      * @Note This constructor does not check for correctness of the input
      *       parameters.
      * 
      * @param sessionID
-     *            the session id the {@linkplain IActivityDataObject activity
-     *            data objects} belong to
-     * @param activityDataObjects
-     *            the {@linkplain IActivityDataObject activity data objects}
-     *            that should be included in this extension
+     *            the session id the {@linkplain IActivity activities} belong to
+     * @param activities
+     *            the {@linkplain IActivity activities} that should be included
+     *            in this extension
      * @param sequenceNumber
-     *            the sequence number of the <b>first</b>
-     *            {@linkplain IActivityDataObject activity data object}
+     *            the sequence number of the <b>first</b> {@linkplain IActivity
+     *            activity}
      */
-    public ActivitiesExtension(String sessionID,
-        List<IActivityDataObject> activityDataObjects, int sequenceNumber) {
+    public ActivitiesExtension(String sessionID, List<IActivity> activities,
+        int sequenceNumber) {
         super(sessionID);
-        this.activityDataObjects = activityDataObjects;
+        this.activities = activities;
         this.sequenceNumber = sequenceNumber;
     }
 
     /**
-     * Returns the {@linkplain IActivityDataObject activity data objects}
-     * included in this extension.
+     * Returns the {@linkplain IActivity activities} included in this extension.
      * 
      * @return
      */
-    public List<IActivityDataObject> getActivityDataObjects() {
-        return activityDataObjects;
+    public List<IActivity> getActivities() {
+        return activities;
     }
 
     /**
-     * Returns the sequence number of the first {@linkplain IActivityDataObject
-     * activity data object} in the list returned from
-     * {@link #getActivityDataObjects}.
+     * Returns the sequence number of the first {@linkplain IActivity
+     * activities} in the list returned from {@link #getActivities()}.
      * 
      * <p>
      * All other sequence numbers can be recalculated where the sequence number
-     * of the activity data object from
-     * <code>getActivityDataObjects().get(x)</code> is
+     * of the activity from <code>getActivities().get(x)</code> is
      * <code>getSequenceNumber() + x</code>.
      * </p>
      * 
@@ -124,11 +118,11 @@ public class ActivitiesExtension extends SarosSessionPacketExtension {
     }
 
     /**
-     * @JTourBusStop 7, Activity creation, IActivityDataObject registration:
+     * @JTourBusStop 7, Activity creation, {@link IActivity} registration:
      * 
-     *               All IActivityDataObject implementations should be
-     *               registered with the XStream extensions provider, otherwise
-     *               annotations like XStreamAlias will not be honored.
+     *               All {@link IActivity} implementations should be registered
+     *               with the XStream extensions provider, otherwise annotations
+     *               like XStreamAlias will not be honored.
      */
 
     public static class Provider extends
@@ -158,47 +152,42 @@ public class ActivitiesExtension extends SarosSessionPacketExtension {
                 // SPATH
                 SPath.class,
 
-                // TODO check XStream doc if those two classes are really needed
-                AbstractActivityDataObject.class,
+                // Activities
+                ChangeColorActivity.class,
 
-                AbstractProjectActivityDataObject.class,
+                ChecksumActivity.class,
 
-                // Business ADOs
-                ChangeColorActivityDataObject.class,
+                ChecksumErrorActivity.class,
 
-                ChecksumActivityDataObject.class,
+                EditorActivity.class,
 
-                ChecksumErrorActivityDataObject.class,
+                FileActivity.class,
 
-                EditorActivityDataObject.class,
+                FolderActivity.class,
 
-                FileActivityDataObject.class,
+                JupiterActivity.class,
 
-                FolderActivityDataObject.class,
+                NOPActivity.class,
 
-                JupiterActivityDataObject.class,
+                PermissionActivity.class,
 
-                NOPActivityDataObject.class,
+                ProgressActivity.class,
 
-                PermissionActivityDataObject.class,
+                RecoveryFileActivity.class,
 
-                ProgressActivityDataObject.class,
+                ShareConsoleActivity.class,
 
-                RecoveryFileActivityDataObject.class,
+                StartFollowingActivity.class,
 
-                ShareConsoleActivityDataObject.class,
+                StopActivity.class,
 
-                StartFollowingActivityDataObject.class,
+                StopFollowingActivity.class,
 
-                StopActivityDataObject.class,
+                TextSelectionActivity.class,
 
-                StopFollowingActivityDataObject.class,
+                VCSActivity.class,
 
-                TextSelectionActivityDataObject.class,
-
-                VCSActivityDataObject.class,
-
-                ViewportActivityDataObject.class);
+                ViewportActivity.class);
         }
     }
 }

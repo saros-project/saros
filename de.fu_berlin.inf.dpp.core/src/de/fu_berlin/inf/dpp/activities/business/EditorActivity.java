@@ -21,9 +21,10 @@ package de.fu_berlin.inf.dpp.activities.business;
 
 import org.apache.commons.lang.ObjectUtils;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.serializable.EditorActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -38,12 +39,14 @@ import de.fu_berlin.inf.dpp.session.User;
  * 
  * @author rdjemili
  */
+@XStreamAlias("editorActivity")
 public class EditorActivity extends AbstractResourceActivity {
 
     public static enum Type {
         ACTIVATED, CLOSED, SAVED
     }
 
+    @XStreamAsAttribute
     protected final Type type;
 
     /**
@@ -63,6 +66,15 @@ public class EditorActivity extends AbstractResourceActivity {
         }
 
         this.type = type;
+    }
+
+    @Override
+    public boolean isValid() {
+        /*
+         * path might be null for Type.ACTIVATED, see ctor and TODO in
+         * AbstractResourceActivity#isValid()
+         */
+        return super.isValid() && (getPath() != null || type == Type.ACTIVATED);
     }
 
     public Type getType() {
@@ -102,10 +114,5 @@ public class EditorActivity extends AbstractResourceActivity {
     @Override
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
-    }
-
-    @Override
-    public IActivityDataObject getActivityDataObject() {
-        return new EditorActivityDataObject(getSource(), type, getPath());
     }
 }

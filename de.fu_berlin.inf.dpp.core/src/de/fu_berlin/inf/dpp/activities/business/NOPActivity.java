@@ -1,9 +1,10 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
-import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.NOPActivityDataObject;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import de.fu_berlin.inf.dpp.session.User;
 
+@XStreamAlias("nopActivity")
 public final class NOPActivity extends AbstractActivity implements
     ITargetedActivity {
 
@@ -21,13 +22,13 @@ public final class NOPActivity extends AbstractActivity implements
     }
 
     @Override
-    public void dispatch(IActivityReceiver receiver) {
-        receiver.receive(this);
+    public boolean isValid() {
+        return super.isValid() && (target != null);
     }
 
     @Override
-    public IActivityDataObject getActivityDataObject() {
-        return new NOPActivityDataObject(getSource(), target, id);
+    public void dispatch(IActivityReceiver receiver) {
+        receiver.receive(this);
     }
 
     public int getID() {

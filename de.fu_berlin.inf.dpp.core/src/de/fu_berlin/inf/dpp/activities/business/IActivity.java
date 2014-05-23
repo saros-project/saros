@@ -19,7 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.activities.business;
 
-import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -78,9 +78,31 @@ public interface IActivity {
     public void dispatch(IActivityReceiver receiver);
 
     /**
-     * @return a "stupid" IActivityDataObject which can be used to send this
-     *         {@link IActivity} to peers.
+     * Since deserialization bypasses the class's constructor, this method is
+     * used to ensure only valid objects are given to the business logic.
+     * <p>
+     * In principle, this method should return <code>false</code> for every
+     * object configuration that would lead to an
+     * {@link IllegalArgumentException} if its constructor was used. However,
+     * since this method is only expected to cover deserialization errors, it is
+     * sufficient for implementations to only check for (unwanted)
+     * <code>null</code> values of fields of which the conversions rely on
+     * external states (such as the Saros session), i.e. fields of type
+     * {@link User} and {@link SPath}. The latter are the cases in which
+     * implementations <i>must</i> return <code>false</code>; they are
+     * <i>allowed</i> to return <code>false</code> for all configurations that
+     * would throw an {@link IllegalArgumentException} if the constructor was
+     * used.
+     * <p>
+     * An alternative solution for this could make use of the <a href=
+     * "http://docs.oracle.com/javase/6/docs/api/java/io/Serializable.html">
+     * <code>readResolve()</code></a> method, which could return
+     * <code>null</code> on invalid objects.
+     * 
+     * @return <code>true</code> if this object's state indicates a clean
+     *         deserialization; always <code>true</code> for locally created
+     *         objects
      */
-    public IActivityDataObject getActivityDataObject();
+    public boolean isValid();
 
 }
