@@ -1544,7 +1544,7 @@
                   ifEmpty="false"
                   operator="or">
                <instanceof
-                     value="de.fu_berlin.inf.dpp.ui.model.rosterSession.SessionHeaderElement">
+                     value="de.fu_berlin.inf.dpp.ui.model.session.SessionHeaderElement">
                </instanceof>
             </iterate>
          </with>
