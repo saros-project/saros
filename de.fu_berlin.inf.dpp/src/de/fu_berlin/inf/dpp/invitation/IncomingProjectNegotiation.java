@@ -26,7 +26,6 @@ import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
@@ -239,10 +238,12 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             for (String projectID : localProjects.keySet()) {
                 IProject iProject = localProjects.get(projectID);
                 if (isPartialRemoteProject(projectID)) {
-                    List<IPath> paths = getRemoteFileList(projectID).getPaths();
+                    List<String> paths = getRemoteFileList(projectID)
+                        .getPaths();
                     List<IResource> dependentResources = new ArrayList<IResource>();
-                    for (IPath iPath : paths) {
-                        dependentResources.add(iProject.findMember(iPath));
+
+                    for (String path : paths) {
+                        dependentResources.add(iProject.findMember(path));
                     }
 
                     sarosSession.addSharedResources(
@@ -651,7 +652,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         filesToSynchronize = computeDiff(localFileList, remoteFileList,
             currentLocalProject, projectID);
 
-        List<IPath> missingFiles = new ArrayList<IPath>();
+        List<String> missingFiles = new ArrayList<String>();
         missingFiles.addAll(filesToSynchronize.getAddedPaths());
         missingFiles.addAll(filesToSynchronize.getAlteredPaths());
 
@@ -667,7 +668,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         }
 
         subMonitor.done();
-        return FileListFactory.createPathFileList(missingFiles);
+        return FileListFactory.createFileList(missingFiles);
     }
 
     /**
@@ -693,7 +694,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
         try {
             if (!isPartialRemoteProject(projectID)) {
-                final List<IPath> toDelete = diff.getRemovedPathsSanitized();
+                final List<String> toDelete = diff.getRemovedPathsSanitized();
 
                 /*
                  * WTF !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! THIS IS DELETING
@@ -704,8 +705,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                     @Override
                     public void run(IProgressMonitor progress)
                         throws CoreException {
-                        for (IPath path : toDelete) {
-                            IResource resource = path.hasTrailingSeparator() ? currentLocalProject
+                        for (String path : toDelete) {
+                            IResource resource = path.endsWith("/") ? currentLocalProject
                                 .getFolder(path) : currentLocalProject
                                 .getFile(path);
 
@@ -724,7 +725,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 diff.clearRemovedPaths();
             }
 
-            for (IPath path : diff.getAddedFolders()) {
+            for (String path : diff.getAddedFolders()) {
                 IFolder folder = currentLocalProject.getFolder(path);
                 if (!folder.exists()) {
                     FileUtils.create(folder);
@@ -801,7 +802,9 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             return;
 
         final VCSResourceInfo info = vcs.getCurrentResourceInfo(resource);
-        final IPath path = resource.getProjectRelativePath();
+        final String path = resource.getProjectRelativePath()
+            .toPortableString();
+
         if (resource instanceof IProject) {
             /*
              * We have to revert the project first because the invitee could
@@ -815,7 +818,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
         String url = remoteFileList.getVCSUrl(path);
         String revision = remoteFileList.getVCSRevision(path);
-        List<IPath> paths = remoteFileList.getPaths();
+
         if (url == null || revision == null) {
             // The resource might have been deleted.
             return;
@@ -824,7 +827,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             LOG.trace("Switching " + resource.getName() + " from " + info.url
                 + " to " + url);
             vcs.switch_(resource, url, revision, monitor);
-        } else if (!info.revision.equals(revision) && paths.contains(path)) {
+        } else if (!info.revision.equals(revision)
+            && remoteFileList.getPaths().contains(path)) {
             LOG.trace("Updating " + resource.getName() + " from "
                 + info.revision + " to " + revision);
             vcs.update(resource, revision, monitor);

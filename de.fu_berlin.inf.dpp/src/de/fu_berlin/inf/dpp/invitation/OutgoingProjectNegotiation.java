@@ -13,7 +13,6 @@ import java.util.concurrent.CancellationException;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
@@ -373,7 +372,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     }
 
     private File createProjectArchive(IProgressMonitor monitor,
-        List<IPath> toSend, String projectID) throws IOException,
+        List<String> toSend, String projectID) throws IOException,
         SarosCancellationException {
 
         IProject project = sarosSession.getProject(projectID);

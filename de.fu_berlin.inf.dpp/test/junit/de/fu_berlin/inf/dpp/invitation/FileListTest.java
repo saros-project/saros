@@ -31,8 +31,6 @@ import java.util.Random;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.junit.Test;
 
 import com.thoughtworks.xstream.XStream;
@@ -71,7 +69,7 @@ public class FileListTest extends AbstractFileListTest {
 
     @Test
     public void testGetFilePaths() throws Exception {
-        List<IPath> paths = threeEntryList.getPaths();
+        List<String> paths = threeEntryList.getPaths();
 
         assertPaths(paths, ROOT1, ROOT2, SUBDIR_FILE1);
     }
@@ -95,7 +93,7 @@ public class FileListTest extends AbstractFileListTest {
 
     @Test
     public void testToXmlAndBack() throws Exception {
-        List<IPath> files = new ArrayList<IPath>();
+        List<String> files = new ArrayList<String>();
         StringBuilder builder = new StringBuilder();
         Random random = new Random();
         for (int a = 0; a < 2; a++) {
@@ -106,13 +104,13 @@ public class FileListTest extends AbstractFileListTest {
                     for (int j = 0; j < 5; j++) {
                         builder.append((char) (random.nextInt(26) + 65));
                     }
-                    files.add(new Path("foo1234567890" + i + "/bar1234567890"
-                        + a + "/" + builder.toString()));
+                    files.add("foo1234567890" + i + "/bar1234567890" + a + "/"
+                        + builder.toString());
                 }
             }
         }
 
-        FileList list = FileListFactory.createPathFileList(files);
+        FileList list = FileListFactory.createFileList(files);
         String xml = toXML(list);
         FileList listFromXml = fromXML(xml);
         assertEquals(list, listFromXml);

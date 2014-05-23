@@ -21,6 +21,14 @@ import org.eclipse.core.runtime.Path;
 import org.junit.Before;
 
 public class AbstractFileListTest {
+    /*
+     * TODO Currently, the subclasses of this test both FileList[Diff] and
+     * FileListFactory, which have two very different jobs. The test logic for
+     * FileList[Diff] may mainly rely on plain String inputs, and test the
+     * storing/sorting/retrieving capabilities of the classes under test. The
+     * FileListFactory, in contrast, needs to be tested with regard to its
+     * FileList creation capabilities.
+     */
 
     protected static final String ROOT1 = "root1";
     protected static final String ROOT2 = "root2";
@@ -105,16 +113,19 @@ public class AbstractFileListTest {
         resources.add(fileInSubDir1);
         threeFileList.addAll(resources);
 
-        threeEntryList = new FileList(resources, null, false, null);
+        threeEntryList = FileListFactory.createFileList(null, resources, null,
+            false, null);
 
         resources.add(fileInSubDir2);
 
-        fourEntryList = new FileList(resources, null, false, null);
+        fourEntryList = FileListFactory.createFileList(null, resources, null,
+            false, null);
 
         resources.remove(fileInSubDir1);
         resources.add(fileInSubDir1changed);
 
-        modifiedFourEntryList = new FileList(resources, null, false, null);
+        modifiedFourEntryList = FileListFactory.createFileList(null, resources,
+            null, false, null);
 
         emptyFileList = new FileList();
     }
@@ -170,17 +181,14 @@ public class AbstractFileListTest {
         return folderMock;
     }
 
-    protected void assertPaths(List<IPath> actual, String... expected) {
+    protected void assertPaths(List<String> actual, String... expected) {
         for (int i = 0; i < expected.length; i++) {
-            Path path = new Path(expected[i]);
-            assertTrue("Expected " + path + " to appear in: " + actual,
-                actual.contains(path));
+            assertTrue("Expected " + expected[i] + " to appear in: " + actual,
+                actual.contains(expected[i]));
         }
 
-        assertEquals(
-            Arrays.toString(expected) + " != "
-                + Arrays.toString(actual.toArray()), expected.length,
-            actual.size());
+        assertEquals(Arrays.toString(expected) + " != " + actual,
+            expected.length, actual.size());
     }
 
 }

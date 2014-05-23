@@ -70,19 +70,20 @@ public class FileZipper {
      * 
      */
     public static void createProjectZipArchive(IProject project,
-        List<IPath> paths, File archive, ZipListener listener)
+        List<String> paths, File archive, ZipListener listener)
         throws IOException, OperationCanceledException {
 
         long totalFileSizes = 0;
 
         List<FileWrapper> filesToZip = new ArrayList<FileWrapper>(paths.size());
 
-        for (IPath path : paths) {
-            IPath fileSystemPath = project.getFile(path).getLocation();
+        for (String path : paths) {
+            IFile file = project.getFile(path);
+            IPath fileSystemPath = file.getLocation();
             if (fileSystemPath != null)
                 totalFileSizes += fileSystemPath.toFile().length();
 
-            filesToZip.add(new EclipseFileWrapper(project.getFile(path)));
+            filesToZip.add(new EclipseFileWrapper(file));
         }
 
         internalZipFiles(filesToZip, archive, true, true, totalFileSizes,

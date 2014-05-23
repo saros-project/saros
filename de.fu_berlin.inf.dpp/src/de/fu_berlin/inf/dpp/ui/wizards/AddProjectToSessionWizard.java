@@ -17,7 +17,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
@@ -385,21 +384,20 @@ public class AddProjectToSessionWizard extends Wizard {
                 MessageFormat.format(
                     Messages.AddProjectToSessionWizard_files_affected,
                     projectName), null));
-            for (IPath path : diff.getRemovedPaths()) {
+            for (String path : diff.getRemovedPaths()) {
                 info.add(new Status(IStatus.WARNING, PID, 1, MessageFormat
                     .format(Messages.AddProjectToSessionWizard_file_toRemove,
-                        path.toOSString()), null));
+                        path), null));
             }
-            for (IPath path : diff.getAlteredPaths()) {
+            for (String path : diff.getAlteredPaths()) {
                 info.add(new Status(IStatus.WARNING, PID, 1, MessageFormat
                     .format(
                         Messages.AddProjectToSessionWizard_file_overwritten,
-                        path.toOSString()), null));
+                        path), null));
             }
-            for (IPath path : diff.getAddedPaths()) {
+            for (String path : diff.getAddedPaths()) {
                 info.add(new Status(IStatus.INFO, PID, 1, MessageFormat.format(
-                    Messages.AddProjectToSessionWizard_file_added,
-                    path.toOSString()), null));
+                    Messages.AddProjectToSessionWizard_file_added, path), null));
             }
             info.add(new Status(IStatus.INFO, PID, 1, "", null)); //$NON-NLS-1$
         }
