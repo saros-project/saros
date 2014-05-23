@@ -18,15 +18,16 @@ import java.util.zip.ZipInputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceDescription;
+import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
@@ -58,6 +59,7 @@ import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.EnterProjectNamePage;
 import de.fu_berlin.inf.dpp.util.CoreUtils;
+import de.fu_berlin.inf.dpp.util.FileUtils;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
@@ -649,7 +651,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         filesToSynchronize = computeDiff(localFileList, remoteFileList,
             currentLocalProject, projectID);
 
-        List<IPath> missingFiles = filesToSynchronize.getAddedPaths();
+        List<IPath> missingFiles = new ArrayList<IPath>();
+        missingFiles.addAll(filesToSynchronize.getAddedPaths());
         missingFiles.addAll(filesToSynchronize.getAlteredPaths());
 
         /*
@@ -681,26 +684,54 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * @return A modified FileListDiff which doesn't contain any directories or
      *         files to remove, but just added and altered files.
      */
-    protected FileListDiff computeDiff(FileList localFileList,
-        FileList remoteFileList, IProject currentLocalProject, String projectID)
-        throws IOException {
+    private FileListDiff computeDiff(FileList localFileList,
+        FileList remoteFileList, final IProject currentLocalProject,
+        String projectID) throws IOException {
         LOG.debug(this + " : computing file list difference");
 
-        try {
-            FileListDiff diff = FileListDiff
-                .diff(localFileList, remoteFileList);
+        FileListDiff diff = FileListDiff.diff(localFileList, remoteFileList);
 
+        try {
             if (!isPartialRemoteProject(projectID)) {
+                final List<IPath> toDelete = diff.getRemovedPathsSanitized();
+
                 /*
                  * WTF !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! THIS IS DELETING
                  * FILES !!!!!!!
                  */
-                diff = diff.removeUnneededResources(currentLocalProject,
-                    new NullProgressMonitor());
+                IWorkspace workspace = ResourcesPlugin.getWorkspace();
+                workspace.run(new IWorkspaceRunnable() {
+                    @Override
+                    public void run(IProgressMonitor progress)
+                        throws CoreException {
+                        for (IPath path : toDelete) {
+                            IResource resource = path.hasTrailingSeparator() ? currentLocalProject
+                                .getFolder(path) : currentLocalProject
+                                .getFile(path);
+
+                            /*
+                             * Check if resource exists because it might have
+                             * already been deleted when deleting its folder
+                             */
+                            if (resource.exists()) {
+                                resource.delete(IResource.FORCE
+                                    | IResource.KEEP_HISTORY, null);
+                            }
+                        }
+                    }
+                }, workspace.getRoot(), IWorkspace.AVOID_UPDATE, null);
+
+                diff.clearRemovedPaths();
             }
 
-            diff = diff.addAllFolders(currentLocalProject,
-                new NullProgressMonitor());
+            for (IPath path : diff.getAddedFolders()) {
+                IFolder folder = currentLocalProject.getFolder(path);
+                if (!folder.exists()) {
+                    FileUtils.create(folder);
+                }
+            }
+
+            diff.clearAddedFolders();
 
             return diff;
         } catch (CoreException e) {

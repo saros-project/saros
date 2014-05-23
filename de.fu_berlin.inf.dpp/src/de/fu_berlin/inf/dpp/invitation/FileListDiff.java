@@ -1,23 +1,14 @@
 package de.fu_berlin.inf.dpp.invitation;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRunnable;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.SubMonitor;
 
 import de.fu_berlin.inf.dpp.invitation.FileList.MetaData;
-import de.fu_berlin.inf.dpp.util.FileUtils;
 
 /**
  * A diff between two {@link FileList}s.
@@ -43,57 +34,64 @@ public class FileListDiff {
     private final List<IPath> unaltered = new ArrayList<IPath>();
 
     /**
-     * Returns a new <code>FileListDiff</code> which contains the difference of
-     * the two <code>FileList</code>s.<br>
-     * <br>
+     * Returns a new {@link FileListDiff} which contains the difference of the
+     * two {@link FileList}s.
+     * <p>
      * The diff describes the operations needed to transform <code>base</code>
      * into <code>target</code>. For example, the result's
-     * <code>getAddedPaths()</code> returns the list of files that are present
-     * in <code>target</code>, but not in <code>base</code>.<br>
-     * <br>
+     * {@link #getAddedPaths()} returns the list of files and folders that are
+     * present in <code>target</code>, but not in <code>base</code>.
+     * <p>
      * If either of the two parameters is <code>null</code>, the result is an
      * empty diff.
      * 
      * @param base
-     *            The base <code>FileList</code>.
+     *            The base {@link FileList}.
      * @param target
-     *            The <code>FileList</code> to compare to.
+     *            The {@link FileList} to compare to.
      * 
-     * @return a new <code>FileListDiff</code> which contains the difference
-     *         information of the two <code>FileList</code>s.
+     * @return a new {@link FileListDiff} which contains the difference
+     *         information of the two {@link FileList}s.
      */
     public static FileListDiff diff(FileList base, FileList target) {
         FileListDiff result = new FileListDiff();
+
         if (base == null || target == null)
             return result;
-        // we have to copy the set because we should not work on references when
-        // deleting
+
+        /*
+         * we have to copy the set because we should not work on references when
+         * deleting
+         */
         Set<IPath> baseEntries = new HashSet<IPath>(base.getPaths());
         Set<IPath> targetEntries = new HashSet<IPath>(target.getPaths());
 
-        // determine the paths that don't match the target to delete them
+        /* determine the paths that don't match the target to delete them */
         baseEntries.removeAll(targetEntries);
         result.removed.addAll(baseEntries);
 
-        // determine the paths that are not already present in local workspace
+        /* determine the paths that are not already present in base set */
         baseEntries = new HashSet<IPath>(base.getPaths());
         targetEntries.removeAll(baseEntries);
         result.added.addAll(targetEntries);
 
-        // determine for all matching paths if files are altered
+        /* determine for all matching paths if files are altered */
         targetEntries = new HashSet<IPath>(target.getPaths());
         baseEntries.retainAll(targetEntries);
+
         for (IPath path : baseEntries) {
+            /* folders cannot be altered */
             if (path.hasTrailingSeparator()) {
                 result.unaltered.add(path);
                 continue;
             }
 
-            MetaData fileData = base.getMetaData(path);
-            MetaData otherFileData = target.getMetaData(path);
-            if ((fileData == null && otherFileData == null)
-                || (fileData != null && otherFileData != null)
-                && (fileData.checksum == otherFileData.checksum)) {
+            MetaData baseData = base.getMetaData(path);
+            MetaData targetData = target.getMetaData(path);
+
+            if ((baseData == null && targetData == null)
+                || (baseData != null && targetData != null)
+                && (baseData.checksum == targetData.checksum)) {
                 result.unaltered.add(path);
             } else {
                 result.altered.add(path);
@@ -103,122 +101,103 @@ public class FileListDiff {
         return result;
     }
 
-    public List<IPath> getRemovedPaths() {
-        return removed;
+    /**
+     * Subset of {@link FileList#getPaths() target.getPaths()}: All entries that
+     * do not exist in <code>base</code>.
+     * 
+     * @return Same format as {@link FileList#getPaths()}. It is safe to
+     *         manipulate the returned list; this diff won't be affected.
+     */
+    public List<IPath> getAddedPaths() {
+        return new ArrayList<IPath>(added);
     }
 
+    /**
+     * Subset of {@link FileList#getPaths() target.getPaths()}: All empty
+     * folders that do not exist in <code>base</code>.
+     * 
+     * @return Same format as {@link FileList#getPaths()}. It is safe to
+     *         manipulate the returned list; this diff won't be affected.
+     */
+    public List<IPath> getAddedFolders() {
+        List<IPath> addedFolders = new ArrayList<IPath>();
+
+        for (IPath path : added) {
+            if (path.hasTrailingSeparator()) {
+                addedFolders.add(path);
+            }
+        }
+
+        return addedFolders;
+    }
+
+    /**
+     * Excludes all added empty folders from this diff.
+     */
+    public void clearAddedFolders() {
+        added.removeAll(getAddedFolders());
+    }
+
+    /**
+     * Subset of {@link FileList#getPaths() base.getPaths()}: All entries that
+     * do not exist in <code>target</code>.
+     * 
+     * @return Same format as {@link FileList#getPaths()}. It is safe to
+     *         manipulate the returned list; this diff won't be affected.
+     */
+    public List<IPath> getRemovedPaths() {
+        return new ArrayList<IPath>(removed);
+    }
+
+    /**
+     * Subset of {@link FileList#getPaths() base.getPaths()}: All entries that
+     * do not exist in <code>target</code>, except folders that contain
+     * unaltered entries.
+     * 
+     * @return Same format as {@link FileList#getPaths()}. It is safe to
+     *         manipulate the returned list; this diff won't be affected.
+     */
+    public List<IPath> getRemovedPathsSanitized() {
+        List<IPath> sanitized = getRemovedPaths();
+
+        for (IPath path : unaltered) {
+            for (int i = 0; i < path.segmentCount(); i++) {
+                sanitized.remove(path.removeLastSegments(i));
+            }
+        }
+
+        return sanitized;
+    }
+
+    /**
+     * Excludes all removed paths from this diff.
+     */
     public void clearRemovedPaths() {
         removed.clear();
     }
 
+    /**
+     * Subset of the intersection of {@link FileList#getPaths() base.getPaths()}
+     * and {@link FileList#getPaths() target.getPaths()}: All entries that have
+     * not been changed.
+     * 
+     * @return Same format as {@link FileList#getPaths()}. It is safe to
+     *         manipulate the returned list; this diff won't be affected.
+     */
     public List<IPath> getUnalteredPaths() {
-        return unaltered;
+        return new ArrayList<IPath>(unaltered);
     }
 
-    public List<IPath> getAddedPaths() {
-        return added;
-    }
-
+    /**
+     * Subset of the intersection of {@link FileList#getPaths() base.getPaths()}
+     * and {@link FileList#getPaths() target.getPaths()}: All entries that have
+     * been changed.
+     * 
+     * @return Same format as {@link FileList#getPaths()}. It is safe to
+     *         manipulate the returned list; this diff won't be affected.
+     */
     public List<IPath> getAlteredPaths() {
-        return altered;
-    }
-
-    /* FIXME THIS PERFORMS LOGIC THAT SHOULD BE PLACED ELSEWHERE */
-
-    /**
-     * Will create all folders contained in this FileList for the given project
-     * and return a FileList which does not contain these folders.
-     * 
-     * @throws CoreException
-     */
-    public FileListDiff addAllFolders(IProject localProject,
-        IProgressMonitor monitor) throws CoreException {
-
-        List<IPath> toCheck = this.getAddedPaths();
-        monitor.beginTask("Adding folders", toCheck.size());
-
-        FileListDiff result = new FileListDiff();
-        result.altered.addAll(this.altered);
-        result.removed.addAll(this.removed);
-        result.unaltered.addAll(this.unaltered);
-
-        for (IPath path : toCheck) {
-
-            if (path.hasTrailingSeparator()) {
-                IFolder folder = localProject.getFolder(path);
-                if (!folder.exists()) {
-                    monitor.subTask("Creating folder " + path.lastSegment());
-                    FileUtils.create(folder);
-                    continue;
-                }
-            } else {
-                result.added.add(path);
-            }
-            monitor.worked(1);
-        }
-        monitor.done();
-        return result;
-    }
-
-    /* FIXME THIS PERFORMS LOGIC THAT SHOULD BE PLACED ELSEWHERE */
-
-    /**
-     * Removes all resources marked as removed in this FileList from the given
-     * project.
-     * 
-     * @param localProject
-     *            the local project were the shared project will be replicated.
-     * @throws CoreException
-     */
-    public FileListDiff removeUnneededResources(final IProject localProject,
-        final IProgressMonitor monitor) throws CoreException {
-        // TODO don't throw CoreException
-
-        // TODO Move to FileUtil, refactor FileUtil#delete(IResource).
-        final List<IPath> toDelete = this.getRemovedPaths();
-
-        // don't delete the path of unaltered files
-        List<IPath> toKeep = this.getUnalteredPaths();
-        for (IPath iPath : toKeep) {
-            for (int i = 0; i < iPath.segmentCount(); i++) {
-                toDelete.remove(iPath.removeLastSegments(i));
-            }
-        }
-        IWorkspaceRunnable deleteProcedure = new IWorkspaceRunnable() {
-            @Override
-            public void run(IProgressMonitor progress) throws CoreException {
-                SubMonitor subMonitor = SubMonitor.convert(progress);
-                for (IPath path : toDelete) {
-                    IResource resource = path.hasTrailingSeparator() ? localProject
-                        .getFolder(path) : localProject.getFile(path);
-
-                    // Check if resource exists because it might have already
-                    // been deleted when deleting its folder
-                    if (resource.exists()) {
-                        subMonitor.subTask("Deleting " + path.lastSegment());
-                        resource.delete(IResource.FORCE
-                            | IResource.KEEP_HISTORY, subMonitor.newChild(1));
-                    }
-                }
-                subMonitor.done();
-            }
-        };
-
-        monitor.beginTask("Removing resources", toDelete.size());
-        IWorkspace workspace = ResourcesPlugin.getWorkspace();
-        workspace.run(deleteProcedure, workspace.getRoot(),
-            IWorkspace.AVOID_UPDATE, monitor);
-
-        FileListDiff result = new FileListDiff();
-        result.added.addAll(this.added);
-        result.altered.addAll(this.altered);
-        // Removed is empty now
-        // TODO only if there was no exception
-        result.unaltered.addAll(this.unaltered);
-
-        monitor.done();
-
-        return result;
+        return new ArrayList<IPath>(altered);
     }
 
     @Override
@@ -248,6 +227,13 @@ public class FileListDiff {
             && this.removed.equals(other.removed)
             && this.altered.equals(other.altered)
             && this.unaltered.equals(other.unaltered);
+    }
+
+    @Override
+    public String toString() {
+        return MessageFormat.format(
+            "added {0}, removed {1}, altered {2}, unaltered {3}", added,
+            removed, altered, unaltered);
     }
 
 }

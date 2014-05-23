@@ -461,8 +461,25 @@ public class FileList {
     }
 
     /**
-     * @return a sorted list of all paths in this file list. The paths are
-     *         sorted by their character length.
+     * Returns a sorted list of all paths in this FileList.
+     * <p>
+     * Example: In case the FileList looks like this:
+     * 
+     * <pre>
+     * / A
+     *   / A1.java
+     * / B
+     *   / B2.java
+     *   / B3.java
+     * / C
+     * </pre>
+     * 
+     * then this method returns:
+     * <code>[A/A1.java, B/B2.java, B/B3.java, C/]</code>
+     * 
+     * @return Returns only the leaves of the tree, i.e. folders are only
+     *         included if they don't contain anything. The paths are sorted by
+     *         their character length.
      */
     public List<IPath> getPaths() {
         if (cachedList != null)
