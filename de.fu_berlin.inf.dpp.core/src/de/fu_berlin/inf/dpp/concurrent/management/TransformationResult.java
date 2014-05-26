@@ -8,8 +8,8 @@ import java.util.List;
 
 import org.apache.commons.lang.ObjectUtils;
 
+import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.QueueItem;
-import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.session.User;
 
 public class TransformationResult {

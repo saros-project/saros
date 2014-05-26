@@ -7,6 +7,6 @@
  * are continually exchanging activities invisibly.
  * 
  * Each activity should implement the 
- * {@link de.fu_berlin.inf.dpp.activities.business.IActivity} interface.
+ * {@link de.fu_berlin.inf.dpp.activities.IActivity} interface.
  */
 package de.fu_berlin.inf.dpp.activities;

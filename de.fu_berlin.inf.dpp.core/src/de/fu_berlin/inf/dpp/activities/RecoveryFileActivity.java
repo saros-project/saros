@@ -1,9 +1,8 @@
-package de.fu_berlin.inf.dpp.activities.business;
+package de.fu_berlin.inf.dpp.activities;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**

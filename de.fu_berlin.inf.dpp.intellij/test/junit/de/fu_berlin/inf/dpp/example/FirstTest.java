@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.example;
 import com.intellij.codeHighlighting.HighlightingPass;
 import com.thoughtworks.xstream.XStream;
 import de.fu_berlin.inf.dpp.SarosCoreTestAction;
-import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
+import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import org.junit.Assert;
 import org.junit.Test;
 

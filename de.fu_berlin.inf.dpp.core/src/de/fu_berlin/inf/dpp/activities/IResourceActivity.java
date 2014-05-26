@@ -1,6 +1,5 @@
-package de.fu_berlin.inf.dpp.activities.business;
+package de.fu_berlin.inf.dpp.activities;
 
-import de.fu_berlin.inf.dpp.activities.SPath;
 
 /**
  * An interface for Activities that are resource-related (e.g. FileActivity)

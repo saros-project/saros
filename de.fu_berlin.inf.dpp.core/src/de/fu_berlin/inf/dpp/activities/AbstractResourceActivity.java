@@ -1,10 +1,9 @@
-package de.fu_berlin.inf.dpp.activities.business;
+package de.fu_berlin.inf.dpp.activities;
 
 import org.apache.commons.lang.ObjectUtils;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.session.User;
 
 public abstract class AbstractResourceActivity extends AbstractActivity

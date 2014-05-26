@@ -24,8 +24,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 
-import de.fu_berlin.inf.dpp.activities.business.IActivity;
-import de.fu_berlin.inf.dpp.activities.business.IResourceActivity;
+import de.fu_berlin.inf.dpp.activities.IActivity;
+import de.fu_berlin.inf.dpp.activities.IResourceActivity;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
@@ -294,7 +294,7 @@ public interface ISarosSession {
      *            The session will register an {@link IActivityListener} on this
      *            producer. It is expected that the producer will inform that
      *            listener about new activities via
-     *            {@link IActivityListener#activityCreated(de.fu_berlin.inf.dpp.activities.business.IActivity)
+     *            {@link IActivityListener#activityCreated(IActivity)
      *            activityCreated()}.
      * 
      * @see #removeActivityProducer(IActivityProducer)
@@ -307,8 +307,7 @@ public interface ISarosSession {
      * @param producer
      *            The session will unregister its {@link IActivityListener} from
      *            this producer and it is expected that the producer no longer
-     *            calls
-     *            {@link IActivityListener#activityCreated(de.fu_berlin.inf.dpp.activities.business.IActivity)
+     *            calls {@link IActivityListener#activityCreated(IActivity)
      *            activityCreated()}.
      * 
      * @see #addActivityProducer(IActivityProducer)
@@ -320,11 +319,10 @@ public interface ISarosSession {
      * is to be executed locally.
      * 
      * @param consumer
-     *            The
-     *            {@link IActivityConsumer#exec(de.fu_berlin.inf.dpp.activities.business.IActivity)
-     *            exec()} method of this consumer will be called. "Consume" is
-     *            not meant in a destructive way: all consumers will be called
-     *            for every activity.
+     *            The {@link IActivityConsumer#exec(IActivity) exec()} method of
+     *            this consumer will be called. "Consume" is not meant in a
+     *            destructive way: all consumers will be called for every
+     *            activity.
      * 
      * @see #removeActivityConsumer(IActivityConsumer)
      */

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.activities.business;
+package de.fu_berlin.inf.dpp.activities;
 
 /**
  * @JTourBusStop 6, Activity creation, Triple dispatch abstract class:

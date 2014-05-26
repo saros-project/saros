@@ -8,8 +8,8 @@ import java.util.List;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
-import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.EditorActivity;
+import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.session.User;
 

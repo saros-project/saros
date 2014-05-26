@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.activities;
 import java.util.Collections;
 import java.util.List;
 
-import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.session.User;
 
 public class QueueItem {

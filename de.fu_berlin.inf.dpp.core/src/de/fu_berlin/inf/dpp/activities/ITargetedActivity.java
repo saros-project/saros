@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.activities.business;
+package de.fu_berlin.inf.dpp.activities;
 
 import de.fu_berlin.inf.dpp.session.User;
 

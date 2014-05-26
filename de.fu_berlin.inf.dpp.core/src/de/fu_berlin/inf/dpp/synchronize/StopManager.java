@@ -18,12 +18,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.log4j.Logger;
 import org.picocontainer.Startable;
 
-import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
-import de.fu_berlin.inf.dpp.activities.business.IActivity;
-import de.fu_berlin.inf.dpp.activities.business.IActivityReceiver;
-import de.fu_berlin.inf.dpp.activities.business.StopActivity;
-import de.fu_berlin.inf.dpp.activities.business.StopActivity.State;
-import de.fu_berlin.inf.dpp.activities.business.StopActivity.Type;
+import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
+import de.fu_berlin.inf.dpp.activities.IActivity;
+import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
+import de.fu_berlin.inf.dpp.activities.StopActivity;
+import de.fu_berlin.inf.dpp.activities.StopActivity.State;
+import de.fu_berlin.inf.dpp.activities.StopActivity.Type;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.observables.ObservableValue;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProvider;

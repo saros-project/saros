@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.project.internal;
 
 import java.util.List;
 
-import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
