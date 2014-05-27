@@ -28,8 +28,12 @@ public class SarosCoreTestAction2 extends AnAction {
     public void actionPerformed(AnActionEvent e) {
         Project project = e.getData(PlatformDataKeys.PROJECT);
 
-        final String jabberID = Messages.showInputDialog(project, "Your Jabber-ID (e.g. 'dev1_alice_stf')", "What are your credentials?", Messages.getQuestionIcon());
-        final String password = Messages.showInputDialog(project, "Password (e.g. 'dev')", "What are your credentials?", Messages.getQuestionIcon());
+        final String jabberID = Messages
+            .showInputDialog(project, "Your Jabber-ID (e.g. 'dev1_alice_stf')",
+                "What are your credentials?", Messages.getQuestionIcon());
+        final String password = Messages
+            .showInputDialog(project, "Password (e.g. 'dev')",
+                "What are your credentials?", Messages.getQuestionIcon());
 
         IUPnPAccess upnpAccess = new UPnPAccessImpl();
         IUPnPService upnp = new UPnPServiceImpl(upnpAccess);
@@ -38,13 +42,15 @@ public class SarosCoreTestAction2 extends AnAction {
         XMPPConnectionService service = new XMPPConnectionService(upnp, stun);
 
         try {
-            service.connect(new ConnectionConfiguration("saros-con.imp.fu-berlin.de"), jabberID, password);
+            service.connect(
+                new ConnectionConfiguration("saros-con.imp.fu-berlin.de"),
+                jabberID, password);
 
             String values = "<html><body>Your roster entries are: <ul>";
 
             final Roster roster = service.getRoster();
             final Collection<RosterEntry> entries = roster.getEntries();
-            for (RosterEntry entry : entries){
+            for (RosterEntry entry : entries) {
                 values += "<li>" + entry.getUser() + "</li>";
             }
 
@@ -52,9 +58,11 @@ public class SarosCoreTestAction2 extends AnAction {
 
             values += "</ul>Test successful, connection was closed.</body></html>";
 
-            Messages.showMessageDialog(project, values, "XMPP Connection Test", Messages.getInformationIcon());
+            Messages.showMessageDialog(project, values, "XMPP Connection Test",
+                Messages.getInformationIcon());
         } catch (XMPPException ex) {
-            Messages.showMessageDialog(project, "Something went wrong", "What a pitty ...", Messages.getErrorIcon());
+            Messages.showMessageDialog(project, "Something went wrong",
+                "What a pitty ...", Messages.getErrorIcon());
         }
 
     }

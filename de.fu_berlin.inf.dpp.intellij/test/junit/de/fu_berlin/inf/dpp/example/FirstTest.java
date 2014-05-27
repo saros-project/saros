@@ -11,9 +11,12 @@ public class FirstTest {
 
     @Test
     public void canReferenceClassesAcrossDependencies() {
-        Assert.assertNotNull(SarosCoreTestAction.class); // from saros-i main classpath
-        Assert.assertNotNull(TextEditActivity.class); // from saros core classpath
+        Assert.assertNotNull(
+            SarosCoreTestAction.class); // from saros-i main classpath
+        Assert
+            .assertNotNull(TextEditActivity.class); // from saros core classpath
         Assert.assertNotNull(XStream.class); // from saros core libs
-        Assert.assertNotNull(HighlightingPass.class); // from IntelliJ dependencies
+        Assert.assertNotNull(
+            HighlightingPass.class); // from IntelliJ dependencies
     }
 }
