@@ -1,58 +1,63 @@
 package de.fu_berlin.inf.dpp.activities;
 
 /**
- * @JTourBusStop 5, Activity creation, Triple dispatch interface:
- * 
- *               The below interface is used for the triple dispatch of the
- *               activity providers. For a new IActivity implementation you will
- *               need to add a new receive overload to the interface and fix the
- *               compilation in the AbstractActivityReceiver class.
- */
-/**
- * A Receiver is an interface for handling multiple dispatch in Java.
- * 
- * In our case we want to call one of the specialized receive methods in
- * IActivityReceiver for a given IActivity.
- * 
- * For instance, if an IActivity is a TextSelectionActivity, we want the method
+ * This interface is for implementing multiple dispatch in Java (see <a
+ * href="http://en.wikipedia.org/wiki/Multiple_dispatch">Wikipedia entry</a>).
+ * <p>
+ * In our case we want to call one of the specialized {@code receive()} methods
+ * in {@link IActivityReceiver} for a given {@link IActivity}. For instance, if
+ * an activity is a {@link TextSelectionActivity}, we want the method
  * {@link #receive(TextSelectionActivity)} to be called.
- * 
  */
 public interface IActivityReceiver {
+    /**
+     * @JTourBusStop 3, Creating a new Activity type, Triple dispatch interface:
+     * 
+     *               This interface provides a receive() method for each
+     *               activity implementation. This is part of the so-called
+     *               "triple dispatch" (see "Activity sending" tour). For now,
+     *               it is enough to know that you need to declare a new
+     *               receive() method with your new Activity type in this
+     *               interface (follow the alphabet, please), and then go to the
+     *               next stop in this tour.
+     */
 
-    void receive(ViewportActivity viewportActivity);
+    /***/
 
-    void receive(TextSelectionActivity textSelectionActivity);
-
-    void receive(TextEditActivity textEditActivity);
-
-    void receive(PermissionActivity permissionActivity);
-
-    void receive(FolderActivity folderActivity);
-
-    void receive(FileActivity fileActivity);
-
-    void receive(EditorActivity editorActivity);
-
-    void receive(JupiterActivity jupiterActivity);
-
-    void receive(StopActivity stopActivity);
+    void receive(ChangeColorActivity changeColorActivity);
 
     void receive(ChecksumActivity checksumActivity);
 
     void receive(ChecksumErrorActivity checksumErrorActivity);
 
-    void receive(ProgressActivity progressActivity);
+    void receive(EditorActivity editorActivity);
 
-    void receive(VCSActivity activity);
+    void receive(FileActivity fileActivity);
 
-    void receive(ChangeColorActivity changeColorActivity);
+    void receive(FolderActivity folderActivity);
 
-    void receive(StartFollowingActivity startFollowingActivity);
-
-    void receive(StopFollowingActivity stopFollowingActivity);
+    void receive(JupiterActivity jupiterActivity);
 
     void receive(NOPActivity nopActivity);
 
+    void receive(PermissionActivity permissionActivity);
+
+    void receive(ProgressActivity progressActivity);
+
     void receive(ShareConsoleActivity shareConsoleActivity);
+
+    void receive(StartFollowingActivity startFollowingActivity);
+
+    void receive(StopActivity stopActivity);
+
+    void receive(StopFollowingActivity stopFollowingActivity);
+
+    void receive(TextEditActivity textEditActivity);
+
+    void receive(TextSelectionActivity textSelectionActivity);
+
+    void receive(ViewportActivity viewportActivity);
+
+    void receive(VCSActivity activity);
+
 }

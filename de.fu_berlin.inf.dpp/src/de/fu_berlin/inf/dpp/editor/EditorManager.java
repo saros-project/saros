@@ -55,13 +55,13 @@ import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
+import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
-import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.RemoteEditorManager.RemoteEditor;
 import de.fu_berlin.inf.dpp.editor.RemoteEditorManager.RemoteEditorState;
@@ -191,6 +191,23 @@ public class EditorManager extends AbstractActivityProvider {
                 editorPool.getAllEditors());
         }
     };
+
+    /**
+     * @JTourBusStop 7, Creating a new Activity type, Waiting for incoming
+     *               activities:
+     * 
+     *               All you have to do on the receiver's side, is to create a
+     *               new AbstractActivityReceiver (or amend an existing one),
+     *               provide it with an receive() method of your newly created
+     *               flavor, and react on the incoming activity.
+     * 
+     *               In case you had to create a new AbstractActivityReceiver
+     *               (because there was no existing one), you'll need to extend
+     *               AbstractActivityProvider, so you can override the exec()
+     *               method and call "activity.dispatch(yourActivityReceiver)".
+     */
+
+    /***/
 
     private IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
         @Override
@@ -573,6 +590,24 @@ public class EditorManager extends AbstractActivityProvider {
 
         editorListenerDispatch.activeEditorChanged(sarosSession.getLocalUser(),
             path);
+
+        /**
+         * @JTourBusStop 6, Creating a new Activity type, Create activity
+         *               instances of your new type:
+         * 
+         *               Now you are prepared to make use of your new activity
+         *               type: Find a place in the business logic where to react
+         *               on the events you want to send as an Activity to the
+         *               other session participants. However, it is not unusual
+         *               to create that piece of business logic anew.
+         * 
+         *               Anyway, once you found a place where to wait for
+         *               certain things to happen, you can create new activity
+         *               instances of your type there and hand them over to
+         *               fireActivity() -- assuming your business logic class
+         *               extends AbstractActivityProvider, of course. That's all
+         *               for the sender's side.
+         */
 
         fireActivity(new EditorActivity(sarosSession.getLocalUser(),
             Type.ACTIVATED, path));

@@ -12,9 +12,22 @@ public abstract class AbstractActivity implements IActivity {
     private final User source;
 
     /**
-     * @JTourBusStop 2, Activity creation, The abstract class to extend from:
+     * @JTourBusStop 2, Creating a new Activity type, The abstract class to
+     *               extend:
      * 
-     *               A new activity implementation should inherit this class.
+     *               Instead of directly implementing IActivity, any new
+     *               activity type should extends this class.
+     * 
+     *               However, there is an important subtype of activities: An
+     *               activity that refers to a resource, such as a file, should
+     *               implement the more specialized IResourceActivity interface.
+     *               And guess what, there is an abstract class for this
+     *               interface, too: AbstractResourceActivity.
+     * 
+     *               So once you decided which of these two abstract classes to
+     *               extend, you can provide your new class with all fields and
+     *               methods you deem necessary, and then continue with the next
+     *               stop.
      */
 
     /**

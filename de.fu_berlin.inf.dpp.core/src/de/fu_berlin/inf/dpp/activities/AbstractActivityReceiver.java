@@ -1,18 +1,29 @@
 package de.fu_berlin.inf.dpp.activities;
 
 /**
- * @JTourBusStop 6, Activity creation, Triple dispatch abstract class:
- * 
- *               Instead of having to create stubs for all IActivity implementations
- *               not handled you can extend this abstract class and just re-implement
- *               the method for your new IActivity implementation.
- */
-/**
- * Abstract implementation of IActivityReceiver which does nothing.
+ * Abstract implementation of IActivityReceiver, which does nothing.
  * 
  * Useful, if just interested in some particular IActivity
  */
 public class AbstractActivityReceiver implements IActivityReceiver {
+
+    /**
+     * @JTourBusStop 4, Creating a new Activity type, Triple dispatch abstract
+     *               class:
+     * 
+     *               Instead of creating stubs for all receive() variants for
+     *               IActivity types you're not even interested in, you can
+     *               extend this abstract class and just override the one (or
+     *               few) method(s) you actually care about.
+     * 
+     *               So once you added a new receive() variant to
+     *               IActivityReceiver, make sure to add a null-implementation
+     *               for your new activity type here, to unburden all *other*
+     *               IActivityReceiver implementations from having to implement
+     *               the receive() method for *your* new activity.
+     */
+
+    /***/
 
     @Override
     public void receive(ChangeColorActivity changeColorActivity) {
@@ -65,6 +76,11 @@ public class AbstractActivityReceiver implements IActivityReceiver {
     }
 
     @Override
+    public void receive(ShareConsoleActivity shareConsoleActivity) {
+        // do nothing
+    }
+
+    @Override
     public void receive(StartFollowingActivity startFollowingActivity) {
         // do nothing
     }
@@ -99,8 +115,4 @@ public class AbstractActivityReceiver implements IActivityReceiver {
         // do nothing
     }
 
-    @Override
-    public void receive(ShareConsoleActivity shareConsoleActivity) {
-        // do nothing
-    }
 }

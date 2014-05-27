@@ -16,17 +16,6 @@ import de.fu_berlin.inf.dpp.session.User;
 public class ChangeColorActivity extends AbstractActivity implements
     ITargetedActivity {
 
-    /**
-     * @JTourBusStop 3, Activity creation, Creating another representation:
-     * 
-     *               TODO Rework this tour.
-     */
-    /**
-     * @JTourBusStop 4, Activity creation, Going back to the IActivity:
-     * 
-     *               TODO Rework this tour.
-     */
-
     @XStreamAsAttribute
     protected final User target;
 

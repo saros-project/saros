@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.activities;
 
-
 /**
  * An interface for Activities that are resource-related (e.g. FileActivity)
  */

@@ -118,12 +118,24 @@ public class ActivitiesExtension extends SarosSessionPacketExtension {
     }
 
     /**
-     * @JTourBusStop 7, Activity creation, {@link IActivity} registration:
+     * @JTourBusStop 5, Creating a new Activity type, XStream registration:
      * 
-     *               All {@link IActivity} implementations should be registered
-     *               with the XStream extensions provider, otherwise annotations
-     *               like XStreamAlias will not be honored.
+     *               We use the XStream library to convert handy Java objects to
+     *               easy-to-send XML string and vice versa. To beautify this
+     *               XML output, we make use of annotations (such as
+     *               XStreamAlias or XStreamAsAttribute).
+     * 
+     *               To make a long story short: Just add your new activity type
+     *               to the list below, so any annotations you might want to use
+     *               will be honored. And again, please remember the alphabet.
+     * 
+     *               Since you now know about XStream annotations, you might
+     *               want to go back to your new class and add some of these?
+     *               You can take a look at other activity classes for
+     *               inspiration.
      */
+
+    /***/
 
     public static class Provider extends
         SarosSessionPacketExtension.Provider<ActivitiesExtension> {

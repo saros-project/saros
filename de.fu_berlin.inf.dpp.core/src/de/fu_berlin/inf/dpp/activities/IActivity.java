@@ -19,7 +19,6 @@
  */
 package de.fu_berlin.inf.dpp.activities;
 
-import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -38,16 +37,19 @@ import de.fu_berlin.inf.dpp.session.User;
 public interface IActivity {
 
     /**
-     * @JTourBusStop 1, Activity creation, The activity interface:
+     * @JTourBusStop 1, Creating a new Activity type, The IActivity interface:
      * 
-     *               This is the interface for all activity implementations,
-     *               there is a specialization called IResourceActivity. An
-     *               activity implementation that refers to a resource, e.g. a
-     *               file, should implement the IResourceActivity interface.
+     *               This tour explains what you need to consider when you want
+     *               to create a new Activity type.
      * 
-     *               The only attribute of an activity instance is the source,
-     *               that is the user that caused the initial creation of the
-     *               activity instance.
+     *               IActivity is the base interface for all activity
+     *               implementations. The only attribute of an IActivity
+     *               instance is the source, that is the session participant who
+     *               did "something" and therefore caused this activity in the
+     *               first place.
+     * 
+     *               So create a new class in the "activities" package with the
+     *               suffix "Activity" and continue with the next stop.
      */
     /**
      * @JTourBusStop 3, Some Basics:
@@ -61,6 +63,7 @@ public interface IActivity {
      *               Handling of Activities is done using the Inversion of
      *               Control pattern.
      */
+
     /**
      * Returns the user who caused this activity.
      * 
@@ -69,11 +72,21 @@ public interface IActivity {
     public User getSource();
 
     /**
-     * The activity will call the receive method of the given receiver with the
-     * actual type of this IActivity.
+     * Any implementation of IActivity needs to override this method in the
+     * following way:
      * 
-     * For instance if dispatch is called on a FolderActivity it will call
-     * {@link IActivityReceiver#receive(FolderActivity)}
+     * <pre>
+     * &#064;Override
+     * <b>public void</b> dispatch(IActivityReceiver receiver) {
+     *     receiver.receive(<b>this</b>);
+     * }
+     * </pre>
+     * 
+     * This way, the matching {@code receive()} method of the given
+     * {@code receiver} will be called, which effectively provides the
+     * {@code receiver} with a type-safe activity object (type-safety is also
+     * the reason why this method cannot be inherited from a common super class,
+     * although the characters of the method body are always the same).
      */
     public void dispatch(IActivityReceiver receiver);
 
