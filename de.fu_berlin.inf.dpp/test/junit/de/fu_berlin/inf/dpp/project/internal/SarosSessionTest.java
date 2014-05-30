@@ -326,15 +326,34 @@ public class SarosSessionTest {
             countingReceiver.getCurrentPacketListenersCount());
 
         Assert.assertTrue(workspaceListeners.isEmpty());
+
+        StopManager stopManager3 = (StopManager) session
+            .getComponent(StopManager.class);
+
+        Assert.assertNull(
+            "component must not be available before the session is started",
+            stopManager3);
+
         session.start();
 
         StopManager stopManager1 = session.getStopManager();
         StopManager stopManager2 = session.getStopManager();
         Assert.assertSame(stopManager1, stopManager2);
+
+        stopManager3 = (StopManager) session.getComponent(StopManager.class);
+
+        Assert.assertSame(stopManager2, stopManager3);
+
         Assert.assertTrue(session.getActivityProviderCount() > 0);
         Assert.assertFalse(workspaceListeners.isEmpty());
 
         session.stop();
+
+        stopManager3 = (StopManager) session.getComponent(StopManager.class);
+        Assert.assertNull(
+            "component must not be available after the session is stopped",
+            stopManager3);
+
         Assert.assertTrue(editorListeners.isEmpty());
         Assert.assertEquals(0, session.getActivityProviderCount());
         Assert.assertTrue(workspaceListeners.isEmpty());

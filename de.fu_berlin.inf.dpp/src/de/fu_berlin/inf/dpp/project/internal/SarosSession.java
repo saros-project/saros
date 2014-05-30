@@ -168,6 +168,8 @@ public final class SarosSession implements ISarosSession {
 
     private final ActivityQueuer activityQueuer;
 
+    private final Object componentAccessLock = new Object();
+
     // HACK to be able to move most parts to core
     private final SharedResourcesManager resourceManager;
 
@@ -600,7 +602,6 @@ public final class SarosSession implements ISarosSession {
             throw new IllegalStateException();
         }
 
-        started = true;
         sessionContainer.start();
 
         for (User user : getRemoteUsers())
@@ -612,6 +613,10 @@ public final class SarosSession implements ISarosSession {
 
         userConverter = new UserConverter(this);
         ActivitiesExtension.PROVIDER.registerConverter(userConverter);
+
+        synchronized (componentAccessLock) {
+            started = true;
+        }
     }
 
     /**
@@ -627,7 +632,10 @@ public final class SarosSession implements ISarosSession {
             throw new IllegalStateException();
         }
 
-        stopped = true;
+        synchronized (componentAccessLock) {
+            stopped = true;
+        }
+
         sarosContext.removeChildContainer(sessionContainer);
         sessionContainer.stop();
         sessionContainer.dispose();
@@ -980,6 +988,23 @@ public final class SarosSession implements ISarosSession {
             projectMapper.removeProject(projectID);
             // HACK
             resourceManager.projectRemoved(project);
+        }
+    }
+
+    @Override
+    public Object getComponent(Object key) {
+        /*
+         * Ensure that we return null when the session is about to start or stop
+         * because the MutablePicoContainer#start/stop/dispose method is
+         * synchronized and may cause a deadlock if the method is called from
+         * the UI thread while a component may call #syncExec inside the start
+         * or stop methods.
+         */
+        synchronized (componentAccessLock) {
+            if (stopped || !started)
+                return null;
+
+            return sessionContainer.getComponent(key);
         }
     }
 

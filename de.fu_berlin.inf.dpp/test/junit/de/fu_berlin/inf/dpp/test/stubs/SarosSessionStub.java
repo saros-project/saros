@@ -318,4 +318,9 @@ public class SarosSessionStub implements ISarosSession {
     public void removeActivityConsumer(IActivityConsumer consumer) {
         throw new RuntimeException("Unexpected call to Stub");
     }
+
+    @Override
+    public Object getComponent(Object key) {
+        throw new RuntimeException("Unexpected call to Stub");
+    }
 }

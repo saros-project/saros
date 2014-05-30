@@ -549,4 +549,19 @@ public interface ISarosSession {
      * @return the id of the current session
      */
     public String getID();
+
+    /**
+     * Returns the session runtime component with the given key.
+     * 
+     * @param key
+     *            the key of the component
+     * @return the runtime component or <code>null</code> if the component is
+     *         either not available or does not exists
+     * 
+     * @deprecated This method should be used with great care. It is up to to
+     *             the caller to ensure that the returned reference can be
+     *             garbage collected when the session has stopped
+     */
+    @Deprecated
+    public Object getComponent(Object key);
 }

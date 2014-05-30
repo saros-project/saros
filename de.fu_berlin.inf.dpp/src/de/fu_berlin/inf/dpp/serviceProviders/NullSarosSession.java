@@ -320,4 +320,10 @@ public class NullSarosSession implements ISarosSession {
         log.warn("unexpected method call");
     }
 
+    @Override
+    public Object getComponent(Object key) {
+        log.warn("unexpected method call");
+        return null;
+    }
+
 }
