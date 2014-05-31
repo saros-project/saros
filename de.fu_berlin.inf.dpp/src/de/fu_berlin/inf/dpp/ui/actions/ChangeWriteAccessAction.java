@@ -10,7 +10,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.PlatformUI;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
@@ -125,21 +124,14 @@ public class ChangeWriteAccessAction extends Action implements Disposable {
     }
 
     private void updateEnablement() {
-        try {
-            List<User> participants = SelectionRetrieverFactory
-                .getSelectionRetriever(User.class).getSelection();
+        List<User> participants = SelectionRetrieverFactory
+            .getSelectionRetriever(User.class).getSelection();
 
-            boolean sessionRunning = (sessionManager.getSarosSession() != null);
-            boolean selectedOneWithOppositePermission = (participants.size() == 1 && participants
-                .get(0).getPermission() != permission);
+        boolean sessionRunning = (sessionManager.getSarosSession() != null);
+        boolean selectedOneWithOppositePermission = (participants.size() == 1 && participants
+            .get(0).getPermission() != permission);
 
-            setEnabled(sessionRunning && selectedOneWithOppositePermission);
-        } catch (NullPointerException e) {
-            setEnabled(false);
-        } catch (Exception e) {
-            if (!PlatformUI.getWorkbench().isClosing())
-                LOG.error("Unexcepted error while updating enablement", e); //$NON-NLS-1$
-        }
+        setEnabled(sessionRunning && selectedOneWithOppositePermission);
     }
 
     @Override
