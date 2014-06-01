@@ -12,15 +12,14 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
-import org.jivesoftware.smack.Connection;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
+import de.fu_berlin.inf.dpp.communication.connection.IConnectionStateListener;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
@@ -58,10 +57,10 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator,
 
     private boolean isConnectionError;
 
-    private final IConnectionListener connectionListener = new IConnectionListener() {
+    private final IConnectionStateListener connectionStateListener = new IConnectionStateListener() {
         @Override
-        public void connectionStateChanged(final Connection connection,
-            final ConnectionState state) {
+        public void connectionStateChanged(final ConnectionState state,
+            final Exception error) {
             SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
 
                 @Override
@@ -79,7 +78,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator,
         setText(Messages.ChangeXMPPAccountAction_connect);
         setId(ACTION_ID);
 
-        connectionHandler.addConnectionListener(connectionListener);
+        connectionHandler.addConnectionStateListener(connectionStateListener);
         setMenuCreator(this);
         updateStatus(connectionHandler.getConnectionState());
     }
@@ -96,7 +95,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator,
 
     @Override
     public void dispose() {
-        connectionHandler.removeConnectionListener(connectionListener);
+        connectionHandler.removeConnectionStateListener(connectionStateListener);
     }
 
     @Override

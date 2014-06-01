@@ -3,10 +3,12 @@ package de.fu_berlin.inf.dpp.communication.connection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.net.proxy.IProxyData;
 import org.eclipse.core.net.proxy.IProxyService;
+import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.proxy.ProxyInfo;
@@ -42,8 +44,25 @@ public class ConnectionHandler {
 
     private volatile IConnectingFailureCallback callback;
 
+    private List<IConnectionStateListener> stateListeners = new CopyOnWriteArrayList<IConnectionStateListener>();
+
     private boolean isConnecting;
     private boolean isDisconnecting;
+
+    private final IConnectionListener xmppConnectionListener = new IConnectionListener() {
+
+        @Override
+        public void connectionStateChanged(Connection connection,
+            ConnectionState state) {
+
+            final Exception error = state == ConnectionState.ERROR ? connectionService
+                .getConnectionError() : null;
+
+            for (IConnectionStateListener listener : stateListeners)
+                listener.connectionStateChanged(state, error);
+        }
+
+    };
 
     public ConnectionHandler(final XMPPConnectionService connectionService,
         final DataTransferManager transferManager,
@@ -52,6 +71,8 @@ public class ConnectionHandler {
         this.transferManager = transferManager;
         this.accountStore = accountStore;
         this.preferences = preferences;
+
+        this.connectionService.addListener(xmppConnectionListener);
     }
 
     /**
@@ -69,24 +90,21 @@ public class ConnectionHandler {
     }
 
     /**
-     * @see XMPPConnectionService#isConnected()
+     * Checks if a connection is currently established.
+     * 
+     * @return <code>true</code> if a connection is established,
+     *         <code>false</code> otherwise
      */
     public boolean isConnected() {
         return connectionService.isConnected();
     }
 
-    /**
-     * @see XMPPConnectionService#addListener(IConnectionListener)
-     */
-    public void addConnectionListener(IConnectionListener listener) {
-        connectionService.addListener(listener);
+    public void addConnectionStateListener(IConnectionStateListener listener) {
+        stateListeners.add(listener);
     }
 
-    /**
-     * @see XMPPConnectionService#removeListener(IConnectionListener)
-     */
-    public void removeConnectionListener(IConnectionListener listener) {
-        connectionService.removeListener(listener);
+    public void removeConnectionStateListener(IConnectionStateListener listener) {
+        stateListeners.remove(listener);
     }
 
     /**

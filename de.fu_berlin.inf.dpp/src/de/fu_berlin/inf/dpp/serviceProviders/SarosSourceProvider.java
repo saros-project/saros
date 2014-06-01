@@ -9,14 +9,13 @@ import org.eclipse.ui.AbstractSourceProvider;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
-import org.jivesoftware.smack.Connection;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
+import de.fu_berlin.inf.dpp.communication.connection.IConnectionStateListener;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
@@ -64,10 +63,10 @@ public class SarosSourceProvider extends AbstractSourceProvider {
     @Inject
     private ConnectionHandler connectionHandler;
 
-    protected IConnectionListener connectionListener = new IConnectionListener() {
+    protected IConnectionStateListener connectionStateListener = new IConnectionStateListener() {
         @Override
-        public void connectionStateChanged(Connection connection,
-            ConnectionState newState) {
+        public void connectionStateChanged(final ConnectionState state,
+            final Exception error) {
             connectionChanged();
         }
     };
@@ -88,7 +87,7 @@ public class SarosSourceProvider extends AbstractSourceProvider {
 
     public SarosSourceProvider() {
         SarosPluginContext.initComponent(this);
-        connectionHandler.addConnectionListener(connectionListener);
+        connectionHandler.addConnectionStateListener(connectionStateListener);
 
         sarosSessionManager.addSarosSessionListener(sarosSessionListener);
 
@@ -100,7 +99,8 @@ public class SarosSourceProvider extends AbstractSourceProvider {
     @Override
     public void dispose() {
         sarosSessionManager.removeSarosSessionListener(sarosSessionListener);
-        connectionHandler.removeConnectionListener(connectionListener);
+        connectionHandler
+            .removeConnectionStateListener(connectionStateListener);
     }
 
     @Override
