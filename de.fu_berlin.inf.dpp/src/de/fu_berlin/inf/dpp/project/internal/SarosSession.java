@@ -1089,6 +1089,7 @@ public final class SarosSession implements ISarosSession {
         sessionContainer.addComponent(ChangeColorManager.class);
         sessionContainer.addComponent(SharedResourcesManager.class);
         sessionContainer.addComponent(PermissionManager.class);
+        sessionContainer.addComponent(FollowingActivitiesManager.class);
 
         // Statistic collectors. Make sure to add new collectors to the
         // StatisticCollectorTest as well

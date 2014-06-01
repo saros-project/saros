@@ -47,11 +47,10 @@ public class SessionContentProvider extends TreeContentProvider {
     private Roster currentRoster;
     private ISarosSession currentSession;
 
-    @Inject
-    private EditorManager editorManager;
+    private FollowingActivitiesManager followingTracker;
 
     @Inject
-    private FollowingActivitiesManager followingActivitiesManager;
+    private EditorManager editorManager;
 
     public SessionContentProvider(TreeContentProvider additionalContent) {
         SarosPluginContext.initComponent(this);
@@ -59,9 +58,6 @@ public class SessionContentProvider extends TreeContentProvider {
         this.additionalContentProvider = additionalContent;
 
         editorManager.addSharedEditorListener(sharedEditorListener);
-        followingActivitiesManager
-            .addIinternalListener(followModeChangesListener);
-
     }
 
     private final IFollowModeChangesListener followModeChangesListener = new IFollowModeChangesListener() {
@@ -173,7 +169,10 @@ public class SessionContentProvider extends TreeContentProvider {
 
         final ISarosSession oldSession = getSession(oldInput);
 
-        final ISarosSession newSession = getSession(newInput);
+        final ISarosSession newSession = currentSession = getSession(newInput);
+
+        if (followingTracker != null)
+            followingTracker.removeListener(followModeChangesListener);
 
         if (additionalContentProvider != null)
             additionalContentProvider.inputChanged(viewer,
@@ -195,8 +194,15 @@ public class SessionContentProvider extends TreeContentProvider {
         if (newRoster != null)
             newRoster.addRosterListener(rosterListener);
 
-        if (newSession != null)
+        if (newSession != null) {
             newSession.addListener(sharedProjectListener);
+
+            followingTracker = (FollowingActivitiesManager) newSession
+                .getComponent(FollowingActivitiesManager.class);
+
+            if (followingTracker != null)
+                followingTracker.addListener(followModeChangesListener);
+        }
 
     }
 
@@ -238,8 +244,8 @@ public class SessionContentProvider extends TreeContentProvider {
 
         editorManager.removeSharedEditorListener(sharedEditorListener);
 
-        followingActivitiesManager
-            .removeIinternalListener(followModeChangesListener);
+        if (followingTracker != null)
+            followingTracker.removeListener(followModeChangesListener);
 
         if (additionalContentProvider != null)
             additionalContentProvider.dispose();
@@ -251,7 +257,7 @@ public class SessionContentProvider extends TreeContentProvider {
         currentRoster = null;
         editorManager = null;
         additionalContentProvider = null;
-        followingActivitiesManager = null;
+        followingTracker = null;
     }
 
     /**

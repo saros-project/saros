@@ -44,7 +44,6 @@ import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ColorNegotiationHook;
-import de.fu_berlin.inf.dpp.project.internal.FollowingActivitiesManager;
 import de.fu_berlin.inf.dpp.versioning.VersionManager;
 
 /**
@@ -113,7 +112,6 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
         Component.create(SessionIDObservable.class),
         Component.create(SarosSessionObservable.class),
         Component.create(AwarenessInformationCollector.class),
-        Component.create(FollowingActivitiesManager.class),
 
         // Handlers
         Component.create(CancelInviteHandler.class),

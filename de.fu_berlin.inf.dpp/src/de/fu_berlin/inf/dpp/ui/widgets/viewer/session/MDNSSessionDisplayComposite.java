@@ -62,8 +62,13 @@ public class MDNSSessionDisplayComposite extends ViewerComposite<TreeViewer> {
     private ViewerFilter filter;
 
     private final ISarosSessionListener sarosSessionListener = new AbstractSarosSessionListener() {
+        /*
+         * do not use sessionStarting as the context may still start and so we
+         * get null in session#getComponent call in the SessionContentProvider
+         * class !
+         */
         @Override
-        public void sessionStarting(final ISarosSession session) {
+        public void sessionStarted(final ISarosSession session) {
             SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
 
                 @Override

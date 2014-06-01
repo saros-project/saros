@@ -1,22 +1,21 @@
 package de.fu_berlin.inf.dpp.project.internal;
 
-import java.text.MessageFormat;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
+import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.IActivity;
+import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.StartFollowingActivity;
 import de.fu_berlin.inf.dpp.activities.StopFollowingActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
@@ -28,40 +27,79 @@ import de.fu_berlin.inf.dpp.session.User;
  * @author Alexander Waldmann (contact@net-corps.de)
  */
 @Component(module = "core")
-public class FollowingActivitiesManager extends AbstractActivityProvider {
+public class FollowingActivitiesManager extends AbstractActivityProvider
+    implements Startable {
 
-    private static final Logger log = Logger
+    private static final Logger LOG = Logger
         .getLogger(FollowingActivitiesManager.class);
 
-    protected final List<IFollowModeChangesListener> internalListeners = new LinkedList<IFollowModeChangesListener>();
-    protected ISarosSession sarosSession;
-    protected AwarenessInformationCollector awarenessInformationCollector;
+    private final List<IFollowModeChangesListener> listeners = new CopyOnWriteArrayList<IFollowModeChangesListener>();
 
-    public FollowingActivitiesManager(ISarosSessionManager sessionManager,
-        EditorManager editorManager,
-        AwarenessInformationCollector awarenessInformationCollector) {
-        this.awarenessInformationCollector = awarenessInformationCollector;
-        sessionManager.addSarosSessionListener(sessionListener);
-        editorManager
-            .addSharedEditorListener(new AbstractSharedEditorListener() {
-                @Override
-                public void followModeChanged(User followedUser,
-                    boolean isFollowed) {
-                    if (sarosSession == null) {
-                        log.error("FollowModeChanged Event listener got a call without a running session.");
-                        return;
-                    }
+    private final ISarosSession session;
 
-                    if (isFollowed) {
-                        fireActivity(new StartFollowingActivity(sarosSession
-                            .getLocalUser(), followedUser));
-                    } else {
-                        fireActivity(new StopFollowingActivity(sarosSession
-                            .getLocalUser()));
+    private final AwarenessInformationCollector collector;
 
-                    }
-                }
-            });
+    private final EditorManager editor;
+
+    private final ISharedEditorListener followModeListener = new AbstractSharedEditorListener() {
+        @Override
+        public void followModeChanged(User followedUser, boolean isFollowed) {
+
+            if (isFollowed) {
+                fireActivity(new StartFollowingActivity(session.getLocalUser(),
+                    followedUser));
+            } else {
+                fireActivity(new StopFollowingActivity(session.getLocalUser()));
+            }
+        }
+    };
+
+    private final IActivityReceiver receiver = new AbstractActivityReceiver() {
+        @Override
+        public void receive(StartFollowingActivity activity) {
+            final User source = activity.getSource();
+            final User target = activity.getFollowedUser();
+
+            if (LOG.isDebugEnabled())
+                LOG.debug("received new follow mode from: " + source
+                    + " , followed: " + target);
+
+            collector.setUserFollowing(source, target);
+            notifyListeners();
+        }
+
+        @Override
+        public void receive(StopFollowingActivity activity) {
+            User source = activity.getSource();
+
+            if (LOG.isDebugEnabled())
+                LOG.debug("user " + source + " stopped follow mode");
+
+            collector.setUserFollowing(source, null);
+            notifyListeners();
+        }
+    };
+
+    public FollowingActivitiesManager(final ISarosSession session,
+        final AwarenessInformationCollector collector,
+        final EditorManager editor) {
+        this.session = session;
+        this.collector = collector;
+        this.editor = editor;
+    }
+
+    @Override
+    public void start() {
+        collector.flushFollowModes();
+        installProvider(session);
+        editor.addSharedEditorListener(followModeListener);
+    }
+
+    @Override
+    public void stop() {
+        uninstallProvider(session);
+        editor.removeSharedEditorListener(followModeListener);
+        collector.flushFollowModes();
     }
 
     @Override
@@ -69,68 +107,16 @@ public class FollowingActivitiesManager extends AbstractActivityProvider {
         activity.dispatch(receiver);
     }
 
-    protected AbstractActivityReceiver receiver = new AbstractActivityReceiver() {
-        @Override
-        public void receive(StartFollowingActivity activity) {
-            User user = activity.getSource();
-            if (!user.isInSarosSession()) {
-                throw new IllegalArgumentException(MessageFormat.format(
-                    "illegal follow mode activity received", user));
-            }
-
-            log.info("Received new follow mode from: "
-                + user.getHumanReadableName() + " followed User: "
-                + activity.getFollowedUser().getHumanReadableName());
-
-            awarenessInformationCollector.setUserFollowing(user,
-                activity.getFollowedUser());
-            notifyListeners();
-        }
-
-        @Override
-        public void receive(StopFollowingActivity activity) {
-            User user = activity.getSource();
-            if (!user.isInSarosSession()) {
-                throw new IllegalArgumentException(MessageFormat.format(
-                    "illegal follow mode activity received", user));
-            }
-
-            log.info("User " + user.getHumanReadableName()
-                + " stopped follow mode");
-
-            awarenessInformationCollector.setUserFollowing(user, null);
-            notifyListeners();
-        }
-    };
-
-    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
-        @Override
-        public void sessionStarted(ISarosSession session) {
-            sarosSession = session;
-            awarenessInformationCollector.flushFollowModes();
-            installProvider(sarosSession);
-        }
-
-        @Override
-        public void sessionEnded(ISarosSession session) {
-            awarenessInformationCollector.flushFollowModes();
-            uninstallProvider(sarosSession);
-            sarosSession = null;
-        }
-    };
-
-    public void notifyListeners() {
-        for (IFollowModeChangesListener listener : this.internalListeners) {
+    private void notifyListeners() {
+        for (IFollowModeChangesListener listener : listeners)
             listener.followModeChanged();
-        }
     }
 
-    public void addIinternalListener(IFollowModeChangesListener listener) {
-        this.internalListeners.add(listener);
+    public void addListener(IFollowModeChangesListener listener) {
+        this.listeners.add(listener);
     }
 
-    public void removeIinternalListener(IFollowModeChangesListener listener) {
-        this.internalListeners.remove(listener);
+    public void removeListener(IFollowModeChangesListener listener) {
+        this.listeners.remove(listener);
     }
-
 }
