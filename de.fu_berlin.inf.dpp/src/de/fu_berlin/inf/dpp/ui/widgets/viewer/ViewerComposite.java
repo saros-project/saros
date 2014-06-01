@@ -41,7 +41,10 @@ public abstract class ViewerComposite<T extends Viewer> extends Composite {
     protected abstract T createViewer(int style);
 
     /**
-     * Configures the viewer (like adding listeners)
+     * Configures the viewer. </p> <b>Important:</b> This method is called
+     * before the CTOR of the subclass is processed. It is up to the caller to
+     * ensure that objects are already instantiated that are used in this method
+     * !
      */
     protected abstract void configureViewer(T viewer);
 
