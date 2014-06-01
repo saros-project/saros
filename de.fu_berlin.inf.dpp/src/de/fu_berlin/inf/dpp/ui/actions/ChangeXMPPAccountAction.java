@@ -15,10 +15,10 @@ import org.eclipse.ui.handlers.IHandlerService;
 import org.jivesoftware.smack.Connection;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
+import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
@@ -49,7 +49,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator,
     private XMPPAccountStore accountService;
 
     @Inject
-    private Saros saros;
+    private ConnectionHandler connectionHandler;
 
     @Inject
     private ISarosSessionManager sarosSessionManager;
@@ -79,15 +79,15 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator,
         setText(Messages.ChangeXMPPAccountAction_connect);
         setId(ACTION_ID);
 
-        saros.getSarosNet().addListener(connectionListener);
+        connectionHandler.addConnectionListener(connectionListener);
         setMenuCreator(this);
-        updateStatus(saros.getSarosNet().getConnectionState());
+        updateStatus(connectionHandler.getConnectionState());
     }
 
     // user clicks on Button
     @Override
     public void run() {
-        if (saros.getSarosNet().isConnected())
+        if (connectionHandler.isConnected())
             disconnect();
         else
             connect(accountService.isEmpty() ? null : accountService
@@ -96,7 +96,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator,
 
     @Override
     public void dispose() {
-        saros.getSarosNet().removeListener(connectionListener);
+        connectionHandler.removeConnectionListener(connectionListener);
     }
 
     @Override
@@ -110,7 +110,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator,
 
         XMPPAccount activeAccount = null;
 
-        if (saros.getSarosNet().isConnected())
+        if (connectionHandler.isConnected())
             activeAccount = accountService.getActiveAccount();
 
         for (XMPPAccount account : accountService.getAllAccounts()) {
@@ -198,7 +198,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator,
                         LOG.info("User clicked too fast, running already a connect or disconnect.");
                         return;
                     }
-                    saros.connect(false);
+                    connectionHandler.connect(false);
                 } finally {
                     running.set(false);
                 }
@@ -215,7 +215,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator,
                         LOG.info("User clicked too fast, running already a connect or disconnect.");
                         return;
                     }
-                    saros.getSarosNet().disconnect();
+                    connectionHandler.disconnect();
                 } finally {
                     running.set(false);
                 }

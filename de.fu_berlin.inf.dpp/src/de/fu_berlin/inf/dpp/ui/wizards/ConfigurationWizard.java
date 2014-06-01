@@ -21,6 +21,7 @@ package de.fu_berlin.inf.dpp.ui.wizards;
 
 import org.bitlet.weupnp.GatewayDevice;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
@@ -41,10 +42,13 @@ import de.fu_berlin.inf.dpp.ui.wizards.pages.ConfigurationSummaryWizardPage;
  */
 public class ConfigurationWizard extends AddXMPPAccountWizard {
 
-    private ConfigurationSettingsWizardPage configurationSettingsWizardPage = new ConfigurationSettingsWizardPage();
-    private ConfigurationSummaryWizardPage configurationSummaryWizardPage = new ConfigurationSummaryWizardPage();
-    private ColorChooserWizardPage colorChooserWizardPage = new ColorChooserWizardPage(
+    private final ConfigurationSettingsWizardPage configurationSettingsWizardPage = new ConfigurationSettingsWizardPage();
+    private final ConfigurationSummaryWizardPage configurationSummaryWizardPage = new ConfigurationSummaryWizardPage();
+    private final ColorChooserWizardPage colorChooserWizardPage = new ColorChooserWizardPage(
         false);
+
+    @Inject
+    private IPreferenceStore preferences;
 
     public ConfigurationWizard() {
         SarosPluginContext.initComponent(this);
@@ -83,7 +87,6 @@ public class ConfigurationWizard extends AddXMPPAccountWizard {
      * {@link ColorChooserWizardPage}into the PreferenceStore.
      */
     protected void setConfiguration() {
-        IPreferenceStore preferences = saros.getPreferenceStore();
 
         String skypeUsername = (configurationSettingsWizardPage.isSkypeUsage()) ? configurationSettingsWizardPage
             .getSkypeUsername() : "";

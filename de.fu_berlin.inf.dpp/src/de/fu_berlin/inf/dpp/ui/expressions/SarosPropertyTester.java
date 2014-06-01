@@ -1,8 +1,11 @@
 package de.fu_berlin.inf.dpp.ui.expressions;
 
 import org.eclipse.core.expressions.PropertyTester;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
+import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 
 /**
@@ -12,13 +15,21 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
  */
 public class SarosPropertyTester extends PropertyTester {
 
+    @Inject
+    private ConnectionHandler connectionHandler;
+
+    public SarosPropertyTester() {
+        super();
+        SarosPluginContext.initComponent(this);
+    }
+
     @Override
     public boolean test(Object receiver, String property, Object[] args,
         Object expectedValue) {
         if (receiver instanceof Saros) {
-            Saros saros = (Saros) receiver;
+
             if ("isConnected".equals(property)) {
-                return saros.getSarosNet().isConnected();
+                return connectionHandler.isConnected();
             }
         }
         return false;

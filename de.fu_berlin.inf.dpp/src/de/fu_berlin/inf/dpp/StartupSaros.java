@@ -10,6 +10,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.stf.server.STFController;
@@ -40,7 +41,7 @@ public class StartupSaros implements IStartup {
     private SarosUI sarosUI;
 
     @Inject
-    private Saros saros;
+    private ConnectionHandler connectionHandler;
 
     @Inject
     private PreferenceUtils preferenceUtils;
@@ -100,10 +101,17 @@ public class StartupSaros implements IStartup {
                  * startup !
                  */
 
-                if (preferenceUtils.isAutoConnecting()
-                    && !xmppAccountStore.isEmpty()) {
-                    saros.asyncConnect();
-                }
+                if (!preferenceUtils.isAutoConnecting()
+                    || xmppAccountStore.isEmpty())
+                    return;
+
+                ThreadUtils.runSafeAsync("AutoConnect", log, new Runnable() {
+                    @Override
+                    public void run() {
+                        connectionHandler.connect(/* avoid error popups */true);
+                    }
+                });
+
             }
         }
     }

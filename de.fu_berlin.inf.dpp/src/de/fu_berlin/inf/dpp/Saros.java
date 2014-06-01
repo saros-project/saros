@@ -24,49 +24,32 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.text.MessageFormat;
-import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.helpers.LogLog;
-import org.eclipse.core.net.proxy.IProxyData;
-import org.eclipse.core.net.proxy.IProxyService;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
-import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.jivesoftware.smack.ConnectionConfiguration;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.XMPPError;
-import org.jivesoftware.smack.proxy.ProxyInfo;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
-import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
-import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 import de.fu_berlin.inf.dpp.misc.pico.DotGraphMonitor;
-import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.stf.server.STFController;
-import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
-import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
-import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -142,13 +125,9 @@ public class Saros extends AbstractUIPlugin {
 
     private ISarosSessionManager sessionManager;
 
-    private XMPPAccountStore xmppAccountStore;
-
     private PreferenceUtils preferenceUtils;
 
-    private XMPPConnectionService connectionService;
-
-    private DataTransferManager transferManager;
+    private ConnectionHandler connectionHandler;
 
     /**
      * To print an architecture diagram at the end of the plug-in life-cycle
@@ -276,16 +255,9 @@ public class Saros extends AbstractUIPlugin {
         sarosContext.removeComponent(Bundle.class);
         sarosContext.addComponent(Bundle.class, getBundle());
 
-        /*
-         * must invoked here otherwise some components will fail to initialize
-         * due NPE... see getSarosNet()
-         */
-        connectionService = sarosContext
-            .getComponent(XMPPConnectionService.class);
+        connectionHandler = sarosContext.getComponent(ConnectionHandler.class);
         sessionManager = sarosContext.getComponent(ISarosSessionManager.class);
-        xmppAccountStore = sarosContext.getComponent(XMPPAccountStore.class);
         preferenceUtils = sarosContext.getComponent(PreferenceUtils.class);
-        transferManager = sarosContext.getComponent(DataTransferManager.class);
 
         // Make sure that all components in the container are
         // instantiated
@@ -348,7 +320,7 @@ public class Saros extends AbstractUIPlugin {
                         try {
 
                             sessionManager.stopSarosSession();
-                            getSarosNet().disconnect();
+                            connectionHandler.disconnect();
                         } finally {
                             /*
                              * Always shutdown the network to ensure a proper
@@ -508,264 +480,5 @@ public class Saros extends AbstractUIPlugin {
      */
     public String getVersion() {
         return sarosVersion;
-    }
-
-    /**
-     * @deprecated inject {@link XMPPConnectionService} and not {@link Saros} to
-     *             obtain a reference
-     * 
-     * @return
-     */
-    @Deprecated
-    public XMPPConnectionService getSarosNet() {
-        return connectionService;
-    }
-
-    /**
-     * Returns the Eclipse {@linkplain ProxyInfo proxy information} for the
-     * given host or <code>null</code> if it is not available
-     */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    private ProxyInfo getProxyInfo(String host) {
-
-        URI hostURI;
-
-        try {
-            hostURI = new URI(host);
-        } catch (URISyntaxException e) {
-            return null;
-        }
-
-        BundleContext bundleContext = getBundle().getBundleContext();
-
-        ServiceReference serviceReference = bundleContext
-            .getServiceReference(IProxyService.class.getName());
-
-        IProxyService proxyService = (IProxyService) bundleContext
-            .getService(serviceReference);
-
-        if (proxyService == null || !proxyService.isProxiesEnabled())
-            return null;
-
-        for (IProxyData pd : proxyService.select(hostURI)) {
-            if (IProxyData.SOCKS_PROXY_TYPE.equals(pd.getType())) {
-                return ProxyInfo.forSocks5Proxy(pd.getHost(), pd.getPort(),
-                    pd.getUserId(), pd.getPassword());
-            }
-        }
-
-        return null;
-    }
-
-    protected ConnectionConfiguration createConnectionConfiguration(
-        String domain, String server, int port, boolean useTLS, boolean useSASL) {
-
-        ProxyInfo proxyInfo;
-
-        if (server.length() != 0)
-            proxyInfo = getProxyInfo(server);
-        else
-            proxyInfo = getProxyInfo(domain);
-
-        ConnectionConfiguration connectionConfiguration = null;
-
-        if (server.length() == 0 && proxyInfo == null)
-            connectionConfiguration = new ConnectionConfiguration(domain);
-        else if (server.length() == 0 && proxyInfo != null)
-            connectionConfiguration = new ConnectionConfiguration(domain,
-                proxyInfo);
-        else if (server.length() != 0 && proxyInfo == null)
-            connectionConfiguration = new ConnectionConfiguration(server, port,
-                domain);
-        else
-            connectionConfiguration = new ConnectionConfiguration(server, port,
-                domain, proxyInfo);
-
-        connectionConfiguration.setSASLAuthenticationEnabled(useSASL);
-
-        if (!useTLS)
-            connectionConfiguration
-                .setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
-
-        connectionConfiguration.setReconnectionAllowed(false);
-
-        return connectionConfiguration;
-    }
-
-    /**
-     * Opens the appropriate {@link IWizard} to configure the active
-     * {@link XMPPAccount}.<br/>
-     * If no active {@link XMPPAccount} exists the {@link ConfigurationWizard}
-     * is used instead.
-     * 
-     * @return
-     */
-    public boolean configureXMPPAccount() {
-        if (xmppAccountStore.isEmpty())
-            return (WizardUtils.openSarosConfigurationWizard() != null);
-
-        return (WizardUtils.openEditXMPPAccountWizard(xmppAccountStore
-            .getActiveAccount()) != null);
-    }
-
-    /**
-     * @nonBlocking
-     */
-    public void asyncConnect() {
-        ThreadUtils.runSafeAsync("AsyncConnect", log, new Runnable() { //$NON-NLS-1$
-                @Override
-                public void run() {
-                    connect(false);
-                }
-            });
-    }
-
-    /**
-     * Connects using the active account from the {@link XMPPAccountStore}. If
-     * no active account is present a wizard is opened before.
-     * 
-     * If there is already an established connection when calling this method,
-     * it disconnects before connecting (including state transitions!).
-     * 
-     * @param failSilently
-     *            if set to <code>true</code> a connection failure will not be
-     *            reported to the user
-     * @blocking
-     * @see XMPPAccountStore#setAccountActive(XMPPAccount)
-     */
-    public void connect(boolean failSilently) {
-
-        /*
-         * the Saros Configuration Wizard may call this again when invoking the
-         * configureXMPPAccount method call, so abort here to prevent an already
-         * logged in error
-         */
-
-        // FIXME this "logic" should not be done here !
-
-        if (xmppAccountStore.isEmpty()) {
-            boolean configured = /*
-                                  * side effect to:
-                                  * preferenceUtils.isAutoConnecting()
-                                  */configureXMPPAccount();
-
-            if (!configured
-                || (configured && preferenceUtils.isAutoConnecting()))
-                return;
-        }
-
-        XMPPAccount account = xmppAccountStore.getActiveAccount();
-
-        String username = account.getUsername();
-        String password = account.getPassword();
-        String domain = account.getDomain();
-        String server = account.getServer();
-        int port = account.getPort();
-        boolean useTLS = account.useTLS();
-        boolean useSASL = account.useSASL();
-
-        connectionService.disconnect();
-
-        List<String> socks5Candidates = preferenceUtils.getSocks5Candidates();
-
-        if (socks5Candidates.isEmpty())
-            socks5Candidates = null;
-
-        connectionService.configure(NAMESPACE, RESOURCE,
-            preferenceUtils.isDebugEnabled(),
-            preferenceUtils.isLocalSOCKS5ProxyEnabled(),
-            preferenceUtils.getFileTransferPort(), socks5Candidates,
-            preferenceUtils.getAutoPortmappingGatewayID(),
-            preferenceUtils.useExternalGatewayAddress(),
-            preferenceUtils.getStunIP(), preferenceUtils.getStunPort(),
-            preferenceUtils.isAutoPortmappingEnabled());
-
-        Exception connectionError = null;
-
-        try {
-
-            if (preferenceUtils.forceFileTranserByChat())
-                transferManager.setTransport(DataTransferManager.IBB_TRANSPORT);
-            else
-                transferManager.setTransport(/* use all */-1);
-
-            connectionService.connect(
-                createConnectionConfiguration(domain, server, port, useTLS,
-                    useSASL), username, password);
-        } catch (Exception e) {
-            connectionError = e;
-        }
-
-        if (connectionError == null)
-            return;
-
-        try {
-            if (!(connectionError instanceof XMPPException))
-                throw connectionError;
-
-            if (DialogUtils
-                .popUpYesNoQuestion(
-                    Messages.Saros_connecting_error_title,
-                    generateHumanReadableErrorMessage((XMPPException) connectionError),
-                    failSilently)) {
-
-                if (configureXMPPAccount())
-                    connect(failSilently);
-            }
-        } catch (Exception e) {
-            log.error("internal error while connecting to the XMPP server: "
-                + e.getMessage(), e);
-
-            String errorMessage = MessageFormat.format(
-                Messages.Saros_connecting_internal_error, e.getMessage());
-
-            DialogUtils.popUpFailureMessage(
-                Messages.Saros_connecting_error_title, errorMessage,
-                failSilently);
-        }
-    }
-
-    private String generateHumanReadableErrorMessage(XMPPException e) {
-
-        // as of Smack 3.3.1 this is always null for connection attemps
-        // Throwable cause = e.getWrappedThrowable();
-
-        XMPPError error = e.getXMPPError();
-
-        if (error != null && error.getCode() == 504)
-            return Messages.Saros_connecting_unknown_host
-                + Messages.Saros_connecting_modify_account
-                + "\n\nDetailed error:\nSMACK: " + error + "\n"
-                + e.getMessage();
-        else if (error != null && error.getCode() == 502)
-            return Messages.Saros_connecting_connect_error
-                + Messages.Saros_connecting_modify_account
-                + "\n\nDetailed error:\nSMACK: " + error + "\n"
-                + e.getMessage();
-
-        String question = null;
-
-        String errorMessage = e.getMessage();
-
-        if (errorMessage != null) {
-            if (errorMessage.toLowerCase().contains("invalid-authzid") //jabber.org got it wrong ... //$NON-NLS-1$
-                || errorMessage.toLowerCase().contains("not-authorized") // SASL //$NON-NLS-1$
-                || errorMessage.toLowerCase().contains("403") // non SASL //$NON-NLS-1$
-                || errorMessage.toLowerCase().contains("401")) { // non SASL //$NON-NLS-1$
-
-                question = Messages.Saros_connecting_invalid_username_password
-                    + Messages.Saros_connecting_modify_account;
-            } else if (errorMessage.toLowerCase().contains("503")) { //$NON-NLS-1$
-                question = Messages.Saros_connecting_sasl_required
-                    + Messages.Saros_connecting_modify_account;
-            }
-        }
-
-        if (question == null)
-            question = Messages.Saros_connecting_failed
-                + Messages.Saros_connecting_modify_account;
-
-        return question;
-
     }
 }

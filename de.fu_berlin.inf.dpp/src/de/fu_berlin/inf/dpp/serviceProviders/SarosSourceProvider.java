@@ -14,6 +14,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
+import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
@@ -53,10 +54,15 @@ public class SarosSourceProvider extends AbstractSourceProvider {
      * of the {@link #SAROS_SESSION} variable.
      */
     public static final String[] SAROS_SESSION_DEPENDENT_COMMANDS = {};
+
     @Inject
     protected Saros saros;
+
     @Inject
     protected ISarosSessionManager sarosSessionManager;
+
+    @Inject
+    private ConnectionHandler connectionHandler;
 
     protected IConnectionListener connectionListener = new IConnectionListener() {
         @Override
@@ -82,20 +88,19 @@ public class SarosSourceProvider extends AbstractSourceProvider {
 
     public SarosSourceProvider() {
         SarosPluginContext.initComponent(this);
-        saros.getSarosNet().addListener(this.connectionListener);
-        this.sarosSessionManager
-            .addSarosSessionListener(this.sarosSessionListener);
+        connectionHandler.addConnectionListener(connectionListener);
 
-        this.fireSourceChanged(ISources.WORKBENCH, SAROS, this.saros);
-        this.fireSourceChanged(ISources.WORKBENCH, SAROS_SESSION,
+        sarosSessionManager.addSarosSessionListener(sarosSessionListener);
+
+        fireSourceChanged(ISources.WORKBENCH, SAROS, saros);
+        fireSourceChanged(ISources.WORKBENCH, SAROS_SESSION,
             sarosSessionManager.getSarosSession());
     }
 
     @Override
     public void dispose() {
-        this.sarosSessionManager
-            .removeSarosSessionListener(this.sarosSessionListener);
-        saros.getSarosNet().removeListener(this.connectionListener);
+        sarosSessionManager.removeSarosSessionListener(sarosSessionListener);
+        connectionHandler.removeConnectionListener(connectionListener);
     }
 
     @Override

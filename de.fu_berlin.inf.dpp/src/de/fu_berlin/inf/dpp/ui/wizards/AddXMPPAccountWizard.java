@@ -21,13 +21,14 @@ package de.fu_berlin.inf.dpp.ui.wizards;
 import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.wizard.Wizard;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
+import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
@@ -35,6 +36,7 @@ import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.EnterXMPPAccountWizardPage;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * A wizard that allows to enter an existing {@link XMPPAccount} or to create
@@ -47,12 +49,15 @@ public class AddXMPPAccountWizard extends Wizard {
         .getLogger(AddXMPPAccountWizard.class);
 
     @Inject
-    protected Saros saros;
+    private IPreferenceStore store;
 
     @Inject
     private XMPPAccountStore accountStore;
 
-    private EnterXMPPAccountWizardPage enterXMPPAccountWizardPage = new EnterXMPPAccountWizardPage();
+    @Inject
+    private ConnectionHandler connectionHandler;
+
+    private final EnterXMPPAccountWizardPage enterXMPPAccountWizardPage = new EnterXMPPAccountWizardPage();
 
     public AddXMPPAccountWizard() {
         SarosPluginContext.initComponent(this);
@@ -126,10 +131,13 @@ public class AddXMPPAccountWizard extends Wizard {
         }
 
         if (accountStore.getAllAccounts().size() == 1
-            && saros.getPreferenceStore().getBoolean(
-                PreferenceConstants.AUTO_CONNECT))
-            saros.asyncConnect();
-
+            && store.getBoolean(PreferenceConstants.AUTO_CONNECT))
+            ThreadUtils.runSafeAsync("ConnectAddAccount", log, new Runnable() {
+                @Override
+                public void run() {
+                    connectionHandler.connect(false);
+                }
+            });
     }
 
     /*
@@ -137,7 +145,7 @@ public class AddXMPPAccountWizard extends Wizard {
      */
 
     public JID getJID() {
-        return this.enterXMPPAccountWizardPage.getJID();
+        return enterXMPPAccountWizardPage.getJID();
     }
 
 }

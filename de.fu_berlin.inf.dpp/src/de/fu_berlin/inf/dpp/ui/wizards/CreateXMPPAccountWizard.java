@@ -31,15 +31,16 @@ import org.jivesoftware.smack.packet.Registration;
 import org.jivesoftware.smack.packet.XMPPError;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
+import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.CreateXMPPAccountWizardPage;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * @JTourBusStop 4, The Interface Tour:
@@ -65,12 +66,12 @@ public class CreateXMPPAccountWizard extends Wizard {
         .getLogger(CreateXMPPAccountWizard.class);
 
     @Inject
-    protected Saros saros;
+    private XMPPAccountStore accountStore;
 
     @Inject
-    protected XMPPAccountStore accountStore;
+    private ConnectionHandler connectionHandler;
 
-    protected final CreateXMPPAccountWizardPage createXMPPAccountPage;
+    private final CreateXMPPAccountWizardPage createXMPPAccountPage;
 
     /*
      * Fields are cached in order to make the values accessible in case the
@@ -169,7 +170,7 @@ public class CreateXMPPAccountWizard extends Wizard {
         // reconnect if user wishes
         if (createXMPPAccountPage.useNow()) {
             boolean reconnect = true;
-            if (saros.getSarosNet().isConnected()) {
+            if (connectionHandler.isConnected()) {
                 reconnect = DialogUtils.openQuestionMessageDialog(getShell(),
                     Messages.CreateXMPPAccountWizard_already_connected,
                     Messages.CreateXMPPAccountWizard_already_connected_text);
@@ -177,7 +178,13 @@ public class CreateXMPPAccountWizard extends Wizard {
 
             if (reconnect) {
                 accountStore.setAccountActive(createdXMPPAccount);
-                saros.connect(false);
+                ThreadUtils.runSafeAsync("ConnectCreatedAccount", log,
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            connectionHandler.connect(false);
+                        }
+                    });
             }
         }
 

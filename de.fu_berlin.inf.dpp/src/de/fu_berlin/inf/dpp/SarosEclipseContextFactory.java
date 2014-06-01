@@ -26,6 +26,7 @@ import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.synchronize.internal.SWTSynchronizer;
 import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.eventhandler.ConnectingFailureHandler;
 import de.fu_berlin.inf.dpp.ui.eventhandler.HostLeftAloneInSessionHandler;
 import de.fu_berlin.inf.dpp.ui.eventhandler.JoinSessionRejectedHandler;
 import de.fu_berlin.inf.dpp.ui.eventhandler.JoinSessionRequestHandler;
@@ -75,6 +76,7 @@ public class SarosEclipseContextFactory extends AbstractSarosContextFactory {
         Component.create(ServerPreferenceHandler.class),
         Component.create(SessionStatusRequestHandler.class),
         Component.create(XMPPAuthorizationHandler.class),
+        Component.create(ConnectingFailureHandler.class),
         // Cache support
         /*
          * TODO avoid direct creation as this will become tricky especially if

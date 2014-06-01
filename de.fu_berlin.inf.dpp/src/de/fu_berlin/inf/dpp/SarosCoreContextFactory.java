@@ -11,6 +11,7 @@ import de.fu_berlin.inf.dpp.communication.SkypeManager;
 import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatService;
 import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCNegotiationManager;
 import de.fu_berlin.inf.dpp.communication.chat.single.SingleUserChatService;
+import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
 import de.fu_berlin.inf.dpp.editor.colorstorage.ColorIDSetStorage;
 import de.fu_berlin.inf.dpp.invitation.hooks.SessionNegotiationHookManager;
@@ -60,7 +61,10 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
 
     private final Component[] components = new Component[] {
 
-        // Version support ... broken uses Eclipse / OSGi STUFF
+        // Facades
+        Component.create(ConnectionHandler.class),
+
+        // Version support
         Component.create(VersionManager.class),
 
         Component.create(MultiUserChatService.class),

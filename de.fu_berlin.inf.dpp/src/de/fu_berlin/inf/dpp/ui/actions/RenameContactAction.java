@@ -30,16 +30,15 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.PlatformUI;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.RosterEntry;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -75,7 +74,7 @@ public class RenameContactAction extends Action {
     };
 
     @Inject
-    protected Saros saros;
+    private XMPPConnectionService connectionService;
 
     public RenameContactAction() {
         super(Messages.RenameContactAction_title);
@@ -86,24 +85,18 @@ public class RenameContactAction extends Action {
 
         SarosPluginContext.initComponent(this);
 
-        saros.getSarosNet().addListener(connectionListener);
+        connectionService.addListener(connectionListener);
+
         SelectionUtils.getSelectionService().addSelectionListener(
             selectionListener);
         updateEnablement();
     }
 
     protected void updateEnablement() {
-        try {
-            List<JID> contacts = SelectionRetrieverFactory
-                .getSelectionRetriever(JID.class).getSelection();
-            this.setEnabled(saros.getSarosNet().isConnected()
-                && contacts.size() == 1);
-        } catch (NullPointerException e) {
-            this.setEnabled(false);
-        } catch (Exception e) {
-            if (!PlatformUI.getWorkbench().isClosing())
-                LOG.error("Unexcepted error while updating enablement", e); //$NON-NLS-1$
-        }
+        List<JID> contacts = SelectionRetrieverFactory.getSelectionRetriever(
+            JID.class).getSelection();
+
+        setEnabled(connectionService.isConnected() && contacts.size() == 1);
     }
 
     @Override
@@ -121,7 +114,7 @@ public class RenameContactAction extends Action {
                      */
                     // Compare the plain-JID portion of the XMPP address
                     if (!new JID(selectedRosterEntries.get(0).getUser())
-                        .equals(saros.getSarosNet().getJID())) {
+                        .equals(connectionService.getJID())) {
                         rosterEntry = selectedRosterEntries.get(0);
                     }
                 }
@@ -163,6 +156,6 @@ public class RenameContactAction extends Action {
     public void dispose() {
         SelectionUtils.getSelectionService().removeSelectionListener(
             selectionListener);
-        saros.getSarosNet().removeListener(connectionListener);
+        connectionService.removeListener(connectionListener);
     }
 }
