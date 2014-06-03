@@ -73,9 +73,9 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
          * transparent to users of this method.
          */
         TransferDescription transferDescription = TransferDescription
-            .createCustomTransferDescription().setRecipient(recipient)
+            .newDescription().setRecipient(recipient)
             // .setSender(set by DataTransferManager)
-            .setType(extension.getElementName())
+            .setElementName(extension.getElementName())
             .setNamespace(extension.getNamespace());
 
         byte[] data = extension.toXML().getBytes("UTF-8");

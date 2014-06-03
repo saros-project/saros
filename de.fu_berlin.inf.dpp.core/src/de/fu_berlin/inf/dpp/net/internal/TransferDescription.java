@@ -3,20 +3,13 @@
  */
 package de.fu_berlin.inf.dpp.net.internal;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
- * A TransferDescription contains all necessary information for dealing with
- * FileTransfers to a user via Socks5 or IBB.
- * 
- * Instances of this class may not be reused but should be treated as value
- * objects, otherwise serialization will fail.
+ * A transfer description contains all necessary information for tunneling
+ * packet extension through a plain TCP connection. </p> <b>Note:</b> Modifying
+ * this class (e.g adding fields) requires changes in the
+ * {@link BinaryChannelConnection} class !
  */
 public class TransferDescription {
 
@@ -24,7 +17,7 @@ public class TransferDescription {
         // NOP
     }
 
-    private String type;
+    private String elementName;
 
     private String namespace;
 
@@ -32,61 +25,13 @@ public class TransferDescription {
 
     private JID sender;
 
-    private long size;
-
     /**
      * Field used to indicate that the payload may be compressed.
      */
     private boolean compress;
 
-    @Override
-    public String toString() {
-        return "Bytestream transfer. type=" + type + " namespace=" + namespace;
-    }
-
-    public static TransferDescription createCustomTransferDescription() {
+    public static TransferDescription newDescription() {
         return new TransferDescription();
-    }
-
-    public static byte[] toByteArray(TransferDescription description)
-        throws IOException {
-        ByteArrayOutputStream serialized = new ByteArrayOutputStream();
-
-        DataOutputStream out = new DataOutputStream(serialized);
-
-        out.writeUTF(description.type != null ? description.type : "");
-        out.writeUTF(description.namespace != null ? description.namespace : "");
-
-        out.writeUTF(description.recipient != null ? description.recipient
-            .toString() : "");
-        out.writeUTF(description.sender != null ? description.sender.toString()
-            : "");
-
-        out.writeLong(description.size);
-        out.writeBoolean(description.compress);
-
-        out.close();
-
-        return serialized.toByteArray();
-    }
-
-    public static TransferDescription fromByteArray(byte[] data)
-        throws IOException {
-        DataInputStream in = new DataInputStream(new ByteArrayInputStream(data));
-
-        TransferDescription description = new TransferDescription();
-
-        description.type = in.readUTF();
-        description.namespace = in.readUTF();
-
-        description.recipient = new JID(in.readUTF());
-        description.sender = new JID(in.readUTF());
-
-        description.size = in.readLong();
-        description.compress = in.readBoolean();
-
-        return description;
-
     }
 
     TransferDescription setNamespace(String namespace) {
@@ -98,13 +43,13 @@ public class TransferDescription {
         return namespace;
     }
 
-    TransferDescription setType(String type) {
-        this.type = type;
+    TransferDescription setElementName(String elementName) {
+        this.elementName = elementName;
         return this;
     }
 
-    public String getType() {
-        return type;
+    public String getElementName() {
+        return elementName;
     }
 
     TransferDescription setRecipient(JID recipient) {
@@ -134,20 +79,10 @@ public class TransferDescription {
         return compress;
     }
 
-    /**
-     * Set the size of the object that is to be transferred (e.g. bytes, words,
-     * units)
-     */
-    TransferDescription setSize(long size) {
-        this.size = size;
-        return this;
-    }
-
-    /**
-     * Returns the size of the transferred object (in bytes or words or other
-     * units)
-     */
-    public long getSize() {
-        return this.size;
+    @Override
+    public String toString() {
+        return "TransferDescription [elementName=" + elementName
+            + ", namespace=" + namespace + ", recipient=" + recipient
+            + ", sender=" + sender + ", compress=" + compress + "]";
     }
 }

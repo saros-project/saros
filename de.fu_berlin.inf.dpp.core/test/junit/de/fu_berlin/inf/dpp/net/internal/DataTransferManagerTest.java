@@ -375,7 +375,7 @@ public class DataTransferManagerTest {
             ConnectionState.CONNECTED);
 
         TransferDescription description = TransferDescription
-            .createCustomTransferDescription();
+            .newDescription();
 
         description.setRecipient(new JID("foo@bar.com"));
 
@@ -393,7 +393,7 @@ public class DataTransferManagerTest {
             ConnectionState.CONNECTED);
 
         TransferDescription description = TransferDescription
-            .createCustomTransferDescription();
+            .newDescription();
 
         dtm.connect("bar", new JID("foo@bar.com"));
 
@@ -413,7 +413,7 @@ public class DataTransferManagerTest {
             ConnectionState.CONNECTED);
 
         TransferDescription description = TransferDescription
-            .createCustomTransferDescription();
+            .newDescription();
 
         dtm.connect("foo", new JID("foo@bar.com"));
 
@@ -576,7 +576,7 @@ public class DataTransferManagerTest {
         connectThread0.verify();
 
         TransferDescription description = TransferDescription
-            .createCustomTransferDescription();
+            .newDescription();
 
         description.setRecipient(new JID("foo@bar.com"));
 

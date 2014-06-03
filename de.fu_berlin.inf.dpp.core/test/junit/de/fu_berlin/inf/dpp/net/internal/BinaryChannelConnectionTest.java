@@ -9,6 +9,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -103,6 +105,89 @@ public class BinaryChannelConnectionTest {
     private volatile byte[] receivedBytes;
 
     @Test
+    public void testCacheUpdates() throws Exception {
+
+        final List<BinaryXMPPExtension> extensions = new ArrayList<BinaryXMPPExtension>();
+
+        final CountDownLatch received = new CountDownLatch(2);
+
+        BinaryChannelConnection alice = new BinaryChannelConnection(new JID(
+            "alice@baumeister.de"), "junit", aliceSession,
+            NetTransferMode.SOCKS5_DIRECT, new StreamConnectionListener() {
+                @Override
+                public void receive(final BinaryXMPPExtension extension) {
+                    // NOP
+                }
+            });
+
+        BinaryChannelConnection bob = new BinaryChannelConnection(new JID(
+            "bob@baumeister.de"), "junit", bobSession,
+            NetTransferMode.SOCKS5_DIRECT, new StreamConnectionListener() {
+                @Override
+                public void receive(final BinaryXMPPExtension extension) {
+                    extensions.add(extension);
+                    received.countDown();
+                }
+            });
+
+        alice.initialize();
+        bob.initialize();
+
+        final TransferDescription description = TransferDescription
+            .newDescription();
+
+        final byte[] bytesToSend = new byte[512];
+
+        try {
+            description.setNamespace("foo-namespace-0");
+            description.setElementName("bar-0");
+            description.setSender(new JID("sender-0@local"));
+            description.setRecipient(new JID("receiver-0@local"));
+
+            alice.send(description, bytesToSend);
+
+            description.setNamespace("foo-namespace-1");
+            description.setElementName("bar-1");
+            description.setSender(new JID("sender-1@local"));
+            description.setRecipient(new JID("receiver-1@local"));
+
+            alice.send(description, bytesToSend);
+
+            received.await(10000, TimeUnit.MILLISECONDS);
+        } finally {
+            alice.close();
+            bob.close();
+        }
+
+        // send packet 0
+        assertEquals("foo-namespace-0", extensions.get(0)
+            .getTransferDescription().getNamespace());
+
+        assertEquals("bar-0", extensions.get(0).getTransferDescription()
+            .getElementName());
+
+        assertEquals("sender-0@local", extensions.get(0)
+            .getTransferDescription().getSender().toString());
+
+        assertEquals("receiver-0@local", extensions.get(0)
+            .getTransferDescription().getRecipient().toString());
+
+        // send packet 1
+        assertEquals("foo-namespace-1", extensions.get(1)
+            .getTransferDescription().getNamespace());
+
+        assertEquals("bar-1", extensions.get(1).getTransferDescription()
+            .getElementName());
+
+        assertEquals("sender-1@local", extensions.get(1)
+            .getTransferDescription().getSender().toString());
+
+        assertEquals("receiver-1@local", extensions.get(1)
+            .getTransferDescription().getRecipient().toString());
+
+    }
+
+    @Test
     public void testFragmentationOnLargeDataToBeSend() throws Exception {
 
         final CountDownLatch received = new CountDownLatch(1);
@@ -129,8 +214,12 @@ public class BinaryChannelConnectionTest {
         alice.initialize();
         bob.initialize();
 
-        TransferDescription description = TransferDescription
-            .createCustomTransferDescription();
+        TransferDescription description = TransferDescription.newDescription();
+
+        description.setNamespace("foo-namespace");
+        description.setElementName("bar");
+        description.setSender(new JID("sender@local"));
+        description.setRecipient(new JID("receiver@local"));
 
         byte[] bytesToSend = new byte[512 * 1024];
 
@@ -182,8 +271,12 @@ public class BinaryChannelConnectionTest {
                 }
             });
 
-        TransferDescription description = TransferDescription
-            .createCustomTransferDescription();
+        TransferDescription description = TransferDescription.newDescription();
+
+        description.setNamespace("foo-namespace");
+        description.setElementName("bar");
+        description.setSender(new JID("sender@local"));
+        description.setRecipient(new JID("receiver@local"));
 
         byte[] bytesToSend = new byte[(int) packetSize];
 

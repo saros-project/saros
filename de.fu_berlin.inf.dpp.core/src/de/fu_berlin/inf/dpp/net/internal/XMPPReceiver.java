@@ -160,7 +160,7 @@ public class XMPPReceiver implements IReceiver {
         TransferDescription description = transferObject
             .getTransferDescription();
 
-        String name = description.getType();
+        String name = description.getElementName();
         String namespace = description.getNamespace();
         // IQ provider?
 
