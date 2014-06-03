@@ -191,7 +191,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             List<FileList> missingFiles = calculateMissingFiles(projectNames,
                 useVersionControl, this.monitor.newChild(10));
 
-            transmitter.sendToSessionUser(ISarosSession.SESSION_CONNECTION_ID,
+            transmitter.send(ISarosSession.SESSION_CONNECTION_ID,
                 peer, ProjectNegotiationMissingFilesExtension.PROVIDER
                     .create(new ProjectNegotiationMissingFilesExtension(
                         sessionID, processID, missingFiles)));
@@ -216,7 +216,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 sarosSession.enableQueuing(project);
             }
 
-            transmitter.sendToSessionUser(ISarosSession.SESSION_CONNECTION_ID,
+            transmitter.send(ISarosSession.SESSION_CONNECTION_ID,
                 peer, StartActivityQueuingResponse.PROVIDER
                     .create(new StartActivityQueuingResponse(sessionID,
                         processID)));

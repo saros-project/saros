@@ -127,10 +127,10 @@ public abstract class ProjectNegotiation extends CancelableProcess {
                 .getMessage()));
 
         try {
-            transmitter.sendToSessionUser(ISarosSession.SESSION_CONNECTION_ID,
+            transmitter.send(ISarosSession.SESSION_CONNECTION_ID,
                 getPeer(), notification);
         } catch (IOException e) {
-            transmitter.sendMessageToUser(getPeer(), notification);
+            transmitter.sendPacketExtension(getPeer(), notification);
         }
     }
 

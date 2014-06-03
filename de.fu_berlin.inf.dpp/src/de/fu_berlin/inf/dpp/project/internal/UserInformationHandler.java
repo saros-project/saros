@@ -154,7 +154,7 @@ public class UserInformationHandler implements Startable {
         try {
             for (User user : remoteUsers) {
                 try {
-                    transmitter.sendToSessionUser(
+                    transmitter.send(
                         ISarosSession.SESSION_CONNECTION_ID, user.getJID(),
                         UserListExtension.PROVIDER.create(extension));
                 } catch (IOException e) {
@@ -233,7 +233,7 @@ public class UserInformationHandler implements Startable {
 
         for (User user : remoteUsers) {
             try {
-                transmitter.sendToSessionUser(
+                transmitter.send(
                     ISarosSession.SESSION_CONNECTION_ID, user.getJID(), packet);
             } catch (IOException e) {
                 log.error(
@@ -341,7 +341,7 @@ public class UserInformationHandler implements Startable {
     private void sendUserListConfirmation(JID to) {
         log.debug("sending user list received confirmation to " + to);
         try {
-            transmitter.sendToSessionUser(ISarosSession.SESSION_CONNECTION_ID,
+            transmitter.send(ISarosSession.SESSION_CONNECTION_ID,
                 to, UserListReceivedExtension.PROVIDER
                     .create(new UserListReceivedExtension(currentSessionID)));
         } catch (IOException e) {

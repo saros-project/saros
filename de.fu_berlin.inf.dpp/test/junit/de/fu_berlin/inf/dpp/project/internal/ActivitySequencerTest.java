@@ -188,7 +188,7 @@ public class ActivitySequencerTest {
             .createNiceMock(ITransmitter.class);
 
         try {
-            brokenTransmitter.sendToSessionUser(
+            brokenTransmitter.send(
                 EasyMock.anyObject(String.class),
                 EasyMock.anyObject(JID.class),
                 EasyMock.anyObject(PacketExtension.class));

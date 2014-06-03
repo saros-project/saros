@@ -568,7 +568,7 @@ public final class SarosSession implements ISarosSession {
                 "the local user cannot kick itself out of the session");
 
         try {
-            transmitter.sendToSessionUser(SESSION_CONNECTION_ID, user.getJID(),
+            transmitter.send(SESSION_CONNECTION_ID, user.getJID(),
                 KickUserExtension.PROVIDER
                     .create(new KickUserExtension(getID())));
         } catch (IOException e) {
@@ -649,7 +649,7 @@ public final class SarosSession implements ISarosSession {
 
         for (User user : usersToNotify) {
             try {
-                transmitter.sendToSessionUser(SESSION_CONNECTION_ID, user
+                transmitter.send(SESSION_CONNECTION_ID, user
                     .getJID(), LeaveSessionExtension.PROVIDER
                     .create(new LeaveSessionExtension(getID())));
             } catch (IOException e) {

@@ -86,7 +86,7 @@ public final class ClientSessionTimeoutHandler extends SessionTimeoutHandler {
                 }
 
                 try {
-                    transmitter.sendToSessionUser(
+                    transmitter.send(
                         ISarosSession.SESSION_CONNECTION_ID, session.getHost()
                             .getJID(), PongExtension.PROVIDER
                             .create(new PongExtension(currentSessionID)));

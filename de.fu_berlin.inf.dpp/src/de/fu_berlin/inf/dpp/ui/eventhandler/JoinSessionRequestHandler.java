@@ -89,7 +89,7 @@ public final class JoinSessionRequestHandler {
     }
 
     private void sendRejection(JID to) {
-        transmitter.sendMessageToUser(to, JoinSessionRejectedExtension.PROVIDER
+        transmitter.sendPacketExtension(to, JoinSessionRejectedExtension.PROVIDER
             .create(new JoinSessionRejectedExtension()));
     }
 }

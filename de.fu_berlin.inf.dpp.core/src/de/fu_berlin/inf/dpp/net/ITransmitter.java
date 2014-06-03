@@ -41,7 +41,7 @@ public interface ITransmitter {
      * 
      *               The Network Layer is responsible for communicating with
      *               other participants by sending and receiving messages. This
-     *               Interface is the main entrance point for sending messages.
+     *               Interface is the main entrance point for sending packets.
      *               (...)
      * 
      */
@@ -57,49 +57,6 @@ public interface ITransmitter {
     public void sendPacket(Packet packet) throws IOException;
 
     /**
-     * <p>
-     * Sends the given {@link PacketExtension} to the given {@link JID}. The
-     * recipient has to be in the session or the extension will not be sent.
-     * </p>
-     * 
-     * <p>
-     * If the extension's raw data (bytes) is longer than
-     * {@value #MAX_XMPP_MESSAGE_SIZE} or if there is a peer-to-peer bytestream
-     * to the recipient the extension will be sent using the bytestream. Else it
-     * will be sent by chat.
-     * </p>
-     * 
-     * <p>
-     * <s>Note: Does NOT ensure that peers receive messages in order because
-     * there may be two completely different communication ways. See
-     * {@link de.fu_berlin.inf.dpp.project.internal.ActivitySequencer} for
-     * details.</s> There is currently only one communication way enabled !
-     * </p>
-     * 
-     * @param recipient
-     * @param extension
-     * @throws IOException
-     *             if sending by bytestreams fails and the extension raw data is
-     *             longer than {@value #MAX_XMPP_MESSAGE_SIZE}
-     * 
-     * @deprecated use {@link #sendToSessionUser(String, JID, PacketExtension)}
-     */
-    @Deprecated
-    public void sendToSessionUser(JID recipient, PacketExtension extension)
-        throws IOException;
-
-    /**
-     * Sends the given {@link PacketExtension} to the given {@link JID}.
-     * 
-     * @param connectionID
-     * @param recipient
-     * @param extension
-     * @throws IOException
-     */
-    public void sendToSessionUser(String connectionID, JID recipient,
-        PacketExtension extension) throws IOException;
-
-    /**
      * Sends the given {@link PacketExtension} to the given {@link JID} over the
      * currently established XMPP connection. There is <b>no</b> guarantee that
      * this message (extension) will arrive at the recipients side !
@@ -108,8 +65,32 @@ public interface ITransmitter {
      * @param jid
      *            the recipient of the extension
      * @param extension
-     *            the to send
+     *            the extension to send
      */
-    // FIXME rename to sendExtension
-    public void sendMessageToUser(JID jid, PacketExtension extension);
+
+    public void sendPacketExtension(JID jid, PacketExtension extension);
+
+    /**
+     * @deprecated use {@link #send(String, JID, PacketExtension)}
+     */
+    @Deprecated
+    public void send(JID recipient, PacketExtension extension)
+        throws IOException;
+
+    /**
+     * Sends the given {@link PacketExtension} to the given {@link JID} using a
+     * direct stream connection. The connection must be already established to
+     * the recipient with the given id.
+     * 
+     * @param connectionID
+     *            the id of the connection
+     * @param recipient
+     *            the recipient of the extension
+     * @param extension
+     *            the extension to send
+     * @throws IOException
+     *             if an I/O error occurs
+     */
+    public void send(String connectionID, JID recipient,
+        PacketExtension extension) throws IOException;
 }

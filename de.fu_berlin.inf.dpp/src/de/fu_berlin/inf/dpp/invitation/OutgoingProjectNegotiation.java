@@ -212,7 +212,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             sessionID, processID, projectExchangeInfos);
 
         transmitter
-            .sendToSessionUser(ISarosSession.SESSION_CONNECTION_ID, peer,
+            .send(ISarosSession.SESSION_CONNECTION_ID, peer,
                 ProjectNegotiationOfferingExtension.PROVIDER.create(offering));
     }
 
@@ -516,7 +516,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             + " to perform additional initialization...",
             IProgressMonitor.UNKNOWN);
 
-        transmitter.sendToSessionUser(ISarosSession.SESSION_CONNECTION_ID,
+        transmitter.send(ISarosSession.SESSION_CONNECTION_ID,
             peer, StartActivityQueuingRequest.PROVIDER
                 .create(new StartActivityQueuingRequest(sessionID, processID)));
 

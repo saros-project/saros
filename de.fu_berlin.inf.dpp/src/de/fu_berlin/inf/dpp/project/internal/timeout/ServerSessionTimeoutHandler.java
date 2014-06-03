@@ -100,7 +100,7 @@ public final class ServerSessionTimeoutHandler extends SessionTimeoutHandler {
                     }
 
                     try {
-                        transmitter.sendToSessionUser(
+                        transmitter.send(
                             ISarosSession.SESSION_CONNECTION_ID, user.getJID(),
                             PingExtension.PROVIDER.create(new PingExtension(
                                 currentSessionID)));

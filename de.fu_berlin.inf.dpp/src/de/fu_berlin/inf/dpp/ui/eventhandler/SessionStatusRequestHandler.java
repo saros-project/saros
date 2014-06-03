@@ -76,7 +76,7 @@ public final class SessionStatusRequestHandler {
                 getSessionDescription(session));
         }
 
-        transmitter.sendMessageToUser(from,
+        transmitter.sendPacketExtension(from,
             SessionStatusResponseExtension.PROVIDER.create(response));
     }
 

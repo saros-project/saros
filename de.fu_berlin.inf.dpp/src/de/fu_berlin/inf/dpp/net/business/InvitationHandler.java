@@ -85,7 +85,7 @@ public class InvitationHandler {
                     PacketExtension response = InvitationAcknowledgedExtension.PROVIDER
                         .create(new InvitationAcknowledgedExtension(
                             invitationID));
-                    transmitter.sendMessageToUser(fromJID, response);
+                    transmitter.sendPacketExtension(fromJID, response);
 
                     sessionManager.invitationReceived(fromJID, sessionID,
                         invitationID, version, description);
@@ -94,7 +94,7 @@ public class InvitationHandler {
                     PacketExtension response = CancelInviteExtension.PROVIDER
                         .create(new CancelInviteExtension(invitationID,
                             "I am already in a Saros session and so cannot accept your invitation."));
-                    transmitter.sendMessageToUser(fromJID, response);
+                    transmitter.sendPacketExtension(fromJID, response);
                 }
             }
         }, InvitationOfferingExtension.PROVIDER.getPacketFilter());

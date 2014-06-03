@@ -305,7 +305,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
         InvitationOfferingExtension invitationOffering = new InvitationOfferingExtension(
             invitationID, sarosSession.getID(), localVersion, description);
 
-        transmitter.sendMessageToUser(peer,
+        transmitter.sendPacketExtension(peer,
             InvitationOfferingExtension.PROVIDER.create(invitationOffering));
     }
 
@@ -427,7 +427,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
         log.debug(this + " : sending updated session negotiation data");
 
         monitor.setTaskName("Sending local session configuration...");
-        transmitter.sendMessageToUser(peer,
+        transmitter.sendPacketExtension(peer,
             InvitationParameterExchangeExtension.PROVIDER
                 .create(modifiedParameters));
 
@@ -491,7 +491,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
              * send using the various methods of the ITransmitted interface.
              */
 
-            transmitter.sendToSessionUser(ISarosSession.SESSION_CONNECTION_ID,
+            transmitter.send(ISarosSession.SESSION_CONNECTION_ID,
                 peer, InvitationAcknowledgedExtension.PROVIDER
                     .create(new InvitationAcknowledgedExtension(invitationID)));
         }
