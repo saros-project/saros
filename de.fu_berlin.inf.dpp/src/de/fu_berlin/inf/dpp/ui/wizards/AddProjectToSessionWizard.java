@@ -48,8 +48,8 @@ import de.fu_berlin.inf.dpp.invitation.IncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
+import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -85,7 +85,7 @@ public class AddProjectToSessionWizard extends Wizard {
     private IChecksumCache checksumCache;
 
     @Inject
-    private DataTransferManager dataTransferManager;
+    private IConnectionManager connectionManager;
 
     @Inject
     private PreferenceUtils preferenceUtils;
@@ -140,7 +140,7 @@ public class AddProjectToSessionWizard extends Wizard {
         if (session == null)
             return;
 
-        namePage = new EnterProjectNamePage(session, dataTransferManager,
+        namePage = new EnterProjectNamePage(session, connectionManager,
             preferenceUtils, fileLists, peer, this.remoteProjectNames);
 
         addPage(namePage);

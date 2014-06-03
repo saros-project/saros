@@ -37,8 +37,8 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 
 import de.fu_berlin.inf.dpp.invitation.FileList;
+import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
@@ -72,7 +72,7 @@ public class EnterProjectNamePage extends WizardPage {
 
     private Button disableVCSCheckbox;
 
-    private DataTransferManager dataTransferManager;
+    private IConnectionManager connectionManager;
 
     private PreferenceUtils preferenceUtils;
 
@@ -88,13 +88,13 @@ public class EnterProjectNamePage extends WizardPage {
      *            projectName
      */
     public EnterProjectNamePage(ISarosSession session,
-        DataTransferManager dataTransferManager,
+        IConnectionManager connectionManager,
         PreferenceUtils preferenceUtils, List<FileList> fileLists, JID peer,
         Map<String, String> remoteProjectNames) {
 
         super(Messages.EnterProjectNamePage_title);
         this.session = session;
-        this.dataTransferManager = dataTransferManager;
+        this.connectionManager = connectionManager;
         this.preferenceUtils = preferenceUtils;
         this.peer = peer;
         this.remoteProjectNames = remoteProjectNames;
@@ -487,7 +487,7 @@ public class EnterProjectNamePage extends WizardPage {
      */
     private void updateConnectionStatus() {
 
-        switch (dataTransferManager.getTransferMode(this.peer)) {
+        switch (connectionManager.getTransferMode(this.peer)) {
         case SOCKS5_MEDIATED:
             if (preferenceUtils.isLocalSOCKS5ProxyEnabled())
                 setDescription(Messages.EnterProjectNamePage_description_socks5proxy);

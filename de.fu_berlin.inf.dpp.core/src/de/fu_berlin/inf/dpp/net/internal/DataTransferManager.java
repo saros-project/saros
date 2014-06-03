@@ -29,6 +29,7 @@ import de.fu_berlin.inf.dpp.ISarosContextBindings.Socks5Transport;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
+import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.IPacketInterceptor;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransferModeListener;
@@ -47,10 +48,8 @@ import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 // FIXME it is currently not possible to configure the transport modes (result
 // of a move to Saros core)
 @Component(module = "net")
-public class DataTransferManager implements IConnectionListener {
-
-    public static final int IBB_TRANSPORT = 1;
-    public static final int SOCKS5_TRANSPORT = 2;
+public class DataTransferManager implements IConnectionListener,
+    IConnectionManager {
 
     private static final Logger log = Logger
         .getLogger(DataTransferManager.class);
@@ -190,10 +189,12 @@ public class DataTransferManager implements IConnectionListener {
         connectionService.addListener(this);
     }
 
+    @Override
     public void addTransferModeListener(ITransferModeListener listener) {
         transferModeDispatch.add(listener);
     }
 
+    @Override
     public void removeTransferModeListener(ITransferModeListener listener) {
         transferModeDispatch.remove(listener);
     }
@@ -285,11 +286,13 @@ public class DataTransferManager implements IConnectionListener {
     /**
      * @deprecated
      */
+    @Override
     @Deprecated
     public void connect(JID peer) throws IOException {
         connect(DEFAULT_CONNECTION_ID, peer);
     }
 
+    @Override
     public void connect(String connectionID, JID peer) throws IOException {
         if (connectionID == null)
             throw new NullPointerException("connectionID is null");
@@ -308,11 +311,13 @@ public class DataTransferManager implements IConnectionListener {
      *            {@link JID} of the peer to disconnect the
      *            {@link IByteStreamConnection}
      */
+    @Override
     @Deprecated
     public boolean closeConnection(JID peer) {
         return closeConnection(DEFAULT_CONNECTION_ID, peer);
     }
 
+    @Override
     public boolean closeConnection(String connectionIdentifier, JID peer) {
         ConnectionHolder holder = connections.remove(toConnectionIDToken(
             connectionIdentifier, peer));
@@ -331,14 +336,12 @@ public class DataTransferManager implements IConnectionListener {
     }
 
     /**
-     * Sets the transport that should be used to establish direct connections.
-     * The transports will be used on the next successful connection to a XMPP
-     * server and will not affect the transports that are currently used.
+     * {@inheritDoc} The transports will be used on the next successful
+     * connection to a XMPP server and will not affect the transports that are
+     * currently used.
      * 
-     * @param transportMask
-     *            bit wise OR mask that contain the transport to use, -1 for all
-     *            available transports or 0 for no transport at all
      */
+    @Override
     public synchronized void setTransport(int transportMask) {
         this.transportMask = transportMask;
     }
@@ -346,11 +349,13 @@ public class DataTransferManager implements IConnectionListener {
     /**
      * @deprecated
      */
+    @Override
     @Deprecated
     public NetTransferMode getTransferMode(JID jid) {
         return getTransferMode(null, jid);
     }
 
+    @Override
     public NetTransferMode getTransferMode(String connectionID, JID jid) {
         IByteStreamConnection connection = getCurrentConnection(connectionID,
             jid);

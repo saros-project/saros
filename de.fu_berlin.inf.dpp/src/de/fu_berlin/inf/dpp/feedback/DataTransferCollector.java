@@ -5,10 +5,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.ITransferModeListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 
 /**
@@ -30,7 +30,7 @@ public class DataTransferCollector extends AbstractStatisticCollector {
     private final Map<NetTransferMode, TransferStatisticHolder> statistic = new EnumMap<NetTransferMode, TransferStatisticHolder>(
         NetTransferMode.class);
 
-    private final DataTransferManager dataTransferManager;
+    private final IConnectionManager connectionManager;
 
     private final ITransferModeListener dataTransferlistener = new ITransferModeListener() {
 
@@ -63,9 +63,9 @@ public class DataTransferCollector extends AbstractStatisticCollector {
     };
 
     public DataTransferCollector(StatisticManager statisticManager,
-        ISarosSession session, DataTransferManager dataTransferManager) {
+        ISarosSession session, IConnectionManager connectionManager) {
         super(statisticManager, session);
-        this.dataTransferManager = dataTransferManager;
+        this.connectionManager = connectionManager;
     }
 
     @Override
@@ -89,11 +89,11 @@ public class DataTransferCollector extends AbstractStatisticCollector {
 
     @Override
     protected void doOnSessionStart(ISarosSession sarosSession) {
-        dataTransferManager.addTransferModeListener(dataTransferlistener);
+        connectionManager.addTransferModeListener(dataTransferlistener);
     }
 
     @Override
     protected void doOnSessionEnd(ISarosSession sarosSession) {
-        dataTransferManager.removeTransferModeListener(dataTransferlistener);
+        connectionManager.removeTransferModeListener(dataTransferlistener);
     }
 }

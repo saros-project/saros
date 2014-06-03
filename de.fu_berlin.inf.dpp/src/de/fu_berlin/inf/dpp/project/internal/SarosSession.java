@@ -73,10 +73,10 @@ import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.misc.xstream.SPathConverter;
 import de.fu_berlin.inf.dpp.misc.xstream.UserConverter;
+import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
@@ -117,7 +117,7 @@ public final class SarosSession implements ISarosSession {
     private PreferenceUtils preferenceUtils;
 
     @Inject
-    private DataTransferManager transferManager;
+    private IConnectionManager connectionManager;
 
     private final IPathFactory pathFactory;
 
@@ -550,7 +550,7 @@ public final class SarosSession implements ISarosSession {
 
         // Disconnect bytestream connection when user leaves session to
         // prevent idling connection when not needed anymore.
-        transferManager.closeConnection(ISarosSession.SESSION_CONNECTION_ID,
+        connectionManager.closeConnection(ISarosSession.SESSION_CONNECTION_ID,
             jid);
 
         log.info("user " + user + " left session");
@@ -659,7 +659,7 @@ public final class SarosSession implements ISarosSession {
         }
 
         for (User user : getRemoteUsers())
-            transferManager.closeConnection(
+            connectionManager.closeConnection(
                 ISarosSession.SESSION_CONNECTION_ID, user.getJID());
 
         // TODO Pull that out

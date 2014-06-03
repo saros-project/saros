@@ -23,9 +23,9 @@ import de.fu_berlin.inf.dpp.account.XMPPAccount;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
+import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.mdns.MDNSService;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 
@@ -49,7 +49,7 @@ public class ConnectionHandler {
     private final XMPPAccountStore accountStore;
     private final PreferenceUtils preferences;
 
-    private final DataTransferManager transferManager;
+    private final IConnectionManager connectionManager;
 
     private volatile IConnectingFailureCallback callback;
 
@@ -79,11 +79,11 @@ public class ConnectionHandler {
 
     public ConnectionHandler(final XMPPConnectionService connectionService,
         final MDNSService mDNSService,
-        final DataTransferManager transferManager,
+        final IConnectionManager transferManager,
         final XMPPAccountStore accountStore, final PreferenceUtils preferences) {
         this.connectionService = connectionService;
         this.mDNSService = mDNSService;
-        this.transferManager = transferManager;
+        this.connectionManager = transferManager;
         this.accountStore = accountStore;
         this.preferences = preferences;
 
@@ -298,9 +298,10 @@ public class ConnectionHandler {
         try {
 
             if (preferences.forceFileTranserByChat())
-                transferManager.setTransport(DataTransferManager.IBB_TRANSPORT);
+                connectionManager
+                    .setTransport(IConnectionManager.IBB_TRANSPORT);
             else
-                transferManager.setTransport(/* use all */-1);
+                connectionManager.setTransport(/* use all */-1);
 
             connectionService.connect(
                 createConnectionConfiguration(domain, server, port, useTLS,

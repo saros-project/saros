@@ -45,6 +45,7 @@ import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;
 import de.fu_berlin.inf.dpp.feedback.StatisticCollectorTest;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.net.DispatchThreadContext;
+import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -142,8 +143,8 @@ public class SarosSessionTest {
         return saros;
     }
 
-    static public DataTransferManager createDataTransferManagerMock() {
-        DataTransferManager mock = EasyMock
+    static public IConnectionManager createDataTransferManagerMock() {
+        IConnectionManager mock = EasyMock
             .createNiceMock(DataTransferManager.class);
 
         EasyMock.replay(mock);
@@ -179,7 +180,7 @@ public class SarosSessionTest {
         container.addComponent(XMPPConnectionService.class,
             createConnectionServiceMock());
         container.addComponent(Saros.class, createSarosMock(store));
-        container.addComponent(DataTransferManager.class,
+        container.addComponent(IConnectionManager.class,
             createDataTransferManagerMock());
 
         // Mocks that stay in the replay state

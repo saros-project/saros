@@ -21,10 +21,10 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.invitation.hooks.ISessionNegotiationHook;
+import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.discovery.DiscoveryManager;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ColorNegotiationHook;
@@ -64,7 +64,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
     private DiscoveryManager discoveryManager;
 
     @Inject
-    private DataTransferManager dataTransferManager;
+    private IConnectionManager connectionManager;
 
     @Inject
     private ISarosSessionManager sessionManager;
@@ -196,7 +196,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
             monitor.setTaskName("Negotiating data connection...");
 
-            dataTransferManager.connect(ISarosSession.SESSION_CONNECTION_ID,
+            connectionManager.connect(ISarosSession.SESSION_CONNECTION_ID,
                 peer);
 
             User newUser = completeInvitation(monitor);

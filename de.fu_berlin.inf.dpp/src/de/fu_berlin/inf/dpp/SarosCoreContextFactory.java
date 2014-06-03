@@ -16,6 +16,7 @@ import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
 import de.fu_berlin.inf.dpp.editor.colorstorage.ColorIDSetStorage;
 import de.fu_berlin.inf.dpp.invitation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.DispatchThreadContext;
+import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
@@ -84,7 +85,7 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
         // Network
         Component.create(DispatchThreadContext.class),
 
-        Component.create(DataTransferManager.class),
+        Component.create(IConnectionManager.class, DataTransferManager.class),
 
         Component.create(DiscoveryManager.class),
 

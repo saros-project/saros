@@ -20,8 +20,8 @@ import de.fu_berlin.inf.dpp.ISarosContextBindings;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
+import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceInitializer;
 import de.fu_berlin.inf.dpp.project.internal.SarosSessionTest;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -125,7 +125,7 @@ public class StatisticCollectorTest {
 
         FeedbackPreferences.setPreferences(preferences);
 
-        container.addComponent(DataTransferManager.class,
+        container.addComponent(IConnectionManager.class,
             SarosSessionTest.createDataTransferManagerMock());
 
         // Components we want to create
