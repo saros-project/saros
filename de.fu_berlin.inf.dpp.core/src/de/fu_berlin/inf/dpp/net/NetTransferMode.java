@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.net;
 
 public enum NetTransferMode {
     NONE("UKNOWN"), IBB("IBB"), SOCKS5_MEDIATED("SOCKS5 (mediated)"), SOCKS5_DIRECT(
-        "SOCKS5 (direct)");
+        "SOCKS5 (direct)"), TCP("TCP");
 
     private final String name;
 

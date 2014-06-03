@@ -128,8 +128,8 @@ public abstract class ByteStreamTransport implements ITransport {
             throw new IOException(this + " transport is not initialized");
 
         return new BinaryChannelConnection(new JID(peer), connectionIdentifier,
-            manager.establishSession(peer, connectionIdentifier),
-            getNetTransferMode(), listener);
+            new XMPPByteStreamAdapter(manager.establishSession(peer,
+                connectionIdentifier)), getNetTransferMode(), listener);
     }
 
     /**
@@ -153,7 +153,8 @@ public abstract class ByteStreamTransport implements ITransport {
             throw new IOException(this + " transport is not initialized");
 
         return new BinaryChannelConnection(new JID(request.getFrom()),
-            request.getSessionID(), request.accept(), getNetTransferMode(),
+            request.getSessionID(),
+            new XMPPByteStreamAdapter(request.accept()), getNetTransferMode(),
             listener);
     }
 

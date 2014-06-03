@@ -29,6 +29,6 @@ public class IBBTransport extends ByteStreamTransport {
 
     @Override
     public String toString() {
-        return "IBBTransport";
+        return "XMPP-IBB-Transport";
     }
 }

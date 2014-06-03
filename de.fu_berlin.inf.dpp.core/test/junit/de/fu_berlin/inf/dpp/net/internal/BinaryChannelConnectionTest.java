@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.jivesoftware.smackx.bytestreams.BytestreamSession;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -27,7 +26,7 @@ public class BinaryChannelConnectionTest {
 
     private static final int PIPE_BUFFER_SIZE = 1024 * 1024;
 
-    private static class PipedBytestreamSession implements BytestreamSession {
+    private static class PipedBytestreamSession implements ByteStream {
 
         private InputStream in;
         private OutputStream out;
@@ -84,8 +83,8 @@ public class BinaryChannelConnectionTest {
         public abstract void receive(BinaryXMPPExtension extension);
     }
 
-    private BytestreamSession aliceSession;
-    private BytestreamSession bobSession;
+    private ByteStream aliceStream;
+    private ByteStream bobStream;
 
     @Before
     public void setUp() throws IOException {
@@ -98,8 +97,8 @@ public class BinaryChannelConnectionTest {
         aliceOut.connect(bobIn);
         aliceIn.connect(bobOut);
 
-        aliceSession = new PipedBytestreamSession(aliceIn, aliceOut);
-        bobSession = new PipedBytestreamSession(bobIn, bobOut);
+        aliceStream = new PipedBytestreamSession(aliceIn, aliceOut);
+        bobStream = new PipedBytestreamSession(bobIn, bobOut);
     }
 
     private volatile byte[] receivedBytes;
@@ -112,7 +111,7 @@ public class BinaryChannelConnectionTest {
         final CountDownLatch received = new CountDownLatch(2);
 
         BinaryChannelConnection alice = new BinaryChannelConnection(new JID(
-            "alice@baumeister.de"), "junit", aliceSession,
+            "alice@baumeister.de"), "junit", aliceStream,
             NetTransferMode.SOCKS5_DIRECT, new StreamConnectionListener() {
                 @Override
                 public void receive(final BinaryXMPPExtension extension) {
@@ -121,7 +120,7 @@ public class BinaryChannelConnectionTest {
             });
 
         BinaryChannelConnection bob = new BinaryChannelConnection(new JID(
-            "bob@baumeister.de"), "junit", bobSession,
+            "bob@baumeister.de"), "junit", bobStream,
             NetTransferMode.SOCKS5_DIRECT, new StreamConnectionListener() {
                 @Override
                 public void receive(final BinaryXMPPExtension extension) {
@@ -193,7 +192,7 @@ public class BinaryChannelConnectionTest {
         final CountDownLatch received = new CountDownLatch(1);
 
         BinaryChannelConnection alice = new BinaryChannelConnection(new JID(
-            "alice@baumeister.de"), "junit", aliceSession,
+            "alice@baumeister.de"), "junit", aliceStream,
             NetTransferMode.SOCKS5_DIRECT, new StreamConnectionListener() {
                 @Override
                 public void receive(final BinaryXMPPExtension extension) {
@@ -202,7 +201,7 @@ public class BinaryChannelConnectionTest {
             });
 
         BinaryChannelConnection bob = new BinaryChannelConnection(new JID(
-            "bob@baumeister.de"), "junit", bobSession,
+            "bob@baumeister.de"), "junit", bobStream,
             NetTransferMode.SOCKS5_DIRECT, new StreamConnectionListener() {
                 @Override
                 public void receive(final BinaryXMPPExtension extension) {
@@ -253,7 +252,7 @@ public class BinaryChannelConnectionTest {
         final CountDownLatch received = new CountDownLatch((int) packetsToSend);
 
         BinaryChannelConnection alice = new BinaryChannelConnection(new JID(
-            "alice@baumeister.de"), "junit", aliceSession,
+            "alice@baumeister.de"), "junit", aliceStream,
             NetTransferMode.SOCKS5_DIRECT, new StreamConnectionListener() {
                 @Override
                 public void receive(final BinaryXMPPExtension extension) {
@@ -262,7 +261,7 @@ public class BinaryChannelConnectionTest {
             });
 
         BinaryChannelConnection bob = new BinaryChannelConnection(new JID(
-            "bob@baumeister.de"), "junit", bobSession,
+            "bob@baumeister.de"), "junit", bobStream,
             NetTransferMode.SOCKS5_DIRECT, new StreamConnectionListener() {
                 @Override
                 public void receive(final BinaryXMPPExtension extension) {

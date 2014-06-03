@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.jivesoftware.smackx.bytestreams.BytestreamSession;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
@@ -74,7 +73,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
 
     private DataInputStream inputStream;
     private DataOutputStream outputStream;
-    private BytestreamSession session;
+    private ByteStream stream;
 
     private Map<Integer, String> inNamespaceCache = new HashMap<Integer, String>();
     private Map<String, Integer> outNamespaceCache = new HashMap<String, Integer>();
@@ -123,19 +122,19 @@ public class BinaryChannelConnection implements IByteStreamConnection {
     }
 
     public BinaryChannelConnection(JID peer, String connectionID,
-        BytestreamSession session, NetTransferMode mode,
+        ByteStream stream, NetTransferMode mode,
         IByteStreamConnectionListener listener) throws IOException {
         this.listener = listener;
         this.peer = peer;
         this.connectionID = connectionID;
-        this.session = session;
-        this.session.setReadTimeout(0); // keep connection alive
+        this.stream = stream;
+        this.stream.setReadTimeout(0); // keep connection alive
         this.transferMode = mode;
 
         outputStream = new DataOutputStream(new BufferedOutputStream(
-            session.getOutputStream()));
+            stream.getOutputStream()));
         inputStream = new DataInputStream(new BufferedInputStream(
-            session.getInputStream()));
+            stream.getInputStream()));
     }
 
     @Override
@@ -172,7 +171,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
                 return;
 
             try {
-                session.close();
+                stream.close();
             } catch (Exception e) {
                 LOG.error("failed to gracefully close connection " + this, e);
             } finally {
