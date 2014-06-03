@@ -1,24 +1,23 @@
 package de.fu_berlin.inf.dpp.ui.model.mdns;
 
-import javax.jmdns.JmDNS;
-
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 
+import de.fu_berlin.inf.dpp.net.mdns.MDNSService;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.model.HeaderElement;
 
 public class MDNSHeaderElement extends HeaderElement {
 
     private final MDNSContentProvider provider;
-    private final JmDNS jmDNS;
+    private final MDNSService mDNSService;
 
-    public MDNSHeaderElement(Font font, MDNSContentProvider provider,
-        JmDNS jmDNS) {
+    public MDNSHeaderElement(final Font font,
+        final MDNSContentProvider provider, final MDNSService mDNSService) {
         super(font);
         this.provider = provider;
-        this.jmDNS = jmDNS;
+        this.mDNSService = mDNSService;
     }
 
     @Override
@@ -40,6 +39,6 @@ public class MDNSHeaderElement extends HeaderElement {
 
     @Override
     public Object[] getChildren() {
-        return provider.getElements(jmDNS);
+        return provider.getElements(mDNSService);
     }
 }

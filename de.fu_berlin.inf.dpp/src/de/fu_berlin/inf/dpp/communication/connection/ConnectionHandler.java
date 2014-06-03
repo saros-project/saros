@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.communication.connection;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -23,6 +24,7 @@ import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
+import de.fu_berlin.inf.dpp.net.mdns.MDNSService;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 
 /**
@@ -36,7 +38,12 @@ public class ConnectionHandler {
 
     private static final Logger LOG = Logger.getLogger(ConnectionHandler.class);
 
+    private static final boolean MDNS_MODE = Boolean
+        .getBoolean("de.fu_berlin.inf.dpp.net.ENABLE_MDNS");
+
     private final XMPPConnectionService connectionService;
+    private final MDNSService mDNSService;
+
     private final XMPPAccountStore accountStore;
     private final PreferenceUtils preferences;
 
@@ -49,6 +56,11 @@ public class ConnectionHandler {
     private boolean isConnecting;
     private boolean isDisconnecting;
 
+    private ConnectionState currentConnectionState = ConnectionState.NOT_CONNECTED;
+    private Exception currentConnectionError = null;
+
+    private final Object notifyLock = new Object();
+
     private final IConnectionListener xmppConnectionListener = new IConnectionListener() {
 
         @Override
@@ -58,16 +70,17 @@ public class ConnectionHandler {
             final Exception error = state == ConnectionState.ERROR ? connectionService
                 .getConnectionError() : null;
 
-            for (IConnectionStateListener listener : stateListeners)
-                listener.connectionStateChanged(state, error);
+            setConnectionState(state, error, true);
         }
 
     };
 
     public ConnectionHandler(final XMPPConnectionService connectionService,
+        final MDNSService mDNSService,
         final DataTransferManager transferManager,
         final XMPPAccountStore accountStore, final PreferenceUtils preferences) {
         this.connectionService = connectionService;
+        this.mDNSService = mDNSService;
         this.transferManager = transferManager;
         this.accountStore = accountStore;
         this.preferences = preferences;
@@ -76,17 +89,41 @@ public class ConnectionHandler {
     }
 
     /**
-     * @see XMPPConnectionService#getConnectionState()
+     * Returns the current connection state.
      */
     public ConnectionState getConnectionState() {
-        return connectionService.getConnectionState();
+        synchronized (notifyLock) {
+            return currentConnectionState;
+        }
     }
 
     /**
-     * @see XMPPConnectionService#getJID()
+     * Returns the latest connection error.
+     * 
+     * @return the connection error or <code>null</code>
      */
-    public JID getJID() {
-        return connectionService.getJID();
+    public Exception getConnectionError() {
+        synchronized (notifyLock) {
+            return currentConnectionError;
+        }
+    }
+
+    /**
+     * Returns a unique id for the current connection.
+     * 
+     * @return a unique id for the current connection or <code>null</code> if no
+     *         connection is established or the connection has no unique id
+     */
+    public String getConnectionID() {
+        if (MDNS_MODE)
+            return mDNSService.getQualifiedServiceName();
+
+        final JID jid = connectionService.getJID();
+
+        if (jid == null)
+            return null;
+
+        return jid.toString();
     }
 
     /**
@@ -96,6 +133,10 @@ public class ConnectionHandler {
      *         <code>false</code> otherwise
      */
     public boolean isConnected() {
+
+        if (MDNS_MODE)
+            return mDNSService.getQualifiedServiceName() != null;
+
         return connectionService.isConnected();
     }
 
@@ -133,7 +174,10 @@ public class ConnectionHandler {
         }
 
         try {
-            connectInternal(failSilently);
+            if (MDNS_MODE)
+                connectMDNSInternal(failSilently);
+            else
+                connectXMPPInternal(failSilently);
         } finally {
             synchronized (this) {
                 isConnecting = false;
@@ -151,7 +195,10 @@ public class ConnectionHandler {
         }
 
         try {
-            connectionService.disconnect();
+            if (MDNS_MODE)
+                disconnectMDNSInternal();
+            else
+                disconnectXMPPInternal();
         } finally {
             synchronized (this) {
                 isDisconnecting = false;
@@ -164,7 +211,52 @@ public class ConnectionHandler {
         this.callback = callback;
     }
 
-    private void connectInternal(boolean failSilently) {
+    private void disconnectXMPPInternal() {
+        connectionService.disconnect();
+    }
+
+    private void disconnectMDNSInternal() {
+        setConnectionState(ConnectionState.DISCONNECTING, null, true);
+        mDNSService.stop();
+        setConnectionState(ConnectionState.NOT_CONNECTED, null, true);
+    }
+
+    private void connectMDNSInternal(boolean failSilently) {
+        IConnectingFailureCallback callbackTmp = callback;
+
+        if (accountStore.isEmpty() && callbackTmp != null && !failSilently) {
+            synchronized (this) {
+                isConnecting = false;
+            }
+
+            callbackTmp.connectingFailed(null);
+            return;
+        }
+
+        final XMPPAccount account = accountStore.getActiveAccount();
+
+        // misuse the XMPP account credentials for now;
+
+        if (isConnected())
+            disconnectMDNSInternal();
+
+        String serviceName = account.getUsername();
+
+        mDNSService.configure("_dpp._tcp.local.", serviceName,
+            (int) (Math.random() * 32000) + 1, null);
+
+        setConnectionState(ConnectionState.CONNECTING, null, true);
+        try {
+            mDNSService.start();
+            setConnectionState(ConnectionState.CONNECTED, null, true);
+        } catch (IOException e) {
+            LOG.error("failed to start MDNS service", e);
+            setConnectionState(ConnectionState.ERROR, e, true);
+            setConnectionState(ConnectionState.NOT_CONNECTED, null, true);
+        }
+    }
+
+    private void connectXMPPInternal(boolean failSilently) {
         IConnectingFailureCallback callbackTmp = callback;
 
         if (accountStore.isEmpty() && callbackTmp != null && !failSilently) {
@@ -301,5 +393,17 @@ public class ConnectionHandler {
         connectionConfiguration.setReconnectionAllowed(false);
 
         return connectionConfiguration;
+    }
+
+    private void setConnectionState(final ConnectionState state,
+        final Exception error, final boolean fireChanges) {
+        synchronized (notifyLock) {
+            this.currentConnectionState = state;
+            this.currentConnectionError = error;
+        }
+
+        for (IConnectionStateListener listener : stateListeners)
+            listener.connectionStateChanged(state, error);
+
     }
 }

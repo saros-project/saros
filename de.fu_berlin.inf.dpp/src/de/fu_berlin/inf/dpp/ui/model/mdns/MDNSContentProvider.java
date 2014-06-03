@@ -1,29 +1,22 @@
 package de.fu_berlin.inf.dpp.ui.model.mdns;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceEvent;
 import javax.jmdns.ServiceInfo;
 import javax.jmdns.ServiceListener;
 
 import org.eclipse.jface.viewers.Viewer;
 
+import de.fu_berlin.inf.dpp.net.mdns.MDNSService;
 import de.fu_berlin.inf.dpp.ui.model.TreeContentProvider;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.ViewerUtils;
 
 public final class MDNSContentProvider extends TreeContentProvider {
 
     private Viewer viewer;
-    private JmDNS jmDNS;
-
-    private boolean isDisposed;
-
-    private final Map<String, ServiceInfo> mDNSServices = new HashMap<String, ServiceInfo>();
+    private MDNSService mDNSService;
 
     private final ServiceListener serviceListener = new ServiceListener() {
 
@@ -34,45 +27,22 @@ public final class MDNSContentProvider extends TreeContentProvider {
 
         @Override
         public void serviceRemoved(ServiceEvent event) {
-            final ServiceInfo info = event.getInfo();
-
-            if (info == null)
-                return;
-
-            SWTUtils.runSafeSWTAsync(null, new Runnable() {
-
-                @Override
-                public void run() {
-                    if (!isDisposed)
-                        mDNSServices.remove(info.getQualifiedName());
-                }
-            });
-
-            // runs async
             ViewerUtils.refresh(viewer, true);
         }
 
         @Override
         public void serviceResolved(ServiceEvent event) {
+            /*
+             * HACK find out why the viewer does not expand empty sub nodes. We
+             * are currently facing the problem that it takes a while after
+             * connecting before first contacts are shown even if we expand the
+             * viewer in Connected state entries might still not be there so
+             * that the user has to manually expand the tree.
+             */
 
-            final ServiceInfo info = event.getInfo();
-
-            if (info == null)
-                return;
-
-            SWTUtils.runSafeSWTAsync(null, new Runnable() {
-
-                @Override
-                public void run() {
-                    if (!isDisposed)
-                        mDNSServices.put(info.getQualifiedName(), info);
-                }
-            });
-
-            // runs async
+            ViewerUtils.expandAll(viewer);
             ViewerUtils.refresh(viewer, true);
         }
-
     };
 
     public MDNSContentProvider() {
@@ -81,41 +51,46 @@ public final class MDNSContentProvider extends TreeContentProvider {
 
     @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-        this.viewer = viewer;
 
-        if (oldInput instanceof JmDNS)
-            ((JmDNS) oldInput).removeServiceListener("_dpp._tcp.local.",
-                serviceListener);
+        if (oldInput instanceof MDNSService)
+            ((MDNSService) oldInput).removeServiceListener(serviceListener);
 
-        jmDNS = null;
+        mDNSService = null;
 
-        if (newInput instanceof JmDNS) {
-            jmDNS = (JmDNS) newInput;
-            jmDNS.addServiceListener("_dpp._tcp.local.", serviceListener);
+        if (newInput instanceof MDNSService) {
+            mDNSService = (MDNSService) newInput;
+            mDNSService.addServiceListener(serviceListener);
         }
+
+        this.viewer = viewer;
     }
 
     @Override
     public void dispose() {
-        isDisposed = true;
 
-        if (jmDNS != null)
-            jmDNS.removeServiceListener("_dpp._tcp.local.", serviceListener);
+        if (mDNSService != null)
+            mDNSService.removeServiceListener(serviceListener);
 
-        jmDNS = null;
-        mDNSServices.clear();
+        mDNSService = null;
     }
 
     @Override
     public Object[] getElements(final Object inputElement) {
 
-        if (!(inputElement instanceof JmDNS))
+        if (!(inputElement instanceof MDNSService))
             return new Object[0];
 
+        final MDNSService service = (MDNSService) inputElement;
         final List<Object> elements = new ArrayList<Object>();
 
-        for (final ServiceInfo info : mDNSServices.values())
+        final String qualifiedServiceName = service.getQualifiedServiceName();
+
+        for (final ServiceInfo info : service.getResolvedServices()) {
+            if (info.getQualifiedName().equals(qualifiedServiceName))
+                continue; // do not display ourself
+
             elements.add(new MDNSEntryElement(info));
+        }
 
         return elements.toArray();
     }

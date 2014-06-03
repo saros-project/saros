@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.widgets.Composite;
-import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.StreamError;
 import org.jivesoftware.smack.packet.XMPPError;
@@ -13,10 +12,9 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.ISarosContextBindings.SarosVersion;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
+import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
+import de.fu_berlin.inf.dpp.communication.connection.IConnectionStateListener;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.net.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.FontUtils;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
@@ -31,7 +29,7 @@ public class ConnectionStateComposite extends Composite {
     private static final String CONNECTED_TOOLTIP = Messages.ConnectionStateComposite_tooltip_connected;
 
     @Inject
-    private XMPPConnectionService connectionService;
+    private ConnectionHandler connectionHandler;
 
     @Inject
     private @SarosVersion
@@ -44,12 +42,10 @@ public class ConnectionStateComposite extends Composite {
 
     private ConnectionState lastConnectionState;
 
-    private final IConnectionListener connectionListener = new IConnectionListener() {
+    private final IConnectionStateListener connectionListener = new IConnectionStateListener() {
         @Override
-        public void connectionStateChanged(final Connection connection,
-            final ConnectionState state) {
-
-            final Exception error = connectionService.getConnectionError();
+        public void connectionStateChanged(final ConnectionState state,
+            final Exception error) {
 
             SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
                 @Override
@@ -80,16 +76,16 @@ public class ConnectionStateComposite extends Composite {
 
         setBackground(getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
 
-        updateLabel(connectionService.getConnectionState(),
-            connectionService.getConnectionError());
+        connectionHandler.addConnectionStateListener(connectionListener);
 
-        connectionService.addListener(connectionListener);
+        updateLabel(connectionHandler.getConnectionState(),
+            connectionHandler.getConnectionError());
     }
 
     @Override
     public void dispose() {
         super.dispose();
-        connectionService.removeListener(connectionListener);
+        connectionHandler.removeConnectionStateListener(connectionListener);
     }
 
     private void updateLabel(ConnectionState state, Exception error) {
@@ -123,17 +119,17 @@ public class ConnectionStateComposite extends Composite {
         case CONNECTING:
             return Messages.ConnectionStateComposite_connecting;
         case CONNECTED:
-            JID jid = connectionService.getJID();
+            String id = connectionHandler.getConnectionID();
 
             /*
              * as we run async the return value may not be the same as described
              * in the javadoc so an error or something else may occurred in the
              * meantime
              */
-            if (jid == null)
+            if (id == null)
                 return Messages.ConnectionStateComposite_error_unknown;
 
-            String displayText = jid.getBase()
+            String displayText = id
                 + Messages.ConnectionStateComposite_connected;
             return displayText;
         case DISCONNECTING:

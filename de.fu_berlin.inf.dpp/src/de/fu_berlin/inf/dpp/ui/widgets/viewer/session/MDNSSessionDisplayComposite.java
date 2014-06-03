@@ -1,13 +1,14 @@
 package de.fu_berlin.inf.dpp.ui.widgets.viewer.session;
 
-import java.io.IOException;
-
-import javax.jmdns.JmDNS;
-
 import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Composite;
+import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
+import de.fu_berlin.inf.dpp.communication.connection.IConnectionStateListener;
+import de.fu_berlin.inf.dpp.net.ConnectionState;
+import de.fu_berlin.inf.dpp.net.mdns.MDNSService;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.ui.model.TreeLabelProvider;
 import de.fu_berlin.inf.dpp.ui.model.mdns.MDNSComparator;
@@ -15,6 +16,8 @@ import de.fu_berlin.inf.dpp.ui.model.mdns.MDNSContentProvider;
 import de.fu_berlin.inf.dpp.ui.model.session.SessionComparator;
 import de.fu_berlin.inf.dpp.ui.model.session.SessionContentProvider;
 import de.fu_berlin.inf.dpp.ui.model.session.SessionInput;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
+import de.fu_berlin.inf.dpp.ui.util.ViewerUtils;
 
 /**
  * This {@link Composite} displays the {@link SarosSession} and the Local Area
@@ -34,25 +37,66 @@ import de.fu_berlin.inf.dpp.ui.model.session.SessionInput;
  */
 public final class MDNSSessionDisplayComposite extends SessionDisplayComposite {
 
-    private static final Logger LOG = Logger
+    private final Logger LOG = Logger
         .getLogger(MDNSSessionDisplayComposite.class);
 
-    private JmDNS jmDNS;
+    @Inject
+    private MDNSService mDNSService;
+
+    @Inject
+    private ConnectionHandler connectionHandler;
+
+    private MDNSService currentmDNSService;
+
+    private final IConnectionStateListener connectionStateListener = new IConnectionStateListener() {
+        @Override
+        public void connectionStateChanged(final ConnectionState state,
+            final Exception error) {
+
+            switch (state) {
+            case CONNECTING:
+            case NOT_CONNECTED:
+                break;
+            case CONNECTED:
+                ViewerUtils.refresh(getViewer(), true);
+                //$FALL-THROUGH$
+            default:
+                return;
+            }
+
+            SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
+
+                @Override
+                public void run() {
+                    if (getViewer().getControl().isDisposed())
+                        return;
+
+                    currentmDNSService = state == ConnectionState.CONNECTING ? mDNSService
+                        : null;
+
+                    updateViewer();
+                }
+            });
+        }
+    };
 
     public MDNSSessionDisplayComposite(Composite parent, int style) {
         super(parent, style);
+        connectionHandler.addConnectionStateListener(connectionStateListener);
+        currentmDNSService = connectionHandler.isConnected() ? mDNSService
+            : null;
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        connectionHandler
+            .removeConnectionStateListener(connectionStateListener);
+        connectionHandler = null;
     }
 
     @Override
     protected void configureViewer(TreeViewer viewer) {
-
-        try {
-            jmDNS = JmDNS.create();
-        } catch (IOException e) {
-            jmDNS = null;
-            LOG.error(e);
-        }
-
         viewer.setContentProvider(new SessionContentProvider(
             new MDNSContentProvider()));
 
@@ -65,6 +109,7 @@ public final class MDNSSessionDisplayComposite extends SessionDisplayComposite {
     protected void updateViewer() {
         checkWidget();
         getViewer().setInput(
-            new SessionInput(sessionManager.getSarosSession(), jmDNS));
+            new SessionInput(sessionManager.getSarosSession(),
+                currentmDNSService));
     }
 }

@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.jmdns.JmDNS;
-
 import org.eclipse.jface.viewers.Viewer;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
@@ -20,6 +18,7 @@ import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.net.RosterAdapter;
+import de.fu_berlin.inf.dpp.net.mdns.MDNSService;
 import de.fu_berlin.inf.dpp.project.internal.FollowingActivitiesManager;
 import de.fu_berlin.inf.dpp.project.internal.IFollowModeChangesListener;
 import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
@@ -230,7 +229,7 @@ public class SessionContentProvider extends TreeContentProvider {
         } else if (additionalContentProvider instanceof MDNSContentProvider) {
             contentHeaderElement = new MDNSHeaderElement(viewer.getControl()
                 .getFont(), (MDNSContentProvider) additionalContentProvider,
-                (JmDNS) input.getCustomContent());
+                (MDNSService) input.getCustomContent());
         }
     }
 

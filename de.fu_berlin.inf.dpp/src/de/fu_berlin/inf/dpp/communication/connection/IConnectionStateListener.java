@@ -2,10 +2,10 @@ package de.fu_berlin.inf.dpp.communication.connection;
 
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 
+/**
+ * A listener for changes to the current connection state.
+ */
 public interface IConnectionStateListener {
-    /**
-     * A listener for changes to the current connection state.
-     */
 
     /**
      * Is fired when the state of the connection changes.
