@@ -8,7 +8,7 @@ import org.eclipse.ui.intro.IIntroManager;
 import org.eclipse.ui.intro.IIntroPart;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
+import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;

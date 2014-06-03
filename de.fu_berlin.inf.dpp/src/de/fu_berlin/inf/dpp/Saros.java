@@ -289,6 +289,9 @@ public class Saros extends AbstractUIPlugin {
 
         getPreferenceStore().setValue(
             "FAVORITE_COLOR_ID_HACK_CREATE_RANDOM_COLOR", false);
+
+        connectionHandler.convertAccountStore(getPreferenceStore(),
+            getSecurePrefs());
     }
 
     /**

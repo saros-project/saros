@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
+import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 
 /**
  * This interface gives you control to manipulate the Saros account store.

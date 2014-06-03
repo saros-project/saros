@@ -6,8 +6,6 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
 
-de.fu_berlin.inf.dpp.accountManagement.TestSuite.class,
-
 de.fu_berlin.inf.dpp.concurrent.undo.TestSuite.class,
 
 de.fu_berlin.inf.dpp.editor.colorstorage.TestSuite.class,

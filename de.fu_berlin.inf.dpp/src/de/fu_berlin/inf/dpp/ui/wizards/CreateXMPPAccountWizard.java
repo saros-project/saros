@@ -32,8 +32,8 @@ import org.jivesoftware.smack.packet.XMPPError;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
-import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
+import de.fu_berlin.inf.dpp.account.XMPPAccount;
+import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;

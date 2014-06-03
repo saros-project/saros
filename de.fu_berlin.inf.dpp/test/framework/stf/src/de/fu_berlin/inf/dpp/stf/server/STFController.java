@@ -23,6 +23,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.SarosContext;
+import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.impl.ControlBotImpl;
 import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation.impl.AccountManipulatorImpl;
@@ -160,6 +161,16 @@ public class STFController {
         if (preferenceStore != null)
             preferenceStore
                 .setToDefault(PreferenceConstants.FAVORITE_SESSION_COLOR_ID);
+
+        /*
+         * use memory only accounts to prevent errors because of multiple access
+         * of the same file
+         */
+
+        XMPPAccountStore store = context.getComponent(XMPPAccountStore.class);
+
+        if (store != null)
+            store.setAccountFile(null, null);
 
         try {
             registry = LocateRegistry.createRegistry(port);

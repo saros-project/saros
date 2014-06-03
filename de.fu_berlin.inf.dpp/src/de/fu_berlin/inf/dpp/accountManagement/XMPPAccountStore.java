@@ -24,7 +24,10 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
  * Class for the management of multiple XMPP accounts in Saros.
  * 
  * @author Stefan Rossbach
+ * 
+ * @deprecated Use {@link de.fu_berlin.inf.dpp.account.XMPPAccountStore} instead
  */
+@Deprecated
 @Component(module = "accountManagement")
 public final class XMPPAccountStore {
 

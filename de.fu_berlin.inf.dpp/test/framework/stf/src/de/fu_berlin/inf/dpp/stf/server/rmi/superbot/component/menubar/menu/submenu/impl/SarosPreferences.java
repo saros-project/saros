@@ -9,7 +9,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 
-import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
+import de.fu_berlin.inf.dpp.account.XMPPAccount;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.Messages;
 import de.fu_berlin.inf.dpp.net.JID;

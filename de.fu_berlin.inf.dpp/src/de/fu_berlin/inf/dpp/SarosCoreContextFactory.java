@@ -5,7 +5,7 @@ import java.util.Arrays;
 import org.picocontainer.BindKey;
 import org.picocontainer.MutablePicoContainer;
 
-import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
+import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.communication.SkypeManager;
 import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatService;

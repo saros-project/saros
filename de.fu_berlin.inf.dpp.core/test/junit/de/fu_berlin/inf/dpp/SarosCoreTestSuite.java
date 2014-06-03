@@ -6,6 +6,8 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
 
+de.fu_berlin.inf.dpp.account.TestSuite.class,
+
 de.fu_berlin.inf.dpp.communication.extensions.TestSuite.class,
 
 de.fu_berlin.inf.dpp.concurrent.TestSuite.class,

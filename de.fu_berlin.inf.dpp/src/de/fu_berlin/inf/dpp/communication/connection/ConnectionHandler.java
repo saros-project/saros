@@ -9,6 +9,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.log4j.Logger;
 import org.eclipse.core.net.proxy.IProxyData;
 import org.eclipse.core.net.proxy.IProxyService;
+import org.eclipse.equinox.security.storage.ISecurePreferences;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.XMPPException;
@@ -17,8 +19,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
-import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
+import de.fu_berlin.inf.dpp.account.XMPPAccount;
+import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -405,5 +407,54 @@ public class ConnectionHandler {
         for (IConnectionStateListener listener : stateListeners)
             listener.connectionStateChanged(state, error);
 
+    }
+
+    /**
+     * @deprecated Only of one-time use to convert from the old, IDE-dependent
+     *             format to the new, IDE-independent format. Will be removed in
+     *             Release n+2
+     */
+    @Deprecated
+    public void convertAccountStore(IPreferenceStore preferenceStore,
+        ISecurePreferences securePrefs) {
+
+        if (!accountStore.isEmpty()) {
+            LOG.debug("skipping conversion of old XMPP accounts, because there are already new ones");
+            return;
+        }
+
+        try {
+            de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore oldStore = new de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore(
+                preferenceStore, securePrefs);
+
+            if (oldStore.isEmpty())
+                return;
+
+            de.fu_berlin.inf.dpp.accountManagement.XMPPAccount oldActiveAccount;
+
+            oldActiveAccount = oldStore.getActiveAccount();
+
+            List<de.fu_berlin.inf.dpp.accountManagement.XMPPAccount> accounts = oldStore
+                .getAllAccounts();
+
+            accounts.remove(oldActiveAccount);
+            accounts.add(0, oldActiveAccount);
+
+            for (de.fu_berlin.inf.dpp.accountManagement.XMPPAccount account : accounts) {
+                LOG.debug("converting old account to new one: " + account);
+
+                try {
+                    accountStore.createAccount(account.getUsername(),
+                        account.getPassword(), account.getDomain(),
+                        account.getServer(), account.getPort(),
+                        account.useTLS(), account.useSASL());
+                } catch (RuntimeException e) {
+                    LOG.error("failed to convert old account: " + account, e);
+                }
+            }
+
+        } catch (RuntimeException e) {
+            LOG.error("failed to convert old account store", e);
+        }
     }
 }

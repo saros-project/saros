@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.accountManagement;
+package de.fu_berlin.inf.dpp.account;
 
 import java.io.Serializable;
 
@@ -7,10 +7,7 @@ import java.io.Serializable;
  * 
  * @author Sebastian Schlaak
  * @author Stefan Rossbach
- * 
- * @deprecated Use {@link de.fu_berlin.inf.dpp.account.XMPPAccount} instead.
  */
-@Deprecated
 public final class XMPPAccount implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -132,7 +129,7 @@ public final class XMPPAccount implements Serializable {
     public String toString() {
         return "username: '" + username + "', domain: '" + domain
             + "', server: '" + server + "', port: " + port + ", TLS: " + useTLS
-            + ", SASL: " + useSASL;
+            + ", SASL: " + useSASL + " : ";
     }
 
     @Override

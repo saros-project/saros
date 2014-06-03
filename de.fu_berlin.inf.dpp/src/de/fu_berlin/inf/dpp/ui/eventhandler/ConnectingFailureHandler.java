@@ -7,7 +7,7 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.XMPPError;
 
 import de.fu_berlin.inf.dpp.Messages;
-import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
+import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.communication.connection.IConnectingFailureCallback;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;

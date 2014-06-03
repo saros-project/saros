@@ -12,7 +12,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.NewProjectAction;
 
-import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
+import de.fu_berlin.inf.dpp.account.XMPPAccount;
 import de.fu_berlin.inf.dpp.ui.wizards.AddContactWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.AddContactsToSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.AddResourcesToSessionWizard;

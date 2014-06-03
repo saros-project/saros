@@ -4,8 +4,8 @@ import java.rmi.RemoteException;
 
 import org.apache.log4j.Logger;
 
-import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
-import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
+import de.fu_berlin.inf.dpp.account.XMPPAccount;
+import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation.IAccountManipulator;
 

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.accountManagement;
+package de.fu_berlin.inf.dpp.account;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
