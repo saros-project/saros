@@ -316,8 +316,8 @@ public class UserInformationHandler implements Startable {
                     continue;
                 }
 
-                user = new User(userEntry.jid, null, false, false,
-                    userEntry.colorID, userEntry.favoriteColorID);
+                user = new User(userEntry.jid, userEntry.nickname, false,
+                    false, userEntry.colorID, userEntry.favoriteColorID);
 
                 user.setPermission(userEntry.permission);
                 session.addUser(user);

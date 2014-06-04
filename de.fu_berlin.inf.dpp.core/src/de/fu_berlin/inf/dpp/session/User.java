@@ -70,7 +70,7 @@ public class User {
         this.colorID = colorID;
         this.favoriteColorID = favoriteColorID;
 
-        if (nickname == null)
+        if (nickname == null || nickname.trim().isEmpty())
             this.nickname = jid.getBareJID().toString();
         else
             this.nickname = nickname;
