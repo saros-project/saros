@@ -114,7 +114,7 @@ public class StartHandle {
         try {
             while (!acknowledged.get()
                 && (System.currentTimeMillis() < timeoutToExceed)
-                && user.isInSarosSession())
+                && user.isInSession())
                 Thread.sleep(stopManager.MILLISTOWAIT);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

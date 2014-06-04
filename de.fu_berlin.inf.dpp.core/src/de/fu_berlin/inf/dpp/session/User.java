@@ -35,7 +35,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
  * eclipse instance, all others are remote users.
  * 
  * The public and mutable properties are the {@link User.Permission} and
- * {@link #isInSarosSession()}.
+ * {@link #isInSession()}.
  * 
  * @entityObject A user is a entity object, i.e. it can change over time.
  */
@@ -76,13 +76,18 @@ public class User {
             this.nickname = nickname;
     }
 
+    /**
+     * @deprecated Will be replaced. Do not use this method in new code.
+     * @return
+     */
+    @Deprecated
     public JID getJID() {
         return jid;
     }
 
     /**
      * Returns the nickname of the user. The nickname persist through the whole
-     * session and will therefore change.
+     * session and will therefore not change.
      * 
      * @return the nickname of the user
      */
@@ -146,7 +151,7 @@ public class User {
      * @return <code>true</code> if the user is part of the session,
      *         <code>false</code> otherwise
      */
-    public boolean isInSarosSession() {
+    public boolean isInSession() {
         return isInSession;
     }
 

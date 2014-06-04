@@ -335,7 +335,7 @@ public class ActivityHandlerTest {
     private User createUser(boolean local) {
         User user = EasyMock.createMock(User.class);
         EasyMock.expect(user.isLocal()).andStubReturn(local);
-        EasyMock.expect(user.isInSarosSession()).andStubReturn(true);
+        EasyMock.expect(user.isInSession()).andStubReturn(true);
         EasyMock.replay(user);
         return user;
     }

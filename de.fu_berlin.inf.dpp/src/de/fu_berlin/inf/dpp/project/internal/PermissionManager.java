@@ -69,7 +69,7 @@ public class PermissionManager extends AbstractActivityProvider implements
     private void handlePermissionChange(PermissionActivity activity) {
 
         User user = activity.getAffectedUser();
-        if (!user.isInSarosSession()) {
+        if (!user.isInSession()) {
             log.warn("could not change permissions of user " + user
                 + " because the user is longer part of the session");
             return;

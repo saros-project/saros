@@ -108,7 +108,7 @@ public final class ServerSessionTimeoutHandler extends SessionTimeoutHandler {
 
                         removedUsers.add(user);
 
-                        if (!user.isInSarosSession())
+                        if (!user.isInSession())
                             continue;
 
                         LOG.error("failed to send ping to: " + user, e);
@@ -235,7 +235,7 @@ public final class ServerSessionTimeoutHandler extends SessionTimeoutHandler {
 
             UserPongStatus status = it.next();
 
-            if (status.user.isInSarosSession())
+            if (status.user.isInSession())
                 users.add(status.user);
         }
 
@@ -252,7 +252,7 @@ public final class ServerSessionTimeoutHandler extends SessionTimeoutHandler {
 
             UserPongStatus status = it.next();
 
-            if (!status.user.isInSarosSession())
+            if (!status.user.isInSession())
                 it.remove();
         }
     }

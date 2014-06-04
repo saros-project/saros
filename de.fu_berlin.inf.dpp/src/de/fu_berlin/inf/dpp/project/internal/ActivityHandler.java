@@ -339,7 +339,7 @@ public final class ActivityHandler implements Startable {
                      * unwanted inconsistencies if that activity was a resource
                      * activity.
                      */
-                    if (!source.isInSarosSession()) {
+                    if (!source.isInSession()) {
                         LOG.warn("dropping activity for user that is no longer in session: "
                             + activity);
                         continue;

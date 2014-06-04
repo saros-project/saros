@@ -506,7 +506,7 @@ public final class SarosSession implements ISarosSession {
     @Override
     public void removeUser(final User user) {
         synchronized (this) {
-            if (!user.isInSarosSession()) {
+            if (!user.isInSession()) {
                 log.warn("user " + user
                     + " is already or is currently removed from the session");
                 return;

@@ -795,7 +795,7 @@ public class EditorManager extends AbstractActivityProvider {
         assert SWTUtils.isSWT();
 
         User sender = activity.getSource();
-        if (!sender.isInSarosSession()) {
+        if (!sender.isInSession()) {
             log.warn("skipping execution of activity " + activity
                 + " for user " + sender + " who is not in the current session");
             return;

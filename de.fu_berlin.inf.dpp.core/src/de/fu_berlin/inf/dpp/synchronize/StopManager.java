@@ -341,7 +341,7 @@ public final class StopManager extends AbstractActivityProvider implements
         boolean acknowledged = false;
         synchronized (notificationLock) {
             while ((System.currentTimeMillis() < timeoutToExceed)
-                && user.isInSarosSession()) {
+                && user.isInSession()) {
 
                 acknowledged = !expectedAcknowledgments.contains(expectedAck);
 
