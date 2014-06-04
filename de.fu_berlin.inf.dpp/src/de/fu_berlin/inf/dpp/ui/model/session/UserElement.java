@@ -103,11 +103,7 @@ public class UserElement extends TreeElement {
             styledString.append(host, StyledString.COUNTER_STYLER);
         }
 
-        /*
-         * Name of user without server-part (if no alias is set), because only
-         * users from the same XMPP server can be in a session anyway..
-         */
-        styledString.append(user.getShortHumanReadableName());
+        styledString.append(user.getHumanReadableName());
 
         /*
          * Right level

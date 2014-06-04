@@ -40,14 +40,21 @@ public class SessionComparator extends ViewerComparator {
             final User user1 = (User) ((UserElement) e1).getUser();
             final User user2 = (User) ((UserElement) e2).getUser();
 
+            final String userDisplayName1 = ((UserElement) e1).getStyledText()
+                .toString();
+            final String userDisplayName2 = ((UserElement) e1).getStyledText()
+                .toString();
+
             if (user1.equals(user2))
                 return 0;
+
             if (user1.isHost())
                 return -1;
+
             if (user2.isHost())
                 return +1;
-            return user1.getJID().toString()
-                .compareToIgnoreCase(user2.getJID().toString());
+
+            return userDisplayName1.compareToIgnoreCase(userDisplayName2);
         }
 
         /*
