@@ -228,7 +228,8 @@ public class SarosSessionManager implements ISarosSessionManager {
                 .nextInt(Integer.MAX_VALUE)));
 
             // FIXME should be passed in (colorID, nickname)
-            final SarosSession sarosSession = new SarosSession(null,
+            final SarosSession sarosSession = new SarosSession(
+                preferenceUtils.getSessionNickname(),
                 preferenceUtils.getFavoriteColorID(), sarosContext);
 
             sarosSessionObservable.setValue(sarosSession);

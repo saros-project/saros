@@ -21,6 +21,7 @@ import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ColorNegotiationHook;
+import de.fu_berlin.inf.dpp.project.internal.NicknameNegotiationHook;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
 
@@ -253,25 +254,39 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
 
         monitor.setTaskName("Initializing session...");
 
-        // HACK (Part 1/2)
+        // HACK (Part 1/4)
         int clientColor = UserColorID.UNKNOWN;
         int hostFavoriteColor = UserColorID.UNKNOWN;
+
+        // HACK (Part 2/4)
+
+        String clientNickname = null;
+        String hostNickname = null;
 
         for (ISessionNegotiationHook hook : hookManager.getHooks()) {
             Map<String, String> settings = parameters.getHookSettings(hook);
             hook.applyActualParameters(settings);
 
-            // HACK (Part 2/2)
+            // HACK (Part 3/4)
             if (hook instanceof ColorNegotiationHook) {
                 clientColor = Integer.parseInt(settings
                     .get(ColorNegotiationHook.KEY_CLIENT_COLOR));
                 hostFavoriteColor = Integer.parseInt(settings
                     .get(ColorNegotiationHook.KEY_HOST_FAV_COLOR));
             }
+
+            // HACK (Part 4/4)
+            if (hook instanceof NicknameNegotiationHook) {
+                clientNickname = settings
+                    .get(NicknameNegotiationHook.KEY_CLIENT_NICKNAME);
+                hostNickname = settings
+                    .get(NicknameNegotiationHook.KEY_HOST_NICKNAME);
+            }
+
         }
 
         sarosSession = sessionManager.joinSession(parameters.getSessionHost(),
-            null, null, clientColor, hostFavoriteColor);
+            clientNickname, hostNickname, clientColor, hostFavoriteColor);
     }
 
     /**

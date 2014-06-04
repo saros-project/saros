@@ -28,6 +28,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.discovery.DiscoveryManager;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ColorNegotiationHook;
+import de.fu_berlin.inf.dpp.project.internal.NicknameNegotiationHook;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
@@ -72,10 +73,14 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
     @Inject
     private InvitationProcessObservable currentSessionNegotiations;
 
-    // HACK last residue of the direct conncetion between SessionNegotation and
+    // HACK last residue of the direct connection between SessionNegotation and
     // the color property of users.
     private int clientColorID = UserColorID.UNKNOWN;
     private int clientFavoriteColorID = UserColorID.UNKNOWN;
+
+    // HACK last residue of the direct connection between SessionNegotation and
+    // the nickname property of users.
+    private String clientNickname = null;
 
     public OutgoingSessionNegotiation(JID peer, ISarosSession sarosSession,
         String description, ISarosContext sarosContext) {
@@ -411,6 +416,12 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
                 clientFavoriteColorID = Integer.parseInt(actualSettings
                     .get(ColorNegotiationHook.KEY_CLIENT_FAV_COLOR));
             }
+
+            // HACK Same hack as above.
+            if (hook instanceof NicknameNegotiationHook) {
+                clientNickname = actualSettings
+                    .get(NicknameNegotiationHook.KEY_CLIENT_NICKNAME);
+            }
         }
 
         return hostParameters;
@@ -471,7 +482,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
         monitor.setTaskName("Synchronizing user list...");
 
-        User user = new User(peer, null, false, false, clientColorID,
+        User user = new User(peer, clientNickname, false, false, clientColorID,
             clientFavoriteColorID);
 
         synchronized (CancelableProcess.SHARED_LOCK) {
