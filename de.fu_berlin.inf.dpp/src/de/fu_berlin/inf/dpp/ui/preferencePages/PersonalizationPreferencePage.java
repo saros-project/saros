@@ -12,6 +12,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.picocontainer.annotations.Inject;
@@ -55,6 +56,8 @@ public final class PersonalizationPreferencePage extends PreferencePage
     private Button playSoundEventChatMessageReceived;
     private Button playSoundEventContactComesOnline;
     private Button playSoundEventContactGoesOffline;
+
+    private Text sessionNicknameText;
 
     public PersonalizationPreferencePage() {
         SarosPluginContext.initComponent(this);
@@ -105,47 +108,52 @@ public final class PersonalizationPreferencePage extends PreferencePage
             PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_OFFLINE,
             playSoundEventContactGoesOffline.getSelection());
 
+        preferenceStore.setValue(PreferenceConstants.SESSION_NICKNAME,
+            sessionNicknameText.getText().trim());
+
         return super.performOk();
     }
 
     @Override
     protected final void performDefaults() {
-        preferenceStore
-            .setToDefault(PreferenceConstants.FAVORITE_SESSION_COLOR_ID);
+
+        sessionNicknameText.setText(preferenceStore
+            .getDefaultString(PreferenceConstants.SESSION_NICKNAME));
 
         colorChooser.selectColor(DEFAULT_COLOR_ID);
 
-        preferenceStore
-            .setToDefault(PreferenceConstants.ENABLE_BALLOON_NOTIFICATION);
+        showBalloonNotifications
+            .setSelection(preferenceStore
+                .getDefaultBoolean(PreferenceConstants.ENABLE_BALLOON_NOTIFICATION));
 
-        showBalloonNotifications.setSelection(preferenceStore
-            .getBoolean(PreferenceConstants.ENABLE_BALLOON_NOTIFICATION));
+        showContributionAnnotation
+            .setSelection(preferenceStore
+                .getDefaultBoolean(PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS));
 
-        preferenceStore
-            .setToDefault(PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS);
-        showContributionAnnotation.setSelection(preferenceStore
-            .getBoolean(PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS));
+        showSelectionFillUpAnnotation
+            .setSelection(preferenceStore
+                .getDefaultBoolean(PreferenceConstants.SHOW_SELECTIONFILLUP_ANNOTATIONS));
 
-        preferenceStore
-            .setToDefault(PreferenceConstants.SHOW_SELECTIONFILLUP_ANNOTATIONS);
-        showSelectionFillUpAnnotation.setSelection(preferenceStore
-            .getBoolean(PreferenceConstants.SHOW_SELECTIONFILLUP_ANNOTATIONS));
+        enableSoundEvents.setSelection(preferenceStore
+            .getDefaultBoolean(PreferenceConstants.SOUND_ENABLED));
 
-        preferenceStore.setToDefault(PreferenceConstants.SOUND_ENABLED);
+        playSoundEventChatMessageSent
+            .setSelection(preferenceStore
+                .getDefaultBoolean(PreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_SENT));
 
-        preferenceStore
-            .setToDefault(PreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_SENT);
+        playSoundEventChatMessageReceived
+            .setSelection(preferenceStore
+                .getDefaultBoolean(PreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_RECEIVED));
 
-        preferenceStore
-            .setToDefault(PreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_RECEIVED);
+        playSoundEventContactComesOnline
+            .setSelection(preferenceStore
+                .getDefaultBoolean(PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_ONLINE));
 
-        preferenceStore
-            .setToDefault(PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_ONLINE);
+        playSoundEventContactGoesOffline
+            .setSelection(preferenceStore
+                .getDefaultBoolean(PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_OFFLINE));
 
-        preferenceStore
-            .setToDefault(PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_OFFLINE);
-
-        initializeSoundButtons();
+        updateSoundEventButtonStates();
 
         super.performDefaults();
     }
@@ -269,8 +277,22 @@ public final class PersonalizationPreferencePage extends PreferencePage
         playSoundEventContactGoesOffline
             .setText(Messages.PersonalizationPreferencePage_enable_sound_on_contact_goes_offline_button_text);
 
-        initializeSoundButtons();
+        enableSoundEvents.setSelection(preferenceStore
+            .getBoolean(PreferenceConstants.SOUND_ENABLED));
 
+        playSoundEventChatMessageSent.setSelection(preferenceStore
+            .getBoolean(PreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_SENT));
+
+        playSoundEventChatMessageReceived.setSelection(preferenceStore
+            .getBoolean(PreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_RECEIVED));
+
+        playSoundEventContactComesOnline.setSelection(preferenceStore
+            .getBoolean(PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_ONLINE));
+
+        playSoundEventContactGoesOffline.setSelection(preferenceStore
+            .getBoolean(PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_OFFLINE));
+
+        updateSoundEventButtonStates();
     }
 
     private void createVisualAppearanceGroup(Composite parent) {
@@ -299,26 +321,21 @@ public final class PersonalizationPreferencePage extends PreferencePage
         };
 
         colorChooser.addSelectionListener(colorSelectionListener);
-    }
 
-    private void initializeSoundButtons() {
+        Composite row = new Composite(group, SWT.NONE);
+        row.setLayout(new GridLayout(2, false));
+        row.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
-        enableSoundEvents.setSelection(preferenceStore
-            .getBoolean(PreferenceConstants.SOUND_ENABLED));
+        final Label sessionNickName = new Label(row, SWT.CENTER);
+        sessionNickName.setText("Nickname:");
 
-        playSoundEventChatMessageSent.setSelection(preferenceStore
-            .getBoolean(PreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_SENT));
+        sessionNicknameText = new Text(row, SWT.SINGLE | SWT.BORDER);
+        sessionNicknameText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
+            true, false));
 
-        playSoundEventChatMessageReceived.setSelection(preferenceStore
-            .getBoolean(PreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_RECEIVED));
+        sessionNicknameText.setText(preferenceStore
+            .getString(PreferenceConstants.SESSION_NICKNAME));
 
-        playSoundEventContactComesOnline.setSelection(preferenceStore
-            .getBoolean(PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_ONLINE));
-
-        playSoundEventContactGoesOffline.setSelection(preferenceStore
-            .getBoolean(PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_OFFLINE));
-
-        updateSoundEventButtonStates();
     }
 
     private void updateSoundEventButtonStates() {
