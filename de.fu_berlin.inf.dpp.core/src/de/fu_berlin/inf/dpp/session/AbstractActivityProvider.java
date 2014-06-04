@@ -52,7 +52,7 @@ public abstract class AbstractActivityProvider implements IActivityProvider {
      *               call the fireActivity method on newly created activities to
      *               inform all listeners.
      */
-    public void fireActivity(IActivity activity) {
+    protected final void fireActivity(IActivity activity) {
         for (IActivityListener activityListener : activityListeners) {
             activityListener.activityCreated(activity);
         }
