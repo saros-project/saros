@@ -411,7 +411,7 @@ public class ActivitySequencer implements Startable {
             }
 
             LOG.trace("dispatching activity " + activity
-                + " to the local user: " + user.getJID());
+                + " to the local user: " + user);
 
             dispatchThread.executeAsDispatch(new Runnable() {
                 @Override
@@ -542,8 +542,8 @@ public class ActivitySequencer implements Startable {
             LOG.debug(msg);
 
         try {
-            transmitter.send(ISarosSession.SESSION_CONNECTION_ID,
-                recipient, activityPacketExtension);
+            transmitter.send(ISarosSession.SESSION_CONNECTION_ID, recipient,
+                activityPacketExtension);
         } catch (IOException e) {
             LOG.error("failed to sent activities: " + activities, e);
             /*
