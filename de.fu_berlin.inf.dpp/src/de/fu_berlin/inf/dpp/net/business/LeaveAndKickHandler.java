@@ -93,8 +93,7 @@ public class LeaveAndKickHandler {
         }
 
         stopSession(sarosSession, "Removed from the session",
-            user.getHumanReadableName()
-                + " removed you from the current session.");
+            user.getNickname() + " removed you from the current session.");
     }
 
     private void leaveReceived(JID from) {
@@ -124,8 +123,7 @@ public class LeaveAndKickHandler {
          */
         if (user.isHost()) {
             stopSession(sarosSession, "Closing the session",
-                "Session was closed by inviter " + user.getHumanReadableName()
-                    + ".");
+                "Session was closed by inviter " + user.getNickname() + ".");
 
         }
 

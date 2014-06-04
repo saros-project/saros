@@ -20,7 +20,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
@@ -40,14 +39,7 @@ public class ContributionAnnotationManagerTest {
         store.setValue(PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS, true);
 
         sessionMock = EasyMock.createNiceMock(ISarosSession.class);
-
-        PowerMock.mockStaticPartial(User.class, "getHumanReadableName");
-
-        EasyMock.expect(
-            User.getHumanReadableName(EasyMock.anyObject(XMPPConnectionService.class),
-                EasyMock.anyObject(JID.class))).andStubReturn("user");
-
-        PowerMock.replay(User.class, sessionMock);
+        PowerMock.replay(sessionMock);
 
         manager = new ContributionAnnotationManager(sessionMock, store);
 
@@ -56,7 +48,7 @@ public class ContributionAnnotationManagerTest {
     @Test
     public void testHistoryRemoval() {
 
-        User alice = new User(new JID("alice@test"), false, false, 0, 0);
+        User alice = new User(new JID("alice@test"), null, false, false, 0, 0);
 
         AnnotationModel model = new AnnotationModel();
 
@@ -78,7 +70,7 @@ public class ContributionAnnotationManagerTest {
 
     @Test
     public void testHistoryRemovalAfterRefresh() {
-        User alice = new User(new JID("alice@test"), false, false, 0, 0);
+        User alice = new User(new JID("alice@test"), null, false, false, 0, 0);
 
         AnnotationModel model = new AnnotationModel();
 

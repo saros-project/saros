@@ -116,7 +116,7 @@ public class RemoveUserAction extends Action {
                     List<String> userNames = new ArrayList<String>();
 
                     for (User user : users)
-                        userNames.add(user.getShortHumanReadableName());
+                        userNames.add(user.getNickname());
 
                     monitor.beginTask(
                         "Removing user(s): "

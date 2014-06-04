@@ -16,8 +16,8 @@ import org.picocontainer.Startable;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.extensions.UserFinishedProjectNegotiationExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.UserListExtension;
-import de.fu_berlin.inf.dpp.communication.extensions.UserListReceivedExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.UserListExtension.UserListEntry;
+import de.fu_berlin.inf.dpp.communication.extensions.UserListReceivedExtension;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
@@ -154,8 +154,8 @@ public class UserInformationHandler implements Startable {
         try {
             for (User user : remoteUsers) {
                 try {
-                    transmitter.send(
-                        ISarosSession.SESSION_CONNECTION_ID, user.getJID(),
+                    transmitter.send(ISarosSession.SESSION_CONNECTION_ID,
+                        user.getJID(),
                         UserListExtension.PROVIDER.create(extension));
                 } catch (IOException e) {
                     log.error("failed to send user list to user: " + user, e);
@@ -233,8 +233,8 @@ public class UserInformationHandler implements Startable {
 
         for (User user : remoteUsers) {
             try {
-                transmitter.send(
-                    ISarosSession.SESSION_CONNECTION_ID, user.getJID(), packet);
+                transmitter.send(ISarosSession.SESSION_CONNECTION_ID,
+                    user.getJID(), packet);
             } catch (IOException e) {
                 log.error(
                     "failed to send userFinishedProjectNegotiation-message: "
@@ -316,8 +316,8 @@ public class UserInformationHandler implements Startable {
                     continue;
                 }
 
-                user = new User(userEntry.jid, false, false, userEntry.colorID,
-                    userEntry.favoriteColorID);
+                user = new User(userEntry.jid, null, false, false,
+                    userEntry.colorID, userEntry.favoriteColorID);
 
                 user.setPermission(userEntry.permission);
                 session.addUser(user);
@@ -341,8 +341,8 @@ public class UserInformationHandler implements Startable {
     private void sendUserListConfirmation(JID to) {
         log.debug("sending user list received confirmation to " + to);
         try {
-            transmitter.send(ISarosSession.SESSION_CONNECTION_ID,
-                to, UserListReceivedExtension.PROVIDER
+            transmitter.send(ISarosSession.SESSION_CONNECTION_ID, to,
+                UserListReceivedExtension.PROVIDER
                     .create(new UserListReceivedExtension(currentSessionID)));
         } catch (IOException e) {
             log.error("failed to send user list received confirmation to: "

@@ -649,9 +649,9 @@ public final class SarosSession implements ISarosSession {
 
         for (User user : usersToNotify) {
             try {
-                transmitter.send(SESSION_CONNECTION_ID, user
-                    .getJID(), LeaveSessionExtension.PROVIDER
-                    .create(new LeaveSessionExtension(getID())));
+                transmitter.send(SESSION_CONNECTION_ID, user.getJID(),
+                    LeaveSessionExtension.PROVIDER
+                        .create(new LeaveSessionExtension(getID())));
             } catch (IOException e) {
                 log.warn("failed to notify user " + user
                     + " about local session stop", e);
@@ -1054,8 +1054,8 @@ public final class SarosSession implements ISarosSession {
 
         assert localUserJID != null;
 
-        localUser = new User(localUserJID, host == null, true, localColorID,
-            localColorID);
+        localUser = new User(localUserJID, null, host == null, true,
+            localColorID, localColorID);
 
         localUser.setInSession(true);
 
@@ -1063,7 +1063,8 @@ public final class SarosSession implements ISarosSession {
             hostUser = localUser;
             participants.put(hostUser.getJID(), hostUser);
         } else {
-            hostUser = new User(host, true, false, hostColorID, hostColorID);
+            hostUser = new User(host, null, true, false, hostColorID,
+                hostColorID);
             hostUser.setInSession(true);
             participants.put(hostUser.getJID(), hostUser);
             participants.put(localUser.getJID(), localUser);

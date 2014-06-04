@@ -23,7 +23,7 @@ public class ContributionAnnotation extends SarosAnnotation {
 
     public ContributionAnnotation(User source, IAnnotationModel model) {
         super(ContributionAnnotation.TYPE, true, "Text contributed by "
-            + source.getHumanReadableName(), source);
+            + source.getNickname(), source);
         this.model = model;
     }
 

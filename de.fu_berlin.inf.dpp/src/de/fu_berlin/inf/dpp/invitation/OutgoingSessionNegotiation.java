@@ -196,8 +196,8 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
             monitor.setTaskName("Negotiating data connection...");
 
-            connectionManager.connect(ISarosSession.SESSION_CONNECTION_ID,
-                peer);
+            connectionManager
+                .connect(ISarosSession.SESSION_CONNECTION_ID, peer);
 
             User newUser = completeInvitation(monitor);
 
@@ -471,7 +471,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
         monitor.setTaskName("Synchronizing user list...");
 
-        User user = new User(peer, false, false, clientColorID,
+        User user = new User(peer, null, false, false, clientColorID,
             clientFavoriteColorID);
 
         synchronized (CancelableProcess.SHARED_LOCK) {
@@ -491,8 +491,8 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
              * send using the various methods of the ITransmitted interface.
              */
 
-            transmitter.send(ISarosSession.SESSION_CONNECTION_ID,
-                peer, InvitationAcknowledgedExtension.PROVIDER
+            transmitter.send(ISarosSession.SESSION_CONNECTION_ID, peer,
+                InvitationAcknowledgedExtension.PROVIDER
                     .create(new InvitationAcknowledgedExtension(invitationID)));
         }
 

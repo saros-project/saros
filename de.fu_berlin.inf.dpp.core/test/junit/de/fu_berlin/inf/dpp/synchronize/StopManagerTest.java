@@ -49,9 +49,9 @@ public class StopManagerTest {
         alicesSession.addActivityConsumer(EasyMock.isA(StopManager.class));
         alicesSession.removeActivityConsumer(EasyMock.isA(StopManager.class));
 
-        alicesAlice = new User(new JID("alice"), true, true, 1, -1);
-        alicesBob = new User(new JID("bob"), false, false, 2, -1);
-        alicesCarl = new User(new JID("carl"), false, false, 3, -1);
+        alicesAlice = new User(new JID("alice"), null, true, true, 1, -1);
+        alicesBob = new User(new JID("bob"), null, false, false, 2, -1);
+        alicesCarl = new User(new JID("carl"), null, false, false, 3, -1);
 
         alicesAlice.setInSession(true);
         alicesBob.setInSession(true);
@@ -79,9 +79,9 @@ public class StopManagerTest {
         bobsSession.addActivityConsumer(EasyMock.isA(StopManager.class));
         bobsSession.removeActivityConsumer(EasyMock.isA(StopManager.class));
 
-        bobsAlice = new User(new JID("alice"), true, false, 1, -1);
-        bobsBob = new User(new JID("bob"), false, true, 2, -1);
-        bobsCarl = new User(new JID("carl"), false, false, 3, -1);
+        bobsAlice = new User(new JID("alice"), null, true, false, 1, -1);
+        bobsBob = new User(new JID("bob"), null, false, true, 2, -1);
+        bobsCarl = new User(new JID("carl"), null, false, false, 3, -1);
 
         bobsAlice.setInSession(true);
         bobsBob.setInSession(true);
@@ -108,9 +108,9 @@ public class StopManagerTest {
         carlsSession.addActivityConsumer(EasyMock.isA(StopManager.class));
         carlsSession.removeActivityConsumer(EasyMock.isA(StopManager.class));
 
-        carlsAlice = new User(new JID("alice"), true, false, 1, -1);
-        carlsBob = new User(new JID("bob"), false, false, 2, -1);
-        carlsCarl = new User(new JID("carl"), false, true, 3, -1);
+        carlsAlice = new User(new JID("alice"), null, true, false, 1, -1);
+        carlsBob = new User(new JID("bob"), null, false, false, 2, -1);
+        carlsCarl = new User(new JID("carl"), null, false, true, 3, -1);
 
         carlsAlice.setInSession(true);
         carlsBob.setInSession(true);
@@ -549,8 +549,8 @@ public class StopManagerTest {
     }
 
     private static User rewriteUser(User user) {
-        User copy = new User(user.getJID(), user.isHost(), !user.isLocal(),
-            user.getColorID(), -1);
+        User copy = new User(user.getJID(), null, user.isHost(),
+            !user.isLocal(), user.getColorID(), -1);
         copy.setInSession(true);
         return copy;
     }

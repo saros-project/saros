@@ -103,7 +103,7 @@ public class UserElement extends TreeElement {
             styledString.append(host, StyledString.COUNTER_STYLER);
         }
 
-        styledString.append(user.getHumanReadableName());
+        styledString.append(user.getNickname());
 
         /*
          * Right level

@@ -21,11 +21,11 @@ import de.fu_berlin.inf.dpp.invitation.OutgoingSessionNegotiation;
 import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.invitation.SessionNegotiation;
+import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.project.INegotiationHandler;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
@@ -66,7 +66,7 @@ public class NegotiationHandler implements INegotiationHandler {
         public OutgoingInvitationJob(OutgoingSessionNegotiation process) {
             super(MessageFormat.format(
                 Messages.NegotiationHandler_inviting_user,
-                User.getHumanReadableName(connectionService, process.getPeer())));
+                getNickname(process.getPeer())));
             this.process = process;
             this.peer = process.getPeer().getBase();
 
@@ -157,8 +157,7 @@ public class NegotiationHandler implements INegotiationHandler {
         protected IStatus run(IProgressMonitor monitor) {
             try {
                 ProjectNegotiation.Status status = process.start(monitor);
-                String peerName = User.getHumanReadableName(connectionService, new JID(
-                    peer));
+                String peerName = getNickname(new JID(peer));
 
                 final String message;
 
@@ -212,12 +211,9 @@ public class NegotiationHandler implements INegotiationHandler {
 
     private final ISarosSessionManager sessionManager;
 
-    private final XMPPConnectionService connectionService;
-
     public NegotiationHandler(ISarosSessionManager sessionManager,
         XMPPConnectionService connectionService, SarosUI sarosUI) {
         this.sarosUI = sarosUI;
-        this.connectionService = connectionService;
         this.sessionManager = sessionManager;
         this.sessionManager.setNegotiationHandler(this);
     }
@@ -338,5 +334,14 @@ public class NegotiationHandler implements INegotiationHandler {
                 DialogUtils.openWindow(wizardDialog);
             }
         });
+    }
+
+    private static String getNickname(JID jid) {
+        String nickname = XMPPUtils.getNickname(null, jid);
+
+        if (nickname == null)
+            nickname = jid.getBareJID().toString();
+
+        return nickname;
     }
 }

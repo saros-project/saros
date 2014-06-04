@@ -326,6 +326,6 @@ public class FollowModeAction extends Action implements IMenuCreator,
 
     private String getFollowUserMessage(User user) {
         return MessageFormat.format(Messages.FollowModeAction_follow_user,
-            user.getShortHumanReadableName());
+            user.getNickname());
     }
 }

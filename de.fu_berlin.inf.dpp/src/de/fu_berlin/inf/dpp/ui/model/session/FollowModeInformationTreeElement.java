@@ -42,8 +42,7 @@ public class FollowModeInformationTreeElement extends
         User followee = awarenessInformationCollector.getFollowedUser(user);
         if (followee != null) {
             if (awarenessInformationCollector.isActiveEditorShared(followee)) {
-                styledString.append("following "
-                    + followee.getShortHumanReadableName());
+                styledString.append("following " + followee.getNickname());
             } else {
                 styledString.append(following_paused);
             }
