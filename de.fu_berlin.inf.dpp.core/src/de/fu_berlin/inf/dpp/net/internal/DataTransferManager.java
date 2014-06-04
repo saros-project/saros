@@ -27,12 +27,12 @@ import org.picocontainer.annotations.Nullable;
 import de.fu_berlin.inf.dpp.ISarosContextBindings.IBBTransport;
 import de.fu_berlin.inf.dpp.ISarosContextBindings.Socks5Transport;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.net.ConnectionMode;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.IPacketInterceptor;
 import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.ITransferModeListener;
-import de.fu_berlin.inf.dpp.net.ConnectionMode;
+import de.fu_berlin.inf.dpp.net.ITransferListener;
 import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
@@ -58,9 +58,9 @@ public class DataTransferManager implements IConnectionListener,
 
     private static final String DEFAULT_CONNECTION_ID = "default";
 
-    private final TransferModeDispatch transferModeDispatch = new TransferModeDispatch();
+    private final CopyOnWriteArrayList<IPacketInterceptor> packetInterceptors = new CopyOnWriteArrayList<IPacketInterceptor>();
 
-    private CopyOnWriteArrayList<IPacketInterceptor> packetInterceptors = new CopyOnWriteArrayList<IPacketInterceptor>();
+    private final List<ITransferListener> transferListeners = new CopyOnWriteArrayList<ITransferListener>();
 
     private volatile JID currentLocalJID;
 
@@ -120,8 +120,7 @@ public class DataTransferManager implements IConnectionListener,
                 extension.setPayload(compressedPayloadLenght, payload);
             }
 
-            transferModeDispatch.transferFinished(description.getSender(),
-                extension.getTransferMode(), true,
+            notifyDataSent(extension.getTransferMode(),
                 extension.getCompressedSize(), extension.getUncompressedSize(),
                 extension.getTransferDuration());
 
@@ -157,17 +156,12 @@ public class DataTransferManager implements IConnectionListener,
 
                 connection.initialize();
             }
-
-            transferModeDispatch
-                .transferModeChanged(peer, connection.getMode());
         }
 
         @Override
         public void connectionClosed(String connectionID, JID peer,
             IByteStreamConnection connection) {
             closeConnection(connectionID, peer);
-            transferModeDispatch
-                .transferModeChanged(peer, ConnectionMode.NONE);
         }
     };
 
@@ -190,13 +184,13 @@ public class DataTransferManager implements IConnectionListener,
     }
 
     @Override
-    public void addTransferModeListener(ITransferModeListener listener) {
-        transferModeDispatch.add(listener);
+    public void addTransferListener(ITransferListener listener) {
+        transferListeners.add(listener);
     }
 
     @Override
-    public void removeTransferModeListener(ITransferModeListener listener) {
-        transferModeDispatch.remove(listener);
+    public void removeTransferListener(ITransferListener listener) {
+        transferListeners.remove(listener);
     }
 
     public void sendData(String connectionID,
@@ -272,9 +266,10 @@ public class DataTransferManager implements IConnectionListener,
             long transferStartTime = System.currentTimeMillis();
             connection.send(transferData, payload);
 
-            transferModeDispatch.transferFinished(transferData.getRecipient(),
-                connection.getMode(), false, payload.length, sizeUncompressed,
-                System.currentTimeMillis() - transferStartTime);
+            notifyDataSent(connection.getMode(), payload.length,
+                sizeUncompressed, System.currentTimeMillis()
+                    - transferStartTime);
+
         } catch (IOException e) {
             log.error(
                 transferData.getRecipient() + " failed to send " + transferData
@@ -617,6 +612,35 @@ public class DataTransferManager implements IConnectionListener,
             connectionIdentifier = DEFAULT_CONNECTION_ID;
 
         return connectionIdentifier.concat(":").concat(jid.toString());
+    }
+
+    private void notifyDataSent(final ConnectionMode mode,
+        final long sizeCompressed, final long sizeUncompressed,
+        final long duration) {
+
+        for (final ITransferListener listener : transferListeners) {
+            try {
+                listener.sent(mode, sizeCompressed, sizeUncompressed, duration);
+            } catch (RuntimeException e) {
+                log.error("invoking sent() on listener: " + listener
+                    + " failed", e);
+            }
+        }
+    }
+
+    private void notifyDataReceived(final ConnectionMode mode,
+        final long sizeCompressed, final long sizeUncompressed,
+        final long duration) {
+
+        for (final ITransferListener listener : transferListeners) {
+            try {
+                listener.received(mode, sizeCompressed, sizeUncompressed,
+                    duration);
+            } catch (RuntimeException e) {
+                log.error("invoking received() on listener: " + listener
+                    + " failed", e);
+            }
+        }
     }
 
     private static byte[] deflate(byte[] input) {

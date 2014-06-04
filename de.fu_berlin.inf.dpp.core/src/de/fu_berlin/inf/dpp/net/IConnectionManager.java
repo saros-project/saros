@@ -22,9 +22,9 @@ public interface IConnectionManager {
      */
     public void setTransport(int transportMask);
 
-    public void addTransferModeListener(ITransferModeListener listener);
+    public void addTransferListener(ITransferListener listener);
 
-    public void removeTransferModeListener(ITransferModeListener listener);
+    public void removeTransferListener(ITransferListener listener);
 
     /**
      * @deprecated

@@ -5,10 +5,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.net.IConnectionManager;
-import de.fu_berlin.inf.dpp.net.ITransferModeListener;
 import de.fu_berlin.inf.dpp.net.ConnectionMode;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.net.IConnectionManager;
+import de.fu_berlin.inf.dpp.net.ITransferListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 
 /**
@@ -32,13 +31,11 @@ public class DataTransferCollector extends AbstractStatisticCollector {
 
     private final IConnectionManager connectionManager;
 
-    private final ITransferModeListener dataTransferlistener = new ITransferModeListener() {
+    private final ITransferListener dataTransferlistener = new ITransferListener() {
 
         @Override
-        public void transferFinished(JID jid, ConnectionMode mode,
-            boolean incoming, long sizeTransferred, long sizeUncompressed,
-            long transmissionMillisecs) {
-
+        public void sent(final ConnectionMode mode, final long sizeCompressed,
+            final long sizeUncompressed, final long duration) {
             // see processGatheredData
             synchronized (DataTransferCollector.this) {
                 TransferStatisticHolder holder = statistic.get(mode);
@@ -48,8 +45,8 @@ public class DataTransferCollector extends AbstractStatisticCollector {
                     statistic.put(mode, holder);
                 }
 
-                holder.bytesTransferred += sizeTransferred;
-                holder.transferTime += transmissionMillisecs;
+                holder.bytesTransferred += sizeCompressed;
+                holder.transferTime += sizeUncompressed;
                 holder.count++;
 
                 // TODO how to handle overflow ?
@@ -57,9 +54,13 @@ public class DataTransferCollector extends AbstractStatisticCollector {
         }
 
         @Override
-        public void transferModeChanged(JID jid, ConnectionMode mode) {
-            // do nothing
+        public void received(final ConnectionMode mode,
+            final long sizeCompressed, final long sizeUncompressed,
+            final long duration) {
+            // TODO differentiate the traffic
+            sent(mode, sizeCompressed, sizeUncompressed, duration);
         }
+
     };
 
     public DataTransferCollector(StatisticManager statisticManager,
@@ -89,11 +90,11 @@ public class DataTransferCollector extends AbstractStatisticCollector {
 
     @Override
     protected void doOnSessionStart(ISarosSession sarosSession) {
-        connectionManager.addTransferModeListener(dataTransferlistener);
+        connectionManager.addTransferListener(dataTransferlistener);
     }
 
     @Override
     protected void doOnSessionEnd(ISarosSession sarosSession) {
-        connectionManager.removeTransferModeListener(dataTransferlistener);
+        connectionManager.removeTransferListener(dataTransferlistener);
     }
 }
