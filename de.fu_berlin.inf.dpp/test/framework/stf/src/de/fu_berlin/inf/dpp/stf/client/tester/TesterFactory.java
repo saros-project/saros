@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.stf.client.tester;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.stf.client.Configuration;
 
 final class TesterFactory {

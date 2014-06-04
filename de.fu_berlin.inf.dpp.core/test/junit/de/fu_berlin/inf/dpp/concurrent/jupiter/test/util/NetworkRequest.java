@@ -1,7 +1,7 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
 
 import de.fu_berlin.inf.dpp.activities.JupiterActivity;
-import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 public class NetworkRequest implements Comparable<NetworkRequest> {
 

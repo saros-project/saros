@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net;
+package de.fu_berlin.inf.dpp.net.xmpp.roster;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,6 +13,10 @@ import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.packet.Presence;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.net.ConnectionState;
+import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 
 /**
  * The RosterTracker is responsible for offering a convenient access for

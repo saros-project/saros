@@ -17,8 +17,8 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.invitation.hooks.ISessionNegotiationHook;
-import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
+import de.fu_berlin.inf.dpp.net.PacketCollector;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ColorNegotiationHook;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -40,8 +40,8 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
 
     private boolean running;
 
-    private SarosPacketCollector invitationDataExchangeCollector;
-    private SarosPacketCollector invitationAcknowledgedCollector;
+    private PacketCollector invitationDataExchangeCollector;
+    private PacketCollector invitationAcknowledgedCollector;
 
     public IncomingSessionNegotiation(ISarosSessionManager sessionManager,
         JID from, String remoteVersion, String invitationID,

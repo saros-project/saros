@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.net.discovery;
+package de.fu_berlin.inf.dpp.net.xmpp.discovery;
 
-import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 /**
  * Listener for {@link DiscoveryManager} events

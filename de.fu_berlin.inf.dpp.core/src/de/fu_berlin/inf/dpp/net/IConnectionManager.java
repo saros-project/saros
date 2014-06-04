@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.net;
 import java.io.IOException;
 
 import de.fu_berlin.inf.dpp.net.internal.IByteStreamConnection;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 // TODO Javadoc
 
@@ -50,8 +51,8 @@ public interface IConnectionManager {
      * @deprecated
      */
     @Deprecated
-    public NetTransferMode getTransferMode(JID jid);
+    public ConnectionMode getTransferMode(JID jid);
 
-    public NetTransferMode getTransferMode(String connectionID, JID jid);
+    public ConnectionMode getTransferMode(String connectionID, JID jid);
 
 }

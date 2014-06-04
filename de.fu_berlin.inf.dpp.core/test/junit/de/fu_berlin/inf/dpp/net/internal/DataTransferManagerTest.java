@@ -20,11 +20,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
-import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.NetTransferMode;
-import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
+import de.fu_berlin.inf.dpp.net.ConnectionMode;
+import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.test.util.TestThread;
 
 public class DataTransferManagerTest {
@@ -35,11 +35,11 @@ public class DataTransferManagerTest {
 
         private IByteStreamConnectionListener listener;
 
-        private NetTransferMode mode;
+        private ConnectionMode mode;
 
         private String connectionID;
 
-        public Transport(NetTransferMode mode) {
+        public Transport(ConnectionMode mode) {
             this.mode = mode;
         }
 
@@ -93,7 +93,7 @@ public class DataTransferManagerTest {
 
         private Set<JID> jidsToIgnore;
 
-        public BlockableTransport(Set<JID> jidsToIgnore, NetTransferMode mode,
+        public BlockableTransport(Set<JID> jidsToIgnore, ConnectionMode mode,
             CountDownLatch acknowledge, CountDownLatch proceed) {
             super(mode);
             this.acknowledge = acknowledge;
@@ -127,12 +127,12 @@ public class DataTransferManagerTest {
     private static class ChannelConnection implements IByteStreamConnection {
 
         private JID to;
-        private NetTransferMode mode;
+        private ConnectionMode mode;
         private IByteStreamConnectionListener listener;
         private volatile boolean closed;
         private volatile int sendPackets;
 
-        public ChannelConnection(JID to, NetTransferMode mode,
+        public ChannelConnection(JID to, ConnectionMode mode,
             IByteStreamConnectionListener listener) {
             this.to = to;
             this.mode = mode;
@@ -162,7 +162,7 @@ public class DataTransferManagerTest {
         }
 
         @Override
-        public NetTransferMode getMode() {
+        public ConnectionMode getMode() {
             return mode;
         }
 
@@ -249,8 +249,8 @@ public class DataTransferManagerTest {
     public void testEstablishConnectionWithMainAndFallbackTransport()
         throws Exception {
 
-        ITransport mainTransport = new Transport(NetTransferMode.SOCKS5_DIRECT);
-        ITransport fallbackTransport = new Transport(NetTransferMode.IBB);
+        ITransport mainTransport = new Transport(ConnectionMode.SOCKS5_DIRECT);
+        ITransport fallbackTransport = new Transport(ConnectionMode.IBB);
 
         IConnectionManager dtm = new DataTransferManager(
             connectionServiceStub, null, mainTransport, fallbackTransport);
@@ -259,7 +259,7 @@ public class DataTransferManagerTest {
             ConnectionState.CONNECTED);
 
         dtm.connect(new JID("foo@bar.com"));
-        assertEquals(NetTransferMode.SOCKS5_DIRECT,
+        assertEquals(ConnectionMode.SOCKS5_DIRECT,
             dtm.getTransferMode(new JID("foo@bar.com")));
 
     }
@@ -270,7 +270,7 @@ public class DataTransferManagerTest {
 
         ITransport mainTransport = EasyMock.createMock(ITransport.class);
 
-        ITransport fallbackTransport = new Transport(NetTransferMode.IBB);
+        ITransport fallbackTransport = new Transport(ConnectionMode.IBB);
 
         EasyMock
             .expect(
@@ -295,15 +295,15 @@ public class DataTransferManagerTest {
 
         EasyMock.verify(mainTransport);
 
-        assertEquals("Wrong transport fallback", NetTransferMode.IBB,
+        assertEquals("Wrong transport fallback", ConnectionMode.IBB,
             dtm.getTransferMode(new JID("foo@bar.com")));
     }
 
     @Test
     public void testForceIBBOnly() throws Exception {
 
-        ITransport mainTransport = new Transport(NetTransferMode.SOCKS5_DIRECT);
-        ITransport fallbackTransport = new Transport(NetTransferMode.IBB);
+        ITransport mainTransport = new Transport(ConnectionMode.SOCKS5_DIRECT);
+        ITransport fallbackTransport = new Transport(ConnectionMode.IBB);
 
         DataTransferManager dtm = new DataTransferManager(
             connectionServiceStub, null, mainTransport, fallbackTransport);
@@ -315,7 +315,7 @@ public class DataTransferManagerTest {
 
         dtm.connect(new JID("foo@bar.com"));
 
-        assertEquals("only IBB transport should be used", NetTransferMode.IBB,
+        assertEquals("only IBB transport should be used", ConnectionMode.IBB,
             dtm.getTransferMode(new JID("foo@bar.com")));
 
     }
@@ -323,7 +323,7 @@ public class DataTransferManagerTest {
     @Test
     public void testConnectionCaching() throws Exception {
 
-        Transport mainTransport = new Transport(NetTransferMode.SOCKS5_DIRECT);
+        Transport mainTransport = new Transport(ConnectionMode.SOCKS5_DIRECT);
 
         IConnectionManager dtm = new DataTransferManager(
             connectionServiceStub, null, mainTransport, null);
@@ -345,7 +345,7 @@ public class DataTransferManagerTest {
 
     @Test
     public void testGetTransferMode() throws Exception {
-        ITransport mainTransport = new Transport(NetTransferMode.SOCKS5_DIRECT);
+        ITransport mainTransport = new Transport(ConnectionMode.SOCKS5_DIRECT);
 
         IConnectionManager dtm = new DataTransferManager(
             connectionServiceStub, null, mainTransport, null);
@@ -356,10 +356,10 @@ public class DataTransferManagerTest {
         dtm.connect(new JID("foo@bar.com"));
 
         assertEquals("wrong transport mode returned",
-            NetTransferMode.SOCKS5_DIRECT,
+            ConnectionMode.SOCKS5_DIRECT,
             dtm.getTransferMode(new JID("foo@bar.com")));
 
-        assertEquals("wrong transport mode returned", NetTransferMode.NONE,
+        assertEquals("wrong transport mode returned", ConnectionMode.NONE,
             dtm.getTransferMode(new JID("nothing@all")));
 
     }
@@ -367,7 +367,7 @@ public class DataTransferManagerTest {
     @Test(expected = IOException.class)
     public void testSendOnInvalidConnectionIdentifierWithNoConnection()
         throws Exception {
-        ITransport mainTransport = new Transport(NetTransferMode.SOCKS5_DIRECT);
+        ITransport mainTransport = new Transport(ConnectionMode.SOCKS5_DIRECT);
 
         DataTransferManager dtm = new DataTransferManager(
             connectionServiceStub, null, mainTransport, null);
@@ -385,7 +385,7 @@ public class DataTransferManagerTest {
 
     @Test(expected = IOException.class)
     public void testSendOnInvalidConnectionIdentifier() throws Exception {
-        ITransport mainTransport = new Transport(NetTransferMode.SOCKS5_DIRECT);
+        ITransport mainTransport = new Transport(ConnectionMode.SOCKS5_DIRECT);
 
         DataTransferManager dtm = new DataTransferManager(
             connectionServiceStub, null, mainTransport, null);
@@ -405,7 +405,7 @@ public class DataTransferManagerTest {
 
     @Test
     public void testSendOnValidConnectionIdentifier() throws Exception {
-        Transport mainTransport = new Transport(NetTransferMode.SOCKS5_DIRECT);
+        Transport mainTransport = new Transport(ConnectionMode.SOCKS5_DIRECT);
 
         DataTransferManager dtm = new DataTransferManager(
             connectionServiceStub, null, mainTransport, null);
@@ -434,10 +434,10 @@ public class DataTransferManagerTest {
         nonBlockingConnects.add(new JID("foo@bar.example"));
 
         BlockableTransport mainTransport = new BlockableTransport(
-            nonBlockingConnects, NetTransferMode.SOCKS5_DIRECT,
+            nonBlockingConnects, ConnectionMode.SOCKS5_DIRECT,
             connectAcknowledge, connectProceed);
 
-        Transport fallbackTransport = new Transport(NetTransferMode.IBB);
+        Transport fallbackTransport = new Transport(ConnectionMode.IBB);
 
         final IConnectionManager dtm = new DataTransferManager(
             connectionServiceStub, null, mainTransport, fallbackTransport);
@@ -521,7 +521,7 @@ public class DataTransferManagerTest {
 
     @Test
     public void connectWithRemoteSideConnectedFirst() throws Exception {
-        Transport mainTransport = new Transport(NetTransferMode.SOCKS5_DIRECT);
+        Transport mainTransport = new Transport(ConnectionMode.SOCKS5_DIRECT);
 
         IConnectionManager dtm = new DataTransferManager(
             connectionServiceStub, null, mainTransport, null);
@@ -545,10 +545,10 @@ public class DataTransferManagerTest {
         final CountDownLatch connectProceed = new CountDownLatch(1);
 
         BlockableTransport mainTransport = new BlockableTransport(
-            new HashSet<JID>(), NetTransferMode.SOCKS5_DIRECT,
+            new HashSet<JID>(), ConnectionMode.SOCKS5_DIRECT,
             connectAcknowledge, connectProceed);
 
-        Transport fallbackTransport = new Transport(NetTransferMode.IBB);
+        Transport fallbackTransport = new Transport(ConnectionMode.IBB);
 
         final DataTransferManager dtm = new DataTransferManager(
             connectionServiceStub, null, mainTransport, fallbackTransport);
@@ -592,7 +592,7 @@ public class DataTransferManagerTest {
 
     @Test
     public void testConnectionClosureOnManualClose() throws Exception {
-        Transport mainTransport = new Transport(NetTransferMode.SOCKS5_DIRECT);
+        Transport mainTransport = new Transport(ConnectionMode.SOCKS5_DIRECT);
 
         IConnectionManager dtm = new DataTransferManager(
             connectionServiceStub, null, mainTransport, null);
@@ -611,13 +611,13 @@ public class DataTransferManagerTest {
         assertFalse("incoming connection was not closed", mainTransport
             .getEstablishedConnections().get(1).isConnected());
 
-        assertEquals(NetTransferMode.NONE,
+        assertEquals(ConnectionMode.NONE,
             dtm.getTransferMode(new JID("fallback@emergency")));
     }
 
     @Test
     public void testConnectionClosureOnDisconnect() throws Exception {
-        Transport mainTransport = new Transport(NetTransferMode.SOCKS5_DIRECT);
+        Transport mainTransport = new Transport(ConnectionMode.SOCKS5_DIRECT);
 
         IConnectionManager dtm = new DataTransferManager(
             connectionServiceStub, null, mainTransport, null);
@@ -637,7 +637,7 @@ public class DataTransferManagerTest {
         assertFalse("incoming connection was not closed", mainTransport
             .getEstablishedConnections().get(1).isConnected());
 
-        assertEquals(NetTransferMode.NONE,
+        assertEquals(ConnectionMode.NONE,
             dtm.getTransferMode(new JID("fallback@emergency")));
     }
 }

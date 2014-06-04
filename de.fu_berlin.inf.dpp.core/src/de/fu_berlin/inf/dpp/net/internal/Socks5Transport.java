@@ -32,8 +32,8 @@ import org.jivesoftware.smackx.bytestreams.socks5.Socks5BytestreamRequest;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5BytestreamSession;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 
-import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.NetTransferMode;
+import de.fu_berlin.inf.dpp.net.ConnectionMode;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 
 /**
@@ -416,7 +416,7 @@ public class Socks5Transport extends ByteStreamTransport {
 
                 return new BinaryChannelConnection(new JID(peer),
                     connectionIdentifier, new XMPPByteStreamAdapter(inSession),
-                    NetTransferMode.SOCKS5_DIRECT, listener);
+                    ConnectionMode.SOCKS5_DIRECT, listener);
             } else {
                 LOG.debug(prefix() + "incoming connection is mediated.");
             }
@@ -442,7 +442,7 @@ public class Socks5Transport extends ByteStreamTransport {
                 return new BinaryChannelConnection(new JID(peer),
                     connectionIdentifier,
                     new XMPPByteStreamAdapter(outSession),
-                    NetTransferMode.SOCKS5_DIRECT, listener);
+                    ConnectionMode.SOCKS5_DIRECT, listener);
             }
 
         } catch (IOException e) {
@@ -465,7 +465,7 @@ public class Socks5Transport extends ByteStreamTransport {
 
         return new BinaryChannelConnection(new JID(peer), connectionIdentifier,
             new XMPPByteStreamAdapter(session),
-            NetTransferMode.SOCKS5_MEDIATED, listener);
+            ConnectionMode.SOCKS5_MEDIATED, listener);
     }
 
     /**
@@ -529,7 +529,7 @@ public class Socks5Transport extends ByteStreamTransport {
                     configureSocks5Socket(outSession);
                     return new BinaryChannelConnection(new JID(peer),
                         connectionIdentifier, new XMPPByteStreamAdapter(
-                            outSession), NetTransferMode.SOCKS5_DIRECT,
+                            outSession), ConnectionMode.SOCKS5_DIRECT,
                         listener);
                 }
 
@@ -596,7 +596,7 @@ public class Socks5Transport extends ByteStreamTransport {
 
                     return new BinaryChannelConnection(new JID(peer),
                         connectionIdentifier, new XMPPByteStreamAdapter(
-                            inSession), NetTransferMode.SOCKS5_DIRECT, listener);
+                            inSession), ConnectionMode.SOCKS5_DIRECT, listener);
                 }
 
             } catch (TimeoutException e) {
@@ -618,7 +618,7 @@ public class Socks5Transport extends ByteStreamTransport {
 
             return new BinaryChannelConnection(new JID(peer),
                 connectionIdentifier, new XMPPByteStreamAdapter(session),
-                NetTransferMode.SOCKS5_MEDIATED, listener);
+                ConnectionMode.SOCKS5_MEDIATED, listener);
 
         } finally {
             runningRemoteConnects.remove(sessionID);
@@ -656,7 +656,7 @@ public class Socks5Transport extends ByteStreamTransport {
     }
 
     @Override
-    public NetTransferMode getNetTransferMode() {
+    public ConnectionMode getNetTransferMode() {
         throw new IllegalStateException(
             "transfer mode is determined during connection establishment");
     }

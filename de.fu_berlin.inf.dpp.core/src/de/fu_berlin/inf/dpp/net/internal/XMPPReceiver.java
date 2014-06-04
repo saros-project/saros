@@ -21,11 +21,11 @@ import org.xmlpull.v1.XmlPullParser;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.DispatchThreadContext;
-import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
-import de.fu_berlin.inf.dpp.net.SarosPacketCollector.CancelHook;
-import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
+import de.fu_berlin.inf.dpp.net.PacketCollector;
+import de.fu_berlin.inf.dpp.net.PacketCollector.CancelHook;
+import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
+import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 
 @Component(module = "net")
 public class XMPPReceiver implements IReceiver {
@@ -96,11 +96,11 @@ public class XMPPReceiver implements IReceiver {
     }
 
     @Override
-    public SarosPacketCollector createCollector(PacketFilter filter) {
-        final SarosPacketCollector collector = new SarosPacketCollector(
+    public PacketCollector createCollector(PacketFilter filter) {
+        final PacketCollector collector = new PacketCollector(
             new CancelHook() {
                 @Override
-                public void cancelPacketCollector(SarosPacketCollector collector) {
+                public void cancelPacketCollector(PacketCollector collector) {
                     removePacketListener(collector);
                 }
             }, filter);

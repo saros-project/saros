@@ -5,7 +5,7 @@ import java.util.Date;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smackx.ChatState;
 
-import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 /**
  * Chat element class representing entries in the {@link ChatHistory}.

@@ -7,13 +7,13 @@ import java.util.Map.Entry;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.ITransferModeListener;
-import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.NetTransferMode;
+import de.fu_berlin.inf.dpp.net.ConnectionMode;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 
 /**
  * Collects information about the amount of data transfered with the different
- * {@link NetTransferMode}s
+ * {@link ConnectionMode}s
  * 
  * @author Christopher Oezbek
  */
@@ -27,15 +27,15 @@ public class DataTransferCollector extends AbstractStatisticCollector {
         private int count;
     }
 
-    private final Map<NetTransferMode, TransferStatisticHolder> statistic = new EnumMap<NetTransferMode, TransferStatisticHolder>(
-        NetTransferMode.class);
+    private final Map<ConnectionMode, TransferStatisticHolder> statistic = new EnumMap<ConnectionMode, TransferStatisticHolder>(
+        ConnectionMode.class);
 
     private final IConnectionManager connectionManager;
 
     private final ITransferModeListener dataTransferlistener = new ITransferModeListener() {
 
         @Override
-        public void transferFinished(JID jid, NetTransferMode mode,
+        public void transferFinished(JID jid, ConnectionMode mode,
             boolean incoming, long sizeTransferred, long sizeUncompressed,
             long transmissionMillisecs) {
 
@@ -57,7 +57,7 @@ public class DataTransferCollector extends AbstractStatisticCollector {
         }
 
         @Override
-        public void transferModeChanged(JID jid, NetTransferMode mode) {
+        public void transferModeChanged(JID jid, ConnectionMode mode) {
             // do nothing
         }
     };
@@ -71,9 +71,9 @@ public class DataTransferCollector extends AbstractStatisticCollector {
     @Override
     protected synchronized void processGatheredData() {
 
-        for (final Entry<NetTransferMode, TransferStatisticHolder> entry : statistic
+        for (final Entry<ConnectionMode, TransferStatisticHolder> entry : statistic
             .entrySet()) {
-            final NetTransferMode mode = entry.getKey();
+            final ConnectionMode mode = entry.getKey();
             final TransferStatisticHolder holder = entry.getValue();
 
             data.setTransferStatistic(

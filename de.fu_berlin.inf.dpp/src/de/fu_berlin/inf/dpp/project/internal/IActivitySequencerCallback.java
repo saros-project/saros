@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.project.internal;
 
-import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**

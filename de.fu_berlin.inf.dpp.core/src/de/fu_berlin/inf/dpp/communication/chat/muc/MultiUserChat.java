@@ -23,7 +23,7 @@ import de.fu_berlin.inf.dpp.communication.chat.AbstractChat;
 import de.fu_berlin.inf.dpp.communication.chat.ChatElement;
 import de.fu_berlin.inf.dpp.communication.chat.ChatElement.ChatElementType;
 import de.fu_berlin.inf.dpp.communication.chat.IChatListener;
-import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 /**
  * This class encapsulates Smacks {@link MultiUserChat} and offers

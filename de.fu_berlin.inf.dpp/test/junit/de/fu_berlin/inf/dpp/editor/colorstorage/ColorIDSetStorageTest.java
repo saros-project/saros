@@ -11,7 +11,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.test.util.MemoryPreferenceStore;
 
 public class ColorIDSetStorageTest {

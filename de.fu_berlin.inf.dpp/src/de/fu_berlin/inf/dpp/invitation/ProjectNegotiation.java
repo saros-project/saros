@@ -23,9 +23,9 @@ import de.fu_berlin.inf.dpp.monitoring.MonitorableFileTransfer.TransferStatus;
 import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
-import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
+import de.fu_berlin.inf.dpp.net.PacketCollector;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 
@@ -195,7 +195,7 @@ public abstract class ProjectNegotiation extends CancelableProcess {
      * @throws SarosCancellationException
      *             if the process was canceled
      */
-    protected final Packet collectPacket(SarosPacketCollector collector,
+    protected final Packet collectPacket(PacketCollector collector,
         long timeout) throws SarosCancellationException {
 
         Packet packet = null;

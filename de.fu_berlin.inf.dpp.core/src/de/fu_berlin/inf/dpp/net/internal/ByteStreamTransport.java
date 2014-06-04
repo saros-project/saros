@@ -9,8 +9,8 @@ import org.jivesoftware.smackx.bytestreams.BytestreamListener;
 import org.jivesoftware.smackx.bytestreams.BytestreamManager;
 import org.jivesoftware.smackx.bytestreams.BytestreamRequest;
 
-import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.NetTransferMode;
+import de.fu_berlin.inf.dpp.net.ConnectionMode;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 /**
  * Abstract skeleton for different transport methods.
@@ -181,5 +181,5 @@ public abstract class ByteStreamTransport implements ITransport {
      */
     abstract protected BytestreamManager createManager(Connection connection);
 
-    abstract protected NetTransferMode getNetTransferMode();
+    abstract protected ConnectionMode getNetTransferMode();
 }

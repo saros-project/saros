@@ -17,7 +17,7 @@ import de.fu_berlin.inf.dpp.communication.chat.ChatElement;
 import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatPreferences;
 import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChat;
 import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatService;
-import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;

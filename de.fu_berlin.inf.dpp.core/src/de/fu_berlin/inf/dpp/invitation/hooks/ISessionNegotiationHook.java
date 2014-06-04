@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.invitation.hooks;
 
 import java.util.Map;
 
-import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 /**
  * A SessionNegotiationHook is a component that wishes to take part in the

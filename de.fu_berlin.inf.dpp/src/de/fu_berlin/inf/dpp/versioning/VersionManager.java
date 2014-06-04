@@ -23,8 +23,8 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.extensions.VersionExchangeExtension;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
+import de.fu_berlin.inf.dpp.net.PacketCollector;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 /**
  * Component for figuring out whether two Saros plug-in instances with known
@@ -249,7 +249,7 @@ public class VersionManager {
         request.setType(IQ.Type.GET);
         request.setTo(rqJID.toString());
 
-        SarosPacketCollector collector = receiver
+        PacketCollector collector = receiver
             .createCollector(new AndFilter(VersionExchangeExtension.PROVIDER
                 .getIQFilter(), new PacketFilter() {
                 @Override

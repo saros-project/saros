@@ -3,7 +3,7 @@
  */
 package de.fu_berlin.inf.dpp.net.internal;
 
-import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 /**
  * A transfer description contains all necessary information for tunneling

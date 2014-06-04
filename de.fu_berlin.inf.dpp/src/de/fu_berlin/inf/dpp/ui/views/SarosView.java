@@ -63,11 +63,11 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.net.IRosterListener;
-import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.RosterAdapter;
-import de.fu_berlin.inf.dpp.net.RosterTracker;
-import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
+import de.fu_berlin.inf.dpp.net.xmpp.roster.IRosterListener;
+import de.fu_berlin.inf.dpp.net.xmpp.roster.AbstractRosterListener;
+import de.fu_berlin.inf.dpp.net.xmpp.roster.RosterTracker;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -133,7 +133,7 @@ public class SarosView extends ViewPart {
     private static final boolean MDNS_MODE = Boolean
         .getBoolean("de.fu_berlin.inf.dpp.net.ENABLE_MDNS");
 
-    private final IRosterListener rosterListener = new RosterAdapter() {
+    private final IRosterListener rosterListener = new AbstractRosterListener() {
         /**
          * Stores the most recent presence for each user, so we can keep track
          * of away/available changes which should not update the RosterView.

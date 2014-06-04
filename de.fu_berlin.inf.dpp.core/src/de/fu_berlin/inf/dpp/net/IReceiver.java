@@ -51,18 +51,18 @@ public interface IReceiver {
     public void processPacket(Packet packet);
 
     /**
-     * Installs a {@linkplain SarosPacketCollector collector}. Use this method
+     * Installs a {@linkplain PacketCollector collector}. Use this method
      * instead of {@link #addPacketListener} if the logic is using a polling
      * mechanism.
      * 
      * @param filter
      *            a filter that packets must match to be added to the collector.
-     * @return a {@linkplain SarosPacketCollector collector} which <b>must</b>
+     * @return a {@linkplain PacketCollector collector} which <b>must</b>
      *         be canceled if it is no longer used
      * 
-     * @see SarosPacketCollector#cancel()
+     * @see PacketCollector#cancel()
      */
-    public SarosPacketCollector createCollector(PacketFilter filter);
+    public PacketCollector createCollector(PacketFilter filter);
 
     /**
      * FOR INTERNAL USE

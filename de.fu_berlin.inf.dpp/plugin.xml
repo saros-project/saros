@@ -1310,7 +1310,7 @@
                </test>
             </adapt>
             <adapt
-                  type="de.fu_berlin.inf.dpp.net.JID">
+                  type="de.fu_berlin.inf.dpp.net.xmpp.JID">
                <test
                      property="de.fu_berlin.inf.dpp.isInSarosSession">
                </test>
@@ -1405,7 +1405,7 @@
       <definition
             id="de.fu_berlin.inf.dpp.ui.definitions.isBuddy">
          <adapt
-               type="de.fu_berlin.inf.dpp.net.JID">
+               type="de.fu_berlin.inf.dpp.net.xmpp.JID">
          </adapt>
       </definition>
       <definition
@@ -1601,7 +1601,7 @@
             id="de.fu_berlin.inf.dpp.propertyTesters.BuddyPropertyTester"
             namespace="de.fu_berlin.inf.dpp"
             properties="isInSarosSession"
-            type="de.fu_berlin.inf.dpp.net.JID">
+            type="de.fu_berlin.inf.dpp.net.xmpp.JID">
       </propertyTester>
       <propertyTester
             class="de.fu_berlin.inf.dpp.ui.expressions.ParticipantPropertyTester"
@@ -1627,7 +1627,7 @@
                type="org.jivesoftware.smack.RosterEntry">
          </adapter>
          <adapter
-               type="de.fu_berlin.inf.dpp.net.JID">
+               type="de.fu_berlin.inf.dpp.net.xmpp.JID">
          </adapter>
       </factory>
       <factory

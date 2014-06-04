@@ -7,8 +7,8 @@ import java.net.Socket;
 
 import org.jivesoftware.smack.Connection;
 
-import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.NetTransferMode;
+import de.fu_berlin.inf.dpp.net.ConnectionMode;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 // TODO rewrite ITransport interface
 
@@ -38,7 +38,7 @@ public class TCPTransport implements ITransport {
         }
 
         final IByteStreamConnection connection = new BinaryChannelConnection(
-            peer, connectionID, new TCPByteStream(socket), NetTransferMode.TCP,
+            peer, connectionID, new TCPByteStream(socket), ConnectionMode.TCP,
             listener);
 
         return connection;

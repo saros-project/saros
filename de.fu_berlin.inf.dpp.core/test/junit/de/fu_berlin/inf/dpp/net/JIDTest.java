@@ -28,6 +28,8 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
+
 public class JIDTest {
 
     private JID jid;

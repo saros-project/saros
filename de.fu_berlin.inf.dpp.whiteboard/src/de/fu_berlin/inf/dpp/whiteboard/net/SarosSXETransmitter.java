@@ -19,9 +19,9 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
+import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -53,7 +53,7 @@ public class SarosSXETransmitter implements ISXETransmitter {
     /**
      * Interval to poll receiving
      * 
-     * @see XMPPTransmitter#receive(SubMonitor, SarosPacketCollector, long,
+     * @see XMPPTransmitter#receive(SubMonitor, PacketCollector, long,
      *      boolean)
      */
     private static final long SXE_TIMEOUT_INTERVAL = 500L;
@@ -160,7 +160,7 @@ public class SarosSXETransmitter implements ISXETransmitter {
         PacketFilter filter = new SXEPacketFilter(msg.getSession(),
             msg.getTo(), awaitFor);
 
-        SarosPacketCollector collector = receiver.createCollector(filter);
+        PacketCollector collector = receiver.createCollector(filter);
 
         try {
             sendWithoutDispatch(msg);

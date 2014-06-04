@@ -15,9 +15,8 @@ import java.util.EnumSet;
  */
 
 public enum ConnectionState {
+
     /**
-     * Saros not connected to a XMPP Server
-     * 
      * Valid next states: CONNECTING (usually triggered by an user action to
      * connect)
      */
@@ -29,8 +28,6 @@ public enum ConnectionState {
     },
 
     /**
-     * Saros is in the process of connecting
-     * 
      * Valid next states:
      * 
      * - ERROR (if the attempt to connect failed)
@@ -45,8 +42,6 @@ public enum ConnectionState {
     },
 
     /**
-     * Saros is successfully connected to an XMPP server
-     * 
      * Valid follow states:
      * 
      * - ERROR (if the connection broke)
@@ -62,8 +57,6 @@ public enum ConnectionState {
     },
 
     /**
-     * Saros is in the process of disconnecting
-     * 
      * Valid follow states:
      * 
      * - NOT_CONNECTED
@@ -76,8 +69,6 @@ public enum ConnectionState {
     },
 
     /**
-     * There is an error in the XMPP connection.
-     * 
      * Valid follow states:
      * 
      * - NOT_CONNECTED

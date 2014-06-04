@@ -32,10 +32,10 @@ import de.fu_berlin.inf.dpp.filesystem.EclipseProjectImpl;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
-import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
+import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ProjectNegotiationMissingFilesExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ProjectNegotiationOfferingExtension;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
@@ -59,9 +59,9 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     @Inject
     private IChecksumCache checksumCache;
 
-    private SarosPacketCollector remoteFileListResponseCollector;
+    private PacketCollector remoteFileListResponseCollector;
 
-    private SarosPacketCollector startActivityQueuingResponseCollector;
+    private PacketCollector startActivityQueuingResponseCollector;
 
     public OutgoingProjectNegotiation(JID to, ISarosSession sarosSession,
         List<IProject> projects, ISarosContext sarosContext) {

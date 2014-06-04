@@ -17,7 +17,7 @@ import java.util.concurrent.Future;
 
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 
-import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 

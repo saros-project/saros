@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net;
+package de.fu_berlin.inf.dpp.net.xmpp;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -22,6 +22,7 @@ import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.stun.IStunService;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.net.util.NetworkingUtils;

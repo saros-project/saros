@@ -28,14 +28,14 @@ import de.fu_berlin.inf.dpp.ISarosContextBindings.IBBTransport;
 import de.fu_berlin.inf.dpp.ISarosContextBindings.Socks5Transport;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.IPacketInterceptor;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransferModeListener;
-import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.NetTransferMode;
-import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
+import de.fu_berlin.inf.dpp.net.ConnectionMode;
+import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 
 /**
  * This class is responsible for handling all transfers of binary data. It
@@ -167,7 +167,7 @@ public class DataTransferManager implements IConnectionListener,
             IByteStreamConnection connection) {
             closeConnection(connectionID, peer);
             transferModeDispatch
-                .transferModeChanged(peer, NetTransferMode.NONE);
+                .transferModeChanged(peer, ConnectionMode.NONE);
         }
     };
 
@@ -351,15 +351,15 @@ public class DataTransferManager implements IConnectionListener,
      */
     @Override
     @Deprecated
-    public NetTransferMode getTransferMode(JID jid) {
+    public ConnectionMode getTransferMode(JID jid) {
         return getTransferMode(null, jid);
     }
 
     @Override
-    public NetTransferMode getTransferMode(String connectionID, JID jid) {
+    public ConnectionMode getTransferMode(String connectionID, JID jid) {
         IByteStreamConnection connection = getCurrentConnection(connectionID,
             jid);
-        return connection == null ? NetTransferMode.NONE : connection.getMode();
+        return connection == null ? ConnectionMode.NONE : connection.getMode();
     }
 
     private IByteStreamConnection connectInternal(String connectionID, JID peer)

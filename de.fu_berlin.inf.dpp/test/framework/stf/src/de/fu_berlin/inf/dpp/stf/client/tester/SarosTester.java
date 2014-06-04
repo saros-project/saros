@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.stf.client.tester;
 
 import java.rmi.RemoteException;
 
-import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.IControlBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.IRemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.ISuperBot;

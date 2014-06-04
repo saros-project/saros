@@ -12,7 +12,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.monitoring.MonitorableFileTransfer;
 import de.fu_berlin.inf.dpp.monitoring.MonitorableFileTransfer.TransferStatus;
 import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
-import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 abstract class FileTransferJob extends Job {
 

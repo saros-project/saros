@@ -2,8 +2,8 @@ package de.fu_berlin.inf.dpp.net.internal;
 
 import java.io.IOException;
 
-import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.NetTransferMode;
+import de.fu_berlin.inf.dpp.net.ConnectionMode;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 /**
  * A IConnection is responsible for sending data to a particular user
@@ -44,5 +44,5 @@ public interface IByteStreamConnection {
      */
     public String getConnectionID();
 
-    public NetTransferMode getMode();
+    public ConnectionMode getMode();
 }

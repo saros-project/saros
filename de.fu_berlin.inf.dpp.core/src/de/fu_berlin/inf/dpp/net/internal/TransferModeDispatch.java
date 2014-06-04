@@ -6,8 +6,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.net.ITransferModeListener;
-import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.NetTransferMode;
+import de.fu_berlin.inf.dpp.net.ConnectionMode;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 class TransferModeDispatch implements ITransferModeListener {
 
@@ -25,7 +25,7 @@ class TransferModeDispatch implements ITransferModeListener {
     }
 
     @Override
-    public synchronized void transferFinished(JID jid, NetTransferMode mode,
+    public synchronized void transferFinished(JID jid, ConnectionMode mode,
         boolean incoming, long sizeTransferred, long sizeUncompressed,
         long transmissionMillisecs) {
 
@@ -40,7 +40,7 @@ class TransferModeDispatch implements ITransferModeListener {
     }
 
     @Override
-    public synchronized void transferModeChanged(JID jid, NetTransferMode mode) {
+    public synchronized void transferModeChanged(JID jid, ConnectionMode mode) {
         for (ITransferModeListener listener : listeners) {
             try {
                 listener.transferModeChanged(jid, mode);

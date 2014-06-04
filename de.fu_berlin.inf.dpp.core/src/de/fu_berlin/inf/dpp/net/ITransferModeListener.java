@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.net;
 
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
+
 /**
  * This interface can be implemented to be informed about file transfers being
  * finished by the DataTransferManager (for instance to collect statistics about
@@ -23,17 +25,17 @@ public interface ITransferModeListener {
      *            The size of the received data after (potentially)
      *            decompression in byte
      */
-    public void transferFinished(JID jid, NetTransferMode mode,
+    public void transferFinished(JID jid, ConnectionMode mode,
         boolean incoming, long sizeTransferred, long sizeUncompressed,
         long transmissionMillisecs);
 
     /**
-     * Gets called when the {@linkplain NetTransferMode transfer mode} changed.
+     * Gets called when the {@linkplain ConnectionMode transfer mode} changed.
      * 
      * @param jid
      *            the peer for which the transfer mode changed
      * @param mode
      *            the mode currently used for transfer
      */
-    public void transferModeChanged(JID jid, NetTransferMode mode);
+    public void transferModeChanged(JID jid, ConnectionMode mode);
 }

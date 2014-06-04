@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net;
+package de.fu_berlin.inf.dpp.net.xmpp.roster;
 
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterListener;

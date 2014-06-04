@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.invitation.SessionNegotiation;
-import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 /**
  * Observable which keeps track of all InvitationProcesses currently running.

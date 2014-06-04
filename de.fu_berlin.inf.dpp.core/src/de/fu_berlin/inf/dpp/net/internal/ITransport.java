@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.jivesoftware.smack.Connection;
 
-import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 /**
  * This interface is used to define various transport methods (probably only XEP

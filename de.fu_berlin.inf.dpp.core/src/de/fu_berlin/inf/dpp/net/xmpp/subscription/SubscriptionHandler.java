@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net.subscription;
+package de.fu_berlin.inf.dpp.net.xmpp.subscription;
 
 import java.text.MessageFormat;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -15,10 +15,9 @@ import org.jivesoftware.smack.packet.Presence.Type;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.net.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.SafePacketListener;
-import de.fu_berlin.inf.dpp.net.XMPPConnectionService;
+import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 
 /**
  * This is class is responsible for handling XMPP subscriptions requests.
@@ -49,13 +48,16 @@ public class SubscriptionHandler {
         }
     };
 
-    private final PacketListener packetListener = new SafePacketListener(LOG,
-        new PacketListener() {
-            @Override
-            public void processPacket(Packet packet) {
+    private final PacketListener packetListener = new PacketListener() {
+        @Override
+        public void processPacket(Packet packet) {
+            try {
                 processPresence((Presence) packet);
+            } catch (RuntimeException e) {
+                LOG.error("failed to process packet: " + packet, e);
             }
-        });
+        }
+    };
 
     public SubscriptionHandler(XMPPConnectionService connectionService) {
         connectionService.addListener(connectionListener);

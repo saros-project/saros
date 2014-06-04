@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.communication.chat;
 
 import org.jivesoftware.smackx.ChatState;
 
-import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 /**
  * A listener for {@link IChat} chat-related events.

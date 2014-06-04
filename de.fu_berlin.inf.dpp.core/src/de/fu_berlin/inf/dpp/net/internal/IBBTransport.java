@@ -4,7 +4,7 @@ import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smackx.bytestreams.BytestreamManager;
 import org.jivesoftware.smackx.bytestreams.ibb.InBandBytestreamManager;
 
-import de.fu_berlin.inf.dpp.net.NetTransferMode;
+import de.fu_berlin.inf.dpp.net.ConnectionMode;
 
 /**
  * Transport class for in-band bytestreams
@@ -23,8 +23,8 @@ public class IBBTransport extends ByteStreamTransport {
     }
 
     @Override
-    public NetTransferMode getNetTransferMode() {
-        return NetTransferMode.IBB;
+    public ConnectionMode getNetTransferMode() {
+        return ConnectionMode.IBB;
     }
 
     @Override

@@ -17,9 +17,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp.net;
+package de.fu_berlin.inf.dpp.net.xmpp;
 
 import org.jivesoftware.smack.Connection;
+
+import de.fu_berlin.inf.dpp.net.ConnectionState;
 
 /**
  * A listener for changes to the current connection state. Use
@@ -34,12 +36,12 @@ public interface IConnectionListener {
      * 
      * @param connection
      *            The affected XMPP-connection that changed its state
-     * @param newState
-     *            the new state of the connection. If the new state is
+     * @param state
+     *            the new state of the connection. If the state is
      *            <code>ERROR</code>, you can use
-     *            {@link XMPPConnectionService#getConnectionError()} to get the error
-     *            message.
+     *            {@link XMPPConnectionService#getConnectionError()} to get the
+     *            error message.
      */
     public void connectionStateChanged(Connection connection,
-        ConnectionState newState);
+        ConnectionState state);
 }

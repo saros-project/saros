@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.net;
+package de.fu_berlin.inf.dpp.net.xmpp.roster;
 
 import java.util.Collection;
 
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.packet.Presence;
 
-public class RosterAdapter implements IRosterListener {
+public abstract class AbstractRosterListener implements IRosterListener {
 
     @Override
     public void entriesAdded(Collection<String> addresses) {

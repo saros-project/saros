@@ -20,8 +20,8 @@ import de.fu_berlin.inf.dpp.communication.extensions.UserListReceivedExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.UserListExtension.UserListEntry;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
+import de.fu_berlin.inf.dpp.net.PacketCollector;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 
@@ -147,7 +147,7 @@ public class UserInformationHandler implements Startable {
         log.debug("synchronizing user list (A)" + usersAdded + ", (R) "
             + usersRemoved + " with user(s) " + remoteUsers);
 
-        final SarosPacketCollector collector = receiver
+        final PacketCollector collector = receiver
             .createCollector(UserListReceivedExtension.PROVIDER
                 .getPacketFilter(currentSessionID));
 

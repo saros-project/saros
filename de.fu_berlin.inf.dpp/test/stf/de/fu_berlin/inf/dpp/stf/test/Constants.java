@@ -1,7 +1,7 @@
 package de.fu_berlin.inf.dpp.stf.test;
 
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 public interface Constants {
 

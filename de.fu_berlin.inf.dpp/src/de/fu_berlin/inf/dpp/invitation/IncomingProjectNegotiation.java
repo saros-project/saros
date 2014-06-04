@@ -47,9 +47,9 @@ import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
-import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
+import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ProjectNegotiationMissingFilesExtension;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
@@ -97,7 +97,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     private boolean running;
 
-    private SarosPacketCollector startActivityQueuingRequestCollector;
+    private PacketCollector startActivityQueuingRequestCollector;
 
     public IncomingProjectNegotiation(ISarosSession sarosSession, JID peer,
         String processID, List<ProjectNegotiationData> projectInfos,

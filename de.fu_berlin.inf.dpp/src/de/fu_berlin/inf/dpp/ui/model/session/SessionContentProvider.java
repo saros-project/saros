@@ -17,8 +17,8 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
-import de.fu_berlin.inf.dpp.net.RosterAdapter;
 import de.fu_berlin.inf.dpp.net.mdns.MDNSService;
+import de.fu_berlin.inf.dpp.net.xmpp.roster.AbstractRosterListener;
 import de.fu_berlin.inf.dpp.project.internal.FollowingActivitiesManager;
 import de.fu_berlin.inf.dpp.project.internal.IFollowModeChangesListener;
 import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
@@ -110,7 +110,7 @@ public class SessionContentProvider extends TreeContentProvider {
     };
 
     // TODO call update and not refresh
-    private final RosterListener rosterListener = new RosterAdapter() {
+    private final RosterListener rosterListener = new AbstractRosterListener() {
         // update nicknames
         @Override
         public void entriesUpdated(Collection<String> addresses) {

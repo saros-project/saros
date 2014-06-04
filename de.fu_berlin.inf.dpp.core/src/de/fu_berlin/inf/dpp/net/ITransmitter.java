@@ -24,6 +24,7 @@ import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 /**
  * A humble interface that is responsible for network functionality. The idea

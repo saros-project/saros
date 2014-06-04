@@ -9,22 +9,18 @@ import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
 
 /**
- * SarosPacketCollector is a special version of a Packet Collector and does not
- * depend on a PacketReader for registration.
+ * This packet collector is a special version of SMACKs
+ * {@link org.jivesoftware.smack.PacketCollector} and does not depend on a
+ * {@link org.jivesoftware.smack.Connection} for registration.
  */
-/*
- * Note, at current state this class is only used during the invitation process
- * and synchronization and we might want to hide its functionality of a blocking
- * receive inside the XMPPTransmitter.receive() method.
- */
-public class SarosPacketCollector implements PacketListener {
+
+public class PacketCollector implements PacketListener {
 
     public static interface CancelHook {
-        public void cancelPacketCollector(SarosPacketCollector collector);
+        public void cancelPacketCollector(PacketCollector collector);
     }
 
-    private static final Logger log = Logger
-        .getLogger(SarosPacketCollector.class);
+    private static final Logger log = Logger.getLogger(PacketCollector.class);
     private boolean hasReveived = false;
 
     /**
@@ -47,7 +43,7 @@ public class SarosPacketCollector implements PacketListener {
      * @param packetFilter
      *            determines which packets will be returned by this collector.
      */
-    public SarosPacketCollector(CancelHook cancelHook, PacketFilter packetFilter) {
+    public PacketCollector(CancelHook cancelHook, PacketFilter packetFilter) {
         this.cancelHook = cancelHook;
         this.packetFilter = packetFilter;
     }

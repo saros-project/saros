@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
-import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 /**
  * Listener interface used by ITransport and IBytestreamConnection to notify

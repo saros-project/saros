@@ -32,11 +32,11 @@ import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCNegotiationMan
 import de.fu_berlin.inf.dpp.communication.chat.single.SingleUserChatService;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.net.IRosterListener;
-import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.RosterAdapter;
-import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.net.xmpp.roster.IRosterListener;
+import de.fu_berlin.inf.dpp.net.xmpp.roster.AbstractRosterListener;
+import de.fu_berlin.inf.dpp.net.xmpp.roster.RosterTracker;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
@@ -93,7 +93,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
      * This RosterListener closure is added to the RosterTracker to get
      * notifications when the roster changes.
      */
-    protected IRosterListener rosterListener = new RosterAdapter() {
+    protected IRosterListener rosterListener = new AbstractRosterListener() {
 
         @Override
         public void entriesUpdated(final Collection<String> addresses) {

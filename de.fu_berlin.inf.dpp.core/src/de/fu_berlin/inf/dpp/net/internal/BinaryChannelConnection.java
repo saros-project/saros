@@ -15,8 +15,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.NetTransferMode;
+import de.fu_berlin.inf.dpp.net.ConnectionMode;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 /**
  * BinaryChannelConnection is a class that encapsulates a bidirectional
@@ -92,7 +92,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
      * NetTransferMode to identify the transport method of the underlying socket
      * connection.
      */
-    private NetTransferMode transferMode;
+    private ConnectionMode transferMode;
 
     private class ReceiverThread extends Thread {
 
@@ -122,7 +122,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
     }
 
     public BinaryChannelConnection(JID peer, String connectionID,
-        ByteStream stream, NetTransferMode mode,
+        ByteStream stream, ConnectionMode mode,
         IByteStreamConnectionListener listener) throws IOException {
         this.listener = listener;
         this.peer = peer;
@@ -199,7 +199,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
     }
 
     @Override
-    public NetTransferMode getMode() {
+    public ConnectionMode getMode() {
         return transferMode;
     }
 

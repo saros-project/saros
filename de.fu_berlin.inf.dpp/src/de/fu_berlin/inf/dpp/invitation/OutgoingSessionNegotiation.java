@@ -22,9 +22,9 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.invitation.hooks.ISessionNegotiationHook;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
-import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
-import de.fu_berlin.inf.dpp.net.discovery.DiscoveryManager;
+import de.fu_berlin.inf.dpp.net.PacketCollector;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.net.xmpp.discovery.DiscoveryManager;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ColorNegotiationHook;
@@ -52,10 +52,10 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
     private String localVersion;
 
-    private SarosPacketCollector invitationAcceptedCollector;
-    private SarosPacketCollector invitationAcknowledgedCollector;
-    private SarosPacketCollector invitationDataExchangeCollector;
-    private SarosPacketCollector invitationCompletedCollector;
+    private PacketCollector invitationAcceptedCollector;
+    private PacketCollector invitationAcknowledgedCollector;
+    private PacketCollector invitationDataExchangeCollector;
+    private PacketCollector invitationCompletedCollector;
 
     @Inject
     private VersionManager versionManager;

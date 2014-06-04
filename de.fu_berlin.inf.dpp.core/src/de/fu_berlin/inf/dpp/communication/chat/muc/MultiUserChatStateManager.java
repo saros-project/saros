@@ -19,7 +19,7 @@ import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.packet.ChatStateExtension;
 
 import de.fu_berlin.inf.dpp.communication.chat.IChatListener;
-import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 /**
  * Handles the {@link ChatState} of a particular {@link MultiUserChat} and the

@@ -9,8 +9,8 @@ import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
 
 import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
-import de.fu_berlin.inf.dpp.net.SarosPacketCollector.CancelHook;
+import de.fu_berlin.inf.dpp.net.PacketCollector;
+import de.fu_berlin.inf.dpp.net.PacketCollector.CancelHook;
 import de.fu_berlin.inf.dpp.net.internal.BinaryXMPPExtension;
 
 class NonThreadedReceiver implements IReceiver {
@@ -40,11 +40,11 @@ class NonThreadedReceiver implements IReceiver {
     }
 
     @Override
-    public SarosPacketCollector createCollector(PacketFilter filter) {
-        final SarosPacketCollector collector = new SarosPacketCollector(
+    public PacketCollector createCollector(PacketFilter filter) {
+        final PacketCollector collector = new PacketCollector(
             new CancelHook() {
                 @Override
-                public void cancelPacketCollector(SarosPacketCollector collector) {
+                public void cancelPacketCollector(PacketCollector collector) {
                     removePacketListener(collector);
                 }
             }, filter);

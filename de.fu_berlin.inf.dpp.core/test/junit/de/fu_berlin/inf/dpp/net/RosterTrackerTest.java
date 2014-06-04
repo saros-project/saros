@@ -23,6 +23,11 @@ import org.jivesoftware.smack.packet.Presence;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
+import de.fu_berlin.inf.dpp.net.xmpp.roster.RosterTracker;
+
 public class RosterTrackerTest {
 
     private static Presence createPresence(String user, Presence.Type type) {
