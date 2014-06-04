@@ -227,7 +227,8 @@ public class SarosSessionManager implements ISarosSessionManager {
             sessionIDObservable.setValue(String.valueOf(SESSION_ID_GENERATOR
                 .nextInt(Integer.MAX_VALUE)));
 
-            final SarosSession sarosSession = new SarosSession(
+            // FIXME should be passed in (colorID, nickname)
+            final SarosSession sarosSession = new SarosSession(null,
                 preferenceUtils.getFavoriteColorID(), sarosContext);
 
             sarosSessionObservable.setValue(sarosSession);
@@ -277,13 +278,13 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     // FIXME offer a startSession method for the client and host !
     @Override
-    public ISarosSession joinSession(JID host, int clientColor, JID inviter,
-        int hostColor) {
+    public ISarosSession joinSession(JID host, String clientNickname,
+        String hostNickname, int clientColor, int hostColor) {
 
         assert getSarosSession() == null;
 
-        SarosSession sarosSession = new SarosSession(host, clientColor,
-            sarosContext, inviter, hostColor);
+        SarosSession sarosSession = new SarosSession(host, clientNickname,
+            hostNickname, clientColor, hostColor, sarosContext);
 
         sarosSessionObservable.setValue(sarosSession);
 

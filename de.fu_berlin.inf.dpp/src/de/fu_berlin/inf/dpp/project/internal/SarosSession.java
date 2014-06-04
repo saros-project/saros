@@ -218,24 +218,25 @@ public final class SarosSession implements ISarosSession {
     private SPathConverter pathConverter;
     private UserConverter userConverter;
 
+    // FIXME those parameter passing feels strange, find a better way
     /**
      * Constructor for host.
      */
-    public SarosSession(int localColorID, ISarosContext sarosContext) {
+    public SarosSession(String nickname, int colorID, ISarosContext sarosContext) {
 
-        this(sarosContext, /* unused */null, localColorID, /* unused */
-        -1);
+        this(sarosContext, /* unused */null, colorID, /* unused */
+        -1, nickname, /* unused */null);
     }
 
     /**
      * Constructor for client.
      */
-    public SarosSession(JID hostJID, int localColorID,
-        ISarosContext sarosContext, JID inviterID, int inviterColorID) {
+    public SarosSession(JID hostJID, String clientNickname,
+        String hostNickname, int clientColorID, int hostColorID,
+        ISarosContext sarosContext) {
 
-        this(sarosContext, hostJID, localColorID, inviterColorID);
-
-        assert inviterID.equals(hostJID) : "non host inviting is disabled";
+        this(sarosContext, hostJID, clientColorID, hostColorID, clientNickname,
+            hostNickname);
     }
 
     @Override
@@ -1037,7 +1038,7 @@ public final class SarosSession implements ISarosSession {
     }
 
     private SarosSession(ISarosContext context, JID host, int localColorID,
-        int hostColorID) {
+        int hostColorID, String localNickname, String hostNickname) {
 
         context.initComponent(this);
 
@@ -1054,7 +1055,7 @@ public final class SarosSession implements ISarosSession {
 
         assert localUserJID != null;
 
-        localUser = new User(localUserJID, null, host == null, true,
+        localUser = new User(localUserJID, localNickname, host == null, true,
             localColorID, localColorID);
 
         localUser.setInSession(true);
@@ -1063,7 +1064,7 @@ public final class SarosSession implements ISarosSession {
             hostUser = localUser;
             participants.put(hostUser.getJID(), hostUser);
         } else {
-            hostUser = new User(host, null, true, false, hostColorID,
+            hostUser = new User(host, hostNickname, true, false, hostColorID,
                 hostColorID);
             hostUser.setInSession(true);
             participants.put(hostUser.getJID(), hostUser);

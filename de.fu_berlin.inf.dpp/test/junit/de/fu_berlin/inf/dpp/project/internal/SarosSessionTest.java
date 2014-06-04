@@ -321,7 +321,7 @@ public class SarosSessionTest {
         PowerMock.replay(ResourcesPlugin.class);
 
         // Test creating, starting and stopping the session.
-        SarosSession session = new SarosSession(0, context);
+        SarosSession session = new SarosSession(null, 0, context);
         Assert.assertEquals(0, session.getActivityProviderCount());
         Assert.assertEquals(0,
             countingReceiver.getCurrentPacketListenersCount());

@@ -271,7 +271,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
         }
 
         sarosSession = sessionManager.joinSession(parameters.getSessionHost(),
-            clientColor, peer, hostFavoriteColor);
+            null, null, clientColor, hostFavoriteColor);
     }
 
     /**
