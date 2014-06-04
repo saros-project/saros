@@ -240,7 +240,7 @@ public class ConsistencyWatchdogHandler extends AbstractActivityProvider
         progress.worked(1);
 
         // Reset jupiter
-        sarosSession.getConcurrentDocumentServer().reset(from.getJID(), path);
+        sarosSession.getConcurrentDocumentServer().reset(from, path);
 
         progress.worked(1);
         final User user = sarosSession.getLocalUser();

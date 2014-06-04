@@ -10,7 +10,6 @@ import de.fu_berlin.inf.dpp.activities.JupiterActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterDocumentServer;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 
@@ -27,33 +26,32 @@ public class JupiterServer {
      * 
      * @host
      */
-    private HashMap<SPath, JupiterDocumentServer> concurrentDocuments = new HashMap<SPath, JupiterDocumentServer>();
+    private final HashMap<SPath, JupiterDocumentServer> concurrentDocuments = new HashMap<SPath, JupiterDocumentServer>();
 
-    private Set<User> currentClients = new HashSet<User>();
+    private final Set<User> currentClients = new HashSet<User>();
 
-    private ISarosSession sarosSession;
+    private final ISarosSession sarosSession;
 
-    public JupiterServer(ISarosSession sarosSession) {
+    public JupiterServer(final ISarosSession sarosSession) {
         this.sarosSession = sarosSession;
     }
 
-    public synchronized void removePath(SPath path) {
+    public synchronized void removePath(final SPath path) {
         concurrentDocuments.remove(path);
     }
 
-    public synchronized void addUser(User user) {
-        JID jid = user.getJID();
+    public synchronized void addUser(final User user) {
         currentClients.add(user);
-        for (JupiterDocumentServer server : concurrentDocuments.values()) {
-            server.addProxyClient(jid);
-        }
+
+        for (final JupiterDocumentServer server : concurrentDocuments.values())
+            server.addProxyClient(user);
     }
 
-    public synchronized void removeUser(User user) {
-        JID jid = user.getJID();
+    public synchronized void removeUser(final User user) {
         currentClients.remove(user);
-        for (JupiterDocumentServer server : concurrentDocuments.values()) {
-            server.removeProxyClient(jid);
+
+        for (final JupiterDocumentServer server : concurrentDocuments.values()) {
+            server.removeProxyClient(user);
         }
     }
 
@@ -70,7 +68,7 @@ public class JupiterServer {
      * SarosSessionMapper to also track the resources and not just the projects
      * that are already shared for every user individually.
      */
-    protected synchronized JupiterDocumentServer getServer(SPath path) {
+    private synchronized JupiterDocumentServer getServer(final SPath path) {
 
         JupiterDocumentServer docServer = concurrentDocuments.get(path);
 
@@ -78,41 +76,42 @@ public class JupiterServer {
 
             docServer = new JupiterDocumentServer(path);
 
-            for (User client : currentClients) {
+            for (final User client : currentClients) {
                 /*
                  * Make sure that we only add clients that already have the
                  * resources in question. Other clients that haven't accepted
                  * the Project yet will be added later.
                  */
                 if (sarosSession.userHasProject(client, path.getProject())) {
-                    docServer.addProxyClient(client.getJID());
+                    docServer.addProxyClient(client);
                 }
             }
-            docServer.addProxyClient(sarosSession.getHost().getJID());
+
+            docServer.addProxyClient(sarosSession.getHost());
 
             concurrentDocuments.put(path, docServer);
         }
         return docServer;
     }
 
-    public synchronized void reset(SPath path, JID jid) {
-        getServer(path).reset(jid);
+    public synchronized void reset(final SPath path, final User user) {
+        getServer(path).reset(user);
     }
 
-    public synchronized Map<JID, JupiterActivity> transform(
-        JupiterActivity jupiterActivity) throws TransformationException {
+    public synchronized Map<User, JupiterActivity> transform(
+        final JupiterActivity activity) throws TransformationException {
 
-        JupiterDocumentServer docServer = getServer(jupiterActivity.getPath());
+        final JupiterDocumentServer docServer = getServer(activity.getPath());
 
-        return docServer.transformJupiterActivity(jupiterActivity);
+        return docServer.transformJupiterActivity(activity);
     }
 
-    public synchronized Map<JID, ChecksumActivity> withTimestamp(
-        ChecksumActivity checksumActivity) throws TransformationException {
+    public synchronized Map<User, ChecksumActivity> withTimestamp(
+        final ChecksumActivity activity) throws TransformationException {
 
-        JupiterDocumentServer docServer = getServer(checksumActivity.getPath());
+        final JupiterDocumentServer docServer = getServer(activity.getPath());
 
-        return docServer.withTimestamp(checksumActivity);
+        return docServer.withTimestamp(activity);
     }
 
 }

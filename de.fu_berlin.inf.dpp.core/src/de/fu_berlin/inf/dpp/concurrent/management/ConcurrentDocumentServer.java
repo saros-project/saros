@@ -17,7 +17,6 @@ import de.fu_berlin.inf.dpp.activities.JupiterActivity;
 import de.fu_berlin.inf.dpp.activities.QueueItem;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
@@ -35,7 +34,7 @@ import de.fu_berlin.inf.dpp.session.User;
  */
 public class ConcurrentDocumentServer implements Startable {
 
-    private static Logger log = Logger
+    private static Logger LOG = Logger
         .getLogger(ConcurrentDocumentServer.class);
 
     private final ISarosSession sarosSession;
@@ -48,17 +47,17 @@ public class ConcurrentDocumentServer implements Startable {
     private final ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
 
         @Override
-        public void userStartedQueuing(User user) {
+        public void userStartedQueuing(final User user) {
             server.addUser(user);
         }
 
         @Override
-        public void userLeft(User user) {
+        public void userLeft(final User user) {
             server.removeUser(user);
         }
     };
 
-    public ConcurrentDocumentServer(ISarosSession sarosSession) {
+    public ConcurrentDocumentServer(final ISarosSession sarosSession) {
         this.sarosSession = sarosSession;
         this.server = new JupiterServer(sarosSession);
     }
@@ -81,17 +80,15 @@ public class ConcurrentDocumentServer implements Startable {
      * @param activity
      *            Activity to be dispatched
      */
-    public void checkFileDeleted(IActivity activity) {
-
+    public void checkFileDeleted(final IActivity activity) {
         activity.dispatch(hostReceiver);
-
     }
 
     private final IActivityReceiver hostReceiver = new AbstractActivityReceiver() {
         @Override
-        public void receive(FileActivity fileActivity) {
-            if (fileActivity.getType() == FileActivity.Type.REMOVED) {
-                server.removePath(fileActivity.getPath());
+        public void receive(final FileActivity activity) {
+            if (activity.getType() == FileActivity.Type.REMOVED) {
+                server.removePath(activity.getPath());
             }
         }
     };
@@ -112,14 +109,14 @@ public class ConcurrentDocumentServer implements Startable {
      * 
      * @return A list of QueueItems containing the activities and receivers
      */
-    public List<QueueItem> transformIncoming(IActivity activity) {
+    public List<QueueItem> transformIncoming(final IActivity activity) {
 
         assert sarosSession.isHost() : "CDS.transformIncoming must not be called on the client";
 
         // assert !isGUI() :
         // "CDS.transformIncoming must not be called from SWT";
 
-        List<QueueItem> result = new ArrayList<QueueItem>();
+        final List<QueueItem> result = new ArrayList<QueueItem>();
 
         try {
             activity.dispatch(hostReceiver);
@@ -131,7 +128,7 @@ public class ConcurrentDocumentServer implements Startable {
                 result.addAll(withTimestamp((ChecksumActivity) activity));
             }
         } catch (Exception e) {
-            log.error("Error while transforming activity: " + activity, e);
+            LOG.error("failed to transform jupiter activity: " + activity, e);
         }
 
         return result;
@@ -141,33 +138,26 @@ public class ConcurrentDocumentServer implements Startable {
      * Does the actual work of transforming a clients JupiterActivity into
      * specific JupiterActivities for every client.
      */
-    private List<QueueItem> receive(JupiterActivity jupiterActivity) {
+    private List<QueueItem> receive(final JupiterActivity activity) {
 
-        List<QueueItem> result = new ArrayList<QueueItem>();
+        final List<QueueItem> result = new ArrayList<QueueItem>();
 
         // Sync jupiterActivity with jupiter document server
-        Map<JID, JupiterActivity> outgoing;
+        final Map<User, JupiterActivity> outgoing;
+
         try {
-            outgoing = server.transform(jupiterActivity);
+            outgoing = server.transform(activity);
         } catch (TransformationException e) {
-            log.error("Error during transformation of: " + jupiterActivity, e);
+            LOG.error("failed to transform jupiter activity: " + activity, e);
             // TODO this should trigger a consistency check
             return result;
         }
 
-        for (Entry<JID, JupiterActivity> entry : outgoing.entrySet()) {
+        for (final Entry<User, JupiterActivity> entry : outgoing.entrySet()) {
+            final User user = entry.getKey();
+            final JupiterActivity transformed = entry.getValue();
 
-            JID jid = entry.getKey();
-            User to = sarosSession.getUser(jid);
-
-            if (to == null) {
-                log.error("unknown user in transformation result: " + jid);
-                continue;
-            }
-
-            JupiterActivity transformed = entry.getValue();
-
-            result.add(new QueueItem(to, transformed));
+            result.add(new QueueItem(user, transformed));
         }
         return result;
     }
@@ -181,45 +171,39 @@ public class ConcurrentDocumentServer implements Startable {
      * 
      * @host
      */
-    public synchronized void reset(JID jid, SPath path) {
+    public synchronized void reset(final User user, final SPath path) {
 
         assert sarosSession.isHost();
 
-        log.debug("Resetting jupiter server for " + jid + ": "
-            + path.toString());
-        this.server.reset(path, jid);
+        LOG.debug("resetting jupiter server for user: " + user + ", path: "
+            + path);
+
+        server.reset(path, user);
     }
 
     /**
      * Does the actual work of transforming a ChecksumActivity.
      */
-    private List<QueueItem> withTimestamp(ChecksumActivity checksumActivity) {
+    private List<QueueItem> withTimestamp(final ChecksumActivity activity) {
 
-        List<QueueItem> result = new ArrayList<QueueItem>();
+        final List<QueueItem> result = new ArrayList<QueueItem>();
 
         // Timestamp checksumActivity with jupiter document server
-        Map<JID, ChecksumActivity> outgoing;
+        final Map<User, ChecksumActivity> outgoing;
+
         try {
-            outgoing = server.withTimestamp(checksumActivity);
+            outgoing = server.withTimestamp(activity);
         } catch (TransformationException e) {
-            log.error("Error during transformation of: " + checksumActivity, e);
+            LOG.error("failed to transform checksum activity: " + activity, e);
             // TODO this should trigger a consistency check
             return result;
         }
 
-        for (Entry<JID, ChecksumActivity> entry : outgoing.entrySet()) {
+        for (Entry<User, ChecksumActivity> entry : outgoing.entrySet()) {
+            final User user = entry.getKey();
+            final ChecksumActivity transformed = entry.getValue();
 
-            JID jid = entry.getKey();
-            User to = sarosSession.getUser(jid);
-
-            if (to == null) {
-                log.error("unknown user in transformation result: " + jid);
-                continue;
-            }
-
-            ChecksumActivity transformed = entry.getValue();
-
-            result.add(new QueueItem(to, transformed));
+            result.add(new QueueItem(user, transformed));
         }
         return result;
     }

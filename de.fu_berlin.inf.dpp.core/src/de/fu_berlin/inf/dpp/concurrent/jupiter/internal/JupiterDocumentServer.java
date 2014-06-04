@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter.internal;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
@@ -11,7 +12,6 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -22,13 +22,13 @@ import de.fu_berlin.inf.dpp.session.User;
  */
 public class JupiterDocumentServer {
 
-    private static final Logger log = Logger
+    private static final Logger LOG = Logger
         .getLogger(JupiterDocumentServer.class);
 
     /**
      * List of proxy clients.
      */
-    private final HashMap<JID, Jupiter> proxies = new HashMap<JID, Jupiter>();
+    private final HashMap<User, Jupiter> proxies = new HashMap<User, Jupiter>();
 
     private final SPath editor;
 
@@ -40,25 +40,25 @@ public class JupiterDocumentServer {
         this.editor = path;
     }
 
-    public synchronized void addProxyClient(JID jid) {
-        if (!proxies.containsKey(jid))
-            proxies.put(jid, new Jupiter(false));
+    public synchronized void addProxyClient(final User user) {
+        if (!proxies.containsKey(user))
+            proxies.put(user, new Jupiter(false));
     }
 
-    public synchronized boolean removeProxyClient(JID jid) {
-        return proxies.remove(jid) != null;
+    public synchronized boolean removeProxyClient(final User user) {
+        return proxies.remove(user) != null;
     }
 
     // FIXME why is this not synchronized ?!
-    public Map<JID, JupiterActivity> transformJupiterActivity(
-        JupiterActivity jupiterActivity) throws TransformationException {
+    public Map<User, JupiterActivity> transformJupiterActivity(
+        final JupiterActivity activity) throws TransformationException {
 
-        Map<JID, JupiterActivity> result = new HashMap<JID, JupiterActivity>();
+        final Map<User, JupiterActivity> result = new HashMap<User, JupiterActivity>();
 
-        User source = jupiterActivity.getSource();
+        final User source = activity.getSource();
 
         // 1. Use JupiterClient of sender to transform JupiterActivity
-        Jupiter sourceProxy = proxies.get(source.getJID());
+        final Jupiter sourceProxy = proxies.get(source);
 
         /*
          * TODO maybe just silently add a proxy ? currently the project is
@@ -68,85 +68,86 @@ public class JupiterDocumentServer {
 
         if (sourceProxy == null)
             throw new IllegalStateException(
-                "no proxy client registered for client: " + source.getJID());
+                "no proxy client registered for user: " + source);
 
-        Operation op = sourceProxy.receiveJupiterActivity(jupiterActivity);
+        final Operation op = sourceProxy.receiveJupiterActivity(activity);
 
         // 2. Generate outgoing JupiterActivities for all other clients and the
         // host
-        for (Map.Entry<JID, Jupiter> entry : proxies.entrySet()) {
+        for (final Entry<User, Jupiter> entry : proxies.entrySet()) {
 
-            JID jid = entry.getKey();
+            final User user = entry.getKey();
 
             // Skip sender
-            if (jid.equals(source.getJID()))
+            if (user.equals(source))
                 continue;
 
-            Jupiter remoteProxy = entry.getValue();
+            final Jupiter remoteProxy = entry.getValue();
 
-            JupiterActivity transformed = remoteProxy.generateJupiterActivity(
-                op, source, editor);
+            final JupiterActivity transformed = remoteProxy
+                .generateJupiterActivity(op, source, editor);
 
-            result.put(jid, transformed);
+            result.put(user, transformed);
         }
 
         return result;
     }
 
-    public synchronized void updateVectorTime(JID source, JID dest) {
-        Jupiter proxy = this.proxies.get(source);
-        if (proxy != null) {
-            try {
-                Timestamp ts = proxy.getTimestamp();
-                this.proxies.get(dest).updateVectorTime(
-                    new JupiterVectorTime(ts.getComponents()[1], ts
-                        .getComponents()[0]));
-            } catch (TransformationException e) {
-                JupiterDocumentServer.log.error(
-                    "Error during update vector time for " + dest, e);
-            }
-        } else {
-            JupiterDocumentServer.log
-                .error("No proxy found for given source jid: " + source);
+    public synchronized void updateVectorTime(final User source, final User dest) {
+        final Jupiter proxy = proxies.get(source);
+
+        if (proxy == null) {
+            LOG.error("no proxy found for user: " + source);
+            return;
+        }
+
+        try {
+            Timestamp ts = proxy.getTimestamp();
+            proxies.get(dest).updateVectorTime(
+                new JupiterVectorTime(ts.getComponents()[1],
+                    ts.getComponents()[0]));
+        } catch (TransformationException e) {
+            LOG.error("error during update vector time for user: " + dest, e);
         }
 
     }
 
-    public synchronized void reset(JID jid) {
-        if (removeProxyClient(jid))
-            addProxyClient(jid);
+    public synchronized void reset(final User user) {
+        if (removeProxyClient(user))
+            addProxyClient(user);
     }
 
-    public Map<JID, ChecksumActivity> withTimestamp(
-        ChecksumActivity checksumActivity) throws TransformationException {
+    public Map<User, ChecksumActivity> withTimestamp(
+        final ChecksumActivity activity) throws TransformationException {
 
-        Map<JID, ChecksumActivity> result = new HashMap<JID, ChecksumActivity>();
+        final Map<User, ChecksumActivity> result = new HashMap<User, ChecksumActivity>();
 
-        User source = checksumActivity.getSource();
+        final User source = activity.getSource();
 
         // 1. Verify that this checksum can still be sent to others...
-        Jupiter sourceProxy = proxies.get(source.getJID());
+        final Jupiter sourceProxy = proxies.get(source);
 
-        boolean isCurrent = sourceProxy.isCurrent(checksumActivity
-            .getTimestamp());
+        final boolean isCurrent = sourceProxy
+            .isCurrent(activity.getTimestamp());
 
         if (!isCurrent)
             return result; // Checksum is no longer valid => discard
 
         // 2. Put timestamp into all resulting checksums
-        for (Map.Entry<JID, Jupiter> entry : proxies.entrySet()) {
+        for (final Entry<User, Jupiter> entry : proxies.entrySet()) {
 
-            JID jid = entry.getKey();
+            final User user = entry.getKey();
 
             // Skip sender
-            if (jid.equals(source.getJID()))
+            if (user.equals(source))
                 continue;
 
-            Jupiter remoteProxy = entry.getValue();
+            final Jupiter remoteProxy = entry.getValue();
 
-            ChecksumActivity timestamped = checksumActivity
-                .withTimestamp(remoteProxy.getTimestamp());
-            result.put(jid, timestamped);
+            ChecksumActivity timestamped = activity.withTimestamp(remoteProxy
+                .getTimestamp());
+
+            result.put(user, timestamped);
         }
 
         return result;

@@ -14,7 +14,7 @@ import de.fu_berlin.inf.dpp.activities.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.JupiterActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.session.User;
 
 /**
  * This class enables the queuing of {@linkplain IActivity activities} for given
@@ -65,13 +65,13 @@ public class ActivityQueuer {
              * fired on the remote sides.
              */
 
-            Map<SPath, List<JID>> editorActivities = new HashMap<SPath, List<JID>>();
+            final Map<SPath, List<User>> editorActivities = new HashMap<SPath, List<User>>();
 
             for (IResourceActivity resourceActivity : activityQueue) {
 
                 // path cannot be null, see for-loop below
                 SPath path = resourceActivity.getPath();
-                JID source = resourceActivity.getSource().getJID();
+                User source = resourceActivity.getSource();
 
                 if (resourceActivity instanceof EditorActivity) {
 
@@ -150,22 +150,22 @@ public class ActivityQueuer {
     }
 
     private boolean alreadyRememberedEditorActivity(
-        Map<SPath, List<JID>> editorActivities, SPath spath, JID jid) {
+        Map<SPath, List<User>> editorActivities, SPath spath, User user) {
 
-        List<JID> jids = editorActivities.get(spath);
-        return jids != null && jids.contains(jid);
+        List<User> users = editorActivities.get(spath);
+        return users != null && users.contains(user);
     }
 
-    private void rememberEditorActivity(Map<SPath, List<JID>> editorActivities,
-        SPath spath, JID jid) {
-        List<JID> jids = editorActivities.get(spath);
+    private void rememberEditorActivity(
+        Map<SPath, List<User>> editorActivities, SPath spath, User user) {
+        List<User> users = editorActivities.get(spath);
 
-        if (jids == null) {
-            jids = new ArrayList<JID>();
-            editorActivities.put(spath, jids);
+        if (users == null) {
+            users = new ArrayList<User>();
+            editorActivities.put(spath, users);
         }
 
-        if (!jids.contains(jid))
-            jids.add(jid);
+        if (!users.contains(user))
+            users.add(user);
     }
 }
