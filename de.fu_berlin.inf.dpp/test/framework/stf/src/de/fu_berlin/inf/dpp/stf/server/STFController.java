@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.stf.server;
 
+import java.io.File;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -18,6 +19,7 @@ import java.util.List;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
 
@@ -163,14 +165,22 @@ public class STFController {
                 .setToDefault(PreferenceConstants.FAVORITE_SESSION_COLOR_ID);
 
         /*
-         * use memory only accounts to prevent errors because of multiple access
-         * of the same file
+         * as the default account file is shared across all Eclipse instances
+         * create / use a file located in the current workspace
          */
 
         XMPPAccountStore store = context.getComponent(XMPPAccountStore.class);
 
-        if (store != null)
-            store.setAccountFile(null, null);
+        if (store != null) {
+
+            File file = ResourcesPlugin.getWorkspace().getRoot().getLocation()
+                .toFile();
+
+            file = new File(file, ".metadata");
+            file = new File(file, ".saros_stf_accounts");
+
+            store.setAccountFile(file, null);
+        }
 
         try {
             registry = LocateRegistry.createRegistry(port);
