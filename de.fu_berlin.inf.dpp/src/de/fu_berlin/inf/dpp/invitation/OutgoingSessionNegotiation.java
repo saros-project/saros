@@ -21,7 +21,6 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.invitation.hooks.ISessionNegotiationHook;
-import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.discovery.DiscoveryManager;
@@ -63,9 +62,6 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
     @Inject
     private DiscoveryManager discoveryManager;
-
-    @Inject
-    private IConnectionManager connectionManager;
 
     @Inject
     private ISarosSessionManager sessionManager;
@@ -198,11 +194,6 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
             sendSessionParameters(actualSessionParameters, monitor);
 
             awaitCompletion(monitor);
-
-            monitor.setTaskName("Negotiating data connection...");
-
-            connectionManager
-                .connect(ISarosSession.SESSION_CONNECTION_ID, peer);
 
             User newUser = completeInvitation(monitor);
 

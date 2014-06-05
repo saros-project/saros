@@ -1,10 +1,12 @@
 package de.fu_berlin.inf.dpp.invitation;
 
+import java.io.IOException;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.jivesoftware.smack.packet.Packet;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcceptedExtension;
@@ -17,6 +19,7 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.invitation.hooks.ISessionNegotiationHook;
+import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
@@ -43,6 +46,9 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
 
     private PacketCollector invitationDataExchangeCollector;
     private PacketCollector invitationAcknowledgedCollector;
+
+    @Inject
+    private IConnectionManager connectionManager;
 
     public IncomingSessionNegotiation(ISarosSessionManager sessionManager,
         JID from, String remoteVersion, String invitationID,
@@ -155,6 +161,11 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
             initializeSession(actualSessionParameters, monitor);
 
             startSession(monitor);
+
+            monitor.setTaskName("Negotiating data connection...");
+
+            connectionManager
+                .connect(ISarosSession.SESSION_CONNECTION_ID, peer);
 
             sendInvitationCompleted(monitor);
 
@@ -314,8 +325,9 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
      * Signal the host that the session invitation is complete (from the
      * client's perspective).
      */
-    private void sendInvitationCompleted(IProgressMonitor monitor) {
-        transmitter.sendPacketExtension(peer,
+    private void sendInvitationCompleted(IProgressMonitor monitor)
+        throws IOException {
+        transmitter.send(ISarosSession.SESSION_CONNECTION_ID, peer,
             InvitationCompletedExtension.PROVIDER
                 .create(new InvitationCompletedExtension(invitationID)));
 
