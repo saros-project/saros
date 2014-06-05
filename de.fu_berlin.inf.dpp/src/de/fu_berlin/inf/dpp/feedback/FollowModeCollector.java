@@ -104,7 +104,7 @@ public class FollowModeCollector extends AbstractStatisticCollector {
                 if (!followModeEnabled) {
                     log.trace(String.format("Follow Mode was deactivated"));
                 } else {
-                    log.trace(String.format("Now following %s ", user.getJID()));
+                    log.trace(String.format("Now following " + user));
                 }
             }
 

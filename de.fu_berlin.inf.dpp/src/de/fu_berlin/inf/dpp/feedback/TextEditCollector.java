@@ -36,7 +36,6 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 
@@ -159,7 +158,7 @@ public class TextEditCollector extends AbstractStatisticCollector {
      */
     protected int pasteThreshold = 16;
 
-    protected JID localUserJID = null;
+    protected User localUser = null;
 
     /** List to contain local {@link EditEvent}s */
     protected List<EditEvent> localEvents = Collections
@@ -174,16 +173,16 @@ public class TextEditCollector extends AbstractStatisticCollector {
     protected Map<Integer, Integer> parallelTextEditsCount = new HashMap<Integer, Integer>();
 
     /** A map which should possible detect auto generation and paste actions */
-    protected Map<JID, Integer> pastes = new HashMap<JID, Integer>();
+    protected Map<User, Integer> pastes = new HashMap<User, Integer>();
 
     /** A map which accumulates the characters produced within paste actions */
-    protected Map<JID, Integer> pastesCharCount = new HashMap<JID, Integer>();
+    protected Map<User, Integer> pastesCharCount = new HashMap<User, Integer>();
 
     /**
-     * for each key {@link JID} an Integer is stored which represents the total
+     * for each key {@link User} an Integer is stored which represents the total
      * chars edited.
      */
-    protected Map<JID, Integer> remoteCharCount = new HashMap<JID, Integer>();
+    protected Map<User, Integer> remoteCharCount = new HashMap<User, Integer>();
 
     private final EditorManager editorManager;
 
@@ -200,7 +199,7 @@ public class TextEditCollector extends AbstractStatisticCollector {
              */
             int textLength = StringUtils.deleteWhitespace(text).length();
             // get the JID for the current edit
-            JID id = user.getJID();
+
             EditEvent event = new EditEvent(System.currentTimeMillis(),
                 textLength);
 
@@ -212,24 +211,24 @@ public class TextEditCollector extends AbstractStatisticCollector {
              * auto generated.
              */
             if (textLength > pasteThreshold) {
-                Integer currentPasteCount = pastes.get(id);
+                Integer currentPasteCount = pastes.get(user);
                 if (currentPasteCount == null) {
                     currentPasteCount = 0;
                 }
-                pastes.put(id, currentPasteCount + 1);
+                pastes.put(user, currentPasteCount + 1);
 
-                Integer currentPasteChars = pastesCharCount.get(id);
+                Integer currentPasteChars = pastesCharCount.get(user);
                 if (currentPasteChars == null) {
                     currentPasteChars = 0;
                 }
-                pastesCharCount.put(id, currentPasteChars + textLength);
+                pastesCharCount.put(user, currentPasteChars + textLength);
 
             }
 
             if (log.isTraceEnabled()) {
                 log.trace(String.format("Recieved chars written from %s "
-                    + "(whitespaces omitted): %s [%s]", user.getJID(),
-                    textLength, StringEscapeUtils.escapeJava(text)));
+                    + "(whitespaces omitted): %s [%s]", user, textLength,
+                    StringEscapeUtils.escapeJava(text)));
             }
 
             if (textLength > 0) {
@@ -254,11 +253,11 @@ public class TextEditCollector extends AbstractStatisticCollector {
                      * by one for each TextEditActivity received.
                      */
                     remoteEvents.add(event);
-                    Integer currentCharCount = remoteCharCount.get(id);
+                    Integer currentCharCount = remoteCharCount.get(user);
                     if (currentCharCount == null) {
                         currentCharCount = 0;
                     }
-                    remoteCharCount.put(id, currentCharCount + textLength);
+                    remoteCharCount.put(user, currentCharCount + textLength);
 
                 }
 
@@ -293,8 +292,8 @@ public class TextEditCollector extends AbstractStatisticCollector {
         int userNumber = 1;
 
         // iterate through the map and write written char count to session data
-        for (Map.Entry<JID, Integer> entry : remoteCharCount.entrySet()) {
-            JID currentId = entry.getKey();
+        for (Map.Entry<User, Integer> entry : remoteCharCount.entrySet()) {
+            User currentId = entry.getKey();
             // get character count for this user
             Integer charCount = entry.getValue();
             // write the count to the session data
@@ -320,12 +319,12 @@ public class TextEditCollector extends AbstractStatisticCollector {
         }
 
         // determine the possible pastes for the local user
-        if (pastes.get(localUserJID) == null) {
+        if (pastes.get(localUser) == null) {
             data.setLocalUserPastes(0);
             data.setLocalUserPasteChars(0);
         } else {
-            Integer pasteCount = pastes.get(localUserJID);
-            Integer pasteChars = pastesCharCount.get(localUserJID);
+            Integer pasteCount = pastes.get(localUser);
+            Integer pasteChars = pastesCharCount.get(localUser);
             data.setLocalUserPastes(pasteCount);
             data.setLocalUserPasteChars(pasteChars);
         }
@@ -455,7 +454,7 @@ public class TextEditCollector extends AbstractStatisticCollector {
     protected void doOnSessionStart(ISarosSession sarosSession) {
         editorManager.addSharedEditorListener(editorListener);
         // set local users JID at the beginning of the session
-        localUserJID = sarosSession.getLocalUser().getJID();
+        localUser = sarosSession.getLocalUser();
     }
 
     @Override

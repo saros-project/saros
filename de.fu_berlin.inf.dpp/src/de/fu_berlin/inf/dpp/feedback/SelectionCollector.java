@@ -96,7 +96,7 @@ public class SelectionCollector extends AbstractStatisticCollector {
      * A map where the latest selections information for each each user as
      * {@link JID} are stored.
      */
-    protected Map<JID, SelectionEvent> activeSelections = new HashMap<JID, SelectionEvent>();
+    protected Map<User, SelectionEvent> activeSelections = new HashMap<User, SelectionEvent>();
 
     /**
      * A list where all selection events made by a remote user with
@@ -112,15 +112,14 @@ public class SelectionCollector extends AbstractStatisticCollector {
         public void textEditRecieved(User user, SPath editor, String text,
             String replacedText, int offset) {
             // the JID of the user who made the text edit
-            JID editorId = user.getJID();
 
             /*
              * for each edit check if it is made within the range of a current
              * active selection
              */
-            for (Map.Entry<JID, SelectionEvent> entry : activeSelections
+            for (Map.Entry<User, SelectionEvent> entry : activeSelections
                 .entrySet()) {
-                JID currentID = entry.getKey();
+                User currentUser = entry.getKey();
                 SelectionEvent selection = entry.getValue();
 
                 /*
@@ -132,7 +131,7 @@ public class SelectionCollector extends AbstractStatisticCollector {
                  * single selection - i.e. when the edit consists of more than
                  * one character.
                  */
-                if (currentID != editorId && selection.offset <= offset
+                if (!currentUser.equals(user) && selection.offset <= offset
                     && (selection.offset + selection.length) >= offset
                     && (selection.path).equals(editor) && !selection.gestured) {
                     selection.gestured = true;
@@ -162,7 +161,6 @@ public class SelectionCollector extends AbstractStatisticCollector {
 
             // get user who made the selection
             User source = selection.getSource();
-            JID id = source.getJID();
 
             /*
              * check if selection was made within the file the local user is
@@ -188,11 +186,11 @@ public class SelectionCollector extends AbstractStatisticCollector {
                  * check if there is already a selection stored for this user
                  * and replace it in case or just store the selection if not
                  */
-                if (activeSelections.containsKey(id)) {
-                    activeSelections.remove(id);
-                    activeSelections.put(id, currentSelection);
+                if (activeSelections.containsKey(source)) {
+                    activeSelections.remove(source);
+                    activeSelections.put(source, currentSelection);
                 } else {
-                    activeSelections.put(id, currentSelection);
+                    activeSelections.put(source, currentSelection);
                 }
             }
         }
