@@ -34,10 +34,8 @@ public class SimpleServerProxyTest extends JupiterTestCase {
         // 01234567890123456789012345
         // abcdefghijklmnopqrstuvwxyz
 
-        client_1 = new ClientSynchronizedDocument(host.getJID(), text, network,
-            alice);
-        client_2 = new ClientSynchronizedDocument(host.getJID(), text, network,
-            bob);
+        client_1 = new ClientSynchronizedDocument(host, text, network, alice);
+        client_2 = new ClientSynchronizedDocument(host, text, network, bob);
         server = new ServerSynchronizedDocument(network, host);
 
         network.addClient(client_1);

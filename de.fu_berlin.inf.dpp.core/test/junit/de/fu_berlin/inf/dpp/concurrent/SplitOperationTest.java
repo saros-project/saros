@@ -31,7 +31,7 @@ public class SplitOperationTest {
     protected IProject project;
 
     protected SPath path;
-    protected User source = JupiterTestCase.createUserMock("source");
+    protected User source = JupiterTestCase.createUser("source");
 
     public static Operation S(Operation one, Operation two) {
         return new SplitOperation(one, two);

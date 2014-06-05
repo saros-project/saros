@@ -45,7 +45,7 @@ public class SimpleJupiterDocumentTest extends JupiterTestCase {
         doc.execOperation(op);
         assertEquals("abdc", doc.getDocument());
 
-        User user = JupiterTestCase.createUserMock("user");
+        User user = JupiterTestCase.createUser("user");
 
         JupiterActivity jupiterActivity = algo.generateJupiterActivity(op,
             user, null);

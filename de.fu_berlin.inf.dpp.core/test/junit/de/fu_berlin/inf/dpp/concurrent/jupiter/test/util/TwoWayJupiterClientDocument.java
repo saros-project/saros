@@ -4,9 +4,9 @@ import de.fu_berlin.inf.dpp.session.User;
 
 public class TwoWayJupiterClientDocument extends ClientSynchronizedDocument {
 
-    public static final User client = JupiterTestCase.createUserMock("Client");
+    public static final User client = JupiterTestCase.createUser("Client");
 
     public TwoWayJupiterClientDocument(String content, NetworkSimulator con) {
-        super(TwoWayJupiterServerDocument.server.getJID(), content, con, client);
+        super(TwoWayJupiterServerDocument.server, content, con, client);
     }
 }

@@ -31,11 +31,11 @@ public class DOptPuzzleTest extends JupiterTestCase {
     public void testThreeConcurrentInsertOperations() throws Exception {
         /* init simulated client and server components. */
         ClientSynchronizedDocument client_1 = new ClientSynchronizedDocument(
-            host.getJID(), "abcd", network, alice);
+            host, "abcd", network, alice);
         ClientSynchronizedDocument client_2 = new ClientSynchronizedDocument(
-            host.getJID(), "abcd", network, bob);
+            host, "abcd", network, bob);
         ClientSynchronizedDocument client_3 = new ClientSynchronizedDocument(
-            host.getJID(), "abcd", network, carl);
+            host, "abcd", network, carl);
         ServerSynchronizedDocument server = new ServerSynchronizedDocument(
             network, host);
 

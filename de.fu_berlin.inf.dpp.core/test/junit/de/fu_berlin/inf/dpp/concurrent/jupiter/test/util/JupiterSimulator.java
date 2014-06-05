@@ -64,7 +64,7 @@ public class JupiterSimulator {
             /* 1. execute locally */
             document.execOperation(operation);
 
-            User user = JupiterTestCase.createUserMock("DUMMY");
+            User user = JupiterTestCase.createUser("DUMMY");
 
             JupiterActivity jupiterActivity = algorithm
                 .generateJupiterActivity(operation, user, new SPath(project,

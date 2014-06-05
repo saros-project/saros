@@ -9,7 +9,6 @@ import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -28,9 +27,9 @@ public class Document {
      */
     public interface JupiterDocumentListener {
 
-        public void documentAction(JID jid);
+        public void documentAction(User user);
 
-        public String getID();
+        public String getUser();
     }
 
     private static final Logger log = Logger
@@ -75,7 +74,7 @@ public class Document {
      * @param op
      */
     public void execOperation(Operation op) {
-        User dummy = JupiterTestCase.createUserMock("dummy");
+        User dummy = JupiterTestCase.createUser("dummy");
 
         List<TextEditActivity> activities = op.toTextEdit(new SPath(project,
             path), dummy);

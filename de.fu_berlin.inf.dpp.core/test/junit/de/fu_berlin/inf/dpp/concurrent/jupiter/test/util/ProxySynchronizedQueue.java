@@ -7,7 +7,6 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -32,8 +31,8 @@ public class ProxySynchronizedQueue {
         this.connection = connection;
     }
 
-    public JID getJID() {
-        return user.getJID();
+    public User getUser() {
+        return user;
     }
 
     public Operation receiveOperation(JupiterActivity jupiterActivity) {
@@ -54,8 +53,7 @@ public class ProxySynchronizedQueue {
     public void sendOperation(Operation op) {
         JupiterActivity jupiterActivity = algorithm.generateJupiterActivity(op,
             this.user, null);
-        connection.sendOperation(new NetworkRequest(jupiterActivity, user
-            .getJID(), -1));
+        connection.sendOperation(new NetworkRequest(jupiterActivity, user, -1));
     }
 
     public Algorithm getAlgorithm() {

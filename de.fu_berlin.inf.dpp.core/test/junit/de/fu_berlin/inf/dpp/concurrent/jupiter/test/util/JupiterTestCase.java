@@ -1,8 +1,5 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 
 import org.apache.log4j.PropertyConfigurator;
@@ -33,16 +30,16 @@ public abstract class JupiterTestCase {
     public void setup() {
         network = new NetworkSimulator();
 
-        alice = createUserMock("alice");
-        bob = createUserMock("bob");
-        carl = createUserMock("carl");
-        host = createUserMock("host");
+        alice = createUser("alice");
+        bob = createUser("bob");
+        carl = createUser("carl");
+        host = createUser("host");
     }
 
     public static void assertEqualDocs(String s, DocumentTestChecker... docs) {
 
         for (int i = 0; i < docs.length; i++) {
-            assertEquals(docs[i].getJID().toString(), s, docs[i].getDocument());
+            assertEquals(docs[i].getUser().toString(), s, docs[i].getDocument());
         }
     }
 
@@ -57,8 +54,8 @@ public abstract class JupiterTestCase {
         ClientSynchronizedDocument[] result = new ClientSynchronizedDocument[number];
 
         for (int i = 0; i < result.length; i++) {
-            result[i] = new ClientSynchronizedDocument(host.getJID(),
-                initialText, network, createUserMock("Client" + i));
+            result[i] = new ClientSynchronizedDocument(host, initialText,
+                network, createUser("Client" + i));
             network.addClient(result[i]);
             s1.addProxyClient(result[i].getUser());
         }
@@ -66,11 +63,7 @@ public abstract class JupiterTestCase {
         return result;
     }
 
-    public static User createUserMock(String name) {
-        User result = createMock(User.class);
-        expect(result.getJID()).andReturn(new JID(name + "@jabber.org"))
-            .anyTimes();
-        replay(result);
-        return result;
+    public static User createUser(String name) {
+        return new User(new JID(name + "@jabber.org"), null, false, true, 0, 0);
     }
 }

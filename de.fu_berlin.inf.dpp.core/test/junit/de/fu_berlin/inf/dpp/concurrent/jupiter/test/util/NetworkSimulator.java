@@ -8,7 +8,7 @@ import java.util.PriorityQueue;
 
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.session.User;
 
 /**
  * This class simulates a network.
@@ -17,7 +17,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
  */
 public class NetworkSimulator {
 
-    private HashMap<JID, NetworkEventHandler> clients;
+    private HashMap<User, NetworkEventHandler> clients;
 
     public IProject project;
 
@@ -30,7 +30,7 @@ public class NetworkSimulator {
     public NetworkSimulator() {
         project = createMock(IProject.class);
         replay(project);
-        clients = new HashMap<JID, NetworkEventHandler>();
+        clients = new HashMap<User, NetworkEventHandler>();
     }
 
     public void sendOperation(final NetworkRequest req) {
@@ -68,12 +68,12 @@ public class NetworkSimulator {
     }
 
     public void addClient(NetworkEventHandler remote) {
-        if (!clients.containsKey(remote.getUser().getJID())) {
-            clients.put(remote.getUser().getJID(), remote);
+        if (!clients.containsKey(remote.getUser())) {
+            clients.put(remote.getUser(), remote);
         }
     }
 
     public void removeClient(NetworkEventHandler remote) {
-        clients.remove(remote.getUser().getJID());
+        clients.remove(remote.getUser());
     }
 }

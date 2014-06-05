@@ -33,9 +33,9 @@ public class CounterExampleTest extends JupiterTestCase {
 
         /* init simulated client and server components. */
         ClientSynchronizedDocument client_1 = new ClientSynchronizedDocument(
-            host.getJID(), initDocumentState, network, alice);
+            host, initDocumentState, network, alice);
         ClientSynchronizedDocument client_2 = new ClientSynchronizedDocument(
-            host.getJID(), initDocumentState, network, bob);
+            host, initDocumentState, network, bob);
 
         ServerSynchronizedDocument server = new ServerSynchronizedDocument(
             network, host);
@@ -72,11 +72,11 @@ public class CounterExampleTest extends JupiterTestCase {
 
         /* init simulated client and server components. */
         ClientSynchronizedDocument client_1 = new ClientSynchronizedDocument(
-            host.getJID(), initDocumentState, network, alice);
+            host, initDocumentState, network, alice);
         ClientSynchronizedDocument client_2 = new ClientSynchronizedDocument(
-            host.getJID(), initDocumentState, network, bob);
+            host, initDocumentState, network, bob);
         ClientSynchronizedDocument client_3 = new ClientSynchronizedDocument(
-            host.getJID(), initDocumentState, network, carl);
+            host, initDocumentState, network, carl);
         ServerSynchronizedDocument server = new ServerSynchronizedDocument(
             network, host);
 
@@ -114,11 +114,11 @@ public class CounterExampleTest extends JupiterTestCase {
 
         /* init simulated client and server components. */
         ClientSynchronizedDocument client_1 = new ClientSynchronizedDocument(
-            host.getJID(), initDocumentState, network, alice);
+            host, initDocumentState, network, alice);
         ClientSynchronizedDocument client_2 = new ClientSynchronizedDocument(
-            host.getJID(), initDocumentState, network, bob);
+            host, initDocumentState, network, bob);
         ClientSynchronizedDocument client_3 = new ClientSynchronizedDocument(
-            host.getJID(), initDocumentState, network, carl);
+            host, initDocumentState, network, carl);
         ServerSynchronizedDocument server = new ServerSynchronizedDocument(
             network, host);
 

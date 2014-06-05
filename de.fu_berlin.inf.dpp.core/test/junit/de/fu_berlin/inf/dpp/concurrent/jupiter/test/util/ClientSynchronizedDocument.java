@@ -8,7 +8,6 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -27,21 +26,16 @@ public class ClientSynchronizedDocument implements NetworkEventHandler,
     private Algorithm algorithm;
 
     protected User user;
-    private JID server_jid;
+    private User server;
     private NetworkSimulator connection;
 
-    public ClientSynchronizedDocument(JID server, String content,
+    public ClientSynchronizedDocument(User server, String content,
         NetworkSimulator connection, User user) {
-        this.server_jid = server;
+        this.server = server;
         this.doc = new Document(content, connection.project, connection.path);
         this.algorithm = new Jupiter(true);
         this.connection = connection;
         this.user = user;
-    }
-
-    @Override
-    public JID getJID() {
-        return user.getJID();
     }
 
     @Override
@@ -72,15 +66,15 @@ public class ClientSynchronizedDocument implements NetworkEventHandler,
     }
 
     public void sendOperation(Operation op) {
-        sendOperation(server_jid, op, 0);
+        sendOperation(server, op, 0);
     }
 
     public void sendOperation(Operation op, int delay) {
         log.info(user + " send: " + op.toString());
-        sendOperation(server_jid, op, delay);
+        sendOperation(server, op, delay);
     }
 
-    public void sendOperation(JID remoteJid, Operation op, int delay) {
+    public void sendOperation(User remoteUser, Operation op, int delay) {
 
         /* 1. execute locally */
         doc.execOperation(op);
@@ -90,8 +84,8 @@ public class ClientSynchronizedDocument implements NetworkEventHandler,
             user, null);
 
         /* 3. send operation. */
-        connection.sendOperation(new NetworkRequest(jupiterActivity, remoteJid,
-            delay));
+        connection.sendOperation(new NetworkRequest(jupiterActivity,
+            remoteUser, delay));
     }
 
     public void receiveNetworkEvent(JupiterActivity jupiterActivity) {

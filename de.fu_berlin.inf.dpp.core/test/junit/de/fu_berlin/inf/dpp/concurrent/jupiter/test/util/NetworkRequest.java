@@ -1,15 +1,15 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
 
 import de.fu_berlin.inf.dpp.activities.JupiterActivity;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.session.User;
 
 public class NetworkRequest implements Comparable<NetworkRequest> {
 
     protected JupiterActivity jupiterActivity;
-    protected JID to;
+    protected User to;
     protected int delay;
 
-    public NetworkRequest(JupiterActivity jupiterActivity, JID to, int delay) {
+    public NetworkRequest(JupiterActivity jupiterActivity, User to, int delay) {
         this.jupiterActivity = jupiterActivity;
         this.to = to;
         this.delay = delay;
@@ -19,7 +19,7 @@ public class NetworkRequest implements Comparable<NetworkRequest> {
         return jupiterActivity;
     }
 
-    public JID getTo() {
+    public User getTo() {
         return to;
     }
 
