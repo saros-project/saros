@@ -21,34 +21,31 @@ import de.fu_berlin.inf.dpp.session.User;
 public class ColorIDSetTest {
 
     private List<User> userList;
-    private Map<JID, UserColorID> userMap;
+    private Map<String, UserColorID> userMap;
     private User alice, bob, carl, dave;
 
     @Before
     public void setUp() {
         userList = new ArrayList<User>();
-        userMap = new HashMap<JID, UserColorID>();
+        userMap = new HashMap<String, UserColorID>();
 
-        alice = new User(new JID("alice@saros.org/Wonderland"), null, false,
-            false, 0, -1);
-        bob = new User(new JID("bob@saros.org/Jamaica"), null, false, false, 1,
+        alice = new User(new JID("alice@saros.org"), null, false, false, 0, -1);
+        bob = new User(new JID("bob@saros.org"), null, false, false, 1, -1);
+        carl = new User(new JID("carl@lagerfeld.org"), null, false, false, 2,
             -1);
-        carl = new User(new JID("carl@lagerfeld.org/Paris"), null, false,
-            false, 2, -1);
-        dave = new User(new JID("dave@saros.org/Hell"), null, false, false, 0,
-            -1);
+        dave = new User(new JID("dave@saros.org"), null, false, false, 0, -1);
     }
 
     private ColorIDSet createColorIDSet(Collection<User> users) {
-        Set<JID> jids = new HashSet<JID>();
+        Set<String> ids = new HashSet<String>();
 
         for (User user : users)
-            jids.add(user.getJID());
+            ids.add(user.getJID().toString());
 
-        ColorIDSet set = new ColorIDSet(jids);
+        ColorIDSet set = new ColorIDSet(ids);
 
         for (User user : users)
-            set.setColor(user.getJID(), user.getColorID());
+            set.setColor(user.getJID().toString(), user.getColorID());
 
         return set;
     }
@@ -90,23 +87,11 @@ public class ColorIDSetTest {
     }
 
     @Test
-    public void testGetColorIdsByResourceQualifiedJIDs() {
-        addUser(alice);
-
-        ColorIDSet set = createColorIDSet(userList);
-
-        assertEquals("Qualified JID did not return correct color.",
-            alice.getColorID(), set.getColor(alice.getJID()));
-        assertEquals("Bare JID did not return correct color.",
-            alice.getColorID(), set.getColor(alice.getJID().getBareJID()));
-    }
-
-    @Test
-    public void testNonexistantJIDs() {
+    public void testNonexistantID() {
         ColorIDSet set = createColorIDSet(userList);
         assertEquals(
             "Expected -1 as the user does not exist in the ColorIdSet.", -1,
-            set.getColor(new JID("satan@hell.com/Dorm")));
+            set.getColor("satan@hell.com"));
     }
 
     @Test
@@ -126,10 +111,10 @@ public class ColorIDSetTest {
         addUser(alice);
         ColorIDSet set = createColorIDSet(userList);
 
-        set.setFavoriteColor(alice.getJID(), 4);
+        set.setFavoriteColor(alice.getJID().toString(), 4);
 
         assertEquals("Alice favorite color does not match", 4,
-            set.getFavoriteColor(alice.getJID()));
+            set.getFavoriteColor(alice.getJID().toString()));
     }
 
     @Test
@@ -146,20 +131,23 @@ public class ColorIDSetTest {
     }
 
     private void checkConsistency(ColorIDSet set) {
-        Collection<JID> users = set.getParticipants();
+        Collection<String> users = set.getParticipants();
 
         for (User user : userList) {
             assertEquals("Color IDs do not match.", user.getColorID(),
-                set.getColor(user.getJID()));
-            assertTrue("User is not contained in the sets' participants",
-                users.contains(user.getJID()));
+                set.getColor(user.getJID().toString()));
+
+            assertTrue("User is not contained in the sets' participants: "
+                + user.getJID().toString(),
+                users.contains(user.getJID().toString()));
         }
 
     }
 
     private void addUser(User user) {
         userList.add(user);
-        userMap.put(user.getJID(), new UserColorID(user.getColorID(), -1));
+        userMap.put(user.getJID().toString(), new UserColorID(
+            user.getColorID(), -1));
     }
 
 }

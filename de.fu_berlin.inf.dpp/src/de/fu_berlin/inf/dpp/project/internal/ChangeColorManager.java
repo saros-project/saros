@@ -22,7 +22,6 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.colorstorage.ColorIDSet;
 import de.fu_berlin.inf.dpp.editor.colorstorage.ColorIDSetStorage;
 import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -34,6 +33,9 @@ import de.fu_berlin.inf.dpp.session.User;
  * currently available colors.
  * 
  * @author Stefan Rossbach
+ */
+/*
+ * IMPORTANT: MAKE SURE YOU USE THE BARE JID TO LOAD/STORE COLOR IDS !!!
  */
 @Component(module = "core")
 public class ChangeColorManager extends AbstractActivityProvider implements
@@ -271,7 +273,7 @@ public class ChangeColorManager extends AbstractActivityProvider implements
             assert assignedColors.size() == currentUsers.size();
 
             ColorIDSet colorIDSet = colorIDSetStorage
-                .getColorIDSet(asJIDCollection(currentUsers));
+                .getColorIDSet(asIDCollection(currentUsers));
 
             resolveColorConflicts: {
 
@@ -393,7 +395,8 @@ public class ChangeColorManager extends AbstractActivityProvider implements
         Map<User, Integer> assignedColors, ColorIDSet colorIDSet) {
 
         for (Map.Entry<User, Integer> e : assignedColors.entrySet()) {
-            e.setValue(colorIDSet.getColor(e.getKey().getJID()));
+            e.setValue(colorIDSet.getColor(e.getKey().getJID().getBareJID()
+                .toString()));
         }
 
     }
@@ -430,8 +433,10 @@ public class ChangeColorManager extends AbstractActivityProvider implements
         Map<User, Integer> lastKnownFavoriteColors = new LinkedHashMap<User, Integer>();
 
         for (User currentUser : assignedColors.keySet()) {
-            lastKnownFavoriteColors.put(currentUser,
-                colorIDSet.getFavoriteColor(currentUser.getJID()));
+            lastKnownFavoriteColors.put(
+                currentUser,
+                colorIDSet.getFavoriteColor(currentUser.getJID().getBareJID()
+                    .toString()));
         }
         return lastKnownFavoriteColors;
     }
@@ -582,7 +587,7 @@ public class ChangeColorManager extends AbstractActivityProvider implements
     private synchronized void updateColorSet(Collection<User> users) {
 
         ColorIDSet colorIDSet = colorIDSetStorage
-            .getColorIDSet(asJIDCollection(users));
+            .getColorIDSet(asIDCollection(users));
 
         log.debug("updating color id set: "
             + Arrays.toString(colorIDSet.getParticipants().toArray()));
@@ -592,8 +597,9 @@ public class ChangeColorManager extends AbstractActivityProvider implements
          * exception
          */
         for (User user : users)
-            colorIDSetStorage.updateColor(colorIDSet, user.getJID(),
-                UserColorID.UNKNOWN, UserColorID.UNKNOWN);
+            colorIDSetStorage.updateColor(colorIDSet, user.getJID()
+                .getBareJID().toString(), UserColorID.UNKNOWN,
+                UserColorID.UNKNOWN);
 
         for (User user : users) {
             if (!isValidColorID(user.getColorID()))
@@ -612,16 +618,17 @@ public class ChangeColorManager extends AbstractActivityProvider implements
                 + user.getColorID() + "' fav id '"
                 + favoriteUserColors.get(user) + "'");
 
-            colorIDSetStorage.updateColor(colorIDSet, user.getJID(),
-                user.getColorID(), favoriteUserColors.get(user));
+            colorIDSetStorage.updateColor(colorIDSet, user.getJID()
+                .getBareJID().toString(), user.getColorID(),
+                favoriteUserColors.get(user));
         }
     }
 
-    private Collection<JID> asJIDCollection(Collection<User> users) {
-        List<JID> result = new ArrayList<JID>(users.size());
+    private Collection<String> asIDCollection(Collection<User> users) {
+        List<String> result = new ArrayList<String>(users.size());
 
         for (User user : users)
-            result.add(user.getJID());
+            result.add(user.getJID().getBareJID().toString());
 
         return result;
     }

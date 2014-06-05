@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -11,13 +12,12 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.test.util.MemoryPreferenceStore;
 
 public class ColorIDSetStorageTest {
 
-    private List<JID> jids;
-    private JID alice, bob, carl, dave;
+    private List<String> ids;
+    private String alice, bob, carl, dave;
 
     private IPreferenceStore preferenceStore;
 
@@ -25,15 +25,15 @@ public class ColorIDSetStorageTest {
 
     @Before
     public void setUp() {
-        jids = new ArrayList<JID>();
-        alice = new JID("alice@saros.org/Wunderland");
-        jids.add(alice);
-        bob = new JID("bob@saros.org/Jamaica");
-        jids.add(bob);
-        carl = new JID("carl@lagerfeld.org/Paris");
-        jids.add(carl);
-        dave = new JID("dave@saros.org/Hell");
-        jids.add(dave);
+        ids = new ArrayList<String>();
+        alice = "alice@saros.org";
+        ids.add(alice);
+        bob = "bob@saros.org";
+        ids.add(bob);
+        carl = "carl@lagerfeld.org";
+        ids.add(carl);
+        dave = "dave@saros.org";
+        ids.add(dave);
 
         preferenceStore = new MemoryPreferenceStore();
     }
@@ -42,34 +42,30 @@ public class ColorIDSetStorageTest {
     public void testGet() {
         storage = new ColorIDSetStorage(preferenceStore);
 
-        ColorIDSet set0 = storage.getColorIDSet(jids);
+        ColorIDSet set0 = storage.getColorIDSet(ids);
         assertEquals(1, storage.size());
 
-        ColorIDSet set1 = storage.getColorIDSet(jids);
+        ColorIDSet set1 = storage.getColorIDSet(ids);
         assertEquals(1, storage.size());
 
         assertEquals("a new set was returned", set0, set1);
 
-        jids.remove(dave);
-        storage.getColorIDSet(jids);
+        ids.remove(dave);
+        storage.getColorIDSet(ids);
         assertEquals(2, storage.size());
     }
 
     @Test
     public void testExtend() {
-        List<JID> newJIDs = new ArrayList<JID>();
-        JID a = new JID("a@a/a");
-        JID b = new JID("b@b/b");
-        newJIDs.add(a);
-        newJIDs.add(b);
+        List<String> newIDs = Arrays.asList(new String[] { "a@a/a", "b@b/b" });
 
         storage = new ColorIDSetStorage(preferenceStore);
 
-        storage.getColorIDSet(jids);
-        storage.getColorIDSet(jids, newJIDs);
+        storage.getColorIDSet(ids);
+        storage.getColorIDSet(ids, newIDs);
         assertEquals(2, storage.size());
 
-        storage.getColorIDSet(jids, newJIDs);
+        storage.getColorIDSet(ids, newIDs);
         assertEquals(2, storage.size());
     }
 
@@ -77,11 +73,11 @@ public class ColorIDSetStorageTest {
     public void testRemove() {
         storage = new ColorIDSetStorage(preferenceStore);
 
-        storage.getColorIDSet(jids);
+        storage.getColorIDSet(ids);
         storage.remove(0);
         assertEquals("Storage did not remove entries.", 0, storage.size());
 
-        storage.getColorIDSet(jids);
+        storage.getColorIDSet(ids);
         assertEquals("Storage should not be empty.", 1, storage.size());
 
         storage.remove(Long.MAX_VALUE);
@@ -92,7 +88,7 @@ public class ColorIDSetStorageTest {
     public void testUpdateColor() {
         storage = new ColorIDSetStorage(preferenceStore);
 
-        ColorIDSet set = storage.getColorIDSet(jids);
+        ColorIDSet set = storage.getColorIDSet(ids);
 
         storage.updateColor(set, alice, 0, -1);
         assertEquals("Initial value of Alice's has changed.", 0,
@@ -106,7 +102,7 @@ public class ColorIDSetStorageTest {
     public void testUpdateColorWithOccupiedColor() {
         storage = new ColorIDSetStorage(preferenceStore);
 
-        ColorIDSet set = storage.getColorIDSet(jids);
+        ColorIDSet set = storage.getColorIDSet(ids);
 
         // init
         storage.updateColor(set, bob, 1, -1);
@@ -120,9 +116,9 @@ public class ColorIDSetStorageTest {
     public void testUpdateColorOfNonExistingJID() {
         storage = new ColorIDSetStorage(preferenceStore);
 
-        ColorIDSet set = storage.getColorIDSet(jids);
+        ColorIDSet set = storage.getColorIDSet(ids);
 
-        storage.updateColor(set, new JID("foo@bar"), 1, -1);
+        storage.updateColor(set, "foo@bar", 1, -1);
     }
 
     @Test
@@ -132,7 +128,7 @@ public class ColorIDSetStorageTest {
             storage.size());
 
         /* The following sets should be saved implicitly. */
-        ColorIDSet colorIDSet = storage.getColorIDSet(jids);
+        ColorIDSet colorIDSet = storage.getColorIDSet(ids);
         ColorIDSet singleColorIDSet = storage.getColorIDSet(Collections
             .singletonList(alice));
 
@@ -144,7 +140,7 @@ public class ColorIDSetStorageTest {
         assertEquals("Load did not load expected amount of sets.", 2,
             storage.size());
 
-        ColorIDSet loadedColorIDSet = storage.getColorIDSet(jids);
+        ColorIDSet loadedColorIDSet = storage.getColorIDSet(ids);
         assertNotNull("Loaded set could not be retrieved.", loadedColorIDSet);
         assertEquals("Newly loaded set does not match loaded one.", colorIDSet,
             loadedColorIDSet);

@@ -8,6 +8,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -17,7 +18,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 /**
  * This class stores {@link ColorIDSet}s when ever a ColorIdSet is added it gets
@@ -52,39 +52,39 @@ public final class ColorIDSetStorage {
     }
 
     /**
-     * Returns the matching {@link ColorIDSet} for the given JIDs if possible
+     * Returns the matching {@link ColorIDSet} for the given ids if possible.
      * 
-     * @param jids
-     *            a collection of participants
-     * @return {@link ColorIDSet} or a new set that includes all participants if
-     *         no matching set was found
+     * @param ids
+     *            the ids to lookup
+     * @return {@link ColorIDSet} or a new set that includes all ids if no
+     *         matching set was found
      * 
      */
-    public synchronized ColorIDSet getColorIDSet(Collection<JID> jids) {
-        return getColorIDSet(jids, new ArrayList<JID>());
+    public synchronized ColorIDSet getColorIDSet(Collection<String> ids) {
+        return getColorIDSet(ids, Collections.<String> emptyList());
     }
 
     /**
-     * Returns the matching {@link ColorIDSet} for the given JIDs if possible.
+     * Returns the matching {@link ColorIDSet} for the given ids if possible.
      * 
-     * @param sessionParticipants
-     *            the JIDs of the session participants
-     * @param jidsToInvite
-     *            the JIDs of the users to invite
-     * @return {@link ColorIDSet} or a new set that includes all participants
-     *         and invitees if no matching set was found
+     * @param ids
+     *            the ids to lookup
+     * @param additionalIds
+     *            additional ids to add
+     * @return {@link ColorIDSet} or a new set that includes all ids and
+     *         additionalIds if no matching set was found
      * 
      */
-    public synchronized ColorIDSet getColorIDSet(
-        Collection<JID> sessionParticipants, Collection<JID> jidsToInvite) {
+    public synchronized ColorIDSet getColorIDSet(Collection<String> ids,
+        Collection<String> additionalIds) {
 
-        Set<JID> allJIDs = new HashSet<JID>();
+        Set<String> allIDs = new HashSet<String>();
 
-        allJIDs.addAll(sessionParticipants);
-        allJIDs.addAll(jidsToInvite);
+        allIDs.addAll(ids);
+        allIDs.addAll(additionalIds);
 
-        ColorIDSet fullColorIDSet = new ColorIDSet(allJIDs);
-        ColorIDSet partialColorIDSet = new ColorIDSet(sessionParticipants);
+        ColorIDSet fullColorIDSet = new ColorIDSet(allIDs);
+        ColorIDSet partialColorIDSet = new ColorIDSet(ids);
 
         ColorIDSet currentSet = null;
 
@@ -95,16 +95,16 @@ public final class ColorIDSetStorage {
 
         if (idx != -1) {
             fullMatch = true;
-        } else if (idx == -1 && !jidsToInvite.isEmpty()) {
+        } else if (idx == -1 && !additionalIds.isEmpty()) {
             idx = currentAvailableSets.indexOf(partialColorIDSet);
         }
 
         if (idx != -1 && fullMatch) {
             currentSet = currentAvailableSets.get(idx);
         } else if (idx != -1) {
-            currentSet = currentAvailableSets.get(idx).extendSet(jidsToInvite);
+            currentSet = currentAvailableSets.get(idx).extendSet(additionalIds);
         } else {
-            currentSet = new ColorIDSet(allJIDs);
+            currentSet = new ColorIDSet(allIDs);
         }
 
         if (!fullMatch)
@@ -129,17 +129,17 @@ public final class ColorIDSetStorage {
      * user in a set.
      * 
      * @param set
-     * @param jid
+     * @param id
      * @param colorID
      * @param favoriteColorID
      * @throws IllegalArgumentException
      *             when the caller tries to set a color multiple times or when
      *             he tries to add a new user.
      */
-    public synchronized void updateColor(ColorIDSet set, JID jid, int colorID,
-        int favoriteColorID) throws IllegalArgumentException {
-        set.setColor(jid, colorID);
-        set.setFavoriteColor(jid, favoriteColorID);
+    public synchronized void updateColor(ColorIDSet set, String id,
+        int colorID, int favoriteColorID) throws IllegalArgumentException {
+        set.setColor(id, colorID);
+        set.setFavoriteColor(id, favoriteColorID);
         set.resetTimestamp();
         save();
     }
