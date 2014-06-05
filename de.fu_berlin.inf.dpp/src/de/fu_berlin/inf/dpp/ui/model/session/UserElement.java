@@ -69,7 +69,7 @@ public class UserElement extends TreeElement {
             this.awarenessInformation.add(new AwarenessInformationTreeElement(
                 this.user));
             FollowModeInformationTreeElement followModeIndicator;
-            if (awarenessInformationCollector.getFollowedJID(user) != null) {
+            if (awarenessInformationCollector.getFollowedUser(user) != null) {
                 followModeIndicator = new FollowModeInformationTreeElement(user);
                 this.awarenessInformation.add(followModeIndicator);
             }

@@ -14,7 +14,6 @@ import de.fu_berlin.inf.dpp.editor.RemoteEditorManager;
 import de.fu_berlin.inf.dpp.editor.RemoteEditorManager.RemoteEditor;
 import de.fu_berlin.inf.dpp.invitation.OutgoingProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -41,7 +40,7 @@ public class AwarenessInformationCollector {
     /**
      * Who is following who in the session?
      */
-    protected Map<JID, JID> followModes = new ConcurrentHashMap<JID, JID>();
+    protected Map<User, User> followModes = new ConcurrentHashMap<User, User>();
 
     public AwarenessInformationCollector(SarosSessionObservable sarosSession,
         ProjectNegotiationObservable projectNegotiationObservable,
@@ -150,32 +149,12 @@ public class AwarenessInformationCollector {
             + target);
 
         // forget any old states, in case there are any..
-        followModes.remove(user.getJID());
+        followModes.remove(user);
 
         // remember which user he/she is following
         if (target != null) { // don't save null, this is not necessary
-            followModes.put(user.getJID(), target.getJID());
+            followModes.put(user, target);
         }
-    }
-
-    /**
-     * Returns the JID of the user that the given user is following, or null if
-     * that user does not follow anyone at the moment, or there is no active
-     * session.
-     * 
-     * @param user
-     * @return
-     */
-    public JID getFollowedJID(User user) {
-        assert user != null;
-
-        ISarosSession session = sarosSession.getValue();
-
-        // should not be called outside of a running session
-        if (session == null)
-            return null;
-
-        return followModes.get(user.getJID());
     }
 
     /**
@@ -194,12 +173,17 @@ public class AwarenessInformationCollector {
         if (session == null)
             return null;
 
-        JID followeeJID = followModes.get(user.getJID());
+        User followee = followModes.get(user);
 
-        if (followeeJID == null)
+        if (followee == null)
             return null;
 
-        return session.getUser(followeeJID);
+        /*
+         * FIXME this should not be done here, it should be the responsibility
+         * of the class that calls setUserFollowing to correctly clear this map
+         * entries !
+         */
+        return session.getUser(followee.getJID());
     }
 
     /**
