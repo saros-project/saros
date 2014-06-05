@@ -120,7 +120,7 @@ public class DataTransferManager implements IConnectionListener,
                 extension.setPayload(compressedPayloadLenght, payload);
             }
 
-            notifyDataSent(extension.getTransferMode(),
+            notifyDataReceived(extension.getTransferMode(),
                 extension.getCompressedSize(), extension.getUncompressedSize(),
                 extension.getTransferDuration());
 
