@@ -1765,7 +1765,7 @@ public class EditorManager extends AbstractActivityProvider {
             return;
 
         if (activeEditor == null) {
-            log.info(jumpTo.getJID() + " has no editor open");
+            log.debug("user " + jumpTo + " has no editor open");
 
             // changed waldmann, 22.01.2012: this balloon Notification became
             // annoying as the awareness information, which file is opened is
@@ -1790,7 +1790,7 @@ public class EditorManager extends AbstractActivityProvider {
         ILineRange viewport = activeEditor.getViewport();
 
         if (viewport == null) {
-            log.warn(jumpTo.getJID() + " has no viewport in editor: "
+            log.warn("user " + jumpTo + " has no viewport in editor: "
                 + activeEditor.getPath());
             return;
         }
