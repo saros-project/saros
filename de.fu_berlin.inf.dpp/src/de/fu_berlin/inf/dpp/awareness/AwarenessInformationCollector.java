@@ -8,14 +8,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.RemoteEditorManager;
 import de.fu_berlin.inf.dpp.editor.RemoteEditorManager.RemoteEditor;
-import de.fu_berlin.inf.dpp.invitation.OutgoingProjectNegotiation;
-import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
-import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
-import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 
@@ -28,44 +24,24 @@ import de.fu_berlin.inf.dpp.session.User;
  * 
  * @author waldmann
  */
-@Component(module = "observables")
 public class AwarenessInformationCollector {
-    private static final Logger log = Logger
+
+    private static final Logger LOG = Logger
         .getLogger(AwarenessInformationCollector.class);
 
-    protected EditorManager editorManager;
-    protected ProjectNegotiationObservable projectNegotiationObservable;
-    protected SarosSessionObservable sarosSession;
+    private final EditorManager editorManager;
+    private final ISarosSessionManager sessionManager;
 
     /**
      * Who is following who in the session?
      */
-    protected Map<User, User> followModes = new ConcurrentHashMap<User, User>();
+    private final Map<User, User> followModes = new ConcurrentHashMap<User, User>();
 
-    public AwarenessInformationCollector(SarosSessionObservable sarosSession,
-        ProjectNegotiationObservable projectNegotiationObservable,
-        EditorManager editorManager) {
+    public AwarenessInformationCollector(ISarosSessionManager sessionManager,
+        final EditorManager editorManager) {
 
-        this.sarosSession = sarosSession;
-        this.projectNegotiationObservable = projectNegotiationObservable;
+        this.sessionManager = sessionManager;
         this.editorManager = editorManager;
-    }
-
-    /**
-     * Returns a dash-separated string describing the current user state
-     * 
-     * @param user
-     * @return
-     */
-    public String getAwarenessDetailString(User user) {
-        List<String> details = getAwarenessDetails(user);
-        StringBuilder sb = new StringBuilder();
-        boolean first = true;
-        for (String detail : details) {
-            sb.append((first ? "" : " - ") + detail);
-            first = false;
-        }
-        return sb.toString();
     }
 
     /**
@@ -79,50 +55,33 @@ public class AwarenessInformationCollector {
     public List<String> getAwarenessDetails(User user) {
         List<String> details = new ArrayList<String>();
 
+        final RemoteEditorManager rem = editorManager.getRemoteEditorManager();
+
+        if (rem == null)
+            return details;
+
+        final RemoteEditor activeEditor = rem.getRemoteActiveEditor(user);
         /*
-         * Differentiate between "invitation in progress" and awareness
-         * information shown while the session is running
+         * The other user has a non-shared editor open, i.e. the remote editor
+         * shows a file which is not part of the session.
          */
-
-        ProjectNegotiation negotiation = projectNegotiationObservable
-            .getProjectExchangeProcess(user.getJID());
-
-        if (negotiation != null
-            && negotiation instanceof OutgoingProjectNegotiation) {
-            /*
-             * a negotiation is still running, i.e. the user is not 100% ready
-             * to work yet FIXME: there is no mechanism to notify about
-             * negotiation termination so this may display dirty data
-             */
-            details.add("in session synchronization");
-        } else {
-            RemoteEditorManager rem = editorManager.getRemoteEditorManager();
-            if (rem != null) {
-                RemoteEditor activeEditor = rem.getRemoteActiveEditor(user);
-                /*
-                 * The other user has a non-shared editor open, i.e. the remote
-                 * editor shows a file which is not part of the session.
-                 */
-                if (activeEditor == null) {
-                    details.add("non-shared file open");
-                    return details;
-                }
-
-                SPath activeFile = activeEditor.getPath();
-                if (activeFile != null) {
-                    /*
-                     * path.getProjectRelativePath() could be too long,
-                     * sometimes the name would be enough...
-                     * 
-                     * TODO: make this configurable?
-                     */
-                    details.add(activeFile.getProject().getName()
-                        + ": "
-                        + activeFile.getFile().getProjectRelativePath()
-                            .toString());
-                }
-            }
+        if (activeEditor == null) {
+            details.add("non-shared file open");
+            return details;
         }
+
+        SPath activeFile = activeEditor.getPath();
+        if (activeFile != null) {
+            /*
+             * path.getProjectRelativePath() could be too long, sometimes the
+             * name would be enough...
+             * 
+             * TODO: make this configurable?
+             */
+            details.add(activeFile.getProject().getName() + ": "
+                + activeFile.getFile().getProjectRelativePath().toString());
+        }
+
         return details;
     }
 
@@ -145,7 +104,7 @@ public class AwarenessInformationCollector {
         assert user != null;
         assert !(user.equals(target));
 
-        log.debug("Remembering that User " + user + " is now following "
+        LOG.debug("Remembering that User " + user + " is now following "
             + target);
 
         // forget any old states, in case there are any..
@@ -167,7 +126,7 @@ public class AwarenessInformationCollector {
     public User getFollowedUser(User user) {
         assert user != null;
 
-        ISarosSession session = sarosSession.getValue();
+        final ISarosSession session = sessionManager.getSarosSession();
 
         // should not be called outside of a running session
         if (session == null)
