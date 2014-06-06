@@ -6,17 +6,17 @@
          point="org.eclipse.ui.views">
       <category
             id="de.fu_berlin.inf.dpp.Saros"
-            name="%category.name"/>
+            name="Saros"/>
       <category
             id="de.fu_berlin.inf.dpp.Developer"
-            name="%category.name.0">
+            name="Saros Development">
       </category>
      <view
            category="de.fu_berlin.inf.dpp.Saros"
            class="de.fu_berlin.inf.dpp.ui.views.SarosView"
            icon="icons/view16/saros_misc.png"
            id="de.fu_berlin.inf.dpp.ui.views.SarosView"
-           name="%view.name.0">
+           name="Saros">
      </view>
    </extension>
    <extension
@@ -36,7 +36,7 @@
             adaptable="true"
             class="de.fu_berlin.inf.dpp.ui.decorators.SharedProjectDecorator"
             id="de.fu_berlin.inf.dpp.ui.decorators.SharedProjectDecorator"
-            label="%decorator.label"
+            label="Shared Project Decorator"
             lightweight="true"
             state="true">
          <enablement>
@@ -47,7 +47,7 @@
             adaptable="true"
             class="de.fu_berlin.inf.dpp.ui.decorators.SharedProjectFileDecorator"
             id="de.fu_berlin.inf.dpp.ui.decorators.SharedProjectFileDecorator"
-            label="%decorator.label.0"
+            label="Shared Project File Decorator"
             lightweight="true"
             state="true">
          <enablement>
@@ -60,27 +60,27 @@
       <page
             class="de.fu_berlin.inf.dpp.ui.preferencePages.GeneralPreferencePage"
             id="de.fu_berlin.inf.dpp.preferences"
-            name="%page.name"/>
+            name="Saros"/>
       <page
             category="de.fu_berlin.inf.dpp.preferences"
             class="de.fu_berlin.inf.dpp.ui.preferencePages.AdvancedPreferencePage"
             id="de.fu_berlin.inf.dpp.preferences.advanced"
-            name="%page.name.0"/>
+            name="Advanced"/>
       <page
             category="de.fu_berlin.inf.dpp.preferences"
             class="de.fu_berlin.inf.dpp.ui.preferencePages.NetworkPreferencePage"
             id="de.fu_berlin.inf.dpp.preferences.network"
-            name="%page.name.1"/>
+            name="Network"/>
       <page
             category="de.fu_berlin.inf.dpp.preferences"
             class="de.fu_berlin.inf.dpp.ui.preferencePages.FeedbackPreferencePage"
             id="de.fu_berlin.dpp.preferences.feedback"
-            name="%page.name.2"/>
+            name="Feedback"/>
       <page
             category="de.fu_berlin.inf.dpp.preferences"
             class="de.fu_berlin.inf.dpp.ui.preferencePages.CommunicationPreferencePage"
             id="de.fu_berlin.dpp.preferences.communication"
-            name="%page.name.3">
+            name="Communication">
       </page>
       <page
               category="de.fu_berlin.inf.dpp.preferences"
@@ -477,37 +477,67 @@
          point="org.eclipse.ui.commands">
       <command
             id="de.fu_berlin.inf.dpp.ui.commands.Empty"
-            name="%command.name">
+            name="EMPTY COMMAND">
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
             id="de.fu_berlin.inf.dpp.ui.commands.GettingStarted"
-            name="%command.name.0">
+            name="Getting Started...">
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
             id="de.fu_berlin.inf.dpp.ui.commands.StartSarosConfiguration"
-            name="%command.name.1">
+            name="Start Saros Configuration...">
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
             id="de.fu_berlin.inf.dpp.ui.commands.CreateXMPPAccount"
-            name="%command.name.2">
+            name="Create Account...">
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
             id="de.fu_berlin.inf.dpp.ui.commands.AddBuddy"
-            name="%command.name.3">
+            name="Add Contact...">
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
             id="de.fu_berlin.inf.dpp.ui.commands.OpenSarosPreferences"
-            name="%command.name.4">
+            name="Preferences...">
       </command>
             <command
             categoryId="org.eclipse.ui.category.project"
             id="de.fu_berlin.inf.dpp.ui.commands.AddXMPPAccount"
             name="Add Account...">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.project"
+            id="de.fu_berlin.inf.dpp.ui.commands.ShareResource"
+            name="Share Project(s)...">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.project"
+            id="de.fu_berlin.inf.dpp.ui.commands.SharedProjectLeave"
+            name="Leave Session...">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.project"
+            id="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddResources"
+            name="Add Projects...">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.project"
+            id="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddBuddies"
+            name="Add Contacts...">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.project"
+            id="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddSelectedResources"
+            name="Add to Saros Session">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.project"
+            id="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddSelectedBuddies"
+            name="Add to Saros Session">
       </command>
    </extension>
    <extension
@@ -542,42 +572,6 @@
             class="de.fu_berlin.inf.dpp.ui.commandHandlers.OpenSarosPreferencesHandler"
             commandId="de.fu_berlin.inf.dpp.ui.commands.OpenSarosPreferences">
       </handler>
-   </extension>
-   <extension
-         point="org.eclipse.ui.commands">
-      <command
-            categoryId="org.eclipse.ui.category.project"
-            id="de.fu_berlin.inf.dpp.ui.commands.ShareResource"
-            name="%command.name.5">
-      </command>
-      <command
-            categoryId="org.eclipse.ui.category.project"
-            id="de.fu_berlin.inf.dpp.ui.commands.SharedProjectLeave"
-            name="%command.name.6">
-      </command>
-      <command
-            categoryId="org.eclipse.ui.category.project"
-            id="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddResources"
-            name="%command.name.7">
-      </command>
-      <command
-            categoryId="org.eclipse.ui.category.project"
-            id="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddBuddies"
-            name="%command.name.8">
-      </command>
-      <command
-            categoryId="org.eclipse.ui.category.project"
-            id="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddSelectedResources"
-            name="%command.name.9">
-      </command>
-      <command
-            categoryId="org.eclipse.ui.category.project"
-            id="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddSelectedBuddies"
-            name="%command.name.10">
-      </command>
-   </extension>
-   <extension
-         point="org.eclipse.ui.handlers">
       <handler
       class="de.fu_berlin.inf.dpp.ui.commandHandlers.ShareProjectHandler"
             commandId="de.fu_berlin.inf.dpp.ui.commands.ShareResource">
@@ -698,7 +692,7 @@
             locationURI="menu:org.eclipse.ui.main.menu?after=additions">
          <menu
                id="de.fu_berlin.inf.dpp.ui.main.menu"
-               label="%menu.label">
+               label="Saros">
             <visibleWhen
                   checkEnabled="false">
             </visibleWhen>
@@ -764,30 +758,14 @@
                   style="push">
                <visibleWhen
                      checkEnabled="false">
-                  <and>
-                     <reference
-                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
-                     </reference>
-                     <not>
+                      <not>
                         <reference
                               definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
                         </reference>
                      </not>
-                  </and>
                </visibleWhen>
             </command>
-            <command
-                  commandId="de.fu_berlin.inf.dpp.ui.commands.Empty"
-                  label="%command.label.1"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
-                  </reference>
-               </visibleWhen>
-            </command>
-            <command
+           <command
                   commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddResources"
                   disabledIcon="icons/dlcl16/project_share_add_projects_tsk.png"
                   icon="icons/elcl16/project_share_add_projects_tsk.png"
@@ -831,7 +809,7 @@
                   commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectLeave"
                   disabledIcon="icons/dlcl16/project_share_leave_tsk.png"
                   icon="icons/elcl16/project_share_leave_tsk.png"
-                  label="%command.label.2"
+                  label="Leave Session..."
                   style="push">
                <visibleWhen
                      checkEnabled="false">
@@ -854,7 +832,7 @@
                   commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectLeave"
                   disabledIcon="icons/dlcl16/project_share_terminate_tsk.png"
                   icon="icons/elcl16/project_share_terminate_tsk.png"
-                  label="%command.label.3"
+                  label="Stop Session..."
                   style="push">
                <visibleWhen
                      checkEnabled="false">
@@ -914,26 +892,6 @@
                   </not>
                   <reference
                         definitionId="de.fu_berlin.inf.dpp.ui.definitions.sessionHeadlineSelected">
-                  </reference>
-               </and>
-            </visibleWhen>
-         </command>
-         <command
-               commandId="de.fu_berlin.inf.dpp.ui.commands.Empty"
-               disabledIcon="icons/dlcl16/project_share_tsk.png"
-               icon="icons/elcl16/project_share_tsk.png"
-               label="%command.label.4"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <and>
-                  <not>
-                     <reference
-                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
-                     </reference>
-                  </not>
-                  <reference
-                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
                   </reference>
                </and>
             </visibleWhen>
@@ -1017,13 +975,16 @@
                visible="false">
          </separator>
       </menuContribution>
+      
+      <!-- Eclipse Context Menus Hooks !-->
+      
       <menuContribution
             allPopups="false"
             locationURI="popup:org.eclipse.ui.popup.any?after=additions">
             <menu
                   icon="icons/elcl16/project_share_tsk.png"
-                  label="%menu.label.0"
-                  tooltip="%menu.tooltip">
+                  label="Share With"
+                  tooltip="Share the Selected Projects With Your Contacts">
                   <visibleWhen
                   checkEnabled="false">
                      <and>
@@ -1043,7 +1004,7 @@
                </separator>
                <command
                      commandId="de.fu_berlin.inf.dpp.ui.commands.Empty"
-                     label="%command.label.6"
+                     label="Not Connected"
                      style="push">
                   <visibleWhen
                         checkEnabled="false">
@@ -1070,7 +1031,7 @@
                </separator>
                <command
                      commandId="de.fu_berlin.inf.dpp.ui.commands.ShareResource"
-                     label="%command.label.7"
+                     label="Multiple Contacts..."
                      style="push">
                </command>
                <separator
@@ -1108,15 +1069,15 @@
                   </and>
                </visibleWhen>
             </command>
-
       </menuContribution>
+      
       <menuContribution
             allPopups="false"
             locationURI="popup:org.eclipse.ui.popup.any?before=menustart">
          <menu
                icon="icons/elcl16/project_share_tsk.png"
-               label="%plugin.workTogetherOn"
-               tooltip="%menu.tooltip.0">
+               label="Work Together on..."
+               tooltip="Share Projects With Selected Contacts">
             <visibleWhen
                   checkEnabled="false">
                <and>
@@ -1136,7 +1097,7 @@
             </separator>
             <command
                   commandId="de.fu_berlin.inf.dpp.ui.commands.Empty"
-                  label="%command.label.8"
+                  label="Not Connected"
                   style="push">
                <visibleWhen
                      checkEnabled="false">
@@ -1163,7 +1124,7 @@
             </separator>
             <command
                   commandId="de.fu_berlin.inf.dpp.ui.commands.ShareResource"
-                  label="%command.label.9"
+                  label="Multiple Projects..."
                   style="push">
             </command>
             <separator
