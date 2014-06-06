@@ -110,8 +110,7 @@ public final class XMPPAccountStore {
 
         boolean error = false;
 
-        boolean encryptAccount = preferenceStore
-            .getBoolean(PreferenceConstants.ENCRYPT_ACCOUNT);
+        boolean encryptAccount = preferenceStore.getBoolean("encrypt_account");
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 

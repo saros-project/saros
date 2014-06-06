@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.osgi.service.prefs.Preferences;
 import org.picocontainer.BindKey;
@@ -123,9 +122,6 @@ public class SarosEclipseContextFactory extends AbstractSarosContextFactory {
 
         container.addComponent(IPreferenceStore.class,
             saros.getPreferenceStore());
-
-        container
-            .addComponent(ISecurePreferences.class, saros.getSecurePrefs());
 
         container.addComponent(Preferences.class, saros.getGlobalPreferences());
     }

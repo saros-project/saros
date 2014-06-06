@@ -31,8 +31,6 @@ public class PreferenceConstants {
 
     public static final String ACCOUNT_DATA = "account_data";
 
-    public static final String ENCRYPT_ACCOUNT = "encrypt_account";
-
     public static final String AUTO_CONNECT = "autoconnect";
 
     public static final String AUTO_PORTMAPPING_DEVICEID = "autoportmappingdeviceid";

@@ -62,7 +62,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
     private static void setPreferences(PreferenceHolderWrapper prefs) {
 
-        prefs.setValue(PreferenceConstants.ENCRYPT_ACCOUNT, false);
         prefs.setValue(PreferenceConstants.AUTO_CONNECT, true);
         prefs.setValue(PreferenceConstants.AUTO_PORTMAPPING_DEVICEID, "");
         prefs.setValue(PreferenceConstants.GATEWAYCHECKPERFORMED, false);

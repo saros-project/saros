@@ -107,13 +107,12 @@ public final class GeneralPreferencePage extends FieldEditorPreferencePage
 
     @Override
     protected void createFieldEditors() {
-        this.parent = new Composite(getFieldEditorParent(), SWT.NONE);
+        parent = new Composite(getFieldEditorParent(), SWT.NONE);
         layoutParent();
         createAccountsGroup();
-        createEncryptPasswordField(this.parent);
-        createAutomaticConnectField(this.parent);
-        createVersionControlPreferences(this.parent);
-        createConcurrentUndoField(this.parent);
+        createAutomaticConnectField(parent);
+        createVersionControlPreferences(parent);
+        createConcurrentUndoField(parent);
     }
 
     /*
@@ -323,11 +322,6 @@ public final class GeneralPreferencePage extends FieldEditorPreferencePage
                 }
             });
         activateAccountButton.setEnabled(false);
-    }
-
-    private void createEncryptPasswordField(Composite group) {
-        addField(new BooleanFieldEditor(PreferenceConstants.ENCRYPT_ACCOUNT,
-            ENCRYPT_PASSWORD_TEXT, group));
     }
 
     private void createAutomaticConnectField(Composite group) {

@@ -26,6 +26,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
@@ -41,6 +42,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
+import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
@@ -290,8 +292,7 @@ public class Saros extends AbstractUIPlugin {
         getPreferenceStore().setValue(
             "FAVORITE_COLOR_ID_HACK_CREATE_RANDOM_COLOR", false);
 
-        connectionHandler.convertAccountStore(getPreferenceStore(),
-            getSecurePrefs());
+        convertAccountStore();
     }
 
     /**
@@ -398,54 +399,6 @@ public class Saros extends AbstractUIPlugin {
         }
     }
 
-    /**
-     * Retrieves the secure preferences store provided by
-     * org.eclipse.equinox.security. Preferences entered here are encrypted for
-     * storage.
-     * 
-     * @return The local secure preferences store.
-     */
-    public synchronized ISecurePreferences getSecurePrefs() {
-
-        if (securePrefs == null) {
-            try {
-                File storeFile = new File(getStateLocation().toFile(), "/.pref"); //$NON-NLS-1$
-                URI workspaceURI = storeFile.toURI();
-
-                /*
-                 * The SecurePreferencesFactory does not accept percent-encoded
-                 * URLs, so we must decode the URL before passing it.
-                 */
-                String prefLocation = URLDecoder.decode(
-                    workspaceURI.toString(), "UTF-8"); //$NON-NLS-1$
-                URL prefURL = new URL(prefLocation);
-
-                securePrefs = SecurePreferencesFactory.open(prefURL, null);
-            } catch (MalformedURLException e) {
-                log.error("Problem with URL when attempting to access secure preferences: "
-                    + e);
-            } catch (IOException e) {
-                log.error("I/O problem when attempting to access secure preferences: "
-                    + e);
-            } finally {
-                if (securePrefs == null)
-                    securePrefs = SecurePreferencesFactory.getDefault();
-            }
-        }
-
-        return securePrefs;
-    }
-
-    public synchronized void saveSecurePrefs() {
-        try {
-            if (securePrefs != null) {
-                securePrefs.flush();
-            }
-        } catch (IOException e) {
-            log.error("Exception when trying to store secure preferences: " + e);
-        }
-    }
-
     protected void setupLoggers() {
         /*
          * HACK this is not the way OSGi works but it currently fulfill its
@@ -483,5 +436,105 @@ public class Saros extends AbstractUIPlugin {
      */
     public String getVersion() {
         return sarosVersion;
+    }
+
+    /**
+     * @deprecated Only of one-time use to convert from the old, IDE-dependent
+     *             format to the new, IDE-independent format. Will be removed in
+     *             Release n+2
+     */
+    @Deprecated
+    public void convertAccountStore() {
+
+        final XMPPAccountStore accountStore = sarosContext
+            .getComponent(XMPPAccountStore.class);
+
+        if (!accountStore.isEmpty()) {
+            log.debug("skipping conversion of old XMPP accounts, because there are already new ones");
+            return;
+        }
+
+        try {
+            de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore oldStore = new de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore(
+                getPreferenceStore(), getSecurePrefs());
+
+            if (oldStore.isEmpty())
+                return;
+
+            de.fu_berlin.inf.dpp.accountManagement.XMPPAccount oldActiveAccount;
+
+            oldActiveAccount = oldStore.getActiveAccount();
+
+            List<de.fu_berlin.inf.dpp.accountManagement.XMPPAccount> accounts = oldStore
+                .getAllAccounts();
+
+            accounts.remove(oldActiveAccount);
+            accounts.add(0, oldActiveAccount);
+
+            for (de.fu_berlin.inf.dpp.accountManagement.XMPPAccount account : accounts) {
+                log.debug("converting old account to new one: " + account);
+
+                try {
+                    accountStore.createAccount(account.getUsername(),
+                        account.getPassword(), account.getDomain(),
+                        account.getServer(), account.getPort(),
+                        account.useTLS(), account.useSASL());
+                } catch (RuntimeException e) {
+                    log.error("failed to convert old account: " + account, e);
+                }
+            }
+
+        } catch (RuntimeException e) {
+            log.error("failed to convert old account store", e);
+        }
+    }
+
+    /**
+     * @deprecated remove after next release
+     */
+    @Deprecated
+    private synchronized ISecurePreferences getSecurePrefs() {
+
+        if (securePrefs == null) {
+            try {
+                File storeFile = new File(getStateLocation().toFile(), "/.pref"); //$NON-NLS-1$
+                URI workspaceURI = storeFile.toURI();
+
+                /*
+                 * The SecurePreferencesFactory does not accept percent-encoded
+                 * URLs, so we must decode the URL before passing it.
+                 */
+                String prefLocation = URLDecoder.decode(
+                    workspaceURI.toString(), "UTF-8"); //$NON-NLS-1$
+                URL prefURL = new URL(prefLocation);
+
+                securePrefs = SecurePreferencesFactory.open(prefURL, null);
+            } catch (MalformedURLException e) {
+                log.error("Problem with URL when attempting to access secure preferences: "
+                    + e);
+            } catch (IOException e) {
+                log.error("I/O problem when attempting to access secure preferences: "
+                    + e);
+            } finally {
+                if (securePrefs == null)
+                    securePrefs = SecurePreferencesFactory.getDefault();
+            }
+        }
+
+        return securePrefs;
+    }
+
+    /**
+     * @deprecated remove after next release
+     */
+    @Deprecated
+    private synchronized void saveSecurePrefs() {
+        try {
+            if (securePrefs != null) {
+                securePrefs.flush();
+            }
+        } catch (IOException e) {
+            log.error("Exception when trying to store secure preferences: " + e);
+        }
     }
 }
