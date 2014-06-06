@@ -3,12 +3,12 @@ package de.fu_berlin.inf.dpp.invitation;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IProgressMonitor;
 
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
+import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 
 /**
  * Abstract base class that offers multiple methods for handling cancellation.

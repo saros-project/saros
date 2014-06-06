@@ -21,6 +21,7 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.invitation.hooks.ISessionNegotiationHook;
+import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.discovery.DiscoveryManager;
@@ -78,6 +79,10 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
     // the nickname property of users.
     private String clientNickname = null;
 
+    // TODO pull up, when this class is in core
+    @Inject
+    private ISarosSessionManager sarosSessionManager;
+
     public OutgoingSessionNegotiation(JID peer, ISarosSession sarosSession,
         String description, ISarosContext sarosContext) {
 
@@ -122,7 +127,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
     public Status start(IProgressMonitor monitor) {
         log.debug(this + " : starting invitation");
 
-        observeMonitor(monitor);
+        observeMonitor(ProgressMonitorAdapterFactory.convertTo(monitor));
 
         monitor.beginTask("Inviting " + peerNickname + "...",
             IProgressMonitor.UNKNOWN);

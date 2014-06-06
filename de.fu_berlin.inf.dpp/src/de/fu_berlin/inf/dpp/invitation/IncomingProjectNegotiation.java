@@ -47,12 +47,14 @@ import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
+import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ProjectNegotiationMissingFilesExtension;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.ui.wizards.AddProjectToSessionWizard;
@@ -98,6 +100,10 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     private boolean running;
 
     private PacketCollector startActivityQueuingRequestCollector;
+
+    // TODO pull up, when this class is in core
+    @Inject
+    private ISarosSessionManager sessionManager;
 
     public IncomingProjectNegotiation(ISarosSession sarosSession, JID peer,
         String processID, List<ProjectNegotiationData> projectInfos,
@@ -158,7 +164,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         this.monitor = SubMonitor.convert(monitor,
             "Initializing shared project", 100);
 
-        observeMonitor(monitor);
+        observeMonitor(ProgressMonitorAdapterFactory.convertTo(monitor));
 
         IWorkspace ws = ResourcesPlugin.getWorkspace();
         IWorkspaceDescription desc = ws.getDescription();
@@ -191,8 +197,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             List<FileList> missingFiles = calculateMissingFiles(projectNames,
                 useVersionControl, this.monitor.newChild(10));
 
-            transmitter.send(ISarosSession.SESSION_CONNECTION_ID,
-                peer, ProjectNegotiationMissingFilesExtension.PROVIDER
+            transmitter.send(ISarosSession.SESSION_CONNECTION_ID, peer,
+                ProjectNegotiationMissingFilesExtension.PROVIDER
                     .create(new ProjectNegotiationMissingFilesExtension(
                         sessionID, processID, missingFiles)));
 
@@ -216,8 +222,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 sarosSession.enableQueuing(project);
             }
 
-            transmitter.send(ISarosSession.SESSION_CONNECTION_ID,
-                peer, StartActivityQueuingResponse.PROVIDER
+            transmitter.send(ISarosSession.SESSION_CONNECTION_ID, peer,
+                StartActivityQueuingResponse.PROVIDER
                     .create(new StartActivityQueuingResponse(sessionID,
                         processID)));
 
@@ -933,7 +939,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         try {
             transfer.recieveFile(archiveFile);
 
-            monitorFileTransfer(transfer, monitor);
+            monitorFileTransfer(transfer,
+                ProgressMonitorAdapterFactory.convertTo(monitor));
             transferFailed = false;
         } catch (XMPPException e) {
             throw new IOException(e.getMessage(), e.getCause());

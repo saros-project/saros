@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
@@ -18,15 +17,14 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
+import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.MonitorableFileTransfer;
 import de.fu_berlin.inf.dpp.monitoring.MonitorableFileTransfer.TransferStatus;
-import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 
 /**
@@ -77,9 +75,6 @@ public abstract class ProjectNegotiation extends CancelableProcess {
      * established or was lost when the class was instantiated.
      */
     protected FileTransferManager fileTransferManager;
-
-    @Inject
-    protected ISarosSessionManager sessionManager;
 
     public ProjectNegotiation(JID peer, String sessionID,
         ISarosContext sarosContext) {
@@ -160,7 +155,7 @@ public abstract class ProjectNegotiation extends CancelableProcess {
         IOException {
 
         MonitorableFileTransfer mtf = new MonitorableFileTransfer(transfer,
-            ProgressMonitorAdapterFactory.convertTo(monitor));
+            monitor);
         TransferStatus transferStatus = mtf.monitorTransfer();
 
         // some information can be directly read from the returned status

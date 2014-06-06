@@ -50,6 +50,10 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
     @Inject
     private IConnectionManager connectionManager;
 
+    // TODO pull up, when this class is in core
+    @Inject
+    private ISarosSessionManager sarosSessionManager;
+
     public IncomingSessionNegotiation(ISarosSessionManager sessionManager,
         JID from, String remoteVersion, String invitationID,
         String description, ISarosContext sarosContext) {

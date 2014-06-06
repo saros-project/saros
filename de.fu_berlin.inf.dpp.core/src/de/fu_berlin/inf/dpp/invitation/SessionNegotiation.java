@@ -36,7 +36,6 @@ import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 
 /**
  * @author rdjemili
@@ -69,9 +68,6 @@ public abstract class SessionNegotiation extends CancelableProcess {
 
     @Inject
     protected SessionNegotiationHookManager hookManager;
-
-    @Inject
-    protected ISarosSessionManager sarosSessionManager;
 
     protected final String invitationID;
     protected final String description;

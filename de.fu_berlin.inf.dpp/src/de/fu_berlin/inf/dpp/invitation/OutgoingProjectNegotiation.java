@@ -32,10 +32,12 @@ import de.fu_berlin.inf.dpp.filesystem.EclipseProjectImpl;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
+import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ProjectNegotiationMissingFilesExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ProjectNegotiationOfferingExtension;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
@@ -63,6 +65,10 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
     private PacketCollector startActivityQueuingResponseCollector;
 
+    // TODO pull up, when this class is in core
+    @Inject
+    private ISarosSessionManager sessionManager;
+
     public OutgoingProjectNegotiation(JID to, ISarosSession sarosSession,
         List<IProject> projects, ISarosContext sarosContext) {
         super(to, sarosSession.getID(), sarosContext);
@@ -79,7 +85,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
         List<File> zipArchives = new ArrayList<File>();
 
-        observeMonitor(monitor);
+        observeMonitor(ProgressMonitorAdapterFactory.convertTo(monitor));
 
         Exception exception = null;
 
@@ -211,9 +217,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         ProjectNegotiationOfferingExtension offering = new ProjectNegotiationOfferingExtension(
             sessionID, processID, projectExchangeInfos);
 
-        transmitter
-            .send(ISarosSession.SESSION_CONNECTION_ID, peer,
-                ProjectNegotiationOfferingExtension.PROVIDER.create(offering));
+        transmitter.send(ISarosSession.SESSION_CONNECTION_ID, peer,
+            ProjectNegotiationOfferingExtension.PROVIDER.create(offering));
     }
 
     /**
@@ -433,7 +438,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 .createOutgoingFileTransfer(remoteContact.toString());
 
             transfer.sendFile(archive, transferID);
-            monitorFileTransfer(transfer, monitor);
+            monitorFileTransfer(transfer,
+                ProgressMonitorAdapterFactory.convertTo(monitor));
         } catch (XMPPException e) {
             throw new IOException(e.getMessage(), e);
         }
@@ -516,8 +522,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             + " to perform additional initialization...",
             IProgressMonitor.UNKNOWN);
 
-        transmitter.send(ISarosSession.SESSION_CONNECTION_ID,
-            peer, StartActivityQueuingRequest.PROVIDER
+        transmitter.send(ISarosSession.SESSION_CONNECTION_ID, peer,
+            StartActivityQueuingRequest.PROVIDER
                 .create(new StartActivityQueuingRequest(sessionID, processID)));
 
         Packet packet = collectPacket(startActivityQueuingResponseCollector,
