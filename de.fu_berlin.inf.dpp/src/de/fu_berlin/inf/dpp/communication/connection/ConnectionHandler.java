@@ -23,6 +23,7 @@ import de.fu_berlin.inf.dpp.account.XMPPAccount;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
+import de.fu_berlin.inf.dpp.net.internal.TCPServer;
 import de.fu_berlin.inf.dpp.net.mdns.MDNSService;
 import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -45,6 +46,8 @@ public class ConnectionHandler {
 
     private final XMPPConnectionService connectionService;
     private final MDNSService mDNSService;
+
+    private final TCPServer tcpServer;
 
     private final XMPPAccountStore accountStore;
     private final PreferenceUtils preferences;
@@ -78,10 +81,11 @@ public class ConnectionHandler {
     };
 
     public ConnectionHandler(final XMPPConnectionService connectionService,
-        final MDNSService mDNSService,
+        final TCPServer tcpServer, final MDNSService mDNSService,
         final IConnectionManager transferManager,
         final XMPPAccountStore accountStore, final PreferenceUtils preferences) {
         this.connectionService = connectionService;
+        this.tcpServer = tcpServer;
         this.mDNSService = mDNSService;
         this.connectionManager = transferManager;
         this.accountStore = accountStore;
@@ -220,6 +224,7 @@ public class ConnectionHandler {
     private void disconnectMDNSInternal() {
         setConnectionState(ConnectionState.DISCONNECTING, null, true);
         mDNSService.stop();
+        tcpServer.stop();
         setConnectionState(ConnectionState.NOT_CONNECTED, null, true);
     }
 
@@ -239,13 +244,30 @@ public class ConnectionHandler {
 
         // misuse the XMPP account credentials for now;
 
-        if (isConnected())
+        if (isConnected()) {
             disconnectMDNSInternal();
+        }
+
+        // misuse the Socks5 proxy port for now
+        int portUsed = 0;
+        try {
+            portUsed = tcpServer.start(null, preferences.getFileTransferPort());
+        } catch (IOException e) {
+            LOG.error("failed to start TCP server: " + e.getMessage(), e);
+
+            synchronized (this) {
+                isConnecting = false;
+            }
+
+            if (callbackTmp != null && !failSilently) {
+                callbackTmp.connectingFailed(e);
+                return;
+            }
+        }
 
         String serviceName = account.getUsername();
 
-        mDNSService.configure("_dpp._tcp.local.", serviceName,
-            (int) (Math.random() * 32000) + 1, null);
+        mDNSService.configure("_dpp._tcp.local.", serviceName, portUsed, null);
 
         setConnectionState(ConnectionState.CONNECTING, null, true);
         try {
