@@ -51,7 +51,7 @@
             lightweight="true"
             state="true">
          <enablement>
-      	   	<objectClass name="org.eclipse.core.resources.IResource"/>
+                 <objectClass name="org.eclipse.core.resources.IResource"/>
          </enablement>
       </decorator>
    </extension>
@@ -83,10 +83,10 @@
             name="%page.name.3">
       </page>
       <page
-      		category="de.fu_berlin.inf.dpp.preferences"
-      		class="de.fu_berlin.inf.dpp.ui.preferencePages.PersonalizationPreferencePage"
-      		id="de.fu_berlin.inf.dpp.preferences.personalization"
-      		name="Personalization">
+              category="de.fu_berlin.inf.dpp.preferences"
+              class="de.fu_berlin.inf.dpp.ui.preferencePages.PersonalizationPreferencePage"
+              id="de.fu_berlin.inf.dpp.preferences.personalization"
+              name="Personalization">
       </page>
    </extension>
    <extension
@@ -225,7 +225,7 @@
             textStylePreferenceValue="NONE"
             verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.ruler.5"
             verticalRulerPreferenceValue="false"/>
-      
+
       <specification
             annotationType="de.fu_berlin.inf.dpp.annotations.contribution.default"
             colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.color.default"
@@ -334,7 +334,7 @@
             textPreferenceValue="true"
             textStylePreferenceValue="UNDERLINE"
             verticalRulerPreferenceValue="false"/>
-      
+
       <specification
             annotationType="de.fu_berlin.inf.dpp.annotations.selection.default"
             colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.color.default"
@@ -532,10 +532,11 @@
             class="de.fu_berlin.inf.dpp.ui.commandHandlers.AddBuddyHandler"
             commandId="de.fu_berlin.inf.dpp.ui.commands.AddBuddy">
          <activeWhen>
-            <reference
-                  definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
-            </reference>
+                <reference definitionId="de.fu_berlin.inf.dpp.ui.definitions.isXMPPEnabled" />
          </activeWhen>
+         <enabledWhen>
+             <reference definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected" />
+         </enabledWhen>
       </handler>
       <handler
             class="de.fu_berlin.inf.dpp.ui.commandHandlers.OpenSarosPreferencesHandler"
@@ -543,7 +544,7 @@
       </handler>
    </extension>
    <extension
-         point="org.eclipse.ui.commands">      
+         point="org.eclipse.ui.commands">
       <command
             categoryId="org.eclipse.ui.category.project"
             id="de.fu_berlin.inf.dpp.ui.commands.ShareResource"
@@ -727,37 +728,25 @@
                   commandId="de.fu_berlin.inf.dpp.ui.commands.CreateXMPPAccount"
                   icon="icons/elcl16/xmpp_create_account_tsk.png"
                   style="push">
+                <visibleWhen>
+                    <reference definitionId="de.fu_berlin.inf.dpp.ui.definitions.isXMPPEnabled" />
+                </visibleWhen>
             </command>
             <command
                   commandId="de.fu_berlin.inf.dpp.ui.commands.AddXMPPAccount"
                   icon="icons/elcl16/xmpp_create_account_tsk.png"
                   style="push">
-            </command>
-            <command
-                  commandId="de.fu_berlin.inf.dpp.ui.commands.Empty"
-                  disabledIcon="icons/dlcl16/buddy_add_tsk.png"
-                  icon="icons/elcl16/buddy_add_tsk.png"
-                  label="%command.label"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <not>
-                     <reference
-                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
-                     </reference>
-                  </not>
-               </visibleWhen>
+                <visibleWhen>
+                    <reference definitionId="de.fu_berlin.inf.dpp.ui.definitions.isXMPPEnabled" />
+                </visibleWhen>
             </command>
             <command
                   commandId="de.fu_berlin.inf.dpp.ui.commands.AddBuddy"
                   disabledIcon="icons/dlcl16/buddy_add_tsk.png"
                   icon="icons/elcl16/buddy_add_tsk.png"
                   style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
-                  </reference>
+               <visibleWhen>
+                  <reference definitionId="de.fu_berlin.inf.dpp.ui.definitions.isXMPPEnabled" />
                </visibleWhen>
             </command>
             <separator
@@ -768,21 +757,6 @@
                   name="CollaborationStart"
                   visible="true">
             </separator>
-            <command
-                  commandId="de.fu_berlin.inf.dpp.ui.commands.Empty"
-                  disabledIcon="icons/dlcl16/project_share_tsk.png"
-                  icon="icons/elcl16/project_share_tsk.png"
-                  label="%command.label.0"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <not>
-                     <reference
-                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
-                     </reference>
-                  </not>
-               </visibleWhen>
-            </command>
             <command
                   commandId="de.fu_berlin.inf.dpp.ui.commands.ShareResource"
                   disabledIcon="icons/dlcl16/spacer.png"
@@ -992,58 +966,17 @@
                disabledIcon="icons/dlcl16/buddy_add_tsk.png"
                icon="icons/elcl16/buddy_add_tsk.png"
                style="push">
-            <visibleWhen
-                  checkEnabled="false">
+            <visibleWhen checkEnabled="false">
                <and>
-                  <reference
-                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
-                  </reference>
+                  <reference definitionId="de.fu_berlin.inf.dpp.ui.definitions.isXMPPEnabled" />
                   <not>
-                     <reference
-                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.buddiesSelected">
-                     </reference>
+                     <reference definitionId="de.fu_berlin.inf.dpp.ui.definitions.buddiesSelected" />
                   </not>
                   <not>
-                     <reference
-                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.participantsSelected">
-                     </reference>
+                     <reference definitionId="de.fu_berlin.inf.dpp.ui.definitions.participantsSelected" />
                   </not>
                   <not>
-                     <reference
-                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.sessionHeadlineSelected">
-                     </reference>
-                  </not>
-               </and>
-            </visibleWhen>
-         </command>
-         <command
-               commandId="de.fu_berlin.inf.dpp.ui.commands.Empty"
-               disabledIcon="icons/dlcl16/buddy_add_tsk.png"
-               icon="icons/elcl16/buddy_add_tsk.png"
-               label="%command.label.5"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <and>
-                  <not>
-                     <reference
-                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
-                     </reference>
-                  </not>
-                  <not>
-                     <reference
-                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.buddiesSelected">
-                     </reference>
-                  </not>
-                  <not>
-                     <reference
-                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.participantsSelected">
-                     </reference>
-                  </not>
-                  <not>
-                     <reference
-                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.sessionHeadlineSelected">
-                     </reference>
+                     <reference definitionId="de.fu_berlin.inf.dpp.ui.definitions.sessionHeadlineSelected" />
                   </not>
                </and>
             </visibleWhen>
@@ -1074,7 +1007,7 @@
       </menuContribution>
       <menuContribution
             allPopups="false"
-            locationURI="popup:org.eclipse.ui.popup.any?after=additions"> 
+            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
          <separator
                name="CollaborationStart"
                visible="true">
@@ -1175,7 +1108,7 @@
                   </and>
                </visibleWhen>
             </command>
-            
+
       </menuContribution>
       <menuContribution
             allPopups="false"
@@ -1280,6 +1213,11 @@
             <test
                   property="de.fu_berlin.inf.dpp.isConnected">
             </test>
+         </with>
+      </definition>
+      <definition id="de.fu_berlin.inf.dpp.ui.definitions.isXMPPEnabled">
+         <with variable="de.fu_berlin.inf.dpp.Saros">
+            <test property="de.fu_berlin.inf.dpp.isXMPPEnabled" />
          </with>
       </definition>
       <definition
@@ -1579,7 +1517,7 @@
             class="de.fu_berlin.inf.dpp.ui.expressions.SarosPropertyTester"
             id="de.fu_berlin.inf.dpp.propertyTesters.SarosPropertyTester"
             namespace="de.fu_berlin.inf.dpp"
-            properties="isConnected"
+            properties="isConnected,isXMPPEnabled"
             type="de.fu_berlin.inf.dpp.Saros">
       </propertyTester>
       <propertyTester
