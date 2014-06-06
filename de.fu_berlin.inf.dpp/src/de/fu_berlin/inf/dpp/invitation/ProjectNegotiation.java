@@ -127,8 +127,8 @@ public abstract class ProjectNegotiation extends CancelableProcess {
                 .getMessage()));
 
         try {
-            transmitter.send(ISarosSession.SESSION_CONNECTION_ID,
-                getPeer(), notification);
+            transmitter.send(ISarosSession.SESSION_CONNECTION_ID, getPeer(),
+                notification);
         } catch (IOException e) {
             transmitter.sendPacketExtension(getPeer(), notification);
         }
@@ -195,8 +195,8 @@ public abstract class ProjectNegotiation extends CancelableProcess {
      * @throws SarosCancellationException
      *             if the process was canceled
      */
-    protected final Packet collectPacket(PacketCollector collector,
-        long timeout) throws SarosCancellationException {
+    protected final Packet collectPacket(PacketCollector collector, long timeout)
+        throws SarosCancellationException {
 
         Packet packet = null;
 
@@ -211,5 +211,10 @@ public abstract class ProjectNegotiation extends CancelableProcess {
             timeout -= 1000;
         }
         return packet;
+    }
+
+    @Override
+    protected void notifyTerminated(ProcessListener listener) {
+        listener.processTerminated(this);
     }
 }

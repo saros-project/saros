@@ -147,8 +147,8 @@ public abstract class SessionNegotiation extends CancelableProcess {
      * @throws SarosCancellationException
      *             if the process was canceled
      */
-    protected final Packet collectPacket(PacketCollector collector,
-        long timeout) throws SarosCancellationException {
+    protected final Packet collectPacket(PacketCollector collector, long timeout)
+        throws SarosCancellationException {
 
         Packet packet = null;
 
@@ -165,4 +165,8 @@ public abstract class SessionNegotiation extends CancelableProcess {
         return packet;
     }
 
+    @Override
+    protected void notifyTerminated(ProcessListener listener) {
+        listener.processTerminated(this);
+    }
 }

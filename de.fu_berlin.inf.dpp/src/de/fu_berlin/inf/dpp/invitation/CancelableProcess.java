@@ -301,14 +301,7 @@ abstract class CancelableProcess {
          */
 
         if (listener != null) {
-            /*
-             * FIXME NOT so nice hack, but otherwise this had to be done in the
-             * listener if we only use processTerminated(CancelableProcess)
-             */
-            if (this instanceof SessionNegotiation)
-                listener.processTerminated((SessionNegotiation) this);
-            else if (this instanceof ProjectNegotiation)
-                listener.processTerminated((ProjectNegotiation) this);
+            notifyTerminated(listener);
         }
 
         if (exitStatus != Status.OK) {
@@ -321,6 +314,16 @@ abstract class CancelableProcess {
         log.debug("process " + this + " exit status: " + exitStatus);
         return exitStatus;
     }
+
+    /**
+     * Informs the listener, that the process is terminated. Otherwise, the
+     * SessionManager would block the execution and wait until the process is
+     * terminated
+     * 
+     * @param listener
+     *            to notify
+     */
+    protected abstract void notifyTerminated(ProcessListener listener);
 
     /**
      * @return <code>true</code> if this was the first processed cancellation,
