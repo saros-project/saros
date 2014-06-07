@@ -18,8 +18,11 @@ public class ConnectionPoolTest {
 
     @Test
     public void testAddAndRemoveOnClosedPool() {
-        IByteStreamConnection connection = EasyMock
+
+        final IByteStreamConnection connection = EasyMock
             .createNiceMock(IByteStreamConnection.class);
+
+        EasyMock.replay(connection);
 
         assertSame("pool accepted connection when closed", connection,
             pool.add("foo", connection));
@@ -30,11 +33,13 @@ public class ConnectionPoolTest {
     @Test
     public void testAddAndRemoveOnOpenedPool() {
 
-        IByteStreamConnection connection0 = EasyMock
+        final IByteStreamConnection connection0 = EasyMock
             .createNiceMock(IByteStreamConnection.class);
 
-        IByteStreamConnection connection1 = EasyMock
+        final IByteStreamConnection connection1 = EasyMock
             .createNiceMock(IByteStreamConnection.class);
+
+        EasyMock.replay(connection0, connection1);
 
         pool.open();
 
@@ -50,12 +55,37 @@ public class ConnectionPoolTest {
     }
 
     @Test
-    public void testPoolClose() {
+    public void testGet() {
 
-        IByteStreamConnection connection0 = EasyMock
+        final IByteStreamConnection connection = EasyMock
             .createNiceMock(IByteStreamConnection.class);
 
-        IByteStreamConnection connection1 = EasyMock
+        EasyMock.replay(connection);
+
+        pool.open();
+
+        pool.add("foo", connection);
+        assertSame("pool does not contain the added connection", connection,
+            pool.get("foo"));
+
+        pool.remove("foo");
+        assertNull("pool does contain the removed connection", pool.get("foo"));
+
+        pool.add("foo", connection);
+        pool.close();
+
+        assertNull("pool does contain the added connection afer close",
+            pool.get("foo"));
+
+    }
+
+    @Test
+    public void testPoolClose() {
+
+        final IByteStreamConnection connection0 = EasyMock
+            .createNiceMock(IByteStreamConnection.class);
+
+        final IByteStreamConnection connection1 = EasyMock
             .createNiceMock(IByteStreamConnection.class);
 
         connection0.close();
@@ -73,9 +103,13 @@ public class ConnectionPoolTest {
 
         pool.close();
 
-        EasyMock.verify(connection0, connection1);
-
         assertNull("connection was not removed on close", pool.remove("foo0"));
         assertNull("connection was not removed on close", pool.remove("foo1"));
+
+        // close twice to ensure close is only called once
+        pool.close();
+
+        EasyMock.verify(connection0, connection1);
+
     }
 }

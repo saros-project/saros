@@ -58,7 +58,8 @@ final class ConnectionPool {
      * 
      * @param id
      *            id of the connection
-     * @return
+     * @return the connection associated with the id or <code>null</code> if no
+     *         such connection exists or the pool is closed
      */
     public synchronized IByteStreamConnection get(final String id) {
         return pool.get(id);
