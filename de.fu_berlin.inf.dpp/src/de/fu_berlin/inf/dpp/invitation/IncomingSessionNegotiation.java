@@ -160,12 +160,19 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
 
             initializeSession(actualSessionParameters, monitor);
 
-            startSession(monitor);
-
+            /*
+             * TODO This is very fragile and needs a better design. We must
+             * connect before we start our session otherwise a component that
+             * try to immediately send an activity or something over the wire
+             * will trigger the ClientSessionTimeoutHandler which will just
+             * terminate the session !
+             */
             monitor.setTaskName("Negotiating data connection...");
 
             connectionManager
                 .connect(ISarosSession.SESSION_CONNECTION_ID, peer);
+
+            startSession(monitor);
 
             sendInvitationCompleted(monitor);
 
