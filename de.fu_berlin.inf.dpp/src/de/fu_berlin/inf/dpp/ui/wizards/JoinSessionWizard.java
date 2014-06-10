@@ -31,10 +31,12 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
+import de.fu_berlin.inf.dpp.invitation.CancelListener;
 import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.invitation.SessionNegotiation;
+import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
@@ -56,42 +58,66 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
  */
 public class JoinSessionWizard extends Wizard {
 
-    private static final Logger log = Logger.getLogger(JoinSessionWizard.class);
+    private static final Logger LOG = Logger.getLogger(JoinSessionWizard.class);
 
-    private boolean accepted = false;
+    private boolean isNegotiationRunning = false;
 
-    private IncomingSessionNegotiation process;
+    private final IncomingSessionNegotiation isn;
 
     private ShowDescriptionPage descriptionPage;
 
-    private SessionNegotiation.Status invitationStatus;
+    private SessionNegotiation.Status status;
 
-    public JoinSessionWizard(IncomingSessionNegotiation process) {
-        this.process = process;
+    private final CancelListener cancelListener = new CancelListener() {
 
-        process.setInvitationUI(this);
+        @Override
+        public void canceled(final CancelLocation location, final String message) {
+            /*
+             * if location is local it will not matter because the wizard will
+             * is already disposed then
+             */
+            handleCanceledAsync(location, message);
+        }
+    };
+
+    public JoinSessionWizard(IncomingSessionNegotiation isn) {
+        this.isn = isn;
+
         setWindowTitle(Messages.JoinSessionWizard_title);
         setHelpAvailable(false);
         setNeedsProgressMonitor(true);
 
-        descriptionPage = new ShowDescriptionPage(process);
+        descriptionPage = new ShowDescriptionPage(isn);
         addPage(descriptionPage);
     }
 
     @Override
     public void createPageControls(Composite pageContainer) {
-        this.descriptionPage.createControl(pageContainer);
+        descriptionPage.createControl(pageContainer);
 
         if (getContainer() instanceof WizardDialogAccessable) {
             ((WizardDialogAccessable) getContainer()).setWizardButtonLabel(
                 IDialogConstants.FINISH_ID, Messages.JoinSessionWizard_accept);
+        }
+
+        isn.addCancelListener(cancelListener);
+
+        if (isn.isCanceled()) {
+            /*
+             * FIXME error message is only available after negotiation
+             * termination, but in most cases it should be null at this point
+             * anyway
+             */
+            handleCanceledAsync(
+                isn.isLocalCancellation() ? CancelLocation.LOCAL
+                    : CancelLocation.REMOTE, null);
         }
     }
 
     @Override
     public boolean performFinish() {
 
-        accepted = true;
+        isNegotiationRunning = true;
 
         try {
             getContainer().run(true, false, new IRunnableWithProgress() {
@@ -99,7 +125,8 @@ public class JoinSessionWizard extends Wizard {
                 public void run(IProgressMonitor monitor)
                     throws InvocationTargetException, InterruptedException {
                     try {
-                        invitationStatus = process.accept(monitor);
+                        status = isn.accept(ProgressMonitorAdapterFactory
+                            .convertTo(monitor));
                     } catch (Exception e) {
                         throw new InvocationTargetException(e);
                     }
@@ -111,25 +138,25 @@ public class JoinSessionWizard extends Wizard {
             if (cause == null)
                 cause = e;
 
-            asyncShowCancelMessage(process.getPeer(), e.getMessage(),
+            showCancelMessageAsync(isn.getPeer(), e.getMessage(),
                 CancelLocation.LOCAL);
 
             // give up, close the wizard as we cannot do anything here !
             return true;
         }
 
-        switch (invitationStatus) {
+        switch (status) {
         case OK:
             break;
         case CANCEL:
         case ERROR:
-            asyncShowCancelMessage(process.getPeer(),
-                process.getErrorMessage(), CancelLocation.LOCAL);
+            showCancelMessageAsync(isn.getPeer(), isn.getErrorMessage(),
+                CancelLocation.LOCAL);
             break;
         case REMOTE_CANCEL:
         case REMOTE_ERROR:
-            asyncShowCancelMessage(process.getPeer(),
-                process.getErrorMessage(), CancelLocation.REMOTE);
+            showCancelMessageAsync(isn.getPeer(), isn.getErrorMessage(),
+                CancelLocation.REMOTE);
             break;
 
         }
@@ -138,49 +165,34 @@ public class JoinSessionWizard extends Wizard {
 
     @Override
     public boolean performCancel() {
-        ThreadUtils.runSafeAsync("CancelJoinSessionWizard", log,
+        ThreadUtils.runSafeAsync("CancelJoinSessionWizard", LOG,
             new Runnable() {
                 @Override
                 public void run() {
-                    process.localCancel(null, CancelOption.NOTIFY_PEER);
+                    isn.localCancel(null, CancelOption.NOTIFY_PEER);
                 }
             });
         return true;
     }
 
-    /**
-     * Get rid of this method, use a listener !
-     */
-    public void cancelWizard(final JID jid, final String errorMsg,
-        final CancelLocation cancelLocation) {
+    @Override
+    public void dispose() {
+        isn.removeCancelListener(cancelListener);
+    }
 
-        SWTUtils.runSafeSWTAsync(log, new Runnable() {
+    private void handleCanceledAsync(final CancelLocation location,
+        final String message) {
+        SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
             @Override
             public void run() {
-
-                /*
-                 * do NOT CLOSE the wizard if it performs async operations
-                 * 
-                 * see performFinish() -> getContainer().run(boolean, boolean,
-                 * IRunnableWithProgress)
-                 */
-                if (accepted)
-                    return;
-
-                Shell shell = JoinSessionWizard.this.getShell();
-                if (shell == null || shell.isDisposed())
-                    return;
-
-                ((WizardDialog) JoinSessionWizard.this.getContainer()).close();
-
-                asyncShowCancelMessage(jid, errorMsg, cancelLocation);
+                cancelWizard(location, message);
             }
         });
     }
 
-    private void asyncShowCancelMessage(final JID jid, final String errorMsg,
+    private void showCancelMessageAsync(final JID jid, final String errorMsg,
         final CancelLocation cancelLocation) {
-        SWTUtils.runSafeSWTAsync(log, new Runnable() {
+        SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
             @Override
             public void run() {
                 showCancelMessage(jid, errorMsg, cancelLocation);
@@ -188,6 +200,30 @@ public class JoinSessionWizard extends Wizard {
         });
     }
 
+    // SWT
+    private void cancelWizard(final CancelLocation location,
+        final String message) {
+
+        /*
+         * do NOT CLOSE the wizard if it performs async operations
+         * 
+         * see performFinish() -> getContainer().run(boolean, boolean,
+         * IRunnableWithProgress)
+         */
+        if (isNegotiationRunning)
+            return;
+
+        final Shell shell = JoinSessionWizard.this.getShell();
+
+        if (shell == null || shell.isDisposed())
+            return;
+
+        ((WizardDialog) JoinSessionWizard.this.getContainer()).close();
+
+        showCancelMessageAsync(isn.getPeer(), message, location);
+    }
+
+    // SWT
     private void showCancelMessage(JID jid, String errorMsg,
         CancelLocation cancelLocation) {
 

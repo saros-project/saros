@@ -413,7 +413,7 @@ public class SarosSessionManager implements ISarosSessionManager {
                 process = new IncomingSessionNegotiation(this, from, version,
                     invitationID, description, sarosContext);
 
-                process.setProcessListener(processListener);
+                process.setNegotiationListener(processListener);
                 currentSessionNegotiations.addInvitationProcess(process);
 
             } finally {
@@ -458,7 +458,7 @@ public class SarosSessionManager implements ISarosSessionManager {
                 process = new IncomingProjectNegotiation(getSarosSession(),
                     from, processID, projectInfos, sarosContext);
 
-                process.setProcessListener(processListener);
+                process.setNegotiationListener(processListener);
                 currentProjectNegotiations.addProjectExchangeProcess(process);
 
             } finally {
@@ -507,7 +507,7 @@ public class SarosSessionManager implements ISarosSessionManager {
                 process = new OutgoingSessionNegotiation(toInvite, session,
                     description, sarosContext);
 
-                process.setProcessListener(processListener);
+                process.setNegotiationListener(processListener);
                 currentSessionNegotiations.addInvitationProcess(process);
 
             } finally {
@@ -614,7 +614,7 @@ public class SarosSessionManager implements ISarosSessionManager {
                     OutgoingProjectNegotiation process = new OutgoingProjectNegotiation(
                         user.getJID(), session, projectsToShare, sarosContext);
 
-                    process.setProcessListener(processListener);
+                    process.setNegotiationListener(processListener);
                     currentProjectNegotiations
                         .addProjectExchangeProcess(process);
                     negotiations.add(process);
@@ -666,7 +666,7 @@ public class SarosSessionManager implements ISarosSessionManager {
                 process = new OutgoingProjectNegotiation(user, session,
                     currentSharedProjects, sarosContext);
 
-                process.setProcessListener(processListener);
+                process.setNegotiationListener(processListener);
                 currentProjectNegotiations.addProjectExchangeProcess(process);
 
             } finally {

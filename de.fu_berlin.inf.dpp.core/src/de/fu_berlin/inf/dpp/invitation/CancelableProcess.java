@@ -1,12 +1,15 @@
 package de.fu_berlin.inf.dpp.invitation;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
+import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 
@@ -16,6 +19,7 @@ import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
  * @author srossbach
  */
 
+// TODO rename to CancelableNegotiation ... adapt Javadoc
 abstract class CancelableProcess {
 
     /**
@@ -42,18 +46,20 @@ abstract class CancelableProcess {
 
     private boolean processTerminated;
 
-    private ProcessListener listener;
+    private volatile ProcessListener listener;
 
     private Status exitStatus;
 
+    private final List<CancelListener> cancelListeners = new CopyOnWriteArrayList<CancelListener>();
+
     /**
      * Sets a {@linkplain ProcessListener process listener} for the current
-     * process.
+     * negotiation.
      * 
      * @param listener
      *            the listener that should be notified
      */
-    public synchronized final void setProcessListener(ProcessListener listener) {
+    public final void setNegotiationListener(final ProcessListener listener) {
         this.listener = listener;
     }
 
@@ -144,17 +150,20 @@ abstract class CancelableProcess {
      * @see #checkCancellation
      * @see #notifyCancellation
      */
-    public synchronized boolean localCancel(String errorMessage,
-        CancelOption cancelOption) {
-        if (!cancel(new LocalCancellationException(errorMessage, cancelOption)))
-            return false;
+    public boolean localCancel(String errorMessage, CancelOption cancelOption) {
+        synchronized (this) {
+            if (!cancel(new LocalCancellationException(errorMessage,
+                cancelOption)))
+                return false;
 
-        isLocalCancellation = true;
+            isLocalCancellation = true;
+        }
 
         log.debug("process " + this
             + " was cancelled by the local side, error: "
             + (errorMessage == null ? "none" : errorMessage));
 
+        notifyCancellationListeners(CancelLocation.LOCAL, errorMessage);
         return true;
     }
 
@@ -175,17 +184,42 @@ abstract class CancelableProcess {
      * @see #notifyCancellation
      */
 
-    public synchronized boolean remoteCancel(String errorMsg) {
-        if (!cancel(new RemoteCancellationException(errorMsg)))
-            return false;
+    public boolean remoteCancel(String errorMsg) {
+        synchronized (this) {
+            if (!cancel(new RemoteCancellationException(errorMsg)))
+                return false;
 
-        isRemoteCancellation = true;
+            isRemoteCancellation = true;
+        }
 
         log.debug("process " + this
             + " was cancelled by the remote side, error: "
             + (errorMsg == null ? "none" : errorMsg));
 
+        notifyCancellationListeners(CancelLocation.REMOTE, errorMessage);
+
         return true;
+    }
+
+    /**
+     * Adds the given listener for cancellation events to this negotiation.
+     * 
+     * @param listener
+     *            the listener to add
+     */
+
+    public final void addCancelListener(final CancelListener listener) {
+        cancelListeners.add(listener);
+    }
+
+    /**
+     * Removes the given listener for cancellation events from this negotiation.
+     * 
+     * @param listener
+     *            the listener to remove
+     */
+    public final void removeCancelListener(final CancelListener listener) {
+        cancelListeners.add(listener);
     }
 
     /**
@@ -194,7 +228,7 @@ abstract class CancelableProcess {
      * @return <code>true</code> this process should be canceled,
      *         <code>false</code> otherwise
      */
-    protected final synchronized boolean isCanceled() {
+    public final synchronized boolean isCanceled() {
         return isRemoteCancellation || isLocalCancellation;
     }
 
@@ -205,7 +239,7 @@ abstract class CancelableProcess {
      * @return <code>true</code> if cancellation is requested on the local side,
      *         <code>false</code> otherwise
      */
-    protected final synchronized boolean isLocalCancellation() {
+    public final synchronized boolean isLocalCancellation() {
         return !isRemoteCancellation
             && ((monitorToObserve != null && monitorToObserve.isCanceled()) || isLocalCancellation);
 
@@ -218,7 +252,7 @@ abstract class CancelableProcess {
      * @return <code>true</code> if cancellation is requested on the remote
      *         side, <code>false</code> otherwise
      */
-    protected final synchronized boolean isRemoteCancellation() {
+    public final synchronized boolean isRemoteCancellation() {
         return isRemoteCancellation;
     }
 
@@ -238,60 +272,68 @@ abstract class CancelableProcess {
      *            {@link #remoteCancel} calls.
      * @return the {@link Status} of the termination
      */
-    protected final synchronized Status terminateProcess(Exception exception) {
+    protected final Status terminateProcess(Exception exception) {
 
-        Status lastExitStatus = null;
+        final SarosCancellationException cause;
+        final Status status;
 
-        // allow multiple calls to log exceptions
-        if (processTerminated)
-            lastExitStatus = exitStatus;
+        synchronized (this) {
+            Status lastExitStatus = null;
 
-        exitStatus = Status.OK;
+            // allow multiple calls to log exceptions
+            if (processTerminated)
+                lastExitStatus = exitStatus;
 
-        if (exception == null)
-            exception = cancellationCause;
+            exitStatus = Status.OK;
 
-        String error = exception == null ? null : exception.getMessage();
+            if (exception == null)
+                exception = cancellationCause;
 
-        if (exception instanceof LocalCancellationException) {
-            localCancel(exception.getMessage(),
-                ((LocalCancellationException) exception).getCancelOption());
+            String error = exception == null ? null : exception.getMessage();
 
-            exitStatus = error == null ? Status.CANCEL : Status.ERROR;
-        } else if (exception instanceof RemoteCancellationException) {
-            remoteCancel(exception.getMessage());
-            exitStatus = error == null ? Status.REMOTE_CANCEL
-                : Status.REMOTE_ERROR;
+            if (exception instanceof LocalCancellationException) {
+                localCancel(exception.getMessage(),
+                    ((LocalCancellationException) exception).getCancelOption());
 
-        } else if (exception instanceof IOException) {
-            log.error(this + " I/O error occured", exception);
+                exitStatus = error == null ? Status.CANCEL : Status.ERROR;
+            } else if (exception instanceof RemoteCancellationException) {
+                remoteCancel(exception.getMessage());
+                exitStatus = error == null ? Status.REMOTE_CANCEL
+                    : Status.REMOTE_ERROR;
 
-            String errorMsg = "I/O failure";
+            } else if (exception instanceof IOException) {
+                log.error(this + " I/O error occured", exception);
 
-            if (exception.getMessage() != null)
-                errorMsg += ": " + exception.getMessage();
+                String errorMsg = "I/O failure";
 
-            localCancel(errorMsg, CancelOption.NOTIFY_PEER);
-            exitStatus = Status.ERROR;
-        } else if (exception != null) {
-            log.error(this + " unknown error", exception);
-            String errorMsg = "Unknown error: " + exception;
+                if (exception.getMessage() != null)
+                    errorMsg += ": " + exception.getMessage();
 
-            if (exception.getMessage() != null)
-                errorMsg = exception.getMessage();
+                localCancel(errorMsg, CancelOption.NOTIFY_PEER);
+                exitStatus = Status.ERROR;
+            } else if (exception != null) {
+                log.error(this + " unknown error", exception);
+                String errorMsg = "Unknown error: " + exception;
 
-            localCancel(errorMsg, CancelOption.NOTIFY_PEER);
-            exitStatus = Status.ERROR;
+                if (exception.getMessage() != null)
+                    errorMsg = exception.getMessage();
+
+                localCancel(errorMsg, CancelOption.NOTIFY_PEER);
+                exitStatus = Status.ERROR;
+            }
+
+            if (processTerminated) {
+                exitStatus = lastExitStatus;
+                return exitStatus;
+            }
+
+            if (exitStatus != Status.OK)
+                errorMessage = generateErrorMessage();
+
+            status = exitStatus;
+            cause = cancellationCause;
+            processTerminated = true;
         }
-
-        if (processTerminated) {
-            exitStatus = lastExitStatus;
-            return exitStatus;
-        }
-
-        processTerminated = true;
-
-        // TODO executeCancellation and listener callback outside of sync block
 
         /*
          * must notify the listener here or otherwise calling
@@ -300,18 +342,21 @@ abstract class CancelableProcess {
          * terminated (which would not be the case at this moment)
          */
 
-        if (listener != null) {
-            notifyTerminated(listener);
-        }
+        final ProcessListener currentListener = listener;
 
-        if (exitStatus != Status.OK) {
-            errorMessage = generateErrorMessage();
-            notifyCancellation(cancellationCause);
+        if (currentListener != null)
+            notifyTerminated(listener);
+
+        assert status != null;
+
+        if (status != Status.OK) {
+            assert cause != null;
+            notifyCancellation(cause);
             log.debug("executing cancellation for process " + this);
             executeCancellation();
         }
 
-        log.debug("process " + this + " exit status: " + exitStatus);
+        log.debug("process " + this + " exit status: " + status);
         return exitStatus;
     }
 
@@ -384,5 +429,11 @@ abstract class CancelableProcess {
         }
 
         return errorMessage;
+    }
+
+    private final void notifyCancellationListeners(
+        final CancelLocation location, final String message) {
+        for (final CancelListener listener : cancelListeners)
+            listener.canceled(location, message);
     }
 }
