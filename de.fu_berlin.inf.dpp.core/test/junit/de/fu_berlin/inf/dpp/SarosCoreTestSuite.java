@@ -24,7 +24,9 @@ de.fu_berlin.inf.dpp.net.TestSuite.class,
 
 de.fu_berlin.inf.dpp.net.internal.TestSuite.class,
 
-de.fu_berlin.inf.dpp.synchronize.TestSuite.class })
+de.fu_berlin.inf.dpp.synchronize.TestSuite.class,
+
+de.fu_berlin.inf.dpp.versioning.TestSuite.class })
 public class SarosCoreTestSuite {
     // the class remains completely empty,
     // being used only as a holder for the above annotations

@@ -142,7 +142,10 @@
 				<fileset dir="${workspaceDirectory}/de.fu_berlin.inf.dpp.core/lib">
 					<include name="*.jar" />
 				</fileset>
-				
+
+				<!-- as the class files from the junit core folder are not included include them -->
+				<dirset  dir="${workspaceDirectory}/de.fu_berlin.inf.dpp.core/bin_test" />
+
 				<fileset dir="${eclipse.dir}/plugins">
 					<include name="*.jar" />
 				</fileset>

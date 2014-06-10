@@ -23,10 +23,7 @@ package de.fu_berlin.inf.dpp.versioning;
 
 import static org.junit.Assert.assertEquals;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.Properties;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -114,7 +111,6 @@ public class VersionManagerTest {
         assertEquals(Compatibility.TOO_NEW, result.getCompatibility());
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testLocalVersionTooNewButCompatible() throws Exception {
 
@@ -123,15 +119,10 @@ public class VersionManagerTest {
 
         init(local, remote);
 
-        Field f = versionManagerLocal.getClass().getDeclaredField(
-            "compatibilityChart");
+        Properties chart = new Properties();
 
-        f.setAccessible(true);
-
-        Map<Version, List<Version>> chart = (Map<Version, List<Version>>) f
-            .get(versionManagerLocal);
-
-        chart.put(local, Arrays.asList(remote));
+        chart.put(local.toString(), remote.toString());
+        versionManagerLocal.setCompatibilityChart(chart);
 
         assertEquals(Compatibility.TOO_OLD,
             versionManagerRemote.determineCompatibility(remote, local));
@@ -152,7 +143,6 @@ public class VersionManagerTest {
 
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testLocalVersionTooOldButCompatible() throws Exception {
         Version local = Version.parseVersion("1999999.1.1.r1");
@@ -160,15 +150,10 @@ public class VersionManagerTest {
 
         init(local, remote);
 
-        Field f = versionManagerLocal.getClass().getDeclaredField(
-            "compatibilityChart");
+        Properties chart = new Properties();
 
-        f.setAccessible(true);
-
-        Map<Version, List<Version>> chart = (Map<Version, List<Version>>) f
-            .get(versionManagerRemote);
-
-        chart.put(remote, Arrays.asList(local));
+        chart.put(remote.toString(), local.toString());
+        versionManagerRemote.setCompatibilityChart(chart);
 
         assertEquals(Compatibility.TOO_OLD,
             versionManagerLocal.determineCompatibility(local, remote));

@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.versioning;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -10,7 +9,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.filter.AndFilter;
@@ -45,9 +43,7 @@ public class VersionManager {
 
     private static final Random ID_GENERATOR = new Random();
 
-    private static final Logger log = Logger.getLogger(VersionManager.class);
-
-    private static final String COMPATIBILITY_PROPERTY_FILE = "version.comp";
+    private static final Logger LOG = Logger.getLogger(VersionManager.class);
 
     /**
      * The compatibilityChart should contain for each version the list of all
@@ -56,7 +52,7 @@ public class VersionManager {
      * {@link Compatibility#OK} if and only if the version information are
      * {@link Version#equals(Object)} to each other.
      */
-    private final Map<Version, List<Version>> compatibilityChart = new HashMap<Version, List<Version>>();
+    private volatile Map<Version, List<Version>> compatibilityChart = new HashMap<Version, List<Version>>();
 
     private final Version version;
     private final ITransmitter transmitter;
@@ -70,13 +66,13 @@ public class VersionManager {
         @Override
         public void processPacket(Packet packet) {
 
-            log.debug("received version request from " + packet.getFrom());
+            LOG.debug("received version request from " + packet.getFrom());
 
             VersionExchangeExtension versionExchangeRequest = VersionExchangeExtension.PROVIDER
                 .getPayload(packet);
 
             if (versionExchangeRequest == null) {
-                log.warn("cannot reply to version request, packet is malformed");
+                LOG.warn("cannot reply to version request, packet is malformed");
                 return;
             }
 
@@ -92,7 +88,7 @@ public class VersionManager {
                     .get(VERSION_KEY);
 
                 if (remoteVersionString == null) {
-                    log.warn("remote version string not found in version exchange data");
+                    LOG.warn("remote version string not found in version exchange data");
                     break createResponseData;
                 }
 
@@ -100,7 +96,7 @@ public class VersionManager {
                     .parseVersion(remoteVersionString);
 
                 if (remoteVersion == Version.INVALID) {
-                    log.warn("remote version string is invalid: "
+                    LOG.warn("remote version string is invalid: "
                         + remoteVersionString);
                     break createResponseData;
                 }
@@ -122,11 +118,11 @@ public class VersionManager {
             try {
                 transmitter.sendPacket(reply);
             } catch (IOException e) {
-                log.error(
+                LOG.error(
                     "could not send version response to " + packet.getFrom(), e);
             }
 
-            log.debug("send version response to " + packet.getFrom());
+            LOG.debug("send version response to " + packet.getFrom());
 
         }
 
@@ -141,6 +137,8 @@ public class VersionManager {
             throw new IllegalArgumentException("version string is malformed: "
                 + version);
 
+        setCompatibilityChart(null);
+
         this.receiver = receiver;
         this.transmitter = transmitter;
 
@@ -153,8 +151,6 @@ public class VersionManager {
 
                 }
             }));
-
-        initializeCompatibilityChart();
     }
 
     /**
@@ -193,14 +189,14 @@ public class VersionManager {
                 .get(VERSION_KEY);
 
             if (remoteVersionString == null) {
-                log.warn("remote version string not found in version exchange data");
+                LOG.warn("remote version string not found in version exchange data");
                 break determineCompatibility;
             }
 
             remoteVersion = Version.parseVersion(remoteVersionString);
 
             if (remoteVersion == Version.INVALID) {
-                log.warn("remote version string is invalid: "
+                LOG.warn("remote version string is invalid: "
                     + remoteVersionString);
                 break determineCompatibility;
             }
@@ -209,7 +205,7 @@ public class VersionManager {
                 .get(COMPATIBILITY_KEY);
 
             if (compatibilityString == null) {
-                log.warn("remote compatibility string not found in version exchange data");
+                LOG.warn("remote compatibility string not found in version exchange data");
                 break determineCompatibility;
             }
 
@@ -217,7 +213,7 @@ public class VersionManager {
                 remoteCompatibility = Compatibility.fromCode(Integer
                     .valueOf(compatibilityString));
             } catch (NumberFormatException e) {
-                log.warn("remote compatibility string contains non numerical characters");
+                LOG.warn("remote compatibility string contains non numerical characters");
             }
 
             compatibility = determineCompatibility(version, remoteVersion);
@@ -230,6 +226,71 @@ public class VersionManager {
 
         return new VersionCompatibilityResult(compatibility, version,
             remoteVersion);
+    }
+
+    /**
+     * Sets an compatibility char that contains additional version information.
+     * The chart should be loaded from a property file which must use the
+     * following syntax:
+     * 
+     * <pre>
+     *     <tt>local_version = remote_version { & remote_version }</tt>
+     * </pre>
+     * 
+     * @param chart
+     *            the chart to set or <code>null</code> to reset the
+     *            compatibility chart
+     */
+    public void setCompatibilityChart(Properties chart) {
+
+        final Map<Version, List<Version>> compatibilityChart = new HashMap<Version, List<Version>>();
+
+        if (chart == null)
+            chart = new Properties(); // dummy
+
+        for (final Object versionKey : chart.keySet()) {
+            final Version version = Version.parseVersion(versionKey.toString());
+
+            if (version == Version.INVALID)
+                continue;
+
+            final List<Version> compatibleVersions = new ArrayList<Version>();
+
+            for (final String compatibleVersionString : chart.get(versionKey)
+                .toString().split("&")) {
+
+                final Version compatibleVersion = Version
+                    .parseVersion(compatibleVersionString.trim());
+
+                if (compatibleVersion != Version.INVALID)
+                    compatibleVersions.add(compatibleVersion);
+            }
+
+            if (!compatibleVersions.contains(version))
+                compatibleVersions.add(version);
+
+            compatibilityChart.put(version, compatibleVersions);
+        }
+
+        final Version currentVersion = version;
+
+        List<Version> currentCompatibleVersions = compatibilityChart
+            .get(currentVersion);
+
+        if (currentCompatibleVersions == null) {
+            currentCompatibleVersions = new ArrayList<Version>();
+            compatibilityChart.put(currentVersion, currentCompatibleVersions);
+        }
+
+        if (!currentCompatibleVersions.contains(currentVersion))
+            currentCompatibleVersions.add(currentVersion);
+
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("current version compability chart: "
+                + compatibilityChart);
+        }
+
+        this.compatibilityChart = compatibilityChart;
     }
 
     private VersionExchangeExtension queryRemoteVersionDetails(final JID rqJID,
@@ -249,9 +310,9 @@ public class VersionManager {
         request.setType(IQ.Type.GET);
         request.setTo(rqJID.toString());
 
-        PacketCollector collector = receiver
-            .createCollector(new AndFilter(VersionExchangeExtension.PROVIDER
-                .getIQFilter(), new PacketFilter() {
+        PacketCollector collector = receiver.createCollector(new AndFilter(
+            VersionExchangeExtension.PROVIDER.getIQFilter(),
+            new PacketFilter() {
                 @Override
                 public boolean accept(Packet packet) {
 
@@ -272,7 +333,7 @@ public class VersionManager {
             return VersionExchangeExtension.PROVIDER.getPayload(collector
                 .nextResult(timeout));
         } catch (IOException e) {
-            log.warn(e.getMessage(), e);
+            LOG.warn(e.getMessage(), e);
             return null;
         } finally {
             collector.cancel();
@@ -291,11 +352,12 @@ public class VersionManager {
         Compatibility compatibility = Compatibility.valueOf(localVersion
             .compareTo(remoteVersion));
 
-        // remote version is lower than our version
-        if (compatibility == Compatibility.TOO_NEW) {
+        final Map<Version, List<Version>> currentChart = compatibilityChart;
 
-            List<Version> compatibleVersions = compatibilityChart
-                .get(localVersion);
+        // remote version is lower than our version
+        if (compatibility == Compatibility.TOO_NEW && currentChart != null) {
+
+            List<Version> compatibleVersions = currentChart.get(localVersion);
 
             assert compatibleVersions != null;
 
@@ -304,74 +366,5 @@ public class VersionManager {
         }
 
         return compatibility;
-    }
-
-    private void initializeCompatibilityChart() {
-
-        Properties properties = loadCompatibilityProperties(COMPATIBILITY_PROPERTY_FILE);
-
-        for (Object versionKey : properties.keySet()) {
-            Version version = Version.parseVersion(versionKey.toString());
-
-            if (version == Version.INVALID)
-                continue;
-
-            List<Version> compatibleVersions = new ArrayList<Version>();
-
-            for (String compatibleVersionString : properties.get(versionKey)
-                .toString().split("&")) {
-
-                Version compatibleVersion = Version
-                    .parseVersion(compatibleVersionString.trim());
-
-                if (compatibleVersion != Version.INVALID)
-                    compatibleVersions.add(compatibleVersion);
-            }
-
-            if (!compatibleVersions.contains(version))
-                compatibleVersions.add(version);
-
-            compatibilityChart.put(version, compatibleVersions);
-        }
-
-        Version currentVersion = version;
-
-        List<Version> currentCompatibleVersions = compatibilityChart
-            .get(currentVersion);
-
-        if (currentCompatibleVersions == null) {
-            currentCompatibleVersions = new ArrayList<Version>();
-            compatibilityChart.put(currentVersion, currentCompatibleVersions);
-        }
-
-        if (!currentCompatibleVersions.contains(currentVersion))
-            currentCompatibleVersions.add(currentVersion);
-    }
-
-    private Properties loadCompatibilityProperties(String filename) {
-
-        InputStream in = VersionManager.class.getClassLoader()
-            .getResourceAsStream(filename);
-
-        Properties properties = new Properties();
-
-        if (in == null) {
-            log.warn("could not find compatibility property file: " + filename);
-
-            return properties;
-        }
-
-        try {
-            properties.load(in);
-        } catch (IOException e) {
-            log.warn("could not read compatibility property file: " + filename,
-                e);
-
-            properties.clear();
-        } finally {
-            IOUtils.closeQuietly(in);
-        }
-
-        return properties;
     }
 }

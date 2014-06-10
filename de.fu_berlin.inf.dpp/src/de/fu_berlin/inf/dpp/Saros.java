@@ -27,8 +27,10 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.List;
+import java.util.Properties;
 import java.util.Random;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.helpers.LogLog;
@@ -55,6 +57,7 @@ import de.fu_berlin.inf.dpp.stf.server.STFController;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.versioning.VersionManager;
 
 /**
  * The main plug-in of Saros.
@@ -120,6 +123,8 @@ public class Saros extends AbstractUIPlugin {
      */
     @Deprecated
     public final static String RESOURCE = "Saros"; //$NON-NLS-1$
+
+    private static final String VERSION_COMPATIBILITY_PROPERTY_FILE = "version.comp"; //$NON-NLS-1$
 
     private String sarosVersion;
 
@@ -260,6 +265,9 @@ public class Saros extends AbstractUIPlugin {
         connectionHandler = sarosContext.getComponent(ConnectionHandler.class);
         sessionManager = sarosContext.getComponent(ISarosSessionManager.class);
         preferenceUtils = sarosContext.getComponent(PreferenceUtils.class);
+
+        initVersionCompatibilityChart(VERSION_COMPATIBILITY_PROPERTY_FILE,
+            sarosContext.getComponent(VersionManager.class));
 
         // Make sure that all components in the container are
         // instantiated
@@ -536,5 +544,37 @@ public class Saros extends AbstractUIPlugin {
         } catch (IOException e) {
             log.error("Exception when trying to store secure preferences: " + e);
         }
+    }
+
+    private void initVersionCompatibilityChart(final String filename,
+        final VersionManager versionManager) {
+
+        if (versionManager == null) {
+            log.error("no version manager component available");
+            return;
+        }
+
+        final InputStream in = VersionManager.class.getClassLoader()
+            .getResourceAsStream(filename);
+
+        final Properties chart = new Properties();
+
+        if (in == null) {
+            log.warn("could not find compatibility property file: " + filename);
+            return;
+        }
+
+        try {
+            chart.load(in);
+        } catch (IOException e) {
+            log.warn("could not read compatibility property file: " + filename,
+                e);
+
+            return;
+        } finally {
+            IOUtils.closeQuietly(in);
+        }
+
+        versionManager.setCompatibilityChart(chart);
     }
 }
