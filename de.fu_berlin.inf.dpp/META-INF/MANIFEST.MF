@@ -78,6 +78,7 @@ Export-Package: de.fu_berlin.inf.dpp;
    de.fu_berlin.inf.dpp,
    org.eclipse.core.resources,
    de.fu_berlin.inf.dpp.net",
+ de.fu_berlin.inf.dpp.monitoring,
  de.fu_berlin.inf.dpp.project;
   uses:="de.fu_berlin.inf.dpp.activities,
    de.fu_berlin.inf.dpp,

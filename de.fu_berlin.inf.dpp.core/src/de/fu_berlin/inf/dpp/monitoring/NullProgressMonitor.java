@@ -28,4 +28,14 @@ public class NullProgressMonitor implements IProgressMonitor {
     public void beginTask(String string, int size) {
         // NOP
     }
+
+    @Override
+    public void done() {
+        // NOP
+    }
+
+    @Override
+    public void setTaskName(String name) {
+        // NOP
+    }
 }

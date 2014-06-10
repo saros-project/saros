@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.graphics.RGB;
 import org.picocontainer.annotations.Inject;
 
@@ -12,6 +11,8 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.invitation.hooks.ISessionNegotiationHook;
 import de.fu_berlin.inf.dpp.invitation.hooks.SessionNegotiationHookManager;
+import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
+import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
@@ -91,7 +92,7 @@ public class WhiteboardManager {
 
                 SXEOutgoingSynchronizationProcess inv = new SXEOutgoingSynchronizationProcess(
                     controller, sxeTransmitter, user.getJID().toString());
-                inv.start(monitor);
+                inv.start(ProgressMonitorAdapterFactory.convertBack(monitor));
             }
         }
 

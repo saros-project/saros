@@ -6,7 +6,15 @@ package de.fu_berlin.inf.dpp.monitoring;
  * their Eclipse counterpart.
  */
 public interface IProgressMonitor {
+
+    /** Constant indicating an unknown amount of work. */
+    public static final int UNKNOWN = -1;
+
+    public void done();
+
     public void subTask(String task);
+
+    public void setTaskName(String name);
 
     public void worked(int amount);
 

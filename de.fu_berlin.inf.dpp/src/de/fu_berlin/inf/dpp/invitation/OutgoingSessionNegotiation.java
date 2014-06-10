@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
 
@@ -21,7 +20,7 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.invitation.hooks.ISessionNegotiationHook;
-import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
+import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.discovery.DiscoveryManager;
@@ -127,7 +126,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
     public Status start(IProgressMonitor monitor) {
         log.debug(this + " : starting invitation");
 
-        observeMonitor(ProgressMonitorAdapterFactory.convertTo(monitor));
+        observeMonitor(monitor);
 
         monitor.beginTask("Inviting " + peerNickname + "...",
             IProgressMonitor.UNKNOWN);
