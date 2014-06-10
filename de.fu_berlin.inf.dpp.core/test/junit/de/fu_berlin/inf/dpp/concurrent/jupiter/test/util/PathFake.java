@@ -112,6 +112,10 @@ public class PathFake implements IPath {
         throw new UnsupportedOperationException();
     }
 
+    @Override public String getFileExtension() {
+       throw new UnsupportedOperationException();
+    }
+
     @Override
     public IPath makeAbsolute() {
         throw new UnsupportedOperationException();

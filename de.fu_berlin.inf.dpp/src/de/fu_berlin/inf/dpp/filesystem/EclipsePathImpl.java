@@ -129,4 +129,9 @@ public class EclipsePathImpl implements IPath {
         return delegate.toString();
     }
 
+    @Override
+    public String getFileExtension() {
+        return delegate.getFileExtension();
+    }
+
 }

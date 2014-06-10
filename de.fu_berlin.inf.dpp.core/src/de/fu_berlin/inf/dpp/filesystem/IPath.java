@@ -65,4 +65,6 @@ public interface IPath {
 
     public File toFile();
 
+    public String getFileExtension();
+
 }
