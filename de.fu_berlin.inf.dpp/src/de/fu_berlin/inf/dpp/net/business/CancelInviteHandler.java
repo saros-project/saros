@@ -12,7 +12,7 @@ import de.fu_berlin.inf.dpp.communication.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.invitation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
+import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
 
 @Component(module = "net")
 public class CancelInviteHandler {
@@ -20,7 +20,7 @@ public class CancelInviteHandler {
     private static final Logger log = Logger
         .getLogger(CancelInviteHandler.class.getName());
 
-    private InvitationProcessObservable invitationProcesses;
+    private SessionNegotiationObservable invitationProcesses;
 
     private PacketListener cancelInvitationExtensionListener = new PacketListener() {
 
@@ -35,7 +35,7 @@ public class CancelInviteHandler {
     };
 
     public CancelInviteHandler(IReceiver receiver,
-        InvitationProcessObservable invitationProcessObservable) {
+        SessionNegotiationObservable invitationProcessObservable) {
 
         this.invitationProcesses = invitationProcessObservable;
 
@@ -47,7 +47,7 @@ public class CancelInviteHandler {
         String errorMsg) {
 
         SessionNegotiation invitationProcess = invitationProcesses
-            .getInvitationProcess(sender, invitationID);
+            .get(sender, invitationID);
 
         if (invitationProcess == null) {
             log.warn("Inv[unkown user]: Received invitation cancel message for unknown invitation process. Ignoring...");

@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
+import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
@@ -107,7 +107,7 @@ public class SarosSessionManagerTest {
 
         manager = new SarosSessionManager(network,
             new SarosSessionObservable(), new SessionIDObservable(),
-            new InvitationProcessObservable(),
+            new SessionNegotiationObservable(),
             new ProjectNegotiationObservable(), preferences);
     }
 

@@ -42,7 +42,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.discovery.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.xmpp.roster.RosterTracker;
 import de.fu_berlin.inf.dpp.net.xmpp.subscription.SubscriptionHandler;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
-import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
+import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
@@ -117,7 +117,7 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
 
         // Observables
         Component.create(FileReplacementInProgressObservable.class),
-        Component.create(InvitationProcessObservable.class),
+        Component.create(SessionNegotiationObservable.class),
         Component.create(ProjectNegotiationObservable.class),
         Component.create(IsInconsistentObservable.class),
         Component.create(SessionIDObservable.class),

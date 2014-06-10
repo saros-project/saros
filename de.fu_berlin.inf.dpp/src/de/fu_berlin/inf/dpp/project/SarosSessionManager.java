@@ -54,7 +54,7 @@ import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
+import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
@@ -113,7 +113,7 @@ public class SarosSessionManager implements ISarosSessionManager {
     @Inject
     private ISarosContext sarosContext;
 
-    private final InvitationProcessObservable currentSessionNegotiations;
+    private final SessionNegotiationObservable currentSessionNegotiations;
 
     private final ProjectNegotiationObservable currentProjectNegotiations;
 
@@ -132,7 +132,7 @@ public class SarosSessionManager implements ISarosSessionManager {
     private final ProcessListener processListener = new ProcessListener() {
         @Override
         public void processTerminated(SessionNegotiation process) {
-            currentSessionNegotiations.removeInvitationProcess(process);
+            currentSessionNegotiations.remove(process);
         }
 
         @Override
@@ -155,7 +155,7 @@ public class SarosSessionManager implements ISarosSessionManager {
     public SarosSessionManager(XMPPConnectionService connectionService,
         SarosSessionObservable sarosSessionObservable,
         SessionIDObservable sessionID,
-        InvitationProcessObservable currentSessionNegotiations,
+        SessionNegotiationObservable currentSessionNegotiations,
         ProjectNegotiationObservable currentProjectNegotiations,
         PreferenceUtils preferenceUtils) {
         this.connectionService = connectionService;
@@ -414,7 +414,7 @@ public class SarosSessionManager implements ISarosSessionManager {
                     invitationID, description, sarosContext);
 
                 process.setNegotiationListener(processListener);
-                currentSessionNegotiations.addInvitationProcess(process);
+                currentSessionNegotiations.add(process);
 
             } finally {
                 startStopSessionLock.unlock();
@@ -501,14 +501,14 @@ public class SarosSessionManager implements ISarosSessionManager {
                 if (session.getResourceQualifiedJID(toInvite) != null)
                     return;
 
-                if (currentSessionNegotiations.isInSessionNegotiation(toInvite))
+                if (currentSessionNegotiations.exists(toInvite))
                     return;
 
                 process = new OutgoingSessionNegotiation(toInvite, session,
                     description, sarosContext);
 
                 process.setNegotiationListener(processListener);
-                currentSessionNegotiations.addInvitationProcess(process);
+                currentSessionNegotiations.add(process);
 
             } finally {
                 startStopSessionLock.unlock();
@@ -757,7 +757,7 @@ public class SarosSessionManager implements ISarosSessionManager {
     private boolean terminateNegotiationProcesses() {
 
         for (SessionNegotiation process : currentSessionNegotiations
-            .getProcesses()) {
+            .list()) {
             process.localCancel(null, CancelOption.NOTIFY_PEER);
         }
 
@@ -772,7 +772,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         boolean terminated = false;
 
         while (System.currentTimeMillis() - startTime < NEGOTIATION_PROCESS_TIMEOUT) {
-            if (currentSessionNegotiations.getProcesses().isEmpty()
+            if (currentSessionNegotiations.list().isEmpty()
                 && currentProjectNegotiations.getProcesses().isEmpty()) {
                 terminated = true;
                 break;

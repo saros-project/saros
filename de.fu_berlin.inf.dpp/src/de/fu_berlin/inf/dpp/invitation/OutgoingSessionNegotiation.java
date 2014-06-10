@@ -24,7 +24,7 @@ import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.discovery.DiscoveryManager;
-import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
+import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ColorNegotiationHook;
 import de.fu_berlin.inf.dpp.project.internal.NicknameNegotiationHook;
@@ -67,7 +67,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
     private ISarosSessionManager sessionManager;
 
     @Inject
-    private InvitationProcessObservable currentSessionNegotiations;
+    private SessionNegotiationObservable currentSessionNegotiations;
 
     // HACK last residue of the direct connection between SessionNegotation and
     // the color property of users.
@@ -95,7 +95,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
     protected void executeCancellation() {
         // TODO remove the user from the session !
 
-        if (currentSessionNegotiations.getProcesses().size() == 0
+        if (currentSessionNegotiations.list().size() == 0
             && sarosSession.getRemoteUsers().isEmpty())
             sarosSessionManager.stopSarosSession();
     }
