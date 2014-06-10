@@ -8,7 +8,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
@@ -17,10 +19,9 @@ import java.util.zip.ZipOutputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
+import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.OperationCanceledException;
 
 /**
@@ -40,19 +41,17 @@ public class FileZipper {
      */
     private static final int BUFFER_SIZE = 32 * 1024;
 
-    // this method does not create a Zip file !
-
     /**
-     * Creates a Zip archive of all files referenced by their paths. The paths
-     * must be relative to the project the files belong to. All directories that
-     * are included in the path of a file will be stored too. The archive will
-     * automatically be deleted if the operation fails or is canceled.
+     * Creates a Zip archive of all files referenced by their paths. All
+     * directories that are included in the path of a file will be stored too
+     * unless an alias list is provided. The archive will automatically be
+     * deleted if the operation fails or is canceled.
      * 
-     * @param project
-     *            an Eclipse project
-     * @param paths
-     *            the paths of the files relative to the project that should be
-     *            compressed and archived
+     * @param files
+     *            list of files to compress
+     * @param alias
+     *            list of alias names/paths for each file entry in the Zip file
+     *            or <code>null</code> to use the original names/paths
      * @param archive
      *            the archive file that will contain the compressed content, if
      *            the archive file already exists it will be overwritten
@@ -69,25 +68,34 @@ public class FileZipper {
      *             {@link ZipListener}
      * 
      */
-    public static void createProjectZipArchive(IProject project,
-        List<String> paths, File archive, ZipListener listener)
+    public static void createProjectZipArchive(List<IFile> files,
+        List<String> alias, File archive, ZipListener listener)
         throws IOException, OperationCanceledException {
+
+        assert files.size() == alias.size();
 
         long totalFileSizes = 0;
 
-        List<FileWrapper> filesToZip = new ArrayList<FileWrapper>(paths.size());
+        List<FileWrapper> filesToZip = new ArrayList<FileWrapper>(files.size());
 
-        for (String path : paths) {
-            IFile file = project.getFile(path);
-            IPath fileSystemPath = file.getLocation();
-            if (fileSystemPath != null)
-                totalFileSizes += fileSystemPath.toFile().length();
-
+        for (IFile file : files) {
             filesToZip.add(new EclipseFileWrapper(file));
+
+            URI uri = file.getLocationURI();
+
+            if (uri == null)
+                continue;
+
+            try {
+                totalFileSizes += EFS.getStore(uri).fetchInfo().getLength();
+            } catch (CoreException e) {
+                log.warn("unable to retrieve file size for file: " + file, e);
+                continue;
+            }
         }
 
-        internalZipFiles(filesToZip, archive, true, true, totalFileSizes,
-            listener);
+        internalZipFiles(filesToZip, alias, archive, true, true,
+            totalFileSizes, listener);
     }
 
     /**
@@ -126,12 +134,14 @@ public class FileZipper {
                 filesToZip.add(new JavaFileWrapper(file));
             }
 
-        internalZipFiles(filesToZip, archive, compress, false, -1L, listener);
+        internalZipFiles(filesToZip, null, archive, compress, false, -1L,
+            listener);
     }
 
-    private static void internalZipFiles(List<FileWrapper> files, File archive,
-        boolean compress, boolean includeDirectories, long totalSize,
-        ZipListener listener) throws IOException, OperationCanceledException {
+    private static void internalZipFiles(List<FileWrapper> files,
+        List<String> alias, File archive, boolean compress,
+        boolean includeDirectories, long totalSize, ZipListener listener)
+        throws IOException, OperationCanceledException {
 
         byte[] buffer = new byte[BUFFER_SIZE];
 
@@ -151,10 +161,23 @@ public class FileZipper {
 
         long totalRead = 0L;
 
+        final Iterator<FileWrapper> fileIt = files.iterator();
+        final Iterator<String> aliasIt = alias == null ? null : alias
+            .iterator();
+
         try {
-            for (FileWrapper file : files) {
-                String entryName = includeDirectories ? file.getPath() : file
-                    .getName();
+            while (fileIt.hasNext()) {
+
+                FileWrapper file = fileIt.next();
+
+                String entryName = null;
+
+                if (aliasIt != null && aliasIt.hasNext())
+                    entryName = aliasIt.next();
+
+                if (entryName == null)
+                    entryName = includeDirectories ? file.getPath() : file
+                        .getName();
 
                 if (listener != null)
                     isCanceled = listener.update(file.getPath());
@@ -168,7 +191,7 @@ public class FileZipper {
                 try {
                     int read = 0;
                     in = file.getInputStream();
-                    while (-1 != (read = in.read(buffer))) {
+                    while ((read = in.read(buffer)) > 0) {
 
                         if (isCanceled)
                             throw new OperationCanceledException(
@@ -188,6 +211,8 @@ public class FileZipper {
                 }
                 zipStream.closeEntry();
             }
+
+            zipStream.finish();
             cleanup = false;
         } finally {
             IOUtils.closeQuietly(zipStream);
@@ -200,7 +225,7 @@ public class FileZipper {
 
         log.debug(String.format("created archive %s I/O: [%s]",
             archive.getAbsolutePath(),
-            Utils.throughput(archive.length(), stopWatch.getTime())));
+            CoreUtils.throughput(archive.length(), stopWatch.getTime())));
 
     }
 
@@ -270,7 +295,7 @@ public class FileZipper {
 
         @Override
         public String getPath() {
-            return file.getProjectRelativePath().toPortableString();
+            return file.getProjectRelativePath().toString();
         }
     }
 }

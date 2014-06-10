@@ -5,13 +5,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.CancellationException;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
@@ -81,9 +81,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     public Status start(IProgressMonitor monitor) {
 
         createCollectors();
-        File zipArchive = null;
 
-        List<File> zipArchives = new ArrayList<File>();
+        File zipArchive = null;
 
         observeMonitor(ProgressMonitorAdapterFactory.convertTo(monitor));
 
@@ -133,7 +132,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                  */
                 sarosSession.userStartedQueuing(user);
 
-                zipArchives = createProjectArchives(fileLists, monitor);
+                zipArchive = createProjectArchive(fileLists, monitor);
                 monitor.subTask("");
             } finally {
                 if (stoppedUsers != null)
@@ -142,26 +141,9 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
             checkCancellation(CancelOption.NOTIFY_PEER);
 
-            if (zipArchives.size() > 0) {
-
-                // pack all archive files into one big archive
-                zipArchive = File.createTempFile("SarosSyncArchive", ".zip");
-                try {
-                    FileZipper.zipFiles(zipArchives, zipArchive, false,
-                        new ZipProgressMonitor(monitor, zipArchives.size(),
-                            false));
-
-                    monitor.subTask("");
-                    monitor.done();
-
-                } catch (OperationCanceledException e) {
-                    throw new LocalCancellationException();
-                }
-                zipArchives.add(zipArchive);
-
+            if (zipArchive != null)
                 sendArchive(zipArchive, peer, ARCHIVE_TRANSFER_ID + processID,
                     monitor);
-            }
 
             User user = sarosSession.getUser(peer);
 
@@ -175,11 +157,9 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             exception = e;
         } finally {
 
-            for (File archive : zipArchives) {
-                if (!archive.delete())
-                    log.warn("could not archive file: "
-                        + archive.getAbsolutePath());
-            }
+            if (zipArchive != null && !zipArchive.delete())
+                log.warn("could not delete archive file: "
+                    + zipArchive.getAbsolutePath());
             deleteCollectors();
             monitor.done();
         }
@@ -329,16 +309,25 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     /**
      * @param fileLists
      *            a list of file lists containing the files to archive
-     * @return List of project archives
+     * @return zip file containing all files denoted by the file lists or
+     *         <code>null</code> if the file lists do not contain any files
      */
-    private List<File> createProjectArchives(List<FileList> fileLists,
-        IProgressMonitor monitor) throws IOException,
+
+    private File createProjectArchive(final List<FileList> fileLists,
+        final IProgressMonitor monitor) throws IOException,
         SarosCancellationException {
 
-        log.debug(this + " : creating archive(s)");
+        boolean skip = true;
 
-        SubMonitor subMonitor = SubMonitor.convert(monitor,
-            "Creating project archives...", fileLists.size());
+        int fileCount = 0;
+
+        for (final FileList list : fileLists) {
+            skip &= list.getPaths().isEmpty();
+            fileCount += list.getPaths().size();
+        }
+
+        if (skip)
+            return null;
 
         /*
          * Use editorManager.saveText() because the EditorAPI.saveProject() will
@@ -356,50 +345,59 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
         checkCancellation(CancelOption.NOTIFY_PEER);
 
-        List<File> archivesToSend = new LinkedList<File>();
+        final List<IFile> filesToCompress = new ArrayList<IFile>(fileCount);
+        final List<String> fileAlias = new ArrayList<String>(fileCount);
 
-        for (FileList fileList : fileLists) {
+        for (final FileList list : fileLists) {
+            final String projectID = list.getProjectID();
 
-            File projectArchive = createProjectArchive(subMonitor.newChild(1),
-                fileList.getPaths(), fileList.getProjectID());
+            final IProject project = sarosSession.getProject(projectID);
 
-            if (projectArchive != null)
-                archivesToSend.add(projectArchive);
+            if (project == null)
+                throw new LocalCancellationException("project with id "
+                    + projectID + " was unshared during synchronization",
+                    CancelOption.NOTIFY_PEER);
 
+            final org.eclipse.core.resources.IProject delegate = ((EclipseProjectImpl) project)
+                .getDelegate();
+
+            /*
+             * TODO: Ask the user whether to save the resources, but only if
+             * they have changed. How to ask Eclipse whether there are resource
+             * changes? if (outInvitationUI.confirmProjectSave(peer))
+             * getOpenEditors => filter per Project => if dirty ask to save
+             */
+            EditorAPI.saveProject(delegate, false);
+
+            final StringBuilder aliasBuilder = new StringBuilder();
+
+            aliasBuilder.append(projectID).append(PATH_DELIMITER);
+
+            final int prefixLength = aliasBuilder.length();
+
+            for (final String path : list.getPaths()) {
+
+                // assert path is relative !
+                filesToCompress.add(delegate.getFile(path));
+                aliasBuilder.append(path);
+                fileAlias.add(aliasBuilder.toString());
+                aliasBuilder.setLength(prefixLength);
+            }
         }
 
-        subMonitor.done();
+        log.debug(this + " : creating archive");
 
-        return archivesToSend;
-    }
-
-    private File createProjectArchive(IProgressMonitor monitor,
-        List<String> toSend, String projectID) throws IOException,
-        SarosCancellationException {
-
-        IProject project = sarosSession.getProject(projectID);
-        /*
-         * TODO: Ask the user whether to save the resources, but only if they
-         * have changed. How to ask Eclipse whether there are resource changes?
-         * if (outInvitationUI.confirmProjectSave(peer)) getOpenEditors =>
-         * filter per Project => if dirty ask to save
-         */
-        EditorAPI.saveProject(((EclipseProjectImpl) project).getDelegate(),
-            false);
-
-        String prefix = projectID + PROJECT_ID_DELIMITER;
+        final SubMonitor subMonitor = SubMonitor.convert(monitor,
+            "Creating project archive...", 1);
 
         File tempArchive = null;
 
         try {
-            if (toSend.size() > 0) {
-                tempArchive = File.createTempFile(prefix, ".zip");
+            tempArchive = File.createTempFile("SarosSyncArchive", ".zip");
 
-                FileZipper.createProjectZipArchive(
-                    ((EclipseProjectImpl) project).getDelegate(), toSend,
-                    tempArchive, new ZipProgressMonitor(monitor, toSend.size(),
-                        true));
-            }
+            FileZipper.createProjectZipArchive(filesToCompress, fileAlias,
+                tempArchive, new ZipProgressMonitor(subMonitor, -1, true));
+
         } catch (OperationCanceledException e) {
             throw new LocalCancellationException();
         }

@@ -1,21 +1,14 @@
 package de.fu_berlin.inf.dpp.invitation;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FilterInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
@@ -29,7 +22,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smackx.filetransfer.FileTransferListener;
@@ -236,7 +228,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
             // Host/Inviter decided to transmit files with one big archive
             if (filesMissing)
-                acceptArchive(archiveTransferListener, localProjects.size(),
+                acceptArchive(archiveTransferListener,
                     this.monitor.newChild(80));
 
             // We are finished with the exchanging process. Add all projects
@@ -306,15 +298,10 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     }
 
     /**
-     * The archive with all missing files sorted by project will be received and
-     * unpacked project by project.
-     * 
-     * @param projectCount
-     *            how many projects will be in the big archive
+     * Accepts the archive with all missing files and decompress it.
      */
     private void acceptArchive(ArchiveTransferListener archiveTransferListener,
-        int projectCount, SubMonitor monitor) throws IOException,
-        SarosCancellationException {
+        SubMonitor monitor) throws IOException, SarosCancellationException {
 
         // waiting for the big archive to come in
 
@@ -328,64 +315,13 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
          * the remote side, because his negotiation is already finished !
          */
 
-        ZipInputStream zipInputStream = null;
-        ZipEntry zipEntry;
-
-        SubMonitor zipStreamLoopMonitor = monitor.newChild(50,
-            SubMonitor.SUPPRESS_NONE);
-
-        zipStreamLoopMonitor.beginTask(null, 100);
-
         try {
-
-            zipInputStream = new ZipInputStream(new BufferedInputStream(
-                new FileInputStream(archiveFile)));
-
-            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
-                // Every zipEntry is (again) a ZipArchive, which contains all
-                // missing files for one project.
-                SubMonitor currentArchiveMonitor = zipStreamLoopMonitor
-                    .newChild(100 / projectCount, SubMonitor.SUPPRESS_NONE);
-
-                /*
-                 * For every entry (which is a zipArchive for a single project)
-                 * we have to find out which project it is meant for. So we need
-                 * the projectID.
-                 * 
-                 * The archive name contains the projectID.
-                 * 
-                 * archiveName = projectID + PROJECT_ID_DELIMITER + randomNumber
-                 * + '.zip'
-                 */
-                String projectID = zipEntry.getName().substring(0,
-                    zipEntry.getName().indexOf(PROJECT_ID_DELIMITER));
-
-                IProject project = localProjects.get(projectID);
-
-                /*
-                 * see FileUtils.writeArchive ... do not wrap the zip input
-                 * stream here
-                 */
-                writeArchive(new FilterInputStream(zipInputStream) {
-                    @Override
-                    public void close() throws IOException {
-                        // prevent the ZipInputStream from being closed
-                    }
-                }, project, currentArchiveMonitor);
-
-                zipInputStream.closeEntry();
-                currentArchiveMonitor.done();
-            }
-        } catch (OperationCanceledException e) {
-            throw new LocalCancellationException(null,
-                CancelOption.DO_NOT_NOTIFY_PEER);
+            unpackArchive(archiveFile,
+                monitor.newChild(50, SubMonitor.SUPPRESS_NONE));
+            monitor.done();
         } finally {
-            IOUtils.closeQuietly(zipInputStream);
-
             if (archiveFile != null)
                 archiveFile.delete();
-
-            monitor.done();
         }
     }
 
@@ -740,21 +676,17 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         }
     }
 
-    /**
-     * Have a look at the description of {@link WorkspaceModifyOperation}!
-     * 
-     * @see WorkspaceModifyOperation
-     */
-    private void writeArchive(final InputStream archiveStream,
-        final IProject project, final IProgressMonitor monitor)
-        throws LocalCancellationException, IOException {
+    private void unpackArchive(final File archiveFile,
+        final IProgressMonitor monitor) throws LocalCancellationException,
+        IOException {
 
-        final DecompressTask decompressTask = new DecompressTask(
-            new ZipInputStream(archiveStream), project, monitor);
+        final DecompressArchiveTask decompressTask = new DecompressArchiveTask(
+            archiveFile, localProjects, PATH_DELIMITER, monitor);
 
         long startTime = System.currentTimeMillis();
 
-        LOG.debug(this + " : Writing archive to disk...");
+        LOG.debug(this + " : unpacking archive file...");
+
         /*
          * TODO: calculate the ADLER32 checksums during decompression and add
          * them into the ChecksumCache. The insertion must be done after the
@@ -772,7 +704,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             throw new IOException(e.getMessage(), e.getCause());
         }
 
-        LOG.debug(String.format("Unpacked archive in %d s",
+        LOG.debug(String.format("unpacked archive in %d s",
             (System.currentTimeMillis() - startTime) / 1000));
 
         // TODO: now add the checksums into the cache

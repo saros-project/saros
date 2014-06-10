@@ -40,15 +40,12 @@ public abstract class ProjectNegotiation extends CancelableProcess {
     public static final String ARCHIVE_TRANSFER_ID = "saros-dpp-pn-server-client-archive/";
 
     /**
-     * While sending all the projects with a big archive containing the project
-     * archives, we create a temp-File. This file is named "projectID" +
-     * PROJECT_ID_DELIMITER + "a random number chosen by 'Java'" + ".zip" This
-     * delimiter is the string that separates projectID and this random number.
-     * Now we can assign the zip archive to the matching project.
-     * 
-     * WARNING: If changed compatibility is broken
+     * Delimiter for every Zip entry to delimit the project id from the path
+     * entry.
+     * <p>
+     * E.g: <b>12345:foo/bar/foobar.java</b>
      */
-    protected static final String PROJECT_ID_DELIMITER = "&&&&";
+    protected static final String PATH_DELIMITER = ":";
 
     /**
      * Timeout for all packet exchanges during the project negotiation
