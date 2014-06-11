@@ -22,12 +22,6 @@ import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 // TODO rename to CancelableNegotiation ... adapt Javadoc
 abstract class CancelableProcess {
 
-    /**
-     * Lock object that can be used by multiple instances that inherits from
-     * {@link CancelableProcess}.
-     */
-    protected final static Object SHARED_LOCK = new Object();
-
     public enum Status {
         OK, CANCEL, REMOTE_CANCEL, ERROR, REMOTE_ERROR
     }

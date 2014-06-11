@@ -259,16 +259,16 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         Collection<User> usersToStop;
 
         /*
-         * Make sure that all users are fully registered, otherwise failures
-         * might occur while a user is currently joining and has not fully
-         * initialized yet.
+         * TODO: Make sure that all users are fully registered when stopping
+         * them, otherwise failures might occur while a user is currently
+         * joining and has not fully initialized yet.
          * 
          * See also OutgoingSessionNegotiation#completeInvitation
+         * 
+         * srossbach: This may already be the case ... just review this
          */
 
-        synchronized (CancelableProcess.SHARED_LOCK) {
-            usersToStop = new ArrayList<User>(sarosSession.getUsers());
-        }
+        usersToStop = new ArrayList<User>(sarosSession.getUsers());
 
         log.debug(this + " : stopping users " + usersToStop);
 
@@ -277,15 +277,15 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         monitor.beginTask("Locking the session...", IProgressMonitor.UNKNOWN);
 
         /*
-         * FIMXE the StopManager should use a timeout as it can happen that a
+         * FIXME the StopManager should use a timeout as it can happen that a
          * user leaves the session during the stop request. Currently it is up
          * to the user to press the cancel button because the StopManager did
          * not check if the user already left the session.
          * 
-         * Stefan Rossbach: The StopManager should not check for the absence of
-         * a user and so either retry again or just stop the sharing (which
-         * currently would lead to a broken session because we have no proper
-         * cancellation logic !
+         * srossbach: The StopManager should not check for the absence of a user
+         * and so either retry again or just stop the sharing (which currently
+         * would lead to a broken session because we have no proper cancellation
+         * logic !
          */
         try {
             startHandles = sarosSession.getStopManager().stop(usersToStop,

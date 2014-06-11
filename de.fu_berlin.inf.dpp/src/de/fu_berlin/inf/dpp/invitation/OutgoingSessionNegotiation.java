@@ -461,6 +461,8 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
         log.debug(this + " : remote side started its Saros session");
     }
 
+    private static final Object REMOVE_ME_IF_SESSION_ADD_USER_IS_THREAD_SAFE = new Object();
+
     /**
      * 
      * Adds the invited user to the current SarosSession. After the user is
@@ -480,7 +482,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
         User user = new User(peer, clientNickname, false, false, clientColorID,
             clientFavoriteColorID);
 
-        synchronized (CancelableProcess.SHARED_LOCK) {
+        synchronized (REMOVE_ME_IF_SESSION_ADD_USER_IS_THREAD_SAFE) {
 
             sarosSession.addUser(user);
             log.debug(this + " : added " + peer
