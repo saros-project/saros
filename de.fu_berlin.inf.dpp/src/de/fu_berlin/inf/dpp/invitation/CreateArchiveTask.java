@@ -1,11 +1,10 @@
-package de.fu_berlin.inf.dpp.util;
+package de.fu_berlin.inf.dpp.invitation;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
@@ -17,54 +16,44 @@ import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Status;
 
-// TODO move to negotiation package, no longer an util class
-public class FileZipper {
+import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.util.CoreUtils;
 
-    private static final Logger LOG = Logger.getLogger(FileZipper.class);
+// TODO java doc
+public class CreateArchiveTask implements IWorkspaceRunnable {
 
-    /*
-     * Setting this value to high will result in cache misses either by the OS
-     * or HDD / SDD controller and slow down performance !
-     */
     private static final int BUFFER_SIZE = 32 * 1024;
 
-    /**
-     * Creates a Zip archive of all files referenced by their paths. All
-     * directories that are included in the path of a file will be stored too
-     * unless an alias list is provided. The archive will automatically be
-     * deleted if the operation fails or is canceled.
-     * 
-     * @param files
-     *            list of files to compress
-     * @param alias
-     *            list of alias names/paths for each file entry in the Zip file
-     *            or <code>null</code> to use the original names/paths
-     * @param archive
-     *            the archive file that will contain the compressed content, if
-     *            the archive file already exists it will be overwritten
-     * @param listener
-     *            a {@link ZipListener} which will receive status updates or
-     *            <code>null</code>
-     * 
-     * @cancelable This operation can be canceled via the given listener.
-     * 
-     * @throws IOException
-     *             if an I/O error occurred while creating the archive
-     * @throws OperationCanceledException
-     *             if the user canceled the operation, see also
-     *             {@link ZipListener}
-     * 
-     */
-    public static void createProjectZipArchive(List<IFile> files,
-        List<String> alias, File archive, ZipListener listener)
-        throws IOException, OperationCanceledException {
+    private static final Logger LOG = Logger.getLogger(CreateArchiveTask.class);
+
+    private final File archive;
+    private final List<IFile> files;
+    private final List<String> alias;
+    private final IProgressMonitor monitor;
+
+    public CreateArchiveTask(final File archive, final List<IFile> files,
+        final List<String> alias, final IProgressMonitor monitor) {
+        this.archive = archive;
+        this.files = files;
+        this.alias = alias;
+        this.monitor = monitor;
+    }
+
+    @Override
+    public void run(IProgressMonitor monitor) throws CoreException {
+        if (this.monitor != null)
+            monitor = this.monitor;
 
         assert files.size() == alias.size();
 
-        long totalSize = 0;
+        long totalSize = 0L;
 
         for (IFile file : files) {
 
@@ -81,26 +70,27 @@ public class FileZipper {
             }
         }
 
-        byte[] buffer = new byte[BUFFER_SIZE];
-
-        OutputStream outputStream = new BufferedOutputStream(
-            new FileOutputStream(archive), BUFFER_SIZE);
-
-        ZipOutputStream zipStream = new ZipOutputStream(outputStream);
-
-        boolean cleanup = true;
-        boolean isCanceled = false;
-
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-
-        long totalRead = 0L;
 
         final Iterator<IFile> fileIt = files.iterator();
         final Iterator<String> aliasIt = alias == null ? null : alias
             .iterator();
 
+        long totalRead = 0L;
+
+        boolean cleanup = true;
+
+        byte[] buffer = new byte[BUFFER_SIZE];
+
+        ZipOutputStream zipStream = null;
+
+        monitor.beginTask("Compressing files...", 100 /* percent */);
+
         try {
+            zipStream = new ZipOutputStream(new BufferedOutputStream(
+                new FileOutputStream(archive), BUFFER_SIZE));
+
             while (fileIt.hasNext()) {
 
                 IFile file = fileIt.next();
@@ -115,10 +105,10 @@ public class FileZipper {
                 if (entryName == null)
                     entryName = originalEntryName;
 
-                if (listener != null)
-                    isCanceled = listener.update(originalEntryName);
+                if (LOG.isTraceEnabled())
+                    LOG.trace("compressing file: " + originalEntryName);
 
-                LOG.trace("compressing file: " + originalEntryName);
+                monitor.subTask("compressing file: " + originalEntryName);
 
                 zipStream.putNextEntry(new ZipEntry(entryName));
 
@@ -137,18 +127,16 @@ public class FileZipper {
 
                     while ((read = in.read(buffer)) > 0) {
 
-                        if (isCanceled)
+                        if (monitor.isCanceled())
                             throw new OperationCanceledException(
-                                "compressing of file '" + entryName
+                                "compressing of file '" + originalEntryName
                                     + "' was canceled");
 
                         zipStream.write(buffer, 0, read);
 
                         totalRead += read;
 
-                        if (listener != null)
-                            listener.update(totalRead, totalSize);
-
+                        updateMonitor(monitor, totalRead, totalSize);
                     }
                 } finally {
                     IOUtils.closeQuietly(in);
@@ -158,11 +146,18 @@ public class FileZipper {
 
             zipStream.finish();
             cleanup = false;
+        } catch (IOException e) {
+            LOG.error("failed to create archive", e);
+            throw new CoreException(new Status(IStatus.ERROR, Saros.SAROS,
+                "failed to create archive", e));
+
         } finally {
             IOUtils.closeQuietly(zipStream);
             if (cleanup && archive != null && archive.exists()
                 && !archive.delete())
                 LOG.warn("could not delete archive file: " + archive);
+
+            monitor.done();
         }
 
         stopWatch.stop();
@@ -173,4 +168,20 @@ public class FileZipper {
 
     }
 
+    private int lastWorked = 0;
+
+    private void updateMonitor(IProgressMonitor monitor, long totalRead,
+        long totalSize) {
+
+        if (totalSize == 0)
+            return;
+
+        int worked = (int) ((totalRead * 100L) / totalSize);
+        int workedDelta = worked - lastWorked;
+
+        if (workedDelta > 0) {
+            monitor.worked(workedDelta);
+            lastWorked = worked;
+        }
+    }
 }

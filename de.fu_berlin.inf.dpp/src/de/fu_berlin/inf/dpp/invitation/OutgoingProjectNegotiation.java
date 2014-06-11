@@ -12,6 +12,7 @@ import java.util.concurrent.CancellationException;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
@@ -41,8 +42,6 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
-import de.fu_berlin.inf.dpp.util.FileZipper;
-import de.fu_berlin.inf.dpp.util.ZipProgressMonitor;
 
 public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
@@ -387,19 +386,18 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
         log.debug(this + " : creating archive");
 
-        final SubMonitor subMonitor = SubMonitor.convert(monitor,
-            "Creating project archive...", 1);
-
         File tempArchive = null;
 
         try {
-            tempArchive = File.createTempFile("SarosSyncArchive", ".zip");
+            tempArchive = File.createTempFile("saros_" + processID, ".zip");
 
-            FileZipper.createProjectZipArchive(filesToCompress, fileAlias,
-                tempArchive, new ZipProgressMonitor(subMonitor, -1, true));
-
+            // TODO run inside workspace ?
+            new CreateArchiveTask(tempArchive, filesToCompress, fileAlias,
+                monitor).run(null);
         } catch (OperationCanceledException e) {
             throw new LocalCancellationException();
+        } catch (CoreException e) {
+            throw new IOException(e.getMessage(), e);
         }
 
         monitor.done();
