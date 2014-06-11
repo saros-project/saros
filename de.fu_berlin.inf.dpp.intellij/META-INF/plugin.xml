@@ -35,12 +35,6 @@
         <group id="saros.MainMenu" text="_Saros"
                description="Awesome Saros menu">
             <add-to-group group-id="MainMenu" anchor="last"/>
-            <action id="saros.dummy"
-                    class="de.fu_berlin.inf.dpp.SarosCoreTestAction"
-                    text="Test simple Saros Core stuff"/>
-            <action id="saros.dummy2"
-                    class="de.fu_berlin.inf.dpp.SarosCoreTestAction2"
-                    text="Test XMPP stuff from Core"/>
         </group>
     </actions>
 
