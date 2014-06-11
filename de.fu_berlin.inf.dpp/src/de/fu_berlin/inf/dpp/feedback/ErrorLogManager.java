@@ -228,9 +228,8 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                 try {
-                    FileSubmitter.uploadErrorLog(
-                        System.getProperty("java.io.tmpdir"), logNameExtended,
-                        errorLog, monitor);
+                    FileSubmitter.uploadErrorLog(logNameExtended, errorLog,
+                        monitor);
                 } catch (IOException e) {
                     String msg = String.format("Couldn't upload file: %s. %s",
                         e.getMessage(), e.getCause() != null ? e.getCause()

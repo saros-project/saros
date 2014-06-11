@@ -62,26 +62,24 @@ public class FileSubmitter {
     /**
      * Convenience wrapper method to upload an error log file to the server. To
      * save time and storage space, the log is compressed to a zip archive with
-     * the given zipName. The zip is created in the given zipLocation and
-     * deleted when the virtual machine terminates.
+     * the given zipName.
      * 
-     * @param zipLocation
-     *            the location where the zip file should be created
      * @param zipName
      *            a name for the zip archive, e.g. with added user ID to make it
      *            unique, zipName must be at least 3 characters long!
      * @throws IOException
      *             if an I/O error occurs
      */
-    public static void uploadErrorLog(String zipLocation, String zipName,
-        File file, IProgressMonitor monitor) throws IOException {
+    public static void uploadErrorLog(String zipName, File file,
+        IProgressMonitor monitor) throws IOException {
 
         if (ERROR_LOG_UPLOAD_URL == null) {
             log.warn("error log upload url is not configured, cannot upload error log file");
             return;
         }
 
-        File archive = new File(zipLocation, zipName + ".zip");
+        File archive = new File(System.getProperty("java.io.tmpdir"), zipName
+            + ".zip");
 
         ZipOutputStream out = null;
         FileInputStream in = null;
@@ -92,18 +90,17 @@ public class FileSubmitter {
 
             in = new FileInputStream(file);
 
-            ZipOutputStream zipStream = new ZipOutputStream(
-                new FileOutputStream(archive));
+            out = new ZipOutputStream(new FileOutputStream(archive));
 
-            zipStream.putNextEntry(new ZipEntry(file.getName()));
+            out.putNextEntry(new ZipEntry(file.getName()));
 
             int read;
 
             while ((read = in.read(buffer)) > 0)
-                zipStream.write(buffer, 0, read);
+                out.write(buffer, 0, read);
 
-            zipStream.finish();
-            zipStream.close();
+            out.finish();
+            out.close();
 
             uploadFile(archive, ERROR_LOG_UPLOAD_URL, monitor);
         } finally {
