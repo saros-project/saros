@@ -345,153 +345,101 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
          */
         for (Entry<String, String> entry : projectNames.entrySet()) {
             SubMonitor lMonitor = subMonitor.newChild(100 / numberOfLoops);
-            String projectID = entry.getKey();
-            String projectName = entry.getValue();
+
             checkCancellation(CancelOption.NOTIFY_PEER);
+
+            final String projectID = entry.getKey();
+            final String projectName = entry.getValue();
+
             ProjectNegotiationData projectInfo = null;
-            for (ProjectNegotiationData pInfo : this.projectInfos) {
-                if (pInfo.getProjectID().equals(projectID))
-                    projectInfo = pInfo;
-            }
-            if (projectInfo == null) {
-                LOG.error("tried to add a project that wasn't shared");
-                // this should never happen
-                continue;
+
+            for (ProjectNegotiationData info : projectInfos) {
+                if (info.getProjectID().equals(projectID))
+                    projectInfo = info;
             }
 
+            if (projectInfo == null)
+                // this should never happen
+                throw new RuntimeException("cannot add project with id "
+                    + projectID + ", this id is unknown");
+
             VCSAdapter vcs = null;
-            if (preferenceUtils.useVersionControl() && useVersionControl) {
+
+            // FIXME we should stop here for partial shared projects
+            if (preferenceUtils.useVersionControl() && useVersionControl
+                && !projectInfo.isPartial()) {
                 vcs = VCSAdapter.getAdapter(projectInfo.getFileList()
                     .getVcsProviderID());
             }
 
-            IProject iProject = ResourcesPlugin.getWorkspace().getRoot()
+            IProject project = ResourcesPlugin.getWorkspace().getRoot()
                 .getProject(projectName);
-            if (iProject.exists()) {
+
+            if (project.exists()) {
                 /*
                  * Saving unsaved files is supposed to be done in
                  * JoinSessionWizard#performFinish().
                  */
-                if (EditorAPI.existUnsavedFiles(iProject)) {
+                if (EditorAPI.existUnsavedFiles(project)) {
                     LOG.error("Unsaved files detected.");
                 }
-            } else {
-                iProject = null;
             }
-            IProject localProject = assignLocalProject(iProject, projectName,
-                projectID, vcs, lMonitor.newChild(30), projectInfo);
-            localProjects.put(projectID, localProject);
 
-            checkCancellation(CancelOption.NOTIFY_PEER);
-            if (vcs != null && !isPartialRemoteProject(projectID)) {
-                LOG.debug("initVcState");
-                initVcState(localProject, vcs, lMonitor.newChild(40),
+            if (vcs != null) {
+                project = checkoutVCSProject(vcs, project,
                     projectInfo.getFileList());
+
+                if (project == null)
+                    throw new LocalCancellationException("VCS checkout failed",
+                        CancelOption.NOTIFY_PEER);
+
+                LOG.debug("initVcState");
+                initVcState(project, vcs, lMonitor.newChild(40),
+                    projectInfo.getFileList());
+
+            } else {
+                project = createProject(project, null);
             }
+
+            localProjects.put(projectID, project);
+
             checkCancellation(CancelOption.NOTIFY_PEER);
 
             LOG.debug("compute required Files for project " + projectName
                 + " with ID: " + projectID);
-            FileList requiredFiles = computeRequiredFiles(localProject,
+
+            FileList requiredFiles = computeRequiredFiles(project,
                 projectInfo.getFileList(), projectID, vcs,
                 lMonitor.newChild(30));
+
             requiredFiles.setProjectID(projectID);
             checkCancellation(CancelOption.NOTIFY_PEER);
             missingFiles.add(requiredFiles);
+
             lMonitor.done();
         }
+
         return missingFiles;
     }
 
     /**
-     * In this method the project we want to have in the session is initialized.
-     * If the baseProject is not null we use it as the base to create the
+     * Creates a new project. If a base project is given those files are copied
+     * into the new project.
      * 
-     * @param projectID
-     * 
-     * @param projectInfo
-     * 
+     * @param project
+     *            the project to create
+     * @param base
+     *            the project to copy resources from
+     * @return the created project
      * @throws LocalCancellationException
+     *             if the process is canceled locally
+     * @throws IOException
      */
-    private IProject assignLocalProject(final IProject baseProject,
-        final String newProjectName, String projectID, final VCSAdapter vcs,
-        final IProgressMonitor monitor, ProjectNegotiationData projectInfo)
-        throws IOException, LocalCancellationException {
-        IProject newLocalProject = baseProject;
-        FileList remoteFileList = projectInfo.getFileList();
-
-        // if the baseProject already exists
-        if (newLocalProject != null) {
-            // TODO Consider other Team providers
-            if (newLocalProject.getName().equals(newProjectName) && vcs != null
-                && !vcs.isManaged(newLocalProject) && !projectInfo.isPartial()) {
-
-                String repositoryRoot = remoteFileList.getRepositoryRoot();
-                String directory = remoteFileList.getProjectInfo().url
-                    .substring(repositoryRoot.length());
-                vcs.connect(newLocalProject, repositoryRoot, directory, monitor);
-            }
-            return newLocalProject;
-        }
-
-        if (vcs != null) {
-            if (!isPartialRemoteProject(projectID)) {
-                try {
-                    /*
-                     * Inform the host of the session that the current (local)
-                     * user has started the possibly time consuming SVN checkout
-                     * via a remoteProgressMonitor
-                     */
-                    ISarosSession sarosSession = sarosSessionObservable
-                        .getValue();
-                    if (sarosSession != null) {
-                        /*
-                         * The monitor that is created here is shown both
-                         * locally and remote and is handled like a regular
-                         * progress monitor.
-                         */
-                        IProgressMonitor remoteMonitor = rpm
-                            .mirrorLocalProgressMonitorToRemote(sarosSession,
-                                sarosSession.getHost(), monitor);
-                        remoteMonitor
-                            .setTaskName("Project checkout via subversion");
-                        newLocalProject = vcs.checkoutProject(newProjectName,
-                            remoteFileList, remoteMonitor);
-                    } else {
-                        LOG.error("No Saros session!");
-                    }
-                } catch (OperationCanceledException e) {
-                    /*
-                     * The exception is thrown if the user canceled the svn
-                     * checkout process. We send the remote user a sophisticated
-                     * message here.
-                     */
-                    throw new LocalCancellationException(
-                        "The CVS checkout process was canceled",
-                        CancelOption.NOTIFY_PEER);
-                }
-            }
-
-            /*
-             * HACK: After checking out a project, give Eclipse/the Team
-             * provider time to realize that the project is now managed. The
-             * problem was that when checking later to see if we have to
-             * switch/update individual resources in initVcState, the project
-             * appeared as unmanaged. It might work to wrap initVcState in a
-             * job, such that it is scheduled after the project is marked as
-             * managed.
-             */
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                // do nothing
-            }
-            if (newLocalProject != null)
-                return newLocalProject;
-        }
+    private IProject createProject(final IProject project, final IProject base)
+        throws LocalCancellationException, IOException {
 
         final CreateProjectTask createProjectTask = new CreateProjectTask(
-            newProjectName, baseProject, monitor);
+            project.getName(), base, monitor);
 
         try {
             ResourcesPlugin.getWorkspace().run(createProjectTask, monitor);
@@ -502,6 +450,86 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         }
 
         return createProjectTask.getProject();
+    }
+
+    /**
+     * Checks out a project using the provided VCS adapter. If the project does
+     * not exists it will be created, otherwise it will be updated.
+     * 
+     * @param vcs
+     *            the VCS adapter to use for checkout
+     * @param project
+     *            the project to use for checkout
+     * @param fileList
+     * @return the checked out project or <code>null</code> if it could not
+     *         checked out
+     * @throws LocalCancellationException
+     *             if the process is canceled locally
+     */
+    private IProject checkoutVCSProject(final VCSAdapter vcs, IProject project,
+        final FileList fileList) throws LocalCancellationException {
+
+        if (isPartialRemoteProject(fileList.getProjectID()))
+            throw new IllegalStateException(
+                "VCS operations on partial shared projects are not supported");
+
+        if (project.exists()) {
+            if (!vcs.isManaged(project))
+                return null;
+
+            final String repositoryRoot = fileList.getRepositoryRoot();
+            final String directory = fileList.getProjectInfo().url
+                .substring(repositoryRoot.length());
+
+            // FIXME this should at least throw a OperationCanceledException
+            vcs.connect(project, repositoryRoot, directory, monitor);
+
+            return project;
+        }
+
+        /*
+         * Inform the host of the session that the current (local) user has
+         * started the possibly time consuming SVN checkout via a
+         * remoteProgressMonitor
+         */
+        final ISarosSession session = sarosSessionObservable.getValue();
+
+        if (session == null)
+            throw new LocalCancellationException(
+                "The current session is terminated.",
+                CancelOption.DO_NOT_NOTIFY_PEER);
+
+        /*
+         * The monitor that is created here is shown both locally and remote and
+         * is handled like a regular progress monitor.
+         */
+        IProgressMonitor remoteMonitor = rpm
+            .mirrorLocalProgressMonitorToRemote(sarosSession,
+                sarosSession.getHost(), monitor);
+        remoteMonitor.setTaskName("Project checkout via subversion");
+
+        try {
+            project = vcs.checkoutProject(project.getName(), fileList,
+                remoteMonitor);
+        } catch (OperationCanceledException e) {
+            throw new LocalCancellationException();
+        }
+
+        /*
+         * HACK: After checking out a project, give Eclipse/the Team provider
+         * time to realize that the project is now managed. The problem was that
+         * when checking later to see if we have to switch/update individual
+         * resources in initVcState, the project appeared as unmanaged. It might
+         * work to wrap initVcState in a job, such that it is scheduled after
+         * the project is marked as managed.
+         */
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            // do nothing
+        }
+
+        return project;
     }
 
     @Override
