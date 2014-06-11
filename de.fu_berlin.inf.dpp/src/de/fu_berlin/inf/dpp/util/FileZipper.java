@@ -2,17 +2,13 @@ package de.fu_berlin.inf.dpp.util;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -24,16 +20,10 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.OperationCanceledException;
 
-/**
- * This class contains method to create a zip archive out of a list of files.
- * 
- * @author orieger
- * @author oezbek
- * 
- */
+// TODO move to negotiation package, no longer an util class
 public class FileZipper {
 
-    private static final Logger log = Logger.getLogger(FileZipper.class);
+    private static final Logger LOG = Logger.getLogger(FileZipper.class);
 
     /*
      * Setting this value to high will result in cache misses either by the OS
@@ -74,12 +64,9 @@ public class FileZipper {
 
         assert files.size() == alias.size();
 
-        long totalFileSizes = 0;
-
-        List<FileWrapper> filesToZip = new ArrayList<FileWrapper>(files.size());
+        long totalSize = 0;
 
         for (IFile file : files) {
-            filesToZip.add(new EclipseFileWrapper(file));
 
             URI uri = file.getLocationURI();
 
@@ -87,61 +74,12 @@ public class FileZipper {
                 continue;
 
             try {
-                totalFileSizes += EFS.getStore(uri).fetchInfo().getLength();
+                totalSize += EFS.getStore(uri).fetchInfo().getLength();
             } catch (CoreException e) {
-                log.warn("unable to retrieve file size for file: " + file, e);
+                LOG.warn("unable to retrieve file size for file: " + file, e);
                 continue;
             }
         }
-
-        internalZipFiles(filesToZip, alias, archive, true, true,
-            totalFileSizes, listener);
-    }
-
-    /**
-     * Creates a Zip archive containing all files of the given list. Only files
-     * are included <b>without</b> their directory names. The archive will
-     * automatically be deleted if the operation fails or is canceled.
-     * 
-     * @param files
-     *            the file that should be included in the archive
-     * @param archive
-     *            the archive file that will contain the content, if the archive
-     *            file already exists it will be overwritten
-     * @param compress
-     *            <code>true</code> if the content should be compressed or
-     *            <code>false</code> if it should only be stored
-     * @param listener
-     *            a {@link ZipListener} which will receive status updates or
-     *            <code>null</code>
-     * 
-     * @cancelable This operation can be canceled via the given listener.
-     * 
-     * @throws IOException
-     *             if an I/O error occurred while creating the archive
-     * @throws OperationCanceledException
-     *             if the user canceled the operation, see also
-     *             {@link ZipListener}
-     * 
-     */
-    public static void zipFiles(List<File> files, File archive,
-        boolean compress, ZipListener listener) throws IOException,
-        OperationCanceledException {
-        List<FileWrapper> filesToZip = new ArrayList<FileWrapper>(files.size());
-
-        for (File file : files)
-            if (file.isFile()) {
-                filesToZip.add(new JavaFileWrapper(file));
-            }
-
-        internalZipFiles(filesToZip, null, archive, compress, false, -1L,
-            listener);
-    }
-
-    private static void internalZipFiles(List<FileWrapper> files,
-        List<String> alias, File archive, boolean compress,
-        boolean includeDirectories, long totalSize, ZipListener listener)
-        throws IOException, OperationCanceledException {
 
         byte[] buffer = new byte[BUFFER_SIZE];
 
@@ -149,9 +87,6 @@ public class FileZipper {
             new FileOutputStream(archive), BUFFER_SIZE);
 
         ZipOutputStream zipStream = new ZipOutputStream(outputStream);
-
-        zipStream.setLevel(compress ? Deflater.DEFAULT_COMPRESSION
-            : Deflater.NO_COMPRESSION);
 
         boolean cleanup = true;
         boolean isCanceled = false;
@@ -161,36 +96,45 @@ public class FileZipper {
 
         long totalRead = 0L;
 
-        final Iterator<FileWrapper> fileIt = files.iterator();
+        final Iterator<IFile> fileIt = files.iterator();
         final Iterator<String> aliasIt = alias == null ? null : alias
             .iterator();
 
         try {
             while (fileIt.hasNext()) {
 
-                FileWrapper file = fileIt.next();
+                IFile file = fileIt.next();
 
                 String entryName = null;
+
+                final String originalEntryName = file.getFullPath().toString();
 
                 if (aliasIt != null && aliasIt.hasNext())
                     entryName = aliasIt.next();
 
                 if (entryName == null)
-                    entryName = includeDirectories ? file.getPath() : file
-                        .getName();
+                    entryName = originalEntryName;
 
                 if (listener != null)
-                    isCanceled = listener.update(file.getPath());
+                    isCanceled = listener.update(originalEntryName);
 
-                log.trace("compressing file: " + entryName);
+                LOG.trace("compressing file: " + originalEntryName);
 
                 zipStream.putNextEntry(new ZipEntry(entryName));
 
                 InputStream in = null;
 
                 try {
+
                     int read = 0;
-                    in = file.getInputStream();
+
+                    try {
+                        in = file.getContents();
+                    } catch (CoreException e) {
+                        throw new IOException("failed to access file "
+                            + originalEntryName, e);
+                    }
+
                     while ((read = in.read(buffer)) > 0) {
 
                         if (isCanceled)
@@ -218,84 +162,15 @@ public class FileZipper {
             IOUtils.closeQuietly(zipStream);
             if (cleanup && archive != null && archive.exists()
                 && !archive.delete())
-                log.warn("could not delete archive file: " + archive);
+                LOG.warn("could not delete archive file: " + archive);
         }
 
         stopWatch.stop();
 
-        log.debug(String.format("created archive %s I/O: [%s]",
+        LOG.debug(String.format("created archive %s I/O: [%s]",
             archive.getAbsolutePath(),
             CoreUtils.throughput(archive.length(), stopWatch.getTime())));
 
     }
 
-    interface FileWrapper {
-        public boolean exists();
-
-        public InputStream getInputStream() throws IOException;
-
-        public String getName();
-
-        public String getPath();
-    }
-
-    private static class JavaFileWrapper implements FileWrapper {
-        protected File file;
-
-        public JavaFileWrapper(File file) {
-            this.file = file;
-        }
-
-        @Override
-        public boolean exists() {
-            return (file).exists();
-        }
-
-        @Override
-        public InputStream getInputStream() throws FileNotFoundException {
-            return new FileInputStream(file);
-        }
-
-        @Override
-        public String getName() {
-            return file.getName();
-        }
-
-        @Override
-        public String getPath() {
-            return file.getPath().replace('\\', '/');
-        }
-    }
-
-    private static class EclipseFileWrapper implements FileWrapper {
-        protected IFile file;
-
-        public EclipseFileWrapper(IFile file) {
-            this.file = file;
-        }
-
-        @Override
-        public boolean exists() {
-            return file.exists();
-        }
-
-        @Override
-        public InputStream getInputStream() throws IOException {
-            try {
-                return file.getContents();
-            } catch (CoreException e) {
-                throw new IOException(e.getMessage(), e);
-            }
-        }
-
-        @Override
-        public String getName() {
-            return file.getName();
-        }
-
-        @Override
-        public String getPath() {
-            return file.getProjectRelativePath().toString();
-        }
-    }
 }

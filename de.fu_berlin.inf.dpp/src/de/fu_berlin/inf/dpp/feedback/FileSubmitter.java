@@ -2,21 +2,21 @@ package de.fu_berlin.inf.dpp.feedback;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Collections;
 import java.util.Random;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-
-import de.fu_berlin.inf.dpp.util.FileZipper;
 
 /**
  * The FileSubmitter class provides static methods to upload a file to a server.
@@ -76,19 +76,41 @@ public class FileSubmitter {
     public static void uploadErrorLog(String zipLocation, String zipName,
         File file, IProgressMonitor monitor) throws IOException {
 
-        File archive = new File(zipLocation, zipName + ".zip");
-        archive.deleteOnExit();
-
-        FileZipper.zipFiles(Collections.singletonList(file), archive, true,
-            null);
-
         if (ERROR_LOG_UPLOAD_URL == null) {
             log.warn("error log upload url is not configured, cannot upload error log file");
             return;
         }
 
-        uploadFile(archive, ERROR_LOG_UPLOAD_URL, monitor);
+        File archive = new File(zipLocation, zipName + ".zip");
 
+        ZipOutputStream out = null;
+        FileInputStream in = null;
+
+        byte[] buffer = new byte[8192];
+
+        try {
+
+            in = new FileInputStream(file);
+
+            ZipOutputStream zipStream = new ZipOutputStream(
+                new FileOutputStream(archive));
+
+            zipStream.putNextEntry(new ZipEntry(file.getName()));
+
+            int read;
+
+            while ((read = in.read(buffer)) > 0)
+                zipStream.write(buffer, 0, read);
+
+            zipStream.finish();
+            zipStream.close();
+
+            uploadFile(archive, ERROR_LOG_UPLOAD_URL, monitor);
+        } finally {
+            IOUtils.closeQuietly(out);
+            IOUtils.closeQuietly(in);
+            archive.delete();
+        }
     }
 
     /**
