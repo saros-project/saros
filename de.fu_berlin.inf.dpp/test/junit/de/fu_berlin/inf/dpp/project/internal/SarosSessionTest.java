@@ -63,7 +63,6 @@ import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.test.fakes.synchonize.NonUISynchronizer;
 import de.fu_berlin.inf.dpp.test.util.MemoryPreferenceStore;
 import de.fu_berlin.inf.dpp.test.util.MemoryPreferences;
-import de.fu_berlin.inf.dpp.ui.SarosUI;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ StatisticManager.class, ResourcesPlugin.class })
@@ -211,8 +210,7 @@ public class SarosSessionTest {
 
         container.addComponent(ISarosSessionManager.class,
             EasyMock.createMock(ISarosSessionManager.class));
-        container.addComponent(SarosUI.class,
-            EasyMock.createMock(SarosUI.class));
+
         container.addComponent(AwarenessInformationCollector.class,
             EasyMock.createMock(AwarenessInformationCollector.class));
         container.addComponent(ConsistencyWatchdogClient.class,

@@ -29,9 +29,9 @@ import de.fu_berlin.inf.dpp.project.INegotiationHandler;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
+import de.fu_berlin.inf.dpp.ui.util.ViewUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
@@ -209,13 +209,10 @@ public class NegotiationHandler implements INegotiationHandler {
         }
     }
 
-    private final SarosUI sarosUI;
-
     private final ISarosSessionManager sessionManager;
 
     public NegotiationHandler(ISarosSessionManager sessionManager,
-        XMPPConnectionService connectionService, SarosUI sarosUI) {
-        this.sarosUI = sarosUI;
+        XMPPConnectionService connectionService) {
         this.sessionManager = sessionManager;
         this.sessionManager.setNegotiationHandler(this);
     }
@@ -258,7 +255,7 @@ public class NegotiationHandler implements INegotiationHandler {
         SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
             @Override
             public void run() {
-                sarosUI.openSarosView();
+                ViewUtils.openSarosView();
             }
         });
 

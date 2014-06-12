@@ -1,9 +1,15 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.concurrent.CancellationException;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.graphics.Image;
@@ -23,7 +29,7 @@ import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
@@ -41,9 +47,6 @@ public class ChangeWriteAccessAction extends Action implements Disposable {
         .getLogger(ChangeWriteAccessAction.class);
 
     private Permission permission;
-
-    @Inject
-    private SarosUI sarosUI;
 
     @Inject
     private ISarosSessionManager sessionManager;
@@ -156,8 +159,7 @@ public class ChangeWriteAccessAction extends Action implements Disposable {
                 if (participants.size() == 1) {
                     User selected = participants.get(0);
                     if (selected.getPermission() != permission) {
-                        sarosUI.performPermissionChange(session, selected,
-                            permission);
+                        performPermissionChange(session, selected, permission);
                         updateEnablement();
                     } else {
                         LOG.warn("Did not change write access of " + selected
@@ -170,4 +172,52 @@ public class ChangeWriteAccessAction extends Action implements Disposable {
         });
     }
 
+    // SWT
+    private void performPermissionChange(final ISarosSession session,
+        final User user, final Permission newPermission) {
+
+        ProgressMonitorDialog dialog = new ProgressMonitorDialog(
+            SWTUtils.getShell());
+
+        try {
+            dialog.run(true, false, new IRunnableWithProgress() {
+                @Override
+                public void run(final IProgressMonitor monitor) {
+
+                    try {
+
+                        monitor.beginTask(Messages.SarosUI_permission_change,
+                            IProgressMonitor.UNKNOWN);
+
+                        session.initiatePermissionChange(user, newPermission);
+                        /*
+                         * FIXME run this at least 2 times and if this still
+                         * does not succeed kick the user
+                         */
+                        // } catch (CancellationException e) {
+                    } catch (InterruptedException e) {
+                        LOG.error(e); // cannot happen
+                    } finally {
+                        monitor.done();
+                    }
+                }
+            });
+        } catch (InvocationTargetException e) {
+            Throwable t = e.getCause();
+
+            if (t instanceof CancellationException) {
+                LOG.warn("permission change failed, user " + user + " did not respond"); //$NON-NLS-1$
+                MessageDialog.openWarning(SWTUtils.getShell(),
+                    Messages.SarosUI_permission_canceled,
+                    Messages.SarosUI_permission_canceled_text);
+            } else {
+                LOG.error("permission change failed", e); //$NON-NLS-1$
+                MessageDialog.openError(SWTUtils.getShell(),
+                    Messages.SarosUI_permission_failed,
+                    Messages.SarosUI_permission_failed_text);
+            }
+        } catch (InterruptedException e) {
+            LOG.error(e); // cannot happen
+        }
+    }
 }

@@ -2,8 +2,8 @@ package de.fu_berlin.inf.dpp.ui.eventhandler;
 
 import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
 import de.fu_berlin.inf.dpp.observables.ValueChangeListener;
-import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
+import de.fu_berlin.inf.dpp.ui.util.ViewUtils;
 
 /**
  * This handler is responsible for opening the SessionView if an inconsistency
@@ -12,8 +12,7 @@ import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
  */
 public class SessionViewOpener {
 
-    public SessionViewOpener(IsInconsistentObservable isInconsistentObservable,
-        final SarosUI sarosUI) {
+    public SessionViewOpener(IsInconsistentObservable isInconsistentObservable) {
         isInconsistentObservable.add(new ValueChangeListener<Boolean>() {
             @Override
             public void setValue(Boolean inconsistency) {
@@ -24,7 +23,7 @@ public class SessionViewOpener {
                 SWTUtils.runSafeSWTAsync(null, new Runnable() {
                     @Override
                     public void run() {
-                        sarosUI.openSarosView();
+                        ViewUtils.openSarosView();
                     }
                 });
             }

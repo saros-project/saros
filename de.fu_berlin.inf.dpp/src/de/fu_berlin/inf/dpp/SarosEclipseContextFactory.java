@@ -24,7 +24,6 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.synchronize.internal.SWTSynchronizer;
 import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
-import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.eventhandler.ConnectingFailureHandler;
 import de.fu_berlin.inf.dpp.ui.eventhandler.HostLeftAloneInSessionHandler;
 import de.fu_berlin.inf.dpp.ui.eventhandler.JoinSessionRejectedHandler;
@@ -61,7 +60,6 @@ public class SarosEclipseContextFactory extends AbstractSarosContextFactory {
         // Component.create(LocalPresenceTracker.class),
 
         Component.create(PreferenceUtils.class),
-        Component.create(SarosUI.class),
         Component.create(SessionViewOpener.class),
         Component.create(UndoManager.class),
         Component.create(RemoteProgressManager.class),

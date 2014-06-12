@@ -14,8 +14,8 @@ import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.stf.server.STFController;
-import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
+import de.fu_berlin.inf.dpp.ui.util.ViewUtils;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
@@ -36,9 +36,6 @@ public class StartupSaros implements IStartup {
 
     @Inject
     private IPreferenceStore preferenceStore;
-
-    @Inject
-    private SarosUI sarosUI;
 
     @Inject
     private ConnectionHandler connectionHandler;
@@ -151,7 +148,7 @@ public class StartupSaros implements IStartup {
                  * because it would be maximized and hiding the workbench window
                  */
                 if (i == null)
-                    sarosUI.openSarosView();
+                    ViewUtils.openSarosView();
             }
         });
     }
