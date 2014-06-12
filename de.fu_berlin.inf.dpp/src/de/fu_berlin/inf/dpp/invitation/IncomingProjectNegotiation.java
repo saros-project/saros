@@ -397,7 +397,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 initVcState(project, vcs, lMonitor.newChild(40),
                     projectInfo.getFileList());
 
-            } else {
+            } else if (!project.exists()) {
                 project = createProject(project, null);
             }
 
@@ -434,6 +434,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * @throws LocalCancellationException
      *             if the process is canceled locally
      * @throws IOException
+     *             if the project already exists or could not created
      */
     private IProject createProject(final IProject project, final IProject base)
         throws LocalCancellationException, IOException {
