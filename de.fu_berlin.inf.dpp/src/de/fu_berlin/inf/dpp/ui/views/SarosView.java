@@ -65,8 +65,8 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.net.xmpp.roster.IRosterListener;
 import de.fu_berlin.inf.dpp.net.xmpp.roster.AbstractRosterListener;
+import de.fu_berlin.inf.dpp.net.xmpp.roster.IRosterListener;
 import de.fu_berlin.inf.dpp.net.xmpp.roster.RosterTracker;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
@@ -528,13 +528,19 @@ public class SarosView extends ViewPart {
                     manager.add(getAction(ChangeColorAction.ACTION_ID));
 
                     if (isHost) {
-                        manager.add(ChangeWriteAccessAction.forWriteAccess);
-                        manager.add(ChangeWriteAccessAction.forReadOnly);
+                        manager
+                            .add(getAction(ChangeWriteAccessAction.WriteAccess.ACTION_ID));
+
+                        manager
+                            .add(getAction(ChangeWriteAccessAction.ReadOnly.ACTION_ID));
                     }
                 } else {
                     if (isHost) {
-                        manager.add(ChangeWriteAccessAction.forWriteAccess);
-                        manager.add(ChangeWriteAccessAction.forReadOnly);
+                        manager
+                            .add(getAction(ChangeWriteAccessAction.WriteAccess.ACTION_ID));
+
+                        manager
+                            .add(getAction(ChangeWriteAccessAction.ReadOnly.ACTION_ID));
 
                         manager.add(getAction(RemoveUserAction.ACTION_ID));
                         manager.add(new Separator());
@@ -676,8 +682,8 @@ public class SarosView extends ViewPart {
     private void createActions() {
 
         // ContextMenus Session
-        registerAction(ChangeWriteAccessAction.forWriteAccess);
-        registerAction(ChangeWriteAccessAction.forReadOnly);
+        registerAction(ChangeWriteAccessAction.WriteAccess.newInstance());
+        registerAction(ChangeWriteAccessAction.ReadOnly.newInstance());
         registerAction(new FollowThisPersonAction());
         registerAction(new JumpToUserWithWriteAccessPositionAction());
         registerAction(new SendFileAction());

@@ -40,11 +40,33 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
  */
 public class ChangeWriteAccessAction extends Action implements Disposable {
 
-    public static final String ACTION_ID = ChangeWriteAccessAction.class
-        .getName();
-
     private static final Logger LOG = Logger
         .getLogger(ChangeWriteAccessAction.class);
+
+    public static final class WriteAccess {
+        public static final String ACTION_ID = ChangeWriteAccessAction.class
+            .getName() + "." + WriteAccess.class.getSimpleName();
+
+        public static ChangeWriteAccessAction newInstance() {
+            return new ChangeWriteAccessAction(ACTION_ID,
+                Permission.WRITE_ACCESS, Messages.GiveWriteAccessAction_title,
+                Messages.GiveWriteAccessAction_tooltip,
+                ImageManager.ICON_CONTACT_SAROS_SUPPORT);
+        }
+    }
+
+    public static final class ReadOnly {
+        public static final String ACTION_ID = ChangeWriteAccessAction.class
+            .getName() + "." + ReadOnly.class.getSimpleName();
+
+        public static ChangeWriteAccessAction newInstance() {
+            return new ChangeWriteAccessAction(ACTION_ID,
+                Permission.READONLY_ACCESS,
+                Messages.RestrictToReadOnlyAccessAction_title,
+                Messages.RestrictToReadOnlyAccessAction_tooltip,
+                ImageManager.ICON_USER_SAROS_READONLY);
+        }
+    }
 
     private Permission permission;
 
@@ -78,25 +100,15 @@ public class ChangeWriteAccessAction extends Action implements Disposable {
         }
     };
 
-    public final static ChangeWriteAccessAction forWriteAccess = new ChangeWriteAccessAction(
-        Permission.WRITE_ACCESS, Messages.GiveWriteAccessAction_title,
-        Messages.GiveWriteAccessAction_tooltip,
-        ImageManager.ICON_CONTACT_SAROS_SUPPORT);
-
-    public final static ChangeWriteAccessAction forReadOnly = new ChangeWriteAccessAction(
-        Permission.READONLY_ACCESS,
-        Messages.RestrictToReadOnlyAccessAction_title,
-        Messages.RestrictToReadOnlyAccessAction_tooltip,
-        ImageManager.ICON_USER_SAROS_READONLY);
-
-    private ChangeWriteAccessAction(Permission permission, String text,
-        String tooltip, final Image icon) {
+    private ChangeWriteAccessAction(final String id,
+        final Permission permission, final String text, final String tooltip,
+        final Image icon) {
 
         super(text);
 
         SarosPluginContext.initComponent(this);
 
-        setId(ACTION_ID + "." + permission);
+        setId(id);
 
         setImageDescriptor(new ImageDescriptor() {
             @Override
