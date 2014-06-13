@@ -3,6 +3,8 @@ package de.fu_berlin.inf.dpp.ui.widgets;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.StreamError;
@@ -80,12 +82,14 @@ public class ConnectionStateComposite extends Composite {
 
         updateLabel(connectionHandler.getConnectionState(),
             connectionHandler.getConnectionError());
-    }
 
-    @Override
-    public void dispose() {
-        super.dispose();
-        connectionHandler.removeConnectionStateListener(connectionListener);
+        addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(DisposeEvent e) {
+                connectionHandler
+                    .removeConnectionStateListener(connectionListener);
+            }
+        });
     }
 
     private void updateLabel(ConnectionState state, Exception error) {

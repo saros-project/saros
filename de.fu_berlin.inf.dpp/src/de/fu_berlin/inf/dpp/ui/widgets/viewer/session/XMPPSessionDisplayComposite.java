@@ -2,6 +2,8 @@ package de.fu_berlin.inf.dpp.ui.widgets.viewer.session;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.Roster;
@@ -84,14 +86,15 @@ public final class XMPPSessionDisplayComposite extends SessionDisplayComposite {
     public XMPPSessionDisplayComposite(Composite parent, int style) {
         super(parent, style);
         connectionService.addListener(connectionListener);
-    }
 
-    @Override
-    public void dispose() {
-        super.dispose();
-        connectionService.removeListener(connectionListener);
-        connectionService = null;
-        cachedRoster = null;
+        addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(DisposeEvent e) {
+                connectionService.removeListener(connectionListener);
+                connectionService = null;
+                cachedRoster = null;
+            }
+        });
     }
 
     @Override

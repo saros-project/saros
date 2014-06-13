@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
@@ -88,6 +90,14 @@ public class ColorChooser extends Composite {
             label.setPreferredSize(50, 50);
             colorLabels.add(label);
         }
+
+        addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(DisposeEvent e) {
+                for (ColorLabel colorLabel : colorLabels)
+                    ((Color) colorLabel.getData()).dispose();
+            }
+        });
     }
 
     private ColorLabel createColorLabel(Composite parent, int style, int colorId) {
@@ -100,14 +110,6 @@ public class ColorChooser extends Composite {
         label.addMouseListener(mouseListener);
 
         return label;
-    }
-
-    @Override
-    public void dispose() {
-        super.dispose();
-
-        for (ColorLabel colorLabel : colorLabels)
-            ((Color) colorLabel.getData()).dispose();
     }
 
     /**

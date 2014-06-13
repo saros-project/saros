@@ -6,6 +6,8 @@ import java.util.List;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -51,18 +53,19 @@ public class ProjectOptionComposite extends Composite {
         createNewProjectGroup();
         createUpdateProjectGroup();
 
+        addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(DisposeEvent e) {
+                listeners.clear();
+            }
+        });
+
         updateEnablement(newProjectRadioButton);
     }
 
     @Override
     public void setLayout(Layout layout) {
         // NOP
-    }
-
-    @Override
-    public void dispose() {
-        super.dispose();
-        listeners.clear();
     }
 
     public void addProjectOptionListener(ProjectOptionListener listener) {

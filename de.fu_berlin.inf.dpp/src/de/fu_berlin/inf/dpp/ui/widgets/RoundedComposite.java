@@ -1,6 +1,8 @@
 package de.fu_berlin.inf.dpp.ui.widgets;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
@@ -117,6 +119,15 @@ public class RoundedComposite extends Composite {
             }
         });
 
+        addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(DisposeEvent e) {
+                if (borderColor != null && !borderColor.isDisposed()) {
+                    borderColor.dispose();
+                }
+            }
+        });
+
         /*
          * Set default layout
          */
@@ -154,13 +165,5 @@ public class RoundedComposite extends Composite {
     @Override
     public Color getBackground() {
         return this.backgroundColor;
-    }
-
-    @Override
-    public void dispose() {
-        super.dispose();
-        if (this.borderColor != null && !this.borderColor.isDisposed()) {
-            this.borderColor.dispose();
-        }
     }
 }

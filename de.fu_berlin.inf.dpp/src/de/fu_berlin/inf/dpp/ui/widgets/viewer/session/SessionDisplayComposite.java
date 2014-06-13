@@ -6,6 +6,8 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Tree;
@@ -134,15 +136,15 @@ public abstract class SessionDisplayComposite extends
             getViewer().addFilter(filter);
         }
 
+        addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(DisposeEvent e) {
+                sessionManager.removeSarosSessionListener(sessionListener);
+                filter = null;
+            }
+        });
+
         hookViewer(getViewer());
-    }
-
-    @Override
-    public void dispose() {
-        super.dispose();
-
-        sessionManager.removeSarosSessionListener(sessionListener);
-        filter = null;
     }
 
     @Override

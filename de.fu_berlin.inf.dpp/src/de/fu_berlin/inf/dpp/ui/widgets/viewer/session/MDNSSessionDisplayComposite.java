@@ -2,6 +2,8 @@ package de.fu_berlin.inf.dpp.ui.widgets.viewer.session;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 import org.picocontainer.annotations.Inject;
 
@@ -85,14 +87,15 @@ public final class MDNSSessionDisplayComposite extends SessionDisplayComposite {
         connectionHandler.addConnectionStateListener(connectionStateListener);
         currentmDNSService = connectionHandler.isConnected() ? mDNSService
             : null;
-    }
 
-    @Override
-    public void dispose() {
-        super.dispose();
-        connectionHandler
-            .removeConnectionStateListener(connectionStateListener);
-        connectionHandler = null;
+        addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(DisposeEvent e) {
+                connectionHandler
+                    .removeConnectionStateListener(connectionStateListener);
+                connectionHandler = null;
+            }
+        });
     }
 
     @Override

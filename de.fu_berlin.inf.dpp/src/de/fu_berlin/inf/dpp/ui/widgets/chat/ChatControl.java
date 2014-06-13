@@ -14,6 +14,8 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.graphics.Color;
@@ -381,7 +383,19 @@ public class ChatControl extends Composite {
             }
         };
 
-        this.addListener(SWT.Show, showListener);
+        addListener(SWT.Show, showListener);
+
+        addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(DisposeEvent e) {
+                sessionManager.removeSarosSessionListener(sessionListener);
+                synchronized (this) {
+                    if (session != null)
+                        session.removeListener(projectListener);
+                }
+                clearColorCache();
+            }
+        });
     }
 
     public boolean isOwnJID(JID jid) {
@@ -408,17 +422,6 @@ public class ChatControl extends Composite {
 
         // TODO: this currently scrolls to the bottom
         chatDisplay.refresh();
-    }
-
-    @Override
-    public void dispose() {
-        super.dispose();
-        sessionManager.removeSarosSessionListener(sessionListener);
-        synchronized (this) {
-            if (session != null)
-                session.removeListener(projectListener);
-        }
-        clearColorCache();
     }
 
     /**
