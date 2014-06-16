@@ -30,12 +30,15 @@ import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatPreferences;
 import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatService;
 import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCNegotiationManager;
 import de.fu_berlin.inf.dpp.communication.chat.single.SingleUserChatService;
+import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
+import de.fu_berlin.inf.dpp.communication.connection.IConnectionStateListener;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.roster.IRosterListener;
 import de.fu_berlin.inf.dpp.net.xmpp.roster.AbstractRosterListener;
+import de.fu_berlin.inf.dpp.net.xmpp.roster.IRosterListener;
 import de.fu_berlin.inf.dpp.net.xmpp.roster.RosterTracker;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
@@ -60,6 +63,9 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
     private static final Logger log = Logger
         .getLogger(ChatRoomsComposite.class);
 
+    static final Color WHITE = Display.getDefault().getSystemColor(
+        SWT.COLOR_WHITE);
+
     /**
      * Default image for ChatView.
      */
@@ -72,9 +78,12 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
     public static final Image composingImage = ImageManager
         .getImage("icons/view16/cmpsg_misc.png");
 
-    protected ListExplanation howTo = new ListExplanation(SWT.ICON_INFORMATION,
-        "To share projects you can either:", "Right-click on a project",
-        "Right-click on a contact",
+    private ListExplanation connectFirst = new ListExplanation(
+        SWT.ICON_INFORMATION, "To share projects you must connect first.");
+
+    private ListExplanation howToShareProjects = new ListExplanation(
+        SWT.ICON_INFORMATION, "To share projects you can either:",
+        "Right-click on a project", "Right-click on a contact",
         "Use the Saros menu in the Eclipse menu bar");
 
     protected boolean isSessionRunning;
@@ -89,6 +98,25 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
     protected Object mucCreationLock = new Object();
 
+    @Inject
+    private ConnectionHandler connectionHandler;
+
+    @Inject
+    protected EditorManager editorManager;
+
+    @Inject
+    protected ISarosSessionManager sessionManager;
+
+    protected CTabFolder chatRooms;
+
+    @Inject
+    protected MultiUserChatService multiUserChatService;
+
+    @Inject
+    protected SingleUserChatService singleUserChatService;
+
+    @Inject
+    private MUCNegotiationManager mucNegotiationManager;
     /**
      * This RosterListener closure is added to the RosterTracker to get
      * notifications when the roster changes.
@@ -117,8 +145,23 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         }
     };
 
-    @Inject
-    protected EditorManager editorManager;
+    private final IConnectionStateListener connectionStateListener = new IConnectionStateListener() {
+
+        @Override
+        public void connectionStateChanged(ConnectionState state,
+            Exception error) {
+            SWTUtils.runSafeSWTAsync(log, new Runnable() {
+
+                @Override
+                public void run() {
+                    if (ChatRoomsComposite.this.isDisposed())
+                        return;
+
+                    updateExplanation();
+                }
+            });
+        }
+    };
 
     protected AbstractSharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
         @Override
@@ -224,23 +267,6 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         }
     };
 
-    @Inject
-    protected ISarosSessionManager sessionManager;
-
-    static final Color WHITE = Display.getDefault().getSystemColor(
-        SWT.COLOR_WHITE);
-
-    protected CTabFolder chatRooms;
-
-    @Inject
-    protected MultiUserChatService multiUserChatService;
-
-    @Inject
-    protected SingleUserChatService singleUserChatService;
-
-    @Inject
-    private MUCNegotiationManager mucNegotiationManager;
-
     protected DisposeListener disposeListener = new DisposeListener() {
 
         @Override
@@ -248,11 +274,8 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
             CTabItem source = (CTabItem) e.getSource();
             source.getControl().dispose();
 
-            if (chatRooms.getItemCount() == 0) {
-                showExplanation(howTo);
-            }
+            updateExplanation();
         }
-
     };
 
     protected IChatServiceListener chatServiceListener = new IChatServiceListener() {
@@ -355,18 +378,19 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
         SarosPluginContext.initComponent(this);
 
-        this.sessionManager.addSarosSessionListener(sessionListener);
-        this.editorManager.addSharedEditorListener(sharedEditorListener);
-        this.singleUserChatService.addChatServiceListener(chatServiceListener);
-        this.multiUserChatService.addChatServiceListener(chatServiceListener);
+        sessionManager.addSarosSessionListener(sessionListener);
+        editorManager.addSharedEditorListener(sharedEditorListener);
+        singleUserChatService.addChatServiceListener(chatServiceListener);
+        multiUserChatService.addChatServiceListener(chatServiceListener);
+        connectionHandler.addConnectionStateListener(connectionStateListener);
 
-        this.setLayout(new FillLayout());
+        setLayout(new FillLayout());
 
-        this.chatRooms = new CTabFolder(this, SWT.BOTTOM);
-        this.setContentControl(this.chatRooms);
+        chatRooms = new CTabFolder(this, SWT.BOTTOM);
+        setContentControl(chatRooms);
 
-        this.chatRooms.setSimple(true);
-        this.chatRooms.setBorderVisible(true);
+        chatRooms.setSimple(true);
+        chatRooms.setBorderVisible(true);
 
         /*
          * TODO: The user can open and close Views as he wishes. This means that
@@ -380,9 +404,9 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         isSessionRunning = sessionManager.getSarosSession() != null;
         isSessionHost = session != null && session.isHost();
 
-        showExplanation(howTo);
+        updateExplanation();
 
-        this.addDisposeListener(new DisposeListener() {
+        addDisposeListener(new DisposeListener() {
 
             @Override
             public void widgetDisposed(DisposeEvent e) {
@@ -395,6 +419,8 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
                 multiUserChatService
                     .removeChatServiceListener(chatServiceListener);
 
+                connectionHandler
+                    .removeConnectionStateListener(connectionStateListener);
                 /**
                  * This must be called before finalization otherwise you will
                  * get NPE on RosterTracker.
@@ -487,10 +513,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         if (tab != null && !tab.isDisposed()) {
             tab.dispose();
 
-            if (chatRooms.getItemCount() == 0) {
-                showExplanation(howTo);
-            }
-
+            updateExplanation();
             return true;
         }
 
@@ -530,6 +553,16 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         }
 
         return false;
+    }
+
+    private void updateExplanation() {
+        if (chatRooms.getItemCount() != 0)
+            return;
+
+        if (!connectionHandler.isConnected())
+            showExplanation(connectFirst);
+        else
+            showExplanation(howToShareProjects);
     }
 
     public ChatControl getSelectedChatControl() {
