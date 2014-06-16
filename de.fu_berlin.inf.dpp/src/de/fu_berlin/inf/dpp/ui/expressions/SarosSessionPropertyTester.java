@@ -2,13 +2,11 @@ package de.fu_berlin.inf.dpp.ui.expressions;
 
 import org.eclipse.core.expressions.PropertyTester;
 
-import de.fu_berlin.inf.dpp.project.internal.SarosSession;
+import de.fu_berlin.inf.dpp.serviceProviders.NullSarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 
 /**
- * Adds tests to the {@link ISarosSession}. <br/>
- * Currently only tests whether the given {@link ISarosSession}'s participant is
- * the host.
+ * Adds tests to a running {@link ISarosSession session}.
  */
 public class SarosSessionPropertyTester extends PropertyTester {
 
@@ -16,15 +14,17 @@ public class SarosSessionPropertyTester extends PropertyTester {
     public boolean test(Object receiver, String property, Object[] args,
         Object expectedValue) {
         // do not check the interface as we might get the NullSarosSession
-        if (receiver instanceof SarosSession) {
-            ISarosSession sarosSession = (ISarosSession) receiver;
-            if ("isHost".equals(property)) {
-                return sarosSession.isHost();
-            }
-            if ("hasWriteAccess".equals(property)) {
-                return sarosSession.hasWriteAccess();
-            }
-        }
+        if (receiver instanceof NullSarosSession)
+            return false;
+
+        final ISarosSession session = (ISarosSession) receiver;
+
+        if ("isHost".equals(property))
+            return session.isHost();
+
+        if ("hasWriteAccess".equals(property))
+            return session.hasWriteAccess();
+
         return false;
     }
 

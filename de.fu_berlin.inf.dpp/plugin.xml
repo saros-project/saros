@@ -1483,15 +1483,15 @@
             type="org.eclipse.core.resources.IResource">
       </propertyTester>
       <propertyTester
-            class="de.fu_berlin.inf.dpp.ui.expressions.BuddyPropertyTester"
-            id="de.fu_berlin.inf.dpp.propertyTesters.BuddyPropertyTester"
+            class="de.fu_berlin.inf.dpp.ui.expressions.ContactPropertyTester"
+            id="de.fu_berlin.inf.dpp.ui.expressions.ContactPropertyTester"
             namespace="de.fu_berlin.inf.dpp"
             properties="isInSarosSession"
             type="de.fu_berlin.inf.dpp.net.xmpp.JID">
       </propertyTester>
       <propertyTester
-            class="de.fu_berlin.inf.dpp.ui.expressions.ParticipantPropertyTester"
-            id="de.fu_berlin.inf.dpp.propertyTesters.ParticipantPropertyTester"
+            class="de.fu_berlin.inf.dpp.ui.expressions.UserPropertyTester"
+            id="de.fu_berlin.inf.dpp.ui.expressions.UserPropertyTester"
             namespace="de.fu_berlin.inf.dpp"
             properties="hasWriteAccess,isRemote"
             type="de.fu_berlin.inf.dpp.session.User">
