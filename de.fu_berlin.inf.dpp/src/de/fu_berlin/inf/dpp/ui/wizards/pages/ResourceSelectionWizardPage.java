@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.ui.wizards.pages;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -10,13 +12,12 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.ResourceSelectionComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.FilterClosedProjectsChangedEvent;
@@ -28,6 +29,8 @@ public class ResourceSelectionWizardPage extends WizardPage {
         .getLogger(ResourceSelectionWizardPage.class);
 
     private ResourceSelectionComposite resourceSelectionComposite;
+
+    private Collection<IResource> preselectedResources;
 
     /**
      * This {@link ResourceSelectionListener} changes the {@link WizardPage} 's
@@ -58,10 +61,16 @@ public class ResourceSelectionWizardPage extends WizardPage {
         }
     };
 
-    public ResourceSelectionWizardPage() {
+    /**
+     * @param preselectedResources
+     *            resources that should be preselected or <code>null</code>
+     */
+    public ResourceSelectionWizardPage(
+        final Collection<IResource> preselectedResources) {
         super(ResourceSelectionWizardPage.class.getName());
         setTitle(Messages.ProjectSelectionWizardPage_title);
         setDescription(Messages.ProjectSelectionWizardPage_description);
+        this.preselectedResources = preselectedResources;
     }
 
     @Override
@@ -99,29 +108,41 @@ public class ResourceSelectionWizardPage extends WizardPage {
         final Runnable takeOverPerspectiveSelection = new Runnable() {
             @Override
             public void run() {
-                List<IResource> selection = SelectionRetrieverFactory
-                    .getSelectionRetriever(IResource.class).getSelection();
-                resourceSelectionComposite.setSelectedResources(selection);
+
+                final List<IResource> selectedResources = new ArrayList<IResource>();
+
+                if (preselectedResources != null
+                    && preselectedResources.size() > 0) {
+
+                    selectedResources.addAll(preselectedResources);
+                    resourceSelectionComposite
+                        .setSelectedResources(selectedResources);
+                }
+
+                preselectedResources = null; // GC
+
                 resourceSelectionComposite
                     .addResourceSelectionListener(resourceSelectionListener);
                 /*
                  * If nothing is selected and only one project exists in the
                  * workspace, select it in the Wizard.
                  */
-                if (selection.size() == 0) {
-                    if (resourceSelectionComposite.getProjectsCount() == 1) {
-                        selection = resourceSelectionComposite.getResources();
-                        resourceSelectionComposite
-                            .setSelectedResources(selection);
-                    }
+                if (selectedResources.size() == 0
+                    && resourceSelectionComposite.getProjectsCount() == 1) {
+
+                    selectedResources.addAll(resourceSelectionComposite
+                        .getResources());
+
+                    resourceSelectionComposite
+                        .setSelectedResources(selectedResources);
                 }
                 /*
-                 * Add the current automatically appliedselection to the
+                 * Add the current automatically applied selection to the
                  * undo-stack, so the user can undo it, and undo/redo works
                  * properly.
                  */
                 resourceSelectionComposite.rememberSelection();
-                setPageComplete(selection.size() > 0);
+                setPageComplete(selectedResources.size() > 0);
             }
         };
 
@@ -129,7 +150,13 @@ public class ResourceSelectionWizardPage extends WizardPage {
 
             @Override
             public void run() {
-                BusyIndicator.showWhile(Display.getDefault(),
+
+                final Shell shell = ResourceSelectionWizardPage.this.getShell();
+
+                if (shell == null || shell.isDisposed())
+                    return;
+
+                BusyIndicator.showWhile(shell.getDisplay(),
                     takeOverPerspectiveSelection);
             }
         });

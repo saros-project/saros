@@ -3,10 +3,10 @@ package de.fu_berlin.inf.dpp.ui.commandHandlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.picocontainer.annotations.Inject;
+import org.eclipse.core.resources.IResource;
 
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
+import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 
 /**
  * @JTourBusStop 1, Invitation Process:
@@ -44,12 +44,10 @@ import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 
 public class ShareProjectHandler extends AbstractHandler {
 
-    @Inject
-    ISarosSessionManager sarosSessionManager;
-
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        WizardUtils.openStartSessionWizard();
+        WizardUtils.openStartSessionWizard(SelectionRetrieverFactory
+            .getSelectionRetriever(IResource.class).getSelection());
         return null;
     }
 }

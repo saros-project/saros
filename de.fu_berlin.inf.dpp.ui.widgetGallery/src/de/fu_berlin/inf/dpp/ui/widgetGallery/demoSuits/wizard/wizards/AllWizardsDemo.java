@@ -60,13 +60,13 @@ public class AllWizardsDemo extends AbstractDemo {
         wizards.put("ShareProjectWizard", new Runnable() {
             @Override
             public void run() {
-                WizardUtils.openStartSessionWizard();
+                WizardUtils.openStartSessionWizard(null);
             }
         });
         wizards.put("ShareProjectAddProjectWizard", new Runnable() {
             @Override
             public void run() {
-                WizardUtils.openAddResourcesToSessionWizard();
+                WizardUtils.openAddResourcesToSessionWizard(null);
             }
         });
         wizards.put("ShareProjectAddBuddiesWizard", new Runnable() {

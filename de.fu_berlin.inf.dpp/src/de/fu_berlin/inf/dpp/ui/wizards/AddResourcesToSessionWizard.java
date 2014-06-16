@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.wizards;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.resources.IResource;
@@ -22,12 +23,19 @@ public class AddResourcesToSessionWizard extends Wizard {
     public static final String TITLE = Messages.ShareProjectAddProjectsWizard_title;
     public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_SHARE_PROJECT_ADD_PROJECTS;
 
-    private final ResourceSelectionWizardPage resourceSelectionWizardPage = new ResourceSelectionWizardPage();
+    private final ResourceSelectionWizardPage resourceSelectionWizardPage;
 
-    public AddResourcesToSessionWizard() {
+    /**
+     * @param preselectedResources
+     *            resources that should be preselected or <code>null</code>
+     */
+    public AddResourcesToSessionWizard(
+        final Collection<IResource> preselectedResources) {
         setWindowTitle(TITLE);
         setDefaultPageImageDescriptor(IMAGE);
         setHelpAvailable(false);
+        resourceSelectionWizardPage = new ResourceSelectionWizardPage(
+            preselectedResources);
     }
 
     @Override

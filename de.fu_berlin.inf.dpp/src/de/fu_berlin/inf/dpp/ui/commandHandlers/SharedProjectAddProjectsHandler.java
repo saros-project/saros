@@ -18,7 +18,7 @@ public class SharedProjectAddProjectsHandler extends AbstractHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        WizardUtils.openAddResourcesToSessionWizard();
+        WizardUtils.openAddResourcesToSessionWizard(null);
         return null;
     }
 

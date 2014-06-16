@@ -1,8 +1,10 @@
 package de.fu_berlin.inf.dpp.ui.util;
 
+import java.util.Collection;
 import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.Wizard;
@@ -181,17 +183,27 @@ public class WizardUtils {
     /**
      * Opens a {@link StartSessionWizard} in the SWT thread and returns the
      * displayed instance in case of success.
+     * 
+     * @param preselectedResources
+     *            resources that should be preselected or <code>null</code>
      */
-    public static StartSessionWizard openStartSessionWizard() {
-        return openWizardSuccessfully(new StartSessionWizard());
+    public static StartSessionWizard openStartSessionWizard(
+        final Collection<IResource> preselectedResources) {
+        return openWizardSuccessfully(new StartSessionWizard(
+            preselectedResources));
     }
 
     /**
      * Opens a {@link AddResourcesToSessionWizard} in the SWT thread and returns
      * the displayed instance in case of success.
+     * 
+     * @param preselectedResources
+     *            resources that should be preselected or <code>null</code>
      */
-    public static AddResourcesToSessionWizard openAddResourcesToSessionWizard() {
-        return openWizardSuccessfully(new AddResourcesToSessionWizard());
+    public static AddResourcesToSessionWizard openAddResourcesToSessionWizard(
+        final Collection<IResource> preselectedResources) {
+        return openWizardSuccessfully(new AddResourcesToSessionWizard(
+            preselectedResources));
     }
 
     /**

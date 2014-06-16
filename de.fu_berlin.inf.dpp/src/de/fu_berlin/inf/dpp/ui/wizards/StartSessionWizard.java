@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.wizards;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.resources.IResource;
@@ -30,16 +31,24 @@ public class StartSessionWizard extends Wizard {
     public static final String TITLE = Messages.ShareProjectWizard_title;
     public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_SHARE_PROJECT_OUTGOING;
 
-    private ResourceSelectionWizardPage resourceSelectionWizardPage = new ResourceSelectionWizardPage();
-    private ContactSelectionWizardPage contactSelectionWizardPage = new ContactSelectionWizardPage(
-        true);
+    private final ResourceSelectionWizardPage resourceSelectionWizardPage;
+    private final ContactSelectionWizardPage contactSelectionWizardPage;
 
-    public StartSessionWizard() {
+    /**
+     * @param preselectedResources
+     *            resources that should be preselected or <code>null</code>
+     */
+    public StartSessionWizard(final Collection<IResource> preselectedResources) {
         SarosPluginContext.initComponent(this);
         setWindowTitle(TITLE);
         setDefaultPageImageDescriptor(IMAGE);
         setNeedsProgressMonitor(true);
         setHelpAvailable(false);
+
+        resourceSelectionWizardPage = new ResourceSelectionWizardPage(
+            preselectedResources);
+
+        contactSelectionWizardPage = new ContactSelectionWizardPage(true);
     }
 
     @Override
