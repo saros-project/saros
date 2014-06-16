@@ -1122,19 +1122,6 @@
                   name="ProjectsEnd"
                   visible="true">
             </separator>
-            <command
-                  commandId="de.fu_berlin.inf.dpp.ui.commands.ShareResource"
-                  label="Multiple Projects..."
-                  style="push">
-            </command>
-            <separator
-                  name="OtherStart"
-                  visible="true">
-            </separator>
-            <separator
-                  name="OtherEnd"
-                  visible="true">
-            </separator>
             <separator
                   name="additions">
             </separator>

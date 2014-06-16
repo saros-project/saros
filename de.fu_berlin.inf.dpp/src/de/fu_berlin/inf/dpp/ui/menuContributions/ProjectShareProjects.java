@@ -1,7 +1,7 @@
 package de.fu_berlin.inf.dpp.ui.menuContributions;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -17,49 +17,55 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.jivesoftware.smack.RosterEntry;
-import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
+import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
+import de.fu_berlin.inf.dpp.ui.wizards.StartSessionWizard;
 
 /**
- * This class fills a {@link Menu} with {@link MenuItem}s.<br/>
- * Each {@link MenuItem} represents an {@link IProject}.<br/>
- * A click leads to a shared project invitation.
+ * Creates a context menu filled with entries that represents a project that
+ * currently exists in the workspace. Each entry will trigger a session start
+ * with the given project and an invitation with the currently selected
+ * contact(s) in the roster. </p> In addition if multiple projects are present
+ * in the workspace an additional entry will be displayed which will open a
+ * {@linkplain StartSessionWizard wizard} to start a session instead.
  */
+// FIXME rename this class, the name is confusing
 public class ProjectShareProjects extends ContributionItem {
 
-    @Inject
-    protected Saros saros;
-
-    protected WorkbenchLabelProvider workbenchLabelProvider = new WorkbenchLabelProvider();
+    private final WorkbenchLabelProvider workbenchLabelProvider = new WorkbenchLabelProvider();
 
     public ProjectShareProjects() {
         this(null);
     }
 
-    public ProjectShareProjects(String id) {
+    public ProjectShareProjects(final String id) {
         super(id);
-        SarosPluginContext.initComponent(this);
     }
 
     @Override
-    public void fill(Menu menu, int index) {
-        final List<JID> selectedBuddies = SelectionRetrieverFactory
+    public void fill(final Menu menu, final int index) {
+        final List<JID> contacts = SelectionRetrieverFactory
             .getSelectionRetriever(JID.class).getSelection();
 
-        IProject[] workspaceProjects = getSortedWorkspaceProjects();
-        if (workspaceProjects.length > 0) {
-            for (int i = 0; i < workspaceProjects.length; i++) {
-                IProject project = workspaceProjects[i];
-                createProjectMenuItem(menu, i, project, selectedBuddies);
-            }
-        } else {
+        final IProject[] projects = getSortedWorkspaceProjects();
+
+        if (projects.length == 0) {
             createNoProjectsMenuItem(menu, 0);
+            return;
+        }
+
+        int idx;
+
+        for (idx = 0; idx < projects.length; idx++)
+            createProjectMenuItem(menu, idx, projects[idx], contacts);
+
+        if (idx > 1) {
+            new MenuItem(menu, SWT.SEPARATOR, idx++);
+            createMultipleProjectMenuItem(menu, idx);
         }
     }
 
@@ -68,17 +74,18 @@ public class ProjectShareProjects extends ContributionItem {
      * 
      * @return
      */
-    public IProject[] getSortedWorkspaceProjects() {
-        IProject[] workspaceProjects = ResourcesPlugin.getWorkspace().getRoot()
-            .getProjects();
+    private IProject[] getSortedWorkspaceProjects() {
+
+        final IProject[] workspaceProjects = ResourcesPlugin.getWorkspace()
+            .getRoot().getProjects();
+
         Arrays.sort(workspaceProjects, new Comparator<IProject>() {
             @Override
-            public int compare(IProject o1, IProject o2) {
-                String name1 = o1.getName();
-                String name2 = o2.getName();
-                return name1.compareToIgnoreCase(name2);
+            public int compare(final IProject a, final IProject b) {
+                return a.getName().compareToIgnoreCase(b.getName());
             }
         });
+
         return workspaceProjects;
     }
 
@@ -86,25 +93,36 @@ public class ProjectShareProjects extends ContributionItem {
      * Creates a menu entry which shares projects with the given
      * {@link RosterEntry}.
      * 
-     * @param parentMenu
-     * @param index
-     * @param project
-     * @param selectedContacts
-     * @return
      */
-    protected MenuItem createProjectMenuItem(Menu parentMenu, int index,
-        final IProject project, final List<JID> selectedContacts) {
+    private MenuItem createProjectMenuItem(final Menu parentMenu,
+        final int index, final IProject project, final List<JID> contacts) {
 
-        MenuItem menuItem = new MenuItem(parentMenu, SWT.NONE, index);
+        final MenuItem menuItem = new MenuItem(parentMenu, SWT.NONE, index);
+
         menuItem.setText(workbenchLabelProvider.getText(project));
         menuItem.setImage(workbenchLabelProvider.getImage(project));
 
         menuItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                List<IResource> resources = new ArrayList<IResource>();
-                resources.add(project);
-                CollaborationUtils.startSession(resources, selectedContacts);
+                CollaborationUtils.startSession(
+                    Collections.<IResource> singletonList(project), contacts);
+            }
+        });
+
+        return menuItem;
+    }
+
+    private MenuItem createMultipleProjectMenuItem(final Menu parentMenu,
+        final int index) {
+
+        final MenuItem menuItem = new MenuItem(parentMenu, SWT.NONE, index);
+
+        menuItem.setText("Multiple Projects...");
+        menuItem.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                WizardUtils.openStartSessionWizard(null);
             }
         });
 
@@ -112,15 +130,13 @@ public class ProjectShareProjects extends ContributionItem {
     }
 
     /**
-     * Creates a menu entry which indicates that no Saros enabled buddies are
+     * Creates a menu entry which indicates that no Saros enabled contacts are
      * online.
-     * 
-     * @param parentMenu
-     * @param index
-     * @return
      */
-    protected MenuItem createNoProjectsMenuItem(Menu parentMenu, int index) {
-        MenuItem menuItem = new MenuItem(parentMenu, SWT.NONE, index);
+    private MenuItem createNoProjectsMenuItem(final Menu parentMenu,
+        final int index) {
+
+        final MenuItem menuItem = new MenuItem(parentMenu, SWT.NONE, index);
         menuItem
             .setText(Messages.ProjectShareProjects_no_projects_in_workspace);
         menuItem.setEnabled(false);
