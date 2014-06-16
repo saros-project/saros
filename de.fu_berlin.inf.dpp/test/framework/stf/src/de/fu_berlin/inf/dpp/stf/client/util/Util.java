@@ -73,8 +73,10 @@ public class Util {
      * file. The project is created by this method so it <b>must not</b> exist
      * before. The invitiees are invited concurrently.
      * 
-     * @NOTE there is no guarantee that the project and its files are already
-     *       shared after this method returns
+     * <p>
+     * <b>Note:</b> there is no guarantee that the project and its files are
+     * already shared after this method returns
+     * 
      * @param projectName
      *            the name of the project
      * @param path
@@ -108,8 +110,10 @@ public class Util {
      * a class. The project is created by this method so it <b>must not</b>
      * exist before. The invitiees are invited concurrently.
      * 
-     * @NOTE there is no guarantee that the project and its files are already
-     *       shared after this method returns
+     * <p>
+     * <b>Note:</b> there is no guarantee that the project and its files are
+     * already shared after this method returns
+     * 
      * @param projectName
      *            the name of the project
      * @param packageName
@@ -193,10 +197,13 @@ public class Util {
      * Adds a project to the current session. This is done sequentially, so the
      * project is send to the invitees one after another.
      * 
-     * @NOTE Adding a project that is already shared or does not exist results
-     *       in unexpected behavior.
-     * @NOTE there is no guarantee that the project and its files are already
-     *       shared after this method returns
+     * <p>
+     * <b>Note:</b> Adding a project that is already shared or does not exist
+     * results in unexpected behavior.
+     * <p>
+     * <b>Note:</b> there is no guarantee that the project and its files are
+     * already shared after this method returns
+     * 
      * @param projectName
      *            the name of the project
      * @param projectType
@@ -230,10 +237,13 @@ public class Util {
      * Establish a Saros session with the given invitees. Every invitee is
      * invited one bye one.
      * 
-     * @NOTE Establishing session with a project that is already shared or does
-     *       not exist results in unexpected behavior.
-     * @NOTE there is no guarantee that the project and its files are already
-     *       shared after this method returns
+     * <p>
+     * <b>Note:</b> Establishing session with a project that is already shared
+     * or does not exist results in unexpected behavior.
+     * <p>
+     * <b>Note:</b> there is no guarantee that the project and its files are
+     * already shared after this method returns
+     * 
      * @param projectName
      *            the name of the project to share
      * @param projectType
@@ -271,10 +281,13 @@ public class Util {
      * Establish a Saros session with the given invitees. All invitees are
      * invited simultaneously.
      * 
-     * @NOTE Establishing session with a project that is already shared or does
-     *       not exist results in unexpected behavior.
-     * @NOTE there is no guarantee that the project and its files are already
-     *       shared after this method returns
+     * <p>
+     * <b>Note:</b> Establishing session with a project that is already shared
+     * or does not exist results in unexpected behavior.
+     * <p>
+     * <b>Note:</b> there is no guarantee that the project and its files are
+     * already shared after this method returns
+     * 
      * @param projectName
      *            the name of the project to share
      * @param projectType
@@ -321,10 +334,13 @@ public class Util {
      * Establish a Saros session with specific files of a project. All invitees
      * are invited simultaneously.
      * 
-     * @NOTE Establishing session with a project that is already shared or does
-     *       not exist results in unexpected behavior.
-     * @NOTE there is no guarantee that the project and its files are already
-     *       shared after this method returns
+     * <p>
+     * <b>Note:</b> Establishing session with a project that is already shared
+     * or does not exist results in unexpected behavior.
+     * <p>
+     * <b>Note:</b> there is no guarantee that the project and its files are
+     * already shared after this method returns
+     * 
      * @param projectName
      *            the name of the project to share
      * @param files
@@ -489,8 +505,10 @@ public class Util {
     /**
      * Adds testers to the current session.
      * 
-     * @NOTE there is no guarantee that the project and its files are already
-     *       shared after this method returns
+     * <p>
+     * <b>Note:</b> there is no guarantee that the project and its files are
+     * already shared after this method returns
+     * 
      * @param projectName
      *            the name of the project which <b>must</b> be shared in the
      *            current session
@@ -682,10 +700,12 @@ public class Util {
      * created. Participants that are already (in a different) session will not
      * be invited.
      * 
-     * @NOTE there is no guarantee that the project and its files are already
-     *       shared after this method returns
-     * @NOTE calling this method with always different project names during a
-     *       session will result in unexpected behavior
+     * <p>
+     * <b>Note:</b> there is no guarantee that the project and its files are
+     * already shared after this method returns
+     * <p>
+     * <b>Note:</b> calling this method with always different project names
+     * during a session will result in unexpected behavior
      * 
      * @param projectName
      *            the name of the project
