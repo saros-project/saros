@@ -158,11 +158,13 @@ public class BuddiesByAliceBobTest extends StfTestCase {
 
     @Test
     public void workTogetherOnMultiProject() throws RemoteException {
-        ALICE.superBot().views().packageExplorerView().tree().newC()
-            .javaProject(Constants.PROJECT1);
+
+        ALICE.superBot().internal().createProject("Foo");
+        ALICE.superBot().internal().createProject("Bar");
+
         ALICE.superBot().views().sarosView().selectContact(BOB.getJID())
-            .workTogetherOn()
-            .multipleProjects(Constants.PROJECT1, BOB.getJID());
+            .workTogetherOn().multipleProjects("Foo", BOB.getJID());
+
         BOB.superBot().confirmShellSessionInvitationAndShellAddProject(
             Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT);
 
