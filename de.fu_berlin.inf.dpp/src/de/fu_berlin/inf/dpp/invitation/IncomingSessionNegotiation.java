@@ -278,7 +278,11 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
 
         for (ISessionNegotiationHook hook : hookManager.getHooks()) {
             Map<String, String> settings = parameters.getHookSettings(hook);
+
             hook.applyActualParameters(settings);
+
+            if (settings == null)
+                continue;
 
             // HACK (Part 3/4)
             if (hook instanceof ColorNegotiationHook) {
