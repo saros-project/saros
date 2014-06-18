@@ -101,12 +101,12 @@ public class NullProgressSubMonitor implements ISubMonitor {
     }
 
     @Override
-    public ISubMonitor convert(IProgressMonitor monitor) {
+    public ISubMonitor convert() {
         return this;
     }
 
     @Override
-    public ISubMonitor convert(IProgressMonitor monitor, String title,
+    public ISubMonitor convert(String title,
         int progress) {
         return this;
     }

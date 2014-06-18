@@ -28,7 +28,9 @@ public interface IProgressMonitor {
 
     void internalWorked(double work);
 
-    ISubMonitor convert(IProgressMonitor monitor);
+    //TODO: Hack, ISubMonitor to be removed from Saros-I
+    ISubMonitor convert();
 
-    ISubMonitor convert(IProgressMonitor monitor, String title, int progress);
+    //TODO: Hack, ISubMonitor to be removed from Saros-I
+    ISubMonitor convert(String title, int progress);
 }

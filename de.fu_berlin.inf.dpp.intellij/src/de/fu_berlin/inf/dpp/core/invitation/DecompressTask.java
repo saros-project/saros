@@ -88,7 +88,7 @@ public class DecompressTask implements IWorkspaceRunnable {
         // TODO calculate size for better progress
 
         ISubMonitor subMonitor = monitor
-            .convert(monitor, "Unpacking archive file to workspace", 1);
+            .convert("Unpacking archive file to workspace", 1);
 
         try {
             ZipEntry entry;
