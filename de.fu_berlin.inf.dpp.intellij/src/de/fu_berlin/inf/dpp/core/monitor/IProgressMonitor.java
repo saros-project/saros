@@ -1,30 +1,13 @@
 package de.fu_berlin.inf.dpp.core.monitor;
 
 /**
- * This interface is under development. It currently equals its Eclipse
- * counterpart. If not mentioned otherwise all offered methods are equivalent to
- * their Eclipse counterpart.
- * </p>
- * TODO Consolidate with interface in Saros/Core
+ * Temporary interface for compatibility with Eclipse SubMonitor implementation
  */
-public interface IProgressMonitor {
-    public static final int UNKNOWN = 0;
-
-    boolean isCanceled();
-
-    void setCanceled(boolean cancel);
-
-    void worked(int delta);
-
-    void subTask(String remaingTime);
-
-    void setTaskName(String name);
-
-    void done();
+//todo: remove it and use de.fu_berlin.inf.dpp.monitoring.IProgressMonitor in all IntelliJ classes
+public interface IProgressMonitor
+    extends de.fu_berlin.inf.dpp.monitoring.IProgressMonitor {
 
     void beginTask(String taskName, String type);
-
-    void beginTask(String taskNam, int size);
 
     void internalWorked(double work);
 
