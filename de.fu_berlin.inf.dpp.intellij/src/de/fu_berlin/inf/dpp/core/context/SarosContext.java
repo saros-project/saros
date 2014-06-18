@@ -29,6 +29,8 @@ import de.fu_berlin.inf.dpp.misc.pico.ChildContainer;
 import de.fu_berlin.inf.dpp.misc.pico.ChildContainerProvider;
 import de.fu_berlin.inf.dpp.misc.pico.DotGraphMonitor;
 import de.fu_berlin.inf.dpp.misc.xstream.XStreamExtensionProvider;
+import de.fu_berlin.inf.dpp.net.internal.extensions.ProjectNegotiationMissingFilesExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.ProjectNegotiationOfferingExtension;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.util.StackTrace;
@@ -106,15 +108,15 @@ public class SarosContext implements ISarosContext {
             Class.forName(InvitationAcceptedExtension.class.getName());
             Class.forName(InvitationCompletedExtension.class.getName());
             Class.forName(CancelProjectNegotiationExtension.class.getName());
-            //     Class.forName(ProjectNegotiationMissingFilesExtension.class .getName());  //todo
+            Class.forName(ProjectNegotiationOfferingExtension.class.getName());
+            Class.forName(
+                ProjectNegotiationMissingFilesExtension.class.getName());
             Class.forName(KickUserExtension.class.getName());
             Class.forName(UserListExtension.class.getName());
             Class.forName(LeaveSessionExtension.class.getName());
             Class.forName(UserListReceivedExtension.class.getName());
             Class.forName(PingExtension.class.getName());
             Class.forName(PongExtension.class.getName());
-            //TODO: has to be added again
-            //Class.forName(ProjectNegotiationOfferingExtension.class.getName());
 
             Class.forName(
                 UserFinishedProjectNegotiationExtension.class.getName());
