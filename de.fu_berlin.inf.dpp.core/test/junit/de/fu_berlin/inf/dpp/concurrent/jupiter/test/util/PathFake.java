@@ -78,6 +78,11 @@ public class PathFake implements IPath {
     }
 
     @Override
+    public IPath removeFirstSegments(int count) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public IPath removeLastSegments(int count) {
         throw new UnsupportedOperationException();
     }
@@ -112,8 +117,9 @@ public class PathFake implements IPath {
         throw new UnsupportedOperationException();
     }
 
-    @Override public String getFileExtension() {
-       throw new UnsupportedOperationException();
+    @Override
+    public String getFileExtension() {
+        throw new UnsupportedOperationException();
     }
 
     @Override

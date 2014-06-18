@@ -41,6 +41,8 @@ public interface IPath {
 
     public int segmentCount();
 
+    public IPath removeFirstSegments(int count);
+
     public IPath removeLastSegments(int count);
 
     public boolean isEmpty();

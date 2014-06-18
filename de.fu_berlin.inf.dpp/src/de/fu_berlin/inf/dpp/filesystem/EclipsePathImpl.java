@@ -60,6 +60,11 @@ public class EclipsePathImpl implements IPath {
     }
 
     @Override
+    public IPath removeFirstSegments(int count) {
+        return new EclipsePathImpl(delegate.removeFirstSegments(count));
+    }
+
+    @Override
     public boolean isEmpty() {
         return delegate.isEmpty();
     }
