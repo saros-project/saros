@@ -124,6 +124,10 @@
         <fileset dir="${core.libdir}" includes="*.jar"/>
     </path>
 
+    <path id="libraries.test.classpath">
+        <fileset dir="${core.basedir}/test/lib"/>
+    </path>
+
     <!-- Global Libraries -->
     <!-- Register Custom Compiler Taskdefs -->
     <property name="javac2.home" value="${idea.home}/lib"/>
@@ -249,6 +253,7 @@
 
 
     <path id="saros-i.test.classpath">
+        <path refid="libraries.test.classpath"/>
         <path refid="saros-i.main.classpath"/>
         <pathelement location="${saros-i.output.dir}"/>
     </path>

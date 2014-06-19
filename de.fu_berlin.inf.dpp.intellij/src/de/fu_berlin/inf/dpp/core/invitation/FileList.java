@@ -22,38 +22,24 @@ package de.fu_berlin.inf.dpp.core.invitation;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
-import de.fu_berlin.inf.dpp.core.monitor.IProgressMonitor;
-import de.fu_berlin.inf.dpp.core.monitor.NullProgressMonitor;
-import de.fu_berlin.inf.dpp.core.util.FileUtils;
-import de.fu_berlin.inf.dpp.core.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.core.vcs.VCSResourceInfo;
-import de.fu_berlin.inf.dpp.core.workspace.IWorkspace;
-import de.fu_berlin.inf.dpp.filesystem.*;
-import org.apache.log4j.Logger;
-import org.picocontainer.annotations.Inject;
+import org.apache.commons.lang.ObjectUtils;
 
-import java.io.IOException;
 import java.util.*;
 
 /**
- * A FileList is a list of resources - files and folders - which belong to the
- * same {@link IProject}. FileLists can be compared to other FileLists. Folders
- * are denoted by a trailing separator. Instances of this class are immutable.
- * No further modification is allowed after creation.<br>
- * <br>
- * NOTE: As computation of a FileList involves a complete rescan of the project,
- * creating new instances should be avoided.
+ * A FileList is a list of resources -- files and folders -- which belong to the
+ * same project. FileLists can be compared to other FileLists. Folders are
+ * denoted by a trailing separator. Instances of this class are immutable. No
+ * further modification is allowed after creation. Instances should be created
+ * using the methods provided by the {@link FileListFactory}.
  *
  * @author rdjemili
  */
-// TODO Consolidate carefully, considerable difference with Saros/E counterpart
 @XStreamAlias("FILELIST")
 public class FileList {
 
-    private static final Logger log = Logger.getLogger(FileList.class);
-
-    @Inject
-    public static IWorkspace workspace;  //todo
+    static final String DIR_SEPARATOR = "/";
     private final boolean useVersionControl;
     /**
      * Identifies the VCS used.
@@ -72,11 +58,9 @@ public class FileList {
      */
     private String projectID;
     private Set<String> encodings = new HashSet<String>();
-    private File root = new File("", null, true);
+    private File root;
     @XStreamOmitField
-    private List<IPath> cachedList = null;
-    @XStreamOmitField
-    private String toString;
+    private List<String> cachedList = null;
 
     /**
      * Creates an empty file list.
@@ -93,72 +77,14 @@ public class FileList {
      */
     FileList(boolean useVersionControl) {
         this.useVersionControl = useVersionControl;
+        this.root = File.createRoot();
     }
 
-    /**
-     * Creates a new file list from the file tree in given container.
-     *
-     * @param container         The resource container that should be represented by the new
-     *                          file list.
-     * @param useVersionControl If false, the FileList won't include version control
-     *                          information.
-     * @throws IOException Exception that might happen while fetching the files from the
-     *                     given container.
-     */
-    FileList(IContainer container, IChecksumCache checksumCache,
-        boolean useVersionControl, IProgressMonitor monitor)
-        throws IOException {
-        this(useVersionControl);
-
-        if (container.getType() == IResource.PROJECT) {
-            addEncoding(container.getDefaultCharset());
-        }
-
-        addMembers(Arrays.asList(container.members()), checksumCache, monitor);
-    }
-
-    /**
-     * Creates a new file list from given resources.
-     *
-     * @param resources         The resources that should be added to this file list.
-     * @param useVersionControl If false, the FileList won't include version control
-     *                          information.
-     * @throws IOException
-     */
-    FileList(List<IResource> resources, IChecksumCache checksumCache,
-        boolean useVersionControl, IProgressMonitor monitor)
-        throws IOException {
-        this(useVersionControl);
-        addMembers(resources, checksumCache, monitor);
-    }
-
-    /**
-     * Creates a new file list from given paths. It does not compute checksums
-     * or location information.
-     *
-     * @param paths a list of paths that <b>refers</b> to <b>files</b> that should
-     *              be added to this file list.
-     * @NOTE This method does not check the input. The caller is
-     * <b>responsible</b> for the <b>correct</b> input !
-     */
-    FileList(List<IPath> paths) {
-        this(false);
-
-        if (paths == null) {
-            throw new NullPointerException("path list must not be null");
-        }
-
-        for (IPath path : paths) {
-            root.addPath(path, null, false);
-        }
-    }
-
-    MetaData getMetaData(IPath path) {
+    MetaData getMetaData(String path) {
         return root.getMetaData(path);
     }
 
-    public String getVCSRevision(IPath path) {
-
+    public String getVCSRevision(String path) {
         if (path.isEmpty()) {
             return vcsProjectInfo.revision;
         }
@@ -172,7 +98,7 @@ public class FileList {
         return metaData.vcsInfo == null ? null : metaData.vcsInfo.revision;
     }
 
-    public String getVCSUrl(IPath path) {
+    public String getVCSUrl(String path) {
         if (path.isEmpty()) {
             return vcsProjectInfo.url;
         }
@@ -196,17 +122,94 @@ public class FileList {
         return new HashSet<String>(encodings);
     }
 
+    void addEncoding(String charset) {
+        if (charset == null) {
+            return;
+        }
+
+        encodings.add(charset);
+    }
+
+    void addPath(String path) {
+        root.addPath(path, null, false);
+    }
+
+    void addPath(String path, MetaData metaData, boolean isDirectory) {
+        root.addPath(path, metaData, isDirectory);
+    }
+
+    boolean contains(String path) {
+        return root.contains(path);
+    }
+
     /**
-     * @return a sorted list of all paths in this file list. The paths are
-     * sorted by their character length.
+     * Returns a sorted list of all paths in this FileList.
+     * <p/>
+     * Example: In case the FileList looks like this:
+     * <p/>
+     * <pre>
+     * / A
+     *   / A1.java
+     * / B
+     *   / B2.java
+     *   / B3.java
+     * / C
+     * </pre>
+     * <p/>
+     * then this method returns:
+     * <code>[A/A1.java, B/B2.java, B/B3.java, C/]</code>
+     *
+     * @return Returns only the leaves of the tree, i.e. folders are only
+     * included if they don't contain anything. The paths are sorted by
+     * their character length.
      */
-    public List<IPath> getPaths() {
+    public List<String> getPaths() {
         if (cachedList != null) {
             return cachedList;
         }
 
         cachedList = root.toList();
         return cachedList;
+    }
+
+    public FileListDiff diff(FileList other) {
+        return FileListDiff.diff(this, other);
+    }
+
+    public boolean useVersionControl() {
+        return useVersionControl;
+    }
+
+    public String getVcsProviderID() {
+        return vcsProviderID;
+    }
+
+    void setVcsProviderID(String id) {
+        vcsProviderID = id;
+    }
+
+    public VCSResourceInfo getProjectInfo() {
+        return vcsProjectInfo;
+    }
+
+    void setVcsRepositoryRoot(VCSResourceInfo info) {
+        vcsProjectInfo = info;
+    }
+
+    public String getRepositoryRoot() {
+        return vcsRepositoryRoot;
+    }
+
+    void setVcsRepositoryRoot(String repoRoot) {
+        vcsRepositoryRoot = repoRoot;
+    }
+
+    public String getProjectID() {
+        return projectID;
+    }
+
+    public void setProjectID(String projectID) {
+        this.projectID = projectID;
     }
 
     @Override
@@ -227,189 +230,12 @@ public class FileList {
         return root.equals(((FileList) o).root);
     }
 
-    private void addMembers(List<IResource> resources,
-        IChecksumCache checksumCache, IProgressMonitor monitor)
-        throws IOException {
-
-        if (resources.size() == 0) {
-            return;
-        }
-
-        if (monitor == null) {
-            monitor = new NullProgressMonitor();
-        }
-
-        if (resources.size() == 0) {
-            return;
-        }
-
-        IProject project = null;
-        VCSAdapter vcs = null;
-
-        if (useVersionControl) {
-            project = resources.get(0).getProject();
-            vcs = VCSAdapter.getAdapter(project);
-
-            if (vcs != null) {
-                String providerID = vcs.getProviderID(project);
-
-                vcsProviderID = providerID;
-                vcsRepositoryRoot = vcs.getRepositoryString(project);
-                vcsProjectInfo = vcs.getCurrentResourceInfo(project);
-                /*
-                 * FIXME we need to stop querying for VCS revisions the moment
-                 * we reach the first exception
-                 *
-                 * Caused by:
-                 * org.tigris.subversion.svnclientadapter.SVNClientException:
-                 * org.apache.subversion.javahl.ClientException: The working
-                 * copy needs to be upgraded
-                 *
-                 * which will significantly slow down the overall invitation
-                 * process. It doesn't make sense to check for other files. If
-                 * there is one resource that is not upgraded, this fails
-                 * overall...
-                 */
-            }
-        }
-
-        Deque<IResource> stack = new LinkedList<IResource>();
-
-        stack.addAll(resources);
-
-        List<IFile> files = new LinkedList<IFile>();
-
-        monitor.subTask("Reading SVN revisions for shared files...");
-        while (!stack.isEmpty()) {
-            IResource resource = stack.pop();
-
-            if (resource.isDerived() || !resource.exists()) {
-                continue;
-            }
-
-            IPath path = resource.getProjectRelativePath();
-
-            if (root.contains(path)) {
-                continue;
-            }
-
-            VCSResourceInfo info = null;
-
-            if (vcs != null) {
-                info = vcs.getCurrentResourceInfo(resource);
-            }
-
-            assert !useVersionControl || (project != null && project
-                .equals(resource.getProject()));
-
-            MetaData data = null;
-
-            switch (resource.getType()) {
-            case IResource.FILE:
-                files.add((IFile) resource);
-                data = new MetaData();
-                data.vcsInfo = info;
-                root.addPath(path, data, false);
-                addEncoding(((IFile) resource).getCharset());
-                break;
-            case IResource.FOLDER:
-                stack.addAll(Arrays.asList(((IFolder) resource).members()));
-
-                if (info != null) {
-                    data = new MetaData();
-                    data.vcsInfo = info;
-                }
-                root.addPath(path, data, true);
-                break;
-            }
-        }
-
-        monitor.beginTask("Calculating checksums...", files.size());
-
-        for (IFile file : files) {
-            try {
-                monitor.subTask(
-                    file.getProject().getName() + ": " + file.getName());
-
-                MetaData data = root.getMetaData(file.getProjectRelativePath());
-
-                Long checksum = null;
-
-                /** {@link IChecksumCache} **/
-                String path = file.getFullPath().toPortableString();
-
-                if (checksumCache != null) {
-                    checksum = checksumCache.getChecksum(path);
-                }
-
-                data.checksum =
-                    checksum == null ? FileUtils.checksum(file) : checksum;
-
-                if (checksumCache != null) {
-                    boolean isInvalid = checksumCache
-                        .addChecksum(path, data.checksum);
-
-                    if (isInvalid && checksum != null) {
-                        log.warn("calculated checksum on dirty data: " + file
-                            .getFullPath());
-                    }
-                }
-
-            } catch (IOException e) {
-                log.error(e);
-            }
-
-            monitor.worked(1);
-        }
-    }
-
-    public FileListDiff diff(FileList other) {
-        return FileListDiff.diff(this, other);
-    }
-
-    public String getVcsProviderID() {
-        return vcsProviderID;
-    }
-
-    public VCSResourceInfo getProjectInfo() {
-        return vcsProjectInfo;
-    }
-
-    public String getRepositoryRoot() {
-        return vcsRepositoryRoot;
-    }
-
-    public String getProjectID() {
-        return projectID;
-    }
-
-    public void setProjectID(String projectID) {
-        this.projectID = projectID;
-    }
-
     @Override
     public String toString() {
-        if (toString != null) {
-            return toString;
-        }
-
-        List<String> paths = new ArrayList<String>();
-
-        for (IPath path : getPaths()) {
-            paths.add(path.toString());
-        }
-
+        List<String> paths = new ArrayList<String>(getPaths());
         Collections.sort(paths);
-        toString = Arrays.toString(paths.toArray());
-        return toString;
-    }
 
-    private void addEncoding(String charset) {
-        if (charset == null) {
-            return;
-        }
-
-        encodings.add(charset);
+        return paths.toString();
     }
 
     @XStreamAlias("f")
@@ -426,7 +252,35 @@ public class FileList {
         private File(String path, MetaData metaData, boolean isDirectory) {
             this.path = path;
             this.metaData = metaData;
+            this.files = new ArrayList<File>();
             this.isDirectory = isDirectory;
+        }
+
+        public static File createRoot() {
+            return new File("", null, true);
+        }
+
+        /**
+         * Helper: Adds this File's path to the given <code>base</code> with a
+         * "/" in between. There will be no leading "/" and no doubled "/"s.
+         */
+        private String appendTo(String base) {
+            if (base.isEmpty()) {
+                return path;
+            }
+
+            if (base.endsWith(DIR_SEPARATOR)) {
+                return base + path;
+            }
+
+            return base + DIR_SEPARATOR + path;
+        }
+
+        /**
+         * Helper: Cuts a path into its segments
+         */
+        private String[] segments(String path) {
+            return path.split(DIR_SEPARATOR);
         }
 
         /**
@@ -443,52 +297,54 @@ public class FileList {
          *
          * @return the list containing the full paths
          */
-        public List<IPath> toList() {
-            List<IPath> paths = new ArrayList<IPath>();
-            toList(workspace.getPathFactory().fromString(path), paths);
+        public List<String> toList() {
+            List<String> paths = new ArrayList<String>();
+            toList(path, paths);
             return paths;
         }
 
         /**
-         * Adds all paths elements from the current file node and its sub nodes.
+         * Will be called recursively to reach all leaves of this file node, and
+         * will put all entries into the given list.
          *
-         * @param path  the path of the parent node
+         * @param base  the path of the parent node
          * @param paths a list to store the paths
          */
-        private void toList(IPath path, List<IPath> paths) {
-            if (files == null) {
-                return;
-            }
-
-            for (File file : files) {
-                if (file.isDirectory && file.files == null) {
-                    paths.add(path.append(file.path).addTrailingSeparator());
-                } else if (!file.isDirectory) {
-                    paths.add(path.append(file.path));
+        private void toList(String base, List<String> paths) {
+            for (File sub : files) {
+                if (sub.isDirectory && sub.files.isEmpty()) {
+                    paths.add(sub.appendTo(base).concat(DIR_SEPARATOR));
+                } else if (!sub.isDirectory) {
+                    paths.add(sub.appendTo(base));
                 }
 
-                file.toList(path.append(file.path), paths);
+                sub.toList(sub.appendTo(base), paths);
             }
         }
 
-        public boolean contains(IPath path) {
+        /**
+         * True, if the given path is one of this File's sub-nodes.
+         */
+        public boolean contains(String path) {
             return getFile(path) != null;
         }
 
-        public MetaData getMetaData(IPath path) {
+        /**
+         * Retrieves the meta data for the given path. Returns <code>null</code>
+         * if there is corresponding file in this node.
+         */
+        public MetaData getMetaData(String path) {
             File file = getFile(path);
             return file == null ? null : file.metaData;
         }
 
-        private File getFile(IPath path) {
-            if (files == null) {
-                return null;
-            }
-
-            String[] segments = path.segments();
-
+        /**
+         * Retrieves the file for the given path, <code>null</code> if it does
+         * not exist.
+         */
+        private File getFile(String path) {
             for (File file : files) {
-                File foundFile = file.getFile(segments, 0);
+                File foundFile = file.getFile(segments(path), 0);
                 if (foundFile != null) {
                     return foundFile;
                 }
@@ -497,6 +353,10 @@ public class FileList {
             return null;
         }
 
+        /**
+         * Will be called recursively to find the file represented by the given
+         * path segments.
+         */
         private File getFile(String[] segments, int segmentIndex) {
             if (segmentIndex >= segments.length) {
                 return null;
@@ -519,10 +379,6 @@ public class FileList {
                 return null;
             }
 
-            if (files == null) {
-                return null;
-            }
-
             for (File file : files) {
                 File foundFile = file.getFile(segments, segmentIndex + 1);
                 if (foundFile != null) {
@@ -532,20 +388,27 @@ public class FileList {
             return null;
         }
 
-        public void addPath(IPath path, MetaData metaData,
+        /**
+         * Inserts a new path into this File structure. Missing intermediate
+         * folder nodes will be created.
+         *
+         * @param path     not <code>null</code>
+         * @param metaData can be <code>null</code>
+         */
+        public void addPath(String path, MetaData metaData,
             boolean isDirectory) {
-            addPath(path.segments(), 0, metaData, isDirectory);
+            addPath(segments(path), 0, metaData, isDirectory);
         }
 
+        /**
+         * Will be called recursively to create the entry for the path given by
+         * its segments including all folder hierarchy levels.
+         */
         private void addPath(String[] segments, int segmentIndex,
             MetaData metaData, boolean isDirectory) {
 
             if (segmentIndex >= segments.length) {
                 return;
-            }
-
-            if (files == null) {
-                files = new ArrayList<File>();
             }
 
             for (File file : files) {
@@ -577,11 +440,10 @@ public class FileList {
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = prime * result + ((files == null) ? 0 : files.hashCode());
+            result = prime * result + ObjectUtils.hashCode(files);
             result = prime * result + (isDirectory ? 1231 : 1237);
-            result =
-                prime * result + ((metaData == null) ? 0 : metaData.hashCode());
-            result = prime * result + ((path == null) ? 0 : path.hashCode());
+            result = prime * result + ObjectUtils.hashCode(metaData);
+            result = prime * result + ObjectUtils.hashCode(path);
             return result;
         }
 
@@ -596,33 +458,20 @@ public class FileList {
             if (getClass() != obj.getClass()) {
                 return false;
             }
+
             File other = (File) obj;
 
             if (isDirectory != other.isDirectory) {
                 return false;
             }
 
-            if (path == null) {
-                if (other.path != null) {
-                    return false;
-                }
-            } else if (!path.equals(other.path)) {
+            if (!ObjectUtils.equals(path, other.path)) {
                 return false;
             }
-
-            if (metaData == null) {
-                if (other.metaData != null) {
-                    return false;
-                }
-            } else if (!metaData.equals(other.metaData)) {
+            if (!ObjectUtils.equals(metaData, other.metaData)) {
                 return false;
             }
-
-            if (files == null) {
-                if (other.files != null) {
-                    return false;
-                }
-            } else if (!files.equals(other.files)) {
+            if (!ObjectUtils.equals(files, other.files)) {
                 return false;
             }
 
@@ -649,28 +498,23 @@ public class FileList {
             if (o == this) {
                 return true;
             }
-
             if (o == null) {
                 return false;
             }
-
             if (!(o instanceof MetaData)) {
                 return false;
             }
 
-            if (checksum != ((MetaData) o).checksum) {
+            MetaData other = (MetaData) o;
+
+            if (!ObjectUtils.equals(checksum, other.checksum)) {
+                return false;
+            }
+            if (!ObjectUtils.equals(vcsInfo, other.vcsInfo)) {
                 return false;
             }
 
-            if (vcsInfo == null && ((MetaData) o).vcsInfo == null) {
-                return true;
-            }
-
-            if (vcsInfo == null) {
-                return false;
-            }
-
-            return vcsInfo.equals(((MetaData) o).vcsInfo);
+            return true;
         }
 
         @Override
@@ -684,4 +528,5 @@ public class FileList {
                 + ", VCS: " + vcsInfo + "]";
         }
     }
+
 }

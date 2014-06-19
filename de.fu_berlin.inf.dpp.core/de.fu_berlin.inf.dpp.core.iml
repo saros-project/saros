@@ -30,7 +30,7 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library" scope="TEST">
+    <orderEntry type="module-library" exported="" scope="TEST">
       <library name="easymock-3.1">
         <CLASSES>
           <root url="jar://$MODULE_DIR$/test/lib/easymock-3.1.jar!/" />
