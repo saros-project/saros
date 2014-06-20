@@ -1,3 +1,23 @@
+/*
+ * DPP - Serious Distributed Pair Programming
+ * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2006
+ * (c) Riad Djemili - 2006
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 1, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
 package de.fu_berlin.inf.dpp.core.preferences;
 
 /**
@@ -11,8 +31,6 @@ public class PreferenceConstants {
     public static final String ACTIVE_ACCOUNT = "active_account";
 
     public static final String ACCOUNT_DATA = "account_data";
-
-    public static final String ENCRYPT_ACCOUNT = "encrypt_account";
 
     public static final String AUTO_CONNECT = "autoconnect";
 
@@ -52,7 +70,7 @@ public class PreferenceConstants {
 
     /*
      * Preferences of the feedback preferences page
-     *
+     * 
      * These preferences are kept both in the workspace scope and globally (in
      * the configuration).
      */
@@ -62,48 +80,34 @@ public class PreferenceConstants {
      */
     public static final String FEEDBACK_SURVEY_DISABLED = "feedback.survey.disabled";
 
-    /**
-     * Can be set and read by the FeedbackManager
-     */
+    /** Can be set and read by the FeedbackManager */
     public static final String FEEDBACK_SURVEY_INTERVAL = "feedback.survey.interval";
 
-    /**
-     * Can be set and read by the StatisticManager
-     */
+    /** Can be set and read by the StatisticManager */
     public static final String STATISTIC_ALLOW_SUBMISSION = "statistic.allow.submission";
 
-    /**
-     * Can be set and read by the ErrorLogManager
-     */
+    /** Can be set and read by the ErrorLogManager */
     public static final String ERROR_LOG_ALLOW_SUBMISSION = "error.log.allow.submission";
 
-    /**
-     * Can be set and read by the ErrorLogManager
-     */
+    /** Can be set and read by the ErrorLogManager */
     public static final String ERROR_LOG_ALLOW_SUBMISSION_FULL = "error.log.allow.submission.full";
 
     /*
      * Global preferences, not initialized i.e. no default values
      */
 
-    /**
-     * Can be set and read by the StatisticManager
-     */
+    /** Can be set and read by the StatisticManager */
     public static final String SESSION_COUNT = "session.count";
 
-    /**
-     * Can be set and read by the FeedbackManager
-     */
+    /** Can be set and read by the FeedbackManager */
     public static final String SESSIONS_UNTIL_NEXT = "sessions.until.next.survey";
 
-    /**
-     * Can be read by the StatisticManager
-     */
+    /** Can be read by the StatisticManager */
     public static final String RANDOM_USER_ID = "user.id";
 
     /**
      * Preference used for a way to let the user identify himself.
-     * <p/>
+     *
      * For instance, this might get a value such as "coezbek" or "rdjemili".
      */
     public static final String STATISTICS_PSEUDONYM_ID = "STATISTICS_PSEUDONYM_ID";
@@ -118,9 +122,7 @@ public class PreferenceConstants {
      * Preferences for Communication
      */
 
-    /**
-     * Custom multiuser-chat service name *
-     */
+    /** Custom multiuser-chat service name **/
     public static final String CUSTOM_MUC_SERVICE = "custom_muc_service";
 
     public static final String FORCE_CUSTOM_MUC_SERVICE = "force_custom_muc_service";
@@ -158,6 +160,8 @@ public class PreferenceConstants {
      * color ID that should be used in a session if it is not already occupied
      */
     public static final String FAVORITE_SESSION_COLOR_ID = "favorite.session.color.id";
+
+    public static final String SESSION_NICKNAME = "session.nickname";
 
     /*
      * Annotation stuff for the editor
