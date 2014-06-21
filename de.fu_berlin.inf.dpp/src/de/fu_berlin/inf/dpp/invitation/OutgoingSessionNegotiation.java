@@ -397,14 +397,10 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
         for (ISessionNegotiationHook hook : hookManager.getHooks()) {
             Map<String, String> preferredSettings = clientParameters
                 .getHookSettings(hook);
-
             Map<String, String> actualSettings = hook
                 .considerClientPreferences(peer, preferredSettings);
 
             hostParameters.saveHookSettings(hook, actualSettings);
-
-            if (preferredSettings == null)
-                continue;
 
             // HACK A User object representing the client needs to access these
             // two values in completeInvitation(). Color management should work
