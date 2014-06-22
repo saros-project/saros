@@ -397,24 +397,28 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
         for (ISessionNegotiationHook hook : hookManager.getHooks()) {
             Map<String, String> preferredSettings = clientParameters
                 .getHookSettings(hook);
-            Map<String, String> actualSettings = hook
-                .considerClientPreferences(peer, preferredSettings);
 
-            hostParameters.saveHookSettings(hook, actualSettings);
+            Map<String, String> finalSettings = hook.considerClientPreferences(
+                peer, preferredSettings);
+
+            if (finalSettings == null)
+                continue;
+
+            hostParameters.saveHookSettings(hook, finalSettings);
 
             // HACK A User object representing the client needs to access these
             // two values in completeInvitation(). Color management should work
             // differently.
             if (hook instanceof ColorNegotiationHook) {
-                clientColorID = Integer.parseInt(actualSettings
+                clientColorID = Integer.parseInt(finalSettings
                     .get(ColorNegotiationHook.KEY_CLIENT_COLOR));
-                clientFavoriteColorID = Integer.parseInt(actualSettings
+                clientFavoriteColorID = Integer.parseInt(finalSettings
                     .get(ColorNegotiationHook.KEY_CLIENT_FAV_COLOR));
             }
 
             // HACK Same hack as above.
             if (hook instanceof NicknameNegotiationHook) {
-                clientNickname = actualSettings
+                clientNickname = finalSettings
                     .get(NicknameNegotiationHook.KEY_CLIENT_NICKNAME);
             }
         }

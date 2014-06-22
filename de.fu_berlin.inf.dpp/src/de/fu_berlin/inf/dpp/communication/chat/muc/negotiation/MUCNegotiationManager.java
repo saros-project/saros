@@ -78,9 +78,19 @@ public class MUCNegotiationManager {
 
         @Override
         public void applyActualParameters(Map<String, String> settings) {
-            setSessionPreferences(new MultiUserChatPreferences(
-                settings.get(KEY_SERVICE), settings.get(KEY_ROOMNAME),
-                settings.get(KEY_PASSWORD)));
+
+            if (settings == null)
+                return;
+
+            final String service = settings.get(KEY_SERVICE);
+            final String roomname = settings.get(KEY_ROOMNAME);
+            final String password = settings.get(KEY_PASSWORD);
+
+            if (service == null || roomname == null || password == null)
+                return;
+
+            setSessionPreferences(new MultiUserChatPreferences(service,
+                roomname, password));
         }
 
         @Override

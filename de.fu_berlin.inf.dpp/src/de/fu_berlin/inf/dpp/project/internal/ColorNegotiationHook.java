@@ -43,8 +43,13 @@ public class ColorNegotiationHook implements ISessionNegotiationHook {
     @Override
     public Map<String, String> considerClientPreferences(JID client,
         Map<String, String> input) {
+
+        if (input == null)
+            return null;
+
         String hostColor = Integer.toString(sessionManager.getSarosSession()
             .getLocalUser().getColorID());
+
         String hostFavoriteColor = Integer.toString(preferenceUtils
             .getFavoriteColorID());
 

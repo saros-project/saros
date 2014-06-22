@@ -63,7 +63,7 @@ public class NicknameNegotiationHook implements ISessionNegotiationHook {
         for (final User user : session.getUsers())
             occupiedNicknames.add(user.getNickname());
 
-        String nickname = input.get(KEY_CLIENT_NICKNAME);
+        String nickname = input == null ? null : input.get(KEY_CLIENT_NICKNAME);
 
         if (nickname == null || nickname.isEmpty())
             nickname = client.getBareJID().toString();

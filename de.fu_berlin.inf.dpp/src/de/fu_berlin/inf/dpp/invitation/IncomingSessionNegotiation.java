@@ -280,6 +280,10 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
             Map<String, String> settings = parameters.getHookSettings(hook);
             hook.applyActualParameters(settings);
 
+            // HACK (Part 2½/4)
+            if (settings == null)
+                continue;
+
             // HACK (Part 3/4)
             if (hook instanceof ColorNegotiationHook) {
                 clientColor = Integer.parseInt(settings
