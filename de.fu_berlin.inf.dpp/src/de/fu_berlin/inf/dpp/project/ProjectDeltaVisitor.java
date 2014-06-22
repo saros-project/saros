@@ -16,10 +16,10 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.activities.FileActivity;
+import de.fu_berlin.inf.dpp.activities.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.activities.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -288,7 +288,9 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
         if (!sarosSession.isShared(ResourceAdapterFactory.create(resource)))
             return;
 
-        if (editorManager.isOpened(spath))
+        if (editorManager.isOpened(spath)
+            || editorManager.isConnected((IFile) resource
+                .getAdapter(IFile.class)))
             return;
 
         log.debug("Resource " + resource.getName() + " changed");

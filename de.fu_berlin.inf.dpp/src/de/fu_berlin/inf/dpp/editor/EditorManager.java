@@ -1539,6 +1539,16 @@ public class EditorManager extends AbstractActivityProvider {
             return;
         }
 
+        final boolean isConnected = isConnected(file);
+
+        /*
+         * connect to the file so the SharedResourceManager / ProjectDeltaVistor
+         * will ignore the file change because it is possible that no editor is
+         * open for this file
+         */
+        if (!isConnected)
+            connect(file);
+
         try {
             IDocument doc = provider.getDocument(input);
 
@@ -1585,6 +1595,8 @@ public class EditorManager extends AbstractActivityProvider {
 
         } finally {
             provider.disconnect(input);
+            if (!isConnected)
+                disconnect(file);
         }
     }
 
