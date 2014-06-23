@@ -1,13 +1,11 @@
 package de.fu_berlin.inf.dpp.ui.model.session;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
-import org.jivesoftware.smack.Roster;
 
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.session.User;
@@ -32,8 +30,7 @@ public class SessionHeaderElement extends HeaderElement {
     @Override
     public StyledString getStyledText() {
         StyledString styledString = new StyledString();
-        if (input == null
-            || input.getSession() == null) {
+        if (input == null || input.getSession() == null) {
             styledString.append(
                 Messages.SessionHeaderElement_no_session_running, boldStyler);
         } else {
@@ -50,43 +47,30 @@ public class SessionHeaderElement extends HeaderElement {
 
     @Override
     public boolean hasChildren() {
-        return input != null
-            && input.getSession() != null;
+        return input != null && input.getSession() != null;
     }
 
     @Override
     public Object[] getChildren() {
-        if (input != null
-            && input.getSession() != null) {
-            List<UserElement> userElements = new ArrayList<UserElement>();
 
-            Collection<User> users = input.getSession().getUsers();
-
-            final Object content = input.getCustomContent();
-
-            Roster roster = null;
-
-            if (content instanceof Roster)
-                roster = (Roster) content;
-
-            for (User user : users) {
-                UserElement userElement = new UserElement(user, roster);
-                userElements.add(userElement);
-            }
-
-            return userElements.toArray();
-        } else {
+        if (input == null || input.getSession() == null)
             return new Object[0];
-        }
+
+        final List<UserElement> userElements = new ArrayList<UserElement>();
+
+        final List<User> users = input.getSession().getUsers();
+
+        for (final User user : users)
+            userElements.add(new UserElement(user));
+
+        return userElements.toArray();
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime
-            * result
-            + ((input == null) ? 0 : input.hashCode());
+        result = prime * result + ((input == null) ? 0 : input.hashCode());
         return result;
     }
 

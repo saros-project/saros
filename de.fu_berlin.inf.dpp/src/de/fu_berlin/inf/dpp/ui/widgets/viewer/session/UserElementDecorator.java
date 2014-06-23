@@ -31,7 +31,7 @@ public class UserElementDecorator implements Listener {
         if (!(treeItem.getData() instanceof UserElement))
             return;
 
-        User user = (User) ((UserElement) treeItem.getData()).getUser();
+        User user = ((UserElement) treeItem.getData()).getUser();
 
         Rectangle bounds = treeItem.getBounds(event.index);
 

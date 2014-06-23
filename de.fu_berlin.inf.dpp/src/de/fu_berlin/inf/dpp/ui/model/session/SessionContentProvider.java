@@ -72,9 +72,7 @@ public class SessionContentProvider extends TreeContentProvider {
     private final ISharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
         @Override
         public void followModeChanged(User user, boolean isFollowed) {
-            UserElement userElement = getUserElement(currentRoster, user);
-            if (userElement != null)
-                ViewerUtils.update(viewer, userElement, null);
+            ViewerUtils.update(viewer, new UserElement(user), null);
         }
 
         @Override
@@ -152,9 +150,7 @@ public class SessionContentProvider extends TreeContentProvider {
 
         @Override
         public void permissionChanged(User user) {
-            UserElement userElement = getUserElement(currentRoster, user);
-            if (userElement != null)
-                ViewerUtils.update(viewer, userElement, null);
+            ViewerUtils.update(viewer, new UserElement(user), null);
         }
     };
 
@@ -278,18 +274,6 @@ public class SessionContentProvider extends TreeContentProvider {
             elements.add(contentHeaderElement);
 
         return elements.toArray();
-    }
-
-    /**
-     * Creates a {@link UserElement} from an input element and a {@link User}.
-     * 
-     * @param roster
-     * @param user
-     * @return a {@link UserElement} or <code>null</code> if the roster is
-     *         <code>null</code>
-     */
-    private UserElement getUserElement(Roster roster, User user) {
-        return roster == null ? null : new UserElement(user, roster);
     }
 
     private ISarosSession getSession(Object input) {

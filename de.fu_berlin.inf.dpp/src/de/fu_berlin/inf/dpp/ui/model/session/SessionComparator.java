@@ -37,8 +37,8 @@ public class SessionComparator extends ViewerComparator {
          * Compares session part
          */
         if (e1 instanceof UserElement && e2 instanceof UserElement) {
-            final User user1 = (User) ((UserElement) e1).getUser();
-            final User user2 = (User) ((UserElement) e2).getUser();
+            final User user1 = ((UserElement) e1).getUser();
+            final User user2 = ((UserElement) e2).getUser();
 
             final String userDisplayName1 = ((UserElement) e1).getStyledText()
                 .toString();

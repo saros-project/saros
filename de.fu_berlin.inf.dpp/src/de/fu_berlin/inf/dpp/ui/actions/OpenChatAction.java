@@ -103,7 +103,7 @@ public class OpenChatAction extends Action implements Disposable {
 
         if (users.size() + contacts.size() == 1) {
             if (users.size() == 1) {
-                User user = (User) users.get(0).getUser();
+                User user = users.get(0).getUser();
                 if (user == null) {
                     return null;
                 }

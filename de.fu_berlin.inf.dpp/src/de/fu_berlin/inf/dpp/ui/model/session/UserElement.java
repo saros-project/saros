@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.graphics.Image;
-import org.jivesoftware.smack.Roster;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
@@ -15,101 +13,85 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
+import de.fu_berlin.inf.dpp.ui.model.TreeContentProvider;
 import de.fu_berlin.inf.dpp.ui.model.TreeElement;
 import de.fu_berlin.inf.dpp.ui.util.SWTBoldStyler;
 
 /**
- * Wrapper for {@link UserElement} in use with {@link Viewer Viewers}
- * 
- * @author bkahlert
+ * Model element for a session {@link User user}. This element can only be used
+ * in conjunction with a {@link TreeContentProvider}.
  */
-public class UserElement extends TreeElement {
+public final class UserElement extends TreeElement {
 
     @Inject
-    protected EditorManager editorManager;
+    private EditorManager editorManager;
 
     @Inject
-    protected AwarenessInformationCollector awarenessInformationCollector;
+    private AwarenessInformationCollector collector;
 
-    protected User user;
-    protected Roster roster;
+    private final User user;
 
     /**
-     * Holds the children for this user element - in the future there might be
-     * multiple elements for each user, showing more details than one
-     * TreeElement could hold.
+     * Child elements of this user element which may hold additional information
+     * such as the currently opened file etc.
      */
-    protected List<AwarenessInformationTreeElement> awarenessInformation = new ArrayList<AwarenessInformationTreeElement>();
+    private final List<AwarenessInformationTreeElement> children = new ArrayList<AwarenessInformationTreeElement>();
 
-    public UserElement(User user, Roster roster) {
+    public UserElement(final User user) {
         SarosPluginContext.initComponent(this);
 
+        if (user == null)
+            throw new IllegalArgumentException("user is null");
+
         this.user = user;
-        this.roster = roster;
 
-        // Comment this check if you want to display awareness information about
-        // the local user to himself..
-        updateChildren();
+        addAwarenessDetails();
     }
 
-    public Object getUser() {
-        return this.user;
-    }
-
-    public boolean getExpanded() {
-        return false;
-
-    }
-
-    protected void updateChildren() {
-        this.awarenessInformation.clear();
-        // Comment this check if you want to display awareness information about
-        // the local user to himself..
-        if (!user.isLocal()) {
-            this.awarenessInformation.add(new AwarenessInformationTreeElement(
-                this.user));
-            FollowModeInformationTreeElement followModeIndicator;
-            if (awarenessInformationCollector.getFollowedUser(user) != null) {
-                followModeIndicator = new FollowModeInformationTreeElement(user);
-                this.awarenessInformation.add(followModeIndicator);
-            }
-        }
+    /**
+     * Returns the {@linkplain User user} that this user element represents.
+     * 
+     * @return the user, never <code>null</code>
+     */
+    public final User getUser() {
+        return user;
     }
 
     @Override
     public Object[] getChildren() {
-        return this.awarenessInformation.toArray();
+        return children.toArray();
     }
 
     @Override
     public boolean hasChildren() {
-        return this.awarenessInformation.size() != 0;
+        return children.size() != 0;
     }
 
     @Override
     public StyledString getStyledText() {
-        StyledString styledString = new StyledString();
-        final String read_only = Messages.UserElement_read_only;
-        final String following = Messages.UserElement_following;
-        final String following_paused = Messages.UserElement_following_paused;
-        final String host = Messages.UserElement_host;
+        StyledString text = new StyledString();
 
         /*
-         * Blank space in the front for the highlighting color square
+         * Blank space in the front for the highlighting color square, see
+         * de.fu_berlin.inf.dpp.ui.widgets.viewer.session.UserElementDecorator
+         * 
+         * ColorSquare [HOST] Alice [following]
          */
-        styledString.append("    ");
+        text.append("    ");
 
         if (user.isHost()) {
-            styledString.append(host, StyledString.COUNTER_STYLER);
+            text.append(Messages.UserElement_host, StyledString.COUNTER_STYLER);
         }
 
-        styledString.append(user.getNickname());
+        text.append(user.getNickname());
 
         /*
          * Right level
          */
         if (user.hasReadOnlyAccess()) {
-            styledString.append(" " + read_only, StyledString.COUNTER_STYLER);
+            text.append(" ");
+            text.append(Messages.UserElement_read_only,
+                StyledString.COUNTER_STYLER);
         }
 
         /*
@@ -119,56 +101,54 @@ public class UserElement extends TreeElement {
          * FollowModeTreeElement for this.
          */
         User followee = editorManager.getFollowedUser();
-        if (user.equals(followee)) {
-            if (awarenessInformationCollector.isActiveEditorShared(user)) {
-                styledString.append(" " + following, SWTBoldStyler.STYLER);
-            } else {
-                styledString.append(" " + following_paused,
-                    SWTBoldStyler.STYLER);
-            }
-        }
 
-        return styledString;
+        if (!user.equals(followee))
+            return text;
+
+        final String followModeState = collector.isActiveEditorShared(user) ? Messages.UserElement_following
+            : Messages.UserElement_following_paused;
+
+        text.append(" ");
+        text.append(followModeState, SWTBoldStyler.STYLER);
+
+        return text;
     }
 
     @Override
     public Image getImage() {
-        if (roster != null && !user.isLocal()
-            && roster.getPresence(user.getJID().toString()).isAway()) {
-            if (user.hasWriteAccess())
-                return ImageManager.ICON_USER_SAROS_AWAY;
-            else
-                return ImageManager.ICON_USER_SAROS_READONLY_AWAY;
-        } else {
-            if (user.hasWriteAccess())
-                return ImageManager.ICON_CONTACT_SAROS_SUPPORT;
-            else
-                return ImageManager.ICON_USER_SAROS_READONLY;
-        }
+        return user.hasWriteAccess() ? ImageManager.ICON_CONTACT_SAROS_SUPPORT
+            : ImageManager.ICON_USER_SAROS_READONLY;
+    }
+
+    private void addAwarenessDetails() {
+        /*
+         * remove this check if you want to display awareness information about
+         * the local user to himself
+         */
+        if (user.isLocal())
+            return;
+
+        children.add(new AwarenessInformationTreeElement(user));
+
+        if (collector.getFollowedUser(user) != null)
+            children.add(new FollowModeInformationTreeElement(user));
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((user == null) ? 0 : user.hashCode());
-        return result;
+        return user.hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
-        if (obj == null)
+
+        if (!(obj instanceof UserElement))
             return false;
-        if (getClass() != obj.getClass())
-            return false;
+
         UserElement other = (UserElement) obj;
-        if (user == null) {
-            if (other.user != null)
-                return false;
-        } else if (!user.equals(other.user))
-            return false;
-        return true;
+        return user.equals(other.user);
     }
+
 }
