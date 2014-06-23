@@ -447,4 +447,38 @@ class SubclipseAdapter extends VCSAdapter {
         return new SubclipseProjectDeltaVisitor(editorManager, sarosSession,
             sharedProject);
     }
+
+    /*
+     * --------------------------------------------------------------------------
+     * VCSProvider intf. impl.
+     */
+
+    @Override
+    public String getID() {
+        return identifier;
+    }
+
+    @Override
+    public String getRepositoryString(
+        de.fu_berlin.inf.dpp.filesystem.IResource resource) {
+        return getRepositoryString(ResourceAdapterFactory.convertBack(resource));
+    }
+
+    @Override
+    public VCSResourceInfo getResourceInfo(
+        de.fu_berlin.inf.dpp.filesystem.IResource resource) {
+        return getResourceInfo(ResourceAdapterFactory.convertBack(resource));
+    }
+
+    @Override
+    public VCSResourceInfo getCurrentResourceInfo(
+        de.fu_berlin.inf.dpp.filesystem.IResource resource) {
+        return getCurrentResourceInfo(ResourceAdapterFactory
+            .convertBack(resource));
+    }
+
+    @Override
+    public String getUrl(de.fu_berlin.inf.dpp.filesystem.IResource resource) {
+        return getUrl(ResourceAdapterFactory.convertBack(resource));
+    }
 }

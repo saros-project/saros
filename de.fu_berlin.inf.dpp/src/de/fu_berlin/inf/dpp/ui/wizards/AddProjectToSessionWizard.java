@@ -60,6 +60,7 @@ import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.EnterProjectNamePage;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
+import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 
 public class AddProjectToSessionWizard extends Wizard {
 
@@ -517,10 +518,22 @@ public class AddProjectToSessionWizard extends Wizard {
 
             FileList remoteFileList = process.getRemoteFileList(projectID);
 
+            final boolean useVersionControl = namePage.useVersionControl();
+
+            VCSAdapter vcs = null;
+
+            if (useVersionControl) {
+                vcs = VCSAdapter
+                    .getAdapter((org.eclipse.core.resources.IProject) ResourceAdapterFactory
+                        .convertBack(project));
+
+                // FIXME how to handle failure ?
+            }
+
             if (session.isShared(project)) {
                 FileList sharedFileList = FileListFactory.createFileList(
                     project, session.getSharedResources(project),
-                    checksumCache, true,
+                    checksumCache, vcs,
                     subMonitor.newChild(1, SubMonitor.SUPPRESS_ALL_LABELS));
 
                 // FIXME FileList objects should be immutable after creation
@@ -529,7 +542,7 @@ public class AddProjectToSessionWizard extends Wizard {
                 subMonitor.worked(1);
 
             FileListDiff diff = FileListDiff.diff(FileListFactory
-                .createFileList(project, null, checksumCache, true,
+                .createFileList(project, null, checksumCache, vcs,
                     subMonitor.newChild(1, SubMonitor.SUPPRESS_ALL_LABELS)),
                 remoteFileList);
 

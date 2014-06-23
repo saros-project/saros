@@ -54,6 +54,7 @@ import de.fu_berlin.inf.dpp.ui.wizards.pages.EnterProjectNamePage;
 import de.fu_berlin.inf.dpp.util.CoreUtils;
 import de.fu_berlin.inf.dpp.util.FileUtils;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
+import de.fu_berlin.inf.dpp.vcs.VCSProvider;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
 // MAJOR TODO refactor this class !!!
@@ -593,8 +594,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * 
      * @param currentLocalProject
      * @param remoteFileList
-     * @param vcs
-     *            The VCS adapter of the local project.
+     * @param provider
+     *            VCS provider of the local project or <code>null</code>
      * @param monitor
      * 
      * @return The list of files that we need from the host.
@@ -603,7 +604,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * @throws IOException
      */
     private FileList computeRequiredFiles(IProject currentLocalProject,
-        FileList remoteFileList, String projectID, VCSAdapter vcs,
+        FileList remoteFileList, String projectID, VCSProvider provider,
         IProgressMonitor monitor) throws LocalCancellationException,
         IOException {
 
@@ -612,7 +613,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
         FileList localFileList = FileListFactory.createFileList(
             ResourceAdapterFactory.create(currentLocalProject), null,
-            checksumCache, vcs != null, subMonitor.newChild(1));
+            checksumCache, provider, subMonitor.newChild(1));
 
         FileListDiff filesToSynchronize = computeDiff(localFileList,
             remoteFileList, currentLocalProject, projectID);

@@ -32,6 +32,7 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.EclipseProjectImpl;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
@@ -42,6 +43,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
+import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 
 public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
@@ -473,10 +475,21 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 throw new LocalCancellationException(null,
                     CancelOption.DO_NOT_NOTIFY_PEER);
             try {
+
+                VCSAdapter vcs = null;
+
+                if (sarosSession.useVersionControl()) {
+                    vcs = VCSAdapter
+                        .getAdapter((org.eclipse.core.resources.IProject) ResourceAdapterFactory
+                            .convertBack(project));
+
+                    // TODO how to handle this if no adapter is available ?
+                    // if(vcs == null)
+                }
+
                 FileList projectFileList = FileListFactory.createFileList(
                     project, sarosSession.getSharedResources(project),
-                    checksumCache, sarosSession.useVersionControl(),
-                    subMonitor.newChild(1));
+                    checksumCache, vcs, subMonitor.newChild(1));
 
                 boolean partial = !sarosSession.isCompletelyShared(project);
 

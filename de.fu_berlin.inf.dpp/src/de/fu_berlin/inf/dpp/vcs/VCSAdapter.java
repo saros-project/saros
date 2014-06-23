@@ -25,7 +25,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
  * @author haferburg
  */
 // TODO Maybe change to VCProject implements IAdaptable? Make connect static.
-public abstract class VCSAdapter {
+public abstract class VCSAdapter implements VCSProvider {
     protected static final Logger log = Logger.getLogger(VCSAdapter.class);
 
     protected RepositoryProviderType provider;
