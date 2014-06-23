@@ -366,7 +366,7 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
                 // Connect
                 VCSResourceInfo info = vcs.getResourceInfo(project);
                 String repositoryString = vcs.getRepositoryString(project);
-                if (repositoryString == null || info.url == null) {
+                if (repositoryString == null || info.getURL() == null) {
                     // HACK For some reason, Subclipse returns null values
                     // here. Pretend the vcs is still null and wait for the
                     // next time we get here.
@@ -374,14 +374,14 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
                     return false;
                 }
 
-                String directory = info.url
-                    .substring(repositoryString.length());
+                String directory = info.getURL().substring(
+                    repositoryString.length());
                 VCSActivity activity = VCSActivity.connect(sarosSession,
                     ResourceAdapterFactory.create(project), repositoryString,
                     directory, vcs.getProviderID(project));
                 pendingActivities.enter(activity);
-                sharedProject.updateVcsUrl(info.url);
-                sharedProject.updateRevision(info.revision);
+                sharedProject.updateVcsUrl(info.getURL());
+                sharedProject.updateRevision(info.getRevision());
 
                 log.debug("Connect to VCS");
             }

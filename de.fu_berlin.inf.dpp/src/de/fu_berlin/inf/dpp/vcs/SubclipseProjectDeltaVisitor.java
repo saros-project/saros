@@ -55,14 +55,15 @@ public class SubclipseProjectDeltaVisitor extends ProjectDeltaVisitor {
          */
         if (isSync(delta)) {
             VCSResourceInfo info = vcs.getResourceInfo(resource);
-            if (sharedProject.updateVcsUrl(resource, info.url)) {
-                sharedProject.updateRevision(resource, info.revision);
+            if (sharedProject.updateVcsUrl(resource, info.getURL())) {
+                sharedProject.updateRevision(resource, info.getRevision());
                 // Switch
-                if (info.revision != null && !ignoreChildren(resource)) {
+                if (info.getRevision() != null && !ignoreChildren(resource)) {
                     addActivity(vcs.getSwitchActivity(sarosSession, resource));
                     setIgnoreChildren(resource);
                 }
-            } else if (sharedProject.updateRevision(resource, info.revision)) {
+            } else if (sharedProject.updateRevision(resource,
+                info.getRevision())) {
                 // Update
                 if (!ignoreChildren(resource)) {
                     addActivity(vcs.getUpdateActivity(sarosSession, resource));
@@ -106,8 +107,8 @@ public class SubclipseProjectDeltaVisitor extends ProjectDeltaVisitor {
             return;
         }
         VCSResourceInfo info = vcs.getResourceInfo(resource);
-        sharedProject.updateVcsUrl(resource, info.url);
-        sharedProject.updateRevision(resource, info.revision);
+        sharedProject.updateVcsUrl(resource, info.getURL());
+        sharedProject.updateRevision(resource, info.getRevision());
     }
 
 }

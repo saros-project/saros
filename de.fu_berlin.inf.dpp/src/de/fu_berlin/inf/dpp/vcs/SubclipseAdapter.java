@@ -86,7 +86,7 @@ class SubclipseAdapter extends VCSAdapter {
     public VCSActivity getSwitchActivity(ISarosSession sarosSession,
         IResource resource) {
         VCSResourceInfo info = getResourceInfo(resource);
-        String url = info.url;
+        String url = info.getURL();
         String revision = getCurrentRevisionString(resource);
         return VCSActivity.switch_(sarosSession,
             ResourceAdapterFactory.create(resource), url, revision);
@@ -147,7 +147,7 @@ class SubclipseAdapter extends VCSAdapter {
             VCSResourceInfo info = fileList.getProjectInfo();
             loc = SVNRepositoryLocation
                 .fromString(fileList.getRepositoryRoot());
-            SVNUrl url = new SVNUrl(info.url);
+            SVNUrl url = new SVNUrl(info.getURL());
 
             ISVNRemoteFolder remote[] = { new RemoteFolder(loc, url,
                 SVNRevision.HEAD) };
@@ -157,7 +157,7 @@ class SubclipseAdapter extends VCSAdapter {
             final CheckoutAsProjectOperation checkoutAsProjectOperation = new CheckoutAsProjectOperation(
                 null, remote, local);
 
-            SVNRevision revision = getRevision(info.revision);
+            SVNRevision revision = getRevision(info.getRevision());
             if (revision != null)
                 checkoutAsProjectOperation.setSvnRevision(revision);
 
@@ -279,18 +279,14 @@ class SubclipseAdapter extends VCSAdapter {
 
     @Override
     public VCSResourceInfo getResourceInfo(IResource resource) {
-        VCSResourceInfo info = new VCSResourceInfo();
-        info.url = getUrl(resource);
-        info.revision = getRevisionString(resource);
-        return info;
+        return new VCSResourceInfo(getUrl(resource),
+            getRevisionString(resource));
     }
 
     @Override
     public VCSResourceInfo getCurrentResourceInfo(IResource resource) {
-        VCSResourceInfo info = new VCSResourceInfo();
-        info.url = getUrl(resource);
-        info.revision = getCurrentRevisionString(resource);
-        return info;
+        return new VCSResourceInfo(getUrl(resource),
+            getCurrentRevisionString(resource));
     }
 
     @Override

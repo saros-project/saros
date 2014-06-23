@@ -200,8 +200,8 @@ public class SharedProject {
                         .getProject());
                     if (vcs.isManaged(resource)) {
                         VCSResourceInfo info = vcs.getResourceInfo(resource);
-                        result.append(format(" ({0}:{1})", info.url, //$NON-NLS-1$
-                            info.revision));
+                        result.append(format(" ({0}:{1})", info.getURL(), //$NON-NLS-1$
+                            info.getRevision()));
                     }
                 }
 
@@ -265,8 +265,8 @@ public class SharedProject {
             assert resource != null : "Resource not found at " + path; //$NON-NLS-1$
             VCSResourceInfo info = vcs.getResourceInfo(resource);
 
-            updateVcsUrl(resource, info.url);
-            updateRevision(resource, info.revision);
+            updateVcsUrl(resource, info.getURL());
+            updateRevision(resource, info.getRevision());
         }
 
         assert checkIntegrity();
@@ -435,16 +435,16 @@ public class SharedProject {
             ResourceInfo found = entry.getValue();
             String foundUrl = found.vcsUrl.getValue();
             String foundRevision = found.vcsRevision.getValue();
-            if (found.vcsRevision.update(expected.revision)) {
+            if (found.vcsRevision.update(expected.getRevision())) {
                 String msg = format(
                     Messages.SharedProject_revision_out_of_sync, path,
-                    projectName, foundRevision, expected.revision);
+                    projectName, foundRevision, expected.getRevision());
                 logIllegalStateException(msg);
                 illegalState = true;
             }
-            if (found.vcsUrl.update(expected.url)) {
+            if (found.vcsUrl.update(expected.getURL())) {
                 String msg = format(Messages.SharedProject_vcs_url_out_of_sync,
-                    path, projectName, foundUrl, expected.url);
+                    path, projectName, foundUrl, expected.getURL());
                 logIllegalStateException(msg);
                 illegalState = true;
             }
@@ -470,8 +470,8 @@ public class SharedProject {
                     if (vcs != null) {
                         final VCSResourceInfo info = vcs
                             .getResourceInfo(resource);
-                        updateRevision(resource, info.revision);
-                        updateVcsUrl(resource, info.url);
+                        updateRevision(resource, info.getRevision());
+                        updateVcsUrl(resource, info.getURL());
                     }
                 }
                 return true;

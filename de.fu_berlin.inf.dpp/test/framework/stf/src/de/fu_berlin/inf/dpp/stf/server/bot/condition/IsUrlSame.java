@@ -37,7 +37,7 @@ public class IsUrlSame extends DefaultCondition {
         if (resourceInfo == null)
             return message + "the resourceInfo is null.";
         else
-            return message + "the URL is \"" + resourceInfo.url + "\".";
+            return message + "the URL is \"" + resourceInfo.getURL() + "\".";
     }
 
     @Override
@@ -52,8 +52,8 @@ public class IsUrlSame extends DefaultCondition {
             return false;
         }
         VCSResourceInfo resourceInfo = vcs.getResourceInfo(resource);
-        boolean result = resourceInfo != null && resourceInfo.url != null
-            && resourceInfo.url.equals(url);
+        boolean result = resourceInfo != null && resourceInfo.getURL() != null
+            && resourceInfo.getURL().equals(url);
         return result;
     }
 }

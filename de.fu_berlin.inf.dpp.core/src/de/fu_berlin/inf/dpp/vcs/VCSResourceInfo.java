@@ -1,22 +1,52 @@
 package de.fu_berlin.inf.dpp.vcs;
 
+import org.apache.commons.lang.ObjectUtils;
+
 /**
- * A simple struct to hold VCS related information associated with a resource.
+ * POJO to hold VCS related information associated with a resource.
  */
-// TODO Encapsulate fields?
-public class VCSResourceInfo {
-    /** The URL of the remote resource in the repository, or null. */
-    public String url;
-    /** The revision of the resource as a String, or null. */
-    public String revision;
+public final class VCSResourceInfo {
+
+    private final String url;
+    private final String revision;
+
+    /**
+     * Creates a new VCSResourceInfo object with the given URL and revision.
+     * 
+     * @param url
+     * @param revision
+     */
+    public VCSResourceInfo(final String url, final String revision) {
+        this.url = url;
+        this.revision = revision;
+    }
+
+    /**
+     * Returns the URL of the remote resource in the repository.
+     * 
+     * @return the URL of the remote resource in the repository, or
+     *         <code>null</code> if not available
+     */
+    public String getURL() {
+        return url;
+    }
+
+    /**
+     * Returns the revision of the resource as string.
+     * 
+     * @return the revision of the resource, or <code>null</code> if not
+     *         available
+     */
+    public String getRevision() {
+        return revision;
+    }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result
-            + ((revision == null) ? 0 : revision.hashCode());
-        result = prime * result + ((url == null) ? 0 : url.hashCode());
+        result = prime * result + ObjectUtils.hashCode(revision);
+        result = prime * result + ObjectUtils.hashCode(url);
         return result;
     }
 
@@ -24,22 +54,14 @@ public class VCSResourceInfo {
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
-        if (obj == null)
+
+        if (!(obj instanceof VCSResourceInfo))
             return false;
-        if (getClass() != obj.getClass())
-            return false;
+
         VCSResourceInfo other = (VCSResourceInfo) obj;
-        if (revision == null) {
-            if (other.revision != null)
-                return false;
-        } else if (!revision.equals(other.revision))
-            return false;
-        if (url == null) {
-            if (other.url != null)
-                return false;
-        } else if (!url.equals(other.url))
-            return false;
-        return true;
+
+        return ObjectUtils.equals(revision, other.revision)
+            && ObjectUtils.equals(url, other.url);
     }
 
     @Override

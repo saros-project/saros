@@ -213,7 +213,7 @@ public final class PackageExplorerView extends StfRemoteObject implements
         if (vcs == null)
             return null;
         VCSResourceInfo info = vcs.getCurrentResourceInfo(resource);
-        String result = info != null ? info.revision : null;
+        String result = info != null ? info.getRevision() : null;
         return result;
     }
 
@@ -230,7 +230,7 @@ public final class PackageExplorerView extends StfRemoteObject implements
         if (vcs == null)
             return null;
         final VCSResourceInfo info = vcs.getResourceInfo(resource);
-        return info.url;
+        return info.getURL();
     }
 
     @Override

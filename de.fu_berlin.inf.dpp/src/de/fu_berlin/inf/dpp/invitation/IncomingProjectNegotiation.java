@@ -480,7 +480,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 return null;
 
             final String repositoryRoot = fileList.getRepositoryRoot();
-            final String directory = fileList.getProjectInfo().url
+            final String directory = fileList.getProjectInfo().getURL()
                 .substring(repositoryRoot.length());
 
             // FIXME this should at least throw a OperationCanceledException
@@ -778,22 +778,27 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             vcs.revert(resource, monitor);
         }
 
-        String url = remoteFileList.getVCSUrl(path);
-        String revision = remoteFileList.getVCSRevision(path);
+        // FIXME both calls may return null
+        final String localURL = info.getURL();
+        final String localRevision = info.getRevision();
 
-        if (url == null || revision == null) {
+        final String remoteURL = remoteFileList.getVCSUrl(path);
+        final String remoteRevision = remoteFileList.getVCSRevision(path);
+
+        if (remoteURL == null || remoteRevision == null) {
             // The resource might have been deleted.
             return;
         }
-        if (!info.url.equals(url)) {
-            LOG.trace("Switching " + resource.getName() + " from " + info.url
-                + " to " + url);
-            vcs.switch_(resource, url, revision, monitor);
-        } else if (!info.revision.equals(revision)
+
+        if (!remoteURL.equals(localURL)) {
+            LOG.trace("Switching " + resource.getName() + " from " + localURL
+                + " to " + remoteURL);
+            vcs.switch_(resource, remoteURL, remoteRevision, monitor);
+        } else if (!remoteRevision.equals(localRevision)
             && remoteFileList.getPaths().contains(path)) {
             LOG.trace("Updating " + resource.getName() + " from "
-                + info.revision + " to " + revision);
-            vcs.update(resource, revision, monitor);
+                + localRevision + " to " + remoteRevision);
+            vcs.update(resource, remoteRevision, monitor);
         }
         if (monitor.isCanceled())
             return;
