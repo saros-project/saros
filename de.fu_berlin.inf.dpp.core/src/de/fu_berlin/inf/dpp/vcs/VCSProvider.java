@@ -39,7 +39,7 @@ public interface VCSProvider {
      * Returns VCS specific information for the resource. For SVN, it returns
      * the revision that was used to get this file. E.g. if a file was last
      * changed in <b>revision 121, HEAD is 127</b>, and we do an
-     * <b>"svn update -r 124"</b>, then this method returns <b>revision 124<b>.
+     * <b>"svn update -r 124"</b>, then this method returns <b>revision 124</b>.
      * We need this revision to replicate changes: If we used the actual
      * revision in commands, it's possible that the URL changes.
      * 

@@ -328,8 +328,6 @@ public class FileList {
         }
     }
 
-    private final boolean useVersionControl;
-
     /** Identifies the VCS used. */
     private String vcsProviderID;
 
@@ -377,18 +375,6 @@ public class FileList {
      * Creates an empty file list.
      */
     FileList() {
-        this(true);
-    }
-
-    /**
-     * Creates an empty file list.
-     * 
-     * @param useVersionControl
-     *            If false, the FileList won't include version control
-     *            information.
-     */
-    FileList(boolean useVersionControl) {
-        this.useVersionControl = useVersionControl;
         this.root = File.createRoot();
     }
 
@@ -458,7 +444,7 @@ public class FileList {
     }
 
     public boolean useVersionControl() {
-        return useVersionControl;
+        return vcsProviderID != null;
     }
 
     public String getVcsProviderID() {

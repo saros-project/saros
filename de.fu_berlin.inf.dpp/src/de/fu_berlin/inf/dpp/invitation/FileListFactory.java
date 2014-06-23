@@ -21,12 +21,15 @@ import de.fu_berlin.inf.dpp.vcs.VCSProvider;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
 /**
- * Offers two ways to create {@link FileList}s, i.e. an inexpensive one, which
- * requires the caller to take care of the validity of input data (
- * {@link #createFileList(List) createFileList(List&lt;String&gt;)}), and an
- * expensive one, that rescans the whole project to gather all MetaData (
- * {@link #createFileList(IProject, List, IChecksumCache, boolean, IProgressMonitor)
- * createFileList(IProject, List&lt;IResource&gt;, ...)}).
+ * Offers two ways to create {@link FileList file lists}.
+ * <p>
+ * <li>Either an inexpensive one that rescans the whole project to gather meta
+ * data:<br>
+ * {@link #createFileList(IProject, List, IChecksumCache, VCSProvider, IProgressMonitor)}
+ * </li>
+ * <li>Or a cheap one which requires the caller to take care of the validity of
+ * input data:<br>
+ * {@link #createFileList(List)}</li>
  */
 public class FileListFactory {
 
@@ -55,16 +58,16 @@ public class FileListFactory {
     /**
      * Creates a new file list from given paths. It does not compute checksums
      * or location information.
-     * 
-     * @NOTE This method does not check the input. The caller is
-     *       <b>responsible</b> for the <b>correct</b> input !
+     * <p>
+     * <b>Note:</b> This method does not check the input. The caller is
+     * <b>responsible</b> for the <b>correct</b> input !
      * 
      * @param paths
      *            a list of paths that <b>refers</b> to <b>files</b> that should
      *            be added to this file list.
      */
     public static FileList createFileList(List<String> paths) {
-        FileList list = new FileList(false);
+        FileList list = new FileList();
 
         for (String path : paths)
             list.addPath(path);
@@ -79,7 +82,7 @@ public class FileListFactory {
     private FileList build(IProject project, List<IResource> resources,
         VCSProvider provider) throws IOException {
 
-        FileList list = new FileList(provider != null);
+        FileList list = new FileList();
 
         if (resources == null) {
             list.addEncoding(project.getDefaultCharset());
@@ -100,32 +103,27 @@ public class FileListFactory {
 
         IProject project = null;
 
-        if (list.useVersionControl()) {
+        if (provider != null) {
             project = resources.get(0).getProject();
+            String providerID = provider.getID();
 
-            if (provider != null) {
-                String providerID = provider.getID();
+            list.setVcsProviderID(providerID);
+            list.setVcsRepositoryRoot(provider.getRepositoryString(project));
 
-                list.setVcsProviderID(providerID);
-                list.setVcsRepositoryRoot(provider.getRepositoryString(project));
-
-                list.setVcsRepositoryRoot(provider
-                    .getCurrentResourceInfo(project));
-                /*
-                 * FIXME we need to stop querying for VCS revisions the moment
-                 * we reach the first exception
-                 * 
-                 * Caused by:
-                 * org.tigris.subversion.svnclientadapter.SVNClientException:
-                 * org.apache.subversion.javahl.ClientException: The working
-                 * copy needs to be upgraded
-                 * 
-                 * which will significantly slow down the overall invitation
-                 * process. It doesn't make sense to check for other files. If
-                 * there is one resource that is not upgraded, this fails
-                 * overall...
-                 */
-            }
+            list.setVcsRepositoryRoot(provider.getCurrentResourceInfo(project));
+            /*
+             * FIXME we need to stop querying for VCS revisions the moment we
+             * reach the first exception
+             * 
+             * Caused by:
+             * org.tigris.subversion.svnclientadapter.SVNClientException:
+             * org.apache.subversion.javahl.ClientException: The working copy
+             * needs to be upgraded
+             * 
+             * which will significantly slow down the overall invitation
+             * process. It doesn't make sense to check for other files. If there
+             * is one resource that is not upgraded, this fails overall...
+             */
         }
 
         Deque<IResource> stack = new LinkedList<IResource>();
@@ -134,7 +132,9 @@ public class FileListFactory {
 
         List<IFile> files = new LinkedList<IFile>();
 
-        monitor.subTask("Reading SVN revisions for shared files...");
+        if (provider != null)
+            monitor.subTask("Reading SVN revisions for shared files...");
+
         while (!stack.isEmpty()) {
             IResource resource = stack.pop();
 
@@ -150,9 +150,6 @@ public class FileListFactory {
 
             if (provider != null)
                 info = provider.getCurrentResourceInfo(resource);
-
-            assert !list.useVersionControl()
-                || (project != null && project.equals(resource.getProject()));
 
             MetaData data = null;
 
