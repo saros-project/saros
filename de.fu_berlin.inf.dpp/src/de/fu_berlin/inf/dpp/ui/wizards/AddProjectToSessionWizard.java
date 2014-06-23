@@ -250,7 +250,7 @@ public class AddProjectToSessionWizard extends Wizard {
                     throws InvocationTargetException, InterruptedException {
                     try {
                         modifiedResources.putAll(calculateModifiedResources(
-                            modifiedProjects, monitor));
+                            modifiedProjects, useVersionControl, monitor));
                     } catch (Exception e) {
                         throw new InvocationTargetException(e);
                     }
@@ -258,6 +258,8 @@ public class AddProjectToSessionWizard extends Wizard {
             });
         } catch (Exception e) {
             Throwable cause = e.getCause();
+
+            log.error("calculating modified resources failed", e);
 
             if (cause instanceof CoreException) {
                 MessageDialog.openError(getShell(),
@@ -480,8 +482,8 @@ public class AddProjectToSessionWizard extends Wizard {
      * current project mapping.
      */
     private Map<String, FileListDiff> calculateModifiedResources(
-        Map<String, IProject> projectMapping, IProgressMonitor monitor)
-        throws IOException {
+        Map<String, IProject> projectMapping, boolean includeVCSData,
+        IProgressMonitor monitor) throws IOException {
         Map<String, FileListDiff> modifiedResources = new HashMap<String, FileListDiff>();
 
         ISarosSession session = sessionManager.getSarosSession();
@@ -518,11 +520,9 @@ public class AddProjectToSessionWizard extends Wizard {
 
             FileList remoteFileList = process.getRemoteFileList(projectID);
 
-            final boolean useVersionControl = namePage.useVersionControl();
-
             VCSAdapter vcs = null;
 
-            if (useVersionControl) {
+            if (includeVCSData) {
                 vcs = VCSAdapter
                     .getAdapter((org.eclipse.core.resources.IProject) ResourceAdapterFactory
                         .convertBack(project));
