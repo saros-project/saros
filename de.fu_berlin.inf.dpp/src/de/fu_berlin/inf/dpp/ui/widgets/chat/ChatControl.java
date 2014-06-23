@@ -24,7 +24,6 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.jivesoftware.smack.XMPPException;
@@ -36,6 +35,7 @@ import de.fu_berlin.inf.dpp.communication.chat.ChatElement;
 import de.fu_berlin.inf.dpp.communication.chat.ChatElement.ChatElementType;
 import de.fu_berlin.inf.dpp.communication.chat.IChat;
 import de.fu_berlin.inf.dpp.communication.chat.IChatListener;
+import de.fu_berlin.inf.dpp.communication.chat.single.SingleUserChat;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -83,11 +83,18 @@ public class ChatControl extends Composite {
 
     private static final Logger log = Logger.getLogger(ChatControl.class);
 
-    private static final Color LOCAL_USER_DEFAULT_COLOR = Display.getDefault()
-        .getSystemColor(SWT.COLOR_CYAN);
+    /*
+     * This should be configurable by the user so we do not have to think about
+     * the "perfect colors" for color blind people.
+     */
 
-    private static final Color REMOTE_USER_DEFAULT_COLOR = Display.getDefault()
-        .getSystemColor(SWT.COLOR_GRAY);
+    // BLUE
+    private static final Color LOCAL_USER_DEFAULT_COLOR = new Color(null, 60,
+        140, 255);
+
+    // ORANGE
+    private static final Color REMOTE_USER_DEFAULT_COLOR = new Color(null, 250,
+        180, 0);
 
     private final Map<JID, Color> colorCache = new HashMap<JID, Color>();
 
@@ -478,41 +485,36 @@ public class ChatControl extends Composite {
      * 
      */
     protected Color getColorForJID(JID jid) {
+
+        final Color defaultColor = isOwnJID(jid) ? LOCAL_USER_DEFAULT_COLOR
+            : REMOTE_USER_DEFAULT_COLOR;
+
+        if (chat instanceof SingleUserChat)
+            return defaultColor;
+
         Color color = colorCache.get(jid);
-        if (color == null) {
-            synchronized (ChatControl.this) {
 
-                User user = null;
-                if (session != null) {
-                    JID resourceQualifiedJID = session
-                        .getResourceQualifiedJID(jid);
+        if (color != null)
+            return color;
 
-                    if (resourceQualifiedJID != null)
-                        user = session.getUser(resourceQualifiedJID);
-                }
+        color = defaultColor;
 
-                if (user != null) {
-                    color = SarosAnnotation.getUserColor(user);
+        User user = null;
 
-                    /*
-                     * excluded until
-                     * http://saros-build.imp.fu-berlin.de/gerrit/#/c/253/ is
-                     * submitted
-                     */
-                    // add default lightness to the current user color
-                    // Color lightenedColor = ColorUtils.addLightness(color,
-                    // SarosAnnotation.getLightnessScale());
-                    // color.dispose();
-                    // color = lightenedColor;
+        synchronized (ChatControl.this) {
+            if (session != null) {
+                JID resourceQualifiedJID = session.getResourceQualifiedJID(jid);
 
-                    colorCache.put(jid, color);
-                } else if (isOwnJID(jid)) {
-                    color = LOCAL_USER_DEFAULT_COLOR;
-                } else {
-                    color = REMOTE_USER_DEFAULT_COLOR;
-                }
+                if (resourceQualifiedJID != null)
+                    user = session.getUser(resourceQualifiedJID);
             }
         }
+
+        if (user != null) {
+            color = SarosAnnotation.getUserColor(user);
+            colorCache.put(jid, color);
+        }
+
         return color;
     }
 
