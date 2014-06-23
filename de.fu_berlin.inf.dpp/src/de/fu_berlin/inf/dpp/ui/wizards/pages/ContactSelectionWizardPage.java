@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.IMessageProvider;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -18,14 +17,10 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.discovery.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.xmpp.discovery.DiscoveryManagerListener;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.FilteredContactSelectionComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.ContactSelectionChangedEvent;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.FilterContactsChangedEvent;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.FilteredContactSelectionListener;
 
 /**
  * Allows the user to select a {@link JID} from the {@link Roster}.
@@ -57,31 +52,7 @@ public class ContactSelectionWizardPage extends WizardPage {
     protected boolean selectionWasValid = false;
 
     @Inject
-    protected IPreferenceStore preferenceStore;
-
-    @Inject
     protected DiscoveryManager discoveryManager;
-
-    /**
-     * This {@link FilteredContactSelectionListener} changes the
-     * {@link WizardPage}'s state according to the selected {@link JID}s.
-     */
-    protected FilteredContactSelectionListener contactSelectionListener = new FilteredContactSelectionListener() {
-        @Override
-        public void contactSelectionChanged(ContactSelectionChangedEvent event) {
-            updatePageCompletion();
-        }
-
-        @Override
-        public void filterNonSarosContactsChanged(
-            FilterContactsChangedEvent event) {
-
-            preferenceStore
-                .setValue(
-                    PreferenceConstants.CONTACT_SELECTION_FILTER_NON_SAROS_CONTACTS,
-                    event.isFilterNonSarosContacts());
-        }
-    };
 
     /**
      * This listener update the page completion if someone's presence changed.
@@ -135,11 +106,8 @@ public class ContactSelectionWizardPage extends WizardPage {
 
         composite.setLayout(new GridLayout(1, false));
 
-        boolean initialFilterConfig = preferenceStore
-            .getBoolean(PreferenceConstants.CONTACT_SELECTION_FILTER_NON_SAROS_CONTACTS);
-
         contactSelectionComposite = new FilteredContactSelectionComposite(
-            composite, SWT.BORDER | SWT.V_SCROLL, initialFilterConfig);
+            composite, SWT.BORDER | SWT.V_SCROLL);
 
         /*
          * preset the contact(s) e.g from the Saros view when invoking 'Work
@@ -147,9 +115,6 @@ public class ContactSelectionWizardPage extends WizardPage {
          */
         contactSelectionComposite.setSelectedContacts(SelectionRetrieverFactory
             .getSelectionRetriever(JID.class).getOverallSelection());
-
-        contactSelectionComposite
-            .addContactSelectionListener(contactSelectionListener);
 
         contactSelectionComposite.setLayoutData(new GridData(SWT.FILL,
             SWT.FILL, true, true));

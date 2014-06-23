@@ -1,7 +1,7 @@
 package de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events;
 
 /**
- * Listener for {@link ContactSelectionListener} events.
+ * Listener for {@link ContactSelectionChangedEvent} events.
  */
 public interface ContactSelectionListener {
 

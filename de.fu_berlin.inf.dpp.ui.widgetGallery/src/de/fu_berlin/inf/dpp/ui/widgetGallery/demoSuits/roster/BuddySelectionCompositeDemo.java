@@ -33,7 +33,7 @@ public class BuddySelectionCompositeDemo extends AbstractDemo {
         parent.setLayout(new GridLayout(1, false));
 
         buddySelectionComposite = new FilteredContactSelectionComposite(parent,
-            SWT.BORDER, true);
+            SWT.BORDER);
         buddySelectionComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
             true, true));
         SelectionUtils.getSelectionService().addSelectionListener(

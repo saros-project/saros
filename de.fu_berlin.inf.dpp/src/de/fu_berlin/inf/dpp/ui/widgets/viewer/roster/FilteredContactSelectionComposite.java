@@ -20,11 +20,7 @@ import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterEntryElement;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterGroupElement;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
-import de.fu_berlin.inf.dpp.ui.util.ViewerUtils;
 import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.ContactSelectionListener;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.FilterContactsChangedEvent;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.FilteredContactSelectionListener;
 import de.fu_berlin.inf.dpp.ui.wizards.AddContactWizard;
 
 /**
@@ -45,14 +41,10 @@ import de.fu_berlin.inf.dpp.ui.wizards.AddContactWizard;
  * @author bkahlert
  * 
  */
-public class FilteredContactSelectionComposite extends
+public final class FilteredContactSelectionComposite extends
     ContactSelectionComposite {
 
-    protected boolean filterNonSarosContacts;
-
-    protected Button filterNonSarosContactsButton;
-
-    protected ViewerFilter nonSarosContactsFilter = new ViewerFilter() {
+    private final ViewerFilter sarosSupportFilter = new ViewerFilter() {
         @Override
         public boolean select(Viewer viewer, Object parentElement,
             Object element) {
@@ -85,43 +77,24 @@ public class FilteredContactSelectionComposite extends
         }
     };
 
-    public FilteredContactSelectionComposite(Composite parent, int style,
-        boolean filterNonSarosContacts) {
+    public FilteredContactSelectionComposite(Composite parent, int style) {
         super(parent, style);
-
         createControls();
-        setFilterNonSarosContacts(filterNonSarosContacts);
+        getViewer().addFilter(sarosSupportFilter);
     }
 
-    /**
-     * Creates additional controls
-     */
-    protected void createControls() {
+    private void createControls() {
         Composite controlComposite = new Composite(this, SWT.NONE);
         controlComposite.setLayoutData(LayoutUtils.createFillHGrabGridData());
         controlComposite.setLayout(new GridLayout(2, false));
 
-        filterNonSarosContactsButton = new Button(controlComposite, SWT.CHECK);
-        filterNonSarosContactsButton.setLayoutData(new GridData(SWT.BEGINNING,
-            SWT.CENTER, false, false));
-
-        filterNonSarosContactsButton
-            .setText(Messages.FilteredContactSelectionComposite_filter_non_saros_contacts_button_text);
-
-        filterNonSarosContactsButton
-            .addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    setFilterNonSarosContacts(filterNonSarosContactsButton
-                        .getSelection());
-                }
-            });
-
         Button addContactButton = new Button(controlComposite, SWT.PUSH);
         addContactButton.setLayoutData(new GridData(SWT.END, SWT.CENTER, true,
             false));
+
         addContactButton
             .setText(Messages.FilteredContactSelectionComposite_add_contact_button_text);
+
         addContactButton.setImage(ImageManager.ELCL_CONTACT_ADD);
         addContactButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -137,52 +110,5 @@ public class FilteredContactSelectionComposite extends
                 setSelectedContacts(selectedContacts);
             }
         });
-    }
-
-    /**
-     * Defines whether non Saros contacts should be displayed or not
-     * 
-     * @param filter
-     *            <code>true</code> if non Saros contacts should not be
-     *            displayed
-     */
-    public void setFilterNonSarosContacts(boolean filter) {
-        if (filterNonSarosContacts == filter)
-            return;
-
-        filterNonSarosContacts = filter;
-
-        if (filterNonSarosContactsButton != null
-            && !filterNonSarosContactsButton.isDisposed()
-            && filterNonSarosContactsButton.getSelection() != filter) {
-            filterNonSarosContactsButton.setSelection(filter);
-        }
-
-        if (filter) {
-            getViewer().addFilter(nonSarosContactsFilter);
-            ViewerUtils.expandAll(getViewer());
-        } else {
-            getViewer().removeFilter(nonSarosContactsFilter);
-            ViewerUtils.expandAll(getViewer());
-        }
-
-        notifyContactSelectionListener(filter);
-    }
-
-    /**
-     * Notify all {@link FilteredContactSelectionListener}s about a changed
-     * {@link FilteredContactSelectionComposite#filterNonSarosContacts} option.
-     * 
-     * @param filterNonSarosContacts
-     */
-    public void notifyContactSelectionListener(boolean filterNonSarosContacts) {
-        FilterContactsChangedEvent event = new FilterContactsChangedEvent(
-            filterNonSarosContacts);
-
-        for (ContactSelectionListener contactSelectionListener : contactSelectionListeners) {
-            if (contactSelectionListener instanceof FilteredContactSelectionListener)
-                ((FilteredContactSelectionListener) contactSelectionListener)
-                    .filterNonSarosContactsChanged(event);
-        }
     }
 }
