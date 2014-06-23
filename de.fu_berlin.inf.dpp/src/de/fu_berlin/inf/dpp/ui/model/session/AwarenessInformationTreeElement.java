@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.ui.model.session;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jface.viewers.StyledString;
@@ -14,6 +16,7 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.RemoteEditorManager;
+import de.fu_berlin.inf.dpp.editor.RemoteEditorManager.RemoteEditor;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.model.TreeElement;
 
@@ -50,8 +53,7 @@ public class AwarenessInformationTreeElement extends TreeElement {
         StyledString styledString = new StyledString();
 
         boolean first = true;
-        for (String detail : awarenessInformationCollector
-            .getAwarenessDetails(this.user)) {
+        for (String detail : getAwarenessDetails()) {
             styledString.append((first ? "" : " - ") + detail);
             first = false;
         }
@@ -85,5 +87,43 @@ public class AwarenessInformationTreeElement extends TreeElement {
 
     public Object getUser() {
         return this.user;
+    }
+
+    /**
+     * Retrieve information about the progress of the invitation (if there is
+     * any) and awareness information that benefits the users (like showing
+     * which file the user is currently viewing, who he is following etc.)
+     */
+    private List<String> getAwarenessDetails() {
+        List<String> details = new ArrayList<String>();
+
+        final RemoteEditorManager rem = editorManager.getRemoteEditorManager();
+
+        if (rem == null)
+            return details;
+
+        final RemoteEditor activeEditor = rem.getRemoteActiveEditor(user);
+        /*
+         * The other user has a non-shared editor open, i.e. the remote editor
+         * shows a file which is not part of the session.
+         */
+        if (activeEditor == null) {
+            details.add("non-shared file open");
+            return details;
+        }
+
+        SPath activeFile = activeEditor.getPath();
+        if (activeFile != null) {
+            /*
+             * path.getProjectRelativePath() could be too long, sometimes the
+             * name would be enough...
+             * 
+             * TODO: make this configurable?
+             */
+            details.add(activeFile.getProject().getName() + ": "
+                + activeFile.getFile().getProjectRelativePath().toString());
+        }
+
+        return details;
     }
 }
