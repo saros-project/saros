@@ -6,9 +6,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.log4j.Logger;
 import org.picocontainer.Startable;
 
-import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.StartFollowingActivity;
 import de.fu_berlin.inf.dpp.activities.StopFollowingActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -16,18 +13,21 @@ import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
-import de.fu_berlin.inf.dpp.session.AbstractActivityProvider;
+import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
+import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
+import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
  * This manager is responsible for distributing knowledge about changes in
- * follow modes between session participants
+ * follow modes between session participants. It both produces and consumes
+ * activities.
  * 
  * @author Alexander Waldmann (contact@net-corps.de)
  */
 @Component(module = "core")
-public class FollowingActivitiesManager extends AbstractActivityProvider
+public class FollowingActivitiesManager extends AbstractActivityProducer
     implements Startable {
 
     private static final Logger LOG = Logger
@@ -54,7 +54,7 @@ public class FollowingActivitiesManager extends AbstractActivityProvider
         }
     };
 
-    private final IActivityReceiver receiver = new AbstractActivityReceiver() {
+    private final IActivityConsumer consumer = new AbstractActivityConsumer() {
         @Override
         public void receive(StartFollowingActivity activity) {
             final User source = activity.getSource();
@@ -91,20 +91,17 @@ public class FollowingActivitiesManager extends AbstractActivityProvider
     @Override
     public void start() {
         collector.flushFollowModes();
-        installProvider(session);
+        session.addActivityProducer(this);
+        session.addActivityConsumer(consumer);
         editor.addSharedEditorListener(followModeListener);
     }
 
     @Override
     public void stop() {
-        uninstallProvider(session);
+        session.removeActivityProducer(this);
+        session.removeActivityConsumer(consumer);
         editor.removeSharedEditorListener(followModeListener);
         collector.flushFollowModes();
-    }
-
-    @Override
-    public void exec(IActivity activity) {
-        activity.dispatch(receiver);
     }
 
     private void notifyListeners() {

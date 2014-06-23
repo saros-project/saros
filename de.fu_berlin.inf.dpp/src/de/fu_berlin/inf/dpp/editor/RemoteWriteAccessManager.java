@@ -11,13 +11,12 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
-import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
 import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
+import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.session.User;
@@ -29,15 +28,18 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
  * This class manages state of open editors of all users with
  * {@link Permission#WRITE_ACCESS} and connects to/disconnects from the
  * corresponding DocumentProviders to make sure that TextEditActivities can be
- * executed.
- * 
+ * executed.<br>
  * The main idea is to connect at the site of user with
  * {@link Permission#READONLY_ACCESS}, when a user with
  * {@link Permission#WRITE_ACCESS} activates his editor with the document.
  * Disconnect happens, when last user with {@link Permission#WRITE_ACCESS}
  * closes the editor.
+ * <p>
+ * This class is an {@link IActivityConsumer} and it expects it's
+ * {@link #exec(de.fu_berlin.inf.dpp.activities.IActivity) exec()} method to be
+ * called -- it won't register itself as an {@link IActivityConsumer}.
  */
-public class RemoteWriteAccessManager {
+public class RemoteWriteAccessManager extends AbstractActivityConsumer {
 
     private static final Logger log = Logger
         .getLogger(RemoteWriteAccessManager.class);
@@ -56,6 +58,35 @@ public class RemoteWriteAccessManager {
     public RemoteWriteAccessManager(final ISarosSession sarosSession) {
         this.sarosSession = sarosSession;
         this.sarosSession.addListener(sharedProjectListener);
+    }
+
+    /**
+     * This method is called from the shared project when a new Activity arrives
+     */
+    @Override
+    public void receive(final EditorActivity editorActivity) {
+        User sender = editorActivity.getSource();
+        SPath path = editorActivity.getPath();
+        if (path == null) {
+            /*
+             * sPath == null means that the user has no active editor any more.
+             */
+            return;
+        }
+
+        switch (editorActivity.getType()) {
+        case ACTIVATED:
+            editorStates.get(path).add(sender);
+            break;
+        case SAVED:
+            break;
+        case CLOSED:
+            editorStates.get(path).remove(sender);
+            break;
+        default:
+            log.warn(".receive() Unknown Activity type");
+        }
+        updateConnectionState(path);
     }
 
     protected ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
@@ -85,44 +116,6 @@ public class RemoteWriteAccessManager {
             }
         }
     };
-
-    protected IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
-
-        @Override
-        public void receive(final EditorActivity editorActivity) {
-            User sender = editorActivity.getSource();
-            SPath path = editorActivity.getPath();
-            if (path == null) {
-                /*
-                 * sPath == null means that the user has no active editor any
-                 * more.
-                 */
-                return;
-            }
-
-            switch (editorActivity.getType()) {
-            case ACTIVATED:
-                editorStates.get(path).add(sender);
-                break;
-            case SAVED:
-                break;
-            case CLOSED:
-                editorStates.get(path).remove(sender);
-                break;
-            default:
-                log.warn(".receive() Unknown Activity type");
-            }
-            updateConnectionState(path);
-        }
-
-    };
-
-    /**
-     * This method is called from the shared project when a new Activity arrives
-     */
-    public void exec(final IActivity activity) {
-        activity.dispatch(activityReceiver);
-    }
 
     public void dispose() {
         sarosSession.removeListener(sharedProjectListener);

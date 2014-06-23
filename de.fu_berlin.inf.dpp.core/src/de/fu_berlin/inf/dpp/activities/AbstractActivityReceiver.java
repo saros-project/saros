@@ -5,7 +5,7 @@ package de.fu_berlin.inf.dpp.activities;
  * 
  * Useful, if just interested in some particular IActivity
  */
-public class AbstractActivityReceiver implements IActivityReceiver {
+public abstract class AbstractActivityReceiver implements IActivityReceiver {
 
     /**
      * @JTourBusStop 4, Creating a new Activity type, Triple dispatch abstract

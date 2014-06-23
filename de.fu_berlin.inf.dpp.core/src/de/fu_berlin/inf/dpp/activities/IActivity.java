@@ -43,13 +43,13 @@ public interface IActivity {
      *               to create a new Activity type.
      * 
      *               IActivity is the base interface for all activity
-     *               implementations. The only attribute of an IActivity
-     *               instance is the source, that is the session participant who
-     *               did "something" and therefore caused this activity in the
-     *               first place.
+     *               implementations. The only common attribute of all IActivity
+     *               instances is the source, that is the session participant
+     *               who did "something" and therefore caused this activity in
+     *               the first place.
      * 
      *               So create a new class in the "activities" package with the
-     *               suffix "Activity" and continue with the next stop.
+     *               suffix "Activity", and continue with the next stop.
      */
     /**
      * @JTourBusStop 3, Some Basics:

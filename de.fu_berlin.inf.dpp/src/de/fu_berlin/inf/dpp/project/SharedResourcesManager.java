@@ -72,7 +72,9 @@ import de.fu_berlin.inf.dpp.filesystem.EclipseProjectImpl;
 import de.fu_berlin.inf.dpp.filesystem.EclipseResourceImpl;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
-import de.fu_berlin.inf.dpp.session.AbstractActivityProvider;
+import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
+import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
+import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
@@ -84,10 +86,12 @@ import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 /**
  * This manager is responsible for handling all resource changes that aren't
  * handled by the EditorManager, that is for changes that aren't done by
- * entering text in a text editor. It creates and executes file, folder, and VCS
- * activities.<br>
- * TODO Extract AbstractActivityProvider functionality in another class
- * ResourceActivityProvider, rename to SharedResourceChangeListener.
+ * entering text in a text editor. It produces and consumes file, folder, and
+ * VCS activities.
+ * <p>
+ * TODO Extract AbstractActivityProducer/Consumer functionality in another
+ * classes ResourceActivityProducer/Consumer, rename to
+ * SharedResourceChangeListener.
  */
 /*
  * For a good introduction to Eclipse's resource change notification mechanisms
@@ -95,7 +99,7 @@ import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
  * http://www.eclipse.org/articles/Article-Resource-deltas/resource-deltas.html
  */
 @Component(module = "core")
-public class SharedResourcesManager extends AbstractActivityProvider implements
+public class SharedResourcesManager extends AbstractActivityProducer implements
     IResourceChangeListener, Startable {
     /** The {@link IResourceChangeEvent}s we're going to register for. */
     /*
@@ -157,7 +161,8 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
 
     @Override
     public void start() {
-        installProvider(sarosSession);
+        sarosSession.addActivityProducer(this);
+        sarosSession.addActivityConsumer(consumer);
         stopManager.addBlockable(stopManagerListener);
         ResourcesPlugin.getWorkspace().addResourceChangeListener(this,
             INTERESTING_EVENTS);
@@ -166,7 +171,8 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
     @Override
     public void stop() {
         ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
-        uninstallProvider(sarosSession);
+        sarosSession.removeActivityProducer(this);
+        sarosSession.removeActivityConsumer(consumer);
         stopManager.removeBlockable(stopManagerListener);
     }
 
@@ -449,41 +455,53 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
         return visitor.toString();
     }
 
-    @Override
-    public void exec(IActivity activity) {
+    private final IActivityConsumer consumer = new AbstractActivityConsumer() {
+        @Override
+        public void exec(IActivity activity) {
+            if (!(activity instanceof FileActivity
+                || activity instanceof FolderActivity || activity instanceof VCSActivity))
+                return;
 
-        if (!(activity instanceof FileActivity
-            || activity instanceof FolderActivity || activity instanceof VCSActivity))
-            return;
-
-        try {
             /*
              * FIXME this will lockout everything. File changes made in the
              * meantime from another background job are not recognized. See
              * AddMultipleFilesTest STF test which fails randomly.
              */
             fileReplacementInProgressObservable.startReplacement();
+            log.trace("execing " + activity);
 
-            log.trace("execing " + activity.toString() + " in "
-                + Thread.currentThread().getName());
+            super.exec(activity);
 
-            if (activity instanceof FileActivity) {
-                exec((FileActivity) activity);
-            } else if (activity instanceof FolderActivity) {
-                exec((FolderActivity) activity);
-            } else if (activity instanceof VCSActivity) {
-                exec((VCSActivity) activity);
-            }
-
-        } catch (CoreException e) {
-            log.error("Failed to execute resource activity.", e);
-        } finally {
             fileReplacementInProgressObservable.replacementDone();
-            log.trace("done execing " + activity.toString());
+            log.trace("done execing " + activity);
         }
-    }
 
-    protected void exec(FileActivity activity) throws CoreException {
+        @Override
+        public void receive(FileActivity activity) {
+            try {
+                handleFileActivity(activity);
+            } catch (CoreException e) {
+                log.error("Failed to execute activity: " + activity, e);
+            }
+        }
+
+        @Override
+        public void receive(FolderActivity activity) {
+            try {
+                handleFolderActivity(activity);
+            } catch (CoreException e) {
+                log.error("Failed to execute activity: " + activity, e);
+            }
+        }
+
+        @Override
+        public void receive(VCSActivity activity) {
+            handleVCSActivity(activity);
+        }
+    };
+
+    protected void handleFileActivity(FileActivity activity)
+        throws CoreException {
 
         if (activity.isRecovery()) {
             handleFileRecovery(activity);
@@ -592,7 +610,8 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
         }
     }
 
-    protected void exec(FolderActivity activity) throws CoreException {
+    protected void handleFolderActivity(FolderActivity activity)
+        throws CoreException {
 
         SPath path = activity.getPath();
 
@@ -611,7 +630,7 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
         }
     }
 
-    protected void exec(VCSActivity activity) {
+    protected void handleVCSActivity(VCSActivity activity) {
         final VCSActivity.Type activityType = activity.getType();
         SPath path = activity.getPath();
 
@@ -636,7 +655,7 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
                     + activity.containedActivity.toString());
             }
             for (IResourceActivity a : activity.containedActivity) {
-                exec(a);
+                consumer.exec(a);
             }
             return;
         }

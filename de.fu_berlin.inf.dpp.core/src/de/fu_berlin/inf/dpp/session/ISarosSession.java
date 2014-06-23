@@ -45,7 +45,7 @@ import de.fu_berlin.inf.dpp.synchronize.StopManager;
 public interface ISarosSession {
 
     /**
-     * @JTourBusStop 2, Architecture Overview, Session Management:
+     * @JTourBusStop 3, Architecture Overview, Session Management:
      * 
      *               This Interface is the main entrance Point for the "Session
      *               Management"-Component. The Session Management is
@@ -297,8 +297,7 @@ public interface ISarosSession {
      *            The session will register an {@link IActivityListener} on this
      *            producer. It is expected that the producer will inform that
      *            listener about new activities via
-     *            {@link IActivityListener#activityCreated(IActivity)
-     *            activityCreated()}.
+     *            {@link IActivityListener#created(IActivity) created()}.
      * 
      * @see #removeActivityProducer(IActivityProducer)
      */
@@ -310,8 +309,7 @@ public interface ISarosSession {
      * @param producer
      *            The session will unregister its {@link IActivityListener} from
      *            this producer and it is expected that the producer no longer
-     *            calls {@link IActivityListener#activityCreated(IActivity)
-     *            activityCreated()}.
+     *            calls {@link IActivityListener#created(IActivity) created()}.
      * 
      * @see #addActivityProducer(IActivityProducer)
      */

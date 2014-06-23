@@ -5,11 +5,11 @@ import java.util.concurrent.CancellationException;
 import org.apache.log4j.Logger;
 import org.picocontainer.Startable;
 
-import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
-import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.PermissionActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.session.AbstractActivityProvider;
+import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
+import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
+import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
@@ -18,46 +18,39 @@ import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
- * This manager is responsible for handling {@link Permission} changes.
+ * This manager is responsible for handling {@link Permission} changes. It both
+ * produces and consumes activities.
  * 
  * @author rdjemili
  */
 @Component(module = "core")
-public class PermissionManager extends AbstractActivityProvider implements
+public class PermissionManager extends AbstractActivityProducer implements
     Startable {
-    private final ISarosSession sarosSession;
+    private static final Logger LOG = Logger.getLogger(PermissionManager.class);
 
-    private static final Logger log = Logger.getLogger(PermissionManager.class);
+    private final IActivityConsumer consumer = new AbstractActivityConsumer() {
+        @Override
+        public void receive(PermissionActivity activity) {
+            handlePermissionChange(activity);
+        }
+    };
+
+    private final ISarosSession sarosSession;
 
     public PermissionManager(ISarosSession sarosSession) {
         this.sarosSession = sarosSession;
     }
 
-    private final AbstractActivityReceiver receiver = new AbstractActivityReceiver() {
-
-        @Override
-        public void receive(PermissionActivity activity) {
-            handlePermissionChange(activity);
-        }
-
-    };
-
     @Override
     public void start() {
-        installProvider(sarosSession);
+        sarosSession.addActivityProducer(this);
+        sarosSession.addActivityConsumer(consumer);
     }
 
     @Override
     public void stop() {
-        uninstallProvider(sarosSession);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void exec(IActivity activity) {
-        activity.dispatch(receiver);
+        sarosSession.removeActivityProducer(this);
+        sarosSession.removeActivityConsumer(consumer);
     }
 
     /**
@@ -67,10 +60,9 @@ public class PermissionManager extends AbstractActivityProvider implements
      * @param activity
      */
     private void handlePermissionChange(PermissionActivity activity) {
-
         User user = activity.getAffectedUser();
         if (!user.isInSession()) {
-            log.warn("could not change permissions of user " + user
+            LOG.warn("could not change permissions of user " + user
                 + " because the user is longer part of the session");
             return;
         }
@@ -94,11 +86,9 @@ public class PermissionManager extends AbstractActivityProvider implements
      * @param synchronizer
      *            An Abstraction of the SWT-Thread
      * 
-     * 
      * @throws CancellationException
      * @throws InterruptedException
      */
-
     public void initiatePermissionChange(final User user,
         final Permission newPermission, UISynchronizer synchronizer)
         throws CancellationException, InterruptedException {
@@ -113,23 +103,21 @@ public class PermissionManager extends AbstractActivityProvider implements
                     newPermission));
 
                 sarosSession.setPermission(user, newPermission);
-
             }
         };
 
         if (user.isHost()) {
-            synchronizer.syncExec(ThreadUtils.wrapSafe(log,
+            synchronizer.syncExec(ThreadUtils.wrapSafe(LOG,
                 fireActivityrunnable));
-
         } else {
             StartHandle startHandle = sarosSession.getStopManager().stop(user,
                 "Permission change");
 
-            synchronizer.syncExec(ThreadUtils.wrapSafe(log,
+            synchronizer.syncExec(ThreadUtils.wrapSafe(LOG,
                 fireActivityrunnable));
 
             if (!startHandle.start())
-                log.error("Didn't unblock. "
+                LOG.error("Didn't unblock. "
                     + "There still exist unstarted StartHandles.");
         }
     }

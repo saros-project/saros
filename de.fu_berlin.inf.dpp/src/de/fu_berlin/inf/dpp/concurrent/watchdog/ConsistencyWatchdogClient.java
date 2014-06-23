@@ -25,12 +25,9 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.ChecksumErrorActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -39,8 +36,10 @@ import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.AbstractActivityProvider;
+import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
+import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.session.User;
@@ -50,16 +49,20 @@ import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
 /**
- * This class is responsible for two things: 1.) Process checksums sent to us
- * from the server by checking our locally existing files against them. See
- * {@link #performCheck(ChecksumActivity)} If an inconsistency is detected the
- * inconsistency state is set via the {@link IsInconsistentObservable}. This
- * enables the {@link ConsistencyAction} (a.k.a. the yellow triangle) in the
- * {@link SarosView}. 2.) Send a ChecksumError to the host, if the user wants to
- * recover from an inconsistency. See {@link #runRecovery(SubMonitor)}
+ * This class is responsible for two things:
+ * <ol>
+ * <li>Process checksums sent to us from the server by checking our locally
+ * existing files against them. See {@link #performCheck(ChecksumActivity)} If
+ * an inconsistency is detected the inconsistency state is set via the
+ * {@link IsInconsistentObservable}. This enables the {@link ConsistencyAction}
+ * (a.k.a. the yellow triangle) in the {@link SarosView}.</li>
+ * <li>Send a ChecksumError to the host, if the user wants to recover from an
+ * inconsistency. See {@link #runRecovery(SubMonitor)}</li>
+ * </ol>
+ * This class both produces and consumes activities.
  */
 @Component(module = "consistency")
-public class ConsistencyWatchdogClient extends AbstractActivityProvider {
+public class ConsistencyWatchdogClient extends AbstractActivityProducer {
 
     private static Logger log = Logger
         .getLogger(ConsistencyWatchdogClient.class);
@@ -86,9 +89,18 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
 
     protected Map<SPath, ChecksumActivity> latestChecksums = new HashMap<SPath, ChecksumActivity>();
 
-    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
-        private ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
+    public ConsistencyWatchdogClient(ISarosSessionManager sessionManager) {
+        this.sessionManager = sessionManager;
+        this.sessionManager.addSarosSessionListener(sessionListener);
+    }
 
+    public void dispose() {
+        this.sessionManager.removeSarosSessionListener(sessionListener);
+    }
+
+    private final ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+
+        private final ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
             @Override
             public void permissionChanged(User user) {
 
@@ -109,13 +121,16 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
             pathsWithWrongChecksums.clear();
             inconsistencyToResolve.setValue(false);
 
-            installProvider(newSarosSession);
+            newSarosSession.addActivityConsumer(consumer);
+            newSarosSession.addActivityProducer(ConsistencyWatchdogClient.this);
             newSarosSession.addListener(sharedProjectListener);
         }
 
         @Override
         public void sessionEnded(ISarosSession oldSarosSession) {
-            uninstallProvider(oldSarosSession);
+            oldSarosSession.removeActivityConsumer(consumer);
+            oldSarosSession
+                .removeActivityProducer(ConsistencyWatchdogClient.this);
             oldSarosSession.removeListener(sharedProjectListener);
 
             latestChecksums.clear();
@@ -127,17 +142,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
         }
     };
 
-    public ConsistencyWatchdogClient(ISarosSessionManager sessionManager) {
-        this.sessionManager = sessionManager;
-        this.sessionManager.addSarosSessionListener(sessionListener);
-    }
-
-    public void dispose() {
-        this.sessionManager.removeSarosSessionListener(sessionListener);
-    }
-
-    protected IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
-
+    private final IActivityConsumer consumer = new AbstractActivityConsumer() {
         @Override
         public void receive(ChecksumActivity checksumActivity) {
             latestChecksums.put(checksumActivity.getPath(), checksumActivity);
@@ -163,7 +168,6 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
 
         @Override
         public void receive(FileActivity fileActivity) {
-
             if (fileActivity.isRecovery()) {
                 int currentValue;
                 while ((currentValue = filesRemaining.get()) > 0) {
@@ -342,11 +346,6 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
 
     protected String getNextRecoveryID() {
         return format.format(new Date()) + RANDOM.nextLong();
-    }
-
-    @Override
-    public void exec(IActivity activity) {
-        activity.dispatch(activityReceiver);
     }
 
     protected boolean isInconsistent(ChecksumActivity checksum) {

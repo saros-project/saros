@@ -18,35 +18,35 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.log4j.Logger;
 import org.picocontainer.Startable;
 
-import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.StopActivity;
 import de.fu_berlin.inf.dpp.activities.StopActivity.State;
 import de.fu_berlin.inf.dpp.activities.StopActivity.Type;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.observables.ObservableValue;
-import de.fu_berlin.inf.dpp.session.AbstractActivityProvider;
+import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
+import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
+import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * The @StopManager class is used to coordinate blocking of user input between
- * different Saros Users. Blocking the user input is not implemented by this
- * class but by classes that implement the @Blockable interface and have
- * registered themselves with the StopManager by calling {@link #addBlockable}.
- * 
+ * different Saros Users. It both produces and consumes activities. Blocking the
+ * user input is not implemented by this class but by classes that implement the
+ * Blockable interface and have registered themselves with the StopManager by
+ * calling {@link #addBlockable}.
+ * <p>
  * There are two variants of the {@link #stop} method. One is working on a
  * single Saros User and the other is working on a collection of them. The
  * guarantee the StopManager makes is that at the end of the execution of the
  * {@link #stop} method all Saros Users are stopped or all of them are started.
- * 
+ * <p>
  * A StartHandle will be returned for each stopped user, it can be used to
  * remove the block of remote users.
  */
 @Component(module = "core")
-public final class StopManager extends AbstractActivityProvider implements
+public final class StopManager extends AbstractActivityProducer implements
     Startable {
 
     private static final Logger log = Logger.getLogger(StopManager.class);
@@ -98,11 +98,20 @@ public final class StopManager extends AbstractActivityProvider implements
     }
 
     /**
-     * @JTourBusStop 12, Activity sending, Triple dispatch:
+     * @JTourBusStop 14, Activity sending, Receiving an Activity:
      * 
-     *               This class extends the AbstractActivityReceiver and
-     *               overrides the method with the right overload.
+     *               This anonymous subclass of AbstractActivityConsumer
+     *               overrides the receive() method with the right overload.
+     *               This way, the triple dispatch ensures that those who are
+     *               interested in certain activities receive exactly these
+     *               types.
      */
+    private final IActivityConsumer consumer = new AbstractActivityConsumer() {
+        @Override
+        public void receive(final StopActivity stopActivity) {
+            handleStopActivity(stopActivity);
+        }
+    };
 
     /**
      * @JTourBusStop 2, StopManager:
@@ -114,88 +123,83 @@ public final class StopManager extends AbstractActivityProvider implements
      *               arrives it will be removed from the set. For incoming lock
      *               requests lockProject(true) will be called.
      */
-    protected IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
-        @Override
-        public void receive(final StopActivity stopActivity) {
-            assert sarosSession != null;
+    private void handleStopActivity(final StopActivity stopActivity) {
+        assert sarosSession != null;
 
-            User user = stopActivity.getRecipient();
+        User user = stopActivity.getRecipient();
 
-            if (user.isRemote())
-                throw new IllegalArgumentException(
-                    "Received StopActivity which is not for the local user");
+        if (user.isRemote())
+            throw new IllegalArgumentException(
+                "Received StopActivity which is not for the local user");
 
-            if (stopActivity.getType() == Type.LOCKREQUEST) {
+        if (stopActivity.getType() == Type.LOCKREQUEST) {
 
-                /*
-                 * local user locks his session and adds a startHandle so he
-                 * knows he is locked. Then he acknowledges.
-                 */
-                if (stopActivity.getState() == State.INITIATED) {
-                    addStartHandle(generateStartHandle(stopActivity));
-                    // locks session and acknowledges
+            /*
+             * local user locks his session and adds a startHandle so he knows
+             * he is locked. Then he acknowledges.
+             */
+            if (stopActivity.getState() == State.INITIATED) {
+                addStartHandle(generateStartHandle(stopActivity));
+                // locks session and acknowledges
 
-                    lockSession(true);
-                    fireActivity(stopActivity
-                        .generateAcknowledgment(sarosSession.getLocalUser()));
+                lockSession(true);
+                fireActivity(stopActivity.generateAcknowledgment(sarosSession
+                    .getLocalUser()));
 
-                    return;
-                }
-                if (stopActivity.getState() == State.ACKNOWLEDGED) {
-                    synchronized (notificationLock) {
-
-                        if (!expectedAcknowledgments.contains(stopActivity)) {
-                            log.warn("Received unexpected StopActivity: "
-                                + stopActivity);
-                            return;
-                        }
-
-                        /**
-                         * Remove from the expectedAcknowledgements set and
-                         * inform who ever has been waiting for that to happen.
-                         * Warn if the removal is failing besides the above
-                         * check.
-                         */
-                        if (!expectedAcknowledgments.remove(stopActivity)) {
-                            log.warn("Received unexpected "
-                                + "StopActivity acknowledgement: "
-                                + stopActivity);
-                            return;
-                        }
-
-                        notificationLock.notifyAll();
-                    }
-                    return;
-                }
+                return;
             }
+            if (stopActivity.getState() == State.ACKNOWLEDGED) {
+                synchronized (notificationLock) {
 
-            if (stopActivity.getType() == Type.UNLOCKREQUEST) {
-                if (stopActivity.getState() == State.INITIATED) {
-
-                    executeUnlock(generateStartHandle(stopActivity));
-                    // sends an acknowledgment
-                    fireActivity(stopActivity
-                        .generateAcknowledgment(sarosSession.getLocalUser()));
-                    return;
-                }
-
-                if (stopActivity.getState() == State.ACKNOWLEDGED) {
-                    StartHandle handle = startsToBeAcknowledged
-                        .remove(stopActivity.getActivityID());
-                    if (handle == null) {
-                        log.error("StartHandle for " + stopActivity
-                            + " could not be found.");
+                    if (!expectedAcknowledgments.contains(stopActivity)) {
+                        log.warn("Received unexpected StopActivity: "
+                            + stopActivity);
                         return;
                     }
-                    handle.acknowledge();
-                    return;
+
+                    /**
+                     * Remove from the expectedAcknowledgements set and inform
+                     * who ever has been waiting for that to happen. Warn if the
+                     * removal is failing besides the above check.
+                     */
+                    if (!expectedAcknowledgments.remove(stopActivity)) {
+                        log.warn("Received unexpected "
+                            + "StopActivity acknowledgement: " + stopActivity);
+                        return;
+                    }
+
+                    notificationLock.notifyAll();
                 }
+                return;
+            }
+        }
+
+        if (stopActivity.getType() == Type.UNLOCKREQUEST) {
+            if (stopActivity.getState() == State.INITIATED) {
+
+                executeUnlock(generateStartHandle(stopActivity));
+                // sends an acknowledgment
+                fireActivity(stopActivity.generateAcknowledgment(sarosSession
+                    .getLocalUser()));
+                return;
             }
 
-            throw new IllegalArgumentException(
-                "StopActivity is of unknown type: " + stopActivity);
+            if (stopActivity.getState() == State.ACKNOWLEDGED) {
+                StartHandle handle = startsToBeAcknowledged.remove(stopActivity
+                    .getActivityID());
+                if (handle == null) {
+                    log.error("StartHandle for " + stopActivity
+                        + " could not be found.");
+                    return;
+                }
+                handle.acknowledge();
+                return;
+            }
         }
-    };
+
+        throw new IllegalArgumentException("StopActivity is of unknown type: "
+            + stopActivity);
+    }
 
     /**
      * Blocking method that asks the given users to halt all user-input and
@@ -463,22 +467,10 @@ public final class StopManager extends AbstractActivityProvider implements
         /**
          * @JTourBusStop 4, Activity sending, Firing the activity:
          * 
-         *               The following fires the activity and all listeners will
-         *               be called.
+         *               The following fires the activity and all listeners
+         *               (that includes the session) will be called.
          */
         fireActivity(activity);
-    }
-
-    /**
-     * @JTourBusStop 11, Activity sending, Handling activities:
-     * 
-     *               The activity dispatcher of the session has called us. This
-     *               class will use the triple dispatch to filter for the
-     *               activities the class is interested in.
-     */
-    @Override
-    public void exec(IActivity activity) {
-        activity.dispatch(activityReceiver);
     }
 
     /**
@@ -567,20 +559,23 @@ public final class StopManager extends AbstractActivityProvider implements
 
     @Override
     public void start() {
+        sarosSession.addActivityConsumer(consumer);
+
         /**
          * @JTourBusStop 3, Activity sending, An example of an
-         *               IActivityProvider:
+         *               IActivityProducer:
          * 
-         *               This is the canonical way of registering an activity
-         *               provider with the session. The session will install a
-         *               listener on this provider.
+         *               The most frequently used IActivityListener is the Saros
+         *               Session. The canonical way to get the session listening
+         *               to one's activities is to add oneself to the session.
          */
-        installProvider(sarosSession);
+        sarosSession.addActivityProducer(this);
     }
 
     @Override
     public void stop() {
-        uninstallProvider(sarosSession);
+        sarosSession.removeActivityConsumer(consumer);
+        sarosSession.removeActivityProducer(this);
         lockSession(false);
         clearExpectedAcknowledgments();
     }

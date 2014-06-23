@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.editor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,13 +14,13 @@ import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.jface.text.source.LineRange;
 
-import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
+import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
+import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 
@@ -30,7 +29,7 @@ import de.fu_berlin.inf.dpp.session.User;
  * remote users as we believe it to be by listening to the Activities we
  * receive.
  */
-public class RemoteEditorManager {
+public class RemoteEditorManager implements IActivityConsumer {
 
     private static final Logger log = Logger
         .getLogger(RemoteEditorManager.class);
@@ -76,46 +75,81 @@ public class RemoteEditorManager {
     }
 
     /**
-     * This class represents the state of the editors, viewports and selection
-     * of a user.
+     * Instances of this class represent the state of the editors of one user,
+     * including the viewports and selections in each of these.
      */
     public static class RemoteEditorState {
 
-        protected User user;
+        private final User user;
 
-        protected LinkedHashMap<SPath, RemoteEditor> openEditors = new LinkedHashMap<SPath, RemoteEditor>();
+        private final LinkedHashMap<SPath, RemoteEditor> openEditors = new LinkedHashMap<SPath, RemoteEditor>();
 
-        protected RemoteEditor activeEditor;
+        private RemoteEditor activeEditor;
+
+        /**
+         * Only to be accessed be the surrounding class
+         */
+        private final IActivityConsumer consumer = new AbstractActivityConsumer() {
+            @Override
+            public void receive(EditorActivity editorActivity) {
+                SPath sPath = editorActivity.getPath();
+
+                switch (editorActivity.getType()) {
+                case ACTIVATED:
+                    activated(sPath);
+                    break;
+                case SAVED:
+                    break;
+                case CLOSED:
+                    closed(sPath);
+                    break;
+                default:
+                    log.warn("Unexpected type: " + editorActivity.getType());
+                    assert false;
+                }
+            }
+
+            @Override
+            public void receive(ViewportActivity viewportActivity) {
+                ILineRange lineRange = new LineRange(
+                    viewportActivity.getStartLine(),
+                    viewportActivity.getNumberOfLines());
+                SPath path = viewportActivity.getPath();
+
+                if (!openEditors.containsKey(path)) {
+                    log.warn("Viewport for editor which was never activated: "
+                        + path);
+                    return;
+                }
+
+                getRemoteEditor(path).setViewport(lineRange);
+            }
+
+            @Override
+            public void receive(TextSelectionActivity textSelectionActivity) {
+                ITextSelection selection = new TextSelection(
+                    textSelectionActivity.getOffset(),
+                    textSelectionActivity.getLength());
+
+                SPath path = textSelectionActivity.getPath();
+
+                if (!openEditors.containsKey(path)) {
+                    log.warn("received selection from user [" + user
+                        + "] for editor which was never activated: " + path);
+                    return;
+                }
+
+                getRemoteEditor(path).setSelection(selection);
+            }
+        };
 
         public RemoteEditorState(User user) {
             this.user = user;
         }
 
-        public void setSelection(SPath path, ITextSelection selection) {
+        /* Helper */
 
-            if (!openEditors.containsKey(path)) {
-                log.warn("received selection from user [" + this.user
-                    + "] for editor which was never activated: " + path);
-                return;
-            }
-
-            getRemoteEditor(path).setSelection(selection);
-
-        }
-
-        public void setViewport(SPath path, ILineRange viewport) {
-
-            if (!openEditors.containsKey(path)) {
-                log.warn("Viewport for editor which was never activated: "
-                    + path);
-                return;
-            }
-
-            getRemoteEditor(path).setViewport(viewport);
-
-        }
-
-        public void activated(SPath path) {
+        private void activated(SPath path) {
             if (path == null) {
                 activeEditor = null;
             } else {
@@ -128,8 +162,49 @@ public class RemoteEditorManager {
                     openEditors.remove(path);
                 }
                 openEditors.put(path, activeEditor);
-
             }
+        }
+
+        private void closed(SPath path) {
+            RemoteEditor remoteEditor = openEditors.remove(path);
+
+            if (remoteEditor == null) {
+                log.warn("Removing an editor which has never been added: "
+                    + path);
+                return;
+            }
+
+            if (remoteEditor == activeEditor) {
+                activeEditor = null;
+            }
+        }
+
+        /* Public methods */
+
+        public User getUser() {
+            return this.user;
+        }
+
+        /**
+         * Returns the activeEditor of the user of this RemoteEditorState or
+         * null if the user has no editor open currently.
+         */
+        public RemoteEditor getActiveEditor() {
+            return this.activeEditor;
+        }
+
+        public boolean isRemoteActiveEditor(SPath path) {
+            if (activeEditor != null && activeEditor.getPath().equals(path))
+                return true;
+            return false;
+        }
+
+        /**
+         * Returns a snapshot copy of the editors open for the user represented
+         * by this RemoteEditorState.
+         */
+        public Set<SPath> getRemoteOpenEditors() {
+            return new HashSet<SPath>(openEditors.keySet());
         }
 
         /**
@@ -150,104 +225,8 @@ public class RemoteEditorManager {
             return result;
         }
 
-        public RemoteEditor getLastEditor() {
-            RemoteEditor editor = null;
-            Iterator<RemoteEditor> it = openEditors.values().iterator();
-            while (it.hasNext()) {
-                editor = it.next();
-            }
-            return editor;
-        }
-
-        public void closed(SPath path) {
-
-            RemoteEditor remoteEditor = openEditors.remove(path);
-
-            if (remoteEditor == null) {
-                log.warn("Removing an editor which has never been added: "
-                    + path);
-                return;
-            }
-
-            if (remoteEditor == activeEditor) {
-                activeEditor = null;
-            }
-        }
-
-        protected IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
-            @Override
-            public void receive(EditorActivity editorActivity) {
-
-                SPath sPath = editorActivity.getPath();
-
-                switch (editorActivity.getType()) {
-                case ACTIVATED:
-                    activated(sPath);
-                    break;
-                case SAVED:
-                    break;
-                case CLOSED:
-                    closed(sPath);
-                    break;
-                default:
-                    log.warn("Unexpected type: " + editorActivity.getType());
-                    assert false;
-                }
-            }
-
-            @Override
-            public void receive(ViewportActivity viewportActivity) {
-
-                ILineRange lineRange = new LineRange(
-                    viewportActivity.getStartLine(),
-                    viewportActivity.getNumberOfLines());
-
-                setViewport(viewportActivity.getPath(), lineRange);
-            }
-
-            @Override
-            public void receive(TextSelectionActivity textSelectionActivity) {
-
-                ITextSelection selection = new TextSelection(
-                    textSelectionActivity.getOffset(),
-                    textSelectionActivity.getLength());
-
-                setSelection(textSelectionActivity.getPath(), selection);
-            }
-        };
-
-        /**
-         * Returns the activeEditor of the user of this RemoteEditorState or
-         * null if the user has no editor open currently.
-         */
-        public RemoteEditor getActiveEditor() {
-            return this.activeEditor;
-        }
-
-        public boolean isRemoteActiveEditor(SPath path) {
-            if (activeEditor != null && activeEditor.getPath().equals(path))
-                return true;
-            return false;
-        }
-
         public boolean isRemoteOpenEditor(SPath path) {
             return openEditors.containsKey(path);
-        }
-
-        public User getUser() {
-            return this.user;
-        }
-
-        /**
-         * Returns a snapshot copy of the editors open for the user represented
-         * by this RemoteEditorState.
-         */
-        public Set<SPath> getRemoteOpenEditors() {
-            return new HashSet<SPath>(openEditors.keySet());
-        }
-
-        public void exec(IActivity activity) {
-            activity.dispatch(activityReceiver);
         }
     }
 
@@ -256,7 +235,6 @@ public class RemoteEditorManager {
     }
 
     public RemoteEditorState getEditorState(User user) {
-
         RemoteEditorState result = editorStates.get(user);
         if (result == null) {
             result = new RemoteEditorState(user);
@@ -265,8 +243,10 @@ public class RemoteEditorManager {
         return result;
     }
 
+    @Override
     public void exec(IActivity activity) {
-        getEditorState(activity.getSource()).exec(activity);
+        RemoteEditorState editorState = getEditorState(activity.getSource());
+        editorState.consumer.exec(activity);
     }
 
     /**
@@ -275,7 +255,6 @@ public class RemoteEditorManager {
      * editor.
      */
     public ITextSelection getSelection(User user) {
-
         RemoteEditor activeEditor = getEditorState(user).getActiveEditor();
 
         if (activeEditor == null)
@@ -319,7 +298,6 @@ public class RemoteEditorManager {
     }
 
     public List<User> getRemoteActiveEditorUsers(SPath path) {
-
         ArrayList<User> result = new ArrayList<User>();
 
         for (RemoteEditorState state : editorStates.values()) {
@@ -354,8 +332,8 @@ public class RemoteEditorManager {
     public Set<SPath> getRemoteActiveEditors() {
         Set<SPath> result = new HashSet<SPath>();
         for (RemoteEditorState state : editorStates.values()) {
-            if (state.activeEditor != null)
-                result.add(state.activeEditor.getPath());
+            if (state.getActiveEditor() != null)
+                result.add(state.getActiveEditor().getPath());
         }
         return result;
     }

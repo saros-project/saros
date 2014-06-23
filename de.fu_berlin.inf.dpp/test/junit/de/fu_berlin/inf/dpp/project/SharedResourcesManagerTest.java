@@ -27,9 +27,9 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.activities.FileActivity.Type;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.session.User;
@@ -109,7 +109,7 @@ public class SharedResourcesManagerTest {
     public void testExecFileActivityCreationSameContent() throws CoreException {
         FileActivity fileActivity = fileCreationWithContent(INCOMING_SAME_CONTENT);
 
-        manager.exec(fileActivity);
+        manager.handleFileActivity(fileActivity);
 
         assertFalse("file was written unnecessarily", calledWriteFile);
     }
@@ -119,7 +119,7 @@ public class SharedResourcesManagerTest {
         throws CoreException {
         FileActivity fileActivity = fileCreationWithContent(INCOMING_DIFFERENT_CONTENT);
 
-        manager.exec(fileActivity);
+        manager.handleFileActivity(fileActivity);
 
         assertTrue("file was not written although content was new",
             calledWriteFile);

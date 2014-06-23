@@ -320,7 +320,8 @@ public class SarosSessionTest {
 
         // Test creating, starting and stopping the session.
         SarosSession session = new SarosSession(null, 0, context);
-        Assert.assertEquals(0, session.getActivityProviderCount());
+        Assert.assertFalse(session.hasActivityConsumers());
+        Assert.assertFalse(session.hasActivityProducers());
         Assert.assertEquals(0,
             countingReceiver.getCurrentPacketListenersCount());
 
@@ -343,7 +344,8 @@ public class SarosSessionTest {
 
         Assert.assertSame(stopManager2, stopManager3);
 
-        Assert.assertTrue(session.getActivityProviderCount() > 0);
+        Assert.assertTrue(session.hasActivityConsumers());
+        Assert.assertTrue(session.hasActivityProducers());
         Assert.assertFalse(workspaceListeners.isEmpty());
 
         session.stop();
@@ -354,7 +356,8 @@ public class SarosSessionTest {
             stopManager3);
 
         Assert.assertTrue(editorListeners.isEmpty());
-        Assert.assertEquals(0, session.getActivityProviderCount());
+        Assert.assertFalse(session.hasActivityConsumers());
+        Assert.assertFalse(session.hasActivityProducers());
         Assert.assertTrue(workspaceListeners.isEmpty());
         Assert.assertEquals(SAROS_SESSION_ID, session.getID());
         Assert.assertEquals(

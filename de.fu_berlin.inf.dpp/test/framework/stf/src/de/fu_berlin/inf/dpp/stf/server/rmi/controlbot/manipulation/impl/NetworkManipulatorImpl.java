@@ -418,7 +418,7 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
         CountDownLatch latch = new CountDownLatch(1);
 
         synchronizeRequests.put(id, latch);
-        listener.activityCreated(activity);
+        listener.created(activity);
 
         try {
             if (!latch.await(timeout, TimeUnit.MILLISECONDS))
@@ -431,7 +431,7 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
 
     }
 
-    // IActivityProvider interface implementation
+    // IActivityConsumer interface implementation
 
     @Override
     public void exec(IActivity activity) {
@@ -458,7 +458,7 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
             NOPActivity response = new NOPActivity(nop.getSource(),
                 nop.getSource(), nop.getID());
 
-            listener.activityCreated(response);
+            listener.created(response);
 
             return;
         }
@@ -470,6 +470,8 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
         if (latch != null)
             latch.countDown();
     }
+
+    // IActivityProducer interface implementation (not perfectly conform)
 
     @Override
     public void addActivityListener(IActivityListener listener) {

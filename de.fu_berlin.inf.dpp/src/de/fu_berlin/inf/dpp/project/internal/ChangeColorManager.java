@@ -14,23 +14,23 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.picocontainer.Startable;
 
-import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.ChangeColorActivity;
-import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.colorstorage.ColorIDSet;
 import de.fu_berlin.inf.dpp.editor.colorstorage.ColorIDSetStorage;
 import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
-import de.fu_berlin.inf.dpp.session.AbstractActivityProvider;
+import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
+import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
  * This manager is responsible for handling color changes and managing the
- * currently available colors.
+ * currently available colors. It both produces and consumes activities.
  * 
  * @author Stefan Rossbach
  */
@@ -38,10 +38,10 @@ import de.fu_berlin.inf.dpp.session.User;
  * IMPORTANT: MAKE SURE YOU USE THE BARE JID TO LOAD/STORE COLOR IDS !!!
  */
 @Component(module = "core")
-public class ChangeColorManager extends AbstractActivityProvider implements
+public class ChangeColorManager extends AbstractActivityProducer implements
     Startable {
 
-    private static final Logger log = Logger
+    private static final Logger LOG = Logger
         .getLogger(ChangeColorManager.class);
 
     private final ISarosSession sarosSession;
@@ -57,8 +57,25 @@ public class ChangeColorManager extends AbstractActivityProvider implements
 
     private final Map<Integer, Integer> usedColorIDs = new HashMap<Integer, Integer>();
 
-    private final AbstractActivityReceiver receiver = new AbstractActivityReceiver() {
+    /**
+     * @JTourBusStop 7, Creating a new Activity type, Waiting for incoming
+     *               activities:
+     * 
+     *               All you have to do on the receiver's side, is to create a
+     *               new IActivityReceiver (or amend an existing one), provide
+     *               it with an receive() method of your newly created flavor,
+     *               and react on the incoming activity.
+     * 
+     *               However, the Saros Session from which we get all incoming
+     *               activities, expects an IActivityConsumer (which is, in
+     *               contrast to IActivityReceiver not aware of different
+     *               Activity types). One handy way to do this, is to use a
+     *               AbstractActivityConsumer which is both Consumer and
+     *               Receiver.
+     */
 
+    /***/
+    private final IActivityConsumer consumer = new AbstractActivityConsumer() {
         @Override
         public void receive(ChangeColorActivity activity) {
             handleChangeColorActivity(activity);
@@ -112,11 +129,6 @@ public class ChangeColorManager extends AbstractActivityProvider implements
     }
 
     @Override
-    public void exec(IActivity activity) {
-        activity.dispatch(receiver);
-    }
-
-    @Override
     public synchronized void start() {
 
         /*
@@ -144,13 +156,22 @@ public class ChangeColorManager extends AbstractActivityProvider implements
             }
 
         }
-        installProvider(sarosSession);
+        /**
+         * @JTourBusStop 8, Creating a new Activity type, Arming your consumer:
+         * 
+         *               To ensure your newly created consumer actually receives
+         *               incoming activities, you need to register it on the
+         *               session. That's it :)
+         */
+        sarosSession.addActivityConsumer(consumer);
+        sarosSession.addActivityProducer(this);
         sarosSession.addListener(sessionListener);
     }
 
     @Override
     public synchronized void stop() {
-        uninstallProvider(sarosSession);
+        sarosSession.removeActivityConsumer(consumer);
+        sarosSession.removeActivityProducer(this);
         sarosSession.removeListener(sessionListener);
     }
 
@@ -172,8 +193,29 @@ public class ChangeColorManager extends AbstractActivityProvider implements
      *            the new color ID for the current session
      */
     public void changeColorID(int colorID) {
-        fireActivity(new ChangeColorActivity(sarosSession.getLocalUser(),
-            sarosSession.getHost(), sarosSession.getLocalUser(), colorID));
+
+        /**
+         * @JTourBusStop 6, Creating a new Activity type, Create activity
+         *               instances of your new type:
+         * 
+         *               Now you are prepared to make use of your new activity
+         *               type: Find a place in the business logic where to react
+         *               on the events you want to send as an Activity to the
+         *               other session participants. However, it is not unusual
+         *               to create that piece of business logic anew.
+         * 
+         *               Anyway, once you found a place where to wait for
+         *               certain things to happen, you can create new activity
+         *               instances of your type there and hand them over to
+         *               fireActivity() -- assuming your business logic class
+         *               extends DefaultActivityProducer, of course. That's all
+         *               for the sender's side.
+         */
+        ChangeColorActivity activity = new ChangeColorActivity(
+            sarosSession.getLocalUser(), sarosSession.getHost(),
+            sarosSession.getLocalUser(), colorID);
+
+        fireActivity(activity);
     }
 
     private void handleChangeColorActivity(ChangeColorActivity activity) {
@@ -189,11 +231,11 @@ public class ChangeColorManager extends AbstractActivityProvider implements
             currentUsers.addAll(favoriteUserColors.keySet());
 
             if (affected == null) {
-                log.warn("received color id change for a user that is no longer part of the session");
+                LOG.warn("received color id change for a user that is no longer part of the session");
                 return;
             }
 
-            log.debug("received color id change fo user : " + affected + " ["
+            LOG.debug("received color id change fo user : " + affected + " ["
                 + activity.getColorID() + "]");
 
             // host send us an update for a user
@@ -245,7 +287,7 @@ public class ChangeColorManager extends AbstractActivityProvider implements
         boolean joined) {
         assert sarosSession.isHost() : "only the session host can assign a color id";
 
-        log.debug("reassigning color IDs for the current session users");
+        LOG.debug("reassigning color IDs for the current session users");
 
         synchronized (this) {
 
@@ -279,7 +321,7 @@ public class ChangeColorManager extends AbstractActivityProvider implements
 
                 // no conflict = OK
                 if (isOptimalColorAssignment(assignedColors)) {
-                    log.debug("color conflict resolve result = NO CONFLICT");
+                    LOG.debug("color conflict resolve result = NO CONFLICT");
                     break resolveColorConflicts;
                 }
 
@@ -304,7 +346,7 @@ public class ChangeColorManager extends AbstractActivityProvider implements
                      */
                     if (favoriteUserColors.containsValue(UserColorID.UNKNOWN)
                         && isValidColorAssignment(assignedColors)) {
-                        log.debug("color conflict resolve result = FAVORITE COLORS UNKNOWN, USING PREVIOUS COLOR ASSIGNMENT");
+                        LOG.debug("color conflict resolve result = FAVORITE COLORS UNKNOWN, USING PREVIOUS COLOR ASSIGNMENT");
                         break resolveColorConflicts;
                     }
 
@@ -312,7 +354,7 @@ public class ChangeColorManager extends AbstractActivityProvider implements
                      * if color assignment is optimal, assignment is resolved.
                      */
                     if (isOptimalColorAssignment(assignedColors)) {
-                        log.debug("color conflict resolve result = ALREADY SOLVED");
+                        LOG.debug("color conflict resolve result = ALREADY SOLVED");
                         break resolveColorConflicts;
                     } else {
                         // the colorIdSet was not optimal, reassign colors
@@ -334,11 +376,11 @@ public class ChangeColorManager extends AbstractActivityProvider implements
                 for (int colorID : assignedColors.values())
                     addColorIdToPool(colorID);
 
-                log.debug("color conflict resolve result = RESOLVED");
+                LOG.debug("color conflict resolve result = RESOLVED");
 
             } // END resolveColorConflicts
 
-            log.debug("new color assignment: " + assignedColors);
+            LOG.debug("new color assignment: " + assignedColors);
 
             updateColorAndUserPools(assignedColors);
 
@@ -543,14 +585,14 @@ public class ChangeColorManager extends AbstractActivityProvider implements
         Integer colorIDUseCount = usedColorIDs.get(colorID);
 
         if (colorIDUseCount == null) {
-            log.warn("color id: " + colorID
+            LOG.warn("color id: " + colorID
                 + " was added although it was never removed");
             colorIDUseCount = 0;
         } else {
             colorIDUseCount--;
         }
 
-        log.trace("color id: " + colorID + " is currently used "
+        LOG.trace("color id: " + colorID + " is currently used "
             + colorIDUseCount + " times");
 
         /*
@@ -578,7 +620,7 @@ public class ChangeColorManager extends AbstractActivityProvider implements
 
         colorIDUseCount++;
 
-        log.trace("color id: " + colorID + " is currently used "
+        LOG.trace("color id: " + colorID + " is currently used "
             + colorIDUseCount + " times");
 
         usedColorIDs.put(colorID, colorIDUseCount);
@@ -589,7 +631,7 @@ public class ChangeColorManager extends AbstractActivityProvider implements
         ColorIDSet colorIDSet = colorIDSetStorage
             .getColorIDSet(asIDCollection(users));
 
-        log.debug("updating color id set: "
+        LOG.debug("updating color id set: "
             + Arrays.toString(colorIDSet.getParticipants().toArray()));
 
         /*
@@ -614,7 +656,7 @@ public class ChangeColorManager extends AbstractActivityProvider implements
                 break;
             }
 
-            log.trace("updating color id set: user '" + user + "' id '"
+            LOG.trace("updating color id set: user '" + user + "' id '"
                 + user.getColorID() + "' fav id '"
                 + favoriteUserColors.get(user) + "'");
 

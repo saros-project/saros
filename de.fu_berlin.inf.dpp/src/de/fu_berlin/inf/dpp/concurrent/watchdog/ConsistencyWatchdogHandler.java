@@ -19,17 +19,16 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.picocontainer.Startable;
 
-import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.ChecksumErrorActivity;
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.RecoveryFileActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
-import de.fu_berlin.inf.dpp.session.AbstractActivityProvider;
+import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
+import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
+import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
@@ -37,10 +36,11 @@ import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.FileUtils;
 
 /**
- * This component is responsible for handling Consistency Errors on the host
+ * This component is responsible for handling Consistency Errors on the host. It
+ * both produces and consumes activities.
  */
 @Component(module = "consistency")
-public class ConsistencyWatchdogHandler extends AbstractActivityProvider
+public class ConsistencyWatchdogHandler extends AbstractActivityProducer
     implements Startable {
 
     private static Logger log = Logger
@@ -52,21 +52,24 @@ public class ConsistencyWatchdogHandler extends AbstractActivityProvider
 
     protected final ISarosSession sarosSession;
 
-    protected final IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
+    private final IActivityConsumer consumer = new AbstractActivityConsumer() {
         @Override
         public void receive(ChecksumErrorActivity checksumError) {
-            startRecovery(checksumError);
+            if (sarosSession.isHost())
+                startRecovery(checksumError);
         }
     };
 
     @Override
     public void start() {
-        installProvider(sarosSession);
+        sarosSession.addActivityConsumer(consumer);
+        sarosSession.addActivityProducer(this);
     }
 
     @Override
     public void stop() {
-        uninstallProvider(sarosSession);
+        sarosSession.removeActivityConsumer(consumer);
+        sarosSession.removeActivityProducer(this);
     }
 
     public ConsistencyWatchdogHandler(ISarosSession sarosSession,
@@ -74,13 +77,6 @@ public class ConsistencyWatchdogHandler extends AbstractActivityProvider
         this.sarosSession = sarosSession;
         this.editorManager = editorManager;
         this.watchdogClient = watchdogClient;
-    }
-
-    @Override
-    public void exec(IActivity activity) {
-        if (!sarosSession.isHost())
-            return;
-        activity.dispatch(activityReceiver);
     }
 
     /**
