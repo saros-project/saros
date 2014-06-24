@@ -18,6 +18,8 @@ de.fu_berlin.inf.dpp.editor.colorstorage.TestSuite.class,
 
 de.fu_berlin.inf.dpp.filesystem.TestSuite.class,
 
+de.fu_berlin.inf.dpp.invitation.TestSuite.class,
+
 de.fu_berlin.inf.dpp.misc.xstream.TestSuite.class,
 
 de.fu_berlin.inf.dpp.net.TestSuite.class,

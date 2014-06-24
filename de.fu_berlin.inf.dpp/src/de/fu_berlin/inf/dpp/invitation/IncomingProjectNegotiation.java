@@ -31,6 +31,7 @@ import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.ISarosContext;
+import de.fu_berlin.inf.dpp.communication.extensions.ProjectNegotiationMissingFilesExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingRequest;
 import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingResponse;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
@@ -43,7 +44,6 @@ import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 import de.fu_berlin.inf.dpp.monitoring.remote.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
-import de.fu_berlin.inf.dpp.net.internal.extensions.ProjectNegotiationMissingFilesExtension;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
@@ -613,7 +613,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
         FileList localFileList = FileListFactory.createFileList(
             ResourceAdapterFactory.create(currentLocalProject), null,
-            checksumCache, provider, subMonitor.newChild(1));
+            checksumCache, provider,
+            ProgressMonitorAdapterFactory.convertTo(subMonitor.newChild(1)));
 
         FileListDiff filesToSynchronize = computeDiff(localFileList,
             remoteFileList, currentLocalProject, projectID);

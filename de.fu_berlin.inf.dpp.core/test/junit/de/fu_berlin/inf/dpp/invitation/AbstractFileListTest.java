@@ -9,9 +9,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.easymock.EasyMock;
-import org.eclipse.core.runtime.Path;
+import org.easymock.IAnswer;
 import org.junit.Before;
 
 import de.fu_berlin.inf.dpp.filesystem.IFile;
@@ -19,7 +20,6 @@ import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 
 public class AbstractFileListTest {
     /*
@@ -50,28 +50,6 @@ public class AbstractFileListTest {
         }
 
         EasyMock.replay(project);
-    }
-
-    // needed as the mocks will always return the same input stream instance
-    private static class ResetingInputStream extends InputStream {
-
-        private final String content;
-        private ByteArrayInputStream in;
-
-        public ResetingInputStream(String content) {
-            this.content = content;
-            in = new ByteArrayInputStream(this.content.getBytes());
-        }
-
-        @Override
-        public int read() throws IOException {
-            return in.read();
-        }
-
-        @Override
-        public void close() throws IOException {
-            in = new ByteArrayInputStream(this.content.getBytes());
-        }
     }
 
     protected IFile fileInRoot1;
@@ -131,10 +109,11 @@ public class AbstractFileListTest {
         emptyFileList = new FileList();
     }
 
-    protected IFile createFileMock(String path, String content, String encoding) {
-        IPath p = ResourceAdapterFactory.create(new Path(path));
-        IPath f = ResourceAdapterFactory.create(new Path(project.getName()
-            + "/" + path));
+    private IFile createFileMock(final String path, final String content,
+        final String encoding) {
+
+        IPath p = createPathMock(path);
+        IPath f = createPathMock(project.getName() + "/" + path);
 
         IFile fileMock = EasyMock.createMock(IFile.class);
 
@@ -147,8 +126,13 @@ public class AbstractFileListTest {
         EasyMock.expect(fileMock.getFullPath()).andStubReturn(f);
 
         try {
-            EasyMock.expect(fileMock.getContents()).andStubReturn(
-                new ResetingInputStream(content));
+            EasyMock.expect(fileMock.getContents()).andStubAnswer(
+                new IAnswer<InputStream>() {
+                    @Override
+                    public InputStream answer() throws Throwable {
+                        return new ByteArrayInputStream(content.getBytes());
+                    }
+                });
             EasyMock.expect(fileMock.getCharset()).andStubReturn(encoding);
         } catch (IOException e) {
             // cannot happen as the mock is in recording mode
@@ -158,10 +142,20 @@ public class AbstractFileListTest {
         return fileMock;
     }
 
-    protected IFolder createFolderMock(String path) {
-        IPath p = ResourceAdapterFactory.create(new Path(path));
-        IPath f = ResourceAdapterFactory.create(new Path(project.getName()
-            + "/" + path));
+    protected IPath createPathMock(final String path) {
+        final String[] segments = path.split(Pattern.quote("/"));
+        final IPath pathMock = EasyMock.createMock(IPath.class);
+        EasyMock.expect(pathMock.toPortableString()).andStubReturn(path);
+        EasyMock.expect(pathMock.lastSegment()).andStubReturn(
+            segments[segments.length - 1]);
+
+        EasyMock.replay(pathMock);
+        return pathMock;
+    }
+
+    protected IFolder createFolderMock(final String path) {
+        IPath p = createPathMock(path);
+        IPath f = createPathMock(project.getName() + "/" + path);
 
         IFolder folderMock = EasyMock.createMock(IFolder.class);
 
