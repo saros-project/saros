@@ -119,7 +119,7 @@ public class StatisticCollectorTest {
         PreferenceInitializer.setPreferences(preferences);
 
         container.addComponent(Saros.class,
-            SarosSessionTest.createSarosMock(store));
+            SarosSessionTest.createSarosMock(store, preferences));
 
         container.addComponent(IPreferenceStore.class, store);
 
