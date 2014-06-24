@@ -56,6 +56,11 @@ public abstract class AbstractActivityReceiver implements IActivityReceiver {
     }
 
     @Override
+    public void receive(IDEInteractionActivity ideInteractionActivity) {
+        // do nothing
+    }
+
+    @Override
     public void receive(JupiterActivity jupiterActivity) {
         // do nothing
     }

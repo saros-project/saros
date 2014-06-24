@@ -62,9 +62,10 @@ import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.test.fakes.synchonize.NonUISynchronizer;
 import de.fu_berlin.inf.dpp.test.util.MemoryPreferenceStore;
 import de.fu_berlin.inf.dpp.test.util.MemoryPreferences;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ StatisticManager.class, ResourcesPlugin.class })
+@PrepareForTest({ StatisticManager.class, SWTUtils.class, ResourcesPlugin.class })
 public class SarosSessionTest {
 
     private static final String SAROS_SESSION_ID = "SAROS_SESSION_TEST";
@@ -234,6 +235,11 @@ public class SarosSessionTest {
         return workspace;
     }
 
+    private static void mockSWTUtils() {
+        PowerMock.mockStaticNice(SWTUtils.class);
+        PowerMock.replay(SWTUtils.class);
+    }
+
     private MutablePicoContainer container;
 
     private CountingReceiver countingReceiver;
@@ -347,6 +353,7 @@ public class SarosSessionTest {
             SAROS_SESSION_ID);
 
         createWorkspaceMock(workspaceListeners);
+        mockSWTUtils();
 
         final ISarosContext context = createContextMock(container);
 

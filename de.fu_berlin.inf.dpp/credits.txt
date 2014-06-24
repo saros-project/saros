@@ -35,6 +35,7 @@ Saros team over the years and have contributed to the product:
 	* Christoph Viebig
 	* Christopher Oezbek
 	* Conrad Läßig
+	* Damla Durmaz
 	* Edna Rosen
 	* Eike Starkmann
 	* Florian Pütz

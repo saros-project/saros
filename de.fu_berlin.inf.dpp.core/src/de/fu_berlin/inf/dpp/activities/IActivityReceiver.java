@@ -36,6 +36,8 @@ public interface IActivityReceiver {
 
     void receive(FolderActivity folderActivity);
 
+    void receive(IDEInteractionActivity ideInteractionActivity);
+
     void receive(JupiterActivity jupiterActivity);
 
     void receive(NOPActivity nopActivity);

@@ -46,6 +46,7 @@ import de.fu_berlin.inf.dpp.activities.NOPActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
+import de.fu_berlin.inf.dpp.awareness.IDEInteractionActivitiesManager;
 import de.fu_berlin.inf.dpp.communication.extensions.ActivitiesExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.KickUserExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.LeaveSessionExtension;
@@ -1106,6 +1107,9 @@ public final class SarosSession implements ISarosSession {
         sessionContainer.addComponent(FollowModeCollector.class);
         sessionContainer.addComponent(SelectionCollector.class);
         sessionContainer.addComponent(ProjectCollector.class);
+
+        // Awareness
+        sessionContainer.addComponent(IDEInteractionActivitiesManager.class);
 
         // Feedback
         sessionContainer.addComponent(ErrorLogManager.class);
