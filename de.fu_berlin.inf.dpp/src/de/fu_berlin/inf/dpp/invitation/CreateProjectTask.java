@@ -60,10 +60,11 @@ public class CreateProjectTask implements IWorkspaceRunnable {
         if (this.monitor != null)
             monitor = this.monitor;
 
-        SubMonitor subMonitor = SubMonitor.convert(monitor,
+        final SubMonitor progress = SubMonitor.convert(monitor,
             "Creating new project... ", base == null ? 2 : 3);
 
-        IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+        final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace()
+            .getRoot();
 
         project = workspaceRoot.getProject(name);
 
@@ -81,29 +82,28 @@ public class CreateProjectTask implements IWorkspaceRunnable {
                     MessageFormat.format(
                         "Project {0} is the same as project {1}!", name, base)));
 
-            project.create(subMonitor.newChild(0,
-                SubMonitor.SUPPRESS_ALL_LABELS));
-
             project
-                .open(subMonitor.newChild(0, SubMonitor.SUPPRESS_ALL_LABELS));
+                .create(progress.newChild(0, SubMonitor.SUPPRESS_ALL_LABELS));
 
-            subMonitor.subTask("refreshing file contents");
+            project.open(progress.newChild(0, SubMonitor.SUPPRESS_ALL_LABELS));
+
+            progress.subTask("refreshing file contents");
             project.refreshLocal(IResource.DEPTH_INFINITE,
-                subMonitor.newChild(1, SubMonitor.SUPPRESS_ALL_LABELS));
+                progress.newChild(1, SubMonitor.SUPPRESS_ALL_LABELS));
 
-            subMonitor.subTask("clearing history");
-            project.clearHistory(subMonitor.newChild(1,
+            progress.subTask("clearing history");
+            project.clearHistory(progress.newChild(1,
                 SubMonitor.SUPPRESS_ALL_LABELS));
 
             if (base != null) {
-                subMonitor.subTask("copying contents from project "
+                progress.subTask("copying contents from project "
                     + base.getName());
                 base.copy(project.getFullPath(), true,
-                    subMonitor.newChild(1, SubMonitor.SUPPRESS_ALL_LABELS));
+                    progress.newChild(1, SubMonitor.SUPPRESS_ALL_LABELS));
             }
         } finally {
-            subMonitor.subTask("");
-            monitor.done();
+            if (monitor != null)
+                monitor.done();
         }
     }
 }

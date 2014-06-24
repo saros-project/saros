@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.util.CoreUtils;
@@ -85,7 +86,8 @@ public class CreateArchiveTask implements IWorkspaceRunnable {
 
         ZipOutputStream zipStream = null;
 
-        monitor.beginTask("Compressing files...", 100 /* percent */);
+        final SubMonitor progress = SubMonitor.convert(monitor,
+            "Compressing files...", 100 /* percent */);
 
         try {
             zipStream = new ZipOutputStream(new BufferedOutputStream(
@@ -108,7 +110,7 @@ public class CreateArchiveTask implements IWorkspaceRunnable {
                 if (LOG.isTraceEnabled())
                     LOG.trace("compressing file: " + originalEntryName);
 
-                monitor.subTask("compressing file: " + originalEntryName);
+                progress.subTask("compressing file: " + originalEntryName);
 
                 zipStream.putNextEntry(new ZipEntry(entryName));
 
@@ -127,7 +129,7 @@ public class CreateArchiveTask implements IWorkspaceRunnable {
 
                     while ((read = in.read(buffer)) > 0) {
 
-                        if (monitor.isCanceled())
+                        if (progress.isCanceled())
                             throw new OperationCanceledException(
                                 "compressing of file '" + originalEntryName
                                     + "' was canceled");
@@ -136,7 +138,7 @@ public class CreateArchiveTask implements IWorkspaceRunnable {
 
                         totalRead += read;
 
-                        updateMonitor(monitor, totalRead, totalSize);
+                        updateMonitor(progress, totalRead, totalSize);
                     }
                 } finally {
                     IOUtils.closeQuietly(in);
@@ -157,7 +159,8 @@ public class CreateArchiveTask implements IWorkspaceRunnable {
                 && !archive.delete())
                 LOG.warn("could not delete archive file: " + archive);
 
-            monitor.done();
+            if (monitor != null)
+                monitor.done();
         }
 
         stopWatch.stop();
@@ -170,8 +173,8 @@ public class CreateArchiveTask implements IWorkspaceRunnable {
 
     private int lastWorked = 0;
 
-    private void updateMonitor(IProgressMonitor monitor, long totalRead,
-        long totalSize) {
+    private void updateMonitor(final IProgressMonitor monitor,
+        final long totalRead, final long totalSize) {
 
         if (totalSize == 0)
             return;

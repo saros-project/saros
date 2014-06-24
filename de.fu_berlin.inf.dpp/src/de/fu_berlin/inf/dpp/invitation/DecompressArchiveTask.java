@@ -83,7 +83,7 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
 
             zipFile = new ZipFile(file);
 
-            SubMonitor subMonitor = SubMonitor.convert(monitor,
+            final SubMonitor progress = SubMonitor.convert(monitor,
                 "Unpacking archive file to workspace", zipFile.size());
 
             for (Enumeration<? extends ZipEntry> entries = zipFile.entries(); entries
@@ -93,7 +93,7 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
 
                 final String entryName = entry.getName();
 
-                if (subMonitor.isCanceled())
+                if (progress.isCanceled())
                     throw new OperationCanceledException();
 
                 final int delimiterIdx = entry.getName().indexOf(delimiter);
@@ -102,7 +102,7 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
                     LOG.warn("skipping zip entry " + entryName
                         + ", entry is not valid");
 
-                    subMonitor.worked(1);
+                    progress.worked(1);
                     continue;
                 }
 
@@ -117,7 +117,7 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
                     LOG.warn("skipping zip entry " + entryName
                         + ", unknown project id: " + id);
 
-                    subMonitor.worked(1);
+                    progress.worked(1);
                     continue;
                 }
 
@@ -129,16 +129,16 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
                  */
                 createFoldersForFile(file);
 
-                subMonitor.subTask("decompressing: " + path);
+                progress.subTask("decompressing: " + path);
 
                 final InputStream in = zipFile.getInputStream(entry);
 
                 if (!file.exists())
                     file.create(in, true,
-                        subMonitor.newChild(1, SubMonitor.SUPPRESS_ALL_LABELS));
+                        progress.newChild(1, SubMonitor.SUPPRESS_ALL_LABELS));
                 else
                     file.setContents(in, true, true,
-                        subMonitor.newChild(1, SubMonitor.SUPPRESS_ALL_LABELS));
+                        progress.newChild(1, SubMonitor.SUPPRESS_ALL_LABELS));
 
                 if (LOG.isTraceEnabled())
                     LOG.trace("file written to disk: " + path);
@@ -149,7 +149,8 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
             throw new CoreException(new org.eclipse.core.runtime.Status(
                 IStatus.ERROR, Saros.SAROS, "failed to unpack archive", e));
         } finally {
-            monitor.subTask("");
+            if (monitor != null)
+                monitor.done();
 
             try {
                 if (zipFile != null)
@@ -158,8 +159,6 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
                 LOG.warn("failed to close zip file " + zipFile.getName()
                     + " : " + e.getMessage());
             }
-
-            monitor.done();
         }
     }
 
