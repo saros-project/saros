@@ -35,6 +35,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.helpers.LogLog;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
@@ -56,7 +57,6 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.stf.server.STFController;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
-import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.versioning.VersionManager;
 
 /**
@@ -249,7 +249,7 @@ public class Saros extends AbstractUIPlugin {
         sarosVersion = getBundle().getVersion().toString();
 
         log.info("Starting Saros " + sarosVersion + " running:\n"
-            + Utils.getPlatformInfo());
+            + getPlatformInfo());
 
         sarosContext = new SarosContext(new SarosEclipseContextFactory(this,
             new SarosCoreContextFactory()), dotMonitor);
@@ -576,5 +576,27 @@ public class Saros extends AbstractUIPlugin {
         }
 
         versionManager.setCompatibilityChart(chart);
+    }
+
+    private String getPlatformInfo() {
+
+        String javaVersion = System.getProperty("java.version",
+            "Unknown Java Version");
+        String javaVendor = System.getProperty("java.vendor", "Unknown Vendor");
+        String os = System.getProperty("os.name", "Unknown OS");
+        String osVersion = System.getProperty("os.version", "Unknown Version");
+        String hardware = System.getProperty("os.arch", "Unknown Architecture");
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("  Java Version: " + javaVersion + "\n");
+        sb.append("  Java Vendor: " + javaVendor + "\n");
+        sb.append("  Eclipse Runtime Version: "
+            + Platform.getBundle("org.eclipse.core.runtime").getVersion()
+                .toString() + "\n");
+        sb.append("  Operating System: " + os + " (" + osVersion + ")\n");
+        sb.append("  Hardware Architecture: " + hardware);
+
+        return sb.toString();
     }
 }

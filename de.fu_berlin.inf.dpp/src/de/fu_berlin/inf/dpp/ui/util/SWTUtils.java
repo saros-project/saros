@@ -18,11 +18,10 @@ import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 public class SWTUtils {
 
-    private static final Logger LOG = Logger.getLogger(Utils.class);
+    private static final Logger LOG = Logger.getLogger(SWTUtils.class);
 
     private static class CallableResult<T> {
         private T result;

@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.communication;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -27,7 +28,6 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * A manager class that allows to discover if a given XMPP entity supports Skype
@@ -122,7 +122,7 @@ public class SkypeManager implements IConnectionListener {
         if (roster == null)
             return null;
 
-        for (Presence presence : Utils.asIterable(roster.getPresences(jid))) {
+        for (Presence presence : asIterable(roster.getPresences(jid))) {
             if (presence.isAvailable()) {
                 String result = getSkypeURLNonBlock(new JID(presence.getFrom()));
                 if (result != null)
@@ -182,7 +182,7 @@ public class SkypeManager implements IConnectionListener {
         if (roster == null)
             return null;
 
-        for (Presence presence : Utils.asIterable(roster.getPresences(jid))) {
+        for (Presence presence : asIterable(roster.getPresences(jid))) {
             if (presence.isAvailable()) {
                 String result = getSkypeURL(new JID(presence.getFrom()));
                 if (result != null)
@@ -245,8 +245,8 @@ public class SkypeManager implements IConnectionListener {
             return;
 
         for (RosterEntry rosterEntry : roster.getEntries()) {
-            for (Presence presence : Utils.asIterable(roster
-                .getPresences(rosterEntry.getUser()))) {
+            for (Presence presence : asIterable(roster.getPresences(rosterEntry
+                .getUser()))) {
                 if (presence.isAvailable()) {
                     IQ result = skypeProvider.createIQ(newSkypeName);
                     result.setType(IQ.Type.SET);
@@ -338,5 +338,14 @@ public class SkypeManager implements IConnectionListener {
         } finally {
             collector.cancel();
         }
+    }
+
+    private static <T> Iterable<T> asIterable(final Iterator<T> it) {
+        return new Iterable<T>() {
+            @Override
+            public Iterator<T> iterator() {
+                return it;
+            }
+        };
     }
 }
