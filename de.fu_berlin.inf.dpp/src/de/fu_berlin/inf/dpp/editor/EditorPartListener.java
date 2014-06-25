@@ -5,14 +5,13 @@
  * 
  * @author awaldmann and nwarnatsch
  */
-package de.fu_berlin.inf.dpp.editor.internal;
+package de.fu_berlin.inf.dpp.editor;
 
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 
-import de.fu_berlin.inf.dpp.editor.EditorManager;
 
 public class EditorPartListener implements IPartListener2 {
 

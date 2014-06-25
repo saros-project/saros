@@ -22,16 +22,19 @@ import de.fu_berlin.inf.dpp.util.AutoHashMap;
  */
 public class DirtyStateListener implements IElementStateListener {
 
-    private static final Logger log = Logger
+    private static final Logger LOG = Logger
         .getLogger(DirtyStateListener.class);
 
-    protected final EditorManager editorManager;
+    private final EditorManager editorManager;
+
+    private final AutoHashMap<IDocumentProvider, Set<IEditorInput>> documentProviders = AutoHashMap
+        .getSetHashMap();
+
+    private boolean enabled = true;
 
     DirtyStateListener(EditorManager editorManager) {
         this.editorManager = editorManager;
     }
-
-    public boolean enabled = true;
 
     @Override
     public void elementDirtyStateChanged(Object element, boolean isDirty) {
@@ -49,26 +52,25 @@ public class DirtyStateListener implements IElementStateListener {
             return;
 
         final IFile file = ((FileEditorInput) element).getFile();
-        final ISarosSession sarosSession = editorManager.sarosSession;
+        final ISarosSession session = editorManager.session;
 
-        if (sarosSession == null
-            || !sarosSession.isShared(ResourceAdapterFactory.create(file
+        if (session == null
+            || !session.isShared(ResourceAdapterFactory.create(file
                 .getProject()))) {
             return;
         }
 
-        SWTUtils.runSafeSWTSync(log, new Runnable() {
+        SWTUtils.runSafeSWTSync(LOG, new Runnable() {
 
             @Override
             public void run() {
 
                 // Only trigger save events for files managed in the editor pool
-                if (!editorManager.isConnected(file)) {
+                if (!editorManager.isManaged(file)) {
                     return;
                 }
 
-                EditorManager.log.debug("Dirty state reset for: "
-                    + file.toString());
+                LOG.debug("Dirty state reset for: " + file.toString());
                 editorManager.sendEditorActivitySaved(new SPath(
                     ResourceAdapterFactory.create(file)));
             }
@@ -95,8 +97,9 @@ public class DirtyStateListener implements IElementStateListener {
         // ignore
     }
 
-    AutoHashMap<IDocumentProvider, Set<IEditorInput>> documentProviders = AutoHashMap
-        .getSetHashMap();
+    public void setEnabled(final boolean enabled) {
+        this.enabled = enabled;
+    }
 
     public void register(IDocumentProvider documentProvider, IEditorInput input) {
 
@@ -121,7 +124,7 @@ public class DirtyStateListener implements IElementStateListener {
     public void unregisterAll() {
 
         for (IDocumentProvider provider : documentProviders.keySet()) {
-            log.warn("DocumentProvider was not correctly"
+            LOG.warn("DocumentProvider was not correctly"
                 + " unregistered yet, EditorPool must be corrupted: "
                 + documentProviders);
             provider.removeElementStateListener(this);

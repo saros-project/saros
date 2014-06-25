@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.concurrent.watchdog;
 
-import java.io.FileNotFoundException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.concurrent.CancellationException;
@@ -222,16 +221,6 @@ public class ConsistencyWatchdogHandler extends AbstractActivityProducer
 
         IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
 
-        // Save document before sending to client
-        if (file.exists()) {
-            try {
-                editorManager.saveLazy(path);
-            } catch (FileNotFoundException e) {
-                log.error("File could not be found, despite existing: " + path,
-                    e);
-            }
-        }
-
         // Reset jupiter
         sarosSession.getConcurrentDocumentServer().reset(from, path);
 
@@ -244,6 +233,12 @@ public class ConsistencyWatchdogHandler extends AbstractActivityProducer
             fireActivity(ChecksumActivity.missing(user, path));
             return;
         }
+
+        /*
+         * save the editor the dirty contents are flushed to the underlying
+         * storage
+         */
+        editorManager.saveLazy(path);
 
         String charset = null;
 

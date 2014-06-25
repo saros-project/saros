@@ -23,7 +23,6 @@ import java.io.FileNotFoundException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -51,7 +50,6 @@ import org.eclipse.ui.texteditor.DocumentProviderRegistry;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.picocontainer.annotations.Inject;
-import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
@@ -135,52 +133,51 @@ public class EditorManager extends AbstractActivityProducer {
      *               editor when it is received.
      */
 
-    protected static final Logger log = Logger.getLogger(EditorManager.class
+    private static final Logger log = Logger.getLogger(EditorManager.class
         .getName());
 
-    protected SharedEditorListenerDispatch editorListenerDispatch = new SharedEditorListenerDispatch();
+    IEditorAPI editorAPI;
 
-    protected IEditorAPI editorAPI;
+    final DirtyStateListener dirtyStateListener = new DirtyStateListener(this);
 
-    protected final IPreferenceStore preferenceStore;
+    final StoppableDocumentListener documentListener = new StoppableDocumentListener(
+        this);
 
-    protected RemoteEditorManager remoteEditorManager;
+    boolean hasWriteAccess;
 
-    protected RemoteWriteAccessManager remoteWriteAccessManager;
+    boolean isLocked;
 
-    protected ISarosSession sarosSession;
+    ISarosSession session;
+
+    private SharedEditorListenerDispatch editorListenerDispatch = new SharedEditorListenerDispatch();
+
+    private final IPreferenceStore preferenceStore;
+
+    private RemoteEditorManager remoteEditorManager;
+
+    private RemoteWriteAccessManager remoteWriteAccessManager;
 
     /**
      * The user that is followed or <code>null</code> if no user is followed.
      */
-    protected User followedUser = null;
+    private User followedUser = null;
 
-    protected boolean hasWriteAccess;
+    private final EditorPool editorPool = new EditorPool(this);
 
-    protected boolean isLocked;
+    private SPath locallyActiveEditor;
 
-    protected final EditorPool editorPool = new EditorPool(this);
+    private Set<SPath> locallyOpenEditors = new HashSet<SPath>();
 
-    protected final DirtyStateListener dirtyStateListener = new DirtyStateListener(
-        this);
+    private ITextSelection localSelection;
 
-    protected final StoppableDocumentListener documentListener = new StoppableDocumentListener(
-        this);
-
-    protected SPath locallyActiveEditor;
-
-    protected Set<SPath> locallyOpenEditors = new HashSet<SPath>();
-
-    protected ITextSelection localSelection;
-
-    protected ILineRange localViewport;
+    private ILineRange localViewport;
 
     /** all files that have connected document providers */
-    protected final Set<IFile> connectedFiles = new HashSet<IFile>();
+    private final Set<IFile> connectedFiles = new HashSet<IFile>();
 
-    AnnotationModelHelper annotationModelHelper;
-    LocationAnnotationManager locationAnnotationManager;
-    ContributionAnnotationManager contributionAnnotationManager;
+    private AnnotationModelHelper annotationModelHelper;
+    private LocationAnnotationManager locationAnnotationManager;
+    private ContributionAnnotationManager contributionAnnotationManager;
 
     private final CustomAnnotationManager customAnnotationManager = new CustomAnnotationManager();
 
@@ -246,22 +243,19 @@ public class EditorManager extends AbstractActivityProducer {
         }
     };
 
-    private Blockable stopManagerListener = new Blockable() {
+    private final Blockable stopManagerListener = new Blockable() {
         @Override
         public void unblock() {
-            SWTUtils.runSafeSWTSync(log, new Runnable() {
-
-                @Override
-                public void run() {
-                    lockAllEditors(false);
-                }
-            });
+            execute(false);
         }
 
         @Override
         public void block() {
-            SWTUtils.runSafeSWTSync(log, new Runnable() {
+            execute(true);
+        }
 
+        private void execute(final boolean lock) {
+            SWTUtils.runSafeSWTSync(log, new Runnable() {
                 @Override
                 public void run() {
                     lockAllEditors(true);
@@ -270,13 +264,13 @@ public class EditorManager extends AbstractActivityProducer {
         }
     };
 
-    private ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
+    private final ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
 
         @Override
         public void permissionChanged(final User user) {
 
             // Make sure we have the up-to-date facts about ourself
-            hasWriteAccess = sarosSession.hasWriteAccess();
+            hasWriteAccess = session.hasWriteAccess();
 
             // Lock / unlock editors
             if (user.isLocal()) {
@@ -293,7 +287,7 @@ public class EditorManager extends AbstractActivityProducer {
             // TODO The user should be able to ask us for this state
 
             // Send awareness-informations
-            User localUser = sarosSession.getLocalUser();
+            User localUser = session.getLocalUser();
             for (SPath path : getLocallyOpenEditors()) {
                 fireActivity(new EditorActivity(localUser, Type.ACTIVATED, path));
             }
@@ -343,28 +337,27 @@ public class EditorManager extends AbstractActivityProducer {
         }
     };
 
-    private ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+    private final ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
 
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
-            sarosSession = newSarosSession;
-            sarosSession.getStopManager().addBlockable(stopManagerListener);
+            session = newSarosSession;
+            session.getStopManager().addBlockable(stopManagerListener);
 
             assert editorPool.getAllEditors().size() == 0 : "EditorPool was not correctly reset!";
 
-            hasWriteAccess = sarosSession.hasWriteAccess();
-            sarosSession.addListener(sharedProjectListener);
-            sarosSession.addActivityProducer(EditorManager.this);
-            sarosSession.addActivityConsumer(consumer);
+            hasWriteAccess = session.hasWriteAccess();
+            session.addListener(sharedProjectListener);
+            session.addActivityProducer(EditorManager.this);
+            session.addActivityConsumer(consumer);
 
             annotationModelHelper = new AnnotationModelHelper();
             locationAnnotationManager = new LocationAnnotationManager(
                 preferenceStore);
             contributionAnnotationManager = new ContributionAnnotationManager(
                 newSarosSession, preferenceStore);
-            remoteEditorManager = new RemoteEditorManager(sarosSession);
-            remoteWriteAccessManager = new RemoteWriteAccessManager(
-                sarosSession);
+            remoteEditorManager = new RemoteEditorManager(session);
+            remoteWriteAccessManager = new RemoteWriteAccessManager(session);
 
             preferenceStore
                 .addPropertyChangeListener(annotationPreferenceListener);
@@ -380,8 +373,8 @@ public class EditorManager extends AbstractActivityProducer {
         @Override
         public void sessionEnded(ISarosSession oldSarosSession) {
 
-            assert sarosSession == oldSarosSession;
-            sarosSession.getStopManager().removeBlockable(stopManagerListener);
+            assert session == oldSarosSession;
+            session.getStopManager().removeBlockable(stopManagerListener);
 
             SWTUtils.runSafeSWTSync(log, new Runnable() {
                 @Override
@@ -405,17 +398,17 @@ public class EditorManager extends AbstractActivityProducer {
                         }
                     });
 
-                    editorPool.removeAllEditors(sarosSession);
+                    editorPool.removeAllEditors(session);
 
                     customAnnotationManager.uninstallAllPainters(true);
 
                     dirtyStateListener.unregisterAll();
 
-                    sarosSession.removeListener(sharedProjectListener);
-                    sarosSession.removeActivityProducer(EditorManager.this);
-                    sarosSession.removeActivityConsumer(consumer);
+                    session.removeListener(sharedProjectListener);
+                    session.removeActivityProducer(EditorManager.this);
+                    session.removeActivityConsumer(consumer);
 
-                    sarosSession = null;
+                    session = null;
                     annotationModelHelper = null;
                     locationAnnotationManager = null;
                     contributionAnnotationManager.dispose();
@@ -472,7 +465,7 @@ public class EditorManager extends AbstractActivityProducer {
         }
     };
 
-    private ISharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
+    private final ISharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
 
         @Override
         public void activeEditorChanged(User user, SPath path) {
@@ -497,9 +490,6 @@ public class EditorManager extends AbstractActivityProducer {
     @Inject
     protected FileReplacementInProgressObservable fileReplacementInProgressObservable;
 
-    /**
-     * @Inject
-     */
     public EditorManager(ISarosSessionManager sessionManager,
         EditorAPI editorApi, IPreferenceStore preferenceStore) {
 
@@ -512,7 +502,9 @@ public class EditorManager extends AbstractActivityProducer {
         addSharedEditorListener(sharedEditorListener);
     }
 
-    public boolean isConnected(IFile file) {
+    // FIXME thread access (used by ProjectDeltaVisitor which may NOT run from
+    // the SWT Thread
+    public boolean isManaged(IFile file) {
         return connectedFiles.contains(file);
     }
 
@@ -524,7 +516,7 @@ public class EditorManager extends AbstractActivityProducer {
      * connected twice.
      * 
      */
-    public void connect(IFile file) {
+    void connect(IFile file) {
 
         if (!file.isAccessible()) {
             log.error(".connect File " + file.getName()
@@ -535,7 +527,7 @@ public class EditorManager extends AbstractActivityProducer {
         log.trace(".connect(" + file.getProjectRelativePath().toOSString()
             + ") invoked");
 
-        if (!isConnected(file)) {
+        if (!isManaged(file)) {
             FileEditorInput input = new FileEditorInput(file);
             IDocumentProvider documentProvider = getDocumentProvider(input);
             try {
@@ -548,12 +540,12 @@ public class EditorManager extends AbstractActivityProducer {
         }
     }
 
-    public void disconnect(IFile file) {
+    void disconnect(IFile file) {
 
         log.trace(".disconnect(" + file.getProjectRelativePath().toOSString()
             + ") invoked");
 
-        if (!isConnected(file)) {
+        if (!isManaged(file)) {
             log.warn(".disconnect(): Trying to disconnect"
                 + " DocProvider which is not connected: "
                 + file.getFullPath().toOSString());
@@ -568,11 +560,11 @@ public class EditorManager extends AbstractActivityProducer {
     }
 
     public void addSharedEditorListener(ISharedEditorListener editorListener) {
-        this.editorListenerDispatch.add(editorListener);
+        editorListenerDispatch.add(editorListener);
     }
 
     public void removeSharedEditorListener(ISharedEditorListener editorListener) {
-        this.editorListenerDispatch.remove(editorListener);
+        editorListenerDispatch.remove(editorListener);
     }
 
     /**
@@ -585,7 +577,7 @@ public class EditorManager extends AbstractActivityProducer {
      *         currently opened editors.
      */
     public Set<SPath> getLocallyOpenEditors() {
-        return this.locallyOpenEditors;
+        return locallyOpenEditors;
     }
 
     /**
@@ -597,18 +589,18 @@ public class EditorManager extends AbstractActivityProducer {
      *            currently editing or <code>null</code> if the local user has
      *            no editor open.
      */
-    public void generateEditorActivated(@Nullable SPath path) {
+    void generateEditorActivated(SPath path) {
 
         this.locallyActiveEditor = path;
 
-        if (path != null && sarosSession.isShared(path.getResource()))
+        if (path != null && session.isShared(path.getResource()))
             this.locallyOpenEditors.add(path);
 
-        editorListenerDispatch.activeEditorChanged(sarosSession.getLocalUser(),
-            path);
+        editorListenerDispatch
+            .activeEditorChanged(session.getLocalUser(), path);
 
-        fireActivity(new EditorActivity(sarosSession.getLocalUser(),
-            Type.ACTIVATED, path));
+        fireActivity(new EditorActivity(session.getLocalUser(), Type.ACTIVATED,
+            path));
 
     }
 
@@ -631,9 +623,9 @@ public class EditorManager extends AbstractActivityProducer {
      *            currently visible portion of the editor. (again visible does
      *            not mean that this editor is actually the active one)
      */
-    public void generateViewport(IEditorPart part, ILineRange viewport) {
+    void generateViewport(IEditorPart part, ILineRange viewport) {
 
-        if (this.sarosSession == null) {
+        if (this.session == null) {
             log.warn("SharedEditorListener not correctly unregistered!");
             return;
         }
@@ -647,7 +639,7 @@ public class EditorManager extends AbstractActivityProducer {
         if (path.equals(locallyActiveEditor))
             this.localViewport = viewport;
 
-        fireActivity(new ViewportActivity(sarosSession.getLocalUser(),
+        fireActivity(new ViewportActivity(session.getLocalUser(),
             viewport.getStartLine(), viewport.getNumberOfLines(), path));
 
         editorListenerDispatch.viewportGenerated(part, viewport, path);
@@ -666,7 +658,7 @@ public class EditorManager extends AbstractActivityProducer {
      *            The ITextSelection in the given part which represents the
      *            currently selected text in editor.
      */
-    public void generateSelection(IEditorPart part, ITextSelection newSelection) {
+    void generateSelection(IEditorPart part, ITextSelection newSelection) {
 
         SPath path = editorAPI.getEditorPath(part);
         if (path == null) {
@@ -680,8 +672,8 @@ public class EditorManager extends AbstractActivityProducer {
         int offset = newSelection.getOffset();
         int length = newSelection.getLength();
 
-        fireActivity(new TextSelectionActivity(sarosSession.getLocalUser(),
-            offset, length, path));
+        fireActivity(new TextSelectionActivity(session.getLocalUser(), offset,
+            length, path));
     }
 
     /**
@@ -700,13 +692,13 @@ public class EditorManager extends AbstractActivityProducer {
      * @param document
      *            The document which was changed.
      */
-    public void textAboutToBeChanged(int offset, String text,
-        int replaceLength, IDocument document) {
+    void textAboutToBeChanged(int offset, String text, int replaceLength,
+        IDocument document) {
 
         if (fileReplacementInProgressObservable.isReplacementInProgress())
             return;
 
-        if (sarosSession == null) {
+        if (session == null) {
             log.error("session has ended but text edits"
                 + " are received from local user");
             return;
@@ -748,7 +740,7 @@ public class EditorManager extends AbstractActivityProducer {
         }
 
         TextEditActivity textEdit = new TextEditActivity(
-            sarosSession.getLocalUser(), offset, text, replacedText, path);
+            session.getLocalUser(), offset, text, replacedText, path);
 
         if (!hasWriteAccess || isLocked) {
             /**
@@ -768,21 +760,19 @@ public class EditorManager extends AbstractActivityProducer {
         fireActivity(textEdit);
 
         // inform all registered ISharedEditorListeners about this text edit
-        editorListenerDispatch.textEditRecieved(sarosSession.getLocalUser(),
-            path, text, replacedText, offset);
+        editorListenerDispatch.textEditRecieved(session.getLocalUser(), path,
+            text, replacedText, offset);
 
         /*
          * TODO Investigate if this is really needed here
          */
-        {
-            IEditorInput input = changedEditor.getEditorInput();
-            IDocumentProvider provider = getDocumentProvider(input);
-            IAnnotationModel model = provider.getAnnotationModel(input);
-            contributionAnnotationManager.splitAnnotation(model, offset);
-        }
+        IEditorInput input = changedEditor.getEditorInput();
+        IDocumentProvider provider = getDocumentProvider(input);
+        IAnnotationModel model = provider.getAnnotationModel(input);
+        contributionAnnotationManager.splitAnnotation(model, offset);
     }
 
-    protected void execEditorActivity(EditorActivity editorActivity) {
+    private void execEditorActivity(EditorActivity editorActivity) {
         User sender = editorActivity.getSource();
         SPath sPath = editorActivity.getPath();
         switch (editorActivity.getType()) {
@@ -793,14 +783,14 @@ public class EditorManager extends AbstractActivityProducer {
             execClosed(sender, sPath);
             break;
         case SAVED:
-            saveText(sPath);
+            saveEditor(sPath);
             break;
         default:
             log.warn("Unexpected type: " + editorActivity.getType());
         }
     }
 
-    protected void execTextEdit(TextEditActivity textEdit) {
+    private void execTextEdit(TextEditActivity textEdit) {
 
         log.trace("EditorManager.execTextEdit invoked");
 
@@ -860,7 +850,7 @@ public class EditorManager extends AbstractActivityProducer {
             textEdit.getReplacedText(), textEdit.getOffset());
     }
 
-    protected void execTextSelection(TextSelectionActivity selection) {
+    private void execTextSelection(TextSelectionActivity selection) {
 
         log.trace("EditorManager.execTextSelection invoked");
 
@@ -895,7 +885,7 @@ public class EditorManager extends AbstractActivityProducer {
         editorListenerDispatch.textSelectionMade(selection);
     }
 
-    protected void execViewport(ViewportActivity viewport) {
+    private void execViewport(ViewportActivity viewport) {
 
         log.trace("EditorManager.execViewport invoked");
 
@@ -955,7 +945,7 @@ public class EditorManager extends AbstractActivityProducer {
         editorListenerDispatch.viewportChanged(viewport);
     }
 
-    protected void execActivated(User user, SPath path) {
+    private void execActivated(User user, SPath path) {
 
         log.trace("EditorManager.execActivated invoked");
 
@@ -989,7 +979,7 @@ public class EditorManager extends AbstractActivityProducer {
         }
     }
 
-    protected void execClosed(User user, SPath path) {
+    private void execClosed(User user, SPath path) {
 
         log.trace("EditorManager.execClosed invoked");
 
@@ -1002,14 +992,15 @@ public class EditorManager extends AbstractActivityProducer {
         }
     }
 
-    protected void execColorChanged() {
+    private void execColorChanged() {
         editorListenerDispatch.colorChanged();
     }
 
     /**
-     * Called when the local user opened an editor part.
+     * Called when the local user opened an editor part. (called by
+     * EditorPartListener)
      */
-    public void partOpened(IEditorPart editorPart) {
+    void partOpened(IEditorPart editorPart) {
 
         log.trace(".partOpened invoked");
 
@@ -1049,20 +1040,6 @@ public class EditorManager extends AbstractActivityProducer {
     }
 
     /**
-     * Convenient method to send an {@link EditorActivity} of type "Activated"
-     * of the currently opened {@link IEditorPart}.
-     */
-    public void sendPartActivated() {
-        SWTUtils.runSafeSWTSync(log, new Runnable() {
-            @Override
-            public void run() {
-                partActivated(editorAPI.getActiveEditor());
-            }
-        });
-
-    }
-
-    /**
      * Called when the local user activated a shared editor.
      * 
      * This can be called twice for a single IEditorPart, because it is called
@@ -1071,9 +1048,9 @@ public class EditorManager extends AbstractActivityProducer {
      * We do not filter duplicate events, because it would be bad to miss events
      * and is not too bad have duplicate one's. In particular we use IPath as an
      * identifier to the IEditorPart which might not work for multiple editors
-     * based on the same file.
+     * based on the same file. (called by EditorPartListener)
      */
-    public void partActivated(IEditorPart editorPart) {
+    void partActivated(IEditorPart editorPart) {
 
         log.trace(".partActivated invoked");
 
@@ -1088,7 +1065,7 @@ public class EditorManager extends AbstractActivityProducer {
         IResource resource = editorAPI.getEditorResource(editorPart);
 
         if (!isSharedEditor(editorPart)
-            || !sarosSession.isShared(ResourceAdapterFactory.create(resource))
+            || !session.isShared(ResourceAdapterFactory.create(resource))
             || !editorAPI.getEditorResource(editorPart).isAccessible()) {
             generateEditorActivated(null);
             // follower switched to another unshared editor or closed followed
@@ -1145,10 +1122,10 @@ public class EditorManager extends AbstractActivityProducer {
 
     /**
      * Called if the IEditorInput of the IEditorPart is now something different
-     * than before! Probably when renaming.
+     * than before! Probably when renaming. (called by EditorPartListener)
      * 
      */
-    public void partInputChanged(IEditorPart editor) {
+    void partInputChanged(IEditorPart editor) {
         // notice currently followed user before closing the editor
         User followedUser = getFollowedUser();
 
@@ -1156,7 +1133,7 @@ public class EditorManager extends AbstractActivityProducer {
 
             // Pretend as if the editor was closed locally (but use the old part
             // before the move happened) and then simulate it being opened again
-            SPath path = editorPool.getCurrentPath(editor, sarosSession);
+            SPath path = editorPool.getCurrentPath(editor, session);
             if (path == null) {
                 log.warn("Editor was managed but path could not be found: "
                     + editor);
@@ -1174,9 +1151,9 @@ public class EditorManager extends AbstractActivityProducer {
     }
 
     /**
-     * Called if the local user closed a part
+     * Called if the local user closed a part (called by EditorPartListener)
      */
-    public void partClosed(IEditorPart editorPart) {
+    void partClosed(IEditorPart editorPart) {
 
         log.trace("EditorManager.partClosed invoked");
 
@@ -1189,7 +1166,7 @@ public class EditorManager extends AbstractActivityProducer {
         partClosedOfPath(editorPart, path);
     }
 
-    protected void partClosedOfPath(IEditorPart editorPart, SPath path) {
+    private void partClosedOfPath(IEditorPart editorPart, SPath path) {
 
         // if closing the followed editor, leave follow mode
         if (getFollowedUser() != null) {
@@ -1205,7 +1182,7 @@ public class EditorManager extends AbstractActivityProducer {
             }
         }
 
-        this.editorPool.remove(editorPart, sarosSession);
+        this.editorPool.remove(editorPart, session);
 
         ITextViewer viewer = EditorAPI.getViewer(editorPart);
 
@@ -1218,10 +1195,10 @@ public class EditorManager extends AbstractActivityProducer {
 
         this.locallyOpenEditors.remove(path);
 
-        editorListenerDispatch.editorRemoved(sarosSession.getLocalUser(), path);
+        editorListenerDispatch.editorRemoved(session.getLocalUser(), path);
 
-        fireActivity(new EditorActivity(sarosSession.getLocalUser(),
-            Type.CLOSED, path));
+        fireActivity(new EditorActivity(session.getLocalUser(), Type.CLOSED,
+            path));
 
         /**
          * TODO We need a reliable way to communicate editors which are outside
@@ -1241,32 +1218,10 @@ public class EditorManager extends AbstractActivityProducer {
      * @return <code>true</code> if the given resource is opened according to
      *         the editor pool.
      */
+    // FIXME thread access (used by ProjectDeltaVisitor which may NOT run from
+    // the SWT Thread
     public boolean isOpened(SPath path) {
         return this.editorPool.getEditors(path).size() > 0;
-    }
-
-    /**
-     * Gives the editors of given path.
-     * 
-     * @param path
-     *            the project-relative path to the resource.
-     * @return the set of editors
-     */
-    protected Set<IEditorPart> getEditors(SPath path) {
-        return this.editorPool.getEditors(path);
-    }
-
-    /**
-     * Convenient method to (un-)lock <b>all</b> opened editors of workbench.
-     * 
-     * @param locked
-     *            <ul>
-     *            <li><b>true</b> locks all opened editors of workbench
-     *            <li><b>false</b> unlocks all opened editors of workbench
-     *            </ul>
-     */
-    public void setAllLocalOpenedEditorsLocked(boolean locked) {
-        this.editorPool.setLocalEditorsEnabled(!locked);
     }
 
     /**
@@ -1277,6 +1232,7 @@ public class EditorManager extends AbstractActivityProducer {
      *         <code>false</code> otherwise.
      */
     public boolean isActiveEditorShared() {
+        checkThreadAccess();
         IEditorPart editorPart = editorAPI.getActiveEditor();
         return editorPart == null ? false : isSharedEditor(editorPart);
     }
@@ -1291,8 +1247,8 @@ public class EditorManager extends AbstractActivityProducer {
      * 
      * Since a null editor does not support either, this method returns false.
      */
-    protected boolean isSharedEditor(IEditorPart editorPart) {
-        if (sarosSession == null)
+    private boolean isSharedEditor(IEditorPart editorPart) {
+        if (session == null)
             return false;
 
         if (EditorAPI.getViewer(editorPart) == null)
@@ -1303,8 +1259,8 @@ public class EditorManager extends AbstractActivityProducer {
         if (resource == null)
             return false;
 
-        return this.sarosSession.isShared(ResourceAdapterFactory
-            .create(resource.getProject()));
+        return this.session.isShared(ResourceAdapterFactory.create(resource
+            .getProject()));
     }
 
     /**
@@ -1332,7 +1288,7 @@ public class EditorManager extends AbstractActivityProducer {
      * @param source
      *            The User who caused this change.
      */
-    protected void replaceText(SPath path, int offset, String replacedText,
+    private void replaceText(SPath path, int offset, String replacedText,
         String text, User source) {
 
         IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
@@ -1412,26 +1368,27 @@ public class EditorManager extends AbstractActivityProducer {
      * 
      * @blocking This method returns after the file has been saved in the SWT
      *           Thread.
-     * 
-     * @nonSWT This method is not intended to be called from SWT (but it should
-     *         be okay)
      */
-    public void saveLazy(final SPath path) throws FileNotFoundException {
-        if (!isDirty(path)) {
-            return;
-        }
+    public void saveLazy(final SPath path) {
 
-        try {
-            SWTUtils.runSWTSync(new Callable<Object>() {
-                @Override
-                public Object call() throws Exception {
-                    saveText(path);
-                    return null;
+        SWTUtils.runSafeSWTSync(log, new Runnable() {
+
+            @Override
+            public void run() {
+
+                boolean isDirty = false;
+                try {
+                    isDirty = isDirty(path);
+                } catch (FileNotFoundException e) {
+                    log.warn("could not save editor: " + path, e);
                 }
-            });
-        } catch (Exception e) {
-            log.error("Unexpected exception: " + e);
-        }
+
+                if (!isDirty)
+                    return;
+
+                saveEditor(path);
+            }
+        });
     }
 
     /**
@@ -1443,7 +1400,7 @@ public class EditorManager extends AbstractActivityProducer {
      * 
      * 
      */
-    public boolean isDirty(SPath path) throws FileNotFoundException {
+    private boolean isDirty(SPath path) throws FileNotFoundException {
 
         IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
 
@@ -1475,7 +1432,8 @@ public class EditorManager extends AbstractActivityProducer {
      * 
      * @nonReentrant This method cannot be called twice at the same time.
      */
-    public void saveText(SPath path) {
+    public void saveEditor(SPath path) {
+        checkThreadAccess();
 
         IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
 
@@ -1512,7 +1470,7 @@ public class EditorManager extends AbstractActivityProducer {
             return;
         }
 
-        final boolean isConnected = isConnected(file);
+        final boolean isConnected = isManaged(file);
 
         /*
          * connect to the file so the SharedResourceManager / ProjectDeltaVistor
@@ -1533,7 +1491,7 @@ public class EditorManager extends AbstractActivityProducer {
             log.trace("EditorManager.saveText Annotations on the IDocument "
                 + "are set");
 
-            dirtyStateListener.enabled = false;
+            dirtyStateListener.setEnabled(false);
 
             BlockingProgressMonitor monitor = new BlockingProgressMonitor();
 
@@ -1558,7 +1516,7 @@ public class EditorManager extends AbstractActivityProducer {
                 log.warn("saving was canceled by user: " + path);
             }
 
-            dirtyStateListener.enabled = true;
+            dirtyStateListener.setEnabled(true);
 
             if (model != null)
                 model.disconnect(doc);
@@ -1580,7 +1538,7 @@ public class EditorManager extends AbstractActivityProducer {
      *            the project relative path to the resource that the user with
      *            {@link Permission#WRITE_ACCESS} was editing.
      */
-    public void sendEditorActivitySaved(SPath path) {
+    void sendEditorActivitySaved(SPath path) {
 
         log.trace("EditorManager.sendEditorActivitySaved started for "
             + path.toString());
@@ -1590,8 +1548,8 @@ public class EditorManager extends AbstractActivityProducer {
         // What is the reason of this?
 
         editorListenerDispatch.userWithWriteAccessEditorSaved(path, false);
-        fireActivity(new EditorActivity(sarosSession.getLocalUser(),
-            Type.SAVED, path));
+        fireActivity(new EditorActivity(session.getLocalUser(), Type.SAVED,
+            path));
     }
 
     /**
@@ -1601,8 +1559,7 @@ public class EditorManager extends AbstractActivityProducer {
      * @param predicate
      *            The filter to use for cleaning.
      */
-    protected void removeAnnotationsFromAllEditors(
-        Predicate<Annotation> predicate) {
+    private void removeAnnotationsFromAllEditors(Predicate<Annotation> predicate) {
 
         for (IEditorPart editor : this.editorPool.getAllEditors()) {
             annotationModelHelper
@@ -1614,6 +1571,7 @@ public class EditorManager extends AbstractActivityProducer {
      * Returns <code>true</code> if there is currently a {@link User} followed,
      * otherwise <code>false</code>.
      */
+    // FIXME misplaced logic
     public boolean isFollowing() {
         return getFollowedUser() != null;
     }
@@ -1622,6 +1580,7 @@ public class EditorManager extends AbstractActivityProducer {
      * Returns the followed {@link User} or <code>null</code> if currently no
      * user is followed.
      */
+    // FIXME misplaced logic
     public User getFollowedUser() {
         return followedUser;
     }
@@ -1630,9 +1589,10 @@ public class EditorManager extends AbstractActivityProducer {
      * Sets the {@link User} to follow or <code>null</code> if no user should be
      * followed.
      */
+    // FIXME misplaced logic
     public void setFollowing(User newFollowedUser) {
         assert newFollowedUser == null
-            || !newFollowedUser.equals(sarosSession.getLocalUser()) : "local user cannot follow himself!";
+            || !newFollowedUser.equals(session.getLocalUser()) : "local user cannot follow himself!";
 
         User oldFollowedUser = this.followedUser;
         this.followedUser = newFollowedUser;
@@ -1647,27 +1607,17 @@ public class EditorManager extends AbstractActivityProducer {
         }
     }
 
-    /**
-     * Return the Viewport for one of the EditorParts (it is undefined which)
-     * associated with the given path or null if no Viewport has been found.
-     */
-    public ILineRange getCurrentViewport(SPath path) {
-
-        // TODO We need to find a way to identify individual editors on the
-        // client and not only paths.
-
-        for (IEditorPart editorPart : getEditors(path)) {
-            ILineRange viewport = editorAPI.getViewport(editorPart);
-            if (viewport != null)
-                return viewport;
-        }
-        return null;
-    }
-
+    // FIXME this is used from ChangeColorManager which should not about this
+    // component at all
     public void refreshAnnotations() {
         for (IEditorPart part : editorPool.getAllEditors()) {
             refreshAnnotations(part);
         }
+    }
+
+    // FIXME see above
+    public void colorChanged() {
+        this.execColorChanged();
     }
 
     /**
@@ -1677,7 +1627,7 @@ public class EditorManager extends AbstractActivityProducer {
      * @param editorPart
      *            the editor part to refresh
      */
-    public void refreshAnnotations(IEditorPart editorPart) {
+    private void refreshAnnotations(IEditorPart editorPart) {
 
         SPath path = editorAPI.getEditorPath(editorPart);
         if (path == null) {
@@ -1706,7 +1656,7 @@ public class EditorManager extends AbstractActivityProducer {
                     .getAnnotationModel());
         }
 
-        for (User user : sarosSession.getUsers()) {
+        for (User user : session.getUsers()) {
             if (user.isLocal()) {
                 continue;
             }
@@ -1740,13 +1690,14 @@ public class EditorManager extends AbstractActivityProducer {
         return this.remoteEditorManager;
     }
 
+    // FIXME misplaced logic
     public void jumpToUser(User jumpTo) {
 
         RemoteEditor activeEditor = remoteEditorManager.getEditorState(jumpTo)
             .getActiveEditor();
 
         // you can't follow yourself
-        if (sarosSession.getLocalUser().equals(jumpTo))
+        if (session.getLocalUser().equals(jumpTo))
             return;
 
         if (activeEditor == null) {
@@ -1848,23 +1799,18 @@ public class EditorManager extends AbstractActivityProducer {
      * @param lock
      *            if true then editors are locked, otherwise they are unlocked
      */
-    protected void lockAllEditors(boolean lock) {
+    private void lockAllEditors(boolean lock) {
         if (lock)
             log.debug("Lock all editors");
         else
             log.debug("Unlock all editors");
-        editorPool
-            .setWriteAccessEnabled(!lock && sarosSession.hasWriteAccess());
+        editorPool.setWriteAccessEnabled(!lock && session.hasWriteAccess());
 
         isLocked = lock;
     }
 
     public Set<SPath> getRemoteOpenEditors() {
         return remoteEditorManager.getRemoteOpenEditors();
-    }
-
-    public void colorChanged() {
-        this.execColorChanged();
     }
 
     /**
@@ -1877,6 +1823,8 @@ public class EditorManager extends AbstractActivityProducer {
      *         <code>false</code> otherwise
      */
     public boolean isOpenEditor(SPath path) {
+        checkThreadAccess();
+
         if (path == null)
             throw new IllegalArgumentException("path must not be null");
 
@@ -1901,6 +1849,8 @@ public class EditorManager extends AbstractActivityProducer {
      *            Path of the Editor to open.
      */
     public void openEditor(SPath path) {
+        checkThreadAccess();
+
         if (path == null)
             throw new IllegalArgumentException();
 
@@ -1914,6 +1864,8 @@ public class EditorManager extends AbstractActivityProducer {
      *            Path of the file of which the editor should be closed
      */
     public void closeEditor(SPath path) {
+        checkThreadAccess();
+
         if (path == null)
             throw new IllegalArgumentException("path must not be null");
 
@@ -2134,5 +2086,10 @@ public class EditorManager extends AbstractActivityProducer {
         }
 
         viewer.setTopIndex(Math.max(0, Math.min(topPosition, lines)));
+    }
+
+    private void checkThreadAccess() {
+        if (!SWTUtils.isSWT())
+            throw new IllegalStateException("method must be invoked from EDT");
     }
 }

@@ -101,12 +101,6 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             List<FileList> fileLists = getRemoteFileList(monitor);
             monitor.subTask("");
 
-            /*
-             * FIXME why do we unlock the editors here when we are going to
-             * block ourself in the next call ?!
-             */
-            editorManager.setAllLocalOpenedEditorsLocked(false);
-
             List<StartHandle> stoppedUsers = null;
             try {
                 stoppedUsers = stopUsers(monitor);
@@ -341,7 +335,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
         // FIXME this throws a NPE if the session has already been stopped
         for (SPath path : editorManager.getOpenEditorsOfAllParticipants())
-            editorManager.saveText(path);
+            editorManager.saveLazy(path);
 
         checkCancellation(CancelOption.NOTIFY_PEER);
 

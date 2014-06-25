@@ -289,7 +289,7 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
             return;
 
         if (editorManager.isOpened(spath)
-            || editorManager.isConnected((IFile) resource
+            || editorManager.isManaged((IFile) resource
                 .getAdapter(IFile.class)))
             return;
 

@@ -22,7 +22,6 @@ package de.fu_berlin.inf.dpp.project;
 import static java.text.MessageFormat.format;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileNotFoundException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -526,19 +525,11 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
 
     private void handleFileRecovery(FileActivity activity) throws CoreException {
         SPath path = activity.getPath();
-        IFile file = ((EclipseFileImpl) activity.getPath().getFile())
-            .getDelegate();
 
         log.debug("performing recovery for file: "
             + activity.getPath().getFullPath());
 
-        try {
-            if (file.exists())
-                editorManager.saveLazy(path);
-
-        } catch (FileNotFoundException e) {
-            log.warn("file " + file + " no longer exists");
-        }
+        editorManager.saveLazy(path);
 
         boolean editorWasOpen = editorManager.isOpenEditor(path);
 

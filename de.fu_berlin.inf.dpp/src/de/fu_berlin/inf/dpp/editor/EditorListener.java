@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.fu_berlin.inf.dpp.editor.internal;
+package de.fu_berlin.inf.dpp.editor;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.text.ITextListener;
@@ -23,7 +23,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.ui.IEditorPart;
 
-import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 
 /**
  * Listener for tracking the selection and viewport of an IEditorPart and

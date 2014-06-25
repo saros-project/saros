@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.concurrent.watchdog;
 
-import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -279,13 +278,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer {
                 if (cancelRecovery.get() || monitor.isCanceled())
                     return;
 
-                // Save document before asking host to resend
-                try {
-                    editorManager.saveLazy(path);
-                } catch (FileNotFoundException e) {
-                    // Sending the checksum error message should recreate
-                    // this file
-                }
+                editorManager.saveLazy(path);
             }
 
             if (cancelRecovery.get())
