@@ -29,14 +29,16 @@ public class FileActivity extends AbstractResourceActivity {
         MOVED
     }
 
-    @XStreamAsAttribute
-    protected final Type type;
-
-    // why no @XStreamAsAttribute ?
     protected final SPath oldPath;
 
     @XStreamAsAttribute
+    protected final Type type;
+
+    @XStreamAsAttribute
     protected final Purpose purpose;
+
+    @XStreamAsAttribute
+    protected String encoding;
 
     protected final byte[] content;
 
@@ -48,11 +50,13 @@ public class FileActivity extends AbstractResourceActivity {
      *            path referencing the newly created file
      * @param content
      *            content of the file denoted by the path
+     * @param encoding
+     *            the encoding the content is encoded with or <code>null</code>
      */
     public static FileActivity created(User source, SPath path, byte[] content,
-        Purpose purpose) {
+        String encoding, Purpose purpose) {
         return new FileActivity(source, Type.CREATED, path, null, content,
-            purpose);
+            encoding, purpose);
     }
 
     /**
@@ -69,12 +73,14 @@ public class FileActivity extends AbstractResourceActivity {
      *            content of the file denoted by the path, may be
      *            <code>null</code> to indicate that the file content was not
      *            changed when moved
+     * @param encoding
+     *            the encoding the content is encoded with or <code>null</code>
      */
     public static FileActivity moved(User source, SPath destPath,
-        SPath sourcePath, byte[] content) {
+        SPath sourcePath, byte[] content, String encoding) {
 
         return new FileActivity(source, Type.MOVED, destPath, sourcePath,
-            content, Purpose.ACTIVITY);
+            content, encoding, Purpose.ACTIVITY);
     }
 
     /**
@@ -85,7 +91,8 @@ public class FileActivity extends AbstractResourceActivity {
      */
     public static FileActivity removed(User source, SPath path, Purpose purpose) {
 
-        return new FileActivity(source, Type.REMOVED, path, null, null, purpose);
+        return new FileActivity(source, Type.REMOVED, path, null, null, null,
+            purpose);
     }
 
     /**
@@ -103,9 +110,11 @@ public class FileActivity extends AbstractResourceActivity {
      * @param content
      *            content of the file denoted by the path (only valid for
      *            {@link Type#CREATED} and {@link Type#MOVED})
+     * @param encoding
+     *            the encoding the content is encoded with or <code>null</code>
      */
     public FileActivity(User source, Type type, SPath newPath, SPath oldPath,
-        byte[] content, Purpose purpose) {
+        byte[] content, String encoding, Purpose purpose) {
 
         super(source, newPath);
 
@@ -134,6 +143,7 @@ public class FileActivity extends AbstractResourceActivity {
         this.type = type;
         this.oldPath = oldPath;
         this.content = content;
+        this.encoding = encoding;
         this.purpose = purpose;
     }
 
@@ -157,23 +167,34 @@ public class FileActivity extends AbstractResourceActivity {
     }
 
     /**
-     * @return the contents of this file for incoming file creation Activities (
-     *         if {@link #getType()} == {@link Type#CREATED}; <code>null</code>
-     *         otherwise.
+     * @return the content of this file or <code>null</code> if not available
      *         <p>
-     *         <b>Important:</b> the returned byte array must <b>not</b> mutated
+     *         <b>Important:</b> the content of the array must <b>not</b> be
+     *         changed
+     * 
+     * @see #created(User, SPath, byte[], String, Purpose)
+     * @see #moved(User, SPath, SPath, byte[], String)
      */
     public byte[] getContent() {
         return content;
     }
 
+    /**
+     * Returns the encoding the content is encoded with.
+     * 
+     * @return the encoding or <code>null</code> if it is not available
+     */
+    public String getEncoding() {
+        return encoding;
+    }
+
     @Override
     public String toString() {
-        if (type == Type.MOVED)
-            return "FileActivity(type: Moved, old path: " + oldPath
-                + ", new path: " + getPath() + ")";
-
-        return "FileActivity(type: " + type + ", path: " + getPath() + ")";
+        return "FileActivity [dst:path=" + getPath() + ", src:path="
+            + (oldPath == null ? "N/A" : oldPath) + ", type=" + type
+            + ", encoding=" + (encoding == null ? "N/A" : encoding)
+            + ", content=" + (content == null ? "0" : content.length)
+            + " byte(s)]";
     }
 
     @Override
@@ -212,7 +233,7 @@ public class FileActivity extends AbstractResourceActivity {
         if (!Arrays.equals(content, other.content))
             return false;
 
-        return true;
+        return ObjectUtils.equals(encoding, other.encoding);
     }
 
     @Override

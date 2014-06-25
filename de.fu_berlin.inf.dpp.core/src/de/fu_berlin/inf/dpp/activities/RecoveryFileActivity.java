@@ -21,19 +21,15 @@ public class RecoveryFileActivity extends FileActivity implements
     @XStreamAsAttribute
     private User target;
 
-    @XStreamAsAttribute
-    private String encoding;
-
     public RecoveryFileActivity(User source, User target, Type type,
         SPath newPath, SPath oldPath, byte[] data, String encoding) {
 
-        super(source, type, newPath, oldPath, data, Purpose.RECOVERY);
+        super(source, type, newPath, oldPath, data, encoding, Purpose.RECOVERY);
 
         if (target == null)
             throw new IllegalArgumentException("target must not be null");
 
         this.target = target;
-        this.encoding = encoding;
     }
 
     @Override
@@ -44,15 +40,6 @@ public class RecoveryFileActivity extends FileActivity implements
     @Override
     public User getTarget() {
         return target;
-    }
-
-    /**
-     * Returns the encoding the content is encoded with.
-     * 
-     * @return the encoding or <code>null</code> if it is not available
-     */
-    public String getEncoding() {
-        return encoding;
     }
 
     /**
@@ -70,14 +57,12 @@ public class RecoveryFileActivity extends FileActivity implements
      *            content of the file denoted by the path
      * @param target
      *            The User this Activity will be send to.
-     * @param encoding
-     *            the encoding the content is encoded with or <code>null</code>
      */
     public static RecoveryFileActivity created(User source, SPath path,
         byte[] content, User target, String encoding) {
 
         FileActivity fileActivity = FileActivity.created(source, path, content,
-            Purpose.RECOVERY);
+            encoding, Purpose.RECOVERY);
 
         return createFromFileActivity(fileActivity, target, encoding);
     }
@@ -132,9 +117,10 @@ public class RecoveryFileActivity extends FileActivity implements
 
     @Override
     public String toString() {
-        return "RecoveryFileActivity [target=" + target + ", encoding="
-            + encoding + ", type=" + type + ", oldPath=" + oldPath
-            + ", content=" + (content == null ? "0" : content.length)
-            + " byte(s)]";
+        return "RecoveryFileActivity [target=" + target + ", dst:path="
+            + getPath() + ", src:path=" + (oldPath == null ? "N/A" : oldPath)
+            + ", type=" + type + ", encoding="
+            + (encoding == null ? "N/A" : encoding) + ", content="
+            + (content == null ? "0" : content.length) + " byte(s)]";
     }
 }

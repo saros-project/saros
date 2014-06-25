@@ -60,7 +60,6 @@ import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IResourceActivity;
-import de.fu_berlin.inf.dpp.activities.RecoveryFileActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.VCSActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -657,10 +656,7 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
         IFile file = ((EclipseFileImpl) activity.getPath().getFile())
             .getDelegate();
 
-        String encoding = null;
-
-        if (activity.isRecovery())
-            encoding = ((RecoveryFileActivity) activity).getEncoding();
+        final String encoding = activity.getEncoding();
 
         byte[] actualContent = FileUtils.getLocalFileContent(file);
         byte[] newContent = activity.getContent();

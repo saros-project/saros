@@ -216,7 +216,8 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
                 log.error("could not read contents of file: "
                     + resource.getFullPath());
             else
-                addActivity(FileActivity.created(user, spath, content,
+                // TODO add encoding
+                addActivity(FileActivity.created(user, spath, content, null,
                     Purpose.ACTIVITY));
 
         } else {
@@ -241,12 +242,13 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
                 throw new IOException();
         }
 
+        // TODO add encoding
         addActivity(FileActivity.moved(
             user,
             new SPath(ResourceAdapterFactory.create(resource)),
             new SPath(ResourceAdapterFactory.create(oldProject),
                 ResourceAdapterFactory.create(oldFullPath
-                    .removeFirstSegments(1))), content));
+                    .removeFirstSegments(1))), content, null));
     }
 
     protected void remove(IResource resource) {
@@ -289,8 +291,8 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
             return;
 
         if (editorManager.isOpened(spath)
-            || editorManager.isManaged((IFile) resource
-                .getAdapter(IFile.class)))
+            || editorManager
+                .isManaged((IFile) resource.getAdapter(IFile.class)))
             return;
 
         log.debug("Resource " + resource.getName() + " changed");
@@ -303,8 +305,9 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
         if (content == null)
             log.error("could not read contents of file: "
                 + resource.getFullPath());
+        // TODO add encoding
         else
-            addActivity(FileActivity.created(user, spath, content,
+            addActivity(FileActivity.created(user, spath, content, null,
                 Purpose.ACTIVITY));
     }
 
