@@ -35,7 +35,8 @@ public class ShareFilesToProjectsWithDifferentEncodingTest extends StfTestCase {
     }
 
     @Test
-    public void testShareFilesWithDifferentProjectEncodings() throws Exception {
+    public void testShareFilesWithDifferentProjectEncodingsAndRecovery()
+        throws Exception {
 
         createProjects("UTF-8", "UTF-16");
 
@@ -53,6 +54,15 @@ public class ShareFilesToProjectsWithDifferentEncodingTest extends StfTestCase {
         BOB.superBot().views().packageExplorerView()
             .selectFile("foo", "Herr Mannelig.txt").open();
         BOB.remoteBot().editor("Herr Mannelig.txt").waitUntilIsActive();
+
+        // Watchdog needs up to 10 seconds to kick in
+        Thread.sleep(10000);
+
+        // 10 seconds + 5 seconds default timeout < Watchdog update period
+        // FIXME fix waitUntilIsInconsistencyDetected
+        BOB.superBot().views().sarosView().waitUntilIsInconsistencyDetected();
+
+        BOB.superBot().views().sarosView().resolveInconsistency();
 
         assertEquals(ALICE.remoteBot().editor("Herr Mannelig.txt").getText(),
             BOB.remoteBot().editor("Herr Mannelig.txt").getText());
@@ -107,7 +117,7 @@ public class ShareFilesToProjectsWithDifferentEncodingTest extends StfTestCase {
     }
 
     @Test
-    public void testShareFilesWithDifferentProjectEncodingsAndRecovery()
+    public void testShareFilesWithDifferentFileEncodingsAndRecovery()
         throws Exception {
 
         createProjects("UTF-8", "UTF-8");

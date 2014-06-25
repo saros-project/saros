@@ -24,6 +24,7 @@ import static java.text.MessageFormat.format;
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -60,6 +61,7 @@ import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IResourceActivity;
+import de.fu_berlin.inf.dpp.activities.RecoveryFileActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.VCSActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -567,6 +569,71 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
         consistencyWatchdogClient.performCheck(path);
     }
 
+    /**
+     * Updates encoding of a file. A best effort is made to use the inherited
+     * encoding if available. Does nothing if the file does not exist or the
+     * encoding to set is <code>null</code>
+     * 
+     * @param encoding
+     *            the encoding that should be used
+     * @param file
+     *            the file to update
+     * @throws CoreException
+     *             if setting the encoding failed
+     */
+    private void updateFileEncoding(final String encoding, final IFile file)
+        throws CoreException {
+
+        if (encoding == null)
+            return;
+
+        if (!file.exists())
+            return;
+
+        try {
+            Charset.forName(encoding);
+        } catch (Exception e) {
+            log.warn("encoding " + encoding + " for file " + file
+                + " is not available on this platform", e);
+            return;
+        }
+
+        String projectEncoding = null;
+        String fileEncoding = null;
+
+        try {
+            projectEncoding = file.getProject().getDefaultCharset();
+        } catch (CoreException e) {
+            log.warn(
+                "could not determine project encoding for project "
+                    + file.getProject(), e);
+        }
+
+        try {
+            fileEncoding = file.getCharset();
+        } catch (CoreException e) {
+            log.warn("could not determine file encoding for file " + file, e);
+        }
+
+        if (encoding.equals(fileEncoding)) {
+            log.debug("encoding does not need to be changed for file: " + file);
+            return;
+        }
+
+        // use inherited encoding if possible
+        if (encoding.equals(projectEncoding)) {
+            log.debug("changing encoding for file " + file
+                + " to use default project encoding: " + projectEncoding);
+            file.setCharset(null, new NullProgressMonitor());
+            return;
+        }
+
+        log.debug("changing encoding for file " + file + " to encoding: "
+            + encoding);
+
+        file.setCharset(encoding, new NullProgressMonitor());
+    }
+
     private void handleFileMove(FileActivity activity) throws CoreException {
         IPath newFilePath = ((EclipsePathImpl) activity.getPath().getFile()
             .getFullPath()).getDelegate();
@@ -578,7 +645,7 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
             .getDelegate());
         FileUtils.move(newFilePath, oldResource);
 
-        if (activity.getContents() == null)
+        if (activity.getContent() == null)
             return;
 
         handleFileCreation(activity);
@@ -599,15 +666,23 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
         IFile file = ((EclipseFileImpl) activity.getPath().getFile())
             .getDelegate();
 
+        String encoding = null;
+
+        if (activity.isRecovery())
+            encoding = ((RecoveryFileActivity) activity).getEncoding();
+
         byte[] actualContent = FileUtils.getLocalFileContent(file);
-        byte[] newContent = activity.getContents();
+        byte[] newContent = activity.getContent();
 
         if (!Arrays.equals(newContent, actualContent)) {
             FileUtils.writeFile(new ByteArrayInputStream(newContent), file,
                 new NullProgressMonitor());
         } else {
-            log.info("FileActivity " + activity + " dropped (same content)");
+            log.debug("FileActivity " + activity + " dropped (same content)");
         }
+
+        if (encoding != null)
+            updateFileEncoding(encoding, file);
     }
 
     protected void handleFolderActivity(FolderActivity activity)

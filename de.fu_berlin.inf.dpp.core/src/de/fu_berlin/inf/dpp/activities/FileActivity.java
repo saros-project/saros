@@ -32,12 +32,13 @@ public class FileActivity extends AbstractResourceActivity {
     @XStreamAsAttribute
     protected final Type type;
 
+    // why no @XStreamAsAttribute ?
     protected final SPath oldPath;
 
     @XStreamAsAttribute
     protected final Purpose purpose;
 
-    protected final byte[] data;
+    protected final byte[] content;
 
     /**
      * Utility method for creating a FileActivity of type {@link Type#CREATED}
@@ -99,12 +100,12 @@ public class FileActivity extends AbstractResourceActivity {
      * @param oldPath
      *            if type is {@link Type#MOVED}, the path from where the file
      *            was moved (<code>null</code> otherwise)
-     * @param data
-     *            data of the file to be created (only valid for
+     * @param content
+     *            content of the file denoted by the path (only valid for
      *            {@link Type#CREATED} and {@link Type#MOVED})
      */
     public FileActivity(User source, Type type, SPath newPath, SPath oldPath,
-        byte[] data, Purpose purpose) {
+        byte[] content, Purpose purpose) {
 
         super(source, newPath);
 
@@ -117,11 +118,11 @@ public class FileActivity extends AbstractResourceActivity {
 
         switch (type) {
         case CREATED:
-            if (data == null || oldPath != null)
+            if (content == null || oldPath != null)
                 throw new IllegalArgumentException();
             break;
         case REMOVED:
-            if (data != null || oldPath != null)
+            if (content != null || oldPath != null)
                 throw new IllegalArgumentException();
             break;
         case MOVED:
@@ -132,7 +133,7 @@ public class FileActivity extends AbstractResourceActivity {
 
         this.type = type;
         this.oldPath = oldPath;
-        this.data = data;
+        this.content = content;
         this.purpose = purpose;
     }
 
@@ -148,20 +149,22 @@ public class FileActivity extends AbstractResourceActivity {
      * files.
      */
     public SPath getOldPath() {
-        return this.oldPath;
+        return oldPath;
     }
 
     public Type getType() {
-        return this.type;
+        return type;
     }
 
     /**
      * @return the contents of this file for incoming file creation Activities (
      *         if {@link #getType()} == {@link Type#CREATED}; <code>null</code>
      *         otherwise.
+     *         <p>
+     *         <b>Important:</b> the returned byte array must <b>not</b> mutated
      */
-    public byte[] getContents() {
-        return this.data;
+    public byte[] getContent() {
+        return content;
     }
 
     @Override
@@ -177,7 +180,7 @@ public class FileActivity extends AbstractResourceActivity {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + Arrays.hashCode(data);
+        result = prime * result + Arrays.hashCode(content);
         result = prime * result + ObjectUtils.hashCode(oldPath);
         result = prime * result + ObjectUtils.hashCode(type);
         result = prime * result + ObjectUtils.hashCode(purpose);
@@ -188,20 +191,25 @@ public class FileActivity extends AbstractResourceActivity {
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
+
         if (!super.equals(obj))
             return false;
+
         if (!(obj instanceof FileActivity))
             return false;
 
         FileActivity other = (FileActivity) obj;
 
-        if (this.type != other.type)
+        if (type != other.type)
             return false;
-        if (this.purpose != other.purpose)
+
+        if (purpose != other.purpose)
             return false;
-        if (!ObjectUtils.equals(this.oldPath, other.oldPath))
+
+        if (!ObjectUtils.equals(oldPath, other.oldPath))
             return false;
-        if (!Arrays.equals(this.data, other.data))
+
+        if (!Arrays.equals(content, other.content))
             return false;
 
         return true;

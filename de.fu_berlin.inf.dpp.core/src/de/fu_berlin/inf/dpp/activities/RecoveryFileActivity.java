@@ -21,8 +21,11 @@ public class RecoveryFileActivity extends FileActivity implements
     @XStreamAsAttribute
     private User target;
 
+    @XStreamAsAttribute
+    private String encoding;
+
     public RecoveryFileActivity(User source, User target, Type type,
-        SPath newPath, SPath oldPath, byte[] data) {
+        SPath newPath, SPath oldPath, byte[] data, String encoding) {
 
         super(source, type, newPath, oldPath, data, Purpose.RECOVERY);
 
@@ -30,6 +33,7 @@ public class RecoveryFileActivity extends FileActivity implements
             throw new IllegalArgumentException("target must not be null");
 
         this.target = target;
+        this.encoding = encoding;
     }
 
     @Override
@@ -40,6 +44,15 @@ public class RecoveryFileActivity extends FileActivity implements
     @Override
     public User getTarget() {
         return target;
+    }
+
+    /**
+     * Returns the encoding the content is encoded with.
+     * 
+     * @return the encoding or <code>null</code> if it is not available
+     */
+    public String getEncoding() {
+        return encoding;
     }
 
     /**
@@ -57,14 +70,16 @@ public class RecoveryFileActivity extends FileActivity implements
      *            content of the file denoted by the path
      * @param target
      *            The User this Activity will be send to.
+     * @param encoding
+     *            the encoding the content is encoded with or <code>null</code>
      */
     public static RecoveryFileActivity created(User source, SPath path,
-        byte[] content, User target) {
+        byte[] content, User target, String encoding) {
 
         FileActivity fileActivity = FileActivity.created(source, path, content,
             Purpose.RECOVERY);
 
-        return createFromFileActivity(fileActivity, target);
+        return createFromFileActivity(fileActivity, target, encoding);
     }
 
     /**
@@ -81,32 +96,45 @@ public class RecoveryFileActivity extends FileActivity implements
      *            The SPath of the affected resource.
      * @param target
      *            The User this Activity will be send to.
+     * @param encoding
+     *            the encoding the content is encoded with or <code>null</code>
      */
     public static RecoveryFileActivity removed(User source, SPath path,
-        User target) {
+        User target, String encoding) {
 
         FileActivity fileActivity = FileActivity.removed(source, path,
             Purpose.RECOVERY);
 
-        return createFromFileActivity(fileActivity, target);
+        return createFromFileActivity(fileActivity, target, encoding);
     }
 
     /**
-     * This method creates a RecoveryFileActivity from a given FileActivity. The
-     * Purpose of the FileActivity has to be
-     * {@link FileActivity.Purpose#RECOVERY}
+     * Creates a RecoveryFileActivity from a given FileActivity. The Purpose of
+     * the FileActivity has to be {@link FileActivity.Purpose#RECOVERY}
      * 
      * @param activity
      *            The FileActivity to be transformed
      * @param target
      *            The User this Activity should be send to
+     * @param encoding
+     *            the encoding the content is encoded with or <code>null</code>
      */
-    public static RecoveryFileActivity createFromFileActivity(
-        FileActivity activity, User target) {
-        if (activity.purpose != Purpose.RECOVERY) {
+    private static RecoveryFileActivity createFromFileActivity(
+        FileActivity activity, User target, String encoding) {
+
+        if (activity.purpose != Purpose.RECOVERY)
             throw new IllegalArgumentException();
-        }
+
         return new RecoveryFileActivity(activity.getSource(), target,
-            activity.type, activity.getPath(), activity.oldPath, activity.data);
+            activity.type, activity.getPath(), activity.oldPath,
+            activity.content, encoding);
+    }
+
+    @Override
+    public String toString() {
+        return "RecoveryFileActivity [target=" + target + ", encoding="
+            + encoding + ", type=" + type + ", oldPath=" + oldPath
+            + ", content=" + (content == null ? "0" : content.length)
+            + " byte(s)]";
     }
 }

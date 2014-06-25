@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.concurrent.watchdog;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.concurrent.CancellationException;
@@ -201,8 +200,9 @@ public class ConsistencyWatchdogHandler extends AbstractActivityProducer
             for (SPath path : checksumError.getPaths()) {
                 progress.subTask("Recovering file: "
                     + path.getProjectRelativePath());
-                recoverFile(checksumError.getSource(), sarosSession, path,
-                    progress.newChild(1));
+                recoverFile(checksumError.getSource(), sarosSession, path);
+
+                progress.worked(1);
             }
 
             // Tell the user that we sent all files
@@ -217,10 +217,8 @@ public class ConsistencyWatchdogHandler extends AbstractActivityProducer
      * Recover a single file for the given user (that is either send the file or
      * tell the user to remove it).
      */
-    protected void recoverFile(User from, final ISarosSession sarosSession,
-        final SPath path, SubMonitor progress) {
-
-        progress.beginTask("Handling file: " + path.toString(), 10);
+    protected void recoverFile(final User from,
+        final ISarosSession sarosSession, final SPath path) {
 
         IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
 
@@ -233,61 +231,59 @@ public class ConsistencyWatchdogHandler extends AbstractActivityProducer
                     e);
             }
         }
-        progress.worked(1);
 
         // Reset jupiter
         sarosSession.getConcurrentDocumentServer().reset(from, path);
 
-        progress.worked(1);
         final User user = sarosSession.getLocalUser();
 
-        if (file.exists()) {
-
-            try {
-
-                byte[] content = FileUtils.getLocalFileContent(file);
-
-                if (content == null)
-                    throw new IOException();
-
-                // Send the file to client
-                fireActivity(RecoveryFileActivity.created(user, path, content,
-                    from));
-
-                // Immediately follow up with a new checksum
-                IDocument doc;
-                FileEditorInput input = new FileEditorInput(file);
-                IDocumentProvider provider = EditorManager
-                    .getDocumentProvider(input);
-                try {
-                    provider.connect(input);
-                    doc = provider.getDocument(input);
-
-                    final DocumentChecksum checksum = new DocumentChecksum(path);
-                    checksum.bind(doc);
-                    checksum.update();
-
-                    fireActivity(new ChecksumActivity(user, path,
-                        checksum.getHash(), checksum.getLength(), null));
-                } catch (CoreException e) {
-                    log.warn("Could not check checksum of file "
-                        + path.toString());
-                } finally {
-                    provider.disconnect(input);
-                }
-
-            } catch (IOException e) {
-                log.error("File could not be read, despite existing: " + path,
-                    e);
-            }
-        } else {
+        if (!file.exists()) {
             // TODO Warn the user...
             // Tell the client to delete the file
-            fireActivity(RecoveryFileActivity.removed(user, path, from));
+            fireActivity(RecoveryFileActivity.removed(user, path, from, null));
             fireActivity(ChecksumActivity.missing(user, path));
-
-            progress.worked(8);
+            return;
         }
-        progress.done();
+
+        String charset = null;
+
+        try {
+            charset = file.getCharset();
+        } catch (CoreException e) {
+            log.error("could not determine encoding for file: " + file, e);
+        }
+
+        byte[] content = FileUtils.getLocalFileContent(file);
+
+        if (content == null) {
+            log.error("could not read file: " + file);
+            return;
+        }
+
+        fireActivity(RecoveryFileActivity.created(user, path, content, from,
+            charset));
+
+        /*
+         * immediately follow up with a new checksum to the remote side can
+         * verify the recovered file
+         */
+        FileEditorInput input = new FileEditorInput(file);
+        IDocumentProvider provider = EditorManager.getDocumentProvider(input);
+
+        try {
+            provider.connect(input);
+            IDocument doc = provider.getDocument(input);
+
+            final DocumentChecksum checksum = new DocumentChecksum(path);
+            checksum.bind(doc);
+            checksum.update();
+
+            fireActivity(new ChecksumActivity(user, path, checksum.getHash(),
+                checksum.getLength(), null));
+        } catch (CoreException e) {
+            log.warn("could not check checksum of file: " + file, e);
+        } finally {
+            provider.disconnect(input);
+        }
     }
 }
