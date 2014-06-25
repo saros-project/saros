@@ -34,7 +34,6 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.EclipseProjectImpl;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
@@ -43,7 +42,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
-import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
+import de.fu_berlin.inf.dpp.vcs.VCSProvider;
 
 public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
@@ -460,13 +459,13 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         /*
          * FIXME must be calculated while the session is blocked !
          */
-        SubMonitor subMonitor = SubMonitor
+        SubMonitor progress = SubMonitor
             .convert(
                 monitor,
                 "Creating file list and calculating file checksums. This may take a while...",
                 projectsToShare.size());
 
-        List<ProjectNegotiationData> pInfos = new ArrayList<ProjectNegotiationData>(
+        List<ProjectNegotiationData> negData = new ArrayList<ProjectNegotiationData>(
             projectsToShare.size());
 
         for (IProject project : projectsToShare) {
@@ -476,13 +475,11 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                     CancelOption.DO_NOT_NOTIFY_PEER);
             try {
 
-                VCSAdapter vcs = null;
+                VCSProvider vcs = null;
 
-                if (sarosSession.useVersionControl()) {
-                    vcs = VCSAdapter
-                        .getAdapter((org.eclipse.core.resources.IProject) ResourceAdapterFactory
-                            .convertBack(project));
-
+                if (sarosSession.useVersionControl()
+                    && vcsProviderFactory != null) {
+                    vcs = vcsProviderFactory.getProvider(project);
                     // TODO how to handle this if no adapter is available ?
                     // if(vcs == null)
                 }
@@ -490,17 +487,17 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 FileList projectFileList = FileListFactory.createFileList(
                     project, sarosSession.getSharedResources(project),
                     checksumCache, vcs, ProgressMonitorAdapterFactory
-                        .convertTo(subMonitor.newChild(1)));
+                        .convertTo(progress.newChild(1)));
 
                 boolean partial = !sarosSession.isCompletelyShared(project);
 
                 String projectID = sarosSession.getProjectID(project);
                 projectFileList.setProjectID(projectID);
 
-                ProjectNegotiationData pInfo = new ProjectNegotiationData(
+                ProjectNegotiationData data = new ProjectNegotiationData(
                     projectID, project.getName(), partial, projectFileList);
 
-                pInfos.add(pInfo);
+                negData.add(data);
 
             } catch (IOException e) {
                 /*
@@ -514,9 +511,9 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             }
         }
 
-        subMonitor.done();
+        progress.done();
 
-        return pInfos;
+        return negData;
     }
 
     /**

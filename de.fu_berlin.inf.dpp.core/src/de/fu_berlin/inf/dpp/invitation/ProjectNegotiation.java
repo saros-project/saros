@@ -26,6 +26,7 @@ import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.vcs.VCSProviderFactory;
 
 /**
  * This abstract class is the superclass for {@link OutgoingProjectNegotiation}
@@ -67,6 +68,8 @@ public abstract class ProjectNegotiation extends CancelableProcess {
     @Inject
     protected IReceiver xmppReceiver;
 
+    @Inject
+    protected VCSProviderFactory vcsProviderFactory;
     /**
      * The file transfer manager can be <code>null</code> if no connection was
      * established or was lost when the class was instantiated.
