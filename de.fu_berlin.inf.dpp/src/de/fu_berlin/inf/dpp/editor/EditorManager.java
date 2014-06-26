@@ -258,7 +258,7 @@ public class EditorManager extends AbstractActivityProducer {
             SWTUtils.runSafeSWTSync(log, new Runnable() {
                 @Override
                 public void run() {
-                    lockAllEditors(true);
+                    lockAllEditors(lock);
                 }
             });
         }
@@ -502,7 +502,7 @@ public class EditorManager extends AbstractActivityProducer {
         addSharedEditorListener(sharedEditorListener);
     }
 
-    // FIXME thread access (used by ProjectDeltaVisitor which may NOT run from
+    // FIXME thread access (used by ProjectDeltaVisitor which might NOT run from
     // the SWT Thread
     public boolean isManaged(IFile file) {
         return connectedFiles.contains(file);
@@ -1218,7 +1218,7 @@ public class EditorManager extends AbstractActivityProducer {
      * @return <code>true</code> if the given resource is opened according to
      *         the editor pool.
      */
-    // FIXME thread access (used by ProjectDeltaVisitor which may NOT run from
+    // FIXME thread access (used by ProjectDeltaVisitor which might NOT run from
     // the SWT Thread
     public boolean isOpened(SPath path) {
         return this.editorPool.getEditors(path).size() > 0;
@@ -1383,10 +1383,8 @@ public class EditorManager extends AbstractActivityProducer {
                     log.warn("could not save editor: " + path, e);
                 }
 
-                if (!isDirty)
-                    return;
-
-                saveEditor(path);
+                if (isDirty)
+                    saveEditor(path);
             }
         });
     }
@@ -1607,15 +1605,15 @@ public class EditorManager extends AbstractActivityProducer {
         }
     }
 
-    // FIXME this is used from ChangeColorManager which should not about this
-    // component at all
+    // FIXME this is used from ChangeColorManager which should not knwo anything
+    // about this component at all
     public void refreshAnnotations() {
         for (IEditorPart part : editorPool.getAllEditors()) {
             refreshAnnotations(part);
         }
     }
 
-    // FIXME see above
+    // FIXME see #refreshAnnotations()
     public void colorChanged() {
         this.execColorChanged();
     }
