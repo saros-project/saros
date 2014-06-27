@@ -45,6 +45,7 @@ public class ChatDisplay extends ScrolledComposite {
         super(parent, style);
 
         this.contentComposite = new Composite(this, SWT.NONE);
+        this.contentComposite.setBackgroundMode(SWT.INHERIT_DEFAULT);
         this.setContent(contentComposite);
         this.setExpandHorizontal(true);
         this.setExpandVertical(true);

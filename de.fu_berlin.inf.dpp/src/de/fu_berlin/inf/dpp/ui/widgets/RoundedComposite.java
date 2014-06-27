@@ -6,8 +6,10 @@ import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
 import de.fu_berlin.inf.dpp.ui.util.ColorUtils;
@@ -19,12 +21,10 @@ import de.fu_berlin.inf.dpp.ui.util.PaintUtils;
  * <p>
  * The composite's content is surrounded by a rounded rectangle if a background
  * is set.
- * <p>
- * <img src="doc-files/RoundedComposite-1.png"/>
  * 
  * <dl>
  * <dt><b>Styles:</b></dt>
- * <dd>SEPARATOR, BORDER, NO_BACKGROUND and those supported by Composite</dd>
+ * <dd>SEPARATOR, and those supported by Composite excluding NO_BACKGROUND</dd>
  * <dt><b>Events:</b></dt>
  * <dd>(none)</dd>
  * </dl>
@@ -43,12 +43,12 @@ import de.fu_berlin.inf.dpp.ui.util.PaintUtils;
  * @author bkahlert
  * 
  */
-public class RoundedComposite extends Composite {
+public class RoundedComposite extends Canvas {
     /**
      * style constants not passed to parent constructor
      */
-    protected static final int STYLES = SWT.SEPARATOR | SWT.BORDER
-        | SWT.NO_BACKGROUND;
+    protected static final int STYLES = SWT.SEPARATOR | SWT.BORDER;
+
     protected int style;
 
     /**
@@ -57,81 +57,33 @@ public class RoundedComposite extends Composite {
      */
     private static final float BORDER_LIGHTNESS_SCALE = 0.85f;
 
-    protected Color backgroundColor;
-    protected Color borderColor;
+    protected Color border;
+
+    private final Composite parent;
 
     public RoundedComposite(Composite parent, final int style) {
-        super(parent, style & ~STYLES);
+        super(parent, (style | SWT.NO_BACKGROUND) & ~STYLES);
         this.style = style & STYLES;
+        this.parent = parent;
 
-        /*
-         * Checks whether to display a border
-         */
-        this.style = style & ~SWT.BORDER;
-
-        /*
-         * Make sure child widgets respect transparency
-         */
-        // this.setBackgroundMode(SWT.INHERIT_DEFAULT);
-
-        /*
-         * Updates the rounded rectangle background.
-         */
-        this.addPaintListener(new PaintListener() {
+        addPaintListener(new PaintListener() {
             @Override
             public void paintControl(PaintEvent e) {
-                if (RoundedComposite.this.backgroundColor == null)
-                    return;
-
-                Rectangle bounds = RoundedComposite.this.getBounds();
-                Rectangle clientArea = RoundedComposite.this.getClientArea();
-
-                /*
-                 * Draws the rounded background
-                 */
-                if ((style & SWT.NO_BACKGROUND) == 0) {
-                    PaintUtils.drawRoundedRectangle(e.gc, clientArea,
-                        RoundedComposite.this.backgroundColor);
-                }
-
-                /*
-                 * Draws the border
-                 */
-                if ((style & SWT.BORDER) != 0) {
-                    if (borderColor == null || borderColor.isDisposed())
-                        borderColor = getDisplay().getSystemColor(
-                            SWT.COLOR_BLACK);
-
-                    PaintUtils.drawRoundedBorder(e.gc, clientArea, borderColor);
-                }
-
-                /*
-                 * If the control shall be displayed as a separator, we draw a
-                 * horizontal line
-                 */
-                if ((style & SWT.SEPARATOR) != 0) {
-                    e.gc.setLineWidth(PaintUtils.LINE_WEIGHT);
-                    e.gc.setForeground(RoundedComposite.this.backgroundColor);
-                    int top = (bounds.height - PaintUtils.LINE_WEIGHT) / 2;
-                    e.gc.drawLine(PaintUtils.ARC / 2, top, bounds.width
-                        - PaintUtils.ARC / 2, top);
-                }
+                paint(e);
             }
         });
 
         addDisposeListener(new DisposeListener() {
             @Override
             public void widgetDisposed(DisposeEvent e) {
-                if (borderColor != null && !borderColor.isDisposed()) {
-                    borderColor.dispose();
-                }
+                disposeBorder();
             }
         });
 
         /*
          * Set default layout
          */
-        this.setLayout(new FillLayout());
+        setLayout(new FillLayout());
     }
 
     @Override
@@ -143,7 +95,7 @@ public class RoundedComposite extends Composite {
          * display the contents
          */
         if ((style & SWT.SEPARATOR) != 0) {
-            int neededWidth = this.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
+            int neededWidth = computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
             int reduceBy = clientArea.width - neededWidth;
             clientArea.x += reduceBy;
             clientArea.width -= reduceBy;
@@ -154,16 +106,59 @@ public class RoundedComposite extends Composite {
 
     @Override
     public void setBackground(Color color) {
-        this.backgroundColor = color;
-        if (this.borderColor != null && !this.borderColor.isDisposed())
-            this.borderColor.dispose();
-        this.borderColor = ColorUtils.scaleColorBy(color,
-            BORDER_LIGHTNESS_SCALE);
-        this.redraw();
+        super.setBackground(color);
+        createBorder();
+        redraw();
     }
 
-    @Override
-    public Color getBackground() {
-        return this.backgroundColor;
+    private void disposeBorder() {
+        if (border != null && !border.isDisposed())
+            border.dispose();
+
+        border = null;
+    }
+
+    private void createBorder() {
+        disposeBorder();
+        border = ColorUtils.scaleColorBy(getBackground(),
+            BORDER_LIGHTNESS_SCALE);
+    }
+
+    /**
+     * Updates the rounded rectangle background.
+     */
+    private void paint(final PaintEvent e) {
+
+        final Color backgroundToUse = getBackground();
+        final Color borderToUser = border != null ? border : getDisplay()
+            .getSystemColor(SWT.COLOR_BLACK);
+
+        final Rectangle bounds = getBounds();
+        final Rectangle clientArea = getClientArea();
+
+        final GC gc = e.gc;
+
+        gc.setBackground(parent.getBackground());
+        gc.fillRectangle(new Rectangle(e.x, e.y, e.width, e.height));
+
+        PaintUtils.drawRoundedRectangle(gc, clientArea, backgroundToUse);
+
+        if ((style & SWT.BORDER) != 0)
+            PaintUtils.drawRoundedBorder(gc, clientArea, borderToUser);
+
+        /*
+         * If the control shall be displayed as a separator, we draw a
+         * horizontal line
+         */
+
+        // FIXME why is this using constants of another util class ?
+        if ((style & SWT.SEPARATOR) != 0) {
+            final int top = (bounds.height - PaintUtils.LINE_WEIGHT) / 2;
+
+            gc.setLineWidth(PaintUtils.LINE_WEIGHT);
+            gc.setForeground(backgroundToUse);
+            gc.drawLine(PaintUtils.ARC / 2, top, bounds.width - PaintUtils.ARC
+                / 2, top);
+        }
     }
 }
