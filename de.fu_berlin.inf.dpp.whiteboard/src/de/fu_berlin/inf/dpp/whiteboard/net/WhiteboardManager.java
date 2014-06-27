@@ -122,7 +122,7 @@ public class WhiteboardManager {
              * dispose because we do not want to be invited when not in a Saros
              * session and the transmitter will be recreated on start
              */
-            sxeTransmitter.dispose();
+            dispose();
         }
     };
 
@@ -208,7 +208,7 @@ public class WhiteboardManager {
         return controller;
     }
 
-    public void dispose() {
+    private void dispose() {
         controller.clear();
         if (sxeTransmitter != null)
             sxeTransmitter.dispose();
