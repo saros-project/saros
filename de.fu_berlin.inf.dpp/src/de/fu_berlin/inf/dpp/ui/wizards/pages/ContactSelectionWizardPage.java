@@ -21,6 +21,8 @@ import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.FilteredContactSelectionComposite;
+import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.ContactSelectionChangedEvent;
+import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.ContactSelectionListener;
 
 /**
  * Allows the user to select a {@link JID} from the {@link Roster}.
@@ -55,9 +57,21 @@ public class ContactSelectionWizardPage extends WizardPage {
     protected DiscoveryManager discoveryManager;
 
     /**
+     * This {@link ContactSelectionListener} changes the {@link WizardPage}'s
+     * state according to the selected {@link JID}s.
+     */
+    protected final ContactSelectionListener contactSelectionListener = new ContactSelectionListener() {
+
+        @Override
+        public void contactSelectionChanged(ContactSelectionChangedEvent event) {
+            updatePageCompletion();
+        }
+    };
+
+    /**
      * This listener update the page completion if someone's presence changed.
      */
-    protected DiscoveryManagerListener discoveryManagerListener = new DiscoveryManagerListener() {
+    protected final DiscoveryManagerListener discoveryManagerListener = new DiscoveryManagerListener() {
         @Override
         public void featureSupportUpdated(final JID jid, String feature,
             boolean isSupported) {
@@ -115,6 +129,9 @@ public class ContactSelectionWizardPage extends WizardPage {
          */
         contactSelectionComposite.setSelectedContacts(SelectionRetrieverFactory
             .getSelectionRetriever(JID.class).getOverallSelection());
+
+        contactSelectionComposite
+            .addContactSelectionListener(contactSelectionListener);
 
         contactSelectionComposite.setLayoutData(new GridData(SWT.FILL,
             SWT.FILL, true, true));
