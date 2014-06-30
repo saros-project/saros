@@ -565,7 +565,8 @@ public class BinaryChannelConnection implements IByteStreamConnection {
 
     @Override
     public String toString() {
-        return getMode().toString() + " " + peer;
+        return "[mode=" + getMode().toString() + ", id=" + connectionID + "]"
+            + " " + peer;
     }
 
     static class IDPool {

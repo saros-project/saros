@@ -47,7 +47,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 public class DataTransferManager implements IConnectionListener,
     IConnectionManager {
 
-    private static final Logger log = Logger
+    private static final Logger LOG = Logger
         .getLogger(DataTransferManager.class);
 
     private static final int CHUNKSIZE = 16 * 1024;
@@ -87,9 +87,6 @@ public class DataTransferManager implements IConnectionListener,
         @Override
         public void receive(final BinaryXMPPExtension extension) {
 
-            final TransferDescription description = extension
-                .getTransferDescription();
-
             boolean dispatchPacket = true;
 
             for (IPacketInterceptor packetInterceptor : packetInterceptors)
@@ -98,11 +95,12 @@ public class DataTransferManager implements IConnectionListener,
             if (!dispatchPacket)
                 return;
 
-            if (log.isTraceEnabled())
-                log.trace("[" + extension.getTransferMode()
-                    + "] received incoming transfer object: " + description
-                    + ", size: " + extension.getCompressedSize()
-                    + ", RX time: " + extension.getTransferDuration() + " ms");
+            if (LOG.isTraceEnabled())
+                LOG.trace("received binary XMPP extension: "
+                    + extension.getTransferDescription() + ", size: "
+                    + extension.getCompressedSize() + ", RX time: "
+                    + extension.getTransferDuration() + " ms ["
+                    + extension.getTransferMode() + "]");
 
             if (extension.getTransferDescription().compressContent()) {
                 byte[] payload = extension.getPayload();
@@ -111,11 +109,10 @@ public class DataTransferManager implements IConnectionListener,
                 try {
                     payload = inflate(payload);
                 } catch (IOException e) {
-                    log.error("could not decompress transfer object payload", e);
+                    LOG.error("could not decompress extension payload", e);
                     return;
                 }
 
-                // FIXME change method signature
                 extension.setPayload(compressedPayloadLenght, payload);
             }
 
@@ -137,9 +134,8 @@ public class DataTransferManager implements IConnectionListener,
             final String id = toConnectionIDToken(connectionID,
                 incomingRequest ? IN : OUT, peer);
 
-            log.debug("bytestream connection changed " + connection.getMode()
-                + " [to: " + peer + "|inc: " + incomingRequest + "|id: "
-                + connectionID + "]");
+            LOG.debug("bytestream connection changed " + connection + ", inc="
+                + incomingRequest + ", pool id=" + id + "]");
 
             /*
              * this may return the current connection if the pool is closed so
@@ -151,13 +147,14 @@ public class DataTransferManager implements IConnectionListener,
             if (current != null) {
                 current.close();
                 if (current == connection) {
-                    log.warn("closed connection [id=" + id + "]: " + current
-                        + " , no connections are currently allowed");
+                    LOG.warn("closed connection [pool id=" + id + "]: "
+                        + current + " , no connections are currently allowed");
 
                     return;
                 } else {
-                    log.warn("existing connection [id=" + id + "] " + current
-                        + " was replaced with connection " + connection);
+                    LOG.warn("existing connection [pool id=" + id + "] "
+                        + current + " was replaced with connection "
+                        + connection);
                 }
             }
 
@@ -194,30 +191,30 @@ public class DataTransferManager implements IConnectionListener,
         transferListeners.remove(listener);
     }
 
-    public void sendData(String connectionID,
-        TransferDescription transferDescription, byte[] payload)
+    public void sendData(final String connectionID,
+        final TransferDescription description, final byte[] data)
         throws IOException {
 
-        JID connectionJID = currentLocalJID;
+        final JID connectionJID = currentLocalJID;
 
         if (connectionJID == null)
             throw new IOException("not connected to a XMPP server");
 
-        IByteStreamConnection connection = getCurrentConnection(connectionID,
-            transferDescription.getRecipient());
+        final IByteStreamConnection connection = getCurrentConnection(
+            connectionID, description.getRecipient());
 
         if (connection == null)
             throw new IOException("not connected to "
-                + transferDescription.getRecipient()
-                + " [connection identifier=" + connectionID + "]");
+                + description.getRecipient() + " [connection identifier="
+                + connectionID + "]");
 
-        if (log.isTraceEnabled())
-            log.trace("sending data " + transferDescription + " from "
-                + connectionJID + " to " + transferDescription.getRecipient()
-                + "[connection identifier=" + connectionID + "]");
+        description.setSender(connectionJID);
 
-        transferDescription.setSender(connectionJID);
-        sendInternal(connection, transferDescription, payload);
+        if (LOG.isTraceEnabled())
+            LOG.trace("send " + description + ", data len=" + data.length
+                + " byte(s), connection=" + connection);
+
+        sendInternal(connection, description, data);
     }
 
     /**
@@ -235,8 +232,8 @@ public class DataTransferManager implements IConnectionListener,
         if (connectionJID == null)
             throw new IOException("not connected to a XMPP server");
 
-        if (log.isTraceEnabled())
-            log.trace("sending data ... from " + connectionJID + " to "
+        if (LOG.isTraceEnabled())
+            LOG.trace("sending data ... from " + connectionJID + " to "
                 + transferDescription.getRecipient());
 
         JID recipient = transferDescription.getRecipient();
@@ -246,37 +243,36 @@ public class DataTransferManager implements IConnectionListener,
             transferDescription, payload);
     }
 
-    private void sendInternal(IByteStreamConnection connection,
-        TransferDescription transferData, byte[] payload) throws IOException {
+    private void sendInternal(final IByteStreamConnection connection,
+        final TransferDescription description, byte[] payload)
+        throws IOException {
+
+        boolean sendPacket = true;
+
+        for (IPacketInterceptor packetInterceptor : packetInterceptors)
+            sendPacket &= packetInterceptor.sendPacket(description, payload);
+
+        if (!sendPacket)
+            return;
+
+        long sizeUncompressed = payload.length;
+
+        if (description.compressContent())
+            payload = deflate(payload);
+
+        final long transferStartTime = System.currentTimeMillis();
+
         try {
-
-            boolean sendPacket = true;
-
-            for (IPacketInterceptor packetInterceptor : packetInterceptors)
-                sendPacket &= packetInterceptor.sendPacket(transferData,
-                    payload);
-
-            if (!sendPacket)
-                return;
-
-            long sizeUncompressed = payload.length;
-
-            if (transferData.compressContent())
-                payload = deflate(payload);
-
-            long transferStartTime = System.currentTimeMillis();
-            connection.send(transferData, payload);
-
-            notifyDataSent(connection.getMode(), payload.length,
-                sizeUncompressed, System.currentTimeMillis()
-                    - transferStartTime);
-
+            connection.send(description, payload);
         } catch (IOException e) {
-            log.error(
-                transferData.getRecipient() + " failed to send " + transferData
-                    + " with " + connection.getMode() + ":" + e.getMessage(), e);
+            LOG.error("failed to send " + description + ", connection="
+                + connection + ":" + e.getMessage(), e);
             throw e;
         }
+
+        notifyDataSent(connection.getMode(), payload.length, sizeUncompressed,
+            System.currentTimeMillis() - transferStartTime);
+
     }
 
     /**
@@ -329,13 +325,13 @@ public class DataTransferManager implements IConnectionListener,
         if (out != null) {
             closed |= true;
             out.close();
-            log.debug("closed connection [id=" + outID + "]: " + out);
+            LOG.debug("closed connection [pool id=" + outID + "]: " + out);
         }
 
         if (in != null) {
             closed |= true;
             in.close();
-            log.debug("closed connection [id=" + inID + "]: " + in);
+            LOG.debug("closed connection [pool id=" + inID + "]: " + in);
         }
 
         return closed;
@@ -386,13 +382,8 @@ public class DataTransferManager implements IConnectionListener,
                         .add(connectionIDToken);
             }
 
-            if (connection != null) {
-                if (log.isTraceEnabled())
-                    log.trace("Reuse bytestream connection "
-                        + connection.getMode());
-
+            if (connection != null)
                 return connection;
-            }
         }
 
         connectLock.lock();
@@ -412,18 +403,18 @@ public class DataTransferManager implements IConnectionListener,
             ArrayList<ITransport> transportModesToUse = new ArrayList<ITransport>(
                 availableTransports);
 
-            log.debug("currently used IP addresses for Socks5Proxy: "
+            LOG.debug("currently used IP addresses for Socks5Proxy: "
                 + Arrays.toString(Socks5Proxy.getSocks5Proxy()
                     .getLocalAddresses().toArray()));
 
             for (ITransport transport : transportModesToUse) {
-                log.info("establishing connection to " + peer.getBase()
+                LOG.info("establishing connection to " + peer.getBase()
                     + " from " + connectionJID + " using " + transport);
                 try {
                     connection = transport.connect(connectionID, peer);
                     break;
                 } catch (IOException e) {
-                    log.error(peer + " failed to connect using " + transport
+                    LOG.error(peer + " failed to connect using " + transport
                         + ": " + e.getMessage(), e);
                 } catch (InterruptedException e) {
                     IOException io = new InterruptedIOException(
@@ -431,7 +422,7 @@ public class DataTransferManager implements IConnectionListener,
                     io.initCause(e);
                     throw io;
                 } catch (Exception e) {
-                    log.error(peer + " failed to connect using " + transport
+                    LOG.error(peer + " failed to connect using " + transport
                         + " because of an unknown error: " + e.getMessage(), e);
                 }
             }
@@ -470,7 +461,7 @@ public class DataTransferManager implements IConnectionListener,
         if (useIBB && fallbackTransport != null)
             availableTransports.add(fallbackTransport);
 
-        log.debug("used transport order for the current XMPP connection: "
+        LOG.debug("used transport order for the current XMPP connection: "
             + Arrays.toString(availableTransports.toArray()));
 
     }
@@ -591,7 +582,7 @@ public class DataTransferManager implements IConnectionListener,
             try {
                 listener.sent(mode, sizeCompressed, sizeUncompressed, duration);
             } catch (RuntimeException e) {
-                log.error("invoking sent() on listener: " + listener
+                LOG.error("invoking sent() on listener: " + listener
                     + " failed", e);
             }
         }
@@ -606,7 +597,7 @@ public class DataTransferManager implements IConnectionListener,
                 listener.received(mode, sizeCompressed, sizeUncompressed,
                     duration);
             } catch (RuntimeException e) {
-                log.error("invoking received() on listener: " + listener
+                LOG.error("invoking received() on listener: " + listener
                     + " failed", e);
             }
         }
