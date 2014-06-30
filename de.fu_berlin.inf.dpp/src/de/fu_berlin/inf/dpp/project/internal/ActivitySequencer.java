@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -68,16 +67,6 @@ public class ActivitySequencer implements Startable {
      * value.
      */
     private static final int FIRST_SEQUENCE_NUMBER = 0;
-
-    private static class SequencedActivity {
-        private final int sequenceNumber;
-        private final IActivity activity;
-
-        private SequencedActivity(IActivity activity, int sequenceNumber) {
-            this.activity = activity;
-            this.sequenceNumber = sequenceNumber;
-        }
-    }
 
     private static class SequencedActivities {
         private final int sequenceNumber;
@@ -201,7 +190,7 @@ public class ActivitySequencer implements Startable {
 
     private final DispatchThreadContext dispatchThread;
 
-    private final Map<JID, ActivityBuffer<SequencedActivity>> bufferedIncomingActivities;
+    private final Map<JID, ActivityBuffer<IActivity>> bufferedIncomingActivities;
 
     private final Map<JID, ActivityBuffer<IActivity>> bufferedOutgoingActivities;
 
@@ -215,7 +204,7 @@ public class ActivitySequencer implements Startable {
         this.receiver = receiver;
         this.currentSessionID = sarosSession.getID();
 
-        this.bufferedIncomingActivities = new HashMap<JID, ActivityBuffer<SequencedActivity>>();
+        this.bufferedIncomingActivities = new HashMap<JID, ActivityBuffer<IActivity>>();
         this.bufferedOutgoingActivities = new HashMap<JID, ActivityBuffer<IActivity>>();
     }
 
@@ -333,68 +322,37 @@ public class ActivitySequencer implements Startable {
         this.callback = callback;
     }
 
-    /*
-     * TODO some part of the logic can be removed if we ensure only ONE transmit
-     * stream and fail FAST if this stream is broken
-     */
-    private void executeActivity(JID sender, SequencedActivity sequencedActivity) {
+    private void executeActivities(final JID sender,
+        final List<IActivity> activities, final int sequenceNumber) {
 
-        assert sequencedActivity != null;
-
-        List<IActivity> serializedActivities = new ArrayList<IActivity>();
+        boolean transmissionError = false;
 
         synchronized (bufferedIncomingActivities) {
-            ActivityBuffer<SequencedActivity> buffer = bufferedIncomingActivities
+            ActivityBuffer<IActivity> buffer = bufferedIncomingActivities
                 .get(sender);
 
             if (buffer == null) {
                 LOG.warn("dropping received activity from "
                     + sender
-                    + " because it is currently not registers, dropped activity: "
-                    + sequencedActivity.activity);
+                    + " because it is currently not registers, dropping activities: "
+                    + activities);
                 return;
             }
 
-            buffer.activities.add(sequencedActivity);
-
-            /*
-             * it is very VERY uncommon to receive an activity with a sequence
-             * number that is 2^32 steps apart from the current expected
-             * sequencer number, so this algorithm does not check for duplicate
-             * sequence numbers
-             */
-            while (true) {
-
-                sequencedActivity = null;
-
-                for (Iterator<SequencedActivity> it = buffer.activities
-                    .iterator(); it.hasNext();) {
-
-                    sequencedActivity = it.next();
-
-                    if (sequencedActivity.sequenceNumber == buffer.nextSequenceNumber) {
-                        it.remove();
-                        break;
-                    }
-
-                    sequencedActivity = null;
-                }
-
-                if (sequencedActivity == null) {
-                    /*
-                     * TODO shut down the session if a activity does not arrive
-                     * in a given timeout
-                     */
-                    break;
-                }
-
-                serializedActivities.add(sequencedActivity.activity);
-                buffer.nextSequenceNumber++;
+            if (buffer.nextSequenceNumber != sequenceNumber) {
+                transmissionError = true;
+            } else {
+                buffer.nextSequenceNumber += activities.size();
             }
         }
 
-        if (!serializedActivities.isEmpty())
-            sarosSession.exec(serializedActivities);
+        if (transmissionError) {
+            unregisterUser(sender);
+            notifyTransmissionError(sender);
+            return;
+        }
+
+        sarosSession.exec(activities);
     }
 
     /**
@@ -461,9 +419,8 @@ public class ActivitySequencer implements Startable {
 
         synchronized (bufferedIncomingActivities) {
             if (bufferedIncomingActivities.get(user.getJID()) == null)
-                bufferedIncomingActivities
-                    .put(user.getJID(), new ActivityBuffer<SequencedActivity>(
-                        FIRST_SEQUENCE_NUMBER));
+                bufferedIncomingActivities.put(user.getJID(),
+                    new ActivityBuffer<IActivity>(FIRST_SEQUENCE_NUMBER));
         }
     }
 
@@ -546,16 +503,9 @@ public class ActivitySequencer implements Startable {
                 activityPacketExtension);
         } catch (IOException e) {
             LOG.error("failed to sent activities: " + activities, e);
-            /*
-             * as our "wonderful" networklayer will try to establish a new
-             * connection (sometimes forever) we will "shutdown" the user here
-             */
+
             unregisterUser(recipient);
-
-            IActivitySequencerCallback currentCallback = callback;
-
-            if (currentCallback != null)
-                currentCallback.transmissionFailed(recipient);
+            notifyTransmissionError(recipient);
         }
     }
 
@@ -598,12 +548,7 @@ public class ActivitySequencer implements Startable {
         else
             LOG.debug(msg);
 
-        int sequenceNumber = payload.getSequenceNumber();
-
-        for (IActivity activity : activities) {
-            executeActivity(from, new SequencedActivity(activity,
-                sequenceNumber++));
-        }
+        executeActivities(from, activities, payload.getSequenceNumber());
     }
 
     /**
@@ -616,5 +561,12 @@ public class ActivitySequencer implements Startable {
         synchronized (bufferedOutgoingActivities) {
             return bufferedOutgoingActivities.get(user.getJID()) != null;
         }
+    }
+
+    private void notifyTransmissionError(final JID user) {
+        IActivitySequencerCallback currentCallback = callback;
+
+        if (currentCallback != null)
+            currentCallback.transmissionFailed(user);
     }
 }
