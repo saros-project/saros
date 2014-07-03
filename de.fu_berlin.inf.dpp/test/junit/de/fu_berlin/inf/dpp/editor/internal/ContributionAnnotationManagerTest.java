@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.editor.internal;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -85,6 +86,40 @@ public class ContributionAnnotationManagerTest {
         assertFalse("oldest annotation was not removed after refresh",
             getAnnotationPositions(model).contains(new Position(0, 1)));
 
+    }
+
+    @Test
+    public void testAnnotationSplit() {
+
+        final User alice = new User(new JID("alice@test"), null, false, false,
+            0, 0);
+        final User bob = new User(new JID("bob@test"), null, false, false, 0, 0);
+
+        final AnnotationModel model = new AnnotationModel();
+
+        manager.insertAnnotation(model, 5, 7, alice);
+        manager.insertAnnotation(model, 2, 15, bob);
+
+        manager.splitAnnotation(model, 9);
+
+        final List<Position> positions = getAnnotationPositions(model);
+
+        assertEquals("split does not affected all annotations", 4,
+            getAnnotationCount(model));
+
+        final Position expectA0 = new Position(5, 4); // 9 = 5 + 4
+        final Position expectA1 = new Position(9, 3); // 9 + 3 = 5 + 7
+        final Position expectB0 = new Position(2, 7); // 9 = 2 + 7
+        final Position expectB1 = new Position(9, 8); // 9 + 8 = 2 + 15
+
+        assertTrue("expected annotation region not found: " + expectA0,
+            positions.contains(expectA0));
+        assertTrue("expected annotation region not found: " + expectA1,
+            positions.contains(expectA1));
+        assertTrue("expected annotation region not found: " + expectB0,
+            positions.contains(expectB0));
+        assertTrue("expected annotation region not found: " + expectB1,
+            positions.contains(expectB1));
     }
 
     @SuppressWarnings("unchecked")
