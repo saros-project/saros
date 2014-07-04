@@ -32,6 +32,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.Platform;
+import org.osgi.framework.Bundle;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.annotations.Inject;
 
@@ -47,6 +49,7 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.awareness.IDEInteractionActivitiesManager;
+import de.fu_berlin.inf.dpp.awareness.TestRunManager;
 import de.fu_berlin.inf.dpp.communication.extensions.ActivitiesExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.KickUserExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.LeaveSessionExtension;
@@ -1110,6 +1113,24 @@ public final class SarosSession implements ISarosSession {
 
         // Awareness
         sessionContainer.addComponent(IDEInteractionActivitiesManager.class);
+
+        /*
+         * The following lines check whether the 'org.eclipse.jdt.junit' and
+         * 'org.eclipse.jdt.junit.core' bundle do exist in the user's Eclipse
+         * IDE. If not, the loading of the 'TestRunManager' would cause an error
+         * and therefore Saros would not load. Depending on user tests, these
+         * lines may be removed.
+         * 
+         * TODO remove these lines, if user tests show that they are not needed
+         */
+        Bundle bundle1 = Platform.getBundle("org.eclipse.jdt.junit");
+        Bundle bundle2 = Platform.getBundle("org.eclipse.jdt.junit.core");
+        if (bundle1 != null && bundle2 != null) {
+            sessionContainer.addComponent(TestRunManager.class);
+            log.debug("Could add 'TestRunManager' to the session container");
+        } else {
+            log.debug("Could not add 'TestRunManager' to the session container, required bundles are missing");
+        }
 
         // Feedback
         sessionContainer.addComponent(ErrorLogManager.class);

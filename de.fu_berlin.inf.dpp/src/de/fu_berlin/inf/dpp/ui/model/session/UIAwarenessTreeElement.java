@@ -4,18 +4,28 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Image;
 
 import de.fu_berlin.inf.dpp.activities.IDEInteractionActivity.Element;
+import de.fu_berlin.inf.dpp.activities.TestRunActivity.State;
 import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 
 /**
- * This is a tree element that can be displayed as a child element of the user
- * entry in the Saros session view, showing information about the currently
- * opened dialog or focused view of that user.
+ * This tree element is supposed to be used as a child element of the user entry
+ * in the Saros session view. It displays current action awareness information
+ * about the user, e.g. the opened dialog, the activated view or information
+ * about test runs.
  * */
 public class UIAwarenessTreeElement extends AwarenessInformationTreeElement {
 
+    /**
+     * Creates a new {@link AwarenessInformationTreeElement} for the given
+     * <code>user</code>.
+     * 
+     * @param user
+     *            The user which is used to determine the appropriate action
+     *            awareness information.
+     */
     public UIAwarenessTreeElement(final User user,
         final EditorManager editorManager,
         final AwarenessInformationCollector collector) {
@@ -25,13 +35,51 @@ public class UIAwarenessTreeElement extends AwarenessInformationTreeElement {
     @Override
     public StyledString getStyledText() {
         StyledString styledString = new StyledString();
-        String uiTitle = collector.getOpenIDEElementTitle(user);
-        Element uiType = collector.getOpenIDEElementType(user);
-        if (uiTitle != null && uiType != null) {
-            if (uiType == Element.DIALOG)
-                styledString.append("Open dialog: " + uiTitle);
-            else
-                styledString.append("Active view: " + uiTitle);
+
+        if (collector.getCurrentTestRunName(user) != null) {
+
+            // a test run has started or finished
+            String name = collector.getCurrentTestRunName(user);
+            State state = collector.getCurrentTestRunState(user);
+
+            String startMessage = "Runs test";
+            String endMessage = "Has run test";
+
+            if (name != null && state != null) {
+                switch (state) {
+                case UNDEFINED:
+                    styledString.append(startMessage + " '" + name + "'");
+                    break;
+                case OK:
+                    styledString.append(endMessage + " '" + name
+                        + "', result: SUCCESS");
+                    break;
+                case ERROR:
+                    styledString.append(endMessage + " '" + name
+                        + "', result: ERROR");
+                    break;
+                case FAILURE:
+                    styledString.append(endMessage + " '" + name
+                        + "', result: FAILURE");
+                    break;
+                default:
+                    // 'IGNORED' which is (now) not interesting for us
+                    break;
+                }
+            }
+
+        } else if (collector.getOpenIDEElementTitle(user) != null) {
+
+            // a normal IDE interaction was made
+            String uiTitle = collector.getOpenIDEElementTitle(user);
+            Element uiType = collector.getOpenIDEElementType(user);
+
+            if (uiTitle != null && uiType != null) {
+                if (uiType == Element.DIALOG)
+                    styledString.append("Open dialog: " + uiTitle);
+                else
+                    styledString.append("Active view: " + uiTitle);
+            }
         }
 
         return styledString;

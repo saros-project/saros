@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import de.fu_berlin.inf.dpp.activities.IDEInteractionActivity.Element;
+import de.fu_berlin.inf.dpp.activities.TestRunActivity.State;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.RemoteEditorManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -32,15 +33,26 @@ public class AwarenessInformationCollector {
 
     /**
      * Stores the title of the activated IDE element (title of dialog or view)
-     * activated by the user <code>JID</code>.
+     * activated by the given user
      */
-    private Map<User, String> activeIDEElement = new HashMap<User, String>();
+    private final Map<User, String> activeIDEElement = new HashMap<User, String>();
 
     /**
      * Stores the type of the activated IDE element ({@link Element}) activated
-     * by the user <code>JID</code>.
+     * by the given user
      */
-    private Map<User, Element> activeIDEElementType = new HashMap<User, Element>();
+    private final Map<User, Element> activeIDEElementType = new HashMap<User, Element>();
+
+    /**
+     * Stores the name of the currently running test of the given user
+     * */
+    private final Map<User, String> currentTestRunName = new HashMap<User, String>();
+
+    /**
+     * Stores the State ({@link State}) of the currently running test of the
+     * given user
+     * */
+    private final Map<User, State> currentTestRunState = new HashMap<User, State>();
 
     public AwarenessInformationCollector(ISarosSessionManager sessionManager,
         final EditorManager editorManager) {
@@ -138,11 +150,6 @@ public class AwarenessInformationCollector {
      * */
     public synchronized void updateOpenIDEElement(User user, String title,
         Element element) {
-        if (user == null || title == null || title.isEmpty()) {
-            // Sometimes, there are empty titles in Eclipse dialogs, but this is
-            // very rare.
-            return;
-        }
         activeIDEElement.put(user, title);
         activeIDEElementType.put(user, element);
     }
@@ -159,9 +166,6 @@ public class AwarenessInformationCollector {
      *            {@link Element}).
      * */
     public synchronized void updateCloseIDEElement(User user, Element element) {
-        if (user == null) {
-            return;
-        }
         activeIDEElement.remove(user);
         activeIDEElementType.remove(user);
     }
@@ -177,9 +181,6 @@ public class AwarenessInformationCollector {
      *         <code>null</code>.
      * */
     public synchronized String getOpenIDEElementTitle(User user) {
-        if (user == null) {
-            return null;
-        }
         return activeIDEElement.get(user);
     }
 
@@ -194,9 +195,61 @@ public class AwarenessInformationCollector {
      *         <code>user</code> is <code>null</code>.
      * */
     public synchronized Element getOpenIDEElementType(User user) {
-        if (user == null) {
-            return null;
-        }
         return activeIDEElementType.get(user);
+    }
+
+    /**
+     * Stores the title and the state of the currently running test of the given
+     * user.
+     * 
+     * @param user
+     *            The user who runs the test.
+     * @param name
+     *            The name of the test.
+     * @param state
+     *            The state ({@link State}) of the running test.
+     * */
+    public synchronized void addTestRun(User user, String name, State state) {
+        currentTestRunName.put(user, name);
+        currentTestRunState.put(user, state);
+    }
+
+    /**
+     * Removes the title and the state of the last running test of the given
+     * user.
+     * 
+     * @param user
+     *            The user who runs the test.
+     * */
+    public synchronized void removeTestRun(User user) {
+        currentTestRunName.remove(user);
+        currentTestRunState.remove(user);
+    }
+
+    /**
+     * Returns the name of the currently running test of the given user or
+     * <code>null</code>, if <code>user</code> is <code>null</code>.
+     * 
+     * @param user
+     *            The user who created this activity.
+     * @return The name of the currently running test of the given user or
+     *         <code>null</code>, if <code>user</code> is <code>null</code>.
+     * */
+    public synchronized String getCurrentTestRunName(User user) {
+        return currentTestRunName.get(user);
+    }
+
+    /**
+     * Returns the state ({@link State}) of the last running test of the given
+     * user or <code>null</code>, if <code>user</code> is <code>null</code>.
+     * 
+     * @param user
+     *            The user who created this activity.
+     * @return The state ({@link State}) of the last running test of the given
+     *         user or <code>null</code>, if <code>user</code> is
+     *         <code>null</code>.
+     * */
+    public synchronized State getCurrentTestRunState(User user) {
+        return currentTestRunState.get(user);
     }
 }

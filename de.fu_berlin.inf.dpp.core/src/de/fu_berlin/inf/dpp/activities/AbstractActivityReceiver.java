@@ -101,6 +101,11 @@ public abstract class AbstractActivityReceiver implements IActivityReceiver {
     }
 
     @Override
+    public void receive(TestRunActivity testRunActivity) {
+        // do nothing
+    }
+
+    @Override
     public void receive(TextEditActivity textEditActivity) {
         // do nothing
     }

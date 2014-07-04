@@ -36,6 +36,13 @@ public interface IActivityReceiver {
 
     void receive(FolderActivity folderActivity);
 
+    /**
+     * This method is called, when an {@link IDEInteractionActivity} was
+     * received.
+     * 
+     * @param ideInteractionActivity
+     *            The received {@link IDEInteractionActivity}
+     * */
     void receive(IDEInteractionActivity ideInteractionActivity);
 
     void receive(JupiterActivity jupiterActivity);
@@ -53,6 +60,14 @@ public interface IActivityReceiver {
     void receive(StopActivity stopActivity);
 
     void receive(StopFollowingActivity stopFollowingActivity);
+
+    /**
+     * This method is called, when a {@link TestRunActivity} was received.
+     * 
+     * @param testRunActivity
+     *            The received {@link TestRunActivity}
+     * */
+    void receive(TestRunActivity testRunActivity);
 
     void receive(TextEditActivity textEditActivity);
 

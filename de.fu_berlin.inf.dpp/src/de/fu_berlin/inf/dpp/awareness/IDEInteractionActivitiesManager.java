@@ -14,13 +14,16 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.jivesoftware.smack.XMPPException;
@@ -62,7 +65,7 @@ public class IDEInteractionActivitiesManager extends AbstractActivityProducer
 
     private final List<IDEInteractionActivitiesListener> listeners = new CopyOnWriteArrayList<IDEInteractionActivitiesListener>();
     private final ISarosSession session;
-    private final AwarenessInformationCollector awarenessInformationController;
+    private final AwarenessInformationCollector awarenessInformationCollector;
     private MultiUserChatService mucs;
     private IChat sessionChat;
     private IWorkbench workbench;
@@ -87,6 +90,8 @@ public class IDEInteractionActivitiesManager extends AbstractActivityProducer
 
     /**
      * Listener for opening or closing shells, which normally are dialogs
+     * <p>
+     * TODO Refactor this to a named class
      * */
     private final Listener shellListener = new Listener() {
 
@@ -160,7 +165,6 @@ public class IDEInteractionActivitiesManager extends AbstractActivityProducer
                     SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
                         @Override
                         public void run() {
-
                             if (workbenchPage == null)
                                 return;
 
@@ -191,7 +195,7 @@ public class IDEInteractionActivitiesManager extends AbstractActivityProducer
         @Override
         public void pageChanged(PageChangedEvent event) {
 
-            String oldTitle = awarenessInformationController
+            String oldTitle = awarenessInformationCollector
                 .getOpenIDEElementTitle(session.getLocalUser());
 
             // FIXME use
@@ -213,12 +217,13 @@ public class IDEInteractionActivitiesManager extends AbstractActivityProducer
 
     /**
      * Listener for activating or deactivating views
+     * <p>
+     * TODO refactor this class to a named class
      * */
     private final IPartListener2 viewListener = new IPartListener2() {
 
         @Override
         public void partActivated(IWorkbenchPartReference partReference) {
-
             if (partReference.getPart(false) instanceof IEditorPart) {
                 // if editor is activated don't show the file's name
                 // TODO find better way than hardcoding this
@@ -232,7 +237,6 @@ public class IDEInteractionActivitiesManager extends AbstractActivityProducer
 
         @Override
         public void partDeactivated(IWorkbenchPartReference partReference) {
-
             if (partReference.getPart(false) instanceof IEditorPart) {
                 // if editor is activated don't show the file's name
                 // TODO find better way than hardcoding this
@@ -304,10 +308,27 @@ public class IDEInteractionActivitiesManager extends AbstractActivityProducer
         }
     };
 
+    /**
+     * Constructs a new {@link IDEInteractionActivitiesManager}.
+     * 
+     * @param session
+     *            The session, in which the action awareness information are
+     *            distributed.
+     * @param awarenessInformationCollector
+     *            This class is used to retrieve the updates from the received
+     *            information about opened/closed dialogs or
+     *            activated/deactivated views.
+     * @param mucs
+     *            The class which manages the creation and destruction of
+     *            {@link MultiUserChat}'s. It is used to display the collected
+     *            information about opened/closed dialogs and
+     *            activated/deactivated views in the multi-user chat in the
+     *            Saros view.
+     * */
     public IDEInteractionActivitiesManager(ISarosSession session,
-        AwarenessInformationCollector awarenessInformationController,
+        AwarenessInformationCollector awarenessInformationCollector,
         MultiUserChatService mucs) {
-        this.awarenessInformationController = awarenessInformationController;
+        this.awarenessInformationCollector = awarenessInformationCollector;
         this.mucs = mucs;
         this.session = session;
         this.mucs.addChatServiceListener(chatServiceListener);
@@ -329,7 +350,9 @@ public class IDEInteractionActivitiesManager extends AbstractActivityProducer
                 try {
                     workbench = PlatformUI.getWorkbench();
                 } catch (IllegalStateException e) {
-                    LOG.warn("Workbench not available. IDE interaction information will not be displayed.");
+                    LOG.warn(
+                        "Workbench not available. IDE interaction information will not be displayed.",
+                        e);
                     return;
                 }
 
@@ -373,7 +396,7 @@ public class IDEInteractionActivitiesManager extends AbstractActivityProducer
         SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
             @Override
             public void run() {
-                // remove dialog listeners
+                // remove dialog, wizard dialog and view listenerslisteners
                 if (workbench != null) {
                     workbench.getDisplay().removeFilter(SWT.Activate,
                         shellListener);
@@ -381,20 +404,18 @@ public class IDEInteractionActivitiesManager extends AbstractActivityProducer
                         shellListener);
                     workbench.getDisplay().removeFilter(SWT.Deactivate,
                         shellListener);
-                }
 
-                // remove wizard dialog listener
+                    IWorkbenchWindow[] windows = workbench
+                        .getWorkbenchWindows();
+                    IPartService partService = null;
+                    for (int i = 0; i < windows.length; i++) {
+                        partService = windows[i].getPartService();
+                        partService.removePartListener(viewListener);
+                    }
+                }
                 if (wizardDialog != null)
                     wizardDialog
                         .removePageChangedListener(wizardDialogListener);
-
-                // remove view listeners
-                IWorkbenchWindow[] windows = workbench.getWorkbenchWindows();
-                IPartService partService = null;
-                for (int i = 0; i < windows.length; i++) {
-                    partService = windows[i].getPartService();
-                    partService.removePartListener(viewListener);
-                }
 
                 // ensure garbage collection
                 workbench = null;
@@ -408,31 +429,25 @@ public class IDEInteractionActivitiesManager extends AbstractActivityProducer
         @Override
         public void receive(IDEInteractionActivity activity) {
             User user = activity.getSource();
-            if (!user.isInSession()) {
-                return;
-            }
 
             if (activity.getStatus() == Status.UNFOCUS) {
-                awarenessInformationController.updateCloseIDEElement(user,
+                awarenessInformationCollector.updateCloseIDEElement(user,
                     activity.getElement());
                 // currently, we don't display close information
                 // this needs further experiments
                 return;
             }
 
-            awarenessInformationController.updateOpenIDEElement(user,
+            awarenessInformationCollector.updateOpenIDEElement(user,
                 activity.getTitle(), activity.getElement());
             notifyListeners();
         }
     };
 
+    // TODO refactor this if this remains in saros after the user test
     private IActivityReceiver receiverChat = new AbstractActivityReceiver() {
         @Override
         public void receive(IDEInteractionActivity activity) {
-            User user = activity.getSource();
-            if (!user.isInSession() || sessionChat == null) {
-                return;
-            }
 
             String message;
             if (activity.getStatus() == Status.FOCUS) {
@@ -451,35 +466,55 @@ public class IDEInteractionActivitiesManager extends AbstractActivityProducer
         }
     };
 
+    // TODO refactor this if this remains in saros after the user test
+    // FIXME In some cases, the status line is empty
     private IActivityReceiver receiverStatusLine = new AbstractActivityReceiver() {
         @Override
         public void receive(IDEInteractionActivity activity) {
-            User user = activity.getSource();
-            if (!user.isInSession()) {
-                return;
-            }
 
-            IActionBars actionBars;
-            try {
-                actionBars = ((IViewSite) PlatformUI.getWorkbench()
-                    .getActiveWorkbenchWindow().getActivePage().getActivePart()
-                    .getSite()).getActionBars();
-            } catch (Exception e) {
-                LOG.debug("could not get action bars for the status line", e);
-                return;
-            }
+            final User user = activity.getSource();
+            final Status currentStatus = activity.getStatus();
+            final Element currentElement = activity.getElement();
+            final String currentTitle = activity.getTitle();
 
-            String message;
-            if (activity.getStatus() == Status.FOCUS) {
-                if (activity.getElement() == Element.DIALOG) {
-                    message = user.getNickname() + " has opened the dialog '"
-                        + activity.getTitle() + "'.";
-                } else {
-                    message = user.getNickname() + " has activated the view '"
-                        + activity.getTitle() + "'.";
+            SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
+
+                @Override
+                public void run() {
+                    IActionBars actionBars = null;
+                    try {
+                        IWorkbenchPart part = workbenchPage.getActivePart();
+                        IWorkbenchPartSite site = part.getSite();
+
+                        if (site instanceof IViewSite) {
+                            actionBars = ((IViewSite) site).getActionBars();
+                        } else if (site instanceof IEditorSite) {
+                            actionBars = ((IEditorSite) site).getActionBars();
+                        }
+
+                        String message;
+                        if (currentStatus == Status.FOCUS) {
+                            if (currentElement == Element.DIALOG) {
+                                message = user.getNickname()
+                                    + " has opened the dialog '" + currentTitle
+                                    + "'.";
+                            } else {
+                                message = user.getNickname()
+                                    + " has activated the view '"
+                                    + currentTitle + "'.";
+                            }
+                            if (actionBars != null)
+                                actionBars.getStatusLineManager().setMessage(
+                                    message);
+                        }
+                    } catch (Exception e) {
+                        // TODO don't handle everything within a try/catch block
+                        LOG.debug(
+                            "Could not get action bars for the status line", e);
+                        return;
+                    }
                 }
-                actionBars.getStatusLineManager().setMessage(message);
-            }
+            });
         }
     };
 
@@ -489,11 +524,25 @@ public class IDEInteractionActivitiesManager extends AbstractActivityProducer
         }
     }
 
+    /**
+     * Adds the given {@link IDEInteractionActivitiesListener} to the
+     * {@link IDEInteractionActivitiesManager}.
+     * 
+     * @param listener
+     *            The given {@link IDEInteractionActivitiesListener} to add
+     * */
     public void addIDEInteractionActivityListener(
         IDEInteractionActivitiesListener listener) {
         listeners.add(listener);
     }
 
+    /**
+     * Removes the given {@link IDEInteractionActivitiesListener} from the
+     * {@link IDEInteractionActivitiesManager}.
+     * 
+     * @param listener
+     *            The given {@link IDEInteractionActivitiesListener} to remove
+     * */
     public void removeIDEInteractionActivityListener(
         IDEInteractionActivitiesListener listener) {
         listeners.remove(listener);
