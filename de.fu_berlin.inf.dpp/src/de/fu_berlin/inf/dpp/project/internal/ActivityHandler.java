@@ -24,6 +24,7 @@ import de.fu_berlin.inf.dpp.concurrent.management.TransformationResult;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
+import de.fu_berlin.inf.dpp.util.ActivityUtils;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
@@ -80,16 +81,31 @@ public final class ActivityHandler implements Startable {
 
     private final Runnable dispatchThreadRunnable = new Runnable() {
 
+        final List<List<IActivity>> pendingActivities = new ArrayList<List<IActivity>>();
+        final List<IActivity> activitiesToExecute = new ArrayList<IActivity>();
+
         @Override
         public void run() {
             LOG.debug("activity dispatcher started");
+
             while (!Thread.currentThread().isInterrupted()) {
+                pendingActivities.clear();
+                activitiesToExecute.clear();
+
                 try {
-                    dispatchAndExecuteActivities(dispatchQueue.take());
+                    pendingActivities.add(dispatchQueue.take());
                 } catch (InterruptedException e) {
                     break;
                 }
+
+                dispatchQueue.drainTo(pendingActivities);
+
+                for (final List<IActivity> activities : pendingActivities)
+                    activitiesToExecute.addAll(activities);
+
+                dispatchAndExecuteActivities(activitiesToExecute);
             }
+
             LOG.debug("activity dispatcher stopped");
         }
     };
@@ -317,11 +333,15 @@ public final class ActivityHandler implements Startable {
      * words, the transformation would be applied to an out-dated state.
      */
     private void dispatchAndExecuteActivities(final List<IActivity> activities) {
-        Runnable transformingRunnable = new Runnable() {
+
+        final List<IActivity> optimizedActivities = ActivityUtils
+            .optimize(activities);
+
+        final Runnable transformingRunnable = new Runnable() {
             @Override
             public void run() {
 
-                for (IActivity activity : activities) {
+                for (IActivity activity : optimizedActivities) {
 
                     User source = activity.getSource();
 
@@ -356,13 +376,20 @@ public final class ActivityHandler implements Startable {
                         }
                     }
                 }
-
             }
         };
 
-        if (LOG.isTraceEnabled())
-            LOG.trace("dispatching " + activities.size()
-                + " activities [mode = " + DISPATCH_MODE + "] : " + activities);
+        if (LOG.isTraceEnabled()) {
+
+            if (optimizedActivities.size() != activities.size()) {
+                LOG.trace("original activities to dispatch: [#"
+                    + activities.size() + "] " + activities);
+            }
+
+            LOG.trace("dispatching [#" + optimizedActivities.size()
+                + "] optimized activities [mode = " + DISPATCH_MODE + "] : "
+                + optimizedActivities);
+        }
 
         if (DISPATCH_MODE == DISPATCH_MODE_SYNC)
             synchronizer.syncExec(ThreadUtils.wrapSafe(LOG,
