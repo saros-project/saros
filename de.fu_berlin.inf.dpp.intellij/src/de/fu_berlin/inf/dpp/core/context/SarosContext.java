@@ -24,6 +24,7 @@ package de.fu_berlin.inf.dpp.core.context;
 
 import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.ISarosContextFactory;
+import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.communication.extensions.ActivitiesExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.CancelProjectNegotiationExtension;
@@ -69,6 +70,7 @@ import org.picocontainer.injectors.ConstructorInjection;
 import org.picocontainer.injectors.ProviderAdapter;
 import org.picocontainer.injectors.Reinjector;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -91,6 +93,10 @@ import java.util.List;
 public class SarosContext implements ISarosContext {
 
     private static final Logger log = Logger.getLogger(SarosContext.class);
+
+    private static final String SAROS_DATA_DIRECTORY = ".saros";
+
+    private static final String SAROS_XMPP_ACCOUNT_FILE = "config.dat";
 
     private final DotGraphMonitor dotMonitor;
 
@@ -205,11 +211,48 @@ public class SarosContext implements ISarosContext {
          */
         reinjector = new Reinjector(container);
 
+        initAccountStore(container.getComponent(XMPPAccountStore.class));
+
         installPacketExtensionProviders();
 
         XMPPUtils.setDefaultConnectionService(
             container.getComponent(XMPPConnectionService.class));
         log.info("successfully created Saros runtime context");
+    }
+
+    private void initAccountStore(XMPPAccountStore store) {
+        // see http://bugs.java.com/bugdatabase/view_bug.do?bug_id=4787931
+
+        String os = System.getProperty("os.name");
+
+        boolean isWindows = os != null && os.toLowerCase().contains("windows");
+
+        String homeDirectory = null;
+
+        if (isWindows) {
+            String userHome = System.getenv("USERPROFILE");
+
+            if (userHome != null) {
+                File directory = new File(userHome);
+
+                if (directory.exists() && directory.isDirectory())
+                    homeDirectory = userHome;
+            }
+        }
+
+        if (homeDirectory == null)
+            homeDirectory = System.getProperty("user.home");
+
+        if (homeDirectory == null) {
+            log.warn(
+                "home directory not set, cannot save and load account data");
+            return;
+        }
+
+        File sarosDataDir = new File(homeDirectory, SAROS_DATA_DIRECTORY);
+        File accountFile = new File(sarosDataDir, SAROS_XMPP_ACCOUNT_FILE);
+
+        store.setAccountFile(accountFile, System.getProperty("user.name"));
     }
 
     /**
