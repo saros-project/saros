@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -14,8 +13,6 @@ import java.util.zip.ZipOutputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
-import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -25,6 +22,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.util.CoreUtils;
 
 // TODO java doc
@@ -57,17 +55,11 @@ public class CreateArchiveTask implements IWorkspaceRunnable {
         long totalSize = 0L;
 
         for (IFile file : files) {
-
-            URI uri = file.getLocationURI();
-
-            if (uri == null)
-                continue;
-
             try {
-                totalSize += EFS.getStore(uri).fetchInfo().getLength();
-            } catch (CoreException e) {
-                LOG.warn("unable to retrieve file size for file: " + file, e);
-                continue;
+                totalSize += file.getSize();
+            } catch (IOException e) {
+                LOG.warn("unable to retrieve file size for file: "
+                    + file.getFullPath().toString(), e);
             }
         }
 
@@ -120,12 +112,7 @@ public class CreateArchiveTask implements IWorkspaceRunnable {
 
                     int read = 0;
 
-                    try {
-                        in = file.getContents();
-                    } catch (CoreException e) {
-                        throw new IOException("failed to access file "
-                            + originalEntryName, e);
-                    }
+                    in = file.getContents();
 
                     while ((read = in.read(buffer)) > 0) {
 

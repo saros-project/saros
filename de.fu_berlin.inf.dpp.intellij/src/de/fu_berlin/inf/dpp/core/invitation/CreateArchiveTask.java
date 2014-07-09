@@ -4,13 +4,16 @@ import de.fu_berlin.inf.dpp.core.exceptions.OperationCanceledException;
 import de.fu_berlin.inf.dpp.core.monitor.IProgressMonitor;
 import de.fu_berlin.inf.dpp.core.workspace.IWorkspaceRunnable;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.util.CoreUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -47,11 +50,7 @@ public class CreateArchiveTask implements IWorkspaceRunnable {
         long totalSize = 0L;
 
         for (IFile file : files) {
-
-            IPath fileSystemPath = file.getLocation();
-
-            totalSize += fileSystemPath.toFile().length();
-
+            totalSize += file.getSize();
         }
 
         StopWatch stopWatch = new StopWatch();
@@ -110,8 +109,7 @@ public class CreateArchiveTask implements IWorkspaceRunnable {
                         if (monitor.isCanceled())
                             throw new OperationCanceledException(
                                 "compressing of file '" + originalEntryName
-                                    + "' was canceled"
-                            );
+                                    + "' was canceled");
 
                         zipStream.write(buffer, 0, read);
 

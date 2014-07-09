@@ -34,6 +34,7 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.EclipseProjectImpl;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
@@ -383,11 +384,19 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
         File tempArchive = null;
 
+        /*
+         * org.eclipse.core.resources.IFile will be converted to
+         * de.fu_berlin.inf.dpp.filesystem.IFile and there is no need for a
+         * check
+         */
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+        List<de.fu_berlin.inf.dpp.filesystem.IFile> coreFilesToCompress = (List) ResourceAdapterFactory
+            .convertTo(filesToCompress);
+
         try {
             tempArchive = File.createTempFile("saros_" + processID, ".zip");
-
             // TODO run inside workspace ?
-            new CreateArchiveTask(tempArchive, filesToCompress, fileAlias,
+            new CreateArchiveTask(tempArchive, coreFilesToCompress, fileAlias,
                 monitor).run(null);
         } catch (OperationCanceledException e) {
             throw new LocalCancellationException();
