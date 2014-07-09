@@ -42,7 +42,7 @@ public class ProgressFrame extends MonitorProgressBar
     public static final String TITLE = "Progress monitor";
     public static final String BUTTON_CANCEL = "Cancel";
 
-    //todo: replace when Saros class will be in repository
+    //todo: replace when Main panel class will be in Repository
     private Container parent = null; // Saros.instance().getMainPanel();
 
     private JFrame frmMain;

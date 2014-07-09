@@ -25,11 +25,14 @@ package de.fu_berlin.inf.dpp.intellij.context;
 import de.fu_berlin.inf.dpp.AbstractSarosContextFactory;
 import de.fu_berlin.inf.dpp.ISarosContextBindings;
 import de.fu_berlin.inf.dpp.ISarosContextFactory;
+import de.fu_berlin.inf.dpp.core.Saros;
+import de.fu_berlin.inf.dpp.core.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.core.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.filesystem.ChecksumCacheImpl;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IFileContentChangedNotifier;
 import de.fu_berlin.inf.dpp.intellij.project.fs.FileContentChangedNotifierBridge;
+import de.fu_berlin.inf.dpp.intellij.store.PreferenceStore;
 import org.picocontainer.BindKey;
 import org.picocontainer.MutablePicoContainer;
 
@@ -40,6 +43,7 @@ import java.util.Arrays;
  */
 public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
 
+    private Saros saros;
     private final ISarosContextFactory additionalContext;
 
     //FIXME: uncomment when classes are submitted
@@ -76,7 +80,9 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
         // Component.create(LeaveSessionAction.class),  //todo
     };
 
-    public SarosIntellijContextFactory(ISarosContextFactory delegate) {
+    public SarosIntellijContextFactory(Saros saros,
+        ISarosContextFactory delegate) {
+        this.saros = saros;
         this.additionalContext = delegate;
     }
 
@@ -91,6 +97,9 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
             container.addComponent(component.getBindKey(),
                 component.getImplementation());
         }
+
+        container.addComponent(saros);
+        container.addComponent(IPreferenceStore.class, new PreferenceStore());
 
         container.addComponent(BindKey.bindKey(String.class,
                 ISarosContextBindings.SarosVersion.class), "14.1.31.DEVEL"
