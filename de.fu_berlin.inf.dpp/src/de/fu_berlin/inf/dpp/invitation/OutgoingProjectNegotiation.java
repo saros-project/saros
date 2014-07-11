@@ -11,7 +11,6 @@ import java.util.Random;
 import java.util.concurrent.CancellationException;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
@@ -32,8 +31,8 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.EclipseProjectImpl;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
+import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
@@ -306,8 +305,6 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
      * @return zip file containing all files denoted by the file lists or
      *         <code>null</code> if the file lists do not contain any files
      */
-
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     private File createProjectArchive(final List<FileList> fileLists,
         final IProgressMonitor monitor) throws IOException,
         SarosCancellationException {
@@ -353,16 +350,14 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                     + projectID + " was unshared during synchronization",
                     CancelOption.NOTIFY_PEER);
 
-            final org.eclipse.core.resources.IProject delegate = ((EclipseProjectImpl) project)
-                .getDelegate();
-
             /*
              * TODO: Ask the user whether to save the resources, but only if
              * they have changed. How to ask Eclipse whether there are resource
              * changes? if (outInvitationUI.confirmProjectSave(peer))
              * getOpenEditors => filter per Project => if dirty ask to save
              */
-            EditorAPI.saveProject(delegate, false);
+            EditorAPI.saveProject(((EclipseProjectImpl) project).getDelegate(),
+                false);
 
             final StringBuilder aliasBuilder = new StringBuilder();
 
@@ -373,7 +368,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             for (final String path : list.getPaths()) {
 
                 // assert path is relative !
-                filesToCompress.add(delegate.getFile(path));
+                filesToCompress.add(project.getFile(path));
                 aliasBuilder.append(path);
                 fileAlias.add(aliasBuilder.toString());
                 aliasBuilder.setLength(prefixLength);
@@ -387,16 +382,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         try {
             tempArchive = File.createTempFile("saros_" + processID, ".zip");
             // TODO run inside workspace ?
-
-            /*
-             * org.eclipse.core.resources.IFile will be converted to
-             * de.fu_berlin.inf.dpp.filesystem.IFile and there is no need for a
-             * check
-             */
-            new CreateArchiveTask(tempArchive,
-                (List) ResourceAdapterFactory.convertTo(filesToCompress),
-                fileAlias, ProgressMonitorAdapterFactory.convertTo(monitor))
-                .run(null);
+            new CreateArchiveTask(tempArchive, filesToCompress, fileAlias,
+                ProgressMonitorAdapterFactory.convertTo(monitor)).run(null);
         } catch (OperationCanceledException e) {
             throw new LocalCancellationException();
         }
