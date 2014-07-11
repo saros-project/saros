@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -13,16 +14,12 @@ import java.util.zip.ZipOutputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
-import org.eclipse.core.resources.IWorkspaceRunnable;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
+import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRunnable;
+import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
+import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
 import de.fu_berlin.inf.dpp.util.CoreUtils;
 
 // TODO java doc
@@ -46,22 +43,16 @@ public class CreateArchiveTask implements IWorkspaceRunnable {
     }
 
     @Override
-    public void run(IProgressMonitor monitor) throws CoreException {
+    public void run(IProgressMonitor monitor) throws IOException {
         if (this.monitor != null)
             monitor = this.monitor;
 
+        if (monitor == null)
+            monitor = new NullProgressMonitor();
+
         assert files.size() == alias.size();
 
-        long totalSize = 0L;
-
-        for (IFile file : files) {
-            try {
-                totalSize += file.getSize();
-            } catch (IOException e) {
-                LOG.warn("unable to retrieve file size for file: "
-                    + file.getFullPath().toString(), e);
-            }
-        }
+        long totalSize = getTotalFileSize(files);
 
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
@@ -78,8 +69,7 @@ public class CreateArchiveTask implements IWorkspaceRunnable {
 
         ZipOutputStream zipStream = null;
 
-        final SubMonitor progress = SubMonitor.convert(monitor,
-            "Compressing files...", 100 /* percent */);
+        monitor.beginTask("Compressing files...", 100 /* percent */);
 
         try {
             zipStream = new ZipOutputStream(new BufferedOutputStream(
@@ -102,7 +92,7 @@ public class CreateArchiveTask implements IWorkspaceRunnable {
                 if (LOG.isTraceEnabled())
                     LOG.trace("compressing file: " + originalEntryName);
 
-                progress.subTask("compressing file: " + originalEntryName);
+                monitor.subTask("compressing file: " + originalEntryName);
 
                 zipStream.putNextEntry(new ZipEntry(entryName));
 
@@ -116,7 +106,8 @@ public class CreateArchiveTask implements IWorkspaceRunnable {
 
                     while ((read = in.read(buffer)) > 0) {
 
-                        if (progress.isCanceled())
+                        // FIXME do not throw an Eclipse Exception !
+                        if (monitor.isCanceled())
                             throw new OperationCanceledException(
                                 "compressing of file '" + originalEntryName
                                     + "' was canceled");
@@ -125,7 +116,7 @@ public class CreateArchiveTask implements IWorkspaceRunnable {
 
                         totalRead += read;
 
-                        updateMonitor(progress, totalRead, totalSize);
+                        updateMonitor(monitor, totalRead, totalSize);
                     }
                 } finally {
                     IOUtils.closeQuietly(in);
@@ -135,19 +126,13 @@ public class CreateArchiveTask implements IWorkspaceRunnable {
 
             zipStream.finish();
             cleanup = false;
-        } catch (IOException e) {
-            LOG.error("failed to create archive", e);
-            throw new CoreException(new Status(IStatus.ERROR, Saros.SAROS,
-                "failed to create archive", e));
-
         } finally {
             IOUtils.closeQuietly(zipStream);
             if (cleanup && archive != null && archive.exists()
                 && !archive.delete())
                 LOG.warn("could not delete archive file: " + archive);
 
-            if (monitor != null)
-                monitor.done();
+            monitor.done();
         }
 
         stopWatch.stop();
@@ -173,5 +158,22 @@ public class CreateArchiveTask implements IWorkspaceRunnable {
             monitor.worked(workedDelta);
             lastWorked = worked;
         }
+    }
+
+    private final long getTotalFileSize(Collection<IFile> files) {
+
+        long size = 0L;
+
+        for (IFile file : files) {
+            try {
+                size += file.getSize();
+            } catch (IOException e) {
+                LOG.warn(
+                    "unable to retrieve file size for file: "
+                        + file.getFullPath(), e);
+            }
+        }
+
+        return size;
     }
 }

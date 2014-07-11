@@ -12,7 +12,6 @@ import java.util.concurrent.CancellationException;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
@@ -308,6 +307,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
      *         <code>null</code> if the file lists do not contain any files
      */
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     private File createProjectArchive(final List<FileList> fileLists,
         final IProgressMonitor monitor) throws IOException,
         SarosCancellationException {
@@ -384,24 +384,21 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
         File tempArchive = null;
 
-        /*
-         * org.eclipse.core.resources.IFile will be converted to
-         * de.fu_berlin.inf.dpp.filesystem.IFile and there is no need for a
-         * check
-         */
-        @SuppressWarnings({ "unchecked", "rawtypes" })
-        List<de.fu_berlin.inf.dpp.filesystem.IFile> coreFilesToCompress = (List) ResourceAdapterFactory
-            .convertTo(filesToCompress);
-
         try {
             tempArchive = File.createTempFile("saros_" + processID, ".zip");
             // TODO run inside workspace ?
-            new CreateArchiveTask(tempArchive, coreFilesToCompress, fileAlias,
-                monitor).run(null);
+
+            /*
+             * org.eclipse.core.resources.IFile will be converted to
+             * de.fu_berlin.inf.dpp.filesystem.IFile and there is no need for a
+             * check
+             */
+            new CreateArchiveTask(tempArchive,
+                (List) ResourceAdapterFactory.convertTo(filesToCompress),
+                fileAlias, ProgressMonitorAdapterFactory.convertTo(monitor))
+                .run(null);
         } catch (OperationCanceledException e) {
             throw new LocalCancellationException();
-        } catch (CoreException e) {
-            throw new IOException(e.getMessage(), e);
         }
 
         monitor.done();

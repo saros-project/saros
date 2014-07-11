@@ -51,7 +51,11 @@ public interface IFile extends IResource {
     public IPath getLocation();
 
     /**
-     * @return the size of the file.
+     * Returns the size of the file.
+     * 
+     * @return the size of the file in bytes
+     * @throws IOException
+     *             if an I/O error occurred
      */
     public long getSize() throws IOException;
 }
