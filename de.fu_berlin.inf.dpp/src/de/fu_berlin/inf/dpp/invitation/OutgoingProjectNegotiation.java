@@ -11,7 +11,6 @@ import java.util.Random;
 import java.util.concurrent.CancellationException;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.XMPPException;
@@ -34,6 +33,7 @@ import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
+import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -83,7 +83,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
         File zipArchive = null;
 
-        observeMonitor(ProgressMonitorAdapterFactory.convertTo(monitor));
+        observeMonitor(monitor);
 
         Exception exception = null;
 
@@ -383,7 +383,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             tempArchive = File.createTempFile("saros_" + processID, ".zip");
             // TODO run inside workspace ?
             new CreateArchiveTask(tempArchive, filesToCompress, fileAlias,
-                ProgressMonitorAdapterFactory.convertTo(monitor)).run(null);
+                monitor).run(null);
         } catch (OperationCanceledException e) {
             throw new LocalCancellationException();
         }
@@ -422,8 +422,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 .createOutgoingFileTransfer(remoteContact.toString());
 
             transfer.sendFile(archive, transferID);
-            monitorFileTransfer(transfer,
-                ProgressMonitorAdapterFactory.convertTo(monitor));
+            monitorFileTransfer(transfer, monitor);
         } catch (XMPPException e) {
             throw new IOException(e.getMessage(), e);
         }
@@ -448,7 +447,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
          */
         SubMonitor progress = SubMonitor
             .convert(
-                monitor,
+                ProgressMonitorAdapterFactory.convertBack(monitor),
                 "Creating file list and calculating file checksums. This may take a while...",
                 projectsToShare.size());
 
