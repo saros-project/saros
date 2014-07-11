@@ -40,17 +40,17 @@ public class MUCNegotiationManager {
 
     private static final String NOT_IN_SESSION = "NOT_IN_SESSION";
 
-    private IPreferenceStore preferences;
+    private final IPreferenceStore preferences;
 
-    private String password;
+    private final String password;
+
+    private final XMPPConnectionService connectionService;
+
+    private final ISarosSessionManager sessionManager;
+
+    private final Random random = new Random();
 
     private MultiUserChatPreferences sessionPreferences;
-
-    protected XMPPConnectionService connectionService;
-
-    private ISarosSessionManager sessionManager;
-
-    private Random random = new Random();
 
     private final ISessionNegotiationHook negotiationHook = new ISessionNegotiationHook() {
         private static final String HOOK_IDENTIFIER = "multiUserChat";
