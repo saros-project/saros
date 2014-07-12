@@ -9,6 +9,8 @@ import org.osgi.service.prefs.Preferences;
 import org.picocontainer.BindKey;
 import org.picocontainer.MutablePicoContainer;
 
+import de.fu_berlin.inf.dpp.communication.connection.IProxyResolver;
+import de.fu_berlin.inf.dpp.communication.connection.Socks5ProxyResolver;
 import de.fu_berlin.inf.dpp.concurrent.undo.UndoManager;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
@@ -96,7 +98,10 @@ public class SarosEclipseContextFactory extends AbstractSarosContextFactory {
 
         // VCS (SVN only)
         Component.create(VCSProviderFactory.class,
-            EclipseVCSProviderFactoryImpl.class) };
+            EclipseVCSProviderFactoryImpl.class),
+
+        // Proxy Support for the XMPP server connection
+        Component.create(IProxyResolver.class, Socks5ProxyResolver.class) };
 
     public SarosEclipseContextFactory(Saros saros, ISarosContextFactory delegate) {
         this.saros = saros;

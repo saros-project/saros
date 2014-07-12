@@ -170,8 +170,6 @@ public class Saros extends AbstractUIPlugin {
      */
     protected ISecurePreferences securePrefs;
 
-    public static final Random RANDOM = new Random();
-
     protected Logger log;
 
     /**
