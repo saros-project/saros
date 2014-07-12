@@ -9,9 +9,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
-import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
@@ -29,17 +27,20 @@ import de.fu_berlin.inf.dpp.ui.model.TreeElement;
  * @author Alexander Waldmann (contact@net-corps.de)
  */
 public class AwarenessInformationTreeElement extends TreeElement {
-    @Inject
-    protected EditorManager editorManager;
 
-    @Inject
-    protected AwarenessInformationCollector awarenessInformationCollector;
+    protected final EditorManager editorManager;
 
-    protected User user;
+    protected final AwarenessInformationCollector collector;
 
-    public AwarenessInformationTreeElement(User user) {
-        SarosPluginContext.initComponent(this);
+    protected final User user;
+
+    public AwarenessInformationTreeElement(final User user,
+        final EditorManager editorManager,
+        final AwarenessInformationCollector collector) {
+
         this.user = user;
+        this.editorManager = editorManager;
+        this.collector = collector;
     }
 
     /**

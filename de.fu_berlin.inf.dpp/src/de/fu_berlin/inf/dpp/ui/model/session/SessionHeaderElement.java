@@ -3,10 +3,13 @@ package de.fu_berlin.inf.dpp.ui.model.session;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 
+import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
+import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
@@ -20,17 +23,24 @@ import de.fu_berlin.inf.dpp.ui.model.TreeElement;
  * @author bkahlert
  */
 public class SessionHeaderElement extends HeaderElement {
-    private final SessionInput input;
+    private final SessionInput sessionInput;
+    private final EditorManager editorManager;
+    private final AwarenessInformationCollector collector;
 
-    public SessionHeaderElement(Font font, SessionInput rosterSessionInput) {
+    public SessionHeaderElement(final Font font,
+        final SessionInput sessionInput, final EditorManager editorManager,
+        AwarenessInformationCollector collector) {
+
         super(font);
-        this.input = rosterSessionInput;
+        this.sessionInput = sessionInput;
+        this.editorManager = editorManager;
+        this.collector = collector;
     }
 
     @Override
     public StyledString getStyledText() {
         StyledString styledString = new StyledString();
-        if (input == null || input.getSession() == null) {
+        if (sessionInput == null || sessionInput.getSession() == null) {
             styledString.append(
                 Messages.SessionHeaderElement_no_session_running, boldStyler);
         } else {
@@ -47,47 +57,42 @@ public class SessionHeaderElement extends HeaderElement {
 
     @Override
     public boolean hasChildren() {
-        return input != null && input.getSession() != null;
+        return sessionInput != null && sessionInput.getSession() != null;
     }
 
     @Override
     public Object[] getChildren() {
 
-        if (input == null || input.getSession() == null)
+        if (sessionInput == null || sessionInput.getSession() == null)
             return new Object[0];
 
         final List<UserElement> userElements = new ArrayList<UserElement>();
 
-        final List<User> users = input.getSession().getUsers();
+        final List<User> users = sessionInput.getSession().getUsers();
 
         for (final User user : users)
-            userElements.add(new UserElement(user));
+            userElements.add(new UserElement(user, editorManager, collector));
 
         return userElements.toArray();
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((input == null) ? 0 : input.hashCode());
-        return result;
+        return ObjectUtils.hashCode(sessionInput);
     }
 
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
+
         if (obj == null)
             return false;
+
         if (getClass() != obj.getClass())
             return false;
+
         SessionHeaderElement other = (SessionHeaderElement) obj;
-        if (input == null) {
-            if (other.input != null)
-                return false;
-        } else if (!input.equals(other.input))
-            return false;
-        return true;
+        return ObjectUtils.equals(sessionInput, other.sessionInput);
     }
 }

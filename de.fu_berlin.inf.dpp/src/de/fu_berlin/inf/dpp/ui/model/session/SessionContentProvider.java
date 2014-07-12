@@ -14,6 +14,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
@@ -51,6 +52,9 @@ public class SessionContentProvider extends TreeContentProvider {
     @Inject
     private EditorManager editorManager;
 
+    @Inject
+    private AwarenessInformationCollector collector;
+
     public SessionContentProvider(TreeContentProvider additionalContent) {
         SarosPluginContext.initComponent(this);
 
@@ -72,7 +76,8 @@ public class SessionContentProvider extends TreeContentProvider {
     private final ISharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
         @Override
         public void followModeChanged(User user, boolean isFollowed) {
-            ViewerUtils.update(viewer, new UserElement(user), null);
+            ViewerUtils.update(viewer, new UserElement(user, editorManager,
+                collector), null);
         }
 
         @Override
@@ -150,7 +155,8 @@ public class SessionContentProvider extends TreeContentProvider {
 
         @Override
         public void permissionChanged(User user) {
-            ViewerUtils.update(viewer, new UserElement(user), null);
+            ViewerUtils.update(viewer, new UserElement(user, editorManager,
+                collector), null);
         }
     };
 
@@ -216,7 +222,7 @@ public class SessionContentProvider extends TreeContentProvider {
     private void createHeaders(SessionInput input) {
 
         sessionHeaderElement = new SessionHeaderElement(viewer.getControl()
-            .getFont(), input);
+            .getFont(), input, editorManager, collector);
 
         if (additionalContentProvider instanceof RosterContentProvider) {
             contentHeaderElement = new RosterHeaderElement(viewer.getControl()
