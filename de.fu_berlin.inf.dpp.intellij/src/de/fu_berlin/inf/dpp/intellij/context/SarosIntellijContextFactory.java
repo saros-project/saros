@@ -31,6 +31,8 @@ import de.fu_berlin.inf.dpp.core.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.filesystem.ChecksumCacheImpl;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IFileContentChangedNotifier;
+import de.fu_berlin.inf.dpp.intellij.editor.EditorAPI;
+import de.fu_berlin.inf.dpp.intellij.editor.ProjectAPI;
 import de.fu_berlin.inf.dpp.intellij.project.fs.FileContentChangedNotifierBridge;
 import de.fu_berlin.inf.dpp.intellij.store.PreferenceStore;
 import org.picocontainer.BindKey;
@@ -50,11 +52,10 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
     private final Component[] components = new Component[] {
 
         // Component.create(ISarosSessionManager.class, SarosSessionManager.class), //todo
-        // Component.create(IntelliJUIHelper.class),  //todo
         // Core Managers
         // Component.create(ConsistencyWatchdogClient.class), //todo
 
-        // Component.create(EditorAPI.class), //todo
+        Component.create(EditorAPI.class), Component.create(ProjectAPI.class),
 
         // Component.create(EditorManager.class), //todo
 
