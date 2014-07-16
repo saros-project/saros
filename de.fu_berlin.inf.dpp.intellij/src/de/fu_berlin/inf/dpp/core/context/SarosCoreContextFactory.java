@@ -27,6 +27,7 @@ import de.fu_berlin.inf.dpp.ISarosContextBindings;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatService;
 import de.fu_berlin.inf.dpp.communication.chat.single.SingleUserChatService;
+import de.fu_berlin.inf.dpp.core.vcs.NullVCSProviderFactoryImpl;
 import de.fu_berlin.inf.dpp.invitation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.IReceiver;
@@ -52,6 +53,7 @@ import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
+import de.fu_berlin.inf.dpp.vcs.VCSProviderFactory;
 import de.fu_berlin.inf.dpp.versioning.VersionManager;
 import org.picocontainer.BindKey;
 import org.picocontainer.MutablePicoContainer;
@@ -82,6 +84,10 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
 
         // Invitation hooks
         Component.create(SessionNegotiationHookManager.class),
+
+        // VCS (only dummy to satisfy dependencies)
+        Component
+            .create(VCSProviderFactory.class, NullVCSProviderFactoryImpl.class),
 
         // Network
         Component.create(DispatchThreadContext.class),

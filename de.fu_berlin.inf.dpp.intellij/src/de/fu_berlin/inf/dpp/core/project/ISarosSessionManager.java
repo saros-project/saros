@@ -143,8 +143,8 @@ public interface ISarosSessionManager {
      * This method is called when a new project was added to the session
      *
      * @param from         The one who added the project.
-     * @param projectInfos what projects where added ({@link FileList}, projectName etc.)
-     *                     see: {@link ProjectNegotiationData}
+     * @param projectInfos what projects where added ({@link de.fu_berlin.inf.dpp.invitation.FileList}, projectName etc.)
+     *                     see: {@link de.fu_berlin.inf.dpp.invitation.ProjectNegotiationData}
      * @param processID    ID of the exchanging process
      */
     public void incomingProjectReceived(JID from,
