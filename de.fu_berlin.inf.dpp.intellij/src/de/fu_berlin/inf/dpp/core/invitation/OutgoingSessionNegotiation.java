@@ -1,7 +1,12 @@
 package de.fu_berlin.inf.dpp.core.invitation;
 
 import de.fu_berlin.inf.dpp.ISarosContext;
-import de.fu_berlin.inf.dpp.communication.extensions.*;
+import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcceptedExtension;
+import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcknowledgedExtension;
+import de.fu_berlin.inf.dpp.communication.extensions.InvitationCompletedExtension;
+import de.fu_berlin.inf.dpp.communication.extensions.InvitationOfferingExtension;
+import de.fu_berlin.inf.dpp.communication.extensions.InvitationParameterExchangeExtension;
+import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.core.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
@@ -60,6 +65,10 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
     @Inject
     private SessionNegotiationObservable currentSessionNegotiations;
 
+    @Inject
+    private ISarosSessionManager sarosSessionManager;
+
+
     // HACK last residue of the direct connection between SessionNegotation and
     // the color property of users.
     private int clientColorID = UserColorID.UNKNOWN;
@@ -69,10 +78,6 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
     // HACK last residue of the direct connection between SessionNegotation and
     // the nickname property of users.
     private String clientNickname = null;
-
-    // TODO pull up, when this class is in core
-    @Inject
-    private ISarosSessionManager sarosSessionManager;
 
     public OutgoingSessionNegotiation(JID peer, ISarosSession sarosSession,
         String description, ISarosContext sarosContext) {
@@ -222,10 +227,8 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
         log.debug(this + " : checking Saros support");
         monitor.setTaskName("Checking Saros support...");
 
-        //FIXME: Change back to Saros.NAMESPACE, because this might change for
-        //different reasons than Saros.NAMESPACE
         JID resourceQualifiedJID = discoveryManager.getSupportingPresence(peer,
-            SarosPacketExtension.EXTENSION_NAMESPACE);
+            Saros.NAMESPACE);
 
         if (resourceQualifiedJID == null) {
             throw new LocalCancellationException(peerNickname

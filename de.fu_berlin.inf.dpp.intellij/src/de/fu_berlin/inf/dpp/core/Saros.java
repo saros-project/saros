@@ -34,20 +34,16 @@ import de.fu_berlin.inf.dpp.intellij.project.fs.Workspace;
 import de.fu_berlin.inf.dpp.misc.pico.DotGraphMonitor;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.util.StackTrace;
-import org.apache.log4j.Logger;
 import org.apache.log4j.helpers.LogLog;
 
 /**
- * Saros plugin class
+ * Saros plugin class for bundling globally necessary variables like project.
  */
 public class Saros {
-
-    private static final Logger LOG = Logger.getLogger(Saros.class);
 
     /**
      * This is the Bundle-SymbolicName (a.k.a the pluginID)
      */
-
     public static final String SAROS = "de.fu_berlin.inf.dpp";
 
     /**
@@ -59,7 +55,7 @@ public class Saros {
      * The name of the XMPP namespace used by SarosEclipse. At the moment it is only
      * used to advertise the SarosEclipse feature in the Service Discovery.
      * <p/>
-     * TODO Add version information, so that only compatible versions of SarosEclipse
+     * TODO Add version information, so that only compatible versions of Saros
      * can use each other.
      */
     public static final String NAMESPACE = SAROS;
@@ -69,11 +65,12 @@ public class Saros {
      * XMPP server (for instance when logging in as john@doe.com, Saros will
      * connect using john@doe.com/Saros)
      * <p/>
+     * //todo
      */
     public static final String RESOURCE = "Saros";
 
     /**
-     * Sub-namespace for the server. It is used to advertise when a server is
+     * Sub-namespace for the server. It is used advertise when a server is
      * active.
      */
     public static final String NAMESPACE_SERVER = NAMESPACE + ".server";
@@ -83,9 +80,11 @@ public class Saros {
     private static boolean isInitialized;
 
     private Project project;
+
     private ToolWindow toolWindow;
 
-    protected PreferenceUtils preferenceUtils;
+    private XMPPConnectionService connectionService;
+    private PreferenceUtils preferenceUtils;
 
     //FIXME: Add again when SarosMainPanelView was added
     //private SarosMainPanelView mainPanel;
@@ -95,7 +94,7 @@ public class Saros {
 
     /**
      * Returns true if the Saros instance has been initialized so that calling
-     * {@link de.fu_berlin.inf.dpp.core.context.SarosContext#reinject(Object)} will be well defined.
+     * {@link SarosContext#reinject(Object)} will be well defined.
      */
     public static boolean isInitialized() {
         return isInitialized;
@@ -104,6 +103,8 @@ public class Saros {
     /**
      * Checks if Saros was already initialized by create(). Throws an
      * IllegalStateException if not initialized.
+     *
+     * @throws IllegalStateException
      */
     public static void checkInitialized() {
         if (!isInitialized()) {
@@ -112,20 +113,8 @@ public class Saros {
         }
     }
 
-    //FIXME: Add again when SarosMainPanelView was added
-    /*
-    public SarosMainPanelView getMainPanel()
-    {
-        return mainPanel;
-    }
-
-    public void setMainPanel(SarosMainPanelView mainPanel)
-    {
-        this.mainPanel = mainPanel;
-    }*/
-
     /**
-     * Creates a new Saros singleton instance with a project.
+     * Creates a new Saros singleton instance from a project.
      *
      * @param project
      * @return
@@ -134,16 +123,6 @@ public class Saros {
         if (instance == null) {
             instance = new Saros(project);
             instance.start();
-        }
-        return instance;
-    }
-
-    /**
-     * @return the Saros instance
-     */
-    public synchronized static Saros getInstance() {
-        if (instance == null) {
-            throw new IllegalStateException("Saros not initialized");
         }
         return instance;
     }
@@ -163,14 +142,13 @@ public class Saros {
         }
 
         //CONTEXT
-        sarosContext = new SarosContext(
-            new SarosIntellijContextFactory(this,
-                new SarosCoreContextFactory()), new DotGraphMonitor()
+        sarosContext = new SarosContext(new SarosIntellijContextFactory(this,
+            new SarosCoreContextFactory()), new DotGraphMonitor()
         );
 
         SarosPluginContext.setSarosContext(sarosContext);
 
-        XMPPConnectionService connectionService = sarosContext
+        connectionService = sarosContext
             .getComponent(XMPPConnectionService.class);
         preferenceUtils = sarosContext.getComponent(PreferenceUtils.class);
 
@@ -183,10 +161,9 @@ public class Saros {
         // Make sure that all components in the container are
         // instantiated
         sarosContext.getComponents(Object.class);
-
     }
 
-    //TODO: Properly stop network and context classes
+    //FIXME: Properly stop network and context classes
     void stop() {
         isInitialized = false;
     }
@@ -199,16 +176,22 @@ public class Saros {
         return toolWindow;
     }
 
-    public void setToolWindow(ToolWindow toolWindow) {
-        this.toolWindow = toolWindow;
-    }
-
-    public SarosContext getSarosContext() {
-        return sarosContext;
-    }
-
     public IWorkspace getWorkspace() {
         return workspace;
     }
 
+    public void setToolWindow(ToolWindow toolWindow) {
+        this.toolWindow = toolWindow;
+    }
+
+    //FIXME: Add again when SarosMainPanelView was added.
+    /*
+    public SarosMainPanelView getMainPanel() {
+        return mainPanel;
+    }
+
+    public void setMainPanel(SarosMainPanelView mainPanel) {
+        this.mainPanel = mainPanel;
+    }*/
 }
+
