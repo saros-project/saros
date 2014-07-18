@@ -32,6 +32,9 @@ import de.fu_berlin.inf.dpp.filesystem.ChecksumCacheImpl;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IFileContentChangedNotifier;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorAPI;
+import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
+import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorHandler;
+import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorManipulator;
 import de.fu_berlin.inf.dpp.intellij.editor.ProjectAPI;
 import de.fu_berlin.inf.dpp.intellij.project.fs.FileContentChangedNotifierBridge;
 import de.fu_berlin.inf.dpp.intellij.store.PreferenceStore;
@@ -46,6 +49,7 @@ import java.util.Arrays;
 public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
 
     private Saros saros;
+
     private final ISarosContextFactory additionalContext;
 
     //FIXME: uncomment when classes are submitted
@@ -57,7 +61,9 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
 
         Component.create(EditorAPI.class), Component.create(ProjectAPI.class),
 
-        // Component.create(EditorManager.class), //todo
+        Component.create(EditorManager.class),
+        Component.create(LocalEditorHandler.class),
+        Component.create(LocalEditorManipulator.class),
 
         // UI handlers
         // Component.create(NegotiationHandler.class), //todo

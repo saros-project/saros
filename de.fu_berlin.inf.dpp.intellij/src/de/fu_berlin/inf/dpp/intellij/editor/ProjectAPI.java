@@ -206,12 +206,8 @@ public class ProjectAPI {
 
     }
 
-    //TODO: Uncomment when StoppableEditorFileListener was added
-    /**
-     public void addFileEditorManagerListener(StoppableEditorFileListener listener) {
-     if (editorFileManager != null) {
-     editorFileManager.addFileEditorManagerListener(listener);
-     }
-
-     }*/
+    public void addFileEditorManagerListener(
+        StoppableEditorFileListener listener) {
+        editorFileManager.addFileEditorManagerListener(listener);
+    }
 }
