@@ -12,7 +12,7 @@ public interface IProgressMonitor {
 
     public void done();
 
-    public void subTask(String task);
+    public void subTask(String name);
 
     public void setTaskName(String name);
 
@@ -22,5 +22,5 @@ public interface IProgressMonitor {
 
     public boolean isCanceled();
 
-    public void beginTask(String string, int size);
+    public void beginTask(String name, int size);
 }
