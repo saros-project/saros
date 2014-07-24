@@ -47,7 +47,7 @@ public final class SubProgressMonitor implements IProgressMonitor {
      * Indicates that strings passed into {@linkplain #subTask} should be
      * ignored.
      */
-    public static final int SUPPRESS_SUBTASK = 3;
+    public static final int SUPPRESS_SUBTASK = 4;
 
     private final IProgressMonitor delegate;
 
