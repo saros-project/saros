@@ -49,6 +49,7 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.awareness.IDEInteractionActivitiesManager;
+import de.fu_berlin.inf.dpp.awareness.RefactoringManager;
 import de.fu_berlin.inf.dpp.awareness.TestRunManager;
 import de.fu_berlin.inf.dpp.communication.extensions.ActivitiesExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.KickUserExtension;
@@ -1130,6 +1131,23 @@ public final class SarosSession implements ISarosSession {
             log.debug("Could add 'TestRunManager' to the session container");
         } else {
             log.debug("Could not add 'TestRunManager' to the session container, required bundles are missing");
+        }
+
+        /*
+         * The following lines check whether the
+         * 'org.eclipse.ltk.core.refactoring' bundle does exist in the user's
+         * Eclipse IDE. If not, the loading of the 'RefactoringManager' would
+         * cause an error and therefore Saros would not load. Depending on user
+         * tests, these lines may be removed.
+         * 
+         * TODO remove these lines, if user tests show that they are not needed
+         */
+        Bundle bundle3 = Platform.getBundle("org.eclipse.ltk.core.refactoring");
+        if (bundle3 != null) {
+            sessionContainer.addComponent(RefactoringManager.class);
+            log.debug("Could add 'RefactoringManager' to the session container");
+        } else {
+            log.debug("Could not add 'RefactoringManager' to the session container, required bundle is missing");
         }
 
         // Feedback

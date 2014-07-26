@@ -53,6 +53,14 @@ public interface IActivityReceiver {
 
     void receive(ProgressActivity progressActivity);
 
+    /**
+     * This method is called, when an {@link RefactoringActivity} was received.
+     * 
+     * @param refactoringActivity
+     *            The received {@link RefactoringActivity}
+     * */
+    void receive(RefactoringActivity refactoringActivity);
+
     void receive(ShareConsoleActivity shareConsoleActivity);
 
     void receive(StartFollowingActivity startFollowingActivity);

@@ -40,6 +40,7 @@ import de.fu_berlin.inf.dpp.activities.NOPActivity;
 import de.fu_berlin.inf.dpp.activities.PermissionActivity;
 import de.fu_berlin.inf.dpp.activities.ProgressActivity;
 import de.fu_berlin.inf.dpp.activities.RecoveryFileActivity;
+import de.fu_berlin.inf.dpp.activities.RefactoringActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.ShareConsoleActivity;
 import de.fu_berlin.inf.dpp.activities.StartFollowingActivity;
@@ -190,6 +191,8 @@ public class ActivitiesExtension extends SarosSessionPacketExtension {
                 ProgressActivity.class,
 
                 RecoveryFileActivity.class,
+
+                RefactoringActivity.class,
 
                 ShareConsoleActivity.class,
 

@@ -13,8 +13,8 @@ import de.fu_berlin.inf.dpp.ui.ImageManager;
 /**
  * This tree element is supposed to be used as a child element of the user entry
  * in the Saros session view. It displays current action awareness information
- * about the user, e.g. the opened dialog, the activated view or information
- * about test runs.
+ * about the user, e.g. the opened dialog, the activated view, information about
+ * test runs or performed refactorings.
  * */
 public class UIAwarenessTreeElement extends AwarenessInformationTreeElement {
 
@@ -67,6 +67,14 @@ public class UIAwarenessTreeElement extends AwarenessInformationTreeElement {
                     break;
                 }
             }
+        } else if (collector.getCurrentRefactoringDescription(user) != null) {
+
+            // a refactoring was performed
+            String description = collector
+                .getCurrentRefactoringDescription(user);
+
+            if (description != null)
+                styledString.append("Refactored: " + description);
 
         } else if (collector.getOpenIDEElementTitle(user) != null) {
 

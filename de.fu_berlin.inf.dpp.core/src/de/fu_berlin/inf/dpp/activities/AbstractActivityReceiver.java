@@ -81,6 +81,11 @@ public abstract class AbstractActivityReceiver implements IActivityReceiver {
     }
 
     @Override
+    public void receive(RefactoringActivity refactoringActivity) {
+        // do nothing
+    }
+
+    @Override
     public void receive(ShareConsoleActivity shareConsoleActivity) {
         // do nothing
     }

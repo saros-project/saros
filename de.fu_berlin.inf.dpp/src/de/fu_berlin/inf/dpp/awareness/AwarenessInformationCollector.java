@@ -49,10 +49,16 @@ public class AwarenessInformationCollector {
     private final Map<User, String> currentTestRunName = new HashMap<User, String>();
 
     /**
-     * Stores the State ({@link State}) of the currently running test of the
+     * Stores the state ({@link State}) of the currently running test of the
      * given user
      * */
     private final Map<User, State> currentTestRunState = new HashMap<User, State>();
+
+    /**
+     * Stores the description of the currently performed refactoring of the
+     * given user
+     * */
+    private final Map<User, String> currentRefactoringDescription = new HashMap<User, String>();
 
     public AwarenessInformationCollector(ISarosSessionManager sessionManager,
         final EditorManager editorManager) {
@@ -251,5 +257,42 @@ public class AwarenessInformationCollector {
      * */
     public synchronized State getCurrentTestRunState(User user) {
         return currentTestRunState.get(user);
+    }
+
+    /**
+     * Stores the description of the performed refactoring of the given user.
+     * 
+     * @param user
+     *            The user who performed the refactoring.
+     * @param description
+     *            The description of the refactoring.
+     * */
+    public synchronized void addRefactoring(User user, String description) {
+        currentRefactoringDescription.put(user, description);
+    }
+
+    /**
+     * Removes the description of the last performed refactoring of the given
+     * user.
+     * 
+     * @param user
+     *            The user who performed the refactoring.
+     * */
+    public synchronized void removeRefactoring(User user) {
+        currentRefactoringDescription.remove(user);
+    }
+
+    /**
+     * Returns the description of the last performed refactoring of the given
+     * user or <code>null</code>, if <code>user</code> is <code>null</code>.
+     * 
+     * @param user
+     *            The user who created this activity.
+     * @return The description of the last performed refactoring of the given
+     *         user or <code>null</code>, if <code>user</code> is
+     *         <code>null</code>.
+     * */
+    public synchronized String getCurrentRefactoringDescription(User user) {
+        return currentRefactoringDescription.get(user);
     }
 }

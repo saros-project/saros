@@ -17,6 +17,8 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.awareness.IDEInteractionActivitiesListener;
 import de.fu_berlin.inf.dpp.awareness.IDEInteractionActivitiesManager;
+import de.fu_berlin.inf.dpp.awareness.RefactoringListener;
+import de.fu_berlin.inf.dpp.awareness.RefactoringManager;
 import de.fu_berlin.inf.dpp.awareness.TestRunManager;
 import de.fu_berlin.inf.dpp.awareness.TestRunsListener;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
@@ -56,6 +58,8 @@ public class SessionContentProvider extends TreeContentProvider {
     private IDEInteractionActivitiesManager ideInteractionTracker;
 
     private TestRunManager testRunTracker;
+
+    private RefactoringManager refactoringTracker;
 
     @Inject
     private EditorManager editorManager;
@@ -112,6 +116,19 @@ public class SessionContentProvider extends TreeContentProvider {
              * 
              * FIXME find a way without adding/removing chain or fix this, if
              * chain remains
+             */
+            viewer.refresh();
+        }
+    };
+
+    private final RefactoringListener refactoringListener = new RefactoringListener() {
+
+        @Override
+        public void refactoringActivityChanged() {
+            /*
+             * HACK same as in testRunsListener.testRunChanged() (see above)
+             * FIXME this needs a complete redesign without a hack after the
+             * user test (if feature is still needed)
              */
             viewer.refresh();
         }
@@ -223,6 +240,9 @@ public class SessionContentProvider extends TreeContentProvider {
             ideInteractionTracker
                 .removeIDEInteractionActivityListener(ideInteractionsListener);
 
+        if (refactoringTracker != null)
+            refactoringTracker.removeRefactoringListener(refactoringListener);
+
         if (testRunTracker != null)
             testRunTracker.removeTestRunListener(testRunsListener);
 
@@ -261,6 +281,12 @@ public class SessionContentProvider extends TreeContentProvider {
             if (ideInteractionTracker != null)
                 ideInteractionTracker
                     .addIDEInteractionActivityListener(ideInteractionsListener);
+
+            refactoringTracker = (RefactoringManager) newSession
+                .getComponent(RefactoringManager.class);
+
+            if (refactoringTracker != null)
+                refactoringTracker.addRefactoringListener(refactoringListener);
 
             testRunTracker = (TestRunManager) newSession
                 .getComponent(TestRunManager.class);
@@ -316,6 +342,9 @@ public class SessionContentProvider extends TreeContentProvider {
             ideInteractionTracker
                 .removeIDEInteractionActivityListener(ideInteractionsListener);
 
+        if (refactoringTracker != null)
+            refactoringTracker.removeRefactoringListener(refactoringListener);
+
         if (testRunTracker != null)
             testRunTracker.removeTestRunListener(testRunsListener);
 
@@ -331,6 +360,7 @@ public class SessionContentProvider extends TreeContentProvider {
         additionalContentProvider = null;
         followingTracker = null;
         ideInteractionTracker = null;
+        refactoringTracker = null;
         testRunTracker = null;
     }
 
