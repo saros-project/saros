@@ -76,6 +76,14 @@ public class UIAwarenessTreeElement extends AwarenessInformationTreeElement {
             if (description != null)
                 styledString.append("Refactored: " + description);
 
+        } else if (collector.currentCreatedFileName(user) != null) {
+
+            // a file was created
+            String fileName = collector.currentCreatedFileName(user);
+
+            if (fileName != null)
+                styledString.append("Created: " + fileName);
+
         } else if (collector.getOpenIDEElementTitle(user) != null) {
 
             // a normal IDE interaction was made

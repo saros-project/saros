@@ -15,6 +15,8 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
+import de.fu_berlin.inf.dpp.awareness.FileCreationListener;
+import de.fu_berlin.inf.dpp.awareness.FileActivityManager;
 import de.fu_berlin.inf.dpp.awareness.IDEInteractionActivitiesListener;
 import de.fu_berlin.inf.dpp.awareness.IDEInteractionActivitiesManager;
 import de.fu_berlin.inf.dpp.awareness.RefactoringListener;
@@ -60,6 +62,8 @@ public class SessionContentProvider extends TreeContentProvider {
     private TestRunManager testRunTracker;
 
     private RefactoringManager refactoringTracker;
+
+    private FileActivityManager fileCreationTracker;
 
     @Inject
     private EditorManager editorManager;
@@ -126,9 +130,54 @@ public class SessionContentProvider extends TreeContentProvider {
         @Override
         public void refactoringActivityChanged() {
             /*
-             * HACK same as in testRunsListener.testRunChanged() (see above)
-             * FIXME this needs a complete redesign without a hack after the
-             * user test (if feature is still needed)
+             * HACK 'RefactoringManager.receiverSessionOverview' stores the
+             * received information in the AwarenessInformationCollector and
+             * notifies this provider to refresh the session overview. If
+             * 'RefactoringManager.receiverSessionOverview' receives the
+             * information, that something was refactored, it notifies this
+             * provider to refresh and THEN removes the information from the
+             * AwarenessInformationCollector. Since 'ViewerUtils.refresh(viewer,
+             * true)' is used to refresh, it runs asynchronously and refreshes
+             * AFTER 'RefactoringManager.receiverSessionOverview' removed the
+             * refactoring from the AwarenessInformationCollector, so that it
+             * was not shown that something was refactored.
+             * 
+             * Therefore it is needed to immediatley refresh before the removal
+             * of the information from the AwarenessInformationCollector. To
+             * reach this, 'viewer.refresh()' instead of
+             * 'ViewerUtils.refresh(viewer, true)' is called.
+             * 
+             * FIXME find a way without adding/removing chain or fix this, if
+             * chain remains
+             */
+            viewer.refresh();
+        }
+    };
+
+    private final FileCreationListener fileCreationListener = new FileCreationListener() {
+
+        @Override
+        public void newFileCreated() {
+            /*
+             * HACK 'FileCreationManager.receiverSessionOverview' stores the
+             * received information in the AwarenessInformationCollector and
+             * notifies this provider to refresh the session overview. If
+             * 'FileCreationManager.receiverSessionOverview' receives the
+             * information, that a file was created, it notifies this provider
+             * to refresh and THEN removes the information from the
+             * AwarenessInformationCollector. Since 'ViewerUtils.refresh(viewer,
+             * true)' is used to refresh, it runs asynchronously and refreshes
+             * AFTER 'FileCreationManager.receiverSessionOverview' removed the
+             * created file from the AwarenessInformationCollector, so that it
+             * was not shown that the file was created.
+             * 
+             * Therefore it is needed to immediately refresh before the removal
+             * of the information from the AwarenessInformationCollector. To
+             * reach this, 'viewer.refresh()' instead of
+             * 'ViewerUtils.refresh(viewer, true)' is called.
+             * 
+             * FIXME find a way without adding/removing chain or fix this, if
+             * chain remains
              */
             viewer.refresh();
         }
@@ -246,6 +295,10 @@ public class SessionContentProvider extends TreeContentProvider {
         if (testRunTracker != null)
             testRunTracker.removeTestRunListener(testRunsListener);
 
+        if (fileCreationTracker != null)
+            fileCreationTracker
+                .removeFileCreationListener(fileCreationListener);
+
         if (additionalContentProvider != null)
             additionalContentProvider.inputChanged(viewer,
                 getContent(oldInput), getContent(newInput));
@@ -293,6 +346,13 @@ public class SessionContentProvider extends TreeContentProvider {
 
             if (testRunTracker != null)
                 testRunTracker.addTestRunListener(testRunsListener);
+
+            fileCreationTracker = (FileActivityManager) newSession
+                .getComponent(FileActivityManager.class);
+
+            if (fileCreationTracker != null)
+                fileCreationTracker
+                    .addFileCreationListener(fileCreationListener);
         }
 
     }
@@ -348,6 +408,10 @@ public class SessionContentProvider extends TreeContentProvider {
         if (testRunTracker != null)
             testRunTracker.removeTestRunListener(testRunsListener);
 
+        if (fileCreationTracker != null)
+            fileCreationTracker
+                .removeFileCreationListener(fileCreationListener);
+
         if (additionalContentProvider != null)
             additionalContentProvider.dispose();
 
@@ -362,6 +426,7 @@ public class SessionContentProvider extends TreeContentProvider {
         ideInteractionTracker = null;
         refactoringTracker = null;
         testRunTracker = null;
+        fileCreationTracker = null;
     }
 
     /**

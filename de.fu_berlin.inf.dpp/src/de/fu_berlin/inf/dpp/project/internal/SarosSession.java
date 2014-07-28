@@ -48,6 +48,7 @@ import de.fu_berlin.inf.dpp.activities.NOPActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
+import de.fu_berlin.inf.dpp.awareness.FileActivityManager;
 import de.fu_berlin.inf.dpp.awareness.IDEInteractionActivitiesManager;
 import de.fu_berlin.inf.dpp.awareness.RefactoringManager;
 import de.fu_berlin.inf.dpp.awareness.TestRunManager;
@@ -1114,6 +1115,7 @@ public final class SarosSession implements ISarosSession {
 
         // Awareness
         sessionContainer.addComponent(IDEInteractionActivitiesManager.class);
+        sessionContainer.addComponent(FileActivityManager.class);
 
         /*
          * The following lines check whether the 'org.eclipse.jdt.junit' and

@@ -60,6 +60,11 @@ public class AwarenessInformationCollector {
      * */
     private final Map<User, String> currentRefactoringDescription = new HashMap<User, String>();
 
+    /**
+     * Stores the name of the last created file of the given user
+     * */
+    private final Map<User, String> currentCreatedFileName = new HashMap<User, String>();
+
     public AwarenessInformationCollector(ISarosSessionManager sessionManager,
         final EditorManager editorManager) {
 
@@ -294,5 +299,40 @@ public class AwarenessInformationCollector {
      * */
     public synchronized String getCurrentRefactoringDescription(User user) {
         return currentRefactoringDescription.get(user);
+    }
+
+    /**
+     * Stores the name of the last created file of the given user.
+     * 
+     * @param user
+     *            The user who created the file.
+     * @param fileName
+     *            The name of the created file
+     * */
+    public synchronized void addCreatedFileName(User user, String fileName) {
+        currentCreatedFileName.put(user, fileName);
+    }
+
+    /**
+     * Removes the name of the last created file of the given user.
+     * 
+     * @param user
+     *            The user who created the file.
+     * */
+    public synchronized void removeCreatedFileName(User user) {
+        currentCreatedFileName.remove(user);
+    }
+
+    /**
+     * Returns the name of the last created file of the given user or
+     * <code>null</code>, if <code>user</code> is <code>null</code>.
+     * 
+     * @param user
+     *            The user who created this activity.
+     * @return The name of the last created file of the given user or
+     *         <code>null</code>, if <code>user</code> is <code>null</code>.
+     * */
+    public synchronized String currentCreatedFileName(User user) {
+        return currentCreatedFileName.get(user);
     }
 }
