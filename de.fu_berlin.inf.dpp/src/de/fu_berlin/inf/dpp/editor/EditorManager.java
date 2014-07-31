@@ -46,7 +46,6 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.part.FileEditorInput;
-import org.eclipse.ui.texteditor.DocumentProviderRegistry;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.picocontainer.annotations.Inject;
@@ -458,7 +457,9 @@ public class EditorManager extends AbstractActivityProducer {
 
         if (!isManaged(file)) {
             FileEditorInput input = new FileEditorInput(file);
-            IDocumentProvider documentProvider = getDocumentProvider(input);
+            IDocumentProvider documentProvider = editorAPI
+                .getDocumentProvider(input);
+
             try {
                 documentProvider.connect(input);
             } catch (CoreException e) {
@@ -482,7 +483,10 @@ public class EditorManager extends AbstractActivityProducer {
         }
 
         FileEditorInput input = new FileEditorInput(file);
-        IDocumentProvider documentProvider = getDocumentProvider(input);
+
+        IDocumentProvider documentProvider = editorAPI
+            .getDocumentProvider(input);
+
         documentProvider.disconnect(input);
 
         connectedFiles.remove(file);
@@ -638,7 +642,7 @@ public class EditorManager extends AbstractActivityProducer {
         // FIXME: This is potentially slow and definitely ugly
         // search editor which changed
         for (IEditorPart editor : editorPool.getAllEditors()) {
-            if (ObjectUtils.equals(getDocument(editor), document)) {
+            if (ObjectUtils.equals(editorAPI.getDocument(editor), document)) {
                 changedEditor = editor;
                 break;
             }
@@ -696,7 +700,7 @@ public class EditorManager extends AbstractActivityProducer {
          * TODO Investigate if this is really needed here
          */
         IEditorInput input = changedEditor.getEditorInput();
-        IDocumentProvider provider = getDocumentProvider(input);
+        IDocumentProvider provider = editorAPI.getDocumentProvider(input);
         IAnnotationModel model = provider.getAnnotationModel(input);
         contributionAnnotationManager.splitAnnotation(model, offset);
     }
@@ -1224,7 +1228,7 @@ public class EditorManager extends AbstractActivityProducer {
 
         IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
         FileEditorInput input = new FileEditorInput(file);
-        IDocumentProvider provider = getDocumentProvider(input);
+        IDocumentProvider provider = editorAPI.getDocumentProvider(input);
 
         try {
             provider.connect(input);
@@ -1339,7 +1343,7 @@ public class EditorManager extends AbstractActivityProducer {
 
         FileEditorInput input = new FileEditorInput(file);
 
-        return getDocumentProvider(input).canSaveDocument(input);
+        return editorAPI.getDocumentProvider(input).canSaveDocument(input);
     }
 
     /**
@@ -1377,7 +1381,7 @@ public class EditorManager extends AbstractActivityProducer {
         editorListenerDispatch.userWithWriteAccessEditorSaved(path, true);
 
         FileEditorInput input = new FileEditorInput(file);
-        IDocumentProvider provider = getDocumentProvider(input);
+        IDocumentProvider provider = editorAPI.getDocumentProvider(input);
 
         if (!provider.canSaveDocument(input)) {
             /*
@@ -1697,28 +1701,6 @@ public class EditorManager extends AbstractActivityProducer {
         Set<SPath> result = remoteEditorManager.getRemoteOpenEditors();
         result.addAll(locallyOpenEditors);
         return result;
-    }
-
-    /**
-     * Returns the {@link IDocumentProvider} of the given {@link IEditorInput}.
-     * This method analyzes the file extension of the {@link IFile} associated
-     * with the given {@link IEditorInput}. Depending on the file extension it
-     * returns file-types responsible {@link IDocumentProvider}.
-     * 
-     * @param input
-     *            the {@link IEditorInput} for which {@link IDocumentProvider}
-     *            is needed
-     * 
-     * @return IDocumentProvider of the given input
-     */
-    public static IDocumentProvider getDocumentProvider(IEditorInput input) {
-        return DocumentProviderRegistry.getDefault().getDocumentProvider(input);
-    }
-
-    public static IDocument getDocument(IEditorPart editorPart) {
-        IEditorInput input = editorPart.getEditorInput();
-
-        return getDocumentProvider(input).getDocument(input);
     }
 
     /**
@@ -2043,7 +2025,8 @@ public class EditorManager extends AbstractActivityProducer {
             session, preferenceStore);
 
         remoteEditorManager = new RemoteEditorManager(session);
-        remoteWriteAccessManager = new RemoteWriteAccessManager(session);
+        remoteWriteAccessManager = new RemoteWriteAccessManager(session,
+            editorAPI);
 
         preferenceStore.addPropertyChangeListener(annotationPreferenceListener);
 

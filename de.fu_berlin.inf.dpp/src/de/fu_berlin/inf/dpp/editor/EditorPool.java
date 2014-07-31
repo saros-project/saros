@@ -135,14 +135,14 @@ class EditorPool {
         editorAPI.setEditable(editorPart, editorManager.hasWriteAccess
             && !editorManager.isLocked);
 
-        final IDocumentProvider documentProvider = EditorManager
+        final IDocumentProvider documentProvider = editorAPI
             .getDocumentProvider(input);
 
         // TODO Not registering is very helpful to find errors related to file
         // transfer problems
         dirtyStateListener.register(documentProvider, input);
 
-        final IDocument document = EditorManager.getDocument(editorPart);
+        final IDocument document = editorAPI.getDocument(editorPart);
 
         document.addDocumentListener(documentListener);
 
@@ -230,7 +230,7 @@ class EditorPool {
 
         editorListeners.remove(editorPart).unbind();
 
-        final IDocumentProvider documentProvider = EditorManager
+        final IDocumentProvider documentProvider = editorAPI
             .getDocumentProvider(input);
 
         dirtyStateListener.unregister(documentProvider, input);

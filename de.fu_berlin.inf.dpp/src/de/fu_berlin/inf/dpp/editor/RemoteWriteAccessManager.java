@@ -13,9 +13,10 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
-import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
+import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
@@ -55,8 +56,12 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
 
     protected ISarosSession sarosSession;
 
-    public RemoteWriteAccessManager(final ISarosSession sarosSession) {
+    protected final IEditorAPI editorAPI;
+
+    public RemoteWriteAccessManager(final ISarosSession sarosSession,
+        IEditorAPI editorAPI) {
         this.sarosSession = sarosSession;
+        this.editorAPI = editorAPI;
         this.sarosSession.addListener(sharedProjectListener);
     }
 
@@ -151,7 +156,7 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
         }
 
         FileEditorInput input = new FileEditorInput(file);
-        IDocumentProvider provider = EditorManager.getDocumentProvider(input);
+        IDocumentProvider provider = editorAPI.getDocumentProvider(input);
         try {
             provider.connect(input);
         } catch (CoreException e) {
@@ -176,7 +181,7 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
 
         IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
         FileEditorInput input = new FileEditorInput(file);
-        IDocumentProvider provider = EditorManager.getDocumentProvider(input);
+        IDocumentProvider provider = editorAPI.getDocumentProvider(input);
         provider.disconnect(input);
     }
 

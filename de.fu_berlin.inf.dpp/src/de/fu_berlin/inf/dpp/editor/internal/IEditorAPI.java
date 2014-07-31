@@ -1,10 +1,14 @@
 package de.fu_berlin.inf.dpp.editor.internal;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.source.ILineRange;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
@@ -132,5 +136,28 @@ public interface IEditorAPI {
      *             if the EditorManager is null
      */
     public void addEditorPartListener(EditorManager editorManager);
+
+    /**
+     * Returns the {@link IDocumentProvider} of the given {@link IEditorInput}.
+     * This method analyzes the file extension of the {@link IFile} associated
+     * with the given {@link IEditorInput}. Depending on the file extension it
+     * returns file-types responsible {@link IDocumentProvider}.
+     * 
+     * @param input
+     *            the {@link IEditorInput} for which {@link IDocumentProvider}
+     *            is needed
+     * 
+     * @return IDocumentProvider of the given input
+     */
+    public IDocumentProvider getDocumentProvider(IEditorInput input);
+
+    /**
+     * Returns the document for the given editor part.
+     * 
+     * @param editorPart
+     *            editor part to retrieve the document
+     * @return the document for the given editor part
+     */
+    public IDocument getDocument(IEditorPart editorPart);
 
 }

@@ -13,9 +13,9 @@ import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.IAnnotationModelExtension;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.texteditor.DocumentProviderRegistry;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
-import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.util.Predicate;
 
 /**
@@ -110,7 +110,8 @@ public class AnnotationModelHelper {
 
     public IAnnotationModel retrieveAnnotationModel(IEditorPart editorPart) {
         IEditorInput input = editorPart.getEditorInput();
-        IDocumentProvider provider = EditorManager.getDocumentProvider(input);
+        IDocumentProvider provider = DocumentProviderRegistry.getDefault()
+            .getDocumentProvider(input);
         IAnnotationModel model = provider.getAnnotationModel(input);
 
         return model;

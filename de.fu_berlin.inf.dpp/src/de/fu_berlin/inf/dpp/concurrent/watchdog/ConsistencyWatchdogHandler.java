@@ -23,6 +23,7 @@ import de.fu_berlin.inf.dpp.activities.RecoveryFileActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
@@ -50,6 +51,8 @@ public class ConsistencyWatchdogHandler extends AbstractActivityProducer
 
     protected final ISarosSession sarosSession;
 
+    protected final IEditorAPI editorAPI;
+
     private final IActivityConsumer consumer = new AbstractActivityConsumer() {
         @Override
         public void receive(ChecksumErrorActivity checksumError) {
@@ -71,9 +74,11 @@ public class ConsistencyWatchdogHandler extends AbstractActivityProducer
     }
 
     public ConsistencyWatchdogHandler(ISarosSession sarosSession,
-        EditorManager editorManager, ConsistencyWatchdogClient watchdogClient) {
+        ConsistencyWatchdogClient watchdogClient, EditorManager editorManager,
+        IEditorAPI editorAPI) {
         this.sarosSession = sarosSession;
         this.editorManager = editorManager;
+        this.editorAPI = editorAPI;
         this.watchdogClient = watchdogClient;
     }
 
@@ -263,7 +268,7 @@ public class ConsistencyWatchdogHandler extends AbstractActivityProducer
          * verify the recovered file
          */
         FileEditorInput input = new FileEditorInput(file);
-        IDocumentProvider provider = EditorManager.getDocumentProvider(input);
+        IDocumentProvider provider = editorAPI.getDocumentProvider(input);
 
         try {
             provider.connect(input);

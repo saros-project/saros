@@ -31,6 +31,7 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
 import de.fu_berlin.inf.dpp.monitoring.remote.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
@@ -73,6 +74,9 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer {
 
     @Inject
     protected EditorManager editorManager;
+
+    @Inject
+    protected IEditorAPI editorAPI;
 
     /**
      * @Inject Injected via Constructor Injection
@@ -366,7 +370,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer {
         }
 
         FileEditorInput input = new FileEditorInput(file);
-        IDocumentProvider provider = EditorManager.getDocumentProvider(input);
+        IDocumentProvider provider = editorAPI.getDocumentProvider(input);
 
         try {
             provider.connect(input);

@@ -45,6 +45,7 @@ import de.fu_berlin.inf.dpp.concurrent.undo.OperationHistory.Type;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
+import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
@@ -102,6 +103,8 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
     protected IUndoContext context = IOperationHistory.GLOBAL_UNDO_CONTEXT;
 
     protected EditorManager editorManager;
+
+    protected IEditorAPI editorAPI;
 
     protected SPath currentActiveEditor = null;
 
@@ -392,7 +395,7 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
     };
 
     public UndoManager(ISarosSessionManager sessionManager,
-        EditorManager editorManager) {
+        EditorManager editorManager, IEditorAPI editorAPI) {
 
         if (log.isDebugEnabled())
             DefaultOperationHistory.DEBUG_OPERATION_HISTORY_APPROVAL = true;
@@ -407,6 +410,8 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
         this.editorManager = editorManager;
 
         editorManager.addSharedEditorListener(sharedEditorListener);
+
+        this.editorAPI = editorAPI;
     }
 
     // just for testing
@@ -536,7 +541,7 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
             .getDelegate();
 
         FileEditorInput input = new FileEditorInput(file);
-        IDocumentProvider provider = EditorManager.getDocumentProvider(input);
+        IDocumentProvider provider = editorAPI.getDocumentProvider(input);
 
         try {
             provider.connect(input);

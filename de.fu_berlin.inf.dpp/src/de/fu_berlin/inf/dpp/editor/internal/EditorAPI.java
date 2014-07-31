@@ -13,6 +13,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
@@ -39,6 +40,8 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.ide.ResourceUtil;
+import org.eclipse.ui.texteditor.DocumentProviderRegistry;
+import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IEditorStatusLine;
 import org.eclipse.ui.texteditor.ITextEditor;
 
@@ -547,5 +550,17 @@ public class EditorAPI implements IEditorAPI {
         }
 
         return new SPath(ResourceAdapterFactory.create(resource));
+    }
+
+    @Override
+    public IDocumentProvider getDocumentProvider(final IEditorInput input) {
+        return DocumentProviderRegistry.getDefault().getDocumentProvider(input);
+    }
+
+    @Override
+    public IDocument getDocument(final IEditorPart editorPart) {
+        final IEditorInput input = editorPart.getEditorInput();
+
+        return getDocumentProvider(input).getDocument(input);
     }
 }
