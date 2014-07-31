@@ -444,41 +444,40 @@ public class EditorManager extends AbstractActivityProducer {
      * connected twice.
      * 
      */
-    void connect(IFile file) {
+    void connect(final IFile file) {
 
         if (!file.isAccessible()) {
-            LOG.error(".connect File " + file.getName()
-                + " could not be accessed");
+            LOG.error(".connect(): file " + file + " could not be accessed");
             return;
         }
 
-        LOG.trace(".connect(" + file.getProjectRelativePath().toOSString()
-            + ") invoked");
+        LOG.trace(".connect(" + file + ") invoked");
 
-        if (!isManaged(file)) {
-            FileEditorInput input = new FileEditorInput(file);
-            IDocumentProvider documentProvider = editorAPI
-                .getDocumentProvider(input);
-
-            try {
-                documentProvider.connect(input);
-            } catch (CoreException e) {
-                LOG.error("Error connecting to a document provider on file '"
-                    + file.toString() + "':", e);
-            }
-            connectedFiles.add(file);
+        if (isManaged(file)) {
+            LOG.trace("file " + file + " is already connected");
+            return;
         }
+
+        FileEditorInput input = new FileEditorInput(file);
+        IDocumentProvider documentProvider = editorAPI
+            .getDocumentProvider(input);
+
+        try {
+            documentProvider.connect(input);
+        } catch (CoreException e) {
+            LOG.error("could not connect to document provider for file: "
+                + file, e);
+        }
+
+        connectedFiles.add(file);
     }
 
-    void disconnect(IFile file) {
+    void disconnect(final IFile file) {
 
-        LOG.trace(".disconnect(" + file.getProjectRelativePath().toOSString()
-            + ") invoked");
+        LOG.trace(".disconnect(" + file + ") invoked");
 
         if (!isManaged(file)) {
-            LOG.warn(".disconnect(): Trying to disconnect"
-                + " DocProvider which is not connected: "
-                + file.getFullPath().toOSString());
+            LOG.warn(".disconnect(): file " + file + " already disconnected");
             return;
         }
 
