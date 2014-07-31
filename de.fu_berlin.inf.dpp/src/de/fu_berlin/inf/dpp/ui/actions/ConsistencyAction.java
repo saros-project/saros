@@ -10,7 +10,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -268,13 +267,7 @@ public class ConsistencyAction extends Action implements Disposable {
                 @Override
                 public void run(IProgressMonitor monitor)
                     throws InterruptedException {
-
-                    SubMonitor progress = SubMonitor.convert(monitor);
-                    progress.beginTask(
-                        Messages.ConsistencyAction_progress_perform_recovery,
-                        100);
-                    watchdogClient.runRecovery(progress.newChild(100));
-                    monitor.done();
+                    watchdogClient.runRecovery(monitor);
                 }
             });
         } catch (InvocationTargetException e) {
