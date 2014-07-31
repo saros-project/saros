@@ -20,6 +20,7 @@
 package de.fu_berlin.inf.dpp.editor;
 
 import java.io.FileNotFoundException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -1710,17 +1711,16 @@ public class EditorManager extends AbstractActivityProducer {
      *            if true then editors are locked, otherwise they are unlocked
      */
     private void lockAllEditors(boolean lock) {
-        if (lock)
-            LOG.debug("Lock all editors");
-        else
-            LOG.debug("Unlock all editors");
+        LOG.debug(lock ? "locking all editors" : "unlocking all editors");
+
         editorPool.setEditable(!lock && session.hasWriteAccess());
 
         isLocked = lock;
     }
 
     public Set<SPath> getRemoteOpenEditors() {
-        return remoteEditorManager.getRemoteOpenEditors();
+        return remoteEditorManager == null ? Collections.<SPath> emptySet()
+            : remoteEditorManager.getRemoteOpenEditors();
     }
 
     /**
