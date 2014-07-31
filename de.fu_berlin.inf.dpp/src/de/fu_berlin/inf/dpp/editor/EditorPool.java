@@ -22,7 +22,6 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.session.User.Permission;
-import de.fu_berlin.inf.dpp.util.StackTrace;
 
 /**
  * The EditorPool manages the <code>IEditorParts</code> of the local user.
@@ -37,10 +36,9 @@ class EditorPool {
     private final EditorManager editorManager;
     private final IEditorAPI editorAPI;
 
-    EditorPool(EditorManager editorManager, IEditorAPI editorAPI) {
-        this.editorManager = editorManager;
-        this.editorAPI = editorAPI;
-    }
+    private final DirtyStateListener dirtyStateListener;
+
+    final StoppableDocumentListener documentListener;
 
     /**
      * The editorParts-map will return all EditorParts associated with a given
@@ -57,6 +55,13 @@ class EditorPool {
     private final Map<IEditorPart, IEditorInput> editorInputMap = new HashMap<IEditorPart, IEditorInput>();
 
     private final Map<IEditorPart, EditorListener> editorListeners = new HashMap<IEditorPart, EditorListener>();
+
+    EditorPool(EditorManager editorManager, IEditorAPI editorAPI) {
+        this.editorManager = editorManager;
+        this.editorAPI = editorAPI;
+        this.dirtyStateListener = new DirtyStateListener(editorManager);
+        this.documentListener = new StoppableDocumentListener(editorManager);
+    }
 
     /**
      * Adds an {@link IEditorPart} to the pool. This method also connects the
@@ -81,7 +86,8 @@ class EditorPool {
      */
     public void add(final IEditorPart editorPart) {
 
-        LOG.trace("EditorPool.add " + editorPart + " invoked");
+        LOG.trace("adding editor part " + editorPart + " ["
+            + editorPart.getTitle() + "]");
 
         final SPath path = editorAPI.getEditorPath(editorPart);
 
@@ -92,9 +98,8 @@ class EditorPool {
         }
 
         if (isManaged(path, editorPart)) {
-            LOG.error(
-                "editor part was added twice to the pool: "
-                    + editorPart.getTitle(), new StackTrace());
+            LOG.error("editor part was added twice to the pool: "
+                + editorPart.getTitle());
             return;
         }
 
@@ -135,11 +140,11 @@ class EditorPool {
 
         // TODO Not registering is very helpful to find errors related to file
         // transfer problems
-        editorManager.dirtyStateListener.register(documentProvider, input);
+        dirtyStateListener.register(documentProvider, input);
 
         final IDocument document = EditorManager.getDocument(editorPart);
 
-        document.addDocumentListener(editorManager.documentListener);
+        document.addDocumentListener(documentListener);
 
         Set<IEditorPart> parts = editorParts.get(path);
 
@@ -195,7 +200,8 @@ class EditorPool {
      */
     public SPath remove(final IEditorPart editorPart) {
 
-        LOG.trace("EditorPool.remove " + editorPart + " invoked");
+        LOG.trace("removing editor part " + editorPart + " ["
+            + editorPart.getTitle() + "]");
 
         final SPath path = editorAPI.getEditorPath(editorPart);
 
@@ -227,14 +233,14 @@ class EditorPool {
         final IDocumentProvider documentProvider = EditorManager
             .getDocumentProvider(input);
 
-        editorManager.dirtyStateListener.unregister(documentProvider, input);
+        dirtyStateListener.unregister(documentProvider, input);
 
         final IDocument document = documentProvider.getDocument(input);
 
         if (document == null) {
             LOG.warn("could not disconnect from document: " + path);
         } else {
-            document.removeDocumentListener(editorManager.documentListener);
+            document.removeDocumentListener(documentListener);
         }
 
         editorManager.disconnect(file);
@@ -285,10 +291,12 @@ class EditorPool {
      */
     public void removeAllEditors() {
 
-        LOG.trace("EditorPool.removeAllEditors invoked");
+        LOG.trace("removing all editors");
 
         for (final IEditorPart part : new HashSet<IEditorPart>(getAllEditors()))
             remove(part);
+
+        dirtyStateListener.unregisterAll();
 
         assert getAllEditors().size() == 0;
     }
@@ -300,7 +308,7 @@ class EditorPool {
      */
     public void setEditable(final boolean editable) {
 
-        LOG.trace("EditorPool.setEditable invoked");
+        LOG.trace("changing editable state, editable=" + editable);
 
         for (final IEditorPart editorPart : getAllEditors())
             editorAPI.setEditable(editorPart, editable);
@@ -311,6 +319,34 @@ class EditorPool {
      */
     public boolean isManaged(final IEditorPart editor) {
         return editorInputMap.containsKey(editor);
+    }
+
+    /**
+     * Changes the state of the <code>ElementStateListener</code> for <b>all</b>
+     * editors in this pool.
+     * 
+     * @param enabled
+     *            if <code>true</code> element state changes will be reported,
+     *            otherwise no element state changes will be reported
+     * 
+     * @see #add(IEditorPart)
+     */
+    public void setElementStateListenerEnabled(final boolean enabled) {
+        dirtyStateListener.setEnabled(enabled);
+    }
+
+    /**
+     * Changes the state of the <code>DocumentListener</code> for <b>all</b>
+     * editors in this pool.
+     * 
+     * @param enabled
+     *            if <code>true</code> document changes will be reported,
+     *            otherwise no document changes will be reported
+     * 
+     * @see #add(IEditorPart)
+     */
+    public void setDocumentListenerEnabled(final boolean enabled) {
+        documentListener.setEnabled(enabled);
     }
 
     private boolean isManaged(final SPath path, final IEditorPart editor) {

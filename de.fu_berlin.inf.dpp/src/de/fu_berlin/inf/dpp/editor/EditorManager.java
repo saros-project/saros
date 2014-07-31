@@ -133,21 +133,15 @@ public class EditorManager extends AbstractActivityProducer {
      *               editor when it is received.
      */
 
-    private static final Logger LOG = Logger.getLogger(EditorManager.class
-        .getName());
+    private static final Logger LOG = Logger.getLogger(EditorManager.class);
 
     private final IEditorAPI editorAPI;
-
-    final DirtyStateListener dirtyStateListener = new DirtyStateListener(this);
-
-    final StoppableDocumentListener documentListener = new StoppableDocumentListener(
-        this);
 
     boolean hasWriteAccess;
 
     boolean isLocked;
 
-    ISarosSession session;
+    private ISarosSession session;
 
     private SharedEditorListenerDispatch editorListenerDispatch = new SharedEditorListenerDispatch();
 
@@ -743,14 +737,16 @@ public class EditorManager extends AbstractActivityProducer {
 
         /*
          * Disable documentListener temporarily to avoid being notified of the
-         * change
+         * change, otherwise this would lead to an infinite activity sending,
+         * crashing the application
          */
-        documentListener.setEnabled(false);
+        editorPool.setDocumentListenerEnabled(false);
 
         replaceText(path, textEdit.getOffset(), textEdit.getReplacedText(),
             textEdit.getText(), user);
 
-        documentListener.setEnabled(true);
+        editorPool.setDocumentListenerEnabled(true);
+
         /*
          * If the text edit ends in the visible region of a local editor, set
          * the cursor annotation.
@@ -1424,7 +1420,7 @@ public class EditorManager extends AbstractActivityProducer {
             LOG.trace("EditorManager.saveText Annotations on the IDocument "
                 + "are set");
 
-            dirtyStateListener.setEnabled(false);
+            editorPool.setElementStateListenerEnabled(false);
 
             BlockingProgressMonitor monitor = new BlockingProgressMonitor();
 
@@ -1449,7 +1445,7 @@ public class EditorManager extends AbstractActivityProducer {
                 LOG.warn("saving was canceled by user: " + path);
             }
 
-            dirtyStateListener.setEnabled(true);
+            editorPool.setElementStateListenerEnabled(true);
 
             if (model != null)
                 model.disconnect(doc);
@@ -2080,8 +2076,6 @@ public class EditorManager extends AbstractActivityProducer {
         editorPool.removeAllEditors();
 
         customAnnotationManager.uninstallAllPainters(true);
-
-        dirtyStateListener.unregisterAll();
 
         assert session != null;
         session.getStopManager().removeBlockable(stopManagerListener);
