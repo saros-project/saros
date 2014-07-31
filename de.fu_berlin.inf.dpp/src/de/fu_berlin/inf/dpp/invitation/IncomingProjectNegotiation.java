@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -187,6 +188,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
             fileTransferManager
                 .addFileTransferListener(archiveTransferListener);
+
+            createProjects(projectNames.values());
 
             List<FileList> missingFiles = calculateMissingFiles(projectNames,
                 useVersionControl, this.monitor.newChild(10));
@@ -385,7 +388,9 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 if (EditorAPI.existUnsavedFiles(project)) {
                     LOG.error("Unsaved files detected.");
                 }
-            }
+            } else
+                throw new IllegalStateException("project " + project
+                    + " does not exists");
 
             if (vcs != null) {
                 project = checkoutVCSProject(vcs, project,
@@ -399,8 +404,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 initVcState(project, vcs, lMonitor.newChild(40),
                     projectInfo.getFileList());
 
-            } else if (!project.exists()) {
-                project = createProject(project, null);
             }
 
             localProjects.put(projectID, project);
@@ -425,34 +428,30 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     }
 
     /**
-     * Creates a new project. If a base project is given those files are copied
-     * into the new project.
+     * Creates the given projects if they do not already exists.
      * 
-     * @param project
-     *            the project to create
-     * @param base
-     *            the project to copy resources from
-     * @return the created project
-     * @throws LocalCancellationException
-     *             if the process is canceled locally
+     * @param projectNames
+     *            the projects to create
      * @throws IOException
-     *             if the project already exists or could not created
+     *             if the creation of at least one project fails
      */
-    private IProject createProject(final IProject project, final IProject base)
-        throws LocalCancellationException, IOException {
-
-        final CreateProjectTask createProjectTask = new CreateProjectTask(
-            project.getName(), base, monitor);
+    private void createProjects(final Collection<String> projectNames)
+        throws IOException {
 
         try {
-            ResourcesPlugin.getWorkspace().run(createProjectTask, monitor);
-        } catch (OperationCanceledException e) {
-            throw new LocalCancellationException();
+
+            for (final String projectName : projectNames) {
+
+                final IProject project = ResourcesPlugin.getWorkspace()
+                    .getRoot().getProject(projectName);
+
+                if (!project.exists())
+                    project.create(null);
+            }
+
         } catch (CoreException e) {
             throw new IOException(e.getMessage(), e.getCause());
         }
-
-        return createProjectTask.getProject();
     }
 
     /**
