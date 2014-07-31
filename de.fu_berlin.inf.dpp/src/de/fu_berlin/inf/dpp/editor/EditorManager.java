@@ -162,7 +162,7 @@ public class EditorManager extends AbstractActivityProducer {
      */
     private User followedUser = null;
 
-    private final EditorPool editorPool = new EditorPool(this);
+    private final EditorPool editorPool;
 
     private SPath locallyActiveEditor;
 
@@ -274,7 +274,7 @@ public class EditorManager extends AbstractActivityProducer {
 
             // Lock / unlock editors
             if (user.isLocal()) {
-                editorPool.setWriteAccessEnabled(hasWriteAccess);
+                editorPool.setEditable(hasWriteAccess);
             }
 
             // TODO [PERF] 1 Make this lazy triggered on activating a part?
@@ -398,7 +398,7 @@ public class EditorManager extends AbstractActivityProducer {
                         }
                     });
 
-                    editorPool.removeAllEditors(session);
+                    editorPool.removeAllEditors();
 
                     customAnnotationManager.uninstallAllPainters(true);
 
@@ -491,12 +491,10 @@ public class EditorManager extends AbstractActivityProducer {
     protected FileReplacementInProgressObservable fileReplacementInProgressObservable;
 
     public EditorManager(ISarosSessionManager sessionManager,
-        EditorAPI editorApi, IPreferenceStore preferenceStore) {
-
-        log.trace("EditorManager initialized");
-
-        editorAPI = editorApi;
+        EditorAPI editorAPI, IPreferenceStore preferenceStore) {
+        this.editorAPI = editorAPI;
         this.preferenceStore = preferenceStore;
+        editorPool = new EditorPool(this, editorAPI);
         registerCustomAnnotations();
         sessionManager.addSarosSessionListener(this.sessionListener);
         addSharedEditorListener(sharedEditorListener);
@@ -867,8 +865,8 @@ public class EditorManager extends AbstractActivityProducer {
 
         User user = selection.getSource();
 
-        Set<IEditorPart> editors = EditorManager.this.editorPool
-            .getEditors(path);
+        Set<IEditorPart> editors = editorPool.getEditors(path);
+
         for (IEditorPart editorPart : editors) {
             locationAnnotationManager.setSelection(editorPart, textSelection,
                 user);
@@ -1133,7 +1131,7 @@ public class EditorManager extends AbstractActivityProducer {
 
             // Pretend as if the editor was closed locally (but use the old part
             // before the move happened) and then simulate it being opened again
-            SPath path = editorPool.getCurrentPath(editor, session);
+            SPath path = editorPool.getCurrentPath(editor);
             if (path == null) {
                 log.warn("Editor was managed but path could not be found: "
                     + editor);
@@ -1182,7 +1180,7 @@ public class EditorManager extends AbstractActivityProducer {
             }
         }
 
-        this.editorPool.remove(editorPart, session);
+        editorPool.remove(editorPart);
 
         ITextViewer viewer = EditorAPI.getViewer(editorPart);
 
@@ -1802,7 +1800,7 @@ public class EditorManager extends AbstractActivityProducer {
             log.debug("Lock all editors");
         else
             log.debug("Unlock all editors");
-        editorPool.setWriteAccessEnabled(!lock && session.hasWriteAccess());
+        editorPool.setEditable(!lock && session.hasWriteAccess());
 
         isLocked = lock;
     }

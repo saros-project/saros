@@ -7,7 +7,6 @@ import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.ui.IEditorPart;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.editor.EditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 
 /**
@@ -90,40 +89,6 @@ public interface IEditorAPI {
      * Enables/disables the ability to edit the document in given editor.
      */
     public void setEditable(IEditorPart editorPart, boolean editable);
-
-    /**
-     * Attaches listeners to the given editor that will fire the
-     * {@link EditorListener} methods on the given editor manager
-     * 
-     * Connecting to an editorPart multiple times, will automatically remove
-     * previous listeners via removeSharedEditorListener(IEditorPart editorPart)
-     * (but will print a warning!)
-     * 
-     * @swt Needs to be called from the SWT-UI thread.
-     * 
-     * @throws IllegalArgumentException
-     *             if the given editorPart does not have an ITextViewer or if
-     *             the EditorManager or EditorPart are null
-     * 
-     */
-    public void addSharedEditorListener(EditorManager editorManager,
-        IEditorPart editorPart);
-
-    /**
-     * Removes the listener to the given editor for the given manager previously
-     * added via {@link #addSharedEditorListener(EditorManager, IEditorPart)}.
-     * 
-     * @swt Needs to be called from the SWT-UI thread.
-     * 
-     * @throws IllegalArgumentException
-     *             if the EditorManager or EditorPart are null
-     * 
-     * @throws IllegalStateException
-     *             if the given editorPart has never been registered via
-     *             {@link #addSharedEditorListener(EditorManager, IEditorPart)}.
-     */
-    public void removeSharedEditorListener(EditorManager editorManager,
-        IEditorPart editorPart);
 
     /**
      * Syntactic sugar for getting the path of the IEditorPart returned by

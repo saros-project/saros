@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.editor;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -19,45 +20,49 @@ import org.eclipse.ui.texteditor.IElementStateListener;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
 /**
- * The EditorPool manages the IEditorParts of the local user. Currently only
- * those parts are supported by Saros (and thus managed in the EditorPool) which
- * can be traced to an {@link IFile} and an {@link ITextViewer}.
+ * The EditorPool manages the <code>IEditorParts</code> of the local user.
+ * <p>
+ * Currently only those parts are supported which can be traced to an
+ * {@link IFile} and an {@link ITextViewer}.
  */
 class EditorPool {
 
-    private static final Logger log = Logger.getLogger(EditorPool.class);
+    private static final Logger LOG = Logger.getLogger(EditorPool.class);
 
-    protected EditorManager editorManager;
+    private final EditorManager editorManager;
+    private final IEditorAPI editorAPI;
 
-    EditorPool(EditorManager editorManager) {
+    EditorPool(EditorManager editorManager, IEditorAPI editorAPI) {
         this.editorManager = editorManager;
+        this.editorAPI = editorAPI;
     }
 
     /**
      * The editorParts-map will return all EditorParts associated with a given
-     * IPath. This can be potentially many because a IFile (which can be
+     * SPath. This can be potentially many because a IFile (which can be
      * identified using a IPath) can be opened in multiple editors.
      */
-    protected Map<SPath, HashSet<IEditorPart>> editorParts = new HashMap<SPath, HashSet<IEditorPart>>();
+    private Map<SPath, Set<IEditorPart>> editorParts = new HashMap<SPath, Set<IEditorPart>>();
 
     /**
      * The editorInputMap contains all IEditorParts which are managed by the
      * EditorPool and stores the associated IEditorInput (the EditorInput could
      * also actually be retrieved directly from the IEditorPart).
      */
-    protected Map<IEditorPart, IEditorInput> editorInputMap = new HashMap<IEditorPart, IEditorInput>();
+    private final Map<IEditorPart, IEditorInput> editorInputMap = new HashMap<IEditorPart, IEditorInput>();
+
+    private final Map<IEditorPart, EditorListener> editorListeners = new HashMap<IEditorPart, EditorListener>();
 
     /**
-     * Tries to add an {@link IEditorPart} to the {@link EditorPool}. This
-     * method also connects the editorPart with its data source (identified by
-     * associated {@link IFile}), makes it editable for user with
-     * {@link Permission#WRITE_ACCESS}, and registers listeners:
+     * Adds an {@link IEditorPart} to the pool. This method also connects the
+     * editorPart with its data source (identified by associated {@link IFile}),
+     * makes it editable for user with {@link Permission#WRITE_ACCESS}, and
+     * registers listeners:
      * <ul>
      * <li>{@link IElementStateListener} on {@link IDocumentProvider} - listens
      * for the changes in the file connected with the editor (e.g. file gets
@@ -69,43 +74,43 @@ class EditorPool {
      * mouse events, keyboard events)</li>
      * </ul>
      * 
-     * This method will print a warning and return without any effect if the
-     * given IEditorPart does not a.) represent an IFile, b.) which can be
-     * referred to using an IPath and c.) the IEditorPart can be mapped to an
-     * ITextViewer.
+     * This method will return without any effect if the given IEditorPart does
+     * not a.) represent an IFile, b.) which can be referred to using an IPath
+     * and c.) the IEditorPart can be mapped to an ITextViewer.
      * 
-     * The method is robust against adding the same IEditorPart twice.
      */
-    public void add(IEditorPart editorPart) {
+    public void add(final IEditorPart editorPart) {
 
-        SPath path = editorManager.editorAPI.getEditorPath(editorPart);
+        LOG.trace("EditorPool.add " + editorPart + " invoked");
+
+        final SPath path = editorAPI.getEditorPath(editorPart);
 
         if (path == null) {
-            log.warn("Could not find path/resource for editor "
+            LOG.warn("could not find path/resource for editor: "
                 + editorPart.getTitle());
             return;
         }
 
-        log.trace("EditorPool.add (" + path.toString() + ") invoked");
-
-        if (getEditors(path).contains(editorPart)) {
-            log.error("EditorPart was added twice to the EditorPool: "
-                + editorPart.getTitle(), new StackTrace());
+        if (isManaged(path, editorPart)) {
+            LOG.error(
+                "editor part was added twice to the pool: "
+                    + editorPart.getTitle(), new StackTrace());
             return;
         }
 
         ITextViewer viewer = EditorAPI.getViewer(editorPart);
         if (viewer == null) {
-            log.warn("This editor is not a ITextViewer: "
+            LOG.warn("editor part is not a ITextViewer: "
                 + editorPart.getTitle());
             return;
         }
 
-        IEditorInput input = editorPart.getEditorInput();
+        final IEditorInput input = editorPart.getEditorInput();
 
-        IFile file = ResourceUtil.getFile(input);
+        final IFile file = ResourceUtil.getFile(input);
+
         if (file == null) {
-            log.warn("This editor does not use IFiles as input");
+            LOG.warn("editor part does not use a file storage");
             return;
         }
 
@@ -113,63 +118,67 @@ class EditorPool {
          * Connecting causes Conversion of Delimiters which trigger Selection
          * and Save Activities, so connect before adding listeners
          */
-        this.editorManager.connect(file);
+        editorManager.connect(file);
 
-        this.editorManager.editorAPI.addSharedEditorListener(
-            this.editorManager, editorPart);
+        final EditorListener listener = new EditorListener(editorManager);
+        listener.bind(editorPart);
 
-        this.editorManager.editorAPI.setEditable(editorPart,
-            this.editorManager.hasWriteAccess && !this.editorManager.isLocked);
+        /*
+         * OMG ... either pull this call out of this class or access the
+         * ediorManager variables in a better manner
+         */
+        editorAPI.setEditable(editorPart, editorManager.hasWriteAccess
+            && !editorManager.isLocked);
 
-        IDocumentProvider documentProvider = EditorManager
+        final IDocumentProvider documentProvider = EditorManager
             .getDocumentProvider(input);
 
         // TODO Not registering is very helpful to find errors related to file
         // transfer problems
-        this.editorManager.dirtyStateListener.register(documentProvider, input);
+        editorManager.dirtyStateListener.register(documentProvider, input);
 
-        IDocument document = EditorManager.getDocument(editorPart);
+        final IDocument document = EditorManager.getDocument(editorPart);
 
-        document.addDocumentListener(this.editorManager.documentListener);
+        document.addDocumentListener(editorManager.documentListener);
 
-        getEditors(path).add(editorPart);
+        Set<IEditorPart> parts = editorParts.get(path);
+
+        if (parts == null) {
+            parts = new HashSet<IEditorPart>();
+            editorParts.put(path, parts);
+        }
+
         editorInputMap.put(editorPart, input);
+        editorListeners.put(editorPart, listener);
+        parts.add(editorPart);
     }
 
-    public SPath getCurrentPath(IEditorPart editorPart,
-        ISarosSession sarosSession) {
+    public SPath getCurrentPath(final IEditorPart editorPart) {
 
-        IEditorInput input = editorInputMap.get(editorPart);
+        final IEditorInput input = editorInputMap.get(editorPart);
+
         if (input == null) {
-            log.warn("EditorPart was never added to the EditorPool: "
+            LOG.warn("editor part was never added to the pool: "
                 + editorPart.getTitle());
             return null;
         }
 
-        IFile file = ResourceUtil.getFile(input);
-        if (file == null) {
-            log.warn("Could not find file for editor input "
-                + editorPart.getTitle());
-            return null;
+        for (final Entry<SPath, Set<IEditorPart>> entry : editorParts
+            .entrySet()) {
+
+            if (entry.getValue().contains(editorPart))
+                return entry.getKey();
         }
 
-        if (!sarosSession.isShared(ResourceAdapterFactory.create(file
-            .getProject()))) {
-            log.warn("File is from incorrect project: " + file.getProject()
-                + " should be " + sarosSession + ": " + file, new StackTrace());
-        }
-
-        IPath path = file.getProjectRelativePath();
-        if (path == null) {
-            log.warn("Could not find path for editor " + editorPart.getTitle());
-        }
-        return new SPath(ResourceAdapterFactory.create(file));
+        return null;
     }
 
     /**
-     * Tries to remove an {@link IEditorPart} from {@link EditorPool}. This
-     * Method also disconnects the editorPart from its data source (identified
-     * by associated {@link IFile}) and removes registered listeners:
+     * Removes an {@link IEditorPart} from the pool.
+     * <p>
+     * This Method also disconnects the editorPart from its data source
+     * (identified by associated {@link IFile}) and removes registered
+     * listeners:
      * <ul>
      * <li>{@link IElementStateListener} from {@link IDocumentProvider}</li>
      * <li>{@link IDocumentListener} from {@link IDocument}</li>
@@ -181,73 +190,63 @@ class EditorPool {
      * @param editorPart
      *            editorPart to be removed
      * 
-     * @return {@link IPath} of the Editor that was removed from the Pool, or
+     * @return {@link SPath} of the Editor that was removed from the Pool, or
      *         <code>null</code> on error.
      */
-    public IPath remove(IEditorPart editorPart, ISarosSession sarosSession) {
+    public SPath remove(final IEditorPart editorPart) {
 
-        log.trace("EditorPool.remove " + editorPart + "invoked");
+        LOG.trace("EditorPool.remove " + editorPart + " invoked");
+
+        final SPath path = editorAPI.getEditorPath(editorPart);
+
+        if (path == null) {
+            LOG.warn("could not find path/resource for editor: "
+                + editorPart.getTitle());
+            return null;
+        }
+
+        if (!isManaged(path, editorPart)) {
+            LOG.error("editor part was never added to the pool: "
+                + editorPart.getTitle());
+            return null;
+        }
 
         IEditorInput input = editorInputMap.remove(editorPart);
-        if (input == null) {
-            log.warn("EditorPart was never added to the EditorPool: "
-                + editorPart.getTitle());
-            return null;
-        }
 
-        IFile file = ResourceUtil.getFile(input);
-        if (file == null) {
-            log.warn("Could not find file for editor input "
-                + editorPart.getTitle());
-            return null;
-        }
+        assert input != null;
 
-        if (!sarosSession.isShared(ResourceAdapterFactory.create(file
-            .getProject()))) {
-            log.warn("File is from incorrect project: " + file.getProject()
-                + " should be " + sarosSession + ": " + file, new StackTrace());
-        }
+        final IFile file = ResourceUtil.getFile(input);
 
-        IPath path = file.getProjectRelativePath();
-        if (path == null) {
-            log.warn("Could not find path for editor " + editorPart.getTitle());
-            return null;
-        }
-
-        // TODO Remove should remove empty HashSets
-        if (!getEditors(new SPath(ResourceAdapterFactory.create(file))).remove(
-            editorPart)) {
-            log.error("EditorPart was never added to the EditorPool: "
-                + editorPart.getTitle());
-            return null;
-        }
+        assert file != null;
 
         // Unregister and unhook
-        this.editorManager.editorAPI.setEditable(editorPart, true);
-        this.editorManager.editorAPI.removeSharedEditorListener(
-            this.editorManager, editorPart);
+        editorAPI.setEditable(editorPart, true);
 
-        IDocumentProvider documentProvider = EditorManager
+        editorListeners.remove(editorPart).unbind();
+
+        final IDocumentProvider documentProvider = EditorManager
             .getDocumentProvider(input);
-        this.editorManager.dirtyStateListener.unregister(documentProvider,
-            input);
 
-        IDocument document = documentProvider.getDocument(input);
+        editorManager.dirtyStateListener.unregister(documentProvider, input);
+
+        final IDocument document = documentProvider.getDocument(input);
+
         if (document == null) {
-            log.warn("Could not disconnect from document: " + path);
+            LOG.warn("could not disconnect from document: " + path);
         } else {
-            document
-                .removeDocumentListener(this.editorManager.documentListener);
+            document.removeDocumentListener(editorManager.documentListener);
         }
 
-        this.editorManager.disconnect(file);
+        editorManager.disconnect(file);
+
+        editorParts.get(path).remove(editorPart);
 
         return path;
     }
 
     /**
-     * Returns all IEditorParts which have been added to this IEditorPool which
-     * display a file using the given path.
+     * Returns all IEditorParts which have been added to this pool which display
+     * a file using the given path.
      * 
      * @param path
      *            {@link IPath} of the Editor
@@ -255,85 +254,71 @@ class EditorPool {
      * @return set of relating IEditorPart
      * 
      */
-    public Set<IEditorPart> getEditors(SPath path) {
+    public Set<IEditorPart> getEditors(final SPath path) {
 
-        log.trace(".getEditors(" + path.toString() + ") invoked");
-        if (!editorParts.containsKey(path)) {
-            HashSet<IEditorPart> result = new HashSet<IEditorPart>();
-            editorParts.put(path, result);
-            return result;
-        }
-        return editorParts.get(path);
+        final HashSet<IEditorPart> result = new HashSet<IEditorPart>();
+
+        if (editorParts.containsKey(path))
+            result.addAll(editorParts.get(path));
+
+        return result;
     }
 
     /**
-     * Returns all IEditorParts actually managed in the EditorPool.
+     * Returns all IEditorParts actually managed by this pool.
      * 
      * @return set of all {@link IEditorPart} from the {@link EditorPool}.
      * 
      */
     public Set<IEditorPart> getAllEditors() {
 
-        log.trace("EditorPool.getAllEditors invoked");
+        final Set<IEditorPart> result = new HashSet<IEditorPart>();
 
-        Set<IEditorPart> result = new HashSet<IEditorPart>();
-
-        for (Set<IEditorPart> parts : this.editorParts.values()) {
+        for (final Set<IEditorPart> parts : editorParts.values())
             result.addAll(parts);
-        }
+
         return result;
     }
 
     /**
      * Removes all {@link IEditorPart} from the EditorPool.
      */
-    public void removeAllEditors(ISarosSession sarosSession) {
+    public void removeAllEditors() {
 
-        log.trace("EditorPool.removeAllEditors invoked");
+        LOG.trace("EditorPool.removeAllEditors invoked");
 
-        for (IEditorPart part : new HashSet<IEditorPart>(getAllEditors())) {
-            remove(part, sarosSession);
-        }
+        for (final IEditorPart part : new HashSet<IEditorPart>(getAllEditors()))
+            remove(part);
 
         assert getAllEditors().size() == 0;
     }
 
     /**
-     * Will set all IEditorParts in the EditorPool to be editable by the local
-     * user if has {@link Permission#WRITE_ACCESS}. The editors will be locked
-     * otherwise.
-     */
-    public void setWriteAccessEnabled(boolean hasWriteAccess) {
-
-        log.trace("EditorPool.setEditable");
-
-        for (IEditorPart editorPart : getAllEditors()) {
-            this.editorManager.editorAPI
-                .setEditable(editorPart, hasWriteAccess);
-        }
-    }
-
-    /**
-     * Will set all IEditorParts that are opened editable or non-editable. This
-     * method is not limited to shared editors.
+     * Changes the editable state of all editors currently managed by this pool.
      * 
-     * @param editable
+     * @see IEditorAPI#setEditable(IEditorPart, boolean)
      */
-    public void setLocalEditorsEnabled(boolean editable) {
+    public void setEditable(final boolean editable) {
 
-        log.trace("EditorPool.setEditable");
+        LOG.trace("EditorPool.setEditable invoked");
 
-        for (IEditorPart editorPart : EditorAPI.getOpenEditors()) {
-            this.editorManager.editorAPI.setEditable(editorPart, editable);
-        }
+        for (final IEditorPart editorPart : getAllEditors())
+            editorAPI.setEditable(editorPart, editable);
     }
 
     /**
-     * Returns true iff the given IEditorPart is managed by the
-     * {@link EditorPool}. See EditorPool for a description of which
-     * IEditorParts are managed.
+     * Returns if the given <code>IEditorPart</code> is managed by this pool.
      */
-    public boolean isManaged(IEditorPart editor) {
+    public boolean isManaged(final IEditorPart editor) {
         return editorInputMap.containsKey(editor);
+    }
+
+    private boolean isManaged(final SPath path, final IEditorPart editor) {
+        final Set<IEditorPart> editorsForPath = editorParts.get(path);
+
+        if (editorsForPath == null)
+            return false;
+
+        return editorsForPath.contains(editor);
     }
 }

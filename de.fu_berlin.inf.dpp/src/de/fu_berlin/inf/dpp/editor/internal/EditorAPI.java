@@ -44,7 +44,6 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.EditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.EditorPartListener;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
@@ -52,7 +51,6 @@ import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.ui.dialogs.WarningMessageDialog;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
-import de.fu_berlin.inf.dpp.util.Pair;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
 /**
@@ -101,12 +99,6 @@ public class EditorAPI implements IEditorAPI {
      * removePartListener
      */
     private final Map<EditorManager, IPartListener2> partListeners = new HashMap<EditorManager, IPartListener2>();
-
-    /**
-     * Map of currently registered EditorListeners for removal via
-     * removeSharedEditorListener
-     */
-    private final Map<Pair<EditorManager, IEditorPart>, EditorListener> editorListeners = new HashMap<Pair<EditorManager, IEditorPart>, EditorListener>();
 
     private boolean warnOnceExternalEditor = true;
 
@@ -409,51 +401,6 @@ public class EditorAPI implements IEditorAPI {
                 ((ITextViewerExtension6) textViewer).getUndoManager()
                     .setMaximalUndoLevel(0);
         }
-    }
-
-    // FIXME move to EditorPool
-    @Override
-    public void addSharedEditorListener(EditorManager editorManager,
-        IEditorPart editorPart) {
-
-        assert SWTUtils.isSWT();
-
-        if (editorManager == null || editorPart == null)
-            throw new IllegalArgumentException();
-
-        Pair<EditorManager, IEditorPart> key = new Pair<EditorManager, IEditorPart>(
-            editorManager, editorPart);
-
-        if (editorListeners.containsKey(key)) {
-            LOG.error(
-                "SharedEditorListener was added twice: "
-                    + editorPart.getTitle(), new StackTrace());
-            removeSharedEditorListener(editorManager, editorPart);
-        }
-        EditorListener listener = new EditorListener(editorManager);
-        listener.bind(editorPart);
-        editorListeners.put(key, listener);
-    }
-
-    // FIXME move to EditorPool
-    @Override
-    public void removeSharedEditorListener(EditorManager editorManager,
-        IEditorPart editorPart) {
-
-        assert SWTUtils.isSWT();
-
-        if (editorManager == null || editorPart == null)
-            throw new IllegalArgumentException();
-
-        Pair<EditorManager, IEditorPart> key = new Pair<EditorManager, IEditorPart>(
-            editorManager, editorPart);
-
-        EditorListener listener = editorListeners.remove(key);
-        if (listener == null)
-            throw new IllegalArgumentException(
-                "The given editorPart has no EditorListener");
-
-        listener.unbind();
     }
 
     public static ILineRange getViewport(ITextViewer viewer) {
