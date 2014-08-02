@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.ui.model.session;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Viewer;
@@ -73,17 +72,11 @@ public class AwarenessInformationTreeElement extends TreeElement {
     @Override
     public Image getImage() {
 
-        RemoteEditorManager rem = editorManager.getRemoteEditorManager();
-        if (rem != null) {
-            Set<SPath> openEditors = editorManager.getRemoteOpenEditors(user);
-            if (openEditors.size() > 0) {
-                // user has a file open!
-                return PlatformUI.getWorkbench().getSharedImages()
-                    .getImage(ISharedImages.IMG_OBJ_FILE);
-            }
-        }
-        return org.eclipse.jdt.ui.JavaUI.getSharedImages().getImage(
-            org.eclipse.jdt.ui.ISharedImages.IMG_FIELD_DEFAULT);
+        return editorManager.getRemoteOpenEditors(user).size() > 0 ? PlatformUI
+            .getWorkbench().getSharedImages()
+            .getImage(ISharedImages.IMG_OBJ_FILE) : org.eclipse.jdt.ui.JavaUI
+            .getSharedImages().getImage(
+                org.eclipse.jdt.ui.ISharedImages.IMG_FIELD_DEFAULT);
     }
 
     public Object getUser() {

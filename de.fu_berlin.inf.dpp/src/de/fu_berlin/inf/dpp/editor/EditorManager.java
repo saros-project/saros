@@ -22,7 +22,6 @@ package de.fu_berlin.inf.dpp.editor;
 import java.io.FileNotFoundException;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.ObjectUtils;
@@ -527,7 +526,7 @@ public class EditorManager extends AbstractActivityProducer {
         this.locallyActiveEditor = path;
 
         if (path != null && session.isShared(path.getResource()))
-            this.locallyOpenEditors.add(path);
+            locallyOpenEditors.add(path);
 
         editorListenerDispatch
             .activeEditorChanged(session.getLocalUser(), path);
@@ -858,8 +857,7 @@ public class EditorManager extends AbstractActivityProducer {
             }
         }
 
-        Set<IEditorPart> editors = this.editorPool.getEditors(viewport
-            .getPath());
+        Set<IEditorPart> editors = editorPool.getEditors(viewport.getPath());
 
         ILineRange lineRange = new LineRange(viewport.getStartLine(),
             viewport.getNumberOfLines());
@@ -1128,7 +1126,7 @@ public class EditorManager extends AbstractActivityProducer {
         // Check if the currently active editor is closed
         boolean newActiveEditor = path.equals(this.locallyActiveEditor);
 
-        this.locallyOpenEditors.remove(path);
+        locallyOpenEditors.remove(path);
 
         editorListenerDispatch.editorRemoved(session.getLocalUser(), path);
 
@@ -1156,7 +1154,7 @@ public class EditorManager extends AbstractActivityProducer {
     // FIXME thread access (used by ProjectDeltaVisitor which might NOT run from
     // the SWT Thread
     public boolean isOpened(SPath path) {
-        return this.editorPool.getEditors(path).size() > 0;
+        return editorPool.getEditors(path).size() > 0;
     }
 
     /**
@@ -1173,28 +1171,28 @@ public class EditorManager extends AbstractActivityProducer {
     }
 
     /**
-     * This method verifies if the given EditorPart is supported by Saros, which
-     * is based basically on two facts:
-     * 
-     * 1.) Has a IResource belonging to the project
-     * 
-     * 2.) Can be mapped to a ITextViewer
-     * 
-     * Since a null editor does not support either, this method returns false.
+     * Verifies if the given <code>IEditorPart</code> is supported by Saros,
+     * which is based basically on following facts:
+     * <ol>
+     * <li>Has an underlying <code>IResource</code> as storage.</li>
+     * <li>Can be adapted to an <code>ITextViewer</code>.</li>
+     * <li>The underlying <code>IResource</code> is part of the current
+     * (partial) project sharing (see {@link ISarosSession#isShared}).</li>
+     * </ol>
      */
-    private boolean isSharedEditor(IEditorPart editorPart) {
+    private boolean isSharedEditor(final IEditorPart editorPart) {
         if (session == null)
             return false;
 
         if (EditorAPI.getViewer(editorPart) == null)
             return false;
 
-        IResource resource = this.editorAPI.getEditorResource(editorPart);
+        final IResource resource = editorAPI.getEditorResource(editorPart);
 
         if (resource == null)
             return false;
 
-        return this.session.isShared(ResourceAdapterFactory.create(resource
+        return session.isShared(ResourceAdapterFactory.create(resource
             .getProject()));
     }
 
@@ -1619,6 +1617,11 @@ public class EditorManager extends AbstractActivityProducer {
         }
     }
 
+    /**
+     * @deprecated
+     * @return
+     */
+    @Deprecated
     public RemoteEditorManager getRemoteEditorManager() {
         return this.remoteEditorManager;
     }
@@ -1680,15 +1683,8 @@ public class EditorManager extends AbstractActivityProducer {
      * Returns an empty set if the user has no editors open.
      */
     public Set<SPath> getRemoteOpenEditors(User user) {
-        return remoteEditorManager.getRemoteOpenEditors(user);
-    }
-
-    public List<User> getRemoteOpenEditorUsers(SPath path) {
-        return remoteEditorManager.getRemoteOpenEditorUsers(path);
-    }
-
-    public List<User> getRemoteActiveEditorUsers(SPath path) {
-        return remoteEditorManager.getRemoteActiveEditorUsers(path);
+        return remoteEditorManager == null ? Collections.<SPath> emptySet()
+            : remoteEditorManager.getRemoteOpenEditors(user);
     }
 
     /**
