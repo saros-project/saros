@@ -35,6 +35,7 @@ import de.fu_berlin.inf.dpp.communication.chat.ChatElement;
 import de.fu_berlin.inf.dpp.communication.chat.ChatElement.ChatElementType;
 import de.fu_berlin.inf.dpp.communication.chat.IChat;
 import de.fu_berlin.inf.dpp.communication.chat.IChatListener;
+import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChat;
 import de.fu_berlin.inf.dpp.communication.chat.single.SingleUserChat;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
@@ -501,7 +502,7 @@ public class ChatControl extends Composite {
 
         User user = null;
 
-        synchronized (ChatControl.this) {
+        synchronized (this) {
             if (session != null) {
                 JID resourceQualifiedJID = session.getResourceQualifiedJID(jid);
 
@@ -519,6 +520,26 @@ public class ChatControl extends Composite {
     }
 
     private String getNickname(JID jid) {
+
+        if (chat instanceof MultiUserChat) {
+            synchronized (this) {
+                if (session != null) {
+                    JID resourceQualifiedJID = session
+                        .getResourceQualifiedJID(jid);
+                    User user = session.getUser(resourceQualifiedJID);
+
+                    if (user != null)
+                        return user.getNickname();
+                }
+            }
+        }
+
+        /*
+         * if we do not find the user in the session then still try to use its
+         * XMPP nickname as this is still better than to display the JID part
+         * which is always hard to read
+         */
+
         String name = XMPPUtils.getNickname(connectionService, jid);
 
         if (name == null)
