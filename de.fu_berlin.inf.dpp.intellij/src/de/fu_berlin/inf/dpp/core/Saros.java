@@ -24,6 +24,7 @@ package de.fu_berlin.inf.dpp.core;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
+
 import de.fu_berlin.inf.dpp.core.context.SarosContext;
 import de.fu_berlin.inf.dpp.core.context.SarosCoreContextFactory;
 import de.fu_berlin.inf.dpp.core.context.SarosPluginContext;
@@ -32,9 +33,13 @@ import de.fu_berlin.inf.dpp.core.workspace.IWorkspace;
 import de.fu_berlin.inf.dpp.intellij.context.SarosIntellijContextFactory;
 import de.fu_berlin.inf.dpp.intellij.project.fs.Workspace;
 import de.fu_berlin.inf.dpp.misc.pico.DotGraphMonitor;
+import de.fu_berlin.inf.dpp.net.ConnectionState;
+import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import org.apache.log4j.helpers.LogLog;
+import org.jivesoftware.smack.Connection;
+import org.jivesoftware.smackx.ServiceDiscoveryManager;
 
 /**
  * Saros plugin class for bundling globally necessary variables like project.
@@ -152,9 +157,23 @@ public class Saros {
             .getComponent(XMPPConnectionService.class);
         preferenceUtils = sarosContext.getComponent(PreferenceUtils.class);
 
+        connectionService.addListener(new IConnectionListener() {
+
+            @Override
+            public void connectionStateChanged(Connection connection,
+                ConnectionState state) {
+
+                if (state == ConnectionState.CONNECTING) {
+                    ServiceDiscoveryManager.getInstanceFor(connection).addFeature(
+                        NAMESPACE);
+                }
+            }
+
+        });
+
         //todo: set parameters from config
         connectionService
-            .configure(Saros.NAMESPACE, Saros.RESOURCE, false, false, 8888,
+            .configure(RESOURCE, false, false, 8888,
                 null, null, true, null, 80, true);
 
         isInitialized = true;

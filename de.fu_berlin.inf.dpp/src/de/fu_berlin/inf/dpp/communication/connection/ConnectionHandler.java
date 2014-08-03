@@ -9,6 +9,7 @@ import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.proxy.ProxyInfo;
+import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -66,6 +67,11 @@ public class ConnectionHandler {
         @Override
         public void connectionStateChanged(Connection connection,
             ConnectionState state) {
+
+            if (state == ConnectionState.CONNECTING) {
+                ServiceDiscoveryManager.getInstanceFor(connection).addFeature(
+                    Saros.NAMESPACE);
+            }
 
             final Exception error = state == ConnectionState.ERROR ? connectionService
                 .getConnectionError() : null;
@@ -307,7 +313,7 @@ public class ConnectionHandler {
         if (socks5Candidates.isEmpty())
             socks5Candidates = null;
 
-        connectionService.configure(Saros.NAMESPACE, Saros.RESOURCE,
+        connectionService.configure(Saros.RESOURCE,
             preferences.isDebugEnabled(),
             preferences.isLocalSOCKS5ProxyEnabled(),
             preferences.getFileTransferPort(), socks5Candidates,
