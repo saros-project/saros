@@ -42,6 +42,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosCoreContextFactory;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;
 import de.fu_berlin.inf.dpp.feedback.StatisticCollectorTest;
@@ -318,6 +319,12 @@ public class SarosSessionTest {
 
         EasyMock.replay(sessionManager);
         container.addComponent(ISarosSessionManager.class, sessionManager);
+
+        final IEditorAPI editorAPI = EasyMock.createNiceMock(IEditorAPI.class);
+
+        EasyMock.replay(editorAPI);
+
+        container.addComponent(IEditorAPI.class, editorAPI);
 
         final ConsistencyWatchdogClient clientWatchdog = EasyMock
             .createNiceMock(ConsistencyWatchdogClient.class);
