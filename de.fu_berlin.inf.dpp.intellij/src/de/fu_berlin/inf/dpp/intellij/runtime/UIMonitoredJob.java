@@ -22,9 +22,9 @@
 
 package de.fu_berlin.inf.dpp.intellij.runtime;
 
-import de.fu_berlin.inf.dpp.core.monitor.IProgressMonitor;
 import de.fu_berlin.inf.dpp.core.monitor.IStatus;
 import de.fu_berlin.inf.dpp.intellij.ui.widgets.progress.ProgressFrame;
+import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 
 /**
  * Class designed to start long lasting job with progress indicator

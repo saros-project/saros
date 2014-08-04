@@ -23,16 +23,25 @@
 package de.fu_berlin.inf.dpp.core.invitation;
 
 import de.fu_berlin.inf.dpp.core.exceptions.OperationCanceledException;
-import de.fu_berlin.inf.dpp.core.monitor.IProgressMonitor;
-import de.fu_berlin.inf.dpp.core.monitor.ISubMonitor;
 import de.fu_berlin.inf.dpp.core.workspace.IWorkspaceRunnable;
-import de.fu_berlin.inf.dpp.filesystem.*;
+import de.fu_berlin.inf.dpp.filesystem.IContainer;
+import de.fu_berlin.inf.dpp.filesystem.IFile;
+import de.fu_berlin.inf.dpp.filesystem.IFolder;
+import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
+import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -86,9 +95,8 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
         try {
 
             zipFile = new ZipFile(file);
-
-            ISubMonitor subMonitor = monitor
-                .convert("Unpacking archive file to workspace", zipFile.size());
+            monitor.beginTask("Unpacking archive file to workspace",
+                zipFile.size());
 
             for (Enumeration<? extends ZipEntry> entries = zipFile
                 .entries(); entries.hasMoreElements(); ) {
@@ -97,7 +105,7 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
 
                 final String entryName = entry.getName();
 
-                if (subMonitor.isCanceled()) {
+                if (monitor.isCanceled()) {
                     throw new OperationCanceledException();
                 }
 
@@ -107,7 +115,7 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
                     LOG.warn("skipping zip entry " + entryName
                         + ", entry is not valid");
 
-                    subMonitor.worked(1);
+                    monitor.worked(1);
                     continue;
                 }
 
@@ -122,7 +130,7 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
                     LOG.warn("skipping zip entry " + entryName
                         + ", unknown project id: " + id);
 
-                    subMonitor.worked(1);
+                    monitor.worked(1);
                     continue;
                 }
 
@@ -134,11 +142,14 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
                  */
                 createFoldersForFile(file);
 
-                subMonitor.subTask("decompressing: " + path);
+                monitor.subTask("decompressing: " + path);
 
                 final InputStream in = zipFile.getInputStream(entry);
 
                 if (!file.exists()) {
+                    //FIXME: Cancellation from UI is only possible between file writes
+                    // thus leading to long delays for large files. Make this
+                    // cancelable
                     file.create(in, true);
                 } else {
                     file.setContents(in, true, true);

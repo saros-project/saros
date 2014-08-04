@@ -24,7 +24,7 @@ package de.fu_berlin.inf.dpp.intellij.ui.widgets.progress;
 
 import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.core.context.SarosPluginContext;
-import de.fu_berlin.inf.dpp.core.monitor.IProgressMonitor;
+import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import org.picocontainer.annotations.Inject;
 
 import javax.swing.JButton;
@@ -39,11 +39,12 @@ import java.awt.event.ActionListener;
  * Creates independent progress monitor window
  */
 //todo: use de.fu_berlin.inf.dpp.monitoring.IProgressMonitor in all IntelliJ classes
-public class ProgressFrame extends MonitorProgressBar
-    implements IProgressMonitor {
+public class ProgressFrame implements IProgressMonitor {
 
     public static final String TITLE = "Progress monitor";
     public static final String BUTTON_CANCEL = "Cancel";
+
+    private MonitorProgressBar monitorProgressBar;
 
     @Inject
     private Saros saros;
@@ -65,7 +66,8 @@ public class ProgressFrame extends MonitorProgressBar
      */
     public ProgressFrame(String title) {
         SarosPluginContext.initComponent(this);
-        Container parent = null; // = saros.getMainPanel();
+        Container parent = null; //TODO: replace by saros.getMainPanel();
+
         frmMain = new JFrame(title);
         frmMain.setSize(300, 160);
         frmMain.setLocationRelativeTo(parent);
@@ -83,12 +85,14 @@ public class ProgressFrame extends MonitorProgressBar
             }
         });
 
-        JLabel infoLabel = display.getInfoLabel();
+        JProgressBar progressBar = new JProgressBar(
+            MonitorProgressBar.MIN_VALUE, MonitorProgressBar.MAX_VALUE);
+        JLabel infoLabel = new JLabel(title);
+        monitorProgressBar = new MonitorProgressBar(progressBar, infoLabel);
 
         pane.add(infoLabel);
         pane.add(btnCancel);
 
-        JProgressBar progressBar = display.getProgressBar();
         pane.add(progressBar);
 
         infoLabel.setBounds(10, 15, 200, 15);
@@ -98,14 +102,46 @@ public class ProgressFrame extends MonitorProgressBar
         frmMain.setResizable(false);
         frmMain.setVisible(true);
 
-        this.frmMain.repaint(); //todo: test if this is necessary at all
+        this.frmMain.repaint();
 
     }
 
     @Override
     public void done() {
-        super.done();
+        monitorProgressBar.done();
         frmMain.dispose();
+    }
+
+    @Override public void subTask(String name) {
+        monitorProgressBar.subTask(name);
+    }
+
+    @Override public void setTaskName(String name) {
+        monitorProgressBar.setTaskName(name);
+    }
+
+    @Override public void worked(int amount) {
+        monitorProgressBar.worked(amount);
+    }
+
+    @Override public void setCanceled(boolean canceled) {
+        monitorProgressBar.setCanceled(canceled);
+    }
+
+    @Override public boolean isCanceled() {
+        return monitorProgressBar.isCanceled();
+    }
+
+    @Override public void beginTask(String name, int size) {
+        monitorProgressBar.beginTask(name, size);
+    }
+
+    /**
+     * @param finishListener FinishListener
+     */
+    public void setFinishListener(
+        MonitorProgressBar.FinishListener finishListener) {
+        monitorProgressBar.setFinishListener(finishListener);
     }
 
 }
