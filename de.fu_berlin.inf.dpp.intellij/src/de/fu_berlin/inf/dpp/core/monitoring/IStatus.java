@@ -20,28 +20,24 @@
  * /
  */
 
-package de.fu_berlin.inf.dpp.core.monitor;
+package de.fu_berlin.inf.dpp.core.monitoring;
 
 /**
- * This is a dummy implementation to ease the copy-paste-adapt process of
- * creating Saros/I out of Saros/E.
- * <p/>
- * TODO Check whether this actually necessary
+ * This interface is under development. It currently equals its Eclipse
+ * counterpart. If not mentioned otherwise all offered methods are equivalent to
+ * their Eclipse counterpart.
+ * </p>
+ * TODO This should either be a Saros/Core interface or more adapted to IntelliJ
  */
-public class Status implements IStatus {
-    public static final Status CANCEL_STATUS = new Status(0);
-    public static final Status OK_STATUS = new Status(1);
+public interface IStatus {
 
-    public Status() {
-    }
+    public static final int OK = 0;
 
-    public Status(int status) {
-    }
+    public static final int INFO = 1;
 
-    public Status(int status, String msg, String title) {
-    }
+    public static final int WARNING = 2;
 
-    public Status(int status, String msg, String title, Exception ex) {
-    }
+    public static final int ERROR = 4;
 
+    public static final int CANCEL = 8;
 }

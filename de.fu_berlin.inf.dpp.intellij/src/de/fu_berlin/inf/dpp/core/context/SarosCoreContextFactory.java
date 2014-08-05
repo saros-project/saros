@@ -27,6 +27,7 @@ import de.fu_berlin.inf.dpp.ISarosContextBindings;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatService;
 import de.fu_berlin.inf.dpp.communication.chat.single.SingleUserChatService;
+import de.fu_berlin.inf.dpp.core.monitoring.remote.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.core.vcs.NullVCSProviderFactoryImpl;
 import de.fu_berlin.inf.dpp.invitation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.DispatchThreadContext;
@@ -132,7 +133,7 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
         // Component.create(InvitationHandler.class), //todo
         // Component.create(LeaveAndKickHandler.class), //todo
 
-        // Component.create(RemoteProgressManager.class), //todo
+        Component.create(RemoteProgressManager.class),
 
     };
 
