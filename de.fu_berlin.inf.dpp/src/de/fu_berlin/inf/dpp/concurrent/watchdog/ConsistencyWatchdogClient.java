@@ -75,12 +75,12 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer {
     /**
      * The number of files remaining in the current recovery session.
      */
-    protected AtomicInteger filesRemaining = new AtomicInteger();
+    private AtomicInteger filesRemaining = new AtomicInteger();
 
     /**
      * The id of the currently running recovery
      */
-    protected volatile String recoveryID;
+    private volatile String recoveryID;
 
     /**
      * Lock used exclusively in {@link #runRecovery} to prevent two recovery
