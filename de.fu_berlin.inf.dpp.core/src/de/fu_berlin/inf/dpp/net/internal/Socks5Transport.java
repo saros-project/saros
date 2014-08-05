@@ -21,7 +21,6 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
-import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.XMPPError;
 import org.jivesoftware.smackx.bytestreams.BytestreamManager;
@@ -33,6 +32,7 @@ import org.jivesoftware.smackx.bytestreams.socks5.Socks5BytestreamSession;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 
 import de.fu_berlin.inf.dpp.net.ConnectionMode;
+import de.fu_berlin.inf.dpp.net.util.NetworkingUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 
@@ -141,37 +141,23 @@ public class Socks5Transport extends ByteStreamTransport {
         waitToCloseResponse.start();
     }
 
-    protected boolean localSOCKS5ProxyIsRunning() {
-        if (SmackConfiguration.isLocalSocks5ProxyEnabled()) {
-            if (!Socks5Proxy.getSocks5Proxy().isRunning()) {
-                LOG.warn(prefix()
-                    + "Local SOCKS5 proxy enabled but couldn't start");
-                // TODO inform user
-                return false;
-            }
-            return true;
-        } else
-            return false;
-    }
-
-    protected int getLocalSocks5ProxyPort() {
-        int port = SmackConfiguration.getLocalSocks5ProxyPort();
-        int realPort = Socks5Proxy.getSocks5Proxy().getPort();
-
-        if (port != realPort && -port != realPort)
-            LOG.trace(prefix() + "proxy port is " + realPort
-                + " (configured to " + port + ")");
-        return realPort;
-    }
-
     protected String verboseLocalProxyInfo() {
-        return " with local proxy "
-            + (localSOCKS5ProxyIsRunning() ? "enabled (Port "
-                + getLocalSocks5ProxyPort() + ")."
-                : "disabled. Local Adresses: "
-                    + Socks5Proxy.getSocks5Proxy().getLocalAddresses()
-                        .toString()) + " ";
+        final Socks5Proxy proxy = NetworkingUtils.getSocks5ProxySafe();
+        final StringBuilder builder = new StringBuilder();
 
+        builder.append("with local SOCKS5 proxy");
+
+        if (!proxy.isRunning()) {
+            builder.append(" not running");
+            return builder.toString();
+        }
+
+        builder.append(" running [");
+        builder.append("port=").append(proxy.getPort()).append(",");
+        builder.append(" configured streamhosts=");
+        builder.append(proxy.getLocalAddresses());
+        builder.append("]");
+        return builder.toString();
     }
 
     /*
@@ -464,8 +450,8 @@ public class Socks5Transport extends ByteStreamTransport {
             inSession, outSession, true);
 
         return new BinaryChannelConnection(new JID(peer), connectionIdentifier,
-            new XMPPByteStreamAdapter(session),
-            ConnectionMode.SOCKS5_MEDIATED, listener);
+            new XMPPByteStreamAdapter(session), ConnectionMode.SOCKS5_MEDIATED,
+            listener);
     }
 
     /**
@@ -529,8 +515,7 @@ public class Socks5Transport extends ByteStreamTransport {
                     configureSocks5Socket(outSession);
                     return new BinaryChannelConnection(new JID(peer),
                         connectionIdentifier, new XMPPByteStreamAdapter(
-                            outSession), ConnectionMode.SOCKS5_DIRECT,
-                        listener);
+                            outSession), ConnectionMode.SOCKS5_DIRECT, listener);
                 }
 
                 LOG.debug(prefix()
