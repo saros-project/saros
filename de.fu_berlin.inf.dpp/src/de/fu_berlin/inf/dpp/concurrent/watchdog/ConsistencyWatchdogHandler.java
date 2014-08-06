@@ -143,15 +143,18 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
         List<StartHandle> startHandles = null;
 
         final SubMonitor progress = SubMonitor.convert(monitor,
-            "Performing recovery", 1200);
+            "Performing recovery...", 1000);
 
         try {
+
+            progress.subTask("locking session");
 
             startHandles = session.getStopManager().stop(session.getUsers(),
                 "Consistency recovery");
 
-            progress.subTask("Sending files to client...");
-            recoverFiles(checksumError, progress.newChild(900));
+            progress.worked(100);
+
+            recoverFiles(checksumError, progress.newChild(800));
 
             /*
              * We have to start the StartHandle of the inconsistent user first
@@ -159,7 +162,7 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
              * started before the inconsistent user completely processed the
              * consistency recovery.
              */
-            progress.subTask("Wait for peers...");
+            progress.subTask("unlocking session");
 
             // find the StartHandle of the inconsistent user
             StartHandle inconsistentStartHandle = null;
@@ -185,21 +188,23 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
         }
     }
 
-    /**
-     * @host This is only called on the host
-     * 
-     * @nonSWT This method should not be called from the SWT Thread!
-     */
     private void recoverFiles(final ChecksumErrorActivity checksumError,
-        IProgressMonitor monitor) {
+        final IProgressMonitor monitor) {
 
-        monitor.beginTask("Sending files", checksumError.getPaths().size() + 1);
+        final List<SPath> inconsistentPaths = checksumError.getPaths();
+
+        monitor.beginTask("Performing recovery...", inconsistentPaths.size());
 
         try {
-            for (SPath path : checksumError.getPaths()) {
-                monitor.subTask("Recovering file: "
-                    + path.getProjectRelativePath());
-                recoverFile(checksumError.getSource(), path);
+            for (final SPath path : inconsistentPaths) {
+                monitor.subTask("recovering file: " + path.getFullPath());
+
+                SWTUtils.runSafeSWTSync(LOG, new Runnable() {
+                    @Override
+                    public void run() {
+                        recoverFile(checksumError.getSource(), path);
+                    }
+                });
 
                 monitor.worked(1);
             }
@@ -261,8 +266,8 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
          * immediately follow up with a new checksum to the remote side can
          * verify the recovered file
          */
-        FileEditorInput input = new FileEditorInput(file);
-        IDocumentProvider provider = editorAPI.getDocumentProvider(input);
+        final FileEditorInput input = new FileEditorInput(file);
+        final IDocumentProvider provider = editorAPI.getDocumentProvider(input);
 
         try {
             provider.connect(input);
@@ -274,6 +279,9 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
 
             fireActivity(new ChecksumActivity(user, path, checksum.getHash(),
                 checksum.getLength(), null));
+
+            checksum.dispose();
+
         } catch (CoreException e) {
             LOG.warn("could not check checksum of file: " + file, e);
         } finally {
