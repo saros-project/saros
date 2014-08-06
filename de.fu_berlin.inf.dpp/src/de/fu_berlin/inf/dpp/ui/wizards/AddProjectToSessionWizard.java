@@ -15,6 +15,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -292,8 +294,34 @@ public class AddProjectToSessionWizard extends Wizard {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                 try {
+
+                    final IWorkspace workspace = ResourcesPlugin.getWorkspace();
+
+                    final IWorkspaceDescription description = workspace
+                        .getDescription();
+
+                    final boolean isAutoBuilding = description.isAutoBuilding();
+
+                    if (isAutoBuilding) {
+                        description.setAutoBuilding(false);
+                        try {
+                            workspace.setDescription(description);
+                        } catch (CoreException e) {
+                            log.warn("could not disable auto building", e);
+                        }
+                    }
+
                     ProjectNegotiation.Status status = process.accept(
                         projectNames, monitor, useVersionControl);
+
+                    if (isAutoBuilding) {
+                        description.setAutoBuilding(true);
+                        try {
+                            workspace.setDescription(description);
+                        } catch (CoreException e) {
+                            log.warn("could not re-enable auto building", e);
+                        }
+                    }
 
                     if (status != ProjectNegotiation.Status.OK)
                         return Status.CANCEL_STATUS;
@@ -307,7 +335,7 @@ public class AddProjectToSessionWizard extends Wizard {
                                     StringUtils.join(projectNames.values(),
                                         ", ")));
 
-                } catch (Exception e) {
+                } catch (RuntimeException e) {
                     log.error(
                         "unkown error during project negotiation: "
                             + e.getMessage(), e);

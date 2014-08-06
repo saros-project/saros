@@ -17,7 +17,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -161,10 +160,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
         observeMonitor(ProgressMonitorAdapterFactory.convertTo(monitor));
 
-        IWorkspace ws = ResourcesPlugin.getWorkspace();
-        IWorkspaceDescription desc = ws.getDescription();
-        boolean wasAutobuilding = desc.isAutoBuilding();
-
         fileReplacementInProgressObservable.startReplacement();
 
         ArchiveTransferListener archiveTransferListener = new ArchiveTransferListener(
@@ -176,11 +171,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
         try {
             checkCancellation(CancelOption.NOTIFY_PEER);
-
-            if (wasAutobuilding) {
-                desc.setAutoBuilding(false);
-                ws.setDescription(desc);
-            }
 
             if (fileTransferManager == null)
                 // FIXME: the logic will try to send this to the remote contact
@@ -277,18 +267,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
             deleteCollectors();
             monitor.done();
-
-            // Re-enable auto-building...
-            if (wasAutobuilding) {
-                desc.setAutoBuilding(true);
-                try {
-                    ws.setDescription(desc);
-                } catch (CoreException e) {
-                    localCancel(
-                        "An error occurred while synchronising the project",
-                        CancelOption.NOTIFY_PEER);
-                }
-            }
         }
 
         return terminateProcess(exception);
