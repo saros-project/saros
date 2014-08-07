@@ -30,6 +30,9 @@ import de.fu_berlin.inf.dpp.core.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.core.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.core.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.core.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.core.ui.eventhandler.NegotiationHandler;
+import de.fu_berlin.inf.dpp.core.ui.eventhandler.UserStatusChangeHandler;
+import de.fu_berlin.inf.dpp.core.ui.eventhandler.XMPPAuthorizationHandler;
 import de.fu_berlin.inf.dpp.filesystem.ChecksumCacheImpl;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IFileContentChangedNotifier;
@@ -68,13 +71,10 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
         Component.create(LocalEditorManipulator.class),
 
         // UI handlers
-        // Component.create(NegotiationHandler.class), //todo
-        // Component.create(UserStatusChangeHandler.class), //todo
-        // Component.create(JoinSessionRequestHandler.class), //todo
-        // Component.create(JoinSessionRejectedHandler.class), //todo
-        // Component.create(ServerPreferenceHandler.class),  //todo
-        // Component.create(SessionStatusRequestHandler.class), //todo
-        // Component.create(XMPPAuthorizationHandler.class), //todo
+        Component.create(NegotiationHandler.class),
+        Component.create(UserStatusChangeHandler.class),
+        Component.create(XMPPAuthorizationHandler.class),
+
 
         Component.create(IChecksumCache.class, ChecksumCacheImpl.class),
 

@@ -71,7 +71,6 @@ public class Messages {
     public static String ShowDescriptionPage_description;
     public static String ShowDescriptionPage_title2;
 
-
     public static String JoinSessionWizard_8;
     public static String JoinSessionWizard_accept;
     public static String JoinSessionWizard_info;
@@ -81,6 +80,18 @@ public class Messages {
     public static String JoinSessionWizard_inv_cancelled_text3;
     public static String JoinSessionWizard_title;
 
+    public static String UserStatusChangeHandler_user_joined;
+    public static String UserStatusChangeHandler_user_joined_text;
+    public static String UserStatusChangeHandler_user_left;
+    public static String UserStatusChangeHandler_user_left_text;
+    public static String UserStatusChangeHandler_he_has_now_access;
+    public static String UserStatusChangeHandler_permission_changed;
+    public static String UserStatusChangeHandler_read_only;
+    public static String UserStatusChangeHandler_write;
+    public static String UserStatusChangeHandler_you_have_now_access;
+
+    public static String SubscriptionManager_incoming_subscription_request_title;
+    public static String SubscriptionManager_incoming_subscription_request_message;
 
     private Messages() {
     }
