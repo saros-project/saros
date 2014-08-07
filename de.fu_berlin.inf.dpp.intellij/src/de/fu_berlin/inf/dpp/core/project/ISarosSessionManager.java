@@ -23,6 +23,7 @@
 package de.fu_berlin.inf.dpp.core.project;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.core.invitation.INegotiationHandler;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.invitation.ProjectNegotiationData;
@@ -34,8 +35,6 @@ import de.fu_berlin.inf.dpp.session.User;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-//import de.fu_berlin.inf.dpp.core.invitation.INegotiationHandler;
 
 /**
  * An interface behind which the {@link SarosSessionManager} hides its
@@ -178,11 +177,8 @@ public interface ISarosSessionManager {
      * Sets the {@link de.fu_berlin.inf.dpp.core.invitation.INegotiationHandler negotiation handler} that will handle
      * incoming and outgoing session and project negotiations requests.
      *
-     * @param handler
-     *            the handler to handle the request or <code>null</code> if the
-     *            requests should not be handled
-     *
+     * @param handler the handler to handle the request or <code>null</code> if the
+     *                requests should not be handled
      */
-    //TODO: reactivate after migration
-    //public void setNegotiationHandler(INegotiationHandler handler);
+    public void setNegotiationHandler(INegotiationHandler handler);
 }
