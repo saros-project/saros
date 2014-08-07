@@ -28,6 +28,8 @@ import de.fu_berlin.inf.dpp.ISarosContextFactory;
 import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.core.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.core.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.core.project.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.core.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.filesystem.ChecksumCacheImpl;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IFileContentChangedNotifier;
@@ -55,7 +57,7 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
     //FIXME: uncomment when classes are submitted
     private final Component[] components = new Component[] {
 
-        // Component.create(ISarosSessionManager.class, SarosSessionManager.class), //todo
+        Component.create(ISarosSessionManager.class, SarosSessionManager.class),
         // Core Managers
         // Component.create(ConsistencyWatchdogClient.class), //todo
 
