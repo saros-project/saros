@@ -304,8 +304,7 @@ public class NegotiationHandler implements INegotiationHandler {
             @Override
             public void run() {
                 AddProjectToSessionWizard projectWizard = new AddProjectToSessionWizard(
-                    process, process.getPeer(), fileLists, process
-                        .getProjectNames());
+                    process, process.getPeer(), fileLists);
 
                 final WizardDialogAccessable wizardDialog = new WizardDialogAccessable(
                     SWTUtils.getShell(), projectWizard, SWT.MIN | SWT.MAX,

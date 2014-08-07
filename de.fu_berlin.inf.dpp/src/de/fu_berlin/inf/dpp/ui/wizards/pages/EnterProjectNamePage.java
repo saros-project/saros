@@ -88,8 +88,8 @@ public class EnterProjectNamePage extends WizardPage {
      *            projectName
      */
     public EnterProjectNamePage(ISarosSession session,
-        IConnectionManager connectionManager,
-        PreferenceUtils preferenceUtils, List<FileList> fileLists, JID peer,
+        IConnectionManager connectionManager, PreferenceUtils preferenceUtils,
+        List<FileList> fileLists, JID peer,
         Map<String, String> remoteProjectNames) {
 
         super(Messages.EnterProjectNamePage_title);
@@ -112,9 +112,6 @@ public class EnterProjectNamePage extends WizardPage {
 
     /**
      * Returns the name of the project to use during the shared session.
-     * 
-     * Caution: This project will be synchronized with the data from the host
-     * and all local changes will be lost.
      */
     public String getTargetProjectName(String projectID) {
         return projectOptionComposites.get(projectID).getProjectName();

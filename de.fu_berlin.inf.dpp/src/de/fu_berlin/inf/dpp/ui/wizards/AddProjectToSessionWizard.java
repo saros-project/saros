@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -67,23 +68,18 @@ import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 
 public class AddProjectToSessionWizard extends Wizard {
 
-    private static Logger log = Logger
+    private static Logger LOG = Logger
         .getLogger(AddProjectToSessionWizard.class);
 
-    protected EnterProjectNamePage namePage;
-    protected WizardDialogAccessable wizardDialog;
-    protected IncomingProjectNegotiation process;
-    protected JID peer;
-    protected List<FileList> fileLists;
-    protected boolean isExceptionCancel;
-    /**
-     * projectID => projectName
-     * 
-     */
-    protected Map<String, String> remoteProjectNames;
+    private EnterProjectNamePage namePage;
+    private WizardDialogAccessable wizardDialog;
+    private IncomingProjectNegotiation process;
+    private JID peer;
+    private List<FileList> fileLists;
+    private boolean isExceptionCancel;
 
     @Inject
-    protected EditorAPI editorAPI;
+    private EditorAPI editorAPI;
 
     @Inject
     private IChecksumCache checksumCache;
@@ -118,23 +114,26 @@ public class AddProjectToSessionWizard extends Wizard {
     }
 
     public AddProjectToSessionWizard(IncomingProjectNegotiation process,
-        JID peer, List<FileList> fileLists, Map<String, String> projectNames) {
+        JID peer, List<FileList> fileLists) {
 
         SarosPluginContext.initComponent(this);
 
         this.process = process;
         this.peer = peer;
         this.fileLists = fileLists;
-        this.remoteProjectNames = projectNames;
         setWindowTitle(Messages.AddProjectToSessionWizard_title);
         setHelpAvailable(true);
         setNeedsProgressMonitor(true);
 
         process.setProjectInvitationUI(this);
 
-        /** holds if the wizard close is because of an exception or not */
+        /* holds if the wizard close is because of an exception or not */
         isExceptionCancel = false;
 
+    }
+
+    public void setWizardDlg(WizardDialogAccessable wizardDialog) {
+        this.wizardDialog = wizardDialog;
     }
 
     @Override
@@ -145,7 +144,7 @@ public class AddProjectToSessionWizard extends Wizard {
             return;
 
         namePage = new EnterProjectNamePage(session, connectionManager,
-            preferenceUtils, fileLists, peer, this.remoteProjectNames);
+            preferenceUtils, fileLists, peer, process.getProjectNames());
 
         addPage(namePage);
     }
@@ -156,27 +155,12 @@ public class AddProjectToSessionWizard extends Wizard {
         if (namePage == null)
             return true;
 
-        final Map<String, IProject> sources = new HashMap<String, IProject>();
-        final Map<String, String> projectNames = new HashMap<String, String>();
+        final Map<String, IProject> targetProjectMapping = getTargetProjectMapping();
+
         final boolean useVersionControl = namePage.useVersionControl();
 
-        for (FileList fList : this.fileLists) {
-            String projectName = namePage.getTargetProjectName(fList
-                .getProjectID());
-
-            projectNames.put(fList.getProjectID(), projectName);
-            sources.put(fList.getProjectID(), ResourcesPlugin.getWorkspace()
-                .getRoot().getProject(projectName));
-        }
-
-        List<IProject> existingProjects = new ArrayList<IProject>();
-
-        for (IProject project : sources.values()) {
-            if (project != null)
-                existingProjects.add(project);
-        }
-
-        final Collection<IEditorPart> openEditors = getOpenEditorsForSharedProjects(existingProjects);
+        final Collection<IEditorPart> openEditors = getOpenEditorsForSharedProjects(targetProjectMapping
+            .values());
 
         final List<IEditorPart> dirtyEditors = new ArrayList<IEditorPart>();
 
@@ -190,173 +174,43 @@ public class AddProjectToSessionWizard extends Wizard {
         }
 
         if (containsDirtyEditors) {
-            SWTUtils.runSafeSWTAsync(log, new Runnable() {
+            SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
                 @Override
                 public void run() {
-                    if (AddProjectToSessionWizard.this.getShell().isDisposed()) {
+                    if (AddProjectToSessionWizard.this.getShell().isDisposed())
                         return;
-                    }
 
-                    int max = Math.min(20, dirtyEditors.size());
-                    int more = dirtyEditors.size() - max;
+                    displaySaveDirtyEditorsDialog(dirtyEditors);
 
-                    List<String> dirtyEditorNames = new ArrayList<String>();
-
-                    for (IEditorPart editor : dirtyEditors.subList(0, max))
-                        dirtyEditorNames.add(editor.getTitle());
-
-                    Collections.sort(dirtyEditorNames);
-
-                    if (more > 0)
-                        dirtyEditorNames.add(MessageFormat
-                            .format(
-                                Messages.AddProjectToSessionWizard_unsaved_changes_dialog_more,
-                                more));
-
-                    String allDirtyEditorNames = StringUtils.join(
-                        dirtyEditorNames, ", ");
-
-                    String dialogText = MessageFormat
-                        .format(
-                            Messages.AddProjectToSessionWizard_unsaved_changes_dialog_text,
-                            allDirtyEditorNames);
-
-                    boolean proceed = DialogUtils.openQuestionMessageDialog(
-                        AddProjectToSessionWizard.this.getShell(),
-                        Messages.AddProjectToSessionWizard_unsaved_changes_dialog_title,
-                        dialogText);
-
-                    if (proceed) {
-                        for (IEditorPart editor : openEditors)
-                            editor.doSave(new NullProgressMonitor());
-                    }
                 }
             });
 
             return false;
         }
 
-        /*
-         * Ask the user whether to overwrite local resources only if resources
-         * are supposed to be overwritten based on the synchronization options
-         * and if there are differences between the remote and local project.
-         */
-        final Map<String, FileListDiff> modifiedResources = new HashMap<String, FileListDiff>();
-        final Map<String, IProject> modifiedProjects = new HashMap<String, IProject>();
-
-        modifiedProjects.putAll(getModifiedProjects(sources));
+        final Map<String, FileListDiff> modifiedResources;
 
         try {
-            getContainer().run(true, false, new IRunnableWithProgress() {
-                @Override
-                public void run(IProgressMonitor monitor)
-                    throws InvocationTargetException, InterruptedException {
-                    try {
-                        modifiedResources.putAll(calculateModifiedResources(
-                            modifiedProjects, useVersionControl, monitor));
-                    } catch (Exception e) {
-                        throw new InvocationTargetException(e);
-                    }
-                }
-            });
-        } catch (Exception e) {
-            Throwable cause = e.getCause();
-
-            log.error("calculating modified resources failed", e);
-
-            if (cause instanceof CoreException) {
-                MessageDialog.openError(getShell(),
-                    "Error computing file list",
-                    "Could not compute local file list: " + cause.getMessage());
-            } else {
-                MessageDialog
-                    .openError(
-                        getShell(),
-                        "Error computing file list",
-                        "Internal error while computing local file list: "
-                            + (cause == null ? e.getMessage() : cause
-                                .getMessage()));
-            }
+            modifiedResources = getModifiedResources(targetProjectMapping,
+                useVersionControl);
+        } catch (IOException e) {
+            LOG.error("could not compute local file list", e);
+            MessageDialog.openError(getShell(), "Error computing file list",
+                "Could not compute local file list: " + e.getMessage());
+            return false;
+        } catch (RuntimeException e) {
+            LOG.error("internal error while computing file list", e);
+            MessageDialog.openError(getShell(), "Error computing file list",
+                "Internal error: " + e.getMessage());
 
             return false;
         }
+
         if (!confirmOverwritingResources(modifiedResources))
             return false;
 
-        /*
-         * close all editors to avoid any conflicts. this will be needed for
-         * rsync as it needs to move files around the file system
-         */
-        for (IEditorPart editor : openEditors)
-            editorAPI.closeEditor(editor);
-
-        Job job = new Job("Synchronizing") {
-            @Override
-            protected IStatus run(IProgressMonitor monitor) {
-                try {
-
-                    final IWorkspace workspace = ResourcesPlugin.getWorkspace();
-
-                    final IWorkspaceDescription description = workspace
-                        .getDescription();
-
-                    final boolean isAutoBuilding = description.isAutoBuilding();
-
-                    if (isAutoBuilding) {
-                        description.setAutoBuilding(false);
-                        try {
-                            workspace.setDescription(description);
-                        } catch (CoreException e) {
-                            log.warn("could not disable auto building", e);
-                        }
-                    }
-
-                    ProjectNegotiation.Status status = process.accept(
-                        projectNames, monitor, useVersionControl);
-
-                    if (isAutoBuilding) {
-                        description.setAutoBuilding(true);
-                        try {
-                            workspace.setDescription(description);
-                        } catch (CoreException e) {
-                            log.warn("could not re-enable auto building", e);
-                        }
-                    }
-
-                    if (status != ProjectNegotiation.Status.OK)
-                        return Status.CANCEL_STATUS;
-
-                    SarosView
-                        .showNotification(
-                            Messages.AddProjectToSessionWizard_synchronize_finished_notification_title,
-                            MessageFormat
-                                .format(
-                                    Messages.AddProjectToSessionWizard_synchronize_finished_notification_text,
-                                    StringUtils.join(projectNames.values(),
-                                        ", ")));
-
-                } catch (RuntimeException e) {
-                    log.error(
-                        "unkown error during project negotiation: "
-                            + e.getMessage(), e);
-                    return Status.CANCEL_STATUS;
-                } finally {
-                    SWTUtils.runSafeSWTAsync(log, new Runnable() {
-                        @Override
-                        public void run() {
-                            for (IEditorPart editor : openEditors) {
-                                if (((IFileEditorInput) editor.getEditorInput())
-                                    .getFile().exists())
-                                    editorAPI.openEditor(editor);
-                            }
-                        }
-                    });
-                }
-                return Status.OK_STATUS;
-            }
-        };
-        job.setUser(true);
-        job.schedule();
+        triggerProjectNegotiation(targetProjectMapping, useVersionControl,
+            openEditors);
 
         return true;
     }
@@ -364,7 +218,7 @@ public class AddProjectToSessionWizard extends Wizard {
     public void cancelWizard(final JID jid, final String errorMsg,
         final CancelLocation cancelLocation) {
 
-        SWTUtils.runSafeSWTAsync(log, new Runnable() {
+        SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
             @Override
             public void run() {
                 Shell shell = wizardDialog.getShell();
@@ -375,7 +229,7 @@ public class AddProjectToSessionWizard extends Wizard {
             }
         });
 
-        SWTUtils.runSafeSWTAsync(log, new Runnable() {
+        SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
             @Override
             public void run() {
                 showCancelMessage(jid, errorMsg, cancelLocation);
@@ -391,7 +245,7 @@ public class AddProjectToSessionWizard extends Wizard {
                 Messages.AddProjectToSessionWizard_leave_session_text, false)) {
                 return false;
             }
-            ThreadUtils.runSafeAsync("CancelAddProjectWizard", log,
+            ThreadUtils.runSafeAsync("CancelAddProjectWizard", LOG,
                 new Runnable() {
                     @Override
                     public void run() {
@@ -403,7 +257,100 @@ public class AddProjectToSessionWizard extends Wizard {
         return true;
     }
 
-    public boolean confirmOverwritingResources(
+    private void triggerProjectNegotiation(
+        final Map<String, IProject> targetProjectMapping,
+        final boolean useVersionControl,
+        final Collection<IEditorPart> editorsToClose) {
+
+        // FIXME allow the IPN to accept ID -> IProject mapping
+        final Map<String, String> projectMapping = new HashMap<String, String>();
+
+        for (Entry<String, IProject> entry : targetProjectMapping.entrySet())
+            projectMapping.put(entry.getKey(), entry.getValue().getName());
+
+        final Job job = new Job("Synchronizing") {
+            @Override
+            protected IStatus run(IProgressMonitor monitor) {
+                try {
+
+                    SWTUtils.runSafeSWTSync(LOG, new Runnable() {
+                        @Override
+                        public void run() {
+                            /*
+                             * close all editors to avoid any conflicts.
+                             */
+                            for (final IEditorPart editor : editorsToClose)
+                                editorAPI.closeEditor(editor);
+
+                        }
+                    });
+
+                    final IWorkspace workspace = ResourcesPlugin.getWorkspace();
+
+                    final IWorkspaceDescription description = workspace
+                        .getDescription();
+
+                    final boolean isAutoBuilding = description.isAutoBuilding();
+
+                    if (isAutoBuilding) {
+                        description.setAutoBuilding(false);
+                        try {
+                            workspace.setDescription(description);
+                        } catch (CoreException e) {
+                            LOG.warn("could not disable auto building", e);
+                        }
+                    }
+
+                    ProjectNegotiation.Status status = process.accept(
+                        projectMapping, monitor, useVersionControl);
+
+                    if (isAutoBuilding) {
+                        description.setAutoBuilding(true);
+                        try {
+                            workspace.setDescription(description);
+                        } catch (CoreException e) {
+                            LOG.warn("could not re-enable auto building", e);
+                        }
+                    }
+
+                    if (status != ProjectNegotiation.Status.OK)
+                        return Status.CANCEL_STATUS;
+
+                    SarosView
+                        .showNotification(
+                            Messages.AddProjectToSessionWizard_synchronize_finished_notification_title,
+                            MessageFormat
+                                .format(
+                                    Messages.AddProjectToSessionWizard_synchronize_finished_notification_text,
+                                    StringUtils.join(projectMapping.values(),
+                                        ", ")));
+
+                } catch (RuntimeException e) {
+                    LOG.error(
+                        "unkown error during project negotiation: "
+                            + e.getMessage(), e);
+                    return Status.CANCEL_STATUS;
+                } finally {
+                    SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
+                        @Override
+                        public void run() {
+                            for (IEditorPart editor : editorsToClose) {
+                                if (((IFileEditorInput) editor.getEditorInput())
+                                    .getFile().exists())
+                                    editorAPI.openEditor(editor);
+                            }
+                        }
+                    });
+                }
+                return Status.OK_STATUS;
+            }
+        };
+        job.setUser(true);
+        job.schedule();
+
+    }
+
+    private boolean confirmOverwritingResources(
         final Map<String, FileListDiff> modifiedResources) {
 
         String message = Messages.AddProjectToSessionWizard_synchronize_projects;
@@ -433,6 +380,7 @@ public class AddProjectToSessionWizard extends Wizard {
             }
             info.add(new Status(IStatus.INFO, PID, 1, "", null)); //$NON-NLS-1$
         }
+
         return new OverwriteErrorDialog(getShell(),
             Messages.AddProjectToSessionWizard_delete_local_changes, null, info)
             .open() == IDialogConstants.OK_ID;
@@ -483,10 +431,6 @@ public class AddProjectToSessionWizard extends Wizard {
         }
     }
 
-    public void setWizardDlg(WizardDialogAccessable wizardDialog) {
-        this.wizardDialog = wizardDialog;
-    }
-
     private Collection<IEditorPart> getOpenEditorsForSharedProjects(
         Collection<IProject> projects) {
 
@@ -506,9 +450,50 @@ public class AddProjectToSessionWizard extends Wizard {
         return openEditors;
     }
 
+    private Map<String, FileListDiff> getModifiedResources(
+        Map<String, IProject> projectMapping, final boolean useVersionControl)
+        throws IOException {
+
+        final Map<String, IProject> modifiedProjects = getModifiedProjects(projectMapping);
+        final Map<String, FileListDiff> result = new HashMap<String, FileListDiff>();
+
+        try {
+            getContainer().run(true, false, new IRunnableWithProgress() {
+                @Override
+                public void run(IProgressMonitor monitor)
+                    throws InvocationTargetException, InterruptedException {
+                    try {
+                        result.putAll(calculateModifiedResources(
+                            modifiedProjects, useVersionControl, monitor));
+                    } catch (IOException e) {
+                        throw new InvocationTargetException(e);
+                    } catch (RuntimeException e) {
+                        throw new InvocationTargetException(e);
+                    }
+                }
+            });
+        } catch (InvocationTargetException e) {
+            Throwable cause = e.getCause();
+
+            if (cause instanceof IOException)
+                throw (IOException) cause;
+            else if (cause instanceof RuntimeException)
+                throw (RuntimeException) cause;
+            else
+                throw new RuntimeException(cause.getMessage(), cause);
+        } catch (InterruptedException e) {
+            throw new RuntimeException("unexpected interruption", e);
+        }
+
+        return result;
+    }
+
     /**
      * Returns all modified resources (either changed or deleted) for the
      * current project mapping.
+     * <p>
+     * <b>Important:</b> Do not call this inside the SWT Thread. This is a long
+     * running operation !
      */
     private Map<String, FileListDiff> calculateModifiedResources(
         Map<String, IProject> projectMapping, boolean includeVCSData,
@@ -544,7 +529,7 @@ public class AddProjectToSessionWizard extends Wizard {
                 if (!session.isShared(project))
                     project.refreshLocal();
             } catch (IOException e) {
-                log.warn("could not refresh project: " + project, e);
+                LOG.warn("could not refresh project: " + project, e);
             }
 
             FileList remoteFileList = process.getRemoteFileList(projectID);
@@ -591,8 +576,6 @@ public class AddProjectToSessionWizard extends Wizard {
     /**
      * Returns a project mapping that contains all projects that will be
      * modified on synchronization.
-     * 
-     * @SWT must be called in the SWT thread context
      */
     private Map<String, IProject> getModifiedProjects(
         Map<String, IProject> projectMapping) {
@@ -606,5 +589,65 @@ public class AddProjectToSessionWizard extends Wizard {
         }
 
         return modifiedProjects;
+    }
+
+    /**
+     * Returns the project ids and their target project as selected in the
+     * {@link EnterProjectNamePage}.
+     * <p>
+     * This method must only be called after the page in completed state !
+     */
+    private Map<String, IProject> getTargetProjectMapping() {
+
+        final Map<String, IProject> result = new HashMap<String, IProject>();
+
+        for (final FileList list : fileLists) {
+            final String projectID = list.getProjectID();
+
+            result.put(projectID, ResourcesPlugin.getWorkspace().getRoot()
+                .getProject(namePage.getTargetProjectName(projectID)));
+        }
+
+        return result;
+    }
+
+    private void displaySaveDirtyEditorsDialog(
+        final List<IEditorPart> dirtyEditors) {
+        int max = Math.min(20, dirtyEditors.size());
+        int more = dirtyEditors.size() - max;
+
+        List<String> dirtyEditorNames = new ArrayList<String>();
+
+        for (IEditorPart editor : dirtyEditors.subList(0, max))
+            dirtyEditorNames.add(editor.getTitle());
+
+        Collections.sort(dirtyEditorNames);
+
+        if (more > 0)
+            dirtyEditorNames.add(MessageFormat.format(
+                Messages.AddProjectToSessionWizard_unsaved_changes_dialog_more,
+                more));
+
+        String allDirtyEditorNames = StringUtils.join(dirtyEditorNames, ", ");
+
+        String dialogText = MessageFormat.format(
+            Messages.AddProjectToSessionWizard_unsaved_changes_dialog_text,
+            allDirtyEditorNames);
+
+        boolean proceed = DialogUtils.openQuestionMessageDialog(getShell(),
+            Messages.AddProjectToSessionWizard_unsaved_changes_dialog_title,
+            dialogText);
+
+        /*
+         * The wizard can be closed automatically and so 'proceed' would be true
+         * if this happens although the user did not clicked anything.
+         */
+        if (getShell().isDisposed())
+            return;
+
+        if (proceed) {
+            for (IEditorPart editor : dirtyEditors)
+                editor.doSave(new NullProgressMonitor());
+        }
     }
 }
