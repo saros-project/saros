@@ -423,8 +423,10 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 final IProject project = ResourcesPlugin.getWorkspace()
                     .getRoot().getProject(projectName);
 
-                if (!project.exists())
+                if (!project.exists()) {
                     project.create(null);
+                    project.open(null);
+                }
             }
 
         } catch (CoreException e) {
