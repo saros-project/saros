@@ -724,7 +724,7 @@ public class EditorManager extends AbstractActivityProducer {
 
     private void execTextEdit(TextEditActivity textEdit) {
 
-        LOG.trace("EditorManager.execTextEdit invoked");
+        LOG.trace(".execTextEdit invoked");
 
         SPath path = textEdit.getPath();
         IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
@@ -786,7 +786,7 @@ public class EditorManager extends AbstractActivityProducer {
 
     private void execTextSelection(TextSelectionActivity selection) {
 
-        LOG.trace("EditorManager.execTextSelection invoked");
+        LOG.trace(".execTextSelection invoked");
 
         SPath path = selection.getPath();
 
@@ -821,7 +821,7 @@ public class EditorManager extends AbstractActivityProducer {
 
     private void execViewport(ViewportActivity viewport) {
 
-        LOG.trace("EditorManager.execViewport invoked");
+        LOG.trace(".execViewport invoked");
 
         User user = viewport.getSource();
         boolean following = user.equals(getFollowedUser());
@@ -880,7 +880,7 @@ public class EditorManager extends AbstractActivityProducer {
 
     private void execActivated(User user, SPath path) {
 
-        LOG.trace("EditorManager.execActivated invoked");
+        LOG.trace(".execActivated invoked");
 
         editorListenerDispatch.activeEditorChanged(user, path);
 
@@ -914,7 +914,7 @@ public class EditorManager extends AbstractActivityProducer {
 
     private void execClosed(User user, SPath path) {
 
-        LOG.trace("EditorManager.execClosed invoked");
+        LOG.trace(".execClosed invoked");
 
         editorListenerDispatch.editorRemoved(user, path);
 
@@ -937,20 +937,18 @@ public class EditorManager extends AbstractActivityProducer {
 
         LOG.trace(".partOpened invoked");
 
-        if (!isSharedEditor(editorPart)) {
+        if (!isSharedEditor(editorPart))
             return;
-        }
 
         /*
          * If the resource is not accessible it might have been deleted without
          * the editor having been closed (for instance outside of Eclipse).
          * Others might be confused about if they receive this editor from us.
          */
-        IResource editorResource = editorAPI.getEditorResource(editorPart);
-        if (!editorResource.isAccessible()) {
-            LOG.warn(".partOpened resource: "
-                + editorResource.getLocation().toOSString()
-                + " is not accesible");
+        final IResource resource = editorAPI.getEditorResource(editorPart);
+
+        if (!resource.isAccessible()) {
+            LOG.warn(".partOpened resource: " + resource + " is not accessible");
             return;
         }
 
@@ -960,7 +958,7 @@ public class EditorManager extends AbstractActivityProducer {
          */
         editorPool.add(editorPart);
 
-        ITextViewer viewer = EditorAPI.getViewer(editorPart);
+        final ITextViewer viewer = EditorAPI.getViewer(editorPart);
 
         if (viewer instanceof ISourceViewer)
             customAnnotationManager.installPainter((ISourceViewer) viewer);
@@ -1058,23 +1056,26 @@ public class EditorManager extends AbstractActivityProducer {
      * than before! Probably when renaming. (called by EditorPartListener)
      * 
      */
-    void partInputChanged(IEditorPart editor) {
+    void partInputChanged(IEditorPart editorPart) {
+
+        LOG.trace(".partInputChanged invoked");
+
         // notice currently followed user before closing the editor
         User followedUser = getFollowedUser();
 
-        if (editorPool.isManaged(editor)) {
+        if (editorPool.isManaged(editorPart)) {
 
             // Pretend as if the editor was closed locally (but use the old part
             // before the move happened) and then simulate it being opened again
-            SPath path = editorPool.getCurrentPath(editor);
+            SPath path = editorPool.getPath(editorPart);
             if (path == null) {
                 LOG.warn("Editor was managed but path could not be found: "
-                    + editor);
+                    + editorPart);
             } else {
-                partClosedOfPath(editor, path);
+                partClosedOfPath(editorPart, path);
             }
 
-            partOpened(editor);
+            partOpened(editorPart);
 
             // restore the previously followed user
             // in case it was set and has changed
@@ -1088,7 +1089,7 @@ public class EditorManager extends AbstractActivityProducer {
      */
     void partClosed(IEditorPart editorPart) {
 
-        LOG.trace("EditorManager.partClosed invoked");
+        LOG.trace(".partClosed invoked");
 
         if (!isSharedEditor(editorPart)) {
             return;

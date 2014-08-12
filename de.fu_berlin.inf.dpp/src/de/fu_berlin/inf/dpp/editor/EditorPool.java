@@ -21,6 +21,7 @@ import org.eclipse.ui.texteditor.IElementStateListener;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
+import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 
 /**
@@ -29,16 +30,35 @@ import de.fu_berlin.inf.dpp.session.User.Permission;
  * Currently only those parts are supported which can be traced to an
  * {@link IFile} and an {@link ITextViewer}.
  */
-class EditorPool {
+final class EditorPool {
 
     private static final Logger LOG = Logger.getLogger(EditorPool.class);
+
+    /*
+     * The values might change over time but we need the original state when an
+     * editor part is removed because we *added* it with these values.
+     */
+
+    /**
+     * Holder class to hold input references of <code>IEditorPart</code>s.
+     */
+    private static class EditorPartInputReferences {
+        private final IEditorInput input;
+        private final IFile file;
+
+        private EditorPartInputReferences(final IEditorInput input,
+            final IFile file) {
+            this.input = input;
+            this.file = file;
+        }
+    }
 
     private final EditorManager editorManager;
     private final IEditorAPI editorAPI;
 
     private final DirtyStateListener dirtyStateListener;
 
-    final StoppableDocumentListener documentListener;
+    private final StoppableDocumentListener documentListener;
 
     /**
      * The editorParts-map will return all EditorParts associated with a given
@@ -49,10 +69,9 @@ class EditorPool {
 
     /**
      * The editorInputMap contains all IEditorParts which are managed by the
-     * EditorPool and stores the associated IEditorInput (the EditorInput could
-     * also actually be retrieved directly from the IEditorPart).
+     * EditorPool and stores the associated input references.
      */
-    private final Map<IEditorPart, IEditorInput> editorInputMap = new HashMap<IEditorPart, IEditorInput>();
+    private final Map<IEditorPart, EditorPartInputReferences> editorInputMap = new HashMap<IEditorPart, EditorPartInputReferences>();
 
     private final Map<IEditorPart, EditorListener> editorListeners = new HashMap<IEditorPart, EditorListener>();
 
@@ -89,33 +108,23 @@ class EditorPool {
         LOG.trace("adding editor part " + editorPart + " ["
             + editorPart.getTitle() + "]");
 
-        final SPath path = editorAPI.getEditorPath(editorPart);
-
-        if (path == null) {
-            LOG.warn("could not find path/resource for editor: "
-                + editorPart.getTitle());
+        if (isManaged(editorPart)) {
+            LOG.error("editor part " + editorPart + " is already managed");
             return;
         }
 
-        if (isManaged(path, editorPart)) {
-            LOG.error("editor part was added twice to the pool: "
-                + editorPart.getTitle());
-            return;
-        }
+        final ITextViewer viewer = EditorAPI.getViewer(editorPart);
 
-        ITextViewer viewer = EditorAPI.getViewer(editorPart);
         if (viewer == null) {
-            LOG.warn("editor part is not a ITextViewer: "
-                + editorPart.getTitle());
+            LOG.warn("editor part is not a ITextViewer: " + editorPart);
             return;
         }
 
         final IEditorInput input = editorPart.getEditorInput();
-
         final IFile file = ResourceUtil.getFile(input);
 
         if (file == null) {
-            LOG.warn("editor part does not use a file storage");
+            LOG.warn("editor part does not use a file storage: " + editorPart);
             return;
         }
 
@@ -146,6 +155,8 @@ class EditorPool {
 
         document.addDocumentListener(documentListener);
 
+        final SPath path = new SPath(ResourceAdapterFactory.create(file));
+
         Set<IEditorPart> parts = editorParts.get(path);
 
         if (parts == null) {
@@ -153,20 +164,23 @@ class EditorPool {
             editorParts.put(path, parts);
         }
 
-        editorInputMap.put(editorPart, input);
+        editorInputMap.put(editorPart, new EditorPartInputReferences(input,
+            file));
+
         editorListeners.put(editorPart, listener);
         parts.add(editorPart);
     }
 
-    public SPath getCurrentPath(final IEditorPart editorPart) {
+    /**
+     * Returns the {@linkplain SPath path} for the corresponding editor.
+     * 
+     * @return the path for the corresponding editor or <code>null</code> if the
+     *         editor is not managed by this pool
+     */
+    public SPath getPath(final IEditorPart editorPart) {
 
-        final IEditorInput input = editorInputMap.get(editorPart);
-
-        if (input == null) {
-            LOG.warn("editor part was never added to the pool: "
-                + editorPart.getTitle());
+        if (!isManaged(editorPart))
             return null;
-        }
 
         for (final Entry<SPath, Set<IEditorPart>> entry : editorParts
             .entrySet()) {
@@ -175,11 +189,13 @@ class EditorPool {
                 return entry.getKey();
         }
 
+        // assert false : should never been reached
         return null;
     }
 
     /**
-     * Removes an {@link IEditorPart} from the pool.
+     * Removes an {@link IEditorPart} from the pool and makes the editor
+     * editable again.
      * <p>
      * This Method also disconnects the editorPart from its data source
      * (identified by associated {@link IFile}) and removes registered
@@ -190,40 +206,24 @@ class EditorPool {
      * <li>{@link EditorListener} from {@link IEditorPart}</li>
      * </ul>
      * 
-     * This method also makes the Editor editable.
-     * 
      * @param editorPart
      *            editorPart to be removed
-     * 
-     * @return {@link SPath} of the Editor that was removed from the Pool, or
-     *         <code>null</code> on error.
      */
-    public SPath remove(final IEditorPart editorPart) {
+    public void remove(final IEditorPart editorPart) {
 
         LOG.trace("removing editor part " + editorPart + " ["
             + editorPart.getTitle() + "]");
 
-        final SPath path = editorAPI.getEditorPath(editorPart);
-
-        if (path == null) {
-            LOG.warn("could not find path/resource for editor: "
-                + editorPart.getTitle());
-            return null;
+        if (!isManaged(editorPart)) {
+            LOG.error("editor part is not managed: " + editorPart);
+            return;
         }
 
-        if (!isManaged(path, editorPart)) {
-            LOG.error("editor part was never added to the pool: "
-                + editorPart.getTitle());
-            return null;
-        }
+        final EditorPartInputReferences inputRefs = editorInputMap
+            .remove(editorPart);
 
-        IEditorInput input = editorInputMap.remove(editorPart);
-
-        assert input != null;
-
-        final IFile file = ResourceUtil.getFile(input);
-
-        assert file != null;
+        final IEditorInput input = inputRefs.input;
+        final IFile file = inputRefs.file;
 
         // Unregister and unhook
         editorAPI.setEditable(editorPart, true);
@@ -238,16 +238,16 @@ class EditorPool {
         final IDocument document = documentProvider.getDocument(input);
 
         if (document == null) {
-            LOG.warn("could not disconnect from document: " + path);
+            LOG.warn("could not disconnect from document: " + file);
         } else {
             document.removeDocumentListener(documentListener);
         }
 
         editorManager.disconnect(file);
 
-        editorParts.get(path).remove(editorPart);
+        final SPath path = new SPath(ResourceAdapterFactory.create(file));
 
-        return path;
+        editorParts.get(path).remove(editorPart);
     }
 
     /**
@@ -317,8 +317,8 @@ class EditorPool {
     /**
      * Returns if the given <code>IEditorPart</code> is managed by this pool.
      */
-    public boolean isManaged(final IEditorPart editor) {
-        return editorInputMap.containsKey(editor);
+    public boolean isManaged(final IEditorPart editorPart) {
+        return editorInputMap.containsKey(editorPart);
     }
 
     /**
@@ -347,14 +347,5 @@ class EditorPool {
      */
     public void setDocumentListenerEnabled(final boolean enabled) {
         documentListener.setEnabled(enabled);
-    }
-
-    private boolean isManaged(final SPath path, final IEditorPart editor) {
-        final Set<IEditorPart> editorsForPath = editorParts.get(path);
-
-        if (editorsForPath == null)
-            return false;
-
-        return editorsForPath.contains(editor);
     }
 }
