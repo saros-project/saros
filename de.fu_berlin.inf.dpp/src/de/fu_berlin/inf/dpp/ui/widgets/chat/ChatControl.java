@@ -524,12 +524,17 @@ public class ChatControl extends Composite {
         if (chat instanceof MultiUserChat) {
             synchronized (this) {
                 if (session != null) {
-                    JID resourceQualifiedJID = session
-                        .getResourceQualifiedJID(jid);
-                    User user = session.getUser(resourceQualifiedJID);
 
-                    if (user != null)
-                        return user.getNickname();
+                    // FIXME it is common that the user join the chat before
+                    // he/she joins the session
+                    final JID rqJID = session.getResourceQualifiedJID(jid);
+
+                    if (rqJID != null) {
+                        final User user = session.getUser(rqJID);
+
+                        if (user != null)
+                            return user.getNickname();
+                    }
                 }
             }
         }
