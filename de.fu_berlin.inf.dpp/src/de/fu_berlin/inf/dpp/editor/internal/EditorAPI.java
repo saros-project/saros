@@ -1,10 +1,8 @@
 package de.fu_berlin.inf.dpp.editor.internal;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
@@ -32,7 +30,6 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IFileEditorInput;
-import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -47,8 +44,6 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.editor.EditorPartListener;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.ui.dialogs.WarningMessageDialog;
@@ -97,57 +92,7 @@ public class EditorAPI implements IEditorAPI {
      */
     private final List<IEditorPart> lockedEditors = new ArrayList<IEditorPart>();
 
-    /**
-     * Currently managed shared project part listeners for removal by
-     * removePartListener
-     */
-    private final Map<EditorManager, IPartListener2> partListeners = new HashMap<EditorManager, IPartListener2>();
-
     private boolean warnOnceExternalEditor = true;
-
-    // FIXME why is the logic placed here ? Move to EditorManager
-    @Override
-    public void addEditorPartListener(EditorManager editorManager) {
-        assert SWTUtils.isSWT();
-
-        if (editorManager == null)
-            throw new IllegalArgumentException();
-
-        if (partListeners.containsKey(editorManager)) {
-            LOG.error("EditorPartListener was added twice: ", new StackTrace());
-            removeEditorPartListener(editorManager);
-        }
-
-        IPartListener2 partListener = new SafePartListener2(LOG,
-            new EditorPartListener(editorManager));
-
-        partListeners.put(editorManager, partListener);
-
-        // TODO This can fail if a shared project is started when no
-        // Eclipse Window is open!
-        getActiveWindow().getPartService().addPartListener(partListener);
-    }
-
-    // FIXME why is the logic placed here ? Move to EditorManager
-    @Override
-    public void removeEditorPartListener(EditorManager editorManager) {
-
-        if (editorManager == null)
-            throw new IllegalArgumentException();
-
-        if (!partListeners.containsKey(editorManager)) {
-            throw new IllegalStateException();
-        }
-
-        // TODO This can fail if a shared project is started when no
-        // Eclipse Window is open!
-        IWorkbenchWindow window = getActiveWindow();
-        if (window == null)
-            return;
-
-        window.getPartService().removePartListener(
-            partListeners.remove(editorManager));
-    }
 
     @Override
     public IEditorPart openEditor(SPath path) {

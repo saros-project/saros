@@ -109,35 +109,6 @@ public interface IEditorAPI {
     public IResource getEditorResource(IEditorPart editorPart);
 
     /**
-     * Removes a previously registered PartListener added via
-     * {@link #addEditorPartListener(EditorManager)}.
-     * 
-     * @swt Needs to be called from the SWT-UI thread.
-     * 
-     * @throws IllegalArgumentException
-     *             if the EditorManager is null
-     * 
-     * @throws IllegalStateException
-     *             if the given EditorManager has never been registered via
-     *             {@link #addEditorPartListener(EditorManager)}
-     */
-    public void removeEditorPartListener(EditorManager editorManager);
-
-    /**
-     * Register a PartListener on the currently active WorkbenchWindow using the
-     * given EditorManager as callback.
-     * 
-     * If a part listener is already registered for the given editorManager it
-     * is removed before adding a new listener (but a warning will be printed!)
-     * 
-     * @swt Needs to be called from the SWT-UI thread.
-     * 
-     * @throws IllegalArgumentException
-     *             if the EditorManager is null
-     */
-    public void addEditorPartListener(EditorManager editorManager);
-
-    /**
      * Returns the {@link IDocumentProvider} of the given {@link IEditorInput}.
      * This method analyzes the file extension of the {@link IFile} associated
      * with the given {@link IEditorInput}. Depending on the file extension it

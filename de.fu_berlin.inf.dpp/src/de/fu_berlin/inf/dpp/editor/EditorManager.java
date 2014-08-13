@@ -45,6 +45,9 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
@@ -72,6 +75,7 @@ import de.fu_berlin.inf.dpp.editor.internal.CustomAnnotationManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.LocationAnnotationManager;
+import de.fu_berlin.inf.dpp.editor.internal.SafePartListener2;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
@@ -159,6 +163,8 @@ public class EditorManager extends AbstractActivityProducer {
     private User followedUser = null;
 
     private final EditorPool editorPool;
+
+    private final IPartListener2 partListener;
 
     private SPath locallyActiveEditor;
 
@@ -425,6 +431,8 @@ public class EditorManager extends AbstractActivityProducer {
         this.editorAPI = editorAPI;
         this.preferenceStore = preferenceStore;
         editorPool = new EditorPool(this, editorAPI);
+        partListener = new SafePartListener2(LOG, new EditorPartListener(this));
+
         registerCustomAnnotations();
         sessionManager.addSarosSessionListener(this.sessionListener);
         addSharedEditorListener(sharedEditorListener);
@@ -2006,6 +2014,7 @@ public class EditorManager extends AbstractActivityProducer {
         assert editorPool.getAllEditors().size() == 0 : "EditorPool was not correctly reset!";
 
         session = newSession;
+
         session.getStopManager().addBlockable(stopManagerListener);
 
         hasWriteAccess = session.hasWriteAccess();
@@ -2026,7 +2035,15 @@ public class EditorManager extends AbstractActivityProducer {
 
         preferenceStore.addPropertyChangeListener(annotationPreferenceListener);
 
-        editorAPI.addEditorPartListener(this);
+        /*
+         * FIXME there can be multiple workbench windows (see Eclipse:
+         * Window->New Window menu entry)
+         */
+        IWorkbenchWindow window = PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow();
+
+        if (window != null)
+            window.getPartService().addPartListener(partListener);
     }
 
     /**
@@ -2037,7 +2054,15 @@ public class EditorManager extends AbstractActivityProducer {
 
         setFollowing(null);
 
-        editorAPI.removeEditorPartListener(this);
+        /*
+         * FIXME there can be multiple workbench windows (see Eclipse:
+         * Window->New Window menu entry)
+         */
+        IWorkbenchWindow window = PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow();
+
+        if (window != null)
+            window.getPartService().removePartListener(partListener);
 
         preferenceStore
             .removePropertyChangeListener(annotationPreferenceListener);
