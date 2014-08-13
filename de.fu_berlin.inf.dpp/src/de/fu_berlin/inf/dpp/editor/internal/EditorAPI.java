@@ -29,7 +29,6 @@ import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
-import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -454,22 +453,6 @@ public class EditorAPI implements IEditorAPI {
             // The operation does not throw an exception, thus this is an error.
             throw new RuntimeException(e);
         }
-    }
-
-    public static boolean existUnsavedFiles(IProject proj) {
-        // Note: We don't need to check editors that aren't loaded.
-        for (IEditorPart editorPart : getOpenEditors(false)) {
-            final IEditorInput editorInput = editorPart.getEditorInput();
-            if (!(editorInput instanceof IFileEditorInput)) {
-                continue;
-            }
-            // Object identity instead of using equals is sufficient.
-            IFile file = ((IFileEditorInput) editorInput).getFile();
-            if (file.getProject() == proj && editorPart.isDirty()) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override

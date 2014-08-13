@@ -34,7 +34,6 @@ import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.communication.extensions.ProjectNegotiationMissingFilesExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingRequest;
 import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingResponse;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
@@ -358,15 +357,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             IProject project = ResourcesPlugin.getWorkspace().getRoot()
                 .getProject(projectName);
 
-            if (project.exists()) {
-                /*
-                 * Saving unsaved files is supposed to be done in
-                 * JoinSessionWizard#performFinish().
-                 */
-                if (EditorAPI.existUnsavedFiles(project)) {
-                    LOG.error("Unsaved files detected.");
-                }
-            } else
+            if (!project.exists())
                 throw new IllegalStateException("project " + project
                     + " does not exists");
 
