@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package de.fu_berlin.inf.dpp.feedback;
 
@@ -29,7 +29,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
  * session. But before he actually shows anything, it is determined from the
  * global preferences if the user wants to participate in general and in which
  * interval.
- * 
+ *
  * @author Lisa Dohrmann
  */
 @Component(module = "feedback")
@@ -153,7 +153,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
 
     /**
      * Number of sessions until the {@link FeedbackDialog} is shown.
-     * 
+     *
      * @return a positive number if the value exists in the preferences or the
      *         default value -1
      */
@@ -165,7 +165,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
     /**
      * Sets the number of session until the next {@link FeedbackDialog} is
      * shown.
-     * 
+     *
      * @param untilNext
      */
 
@@ -180,7 +180,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
 
     /**
      * Returns whether the feedback is disabled or enabled by the user.
-     * 
+     *
      * @return 0 - undefined, 1 - enabled, 2 - disabled
      */
     public static int getFeedbackStatus() {
@@ -191,7 +191,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
 
     /**
      * Returns if the feedback is disabled as a boolean.
-     * 
+     *
      * @return true if it is disabled
      */
     public static boolean isFeedbackDisabled() {
@@ -200,7 +200,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
 
     /**
      * Sets if the feedback is disabled or not.
-     * 
+     *
      * @param disabled
      */
     public static void setFeedbackDisabled(final boolean disabled) {
@@ -212,7 +212,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
 
     /**
      * Returns the interval in which the survey should be shown.
-     * 
+     *
      * @return
      */
     public static int getSurveyInterval() {
@@ -222,7 +222,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
 
     /**
      * Sets the feedback survey interval.
-     * 
+     *
      * @param interval
      */
     public static void setSurveyInterval(final int interval) {
@@ -242,10 +242,10 @@ public class FeedbackManager extends AbstractFeedbackManager implements
      * Shows the FeedbackDialog with the given message and returns whether the
      * user answered it with yes or no and resets the sessions until the next
      * dialog is shown.
-     * 
+     *
      * @param message
      * @return true, if the user clicked yes, otherwise false
-     * 
+     *
      * @blocking
      */
     public boolean showFeedbackDialog(final String message) {
@@ -275,7 +275,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
      * <br>
      * The number of sessions until the next reminder is shown is reset to the
      * current interval length on every call.
-     * 
+     *
      * @return which browser was used to open the survey as one of the
      *         FeedbackManagers constants (BROWSER_EXT, BROWSER_INT or
      *         BROWSER_NONE)
@@ -293,7 +293,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
                 // TODO user should be able to copy&paste the link easily
                 MessageDialog.openWarning(SWTUtils.getShell(),
                     "Opening survey failed",
-                    "Your browser couldn't be opend. Please visit "
+                    "Your browser couldn't be opened. Please visit "
                         + SURVEY_URL + " yourself.");
             }
         }
@@ -302,7 +302,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
 
     /**
      * Determines from the users preferences if the survey should be shown now.
-     * 
+     *
      * @return true if the survey should be shown now, false otherwise
      */
     public boolean showNow() {
@@ -317,7 +317,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
 
     /**
      * Only for debugging.
-     * 
+     *
      * @return
      */
     protected boolean debugSessionTime() {
@@ -328,7 +328,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
 
     /**
      * Convenience method to get a string that describes the given browser type.
-     * 
+     *
      * @param browserType
      * @return a string that describes the browser
      */

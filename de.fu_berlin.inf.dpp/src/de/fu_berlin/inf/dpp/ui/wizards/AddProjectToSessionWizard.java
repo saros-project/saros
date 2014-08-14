@@ -327,7 +327,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
                 } catch (RuntimeException e) {
                     LOG.error(
-                        "unkown error during project negotiation: "
+                        "unknown error during project negotiation: "
                             + e.getMessage(), e);
                     return Status.CANCEL_STATUS;
                 } finally {

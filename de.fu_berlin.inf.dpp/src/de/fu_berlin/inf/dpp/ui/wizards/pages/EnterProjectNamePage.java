@@ -507,7 +507,7 @@ public class EnterProjectNamePage extends WizardPage {
         case IBB:
             String speedInfo = "";
 
-            if (preferenceUtils.forceFileTranserByChat()) {
+            if (preferenceUtils.forceFileTransferByChat()) {
                 setDescription(MessageFormat
                     .format(
                         Messages.EnterProjectNamePage_direct_filetransfer_deactivated,

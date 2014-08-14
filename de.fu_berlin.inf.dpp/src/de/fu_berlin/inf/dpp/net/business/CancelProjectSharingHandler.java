@@ -71,7 +71,7 @@ public class CancelProjectSharingHandler {
             log.debug("Inv" + sender + " : Received invitation cancel message");
             process.remoteCancel(errorMsg);
         } else {
-            log.warn("Inv[unkown user]: Received invitation cancel message");
+            log.warn("Inv[unknown user]: Received invitation cancel message");
         }
     }
 }

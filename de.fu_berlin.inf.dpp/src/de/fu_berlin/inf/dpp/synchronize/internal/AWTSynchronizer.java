@@ -47,7 +47,7 @@ public class AWTSynchronizer implements UISynchronizer {
             LOG.error(
                 "running "
                     + runnable
-                    + " failed, encountered an error while beeing executed in the EDT",
+                    + " failed, encountered an error while being executed in the EDT",
                 e);
         }
     }

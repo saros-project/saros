@@ -99,7 +99,7 @@ public class ConsistencyAction extends Action implements Disposable {
 
         @Override
         public void setValue(Boolean newValue) {
-            handleConistencyChange(newValue);
+            handleConsistencyChange(newValue);
         }
     };
 
@@ -163,7 +163,7 @@ public class ConsistencyAction extends Action implements Disposable {
         }
     }
 
-    private void handleConistencyChange(Boolean isInconsistent) {
+    private void handleConsistencyChange(Boolean isInconsistent) {
 
         if (sarosSession.isHost() && isInconsistent) {
             LOG.warn("No inconsistency should ever be reported" //$NON-NLS-1$

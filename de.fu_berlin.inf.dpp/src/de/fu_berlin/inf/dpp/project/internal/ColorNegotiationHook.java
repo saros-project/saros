@@ -12,7 +12,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 public class ColorNegotiationHook implements ISessionNegotiationHook {
     private static final String HOOK_IDENTIFIER = "colorManagement";
     // This high visibility is not needed for good. Currently there is a color
-    // related HACK in the SessionNegotation that relies on these constants.
+    // related HACK in the SessionNegotiation that relies on these constants.
     public static final String KEY_CLIENT_COLOR = "clientColor";
     public static final String KEY_CLIENT_FAV_COLOR = "clientFavoriteColor";
     public static final String KEY_HOST_COLOR = "hostColor";
@@ -65,7 +65,7 @@ public class ColorNegotiationHook implements ISessionNegotiationHook {
     @Override
     public void applyActualParameters(Map<String, String> settings) {
         // TODO Implement the application of the returned color settings. This
-        // is currently done with a HACK in IncomingSessionNegotation (see
+        // is currently done with a HACK in IncomingSessionNegotiation (see
         // method initializeSession())
     }
 

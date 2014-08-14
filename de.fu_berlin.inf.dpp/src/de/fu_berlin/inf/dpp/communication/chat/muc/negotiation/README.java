@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.communication.chat.muc.negotiation;
 import org.eclipse.core.resources.ResourcesPlugin;
 
 /**
- * The MUCNegotationManager must not be part of the communication package. This
+ * The MUCNegotiationManager must not be part of the communication package. This
  * is a component used during session negotiation to hold data that a client may
  * need to start a MUC session. It was hidden in that package, maybe gave some
  * developers a headache on how MUC sessions are actually started.

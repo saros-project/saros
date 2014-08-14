@@ -42,7 +42,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 /**
  * Offers convenient methods for collaboration actions like sharing a project
  * resources.
- * 
+ *
  * @author bkahlert
  * @author kheld
  */
@@ -65,10 +65,10 @@ public class CollaborationUtils {
     /**
      * Starts a new session and shares the given resources with given contacts.<br/>
      * Does nothing if a {@link ISarosSession session} is already running.
-     * 
+     *
      * @param resources
      * @param contacts
-     * 
+     *
      * @nonBlocking
      */
     public static void startSession(List<IResource> resources,
@@ -115,7 +115,7 @@ public class CollaborationUtils {
     /**
      * Leaves the currently running {@link SarosSession}<br/>
      * Does nothing if no {@link SarosSession} is running.
-     * 
+     *
      */
     public static void leaveSession() {
 
@@ -159,9 +159,9 @@ public class CollaborationUtils {
     /**
      * Adds the given project resources to the session.<br/>
      * Does nothing if no {@link SarosSession session} is running.
-     * 
+     *
      * @param resourcesToAdd
-     * 
+     *
      * @nonBlocking
      */
     public static void addResourcesToSession(List<IResource> resourcesToAdd) {
@@ -200,9 +200,9 @@ public class CollaborationUtils {
     /**
      * Adds the given contacts to the session.<br/>
      * Does nothing if no {@link ISarosSession session} is running.
-     * 
+     *
      * @param contacts
-     * 
+     *
      * @nonBlocking
      */
     public static void addContactsToSession(final List<JID> contacts) {
@@ -235,7 +235,7 @@ public class CollaborationUtils {
      * Creates the message that invitees see on an incoming project share
      * request. Currently it contains the project names along with the number of
      * shared files and total file size for each shared project.
-     * 
+     *
      * @param sarosSession
      * @return
      */
@@ -287,7 +287,7 @@ public class CollaborationUtils {
      * In case of partially shared project, this method also adds files and
      * folders that are needed for a consistent project on the receiver's side,
      * even when there were not selected by the user (e.g ".project" files).
-     * 
+     *
      * @param selectedResources
      * @param sarosSession
      * @return
@@ -377,7 +377,7 @@ public class CollaborationUtils {
              * provider (editor) will fail to render the file input correctly. I
              * think we should negotiate the project encodings and forbid
              * further proceeding if they do not match ! The next step should be
-             * to also transmit the encoding in FileActivites, because it is
+             * to also transmit the encoding in FileActivities, because it is
              * possible to change the encoding of files independently of the
              * project encoding settings.
              */

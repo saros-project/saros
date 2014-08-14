@@ -108,7 +108,7 @@ public class DeleteContactAction extends Action implements Disposable {
             this.setEnabled(false);
         } catch (Exception e) {
             if (!PlatformUI.getWorkbench().isClosing())
-                LOG.error("Unexcepted error while updating enablement", e); //$NON-NLS-1$
+                LOG.error("Unexpected error while updating enablement", e); //$NON-NLS-1$
         }
     }
 

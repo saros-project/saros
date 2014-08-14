@@ -17,7 +17,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * Component for detecting network errors on the client side of a session.
- * 
+ *
  * @author srossbach
  */
 public final class ClientSessionTimeoutHandler extends SessionTimeoutHandler {
@@ -61,7 +61,7 @@ public final class ClientSessionTimeoutHandler extends SessionTimeoutHandler {
                                 .wait(PING_PONG_UPDATE_DELAY);
                         } catch (InterruptedException e) {
                             if (!shutdown)
-                                LOG.error("watchdog shutdown prematurly", e);
+                                LOG.error("watchdog shutdown prematurely", e);
 
                             return;
                         }
@@ -86,9 +86,8 @@ public final class ClientSessionTimeoutHandler extends SessionTimeoutHandler {
                 }
 
                 try {
-                    transmitter.send(
-                        ISarosSession.SESSION_CONNECTION_ID, session.getHost()
-                            .getJID(), PongExtension.PROVIDER
+                    transmitter.send(ISarosSession.SESSION_CONNECTION_ID,
+                        session.getHost().getJID(), PongExtension.PROVIDER
                             .create(new PongExtension(currentSessionID)));
                 } catch (IOException e) {
                     LOG.error("failed to send pong", e);

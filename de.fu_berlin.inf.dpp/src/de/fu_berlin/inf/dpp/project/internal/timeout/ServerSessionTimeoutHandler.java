@@ -25,7 +25,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * Component for detecting network errors on the server side of a session.
- * 
+ *
  * @author srossbach
  */
 public final class ServerSessionTimeoutHandler extends SessionTimeoutHandler {
@@ -100,10 +100,9 @@ public final class ServerSessionTimeoutHandler extends SessionTimeoutHandler {
                     }
 
                     try {
-                        transmitter.send(
-                            ISarosSession.SESSION_CONNECTION_ID, user.getJID(),
-                            PingExtension.PROVIDER.create(new PingExtension(
-                                currentSessionID)));
+                        transmitter.send(ISarosSession.SESSION_CONNECTION_ID,
+                            user.getJID(), PingExtension.PROVIDER
+                                .create(new PingExtension(currentSessionID)));
                     } catch (IOException e) {
 
                         removedUsers.add(user);
@@ -145,7 +144,7 @@ public final class ServerSessionTimeoutHandler extends SessionTimeoutHandler {
                             .wait(PING_PONG_UPDATE_DELAY);
                     } catch (InterruptedException e) {
                         if (!shutdown)
-                            LOG.error("watchdog shutdown prematurly", e);
+                            LOG.error("watchdog shutdown prematurely", e);
 
                         return;
                     }

@@ -352,7 +352,7 @@ public class SharedProject {
     }
 
     /**
-     * Adds the resource, and recursively adds its decendants if it's a
+     * Adds the resource, and recursively adds its descendants if it's a
      * IContainer.
      */
     protected void addAll(IResource resource) throws CoreException {

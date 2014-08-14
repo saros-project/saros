@@ -3,7 +3,7 @@
  * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
  * (c) Christopher Oezbek - 2006
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 1, or (at your option)
@@ -44,11 +44,11 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * @JTourBusStop 4, The Interface Tour:
- * 
+ *
  *               Another important element to the Saros interface is the
  *               Wizard. Eclipse supplies an abstract Wizard class that can
  *               be extended with your concrete functionality.
- * 
+ *
  *               In this example, the CreateXMPPAccountWizard allows the user
  *               to enter the details of a new account, validate them and
  *               store them in our account store.
@@ -56,7 +56,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * A wizard that is used to create XMPP accounts.
- * 
+ *
  * @author rdjemili
  * @author coezbek
  * @author bkahlert
@@ -104,7 +104,7 @@ public class CreateXMPPAccountWizard extends Wizard {
 
     /**
      * @JTourBusStop 5, The Interface Tour:
-     * 
+     *
      *               The performFinish() method is run when the user clicks the
      *               finish button on the wizard.
      */
@@ -158,7 +158,7 @@ public class CreateXMPPAccountWizard extends Wizard {
             // Leave the wizard open
             return false;
         } catch (InterruptedException e) {
-            log.error("uninterruptable context was interrupted", e);
+            log.error("uninterruptible context was interrupted", e);
             createXMPPAccountPage.setErrorMessage(e.getMessage());
             return false;
         }
@@ -197,7 +197,7 @@ public class CreateXMPPAccountWizard extends Wizard {
 
     /**
      * Returns the server (used) for account creation.
-     * 
+     *
      * @return
      */
     protected String getServer() {
@@ -210,7 +210,7 @@ public class CreateXMPPAccountWizard extends Wizard {
 
     /**
      * Returns the username (used) for account creation.
-     * 
+     *
      * @return
      */
     protected String getUsername() {
@@ -223,7 +223,7 @@ public class CreateXMPPAccountWizard extends Wizard {
 
     /**
      * Returns the password (used) for account creation.
-     * 
+     *
      * @return
      */
     protected String getPassword() {
@@ -236,7 +236,7 @@ public class CreateXMPPAccountWizard extends Wizard {
 
     /**
      * Returns the created {@link XMPPAccount}.
-     * 
+     *
      * @return null if the {@link XMPPAccount} has not (yet) been created.
      */
     public XMPPAccount getCreatedXMPPAccount() {
@@ -253,7 +253,7 @@ public class CreateXMPPAccountWizard extends Wizard {
         if (error.getCode() == 409)
             message = "The XMPP account already exists.";
         else
-            message = "An unknown error occured. Please register on provider's website.";
+            message = "An unknown error occurred. Please register on provider's website.";
 
         return message;
     }

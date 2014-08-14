@@ -109,18 +109,18 @@ import de.fu_berlin.inf.dpp.session.User;
  * textedits.remote.user.1.pastes.chars=0<br>
  * textedits.remote.user.1.pastes=0<br>
  * </code>
- * 
+ *
  * TODO: replace the HashMaps by AutoHashMaps which initializes missing values
  * with a default. This will lead to easier code and help to get rid of these
  * constructs:
- * 
+ *
  * Integer currentPasteCount = possiblePastes.get(id); if (currentPasteCount ==
  * null) { currentPasteCount = 0; } possiblePastes.put(id, currentPasteCount +
  * 1);
- * 
+ *
  * TODO: synchronize the numbers the users get with the other collectors (E.g.
  * Alice as user should appear as user.2 in all statistic fields.
- * 
+ *
  * @author Lisa Dohrmann, Moritz von Hoffen
  */
 @Component(module = "feedback")
@@ -226,7 +226,7 @@ public class TextEditCollector extends AbstractStatisticCollector {
             }
 
             if (log.isTraceEnabled()) {
-                log.trace(String.format("Recieved chars written from %s "
+                log.trace(String.format("Received chars written from %s "
                     + "(whitespaces omitted): %s [%s]", user, textLength,
                     StringEscapeUtils.escapeJava(text)));
             }
@@ -390,7 +390,7 @@ public class TextEditCollector extends AbstractStatisticCollector {
      * lastRemote.time + intervalWidth].</code><br>
      * <br>
      * This local edit is than counted as a parallel one.
-     * 
+     *
      * @param intervalWidth
      *            the width of the interval to be considered
      */
@@ -435,7 +435,7 @@ public class TextEditCollector extends AbstractStatisticCollector {
      * Stores the given value for the given key in the map. If there is a
      * previous value for this key, the old value is added to the new one and
      * the result is stored in the map.
-     * 
+     *
      * @param map
      * @param key
      * @param value

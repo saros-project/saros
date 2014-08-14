@@ -30,7 +30,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * A action for skyping other JIDs.
- * 
+ *
  * @author rdjemili
  */
 @Component(module = "net")
@@ -89,7 +89,7 @@ public class SkypeAction extends Action implements Disposable {
             this.setEnabled(false);
         } catch (Exception e) {
             if (!PlatformUI.getWorkbench().isClosing())
-                LOG.error("Unexcepted error while updating enablement", e); //$NON-NLS-1$
+                LOG.error("Unexpected error while updating enablement", e); //$NON-NLS-1$
         }
     }
 

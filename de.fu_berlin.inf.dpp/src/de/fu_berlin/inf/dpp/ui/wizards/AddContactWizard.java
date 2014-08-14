@@ -48,7 +48,7 @@ import de.fu_berlin.inf.dpp.ui.wizards.pages.AddContactWizardPage;
 /**
  * Wizard for adding a new contact to the {@link Roster roster} of the currently
  * connected user.
- * 
+ *
  * @author bkahlert
  */
 public class AddContactWizard extends Wizard {
@@ -148,7 +148,7 @@ public class AddContactWizard extends Wizard {
             // Leave the wizard open
             return false;
         } catch (InterruptedException e) {
-            log.error("uninterruptable context was interrupted", e);
+            log.error("uninterruptible context was interrupted", e);
         }
 
         // Close the wizard
@@ -157,7 +157,7 @@ public class AddContactWizard extends Wizard {
 
     /**
      * Returns {@JID} of the newly added contact
-     * 
+     *
      * @return
      */
     public JID getContact() {
@@ -166,7 +166,7 @@ public class AddContactWizard extends Wizard {
 
     /**
      * Adds given contact to the {@link Roster}.
-     * 
+     *
      * @param connection
      * @param jid
      * @param nickname

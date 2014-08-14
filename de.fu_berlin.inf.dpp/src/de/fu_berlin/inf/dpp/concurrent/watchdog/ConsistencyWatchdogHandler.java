@@ -85,7 +85,7 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
      * pair of JID of the user and a string representation of the paths of the
      * handled files as key. You can use <code>closeChecksumErrorMessage</code>
      * with the same arguments to close this message again.
-     * 
+     *
      */
     private void triggerRecovery(final ChecksumErrorActivity checksumError) {
 
@@ -99,8 +99,8 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
             }
 
             // TODO add some text
-            // "Inconsitent file state has detected. File "
-            // + pathes
+            // "Inconsistent file state has detected. File "
+            // + paths
             // + " from user "
             // + from.getBase()
             // +
@@ -131,7 +131,7 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
                         LOG.error("Internal Error: ", t);
                     }
                 } catch (InterruptedException e) {
-                    LOG.error("Code not designed to be interruptable", e);
+                    LOG.error("Code not designed to be interruptible", e);
                 }
             }
         });

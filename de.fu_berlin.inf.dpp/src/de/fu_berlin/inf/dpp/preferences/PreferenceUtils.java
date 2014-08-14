@@ -138,7 +138,7 @@ public class PreferenceUtils {
             return port;
     }
 
-    public boolean forceFileTranserByChat() {
+    public boolean forceFileTransferByChat() {
         return preferenceStore
             .getBoolean(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT);
     }

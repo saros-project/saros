@@ -42,7 +42,7 @@ import de.fu_berlin.inf.dpp.session.User.Permission;
  * statistical data can be stored as simple key/value pairs. This data can then
  * be saved to disk as a file.<br>
  * <br>
- * 
+ *
  * TODO Add a field user.saros.team to the SessionStatistic which is set to true
  * if:<br>
  * - the associated button on the FeedbackPreferencePage is true <br>
@@ -50,7 +50,7 @@ import de.fu_berlin.inf.dpp.session.User.Permission;
  * - the version number is just [X]X.[X]X.[X]X (with [X] being optional)<br>
  * The value should be determined by the SessionDataCollector and written to the
  * statistic on the end of a session.
- * 
+ *
  * @author Lisa Dohrmann
  */
 public class SessionStatistic {
@@ -82,20 +82,20 @@ public class SessionStatistic {
 
     /**
      * ISO DateTime (UTC) of the time the session started for the local user.
-     * 
+     *
      * This might not be equal to the start of the whole session, because the
      * local user might not be host.
-     * 
+     *
      * @since 9.9.11
      */
     protected static final String KEY_SESSION_LOCAL_START = "session.local.start";
 
     /**
      * ISO DateTime (UTC) of the time the session ended for the local user.
-     * 
+     *
      * This might not be equal to the end of the whole session, because the
      * local user might not be host.
-     * 
+     *
      * @since 9.9.11
      */
     protected static final String KEY_SESSION_LOCAL_END = "session.local.end";
@@ -140,7 +140,7 @@ public class SessionStatistic {
      * can be used to track the randomly generated
      * {@link SessionStatistic#KEY_USER_ID} to a "real" person if the user
      * chooses to do so.
-     * 
+     *
      * @since 9.9.11
      */
     protected static final String KEY_PSEUDONYM = "user.pseudonym";
@@ -226,7 +226,7 @@ public class SessionStatistic {
     /**
      * Returns the properties object of this SessionStatistic that holds the
      * statistical data.
-     * 
+     *
      * @return the wrapped {@link #data} properties object
      */
     public Properties getData() {
@@ -241,8 +241,8 @@ public class SessionStatistic {
     }
 
     /**
-     * Adds the contents of the given SessionStaistic to this SessionStatistic.
-     * 
+     * Adds the contents of the given SessionStatistic to this SessionStatistic.
+     *
      * @param statistic
      */
     public void addAll(SessionStatistic statistic) {
@@ -264,7 +264,7 @@ public class SessionStatistic {
 
     /**
      * Writes the session data to a file.
-     * 
+     *
      * @param file
      *            the file to save the current session statistic into
      */
@@ -370,7 +370,7 @@ public class SessionStatistic {
      * Returns for the given number of users the percentage of the total session
      * time they were together in the session.
      */
-    public int getSessionTimePrecentForUsers(int numberOfUsers) {
+    public int getSessionTimePercentForUsers(int numberOfUsers) {
         return Integer.parseInt(data.getProperty(appendToKey(
             KEY_SESSION_TIME_USERS, numberOfUsers, KEY_PERCENT)));
     }
@@ -463,7 +463,7 @@ public class SessionStatistic {
             String.valueOf(time));
     }
 
-    public int getTotalPermissionPercentReadOnlyAcccess() {
+    public int getTotalPermissionPercentReadOnlyAccess() {
         return Integer.parseInt(data.getProperty(appendToKey(
             KEY_PERMISSION_READONLY, KEY_PERCENT)));
     }
@@ -751,7 +751,7 @@ public class SessionStatistic {
     /**
      * Sets the count of selections made by users with
      * {@link Permission#READONLY_ACCESS}
-     * 
+     *
      * @param userWithReadOnlyAccessSelectionCount
      */
     public void setTotalOberserverSelectionCount(
@@ -764,7 +764,7 @@ public class SessionStatistic {
     /**
      * Sets the count of user with {@link Permission#READONLY_ACCESS} selections
      * that were witnessed by another user
-     * 
+     *
      * @param numberOfWitnessedUserWithReadOnlyAccessSelections
      */
     public void setWitnessedUserWithReadOnlyAccessSelections(
@@ -776,8 +776,8 @@ public class SessionStatistic {
 
     /**
      * Sets the number of user with {@link Permission#READONLY_ACCESS}
-     * selections where an edit occured.
-     * 
+     * selections where an edit occurred.
+     *
      * @param userWithWriteAccessSelectionCount
      */
     public void setGestureCount(int userWithWriteAccessSelectionCount) {
@@ -813,7 +813,7 @@ public class SessionStatistic {
 
     /**
      * Sets the characters edited by each user.
-     * 
+     *
      * @param userNumber
      * @param charCount
      */
@@ -824,7 +824,7 @@ public class SessionStatistic {
 
     /**
      * Sets the number of remote paste events for each user.
-     * 
+     *
      * @param userNumber
      * @param pasteCount
      */
@@ -835,7 +835,7 @@ public class SessionStatistic {
 
     /**
      * Sets the number of local paste events
-     * 
+     *
      * @param pasteCount
      */
     public void setLocalUserPastes(int pasteCount) {
@@ -845,7 +845,7 @@ public class SessionStatistic {
 
     /**
      * Sets the number of chars that were added through a remote paste
-     * 
+     *
      * @param userNumber
      * @param pasteChars
      */
@@ -857,7 +857,7 @@ public class SessionStatistic {
 
     /**
      * Sets the number of chars that were added through a paste
-     * 
+     *
      * @param pasteChars
      */
     public void setLocalUserPasteChars(Integer pasteChars) {
@@ -903,7 +903,7 @@ public class SessionStatistic {
 
     /**
      * Sets the time spent in VoIP sessions in minutes
-     * 
+     *
      * @param timeInMinutes
      */
     public void setVoIPTime(double timeInMinutes) {
@@ -913,7 +913,7 @@ public class SessionStatistic {
     /**
      * Sets the percentage spent in VoIP sessions in respect to the session
      * length
-     * 
+     *
      * @param percentage
      */
     public void setVoIPPercentage(int percentage) {
@@ -923,7 +923,7 @@ public class SessionStatistic {
 
     /**
      * Sets the number of established VoIP sessions
-     * 
+     *
      * @param numberVoIPSessions
      */
     public void setVoIPSessionCount(int numberVoIPSessions) {

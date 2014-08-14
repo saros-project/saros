@@ -242,7 +242,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer {
      * The <strong>cancellation</strong> of this method is <strong>not
      * implemented</strong>, so canceling the given monitor does not have any
      * effect.
-     * 
+     *
      * @noSWT This method should not be called from SWT
      * @blocking This method returns after the recovery has finished
      * @client Can only be called on the client!
@@ -270,7 +270,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer {
                     cancelRecovery.set(true);
                 } while (!lock.tryLock(100, TimeUnit.MILLISECONDS));
             } catch (InterruptedException e) {
-                LOG.error("Not designed to be interruptable");
+                LOG.error("Not designed to be interruptible");
                 return;
             }
 

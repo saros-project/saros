@@ -18,7 +18,7 @@ public class NicknameNegotiationHook implements ISessionNegotiationHook {
     private static final String HOOK_IDENTIFIER = "nicknameManagement";
     // This high visibility is not needed for good. Currently there is a
     // nickname
-    // related HACK in the SessionNegotation (out/in) that relies on these
+    // related HACK in the SessionNegotiation (out/in) that relies on these
     // constants.
 
     // FIXME this is HACK number 2, the hooking mechanism is currently not very
@@ -87,7 +87,7 @@ public class NicknameNegotiationHook implements ISessionNegotiationHook {
     public void applyActualParameters(Map<String, String> settings) {
         // TODO Implement the application of the returned nickname settings.
         // This
-        // is currently done with a HACK in IncomingSessionNegotation (see
+        // is currently done with a HACK in IncomingSessionNegotiation (see
         // method initializeSession())
     }
 

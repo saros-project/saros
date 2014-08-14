@@ -323,7 +323,7 @@ public class ConnectionHandler {
 
         try {
 
-            if (preferences.forceFileTranserByChat())
+            if (preferences.forceFileTransferByChat())
                 connectionManager
                     .setTransport(IConnectionManager.IBB_TRANSPORT);
             else
