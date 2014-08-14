@@ -467,7 +467,7 @@ public final class NetworkPreferencePage extends PreferencePage implements
                 public void widgetSelected(SelectionEvent event) {
                     try {
                         List<InetAddress> addresses = NetworkingUtils
-                            .getAllNonLoopbackLocalIPAdresses(true);
+                            .getAllNonLoopbackLocalIPAddresses(true);
 
                         List<String> ipLiterals = new ArrayList<String>();
 

@@ -103,7 +103,7 @@ public class DataTransferManager implements IConnectionListener,
 
             if (extension.getTransferDescription().compressContent()) {
                 byte[] payload = extension.getPayload();
-                long compressedPayloadLenght = payload.length;
+                long compressedPayloadLength = payload.length;
 
                 try {
                     payload = inflate(payload);
@@ -112,7 +112,7 @@ public class DataTransferManager implements IConnectionListener,
                     return;
                 }
 
-                extension.setPayload(compressedPayloadLenght, payload);
+                extension.setPayload(compressedPayloadLength, payload);
             }
 
             notifyDataReceived(extension.getTransferMode(),

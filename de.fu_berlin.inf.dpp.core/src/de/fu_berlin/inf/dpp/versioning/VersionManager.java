@@ -286,7 +286,7 @@ public class VersionManager {
             currentCompatibleVersions.add(currentVersion);
 
         if (LOG.isTraceEnabled()) {
-            LOG.trace("current version compability chart: "
+            LOG.trace("current version compatibility chart: "
                 + compatibilityChart);
         }
 

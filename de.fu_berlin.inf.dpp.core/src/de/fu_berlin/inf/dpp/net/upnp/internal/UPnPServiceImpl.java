@@ -133,7 +133,7 @@ public class UPnPServiceImpl implements IUPnPService, Disposable {
                 // SarosView
                 // .showNotification(
                 // "Setting up port mapping not allowed",
-                // "The selected gateway supports UPnP discovery but appearently does not allow performing port mapping.\n"
+                // "The selected gateway supports UPnP discovery but apparently does not allow performing port mapping.\n"
                 // +
                 // "You can probably enable port mapping in the gateway configuration. ");
                 // }

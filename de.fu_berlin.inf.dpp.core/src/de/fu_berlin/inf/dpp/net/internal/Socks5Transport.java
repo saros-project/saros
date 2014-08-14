@@ -438,7 +438,7 @@ public class Socks5Transport extends ByteStreamTransport {
                 e);
         } catch (ExecutionException e) {
             LOG.error(
-                "An error occured while establishing a response connection ",
+                "An error occurred while establishing a response connection ",
                 e.getCause());
         }
 
@@ -547,7 +547,7 @@ public class Socks5Transport extends ByteStreamTransport {
                         + ", remote side could not connect to any offered stream hosts: "
                         + e.getMessage());
                 } else {
-                    LOG.error(prefix() + "cound not establish a connection to "
+                    LOG.error(prefix() + "could not establish a connection to "
                         + peer, e);
                 }
             } catch (Exception e) {
@@ -752,10 +752,10 @@ public class Socks5Transport extends ByteStreamTransport {
 
         try {
             ((Socket) socket.get(session)).setSoLinger(true, lingerTimeout);
-            LOG.debug("socket is configued with SO_LINGER timout: "
+            LOG.debug("socket is configured with SO_LINGER timeout: "
                 + lingerTimeout + " ms");
         } catch (Exception e) {
-            LOG.warn("could not modifiy SO_LINGER socket option", e);
+            LOG.warn("could not modify SO_LINGER socket option", e);
         }
 
     }

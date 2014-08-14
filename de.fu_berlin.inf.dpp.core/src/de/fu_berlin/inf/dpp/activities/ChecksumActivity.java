@@ -44,7 +44,7 @@ public class ChecksumActivity extends AbstractResourceActivity {
      * Constructor for ChecksumActivities. Timestamp can be null.
      * ChecksumActivities created by the watchdog don't have access to the
      * JupiterClients and therefore create an Activity without timestamp.
-     * Timestamps will be added later by the ConcurentDocumentClient /-Server
+     * Timestamps will be added later by the ConcurrentDocumentClient /-Server
      * (by creating a new Activity with a timestamp)
      * 
      * @param source

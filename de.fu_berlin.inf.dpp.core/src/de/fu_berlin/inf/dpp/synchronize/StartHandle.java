@@ -118,7 +118,7 @@ public class StartHandle {
                 Thread.sleep(stopManager.MILLISTOWAIT);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            log.error("Code not designed to be interruptable", e);
+            log.error("Code not designed to be interruptible", e);
         }
 
         return acknowledged.get();

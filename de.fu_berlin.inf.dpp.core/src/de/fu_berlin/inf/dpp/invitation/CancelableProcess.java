@@ -296,7 +296,7 @@ abstract class CancelableProcess {
                     : Status.REMOTE_ERROR;
 
             } else if (exception instanceof IOException) {
-                log.error(this + " I/O error occured", exception);
+                log.error(this + " I/O error occurred", exception);
 
                 String errorMsg = "I/O failure";
 

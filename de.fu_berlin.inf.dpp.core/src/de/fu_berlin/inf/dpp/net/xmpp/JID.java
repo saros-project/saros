@@ -87,7 +87,7 @@ public class JID implements Serializable {
     }
 
     /**
-     * Checks whether the {@link #getBase() base} portion is correctly formated.
+     * Checks whether the {@link #getBase() base} portion is correctly formatted.
      * 
      * @param jid
      * @return
@@ -97,7 +97,7 @@ public class JID implements Serializable {
     }
 
     /**
-     * Checks whether the {@link #getBase() base} portion is correctly formated.
+     * Checks whether the {@link #getBase() base} portion is correctly formatted.
      * 
      * @return
      */

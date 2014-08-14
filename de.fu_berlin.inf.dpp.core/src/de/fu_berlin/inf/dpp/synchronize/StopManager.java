@@ -381,7 +381,7 @@ public final class StopManager extends AbstractActivityProducer implements
         }
 
         if (!acknowledged) {
-            log.warn("No acknowlegment arrived, gave up waiting");
+            log.warn("No acknowledgment arrived, gave up waiting");
 
             handle.start();
             throw new CancellationException();

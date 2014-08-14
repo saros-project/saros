@@ -196,7 +196,7 @@ public class SingleUserChatService extends AbstractChatService {
         chat.initChat(
             userJID,
             chatManager.createChat(chat.getParticipants().iterator().next()
-                .getBase(), chat.getMessagerListener()), chatStateManager);
+                .getBase(), chat.getMessageListener()), chatStateManager);
     }
 
     /**

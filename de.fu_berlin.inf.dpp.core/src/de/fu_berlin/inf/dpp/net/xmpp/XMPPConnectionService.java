@@ -411,7 +411,7 @@ public class XMPPConnectionService {
 
     /**
      * Configures Bytestream related settings, like PacketReplyTimeout,
-     * Socks5Proxy configuration, look up streamhost address candiates for
+     * Socks5Proxy configuration, look up streamhost address candidates for
      * Socks5Proxy, update UPnP settings on proxy setting change.
      */
     private void initialzeNetworkComponents() {
@@ -453,7 +453,7 @@ public class XMPPConnectionService {
 
         if (interfaceAddresses.isEmpty()) {
             for (InetAddress interfaceAddress : NetworkingUtils
-                .getAllNonLoopbackLocalIPAdresses(true)) {
+                .getAllNonLoopbackLocalIPAddresses(true)) {
                 interfaceAddresses.add(interfaceAddress.getHostAddress());
             }
             LOG.debug("using autodetected addresses: " + interfaceAddresses);
