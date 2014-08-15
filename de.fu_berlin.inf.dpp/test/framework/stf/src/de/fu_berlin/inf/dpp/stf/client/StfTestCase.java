@@ -321,19 +321,40 @@ public abstract class StfTestCase {
                     .restoreDefaultAccount(tester.getName(),
                         tester.getPassword(), tester.getDomain());
 
-                tester.superBot().views().sarosView()
-                    .connectWith(tester.getJID(), tester.getPassword(), true);
             } catch (Exception e) {
                 exception = e;
             }
         }
+
+        if (exception != null)
+            throw exception;
+
+        final List<Callable<Void>> connectTasks = new ArrayList<Callable<Void>>();
+
+        for (final AbstractTester tester : currentTesters) {
+            connectTasks.add(new Callable<Void>() {
+                @Override
+                public Void call() throws Exception {
+                    tester
+                        .superBot()
+                        .views()
+                        .sarosView()
+                        .connectWith(tester.getJID(), tester.getPassword(),
+                            true);
+
+                    return null;
+                }
+            });
+        }
+
+        Util.workAll(connectTasks);
+
         for (AbstractTester tester : currentTesters) {
             try {
                 resetNicknames(tester);
                 resetContacts(tester);
             } catch (Exception e) {
-                if (exception != null)
-                    exception = e;
+                exception = e;
             }
         }
 
