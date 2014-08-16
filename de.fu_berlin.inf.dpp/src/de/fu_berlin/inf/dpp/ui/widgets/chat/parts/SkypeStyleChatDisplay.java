@@ -18,7 +18,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.widgets.SimpleRoundedComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.events.ChatClearedEvent;
@@ -32,14 +31,15 @@ import de.fu_berlin.inf.dpp.ui.widgets.chat.items.ChatLineSeparator;
  * 
  * @author bkahlert
  */
-public final class SkypeStyleChatDisplay extends ScrolledComposite {
+public final class SkypeStyleChatDisplay extends ScrolledComposite implements
+    IChatDisplay {
 
     private final List<IChatDisplayListener> chatDisplayListeners = new CopyOnWriteArrayList<IChatDisplayListener>();
 
     private Composite contentComposite;
     private Composite optionsComposite;
 
-    private JID lastUser;
+    private Object lastEntity;
 
     public SkypeStyleChatDisplay(Composite parent, int style,
         Color backgroundColor) {
@@ -76,7 +76,7 @@ public final class SkypeStyleChatDisplay extends ScrolledComposite {
         addListener(SWT.Resize, new Listener() {
             @Override
             public void handleEvent(Event event) {
-                SkypeStyleChatDisplay.this.refresh();
+                refresh();
             }
         });
     }
@@ -117,36 +117,25 @@ public final class SkypeStyleChatDisplay extends ScrolledComposite {
         clearButton.setLayoutData(new GridData(SWT.END, SWT.END, true, true));
     }
 
-    /**
-     * Displays a new line containing the supplied message and a separator line
-     * if necessary.
-     * 
-     * @param jid
-     *            JID of the sender who composed the message
-     * @param color
-     *            the color to be used to mark the user
-     * @param message
-     *            composed by the sender
-     * @param receivedOn
-     *            the date the message was received
-     */
-    public void addChatLine(JID jid, String displayName, Color color,
-        String message, Date receivedOn) {
+    @Override
+    public void addMessage(Object entity, String name, String message,
+        Date time, Color color) {
+
         /*
          * Sender line
          */
-        if (lastUser != null && lastUser.equals(jid)) { // same user
+        if (lastEntity != null && lastEntity.equals(entity)) { // same user
             ChatLineSeparator chatLineSeparator = new ChatLineSeparator(
-                contentComposite, displayName, color, receivedOn);
+                contentComposite, name, color, time);
             chatLineSeparator.setLayoutData(new GridData(SWT.FILL,
                 SWT.BEGINNING, true, false));
-            chatLineSeparator.setData(jid);
+            chatLineSeparator.setData(entity);
         } else { // new / different user
             ChatLinePartnerChangeSeparator chatPartnerChangeLine = new ChatLinePartnerChangeSeparator(
-                contentComposite, displayName, color, receivedOn);
+                contentComposite, name, color, time);
             chatPartnerChangeLine.setLayoutData(new GridData(SWT.FILL,
                 SWT.BEGINNING, true, false));
-            chatPartnerChangeLine.setData(jid);
+            chatPartnerChangeLine.setData(entity);
         }
 
         /*
@@ -165,21 +154,13 @@ public final class SkypeStyleChatDisplay extends ScrolledComposite {
 
         refresh();
 
-        lastUser = jid;
+        lastEntity = entity;
     }
 
-    /**
-     * Updates the color of the chat line separators for a specific JID.
-     * 
-     * @param jid
-     *            JID whose color should be updated
-     * @param color
-     *            the new color
-     */
-    public void updateColor(JID jid, Color color) {
-
+    @Override
+    public void updateEntityColor(final Object entity, final Color color) {
         for (Control control : contentComposite.getChildren()) {
-            if (!jid.equals(control.getData()))
+            if (!entity.equals(control.getData()))
                 continue;
 
             if (control instanceof ChatLineSeparator
@@ -188,25 +169,17 @@ public final class SkypeStyleChatDisplay extends ScrolledComposite {
         }
     }
 
-    /**
-     * Updates the display name of the chat line separators for a specific JID.
-     * 
-     * @param jid
-     *            the JID whose display name should be updated
-     * @param displayName
-     *            the new display name
-     */
-    public void updateDisplayName(JID jid, String displayName) {
+    @Override
+    public void updateEntityName(final Object entity, final String name) {
         for (Control control : contentComposite.getChildren()) {
-            if (!jid.equals(control.getData()))
+            if (!entity.equals(control.getData()))
                 continue;
 
             if (control instanceof ChatLinePartnerChangeSeparator) {
                 ChatLinePartnerChangeSeparator separator = (ChatLinePartnerChangeSeparator) control;
-                separator.setUsername(displayName);
+                separator.setUsername(name);
             }
         }
-
     }
 
     /**
@@ -238,50 +211,39 @@ public final class SkypeStyleChatDisplay extends ScrolledComposite {
          */
         contentComposite.layout();
 
-        int verticalBarWidth = (this.getVerticalBar() != null) ? this
+        int verticalBarWidth = (getVerticalBar() != null) ? this
             .getVerticalBar().getSize().x : 0;
 
         int widthHint = Math.max(computeMaxNonChatLineWidth()
-            + verticalBarWidth,
-            SkypeStyleChatDisplay.this.getClientArea().width);
+            + verticalBarWidth, getClientArea().width);
 
         final Point neededSize = contentComposite.computeSize(widthHint,
             SWT.DEFAULT);
 
-        SkypeStyleChatDisplay.this.setMinSize(neededSize);
-        SkypeStyleChatDisplay.this.setOrigin(0, neededSize.y);
+        setMinSize(neededSize);
+        setOrigin(0, neededSize.y);
     }
 
-    /**
-     * Clears the {@link SkypeStyleChatDisplay}
-     */
+    @Override
     public void clear() {
         for (Control chatItem : contentComposite.getChildren()) {
             chatItem.dispose();
         }
 
         refresh();
-        lastUser = null;
+        lastEntity = null;
 
         notifyChatCleared();
     }
 
-    /**
-     * Adds a {@link IChatDisplayListener}
-     * 
-     * @param chatListener
-     */
-    public void addChatDisplayListener(IChatDisplayListener chatListener) {
-        chatDisplayListeners.add(chatListener);
+    @Override
+    public void addChatDisplayListener(final IChatDisplayListener listener) {
+        chatDisplayListeners.add(listener);
     }
 
-    /**
-     * Removes a {@link IChatDisplayListener}
-     * 
-     * @param chatListener
-     */
-    public void removeChatListener(IChatDisplayListener chatListener) {
-        chatDisplayListeners.remove(chatListener);
+    @Override
+    public void removeChatDisplayListener(final IChatDisplayListener listener) {
+        chatDisplayListeners.remove(listener);
     }
 
     /**

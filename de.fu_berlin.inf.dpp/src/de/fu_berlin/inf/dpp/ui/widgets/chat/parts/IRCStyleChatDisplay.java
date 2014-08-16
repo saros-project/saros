@@ -17,19 +17,16 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.events.IChatDisplayListener;
 
 /**
  * This composite displays a chat conversation between users.
  */
-public class IRCStyleChatDisplay extends Composite {
+public class IRCStyleChatDisplay extends Composite implements IChatDisplay {
 
     private final DateFormat dateFormatter = DateFormat
         .getTimeInstance(DateFormat.SHORT);
-
-    private final List<IChatDisplayListener> chatDisplayListeners = new ArrayList<IChatDisplayListener>();
 
     private final StyledText display;
 
@@ -65,91 +62,45 @@ public class IRCStyleChatDisplay extends Composite {
         addHyperLinkListener(display);
     }
 
-    /**
-     * Displays a new line containing the supplied message and a separator line
-     * if necessary.
-     * 
-     * @param jid
-     *            JID of the sender who composed the message
-     * @param color
-     *            the color to be used to mark the user
-     * @param message
-     *            composed by the sender
-     * @param receivedOn
-     *            the date the message was received
-     */
-    public void addChatLine(final JID jid, final String displayName,
-        final Color color, final String message, final Date receivedOn) {
+    @Override
+    public void addChatDisplayListener(final IChatDisplayListener listener) {
+        // NOP
+    }
+
+    @Override
+    public void removeChatDisplayListener(final IChatDisplayListener listener) {
+        // NOP
+    }
+
+    @Override
+    public void addMessage(final Object entity, final String name,
+        final String message, final Date time, final Color color) {
 
         if (!appendLineBreak)
             appendLineBreak = true;
         else
             display.append("\n");
 
-        display.append("[" + dateFormatter.format(receivedOn) + "] ");
-        display.append("<" + displayName + "> " + message);
+        display.append("[" + dateFormatter.format(time) + "] ");
+        display.append("<" + name + "> " + message);
         decorateContent();
 
         display.setTopIndex(display.getLineCount() - 1);
     }
 
-    /**
-     * Updates the color of the chat line separators for a specific JID.
-     * 
-     * @param jid
-     *            JID whose color should be updated
-     * @param color
-     *            the new color
-     */
-    public void updateColor(JID jid, Color color) {
-
-        // for (Control control : contentComposite.getChildren()) {
-        // if (!jid.equals(control.getData()))
-        // continue;
-        //
-        // if (control instanceof ChatLineSeparator
-        // || control instanceof ChatLinePartnerChangeSeparator)
-        // control.setBackground(color);
-        // }
+    @Override
+    public void clear() {
+        // NOP
     }
 
-    /**
-     * Updates the display name of the chat line separators for a specific JID.
-     * 
-     * @param jid
-     *            the JID whose display name should be updated
-     * @param displayName
-     *            the new display name
-     */
-    public void updateDisplayName(JID jid, String displayName) {
-        // for (Control control : contentComposite.getChildren()) {
-        // if (!jid.equals(control.getData()))
-        // continue;
-        //
-        // if (control instanceof ChatLinePartnerChangeSeparator) {
-        // ChatLinePartnerChangeSeparator separator =
-        // (ChatLinePartnerChangeSeparator) control;
-        // separator.setUsername(displayName);
-        // }
-        // }
+    @Override
+    public void updateEntityName(final Object entity, final String name) {
+        // NOP
     }
 
-    /**
-     * Adds a {@link IChatDisplayListener}
-     * 
-     * @param chatListener
-     */
-    public void addChatDisplayListener(final IChatDisplayListener chatListener) {
-        chatDisplayListeners.add(chatListener);
-    }
-
-    /**
-     * Removes a {@link IChatDisplayListener}
-     * 
-     * @param chatListener
-     */
-    public void removeChatListener(final IChatDisplayListener chatListener) {
-        chatDisplayListeners.remove(chatListener);
+    @Override
+    public void updateEntityColor(final Object entity, final Color color) {
+        // NOP
     }
 
     // TODO duplicate code, see ChatLine class

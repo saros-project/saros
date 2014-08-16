@@ -60,6 +60,7 @@ import de.fu_berlin.inf.dpp.ui.widgets.chat.events.IChatControlListener;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.events.IChatDisplayListener;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.events.MessageEnteredEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.parts.ChatInput;
+import de.fu_berlin.inf.dpp.ui.widgets.chat.parts.IChatDisplay;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.parts.SkypeStyleChatDisplay;
 
 /**
@@ -115,7 +116,7 @@ public final class ChatControl extends Composite {
 
     private final SashForm sashForm;
     private final ChatRoomsComposite chatRooms;
-    private final SkypeStyleChatDisplay chatDisplay;
+    private final IChatDisplay chatDisplay;
     private final ChatInput chatInput;
     private final IChat chat;
     private int missedMessages;
@@ -335,7 +336,9 @@ public final class ChatControl extends Composite {
         chatDisplay = new SkypeStyleChatDisplay(sashForm, chatDisplayStyle,
             displayBackgroundColor);
 
-        chatDisplay.setAlwaysShowScrollBars(true);
+        if (chatDisplay instanceof SkypeStyleChatDisplay)
+            ((SkypeStyleChatDisplay) chatDisplay).setAlwaysShowScrollBars(true);
+
         chatDisplay.addChatDisplayListener(this.chatDisplayListener);
 
         // ChatInput
@@ -412,7 +415,7 @@ public final class ChatControl extends Composite {
         clearColorCache();
 
         for (JID jid : getChatJIDsFromHistory())
-            chatDisplay.updateColor(jid, getColorForJID(jid));
+            chatDisplay.updateEntityColor(jid, getColorForJID(jid));
     }
 
     /**
@@ -420,10 +423,12 @@ public final class ChatControl extends Composite {
      */
     public void updateDisplayNames() {
         for (JID jid : getChatJIDsFromHistory())
-            chatDisplay.updateDisplayName(jid, getNickname(jid));
+            chatDisplay.updateEntityName(jid, getNickname(jid));
 
         // TODO: this currently scrolls to the bottom
-        chatDisplay.refresh();
+        if (chatDisplay instanceof SkypeStyleChatDisplay)
+            ((SkypeStyleChatDisplay) chatDisplay).refresh();
+
     }
 
     public void addChatLine(ChatElement element) {
@@ -459,8 +464,8 @@ public final class ChatControl extends Composite {
             return;
         }
 
-        chatDisplay.addChatLine(jid, getNickname(jid), color, message,
-            element.getDate());
+        chatDisplay.addMessage(jid, getNickname(jid), message,
+            element.getDate(), color);
     }
 
     /**
@@ -479,7 +484,7 @@ public final class ChatControl extends Composite {
      * @return the entered text
      */
     public String getInputText() {
-        return this.chatInput.getText();
+        return chatInput.getText();
     }
 
     /**
@@ -488,7 +493,7 @@ public final class ChatControl extends Composite {
      * @param chatControlListener
      */
     public void addChatControlListener(IChatControlListener chatControlListener) {
-        this.chatControlListeners.add(chatControlListener);
+        chatControlListeners.add(chatControlListener);
     }
 
     /**
@@ -498,7 +503,7 @@ public final class ChatControl extends Composite {
      */
     public void removeChatControlListener(
         IChatControlListener chatControlListener) {
-        this.chatControlListeners.remove(chatControlListener);
+        chatControlListeners.remove(chatControlListener);
     }
 
     /**
@@ -508,7 +513,7 @@ public final class ChatControl extends Composite {
      *            the entered character
      */
     public void notifyCharacterEntered(Character character) {
-        for (IChatControlListener chatControlListener : this.chatControlListeners) {
+        for (IChatControlListener chatControlListener : chatControlListeners) {
             chatControlListener.characterEntered(new CharacterEnteredEvent(
                 this, character));
         }
@@ -521,7 +526,7 @@ public final class ChatControl extends Composite {
      *            the entered text
      */
     public void notifyMessageEntered(String message) {
-        for (IChatControlListener chatControlListener : this.chatControlListeners) {
+        for (IChatControlListener chatControlListener : chatControlListeners) {
             chatControlListener.messageEntered(new MessageEnteredEvent(this,
                 message));
         }
@@ -531,7 +536,7 @@ public final class ChatControl extends Composite {
      * Notify all {@link IChatDisplayListener}s about a cleared chat
      */
     public void notifyChatCleared(ChatClearedEvent event) {
-        for (IChatControlListener chatControlListener : this.chatControlListeners) {
+        for (IChatControlListener chatControlListener : chatControlListeners) {
             chatControlListener.chatCleared(event);
         }
     }
