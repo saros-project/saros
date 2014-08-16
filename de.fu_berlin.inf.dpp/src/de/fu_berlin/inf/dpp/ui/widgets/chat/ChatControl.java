@@ -61,6 +61,7 @@ import de.fu_berlin.inf.dpp.ui.widgets.chat.events.IChatDisplayListener;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.events.MessageEnteredEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.parts.ChatInput;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.parts.IChatDisplay;
+import de.fu_berlin.inf.dpp.ui.widgets.chat.parts.IRCStyleChatDisplay;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.parts.SkypeStyleChatDisplay;
 
 /**
@@ -102,13 +103,13 @@ public final class ChatControl extends Composite {
     private ISarosSession session;
 
     @Inject
-    protected XMPPConnectionService connectionService;
+    private XMPPConnectionService connectionService;
 
     @Inject
-    protected ISarosSessionManager sessionManager;
+    private ISarosSessionManager sessionManager;
 
     @Inject
-    protected IPreferenceStore preferenceStore;
+    private IPreferenceStore preferenceStore;
 
     private final List<IChatControlListener> chatControlListeners = new ArrayList<IChatControlListener>();
 
@@ -332,9 +333,14 @@ public final class ChatControl extends Composite {
 
         sashForm = new SashForm(this, SWT.VERTICAL);
 
-        // ChatDisplay
-        chatDisplay = new SkypeStyleChatDisplay(sashForm, chatDisplayStyle,
-            displayBackgroundColor);
+        final boolean isIRCLayout = preferenceStore
+            .getBoolean(PreferenceConstants.USE_IRC_STYLE_CHAT_LAYOUT);
+
+        if (isIRCLayout)
+            chatDisplay = new IRCStyleChatDisplay(sashForm, SWT.BORDER);
+        else
+            chatDisplay = new SkypeStyleChatDisplay(sashForm, chatDisplayStyle,
+                displayBackgroundColor);
 
         if (chatDisplay instanceof SkypeStyleChatDisplay)
             ((SkypeStyleChatDisplay) chatDisplay).setAlwaysShowScrollBars(true);

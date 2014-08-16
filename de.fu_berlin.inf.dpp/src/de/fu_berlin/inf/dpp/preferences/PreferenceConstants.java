@@ -115,18 +115,19 @@ public class PreferenceConstants {
      */
     public static final String STATISTIC_ALLOW_PSEUDONYM = "STATISTIC_ALLOW_PSEUDONYM";
 
-    /**
-     * Preferences for Communication
+    /*
+     * Preferences for Communication /Chat
      */
 
-    /** Custom multiuser-chat service name **/
+    public static final String USE_IRC_STYLE_CHAT_LAYOUT = "chat.irc.layout";
+
     public static final String CUSTOM_MUC_SERVICE = "custom_muc_service";
 
     public static final String FORCE_CUSTOM_MUC_SERVICE = "force_custom_muc_service";
 
-    public static final String SOUND_ENABLED = "sound.enabled";
-
     /* Sound Events */
+
+    public static final String SOUND_ENABLED = "sound.enabled";
 
     public static final String SOUND_PLAY_EVENT_MESSAGE_SENT = "sound.play.event.message.sent";
 
