@@ -79,10 +79,9 @@ import de.fu_berlin.inf.dpp.ui.widgets.chat.parts.ChatInput;
  * @author bkahlert
  * 
  */
-public class ChatControl extends Composite {
-    protected List<IChatControlListener> chatControlListeners = new ArrayList<IChatControlListener>();
+public final class ChatControl extends Composite {
 
-    private static final Logger log = Logger.getLogger(ChatControl.class);
+    private static final Logger LOG = Logger.getLogger(ChatControl.class);
 
     /*
      * This should be configurable by the user so we do not have to think about
@@ -110,12 +109,23 @@ public class ChatControl extends Composite {
     @Inject
     protected IPreferenceStore preferenceStore;
 
+    private final List<IChatControlListener> chatControlListeners = new ArrayList<IChatControlListener>();
+
+    // chat layer
+
+    private final SashForm sashForm;
+    private final ChatRoomsComposite chatRooms;
+    private final ChatDisplay chatDisplay;
+    private final ChatInput chatInput;
+    private final IChat chat;
+    private int missedMessages;
+
     /**
      * This {@link IChatDisplayListener} is used to forward events fired in the
      * {@link ChatDisplay} so the user only has to add listeners on the
      * {@link ChatControl} and not on all its child components.
      */
-    protected IChatDisplayListener chatDisplayListener = new IChatDisplayListener() {
+    private final IChatDisplayListener chatDisplayListener = new IChatDisplayListener() {
         @Override
         public void chatCleared(ChatClearedEvent event) {
             clearColorCache();
@@ -130,7 +140,7 @@ public class ChatControl extends Composite {
      * {@link ChatInput} so the user only has to add listeners on the
      * {@link ChatControl} and not on all its child components.
      */
-    protected KeyAdapter chatInputListener = new KeyAdapter() {
+    private final KeyAdapter chatInputListener = new KeyAdapter() {
         @Override
         public void keyPressed(KeyEvent e) {
             switch (e.keyCode) {
@@ -167,7 +177,7 @@ public class ChatControl extends Composite {
         }
     };
 
-    private ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+    private final ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
 
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
@@ -197,7 +207,7 @@ public class ChatControl extends Composite {
         }
     };
 
-    private ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
+    private final ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
 
         @Override
         public void userJoined(User user) {
@@ -205,7 +215,7 @@ public class ChatControl extends Composite {
         }
     };
 
-    private IChatListener chatListener = new IChatListener() {
+    private final IChatListener chatListener = new IChatListener() {
 
         @Override
         public void messageReceived(final JID sender, final String message) {
@@ -216,7 +226,7 @@ public class ChatControl extends Composite {
             final boolean playMessageReceivedSound = preferenceStore
                 .getBoolean(PreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_RECEIVED);
 
-            SWTUtils.runSafeSWTAsync(log, new Runnable() {
+            SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
 
                 @Override
                 public void run() {
@@ -228,7 +238,7 @@ public class ChatControl extends Composite {
 
                     addChatLine(new ChatElement(message, sender, new Date()));
 
-                    if (!isOwnJID(sender)) {
+                    if (!isLocalJID(sender)) {
 
                         if (playMessageReceivedSound) {
                             SoundPlayer.playSound(Sounds.MESSAGE_RECEIVED);
@@ -245,13 +255,13 @@ public class ChatControl extends Composite {
 
         @Override
         public void stateChanged(final JID jid, final ChatState state) {
-            SWTUtils.runSafeSWTAsync(log, new Runnable() {
+            SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
                 @Override
                 public void run() {
                     if (ChatControl.this.isDisposed())
                         return;
 
-                    if (isOwnJID(jid))
+                    if (isLocalJID(jid))
                         return;
 
                     CTabItem tab = chatRooms.getChatTab(chat);
@@ -277,7 +287,7 @@ public class ChatControl extends Composite {
                     addChatLine(new ChatElement(jid, new Date(),
                         ChatElementType.JOIN));
 
-                    if (isOwnJID(jid))
+                    if (isLocalJID(jid))
                         chatInput.setEnabled(true);
                 }
             });
@@ -295,7 +305,7 @@ public class ChatControl extends Composite {
                     addChatLine(new ChatElement(jid, new Date(),
                         ChatElementType.LEAVE));
 
-                    if (isOwnJID(jid))
+                    if (isLocalJID(jid))
                         chatInput.setEnabled(false);
                 }
             });
@@ -303,47 +313,39 @@ public class ChatControl extends Composite {
 
     };
 
-    /**
-     * Chat layer
-     */
-    protected SashForm sashForm;
-    protected ChatRoomsComposite chatRooms;
-    protected ChatDisplay chatDisplay;
-    protected ChatInput chatInput;
-    protected IChat chat;
-    protected int missedMessages;
+    public ChatControl(final ChatRoomsComposite chatRooms, final IChat chat,
+        final Composite parent, final int style,
+        final Color displayBackgroundColor, final int minVisibleInputLines) {
 
-    public ChatControl(ChatRoomsComposite chatRooms, IChat chat,
-        Composite parent, int style, Color displayBackgroundColor,
-        final int minVisibleInputLines) {
         super(parent, style & ~SWT.BORDER);
 
         SarosPluginContext.initComponent(this);
 
-        int chatDisplayStyle = (style & SWT.BORDER) | SWT.V_SCROLL
+        final int chatDisplayStyle = (style & SWT.BORDER) | SWT.V_SCROLL
             | SWT.H_SCROLL;
-        int chatInputStyle = (style & SWT.BORDER) | SWT.MULTI | SWT.V_SCROLL
-            | SWT.WRAP;
 
-        this.setLayout(new FillLayout());
+        final int chatInputStyle = (style & SWT.BORDER) | SWT.MULTI
+            | SWT.V_SCROLL | SWT.WRAP;
 
-        this.sashForm = new SashForm(this, SWT.VERTICAL);
+        setLayout(new FillLayout());
+
+        sashForm = new SashForm(this, SWT.VERTICAL);
 
         // ChatDisplay
-        this.chatDisplay = new ChatDisplay(sashForm, chatDisplayStyle,
+        chatDisplay = new ChatDisplay(sashForm, chatDisplayStyle,
             displayBackgroundColor);
-        this.chatDisplay.setAlwaysShowScrollBars(true);
-        this.chatDisplay.addChatDisplayListener(this.chatDisplayListener);
+
+        chatDisplay.setAlwaysShowScrollBars(true);
+        chatDisplay.addChatDisplayListener(this.chatDisplayListener);
 
         // ChatInput
-        this.chatInput = new ChatInput(sashForm, chatInputStyle);
-        this.chatInput.addKeyListener(this.chatInputListener);
-        this.chatInput.setEnabled(true);
+        chatInput = new ChatInput(sashForm, chatInputStyle);
+        chatInput.addKeyListener(this.chatInputListener);
+        chatInput.setEnabled(true);
 
-        /*
-         * Updates SashForm weights to emulate a fixed ChatInput height
-         */
-        this.addListener(SWT.Resize, new Listener() {
+        // Updates SashForm weights to emulate a fixed ChatInput height
+
+        addListener(SWT.Resize, new Listener() {
             @Override
             public void handleEvent(Event event) {
                 int fullHeight = ChatControl.this.getSize().y;
@@ -366,7 +368,6 @@ public class ChatControl extends Composite {
         });
 
         this.chatRooms = chatRooms;
-
         this.chat = chat;
         this.chat.addChatListener(chatListener);
 
@@ -378,20 +379,17 @@ public class ChatControl extends Composite {
                 this.session.addListener(projectListener);
         }
 
-        for (ChatElement chatElement : this.chat.getHistory()) {
+        for (ChatElement chatElement : this.chat.getHistory())
             addChatLine(chatElement);
-        }
 
-        this.missedMessages = 0;
+        missedMessages = 0;
 
-        Listener showListener = new Listener() {
+        addListener(SWT.Show, new Listener() {
             @Override
             public void handleEvent(Event event) {
                 resetUnseenMessages();
             }
-        };
-
-        addListener(SWT.Show, showListener);
+        });
 
         addDisposeListener(new DisposeListener() {
             @Override
@@ -404,10 +402,6 @@ public class ChatControl extends Composite {
                 clearColorCache();
             }
         });
-    }
-
-    public boolean isOwnJID(JID jid) {
-        return jid.equals(chat.getJID());
     }
 
     /**
@@ -430,16 +424,6 @@ public class ChatControl extends Composite {
 
         // TODO: this currently scrolls to the bottom
         chatDisplay.refresh();
-    }
-
-    /**
-     * Clears the color cache and disposes the stored colors.
-     */
-    private void clearColorCache() {
-        for (Map.Entry<JID, Color> entry : colorCache.entrySet()) {
-            entry.getValue().dispose();
-        }
-        colorCache.clear();
     }
 
     public void addChatLine(ChatElement element) {
@@ -480,14 +464,151 @@ public class ChatControl extends Composite {
     }
 
     /**
+     * Sets the chat input's text
+     * 
+     * @param string
+     *            the new text
+     */
+    public void setInputText(String string) {
+        chatInput.setText(string);
+    }
+
+    /**
+     * Return entered text in the chat input
+     * 
+     * @return the entered text
+     */
+    public String getInputText() {
+        return this.chatInput.getText();
+    }
+
+    /**
+     * Adds a {@link IChatControlListener}
+     * 
+     * @param chatControlListener
+     */
+    public void addChatControlListener(IChatControlListener chatControlListener) {
+        this.chatControlListeners.add(chatControlListener);
+    }
+
+    /**
+     * Removes a {@link IChatControlListener}
+     * 
+     * @param chatControlListener
+     */
+    public void removeChatControlListener(
+        IChatControlListener chatControlListener) {
+        this.chatControlListeners.remove(chatControlListener);
+    }
+
+    /**
+     * Notify all {@link IChatControlListener}s about entered character
+     * 
+     * @param character
+     *            the entered character
+     */
+    public void notifyCharacterEntered(Character character) {
+        for (IChatControlListener chatControlListener : this.chatControlListeners) {
+            chatControlListener.characterEntered(new CharacterEnteredEvent(
+                this, character));
+        }
+    }
+
+    /**
+     * Notify all {@link IChatControlListener}s about entered text
+     * 
+     * @param message
+     *            the entered text
+     */
+    public void notifyMessageEntered(String message) {
+        for (IChatControlListener chatControlListener : this.chatControlListeners) {
+            chatControlListener.messageEntered(new MessageEnteredEvent(this,
+                message));
+        }
+    }
+
+    /**
+     * Notify all {@link IChatDisplayListener}s about a cleared chat
+     */
+    public void notifyChatCleared(ChatClearedEvent event) {
+        for (IChatControlListener chatControlListener : this.chatControlListeners) {
+            chatControlListener.chatCleared(event);
+        }
+    }
+
+    /**
+     * @see ChatDisplay#clear()
+     */
+    public void clear() {
+        chatDisplay.clear();
+    }
+
+    /**
+     * @see ChatDisplay#silentClear()
+     */
+    public void silentClear() {
+        chatDisplay.silentClear();
+    }
+
+    @Override
+    public boolean setFocus() {
+        return chatInput.setFocus();
+    }
+
+    private void toggleChatBoldFontStyle() {
+        FontData[] fds = chatRooms.getChatTab(chat).getFont().getFontData();
+        if (fds.length > 0) {
+            chatRooms.getChatTab(chat).setFont(
+                new Font(getDisplay(), fds[0].getName(), fds[0].getHeight(),
+                    fds[0].getStyle() ^ SWT.BOLD));
+        }
+    }
+
+    private void incrementUnseenMessages() {
+        if (!chatRooms.isVisible()
+            || chatRooms.getSelectedChatControl() != this) {
+
+            if (missedMessages == 0) {
+                toggleChatBoldFontStyle();
+            }
+            missedMessages++;
+            chatRooms.getChatTab(chat).setText(
+                "(" + missedMessages + ") " + chatRooms.getChatTabName(chat));
+        }
+    }
+
+    private void resetUnseenMessages() {
+        if (missedMessages > 0) {
+            toggleChatBoldFontStyle();
+            missedMessages = 0;
+            chatRooms.getChatTab(chat).setText(chatRooms.getChatTabName(chat));
+        }
+    }
+
+    /**
+     * Makes sure refreshing the chat is done in the SWT thread. Performed
+     * asynchronously to prevent dead locks.
+     */
+    private void updateColorsInSWTAsync() {
+        SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
+            @Override
+            public void run() {
+                if (isDisposed())
+                    return;
+                updateColors();
+            }
+        });
+    }
+
+    /**
      * Retrieves the color for a the JID. If the JID is used by a user in the
      * currently running Saros session its session color will be returned.
      * Otherwise a default color is returned.
      * 
      */
-    protected Color getColorForJID(JID jid) {
+    private Color getColorForJID(JID jid) {
 
-        final Color defaultColor = isOwnJID(jid) ? LOCAL_USER_DEFAULT_COLOR
+        final Color defaultColor = isLocalJID(jid) ? LOCAL_USER_DEFAULT_COLOR
             : REMOTE_USER_DEFAULT_COLOR;
 
         if (chat instanceof SingleUserChat)
@@ -553,23 +674,37 @@ public class ChatControl extends Composite {
         return name;
     }
 
-    /**
-     * Sets the chat input's text
-     * 
-     * @param string
-     *            the new text
-     */
-    public void setInputText(String string) {
-        chatInput.setText(string);
+    private Collection<JID> getChatJIDsFromHistory() {
+        /*
+         * FIXME: MUC JIDs are returned with perspective
+         * saros419397963@conference
+         * .saros-con.imp.fu-berlin.de/jenkins_bob_stf@saros
+         * -con.imp.fu-berlin.de/Saros
+         * 
+         * which will become jenkins_bob_stf@saros-con.imp.fu-berlin.de/Saros
+         * after getBareJID() and this is not the BARE JID!
+         */
+
+        Set<JID> jids = new HashSet<JID>();
+
+        for (ChatElement element : chat.getHistory())
+            jids.add(element.getSender().getBareJID());
+
+        return jids;
+    }
+
+    private boolean isLocalJID(JID jid) {
+        return jid.equals(chat.getJID());
     }
 
     /**
-     * Return entered text in the chat input
-     * 
-     * @return the entered text
+     * Clears the color cache and disposes the stored colors.
      */
-    public String getInputText() {
-        return this.chatInput.getText();
+    private void clearColorCache() {
+        for (Map.Entry<JID, Color> entry : colorCache.entrySet()) {
+            entry.getValue().dispose();
+        }
+        colorCache.clear();
     }
 
     /**
@@ -594,144 +729,7 @@ public class ChatControl extends Composite {
             chat.setCurrentState(getInputText().isEmpty() ? ChatState.inactive
                 : ChatState.composing);
         } catch (XMPPException ex) {
-            log.error(ex.getMessage(), ex);
+            LOG.error(ex.getMessage(), ex);
         }
-    }
-
-    /**
-     * Adds a {@link IChatControlListener}
-     * 
-     * @param chatControlListener
-     */
-    public void addChatControlListener(IChatControlListener chatControlListener) {
-        this.chatControlListeners.add(chatControlListener);
-    }
-
-    /**
-     * Removes a {@link IChatControlListener}
-     * 
-     * @param chatControlListener
-     */
-    public void removeChatControlListener(
-        IChatControlListener chatControlListener) {
-        this.chatControlListeners.remove(chatControlListener);
-    }
-
-    /**
-     * Notify all {@link IChatControlListener}s about entered character
-     * 
-     * @param character
-     *            the entered character
-     */
-    public void notifyCharacterEntered(Character character) {
-        for (IChatControlListener chatControlListener : this.chatControlListeners) {
-            chatControlListener.characterEntered(new CharacterEnteredEvent(
-                this, character));
-        }
-    }
-
-    /**
-     * Notify all {@link IChatControlListener}s about entered text
-     * 
-     * @param message
-     *            the entered text
-     */
-    public void notifyMessageEntered(String message) {
-        for (IChatControlListener chatControlListener : this.chatControlListeners) {
-            chatControlListener.messageEntered(new MessageEnteredEvent(this,
-                message));
-        }
-    }
-
-    /**
-     * Notify all {@link IChatDisplayListener}s about a cleared chat
-     */
-    public void notifyChatCleared(ChatClearedEvent event) {
-        for (IChatControlListener chatControlListener : this.chatControlListeners) {
-            chatControlListener.chatCleared(event);
-        }
-    }
-
-    protected void toggleChatBoldFontStyle() {
-        FontData[] fds = chatRooms.getChatTab(chat).getFont().getFontData();
-        if (fds.length > 0) {
-            chatRooms.getChatTab(chat).setFont(
-                new Font(getDisplay(), fds[0].getName(), fds[0].getHeight(),
-                    fds[0].getStyle() ^ SWT.BOLD));
-        }
-    }
-
-    protected void incrementUnseenMessages() {
-        if (!chatRooms.isVisible()
-            || chatRooms.getSelectedChatControl() != this) {
-
-            if (missedMessages == 0) {
-                toggleChatBoldFontStyle();
-            }
-            missedMessages++;
-            chatRooms.getChatTab(chat).setText(
-                "(" + missedMessages + ") " + chatRooms.getChatTabName(chat));
-        }
-    }
-
-    protected void resetUnseenMessages() {
-        if (missedMessages > 0) {
-            toggleChatBoldFontStyle();
-            missedMessages = 0;
-            chatRooms.getChatTab(chat).setText(chatRooms.getChatTabName(chat));
-        }
-    }
-
-    /**
-     * @see ChatDisplay#clear()
-     */
-    public void clear() {
-        chatDisplay.clear();
-    }
-
-    /**
-     * @see ChatDisplay#silentClear()
-     */
-    public void silentClear() {
-        chatDisplay.silentClear();
-    }
-
-    @Override
-    public boolean setFocus() {
-        return chatInput.setFocus();
-    }
-
-    /**
-     * Makes sure refreshing the chat is done in the SWT thread. Performed
-     * asynchronously to prevent dead locks.
-     */
-    private void updateColorsInSWTAsync() {
-        SWTUtils.runSafeSWTAsync(log, new Runnable() {
-            @Override
-            public void run() {
-                if (isDisposed())
-                    return;
-                updateColors();
-            }
-        });
-    }
-
-    private Collection<JID> getChatJIDsFromHistory() {
-        /*
-         * FIXME: MUC JIDs are returned with perspective
-         * saros419397963@conference
-         * .saros-con.imp.fu-berlin.de/jenkins_bob_stf@saros
-         * -con.imp.fu-berlin.de/Saros
-         * 
-         * which will become jenkins_bob_stf@saros-con.imp.fu-berlin.de/Saros
-         * after getBareJID() and this is not the BARE JID!
-         */
-
-        Set<JID> jids = new HashSet<JID>();
-
-        for (ChatElement element : chat.getHistory())
-            jids.add(element.getSender().getBareJID());
-
-        return jids;
     }
 }
