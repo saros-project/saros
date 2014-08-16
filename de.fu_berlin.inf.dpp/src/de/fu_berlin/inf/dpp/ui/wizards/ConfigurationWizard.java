@@ -43,7 +43,10 @@ import de.fu_berlin.inf.dpp.ui.wizards.pages.ConfigurationSummaryWizardPage;
 public class ConfigurationWizard extends AddXMPPAccountWizard {
 
     private final ConfigurationSettingsWizardPage configurationSettingsWizardPage = new ConfigurationSettingsWizardPage();
-    private final ConfigurationSummaryWizardPage configurationSummaryWizardPage = new ConfigurationSummaryWizardPage();
+
+    private final ConfigurationSummaryWizardPage configurationSummaryWizardPage = new ConfigurationSummaryWizardPage(
+        enterXMPPAccountWizardPage, configurationSettingsWizardPage);
+
     private final ColorChooserWizardPage colorChooserWizardPage = new ColorChooserWizardPage(
         false);
 

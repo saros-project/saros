@@ -57,7 +57,7 @@ public class AddXMPPAccountWizard extends Wizard {
     @Inject
     private ConnectionHandler connectionHandler;
 
-    private final EnterXMPPAccountWizardPage enterXMPPAccountWizardPage = new EnterXMPPAccountWizardPage();
+    protected final EnterXMPPAccountWizardPage enterXMPPAccountWizardPage = new EnterXMPPAccountWizardPage();
 
     public AddXMPPAccountWizard() {
         SarosPluginContext.initComponent(this);
