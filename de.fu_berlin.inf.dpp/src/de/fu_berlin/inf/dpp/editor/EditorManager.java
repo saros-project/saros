@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -93,7 +94,6 @@ import de.fu_berlin.inf.dpp.session.User.Permission;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
-import de.fu_berlin.inf.dpp.util.BlockingProgressMonitor;
 import de.fu_berlin.inf.dpp.util.Predicate;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
@@ -1433,27 +1433,12 @@ public class EditorManager extends AbstractActivityProducer {
 
             editorPool.setElementStateListenerEnabled(false);
 
-            BlockingProgressMonitor monitor = new BlockingProgressMonitor();
-
             try {
-                provider.saveDocument(monitor, input, doc, true);
+                provider.saveDocument(new NullProgressMonitor(), input, doc,
+                    true);
                 LOG.debug("Saved document: " + path);
             } catch (CoreException e) {
                 LOG.error("Failed to save document: " + path, e);
-            }
-
-            // Wait for saving to be done
-            try {
-                if (!monitor.await(10)) {
-                    LOG.warn("Timeout expired on saving document: " + path);
-                }
-            } catch (InterruptedException e) {
-                LOG.error("Code not designed to be interruptable", e);
-                Thread.currentThread().interrupt();
-            }
-
-            if (monitor.isCanceled()) {
-                LOG.warn("saving was canceled by user: " + path);
             }
 
             editorPool.setElementStateListenerEnabled(true);
