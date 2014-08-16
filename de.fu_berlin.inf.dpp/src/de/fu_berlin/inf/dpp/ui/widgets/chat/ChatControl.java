@@ -59,8 +59,8 @@ import de.fu_berlin.inf.dpp.ui.widgets.chat.events.ChatClearedEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.events.IChatControlListener;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.events.IChatDisplayListener;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.events.MessageEnteredEvent;
-import de.fu_berlin.inf.dpp.ui.widgets.chat.parts.SkypeStyleChatDisplay;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.parts.ChatInput;
+import de.fu_berlin.inf.dpp.ui.widgets.chat.parts.SkypeStyleChatDisplay;
 
 /**
  * This composite displays a chat conversation and the possibility to enter
@@ -122,8 +122,8 @@ public final class ChatControl extends Composite {
 
     /**
      * This {@link IChatDisplayListener} is used to forward events fired in the
-     * {@link SkypeStyleChatDisplay} so the user only has to add listeners on the
-     * {@link ChatControl} and not on all its child components.
+     * {@link SkypeStyleChatDisplay} so the user only has to add listeners on
+     * the {@link ChatControl} and not on all its child components.
      */
     private final IChatDisplayListener chatDisplayListener = new IChatDisplayListener() {
         @Override
@@ -541,13 +541,6 @@ public final class ChatControl extends Composite {
      */
     public void clear() {
         chatDisplay.clear();
-    }
-
-    /**
-     * @see SkypeStyleChatDisplay#silentClear()
-     */
-    public void silentClear() {
-        chatDisplay.silentClear();
     }
 
     @Override

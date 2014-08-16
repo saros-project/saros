@@ -1,8 +1,8 @@
 package de.fu_berlin.inf.dpp.ui.widgets.chat.parts;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -32,34 +32,35 @@ import de.fu_berlin.inf.dpp.ui.widgets.chat.items.ChatLineSeparator;
  * 
  * @author bkahlert
  */
-public class SkypeStyleChatDisplay extends ScrolledComposite {
+public final class SkypeStyleChatDisplay extends ScrolledComposite {
 
-    protected List<IChatDisplayListener> chatDisplayListeners = new ArrayList<IChatDisplayListener>();
+    private final List<IChatDisplayListener> chatDisplayListeners = new CopyOnWriteArrayList<IChatDisplayListener>();
 
-    protected Composite contentComposite;
-    protected Composite optionsComposite;
+    private Composite contentComposite;
+    private Composite optionsComposite;
 
-    protected JID lastUser;
+    private JID lastUser;
 
-    public SkypeStyleChatDisplay(Composite parent, int style, Color backgroundColor) {
+    public SkypeStyleChatDisplay(Composite parent, int style,
+        Color backgroundColor) {
         super(parent, style);
 
-        this.contentComposite = new Composite(this, SWT.NONE);
-        this.contentComposite.setBackgroundMode(SWT.INHERIT_DEFAULT);
-        this.setContent(contentComposite);
-        this.setExpandHorizontal(true);
-        this.setExpandVertical(true);
-        this.getVerticalBar().setIncrement(50);
+        contentComposite = new Composite(this, SWT.NONE);
+        contentComposite.setBackgroundMode(SWT.INHERIT_DEFAULT);
+        setContent(contentComposite);
+        setExpandHorizontal(true);
+        setExpandVertical(true);
+        getVerticalBar().setIncrement(50);
 
         // Focus content composite on activation to enable scrolling.
-        this.addListener(SWT.Activate, new Listener() {
+        addListener(SWT.Activate, new Listener() {
             @Override
             public void handleEvent(Event e) {
                 contentComposite.setFocus();
             }
         });
 
-        this.setBackgroundMode(SWT.INHERIT_DEFAULT);
+        setBackgroundMode(SWT.INHERIT_DEFAULT);
         contentComposite.setBackground(backgroundColor);
 
         /*
@@ -72,7 +73,7 @@ public class SkypeStyleChatDisplay extends ScrolledComposite {
         /*
          * Scroll to bottom if resized
          */
-        this.addListener(SWT.Resize, new Listener() {
+        addListener(SWT.Resize, new Listener() {
             @Override
             public void handleEvent(Event event) {
                 SkypeStyleChatDisplay.this.refresh();
@@ -82,21 +83,22 @@ public class SkypeStyleChatDisplay extends ScrolledComposite {
 
     /**
      * Adds a line of options to modify the chat to the end of the
-     * {@link SkypeStyleChatDisplay} and removes an eventually existing option bar.
+     * {@link SkypeStyleChatDisplay} and removes an eventually existing option
+     * bar.
      */
-    protected void createOptionComposite() {
-        if (this.optionsComposite != null)
-            this.optionsComposite.dispose();
+    private void createOptionComposite() {
+        if (optionsComposite != null)
+            optionsComposite.dispose();
 
-        this.optionsComposite = new Composite(contentComposite, SWT.NONE);
+        optionsComposite = new Composite(contentComposite, SWT.NONE);
 
         GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
-        this.optionsComposite.setLayoutData(gridData);
+        optionsComposite.setLayoutData(gridData);
 
         GridLayout gridLayout = new GridLayout(1, false);
         gridLayout.marginWidth = 0;
         gridLayout.marginHeight = 0;
-        this.optionsComposite.setLayout(gridLayout);
+        optionsComposite.setLayout(gridLayout);
 
         final Button clearButton = new Button(optionsComposite, SWT.PUSH);
         clearButton.setText(Messages.ChatDisplay_clear);
@@ -104,12 +106,12 @@ public class SkypeStyleChatDisplay extends ScrolledComposite {
 
             @Override
             public void widgetSelected(SelectionEvent e) {
-                SkypeStyleChatDisplay.this.clear();
+                clear();
             }
 
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
-                // irrelevant
+                // NOP
             }
         });
         clearButton.setLayoutData(new GridData(SWT.END, SWT.END, true, true));
@@ -159,9 +161,9 @@ public class SkypeStyleChatDisplay extends ScrolledComposite {
         /*
          * Reposition the clear option to the end
          */
-        this.createOptionComposite();
+        createOptionComposite();
 
-        this.refresh();
+        refresh();
 
         lastUser = jid;
     }
@@ -208,24 +210,14 @@ public class SkypeStyleChatDisplay extends ScrolledComposite {
     }
 
     /**
-     * Returns the chat items used to display the current conversation
-     * 
-     * @return ordered array of items like
-     *         {@link ChatLinePartnerChangeSeparator}s and {@link ChatLine}s
-     */
-    protected Control[] getChatItems() {
-        return this.contentComposite.getChildren();
-    }
-
-    /**
      * Computes the ideal render widths of non-{@link ChatLine}s and returns the
      * maximum.
      * 
      * @return the maximum ideal render width of all non-{@link ChatLine}s
      */
-    protected int computeMaxNonChatLineWidth() {
+    private int computeMaxNonChatLineWidth() {
         int maxNonChatLineWidth = 0;
-        for (Control chatItem : getChatItems()) {
+        for (Control chatItem : contentComposite.getChildren()) {
             if (!(chatItem instanceof ChatLine)) {
                 int currentNonChatLineWidth = chatItem.computeSize(SWT.DEFAULT,
                     SWT.DEFAULT).x;
@@ -244,16 +236,18 @@ public class SkypeStyleChatDisplay extends ScrolledComposite {
         /*
          * Layout makes the added controls visible
          */
-        this.contentComposite.layout();
+        contentComposite.layout();
 
         int verticalBarWidth = (this.getVerticalBar() != null) ? this
             .getVerticalBar().getSize().x : 0;
 
         int widthHint = Math.max(computeMaxNonChatLineWidth()
-            + verticalBarWidth, SkypeStyleChatDisplay.this.getClientArea().width);
+            + verticalBarWidth,
+            SkypeStyleChatDisplay.this.getClientArea().width);
 
-        final Point neededSize = SkypeStyleChatDisplay.this.contentComposite.computeSize(
-            widthHint, SWT.DEFAULT);
+        final Point neededSize = contentComposite.computeSize(widthHint,
+            SWT.DEFAULT);
+
         SkypeStyleChatDisplay.this.setMinSize(neededSize);
         SkypeStyleChatDisplay.this.setOrigin(0, neededSize.y);
     }
@@ -262,19 +256,14 @@ public class SkypeStyleChatDisplay extends ScrolledComposite {
      * Clears the {@link SkypeStyleChatDisplay}
      */
     public void clear() {
-        this.silentClear();
-        this.notifyChatCleared();
-    }
-
-    /**
-     * Clears the {@link SkypeStyleChatDisplay} without firing events
-     */
-    public void silentClear() {
-        for (Control chatItem : getChatItems()) {
+        for (Control chatItem : contentComposite.getChildren()) {
             chatItem.dispose();
         }
-        this.refresh();
-        this.lastUser = null;
+
+        refresh();
+        lastUser = null;
+
+        notifyChatCleared();
     }
 
     /**
@@ -283,7 +272,7 @@ public class SkypeStyleChatDisplay extends ScrolledComposite {
      * @param chatListener
      */
     public void addChatDisplayListener(IChatDisplayListener chatListener) {
-        this.chatDisplayListeners.add(chatListener);
+        chatDisplayListeners.add(chatListener);
     }
 
     /**
@@ -292,14 +281,14 @@ public class SkypeStyleChatDisplay extends ScrolledComposite {
      * @param chatListener
      */
     public void removeChatListener(IChatDisplayListener chatListener) {
-        this.chatDisplayListeners.remove(chatListener);
+        chatDisplayListeners.remove(chatListener);
     }
 
     /**
      * Notify all {@link IChatDisplayListener}s about a cleared chat
      */
     public void notifyChatCleared() {
-        for (IChatDisplayListener chatListener : this.chatDisplayListeners) {
+        for (IChatDisplayListener chatListener : chatDisplayListeners) {
             chatListener.chatCleared(new ChatClearedEvent(this));
         }
     }
