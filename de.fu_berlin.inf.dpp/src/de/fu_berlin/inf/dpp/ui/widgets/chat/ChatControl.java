@@ -59,7 +59,7 @@ import de.fu_berlin.inf.dpp.ui.widgets.chat.events.ChatClearedEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.events.IChatControlListener;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.events.IChatDisplayListener;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.events.MessageEnteredEvent;
-import de.fu_berlin.inf.dpp.ui.widgets.chat.parts.ChatDisplay;
+import de.fu_berlin.inf.dpp.ui.widgets.chat.parts.SkypeStyleChatDisplay;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.parts.ChatInput;
 
 /**
@@ -115,14 +115,14 @@ public final class ChatControl extends Composite {
 
     private final SashForm sashForm;
     private final ChatRoomsComposite chatRooms;
-    private final ChatDisplay chatDisplay;
+    private final SkypeStyleChatDisplay chatDisplay;
     private final ChatInput chatInput;
     private final IChat chat;
     private int missedMessages;
 
     /**
      * This {@link IChatDisplayListener} is used to forward events fired in the
-     * {@link ChatDisplay} so the user only has to add listeners on the
+     * {@link SkypeStyleChatDisplay} so the user only has to add listeners on the
      * {@link ChatControl} and not on all its child components.
      */
     private final IChatDisplayListener chatDisplayListener = new IChatDisplayListener() {
@@ -332,7 +332,7 @@ public final class ChatControl extends Composite {
         sashForm = new SashForm(this, SWT.VERTICAL);
 
         // ChatDisplay
-        chatDisplay = new ChatDisplay(sashForm, chatDisplayStyle,
+        chatDisplay = new SkypeStyleChatDisplay(sashForm, chatDisplayStyle,
             displayBackgroundColor);
 
         chatDisplay.setAlwaysShowScrollBars(true);
@@ -537,14 +537,14 @@ public final class ChatControl extends Composite {
     }
 
     /**
-     * @see ChatDisplay#clear()
+     * @see SkypeStyleChatDisplay#clear()
      */
     public void clear() {
         chatDisplay.clear();
     }
 
     /**
-     * @see ChatDisplay#silentClear()
+     * @see SkypeStyleChatDisplay#silentClear()
      */
     public void silentClear() {
         chatDisplay.silentClear();

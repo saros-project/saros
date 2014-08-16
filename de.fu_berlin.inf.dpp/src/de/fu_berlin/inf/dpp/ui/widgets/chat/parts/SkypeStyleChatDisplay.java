@@ -32,7 +32,7 @@ import de.fu_berlin.inf.dpp.ui.widgets.chat.items.ChatLineSeparator;
  * 
  * @author bkahlert
  */
-public class ChatDisplay extends ScrolledComposite {
+public class SkypeStyleChatDisplay extends ScrolledComposite {
 
     protected List<IChatDisplayListener> chatDisplayListeners = new ArrayList<IChatDisplayListener>();
 
@@ -41,7 +41,7 @@ public class ChatDisplay extends ScrolledComposite {
 
     protected JID lastUser;
 
-    public ChatDisplay(Composite parent, int style, Color backgroundColor) {
+    public SkypeStyleChatDisplay(Composite parent, int style, Color backgroundColor) {
         super(parent, style);
 
         this.contentComposite = new Composite(this, SWT.NONE);
@@ -75,14 +75,14 @@ public class ChatDisplay extends ScrolledComposite {
         this.addListener(SWT.Resize, new Listener() {
             @Override
             public void handleEvent(Event event) {
-                ChatDisplay.this.refresh();
+                SkypeStyleChatDisplay.this.refresh();
             }
         });
     }
 
     /**
      * Adds a line of options to modify the chat to the end of the
-     * {@link ChatDisplay} and removes an eventually existing option bar.
+     * {@link SkypeStyleChatDisplay} and removes an eventually existing option bar.
      */
     protected void createOptionComposite() {
         if (this.optionsComposite != null)
@@ -104,7 +104,7 @@ public class ChatDisplay extends ScrolledComposite {
 
             @Override
             public void widgetSelected(SelectionEvent e) {
-                ChatDisplay.this.clear();
+                SkypeStyleChatDisplay.this.clear();
             }
 
             @Override
@@ -250,16 +250,16 @@ public class ChatDisplay extends ScrolledComposite {
             .getVerticalBar().getSize().x : 0;
 
         int widthHint = Math.max(computeMaxNonChatLineWidth()
-            + verticalBarWidth, ChatDisplay.this.getClientArea().width);
+            + verticalBarWidth, SkypeStyleChatDisplay.this.getClientArea().width);
 
-        final Point neededSize = ChatDisplay.this.contentComposite.computeSize(
+        final Point neededSize = SkypeStyleChatDisplay.this.contentComposite.computeSize(
             widthHint, SWT.DEFAULT);
-        ChatDisplay.this.setMinSize(neededSize);
-        ChatDisplay.this.setOrigin(0, neededSize.y);
+        SkypeStyleChatDisplay.this.setMinSize(neededSize);
+        SkypeStyleChatDisplay.this.setOrigin(0, neededSize.y);
     }
 
     /**
-     * Clears the {@link ChatDisplay}
+     * Clears the {@link SkypeStyleChatDisplay}
      */
     public void clear() {
         this.silentClear();
@@ -267,7 +267,7 @@ public class ChatDisplay extends ScrolledComposite {
     }
 
     /**
-     * Clears the {@link ChatDisplay} without firing events
+     * Clears the {@link SkypeStyleChatDisplay} without firing events
      */
     public void silentClear() {
         for (Control chatItem : getChatItems()) {
