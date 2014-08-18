@@ -47,6 +47,8 @@ public class UserInformationHandler implements Startable {
 
     private String currentSessionID;
 
+    private volatile boolean isRunning;
+
     private final PacketListener userListListener = new PacketListener() {
 
         @Override
@@ -80,12 +82,15 @@ public class UserInformationHandler implements Startable {
         receiver.addPacketListener(userFinishedProjectNegotiations,
             UserFinishedProjectNegotiationExtension.PROVIDER
                 .getPacketFilter(currentSessionID));
+
+        isRunning = true;
     }
 
     @Override
     public void stop() {
         receiver.removePacketListener(userListListener);
         receiver.removePacketListener(userFinishedProjectNegotiations);
+        isRunning = false;
     }
 
     /**
@@ -182,7 +187,7 @@ public class UserInformationHandler implements Startable {
                     }
                 }
 
-                if (awaitReply.isEmpty())
+                if (awaitReply.isEmpty() || !isRunning)
                     break;
 
                 Packet result = collector.nextResult(100);
