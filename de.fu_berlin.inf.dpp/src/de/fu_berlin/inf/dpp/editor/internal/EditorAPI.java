@@ -11,6 +11,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.ITextSelection;
@@ -30,6 +31,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
@@ -40,6 +42,7 @@ import org.eclipse.ui.texteditor.DocumentProviderRegistry;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IEditorStatusLine;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -63,6 +66,21 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
 public class EditorAPI implements IEditorAPI {
 
     private static final Logger LOG = Logger.getLogger(EditorAPI.class);
+
+    private static final String[] RESTRICTED_ACTION = {
+        ITextEditorActionConstants.CUT_LINE,
+        ITextEditorActionConstants.CUT_LINE_TO_BEGINNING,
+        ITextEditorActionConstants.CUT_LINE_TO_END,
+        IWorkbenchActionConstants.CUT_EXT,
+        ITextEditorActionConstants.DELETE_LINE,
+        ITextEditorActionConstants.DELETE_LINE_TO_BEGINNING,
+        ITextEditorActionConstants.DELETE_LINE_TO_END,
+        ITextEditorActionConstants.CONTENT_ASSIST,
+        ITextEditorActionConstants.MOVE_LINE_DOWN,
+        ITextEditorActionConstants.MOVE_LINE_UP,
+        ITextEditorActionConstants.SHIFT_LEFT,
+        ITextEditorActionConstants.SHIFT_RIGHT,
+        ITextEditorActionConstants.SHIFT_RIGHT_TAB };
 
     protected final VerifyKeyListener keyVerifier = new VerifyKeyListener() {
         @Override
@@ -326,8 +344,8 @@ public class EditorAPI implements IEditorAPI {
                 ((ITextViewerExtension) textViewer)
                     .removeVerifyKeyListener(EditorAPI.this.keyVerifier);
 
-            // enable editing and undo-manager
             textViewer.setEditable(true);
+            setEditorActionState(editorPart, true);
 
             // TODO use undoLevel from Preferences (TextEditorPlugin)
             if (textViewer instanceof ITextViewerExtension6)
@@ -341,12 +359,13 @@ public class EditorAPI implements IEditorAPI {
                 ((ITextViewerExtension) textViewer)
                     .prependVerifyKeyListener(EditorAPI.this.keyVerifier);
 
-            // disable editing and undo-manager
             textViewer.setEditable(false);
+            setEditorActionState(editorPart, false);
 
             if (textViewer instanceof ITextViewerExtension6)
                 ((ITextViewerExtension6) textViewer).getUndoManager()
                     .setMaximalUndoLevel(0);
+
         }
     }
 
@@ -490,5 +509,22 @@ public class EditorAPI implements IEditorAPI {
         final IEditorInput input = editorPart.getEditorInput();
 
         return getDocumentProvider(input).getDocument(input);
+    }
+
+    private void setEditorActionState(final IEditorPart editorPart,
+        final boolean enabled) {
+
+        final ITextEditor editor = (ITextEditor) editorPart
+            .getAdapter(ITextEditor.class);
+
+        if (editor == null)
+            return;
+
+        for (final String actionID : RESTRICTED_ACTION) {
+            final IAction action = editor.getAction(actionID);
+
+            if (action != null)
+                action.setEnabled(enabled);
+        }
     }
 }
