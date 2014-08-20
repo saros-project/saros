@@ -47,6 +47,7 @@ import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.intellij.project.SharedResourcesManager;
 import de.fu_berlin.inf.dpp.misc.xstream.SPathConverter;
 import de.fu_berlin.inf.dpp.misc.xstream.UserConverter;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
@@ -243,8 +244,7 @@ public final class SarosSession implements ISarosSession {
         // Classes belonging to a session
 
         // Core Managers
-        //TODO: uncomment when SharedResourcesManager was added
-        //        sessionContainer.addComponent(SharedResourcesManager.class);
+        sessionContainer.addComponent(SharedResourcesManager.class);
         sessionContainer.addComponent(PermissionManager.class);
         //TODO: uncomment when FollowingActivitiesManager was added
         //        sessionContainer.addComponent(FollowingActivitiesManager.class);

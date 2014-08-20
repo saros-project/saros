@@ -4,6 +4,7 @@ import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.VCSActivity;
+import de.fu_berlin.inf.dpp.intellij.project.SharedResourcesManager;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ import java.util.List;
 
 /**
  * A ResourceActivityFilter stores pending activities for the
- * {@link de.fu_berlin.inf.dpp.core.project.SharedResourcesManager}, then orders and filters them.
+ * {@link SharedResourcesManager}, then orders and filters them.
  */
 class ResourceActivityFilter {
     private static final Logger log = Logger

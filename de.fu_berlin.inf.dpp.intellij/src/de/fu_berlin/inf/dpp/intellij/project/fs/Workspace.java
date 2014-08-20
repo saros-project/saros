@@ -30,6 +30,7 @@ import de.fu_berlin.inf.dpp.core.workspace.IWorkspaceDescription;
 import de.fu_berlin.inf.dpp.core.workspace.IWorkspaceRoot;
 import de.fu_berlin.inf.dpp.core.workspace.IWorkspaceRunnable;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
+import de.fu_berlin.inf.dpp.intellij.project.FileSystemChangeListener;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
 import org.apache.log4j.Logger;
@@ -141,6 +142,16 @@ public class Workspace implements IWorkspace {
     protected void initPath(File path) {
         this.root = new WorkspaceRoot(path);
         this.path = path;
+    }
+
+    public void addResourceListener(FileSystemChangeListener listener) {
+        listener.setWorkspace(this);
+        fileSystem.addVirtualFileListener(listener);
+    }
+
+    public void removeResourceListener(FileSystemChangeListener listener) {
+        listener.setWorkspace(this);
+        fileSystem.removeVirtualFileListener(listener);
     }
 
 }
