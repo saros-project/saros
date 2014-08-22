@@ -184,4 +184,22 @@ public final class SubProgressMonitor implements IProgressMonitor {
         totalWork = size < 0 ? 0 : size;
         beginTaskCalled = true;
     }
+
+    /**
+     * Returns the total ticks to consume from the parent monitor.
+     * 
+     * @return the total ticks to consume from the parent monitor
+     */
+    public int getTotalTicks() {
+        return totalTicksToConsume;
+    }
+
+    /**
+     * Returns the parent monitor that this monitor is consuming ticks from.
+     * 
+     * @return the parent monitor of this monitor
+     */
+    public IProgressMonitor getParent() {
+        return delegate;
+    }
 }

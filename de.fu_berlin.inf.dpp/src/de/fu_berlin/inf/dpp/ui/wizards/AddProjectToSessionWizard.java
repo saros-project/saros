@@ -302,7 +302,9 @@ public class AddProjectToSessionWizard extends Wizard {
                     }
 
                     ProjectNegotiation.Status status = process.accept(
-                        projectMapping, monitor, useVersionControl);
+                        projectMapping,
+                        ProgressMonitorAdapterFactory.convertTo(monitor),
+                        useVersionControl);
 
                     if (isAutoBuilding) {
                         description.setAutoBuilding(true);

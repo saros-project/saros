@@ -20,7 +20,6 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
@@ -42,7 +41,9 @@ import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
+import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
+import de.fu_berlin.inf.dpp.monitoring.SubProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.remote.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -65,7 +66,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     private static final Logger LOG = Logger
         .getLogger(IncomingProjectNegotiation.class);
 
-    private SubMonitor monitor;
+    private static int MONITOR_WORK_SCALE = 1000;
+
     private AddProjectToSessionWizard addIncomingProjectUI;
 
     private List<ProjectNegotiationData> projectInfos;
@@ -143,23 +145,20 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     /**
      * 
-     * @param projectNames
+     * @param projectMapping
      *            In this parameter the names of the projects are stored. They
      *            key is the session wide <code><b>projectID</b></code> and the
      *            value is the name of the project in the workspace of the local
      *            user (given from the {@link EnterProjectNamePage})
      */
-    public Status accept(Map<String, String> projectNames,
-        IProgressMonitor monitor, boolean useVersionControl) {
+    public Status accept(Map<String, String> projectMapping,
+        final IProgressMonitor monitor, boolean useVersionControl) {
 
         synchronized (this) {
             running = true;
         }
 
-        this.monitor = SubMonitor.convert(monitor,
-            "Initializing shared project", 100);
-
-        observeMonitor(ProgressMonitorAdapterFactory.convertTo(monitor));
+        observeMonitor(monitor);
 
         fileReplacementInProgressObservable.startReplacement();
 
@@ -180,17 +179,20 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             fileTransferManager
                 .addFileTransferListener(archiveTransferListener);
 
-            createProjects(projectNames.values());
+            createProjects(projectMapping.values());
 
-            List<FileList> missingFiles = calculateMissingFiles(projectNames,
-                useVersionControl, this.monitor.newChild(10));
+            List<FileList> missingFiles = calculateMissingFiles(projectMapping,
+                useVersionControl, monitor);
+
+            monitor.subTask("");
 
             transmitter.send(ISarosSession.SESSION_CONNECTION_ID, peer,
                 ProjectNegotiationMissingFilesExtension.PROVIDER
                     .create(new ProjectNegotiationMissingFilesExtension(
                         sessionID, processID, missingFiles)));
 
-            awaitActivityQueueingActivation(this.monitor.newChild(0));
+            awaitActivityQueueingActivation(monitor);
+            monitor.subTask("");
 
             /*
              * the user who sends this ProjectNegotiation is now responsible for
@@ -224,8 +226,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
             // Host/Inviter decided to transmit files with one big archive
             if (filesMissing)
-                acceptArchive(archiveTransferListener,
-                    this.monitor.newChild(80));
+                acceptArchive(archiveTransferListener, monitor);
 
             // We are finished with the exchanging process. Add all projects
             // resources to the session.
@@ -284,15 +285,17 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     /**
      * Accepts the archive with all missing files and decompress it.
      */
-    private void acceptArchive(ArchiveTransferListener archiveTransferListener,
-        SubMonitor monitor) throws IOException, SarosCancellationException {
+    private void acceptArchive(
+        final ArchiveTransferListener archiveTransferListener,
+        final IProgressMonitor monitor) throws IOException,
+        SarosCancellationException {
 
         // waiting for the big archive to come in
 
         monitor.beginTask(null, 100);
 
         File archiveFile = receiveArchive(archiveTransferListener, processID,
-            monitor.newChild(50, SubMonitor.SUPPRESS_NONE));
+            new SubProgressMonitor(monitor, 50));
 
         /*
          * FIXME at this point it makes no sense to report the cancellation to
@@ -300,8 +303,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
          */
 
         try {
-            unpackArchive(archiveFile,
-                monitor.newChild(50, SubMonitor.SUPPRESS_NONE));
+            unpackArchive(archiveFile, new SubProgressMonitor(monitor, 50));
             monitor.done();
         } finally {
             if (archiveFile != null)
@@ -317,10 +319,11 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      */
     private List<FileList> calculateMissingFiles(
         Map<String, String> projectNames, boolean useVersionControl,
-        SubMonitor subMonitor) throws SarosCancellationException, IOException {
+        IProgressMonitor monitor) throws SarosCancellationException,
+        IOException {
 
-        subMonitor.beginTask(null, 100);
-        int numberOfLoops = projectNames.size();
+        monitor.beginTask(null, projectNames.size() * MONITOR_WORK_SCALE);
+
         List<FileList> missingFiles = new ArrayList<FileList>();
 
         /*
@@ -328,7 +331,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
          * computes the missing files.
          */
         for (Entry<String, String> entry : projectNames.entrySet()) {
-            SubMonitor lMonitor = subMonitor.newChild(100 / numberOfLoops);
 
             checkCancellation(CancelOption.NOTIFY_PEER);
 
@@ -363,17 +365,22 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 throw new IllegalStateException("project " + project
                     + " does not exists");
 
+            int ticksToConsume = MONITOR_WORK_SCALE;
+
             if (vcs != null) {
                 project = checkoutVCSProject(vcs, project,
-                    projectInfo.getFileList());
+                    projectInfo.getFileList(), new SubProgressMonitor(monitor,
+                        MONITOR_WORK_SCALE / 2));
 
                 if (project == null)
                     throw new LocalCancellationException("VCS checkout failed",
                         CancelOption.NOTIFY_PEER);
 
                 LOG.debug("initVcState");
-                initVcState(project, vcs, lMonitor.newChild(40),
-                    projectInfo.getFileList());
+                initVcState(project, vcs, projectInfo.getFileList(),
+                    new SubProgressMonitor(monitor, 0));
+
+                ticksToConsume -= MONITOR_WORK_SCALE / 2;
 
             }
 
@@ -381,19 +388,19 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
             checkCancellation(CancelOption.NOTIFY_PEER);
 
-            LOG.debug("compute required Files for project " + projectName
+            LOG.debug("compute required files for project " + projectName
                 + " with ID: " + projectID);
 
             FileList requiredFiles = computeRequiredFiles(project,
                 projectInfo.getFileList(), projectID, vcs,
-                lMonitor.newChild(30));
+                new SubProgressMonitor(monitor, ticksToConsume));
 
             requiredFiles.setProjectID(projectID);
             checkCancellation(CancelOption.NOTIFY_PEER);
             missingFiles.add(requiredFiles);
-
-            lMonitor.done();
         }
+
+        monitor.done();
 
         return missingFiles;
     }
@@ -442,22 +449,34 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      *             if the process is canceled locally
      */
     private IProject checkoutVCSProject(final VCSAdapter vcs, IProject project,
-        final FileList fileList) throws LocalCancellationException {
+        final FileList fileList, final IProgressMonitor monitor)
+        throws LocalCancellationException {
+
+        int ticksToConsume = 0;
+
+        if (monitor instanceof SubProgressMonitor)
+            ticksToConsume = ((SubProgressMonitor) monitor).getTotalTicks();
+
+        final org.eclipse.core.runtime.IProgressMonitor progress = getProgressMonitor(monitor);
 
         if (isPartialRemoteProject(fileList.getProjectID()))
             throw new IllegalStateException(
                 "VCS operations on partial shared projects are not supported");
 
         if (project.exists()) {
-            if (!vcs.isManaged(project))
+            if (!vcs.isManaged(project)) {
+                progress.done();
                 return null;
+            }
 
             final String repositoryRoot = fileList.getRepositoryRoot();
             final String directory = fileList.getProjectInfo().getURL()
                 .substring(repositoryRoot.length());
 
             // FIXME this should at least throw a OperationCanceledException
-            vcs.connect(project, repositoryRoot, directory, monitor);
+            vcs.connect(project, repositoryRoot, directory,
+                new org.eclipse.core.runtime.SubProgressMonitor(progress,
+                    ticksToConsume / 2));
 
             return project;
         }
@@ -478,8 +497,11 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
          * The monitor that is created here is shown both locally and remote and
          * is handled like a regular progress monitor.
          */
-        IProgressMonitor remoteMonitor = rpm.createRemoteProgress(
-            Collections.singletonList(sarosSession.getHost()), monitor);
+        org.eclipse.core.runtime.IProgressMonitor remoteMonitor = rpm
+            .createRemoteProgress(Collections.singletonList(sarosSession
+                .getHost()), new org.eclipse.core.runtime.SubProgressMonitor(
+                progress, ticksToConsume / 2));
+
         remoteMonitor.setTaskName("Project checkout via subversion");
 
         try {
@@ -580,13 +602,12 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         IProgressMonitor monitor) throws LocalCancellationException,
         IOException {
 
-        SubMonitor subMonitor = SubMonitor.convert(monitor,
-            "Compute required Files...", 1);
+        monitor.beginTask("Compute required Files...", 1 * MONITOR_WORK_SCALE);
 
         FileList localFileList = FileListFactory.createFileList(
             ResourceAdapterFactory.create(currentLocalProject), null,
-            checksumCache, provider,
-            ProgressMonitorAdapterFactory.convertTo(subMonitor.newChild(1)));
+            checksumCache, provider, new SubProgressMonitor(monitor,
+                1 * MONITOR_WORK_SCALE, SubProgressMonitor.SUPPRESS_BEGINTASK));
 
         FileListDiff filesToSynchronize = computeDiff(localFileList,
             remoteFileList, currentLocalProject, projectID);
@@ -600,14 +621,13 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
          * not need any files.
          */
 
-        if (missingFiles.isEmpty()) {
-            LOG.debug(this + " : there are no files to synchronize.");
-            subMonitor.done();
-            return FileListFactory.createEmptyFileList();
-        }
+        monitor.done();
 
-        subMonitor.done();
-        return FileListFactory.createFileList(missingFiles);
+        LOG.debug(this + " : " + missingFiles.size()
+            + " file(s) must be synchronized");
+
+        return missingFiles.isEmpty() ? FileListFactory.createEmptyFileList()
+            : FileListFactory.createFileList(missingFiles);
     }
 
     /**
@@ -642,7 +662,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 IWorkspace workspace = ResourcesPlugin.getWorkspace();
                 workspace.run(new IWorkspaceRunnable() {
                     @Override
-                    public void run(IProgressMonitor progress)
+                    public void run(
+                        org.eclipse.core.runtime.IProgressMonitor monitor)
                         throws CoreException {
                         for (String path : toDelete) {
                             IResource resource = path.endsWith("/") ? currentLocalProject
@@ -690,8 +711,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 ResourceAdapterFactory.create(entry.getValue()));
 
         final DecompressArchiveTask decompressTask = new DecompressArchiveTask(
-            archiveFile, projectMapping, PATH_DELIMITER,
-            ProgressMonitorAdapterFactory.convertTo(monitor));
+            archiveFile, projectMapping, PATH_DELIMITER, monitor);
 
         long startTime = System.currentTimeMillis();
 
@@ -709,7 +729,9 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         try {
             ResourcesPlugin.getWorkspace().run(new IWorkspaceRunnable() {
                 @Override
-                public void run(IProgressMonitor monitor) throws CoreException {
+                public void run(
+                    org.eclipse.core.runtime.IProgressMonitor monitor)
+                    throws CoreException {
                     try {
                         decompressTask.run(ProgressMonitorAdapterFactory
                             .convertTo(monitor));
@@ -719,7 +741,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                                 Saros.SAROS, "failed to unpack archive", e));
                     }
                 }
-            }, monitor);
+            }, null);
         } catch (OperationCanceledException e) {
             throw new LocalCancellationException(null,
                 CancelOption.DO_NOT_NOTIFY_PEER);
@@ -748,9 +770,18 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * @throws SarosCancellationException
      */
     private void initVcState(IResource resource, VCSAdapter vcs,
-        SubMonitor monitor, FileList remoteFileList)
+        FileList remoteFileList, IProgressMonitor monitor)
         throws SarosCancellationException {
-        if (monitor.isCanceled())
+
+        /*
+         * as this is called recursively the monitor can only used for
+         * cancellation
+         */
+
+        final SubMonitor progress = SubMonitor
+            .convert(getProgressMonitor(monitor));
+
+        if (progress.isCanceled())
             return;
 
         if (!vcs.isManaged(resource))
@@ -760,7 +791,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         final String path = resource.getProjectRelativePath()
             .toPortableString();
 
-        if (resource instanceof IProject) {
+        if (resource.getType() == IResource.PROJECT) {
             /*
              * We have to revert the project first because the invitee could
              * have deleted a managed resource. Also, we don't want an update or
@@ -768,7 +799,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
              * leave some unmanaged files, but these will get cleaned up later;
              * we're only concerned with managed files here.
              */
-            vcs.revert(resource, monitor);
+            vcs.revert(resource, progress.newChild(0, SubMonitor.SUPPRESS_NONE));
         }
 
         // FIXME both calls may return null
@@ -786,14 +817,17 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         if (!remoteURL.equals(localURL)) {
             LOG.trace("Switching " + resource.getName() + " from " + localURL
                 + " to " + remoteURL);
-            vcs.switch_(resource, remoteURL, remoteRevision, monitor);
+            vcs.switch_(resource, remoteURL, remoteRevision,
+                progress.newChild(0, SubMonitor.SUPPRESS_NONE));
         } else if (!remoteRevision.equals(localRevision)
             && remoteFileList.getPaths().contains(path)) {
             LOG.trace("Updating " + resource.getName() + " from "
                 + localRevision + " to " + remoteRevision);
-            vcs.update(resource, remoteRevision, monitor);
+            vcs.update(resource, remoteRevision,
+                progress.newChild(0, SubMonitor.SUPPRESS_NONE));
         }
-        if (monitor.isCanceled())
+
+        if (progress.isCanceled())
             return;
 
         if (resource instanceof IContainer) {
@@ -803,7 +837,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                     .asList(((IContainer) resource).members());
                 for (IResource child : children) {
                     if (remoteFileList.getPaths().contains(child.getFullPath()))
-                        initVcState(child, vcs, monitor, remoteFileList);
+                        initVcState(child, vcs, remoteFileList, monitor);
                     if (monitor.isCanceled())
                         break;
                 }
@@ -822,6 +856,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 executeCancellation();
             }
         }
+
+        monitor.done();
     }
 
     public List<ProjectNegotiationData> getProjectInfos() {
@@ -878,8 +914,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 Thread.sleep(200);
             }
         } catch (InterruptedException e) {
-            monitor.setCanceled(true);
-            monitor.done();
             Thread.currentThread().interrupt();
             throw new LocalCancellationException();
         }
@@ -899,17 +933,16 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         try {
             transfer.recieveFile(archiveFile);
 
-            monitorFileTransfer(transfer,
-                ProgressMonitorAdapterFactory.convertTo(monitor));
+            monitorFileTransfer(transfer, monitor);
             transferFailed = false;
         } catch (XMPPException e) {
             throw new IOException(e.getMessage(), e.getCause());
         } finally {
             if (transferFailed)
                 archiveFile.delete();
-
-            monitor.done();
         }
+
+        monitor.done();
 
         LOG.debug(this + " : stored archive in file "
             + archiveFile.getAbsolutePath() + ", size: "
@@ -946,5 +979,18 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     @Override
     public String toString() {
         return "IPN [remote side: " + peer + "]";
+    }
+
+    private static org.eclipse.core.runtime.IProgressMonitor getProgressMonitor(
+        IProgressMonitor monitor) {
+
+        while (monitor instanceof SubProgressMonitor)
+            monitor = ((SubProgressMonitor) monitor).getParent();
+
+        try {
+            return ProgressMonitorAdapterFactory.convertBack(monitor);
+        } catch (Exception e) {
+            return new org.eclipse.core.runtime.NullProgressMonitor();
+        }
     }
 }

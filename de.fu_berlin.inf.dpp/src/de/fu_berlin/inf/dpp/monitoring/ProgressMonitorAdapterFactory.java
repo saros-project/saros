@@ -30,7 +30,12 @@ public class ProgressMonitorAdapterFactory {
      *            a Saros Core ProgressMonitor
      * @return the corresponding Eclipse
      *         {@linkplain org.eclipse.core.runtime.IProgressMonitor}
+     * @deprecated This method can only handle
+     *             {@link EclipseProgressMonitorImpl} implementations correctly.
+     *             It is likely to produce a {@link ClassCastException} if
+     *             invoked on any other implementations !
      */
+    @Deprecated
     public static org.eclipse.core.runtime.IProgressMonitor convertBack(
         IProgressMonitor monitor) {
 
