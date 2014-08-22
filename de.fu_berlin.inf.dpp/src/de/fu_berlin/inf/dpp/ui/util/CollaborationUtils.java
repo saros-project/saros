@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.ui.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,6 +21,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
@@ -42,7 +44,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 /**
  * Offers convenient methods for collaboration actions like sharing a project
  * resources.
- *
+ * 
  * @author bkahlert
  * @author kheld
  */
@@ -65,10 +67,10 @@ public class CollaborationUtils {
     /**
      * Starts a new session and shares the given resources with given contacts.<br/>
      * Does nothing if a {@link ISarosSession session} is already running.
-     *
+     * 
      * @param resources
      * @param contacts
-     *
+     * 
      * @nonBlocking
      */
     public static void startSession(List<IResource> resources,
@@ -85,6 +87,7 @@ public class CollaborationUtils {
                     IProgressMonitor.UNKNOWN);
 
                 try {
+                    refreshProjects(newResources.keySet(), null);
                     sessionManager.startSession(convert(newResources));
                     Set<JID> participantsToAdd = new HashSet<JID>(contacts);
 
@@ -115,7 +118,7 @@ public class CollaborationUtils {
     /**
      * Leaves the currently running {@link SarosSession}<br/>
      * Does nothing if no {@link SarosSession} is running.
-     *
+     * 
      */
     public static void leaveSession() {
 
@@ -159,22 +162,22 @@ public class CollaborationUtils {
     /**
      * Adds the given project resources to the session.<br/>
      * Does nothing if no {@link SarosSession session} is running.
-     *
+     * 
      * @param resourcesToAdd
-     *
+     * 
      * @nonBlocking
      */
     public static void addResourcesToSession(List<IResource> resourcesToAdd) {
 
-        final ISarosSession sarosSession = sessionManager.getSarosSession();
+        final ISarosSession session = sessionManager.getSarosSession();
 
-        if (sarosSession == null) {
+        if (session == null) {
             LOG.warn("cannot add resources to a non-running session");
             return;
         }
 
         final Map<IProject, List<IResource>> projectResources = acquireResources(
-            resourcesToAdd, sarosSession);
+            resourcesToAdd, session);
 
         if (projectResources.isEmpty())
             return;
@@ -183,16 +186,34 @@ public class CollaborationUtils {
             @Override
             public void run() {
 
-                if (sarosSession.hasWriteAccess()) {
-                    sessionManager
-                        .addResourcesToSession(convert(projectResources));
+                if (!session.hasWriteAccess()) {
+                    DialogUtils
+                        .popUpFailureMessage(
+                            Messages.CollaborationUtils_insufficient_privileges,
+                            Messages.CollaborationUtils_insufficient_privileges_text,
+                            false);
                     return;
                 }
 
-                DialogUtils.popUpFailureMessage(
-                    Messages.CollaborationUtils_insufficient_privileges,
-                    Messages.CollaborationUtils_insufficient_privileges_text,
-                    false);
+                final List<IProject> projectsToRefresh = new ArrayList<IProject>();
+
+                for (IProject project : projectResources.keySet()) {
+                    if (!session.isShared(ResourceAdapterFactory
+                        .create(project)))
+                        projectsToRefresh.add(project);
+                }
+
+                try {
+                    refreshProjects(projectsToRefresh, null);
+                } catch (CoreException e) {
+                    LOG.warn("failed to refresh projects", e);
+                    /*
+                     * FIXME use a Job instead of a plain thread and so better
+                     * execption handling !
+                     */
+                }
+
+                sessionManager.addResourcesToSession(convert(projectResources));
             }
         });
     }
@@ -200,9 +221,9 @@ public class CollaborationUtils {
     /**
      * Adds the given contacts to the session.<br/>
      * Does nothing if no {@link ISarosSession session} is running.
-     *
+     * 
      * @param contacts
-     *
+     * 
      * @nonBlocking
      */
     public static void addContactsToSession(final List<JID> contacts) {
@@ -235,7 +256,7 @@ public class CollaborationUtils {
      * Creates the message that invitees see on an incoming project share
      * request. Currently it contains the project names along with the number of
      * shared files and total file size for each shared project.
-     *
+     * 
      * @param sarosSession
      * @return
      */
@@ -287,7 +308,7 @@ public class CollaborationUtils {
      * In case of partially shared project, this method also adds files and
      * folders that are needed for a consistent project on the receiver's side,
      * even when there were not selected by the user (e.g ".project" files).
-     *
+     * 
      * @param selectedResources
      * @param sarosSession
      * @return
@@ -438,5 +459,22 @@ public class CollaborationUtils {
                 ResourceAdapterFactory.convertTo(entry.getValue()));
 
         return result;
+    }
+
+    private static void refreshProjects(final Collection<IProject> projects,
+        final IProgressMonitor monitor) throws CoreException {
+
+        final SubMonitor progress = SubMonitor.convert(monitor,
+            "Refreshing projects...", projects.size());
+
+        for (final IProject project : projects) {
+            if (!project.isOpen())
+                project.open(progress.newChild(0));
+
+            project
+                .refreshLocal(IResource.DEPTH_INFINITE, progress.newChild(1));
+        }
+
+        progress.done();
     }
 }

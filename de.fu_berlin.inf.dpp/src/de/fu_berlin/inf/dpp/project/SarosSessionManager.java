@@ -19,7 +19,6 @@
  */
 package de.fu_berlin.inf.dpp.project;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -68,7 +67,7 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
 /**
  * The SessionManager is responsible for initiating new Saros sessions and for
  * reacting to invitations. The user can be only part of one session at most.
- *
+ * 
  * @author rdjemili
  */
 
@@ -77,22 +76,22 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     /**
      * @JTourBusStop 5, Architecture Overview, Invitation Management:
-     *
+     * 
      *               While Activities are used to keep a running session
      *               consistent, we use MESSAGES whenever the Session itself is
      *               modified. This includes adding users or projects to the
      *               session.
-     *
+     * 
      *               The Invitation Process is managed by the "Invitation
      *               Management"-Component. This class is the main entrance
      *               point of this Component. During the invitation Process, the
      *               Network Layer is used to send MESSAGES between the host and
      *               the invitees and the Session Management is informed about
      *               joined users and added projects.
-     *
+     * 
      *               For more informations about the Invitation Process see the
      *               "Invitation Process"-Tour.
-     *
+     * 
      */
 
     private static final Logger log = Logger
@@ -174,24 +173,28 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     /**
      * @JTourBusStop 3, Invitation Process:
-     *
+     * 
      *               This class manages the current Saros session.
-     *
+     * 
      *               Saros makes a distinction between a session and a shared
      *               project. A session is an on-line collaboration between
      *               users which allows users to carry out activities. The main
      *               activity is to share projects. Hence, before you share a
      *               project, a session has to be started and all users added to
      *               it.
-     *
+     * 
      *               (At the moment, this separation is invisible to the user.
      *               He/she must share a project in order to start a session.)
-     *
+     * 
      */
     @Override
     public void startSession(
         final Map<IProject, List<IResource>> projectResourcesMapping) {
 
+        /*
+         * FIXME split the logic, start a session without anything and then add
+         * resources !
+         */
         try {
             if (!startStopSessionLock.tryLock(LOCK_TIMEOUT,
                 TimeUnit.MILLISECONDS)) {
@@ -241,25 +244,8 @@ public class SarosSessionManager implements ISarosSessionManager {
             for (Entry<IProject, List<IResource>> mapEntry : projectResourcesMapping
                 .entrySet()) {
 
-                IProject project = mapEntry.getKey();
-                List<IResource> resourcesList = mapEntry.getValue();
-
-                if (!project.isOpen()) {
-                    try {
-                        project.open();
-                    } catch (IOException e) {
-                        log.error("an error occurred while opening project: "
-                            + project.getName(), e);
-                        continue;
-                    }
-                }
-
-                try {
-                    if (resourcesList == null)
-                        project.refreshLocal();
-                } catch (IOException e) {
-                    log.warn("could not refresh project: " + project, e);
-                }
+                final IProject project = mapEntry.getKey();
+                final List<IResource> resourcesList = mapEntry.getValue();
 
                 String projectID = String.valueOf(SESSION_ID_GENERATOR
                     .nextInt(Integer.MAX_VALUE));
@@ -372,7 +358,7 @@ public class SarosSessionManager implements ISarosSessionManager {
      * method. The caller needs to save the returned value to a local variable
      * and do a null check. For new code you should consider being scoped by the
      * SarosSession and get the SarosSession in the constructor.
-     *
+     * 
      * @deprecated Error prone method, which produces NPE if not handled
      *             correctly. Will soon get removed.
      */
@@ -426,7 +412,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     /**
      * This method is called when a new project was added to the session
-     *
+     * 
      * @param from
      *            The one who added the project.
      * @param projectInfos
@@ -525,9 +511,9 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     /**
      * Adds project resources to an existing session.
-     *
+     * 
      * @param projectResourcesMapping
-     *
+     * 
      */
     @Override
     public void addResourcesToSession(
@@ -554,25 +540,9 @@ public class SarosSessionManager implements ISarosSessionManager {
 
         for (Entry<IProject, List<IResource>> mapEntry : projectResourcesMapping
             .entrySet()) {
-            IProject project = mapEntry.getKey();
-            List<IResource> resourcesList = mapEntry.getValue();
 
-            if (!project.isOpen()) {
-                try {
-                    project.open();
-                } catch (IOException e) {
-                    log.error("an error occurred while opening project: "
-                        + project.getName(), e);
-                    continue;
-                }
-            }
-
-            try {
-                if (resourcesList == null && !session.isShared(project))
-                    project.refreshLocal();
-            } catch (IOException e) {
-                log.warn("could not refresh project: " + project, e);
-            }
+            final IProject project = mapEntry.getKey();
+            final List<IResource> resourcesList = mapEntry.getValue();
 
             // side effect: non shared projects are always partial -.-
             if (!session.isCompletelyShared(project)) {
