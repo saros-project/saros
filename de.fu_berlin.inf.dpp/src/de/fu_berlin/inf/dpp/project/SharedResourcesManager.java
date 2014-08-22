@@ -656,8 +656,7 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
         byte[] newContent = activity.getContent();
 
         if (!Arrays.equals(newContent, actualContent)) {
-            FileUtils.writeFile(new ByteArrayInputStream(newContent), file,
-                new NullProgressMonitor());
+            FileUtils.writeFile(new ByteArrayInputStream(newContent), file);
         } else {
             log.debug("FileActivity " + activity + " dropped (same content)");
         }

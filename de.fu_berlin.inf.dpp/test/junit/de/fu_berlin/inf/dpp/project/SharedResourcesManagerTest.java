@@ -18,7 +18,6 @@ import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -90,8 +89,7 @@ public class SharedResourcesManagerTest {
          * We only care about <code>FileUtils.writeFile()</code>. When it's
          * called, we log it.
          */
-        FileUtils.writeFile(isA(InputStream.class), isA(IFile.class),
-            isA(IProgressMonitor.class));
+        FileUtils.writeFile(isA(InputStream.class), isA(IFile.class));
         expectLastCall().andStubAnswer(new IAnswer<Object>() {
             @Override
             public Object answer() throws Throwable {
