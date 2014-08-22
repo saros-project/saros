@@ -12,23 +12,16 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRunnable;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.SubMonitor;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.filesystem.IContainer;
+import de.fu_berlin.inf.dpp.filesystem.IFile;
+import de.fu_berlin.inf.dpp.filesystem.IFolder;
+import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
+import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRunnable;
+import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 
 public class DecompressArchiveTask implements IWorkspaceRunnable {
@@ -73,7 +66,7 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
      * better response if there exists big files in the archive
      */
     @Override
-    public void run(IProgressMonitor monitor) throws CoreException {
+    public void run(IProgressMonitor monitor) throws IOException {
         if (this.monitor != null)
             monitor = this.monitor;
 
@@ -83,8 +76,8 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
 
             zipFile = new ZipFile(file);
 
-            final SubMonitor progress = SubMonitor.convert(monitor,
-                "Unpacking archive file to workspace", zipFile.size());
+            monitor.beginTask("Unpacking archive file to workspace",
+                zipFile.size());
 
             for (Enumeration<? extends ZipEntry> entries = zipFile.entries(); entries
                 .hasMoreElements();) {
@@ -93,7 +86,8 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
 
                 final String entryName = entry.getName();
 
-                if (progress.isCanceled())
+                // FIXME do not throw Eclipse exceptions
+                if (monitor.isCanceled())
                     throw new OperationCanceledException();
 
                 final int delimiterIdx = entry.getName().indexOf(delimiter);
@@ -102,14 +96,14 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
                     LOG.warn("skipping zip entry " + entryName
                         + ", entry is not valid");
 
-                    progress.worked(1);
+                    monitor.worked(1);
                     continue;
                 }
 
                 final String id = entryName.substring(0, delimiterIdx);
 
-                final IPath path = new Path(entryName.substring(
-                    delimiterIdx + 1, entryName.length()));
+                final String path = entryName.substring(delimiterIdx + 1,
+                    entryName.length());
 
                 final IProject project = idToProjectMapping.get(id);
 
@@ -117,7 +111,7 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
                     LOG.warn("skipping zip entry " + entryName
                         + ", unknown project id: " + id);
 
-                    progress.worked(1);
+                    monitor.worked(1);
                     continue;
                 }
 
@@ -129,25 +123,24 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
                  */
                 createFoldersForFile(file);
 
-                progress.subTask("decompressing: " + path);
+                monitor.subTask("decompressing: " + path);
 
                 final InputStream in = zipFile.getInputStream(entry);
 
+                /*
+                 * FIXME make it possible to cancel the task during
+                 * decompressing large files
+                 */
                 if (!file.exists())
-                    file.create(in, true,
-                        progress.newChild(1, SubMonitor.SUPPRESS_ALL_LABELS));
+                    file.create(in, false);
                 else
-                    file.setContents(in, true, true,
-                        progress.newChild(1, SubMonitor.SUPPRESS_ALL_LABELS));
+                    file.setContents(in, false, true);
+
+                monitor.worked(1);
 
                 if (LOG.isTraceEnabled())
                     LOG.trace("file written to disk: " + path);
             }
-
-        } catch (IOException e) {
-            LOG.error("failed to unpack archive", e);
-            throw new CoreException(new org.eclipse.core.runtime.Status(
-                IStatus.ERROR, Saros.SAROS, "failed to unpack archive", e));
         } finally {
             if (monitor != null)
                 monitor.done();
@@ -162,7 +155,7 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
         }
     }
 
-    private void createFoldersForFile(IFile file) throws CoreException {
+    private void createFoldersForFile(IFile file) throws IOException {
         List<IFolder> parents = new ArrayList<IFolder>();
 
         IContainer parent = file.getParent();
@@ -178,6 +171,6 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
         Collections.reverse(parents);
 
         for (IFolder folder : parents)
-            folder.create(false, true, new NullProgressMonitor());
+            folder.create(false, true);
     }
 }

@@ -21,6 +21,7 @@ import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.XMPPException;
@@ -31,6 +32,7 @@ import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.ISarosContext;
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.communication.extensions.ProjectNegotiationMissingFilesExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingRequest;
 import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingResponse;
@@ -681,8 +683,15 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         final IProgressMonitor monitor) throws LocalCancellationException,
         IOException {
 
+        final Map<String, de.fu_berlin.inf.dpp.filesystem.IProject> projectMapping = new HashMap<String, de.fu_berlin.inf.dpp.filesystem.IProject>();
+
+        for (Entry<String, IProject> entry : localProjects.entrySet())
+            projectMapping.put(entry.getKey(),
+                ResourceAdapterFactory.create(entry.getValue()));
+
         final DecompressArchiveTask decompressTask = new DecompressArchiveTask(
-            archiveFile, localProjects, PATH_DELIMITER, monitor);
+            archiveFile, projectMapping, PATH_DELIMITER,
+            ProgressMonitorAdapterFactory.convertTo(monitor));
 
         long startTime = System.currentTimeMillis();
 
@@ -696,8 +705,21 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
          * after it finished!
          */
 
+        // TODO use Core Workspace Impl
         try {
-            ResourcesPlugin.getWorkspace().run(decompressTask, monitor);
+            ResourcesPlugin.getWorkspace().run(new IWorkspaceRunnable() {
+                @Override
+                public void run(IProgressMonitor monitor) throws CoreException {
+                    try {
+                        decompressTask.run(ProgressMonitorAdapterFactory
+                            .convertTo(monitor));
+                    } catch (IOException e) {
+                        throw new CoreException(
+                            new org.eclipse.core.runtime.Status(IStatus.ERROR,
+                                Saros.SAROS, "failed to unpack archive", e));
+                    }
+                }
+            }, monitor);
         } catch (OperationCanceledException e) {
             throw new LocalCancellationException(null,
                 CancelOption.DO_NOT_NOTIFY_PEER);
