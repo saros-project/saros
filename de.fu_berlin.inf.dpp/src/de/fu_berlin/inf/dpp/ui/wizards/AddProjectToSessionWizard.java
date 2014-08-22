@@ -301,7 +301,7 @@ public class AddProjectToSessionWizard extends Wizard {
                         }
                     }
 
-                    ProjectNegotiation.Status status = process.accept(
+                    ProjectNegotiation.Status status = process.run(
                         projectMapping,
                         ProgressMonitorAdapterFactory.convertTo(monitor),
                         useVersionControl);

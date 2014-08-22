@@ -48,7 +48,6 @@ import de.fu_berlin.inf.dpp.monitoring.remote.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
-import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -76,9 +75,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     private PreferenceUtils preferenceUtils;
 
     @Inject
-    private SarosSessionObservable sarosSessionObservable;
-
-    @Inject
     private RemoteProgressManager rpm;
 
     @Inject
@@ -92,7 +88,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      */
     private Map<String, IProject> localProjects;
 
-    private final ISarosSession sarosSession;
+    private final ISarosSession session;
 
     private boolean running;
 
@@ -107,7 +103,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         ISarosContext sarosContext) {
         super(peer, sarosSession.getID(), sarosContext);
 
-        this.sarosSession = sarosSession;
+        this.session = sarosSession;
         this.processID = processID;
         this.projectInfos = projectInfos;
         this.localProjects = new HashMap<String, IProject>();
@@ -151,7 +147,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      *            value is the name of the project in the workspace of the local
      *            user (given from the {@link EnterProjectNamePage})
      */
-    public Status accept(Map<String, String> projectMapping,
+    public Status run(Map<String, String> projectMapping,
         final IProgressMonitor monitor, boolean useVersionControl) {
 
         synchronized (this) {
@@ -208,8 +204,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                  * and the first one is never done without the second. (See also
                  * finally block below.)
                  */
-                sarosSession.addProjectMapping(entry.getKey(), project, peer);
-                sarosSession.enableQueuing(project);
+                session.addProjectMapping(entry.getKey(), project, peer);
+                session.enableQueuing(project);
             }
 
             transmitter.send(ISarosSession.SESSION_CONNECTION_ID, peer,
@@ -241,11 +237,11 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                         dependentResources.add(iProject.findMember(path));
                     }
 
-                    sarosSession.addSharedResources(
+                    session.addSharedResources(
                         ResourceAdapterFactory.create(iProject), projectID,
                         ResourceAdapterFactory.convertTo(dependentResources));
                 } else {
-                    sarosSession.addSharedResources(
+                    session.addSharedResources(
                         ResourceAdapterFactory.create(iProject), projectID,
                         null);
                 }
@@ -259,7 +255,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
              * TODO Move disable queuing responsibility to SarosSession (see
              * todo above in for loop).
              */
-            sarosSession.disableQueuing();
+            session.disableQueuing();
 
             if (fileTransferManager != null)
                 fileTransferManager
@@ -485,20 +481,12 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
          * Inform the host of the session that the current (local) user has
          * started the possibly time consuming SVN checkout via a
          * remoteProgressMonitor
-         */
-        final ISarosSession session = sarosSessionObservable.getValue();
-
-        if (session == null)
-            throw new LocalCancellationException(
-                "The current session is terminated.",
-                CancelOption.DO_NOT_NOTIFY_PEER);
-
-        /*
+         * 
          * The monitor that is created here is shown both locally and remote and
          * is handled like a regular progress monitor.
          */
         org.eclipse.core.runtime.IProgressMonitor remoteMonitor = rpm
-            .createRemoteProgress(Collections.singletonList(sarosSession
+            .createRemoteProgress(Collections.singletonList(session
                 .getHost()), new org.eclipse.core.runtime.SubProgressMonitor(
                 progress, ticksToConsume / 2));
 
@@ -541,12 +529,12 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
          * properly !
          */
         for (Entry<String, IProject> entry : localProjects.entrySet())
-            sarosSession.removeProjectMapping(entry.getKey(),
+            session.removeProjectMapping(entry.getKey(),
                 ResourceAdapterFactory.create(entry.getValue()), peer);
 
         // The session might have been stopped already, if not we will stop it.
-        if (sarosSession.getProjectResourcesMapping().keySet().isEmpty()
-            || sarosSession.getRemoteUsers().isEmpty())
+        if (session.getProjectResourcesMapping().keySet().isEmpty()
+            || session.getRemoteUsers().isEmpty())
             sessionManager.stopSarosSession();
     }
 

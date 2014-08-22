@@ -76,7 +76,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         this.projects = projects;
     }
 
-    public Status start(IProgressMonitor monitor) {
+    public Status run(IProgressMonitor monitor) {
 
         createCollectors();
 

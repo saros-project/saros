@@ -159,7 +159,7 @@ public class NegotiationHandler implements INegotiationHandler {
         protected IStatus run(IProgressMonitor monitor) {
             try {
                 ProjectNegotiation.Status status = process
-                    .start(ProgressMonitorAdapterFactory.convertTo(monitor));
+                    .run(ProgressMonitorAdapterFactory.convertTo(monitor));
 
                 String peerName = getNickname(new JID(peer));
 
