@@ -32,6 +32,7 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.vcs.VCSProvider;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
 /**
@@ -46,7 +47,11 @@ import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 @XStreamAlias("FILELIST")
 public class FileList {
 
-    static final String DIR_SEPARATOR = "/";
+    /**
+     * Separator used to divide path segments and mark directories in a file
+     * list by suffixing the path entry with this value.
+     */
+    public static final String DIR_SEPARATOR = "/";
 
     @XStreamAlias("f")
     private static class File {
@@ -330,7 +335,7 @@ public class FileList {
     /** Identifies the VCS used. */
     private String vcsProviderID;
 
-    /** @see VCSAdapter#getRepositoryString(IResource) */
+    /** @see VCSProvider#getRepositoryString(IResource) */
     private String vcsRepositoryRoot;
     /** VCS internal information. */
     private VCSResourceInfo vcsProjectInfo;

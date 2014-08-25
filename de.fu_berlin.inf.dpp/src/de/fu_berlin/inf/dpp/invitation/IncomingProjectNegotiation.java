@@ -83,10 +83,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     @Inject
     private FileReplacementInProgressObservable fileReplacementInProgressObservable;
 
-    /**
-     * maps the projectID to the project in workspace
-     */
-    private Map<String, IProject> localProjects;
+    private Map<String, IProject> localProjectMapping;
 
     private final ISarosSession session;
 
@@ -106,7 +103,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         this.session = sarosSession;
         this.processID = processID;
         this.projectInfos = projectInfos;
-        this.localProjects = new HashMap<String, IProject>();
+        this.localProjectMapping = new HashMap<String, IProject>();
     }
 
     @Override
@@ -194,7 +191,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
              * the user who sends this ProjectNegotiation is now responsible for
              * the resources of the contained projects
              */
-            for (Entry<String, IProject> entry : localProjects.entrySet()) {
+            for (Entry<String, IProject> entry : localProjectMapping.entrySet()) {
                 de.fu_berlin.inf.dpp.filesystem.IProject project = ResourceAdapterFactory
                     .create(entry.getValue());
 
@@ -224,26 +221,38 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             if (filesMissing)
                 acceptArchive(archiveTransferListener, monitor);
 
-            // We are finished with the exchanging process. Add all projects
-            // resources to the session.
-            for (String projectID : localProjects.keySet()) {
-                IProject iProject = localProjects.get(projectID);
-                if (isPartialRemoteProject(projectID)) {
-                    List<String> paths = getRemoteFileList(projectID)
-                        .getPaths();
-                    List<IResource> dependentResources = new ArrayList<IResource>();
+            /*
+             * We are finished with the exchanging process. Add all projects
+             * resources to the session.
+             */
+            for (Entry<String, IProject> entry : localProjectMapping.entrySet()) {
 
-                    for (String path : paths) {
-                        dependentResources.add(iProject.findMember(path));
+                final String projectID = entry.getKey();
+                final IProject project = entry.getValue();
+
+                if (isPartialRemoteProject(projectID)) {
+
+                    final List<String> paths = getRemoteFileList(projectID)
+                        .getPaths();
+
+                    final List<IResource> resources = new ArrayList<IResource>(
+                        paths.size());
+
+                    for (final String path : paths) {
+                        if (path.endsWith(FileList.DIR_SEPARATOR))
+                            resources.add(project.getFolder(path));
+                        else
+                            resources.add(project.getFile(path));
                     }
 
                     session.addSharedResources(
-                        ResourceAdapterFactory.create(iProject), projectID,
-                        ResourceAdapterFactory.convertTo(dependentResources));
+                        ResourceAdapterFactory.create(project), projectID,
+                        ResourceAdapterFactory.convertTo(resources));
                 } else {
-                    session.addSharedResources(
-                        ResourceAdapterFactory.create(iProject), projectID,
-                        null);
+                    session
+                        .addSharedResources(
+                            ResourceAdapterFactory.create(project), projectID,
+                            null);
                 }
 
                 sessionManager.projectAdded(projectID);
@@ -378,7 +387,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
             }
 
-            localProjects.put(projectID, project);
+            localProjectMapping.put(projectID, project);
 
             checkCancellation(CancelOption.NOTIFY_PEER);
 
@@ -522,7 +531,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
          * currently NOT support cancellation of the project negotiation
          * properly !
          */
-        for (Entry<String, IProject> entry : localProjects.entrySet())
+        for (Entry<String, IProject> entry : localProjectMapping.entrySet())
             session.removeProjectMapping(entry.getKey(),
                 ResourceAdapterFactory.create(entry.getValue()), peer);
 
@@ -688,7 +697,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
         final Map<String, de.fu_berlin.inf.dpp.filesystem.IProject> projectMapping = new HashMap<String, de.fu_berlin.inf.dpp.filesystem.IProject>();
 
-        for (Entry<String, IProject> entry : localProjects.entrySet())
+        for (Entry<String, IProject> entry : localProjectMapping.entrySet())
             projectMapping.put(entry.getKey(),
                 ResourceAdapterFactory.create(entry.getValue()));
 
