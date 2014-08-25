@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -262,12 +261,6 @@ public class AddProjectToSessionWizard extends Wizard {
         final boolean useVersionControl,
         final Collection<IEditorPart> editorsToClose) {
 
-        // FIXME allow the IPN to accept ID -> IProject mapping
-        final Map<String, String> projectMapping = new HashMap<String, String>();
-
-        for (Entry<String, IProject> entry : targetProjectMapping.entrySet())
-            projectMapping.put(entry.getKey(), entry.getValue().getName());
-
         final Job job = new Job("Synchronizing") {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
@@ -302,7 +295,7 @@ public class AddProjectToSessionWizard extends Wizard {
                     }
 
                     ProjectNegotiation.Status status = process.run(
-                        projectMapping,
+                        targetProjectMapping,
                         ProgressMonitorAdapterFactory.convertTo(monitor),
                         useVersionControl);
 
@@ -318,14 +311,18 @@ public class AddProjectToSessionWizard extends Wizard {
                     if (status != ProjectNegotiation.Status.OK)
                         return Status.CANCEL_STATUS;
 
+                    final List<String> projectNames = new ArrayList<String>();
+
+                    for (final IProject project : targetProjectMapping.values())
+                        projectNames.add(project.getName());
+
                     SarosView
                         .showNotification(
                             Messages.AddProjectToSessionWizard_synchronize_finished_notification_title,
                             MessageFormat
                                 .format(
                                     Messages.AddProjectToSessionWizard_synchronize_finished_notification_text,
-                                    StringUtils.join(projectMapping.values(),
-                                        ", ")));
+                                    StringUtils.join(projectNames, ", ")));
 
                 } catch (RuntimeException e) {
                     LOG.error(

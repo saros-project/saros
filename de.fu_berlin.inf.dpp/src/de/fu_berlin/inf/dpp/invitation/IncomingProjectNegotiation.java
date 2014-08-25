@@ -112,7 +112,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     @Override
     public Map<String, String> getProjectNames() {
         Map<String, String> result = new HashMap<String, String>();
-        for (ProjectNegotiationData info : this.projectInfos) {
+        for (ProjectNegotiationData info : projectInfos) {
             result.put(info.getProjectID(), info.getProjectName());
         }
         return result;
@@ -127,7 +127,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      *         fileList}
      */
     public FileList getRemoteFileList(String projectID) {
-        for (ProjectNegotiationData info : this.projectInfos) {
+        for (ProjectNegotiationData info : projectInfos) {
             if (info.getProjectID().equals(projectID))
                 return info.getFileList();
         }
@@ -147,7 +147,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      *            value is the name of the project in the workspace of the local
      *            user (given from the {@link EnterProjectNamePage})
      */
-    public Status run(Map<String, String> projectMapping,
+    public Status run(Map<String, IProject> projectMapping,
         final IProgressMonitor monitor, boolean useVersionControl) {
 
         synchronized (this) {
@@ -310,15 +310,15 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     /**
      * calculates all the files the host/inviter has to send for synchronization
      * 
-     * @param projectNames
+     * @param projectMapping
      *            projectID => projectName (in local workspace)
      */
     private List<FileList> calculateMissingFiles(
-        Map<String, String> projectNames, boolean useVersionControl,
+        Map<String, IProject> projectMapping, boolean useVersionControl,
         IProgressMonitor monitor) throws SarosCancellationException,
         IOException {
 
-        monitor.beginTask(null, projectNames.size() * MONITOR_WORK_SCALE);
+        monitor.beginTask(null, projectMapping.size() * MONITOR_WORK_SCALE);
 
         List<FileList> missingFiles = new ArrayList<FileList>();
 
@@ -326,12 +326,13 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
          * this for loop sets up all the projects needed for the session and
          * computes the missing files.
          */
-        for (Entry<String, String> entry : projectNames.entrySet()) {
+        for (Entry<String, IProject> entry : projectMapping.entrySet()) {
 
             checkCancellation(CancelOption.NOTIFY_PEER);
 
             final String projectID = entry.getKey();
-            final String projectName = entry.getValue();
+
+            IProject project = entry.getValue();
 
             ProjectNegotiationData projectInfo = null;
 
@@ -353,9 +354,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 vcs = VCSAdapter.getAdapter(projectInfo.getFileList()
                     .getVcsProviderID());
             }
-
-            IProject project = ResourcesPlugin.getWorkspace().getRoot()
-                .getProject(projectName);
 
             if (!project.exists())
                 throw new IllegalStateException("project " + project
@@ -384,7 +382,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
             checkCancellation(CancelOption.NOTIFY_PEER);
 
-            LOG.debug("compute required files for project " + projectName
+            LOG.debug("compute required files for project " + project
                 + " with ID: " + projectID);
 
             FileList requiredFiles = computeRequiredFiles(project,
@@ -404,21 +402,17 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     /**
      * Creates the given projects if they do not already exists.
      * 
-     * @param projectNames
+     * @param projects
      *            the projects to create
      * @throws IOException
      *             if the creation of at least one project fails
      */
-    private void createProjects(final Collection<String> projectNames)
+    private void createProjects(final Collection<IProject> projects)
         throws IOException {
 
         try {
 
-            for (final String projectName : projectNames) {
-
-                final IProject project = ResourcesPlugin.getWorkspace()
-                    .getRoot().getProject(projectName);
-
+            for (final IProject project : projects) {
                 if (!project.exists()) {
                     project.create(null);
                     project.open(null);
@@ -486,9 +480,9 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
          * is handled like a regular progress monitor.
          */
         org.eclipse.core.runtime.IProgressMonitor remoteMonitor = rpm
-            .createRemoteProgress(Collections.singletonList(session
-                .getHost()), new org.eclipse.core.runtime.SubProgressMonitor(
-                progress, ticksToConsume / 2));
+            .createRemoteProgress(Collections.singletonList(session.getHost()),
+                new org.eclipse.core.runtime.SubProgressMonitor(progress,
+                    ticksToConsume / 2));
 
         remoteMonitor.setTaskName("Project checkout via subversion");
 
