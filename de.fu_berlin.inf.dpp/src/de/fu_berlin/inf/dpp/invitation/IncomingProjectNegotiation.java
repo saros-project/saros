@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -52,7 +51,6 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.ui.wizards.AddProjectToSessionWizard;
-import de.fu_berlin.inf.dpp.ui.wizards.pages.EnterProjectNamePage;
 import de.fu_berlin.inf.dpp.util.CoreUtils;
 import de.fu_berlin.inf.dpp.util.FileUtils;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
@@ -137,15 +135,24 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     }
 
     /**
+     * Starts the negotiation. The negotiation can be aborted by canceling the
+     * given monitor. The execution of this method perform changes to the file
+     * system! It is the responsibility of the caller to ensure that appropriate
+     * actions are performed to avoid unintended data loss, i.e this method will
+     * do a best effort to backup altered data but no guarantee can be made in
+     * doing so!
      * 
      * @param projectMapping
-     *            In this parameter the names of the projects are stored. They
-     *            key is the session wide <code><b>projectID</b></code> and the
-     *            value is the name of the project in the workspace of the local
-     *            user (given from the {@link EnterProjectNamePage})
+     *            mapping from remote project ids to the target local projects
+     * 
+     * @throws IllegalArgumentException
+     *             if either a project id is not valid or the referenced project
+     *             for that id does not exist
      */
     public Status run(Map<String, IProject> projectMapping,
         final IProgressMonitor monitor, boolean useVersionControl) {
+
+        checkProjectMapping(projectMapping);
 
         synchronized (this) {
             running = true;
@@ -171,8 +178,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
             fileTransferManager
                 .addFileTransferListener(archiveTransferListener);
-
-            createProjects(projectMapping.values());
 
             List<FileList> missingFiles = calculateMissingFiles(projectMapping,
                 useVersionControl, monitor);
@@ -406,31 +411,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         monitor.done();
 
         return missingFiles;
-    }
-
-    /**
-     * Creates the given projects if they do not already exists.
-     * 
-     * @param projects
-     *            the projects to create
-     * @throws IOException
-     *             if the creation of at least one project fails
-     */
-    private void createProjects(final Collection<IProject> projects)
-        throws IOException {
-
-        try {
-
-            for (final IProject project : projects) {
-                if (!project.exists()) {
-                    project.create(null);
-                    project.open(null);
-                }
-            }
-
-        } catch (CoreException e) {
-            throw new IOException(e.getMessage(), e.getCause());
-        }
     }
 
     /**
@@ -940,6 +920,19 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             + CoreUtils.formatByte(archiveFile.length()));
 
         return archiveFile;
+    }
+
+    private void checkProjectMapping(final Map<String, IProject> mapping) {
+        for (final Entry<String, IProject> entry : mapping.entrySet()) {
+
+            if (getRemoteFileList(entry.getKey()) == null)
+                throw new IllegalArgumentException("invalid project id: "
+                    + entry.getKey());
+
+            if (!entry.getValue().exists())
+                throw new IllegalArgumentException("project does not exist: "
+                    + entry.getValue());
+        }
     }
 
     private static class ArchiveTransferListener implements

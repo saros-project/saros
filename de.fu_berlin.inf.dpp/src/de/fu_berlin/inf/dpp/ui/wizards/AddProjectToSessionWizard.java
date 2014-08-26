@@ -9,12 +9,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -190,9 +192,9 @@ public class AddProjectToSessionWizard extends Wizard {
         final Map<String, FileListDiff> modifiedResources;
 
         try {
-            modifiedResources = getModifiedResources(targetProjectMapping,
-                useVersionControl);
-        } catch (IOException e) {
+            modifiedResources = createProjectsAndGetModifiedResources(
+                targetProjectMapping, useVersionControl);
+        } catch (CoreException e) {
             LOG.error("could not compute local file list", e);
             MessageDialog.openError(getShell(), "Error computing file list",
                 "Could not compute local file list: " + e.getMessage());
@@ -449,9 +451,13 @@ public class AddProjectToSessionWizard extends Wizard {
         return openEditors;
     }
 
-    private Map<String, FileListDiff> getModifiedResources(
-        Map<String, IProject> projectMapping, final boolean useVersionControl)
-        throws IOException {
+    /**
+     * Returns all modified resources (either changed or deleted) for the
+     * current project mapping. Creates non existing projects if necessary.
+     */
+    private Map<String, FileListDiff> createProjectsAndGetModifiedResources(
+        final Map<String, IProject> projectMapping,
+        final boolean useVersionControl) throws CoreException {
 
         final Map<String, IProject> modifiedProjects = getModifiedProjects(projectMapping);
         final Map<String, FileListDiff> result = new HashMap<String, FileListDiff>();
@@ -462,9 +468,21 @@ public class AddProjectToSessionWizard extends Wizard {
                 public void run(IProgressMonitor monitor)
                     throws InvocationTargetException, InterruptedException {
                     try {
-                        result.putAll(calculateModifiedResources(
-                            modifiedProjects, useVersionControl, monitor));
-                    } catch (IOException e) {
+
+                        for (final IProject project : projectMapping.values()) {
+                            if (!modifiedProjects.values().contains(project)) {
+
+                                if (!project.exists())
+                                    project.create(null);
+                            }
+
+                            if (!project.isOpen())
+                                project.open(null);
+                        }
+
+                        result.putAll(getModifiedResources(modifiedProjects,
+                            useVersionControl, monitor));
+                    } catch (CoreException e) {
                         throw new InvocationTargetException(e);
                     } catch (RuntimeException e) {
                         throw new InvocationTargetException(e);
@@ -474,8 +492,8 @@ public class AddProjectToSessionWizard extends Wizard {
         } catch (InvocationTargetException e) {
             Throwable cause = e.getCause();
 
-            if (cause instanceof IOException)
-                throw (IOException) cause;
+            if (cause instanceof CoreException)
+                throw (CoreException) cause;
             else if (cause instanceof RuntimeException)
                 throw (RuntimeException) cause;
             else
@@ -494,12 +512,14 @@ public class AddProjectToSessionWizard extends Wizard {
      * <b>Important:</b> Do not call this inside the SWT Thread. This is a long
      * running operation !
      */
-    private Map<String, FileListDiff> calculateModifiedResources(
-        Map<String, IProject> projectMapping, boolean includeVCSData,
-        IProgressMonitor monitor) throws IOException {
-        Map<String, FileListDiff> modifiedResources = new HashMap<String, FileListDiff>();
+    private Map<String, FileListDiff> getModifiedResources(
+        final Map<String, IProject> projectMapping,
+        final boolean includeVCSData, final IProgressMonitor monitor)
+        throws CoreException {
 
-        ISarosSession session = sessionManager.getSarosSession();
+        final Map<String, FileListDiff> modifiedResources = new HashMap<String, FileListDiff>();
+
+        final ISarosSession session = sessionManager.getSarosSession();
 
         // FIXME the wizard should handle the case that the session may stop in
         // the meantime !
@@ -507,59 +527,58 @@ public class AddProjectToSessionWizard extends Wizard {
         if (session == null)
             throw new IllegalStateException("no session running");
 
-        SubMonitor subMonitor = SubMonitor.convert(monitor,
+        final SubMonitor subMonitor = SubMonitor.convert(monitor,
             "Searching for files that will be modified...",
-            projectMapping.size() * 2);
+            projectMapping.size());
 
-        for (Map.Entry<String, IProject> entry : projectMapping.entrySet()) {
+        for (final Entry<String, IProject> entry : projectMapping.entrySet()) {
 
-            String projectID = entry.getKey();
-            de.fu_berlin.inf.dpp.filesystem.IProject project = ResourceAdapterFactory
+            final String projectID = entry.getKey();
+            final IProject project = entry.getValue();
+
+            final de.fu_berlin.inf.dpp.filesystem.IProject adaptedProject = ResourceAdapterFactory
                 .create(entry.getValue());
-
-            if (!project.isOpen())
-                project.open();
 
             /*
              * do not refresh already partially shared projects as this may
              * trigger resource change events
              */
+            if (!session.isShared(adaptedProject))
+                project.refreshLocal(IResource.DEPTH_INFINITE, null);
+
+            final VCSAdapter vcs;
+
+            // FIXME how to handle failure ?
+            if (includeVCSData)
+                vcs = VCSAdapter.getAdapter(project);
+            else
+                vcs = null;
+
+            final FileList localFileList;
+
+            /*
+             * TODO optimize for partial shared projects a.k.a do not scan all
+             * files
+             */
+
             try {
-                if (!session.isShared(project))
-                    project.refreshLocal();
-            } catch (IOException e) {
-                LOG.warn("could not refresh project: " + project, e);
-            }
-
-            FileList remoteFileList = process.getRemoteFileList(projectID);
-
-            VCSAdapter vcs = null;
-
-            if (includeVCSData) {
-                vcs = VCSAdapter
-                    .getAdapter((org.eclipse.core.resources.IProject) ResourceAdapterFactory
-                        .convertBack(project));
-
-                // FIXME how to handle failure ?
-            }
-
-            if (session.isShared(project)) {
-                FileList sharedFileList = FileListFactory.createFileList(
-                    project, session.getSharedResources(project),
-                    checksumCache, vcs, ProgressMonitorAdapterFactory
+                localFileList = FileListFactory.createFileList(adaptedProject,
+                    null, checksumCache, vcs, ProgressMonitorAdapterFactory
                         .convertTo(subMonitor.newChild(1,
                             SubMonitor.SUPPRESS_ALL_LABELS)));
+            } catch (IOException e) {
+                Throwable cause = e.getCause();
 
-                // FIXME FileList objects should be immutable after creation
-                remoteFileList.getPaths().addAll(sharedFileList.getPaths());
-            } else
-                subMonitor.worked(1);
+                if (cause instanceof CoreException)
+                    throw (CoreException) cause;
 
-            FileListDiff diff = FileListDiff.diff(FileListFactory
-                .createFileList(project, null, checksumCache, vcs,
-                    ProgressMonitorAdapterFactory.convertTo(subMonitor
-                        .newChild(1, SubMonitor.SUPPRESS_ALL_LABELS))),
-                remoteFileList);
+                throw new CoreException(new org.eclipse.core.runtime.Status(
+                    IStatus.ERROR, Saros.SAROS,
+                    "failed to compute local file list", e));
+            }
+
+            final FileListDiff diff = FileListDiff.diff(localFileList,
+                process.getRemoteFileList(projectID));
 
             if (process.isPartialRemoteProject(projectID))
                 diff.clearRemovedPaths();
@@ -569,6 +588,7 @@ public class AddProjectToSessionWizard extends Wizard {
                 modifiedResources.put(project.getName(), diff);
             }
         }
+
         return modifiedResources;
     }
 
@@ -580,7 +600,7 @@ public class AddProjectToSessionWizard extends Wizard {
         Map<String, IProject> projectMapping) {
         Map<String, IProject> modifiedProjects = new HashMap<String, IProject>();
 
-        for (Map.Entry<String, IProject> entry : projectMapping.entrySet()) {
+        for (Entry<String, IProject> entry : projectMapping.entrySet()) {
             if (!namePage.overwriteResources(entry.getKey()))
                 continue;
 
