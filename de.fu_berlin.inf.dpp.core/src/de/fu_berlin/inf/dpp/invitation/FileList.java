@@ -415,7 +415,7 @@ public class FileList {
     private List<String> cachedList = null;
 
     /**
-     * Returns a sorted list of all paths in this FileList.
+     * Returns a list of all paths in this FileList.
      * <p>
      * Example: In case the FileList looks like this:
      * 

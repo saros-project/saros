@@ -296,8 +296,16 @@ public class AddProjectToSessionWizard extends Wizard {
                         }
                     }
 
-                    ProjectNegotiation.Status status = process.run(
-                        targetProjectMapping,
+                    final Map<String, de.fu_berlin.inf.dpp.filesystem.IProject> convertedMapping = new HashMap<String, de.fu_berlin.inf.dpp.filesystem.IProject>();
+
+                    for (final Entry<String, IProject> entry : targetProjectMapping
+                        .entrySet()) {
+                        convertedMapping.put(entry.getKey(),
+                            ResourceAdapterFactory.create(entry.getValue()));
+                    }
+
+                    final ProjectNegotiation.Status status = process.run(
+                        convertedMapping,
                         ProgressMonitorAdapterFactory.convertTo(monitor),
                         useVersionControl);
 

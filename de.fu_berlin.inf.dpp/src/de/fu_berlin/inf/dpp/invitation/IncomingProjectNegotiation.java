@@ -11,15 +11,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRunnable;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.XMPPException;
@@ -30,13 +22,15 @@ import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.ISarosContext;
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.communication.extensions.ProjectNegotiationMissingFilesExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingRequest;
 import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingResponse;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
+import de.fu_berlin.inf.dpp.filesystem.IFolder;
+import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
@@ -52,7 +46,6 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.util.CoreUtils;
-import de.fu_berlin.inf.dpp.util.FileUtils;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSProvider;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
@@ -81,6 +74,10 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     @Inject
     private FileReplacementInProgressObservable fileReplacementInProgressObservable;
 
+    /*
+     * FIXME remove this field, it is used as global access variable throughout
+     * multiple methods in this class which is error prone !
+     */
     private Map<String, IProject> localProjectMapping;
 
     private final ISarosSession session;
@@ -197,16 +194,16 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
              * the resources of the contained projects
              */
             for (Entry<String, IProject> entry : localProjectMapping.entrySet()) {
-                de.fu_berlin.inf.dpp.filesystem.IProject project = ResourceAdapterFactory
-                    .create(entry.getValue());
 
+                final String projectID = entry.getKey();
+                final IProject project = entry.getValue();
                 /*
                  * TODO Move enable (and disable) queuing responsibility to
                  * SarosSession, since the second call relies on the first one,
                  * and the first one is never done without the second. (See also
                  * finally block below.)
                  */
-                session.addProjectMapping(entry.getKey(), project, peer);
+                session.addProjectMapping(projectID, project, peer);
                 session.enableQueuing(project);
             }
 
@@ -235,31 +232,20 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 final String projectID = entry.getKey();
                 final IProject project = entry.getValue();
 
+                List<IResource> resources = null;
+
                 if (isPartialRemoteProject(projectID)) {
 
                     final List<String> paths = getRemoteFileList(projectID)
                         .getPaths();
 
-                    final List<IResource> resources = new ArrayList<IResource>(
-                        paths.size());
+                    resources = new ArrayList<IResource>(paths.size());
 
-                    for (final String path : paths) {
-                        if (path.endsWith(FileList.DIR_SEPARATOR))
-                            resources.add(project.getFolder(path));
-                        else
-                            resources.add(project.getFile(path));
-                    }
-
-                    session.addSharedResources(
-                        ResourceAdapterFactory.create(project), projectID,
-                        ResourceAdapterFactory.convertTo(resources));
-                } else {
-                    session
-                        .addSharedResources(
-                            ResourceAdapterFactory.create(project), projectID,
-                            null);
+                    for (final String path : paths)
+                        resources.add(getResource(project, path));
                 }
 
+                session.addSharedResources(project, projectID, resources);
                 sessionManager.projectAdded(projectID);
             }
         } catch (Exception e) {
@@ -376,17 +362,20 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             int ticksToConsume = MONITOR_WORK_SCALE;
 
             if (vcs != null) {
-                project = checkoutVCSProject(vcs, project,
-                    projectInfo.getFileList(), new SubProgressMonitor(monitor,
-                        MONITOR_WORK_SCALE / 2));
+                project = checkoutVCSProject(
+                    vcs,
+                    (org.eclipse.core.resources.IProject) ResourceAdapterFactory
+                        .convertBack(project), projectInfo.getFileList(),
+                    new SubProgressMonitor(monitor, MONITOR_WORK_SCALE / 2));
 
                 if (project == null)
                     throw new LocalCancellationException("VCS checkout failed",
                         CancelOption.NOTIFY_PEER);
 
                 LOG.debug("initVcState");
-                initVcState(project, vcs, projectInfo.getFileList(),
-                    new SubProgressMonitor(monitor, 0));
+                initVcState(ResourceAdapterFactory.convertBack(project), vcs,
+                    projectInfo.getFileList(), new SubProgressMonitor(monitor,
+                        0));
 
                 ticksToConsume -= MONITOR_WORK_SCALE / 2;
 
@@ -427,9 +416,9 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * @throws LocalCancellationException
      *             if the process is canceled locally
      */
-    private IProject checkoutVCSProject(final VCSAdapter vcs, IProject project,
-        final FileList fileList, final IProgressMonitor monitor)
-        throws LocalCancellationException {
+    private IProject checkoutVCSProject(final VCSAdapter vcs,
+        org.eclipse.core.resources.IProject project, final FileList fileList,
+        final IProgressMonitor monitor) throws LocalCancellationException {
 
         int ticksToConsume = 0;
 
@@ -457,7 +446,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 new org.eclipse.core.runtime.SubProgressMonitor(progress,
                     ticksToConsume / 2));
 
-            return project;
+            return ResourceAdapterFactory.create(project);
         }
 
         /*
@@ -496,7 +485,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             // do nothing
         }
 
-        return project;
+        return ResourceAdapterFactory.create(project);
     }
 
     @Override
@@ -511,9 +500,10 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
          * currently NOT support cancellation of the project negotiation
          * properly !
          */
-        for (Entry<String, IProject> entry : localProjectMapping.entrySet())
-            session.removeProjectMapping(entry.getKey(),
-                ResourceAdapterFactory.create(entry.getValue()), peer);
+        for (Entry<String, IProject> entry : localProjectMapping.entrySet()) {
+            session
+                .removeProjectMapping(entry.getKey(), entry.getValue(), peer);
+        }
 
         // The session might have been stopped already, if not we will stop it.
         if (session.getProjectResourcesMapping().keySet().isEmpty()
@@ -557,7 +547,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * If a VCS is used, update files if needed, and remove them from the list
      * of requested files if that's possible.
      * 
-     * @param currentLocalProject
+     * @param project
      * @param remoteFileList
      * @param provider
      *            VCS provider of the local project or <code>null</code>
@@ -568,20 +558,19 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      *             If the user requested a cancel.
      * @throws IOException
      */
-    private FileList computeRequiredFiles(IProject currentLocalProject,
+    private FileList computeRequiredFiles(IProject project,
         FileList remoteFileList, String projectID, VCSProvider provider,
         IProgressMonitor monitor) throws LocalCancellationException,
         IOException {
 
         monitor.beginTask("Compute required Files...", 1 * MONITOR_WORK_SCALE);
 
-        FileList localFileList = FileListFactory.createFileList(
-            ResourceAdapterFactory.create(currentLocalProject), null,
+        FileList localFileList = FileListFactory.createFileList(project, null,
             checksumCache, provider, new SubProgressMonitor(monitor,
                 1 * MONITOR_WORK_SCALE, SubProgressMonitor.SUPPRESS_BEGINTASK));
 
         FileListDiff filesToSynchronize = computeDiff(localFileList,
-            remoteFileList, currentLocalProject, projectID);
+            remoteFileList, project, projectID);
 
         List<String> missingFiles = new ArrayList<String>();
         missingFiles.addAll(filesToSynchronize.getAddedPaths());
@@ -608,66 +597,64 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      *            The file list of the local project.
      * @param remoteFileList
      *            The file list of the remote project.
-     * @param currentLocalProject
+     * @param project
      *            The project in workspace. Every file we need to add/replace is
      *            added to the {@link FileListDiff}
      * @param projectID
      * @return A modified FileListDiff which doesn't contain any directories or
      *         files to remove, but just added and altered files.
      */
-    private FileListDiff computeDiff(FileList localFileList,
-        FileList remoteFileList, final IProject currentLocalProject,
-        String projectID) throws IOException {
+    /*
+     * FIXME it is not very obviously that a computeDiff method also
+     * manipulates/DELETES files !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     */
+    private FileListDiff computeDiff(final FileList localFileList,
+        final FileList remoteFileList, final IProject project,
+        final String projectID) throws IOException {
+
         LOG.debug(this + " : computing file list difference");
 
-        FileListDiff diff = FileListDiff.diff(localFileList, remoteFileList);
+        final FileListDiff diff = FileListDiff.diff(localFileList,
+            remoteFileList);
 
-        try {
-            if (!isPartialRemoteProject(projectID)) {
-                final List<String> toDelete = diff.getRemovedPathsSanitized();
+        if (!isPartialRemoteProject(projectID)) {
 
-                /*
-                 * WTF !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! THIS IS DELETING
-                 * FILES !!!!!!!
-                 */
-                IWorkspace workspace = ResourcesPlugin.getWorkspace();
-                workspace.run(new IWorkspaceRunnable() {
-                    @Override
-                    public void run(
-                        org.eclipse.core.runtime.IProgressMonitor monitor)
-                        throws CoreException {
-                        for (String path : toDelete) {
-                            IResource resource = path.endsWith("/") ? currentLocalProject
-                                .getFolder(path) : currentLocalProject
-                                .getFile(path);
+            /*
+             * FIXME run inside Workspace and
+             */
 
-                            /*
-                             * Check if resource exists because it might have
-                             * already been deleted when deleting its folder
-                             */
-                            if (resource.exists()) {
-                                resource.delete(IResource.FORCE
-                                    | IResource.KEEP_HISTORY, null);
-                            }
-                        }
-                    }
-                }, workspace.getRoot(), IWorkspace.AVOID_UPDATE, null);
+            deleteResources(project, diff.getRemovedPathsSanitized());
 
-                diff.clearRemovedPaths();
-            }
+            diff.clearRemovedPaths();
+        }
 
-            for (String path : diff.getAddedFolders()) {
-                IFolder folder = currentLocalProject.getFolder(path);
-                if (!folder.exists()) {
-                    FileUtils.create(folder);
-                }
-            }
+        for (final String path : diff.getAddedFolders()) {
+            final IFolder folder = project.getFolder(path);
 
-            diff.clearAddedFolders();
+            if (!folder.exists())
+                folder.create(false, true);
 
-            return diff;
-        } catch (CoreException e) {
-            throw new IOException(e.getMessage(), e.getCause());
+        }
+
+        diff.clearAddedFolders();
+
+        return diff;
+    }
+
+    /**
+     * Deletes the resources denoted by the given paths for the given project.
+     * This method manipulates the order of the list!
+     */
+    private void deleteResources(final IProject project,
+        final List<String> paths) throws IOException {
+
+        Collections.sort(paths, Collections.reverseOrder());
+
+        for (final String path : paths) {
+            final IResource resource = getResource(project, path);
+
+            if (resource.exists())
+                resource.delete(IResource.KEEP_HISTORY);
         }
     }
 
@@ -678,8 +665,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         final Map<String, de.fu_berlin.inf.dpp.filesystem.IProject> projectMapping = new HashMap<String, de.fu_berlin.inf.dpp.filesystem.IProject>();
 
         for (Entry<String, IProject> entry : localProjectMapping.entrySet())
-            projectMapping.put(entry.getKey(),
-                ResourceAdapterFactory.create(entry.getValue()));
+            projectMapping.put(entry.getKey(), entry.getValue());
 
         final DecompressArchiveTask decompressTask = new DecompressArchiveTask(
             archiveFile, projectMapping, PATH_DELIMITER, monitor);
@@ -696,28 +682,13 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
          * after it finished!
          */
 
-        // TODO use Core Workspace Impl
+        // FIXME run inside workspace runnable !
         try {
-            ResourcesPlugin.getWorkspace().run(new IWorkspaceRunnable() {
-                @Override
-                public void run(
-                    org.eclipse.core.runtime.IProgressMonitor monitor)
-                    throws CoreException {
-                    try {
-                        decompressTask.run(ProgressMonitorAdapterFactory
-                            .convertTo(monitor));
-                    } catch (IOException e) {
-                        throw new CoreException(
-                            new org.eclipse.core.runtime.Status(IStatus.ERROR,
-                                Saros.SAROS, "failed to unpack archive", e));
-                    }
-                }
-            }, null);
+            decompressTask.run(monitor);
+
         } catch (OperationCanceledException e) {
             throw new LocalCancellationException(null,
                 CancelOption.DO_NOT_NOTIFY_PEER);
-        } catch (CoreException e) {
-            throw new IOException(e.getMessage(), e.getCause());
         }
 
         LOG.debug(String.format("unpacked archive in %d s",
@@ -740,8 +711,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * 
      * @throws SarosCancellationException
      */
-    private void initVcState(IResource resource, VCSAdapter vcs,
-        FileList remoteFileList, IProgressMonitor monitor)
+    private void initVcState(org.eclipse.core.resources.IResource resource,
+        VCSAdapter vcs, FileList remoteFileList, IProgressMonitor monitor)
         throws SarosCancellationException {
 
         /*
@@ -762,7 +733,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         final String path = resource.getProjectRelativePath()
             .toPortableString();
 
-        if (resource.getType() == IResource.PROJECT) {
+        if (resource.getType() == org.eclipse.core.resources.IResource.PROJECT) {
             /*
              * We have to revert the project first because the invitee could
              * have deleted a managed resource. Also, we don't want an update or
@@ -801,12 +772,13 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         if (progress.isCanceled())
             return;
 
-        if (resource instanceof IContainer) {
+        if (resource instanceof org.eclipse.core.resources.IContainer) {
             // Recurse.
             try {
-                List<IResource> children = Arrays
-                    .asList(((IContainer) resource).members());
-                for (IResource child : children) {
+                List<org.eclipse.core.resources.IResource> children = Arrays
+                    .asList(((org.eclipse.core.resources.IContainer) resource)
+                        .members());
+                for (org.eclipse.core.resources.IResource child : children) {
                     if (remoteFileList.getPaths().contains(child.getFullPath()))
                         initVcState(child, vcs, remoteFileList, monitor);
                     if (monitor.isCanceled())
@@ -958,6 +930,13 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         public FileTransferRequest getRequest() {
             return this.request;
         }
+    }
+
+    private IResource getResource(IProject project, String path) {
+        if (path.endsWith(FileList.DIR_SEPARATOR))
+            return project.getFolder(path);
+        else
+            return project.getFile(path);
     }
 
     @Override
