@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.invitation;
+package de.fu_berlin.inf.dpp.negotiation;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.invitation;
+package de.fu_berlin.inf.dpp.negotiation;
 
 import java.io.IOException;
 import java.util.List;
@@ -9,9 +9,9 @@ import org.apache.log4j.Logger;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
-import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
-import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
+import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelLocation;
+import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelOption;
 
 /**
  * Abstract base class that offers multiple methods for handling cancellation.

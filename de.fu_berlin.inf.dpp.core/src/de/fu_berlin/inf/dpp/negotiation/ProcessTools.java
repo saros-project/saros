@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.invitation;
+package de.fu_berlin.inf.dpp.negotiation;
 
 public class ProcessTools {
     public enum CancelOption {

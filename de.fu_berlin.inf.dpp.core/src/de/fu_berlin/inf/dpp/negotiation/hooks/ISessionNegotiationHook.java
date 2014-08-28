@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.invitation.hooks;
+package de.fu_berlin.inf.dpp.negotiation.hooks;
 
 import java.util.Map;
 

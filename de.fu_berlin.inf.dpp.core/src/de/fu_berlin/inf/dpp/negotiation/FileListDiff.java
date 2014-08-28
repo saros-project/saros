@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.invitation;
+package de.fu_berlin.inf.dpp.negotiation;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import de.fu_berlin.inf.dpp.invitation.FileList.MetaData;
+import de.fu_berlin.inf.dpp.negotiation.FileList.MetaData;
 
 /**
  * A diff between two {@link FileList}s.

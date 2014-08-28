@@ -1,6 +1,6 @@
-package de.fu_berlin.inf.dpp.invitation;
+package de.fu_berlin.inf.dpp.negotiation;
 
-import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
+import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelLocation;
 
 /**
  * Listener for monitoring {@link CancelableProcess negotiations}.
