@@ -5,6 +5,7 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -51,9 +52,12 @@ public class FileContentNotifierBridge implements IFileContentChangedNotifier,
                     && (delta.getFlags() == IResourceDelta.MARKERS))
                     continue;
 
+                final IFile file = (IFile) delta.getResource().getAdapter(
+                    IFile.class);
+
                 for (IFileContentChangedListener listener : fileContentChangedListeners)
-                    listener.fileContentChanged(delta.getResource()
-                        .getFullPath().toPortableString());
+                    listener.fileContentChanged(ResourceAdapterFactory
+                        .create(file));
             }
         }
     }

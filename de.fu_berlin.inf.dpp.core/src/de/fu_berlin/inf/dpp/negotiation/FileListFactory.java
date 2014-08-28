@@ -189,16 +189,13 @@ public class FileListFactory {
 
                 Long checksum = null;
 
-                /** {@link IChecksumCache} **/
-                String path = file.getFullPath().toPortableString();
-
                 if (checksumCache != null)
-                    checksum = checksumCache.getChecksum(path);
+                    checksum = checksumCache.getChecksum(file);
 
                 data.checksum = checksum == null ? checksum(file) : checksum;
 
                 if (checksumCache != null) {
-                    boolean isInvalid = checksumCache.addChecksum(path,
+                    boolean isInvalid = checksumCache.addChecksum(file,
                         data.checksum);
 
                     if (isInvalid && checksum != null)
