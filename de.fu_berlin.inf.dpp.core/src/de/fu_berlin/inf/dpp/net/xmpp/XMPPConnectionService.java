@@ -201,7 +201,7 @@ public class XMPPConnectionService {
          * connection attempt, currently it is only UPNP discovery
          */
 
-        ThreadUtils.runSafeAsync("SearchUPNP", LOG, new Runnable() {
+        ThreadUtils.runSafeAsync("dpp-upnp-resolver", LOG, new Runnable() {
             @Override
             public void run() {
                 if (upnpService != null)
@@ -469,7 +469,7 @@ public class XMPPConnectionService {
          * to the XMPP server is established
          */
         if (stunService != null && stunServer != null) {
-            ThreadUtils.runSafeAsync("StunAddProxys", LOG, new Runnable() {
+            ThreadUtils.runSafeAsync("dpp-stun-discovery", LOG, new Runnable() {
                 @Override
                 public void run() {
                     Collection<InetSocketAddress> addresses = stunService

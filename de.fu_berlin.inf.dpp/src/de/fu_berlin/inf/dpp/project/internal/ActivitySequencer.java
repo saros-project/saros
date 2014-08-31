@@ -257,8 +257,8 @@ public class ActivitySequencer implements Startable {
         receiver.addPacketListener(activitiesPacketListener,
             ActivitiesExtension.PROVIDER.getPacketFilter(currentSessionID));
 
-        activitySendThread = ThreadUtils.runSafeAsync("ActivitySender", LOG,
-            activitySender);
+        activitySendThread = ThreadUtils.runSafeAsync("dpp-activity-sender",
+            LOG, activitySender);
     }
 
     /**

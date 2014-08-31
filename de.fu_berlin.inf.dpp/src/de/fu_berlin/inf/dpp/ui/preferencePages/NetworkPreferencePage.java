@@ -512,7 +512,7 @@ public final class NetworkPreferencePage extends PreferencePage implements
             gatewayInfo.pack();
             gatewayInfo.setVisible(true);
 
-            ThreadUtils.runSafeAsync("NetworkPageUPnPDiscoverer", null,
+            ThreadUtils.runSafeAsync("dpp-upnp-resolver-cfg", null,
                 new Runnable() {
 
                     @Override

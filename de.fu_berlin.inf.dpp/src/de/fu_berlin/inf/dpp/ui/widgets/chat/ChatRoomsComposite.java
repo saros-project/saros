@@ -243,7 +243,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
              * now CARL joins the session and BOB leaves afterwards, ALICE and
              * CARLs MUC is broken !
              */
-            ThreadUtils.runSafeAsync("JoinMUC", log, new Runnable() {
+            ThreadUtils.runSafeAsync("dpp-muc-join", log, new Runnable() {
                 @Override
                 public void run() {
                     synchronized (mucCreationLock) {

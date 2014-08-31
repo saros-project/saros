@@ -58,10 +58,7 @@ abstract class SessionTimeoutHandler implements Startable {
     private final IActivitySequencerCallback callback = new IActivitySequencerCallback() {
         @Override
         public void transmissionFailed(final JID jid) {
-            if (session.isHost())
-                handleNetworkError(jid, "TxFailure");
-            else
-                handleNetworkError(jid, "TxFailure");
+            handleNetworkError(jid, "tx");
         }
     };
 
@@ -101,17 +98,17 @@ abstract class SessionTimeoutHandler implements Startable {
         String threadName = reason == null ? "" : reason;
 
         if (session.isHost()) {
-            ThreadUtils.runSafeAsync("RemoveUser" + threadName, LOG,
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        User user = session.getUser(jid);
-                        if (user != null)
-                            session.removeUser(user);
-                    }
-                });
+            ThreadUtils.runSafeAsync("dpp-kill-user-" + jid.getName() + "-"
+                + threadName, LOG, new Runnable() {
+                @Override
+                public void run() {
+                    User user = session.getUser(jid);
+                    if (user != null)
+                        session.removeUser(user);
+                }
+            });
         } else {
-            ThreadUtils.runSafeAsync("StopSession" + threadName, LOG,
+            ThreadUtils.runSafeAsync("dpp-kill-session-" + threadName, LOG,
                 new Runnable() {
                     @Override
                     public void run() {

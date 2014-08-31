@@ -17,7 +17,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * Component for detecting network errors on the client side of a session.
- *
+ * 
  * @author srossbach
  */
 public final class ClientSessionTimeoutHandler extends SessionTimeoutHandler {
@@ -81,7 +81,7 @@ public final class ClientSessionTimeoutHandler extends SessionTimeoutHandler {
                 if (abort) {
                     LOG.error("no ping received, reached timeout = "
                         + PING_PONG_TIMEOUT);
-                    handleNetworkError(session.getHost().getJID(), "RxFailure");
+                    handleNetworkError(session.getHost().getJID(), "rx");
                     return;
                 }
 
@@ -91,7 +91,7 @@ public final class ClientSessionTimeoutHandler extends SessionTimeoutHandler {
                             .create(new PongExtension(currentSessionID)));
                 } catch (IOException e) {
                     LOG.error("failed to send pong", e);
-                    handleNetworkError(session.getHost().getJID(), "TxFailure");
+                    handleNetworkError(session.getHost().getJID(), "tx");
                 }
             }
         }
@@ -117,7 +117,7 @@ public final class ClientSessionTimeoutHandler extends SessionTimeoutHandler {
         receiver.addPacketListener(pingPacketListener,
             PingExtension.PROVIDER.getPacketFilter(currentSessionID));
 
-        workerThread = ThreadUtils.runSafeAsync("ClientSessionTimeoutWatchdog",
+        workerThread = ThreadUtils.runSafeAsync("dpp-client-network-watchdog",
             LOG, clientSessionTimeoutWatchdog);
     }
 

@@ -260,8 +260,8 @@ public final class ActivityHandler implements Startable {
         if (DISPATCH_MODE == DISPATCH_MODE_ASYNC)
             return;
 
-        dispatchThread = ThreadUtils.runSafeAsync("ActivityDispatcher", LOG,
-            dispatchThreadRunnable);
+        dispatchThread = ThreadUtils.runSafeAsync("dpp-activity-dispatcher",
+            LOG, dispatchThreadRunnable);
     }
 
     @Override

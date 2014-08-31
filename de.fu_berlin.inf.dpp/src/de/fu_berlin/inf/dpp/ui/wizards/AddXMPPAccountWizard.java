@@ -119,7 +119,7 @@ public class AddXMPPAccountWizard extends Wizard {
 
         if (accountStore.getAllAccounts().size() == 1
             && store.getBoolean(PreferenceConstants.AUTO_CONNECT))
-            ThreadUtils.runSafeAsync("ConnectAddAccount", LOG, new Runnable() {
+            ThreadUtils.runSafeAsync("dpp-connect-demand", LOG, new Runnable() {
                 @Override
                 public void run() {
                     connectionHandler.connect(false);

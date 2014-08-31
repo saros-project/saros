@@ -102,12 +102,14 @@ public class StartupSaros implements IStartup {
                     || xmppAccountStore.isEmpty())
                     return;
 
-                ThreadUtils.runSafeAsync("AutoConnect", log, new Runnable() {
-                    @Override
-                    public void run() {
-                        connectionHandler.connect(/* avoid error popups */true);
-                    }
-                });
+                ThreadUtils.runSafeAsync("dpp-connect-auto", log,
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            connectionHandler
+                                .connect(/* avoid error popups */true);
+                        }
+                    });
 
             }
         }
@@ -125,7 +127,7 @@ public class StartupSaros implements IStartup {
 
     private void startSTFController(final int port) {
 
-        ThreadUtils.runSafeAsync("STF-Controller-Starter", log, new Runnable() {
+        ThreadUtils.runSafeAsync("dpp-stf-startup", log, new Runnable() {
             @Override
             public void run() {
                 try {

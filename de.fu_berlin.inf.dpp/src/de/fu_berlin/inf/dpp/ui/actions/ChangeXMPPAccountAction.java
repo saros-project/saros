@@ -95,7 +95,8 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator,
 
     @Override
     public void dispose() {
-        connectionHandler.removeConnectionStateListener(connectionStateListener);
+        connectionHandler
+            .removeConnectionStateListener(connectionStateListener);
     }
 
     @Override
@@ -189,7 +190,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator,
         if (account != null)
             accountService.setAccountActive(account);
 
-        ThreadUtils.runSafeAsync("ConnectAction", LOG, new Runnable() {
+        ThreadUtils.runSafeAsync("dpp-connect-manual", LOG, new Runnable() {
             @Override
             public void run() {
                 try {
@@ -206,7 +207,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator,
     }
 
     private void disconnect() {
-        ThreadUtils.runSafeAsync("DisconnectAction", LOG, new Runnable() {
+        ThreadUtils.runSafeAsync("dpp-disconnect-manual", LOG, new Runnable() {
             @Override
             public void run() {
                 try {

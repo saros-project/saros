@@ -56,7 +56,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * A wizard that is used to create XMPP accounts.
- *
+ * 
  * @author rdjemili
  * @author coezbek
  * @author bkahlert
@@ -104,7 +104,7 @@ public class CreateXMPPAccountWizard extends Wizard {
 
     /**
      * @JTourBusStop 5, The Interface Tour:
-     *
+     * 
      *               The performFinish() method is run when the user clicks the
      *               finish button on the wizard.
      */
@@ -178,7 +178,7 @@ public class CreateXMPPAccountWizard extends Wizard {
 
             if (reconnect) {
                 accountStore.setAccountActive(createdXMPPAccount);
-                ThreadUtils.runSafeAsync("ConnectCreatedAccount", log,
+                ThreadUtils.runSafeAsync("dpp-connect-demand", log,
                     new Runnable() {
                         @Override
                         public void run() {
@@ -197,7 +197,7 @@ public class CreateXMPPAccountWizard extends Wizard {
 
     /**
      * Returns the server (used) for account creation.
-     *
+     * 
      * @return
      */
     protected String getServer() {
@@ -210,7 +210,7 @@ public class CreateXMPPAccountWizard extends Wizard {
 
     /**
      * Returns the username (used) for account creation.
-     *
+     * 
      * @return
      */
     protected String getUsername() {
@@ -223,7 +223,7 @@ public class CreateXMPPAccountWizard extends Wizard {
 
     /**
      * Returns the password (used) for account creation.
-     *
+     * 
      * @return
      */
     protected String getPassword() {
@@ -236,7 +236,7 @@ public class CreateXMPPAccountWizard extends Wizard {
 
     /**
      * Returns the created {@link XMPPAccount}.
-     *
+     * 
      * @return null if the {@link XMPPAccount} has not (yet) been created.
      */
     public XMPPAccount getCreatedXMPPAccount() {

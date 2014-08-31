@@ -36,7 +36,7 @@ public class SoundPlayer {
             return;
         }
 
-        ThreadUtils.runSafeAsync("SoundPlayer", log, new Runnable() {
+        ThreadUtils.runSafeAsync("dpp-sound", log, new Runnable() {
             @Override
             public void run() {
                 de.fu_berlin.inf.dpp.misc.sound.SoundPlayer

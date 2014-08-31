@@ -229,7 +229,7 @@ public final class StopManager extends AbstractActivityProducer implements
         final AtomicBoolean isTimeout = new AtomicBoolean(false);
 
         for (final User user : users) {
-            threads.add(ThreadUtils.runSafeAsync("BlockUser-" + user + "-"
+            threads.add(ThreadUtils.runSafeAsync("dpp-stop-" + user + "-"
                 + cause, log, new Runnable() {
                 @Override
                 public void run() {

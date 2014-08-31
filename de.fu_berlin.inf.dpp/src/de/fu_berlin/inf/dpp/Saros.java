@@ -322,7 +322,7 @@ public class Saros extends AbstractUIPlugin {
 
         try {
             Thread shutdownThread = ThreadUtils.runSafeAsync(
-                "ShutdownProcess", log, new Runnable() { //$NON-NLS-1$
+                "dpp-shutdown", log, new Runnable() { //$NON-NLS-1$
                     @Override
                     public void run() {
 
