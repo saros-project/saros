@@ -45,10 +45,10 @@ import de.fu_berlin.inf.dpp.net.xmpp.roster.AbstractRosterListener;
 import de.fu_berlin.inf.dpp.net.xmpp.roster.IRosterListener;
 import de.fu_berlin.inf.dpp.net.xmpp.roster.RosterTracker;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
-import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -221,7 +221,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         }
     };
 
-    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+    protected ISarosSessionListener sessionListener = new NullSarosSessionListener() {
 
         @Override
         public void sessionStarting(final ISarosSession session) {

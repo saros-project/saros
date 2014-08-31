@@ -20,47 +20,44 @@
  * /
  */
 
-package de.fu_berlin.inf.dpp.core.project;
+package de.fu_berlin.inf.dpp.session;
 
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.User;
 
 /**
- * A listener for SarosSession life-cycle related events.
- *
- * @author bkahlert
+ * A session {@link ISarosSessionListener listener} that does nothing.
  */
-public class AbstractSarosSessionListener implements ISarosSessionListener {
+public class NullSarosSessionListener implements ISarosSessionListener {
 
     @Override
-    public void postOutgoingInvitationCompleted(IProgressMonitor monitor,
-        User user) {
-
+    public void sessionStarting(ISarosSession session) {
+        // NOP
     }
 
     @Override
-    public void sessionStarting(ISarosSession newSarosSession) {
-        // do nothing
+    public void sessionStarted(ISarosSession session) {
+        // NOP
     }
 
     @Override
-    public void sessionStarted(ISarosSession newSarosSession) {
-        // do nothing
+    public void sessionEnding(ISarosSession session) {
+        // NOP
     }
 
     @Override
-    public void sessionEnding(ISarosSession oldSarosSession) {
-        // do nothing
-    }
-
-    @Override
-    public void sessionEnded(ISarosSession oldSarosSession) {
-        // do nothing
+    public void sessionEnded(ISarosSession session) {
+        // NOP
     }
 
     @Override
     public void projectAdded(String projectID) {
-        // do nothing
+        // NOP
     }
+
+    @Override
+    public void postOutgoingInvitationCompleted(ISarosSession session,
+        User user, IProgressMonitor monitor) {
+        // NOP
+    }
+
 }

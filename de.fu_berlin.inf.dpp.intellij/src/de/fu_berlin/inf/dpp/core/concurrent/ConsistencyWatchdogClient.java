@@ -30,17 +30,17 @@ import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.core.editor.adapter.DocumentFactory;
 import de.fu_berlin.inf.dpp.core.editor.adapter.IDocument;
 import de.fu_berlin.inf.dpp.core.monitoring.remote.RemoteProgressManager;
-import de.fu_berlin.inf.dpp.core.project.AbstractSarosSessionListener;
-import de.fu_berlin.inf.dpp.core.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.core.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorHandler;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
+import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
 import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.session.User;
 import org.apache.log4j.Logger;
@@ -181,7 +181,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer {
         }
     };
 
-    private final ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+    private final ISarosSessionListener sessionListener = new NullSarosSessionListener() {
         private final ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
 
             @Override

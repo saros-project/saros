@@ -14,10 +14,10 @@ import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 import de.fu_berlin.inf.dpp.negotiation.hooks.ISessionNegotiationHook;
 import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.whiteboard.gef.model.GEFRecordFactory;
@@ -67,7 +67,7 @@ public class WhiteboardManager {
      * for other peers to be invited and let the host start the synchronization
      * process.
      */
-    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+    protected ISarosSessionListener sessionListener = new NullSarosSessionListener() {
 
         @Override
         public void postOutgoingInvitationCompleted(ISarosSession session,

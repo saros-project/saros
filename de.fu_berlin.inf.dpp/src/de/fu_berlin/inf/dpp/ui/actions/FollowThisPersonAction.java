@@ -16,10 +16,10 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
-import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
@@ -43,7 +43,7 @@ public class FollowThisPersonAction extends Action implements Disposable {
     private static final Logger LOG = Logger
         .getLogger(FollowThisPersonAction.class);
 
-    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+    protected ISarosSessionListener sessionListener = new NullSarosSessionListener() {
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
             updateActionEnablement();

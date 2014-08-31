@@ -32,15 +32,15 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
 import de.fu_berlin.inf.dpp.monitoring.remote.RemoteProgressManager;
-import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.actions.ConsistencyAction;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
@@ -127,19 +127,19 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer {
         sessionManager.removeSarosSessionListener(sessionListener);
     }
 
-    private final ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+    private final ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
+        @Override
+        public void permissionChanged(User user) {
 
-        private final ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
-            @Override
-            public void permissionChanged(User user) {
+            if (user.isRemote())
+                return;
 
-                if (user.isRemote())
-                    return;
+            // Clear our checksums
+            latestChecksums.clear();
+        }
+    };
 
-                // Clear our checksums
-                latestChecksums.clear();
-            }
-        };
+    private final ISarosSessionListener sessionListener = new NullSarosSessionListener() {
 
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
@@ -242,7 +242,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer {
      * The <strong>cancellation</strong> of this method is <strong>not
      * implemented</strong>, so canceling the given monitor does not have any
      * effect.
-     *
+     * 
      * @noSWT This method should not be called from SWT
      * @blocking This method returns after the recovery has finished
      * @client Can only be called on the client!
