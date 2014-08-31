@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.editor;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -22,7 +23,6 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
-import de.fu_berlin.inf.dpp.util.AutoHashMap;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
 /**
@@ -46,7 +46,7 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
         .getLogger(RemoteWriteAccessManager.class);
 
     /** stores users and their opened files (identified by their path) */
-    protected Map<SPath, Set<User>> editorStates = AutoHashMap.getSetHashMap();
+    protected Map<SPath, Set<User>> editorStates = new HashMap<SPath, Set<User>>();
 
     /**
      * stores files (identified by their path) connected by at least user with
@@ -81,12 +81,12 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
 
         switch (editorActivity.getType()) {
         case ACTIVATED:
-            editorStates.get(path).add(sender);
+            getEditorState(path).add(sender);
             break;
         case SAVED:
             break;
         case CLOSED:
-            editorStates.get(path).remove(sender);
+            getEditorState(path).remove(sender);
             break;
         default:
             log.warn(".receive() Unknown Activity type");
@@ -135,7 +135,7 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
         if (!connectedUserWithWriteAccessFiles.isEmpty()) {
             log.warn("RemoteWriteAccessManager could not"
                 + " be dispose correctly. Still connect to: "
-                + connectedUserWithWriteAccessFiles.toString());
+                + connectedUserWithWriteAccessFiles);
         }
     }
 
@@ -198,7 +198,7 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
             .contains(path);
         boolean hasUserWithWriteAccess = false;
 
-        for (User user : editorStates.get(path)) {
+        for (User user : getEditorState(path)) {
             if (user.hasWriteAccess()) {
                 hasUserWithWriteAccess = true;
                 break;
@@ -216,5 +216,16 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
                 + " will be disconnected ");
             disconnectDocumentProvider(path);
         }
+    }
+
+    private Set<User> getEditorState(final SPath path) {
+        Set<User> editorState = editorStates.get(path);
+
+        if (editorState == null) {
+            editorState = new HashSet<User>();
+            editorStates.put(path, editorState);
+        }
+
+        return editorState;
     }
 }
