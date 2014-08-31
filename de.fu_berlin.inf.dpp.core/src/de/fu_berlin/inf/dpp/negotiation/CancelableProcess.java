@@ -40,20 +40,20 @@ abstract class CancelableProcess {
 
     private boolean processTerminated;
 
-    private volatile ProcessListener listener;
+    private volatile NegotiationListener listener;
 
     private Status exitStatus;
 
     private final List<CancelListener> cancelListeners = new CopyOnWriteArrayList<CancelListener>();
 
     /**
-     * Sets a {@linkplain ProcessListener process listener} for the current
+     * Sets a {@linkplain NegotiationListener process listener} for the current
      * negotiation.
      * 
      * @param listener
      *            the listener that should be notified
      */
-    public final void setNegotiationListener(final ProcessListener listener) {
+    public final void setNegotiationListener(final NegotiationListener listener) {
         this.listener = listener;
     }
 
@@ -336,7 +336,7 @@ abstract class CancelableProcess {
          * terminated (which would not be the case at this moment)
          */
 
-        final ProcessListener currentListener = listener;
+        final NegotiationListener currentListener = listener;
 
         if (currentListener != null)
             notifyTerminated(listener);
@@ -362,7 +362,7 @@ abstract class CancelableProcess {
      * @param listener
      *            to notify
      */
-    protected abstract void notifyTerminated(ProcessListener listener);
+    protected abstract void notifyTerminated(NegotiationListener listener);
 
     /**
      * @return <code>true</code> if this was the first processed cancellation,

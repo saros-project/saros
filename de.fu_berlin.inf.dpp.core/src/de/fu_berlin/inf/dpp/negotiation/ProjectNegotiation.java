@@ -209,7 +209,7 @@ public abstract class ProjectNegotiation extends CancelableProcess {
     }
 
     @Override
-    protected void notifyTerminated(ProcessListener listener) {
-        listener.processTerminated(this);
+    protected void notifyTerminated(NegotiationListener listener) {
+        listener.negotiationTerminated(this);
     }
 }

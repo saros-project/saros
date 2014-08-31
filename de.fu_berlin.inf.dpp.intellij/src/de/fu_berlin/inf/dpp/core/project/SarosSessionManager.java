@@ -33,7 +33,7 @@ import de.fu_berlin.inf.dpp.core.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.negotiation.FileList;
-import de.fu_berlin.inf.dpp.negotiation.ProcessListener;
+import de.fu_berlin.inf.dpp.negotiation.NegotiationListener;
 import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
@@ -109,14 +109,14 @@ public class SarosSessionManager implements ISarosSessionManager {
     private final ProjectNegotiationObservable currentProjectNegotiations;
     private final List<ISarosSessionListener> sarosSessionListeners = new CopyOnWriteArrayList<ISarosSessionListener>();
     private final Lock startStopSessionLock = new ReentrantLock();
-    private final ProcessListener processListener = new ProcessListener() {
+    private final NegotiationListener processListener = new NegotiationListener() {
         @Override
-        public void processTerminated(SessionNegotiation process) {
+        public void negotiationTerminated(SessionNegotiation process) {
             currentSessionNegotiations.remove(process);
         }
 
         @Override
-        public void processTerminated(ProjectNegotiation process) {
+        public void negotiationTerminated(ProjectNegotiation process) {
             currentProjectNegotiations.removeProjectExchangeProcess(process);
         }
     };
