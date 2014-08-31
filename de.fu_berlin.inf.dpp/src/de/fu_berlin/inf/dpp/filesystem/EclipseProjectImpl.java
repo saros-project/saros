@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.filesystem;
 import java.io.IOException;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.OperationCanceledException;
 
 public class EclipseProjectImpl extends EclipseContainerImpl implements
     IProject {
@@ -54,6 +55,8 @@ public class EclipseProjectImpl extends EclipseContainerImpl implements
         try {
             getDelegate().open(null);
         } catch (CoreException e) {
+            throw new IOException(e);
+        } catch (OperationCanceledException e) {
             throw new IOException(e);
         }
     }

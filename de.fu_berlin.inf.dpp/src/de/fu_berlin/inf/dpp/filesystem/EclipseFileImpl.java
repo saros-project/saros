@@ -6,6 +6,7 @@ import java.net.URI;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.OperationCanceledException;
 
 public class EclipseFileImpl extends EclipseResourceImpl implements IFile {
 
@@ -38,6 +39,8 @@ public class EclipseFileImpl extends EclipseResourceImpl implements IFile {
             getDelegate().setContents(input, force, keepHistory, null);
         } catch (CoreException e) {
             throw new IOException(e);
+        } catch (OperationCanceledException e) {
+            throw new IOException(e);
         }
     }
 
@@ -46,6 +49,8 @@ public class EclipseFileImpl extends EclipseResourceImpl implements IFile {
         try {
             getDelegate().create(input, force, null);
         } catch (CoreException e) {
+            throw new IOException(e);
+        } catch (OperationCanceledException e) {
             throw new IOException(e);
         }
     }

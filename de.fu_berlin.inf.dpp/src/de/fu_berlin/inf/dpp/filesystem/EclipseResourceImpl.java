@@ -5,6 +5,7 @@ import java.net.URI;
 
 import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.OperationCanceledException;
 
 public class EclipseResourceImpl implements IResource {
 
@@ -125,6 +126,8 @@ public class EclipseResourceImpl implements IResource {
             delegate.delete(updateFlags, null);
         } catch (CoreException e) {
             throw new IOException(e);
+        } catch (OperationCanceledException e) {
+            throw new IOException(e);
         }
     }
 
@@ -134,6 +137,8 @@ public class EclipseResourceImpl implements IResource {
             delegate.move(((EclipsePathImpl) destination).getDelegate(), force,
                 null);
         } catch (CoreException e) {
+            throw new IOException(e);
+        } catch (OperationCanceledException e) {
             throw new IOException(e);
         }
     }
