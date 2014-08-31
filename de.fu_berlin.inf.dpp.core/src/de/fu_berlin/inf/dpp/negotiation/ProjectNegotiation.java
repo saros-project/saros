@@ -37,7 +37,9 @@ public abstract class ProjectNegotiation extends CancelableProcess {
     private static final Logger LOG = Logger
         .getLogger(ProjectNegotiation.class);
 
-    /** Prefix part of the id used in the SMACK XMPP file transfer protocol. */
+    /**
+     * Prefix part of the id used in the SMACK XMPP file transfer protocol.
+     */
     public static final String ARCHIVE_TRANSFER_ID = "saros-dpp-pn-server-client-archive/";
 
     /**
@@ -54,11 +56,6 @@ public abstract class ProjectNegotiation extends CancelableProcess {
     protected static final long PACKET_TIMEOUT = Long.getLong(
         "de.fu_berlin.inf.dpp.negotiation.project.PACKET_TIMEOUT", 30000L);
 
-    protected String processID;
-    protected JID peer;
-
-    protected final String sessionID;
-
     @Inject
     protected XMPPConnectionService connectionService;
 
@@ -70,16 +67,24 @@ public abstract class ProjectNegotiation extends CancelableProcess {
 
     @Inject
     protected VCSProviderFactory vcsProviderFactory;
+
+    private final String negotiationID;
+
+    private final String sessionID;
+
+    protected final JID peer;
+
     /**
      * The file transfer manager can be <code>null</code> if no connection was
      * established or was lost when the class was instantiated.
      */
     protected FileTransferManager fileTransferManager;
 
-    public ProjectNegotiation(JID peer, String sessionID,
-        ISarosContext sarosContext) {
-        this.peer = peer;
+    public ProjectNegotiation(final String negotiationID,
+        final String sessionID, final JID peer, ISarosContext sarosContext) {
+        this.negotiationID = negotiationID;
         this.sessionID = sessionID;
+        this.peer = peer;
         sarosContext.initComponent(this);
 
         Connection connection = connectionService.getConnection();
@@ -95,12 +100,27 @@ public abstract class ProjectNegotiation extends CancelableProcess {
      */
     public abstract Map<String, String> getProjectNames();
 
-    public String getProcessID() {
-        return this.processID;
+    /**
+     * Returns the ID of this negotiation.
+     * 
+     * @return the ID
+     */
+    public final String getID() {
+        return negotiationID;
     }
 
-    public JID getPeer() {
-        return this.peer;
+    /**
+     * Returns the {@linkplain ISarosSession session} id this negotiation
+     * belongs to.
+     * 
+     * @return the id of the current session this negotiations belongs to
+     */
+    public final String getSessionID() {
+        return sessionID;
+    }
+
+    public final JID getPeer() {
+        return peer;
     }
 
     @Override
@@ -118,7 +138,7 @@ public abstract class ProjectNegotiation extends CancelableProcess {
             + " of the local project negotiation cancellation");
 
         PacketExtension notification = CancelProjectNegotiationExtension.PROVIDER
-            .create(new CancelProjectNegotiationExtension(sessionID, cause
+            .create(new CancelProjectNegotiationExtension(getSessionID(), cause
                 .getMessage()));
 
         try {

@@ -36,11 +36,6 @@ import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 import de.fu_berlin.inf.dpp.monitoring.SubProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.remote.RemoteProgressManager;
-import de.fu_berlin.inf.dpp.negotiation.FileList;
-import de.fu_berlin.inf.dpp.negotiation.FileListDiff;
-import de.fu_berlin.inf.dpp.negotiation.FileListFactory;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelLocation;
 import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
@@ -95,13 +90,12 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     @Inject
     private ISarosSessionManager sessionManager;
 
-    public IncomingProjectNegotiation(ISarosSession sarosSession, JID peer,
-        String processID, List<ProjectNegotiationData> projectInfos,
+    public IncomingProjectNegotiation(ISarosSession session, JID peer,
+        String negotiationID, List<ProjectNegotiationData> projectInfos,
         ISarosContext sarosContext) {
-        super(peer, sarosSession.getID(), sarosContext);
+        super(negotiationID, session.getID(), peer, sarosContext);
 
-        this.session = sarosSession;
-        this.processID = processID;
+        this.session = session;
         this.projectInfos = projectInfos;
         this.localProjectMapping = new HashMap<String, IProject>();
     }
@@ -165,7 +159,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         fileReplacementInProgressObservable.startReplacement();
 
         ArchiveTransferListener archiveTransferListener = new ArchiveTransferListener(
-            ARCHIVE_TRANSFER_ID + processID);
+            ARCHIVE_TRANSFER_ID + getID());
 
         Exception exception = null;
 
@@ -189,7 +183,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             transmitter.send(ISarosSession.SESSION_CONNECTION_ID, peer,
                 ProjectNegotiationMissingFilesExtension.PROVIDER
                     .create(new ProjectNegotiationMissingFilesExtension(
-                        sessionID, processID, missingFiles)));
+                        getSessionID(), getID(), missingFiles)));
 
             awaitActivityQueueingActivation(monitor);
             monitor.subTask("");
@@ -214,8 +208,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
             transmitter.send(ISarosSession.SESSION_CONNECTION_ID, peer,
                 StartActivityQueuingResponse.PROVIDER
-                    .create(new StartActivityQueuingResponse(sessionID,
-                        processID)));
+                    .create(new StartActivityQueuingResponse(getSessionID(),
+                        getID())));
 
             checkCancellation(CancelOption.NOTIFY_PEER);
 
@@ -295,7 +289,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
         monitor.beginTask(null, 100);
 
-        File archiveFile = receiveArchive(archiveTransferListener, processID,
+        File archiveFile = receiveArchive(archiveTransferListener, getID(),
             new SubProgressMonitor(monitor, 50));
 
         /*
@@ -838,7 +832,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     private void createCollectors() {
         startActivityQueuingRequestCollector = xmppReceiver
             .createCollector(StartActivityQueuingRequest.PROVIDER
-                .getPacketFilter(sessionID, processID));
+                .getPacketFilter(getSessionID(), getID()));
     }
 
     private void deleteCollectors() {

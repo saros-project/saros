@@ -16,7 +16,6 @@ import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.negotiation.hooks.ISessionNegotiationHook;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
@@ -191,7 +190,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
 
         transmitter.sendPacketExtension(peer,
             InvitationAcceptedExtension.PROVIDER
-                .create(new InvitationAcceptedExtension(invitationID)));
+                .create(new InvitationAcceptedExtension(getID())));
     }
 
     /**
@@ -200,7 +199,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
      */
     private InvitationParameterExchangeExtension createClientSessionPreferences() {
         InvitationParameterExchangeExtension parameters = new InvitationParameterExchangeExtension(
-            invitationID);
+            getID());
 
         for (ISessionNegotiationHook hook : hookManager.getHooks()) {
             Map<String, String> clientPreferences = hook
@@ -336,7 +335,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
         throws IOException {
         transmitter.send(ISarosSession.SESSION_CONNECTION_ID, peer,
             InvitationCompletedExtension.PROVIDER
-                .create(new InvitationCompletedExtension(invitationID)));
+                .create(new InvitationCompletedExtension(getID())));
 
         LOG.debug(this + " : invitation complete confirmation sent");
     }
@@ -361,11 +360,11 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
     private void createCollectors() {
         invitationAcknowledgedCollector = receiver
             .createCollector(InvitationAcknowledgedExtension.PROVIDER
-                .getPacketFilter(invitationID));
+                .getPacketFilter(getID()));
 
         invitationDataExchangeCollector = receiver
             .createCollector(InvitationParameterExchangeExtension.PROVIDER
-                .getPacketFilter(invitationID));
+                .getPacketFilter(getID()));
     }
 
     private void deleteCollectors() {

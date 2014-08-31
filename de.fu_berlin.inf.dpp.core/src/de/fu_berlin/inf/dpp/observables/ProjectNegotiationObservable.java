@@ -25,6 +25,7 @@ public class ProjectNegotiationObservable {
 
     private int addings = 0;
 
+    // FIXME you can have multiple negotiations !!!!!!!!!!!!!!!!!!!!
     /**
      * JID => ProjectNegotiation
      * 
@@ -42,16 +43,6 @@ public class ProjectNegotiationObservable {
      */
     public synchronized ProjectNegotiation getProjectExchangeProcess(JID jid) {
         return this.processes.get(jid);
-    }
-
-    public synchronized ProjectNegotiation getProjectExchangeProcess(
-        String processID) {
-        for (ProjectNegotiation projectNegotiation : this.processes.values()) {
-            if (projectNegotiation.getProcessID().equals(processID)) {
-                return projectNegotiation;
-            }
-        }
-        return null;
     }
 
     public synchronized void addProjectExchangeProcess(

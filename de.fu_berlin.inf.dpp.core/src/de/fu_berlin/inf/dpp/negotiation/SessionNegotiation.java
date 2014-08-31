@@ -69,15 +69,18 @@ public abstract class SessionNegotiation extends CancelableProcess {
     @Inject
     protected SessionNegotiationHookManager hookManager;
 
-    protected final String invitationID;
+    private final String negotiationID;
+
     protected final String description;
+
+    // FIXME make final
     protected JID peer;
 
     protected final String peerNickname;
 
-    public SessionNegotiation(String invitationID, JID peer,
-        String description, ISarosContext sarosContext) {
-        this.invitationID = invitationID;
+    public SessionNegotiation(final String negotiationID, final JID peer,
+        final String description, final ISarosContext sarosContext) {
+        this.negotiationID = negotiationID;
         this.peer = peer;
         this.description = description;
         sarosContext.initComponent(this);
@@ -90,7 +93,7 @@ public abstract class SessionNegotiation extends CancelableProcess {
     }
 
     public JID getPeer() {
-        return this.peer;
+        return peer;
     }
 
     /**
@@ -98,16 +101,16 @@ public abstract class SessionNegotiation extends CancelableProcess {
      *         an invitation.
      */
     public String getDescription() {
-        return this.description;
+        return description;
     }
 
     /**
-     * Returns the ID of this invitation process.
+     * Returns the ID of this negotiation.
      * 
      * @return the ID
      */
     public final String getID() {
-        return invitationID;
+        return negotiationID;
     }
 
     @Override
@@ -125,7 +128,7 @@ public abstract class SessionNegotiation extends CancelableProcess {
             + " of the local cancellation");
 
         PacketExtension notification = CancelInviteExtension.PROVIDER
-            .create(new CancelInviteExtension(invitationID, cause.getMessage()));
+            .create(new CancelInviteExtension(negotiationID, cause.getMessage()));
 
         transmitter.sendPacketExtension(getPeer(), notification);
     }

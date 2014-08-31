@@ -45,9 +45,9 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
     private List<IProject> projects;
 
-    private ISarosSession sarosSession;
+    private final ISarosSession session;
 
-    private final static Random PROCESS_ID_GENERATOR = new Random();
+    private static final Random NEGOTIATION_ID_GENERATOR = new Random();
 
     @Inject
     private IEditorManager editorManager;
@@ -63,12 +63,12 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     @Inject
     private ISarosSessionManager sessionManager;
 
-    public OutgoingProjectNegotiation(JID to, ISarosSession sarosSession,
+    public OutgoingProjectNegotiation(JID to, ISarosSession session,
         List<IProject> projects, ISarosContext sarosContext) {
-        super(to, sarosSession.getID(), sarosContext);
+        super(String.valueOf(NEGOTIATION_ID_GENERATOR.nextLong()), session
+            .getID(), to, sarosContext);
 
-        this.processID = String.valueOf(PROCESS_ID_GENERATOR.nextLong());
-        this.sarosSession = sarosSession;
+        this.session = session;
         this.projects = projects;
     }
 
@@ -114,7 +114,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 sendAndAwaitActivityQueueingActivation(monitor);
                 monitor.subTask("");
 
-                User user = sarosSession.getUser(peer);
+                User user = session.getUser(peer);
 
                 if (user == null)
                     throw new LocalCancellationException(null,
@@ -129,7 +129,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                  * activities at this time. Maybe change the description of the
                  * listener interface ?
                  */
-                sarosSession.userStartedQueuing(user);
+                session.userStartedQueuing(user);
 
                 zipArchive = createProjectArchive(fileLists, monitor);
                 monitor.subTask("");
@@ -141,16 +141,16 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             checkCancellation(CancelOption.NOTIFY_PEER);
 
             if (zipArchive != null)
-                sendArchive(zipArchive, peer, ARCHIVE_TRANSFER_ID + processID,
+                sendArchive(zipArchive, peer, ARCHIVE_TRANSFER_ID + getID(),
                     monitor);
 
-            User user = sarosSession.getUser(peer);
+            User user = session.getUser(peer);
 
             if (user == null)
                 throw new LocalCancellationException(null,
                     CancelOption.DO_NOT_NOTIFY_PEER);
 
-            sarosSession.userFinishedProjectNegotiation(user);
+            session.userFinishedProjectNegotiation(user);
 
         } catch (Exception e) {
             exception = e;
@@ -194,7 +194,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
          * current implementation opens a wizard on the remote side)
          */
         ProjectNegotiationOfferingExtension offering = new ProjectNegotiationOfferingExtension(
-            sessionID, processID, projectExchangeInfos);
+            getSessionID(), getID(), projectExchangeInfos);
 
         transmitter.send(ISarosSession.SESSION_CONNECTION_ID, peer,
             ProjectNegotiationOfferingExtension.PROVIDER.create(offering));
@@ -242,14 +242,14 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     public Map<String, String> getProjectNames() {
         Map<String, String> result = new HashMap<String, String>();
         for (IProject project : projects)
-            result.put(sarosSession.getProjectID(project), project.getName());
+            result.put(session.getProjectID(project), project.getName());
 
         return result;
     }
 
     @Override
     protected void executeCancellation() {
-        if (sarosSession.getRemoteUsers().isEmpty())
+        if (session.getRemoteUsers().isEmpty())
             sessionManager.stopSarosSession();
     }
 
@@ -265,8 +265,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
          * srossbach: This may already be the case ... just review this
          */
 
-        final List<User> usersToStop = new ArrayList<User>(
-            sarosSession.getUsers());
+        final List<User> usersToStop = new ArrayList<User>(session.getUsers());
 
         LOG.debug(this + " : stopping users " + usersToStop);
 
@@ -274,8 +273,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
         // FIXME better handling of users that do not reply !!!
         try {
-            return sarosSession.getStopManager().stop(usersToStop,
-                "archive creation for OPN [id=" + getProcessID() + "]");
+            return session.getStopManager().stop(usersToStop,
+                "archive creation for OPN [id=" + getID() + "]");
         } catch (CancellationException e) {
             LOG.warn("failed to stop users", e);
             return null;
@@ -321,7 +320,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         for (final FileList list : fileLists) {
             final String projectID = list.getProjectID();
 
-            final IProject project = sarosSession.getProject(projectID);
+            final IProject project = session.getProject(projectID);
 
             if (project == null)
                 throw new LocalCancellationException("project with id "
@@ -356,7 +355,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         File tempArchive = null;
 
         try {
-            tempArchive = File.createTempFile("saros_" + processID, ".zip");
+            tempArchive = File.createTempFile("saros_" + getID(), ".zip");
             // TODO run inside workspace ?
             new CreateArchiveTask(tempArchive, filesToCompress, fileAlias,
                 monitor).run(null);
@@ -372,11 +371,11 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     private void createCollectors() {
         remoteFileListResponseCollector = xmppReceiver
             .createCollector(ProjectNegotiationMissingFilesExtension.PROVIDER
-                .getPacketFilter(sessionID, processID));
+                .getPacketFilter(getSessionID(), getID()));
 
         startActivityQueuingResponseCollector = xmppReceiver
             .createCollector(StartActivityQueuingResponse.PROVIDER
-                .getPacketFilter(sessionID, processID));
+                .getPacketFilter(getSessionID(), getID()));
     }
 
     private void deleteCollectors() {
@@ -438,8 +437,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
                 VCSProvider vcs = null;
 
-                if (sarosSession.useVersionControl()
-                    && vcsProviderFactory != null) {
+                if (session.useVersionControl() && vcsProviderFactory != null) {
                     vcs = vcsProviderFactory.getProvider(project);
                     // TODO how to handle this if no adapter is available ?
                     // if(vcs == null)
@@ -453,14 +451,14 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                     editorManager.saveEditors(project);
 
                 FileList projectFileList = FileListFactory.createFileList(
-                    project, sarosSession.getSharedResources(project),
+                    project, session.getSharedResources(project),
                     checksumCache, vcs, new SubProgressMonitor(monitor,
                         1 * scale, SubProgressMonitor.SUPPRESS_BEGINTASK
                             | SubProgressMonitor.SUPPRESS_SETTASKNAME));
 
-                boolean partial = !sarosSession.isCompletelyShared(project);
+                boolean partial = !session.isCompletelyShared(project);
 
-                String projectID = sarosSession.getProjectID(project);
+                String projectID = session.getProjectID(project);
                 projectFileList.setProjectID(projectID);
 
                 ProjectNegotiationData data = new ProjectNegotiationData(
@@ -498,9 +496,11 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             + " to perform additional initialization...",
             IProgressMonitor.UNKNOWN);
 
-        transmitter.send(ISarosSession.SESSION_CONNECTION_ID, peer,
-            StartActivityQueuingRequest.PROVIDER
-                .create(new StartActivityQueuingRequest(sessionID, processID)));
+        transmitter
+            .send(ISarosSession.SESSION_CONNECTION_ID, peer,
+                StartActivityQueuingRequest.PROVIDER
+                    .create(new StartActivityQueuingRequest(getSessionID(),
+                        getID())));
 
         Packet packet = collectPacket(startActivityQueuingResponseCollector,
             PACKET_TIMEOUT);
