@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.negotiation;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,25 +17,18 @@ import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.ISarosContext;
-import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.communication.extensions.ProjectNegotiationMissingFilesExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.ProjectNegotiationOfferingExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingRequest;
 import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingResponse;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
+import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
-import de.fu_berlin.inf.dpp.filesystem.EclipseProjectImpl;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.SubProgressMonitor;
-import de.fu_berlin.inf.dpp.negotiation.FileList;
-import de.fu_berlin.inf.dpp.negotiation.FileListFactory;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -48,7 +40,7 @@ import de.fu_berlin.inf.dpp.vcs.VCSProvider;
 
 public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
-    private static Logger log = Logger
+    private static Logger LOG = Logger
         .getLogger(OutgoingProjectNegotiation.class);
 
     private List<IProject> projects;
@@ -58,7 +50,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     private final static Random PROCESS_ID_GENERATOR = new Random();
 
     @Inject
-    private EditorManager editorManager;
+    private IEditorManager editorManager;
 
     @Inject
     private IChecksumCache checksumCache;
@@ -95,6 +87,17 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 // FIXME: the logic will try to send this to the remote contact
                 throw new IOException("not connected to a XMPP server");
 
+            /*
+             * FIXME save editors first, then do the file list and zip stuff
+             * inside a Workspace Runnable with file locks !. There is a small
+             * gap between saving editors and entering the file lock but it will
+             * almost never matter in a real execution environment.
+             * 
+             * Do not save the editors inside the runnable as this may not work
+             * depending on the IEditorManager implementation, i.e this thread
+             * holds the lock, but saving editors is performed in another thread
+             * !
+             */
             sendFileList(createProjectExchangeInfoList(projects, monitor),
                 monitor);
 
@@ -154,7 +157,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         } finally {
 
             if (zipArchive != null && !zipArchive.delete())
-                log.warn("could not delete archive file: "
+                LOG.warn("could not delete archive file: "
                     + zipArchive.getAbsolutePath());
             deleteCollectors();
             monitor.done();
@@ -175,7 +178,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
         checkCancellation(CancelOption.NOTIFY_PEER);
 
-        log.debug(this + " : sending file list");
+        LOG.debug(this + " : sending file list");
 
         /*
          * file lists are normally very small so we "accept" the circumstance
@@ -208,7 +211,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     private List<FileList> getRemoteFileList(IProgressMonitor monitor)
         throws IOException, SarosCancellationException {
 
-        log.debug(this + " : waiting for remote file list");
+        LOG.debug(this + " : waiting for remote file list");
 
         monitor.beginTask("Waiting for " + peer.getName()
             + " to choose project(s) location", IProgressMonitor.UNKNOWN);
@@ -226,7 +229,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         List<FileList> remoteFileLists = ProjectNegotiationMissingFilesExtension.PROVIDER
             .getPayload(packet).getFileLists();
 
-        log.debug(this + " : remote file list has been received");
+        LOG.debug(this + " : remote file list has been received");
 
         checkCancellation(CancelOption.NOTIFY_PEER);
 
@@ -250,9 +253,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             sessionManager.stopSarosSession();
     }
 
-    private List<StartHandle> stopUsers(IProgressMonitor monitor)
-        throws SarosCancellationException {
-        Collection<User> usersToStop;
+    private List<StartHandle> stopUsers(IProgressMonitor monitor) {
 
         /*
          * TODO: Make sure that all users are fully registered when stopping
@@ -264,40 +265,28 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
          * srossbach: This may already be the case ... just review this
          */
 
-        usersToStop = new ArrayList<User>(sarosSession.getUsers());
+        final List<User> usersToStop = new ArrayList<User>(
+            sarosSession.getUsers());
 
-        log.debug(this + " : stopping users " + usersToStop);
-
-        List<StartHandle> startHandles;
+        LOG.debug(this + " : stopping users " + usersToStop);
 
         monitor.beginTask("Locking the session...", IProgressMonitor.UNKNOWN);
 
-        /*
-         * FIXME the StopManager should use a timeout as it can happen that a
-         * user leaves the session during the stop request. Currently it is up
-         * to the user to press the cancel button because the StopManager did
-         * not check if the user already left the session.
-         * 
-         * srossbach: The StopManager should not check for the absence of a user
-         * and so either retry again or just stop the sharing (which currently
-         * would lead to a broken session because we have no proper cancellation
-         * logic !
-         */
+        // FIXME better handling of users that do not reply !!!
         try {
-            startHandles = sarosSession.getStopManager().stop(usersToStop,
-                "Synchronizing invitation");
+            return sarosSession.getStopManager().stop(usersToStop,
+                "archive creation for OPN [id=" + getProcessID() + "]");
         } catch (CancellationException e) {
-            checkCancellation(CancelOption.NOTIFY_PEER);
+            LOG.warn("failed to stop users", e);
             return null;
+        } finally {
+            monitor.done();
         }
-
-        monitor.done();
-        return startHandles;
     }
 
     private void startUsers(List<StartHandle> startHandles) {
         for (StartHandle startHandle : startHandles) {
-            log.debug(this + " : restarting user " + startHandle.getUser());
+            LOG.debug(this + " : restarting user " + startHandle.getUser());
             startHandle.start();
         }
     }
@@ -324,20 +313,6 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         if (skip)
             return null;
 
-        /*
-         * Use editorManager.saveText() because the EditorAPI.saveProject() will
-         * not save files which were modified in the background. This is what
-         * happens for example if a user edits a file which is not opened by the
-         * local user.
-         * 
-         * Stefan Rossbach: this will still fail if a user edited a file and
-         * then closes the editor without saving it.
-         */
-
-        // FIXME this throws a NPE if the session has already been stopped
-        for (SPath path : editorManager.getOpenEditorsOfAllParticipants())
-            editorManager.saveLazy(path);
-
         checkCancellation(CancelOption.NOTIFY_PEER);
 
         final List<IFile> filesToCompress = new ArrayList<IFile>(fileCount);
@@ -354,13 +329,11 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                     CancelOption.NOTIFY_PEER);
 
             /*
-             * TODO: Ask the user whether to save the resources, but only if
-             * they have changed. How to ask Eclipse whether there are resource
-             * changes? if (outInvitationUI.confirmProjectSave(peer))
-             * getOpenEditors => filter per Project => if dirty ask to save
+             * force editor buffer flush because we read the files from the
+             * underlying storage
              */
-            EditorAPI.saveProject(((EclipseProjectImpl) project).getDelegate(),
-                false);
+            if (editorManager != null)
+                editorManager.saveEditors(project);
 
             final StringBuilder aliasBuilder = new StringBuilder();
 
@@ -378,7 +351,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             }
         }
 
-        log.debug(this + " : creating archive");
+        LOG.debug(this + " : creating archive");
 
         File tempArchive = null;
 
@@ -415,7 +388,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         String transferID, IProgressMonitor monitor)
         throws SarosCancellationException, IOException {
 
-        log.debug(this + " : sending archive");
+        LOG.debug(this + " : sending archive");
         monitor.beginTask("Sending archive file...", 100);
 
         assert fileTransferManager != null;
@@ -432,7 +405,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
         monitor.done();
 
-        log.debug(this + " : archive send");
+        LOG.debug(this + " : archive send");
     }
 
     /**
@@ -472,6 +445,13 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                     // if(vcs == null)
                 }
 
+                /*
+                 * force editor buffer flush because we read the files from the
+                 * underlying storage
+                 */
+                if (editorManager != null)
+                    editorManager.saveEditors(project);
+
                 FileList projectFileList = FileListFactory.createFileList(
                     project, sarosSession.getSharedResources(project),
                     checksumCache, vcs, new SubProgressMonitor(monitor,
@@ -495,7 +475,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                  * no existing project negotiation yet
                  */
                 localCancel(e.getMessage(), CancelOption.DO_NOT_NOTIFY_PEER);
-                // throw to log this error in the CancelableProcess class
+                // throw to LOG this error in the CancelableProcess class
                 throw new IOException(e.getMessage(), e);
             }
         }
