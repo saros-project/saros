@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
@@ -16,27 +15,6 @@ import de.fu_berlin.inf.dpp.activities.ViewportActivity;
  * Class contains static helper methods for {@link IActivity activities}.
  */
 public class ActivityUtils {
-
-    /**
-     * Checks if the give collections contains only
-     * {@linkplain ChecksumActivity checksum activities}.
-     * 
-     * @param activities
-     *            collection containing {@linkplain IActivity activities}
-     * @return <code>true</code> if the collection contains only checksum
-     *         activities, <code>false</code> otherwise
-     */
-    public static boolean containsChecksumsOnly(Collection<IActivity> activities) {
-
-        if (activities.isEmpty())
-            return false;
-
-        for (IActivity a : activities)
-            if (!(a instanceof ChecksumActivity))
-                return false;
-
-        return true;
-    }
 
     /**
      * Tries to reduce the number of {@link IActivity activities} so that:

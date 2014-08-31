@@ -489,14 +489,13 @@ public class ActivitySequencer implements Startable {
             .create(new ActivitiesExtension(currentSessionID, activities,
                 sequenceNumber));
 
-        String msg = "send (" + String.format("%03d", activities.size()) + ") "
-            + recipient + " -> " + activities;
-
-        // only log on debug level if there is more than a checksum
-        if (ActivityUtils.containsChecksumsOnly(activities))
-            LOG.trace(msg);
-        else
-            LOG.debug(msg);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("send (" + String.format("%03d", activities.size())
+                + ") " + recipient + " -> " + activities);
+        } else if (LOG.isDebugEnabled()) {
+            LOG.debug("send (" + String.format("%03d", activities.size())
+                + ") " + recipient);
+        }
 
         try {
             transmitter.send(ISarosSession.SESSION_CONNECTION_ID, recipient,
@@ -540,13 +539,13 @@ public class ActivitySequencer implements Startable {
 
         List<IActivity> activities = payload.getActivities();
 
-        String msg = "rcvd (" + String.format("%03d", activities.size()) + ") "
-            + from + ": " + activities;
-
-        if (ActivityUtils.containsChecksumsOnly(activities))
-            LOG.trace(msg);
-        else
-            LOG.debug(msg);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("rcvd (" + String.format("%03d", activities.size())
+                + ") " + from + " -> " + activities);
+        } else if (LOG.isDebugEnabled()) {
+            LOG.debug("rcvd (" + String.format("%03d", activities.size())
+                + ") " + from);
+        }
 
         executeActivities(from, activities, payload.getSequenceNumber());
     }

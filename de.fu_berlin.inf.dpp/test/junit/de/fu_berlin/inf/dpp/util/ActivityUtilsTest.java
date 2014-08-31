@@ -1,19 +1,15 @@
 package de.fu_berlin.inf.dpp.util;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.easymock.EasyMock;
 import org.eclipse.core.runtime.Path;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.NOPActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
@@ -41,33 +37,6 @@ public class ActivityUtilsTest {
     private final IProject barProject = EasyMock.createMock(IProject.class);
 
     private final NOPActivity nop = new NOPActivity(alice, bob, 0);
-
-    private final ChecksumActivity checksumADO = new ChecksumActivity(alice,
-        new SPath(fooProject, fooPath), 0, 0, null);
-
-    @Test
-    public void testContainsChecksumsOnly() {
-
-        List<IActivity> emtpy = Collections.emptyList();
-        List<IActivity> checksum = new ArrayList<IActivity>();
-        List<IActivity> random = new ArrayList<IActivity>();
-
-        checksum.add(checksumADO);
-        random.add(checksumADO);
-        random.add(nop);
-
-        assertFalse(
-            "must return false on a collection with at least one non checksum activity",
-            ActivityUtils.containsChecksumsOnly(random));
-
-        assertFalse(
-            "must return false on a collection without a checksum activity",
-            ActivityUtils.containsChecksumsOnly(emtpy));
-
-        assertTrue(
-            "must return true on a collection containing only checksum activities",
-            ActivityUtils.containsChecksumsOnly(checksum));
-    }
 
     @Test
     public void testOptimize() {
