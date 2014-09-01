@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.ui.model.roster;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jface.viewers.IContentProvider;
@@ -31,10 +32,10 @@ import de.fu_berlin.inf.dpp.ui.util.ViewerUtils;
 public final class RosterContentProvider extends TreeContentProvider {
 
     private Viewer viewer;
-    private Roster roster;
+    private volatile Roster roster;
 
     @Inject
-    private DiscoveryManager discoveryManager;
+    private volatile DiscoveryManager discoveryManager;
 
     private final DiscoveryManagerListener discoveryManagerListener = new DiscoveryManagerListener() {
         @Override
@@ -42,21 +43,26 @@ public final class RosterContentProvider extends TreeContentProvider {
             boolean isSupported) {
 
             if (Saros.NAMESPACE.equals(feature))
-                ViewerUtils.update(viewer, new RosterEntryElement(roster, jid),
-                    null);
+                ViewerUtils.update(viewer, new RosterEntryElement(roster, jid,
+                    true), null);
         }
     };
 
     private final RosterListener rosterListener = new RosterListener() {
         @Override
         public void presenceChanged(Presence presence) {
-            ViewerUtils.update(viewer, new RosterEntryElement(roster, new JID(
-                presence.getFrom())), null);
+            ViewerUtils.refresh(viewer, true);
+
+            final String user = presence.getFrom();
+
+            if (user != null)
+                querySarosSupport(Collections.singletonList(user));
         }
 
         @Override
         public void entriesUpdated(Collection<String> addresses) {
             ViewerUtils.refresh(viewer, true);
+            querySarosSupport(addresses);
         }
 
         @Override
@@ -67,14 +73,14 @@ public final class RosterContentProvider extends TreeContentProvider {
         @Override
         public void entriesAdded(Collection<String> addresses) {
             ViewerUtils.refresh(viewer, true);
+            querySarosSupport(addresses);
         }
     };
 
     public RosterContentProvider() {
         SarosPluginContext.initComponent(this);
 
-        discoveryManager
-            .addDiscoveryManagerListener(this.discoveryManagerListener);
+        discoveryManager.addDiscoveryManagerListener(discoveryManagerListener);
     }
 
     @Override
@@ -89,6 +95,9 @@ public final class RosterContentProvider extends TreeContentProvider {
         if (newInput instanceof Roster) {
             roster = (Roster) newInput;
             roster.addRosterListener(rosterListener);
+
+            for (final RosterEntry entry : roster.getEntries())
+                querySarosSupport(Collections.singletonList(entry.getUser()));
         }
     }
 
@@ -115,15 +124,58 @@ public final class RosterContentProvider extends TreeContentProvider {
             return new Object[0];
 
         Roster roster = (Roster) inputElement;
-        List<Object> elements = new ArrayList<Object>();
+        final List<Object> elements = new ArrayList<Object>();
 
-        for (RosterGroup rosterGroup : roster.getGroups())
-            elements.add(new RosterGroupElement(roster, rosterGroup));
+        for (RosterGroup group : roster.getGroups()) {
+            elements.add(new RosterGroupElement(group,
+                createRosterEntryElements(group.getEntries()).toArray(
+                    new RosterEntryElement[0])));
+        }
 
-        for (RosterEntry rosterEntry : roster.getUnfiledEntries())
-            elements.add(new RosterEntryElement(roster, new JID(rosterEntry
-                .getUser())));
+        elements.addAll(createRosterEntryElements(roster.getUnfiledEntries()));
 
         return elements.toArray();
+    }
+
+    private List<RosterEntryElement> createRosterEntryElements(
+        final Collection<RosterEntry> entries) {
+
+        final List<RosterEntryElement> elements = new ArrayList<RosterEntryElement>();
+
+        for (final RosterEntry entry : entries)
+            elements.add(createRosterEntryElement(new JID(entry.getUser())));
+
+        return elements;
+    }
+
+    private RosterEntryElement createRosterEntryElement(final JID jid) {
+        final Boolean isSarosSupport = discoveryManager.isFeatureSupported(jid,
+            Saros.NAMESPACE);
+
+        return new RosterEntryElement(roster, jid,
+            isSarosSupport == null ? false : isSarosSupport);
+    }
+
+    private void querySarosSupport(Collection<String> users) {
+
+        final Roster currentRoster = roster;
+        final DiscoveryManager currentDiscoveryManager = discoveryManager;
+
+        if (currentRoster == null || currentDiscoveryManager == null)
+            return;
+
+        for (final String user : users) {
+            final JID jid = new JID(user);
+
+            if (!currentRoster.getPresence(jid.getBase()).isAvailable())
+                continue;
+
+            Boolean sarosSupported = discoveryManager.isFeatureSupported(jid,
+                Saros.NAMESPACE);
+
+            if (sarosSupported == null)
+                discoveryManager
+                    .queryFeatureSupport(jid, Saros.NAMESPACE, true);
+        }
     }
 }

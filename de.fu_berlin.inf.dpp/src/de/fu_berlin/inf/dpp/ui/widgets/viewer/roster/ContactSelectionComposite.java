@@ -46,7 +46,7 @@ import de.fu_berlin.inf.dpp.util.ArrayUtils;
  * to check (via check boxes) them.
  * <p>
  * This composite does <strong>NOT</strong> handle setting the layout.
- *
+ * 
  * <dl>
  * <dt><b>Styles:</b></dt>
  * <dd>NONE and those supported by {@link StructuredViewer}</dd>
@@ -54,9 +54,9 @@ import de.fu_berlin.inf.dpp.util.ArrayUtils;
  * <dt><b>Events:</b></dt>
  * <dd>(none)</dd>
  * </dl>
- *
+ * 
  * @author bkahlert
- *
+ * 
  */
 public class ContactSelectionComposite extends
     ViewerComposite<CheckboxTreeViewer> {
@@ -158,7 +158,7 @@ public class ContactSelectionComposite extends
 
     /**
      * Sets the currently selected {@link JID}s.
-     *
+     * 
      * @param contacts
      */
     public void setSelectedContacts(List<JID> contacts) {
@@ -172,10 +172,10 @@ public class ContactSelectionComposite extends
 
         List<RosterEntryElement> elementsToCheck = new ArrayList<RosterEntryElement>();
 
-        for (JID contact : contacts) {
-            elementsToCheck.add(new RosterEntryElement(connectionService
-                .getRoster(), contact));
-        }
+        // insert dummy values except the jid as those elements are never
+        // display anyways and only used for comparison
+        for (JID contact : contacts)
+            elementsToCheck.add(new RosterEntryElement(null, contact, false));
 
         Map<RosterEntryElement, Boolean> checkStatesChanges = calculateCheckStateDiff(
             allElements, checkedElements, elementsToCheck);
@@ -210,7 +210,7 @@ public class ContactSelectionComposite extends
     /**
      * Calculates from a given set of {@link RosterEntryElement}s which
      * {@link RosterEntryElement}s change their check state.
-     *
+     * 
      * @param allRosterEntryElements
      * @param checkedRosterEntryElement
      *            {@link RosterEntryElement}s which are already checked
@@ -241,7 +241,7 @@ public class ContactSelectionComposite extends
 
     /**
      * Returns the currently selected {@link JID}s.
-     *
+     * 
      * @return
      */
     public List<JID> getSelectedContacts() {
@@ -257,7 +257,7 @@ public class ContactSelectionComposite extends
 
     /**
      * Returns the currently selected {@link JID}s that support Saros.
-     *
+     * 
      * @return
      */
     public List<JID> getSelectedContactsWithSarosSupport() {
@@ -276,7 +276,7 @@ public class ContactSelectionComposite extends
     /**
      * Returns the current online status of selected entries. If one of the
      * selected RosterEntryElements is offline, the return value is false.
-     *
+     * 
      * @return
      */
     public boolean areAllSelectedOnline() {
@@ -290,7 +290,7 @@ public class ContactSelectionComposite extends
 
     /**
      * Adds a {@link ContactSelectionListener}
-     *
+     * 
      * @param contactSelectionListener
      */
     public void addContactSelectionListener(
@@ -300,7 +300,7 @@ public class ContactSelectionComposite extends
 
     /**
      * Removes a {@link ContactSelectionListener}
-     *
+     * 
      * @param contactSelectionListener
      */
     public void removeContactSelectionListener(
@@ -310,7 +310,7 @@ public class ContactSelectionComposite extends
 
     /**
      * Notify all {@link ContactSelectionListener}s about a changed selection.
-     *
+     * 
      * @param jid
      *            of the contact who's selection changed
      * @param isSelected
@@ -333,7 +333,7 @@ public class ContactSelectionComposite extends
     /**
      * Gathers the checked states of the given widget and its descendants,
      * following a pre-order traversal of the {@link ITreeContentProvider}.
-     *
+     * 
      * @param treeViewer
      *            to be traversed
      * @return
@@ -360,7 +360,7 @@ public class ContactSelectionComposite extends
     /**
      * Gathers the checked states of the given widget and its descendants,
      * following a pre-order traversal of the {@link ITreeContentProvider}.
-     *
+     * 
      * @param collectedObjects
      *            a writable list of elements (element type: <code>Object</code>
      *            )
