@@ -22,7 +22,7 @@ de.fu_berlin.inf.dpp.ui.model.roster.TestSuite.class,
 
 de.fu_berlin.inf.dpp.ui.wizards.pages.TestSuite.class,
 
-de.fu_berlin.inf.dpp.util.TestSuite.class,
+de.fu_berlin.inf.dpp.util.UtilTestSuite.class,
 
 })
 public class SarosEclipseTestSuite {

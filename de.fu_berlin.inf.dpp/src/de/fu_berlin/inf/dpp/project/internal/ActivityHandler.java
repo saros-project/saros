@@ -12,6 +12,7 @@ import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.jface.window.Window;
 import org.picocontainer.Startable;
 
+import de.fu_berlin.inf.dpp.activities.ActivityOptimizer;
 import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IResourceActivity;
@@ -24,7 +25,6 @@ import de.fu_berlin.inf.dpp.concurrent.management.TransformationResult;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
-import de.fu_berlin.inf.dpp.util.ActivityUtils;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
@@ -334,7 +334,7 @@ public final class ActivityHandler implements Startable {
      */
     private void dispatchAndExecuteActivities(final List<IActivity> activities) {
 
-        final List<IActivity> optimizedActivities = ActivityUtils
+        final List<IActivity> optimizedActivities = ActivityOptimizer
             .optimize(activities);
 
         final Runnable transformingRunnable = new Runnable() {

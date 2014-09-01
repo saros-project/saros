@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.util;
+package de.fu_berlin.inf.dpp.activities;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -6,15 +6,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
-import de.fu_berlin.inf.dpp.activities.ViewportActivity;
-
 /**
- * Class contains static helper methods for {@link IActivity activities}.
+ * Optimizer for activities.
  */
-public class ActivityUtils {
+public class ActivityOptimizer {
 
     /**
      * Tries to reduce the number of {@link IActivity activities} so that:

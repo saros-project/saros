@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.util;
+package de.fu_berlin.inf.dpp.activities;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
@@ -7,36 +7,40 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.easymock.EasyMock;
-import org.eclipse.core.runtime.Path;
+import org.junit.Before;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.NOPActivity;
-import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
-import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.User;
 
-public class ActivityUtilsTest {
+public class ActivityOptimizerTest {
 
     private final User alice = new User(new JID("alice@junit"), null, true,
         true, 0, 0);
     private final User bob = new User(new JID("bob@junit"), null, false, false,
         0, 0);
 
-    private final IPath fooPath = ResourceAdapterFactory
-        .create(new Path("foo"));
-    private final IPath barPath = ResourceAdapterFactory
-        .create(new Path("bar"));
+    private IPath fooPath;
+    private IPath barPath;
 
-    private final IProject fooProject = EasyMock.createMock(IProject.class);
-    private final IProject barProject = EasyMock.createMock(IProject.class);
+    private IProject fooProject;
+    private IProject barProject;
 
     private final NOPActivity nop = new NOPActivity(alice, bob, 0);
+
+    @Before
+    public void setup() {
+
+        fooProject = EasyMock.createNiceMock(IProject.class);
+        barProject = EasyMock.createNiceMock(IProject.class);
+
+        fooPath = EasyMock.createNiceMock(IPath.class);
+        barPath = EasyMock.createNiceMock(IPath.class);
+
+        EasyMock.replay(fooProject, barProject, fooPath, barPath);
+    }
 
     @Test
     public void testOptimize() {
@@ -134,7 +138,7 @@ public class ActivityUtilsTest {
         activities.add(vpChange7);
         activities.add(nop);
 
-        List<IActivity> optimized = ActivityUtils.optimize(activities);
+        List<IActivity> optimized = ActivityOptimizer.optimize(activities);
 
         assertEquals("activities are not optimally optimized", /* NOP */
             16 + /* TS */4 + /* VP */4, optimized.size());
