@@ -1,6 +1,8 @@
 package de.fu_berlin.inf.dpp;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.IStartup;
 import org.eclipse.ui.PlatformUI;
@@ -14,6 +16,7 @@ import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.stf.server.STFController;
+import de.fu_berlin.inf.dpp.ui.commandHandlers.GettingStartedHandler;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.ViewUtils;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
@@ -29,7 +32,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 @Component(module = "integration")
 public class StartupSaros implements IStartup {
 
-    private static final Logger log = Logger.getLogger(StartupSaros.class);
+    private static final Logger LOG = Logger.getLogger(StartupSaros.class);
 
     @Inject
     private ISarosContext context;
@@ -72,11 +75,11 @@ public class StartupSaros implements IStartup {
         Integer port = Integer.getInteger("de.fu_berlin.inf.dpp.testmode");
 
         if (port != null && port > 0 && port <= 65535) {
-            log.info("starting STF controller on port " + port);
+            LOG.info("starting STF controller on port " + port);
             startSTFController(port);
 
         } else if (port != null) {
-            log.error("could not start STF controller: port " + port
+            LOG.error("could not start STF controller: port " + port
                 + " is not a valid port number");
         } else {
             /*
@@ -86,7 +89,7 @@ public class StartupSaros implements IStartup {
              */
 
             if (xmppAccountStore.isEmpty())
-                showTutorialWebpage();
+                showTutorial();
             else {
                 /*
                  * HACK workaround for http://sourceforge.net/p/dpp/bugs/782/
@@ -102,7 +105,7 @@ public class StartupSaros implements IStartup {
                     || xmppAccountStore.isEmpty())
                     return;
 
-                ThreadUtils.runSafeAsync("dpp-connect-auto", log,
+                ThreadUtils.runSafeAsync("dpp-connect-auto", LOG,
                     new Runnable() {
                         @Override
                         public void run() {
@@ -115,32 +118,35 @@ public class StartupSaros implements IStartup {
         }
     }
 
-    private void showTutorialWebpage() {
-        SWTUtils.runSafeSWTAsync(log, new Runnable() {
+    private void showTutorial() {
+        SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
             @Override
             public void run() {
-                SWTUtils.openInternalBrowser(Messages.Saros_tutorial_url,
-                    Messages.Saros_tutorial_title);
+                try {
+                    new GettingStartedHandler().execute(new ExecutionEvent());
+                } catch (ExecutionException e) {
+                    LOG.warn("failed to execute tutorial handler", e);
+                }
             }
         });
     }
 
     private void startSTFController(final int port) {
 
-        ThreadUtils.runSafeAsync("dpp-stf-startup", log, new Runnable() {
+        ThreadUtils.runSafeAsync("dpp-stf-startup", LOG, new Runnable() {
             @Override
             public void run() {
                 try {
                     STFController.start(port, context);
                 } catch (Exception e) {
-                    log.error("starting STF controller failed", e);
+                    LOG.error("starting STF controller failed", e);
                 }
             }
         });
     }
 
     private void showSarosView() {
-        SWTUtils.runSafeSWTAsync(log, new Runnable() {
+        SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
             @Override
             public void run() {
                 IIntroManager m = PlatformUI.getWorkbench().getIntroManager();
