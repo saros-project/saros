@@ -18,7 +18,7 @@ import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.dialogs.FeedbackDialog;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 

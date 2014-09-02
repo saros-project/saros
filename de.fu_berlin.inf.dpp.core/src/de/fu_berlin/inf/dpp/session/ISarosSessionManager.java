@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.project;
+package de.fu_berlin.inf.dpp.session;
 
 import java.util.Collection;
 import java.util.List;
@@ -11,18 +11,10 @@ import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.negotiation.FileList;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
-import de.fu_berlin.inf.dpp.session.User;
 
 /**
- * An interface behind which the {@link SarosSessionManager} hides its
- * non-public methods.
- * 
- * The (I)SessionManager is responsible for providing a link between the
- * basically static world managed by PicoContainer where every class has just a
- * singleton instance which never changes and the {@link ISarosSession} which
- * can change many times during the course of the plug-in life-cycle.
+ * Interface for starting and stopping a DPP session. It also offers support for
+ * monitoring the life-cycle of a session.
  */
 @Component(module = "net")
 public interface ISarosSessionManager {
@@ -168,14 +160,16 @@ public interface ISarosSessionManager {
      */
     void postOutgoingInvitationCompleted(IProgressMonitor monitor, User newUser);
 
-    /**
-     * Sets the {@link INegotiationHandler negotiation handler} that will handle
-     * incoming and outgoing session and project negotiations requests.
-     * 
-     * @param handler
-     *            the handler to handle the request or <code>null</code> if the
-     *            requests should not be handled
-     * 
-     */
-    public void setNegotiationHandler(INegotiationHandler handler);
+    // FIXME add back
+    // /**
+    // * Sets the {@link INegotiationHandler negotiation handler} that will
+    // handle
+    // * incoming and outgoing session and project negotiations requests.
+    // *
+    // * @param handler
+    // * the handler to handle the request or <code>null</code> if the
+    // * requests should not be handled
+    // *
+    // */
+    // public void setNegotiationHandler(INegotiationHandler handler);
 }
