@@ -124,8 +124,11 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
         }
 
         @Override
-        public boolean sendPacket(TransferDescription description,
-            byte[] payload) {
+        public boolean sendPacket(final String connectionID,
+            final TransferDescription description, final byte[] payload) {
+
+            if (!ISarosSession.SESSION_CONNECTION_ID.equals(connectionID))
+                return true;
 
             JID jid = description.getRecipient();
             LOG.trace("intercepting outgoing packet to: " + jid);
@@ -320,7 +323,8 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
                 LOG.trace("sending blocked packet: " + holder.description
                     + ", payload length: " + holder.payload.length);
 
-                getDataTransferManager().sendData(holder.description,
+                getDataTransferManager().sendData(
+                    ISarosSession.SESSION_CONNECTION_ID, holder.description,
                     holder.payload);
             } catch (Exception e) {
                 LOG.error(e.getMessage(), e);

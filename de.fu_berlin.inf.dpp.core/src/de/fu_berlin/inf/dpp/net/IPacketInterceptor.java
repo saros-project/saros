@@ -12,7 +12,7 @@ public interface IPacketInterceptor {
 
     /**
      * This method is called before the {@link DataTransferManager} is
-     * dispatching the packet
+     * dispatching the packet.
      * 
      * @param extension
      * @return <code>true</code> if the packet should be dispatched,
@@ -22,12 +22,14 @@ public interface IPacketInterceptor {
 
     /**
      * This method is called before the {@link DataTransferManager} is sending
-     * the packet
+     * the packet.
      * 
+     * @param connectID
      * @param description
      * @param payload
      * @return <code>true</code> if the packet should be send,
      *         <code>false</code> if the packet should be dropped
      */
-    public boolean sendPacket(TransferDescription description, byte[] payload);
+    public boolean sendPacket(String connectID,
+        TransferDescription description, byte[] payload);
 }

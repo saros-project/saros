@@ -213,7 +213,7 @@ public class DataTransferManager implements IConnectionListener,
             LOG.trace("send " + description + ", data len=" + data.length
                 + " byte(s), connection=" + connection);
 
-        sendInternal(connection, description, data);
+        sendInternal(connectionID, connection, description, data);
     }
 
     /**
@@ -238,18 +238,21 @@ public class DataTransferManager implements IConnectionListener,
         JID recipient = transferDescription.getRecipient();
         transferDescription.setSender(connectionJID);
 
-        sendInternal(connectInternal(DEFAULT_CONNECTION_ID, recipient),
+        sendInternal(DEFAULT_CONNECTION_ID,
+            connectInternal(DEFAULT_CONNECTION_ID, recipient),
             transferDescription, payload);
     }
 
-    private void sendInternal(final IByteStreamConnection connection,
+    private void sendInternal(final String connectionID,
+        final IByteStreamConnection connection,
         final TransferDescription description, byte[] payload)
         throws IOException {
 
         boolean sendPacket = true;
 
         for (IPacketInterceptor packetInterceptor : packetInterceptors)
-            sendPacket &= packetInterceptor.sendPacket(description, payload);
+            sendPacket &= packetInterceptor.sendPacket(connectionID,
+                description, payload);
 
         if (!sendPacket)
             return;
