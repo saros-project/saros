@@ -26,7 +26,7 @@ import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.osgi.service.prefs.Preferences;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosConstants;
 import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 import de.fu_berlin.inf.dpp.feedback.AbstractFeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.FeedbackInterval;
@@ -48,7 +48,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
     @Override
     public void initializeDefaultPreferences() {
         LOG.info("initializing preference default values");
-        Preferences prefs = new DefaultScope().getNode(Saros.SAROS);
+        Preferences prefs = new DefaultScope().getNode(SarosConstants.SAROS);
         setPreferences(prefs);
     }
 

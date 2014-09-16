@@ -4,7 +4,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosConstants;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
@@ -53,7 +53,7 @@ public class ServerPreferenceHandler {
         if (discoveryManager == null)
             return;
 
-        discoveryManager.addFeature(Saros.NAMESPACE_SERVER);
+        discoveryManager.addFeature(SarosConstants.NAMESPACE_SERVER);
     }
 
     private void removeServerFeature(Connection connection) {
@@ -66,6 +66,6 @@ public class ServerPreferenceHandler {
         if (discoveryManager == null)
             return;
 
-        discoveryManager.removeFeature(Saros.NAMESPACE_SERVER);
+        discoveryManager.removeFeature(SarosConstants.NAMESPACE_SERVER);
     }
 }

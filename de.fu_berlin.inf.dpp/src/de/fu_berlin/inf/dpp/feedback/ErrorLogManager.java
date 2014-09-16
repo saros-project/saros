@@ -15,7 +15,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.picocontainer.Startable;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosConstants;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -235,7 +235,7 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
                         e.getMessage(), e.getCause() != null ? e.getCause()
                             .getMessage() : "");
                     log.error(msg);
-                    return new Status(IStatus.ERROR, Saros.SAROS, msg, e);
+                    return new Status(IStatus.ERROR, SarosConstants.SAROS, msg, e);
                 } catch (OperationCanceledException e) {
                     return Status.CANCEL_STATUS;
                 } finally {

@@ -1,20 +1,12 @@
 package de.fu_berlin.inf.dpp.core.invitation;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.Random;
-
-import org.apache.log4j.Logger;
-import org.jivesoftware.smack.packet.Packet;
-import org.picocontainer.annotations.Inject;
-
 import de.fu_berlin.inf.dpp.ISarosContext;
+import de.fu_berlin.inf.dpp.SarosConstants;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcceptedExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcknowledgedExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationCompletedExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationOfferingExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationParameterExchangeExtension;
-import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.core.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.core.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
@@ -33,6 +25,13 @@ import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.versioning.Compatibility;
 import de.fu_berlin.inf.dpp.versioning.VersionCompatibilityResult;
 import de.fu_berlin.inf.dpp.versioning.VersionManager;
+import org.apache.log4j.Logger;
+import org.jivesoftware.smack.packet.Packet;
+import org.picocontainer.annotations.Inject;
+
+import java.io.IOException;
+import java.util.Map;
+import java.util.Random;
 
 /*
  * IMPORTANT: All messages in the cancellation exception are SHOWN to the end user !
@@ -227,7 +226,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
         monitor.setTaskName("Checking Saros support...");
 
         JID resourceQualifiedJID = discoveryManager.getSupportingPresence(peer,
-            Saros.NAMESPACE);
+            SarosConstants.NAMESPACE);
 
         if (resourceQualifiedJID == null) {
             throw new LocalCancellationException(

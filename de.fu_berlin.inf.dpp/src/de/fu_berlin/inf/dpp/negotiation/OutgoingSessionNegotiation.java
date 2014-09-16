@@ -9,7 +9,7 @@ import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.ISarosContext;
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosConstants;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcceptedExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcknowledgedExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationCompletedExtension;
@@ -229,7 +229,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
         monitor.setTaskName("Checking Saros support...");
 
         JID resourceQualifiedJID = discoveryManager.getSupportingPresence(peer,
-            Saros.NAMESPACE);
+            SarosConstants.NAMESPACE);
 
         if (resourceQualifiedJID == null)
             throw new LocalCancellationException(

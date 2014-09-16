@@ -22,7 +22,7 @@
 
 package de.fu_berlin.inf.dpp.core.ui.util;
 
-import de.fu_berlin.inf.dpp.core.Saros;
+import de.fu_berlin.inf.dpp.SarosConstants;
 import de.fu_berlin.inf.dpp.core.context.SarosPluginContext;
 import de.fu_berlin.inf.dpp.core.monitoring.IStatus;
 import de.fu_berlin.inf.dpp.core.monitoring.Status;
@@ -122,7 +122,7 @@ public class CollaborationUtils {
                 } catch (Exception e) {
 
                     LOG.error("could not start a Saros session", e);
-                    return new Status(IStatus.ERROR, Saros.SAROS,
+                    return new Status(IStatus.ERROR, SarosConstants.SAROS,
                         e.getMessage(), e);
                 }
 

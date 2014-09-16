@@ -24,7 +24,7 @@ package de.fu_berlin.inf.dpp.core;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
-
+import de.fu_berlin.inf.dpp.SarosConstants;
 import de.fu_berlin.inf.dpp.core.context.SarosContext;
 import de.fu_berlin.inf.dpp.core.context.SarosCoreContextFactory;
 import de.fu_berlin.inf.dpp.core.context.SarosPluginContext;
@@ -45,40 +45,6 @@ import org.jivesoftware.smackx.ServiceDiscoveryManager;
  * Saros plugin class for bundling globally necessary variables like project.
  */
 public class Saros {
-
-    /**
-     * This is the Bundle-SymbolicName (a.k.a the pluginID)
-     */
-    public static final String SAROS = "de.fu_berlin.inf.dpp";
-
-    /**
-     * Default server name
-     */
-    public static final String SAROS_SERVER = "saros-con.imp.fu-berlin.de";
-
-    /**
-     * The name of the XMPP namespace used by SarosEclipse. At the moment it is only
-     * used to advertise the SarosEclipse feature in the Service Discovery.
-     * <p/>
-     * TODO Add version information, so that only compatible versions of Saros
-     * can use each other.
-     */
-    public static final String NAMESPACE = SAROS;
-
-    /**
-     * The name of the resource identifier used by Saros when connecting to the
-     * XMPP server (for instance when logging in as john@doe.com, Saros will
-     * connect using john@doe.com/Saros)
-     * <p/>
-     * //todo
-     */
-    public static final String RESOURCE = "Saros";
-
-    /**
-     * Sub-namespace for the server. It is used advertise when a server is
-     * active.
-     */
-    public static final String NAMESPACE_SERVER = NAMESPACE + ".server";
 
     private static Saros instance;
 
@@ -165,15 +131,14 @@ public class Saros {
 
                 if (state == ConnectionState.CONNECTING) {
                     ServiceDiscoveryManager.getInstanceFor(connection).addFeature(
-                        NAMESPACE);
+                        SarosConstants.NAMESPACE);
                 }
             }
 
         });
 
         //todo: set parameters from config
-        connectionService
-            .configure(RESOURCE, false, false, 8888,
+        connectionService.configure(SarosConstants.RESOURCE, false, false, 8888,
                 null, null, true, null, 80, true);
 
         isInitialized = true;

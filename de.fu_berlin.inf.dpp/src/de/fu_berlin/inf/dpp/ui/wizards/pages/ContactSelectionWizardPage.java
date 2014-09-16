@@ -12,7 +12,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.jivesoftware.smack.Roster;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosConstants;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.discovery.DiscoveryManager;
@@ -76,7 +76,7 @@ public class ContactSelectionWizardPage extends WizardPage {
         public void featureSupportUpdated(final JID jid, String feature,
             boolean isSupported) {
 
-            if (!Saros.NAMESPACE.equals(feature))
+            if (!SarosConstants.NAMESPACE.equals(feature))
                 return;
 
             SWTUtils.runSafeSWTAsync(LOG, new Runnable() {

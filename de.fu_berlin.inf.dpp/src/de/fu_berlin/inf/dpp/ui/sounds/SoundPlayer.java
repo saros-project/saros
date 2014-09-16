@@ -10,7 +10,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosConstants;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
@@ -49,7 +49,7 @@ public class SoundPlayer {
      * Returns a file from path
      */
     private static File getSoundFile(String filename) {
-        URL url = Platform.getBundle(Saros.SAROS)
+        URL url = Platform.getBundle(SarosConstants.SAROS)
             .getEntry(SOUND_DIR + filename);
         try {
             url = FileLocator.toFileURL(url);

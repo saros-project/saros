@@ -33,7 +33,7 @@ import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.XMPPException;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosConstants;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -182,7 +182,7 @@ public class AddContactWizard extends Wizard {
 
         try {
             boolean jidOnServer = XMPPUtils.isJIDonServer(connection, jid,
-                Saros.RESOURCE);
+                SarosConstants.RESOURCE);
             if (!jidOnServer) {
                 boolean cancel = false;
                 try {

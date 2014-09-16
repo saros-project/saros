@@ -14,7 +14,7 @@ import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smack.packet.Presence;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosConstants;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.discovery.DiscoveryManager;
@@ -42,7 +42,7 @@ public final class RosterContentProvider extends TreeContentProvider {
         public void featureSupportUpdated(final JID jid, String feature,
             boolean isSupported) {
 
-            if (Saros.NAMESPACE.equals(feature))
+            if (SarosConstants.NAMESPACE.equals(feature))
                 ViewerUtils.update(viewer, new RosterEntryElement(roster, jid,
                     true), null);
         }
@@ -150,7 +150,7 @@ public final class RosterContentProvider extends TreeContentProvider {
 
     private RosterEntryElement createRosterEntryElement(final JID jid) {
         final Boolean isSarosSupport = discoveryManager.isFeatureSupported(jid,
-            Saros.NAMESPACE);
+            SarosConstants.NAMESPACE);
 
         return new RosterEntryElement(roster, jid,
             isSarosSupport == null ? false : isSarosSupport);
@@ -171,11 +171,11 @@ public final class RosterContentProvider extends TreeContentProvider {
                 continue;
 
             Boolean sarosSupported = discoveryManager.isFeatureSupported(jid,
-                Saros.NAMESPACE);
+                SarosConstants.NAMESPACE);
 
             if (sarosSupported == null)
                 discoveryManager
-                    .queryFeatureSupport(jid, Saros.NAMESPACE, true);
+                    .queryFeatureSupport(jid, SarosConstants.NAMESPACE, true);
         }
     }
 }

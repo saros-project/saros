@@ -40,7 +40,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosConstants;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
@@ -364,7 +364,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
         String message = Messages.AddProjectToSessionWizard_synchronize_projects;
 
-        String PID = Saros.SAROS;
+        String PID = SarosConstants.SAROS;
         MultiStatus info = new MultiStatus(PID, 1, message, null);
         for (String projectName : modifiedResources.keySet()) {
             FileListDiff diff = modifiedResources.get(projectName);
@@ -581,7 +581,7 @@ public class AddProjectToSessionWizard extends Wizard {
                     throw (CoreException) cause;
 
                 throw new CoreException(new org.eclipse.core.runtime.Status(
-                    IStatus.ERROR, Saros.SAROS,
+                    IStatus.ERROR, SarosConstants.SAROS,
                     "failed to compute local file list", e));
             }
 
