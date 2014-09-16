@@ -13,7 +13,6 @@ import org.eclipse.core.runtime.Status;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.SarosConstants;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
 
@@ -53,7 +52,7 @@ public class EclipseLogAppender extends AppenderSkeleton {
             status = IStatus.WARNING;
         }
 
-        IStatus logMessage = new Status(status, SarosConstants.SAROS, IStatus.OK,
+        IStatus logMessage = new Status(status, Saros.PLUGIN_ID, IStatus.OK,
             message, getThrowable(event));
         saros.getLog().log(logMessage);
     }

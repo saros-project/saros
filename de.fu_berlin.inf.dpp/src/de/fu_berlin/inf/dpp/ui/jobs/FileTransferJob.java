@@ -8,7 +8,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.jivesoftware.smackx.filetransfer.FileTransfer;
 import org.jivesoftware.smackx.filetransfer.FileTransfer.Error;
 
-import de.fu_berlin.inf.dpp.SarosConstants;
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.monitoring.MonitorableFileTransfer;
 import de.fu_berlin.inf.dpp.monitoring.MonitorableFileTransfer.TransferStatus;
 import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
@@ -39,7 +39,7 @@ abstract class FileTransferJob extends Job {
              */
             String errMsg = error == null ? "File transfer failed. Maybe the remote side cancelled the transfer."
                 : error.getMessage();
-            Status status = new Status(IStatus.ERROR, SarosConstants.SAROS, errMsg,
+            Status status = new Status(IStatus.ERROR, Saros.PLUGIN_ID, errMsg,
                 transfer.getException());
 
             LOG.error("file transfer from " + jid + " failed: " + errMsg,

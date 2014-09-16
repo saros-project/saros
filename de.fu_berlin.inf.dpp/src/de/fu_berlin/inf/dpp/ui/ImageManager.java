@@ -7,7 +7,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
-import de.fu_berlin.inf.dpp.SarosConstants;
+import de.fu_berlin.inf.dpp.Saros;
 
 /**
  * Handles references to all used images throughout this plug-in.
@@ -138,7 +138,8 @@ public class ImageManager {
      * @return the image descriptor
      */
     public static ImageDescriptor getImageDescriptor(String path) {
-        return AbstractUIPlugin.imageDescriptorFromPlugin(SarosConstants.SAROS, path);
+        return AbstractUIPlugin
+            .imageDescriptorFromPlugin(Saros.PLUGIN_ID, path);
     }
 
 }

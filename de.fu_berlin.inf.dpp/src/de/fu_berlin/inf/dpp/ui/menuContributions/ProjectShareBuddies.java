@@ -61,7 +61,7 @@ public class ProjectShareBuddies extends ContributionItem {
 
         for (final RosterEntry rosterEntry : getSortedRosterEntries()) {
             Boolean sarosSupport = discoveryManager.isFeatureSupported(new JID(
-                rosterEntry.getUser()), SarosConstants.NAMESPACE);
+                rosterEntry.getUser()), SarosConstants.XMPP_FEATURE_NAMESPACE);
 
             if (sarosSupport != null && sarosSupport) {
                 createContactMenuItem(menu, numSarosSupportedContacts++,

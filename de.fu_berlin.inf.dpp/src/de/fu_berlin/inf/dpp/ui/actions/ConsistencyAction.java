@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.SarosConstants;
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -240,10 +240,10 @@ public class ConsistencyAction extends Action implements Disposable {
         final Set<SPath> paths = new HashSet<SPath>(
             watchdogClient.getPathsWithWrongChecksums());
 
-        String PID = SarosConstants.SAROS;
+        String pluginID = Saros.PLUGIN_ID;
 
         MultiStatus multiStatus = new MultiStatus(
-            PID,
+            pluginID,
             0,
             "Please confirm workspace modifications.\n\n"
                 + "The recovery process will perform changes to files and folders of the current shared project(s).\n\n"
@@ -251,7 +251,7 @@ public class ConsistencyAction extends Action implements Disposable {
                 + "Press 'Details' for the affected files and folders.", null);
 
         for (SPath path : paths)
-            multiStatus.add(new Status(IStatus.WARNING, PID, "project: "
+            multiStatus.add(new Status(IStatus.WARNING, pluginID, "project: "
                 + path.getProject().getName() + ", file:"
                 + path.getProjectRelativePath().toOSString()));
 

@@ -42,7 +42,7 @@ public final class RosterContentProvider extends TreeContentProvider {
         public void featureSupportUpdated(final JID jid, String feature,
             boolean isSupported) {
 
-            if (SarosConstants.NAMESPACE.equals(feature))
+            if (SarosConstants.XMPP_FEATURE_NAMESPACE.equals(feature))
                 ViewerUtils.update(viewer, new RosterEntryElement(roster, jid,
                     true), null);
         }
@@ -150,7 +150,7 @@ public final class RosterContentProvider extends TreeContentProvider {
 
     private RosterEntryElement createRosterEntryElement(final JID jid) {
         final Boolean isSarosSupport = discoveryManager.isFeatureSupported(jid,
-            SarosConstants.NAMESPACE);
+            SarosConstants.XMPP_FEATURE_NAMESPACE);
 
         return new RosterEntryElement(roster, jid,
             isSarosSupport == null ? false : isSarosSupport);
@@ -171,11 +171,11 @@ public final class RosterContentProvider extends TreeContentProvider {
                 continue;
 
             Boolean sarosSupported = discoveryManager.isFeatureSupported(jid,
-                SarosConstants.NAMESPACE);
+                SarosConstants.XMPP_FEATURE_NAMESPACE);
 
             if (sarosSupported == null)
                 discoveryManager
-                    .queryFeatureSupport(jid, SarosConstants.NAMESPACE, true);
+                    .queryFeatureSupport(jid, SarosConstants.XMPP_FEATURE_NAMESPACE, true);
         }
     }
 }

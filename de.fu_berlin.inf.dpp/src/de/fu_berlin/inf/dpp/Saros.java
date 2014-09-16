@@ -68,6 +68,11 @@ import de.fu_berlin.inf.dpp.versioning.VersionManager;
 public class Saros extends AbstractUIPlugin {
 
     /**
+     * This is the Bundle-SymbolicName (a.k.a the pluginID)
+     */
+    public static final String PLUGIN_ID = "de.fu_berlin.inf.dpp"; //$NON-NLS-1$
+
+    /**
      * @JTourBusStop 1, Some Basics:
      * 
      *               This class manages the lifecycle of the Saros plug-in,
@@ -220,7 +225,7 @@ public class Saros extends AbstractUIPlugin {
 
         SarosPluginContext.setSarosContext(sarosContext);
 
-        sarosFeatureID = SarosConstants.SAROS + "_" + sarosVersion; //$NON-NLS-1$
+        sarosFeatureID = PLUGIN_ID + "_" + sarosVersion; //$NON-NLS-1$
 
         // Remove the Bundle if an instance of it was already registered
         sarosContext.removeComponent(Bundle.class);
@@ -346,7 +351,7 @@ public class Saros extends AbstractUIPlugin {
     public synchronized Preferences getGlobalPreferences() {
         // TODO Singleton-Pattern code smell: ConfigPrefs should be a @component
         if (configPrefs == null) {
-            configPrefs = new ConfigurationScope().getNode(SarosConstants.SAROS);
+            configPrefs = new ConfigurationScope().getNode(PLUGIN_ID);
         }
         return configPrefs;
     }

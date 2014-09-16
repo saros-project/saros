@@ -15,7 +15,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.picocontainer.Startable;
 
-import de.fu_berlin.inf.dpp.SarosConstants;
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -27,12 +27,12 @@ import de.fu_berlin.inf.dpp.ui.preferencePages.FeedbackPreferencePage;
  * contains all errors and warnings per default. If the user furthermore allowed
  * the submission of the full log (i.e. with debug and info messages) via the
  * {@link FeedbackPreferencePage}, then the full log is submitted.
- *
+ * 
  * @author Lisa Dohrmann
- *
+ * 
  * @TODO provide a better way to access the preference constants. coezbek wants
  *       to use his preference framework for this
- *
+ * 
  */
 @Component(module = "feedback")
 public class ErrorLogManager extends AbstractFeedbackManager implements
@@ -68,7 +68,7 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
 
     /**
      * Returns if the submission of the error log is allowed as a boolean.
-     *
+     * 
      * @return true if it is allowed
      */
     public static boolean isErrorLogSubmissionAllowed() {
@@ -78,7 +78,7 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
     /**
      * Returns whether the submission of the error log is allowed, forbidden or
      * unknown.
-     *
+     * 
      * @return 0 = unknown, 1 = allowed, 2 = forbidden
      */
     public static int getErrorLogSubmissionStatus() {
@@ -98,7 +98,7 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
 
     /**
      * Returns if the user gave an answer to the error log submission.
-     *
+     * 
      * @return true if the user either allowed or forbade the submission,
      *         otherwise false
      */
@@ -108,7 +108,7 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
 
     /**
      * Returns if the submission of the full error log is allowed as a boolean.
-     *
+     * 
      * @return true if it is allowed
      */
     public static boolean isFullErrorLogSubmissionAllowed() {
@@ -119,7 +119,7 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
      * Returns whether the submission of the *full* error log, i.e. the log that
      * contains errors and warnings as well as debug and info messages, is
      * allowed or forbidden
-     *
+     * 
      * @return ALLOW or FORBID
      */
     public static int getFullErrorLogSubmissionStatus() {
@@ -141,7 +141,7 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
      * location is determined by iterating through all log appenders until a
      * FileAppender with the given appenderName is found. Its current value of
      * the File option is than returned as the path of the error log.
-     *
+     * 
      * @return the location of the error log file or null if none could be
      *         determined
      */
@@ -162,7 +162,7 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
     /**
      * Returns the error log file produced by the ErrorsOnlyAppender or null, if
      * none could be found.
-     *
+     * 
      * @return an existing error log file or null
      */
     public static File getErrorsOnlyLogFile() {
@@ -179,7 +179,7 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
     /**
      * Returns the error log file produced by the SessionLogAppender or null, if
      * none could be found.
-     *
+     * 
      * @return an existing error log file or null
      */
     public static File getFullErrorLogFile() {
@@ -198,9 +198,9 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
      * choice) to our server by wrapping the submission in an
      * IRunnableWithProgress to report feedback of the execution in the active
      * workbench windows status bar.
-     *
+     * 
      * @see FileSubmitter#uploadErrorLog(String, String, File, IProgressMonitor)
-     *
+     * 
      * @nonblocking
      * @cancelable
      */
@@ -235,7 +235,7 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
                         e.getMessage(), e.getCause() != null ? e.getCause()
                             .getMessage() : "");
                     log.error(msg);
-                    return new Status(IStatus.ERROR, SarosConstants.SAROS, msg, e);
+                    return new Status(IStatus.ERROR, Saros.PLUGIN_ID, msg, e);
                 } catch (OperationCanceledException e) {
                     return Status.CANCEL_STATUS;
                 } finally {

@@ -46,6 +46,11 @@ import org.jivesoftware.smackx.ServiceDiscoveryManager;
  */
 public class Saros {
 
+    /**
+     * This is the plugin ID that identifies the saros plugin in the IDEA ecosystem.
+     */
+    public static final String PLUGIN_ID = "de.fu_berlin.inf.dpp.intellij";
+
     private static Saros instance;
 
     private static boolean isInitialized;
@@ -131,7 +136,7 @@ public class Saros {
 
                 if (state == ConnectionState.CONNECTING) {
                     ServiceDiscoveryManager.getInstanceFor(connection).addFeature(
-                        SarosConstants.NAMESPACE);
+                        SarosConstants.XMPP_FEATURE_NAMESPACE);
                 }
             }
 

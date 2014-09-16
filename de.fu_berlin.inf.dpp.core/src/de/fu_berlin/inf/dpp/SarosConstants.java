@@ -3,22 +3,20 @@ package de.fu_berlin.inf.dpp;
 public interface SarosConstants {
 
     /**
-     * This is the Bundle-SymbolicName (a.k.a the pluginID)
+     * XMPP namespace of the Saros Feature.
+     * <p>
+     * See also: XEP-0030: Service Discovery
+     * (http://xmpp.org/extensions/xep-0030.html)
      */
-    public static final String SAROS = "de.fu_berlin.inf.dpp"; //$NON-NLS-1$
-    /**
-     * The name of the XMPP namespace used by Saros. At the moment it is only
-     * used to advertise the Saros feature in the Service Discovery.
-     * 
-     * TODO Add version information, so that only compatible versions of Saros
-     * can use each other.
-     */
-    public final static String NAMESPACE = SAROS;
+
+    public final static String XMPP_FEATURE_NAMESPACE = "de.fu_berlin.inf.dpp";
     /**
      * Sub-namespace for the server. It is used advertise when a server is
      * active.
      */
-    public static final String NAMESPACE_SERVER = NAMESPACE + ".server"; //$NON-NLS-1$
+
+    public static final String NAMESPACE_SERVER = XMPP_FEATURE_NAMESPACE
+        + ".server";
     /**
      * The name of the resource identifier used by Saros when connecting to the
      * XMPP server (for instance when logging in as john@doe.com, Saros will
@@ -30,6 +28,6 @@ public interface SarosConstants {
      *             may be something like foo@bar/Saros765E18ED !
      */
     @Deprecated
-    public final static String RESOURCE = "Saros"; //$NON-NLS-1$
+    public final static String RESOURCE = "Saros";
 
 }

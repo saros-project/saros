@@ -6,7 +6,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
-import de.fu_berlin.inf.dpp.SarosConstants;
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 
@@ -46,7 +46,7 @@ public class EclipseWorkspaceImpl implements IWorkspace {
             try {
                 delegate.run(mon);
             } catch (IOException e) {
-                IStatus status = new Status(IStatus.ERROR, SarosConstants.SAROS,
+                IStatus status = new Status(IStatus.ERROR, Saros.PLUGIN_ID,
                     e.getMessage(), e);
                 throw new CoreException(status);
             }

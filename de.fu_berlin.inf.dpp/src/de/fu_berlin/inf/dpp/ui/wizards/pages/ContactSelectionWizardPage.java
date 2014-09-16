@@ -76,7 +76,7 @@ public class ContactSelectionWizardPage extends WizardPage {
         public void featureSupportUpdated(final JID jid, String feature,
             boolean isSupported) {
 
-            if (!SarosConstants.NAMESPACE.equals(feature))
+            if (!SarosConstants.XMPP_FEATURE_NAMESPACE.equals(feature))
                 return;
 
             SWTUtils.runSafeSWTAsync(LOG, new Runnable() {

@@ -70,7 +70,7 @@ public class ConnectionHandler {
 
             if (state == ConnectionState.CONNECTING) {
                 ServiceDiscoveryManager.getInstanceFor(connection).addFeature(
-                    SarosConstants.NAMESPACE);
+                    SarosConstants.XMPP_FEATURE_NAMESPACE);
             }
 
             final Exception error = state == ConnectionState.ERROR ? connectionService

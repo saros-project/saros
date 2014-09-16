@@ -229,7 +229,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
         monitor.setTaskName("Checking Saros support...");
 
         JID resourceQualifiedJID = discoveryManager.getSupportingPresence(peer,
-            SarosConstants.NAMESPACE);
+            SarosConstants.XMPP_FEATURE_NAMESPACE);
 
         if (resourceQualifiedJID == null)
             throw new LocalCancellationException(
