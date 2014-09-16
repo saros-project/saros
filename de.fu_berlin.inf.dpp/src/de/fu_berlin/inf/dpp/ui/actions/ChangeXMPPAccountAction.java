@@ -20,7 +20,7 @@ import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.communication.connection.IConnectionStateListener;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
@@ -95,7 +95,8 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator,
 
     @Override
     public void dispose() {
-        connectionHandler.removeConnectionStateListener(connectionStateListener);
+        connectionHandler
+            .removeConnectionStateListener(connectionStateListener);
     }
 
     @Override
@@ -189,7 +190,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator,
         if (account != null)
             accountService.setAccountActive(account);
 
-        ThreadUtils.runSafeAsync("ConnectAction", LOG, new Runnable() {
+        ThreadUtils.runSafeAsync("dpp-connect-manual", LOG, new Runnable() {
             @Override
             public void run() {
                 try {
@@ -206,7 +207,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator,
     }
 
     private void disconnect() {
-        ThreadUtils.runSafeAsync("DisconnectAction", LOG, new Runnable() {
+        ThreadUtils.runSafeAsync("dpp-disconnect-manual", LOG, new Runnable() {
             @Override
             public void run() {
                 try {

@@ -4,15 +4,19 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.easymock.EasyMock;
+import org.junit.Before;
 import org.junit.Test;
 
 public class ChecksumCacheTest {
 
-    private String collidingA0 = "righto";
-    private String collidingA1 = "buzzards";
+    private IFile collidingA0;
+    private IFile collidingA1;
 
-    private String collidingB0 = "wainages";
-    private String collidingB1 = "presentencing";
+    private IFile collidingB0;
+    private IFile collidingB1;
+
+    private IFile nonColliding;
 
     private IFileContentChangedListener listener;
 
@@ -31,6 +35,15 @@ public class ChecksumCacheTest {
         }
 
     };
+
+    @Before
+    public void setup() {
+        collidingA0 = createFileMock("righto");
+        collidingA1 = createFileMock("buzzards");
+        collidingB0 = createFileMock("wainages");
+        collidingB1 = createFileMock("presentencing");
+        nonColliding = createFileMock("01234567890123456789012345678901");
+    }
 
     @Test
     public void testGetChecksumOfNonExistingEntry() {
@@ -118,18 +131,34 @@ public class ChecksumCacheTest {
     @Test
     public void testUpdateChecksum() {
         IChecksumCache cache = new ChecksumCacheImpl(notifier);
-        cache.addChecksum("01234567890123456789012345678901", 5L);
+        cache.addChecksum(nonColliding, 5L);
         cache.addChecksum(collidingA0, 5L);
         cache.addChecksum(collidingA1, 6L);
 
-        cache.addChecksum("01234567890123456789012345678901", 1L);
+        cache.addChecksum(nonColliding, 1L);
         cache.addChecksum(collidingA0, 1L);
         cache.addChecksum(collidingA1, 1L);
 
-        assertEquals(Long.valueOf(1),
-            cache.getChecksum("01234567890123456789012345678901"));
+        assertEquals(Long.valueOf(1), cache.getChecksum(nonColliding));
         assertEquals(Long.valueOf(1), cache.getChecksum(collidingA0));
         assertEquals(Long.valueOf(1), cache.getChecksum(collidingA1));
 
+    }
+
+    private static IFile createFileMock(final String path) {
+        IFile fileMock = EasyMock.createMock(IFile.class);
+        IPath pathMock = EasyMock.createMock(IPath.class);
+
+        pathMock.toOSString();
+
+        EasyMock.expectLastCall().andStubReturn(path);
+
+        fileMock.getFullPath();
+
+        EasyMock.expectLastCall().andStubReturn(pathMock);
+
+        EasyMock.replay(fileMock, pathMock);
+
+        return fileMock;
     }
 }

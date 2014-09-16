@@ -14,7 +14,7 @@ public class Configuration {
     private static final String[] BUNDLE_NAMES = {
         "de.fu_berlin.inf.dpp.project.messages",
         "de.fu_berlin.inf.dpp.feedback.messages",
-        "de.fu_berlin.inf.dpp.messages", "de.fu_berlin.inf.dpp.ui.messages",
+        "de.fu_berlin.inf.dpp.ui.messages",
         "de.fu_berlin.inf.dpp.stf.shared.configuration" };
 
     private static final ResourceBundle[] RESOURCE_BUNDLES;

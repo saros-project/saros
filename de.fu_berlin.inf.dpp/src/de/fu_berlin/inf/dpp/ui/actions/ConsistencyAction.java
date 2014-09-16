@@ -10,7 +10,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -30,10 +29,10 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
 import de.fu_berlin.inf.dpp.observables.ValueChangeListener;
-import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -84,7 +83,7 @@ public class ConsistencyAction extends Action implements Disposable {
         }
     }
 
-    private final ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+    private final ISarosSessionListener sessionListener = new NullSarosSessionListener() {
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
             setSharedProject(newSarosSession);
@@ -100,7 +99,7 @@ public class ConsistencyAction extends Action implements Disposable {
 
         @Override
         public void setValue(Boolean newValue) {
-            handleConistencyChange(newValue);
+            handleConsistencyChange(newValue);
         }
     };
 
@@ -164,7 +163,7 @@ public class ConsistencyAction extends Action implements Disposable {
         }
     }
 
-    private void handleConistencyChange(Boolean isInconsistent) {
+    private void handleConsistencyChange(Boolean isInconsistent) {
 
         if (sarosSession.isHost() && isInconsistent) {
             LOG.warn("No inconsistency should ever be reported" //$NON-NLS-1$
@@ -268,13 +267,7 @@ public class ConsistencyAction extends Action implements Disposable {
                 @Override
                 public void run(IProgressMonitor monitor)
                     throws InterruptedException {
-
-                    SubMonitor progress = SubMonitor.convert(monitor);
-                    progress.beginTask(
-                        Messages.ConsistencyAction_progress_perform_recovery,
-                        100);
-                    watchdogClient.runRecovery(progress.newChild(100));
-                    monitor.done();
+                    watchdogClient.runRecovery(monitor);
                 }
             });
         } catch (InvocationTargetException e) {

@@ -108,6 +108,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
             AbstractFeedbackManager.FORBID);
 
         // Communication default settings
+        prefs.setValue(PreferenceConstants.USE_IRC_STYLE_CHAT_LAYOUT, false);
         prefs.setValue(PreferenceConstants.CUSTOM_MUC_SERVICE, "");
         prefs.setValue(PreferenceConstants.FORCE_CUSTOM_MUC_SERVICE, true);
         prefs.setValue(PreferenceConstants.SOUND_ENABLED, true);

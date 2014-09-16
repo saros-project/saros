@@ -6,7 +6,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
@@ -25,6 +25,7 @@ public class ProjectNegotiationObservable {
 
     private int addings = 0;
 
+    // FIXME you can have multiple negotiations !!!!!!!!!!!!!!!!!!!!
     /**
      * JID => ProjectNegotiation
      * 
@@ -42,16 +43,6 @@ public class ProjectNegotiationObservable {
      */
     public synchronized ProjectNegotiation getProjectExchangeProcess(JID jid) {
         return this.processes.get(jid);
-    }
-
-    public synchronized ProjectNegotiation getProjectExchangeProcess(
-        String processID) {
-        for (ProjectNegotiation projectNegotiation : this.processes.values()) {
-            if (projectNegotiation.getProcessID().equals(processID)) {
-                return projectNegotiation;
-            }
-        }
-        return null;
     }
 
     public synchronized void addProjectExchangeProcess(

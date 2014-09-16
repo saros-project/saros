@@ -1,10 +1,12 @@
 package de.fu_berlin.inf.dpp.util;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -12,15 +14,9 @@ import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRunnable;
-import org.eclipse.core.resources.ResourceAttributes;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
  * This class contains static utility methods for file handling.
@@ -30,292 +26,91 @@ import org.eclipse.core.runtime.IProgressMonitor;
  */
 public class FileUtils {
 
-    private static Logger log = Logger.getLogger(FileUtils.class);
+    private static Logger LOG = Logger.getLogger(FileUtils.class);
 
     private FileUtils() {
         // no instantiation allowed
     }
 
     /**
-     * Makes the given file read-only (</code>readOnly == true</code>) or
-     * writable (<code>readOnly == false</code>).
-     * 
-     * @param file
-     *            the resource whose read-only attribute is to be set or removed
-     * @param readOnly
-     *            <code>true</code> to set the given file to be read-only,
-     *            <code>false</code> to make writable
-     * @return The state before setting read-only to the given value.
-     */
-    public static boolean setReadOnly(IResource file, boolean readOnly) {
-
-        ResourceAttributes attributes = file.getResourceAttributes();
-
-        if (attributes == null) {
-            // TODO Throw a FileNotFoundException and deal with it everywhere!
-            log.error("File does not exist for setting readOnly == " + readOnly
-                + ": " + file, new StackTrace());
-            return false;
-        }
-        boolean result = attributes.isReadOnly();
-
-        // Already in desired state
-        if (result == readOnly)
-            return result;
-
-        attributes.setReadOnly(readOnly);
-        try {
-            file.setResourceAttributes(attributes);
-        } catch (CoreException e) {
-            // failure is not an option
-            log.warn("Failed to set resource readonly == " + readOnly + ": "
-                + file);
-        }
-        return result;
-    }
-
-    /**
-     * Writes the given input stream to the given file.
-     * 
-     * This operation will remove a possible readOnly flag and re-set if after
-     * the operation.
-     * 
-     * @blocking This operations blocks until the operation is reported as
-     *           finished by Eclipse.
+     * Writes the data of the given input stream to the given file.
      * 
      * @param input
      *            the input stream to write to the file
      * @param file
      *            the file to create/overwrite
      * @throws CoreException
-     *             if the file could not be written.
      */
-    public static void writeFile(InputStream input, IFile file,
-        IProgressMonitor monitor) throws CoreException {
+    public static void writeFile(final InputStream input, final IFile file)
+        throws CoreException {
         if (file.exists()) {
-            updateFile(input, file, monitor);
+            file.setContents(input, false, true, null);
         } else {
-            createFile(input, file, monitor);
+            mkdirs(file);
+            file.create(input, false, null);
         }
-
     }
 
     /**
-     * Move the file to the same location, adding the file extension "BACKUP" or
-     * "_BACKUP_X" on file name where X is a number that matches a not used file
-     * name.
+     * Makes sure that the parent directories of the given
+     * {@linkplain IResource resource} exist.
      * 
-     * @param file
-     *            the {@link IFile} to rename
-     * @param monitor
-     *            a progress monitor to show progress to user
      * @throws CoreException
-     * @throws FileNotFoundException
      */
-    public static void backupFile(IFile file, IProgressMonitor monitor)
-        throws CoreException, FileNotFoundException {
+    public static void mkdirs(final IResource resource) throws CoreException {
 
-        if (!file.exists())
-            throw new FileNotFoundException();
+        final List<IFolder> parents = new ArrayList<IFolder>();
 
-        IProject project = file.getProject();
-
-        IPath originalBackupPath = file.getProjectRelativePath()
-            .addFileExtension("BACKUP");
-
-        IPath backupPath = originalBackupPath;
-
-        for (int i = 0; i < 1000; i++) {
-            if (!project.exists(backupPath))
-                break;
-
-            backupPath = originalBackupPath.removeFileExtension()
-                .addFileExtension("BACKUP_" + i);
-        }
-
-        file.move(
-            file.getFullPath().removeLastSegments(1)
-                .append(backupPath.lastSegment()), true, monitor);
-    }
-
-    /**
-     * Creates the given file and any missing parent directories.
-     * 
-     * This method will try to remove read-only settings on the parent
-     * directories and reset them at the end of the operation.
-     * 
-     * @pre the file must not exist. Use writeFile() for getting this cases
-     *      handled.
-     */
-    public static void createFile(final InputStream input, final IFile file,
-        IProgressMonitor monitor) throws CoreException {
-
-        IWorkspaceRunnable createFileProcedure = new IWorkspaceRunnable() {
-            @Override
-            public void run(IProgressMonitor monitor) throws CoreException {
-                // Make sure directory exists
-                mkdirs(file);
-
-                // Make sure that parent is writable
-                IContainer parent = file.getParent();
-                boolean wasReadOnly = false;
-                if (parent != null)
-                    wasReadOnly = setReadOnly(parent, false);
-
-                file.create(input, true, monitor);
-
-                // Reset permissions on parent
-                if (parent != null && wasReadOnly)
-                    setReadOnly(parent, true);
-
-            }
-        };
-
-        IWorkspace workspace = ResourcesPlugin.getWorkspace();
-        workspace.run(createFileProcedure, workspace.getRoot(),
-            IWorkspace.AVOID_UPDATE, null);
-
-    }
-
-    /**
-     * Updates the data in the file with the data from the given InputStream.
-     * 
-     * @pre the file must exist
-     */
-    public static void updateFile(final InputStream input, final IFile file,
-        IProgressMonitor monitor) throws CoreException {
-
-        IWorkspaceRunnable replaceFileProcedure = new IWorkspaceRunnable() {
-            @Override
-            public void run(IProgressMonitor monitor) throws CoreException {
-                file.setContents(input, true, true, monitor);
-            }
-        };
-
-        IWorkspace workspace = ResourcesPlugin.getWorkspace();
-        workspace.run(replaceFileProcedure, workspace.getRoot(),
-            IWorkspace.AVOID_UPDATE, null);
-    }
-
-    /**
-     * Makes sure that the parent directories of the given IResource exist,
-     * possibly removing write protection.
-     */
-    public static boolean mkdirs(IResource resource) {
-
-        if (resource == null)
-            return true;
-
-        IFolder parent = getParentFolder(resource);
-        if (parent == null || parent.exists())
-            return true;
-
-        IContainer root = parent;
-        while (!root.exists()) {
-            IContainer temp = root.getParent();
-            if (temp == null)
-                break;
-            root = temp;
-        }
-        boolean wasReadOnly = FileUtils.setReadOnly(root, false);
-
-        try {
-            create(parent);
-        } catch (CoreException e) {
-            log.error("Could not create Dir: " + parent.getFullPath());
-            return false;
-        } finally {
-            if (wasReadOnly)
-                FileUtils.setReadOnly(root, true);
-        }
-        return true;
-    }
-
-    public static IFolder getParentFolder(IResource resource) {
-
-        if (resource == null) {
-            return null;
-        }
         IContainer parent = resource.getParent();
-        if (parent == null || parent.getType() != IResource.FOLDER) {
-            return null;
+
+        while (parent != null && parent.getType() == IResource.FOLDER) {
+            if (parent.exists())
+                break;
+
+            parents.add((IFolder) parent);
+            parent = parent.getParent();
         }
-        return (IFolder) parent;
+
+        Collections.reverse(parents);
+
+        for (final IFolder folder : parents)
+            folder.create(false, true, null);
     }
 
+    /**
+     * Creates the given folder. All parent folder may be created on demand if
+     * necessary.
+     * 
+     * @param folder
+     *            the folder to create
+     * @throws CoreException
+     */
     public static void create(final IFolder folder) throws CoreException {
-
-        // if ((folder == null) || (folder.exists())) {
-        // log.debug(".create() Creating folder not possible");
-        // return;
-        // }
-
-        if (folder == null) {
-            log.warn(".create() Creating folder not possible -  it is null");
-            throw new IllegalArgumentException();
-        }
         if (folder.exists()) {
-            log.debug(".create() Creating folder " + folder.getName()
-                + " not possible - it already exists");
+            LOG.warn("folder already exists: " + folder, new StackTrace());
             return;
         }
-        IWorkspaceRunnable createFolderProcedure = new IWorkspaceRunnable() {
-            @Override
-            public void run(IProgressMonitor monitor) throws CoreException {
 
-                // recursively create folders until parent folder exists
-                // or project root is reached
-                IFolder parentFolder = getParentFolder(folder);
-                if (parentFolder != null) {
-                    create(parentFolder);
-                }
-
-                folder.create(IResource.NONE, true, monitor);
-
-                if (monitor.isCanceled()) {
-                    log.warn("Creating folder failed: " + folder);
-                }
-
-            }
-        };
-
-        IWorkspace workspace = ResourcesPlugin.getWorkspace();
-        workspace.run(createFolderProcedure, workspace.getRoot(),
-            IWorkspace.AVOID_UPDATE, null);
-
+        mkdirs(folder);
+        folder.create(false, true, null);
     }
 
+    /**
+     * Deletes the given resource and tries to store the existing resource to
+     * the Eclipse history space.
+     * 
+     * @param resource
+     *            the resource to delete
+     * @throws CoreException
+     */
     public static void delete(final IResource resource) throws CoreException {
         if (!resource.exists()) {
-            log.warn("File not found for deletion: " + resource,
+            LOG.warn("file for deletion does not exist: " + resource,
                 new StackTrace());
             return;
         }
 
-        IWorkspaceRunnable deleteProcedure = new IWorkspaceRunnable() {
-            @Override
-            public void run(IProgressMonitor monitor) throws CoreException {
-                if (!resource.exists())
-                    return;
-
-                if (resource.getResourceAttributes() == null)
-                    return;
-
-                setReadOnly(resource, false);
-
-                resource.delete(IResource.FORCE | IResource.KEEP_HISTORY,
-                    monitor);
-
-                if (monitor.isCanceled()) {
-                    log.warn("Removing resource failed: " + resource);
-                }
-            }
-        };
-
-        IWorkspace workspace = ResourcesPlugin.getWorkspace();
-        workspace.run(deleteProcedure, workspace.getRoot(),
-            IWorkspace.AVOID_UPDATE, null);
-
+        resource.delete(IResource.KEEP_HISTORY, null);
     }
 
     /**
@@ -333,32 +128,7 @@ public class FileUtils {
     public static void move(final IPath destination, final IResource source)
         throws CoreException {
 
-        log.trace(".move(" + destination.toOSString() + " , "
-            + source.getName() + ")");
-
-        if (!source.isAccessible()) {
-            log.warn(".move Source file can not be accessed  "
-                + source.getFullPath());
-            return;
-        }
-
-        IWorkspaceRunnable moveProcedure = new IWorkspaceRunnable() {
-            @Override
-            public void run(IProgressMonitor monitor) throws CoreException {
-                IPath absDestination = destination.makeAbsolute();
-
-                source.move(absDestination, false, monitor);
-
-                if (monitor.isCanceled()) {
-                    log.warn("Moving resource failed (Cancel Button pressed).");
-                }
-            }
-        };
-
-        IWorkspace workspace = ResourcesPlugin.getWorkspace();
-        workspace.run(moveProcedure, workspace.getRoot(),
-            IWorkspace.AVOID_UPDATE, null);
-
+        source.move(destination.makeAbsolute(), false, null);
     }
 
     /**
@@ -394,7 +164,7 @@ public class FileUtils {
 
                     totalFileSize += filesize;
                 } catch (Exception e) {
-                    log.warn(
+                    LOG.warn(
                         "failed to retrieve file size of file "
                             + resource.getLocationURI(), e);
                 }
@@ -417,7 +187,7 @@ public class FileUtils {
                     totalFileCount += subFileCountAndSize.v;
 
                 } catch (Exception e) {
-                    log.warn("failed to process container: " + resource, e);
+                    LOG.warn("failed to process container: " + resource, e);
                 }
                 break;
             default:
@@ -444,9 +214,9 @@ public class FileUtils {
             in = localFile.getContents();
             content = IOUtils.toByteArray(in);
         } catch (CoreException e) {
-            log.warn("could not get content of file " + localFile.getFullPath());
+            LOG.warn("could not get content of file " + localFile.getFullPath());
         } catch (IOException e) {
-            log.warn("could not convert file content to byte array (file: "
+            LOG.warn("could not convert file content to byte array (file: "
                 + localFile.getFullPath() + ")");
         } finally {
             IOUtils.closeQuietly(in);

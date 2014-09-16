@@ -10,13 +10,14 @@ import org.jivesoftware.smack.Connection;
 import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatPreferences;
-import de.fu_berlin.inf.dpp.invitation.hooks.ISessionNegotiationHook;
-import de.fu_berlin.inf.dpp.invitation.hooks.SessionNegotiationHookManager;
+import de.fu_berlin.inf.dpp.negotiation.hooks.ISessionNegotiationHook;
+import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 
 /**
  * The MUCNegotiationManager is responsible for transmitting the Communication
@@ -34,20 +35,22 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
  */
 public class MUCNegotiationManager {
 
-    private static final Logger log = Logger
+    private static final Logger LOG = Logger
         .getLogger(MUCNegotiationManager.class);
 
-    protected IPreferenceStore preferences;
+    private static final String NOT_IN_SESSION = "NOT_IN_SESSION";
 
-    protected SessionIDObservable sessionID;
+    private final IPreferenceStore preferences;
 
-    protected String password;
+    private final String password;
 
-    protected MultiUserChatPreferences sessionPreferences;
+    private final XMPPConnectionService connectionService;
 
-    protected XMPPConnectionService connectionService;
+    private final ISarosSessionManager sessionManager;
 
-    private Random random = new Random();
+    private final Random random = new Random();
+
+    private MultiUserChatPreferences sessionPreferences;
 
     private final ISessionNegotiationHook negotiationHook = new ISessionNegotiationHook() {
         private static final String HOOK_IDENTIFIER = "multiUserChat";
@@ -99,10 +102,10 @@ public class MUCNegotiationManager {
         }
     };
 
-    public MUCNegotiationManager(SessionIDObservable sessionID,
+    public MUCNegotiationManager(ISarosSessionManager sessionManager,
         @Nullable XMPPConnectionService connectionService,
         IPreferenceStore preferences, SessionNegotiationHookManager hooks) {
-        this.sessionID = sessionID;
+        this.sessionManager = sessionManager;
         this.connectionService = connectionService;
         this.preferences = preferences;
         this.password = String.valueOf(random.nextInt());
@@ -115,8 +118,12 @@ public class MUCNegotiationManager {
      * and chat room password.
      */
     public MultiUserChatPreferences getOwnPreferences() {
-        return new MultiUserChatPreferences(getMUCService(), "SAROS"
-            + sessionID.getValue(), password);
+
+        // TODO if no session is present return null
+        final ISarosSession session = sessionManager.getSarosSession();
+
+        return new MultiUserChatPreferences(getMUCService(), "SAROS_"
+            + (session != null ? session.getID() : NOT_IN_SESSION), password);
     }
 
     /**
@@ -133,7 +140,7 @@ public class MUCNegotiationManager {
      *            received communication settings
      */
     public void setSessionPreferences(MultiUserChatPreferences remotePreferences) {
-        log.debug("Got hosts Communication Config: server "
+        LOG.debug("Got hosts Communication Config: server "
             + remotePreferences.getService() + " room "
             + remotePreferences.getRoomName() + " pw "
             + remotePreferences.getPassword());

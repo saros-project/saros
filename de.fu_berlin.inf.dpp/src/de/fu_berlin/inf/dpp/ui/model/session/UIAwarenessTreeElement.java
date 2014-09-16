@@ -4,6 +4,8 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Image;
 
 import de.fu_berlin.inf.dpp.activities.IDEInteractionActivity.Element;
+import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
+import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 
@@ -14,17 +16,17 @@ import de.fu_berlin.inf.dpp.ui.ImageManager;
  * */
 public class UIAwarenessTreeElement extends AwarenessInformationTreeElement {
 
-    public UIAwarenessTreeElement(User user) {
-        super(user);
+    public UIAwarenessTreeElement(final User user,
+        final EditorManager editorManager,
+        final AwarenessInformationCollector collector) {
+        super(user, editorManager, collector);
     }
 
     @Override
     public StyledString getStyledText() {
         StyledString styledString = new StyledString();
-        String uiTitle = awarenessInformationCollector
-            .getOpenIDEElementTitle(user);
-        Element uiType = awarenessInformationCollector
-            .getOpenIDEElementType(user);
+        String uiTitle = collector.getOpenIDEElementTitle(user);
+        Element uiType = collector.getOpenIDEElementType(user);
         if (uiTitle != null && uiType != null) {
             if (uiType == Element.DIALOG)
                 styledString.append("Open dialog: " + uiTitle);

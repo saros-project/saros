@@ -9,9 +9,12 @@ import org.osgi.service.prefs.Preferences;
 import org.picocontainer.BindKey;
 import org.picocontainer.MutablePicoContainer;
 
+import de.fu_berlin.inf.dpp.communication.connection.IProxyResolver;
+import de.fu_berlin.inf.dpp.communication.connection.Socks5ProxyResolver;
 import de.fu_berlin.inf.dpp.concurrent.undo.UndoManager;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.filesystem.ChecksumCacheImpl;
 import de.fu_berlin.inf.dpp.filesystem.EclipsePathFactory;
@@ -54,7 +57,7 @@ public class SarosEclipseContextFactory extends AbstractSarosContextFactory {
         // Core Managers
         Component.create(ConsistencyWatchdogClient.class),
         Component.create(EditorAPI.class),
-        Component.create(EditorManager.class),
+        Component.create(IEditorManager.class, EditorManager.class),
         // disabled because of privacy violations
         // see
         // http://opus.haw-hamburg.de/volltexte/2011/1391/pdf/ba_krassmann_online.pdf
@@ -96,7 +99,10 @@ public class SarosEclipseContextFactory extends AbstractSarosContextFactory {
 
         // VCS (SVN only)
         Component.create(VCSProviderFactory.class,
-            EclipseVCSProviderFactoryImpl.class) };
+            EclipseVCSProviderFactoryImpl.class),
+
+        // Proxy Support for the XMPP server connection
+        Component.create(IProxyResolver.class, Socks5ProxyResolver.class) };
 
     public SarosEclipseContextFactory(Saros saros, ISarosContextFactory delegate) {
         this.saros = saros;

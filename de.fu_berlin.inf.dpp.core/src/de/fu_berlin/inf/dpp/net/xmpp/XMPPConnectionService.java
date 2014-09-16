@@ -17,7 +17,6 @@ import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 import org.picocontainer.annotations.Nullable;
 
@@ -45,7 +44,6 @@ public class XMPPConnectionService {
 
     private Connection connection;
 
-    private String namespace;
     private String resource;
     private int proxyPort;
     private boolean isProxyEnabled;
@@ -137,8 +135,6 @@ public class XMPPConnectionService {
      * Configures the service. Must be at least called once before
      * {@link #connect} is called.
      * 
-     * @param namespace
-     *            the namespace of the feature (plugin)
      * @param resource
      *            the resource qualifier for a running connection
      * @param enableDebug
@@ -163,10 +159,10 @@ public class XMPPConnectionService {
      * @param stunPort
      *            STUN server port if 0 the default stun port will be used
      */
-    public synchronized void configure(final String namespace,
-        final String resource, final boolean enableDebug,
-        final boolean proxyEnabled, final int proxyPort,
-        final Collection<String> proxyAddresses, final String gatewayDeviceID,
+    public synchronized void configure(final String resource,
+        final boolean enableDebug, final boolean proxyEnabled,
+        final int proxyPort, final Collection<String> proxyAddresses,
+        final String gatewayDeviceID,
         final boolean useExternalGatewayDeviceAddress, final String stunServer,
         final int stunPort, boolean enablePortMapping) {
 
@@ -175,7 +171,6 @@ public class XMPPConnectionService {
                 "cannot configure the network while a connection is established");
 
         Connection.DEBUG_ENABLED = enableDebug;
-        this.namespace = namespace;
         this.resource = resource;
         this.proxyPort = proxyPort;
 
@@ -206,7 +201,7 @@ public class XMPPConnectionService {
          * connection attempt, currently it is only UPNP discovery
          */
 
-        ThreadUtils.runSafeAsync("SearchUPNP", LOG, new Runnable() {
+        ThreadUtils.runSafeAsync("dpp-upnp-resolver", LOG, new Runnable() {
             @Override
             public void run() {
                 if (upnpService != null)
@@ -271,9 +266,6 @@ public class XMPPConnectionService {
             setConnectionState(ConnectionState.CONNECTING, null);
 
             connection.connect();
-
-            ServiceDiscoveryManager.getInstanceFor(connection).addFeature(
-                namespace);
 
             /*
              * BUG in Smack: should be possible to register the listener before
@@ -419,7 +411,7 @@ public class XMPPConnectionService {
 
     /**
      * Configures Bytestream related settings, like PacketReplyTimeout,
-     * Socks5Proxy configuration, look up streamhost address candiates for
+     * Socks5Proxy configuration, look up streamhost address candidates for
      * Socks5Proxy, update UPnP settings on proxy setting change.
      */
     private void initialzeNetworkComponents() {
@@ -461,7 +453,7 @@ public class XMPPConnectionService {
 
         if (interfaceAddresses.isEmpty()) {
             for (InetAddress interfaceAddress : NetworkingUtils
-                .getAllNonLoopbackLocalIPAdresses(true)) {
+                .getAllNonLoopbackLocalIPAddresses(true)) {
                 interfaceAddresses.add(interfaceAddress.getHostAddress());
             }
             LOG.debug("using autodetected addresses: " + interfaceAddresses);
@@ -477,7 +469,7 @@ public class XMPPConnectionService {
          * to the XMPP server is established
          */
         if (stunService != null && stunServer != null) {
-            ThreadUtils.runSafeAsync("StunAddProxys", LOG, new Runnable() {
+            ThreadUtils.runSafeAsync("dpp-stun-discovery", LOG, new Runnable() {
                 @Override
                 public void run() {
                     Collection<InetSocketAddress> addresses = stunService

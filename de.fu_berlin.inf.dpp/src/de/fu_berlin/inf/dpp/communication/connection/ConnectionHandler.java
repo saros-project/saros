@@ -1,20 +1,16 @@
 package de.fu_berlin.inf.dpp.communication.connection;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.net.proxy.IProxyData;
-import org.eclipse.core.net.proxy.IProxyService;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.proxy.ProxyInfo;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
+import org.jivesoftware.smackx.ServiceDiscoveryManager;
+import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.account.XMPPAccount;
@@ -47,6 +43,8 @@ public class ConnectionHandler {
 
     private final TCPServer tcpServer;
 
+    private final IProxyResolver proxyResolver;
+
     private final XMPPAccountStore accountStore;
     private final PreferenceUtils preferences;
 
@@ -70,6 +68,11 @@ public class ConnectionHandler {
         public void connectionStateChanged(Connection connection,
             ConnectionState state) {
 
+            if (state == ConnectionState.CONNECTING) {
+                ServiceDiscoveryManager.getInstanceFor(connection).addFeature(
+                    Saros.NAMESPACE);
+            }
+
             final Exception error = state == ConnectionState.ERROR ? connectionService
                 .getConnectionError() : null;
 
@@ -81,11 +84,14 @@ public class ConnectionHandler {
     public ConnectionHandler(final XMPPConnectionService connectionService,
         final TCPServer tcpServer, final MDNSService mDNSService,
         final IConnectionManager transferManager,
+        final @Nullable IProxyResolver proxyResolver,
         final XMPPAccountStore accountStore, final PreferenceUtils preferences) {
+
         this.connectionService = connectionService;
         this.tcpServer = tcpServer;
         this.mDNSService = mDNSService;
         this.connectionManager = transferManager;
+        this.proxyResolver = proxyResolver;
         this.accountStore = accountStore;
         this.preferences = preferences;
 
@@ -307,7 +313,7 @@ public class ConnectionHandler {
         if (socks5Candidates.isEmpty())
             socks5Candidates = null;
 
-        connectionService.configure(Saros.NAMESPACE, Saros.RESOURCE,
+        connectionService.configure(Saros.RESOURCE,
             preferences.isDebugEnabled(),
             preferences.isLocalSOCKS5ProxyEnabled(),
             preferences.getFileTransferPort(), socks5Candidates,
@@ -317,7 +323,7 @@ public class ConnectionHandler {
 
         try {
 
-            if (preferences.forceFileTranserByChat())
+            if (preferences.forceFileTransferByChat())
                 connectionManager
                     .setTransport(IConnectionManager.IBB_TRANSPORT);
             else
@@ -343,55 +349,17 @@ public class ConnectionHandler {
         }
     }
 
-    /**
-     * Returns the Eclipse {@linkplain ProxyInfo proxy information} for the
-     * given host or <code>null</code> if it is not available
-     */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    private ProxyInfo getProxyInfo(String host) {
-
-        URI hostURI;
-
-        try {
-            hostURI = new URI(host);
-        } catch (URISyntaxException e) {
-            return null;
-        }
-
-        BundleContext bundleContext = null;
-
-        // TODO perform the intended logic here
-        if (true)
-            return null;
-
-        ServiceReference serviceReference = bundleContext
-            .getServiceReference(IProxyService.class.getName());
-
-        IProxyService proxyService = (IProxyService) bundleContext
-            .getService(serviceReference);
-
-        if (proxyService == null || !proxyService.isProxiesEnabled())
-            return null;
-
-        for (IProxyData pd : proxyService.select(hostURI)) {
-            if (IProxyData.SOCKS_PROXY_TYPE.equals(pd.getType())) {
-                return ProxyInfo.forSocks5Proxy(pd.getHost(), pd.getPort(),
-                    pd.getUserId(), pd.getPassword());
-            }
-        }
-
-        return null;
-    }
-
     private ConnectionConfiguration createConnectionConfiguration(
         String domain, String server, int port, boolean useTLS, boolean useSASL) {
 
-        ProxyInfo proxyInfo;
+        ProxyInfo proxyInfo = null;
 
-        if (server.length() != 0)
-            proxyInfo = getProxyInfo(server);
-        else
-            proxyInfo = getProxyInfo(domain);
+        if (proxyResolver != null) {
+            if (server.length() != 0)
+                proxyInfo = proxyResolver.resolve(server);
+            else
+                proxyInfo = proxyResolver.resolve(domain);
+        }
 
         ConnectionConfiguration connectionConfiguration = null;
 

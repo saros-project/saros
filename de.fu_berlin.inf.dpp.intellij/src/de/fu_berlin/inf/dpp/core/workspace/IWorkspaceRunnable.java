@@ -23,7 +23,7 @@
 package de.fu_berlin.inf.dpp.core.workspace;
 
 import de.fu_berlin.inf.dpp.core.exceptions.OperationCanceledException;
-import de.fu_berlin.inf.dpp.core.monitor.IProgressMonitor;
+import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 
 import java.io.IOException;
 

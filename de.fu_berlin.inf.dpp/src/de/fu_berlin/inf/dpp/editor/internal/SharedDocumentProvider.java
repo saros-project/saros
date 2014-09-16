@@ -8,68 +8,65 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
-import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
 import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.session.User.Permission;
 
 /**
- * This Document provider tries tell others that files are not editable if
- * {@link Permission#READONLY_ACCESS}.
+ * This Document provider tries tell others that files are not editable if the
+ * local user has no write access.
+ * <p>
+ * As it is up to Eclipse to choose the appropriate document provider for files
+ * this provider will likely only works on plain text documents, e.g files with
+ * <tt>txt</tt> extension.
  */
-@Component(module = "util")
-public class SharedDocumentProvider extends TextFileDocumentProvider {
+@Component(module = "eclipse")
+public final class SharedDocumentProvider extends TextFileDocumentProvider {
 
-    private static final Logger log = Logger
-        .getLogger(SharedDocumentProvider.class.getName());
+    private static final Logger LOG = Logger
+        .getLogger(SharedDocumentProvider.class);
 
-    protected ISarosSession sarosSession;
+    private volatile ISarosSession session;
 
     @Inject
-    protected ISarosSessionManager sessionManager;
+    private ISarosSessionManager sessionManager;
 
-    protected boolean hasWriteAccess;
+    private boolean hasWriteAccess;
 
-    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+    private final ISarosSessionListener sessionListener = new NullSarosSessionListener() {
 
         @Override
-        public void sessionStarted(ISarosSession newSarosSession) {
-            sarosSession = newSarosSession;
-            hasWriteAccess = sarosSession.hasWriteAccess();
-            sarosSession.addListener(sharedProjectListener);
+        public void sessionStarted(final ISarosSession session) {
+            hasWriteAccess = session.hasWriteAccess();
+            session.addListener(sharedProjectListener);
+            SharedDocumentProvider.this.session = session;
         }
 
         @Override
-        public void sessionEnded(ISarosSession oldSarosSession) {
-            assert sarosSession == oldSarosSession;
-            sarosSession.removeListener(sharedProjectListener);
-            sarosSession = null;
+        public void sessionEnded(final ISarosSession session) {
+            assert SharedDocumentProvider.this.session == session;
+            session.removeListener(sharedProjectListener);
+            SharedDocumentProvider.this.session = null;
         }
     };
 
-    protected ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
+    private final ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
         @Override
-        public void permissionChanged(User user) {
-            if (sarosSession != null) {
-                hasWriteAccess = sarosSession.hasWriteAccess();
-            } else {
-                log.warn("Internal error: Shared project null in permissionChanged!");
-            }
+        public void permissionChanged(final User user) {
+
+            if (!user.isLocal())
+                return;
+
+            final ISarosSession currentSession = session;
+
+            hasWriteAccess = currentSession != null
+                && currentSession.hasWriteAccess();
         }
     };
-
-    public SharedDocumentProvider(ISarosSessionManager sessionManager) {
-        this.sessionManager = sessionManager;
-
-        if (sessionManager.getSarosSession() != null) {
-            sessionListener.sessionStarted(sessionManager.getSarosSession());
-        }
-        sessionManager.addSarosSessionListener(sessionListener);
-    }
 
     /**
      * This constructor is necessary when Eclipse creates a
@@ -77,48 +74,39 @@ public class SharedDocumentProvider extends TextFileDocumentProvider {
      */
     public SharedDocumentProvider() {
 
-        log.debug("SharedDocumentProvider created by Eclipse");
+        LOG.debug("SharedDocumentProvider created by Eclipse");
 
         SarosPluginContext.reinject(this);
 
-        if (sessionManager.getSarosSession() != null) {
-            sessionListener.sessionStarted(sessionManager.getSarosSession());
-        }
+        final ISarosSession currentSession = sessionManager.getSarosSession();
+
+        if (currentSession != null)
+            sessionListener.sessionStarted(currentSession);
+
         sessionManager.addSarosSessionListener(sessionListener);
     }
 
     @Override
-    public boolean isReadOnly(Object element) {
-        return super.isReadOnly(element);
-    }
-
-    @Override
     public boolean isModifiable(Object element) {
-        if (!isInSharedProject(element)) {
+        if (!isInSharedProject(element))
             return super.isModifiable(element);
-        }
 
-        return this.hasWriteAccess && super.isModifiable(element);
-    }
-
-    @Override
-    public boolean canSaveDocument(Object element) {
-        return super.canSaveDocument(element);
-    }
-
-    @Override
-    public boolean mustSaveDocument(Object element) {
-        return super.mustSaveDocument(element);
+        return hasWriteAccess && super.isModifiable(element);
     }
 
     private boolean isInSharedProject(Object element) {
 
-        if (sarosSession == null)
+        if (!(element instanceof IFileEditorInput))
+            return false;
+
+        final ISarosSession currentSession = session;
+
+        if (currentSession == null)
             return false;
 
         IFileEditorInput fileEditorInput = (IFileEditorInput) element;
 
-        return sarosSession.isShared(ResourceAdapterFactory
+        return currentSession.isShared(ResourceAdapterFactory
             .create(fileEditorInput.getFile().getProject()));
     }
 }

@@ -6,10 +6,10 @@ import org.picocontainer.Startable;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.project.internal.IActivitySequencerCallback;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
@@ -58,10 +58,7 @@ abstract class SessionTimeoutHandler implements Startable {
     private final IActivitySequencerCallback callback = new IActivitySequencerCallback() {
         @Override
         public void transmissionFailed(final JID jid) {
-            if (session.isHost())
-                handleNetworkError(jid, "TxFailure");
-            else
-                handleNetworkError(jid, "TxFailure");
+            handleNetworkError(jid, "tx");
         }
     };
 
@@ -101,17 +98,17 @@ abstract class SessionTimeoutHandler implements Startable {
         String threadName = reason == null ? "" : reason;
 
         if (session.isHost()) {
-            ThreadUtils.runSafeAsync("RemoveUser" + threadName, LOG,
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        User user = session.getUser(jid);
-                        if (user != null)
-                            session.removeUser(user);
-                    }
-                });
+            ThreadUtils.runSafeAsync("dpp-kill-user-" + jid.getName() + "-"
+                + threadName, LOG, new Runnable() {
+                @Override
+                public void run() {
+                    User user = session.getUser(jid);
+                    if (user != null)
+                        session.removeUser(user);
+                }
+            });
         } else {
-            ThreadUtils.runSafeAsync("StopSession" + threadName, LOG,
+            ThreadUtils.runSafeAsync("dpp-kill-session-" + threadName, LOG,
                 new Runnable() {
                     @Override
                     public void run() {

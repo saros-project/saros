@@ -9,10 +9,10 @@ import de.fu_berlin.inf.dpp.communication.extensions.KickUserExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.LeaveSessionExtension;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
@@ -33,7 +33,7 @@ public class LeaveAndKickHandler {
 
     private final IReceiver receiver;
 
-    private final ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+    private final ISarosSessionListener sessionListener = new NullSarosSessionListener() {
 
         @Override
         public void sessionStarted(ISarosSession session) {
@@ -92,8 +92,8 @@ public class LeaveAndKickHandler {
             return;
         }
 
-        stopSession(sarosSession, "Removed from the session",
-            user.getNickname() + " removed you from the current session.");
+        stopSession("Removed from the session", user.getNickname()
+            + " removed you from the current session.");
     }
 
     private void leaveReceived(JID from) {
@@ -122,8 +122,8 @@ public class LeaveAndKickHandler {
          * context which executes all incoming packets sequentially
          */
         if (user.isHost()) {
-            stopSession(sarosSession, "Closing the session",
-                "Session was closed by inviter " + user.getNickname() + ".");
+            stopSession("Closing the session", "Session was closed by inviter "
+                + user.getNickname() + ".");
 
         }
 
@@ -138,7 +138,7 @@ public class LeaveAndKickHandler {
          * must be run async. otherwise the user list synchronization will time
          * out as we block the packet receive thread here
          */
-        ThreadUtils.runSafeAsync("RemoveUser-" + user, log, new Runnable() {
+        ThreadUtils.runSafeAsync("dpp-remove-" + user, log, new Runnable() {
             @Override
             public void run() {
                 sarosSession.removeUser(user);
@@ -147,9 +147,8 @@ public class LeaveAndKickHandler {
 
     }
 
-    private void stopSession(final ISarosSession session, final String topic,
-        final String reason) {
-        ThreadUtils.runSafeAsync("StopSessionOnHostLeave", log, new Runnable() {
+    private void stopSession(final String topic, final String reason) {
+        ThreadUtils.runSafeAsync("dpp-stop-host", log, new Runnable() {
             @Override
             public void run() {
                 sessionManager.stopSarosSession();

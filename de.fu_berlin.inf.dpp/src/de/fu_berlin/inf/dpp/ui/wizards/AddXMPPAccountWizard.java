@@ -18,9 +18,8 @@
  */
 package de.fu_berlin.inf.dpp.ui.wizards;
 
-import java.util.concurrent.Callable;
-
 import org.apache.log4j.Logger;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.wizard.Wizard;
 import org.picocontainer.annotations.Inject;
@@ -33,8 +32,6 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.EnterXMPPAccountWizardPage;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
@@ -45,7 +42,8 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
  * @author bkahlert
  */
 public class AddXMPPAccountWizard extends Wizard {
-    private static final Logger log = Logger
+
+    private static final Logger LOG = Logger
         .getLogger(AddXMPPAccountWizard.class);
 
     @Inject
@@ -57,7 +55,7 @@ public class AddXMPPAccountWizard extends Wizard {
     @Inject
     private ConnectionHandler connectionHandler;
 
-    private final EnterXMPPAccountWizardPage enterXMPPAccountWizardPage = new EnterXMPPAccountWizardPage();
+    protected final EnterXMPPAccountWizardPage enterXMPPAccountWizardPage = new EnterXMPPAccountWizardPage();
 
     public AddXMPPAccountWizard() {
         SarosPluginContext.initComponent(this);
@@ -81,24 +79,13 @@ public class AddXMPPAccountWizard extends Wizard {
 
     @Override
     public boolean performCancel() {
-        if (enterXMPPAccountWizardPage.isXMPPAccountCreated()) {
-            boolean doCancel = true;
-            try {
-                doCancel = SWTUtils.runSWTSync(new Callable<Boolean>() {
-                    @Override
-                    public Boolean call() throws Exception {
-                        return DialogUtils.openQuestionMessageDialog(
-                            getShell(),
-                            Messages.AddXMPPAccountWizard_account_created,
-                            Messages.AddXMPPAccountWizard_account_created_text);
-                    }
-                });
-            } catch (Exception e) {
-                log.warn(e);
-            }
-            return doCancel;
-        }
-        return true;
+
+        if (!enterXMPPAccountWizardPage.isXMPPAccountCreated())
+            return true;
+
+        return MessageDialog.openQuestion(getShell(),
+            Messages.AddXMPPAccountWizard_account_created,
+            Messages.AddXMPPAccountWizard_account_created_text);
     }
 
     /**
@@ -132,20 +119,11 @@ public class AddXMPPAccountWizard extends Wizard {
 
         if (accountStore.getAllAccounts().size() == 1
             && store.getBoolean(PreferenceConstants.AUTO_CONNECT))
-            ThreadUtils.runSafeAsync("ConnectAddAccount", log, new Runnable() {
+            ThreadUtils.runSafeAsync("dpp-connect-demand", LOG, new Runnable() {
                 @Override
                 public void run() {
                     connectionHandler.connect(false);
                 }
             });
     }
-
-    /*
-     * Wizard Results
-     */
-
-    public JID getJID() {
-        return enterXMPPAccountWizardPage.getJID();
-    }
-
 }

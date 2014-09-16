@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Queue;
 
 import org.apache.log4j.Logger;
@@ -110,24 +111,24 @@ public class ContributionAnnotationManager {
         if (!contribtionAnnotationsEnabled)
             return;
 
-        if (length > 0) {
-            /* Return early if there already is an annotation at that offset */
-            for (Iterator<Annotation> it = model.getAnnotationIterator(); it
-                .hasNext();) {
-                Annotation annotation = it.next();
+        if (length < 0) // why is 0 len allowed ?
+            return;
 
-                if (annotation instanceof ContributionAnnotation
-                    && model.getPosition(annotation).includes(offset)
-                    && ((ContributionAnnotation) annotation).getSource()
-                        .equals(source)) {
-                    return;
-                }
+        /* Return early if there already is an annotation at that offset */
+        for (Iterator<Annotation> it = model.getAnnotationIterator(); it
+            .hasNext();) {
+            Annotation annotation = it.next();
+
+            if (annotation instanceof ContributionAnnotation
+                && model.getPosition(annotation).includes(offset)
+                && ((ContributionAnnotation) annotation).getSource().equals(
+                    source)) {
+                return;
             }
-
-            ContributionAnnotation annotation = new ContributionAnnotation(
-                source, model);
-            addContributionAnnotation(annotation, new Position(offset, length));
         }
+
+        addContributionAnnotation(new ContributionAnnotation(source, model),
+            new Position(offset, length));
     }
 
     /**
@@ -140,50 +141,59 @@ public class ContributionAnnotationManager {
      * @param offset
      *            at which annotations should be splitted.
      */
-
+    /*
+     * FIXME that method is broken, it does not honor the history, i.e Alice
+     * insert text ranges a, b, c, d ... now we split a into a0, a1 and as a
+     * result a0 and a1 are now the newest entries instead the oldest
+     * 
+     * See also http://sourceforge.net/p/dpp/bugs/757/ that includes also
+     * another defect which is part of this behavior
+     */
     @SuppressWarnings("unchecked")
-    public void splitAnnotation(IAnnotationModel model, int offset) {
+    public void splitAnnotation(final IAnnotationModel model, final int offset) {
 
         if (!contribtionAnnotationsEnabled)
             return;
 
+        final List<ContributionAnnotation> annotationsToRemove = new ArrayList<ContributionAnnotation>();
+        final Map<ContributionAnnotation, Position> annotationsToAdd = new HashMap<ContributionAnnotation, Position>();
+
         for (Iterator<Annotation> it = model.getAnnotationIterator(); it
             .hasNext();) {
-            Annotation annotation = it.next();
 
-            if (annotation instanceof ContributionAnnotation) {
+            final Annotation annotation = it.next();
 
-                Position pos = model.getPosition(annotation);
+            if (!(annotation instanceof ContributionAnnotation))
+                continue;
 
-                if (pos == null) {
-                    /*
-                     * FIXME This error occurs when search/replacing lots of
-                     * small stuff as client
-                     */
-                    log.warn("Annotation could not be found: " + annotation);
-                    return;
-                }
+            final ContributionAnnotation contributionAnnotation = (ContributionAnnotation) annotation;
+            final User source = contributionAnnotation.getSource();
 
-                if ((offset > pos.offset) && (offset < pos.offset + pos.length)) {
-                    Position beforeOffset = new Position(pos.offset, offset
-                        - pos.offset);
-                    Position afterOffset = new Position(offset, pos.length
-                        - (offset - pos.offset));
+            final Position pos = model.getPosition(contributionAnnotation);
 
-                    ContributionAnnotation oldAnnotation = (ContributionAnnotation) annotation;
+            if ((offset > pos.offset) && (offset < pos.offset + pos.length)) {
 
-                    removeFromHistory(oldAnnotation);
+                Position before = new Position(pos.offset, offset - pos.offset);
 
-                    ContributionAnnotation newAnnotation;
-                    User source = oldAnnotation.getSource();
+                Position after = new Position(offset, pos.length
+                    - (offset - pos.offset));
 
-                    newAnnotation = new ContributionAnnotation(source, model);
-                    addContributionAnnotation(newAnnotation, beforeOffset);
+                annotationsToRemove.add(contributionAnnotation);
 
-                    newAnnotation = new ContributionAnnotation(source, model);
-                    addContributionAnnotation(newAnnotation, afterOffset);
-                }
+                annotationsToAdd.put(new ContributionAnnotation(source, model),
+                    before);
+
+                annotationsToAdd.put(new ContributionAnnotation(source, model),
+                    after);
             }
+        }
+
+        for (final ContributionAnnotation annotation : annotationsToRemove)
+            removeFromHistory(annotation);
+
+        for (final Entry<ContributionAnnotation, Position> entry : annotationsToAdd
+            .entrySet()) {
+            addContributionAnnotation(entry.getKey(), entry.getValue());
         }
     }
 

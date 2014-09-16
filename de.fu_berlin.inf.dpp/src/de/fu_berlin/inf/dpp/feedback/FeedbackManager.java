@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package de.fu_berlin.inf.dpp.feedback;
 
@@ -18,10 +18,9 @@ import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.dialogs.FeedbackDialog;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * The FeedbackManager registers himself as a listener with the
@@ -128,7 +127,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
          * ever wants to count the number of declined dialogs, threading
          * problems must be newly considered.
          */
-        ThreadUtils.runSafeAsync("ShowFeedbackDialog", log, new Runnable() {
+        SWTUtils.runSafeSWTAsync(log, new Runnable() {
 
             @Override
             public void run() {
@@ -293,7 +292,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
                 // TODO user should be able to copy&paste the link easily
                 MessageDialog.openWarning(SWTUtils.getShell(),
                     "Opening survey failed",
-                    "Your browser couldn't be opend. Please visit "
+                    "Your browser couldn't be opened. Please visit "
                         + SURVEY_URL + " yourself.");
             }
         }

@@ -31,7 +31,7 @@ public class NetworkingUtils {
      *            flag if IPv6 addresses are added to the result
      * @return List<{@link String}> of all retrieved IP addresses
      */
-    public static List<InetAddress> getAllNonLoopbackLocalIPAdresses(
+    public static List<InetAddress> getAllNonLoopbackLocalIPAddresses(
         boolean includeIPv6Addresses) {
 
         LinkedList<InetAddress> addresses = new LinkedList<InetAddress>();

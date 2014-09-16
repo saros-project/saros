@@ -19,13 +19,15 @@ import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
+import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ SarosSession.class, SarosSessionManager.class })
@@ -35,7 +37,7 @@ public class SarosSessionManagerTest {
         private static final long serialVersionUID = 1L;
     }
 
-    private class StateVerifyListener extends AbstractSarosSessionListener {
+    private class StateVerifyListener extends NullSarosSessionListener {
         int state = -1;
 
         @Override
@@ -65,7 +67,7 @@ public class SarosSessionManagerTest {
         }
     }
 
-    private class ErrorThrowingListener extends AbstractSarosSessionListener {
+    private class ErrorThrowingListener extends NullSarosSessionListener {
 
         @Override
         public void sessionStarting(ISarosSession newSarosSession) {
@@ -143,7 +145,7 @@ public class SarosSessionManagerTest {
 
     @Test
     public void testRecursiveStop() {
-        ISarosSessionListener listener = new AbstractSarosSessionListener() {
+        ISarosSessionListener listener = new NullSarosSessionListener() {
             int count = 0;
 
             @Override
@@ -161,7 +163,7 @@ public class SarosSessionManagerTest {
 
     @Test
     public void testRecursiveStart() {
-        ISarosSessionListener listener = new AbstractSarosSessionListener() {
+        ISarosSessionListener listener = new NullSarosSessionListener() {
             int count = 0;
 
             @Override
@@ -181,7 +183,7 @@ public class SarosSessionManagerTest {
 
         final AtomicReference<RuntimeException> exception = new AtomicReference<RuntimeException>();
 
-        ISarosSessionListener listener = new AbstractSarosSessionListener() {
+        ISarosSessionListener listener = new NullSarosSessionListener() {
             @Override
             public void sessionStarting(ISarosSession oldSarosSession) {
                 try {
@@ -206,7 +208,7 @@ public class SarosSessionManagerTest {
 
         final AtomicReference<RuntimeException> exception = new AtomicReference<RuntimeException>();
 
-        ISarosSessionListener listener = new AbstractSarosSessionListener() {
+        ISarosSessionListener listener = new NullSarosSessionListener() {
             @Override
             public void sessionEnding(ISarosSession oldSarosSession) {
                 try {

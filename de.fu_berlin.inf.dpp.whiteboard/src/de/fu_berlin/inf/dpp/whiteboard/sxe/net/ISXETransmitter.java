@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.SXEMessageType;
 
@@ -35,11 +34,11 @@ public interface ISXETransmitter {
      * @param monitor
      * @param msg
      * @param awaitFor
-     * @return the response message
+     * @return the response message or <code>null</code> if the operation was
+     *         canceled
      */
     public SXEMessage sendAndAwait(IProgressMonitor monitor, SXEMessage msg,
-        SXEMessageType... awaitFor) throws IOException,
-        LocalCancellationException;
+        SXEMessageType... awaitFor) throws IOException;
 
     // public SXEMessage receive(SubMonitor monitor, SXESession session, String
     // peer, SXEMessageType... awaitFor) throws IOException,

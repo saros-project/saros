@@ -15,10 +15,10 @@ import de.fu_berlin.inf.dpp.communication.extensions.PongExtension;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
@@ -100,10 +100,9 @@ public final class ServerSessionTimeoutHandler extends SessionTimeoutHandler {
                     }
 
                     try {
-                        transmitter.send(
-                            ISarosSession.SESSION_CONNECTION_ID, user.getJID(),
-                            PingExtension.PROVIDER.create(new PingExtension(
-                                currentSessionID)));
+                        transmitter.send(ISarosSession.SESSION_CONNECTION_ID,
+                            user.getJID(), PingExtension.PROVIDER
+                                .create(new PingExtension(currentSessionID)));
                     } catch (IOException e) {
 
                         removedUsers.add(user);
@@ -112,7 +111,7 @@ public final class ServerSessionTimeoutHandler extends SessionTimeoutHandler {
                             continue;
 
                         LOG.error("failed to send ping to: " + user, e);
-                        handleNetworkError(user.getJID(), "TxFailure");
+                        handleNetworkError(user.getJID(), "tx");
                     }
                 }
 
@@ -127,7 +126,7 @@ public final class ServerSessionTimeoutHandler extends SessionTimeoutHandler {
                 for (User user : usersToRemove) {
                     LOG.error("no pong received from user " + user
                         + ", reached timeout = " + PING_PONG_TIMEOUT);
-                    handleNetworkError(user.getJID(), "RxFailure");
+                    handleNetworkError(user.getJID(), "rx");
 
                 }
 
@@ -145,7 +144,7 @@ public final class ServerSessionTimeoutHandler extends SessionTimeoutHandler {
                             .wait(PING_PONG_UPDATE_DELAY);
                     } catch (InterruptedException e) {
                         if (!shutdown)
-                            LOG.error("watchdog shutdown prematurly", e);
+                            LOG.error("watchdog shutdown prematurely", e);
 
                         return;
                     }
@@ -174,7 +173,7 @@ public final class ServerSessionTimeoutHandler extends SessionTimeoutHandler {
 
         session.addListener(sessionEventListener);
 
-        workerThread = ThreadUtils.runSafeAsync("ServerSessionTimeoutWatchdog",
+        workerThread = ThreadUtils.runSafeAsync("dpp-server-network-watchdog",
             LOG, serverSessionTimeoutWatchdog);
     }
 

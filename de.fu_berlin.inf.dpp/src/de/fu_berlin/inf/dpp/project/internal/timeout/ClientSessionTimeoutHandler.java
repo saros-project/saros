@@ -10,9 +10,9 @@ import de.fu_berlin.inf.dpp.communication.extensions.PingExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.PongExtension;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
@@ -61,7 +61,7 @@ public final class ClientSessionTimeoutHandler extends SessionTimeoutHandler {
                                 .wait(PING_PONG_UPDATE_DELAY);
                         } catch (InterruptedException e) {
                             if (!shutdown)
-                                LOG.error("watchdog shutdown prematurly", e);
+                                LOG.error("watchdog shutdown prematurely", e);
 
                             return;
                         }
@@ -81,18 +81,17 @@ public final class ClientSessionTimeoutHandler extends SessionTimeoutHandler {
                 if (abort) {
                     LOG.error("no ping received, reached timeout = "
                         + PING_PONG_TIMEOUT);
-                    handleNetworkError(session.getHost().getJID(), "RxFailure");
+                    handleNetworkError(session.getHost().getJID(), "rx");
                     return;
                 }
 
                 try {
-                    transmitter.send(
-                        ISarosSession.SESSION_CONNECTION_ID, session.getHost()
-                            .getJID(), PongExtension.PROVIDER
+                    transmitter.send(ISarosSession.SESSION_CONNECTION_ID,
+                        session.getHost().getJID(), PongExtension.PROVIDER
                             .create(new PongExtension(currentSessionID)));
                 } catch (IOException e) {
                     LOG.error("failed to send pong", e);
-                    handleNetworkError(session.getHost().getJID(), "TxFailure");
+                    handleNetworkError(session.getHost().getJID(), "tx");
                 }
             }
         }
@@ -118,7 +117,7 @@ public final class ClientSessionTimeoutHandler extends SessionTimeoutHandler {
         receiver.addPacketListener(pingPacketListener,
             PingExtension.PROVIDER.getPacketFilter(currentSessionID));
 
-        workerThread = ThreadUtils.runSafeAsync("ClientSessionTimeoutWatchdog",
+        workerThread = ThreadUtils.runSafeAsync("dpp-client-network-watchdog",
             LOG, clientSessionTimeoutWatchdog);
     }
 

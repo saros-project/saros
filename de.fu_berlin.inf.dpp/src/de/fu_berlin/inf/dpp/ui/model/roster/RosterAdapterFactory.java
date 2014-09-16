@@ -41,7 +41,7 @@ public class RosterAdapterFactory implements IAdapterFactory {
     public Object getAdapter(Object adaptableObject, Class adapterType) {
         if (adaptableObject instanceof RosterGroupElement) {
             if (adapterType == RosterGroup.class) {
-                return ((RosterGroupElement) adaptableObject).rosterGroup;
+                return ((RosterGroupElement) adaptableObject).getRosterGroup();
             }
         }
 
@@ -49,7 +49,7 @@ public class RosterAdapterFactory implements IAdapterFactory {
             if (adapterType == RosterEntry.class)
                 return ((RosterEntryElement) adaptableObject).getRosterEntry();
             if (adapterType == JID.class)
-                return ((RosterEntryElement) adaptableObject).jid;
+                return ((RosterEntryElement) adaptableObject).getJID();
         }
 
         return null;

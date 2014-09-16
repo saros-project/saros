@@ -49,4 +49,13 @@ public interface IFile extends IResource {
     public void create(InputStream input, boolean force) throws IOException;
 
     public IPath getLocation();
+
+    /**
+     * Returns the size of the file.
+     * 
+     * @return the size of the file in bytes
+     * @throws IOException
+     *             if an I/O error occurred
+     */
+    public long getSize() throws IOException;
 }

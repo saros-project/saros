@@ -7,7 +7,7 @@ import de.fu_berlin.inf.dpp.session.User;
 
 public class QueueItem {
     /*
-     * FIMXE this class declared inside the ActivityHandler (which is not part
+     * FIXME this class declared inside the ActivityHandler (which is not part
      * of the core yet) but used in the Jupiter Concurrent package. Find a
      * better home for that class !
      */

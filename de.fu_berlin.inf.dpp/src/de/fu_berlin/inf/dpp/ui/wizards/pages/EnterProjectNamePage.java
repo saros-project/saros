@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 
-import de.fu_berlin.inf.dpp.invitation.FileList;
+import de.fu_berlin.inf.dpp.negotiation.FileList;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
@@ -88,8 +88,8 @@ public class EnterProjectNamePage extends WizardPage {
      *            projectName
      */
     public EnterProjectNamePage(ISarosSession session,
-        IConnectionManager connectionManager,
-        PreferenceUtils preferenceUtils, List<FileList> fileLists, JID peer,
+        IConnectionManager connectionManager, PreferenceUtils preferenceUtils,
+        List<FileList> fileLists, JID peer,
         Map<String, String> remoteProjectNames) {
 
         super(Messages.EnterProjectNamePage_title);
@@ -112,9 +112,6 @@ public class EnterProjectNamePage extends WizardPage {
 
     /**
      * Returns the name of the project to use during the shared session.
-     * 
-     * Caution: This project will be synchronized with the data from the host
-     * and all local changes will be lost.
      */
     public String getTargetProjectName(String projectID) {
         return projectOptionComposites.get(projectID).getProjectName();
@@ -510,7 +507,7 @@ public class EnterProjectNamePage extends WizardPage {
         case IBB:
             String speedInfo = "";
 
-            if (preferenceUtils.forceFileTranserByChat()) {
+            if (preferenceUtils.forceFileTransferByChat()) {
                 setDescription(MessageFormat
                     .format(
                         Messages.EnterProjectNamePage_direct_filetransfer_deactivated,

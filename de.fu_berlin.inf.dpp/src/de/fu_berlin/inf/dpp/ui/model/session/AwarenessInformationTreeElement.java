@@ -2,16 +2,13 @@ package de.fu_berlin.inf.dpp.ui.model.session;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
-import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
@@ -29,17 +26,20 @@ import de.fu_berlin.inf.dpp.ui.model.TreeElement;
  * @author Alexander Waldmann (contact@net-corps.de)
  */
 public class AwarenessInformationTreeElement extends TreeElement {
-    @Inject
-    protected EditorManager editorManager;
 
-    @Inject
-    protected AwarenessInformationCollector awarenessInformationCollector;
+    protected final EditorManager editorManager;
 
-    protected User user;
+    protected final AwarenessInformationCollector collector;
 
-    public AwarenessInformationTreeElement(User user) {
-        SarosPluginContext.initComponent(this);
+    protected final User user;
+
+    public AwarenessInformationTreeElement(final User user,
+        final EditorManager editorManager,
+        final AwarenessInformationCollector collector) {
+
         this.user = user;
+        this.editorManager = editorManager;
+        this.collector = collector;
     }
 
     /**
@@ -72,17 +72,11 @@ public class AwarenessInformationTreeElement extends TreeElement {
     @Override
     public Image getImage() {
 
-        RemoteEditorManager rem = editorManager.getRemoteEditorManager();
-        if (rem != null) {
-            Set<SPath> openEditors = editorManager.getRemoteOpenEditors(user);
-            if (openEditors.size() > 0) {
-                // user has a file open!
-                return PlatformUI.getWorkbench().getSharedImages()
-                    .getImage(ISharedImages.IMG_OBJ_FILE);
-            }
-        }
-        return org.eclipse.jdt.ui.JavaUI.getSharedImages().getImage(
-            org.eclipse.jdt.ui.ISharedImages.IMG_FIELD_DEFAULT);
+        return editorManager.getRemoteOpenEditors(user).size() > 0 ? PlatformUI
+            .getWorkbench().getSharedImages()
+            .getImage(ISharedImages.IMG_OBJ_FILE) : org.eclipse.jdt.ui.JavaUI
+            .getSharedImages().getImage(
+                org.eclipse.jdt.ui.ISharedImages.IMG_FIELD_DEFAULT);
     }
 
     public Object getUser() {

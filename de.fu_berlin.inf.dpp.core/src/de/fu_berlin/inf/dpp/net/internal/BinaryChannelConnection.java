@@ -218,7 +218,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
         final int fragmentId = idPool.nextID();
 
         if (fragmentId < 0)
-            throw new IOException("concurrent access threshold exeeded");
+            throw new IOException("concurrent access threshold exceeded");
 
         try {
 
@@ -235,7 +235,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
 
                 if (localId == null) {
                     if (nextJIDId > 255)
-                        throw new IOException("JID cache limit exeeded");
+                        throw new IOException("JID cache limit exceeded");
 
                     localId = Integer.valueOf(nextJIDId++);
                     outJIDCache.put(localJID, localId);
@@ -255,7 +255,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
 
                 if (remoteId == null) {
                     if (nextJIDId > 255)
-                        throw new IOException("JID cache limit exeeded");
+                        throw new IOException("JID cache limit exceeded");
 
                     remoteId = Integer.valueOf(nextJIDId++);
                     outJIDCache.put(remoteJID, remoteId);
@@ -275,7 +275,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
 
                 if (namespaceId == null) {
                     if (nextNamespaceId > 255)
-                        throw new IOException("namespace cache limit exeeded");
+                        throw new IOException("namespace cache limit exceeded");
 
                     namespaceId = Integer.valueOf(nextNamespaceId++);
                     outNamespaceCache.put(namespace, namespaceId);
@@ -296,7 +296,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
                 if (elementNameId == null) {
                     if (nextElementNameId > 65535)
                         throw new IOException(
-                            "element name cache limit exeeded");
+                            "element name cache limit exceeded");
 
                     elementNameId = Integer.valueOf(nextElementNameId++);
                     outElementNameCache.put(elementName, elementNameId);

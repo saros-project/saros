@@ -1,7 +1,5 @@
 package de.fu_berlin.inf.dpp.core.project;
 
-import de.fu_berlin.inf.dpp.core.vcs.VCSAdapter;
-import de.fu_berlin.inf.dpp.core.vcs.VCSResourceInfo;
 import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
@@ -10,11 +8,11 @@ import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.session.User;
+import de.fu_berlin.inf.dpp.vcs.VCSProvider;
 import org.apache.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 import static java.text.MessageFormat.format;
@@ -48,7 +46,7 @@ public class SharedProject {
     /* Stored state values: */
     protected UpdatableValue<Boolean> projectIsOpen = new UpdatableValue<Boolean>(
         false);
-    protected UpdatableValue<VCSAdapter> vcs = new UpdatableValue<VCSAdapter>(
+    protected UpdatableValue<VCSProvider> vcs = new UpdatableValue<VCSProvider>(
         null);
     /**
      * Maps the project relative path of a resource.
@@ -136,30 +134,12 @@ public class SharedProject {
 
         if (!sarosSession.useVersionControl())
             return;
-
-        VCSAdapter vcs = VCSAdapter.getAdapter(project);
-        this.vcs.update(vcs);
-        if (vcs == null)
-            return;
-
-        Set<IPath> paths = resourceMap.keySet();
-        for (IPath path : paths) {
-            IResource resource = project.findMember(path);
-            assert
-                resource != null :
-                "Resource not found at " + path; //$NON-NLS-1$
-            VCSResourceInfo info = vcs.getResourceInfo(resource);
-
-            updateVcsUrl(resource, info.url);
-            updateRevision(resource, info.revision);
-        }
-
     }
 
     /**
-     * Updates the current VCSAdapter, and returns true if the value changed.
+     * Updates the current VCSProvider, and returns true if the value changed.
      */
-    public boolean updateVcs(VCSAdapter newValue) {
+    public boolean updateVcs(VCSProvider newValue) {
         return vcs.update(newValue);
     }
 
@@ -276,9 +256,9 @@ public class SharedProject {
     }
 
     /**
-     * Returns the current VCSAdapter.
+     * Returns the current VCSProvider
      */
-    public VCSAdapter getVCSAdapter() {
+    public VCSProvider getVCSProvider() {
         return vcs.getValue();
     }
 

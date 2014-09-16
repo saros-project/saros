@@ -62,8 +62,11 @@ public final class ChecksumCacheImpl implements IChecksumCache {
     private final IFileContentChangedListener fileContentChangedListener = new IFileContentChangedListener() {
 
         @Override
-        public void fileContentChanged(String path) {
+        public void fileContentChanged(IFile file) {
             synchronized (ChecksumCacheImpl.this) {
+
+                final String path = file.getFullPath().toOSString();
+
                 Murmur3Hash<Long> hash = create128BitMurmur3Hash(path);
                 Murmur3Hash<Long> currentHash = getHash(path, hash);
 
@@ -78,7 +81,7 @@ public final class ChecksumCacheImpl implements IChecksumCache {
                         LOG.trace("invalidating checksum for new file: " + path
                             + " [" + hash + "]");
 
-                    addChecksum(path, 0);
+                    addChecksum(file, 0);
                     getHash(path, hash).setObject(null);
                 }
             }
@@ -95,7 +98,10 @@ public final class ChecksumCacheImpl implements IChecksumCache {
 
     @Override
     @SuppressWarnings({ "unchecked" })
-    public synchronized Long getChecksum(String path) {
+    public synchronized Long getChecksum(IFile file) {
+
+        final String path = file.getFullPath().toOSString();
+
         Object object = cache.get(path.hashCode());
 
         if (object == null) {
@@ -131,7 +137,10 @@ public final class ChecksumCacheImpl implements IChecksumCache {
 
     @Override
     @SuppressWarnings("unchecked")
-    public synchronized boolean addChecksum(String path, long checksum) {
+    public synchronized boolean addChecksum(IFile file, long checksum) {
+
+        final String path = file.getFullPath().toOSString();
+
         Murmur3Hash<Long> hash = create128BitMurmur3Hash(path);
         hash.setObject(checksum);
 

@@ -53,6 +53,7 @@ Saros team over the years and have contributed to the product:
 	* Marc Rintsch
 	* Maria Formisano
 	* Maria Spiering
+	* Martin Wichner
 	* Meike Johannsen
 	* Michael Jurke
 	* Michael Scheppat

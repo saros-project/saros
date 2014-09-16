@@ -467,7 +467,7 @@ public final class NetworkPreferencePage extends PreferencePage implements
                 public void widgetSelected(SelectionEvent event) {
                     try {
                         List<InetAddress> addresses = NetworkingUtils
-                            .getAllNonLoopbackLocalIPAdresses(true);
+                            .getAllNonLoopbackLocalIPAddresses(true);
 
                         List<String> ipLiterals = new ArrayList<String>();
 
@@ -512,7 +512,7 @@ public final class NetworkPreferencePage extends PreferencePage implements
             gatewayInfo.pack();
             gatewayInfo.setVisible(true);
 
-            ThreadUtils.runSafeAsync("NetworkPageUPnPDiscoverer", null,
+            ThreadUtils.runSafeAsync("dpp-upnp-resolver-cfg", null,
                 new Runnable() {
 
                     @Override

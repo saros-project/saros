@@ -5,14 +5,14 @@ import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
 
 import de.fu_berlin.inf.dpp.communication.extensions.CancelProjectNegotiationExtension;
-import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
-import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
 
 public class CancelProjectSharingHandler {
 
@@ -25,7 +25,7 @@ public class CancelProjectSharingHandler {
 
     private final IReceiver receiver;
 
-    private final ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+    private final ISarosSessionListener sessionListener = new NullSarosSessionListener() {
 
         @Override
         public void sessionStarted(ISarosSession session) {
@@ -71,7 +71,7 @@ public class CancelProjectSharingHandler {
             log.debug("Inv" + sender + " : Received invitation cancel message");
             process.remoteCancel(errorMsg);
         } else {
-            log.warn("Inv[unkown user]: Received invitation cancel message");
+            log.warn("Inv[unknown user]: Received invitation cancel message");
         }
     }
 }

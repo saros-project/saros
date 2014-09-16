@@ -1,13 +1,16 @@
 package de.fu_berlin.inf.dpp.editor.internal;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.source.ILineRange;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.editor.EditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 
 /**
@@ -92,40 +95,6 @@ public interface IEditorAPI {
     public void setEditable(IEditorPart editorPart, boolean editable);
 
     /**
-     * Attaches listeners to the given editor that will fire the
-     * {@link EditorListener} methods on the given editor manager
-     * 
-     * Connecting to an editorPart multiple times, will automatically remove
-     * previous listeners via removeSharedEditorListener(IEditorPart editorPart)
-     * (but will print a warning!)
-     * 
-     * @swt Needs to be called from the SWT-UI thread.
-     * 
-     * @throws IllegalArgumentException
-     *             if the given editorPart does not have an ITextViewer or if
-     *             the EditorManager or EditorPart are null
-     * 
-     */
-    public void addSharedEditorListener(EditorManager editorManager,
-        IEditorPart editorPart);
-
-    /**
-     * Removes the listener to the given editor for the given manager previously
-     * added via {@link #addSharedEditorListener(EditorManager, IEditorPart)}.
-     * 
-     * @swt Needs to be called from the SWT-UI thread.
-     * 
-     * @throws IllegalArgumentException
-     *             if the EditorManager or EditorPart are null
-     * 
-     * @throws IllegalStateException
-     *             if the given editorPart has never been registered via
-     *             {@link #addSharedEditorListener(EditorManager, IEditorPart)}.
-     */
-    public void removeSharedEditorListener(EditorManager editorManager,
-        IEditorPart editorPart);
-
-    /**
      * Syntactic sugar for getting the path of the IEditorPart returned by
      * getActiveEditor()
      */
@@ -140,32 +109,26 @@ public interface IEditorAPI {
     public IResource getEditorResource(IEditorPart editorPart);
 
     /**
-     * Removes a previously registered PartListener added via
-     * {@link #addEditorPartListener(EditorManager)}.
+     * Returns the {@link IDocumentProvider} of the given {@link IEditorInput}.
+     * This method analyzes the file extension of the {@link IFile} associated
+     * with the given {@link IEditorInput}. Depending on the file extension it
+     * returns file-types responsible {@link IDocumentProvider}.
      * 
-     * @swt Needs to be called from the SWT-UI thread.
+     * @param input
+     *            the {@link IEditorInput} for which {@link IDocumentProvider}
+     *            is needed
      * 
-     * @throws IllegalArgumentException
-     *             if the EditorManager is null
-     * 
-     * @throws IllegalStateException
-     *             if the given EditorManager has never been registered via
-     *             {@link #addEditorPartListener(EditorManager)}
+     * @return IDocumentProvider of the given input
      */
-    public void removeEditorPartListener(EditorManager editorManager);
+    public IDocumentProvider getDocumentProvider(IEditorInput input);
 
     /**
-     * Register a PartListener on the currently active WorkbenchWindow using the
-     * given EditorManager as callback.
+     * Returns the document for the given editor part.
      * 
-     * If a part listener is already registered for the given editorManager it
-     * is removed before adding a new listener (but a warning will be printed!)
-     * 
-     * @swt Needs to be called from the SWT-UI thread.
-     * 
-     * @throws IllegalArgumentException
-     *             if the EditorManager is null
+     * @param editorPart
+     *            editor part to retrieve the document
+     * @return the document for the given editor part
      */
-    public void addEditorPartListener(EditorManager editorManager);
+    public IDocument getDocument(IEditorPart editorPart);
 
 }

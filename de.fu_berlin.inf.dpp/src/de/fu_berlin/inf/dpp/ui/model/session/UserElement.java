@@ -5,9 +5,7 @@ import java.util.List;
 
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Image;
-import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.session.User;
@@ -23,11 +21,9 @@ import de.fu_berlin.inf.dpp.ui.util.SWTBoldStyler;
  */
 public final class UserElement extends TreeElement {
 
-    @Inject
-    private EditorManager editorManager;
+    private final EditorManager editorManager;
 
-    @Inject
-    private AwarenessInformationCollector collector;
+    private final AwarenessInformationCollector collector;
 
     private final User user;
 
@@ -37,13 +33,14 @@ public final class UserElement extends TreeElement {
      */
     private final List<AwarenessInformationTreeElement> children = new ArrayList<AwarenessInformationTreeElement>();
 
-    public UserElement(final User user) {
-        SarosPluginContext.initComponent(this);
-
+    public UserElement(final User user, final EditorManager editorManager,
+        final AwarenessInformationCollector collector) {
         if (user == null)
             throw new IllegalArgumentException("user is null");
 
         this.user = user;
+        this.editorManager = editorManager;
+        this.collector = collector;
 
         addAwarenessDetails();
     }
@@ -128,10 +125,12 @@ public final class UserElement extends TreeElement {
         if (user.isLocal())
             return;
 
-        children.add(new AwarenessInformationTreeElement(user));
-
-        if (collector.getFollowedUser(user) != null)
-            children.add(new FollowModeInformationTreeElement(user));
+        children.add(new AwarenessInformationTreeElement(user, editorManager,
+            collector));
+        if (collector.getFollowedUser(user) != null) {
+            children.add(new FollowModeInformationTreeElement(user,
+                editorManager, collector));
+        }
 
         /*
          * TODO remove this check, if the user tests show which place for
@@ -139,7 +138,8 @@ public final class UserElement extends TreeElement {
          */
         if (Boolean
             .getBoolean("de.fu_berlin.inf.dpp.awareness.SESSION_OVERVIEW")) {
-            children.add(new UIAwarenessTreeElement(user));
+            children.add(new UIAwarenessTreeElement(user, editorManager,
+                collector));
         }
     }
 

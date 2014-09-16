@@ -22,10 +22,17 @@
 
 package de.fu_berlin.inf.dpp.core.util;
 
-import de.fu_berlin.inf.dpp.core.monitor.IProgressMonitor;
+import de.fu_berlin.inf.dpp.core.exceptions.OperationCanceledException;
 import de.fu_berlin.inf.dpp.core.workspace.IWorkspace;
 import de.fu_berlin.inf.dpp.core.workspace.IWorkspaceRunnable;
-import de.fu_berlin.inf.dpp.filesystem.*;
+import de.fu_berlin.inf.dpp.filesystem.IContainer;
+import de.fu_berlin.inf.dpp.filesystem.IFile;
+import de.fu_berlin.inf.dpp.filesystem.IFolder;
+import de.fu_berlin.inf.dpp.filesystem.IPath;
+import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.filesystem.IResourceAttributes;
+import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.util.Pair;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import org.apache.commons.io.IOUtils;
@@ -37,6 +44,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.concurrent.CancellationException;
 import java.util.zip.Adler32;
 
 public class FileUtils {
@@ -129,8 +137,6 @@ public class FileUtils {
      * @param input the input stream to write to the file
      * @param file  the file to create/overwrite
      * @throws IOException if the file could not be written.
-     * @blocking This operations blocks until the operation is reported as
-     * finished by Eclipse.
      */
     public static void writeFile(InputStream input, IFile file,
         IProgressMonitor monitor) throws IOException {
@@ -150,10 +156,10 @@ public class FileUtils {
      * @param file    the {@link IFile} to rename
      * @param monitor a progress monitor to show progress to user
      * @throws IOException
-     * @throws FileNotFoundException
+     * @throws CancellationException
      */
     public static void backupFile(IFile file, IProgressMonitor monitor)
-        throws IOException, FileNotFoundException {
+        throws CancellationException, IOException {
 
         if (!file.exists()) {
             throw new FileNotFoundException();
@@ -194,7 +200,8 @@ public class FileUtils {
 
         IWorkspaceRunnable createFileProcedure = new IWorkspaceRunnable() {
             @Override
-            public void run(IProgressMonitor monitor) throws IOException {
+            public void run(IProgressMonitor monitor)
+                throws OperationCanceledException, IOException {
                 // Make sure directory exists
                 mkdirs(file);
 
@@ -230,7 +237,8 @@ public class FileUtils {
 
         IWorkspaceRunnable replaceFileProcedure = new IWorkspaceRunnable() {
             @Override
-            public void run(IProgressMonitor monitor) throws IOException {
+            public void run(IProgressMonitor monitor)
+                throws OperationCanceledException, IOException {
 
                 file.setContents(input, true, true);
 
@@ -261,7 +269,7 @@ public class FileUtils {
     public static void create(final IFolder folder) throws IOException {
 
         // if ((folder == null) || (folder.exists())) {
-        // log.debug(".create() Creating folder not possible");
+        // LOG.debug(".create() Creating folder not possible");
         // return;
         // }
 
@@ -276,20 +284,23 @@ public class FileUtils {
         }
         IWorkspaceRunnable createFolderProcedure = new IWorkspaceRunnable() {
             @Override
-            public void run(IProgressMonitor monitor) throws IOException {
+            public void run(IProgressMonitor monitor)
+                throws OperationCanceledException, IOException {
 
                 // recursively create folders until parent folder exists
                 // or project root is reached
                 IFolder parentFolder = getParentFolder(folder);
+
                 if (parentFolder != null) {
                     create(parentFolder);
                 }
 
                 folder.create(IResource.NONE, true);
 
-                if (monitor.isCanceled()) {
-                    log.warn("Creating folder failed: " + folder);
-                }
+                //TODO: find out about exceptions that get thrown here
+                // if (monitor.isCanceled()) {
+                //       log.warn("Creating folder failed: " + folder);
+                //  }
 
             }
         };
@@ -308,7 +319,8 @@ public class FileUtils {
 
         IWorkspaceRunnable deleteProcedure = new IWorkspaceRunnable() {
             @Override
-            public void run(IProgressMonitor monitor) throws IOException {
+            public void run(IProgressMonitor monitor)
+                throws OperationCanceledException, IOException {
                 if (!resource.exists()) {
                     return;
                 }
@@ -356,7 +368,8 @@ public class FileUtils {
 
         IWorkspaceRunnable moveProcedure = new IWorkspaceRunnable() {
             @Override
-            public void run(IProgressMonitor monitor) throws IOException {
+            public void run(IProgressMonitor monitor)
+                throws OperationCanceledException, IOException {
                 IPath absDestination = destination.makeAbsolute();
 
                 source.move(absDestination, false);
@@ -441,7 +454,8 @@ public class FileUtils {
                     totalFileSize += filesize;
                 } catch (Exception e) {
                     log.warn("failed to retrieve file size of file " + resource
-                            .getLocationURI(), e);
+                            .getLocationURI(), e
+                    );
                 }
                 break;
             case IResource.PROJECT:

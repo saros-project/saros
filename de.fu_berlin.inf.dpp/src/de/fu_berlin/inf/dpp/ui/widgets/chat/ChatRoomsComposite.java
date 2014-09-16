@@ -4,10 +4,14 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
@@ -40,10 +44,11 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.roster.AbstractRosterListener;
 import de.fu_berlin.inf.dpp.net.xmpp.roster.IRosterListener;
 import de.fu_berlin.inf.dpp.net.xmpp.roster.RosterTracker;
-import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -117,6 +122,43 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
     @Inject
     private MUCNegotiationManager mucNegotiationManager;
+
+    @Inject
+    private IPreferenceStore preferenceStore;
+
+    private final IPropertyChangeListener propertyChangeListener = new IPropertyChangeListener() {
+
+        @Override
+        public void propertyChange(PropertyChangeEvent event) {
+            if (!PreferenceConstants.USE_IRC_STYLE_CHAT_LAYOUT.equals(event
+                .getProperty()))
+                return;
+
+            SWTUtils.runSafeSWTAsync(log, new Runnable() {
+
+                @Override
+                public void run() {
+                    if (ChatRoomsComposite.this.isDisposed())
+                        return;
+
+                    final List<IChat> currentChats = new ArrayList<IChat>();
+
+                    final int activeIdx = chatRooms.getSelectionIndex();
+
+                    for (CTabItem tab : chatRooms.getItems())
+                        currentChats.add((IChat) tab.getData());
+
+                    for (IChat chat : currentChats)
+                        closeChatTab(chat);
+
+                    int idx = 0;
+                    for (IChat chat : currentChats)
+                        openChat(chat, idx++ == activeIdx);
+                }
+            });
+        }
+    };
+
     /**
      * This RosterListener closure is added to the RosterTracker to get
      * notifications when the roster changes.
@@ -179,7 +221,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         }
     };
 
-    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+    protected ISarosSessionListener sessionListener = new NullSarosSessionListener() {
 
         @Override
         public void sessionStarting(final ISarosSession session) {
@@ -201,7 +243,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
              * now CARL joins the session and BOB leaves afterwards, ALICE and
              * CARLs MUC is broken !
              */
-            ThreadUtils.runSafeAsync("JoinMUC", log, new Runnable() {
+            ThreadUtils.runSafeAsync("dpp-muc-join", log, new Runnable() {
                 @Override
                 public void run() {
                     synchronized (mucCreationLock) {
@@ -383,6 +425,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         singleUserChatService.addChatServiceListener(chatServiceListener);
         multiUserChatService.addChatServiceListener(chatServiceListener);
         connectionHandler.addConnectionStateListener(connectionStateListener);
+        preferenceStore.addPropertyChangeListener(propertyChangeListener);
 
         setLayout(new FillLayout());
 
@@ -414,8 +457,12 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
                 editorManager.removeSharedEditorListener(sharedEditorListener);
 
+                preferenceStore
+                    .removePropertyChangeListener(propertyChangeListener);
+
                 singleUserChatService
                     .removeChatServiceListener(chatServiceListener);
+
                 multiUserChatService
                     .removeChatServiceListener(chatServiceListener);
 

@@ -89,54 +89,43 @@ public class SkypeAction extends Action implements Disposable {
             this.setEnabled(false);
         } catch (Exception e) {
             if (!PlatformUI.getWorkbench().isClosing())
-                LOG.error("Unexcepted error while updating enablement", e); //$NON-NLS-1$
+                LOG.error("Unexpected error while updating enablement", e); //$NON-NLS-1$
         }
     }
 
-    /**
-     * @review runSafe OK
-     */
     @Override
     public void run() {
-        ThreadUtils.runSafeSync(LOG, new Runnable() {
-            @Override
-            public void run() {
-                final List<JID> participants = SelectionRetrieverFactory
-                    .getSelectionRetriever(JID.class).getSelection();
 
-                if (participants.size() == 1) {
-                    ThreadUtils.runSafeAsync(
-                        "SkypeAction", LOG, new Runnable() { //$NON-NLS-1$
+        final List<JID> participants = SelectionRetrieverFactory
+            .getSelectionRetriever(JID.class).getSelection();
+
+        if (participants.size() != 1)
+            return;
+
+        ThreadUtils.runSafeAsync("SkypeAction", LOG, new Runnable() { //$NON-NLS-1$
+                @Override
+                public void run() {
+                    SWTUtils.runSafeSWTSync(LOG, new Runnable() {
+                        @Override
+                        public void run() {
+                            setEnabled(false);
+                        }
+                    });
+                    final String skypeURL = skypeManager
+                        .getSkypeURL(participants.get(0).getBareJID());
+                    if (skypeURL != null) {
+                        SWTUtils.runSafeSWTSync(LOG, new Runnable() {
                             @Override
                             public void run() {
-                                SWTUtils.runSafeSWTSync(LOG, new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        setEnabled(false);
-                                    }
-                                });
-                                final String skypeURL = skypeManager
-                                    .getSkypeURL(participants.get(0)
-                                        .getBareJID());
-                                if (skypeURL != null) {
-                                    SWTUtils.runSafeSWTSync(LOG,
-                                        new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                URLHyperlink link = new URLHyperlink(
-                                                    new Region(0, 0), skypeURL);
-                                                link.open();
-                                            }
-                                        });
-                                }
-
+                                URLHyperlink link = new URLHyperlink(
+                                    new Region(0, 0), skypeURL);
+                                link.open();
                             }
                         });
-                } else {
-                    LOG.warn("More than one participant selected."); //$NON-NLS-1$
+                    }
+
                 }
-            }
-        });
+            });
     }
 
     @Override

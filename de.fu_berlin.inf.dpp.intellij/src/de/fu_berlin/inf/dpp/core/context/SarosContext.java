@@ -24,20 +24,53 @@ package de.fu_berlin.inf.dpp.core.context;
 
 import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.ISarosContextFactory;
-import de.fu_berlin.inf.dpp.communication.extensions.*;
+import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
+import de.fu_berlin.inf.dpp.communication.extensions.ActivitiesExtension;
+import de.fu_berlin.inf.dpp.communication.extensions.CancelInviteExtension;
+import de.fu_berlin.inf.dpp.communication.extensions.CancelProjectNegotiationExtension;
+import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcceptedExtension;
+import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcknowledgedExtension;
+import de.fu_berlin.inf.dpp.communication.extensions.InvitationCompletedExtension;
+import de.fu_berlin.inf.dpp.communication.extensions.InvitationOfferingExtension;
+import de.fu_berlin.inf.dpp.communication.extensions.InvitationParameterExchangeExtension;
+import de.fu_berlin.inf.dpp.communication.extensions.JoinSessionRejectedExtension;
+import de.fu_berlin.inf.dpp.communication.extensions.JoinSessionRequestExtension;
+import de.fu_berlin.inf.dpp.communication.extensions.KickUserExtension;
+import de.fu_berlin.inf.dpp.communication.extensions.LeaveSessionExtension;
+import de.fu_berlin.inf.dpp.communication.extensions.PingExtension;
+import de.fu_berlin.inf.dpp.communication.extensions.PongExtension;
+import de.fu_berlin.inf.dpp.communication.extensions.ProjectNegotiationMissingFilesExtension;
+import de.fu_berlin.inf.dpp.communication.extensions.ProjectNegotiationOfferingExtension;
+import de.fu_berlin.inf.dpp.communication.extensions.SessionStatusRequestExtension;
+import de.fu_berlin.inf.dpp.communication.extensions.SessionStatusResponseExtension;
+import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingRequest;
+import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingResponse;
+import de.fu_berlin.inf.dpp.communication.extensions.UserFinishedProjectNegotiationExtension;
+import de.fu_berlin.inf.dpp.communication.extensions.UserListExtension;
+import de.fu_berlin.inf.dpp.communication.extensions.UserListReceivedExtension;
+import de.fu_berlin.inf.dpp.communication.extensions.VersionExchangeExtension;
 import de.fu_berlin.inf.dpp.misc.pico.ChildContainer;
 import de.fu_berlin.inf.dpp.misc.pico.ChildContainerProvider;
 import de.fu_berlin.inf.dpp.misc.pico.DotGraphMonitor;
 import de.fu_berlin.inf.dpp.misc.xstream.XStreamExtensionProvider;
-import de.fu_berlin.inf.dpp.net.internal.extensions.ProjectNegotiationMissingFilesExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.ProjectNegotiationOfferingExtension;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import org.apache.log4j.Logger;
-import org.picocontainer.*;
-import org.picocontainer.injectors.*;
+import org.picocontainer.Characteristics;
+import org.picocontainer.ComponentAdapter;
+import org.picocontainer.MutablePicoContainer;
+import org.picocontainer.Parameter;
+import org.picocontainer.PicoBuilder;
+import org.picocontainer.PicoCompositionException;
+import org.picocontainer.PicoContainer;
+import org.picocontainer.injectors.AnnotatedFieldInjection;
+import org.picocontainer.injectors.CompositeInjection;
+import org.picocontainer.injectors.ConstructorInjection;
+import org.picocontainer.injectors.ProviderAdapter;
+import org.picocontainer.injectors.Reinjector;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -60,6 +93,10 @@ import java.util.List;
 public class SarosContext implements ISarosContext {
 
     private static final Logger log = Logger.getLogger(SarosContext.class);
+
+    private static final String SAROS_DATA_DIRECTORY = ".saros";
+
+    private static final String SAROS_XMPP_ACCOUNT_FILE = "config.dat";
 
     private final DotGraphMonitor dotMonitor;
 
@@ -174,11 +211,48 @@ public class SarosContext implements ISarosContext {
          */
         reinjector = new Reinjector(container);
 
+        initAccountStore(container.getComponent(XMPPAccountStore.class));
+
         installPacketExtensionProviders();
 
         XMPPUtils.setDefaultConnectionService(
             container.getComponent(XMPPConnectionService.class));
         log.info("successfully created Saros runtime context");
+    }
+
+    private void initAccountStore(XMPPAccountStore store) {
+        // see http://bugs.java.com/bugdatabase/view_bug.do?bug_id=4787931
+
+        String os = System.getProperty("os.name");
+
+        boolean isWindows = os != null && os.toLowerCase().contains("windows");
+
+        String homeDirectory = null;
+
+        if (isWindows) {
+            String userHome = System.getenv("USERPROFILE");
+
+            if (userHome != null) {
+                File directory = new File(userHome);
+
+                if (directory.exists() && directory.isDirectory())
+                    homeDirectory = userHome;
+            }
+        }
+
+        if (homeDirectory == null)
+            homeDirectory = System.getProperty("user.home");
+
+        if (homeDirectory == null) {
+            log.warn(
+                "home directory not set, cannot save and load account data");
+            return;
+        }
+
+        File sarosDataDir = new File(homeDirectory, SAROS_DATA_DIRECTORY);
+        File accountFile = new File(sarosDataDir, SAROS_XMPP_ACCOUNT_FILE);
+
+        store.setAccountFile(accountFile, System.getProperty("user.name"));
     }
 
     /**

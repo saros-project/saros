@@ -22,7 +22,13 @@
 
 package de.fu_berlin.inf.dpp.intellij.project.fs;
 
-import de.fu_berlin.inf.dpp.filesystem.*;
+import de.fu_berlin.inf.dpp.filesystem.IContainer;
+import de.fu_berlin.inf.dpp.filesystem.IFile;
+import de.fu_berlin.inf.dpp.filesystem.IFolder;
+import de.fu_berlin.inf.dpp.filesystem.IPath;
+import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.filesystem.IResourceAttributes;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -35,12 +41,12 @@ import java.util.List;
 import java.util.Map;
 
 public class ProjectImp implements IProject {
-    public static final String DEFAULT_CHARSET = "utf8";
+    public static final String DEFAULT_CHARSET = "UTF-8";
     private String defaultCharset = DEFAULT_CHARSET;
     private String name;
     private File path;
 
-    // TODO consider caching
+    //FIXME: Fix concurrency issues.
     private Map<IPath, IResource> resourceMap = new HashMap<IPath, IResource>();
     private Map<String, IFile> fileMap = new HashMap<String, IFile>();
     private Map<String, IFolder> folderMap = new HashMap<String, IFolder>();
@@ -89,7 +95,6 @@ public class ProjectImp implements IProject {
     }
 
     protected void addRecursive(File file) {
-
         if (file.isDirectory()) {
             for (File myFile : file.listFiles()) {
                 addRecursive(myFile);
@@ -150,39 +155,36 @@ public class ProjectImp implements IProject {
 
     @Override
     public IFile getFile(String name) {
-        return fileMap.get(name);
+        final IFile file = fileMap.get(name);
+        if (file != null) {
+            return file;
+        }
+
+        if (path.isAbsolute()) {
+            return new FileImp(this, new File(name));
+        } else {
+            return new FileImp(this, new File(this.path + "/" + name));
+        }
     }
 
     @Override
     public IFile getFile(IPath path) {
-        IFile f = getFile(path.toPortableString());
-
-        if (f == null) {
-            if (path.isAbsolute()) {
-                f = new FileImp(this, new File(path.toPortableString()));
-            } else {
-                f = new FileImp(this,
-                    new File(this.path + "/" + path.toPortableString()));
-            }
-        }
-
-        return f;
+        return getFile(path.toPortableString());
     }
 
     @Override
     public IFolder getFolder(String name) {
-        return folderMap.get(name);
+        final IFolder folder = folderMap.get(name);
+        if (folder != null) {
+            return folder;
+        }
+
+        return new FolderImp(this, new File(name));
     }
 
     @Override
     public IFolder getFolder(IPath path) {
-        IFolder folder = getFolder(path.toPortableString());
-
-        if (folder == null) {
-            folder = new FolderImp(this, path.toFile());
-        }
-
-        return folder;
+        return getFolder(path.toPortableString());
     }
 
     @Override

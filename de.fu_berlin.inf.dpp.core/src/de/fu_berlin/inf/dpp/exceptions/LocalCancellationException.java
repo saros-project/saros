@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.exceptions;
 
-import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
+import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelOption;
 
 /**
  * Exception used for signaling that the local user canceled an operation

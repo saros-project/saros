@@ -31,12 +31,12 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import de.fu_berlin.inf.dpp.invitation.CancelListener;
-import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
-import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
-import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
-import de.fu_berlin.inf.dpp.invitation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
+import de.fu_berlin.inf.dpp.negotiation.CancelListener;
+import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelLocation;
+import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelOption;
+import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
@@ -165,13 +165,12 @@ public class JoinSessionWizard extends Wizard {
 
     @Override
     public boolean performCancel() {
-        ThreadUtils.runSafeAsync("CancelJoinSessionWizard", LOG,
-            new Runnable() {
-                @Override
-                public void run() {
-                    isn.localCancel(null, CancelOption.NOTIFY_PEER);
-                }
-            });
+        ThreadUtils.runSafeAsync("dpp-isn-cancel", LOG, new Runnable() {
+            @Override
+            public void run() {
+                isn.localCancel(null, CancelOption.NOTIFY_PEER);
+            }
+        });
         return true;
     }
 

@@ -9,16 +9,17 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
-import de.fu_berlin.inf.dpp.invitation.hooks.ISessionNegotiationHook;
-import de.fu_berlin.inf.dpp.invitation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
+import de.fu_berlin.inf.dpp.negotiation.hooks.ISessionNegotiationHook;
+import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
 import de.fu_berlin.inf.dpp.session.User;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.whiteboard.gef.model.GEFRecordFactory;
 import de.fu_berlin.inf.dpp.whiteboard.gef.util.ColorUtils;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.ISXEMessageHandler;
@@ -44,6 +45,8 @@ public class WhiteboardManager {
 
     private static final Object LOCK = new Object();
 
+    private static final WhiteboardManager INSTANCE = new WhiteboardManager();
+
     protected SXEController controller;
 
     /**
@@ -55,10 +58,8 @@ public class WhiteboardManager {
      */
     private final Map<JID, Boolean> hasWhiteboard = new HashMap<JID, Boolean>();
 
-    private static WhiteboardManager instance = new WhiteboardManager();
-
     public static WhiteboardManager getInstance() {
-        return instance;
+        return INSTANCE;
     }
 
     /**
@@ -66,7 +67,7 @@ public class WhiteboardManager {
      * for other peers to be invited and let the host start the synchronization
      * process.
      */
-    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+    protected ISarosSessionListener sessionListener = new NullSarosSessionListener() {
 
         @Override
         public void postOutgoingInvitationCompleted(ISarosSession session,
@@ -185,7 +186,7 @@ public class WhiteboardManager {
 
     private WhiteboardManager() {
 
-        SarosPluginContext.reinject(this);
+        SarosPluginContext.initComponent(this);
 
         sessionManager.addSarosSessionListener(sessionListener);
         hooks.addHook(hook);
@@ -195,10 +196,18 @@ public class WhiteboardManager {
         controller = new SXEController(new GEFRecordFactory());
     }
 
-    private void setupColorAndTransmitter(ISarosSession session) {
-        RGB color = SarosAnnotation.getUserColor(session.getLocalUser())
-            .getRGB();
-        ColorUtils.setForegroundColor(color);
+    private void setupColorAndTransmitter(final ISarosSession session) {
+
+        SWTUtils.runSafeSWTSync(LOG, new Runnable() {
+
+            @Override
+            public void run() {
+                RGB color = SarosAnnotation
+                    .getUserColor(session.getLocalUser()).getRGB();
+
+                ColorUtils.setForegroundColor(color);
+            }
+        });
 
         sxeTransmitter = new SarosSXETransmitter(session);
         controller.initNetwork(sxeTransmitter);

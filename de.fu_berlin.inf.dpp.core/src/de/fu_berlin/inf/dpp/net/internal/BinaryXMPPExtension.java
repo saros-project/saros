@@ -10,7 +10,7 @@ public final class BinaryXMPPExtension {
     private long transferredSize;
     private long uncompressedSize;
     private byte[] payload;
-    private long tranferDuration;
+    private long transferDuration;
     private ConnectionMode transferMode;
 
     public BinaryXMPPExtension(ConnectionMode transferMode,
@@ -20,7 +20,7 @@ public final class BinaryXMPPExtension {
         this.chunkCount = chunkCount;
         transferredSize = 0;
         uncompressedSize = 0;
-        tranferDuration = System.currentTimeMillis();
+        transferDuration = System.currentTimeMillis();
     }
 
     /**
@@ -68,7 +68,7 @@ public final class BinaryXMPPExtension {
      * Returns the time in milliseconds until the transfer was completed.
      */
     long getTransferDuration() {
-        return tranferDuration;
+        return transferDuration;
     }
 
     /**
@@ -105,7 +105,7 @@ public final class BinaryXMPPExtension {
         boolean last = (--chunkCount <= 0);
 
         if (last)
-            tranferDuration = System.currentTimeMillis() - tranferDuration;
+            transferDuration = System.currentTimeMillis() - transferDuration;
 
         return last;
     }

@@ -7,7 +7,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.xmlpull.v1.XmlPullParserException;
 
-import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.SXEMessageType;
@@ -36,8 +35,7 @@ public class MockedSXETransmitter implements ISXETransmitter {
 
     @Override
     public SXEMessage sendAndAwait(IProgressMonitor monitor, SXEMessage msg,
-        SXEMessageType... awaitFor) throws IOException,
-        LocalCancellationException {
+        SXEMessageType... awaitFor) throws IOException {
         // TODO incorporate to enable proper invitation testing
         throw new UnsupportedOperationException();
     }

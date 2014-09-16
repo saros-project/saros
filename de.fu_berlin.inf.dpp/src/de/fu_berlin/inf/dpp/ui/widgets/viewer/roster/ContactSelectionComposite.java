@@ -74,7 +74,8 @@ public class ContactSelectionComposite extends
             ConnectionState newState) {
             switch (newState) {
             case CONNECTED:
-                ViewerUtils.setInput(getViewer(), connectionService.getRoster());
+                ViewerUtils
+                    .setInput(getViewer(), connectionService.getRoster());
                 ViewerUtils.expandAll(getViewer());
                 break;
             case NOT_CONNECTED:
@@ -171,10 +172,10 @@ public class ContactSelectionComposite extends
 
         List<RosterEntryElement> elementsToCheck = new ArrayList<RosterEntryElement>();
 
-        for (JID contact : contacts) {
-            elementsToCheck.add(new RosterEntryElement(connectionService.getRoster(),
-                contact));
-        }
+        // insert dummy values except the jid as those elements are never
+        // display anyways and only used for comparison
+        for (JID contact : contacts)
+            elementsToCheck.add(new RosterEntryElement(null, contact, false));
 
         Map<RosterEntryElement, Boolean> checkStatesChanges = calculateCheckStateDiff(
             allElements, checkedElements, elementsToCheck);
@@ -274,7 +275,7 @@ public class ContactSelectionComposite extends
 
     /**
      * Returns the current online status of selected entries. If one of the
-     * selected RoserEntryElements is offline, the return value is false.
+     * selected RosterEntryElements is offline, the return value is false.
      * 
      * @return
      */

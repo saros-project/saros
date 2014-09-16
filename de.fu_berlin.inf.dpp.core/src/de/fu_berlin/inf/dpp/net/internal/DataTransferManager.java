@@ -18,7 +18,6 @@ import java.util.zip.Inflater;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
-import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.ISarosContextBindings.IBBTransport;
@@ -104,7 +103,7 @@ public class DataTransferManager implements IConnectionListener,
 
             if (extension.getTransferDescription().compressContent()) {
                 byte[] payload = extension.getPayload();
-                long compressedPayloadLenght = payload.length;
+                long compressedPayloadLength = payload.length;
 
                 try {
                     payload = inflate(payload);
@@ -113,7 +112,7 @@ public class DataTransferManager implements IConnectionListener,
                     return;
                 }
 
-                extension.setPayload(compressedPayloadLenght, payload);
+                extension.setPayload(compressedPayloadLength, payload);
             }
 
             notifyDataReceived(extension.getTransferMode(),
@@ -214,7 +213,7 @@ public class DataTransferManager implements IConnectionListener,
             LOG.trace("send " + description + ", data len=" + data.length
                 + " byte(s), connection=" + connection);
 
-        sendInternal(connection, description, data);
+        sendInternal(connectionID, connection, description, data);
     }
 
     /**
@@ -239,18 +238,21 @@ public class DataTransferManager implements IConnectionListener,
         JID recipient = transferDescription.getRecipient();
         transferDescription.setSender(connectionJID);
 
-        sendInternal(connectInternal(DEFAULT_CONNECTION_ID, recipient),
+        sendInternal(DEFAULT_CONNECTION_ID,
+            connectInternal(DEFAULT_CONNECTION_ID, recipient),
             transferDescription, payload);
     }
 
-    private void sendInternal(final IByteStreamConnection connection,
+    private void sendInternal(final String connectionID,
+        final IByteStreamConnection connection,
         final TransferDescription description, byte[] payload)
         throws IOException {
 
         boolean sendPacket = true;
 
         for (IPacketInterceptor packetInterceptor : packetInterceptors)
-            sendPacket &= packetInterceptor.sendPacket(description, payload);
+            sendPacket &= packetInterceptor.sendPacket(connectionID,
+                description, payload);
 
         if (!sendPacket)
             return;
@@ -400,30 +402,29 @@ public class DataTransferManager implements IConnectionListener,
             if (connectionJID == null)
                 throw new IOException("not connected to a XMPP server");
 
-            ArrayList<ITransport> transportModesToUse = new ArrayList<ITransport>(
+            final ArrayList<ITransport> transportModesToUse = new ArrayList<ITransport>(
                 availableTransports);
 
-            LOG.debug("currently used IP addresses for Socks5Proxy: "
-                + Arrays.toString(Socks5Proxy.getSocks5Proxy()
-                    .getLocalAddresses().toArray()));
-
             for (ITransport transport : transportModesToUse) {
-                LOG.info("establishing connection to " + peer.getBase()
-                    + " from " + connectionJID + " using " + transport);
+                LOG.info("establishing connection to " + peer + " from "
+                    + connectionJID + " using transport " + transport);
                 try {
                     connection = transport.connect(connectionID, peer);
                     break;
                 } catch (IOException e) {
-                    LOG.error(peer + " failed to connect using " + transport
-                        + ": " + e.getMessage(), e);
+                    LOG.warn("failed to connect to " + peer
+                        + " using transport: " + transport, e);
                 } catch (InterruptedException e) {
+                    LOG.warn("interrupted while connecting to " + peer
+                        + " using transport: " + transport);
                     IOException io = new InterruptedIOException(
-                        "connecting cancelled: " + e.getMessage());
+                        "connection establishment to " + peer + " aborted");
                     io.initCause(e);
                     throw io;
                 } catch (Exception e) {
-                    LOG.error(peer + " failed to connect using " + transport
-                        + " because of an unknown error: " + e.getMessage(), e);
+                    LOG.error("failed to connect to " + peer
+                        + " due to an internal error in transport: "
+                        + transport, e);
                 }
             }
 
@@ -434,7 +435,9 @@ public class DataTransferManager implements IConnectionListener,
                 return connection;
             }
 
-            throw new IOException("could not connect to: " + peer);
+            throw new IOException("could not connect to " + peer
+                + ", exhausted all available transport modes: "
+                + transportModesToUse);
         } finally {
             synchronized (currentOutgoingConnectionEstablishments) {
                 currentOutgoingConnectionEstablishments

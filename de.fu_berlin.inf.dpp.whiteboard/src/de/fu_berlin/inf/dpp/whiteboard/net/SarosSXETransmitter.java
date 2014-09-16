@@ -15,8 +15,6 @@ import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
-import de.fu_berlin.inf.dpp.invitation.ProcessTools;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
@@ -53,8 +51,7 @@ public class SarosSXETransmitter implements ISXETransmitter {
     /**
      * Interval to poll receiving
      * 
-     * @see XMPPTransmitter#receive(SubMonitor, PacketCollector, long,
-     *      boolean)
+     * @see XMPPTransmitter#receive(SubMonitor, PacketCollector, long, boolean)
      */
     private static final long SXE_TIMEOUT_INTERVAL = 500L;
 
@@ -149,8 +146,7 @@ public class SarosSXETransmitter implements ISXETransmitter {
 
     @Override
     public synchronized SXEMessage sendAndAwait(IProgressMonitor monitor,
-        SXEMessage msg, SXEMessageType... awaitFor) throws IOException,
-        LocalCancellationException {
+        SXEMessage msg, SXEMessageType... awaitFor) throws IOException {
 
         log.debug(prefix() + "send " + msg.getMessageType() + " to "
             + msg.getTo() + " waiting for " + Arrays.toString(awaitFor));
@@ -170,15 +166,11 @@ public class SarosSXETransmitter implements ISXETransmitter {
                 packet = collector.nextResult(SXE_TIMEOUT_INTERVAL);
 
                 if (monitor.isCanceled())
-                    throw new LocalCancellationException();
+                    return null;
 
-                if (System.currentTimeMillis() - startTime > SXE_TIMEOUT) {
-                    String warn = "Received no answer from " + msg.getTo()
-                        + ", giving up...";
-                    log.warn(warn);
-                    throw new LocalCancellationException(warn,
-                        ProcessTools.CancelOption.DO_NOT_NOTIFY_PEER);
-                }
+                if (System.currentTimeMillis() - startTime > SXE_TIMEOUT)
+                    throw new IOException("received no response from "
+                        + msg.getTo());
 
             } while (packet == null);
 

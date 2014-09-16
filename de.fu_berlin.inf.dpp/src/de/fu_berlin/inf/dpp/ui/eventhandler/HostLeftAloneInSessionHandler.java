@@ -6,12 +6,12 @@ import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
-import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
@@ -33,7 +33,7 @@ public class HostLeftAloneInSessionHandler {
 
     private final IPreferenceStore preferenceStore;
 
-    private final ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+    private final ISarosSessionListener sessionListener = new NullSarosSessionListener() {
         @Override
         public void sessionEnded(ISarosSession session) {
             session.removeListener(projectListener);
@@ -113,7 +113,7 @@ public class HostLeftAloneInSessionHandler {
              * ERROR 16:49:09,455 [Worker-6] (SarosSessionManager.java:782) Internal error in notifying listener of an added project: java.lang.NullPointerException
              * at de.fu_berlin.inf.dpp.ui.decorators.SharedProjectDecorator$1.projectAdded(SharedProjectDecorator.java:81)
              * at de.fu_berlin.inf.dpp.project.SarosSessionManager.projectAdded(SarosSessionManager.java:780)
-             * at de.fu_berlin.inf.dpp.invitation.IncomingProjectNegotiation.accept(IncomingProjectNegotiation.java:241)
+             * at de.fu_berlin.inf.dpp.negotiation.IncomingProjectNegotiation.accept(IncomingProjectNegotiation.java:241)
              * at de.fu_berlin.inf.dpp.ui.wizards.AddProjectToSessionWizard$2.run(AddProjectToSessionWizard.java:267)
              * at org.eclipse.core.internal.jobs.Worker.run(Worker.java:54)
              * DEBUG 16:49:09,456 [Worker-6] (CancelableProcess.java:280) process IPN [remote side: jenkins_alice_stf@saros-con.imp.fu-berlin.de/Saros] exit status: OK

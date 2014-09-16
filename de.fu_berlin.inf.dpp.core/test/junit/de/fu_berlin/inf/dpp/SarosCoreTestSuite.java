@@ -8,6 +8,8 @@ import org.junit.runners.Suite;
 
 de.fu_berlin.inf.dpp.account.TestSuite.class,
 
+de.fu_berlin.inf.dpp.activities.TestSuite.class,
+
 de.fu_berlin.inf.dpp.communication.extensions.TestSuite.class,
 
 de.fu_berlin.inf.dpp.concurrent.TestSuite.class,
@@ -18,7 +20,7 @@ de.fu_berlin.inf.dpp.editor.colorstorage.TestSuite.class,
 
 de.fu_berlin.inf.dpp.filesystem.TestSuite.class,
 
-de.fu_berlin.inf.dpp.invitation.TestSuite.class,
+de.fu_berlin.inf.dpp.negotiation.TestSuite.class,
 
 de.fu_berlin.inf.dpp.misc.xstream.TestSuite.class,
 
@@ -27,6 +29,8 @@ de.fu_berlin.inf.dpp.net.TestSuite.class,
 de.fu_berlin.inf.dpp.net.internal.TestSuite.class,
 
 de.fu_berlin.inf.dpp.synchronize.TestSuite.class,
+
+de.fu_berlin.inf.dpp.util.TestSuite.class,
 
 de.fu_berlin.inf.dpp.versioning.TestSuite.class })
 public class SarosCoreTestSuite {

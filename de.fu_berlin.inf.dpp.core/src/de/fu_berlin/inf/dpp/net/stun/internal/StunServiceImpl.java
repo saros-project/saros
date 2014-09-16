@@ -69,7 +69,7 @@ public final class StunServiceImpl implements IStunService {
         try {
             stunInetAddress = InetAddress.getByName(stunAddress);
             localInetAddresses = NetworkingUtils
-                .getAllNonLoopbackLocalIPAdresses(false);
+                .getAllNonLoopbackLocalIPAddresses(false);
 
         } catch (IOException e) {
             log.error(
@@ -153,12 +153,12 @@ public final class StunServiceImpl implements IStunService {
                     0), timeout);
             } catch (IOException e) {
                 log.error(
-                    "an error occured while performing a STUN discovery: "
+                    "an error occurred while performing a STUN discovery: "
                         + e.getMessage(), e);
                 return;
             } catch (Exception e) {
                 log.error(
-                    "an internal error occured while performing a STUN discovery: "
+                    "an internal error occurred while performing a STUN discovery: "
                         + e.getMessage(), e);
                 return;
             }
@@ -241,7 +241,7 @@ public final class StunServiceImpl implements IStunService {
                 final DatagramPacket packet = new DatagramPacket(requestData,
                     requestData.length);
 
-                final CountDownLatch responeReceived = new CountDownLatch(1);
+                final CountDownLatch responseReceived = new CountDownLatch(1);
 
                 // we are using UDP, and since there is no guarantee that these
                 // packets ever reach their destination we have to resent them
@@ -253,7 +253,7 @@ public final class StunServiceImpl implements IStunService {
                             try {
                                 log.trace("sending STUN request");
                                 socket.send(packet);
-                                if (responeReceived.await(sendDelay,
+                                if (responseReceived.await(sendDelay,
                                     TimeUnit.MILLISECONDS))
                                     break;
 
@@ -300,7 +300,7 @@ public final class StunServiceImpl implements IStunService {
                     break;
                 }
 
-                responeReceived.countDown();
+                responseReceived.countDown();
                 senderThread.interrupt();
                 socket.close();
 

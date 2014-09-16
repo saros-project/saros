@@ -100,7 +100,7 @@ public class TCPServer {
                 break;
             } catch (IOException e) {
                 if (!searchFreePort) {
-                    LOG.error("faild to bind socket to: " + serverAddress);
+                    LOG.error("failed to bind socket to: " + serverAddress);
                     closeServerSocket(server);
                     throw e;
                 }

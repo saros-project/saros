@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
-import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
@@ -57,71 +56,70 @@ public class SXEIncomingSynchronizationProcess extends SXESynchronization {
          * dispatching listener thread when awaiting answers (could not process
          * incoming messages, deadlock)
          */
-        ThreadUtils.runSafeAsync("Incoming whiteboard synchronization process",
-            log, new Runnable() {
+        ThreadUtils.runSafeAsync("dpp-wb-sync-inc", log, new Runnable() {
 
-                @Override
-                public void run() {
-                    try {
+            @Override
+            public void run() {
+                try {
 
-                        log.debug(prefix() + "invitation from " + peer
-                            + " received");
+                    log.debug(prefix() + "invitation from " + peer
+                        + " received");
 
-                        SWTUtils.runSafeSWTSync(log, new Runnable() {
+                    SWTUtils.runSafeSWTSync(log, new Runnable() {
 
-                            @Override
-                            public void run() {
-                                if (!controller
-                                    .switchToConnectingState(session)) {
-                                    log.debug(prefix()
-                                        + "Received state offer while in "
-                                        + controller.getState() + " state");
-                                    SXEMessage msg = session.getNextMessage(
-                                        SXEMessageType.REFUSE_STATE, peer);
-                                    controller.getTransmitter().sendAsync(msg);
-                                    return;
-                                }
+                        @Override
+                        public void run() {
+                            if (!controller.switchToConnectingState(session)) {
+                                log.debug(prefix()
+                                    + "Received state offer while in "
+                                    + controller.getState() + " state");
+                                SXEMessage msg = session.getNextMessage(
+                                    SXEMessageType.REFUSE_STATE, peer);
+                                controller.getTransmitter().sendAsync(msg);
+                                return;
                             }
-                        });
+                        }
+                    });
 
-                        SXEMessage msg = session.getNextMessage(
-                            SXEMessageType.ACCEPT_STATE, peer);
+                    SXEMessage msg = session.getNextMessage(
+                        SXEMessageType.ACCEPT_STATE, peer);
 
-                        log.debug(prefix() + "queue incoming records from now");
+                    log.debug(prefix() + "queue incoming records from now");
 
-                        final SXEMessage stateMessage = controller
-                            .getTransmitter().sendAndAwait(
-                                new NullProgressMonitor(), msg,
-                                SXEMessageType.STATE);
+                    final SXEMessage stateMessage = controller.getTransmitter()
+                        .sendAndAwait(new NullProgressMonitor(), msg,
+                            SXEMessageType.STATE);
 
-                        log.debug(prefix() + "state received");
-
-                        SWTUtils.runSafeSWTSync(log, new Runnable() {
-
-                            @Override
-                            public void run() {
-                                controller.startSession(stateMessage);
-                            }
-
-                        });
-
-                        // TODO send ack? Note: is not included in SXE
-
-                    } catch (IOException e) {
-                        log.error(prefix()
-                            + "Timeout while synchronizing whiteboard state: "
-                            + e.getMessage());
-                    } catch (LocalCancellationException lce) {
+                    if (stateMessage == null) {
                         log.debug(prefix()
-                            + "Whitebaord synchronization cancelled: "
-                            + lce.getMessage());
-                    } catch (Exception e) {
-                        log.debug(prefix()
-                            + "Unexpected Exception in Whitebaord synchronization: "
-                            + e);
+                            + "Whitebaord synchronization cancelled locally");
+                        return;
                     }
+
+                    log.debug(prefix() + "state received");
+
+                    SWTUtils.runSafeSWTSync(log, new Runnable() {
+
+                        @Override
+                        public void run() {
+                            controller.startSession(stateMessage);
+                        }
+
+                    });
+
+                    // TODO send ack? Note: is not included in SXE
+
+                } catch (IOException e) {
+                    log.error(prefix()
+                        + "Timeout while synchronizing whiteboard state: "
+                        + e.getMessage());
+                } catch (Exception e) {
+                    log.debug(prefix()
+                        + "Unexpected Exception in Whitebaord synchronization: "
+                        + e);
                 }
-            });
+            }
+        });
 
     }
 

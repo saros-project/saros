@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.ui.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,6 +21,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
@@ -30,9 +32,9 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.filesystem.EclipseProjectImpl;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.util.FileUtils;
@@ -85,6 +87,7 @@ public class CollaborationUtils {
                     IProgressMonitor.UNKNOWN);
 
                 try {
+                    refreshProjects(newResources.keySet(), null);
                     sessionManager.startSession(convert(newResources));
                     Set<JID> participantsToAdd = new HashSet<JID>(contacts);
 
@@ -166,15 +169,15 @@ public class CollaborationUtils {
      */
     public static void addResourcesToSession(List<IResource> resourcesToAdd) {
 
-        final ISarosSession sarosSession = sessionManager.getSarosSession();
+        final ISarosSession session = sessionManager.getSarosSession();
 
-        if (sarosSession == null) {
+        if (session == null) {
             LOG.warn("cannot add resources to a non-running session");
             return;
         }
 
         final Map<IProject, List<IResource>> projectResources = acquireResources(
-            resourcesToAdd, sarosSession);
+            resourcesToAdd, session);
 
         if (projectResources.isEmpty())
             return;
@@ -183,16 +186,34 @@ public class CollaborationUtils {
             @Override
             public void run() {
 
-                if (sarosSession.hasWriteAccess()) {
-                    sessionManager
-                        .addResourcesToSession(convert(projectResources));
+                if (!session.hasWriteAccess()) {
+                    DialogUtils
+                        .popUpFailureMessage(
+                            Messages.CollaborationUtils_insufficient_privileges,
+                            Messages.CollaborationUtils_insufficient_privileges_text,
+                            false);
                     return;
                 }
 
-                DialogUtils.popUpFailureMessage(
-                    Messages.CollaborationUtils_insufficient_privileges,
-                    Messages.CollaborationUtils_insufficient_privileges_text,
-                    false);
+                final List<IProject> projectsToRefresh = new ArrayList<IProject>();
+
+                for (IProject project : projectResources.keySet()) {
+                    if (!session.isShared(ResourceAdapterFactory
+                        .create(project)))
+                        projectsToRefresh.add(project);
+                }
+
+                try {
+                    refreshProjects(projectsToRefresh, null);
+                } catch (CoreException e) {
+                    LOG.warn("failed to refresh projects", e);
+                    /*
+                     * FIXME use a Job instead of a plain thread and so better
+                     * execption handling !
+                     */
+                }
+
+                sessionManager.addResourcesToSession(convert(projectResources));
             }
         });
     }
@@ -377,7 +398,7 @@ public class CollaborationUtils {
              * provider (editor) will fail to render the file input correctly. I
              * think we should negotiate the project encodings and forbid
              * further proceeding if they do not match ! The next step should be
-             * to also transmit the encoding in FileActivites, because it is
+             * to also transmit the encoding in FileActivities, because it is
              * possible to change the encoding of files independently of the
              * project encoding settings.
              */
@@ -438,5 +459,22 @@ public class CollaborationUtils {
                 ResourceAdapterFactory.convertTo(entry.getValue()));
 
         return result;
+    }
+
+    private static void refreshProjects(final Collection<IProject> projects,
+        final IProgressMonitor monitor) throws CoreException {
+
+        final SubMonitor progress = SubMonitor.convert(monitor,
+            "Refreshing projects...", projects.size());
+
+        for (final IProject project : projects) {
+            if (!project.isOpen())
+                project.open(progress.newChild(0));
+
+            project
+                .refreshLocal(IResource.DEPTH_INFINITE, progress.newChild(1));
+        }
+
+        progress.done();
     }
 }

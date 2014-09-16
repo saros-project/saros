@@ -69,8 +69,8 @@ import de.fu_berlin.inf.dpp.net.xmpp.roster.AbstractRosterListener;
 import de.fu_berlin.inf.dpp.net.xmpp.roster.IRosterListener;
 import de.fu_berlin.inf.dpp.net.xmpp.roster.RosterTracker;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.BalloonNotification;
 import de.fu_berlin.inf.dpp.ui.actions.ChangeColorAction;
@@ -105,22 +105,22 @@ import de.fu_berlin.inf.dpp.ui.widgets.viewer.session.XMPPSessionDisplayComposit
 
 /**
  * @JTourBusStop 1, The Interface Tour:
- * 
+ *
  *               This tour shows you a few keys parts of the Saros interface and
  *               how it functions. It will give you a glimpse of the main views
  *               used by Saros, an idea about how to code the user interface and
  *               how it communicates with the underlying business logic.
- * 
+ *
  *               We begin here at the SarosView, the central class that implements
  *               the Saros Eclipse view. Notice that each view inherits from the
  *               Eclipse ViewPart, which manages most of the view's mechanics,
  *               leaving us to fill in the missing parts specific to our view.
- * 
+ *
  */
 
 /**
  * This view displays the contact list, the Saros Session and Saros Chat.
- * 
+ *
  * @author patbit
  */
 @Component(module = "ui")
@@ -253,7 +253,7 @@ public class SarosView extends ViewPart {
      * {@linkplain Disposable#dispose() disposed} when and if necessary.
      */
     /*
-     * TODO What about having actions as (disposable and recreateable?)
+     * TODO What about having actions as (disposable and recreatable?)
      * singletons? This map (together with register and get methods) would not
      * be necessary, actions could be added to the menus at will (through a
      * method that would remember only the disposable ones, so they can be
@@ -271,14 +271,14 @@ public class SarosView extends ViewPart {
 
     /**
      * @JTourBusStop 2, The Interface Tour:
-     * 
+     *
      *               The createPartControl method constructs the view's
      *               controls.
-     * 
+     *
      *               Notice that the SarosView class doesn't contain everything.
      *               Rather it arranges and manages other components which carry
      *               out most of the functionality.
-     * 
+     *
      *               You should have noticed that the Saros view is divided into
      *               parts, left and right. The left side is a composite of the
      *               session information and the roster. The right side
@@ -386,12 +386,12 @@ public class SarosView extends ViewPart {
 
         /**
          * @JTourBusStop 3, The Interface Tour:
-         * 
+         *
          *               There are a few additional things in the Saros view.
-         * 
+         *
          *               There is tool bar that holds the icons along the top
          *               (also see addToolbarItems() below).
-         * 
+         *
          *               Also, there are context menus which appear when you: -
          *               right-click on a person in your current session -
          *               right-click on a buddy in the buddy list.
@@ -560,7 +560,7 @@ public class SarosView extends ViewPart {
      * Adds the {@link IWorkbenchActionConstants#MB_ADDITIONS additions}
      * {@link Separator} to the {@link MenuManager} in order to let others
      * extend the menu.
-     * 
+     *
      * @param menuManager
      */
     protected void addAdditionsSeparator(MenuManager menuManager) {
@@ -597,7 +597,7 @@ public class SarosView extends ViewPart {
 
     /**
      * Display a notification next to the given control..
-     * 
+     *
      * @param title
      * @param text
      * @param control
@@ -649,7 +649,7 @@ public class SarosView extends ViewPart {
      * current focus. The visibility time of the notification will vary,
      * depending on how much words the text contains. This method <b>SHOULD
      * NOT</b> be called directly from the business logic.
-     * 
+     *
      * @param title
      *            the title of the notification
      * @param text

@@ -8,10 +8,10 @@ import java.util.Map;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
 
 /**
  * A Collector class that collects information for each shared project during a
@@ -31,7 +31,7 @@ public class ProjectCollector extends AbstractStatisticCollector {
 
     private final Map<String, ProjectInformation> sharedProjects = new HashMap<String, ProjectInformation>();
 
-    private final ISarosSessionListener projectListener = new AbstractSarosSessionListener() {
+    private final ISarosSessionListener projectListener = new NullSarosSessionListener() {
         @Override
         public void projectAdded(String projectID) {
             ProjectInformation info = sharedProjects.get(projectID);

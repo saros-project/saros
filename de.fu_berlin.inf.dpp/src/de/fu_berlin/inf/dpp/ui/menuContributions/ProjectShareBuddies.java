@@ -80,8 +80,8 @@ public class ProjectShareBuddies extends ContributionItem {
      * @return
      */
     protected RosterEntry[] getSortedRosterEntries() {
-        RosterEntry[] rosterEntries = connectionService.getRoster().getEntries()
-            .toArray(new RosterEntry[0]);
+        RosterEntry[] rosterEntries = connectionService.getRoster()
+            .getEntries().toArray(new RosterEntry[0]);
 
         Arrays.sort(rosterEntries, new Comparator<RosterEntry>() {
             @Override
@@ -111,7 +111,7 @@ public class ProjectShareBuddies extends ContributionItem {
          * The model knows how to display roster entries best.
          */
         RosterEntryElement rosterEntryElement = new RosterEntryElement(
-            connectionService.getRoster(), new JID(rosterEntry.getUser()));
+            connectionService.getRoster(), new JID(rosterEntry.getUser()), true);
 
         MenuItem menuItem = new MenuItem(parentMenu, SWT.NONE, index);
         menuItem.setText(rosterEntryElement.getStyledText().toString());

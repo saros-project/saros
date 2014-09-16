@@ -2,8 +2,11 @@ package de.fu_berlin.inf.dpp.filesystem;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 
+import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.OperationCanceledException;
 
 public class EclipseFileImpl extends EclipseResourceImpl implements IFile {
 
@@ -36,6 +39,8 @@ public class EclipseFileImpl extends EclipseResourceImpl implements IFile {
             getDelegate().setContents(input, force, keepHistory, null);
         } catch (CoreException e) {
             throw new IOException(e);
+        } catch (OperationCanceledException e) {
+            throw new IOException(e);
         }
     }
 
@@ -44,6 +49,8 @@ public class EclipseFileImpl extends EclipseResourceImpl implements IFile {
         try {
             getDelegate().create(input, force, null);
         } catch (CoreException e) {
+            throw new IOException(e);
+        } catch (OperationCanceledException e) {
             throw new IOException(e);
         }
     }
@@ -67,5 +74,20 @@ public class EclipseFileImpl extends EclipseResourceImpl implements IFile {
     @Override
     public org.eclipse.core.resources.IFile getDelegate() {
         return (org.eclipse.core.resources.IFile) delegate;
+    }
+
+    @Override
+    public long getSize() throws IOException {
+        URI uri = getDelegate().getLocationURI();
+
+        if (uri != null) {
+            try {
+                return EFS.getStore(uri).fetchInfo().getLength();
+            } catch (CoreException e) {
+                throw new IOException(e);
+            }
+        }
+
+        return 0;
     }
 }

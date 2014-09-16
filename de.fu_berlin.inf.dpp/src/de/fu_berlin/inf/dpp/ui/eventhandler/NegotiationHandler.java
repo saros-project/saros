@@ -13,20 +13,21 @@ import org.eclipse.swt.SWT;
 import org.eclipse.ui.progress.IProgressConstants;
 
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.invitation.FileList;
-import de.fu_berlin.inf.dpp.invitation.IncomingProjectNegotiation;
-import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
-import de.fu_berlin.inf.dpp.invitation.OutgoingProjectNegotiation;
-import de.fu_berlin.inf.dpp.invitation.OutgoingSessionNegotiation;
-import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
-import de.fu_berlin.inf.dpp.invitation.ProjectNegotiationData;
-import de.fu_berlin.inf.dpp.invitation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
+import de.fu_berlin.inf.dpp.negotiation.FileList;
+import de.fu_berlin.inf.dpp.negotiation.IncomingProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.OutgoingProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
+import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.project.INegotiationHandler;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
@@ -158,7 +159,9 @@ public class NegotiationHandler implements INegotiationHandler {
         @Override
         protected IStatus run(IProgressMonitor monitor) {
             try {
-                ProjectNegotiation.Status status = process.start(monitor);
+                ProjectNegotiation.Status status = process
+                    .run(ProgressMonitorAdapterFactory.convertTo(monitor));
+
                 String peerName = getNickname(new JID(peer));
 
                 final String message;
@@ -211,10 +214,11 @@ public class NegotiationHandler implements INegotiationHandler {
 
     private final ISarosSessionManager sessionManager;
 
-    public NegotiationHandler(ISarosSessionManager sessionManager,
+    // FIXME use ISarosSessionManager interface
+    public NegotiationHandler(SarosSessionManager sessionManager,
         XMPPConnectionService connectionService) {
+        sessionManager.setNegotiationHandler(this);
         this.sessionManager = sessionManager;
-        this.sessionManager.setNegotiationHandler(this);
     }
 
     @Override
@@ -302,8 +306,7 @@ public class NegotiationHandler implements INegotiationHandler {
             @Override
             public void run() {
                 AddProjectToSessionWizard projectWizard = new AddProjectToSessionWizard(
-                    process, process.getPeer(), fileLists, process
-                        .getProjectNames());
+                    process, process.getPeer(), fileLists);
 
                 final WizardDialogAccessable wizardDialog = new WizardDialogAccessable(
                     SWTUtils.getShell(), projectWizard, SWT.MIN | SWT.MAX,

@@ -20,11 +20,11 @@ import de.fu_berlin.inf.dpp.net.IPacketInterceptor;
 import de.fu_berlin.inf.dpp.net.internal.BinaryXMPPExtension;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityListener;
 import de.fu_berlin.inf.dpp.session.IActivityProducer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.bot.SarosSWTBotPreferences;
@@ -124,8 +124,11 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
         }
 
         @Override
-        public boolean sendPacket(TransferDescription description,
-            byte[] payload) {
+        public boolean sendPacket(final String connectionID,
+            final TransferDescription description, final byte[] payload) {
+
+            if (!ISarosSession.SESSION_CONNECTION_ID.equals(connectionID))
+                return true;
 
             JID jid = description.getRecipient();
             LOG.trace("intercepting outgoing packet to: " + jid);
@@ -320,7 +323,8 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
                 LOG.trace("sending blocked packet: " + holder.description
                     + ", payload length: " + holder.payload.length);
 
-                getDataTransferManager().sendData(holder.description,
+                getDataTransferManager().sendData(
+                    ISarosSession.SESSION_CONNECTION_ID, holder.description,
                     holder.payload);
             } catch (Exception e) {
                 LOG.error(e.getMessage(), e);

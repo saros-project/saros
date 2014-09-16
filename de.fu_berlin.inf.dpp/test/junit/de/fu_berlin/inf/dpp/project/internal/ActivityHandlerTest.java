@@ -54,7 +54,7 @@ public class ActivityHandlerTest {
     // Results from Callback
     private IActivity transformedActivity;
     private IActivity localActivity;
-    private boolean willBeSent;
+    private volatile boolean willBeSent;
     private List<User> targets = new ArrayList<User>();
 
     // Input
@@ -224,7 +224,7 @@ public class ActivityHandlerTest {
             // As the dispatching is performed by a different Thread we have
             // to wait for it to dispatch the activity
             try {
-                if (!gate.await(5, TimeUnit.SECONDS)) {
+                if (!gate.await(10, TimeUnit.SECONDS)) {
                     fail(activity + " was not dispatched");
                 }
             } catch (InterruptedException e) {

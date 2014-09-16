@@ -6,7 +6,6 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.XMPPError;
 
-import de.fu_berlin.inf.dpp.Messages;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.communication.connection.IConnectingFailureCallback;
@@ -72,16 +71,18 @@ public class ConnectingFailureHandler implements IConnectingFailureCallback {
 
             if (!(exception instanceof XMPPException)) {
 
-                DialogUtils.popUpFailureMessage(
-                    Messages.Saros_connecting_error_title, MessageFormat
-                        .format(Messages.Saros_connecting_internal_error,
-                            exception.getMessage()), false);
+                DialogUtils
+                    .popUpFailureMessage(
+                        "Connecting Error",
+                        MessageFormat
+                            .format(
+                                "Could not connect to XMPP server. Unexpected error: {0}",
+                                exception.getMessage()), false);
 
                 return;
             }
 
-            if (DialogUtils.popUpYesNoQuestion(
-                Messages.Saros_connecting_error_title,
+            if (DialogUtils.popUpYesNoQuestion("Connecting Error",
                 generateHumanReadableErrorMessage((XMPPException) exception),
                 false)) {
 
@@ -110,14 +111,14 @@ public class ConnectingFailureHandler implements IConnectingFailureCallback {
         XMPPError error = e.getXMPPError();
 
         if (error != null && error.getCode() == 504)
-            return Messages.Saros_connecting_unknown_host
-                + Messages.Saros_connecting_modify_account
-                + "\n\nDetailed error:\nSMACK: " + error + "\n"
+            return "The XMPP server could not be found. Make sure that you entered the domain part of your JID correctly.\n\nIn case of DNS or SRV problems please try to manually configure the server address and port under the advanced settings for this account or update the hosts file of your OS.\n\n"
+                + "Do you want to edit your current XMPP account now?"
+                + "\n\nDetailed error:\nSMACK: " + error + "\n" //$NON-NLS-1$ //$NON-NLS-2$
                 + e.getMessage();
         else if (error != null && error.getCode() == 502)
-            return Messages.Saros_connecting_connect_error
-                + Messages.Saros_connecting_modify_account
-                + "\n\nDetailed error:\nSMACK: " + error + "\n"
+            return "Could not connect to the XMPP server. Make sure that a XMPP service is running on the given domain / IP address and port.\n\nIn case of DNS or SRV problems please try to manually configure the server address and port under the advanced settings for this account or update the hosts file of your OS.\n\n"
+                + "Do you want to edit your current XMPP account now?"
+                + "\n\nDetailed error:\nSMACK: " + error + "\n" //$NON-NLS-1$ //$NON-NLS-2$
                 + e.getMessage();
 
         String question = null;
@@ -130,17 +131,17 @@ public class ConnectingFailureHandler implements IConnectingFailureCallback {
                 || errorMessage.toLowerCase().contains("403") // non SASL //$NON-NLS-1$
                 || errorMessage.toLowerCase().contains("401")) { // non SASL //$NON-NLS-1$
 
-                question = Messages.Saros_connecting_invalid_username_password
-                    + Messages.Saros_connecting_modify_account;
+                question = "Invalid username or password.\n\n"
+                    + "Do you want to edit your current XMPP account now?";
             } else if (errorMessage.toLowerCase().contains("503")) { //$NON-NLS-1$
-                question = Messages.Saros_connecting_sasl_required
-                    + Messages.Saros_connecting_modify_account;
+                question = "The XMPP server only allows authentication via SASL.\nPlease enable SASL for the current account in the account options and try again.\n\n"
+                    + "Do you want to edit your current XMPP account now?";
             }
         }
 
         if (question == null)
-            question = Messages.Saros_connecting_failed
-                + Messages.Saros_connecting_modify_account;
+            question = "Could not connect to XMPP server.\n\n"
+                + "Do you want to edit your current XMPP account now?";
 
         return question;
 

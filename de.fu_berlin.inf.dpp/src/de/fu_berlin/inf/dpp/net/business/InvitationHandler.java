@@ -13,12 +13,12 @@ import de.fu_berlin.inf.dpp.communication.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcknowledgedExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationOfferingExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.ProjectNegotiationOfferingExtension;
-import de.fu_berlin.inf.dpp.invitation.ProjectNegotiationData;
+import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 
 /**
  * Business Logic for handling incoming Session- and ProjectNegotiation requests

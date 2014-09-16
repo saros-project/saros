@@ -95,13 +95,13 @@ public class MonitorableFileTransfer {
             if (bytesPerSecond > 0)
                 secondsLeft = (fileSize - bytesWritten) / bytesPerSecond;
 
-            String remaingTime = "Remaining time: "
+            String remainingTime = "Remaining time: "
                 + (bytesPerSecond == 0 ? "N/A" : CoreUtils
                     .formatDuration(secondsLeft)
                     + " ("
                     + CoreUtils.formatByte(bytesPerSecond) + "/s)");
 
-            monitor.subTask(remaingTime);
+            monitor.subTask(remainingTime);
 
             try {
                 Thread.sleep(INTERVAL);

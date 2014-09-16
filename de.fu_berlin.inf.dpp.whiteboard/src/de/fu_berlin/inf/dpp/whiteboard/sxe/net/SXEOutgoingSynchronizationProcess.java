@@ -7,7 +7,6 @@ import java.util.concurrent.Callable;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.SXEMessageType;
@@ -60,6 +59,12 @@ public class SXEOutgoingSynchronizationProcess extends SXESynchronization {
                 monitor, msg, SXEMessageType.ACCEPT_STATE,
                 SXEMessageType.REFUSE_STATE);
 
+            if (answer == null) {
+                log.debug(prefix()
+                    + "Whitebaord synchronization cancelled locally");
+                return;
+            }
+
             if (answer.getMessageType() == SXEMessageType.ACCEPT_STATE) {
 
                 log.debug(prefix() + peer + " accepted state-offer");
@@ -109,9 +114,6 @@ public class SXEOutgoingSynchronizationProcess extends SXESynchronization {
             log.error(prefix()
                 + "Timeout while synchronizing whiteboard state: "
                 + e.getMessage());
-        } catch (LocalCancellationException lce) {
-            log.debug(prefix() + "Whitebaord synchronization cancelled: "
-                + lce.getMessage());
         } catch (Exception e) {
             log.debug(prefix()
                 + "Unexpected Exception in Whitebaord synchronization: " + e);

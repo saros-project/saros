@@ -180,7 +180,7 @@ public class VCSActivity extends AbstractResourceActivity {
     }
 
     /**
-     * Returns <code>true</code> if executing this activity would implicitely
+     * Returns <code>true</code> if executing this activity would implicitly
      * execute the <code>otherActivity</code>. In other words, if executing
      * <code>otherActivity</code> after this one would be a <code>null</code>
      * operation.<br>

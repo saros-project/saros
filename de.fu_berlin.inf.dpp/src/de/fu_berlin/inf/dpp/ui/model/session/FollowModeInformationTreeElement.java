@@ -1,10 +1,11 @@
 package de.fu_berlin.inf.dpp.ui.model.session;
 
-import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.graphics.Image;
 
+import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
+import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
@@ -19,11 +20,11 @@ import de.fu_berlin.inf.dpp.ui.Messages;
  */
 public class FollowModeInformationTreeElement extends
     AwarenessInformationTreeElement {
-    private static final Logger log = Logger
-        .getLogger(FollowModeInformationTreeElement.class);
 
-    public FollowModeInformationTreeElement(User user) {
-        super(user);
+    public FollowModeInformationTreeElement(final User user,
+        final EditorManager editorManager,
+        final AwarenessInformationCollector collector) {
+        super(user, editorManager, collector);
     }
 
     /**
@@ -34,14 +35,13 @@ public class FollowModeInformationTreeElement extends
      */
     @Override
     public StyledString getStyledText() {
-        log.debug("FollowModeInformation getStyledText()");
 
         StyledString styledString = new StyledString();
         final String following_paused = Messages.UserElement_following_paused;
 
-        User followee = awarenessInformationCollector.getFollowedUser(user);
+        User followee = collector.getFollowedUser(user);
         if (followee != null) {
-            if (awarenessInformationCollector.isActiveEditorShared(followee)) {
+            if (collector.isActiveEditorShared(followee)) {
                 styledString.append("following " + followee.getNickname());
             } else {
                 styledString.append(following_paused);

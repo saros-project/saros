@@ -87,7 +87,7 @@ public class SingleUserChat extends AbstractChat {
      * 
      * @return the chat's {@link MessageListener}
      */
-    synchronized MessageListener getMessagerListener() {
+    synchronized MessageListener getMessageListener() {
         return chatStateListener;
     }
 

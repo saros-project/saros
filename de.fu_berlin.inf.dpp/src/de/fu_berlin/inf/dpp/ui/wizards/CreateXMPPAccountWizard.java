@@ -3,7 +3,7 @@
  * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
  * (c) Christopher Oezbek - 2006
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 1, or (at your option)
@@ -44,11 +44,11 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * @JTourBusStop 4, The Interface Tour:
- * 
+ *
  *               Another important element to the Saros interface is the
  *               Wizard. Eclipse supplies an abstract Wizard class that can
  *               be extended with your concrete functionality.
- * 
+ *
  *               In this example, the CreateXMPPAccountWizard allows the user
  *               to enter the details of a new account, validate them and
  *               store them in our account store.
@@ -158,7 +158,7 @@ public class CreateXMPPAccountWizard extends Wizard {
             // Leave the wizard open
             return false;
         } catch (InterruptedException e) {
-            log.error("uninterruptable context was interrupted", e);
+            log.error("uninterruptible context was interrupted", e);
             createXMPPAccountPage.setErrorMessage(e.getMessage());
             return false;
         }
@@ -178,7 +178,7 @@ public class CreateXMPPAccountWizard extends Wizard {
 
             if (reconnect) {
                 accountStore.setAccountActive(createdXMPPAccount);
-                ThreadUtils.runSafeAsync("ConnectCreatedAccount", log,
+                ThreadUtils.runSafeAsync("dpp-connect-demand", log,
                     new Runnable() {
                         @Override
                         public void run() {
@@ -253,7 +253,7 @@ public class CreateXMPPAccountWizard extends Wizard {
         if (error.getCode() == 409)
             message = "The XMPP account already exists.";
         else
-            message = "An unknown error occured. Please register on provider's website.";
+            message = "An unknown error occurred. Please register on provider's website.";
 
         return message;
     }

@@ -21,6 +21,7 @@ import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -64,6 +65,8 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
 
     private final EditorManager editorManager;
 
+    private final IEditorAPI editorAPI;
+
     private final ISarosSession session;
 
     private final StopManager stopManager;
@@ -89,10 +92,11 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
     };
 
     public ConsistencyWatchdogServer(ISarosSession session,
-        EditorManager editorManager, StopManager stopManager,
-        UISynchronizer synchronizer) {
+        EditorManager editorManager, IEditorAPI editorAPI,
+        StopManager stopManager, UISynchronizer synchronizer) {
         this.session = session;
         this.editorManager = editorManager;
+        this.editorAPI = editorAPI;
         this.stopManager = stopManager;
         this.synchronizer = synchronizer;
     }
@@ -212,7 +216,7 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
 
             if (file.exists()) {
                 input = new FileEditorInput(file);
-                provider = EditorManager.getDocumentProvider(input);
+                provider = editorAPI.getDocumentProvider(input);
                 try {
                     provider.connect(input);
                     doc = provider.getDocument(input);

@@ -23,19 +23,19 @@
 package de.fu_berlin.inf.dpp.core.project;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.core.invitation.ProjectNegotiationData;
+import de.fu_berlin.inf.dpp.core.invitation.INegotiationHandler;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-//import de.fu_berlin.inf.dpp.core.invitation.INegotiationHandler;
 
 /**
  * An interface behind which the {@link SarosSessionManager} hides its
@@ -143,8 +143,8 @@ public interface ISarosSessionManager {
      * This method is called when a new project was added to the session
      *
      * @param from         The one who added the project.
-     * @param projectInfos what projects where added ({@link FileList}, projectName etc.)
-     *                     see: {@link ProjectNegotiationData}
+     * @param projectInfos what projects where added ({@link de.fu_berlin.inf.dpp.invitation.FileList}, projectName etc.)
+     *                     see: {@link de.fu_berlin.inf.dpp.invitation.ProjectNegotiationData}
      * @param processID    ID of the exchanging process
      */
     public void incomingProjectReceived(JID from,
@@ -178,11 +178,8 @@ public interface ISarosSessionManager {
      * Sets the {@link de.fu_berlin.inf.dpp.core.invitation.INegotiationHandler negotiation handler} that will handle
      * incoming and outgoing session and project negotiations requests.
      *
-     * @param handler
-     *            the handler to handle the request or <code>null</code> if the
-     *            requests should not be handled
-     *
+     * @param handler the handler to handle the request or <code>null</code> if the
+     *                requests should not be handled
      */
-    //TODO: reactivate after migration
-    //public void setNegotiationHandler(INegotiationHandler handler);
+    public void setNegotiationHandler(INegotiationHandler handler);
 }

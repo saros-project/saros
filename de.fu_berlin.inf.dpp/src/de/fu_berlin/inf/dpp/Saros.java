@@ -53,8 +53,7 @@ import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 import de.fu_berlin.inf.dpp.misc.pico.DotGraphMonitor;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.stf.server.STFController;
+import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import de.fu_berlin.inf.dpp.versioning.VersionManager;
@@ -169,8 +168,6 @@ public class Saros extends AbstractUIPlugin {
      * the user's option) be stored encrypted.
      */
     protected ISecurePreferences securePrefs;
-
-    public static final Random RANDOM = new Random();
 
     protected Logger log;
 
@@ -325,7 +322,7 @@ public class Saros extends AbstractUIPlugin {
 
         try {
             Thread shutdownThread = ThreadUtils.runSafeAsync(
-                "ShutdownProcess", log, new Runnable() { //$NON-NLS-1$
+                "dpp-shutdown", log, new Runnable() { //$NON-NLS-1$
                     @Override
                     public void run() {
 
@@ -418,7 +415,7 @@ public class Saros extends AbstractUIPlugin {
         try {
             // change the context class loader so Log4J will find the appenders
             Thread.currentThread().setContextClassLoader(
-                STFController.class.getClassLoader());
+                Saros.class.getClassLoader());
 
             PropertyConfigurator.configure(Saros.class.getClassLoader()
                 .getResource("saros.log4j.properties")); //$NON-NLS-1$
@@ -554,7 +551,7 @@ public class Saros extends AbstractUIPlugin {
             return;
         }
 
-        final InputStream in = VersionManager.class.getClassLoader()
+        final InputStream in = Saros.class.getClassLoader()
             .getResourceAsStream(filename);
 
         final Properties chart = new Properties();

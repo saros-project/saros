@@ -45,14 +45,15 @@ import de.fu_berlin.inf.dpp.concurrent.undo.OperationHistory.Type;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
+import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
-import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.StackTrace;
@@ -102,6 +103,8 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
     protected IUndoContext context = IOperationHistory.GLOBAL_UNDO_CONTEXT;
 
     protected EditorManager editorManager;
+
+    protected IEditorAPI editorAPI;
 
     protected SPath currentActiveEditor = null;
 
@@ -254,7 +257,7 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
      * enables and disables the UndoManager and does cleanup works at the begin
      * and the end of a session.
      */
-    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+    protected ISarosSessionListener sessionListener = new NullSarosSessionListener() {
 
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
@@ -392,7 +395,7 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
     };
 
     public UndoManager(ISarosSessionManager sessionManager,
-        EditorManager editorManager) {
+        EditorManager editorManager, IEditorAPI editorAPI) {
 
         if (log.isDebugEnabled())
             DefaultOperationHistory.DEBUG_OPERATION_HISTORY_APPROVAL = true;
@@ -407,6 +410,8 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
         this.editorManager = editorManager;
 
         editorManager.addSharedEditorListener(sharedEditorListener);
+
+        this.editorAPI = editorAPI;
     }
 
     // just for testing
@@ -536,7 +541,7 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
             .getDelegate();
 
         FileEditorInput input = new FileEditorInput(file);
-        IDocumentProvider provider = EditorManager.getDocumentProvider(input);
+        IDocumentProvider provider = editorAPI.getDocumentProvider(input);
 
         try {
             provider.connect(input);

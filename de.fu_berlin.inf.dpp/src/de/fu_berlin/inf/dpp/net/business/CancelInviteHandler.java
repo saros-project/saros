@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package de.fu_berlin.inf.dpp.net.business;
 
@@ -9,7 +9,7 @@ import org.jivesoftware.smack.packet.Packet;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.extensions.CancelInviteExtension;
-import de.fu_berlin.inf.dpp.invitation.SessionNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
@@ -46,11 +46,11 @@ public class CancelInviteHandler {
     public void invitationCanceled(JID sender, String invitationID,
         String errorMsg) {
 
-        SessionNegotiation invitationProcess = invitationProcesses
-            .get(sender, invitationID);
+        SessionNegotiation invitationProcess = invitationProcesses.get(sender,
+            invitationID);
 
         if (invitationProcess == null) {
-            log.warn("Inv[unkown user]: Received invitation cancel message for unknown invitation process. Ignoring...");
+            log.warn("Inv[unknown user]: Received invitation cancel message for unknown invitation process. Ignoring...");
             return;
         }
 
