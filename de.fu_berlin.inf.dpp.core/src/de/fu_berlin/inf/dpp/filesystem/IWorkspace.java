@@ -9,4 +9,8 @@ import java.io.IOException;
  */
 public interface IWorkspace {
     public void run(IWorkspaceRunnable runnable) throws IOException;
+
+    public IProject getProject(String project);
+
+    public IPath getLocation();
 }

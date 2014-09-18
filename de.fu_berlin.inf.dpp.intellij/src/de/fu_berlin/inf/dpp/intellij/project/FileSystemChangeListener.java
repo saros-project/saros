@@ -175,8 +175,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
     @Override
     public void contentsChanged(@NotNull VirtualFileEvent virtualFileEvent) {
         VirtualFile virtualFile = virtualFileEvent.getFile();
-        ProjectImp project = (ProjectImp) workspace.getRoot()
-            .locateProject(new PathImp(new File(virtualFile.getPath())));
+        ProjectImp project = workspace.getProjectForPath(virtualFile.getPath());
         IFile file = new FileImp(project, new File(virtualFile.getPath()));
 
         if (resourceManager.getSession().isShared(file) && newFiles
@@ -222,7 +221,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
 
         File file = convertVirtualFileEventToFile(virtualFileEvent);
         IPath path = new PathImp(file);
-        IProject project = workspace.getRoot().locateProject(path);
+        ProjectImp project = workspace.getProjectForPath(file.getPath());
 
         if (project == null || !project.exists()) {
             return;
@@ -284,7 +283,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         }
 
         IPath path = new PathImp(file);
-        IProject project = workspace.getRoot().locateProject(path);
+        ProjectImp project = workspace.getProjectForPath(file.getPath());
 
         if (project == null || !project.exists()) {
             return;
@@ -327,7 +326,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         }
 
         IPath path = new PathImp(newFile);
-        IProject project = workspace.getRoot().locateProject(path);
+        ProjectImp project = workspace.getProjectForPath(newFile.getPath());
 
         if (project == null || !project.exists()) {
             return;
@@ -345,7 +344,8 @@ public class FileSystemChangeListener extends AbstractStoppableListener
             virtualFileMoveEvent.getOldParent() + File.separator
                 + virtualFileMoveEvent.getFileName()
         ));
-        IProject oldProject = workspace.getRoot().locateProject(oldPath);
+        IProject oldProject = workspace
+            .getProjectForPath(oldPath.toPortableString());
 
         oldPath = makeAbsolutePathProjectRelative(oldPath, project);
         SPath oldSPath = new SPath(oldProject, oldPath);
@@ -385,7 +385,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         }
 
         IPath oldPath = new PathImp(oldFile);
-        IProject project = workspace.getRoot().locateProject(oldPath);
+        ProjectImp project = workspace.getProjectForPath(newFile.getPath());
 
         if (project == null || !project.exists()) {
             return;
@@ -421,7 +421,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         }
 
         IPath path = new PathImp(newFile);
-        IProject project = workspace.getRoot().locateProject(path);
+        ProjectImp project = workspace.getProjectForPath(newFile.getPath());
 
         if (project == null || !project.exists()) {
             return;

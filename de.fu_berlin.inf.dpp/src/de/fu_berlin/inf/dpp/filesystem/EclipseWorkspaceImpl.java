@@ -82,4 +82,15 @@ public class EclipseWorkspaceImpl implements IWorkspace {
         }
     }
 
+    @Override
+    public IProject getProject(String project) {
+        return ResourceAdapterFactory.create(delegate.getRoot().getProject(
+            project));
+    }
+
+    @Override
+    public IPath getLocation() {
+        return ResourceAdapterFactory.create(delegate.getRoot().getLocation());
+    }
+
 }

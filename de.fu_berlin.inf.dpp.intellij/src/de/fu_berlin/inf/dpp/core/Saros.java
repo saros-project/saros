@@ -29,7 +29,7 @@ import de.fu_berlin.inf.dpp.core.context.SarosContext;
 import de.fu_berlin.inf.dpp.core.context.SarosCoreContextFactory;
 import de.fu_berlin.inf.dpp.core.context.SarosPluginContext;
 import de.fu_berlin.inf.dpp.core.preferences.PreferenceUtils;
-import de.fu_berlin.inf.dpp.core.workspace.IWorkspace;
+import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.intellij.context.SarosIntellijContextFactory;
 import de.fu_berlin.inf.dpp.intellij.project.fs.Workspace;
 import de.fu_berlin.inf.dpp.misc.pico.DotGraphMonitor;
@@ -135,16 +135,17 @@ public class Saros {
                 ConnectionState state) {
 
                 if (state == ConnectionState.CONNECTING) {
-                    ServiceDiscoveryManager.getInstanceFor(connection).addFeature(
-                        SarosConstants.XMPP_FEATURE_NAMESPACE);
+                    ServiceDiscoveryManager.getInstanceFor(connection)
+                        .addFeature(SarosConstants.XMPP_FEATURE_NAMESPACE);
                 }
             }
 
         });
 
         //todo: set parameters from config
-        connectionService.configure(SarosConstants.RESOURCE, false, false, 8888,
-                null, null, true, null, 80, true);
+        connectionService
+            .configure(SarosConstants.RESOURCE, false, false, 8888, null, null,
+                true, null, 80, true);
 
         isInitialized = true;
         // Make sure that all components in the container are

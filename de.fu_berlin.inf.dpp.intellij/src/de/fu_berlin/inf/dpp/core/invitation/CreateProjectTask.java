@@ -1,8 +1,8 @@
 package de.fu_berlin.inf.dpp.core.invitation;
 
-import de.fu_berlin.inf.dpp.core.workspace.IWorkspace;
-import de.fu_berlin.inf.dpp.core.workspace.IWorkspaceRunnable;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
+import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRunnable;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
 import org.apache.log4j.Logger;
@@ -64,7 +64,7 @@ public class CreateProjectTask implements IWorkspaceRunnable {
 
         monitor.beginTask("Creating project", IProgressMonitor.UNKNOWN);
 
-        project = workspace.getRoot().getProject(name);
+        project = workspace.getProject(name);
 
         //FIXME: right now creating a directory for project only, later IntelliJ
         // native implementation should be used to create project structure

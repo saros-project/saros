@@ -1,21 +1,5 @@
 package de.fu_berlin.inf.dpp.core.invitation;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.apache.log4j.Logger;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.Packet;
-import org.jivesoftware.smackx.filetransfer.FileTransferListener;
-import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
-import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
-import org.picocontainer.annotations.Inject;
-
 import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.communication.extensions.ProjectNegotiationMissingFilesExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingRequest;
@@ -25,14 +9,14 @@ import de.fu_berlin.inf.dpp.core.monitoring.remote.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.core.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.core.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.core.util.FileUtils;
-import de.fu_berlin.inf.dpp.core.workspace.IWorkspace;
-import de.fu_berlin.inf.dpp.core.workspace.IWorkspaceRunnable;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
+import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRunnable;
 import de.fu_berlin.inf.dpp.intellij.project.fs.PathImp;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.SubProgressMonitor;
@@ -49,6 +33,21 @@ import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.util.CoreUtils;
 import de.fu_berlin.inf.dpp.vcs.VCSProvider;
+import org.apache.log4j.Logger;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.smackx.filetransfer.FileTransferListener;
+import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
+import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
+import org.picocontainer.annotations.Inject;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * TODO: Refactor when merging with Saros/E IPN.
@@ -342,7 +341,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
             VCSProvider vcs = null;
 
-            IProject project = workspace.getRoot().getProject(projectName);
+            IProject project = workspace.getProject(projectName);
 
             if (!project.exists()) {
                 project = createProject(project, null);
@@ -390,7 +389,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             project.getName(), base, monitor, workspace);
 
         try {
-            workspace.run(createProjectTask, monitor);
+            workspace.run(createProjectTask);
         } catch (OperationCanceledException e) {
             throw new LocalCancellationException();
         } catch (IOException e) {
@@ -552,7 +551,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                             }
                         }
                     }
-                }, workspace.getRoot(), IWorkspace.AVOID_UPDATE, null);
+                });
 
                 diff.clearRemovedPaths();
             }
@@ -592,7 +591,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
          */
 
         try {
-            workspace.run(decompressTask, monitor);
+            workspace.run(decompressTask);
         } catch (OperationCanceledException e) {
             throw new LocalCancellationException(null,
                 CancelOption.DO_NOT_NOTIFY_PEER);
