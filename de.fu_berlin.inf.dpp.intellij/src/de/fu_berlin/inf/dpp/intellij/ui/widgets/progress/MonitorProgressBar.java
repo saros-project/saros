@@ -117,6 +117,12 @@ public class MonitorProgressBar implements IProgressMonitor {
 
     @Override
     public void done() {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                progressBar.setIndeterminate(false);
+                progressBar.setValue(MAX_VALUE);
+            }
+        });
         if (finishListener != null) {
             finishListener.finished();
         }
