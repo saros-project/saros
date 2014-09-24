@@ -54,8 +54,7 @@ public class Workspace implements IWorkspace {
 
     @Override
     public IProject getProject(String projectName) {
-        return new ProjectImp(projectName,
-            new File(project.getBasePath() + "/" + projectName));
+        return new ProjectImp(project, projectName);
     }
 
     /**
@@ -74,8 +73,7 @@ public class Workspace implements IWorkspace {
         }
 
         String projectName = new PathImp(relativePath).segments()[0];
-        return new ProjectImp(projectName,
-            new File(project.getBasePath() + "/" + projectName));
+        return new ProjectImp(project, projectName);
     }
 
     @Override

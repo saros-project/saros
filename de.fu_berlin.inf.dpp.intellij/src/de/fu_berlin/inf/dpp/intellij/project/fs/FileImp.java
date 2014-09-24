@@ -33,7 +33,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-//todo: use VirtualFile from intellij later
+/**
+ * IDEA implementation of the IFile interface.
+ * <p/>
+ * FIXME: Remove all hacks regarding absolute files.
+ */
 public class FileImp extends ResourceImp implements IFile {
     private static Logger LOG = Logger.getLogger(FileImp.class);
 
@@ -48,18 +52,28 @@ public class FileImp extends ResourceImp implements IFile {
 
     @Override
     public InputStream getContents() throws IOException {
-        if (file.exists()) {
+        if (file.isAbsolute() && file.exists()) {
             return new FileInputStream(file);
-        } else {
-            return null;
         }
+
+        if (!file.isAbsolute() & getFullPath().toFile().exists()) {
+            return new FileInputStream(getFullPath().toFile());
+        }
+
+        return null;
     }
 
     @Override
     public void setContents(InputStream input, boolean force,
         boolean keepHistory) throws IOException {
 
-        FileOutputStream fos = new FileOutputStream(file);
+        FileOutputStream fos = null;
+        if (!file.isAbsolute()) {
+            fos = new FileOutputStream(getFullPath().toFile());
+        } else {
+            fos = new FileOutputStream(file);
+        }
+
         try {
             int read = -1;
             byte[] buffer = new byte[1024];
@@ -82,7 +96,8 @@ public class FileImp extends ResourceImp implements IFile {
         return new PathImp(file);
     }
 
-    @Override public long getSize() throws IOException {
+    @Override
+    public long getSize() throws IOException {
         return file.length();
     }
 
