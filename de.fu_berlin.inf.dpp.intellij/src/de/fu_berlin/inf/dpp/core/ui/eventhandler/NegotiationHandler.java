@@ -22,15 +22,8 @@
 
 package de.fu_berlin.inf.dpp.core.ui.eventhandler;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.log4j.Logger;
-
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
-
 import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.core.invitation.INegotiationHandler;
 import de.fu_berlin.inf.dpp.core.invitation.IncomingProjectNegotiation;
@@ -44,6 +37,8 @@ import de.fu_berlin.inf.dpp.intellij.runtime.UIMonitoredJob;
 import de.fu_berlin.inf.dpp.intellij.ui.Messages;
 import de.fu_berlin.inf.dpp.intellij.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
+import de.fu_berlin.inf.dpp.intellij.ui.wizards.AddProjectToSessionWizard;
+import de.fu_berlin.inf.dpp.intellij.ui.wizards.JoinSessionWizard;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.negotiation.FileList;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
@@ -51,6 +46,11 @@ import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import org.apache.log4j.Logger;
+
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This handler is responsible for presenting and running the session and
@@ -114,25 +114,11 @@ public class NegotiationHandler implements INegotiationHandler {
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             @Override
             public void run() {
-
-                /**
-                 * @JTourBusStop 8, Invitation Process:
-                 * 
-                 *               (4a) The SessionManager then hands over the
-                 *               control to the NegotiationHandler (this class)
-                 *               which works on a newly started
-                 *               IncomingSessionNegotiation. This handler opens
-                 *               the JoinSessionWizard, a dialog for the user to
-                 *               decide whether to next the invitation.
-                 */
-
-                // TODO: Uncomment when JoinSessionWizard was added
-                /*
-                 * JoinSessionWizard sessionWizard = new JoinSessionWizard(
-                 * process);
-                 */
+                JoinSessionWizard wizard = new JoinSessionWizard(process);
+                wizard.setModal(true);
+                wizard.open();
             }
-        });
+        }, ModalityState.current());
 
     }
 
@@ -145,15 +131,15 @@ public class NegotiationHandler implements INegotiationHandler {
             fileLists.add(pInfo.getFileList());
         }
 
-        ApplicationManager.getApplication().invokeAndWait(new Runnable() {
+        ApplicationManager.getApplication().invokeLater(new Runnable() {
             @Override
             public void run() {
-                // TODO: Uncomment when AddProjectToSessionWizard was added
-                /*
-                 * AddProjectToSessionWizard projectToSessionWizard = new
-                 * AddProjectToSessionWizard( process, process.getPeer(),
-                 * fileLists, process.getProjectNames());
-                 */
+                AddProjectToSessionWizard wizard = new AddProjectToSessionWizard(
+                    process, process.getPeer(), fileLists,
+                    process.getProjectNames());
+                wizard.setModal(false);
+                wizard.open();
+
             }
         }, ModalityState.current());
     }

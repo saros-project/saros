@@ -26,10 +26,13 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
+import de.fu_berlin.inf.dpp.core.Saros;
+import de.fu_berlin.inf.dpp.core.context.SarosPluginContext;
 import de.fu_berlin.inf.dpp.intellij.ui.wizards.pages.AbstractWizardPage;
 import de.fu_berlin.inf.dpp.intellij.ui.wizards.pages.HeaderPanel;
 import de.fu_berlin.inf.dpp.intellij.ui.wizards.pages.NavigationPanel;
 import org.jetbrains.annotations.NotNull;
+import org.picocontainer.annotations.Inject;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -55,7 +58,7 @@ import java.util.Map;
  * <p/>
  * FIXME: Make layouts resizable
  */
-public class Wizard extends JDialog {
+public abstract class Wizard extends JDialog {
 
     private final WizardPageModel wizardPageModel;
 
@@ -90,12 +93,17 @@ public class Wizard extends JDialog {
     };
 
     private final JPanel cardPanel;
-    private final Project project;
+
     private final HeaderPanel headerPanel;
 
     private final CardLayout cardLayout;
 
     private final NavigationPanel navigationPanel;
+
+    protected Project project;
+
+    @Inject
+    protected Saros saros;
 
     /**
      * Constructor creates wizard structure.
@@ -103,11 +111,13 @@ public class Wizard extends JDialog {
      * @param title       window title
      * @param headerPanel
      */
-    public Wizard(Project project, String title, HeaderPanel headerPanel) {
+    public Wizard(String title, HeaderPanel headerPanel) {
         super(new JFrame(), title);
-        this.project = project;
+        SarosPluginContext.initComponent(this);
 
         this.headerPanel = headerPanel;
+        project = saros.getProject();
+
         wizardPageModel = new WizardPageModel();
 
         setSize(600, 400);
@@ -139,8 +149,6 @@ public class Wizard extends JDialog {
         getContentPane().add(navigationPanel, BorderLayout.SOUTH);
 
         wizardPageModel.goToFirstPage();
-
-        setVisible(true);
     }
 
     /**
@@ -192,19 +200,23 @@ public class Wizard extends JDialog {
         ProgressManager.getInstance()
             .run(new Task.Modal(project, title, false) {
 
-            @Override
-            public void run(
-                @NotNull
-                ProgressIndicator indicator) {
-                indicator.setIndeterminate(true);
-                runnable.run();
-                indicator.stop();
-            }
-        });
+                @Override
+                public void run(
+                    @NotNull
+                    ProgressIndicator indicator) {
+                    indicator.setIndeterminate(true);
+                    runnable.run();
+                    indicator.stop();
+                }
+            });
     }
 
     public void close() {
         dispose();
+    }
+
+    public void open() {
+        setVisible(true);
     }
 
     /**
