@@ -22,9 +22,14 @@
 
 package de.fu_berlin.inf.dpp.intellij.ui.wizards;
 
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.project.Project;
 import de.fu_berlin.inf.dpp.intellij.ui.wizards.pages.AbstractWizardPage;
 import de.fu_berlin.inf.dpp.intellij.ui.wizards.pages.HeaderPanel;
 import de.fu_berlin.inf.dpp.intellij.ui.wizards.pages.NavigationPanel;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -47,10 +52,11 @@ import java.util.Map;
  * Wizard wiz = new Wizard("title");
  * wiz.registerPage();
  * wiz.create();
- *
+ * <p/>
  * FIXME: Make layouts resizable
  */
 public class Wizard extends JDialog {
+
     private final WizardPageModel wizardPageModel;
 
     private final ActionListener navigationListener = new ActionListener() {
@@ -65,10 +71,11 @@ public class Wizard extends JDialog {
                 .equalsIgnoreCase(e.getActionCommand())) {
                 wizardPageModel.getCurrentPage().actionNext();
                 AbstractWizardPage nextPage = wizardPageModel.getNextPage();
-                if (nextPage == null)
+                if (nextPage == null) {
                     close();
-                else
+                } else {
                     goToPage(nextPage);
+                }
             } else if (NavigationPanel.BACK_ACTION
                 .equalsIgnoreCase(e.getActionCommand())) {
                 wizardPageModel.getCurrentPage().actionBack();
@@ -83,6 +90,7 @@ public class Wizard extends JDialog {
     };
 
     private final JPanel cardPanel;
+    private final Project project;
     private final HeaderPanel headerPanel;
 
     private final CardLayout cardLayout;
@@ -95,8 +103,9 @@ public class Wizard extends JDialog {
      * @param title       window title
      * @param headerPanel
      */
-    public Wizard(String title, HeaderPanel headerPanel) {
+    public Wizard(Project project, String title, HeaderPanel headerPanel) {
         super(new JFrame(), title);
+        this.project = project;
 
         this.headerPanel = headerPanel;
         wizardPageModel = new WizardPageModel();
@@ -152,8 +161,9 @@ public class Wizard extends JDialog {
      * and modifying the wizardPageModel.
      */
     protected void goToPage(AbstractWizardPage page) {
-        if (page == null)
+        if (page == null) {
             return;
+        }
 
         wizardPageModel.setCurrentPagePosition(page);
 
@@ -167,10 +177,30 @@ public class Wizard extends JDialog {
             position = NavigationPanel.Position.FIRST;
         }
 
-        navigationPanel.setPosition(position, page.isBackButtonVisible(),
-            page.isNextButtonVisible());
+        navigationPanel.setPosition(position, page.isBackButtonEnabled(),
+            page.isNextButtonEnabled());
 
         cardLayout.show(cardPanel, page.getId());
+    }
+
+    /**
+     * Starts the given runnable in a separate thread and shows a modal,
+     * non-cancellable progress dialog using
+     * {@link ProgressManager#run(com.intellij.openapi.progress.Task)}.
+     */
+    public void runTask(final Runnable runnable, String title) {
+        ProgressManager.getInstance()
+            .run(new Task.Modal(project, title, false) {
+
+            @Override
+            public void run(
+                @NotNull
+                ProgressIndicator indicator) {
+                indicator.setIndeterminate(true);
+                runnable.run();
+                indicator.stop();
+            }
+        });
     }
 
     public void close() {
@@ -198,7 +228,7 @@ public class Wizard extends JDialog {
     /**
      * Default wizard model. Class keeps information about
      * wizard position, acts as container for
-     * <p/>
+     * <p>
      * FIXME: Replace back, current and next page fields by index of current page
      * and calculation
      */
@@ -255,25 +285,29 @@ public class Wizard extends JDialog {
          * @param page AbstractWizardPage
          */
         public void setCurrentPagePosition(AbstractWizardPage page) {
-            if (page == null)
+            if (page == null) {
                 return;
+            }
             currentPage = page;
 
             int index = pageList.indexOf(currentPage);
-            if (index < 0)
+            if (index < 0) {
                 throw new IllegalArgumentException(
                     "WizardPageModel called with "
                         + "illegal page it does not contain."
                 );
-            if (index > 0)
+            }
+            if (index > 0) {
                 backPage = pageList.get(index - 1);
-            else
+            } else {
                 backPage = null;
+            }
 
-            if (index < pageList.size() - 1)
+            if (index < pageList.size() - 1) {
                 nextPage = pageList.get(index + 1);
-            else
+            } else {
                 nextPage = null;
+            }
         }
     }
 }

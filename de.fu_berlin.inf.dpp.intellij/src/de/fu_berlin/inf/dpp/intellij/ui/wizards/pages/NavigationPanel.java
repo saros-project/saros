@@ -35,8 +35,7 @@ import java.awt.Insets;
 import java.awt.event.ActionListener;
 
 /**
- * Default navigation panel creates panel with 3 default buttons
- * back, next and cancel.
+ * Default navigation panel with a progress bar and back, next, cancel buttons.
  */
 
 public class NavigationPanel extends JPanel {
@@ -61,33 +60,30 @@ public class NavigationPanel extends JPanel {
         backButton = new JButton(TITLE_BACK);
         nextButton = new JButton(TITLE_NEXT);
         cancelButton = new JButton(TITLE_CANCEL);
-        create();
+        createUIComponents();
     }
 
-    /**
-     * Method creates panel UI.
-     */
-    private void create() {
-        JPanel buttonPanel = this;
-        Box buttonBox = new Box(BoxLayout.X_AXIS);
+    private void createUIComponents() {
+        setLayout(new BorderLayout());
 
-        buttonPanel.setLayout(new BorderLayout());
-        buttonPanel.add(new JSeparator(), BorderLayout.NORTH);
+        Box box = new Box(BoxLayout.X_AXIS);
 
-        buttonBox.setBorder(new EmptyBorder(new Insets(5, 10, 5, 10)));
+        add(new JSeparator(), BorderLayout.NORTH);
+
+        box.setBorder(new EmptyBorder(new Insets(5, 10, 5, 10)));
 
         backButton.setActionCommand(BACK_ACTION);
-        buttonBox.add(backButton);
-        buttonBox.add(Box.createHorizontalStrut(10));
+        box.add(backButton);
+        box.add(Box.createHorizontalStrut(10));
 
         nextButton.setActionCommand(NEXT_ACTION);
-        buttonBox.add(nextButton);
+        box.add(nextButton);
 
         cancelButton.setActionCommand(CANCEL_ACTION);
-        buttonBox.add(Box.createHorizontalStrut(10));
-        buttonBox.add(cancelButton);
+        box.add(Box.createHorizontalStrut(10));
+        box.add(cancelButton);
 
-        buttonPanel.add(buttonBox, BorderLayout.EAST);
+        add(box, BorderLayout.EAST);
     }
 
     /**
@@ -106,31 +102,26 @@ public class NavigationPanel extends JPanel {
      * position in the page list (see {@link Wizard.WizardPageModel}.
      *
      * @param position          page position in the page list
-     * @param backButtonVisible
-     * @param nextButtonVisible
+     * @param backButtonEnabled
+     * @param nextButtonEnabled
      */
-    public void setPosition(Position position, boolean backButtonVisible,
-        boolean nextButtonVisible) {
-        backButton.setVisible(false);
-        nextButton.setVisible(false);
-
+    public void setPosition(Position position, boolean backButtonEnabled,
+        boolean nextButtonEnabled) {
         switch (position) {
         case FIRST:
             backButton.setEnabled(false);
 
-            nextButton.setEnabled(true && nextButtonVisible);
-            nextButton.setVisible(nextButtonVisible);
+            nextButton.setEnabled(nextButtonEnabled);
             break;
         case MIDDLE:
-            backButton.setEnabled(true && backButtonVisible);
-            backButton.setVisible(backButtonVisible);
+            backButton.setEnabled(backButtonEnabled);
 
-            nextButton.setEnabled(true && nextButtonVisible);
-            nextButton.setVisible(nextButtonVisible);
+            nextButton.setEnabled(nextButtonEnabled);
             break;
         case LAST:
-            nextButton.setEnabled(true && nextButtonVisible);
-            nextButton.setVisible(nextButtonVisible);
+            backButton.setEnabled(backButtonEnabled);
+
+            nextButton.setEnabled(nextButtonEnabled);
             nextButton.setText(TITLE_FINISH);
             nextButton.repaint();
             break;

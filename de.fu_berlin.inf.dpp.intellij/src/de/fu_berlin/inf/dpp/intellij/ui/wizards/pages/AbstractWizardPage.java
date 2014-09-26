@@ -97,11 +97,11 @@ public abstract class AbstractWizardPage extends JPanel {
         }
     }
 
-    public boolean isBackButtonVisible() {
+    public boolean isBackButtonEnabled() {
         return true;
     }
 
-    public boolean isNextButtonVisible() {
+    public boolean isNextButtonEnabled() {
         return true;
     }
 }
