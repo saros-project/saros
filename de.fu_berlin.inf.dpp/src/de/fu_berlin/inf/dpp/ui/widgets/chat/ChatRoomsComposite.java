@@ -55,6 +55,7 @@ import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.ui.widgets.ListExplanationComposite.ListExplanation;
 import de.fu_berlin.inf.dpp.ui.widgets.ListExplanatoryComposite;
+import de.fu_berlin.inf.dpp.util.Pair;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
@@ -82,6 +83,12 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
      */
     public static final Image composingImage = ImageManager
         .getImage("icons/view16/cmpsg_misc.png");
+
+    /**
+     * Default image for Activity Log.
+     */
+    public static final Image activityLogImage = ImageManager
+        .getImage("icons/view16/activitylog_misc.png");
 
     private ListExplanation connectFirst = new ListExplanation(
         SWT.ICON_INFORMATION, "To share projects you must connect first.");
@@ -141,19 +148,27 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
                     if (ChatRoomsComposite.this.isDisposed())
                         return;
 
-                    final List<IChat> currentChats = new ArrayList<IChat>();
+                    final List<Pair<Integer, IChat>> currentData = new ArrayList<Pair<Integer, IChat>>();
 
                     final int activeIdx = chatRooms.getSelectionIndex();
 
-                    for (CTabItem tab : chatRooms.getItems())
-                        currentChats.add((IChat) tab.getData());
-
-                    for (IChat chat : currentChats)
-                        closeChatTab(chat);
-
                     int idx = 0;
-                    for (IChat chat : currentChats)
-                        openChat(chat, idx++ == activeIdx);
+
+                    for (CTabItem tab : chatRooms.getItems()) {
+                        final Object data = tab.getData();
+
+                        if (data instanceof IChat)
+                            currentData.add(new Pair<Integer, IChat>(idx,
+                                (IChat) data));
+
+                        idx++;
+                    }
+
+                    for (Pair<Integer, IChat> chatData : currentData)
+                        closeChatTab(chatData.v);
+
+                    for (Pair<Integer, IChat> chatData : currentData)
+                        openChat(chatData.v, chatData.p == activeIdx);
                 }
             });
         }
@@ -262,6 +277,8 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
+
+            createActivityLogTab();
         }
 
         @Override
@@ -354,6 +371,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
                         sessionChat = null;
                     } else {
                         openChat(chat, false);
+                        openActivityLog();
                     }
                 }
             });
@@ -519,6 +537,11 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         }
     }
 
+    private void openActivityLog() {
+        CTabItem activityLogItem = createActivityLogTab();
+        chatRooms.setSelection(activityLogItem);
+    }
+
     private CTabItem createChatTab(IChat chat) {
         ChatControl control = new ChatControl(this, chat, chatRooms,
             SWT.BORDER, WHITE, 2);
@@ -539,16 +562,37 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         return chatTab;
     }
 
+    private CTabItem createActivityLogTab() {
+        ActivityLogControl activityControl = new ActivityLogControl(chatRooms,
+            SWT.BORDER);
+
+        CTabItem activityLogTab = new CTabItem(chatRooms, SWT.NONE, 0);
+        activityLogTab.setText(Messages.ActivityLog_tab_title);
+        activityLogTab.setImage(activityLogImage);
+        activityLogTab.setControl(activityControl);
+
+        return activityLogTab;
+    }
+
     /*
      * TODO make this protected / private and use a listener to update the chat
      * tabs text
      */
     public CTabItem getChatTab(IChat chat) {
-        for (CTabItem tab : this.chatRooms.getItems()) {
-            IChat data = (IChat) tab.getData();
+        for (CTabItem tab : chatRooms.getItems()) {
 
             // do the equal check this way to allow null values in the tab data
-            if (chat.equals(data))
+            if (chat.equals(tab.getData()))
+                return tab;
+        }
+
+        return null;
+    }
+
+    public CTabItem getActivityLogTab() {
+        for (CTabItem tab : chatRooms.getItems()) {
+
+            if (tab.getControl() instanceof ActivityLogControl)
                 return tab;
         }
 
@@ -612,6 +656,13 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
             showExplanation(howToShareProjects);
     }
 
+    /**
+     * Returns the {@linkplain ChatControl control} for the current selected
+     * chat (tab) or <code>null</code> if no tab or a tab is selected which not
+     * represents a chat.
+     * 
+     * @return the control for the current selected chat or <code>null</code>
+     */
     public ChatControl getSelectedChatControl() {
         return !isChatExistent() ? null : (ChatControl) chatRooms
             .getSelection().getControl();

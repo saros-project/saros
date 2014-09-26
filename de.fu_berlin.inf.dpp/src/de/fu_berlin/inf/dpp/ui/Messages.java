@@ -5,6 +5,7 @@ import org.eclipse.osgi.util.NLS;
 // TODO add a guideline on how to name the strings !!!
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "de.fu_berlin.inf.dpp.ui.messages"; //$NON-NLS-1$
+    public static String ActivityLog_tab_title;
     public static String AddContactWizard_title;
     public static String AddContactWizardPage_nickname;
     public static String AddContactWizardPage_optional;

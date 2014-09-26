@@ -36,6 +36,8 @@ public class IDEInteractionActivity extends AbstractActivity {
      * element with which was interacted by the given user and the kind of
      * element, which can be a dialog or a view ({@link Element}).
      * 
+     * @param source
+     *            The user who is the source (originator) of this activity
      * @param title
      *            The title of the ide element with which was interacted
      * @param element

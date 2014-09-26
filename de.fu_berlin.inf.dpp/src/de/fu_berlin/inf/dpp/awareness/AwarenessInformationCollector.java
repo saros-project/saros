@@ -1,11 +1,15 @@
 package de.fu_berlin.inf.dpp.awareness;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.fu_berlin.inf.dpp.activities.IDEInteractionActivity.Element;
 import de.fu_berlin.inf.dpp.activities.TestRunActivity.State;
+import de.fu_berlin.inf.dpp.awareness.actions.ActionType;
+import de.fu_berlin.inf.dpp.awareness.actions.ActionTypeDataHolder;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.RemoteEditorManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -25,6 +29,11 @@ public class AwarenessInformationCollector {
 
     private final EditorManager editorManager;
     private final ISarosSessionManager sessionManager;
+
+    /**
+     * Listener for observing updates in the awareness information
+     * */
+    private final List<AwarenessUpdateListener> listeners = new CopyOnWriteArrayList<AwarenessUpdateListener>();
 
     /**
      * Who is following who in the session?
@@ -146,10 +155,39 @@ public class AwarenessInformationCollector {
         return editorActive;
     }
 
+    private void notifyListeners(ActionTypeDataHolder data) {
+        for (AwarenessUpdateListener listener : listeners) {
+            listener.update(data);
+        }
+    }
+
+    /**
+     * Adds the given {@link AwarenessUpdateListener} to the
+     * {@link AwarenessInformationCollector}.
+     * 
+     * @param listener
+     *            The given {@link AwarenessUpdateListener} to add
+     */
+    public void addAwarenessUpdateListener(AwarenessUpdateListener listener) {
+        listeners.add(listener);
+    }
+
+    /**
+     * Removes the given {@link AwarenessUpdateListener} from the
+     * {@link AwarenessInformationCollector}.
+     * 
+     * @param listener
+     *            The given {@link AwarenessUpdateListener} to remove
+     */
+    public void removeAwarenessUpdateListener(AwarenessUpdateListener listener) {
+        listeners.remove(listener);
+    }
+
     /**
      * Stores the title of the open dialog (e.g. "New Java Class", "Search",
      * etc.) or active view (e.g. "Saros", "Package Explorer" etc.) the given
-     * user is currently interacting with.
+     * user is currently interacting with. Additonally, it notifies all
+     * observers to inform them that something was changed.
      * 
      * @param user
      *            The user who created this activity.
@@ -159,10 +197,14 @@ public class AwarenessInformationCollector {
      *            The type of IDE element, which can be a dialog or a view (
      *            {@link Element}).
      * */
-    public synchronized void addOpenIDEElement(User user, String title,
-        Element element) {
-        activeIDEElement.put(user, title);
-        activeIDEElementType.put(user, element);
+    public void addOpenIDEElement(User user, String title, Element element) {
+        synchronized (this) {
+            activeIDEElement.put(user, title);
+            activeIDEElementType.put(user, element);
+        }
+        ActionTypeDataHolder actionTypeHolder = new ActionTypeDataHolder(user,
+            ActionType.ADD_IDEELEMENT, title, element);
+        notifyListeners(actionTypeHolder);
     }
 
     /**
@@ -195,7 +237,8 @@ public class AwarenessInformationCollector {
 
     /**
      * Stores the title and the state of the currently running test of the given
-     * user.
+     * user. Additonally, it notifies all observers to inform them that
+     * something was changed.
      * 
      * @param user
      *            The user who runs the test.
@@ -204,9 +247,14 @@ public class AwarenessInformationCollector {
      * @param state
      *            The state ({@link State}) of the running test.
      * */
-    public synchronized void addTestRun(User user, String name, State state) {
-        currentTestRunName.put(user, name);
-        currentTestRunState.put(user, state);
+    public void addTestRun(User user, String name, State state) {
+        synchronized (this) {
+            currentTestRunName.put(user, name);
+            currentTestRunState.put(user, state);
+        }
+        ActionTypeDataHolder actionTypeHolder = new ActionTypeDataHolder(user,
+            ActionType.ADD_TESTRUN, name, state);
+        notifyListeners(actionTypeHolder);
     }
 
     /**
@@ -238,14 +286,21 @@ public class AwarenessInformationCollector {
 
     /**
      * Stores the description of the performed refactoring of the given user.
+     * Additonally, it notifies all observers to inform them that something was
+     * changed.
      * 
      * @param user
      *            The user who performed the refactoring.
      * @param description
      *            The description of the refactoring.
      * */
-    public synchronized void addRefactoring(User user, String description) {
-        currentRefactoringDescription.put(user, description);
+    public void addRefactoring(User user, String description) {
+        synchronized (this) {
+            currentRefactoringDescription.put(user, description);
+        }
+        ActionTypeDataHolder actionTypeHolder = new ActionTypeDataHolder(user,
+            ActionType.ADD_REFACTORING, description);
+        notifyListeners(actionTypeHolder);
     }
 
     /**
@@ -263,15 +318,21 @@ public class AwarenessInformationCollector {
     }
 
     /**
-     * Stores the name of the last created file of the given user.
+     * Stores the name of the last created file of the given user. Additonally,
+     * it notifies all observers to inform them that something was changed.
      * 
      * @param user
      *            The user who created the file.
      * @param fileName
      *            The name of the created file
      * */
-    public synchronized void addCreatedFileName(User user, String fileName) {
-        currentCreatedFileName.put(user, fileName);
+    public void addCreatedFileName(User user, String fileName) {
+        synchronized (this) {
+            currentCreatedFileName.put(user, fileName);
+        }
+        ActionTypeDataHolder actionTypeHolder = new ActionTypeDataHolder(user,
+            ActionType.ADD_CREATEDFILE, fileName);
+        notifyListeners(actionTypeHolder);
     }
 
     /**

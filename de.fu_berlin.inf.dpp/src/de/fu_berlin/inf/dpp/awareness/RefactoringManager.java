@@ -11,7 +11,6 @@ import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.RefactoringActivity;
-import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatService;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
@@ -47,8 +46,7 @@ public class RefactoringManager extends AbstractActivityProducer implements
      *            information about performed refactorings.
      * */
     public RefactoringManager(ISarosSession session,
-        AwarenessInformationCollector awarenessInformationCollector,
-        MultiUserChatService mucs) {
+        AwarenessInformationCollector awarenessInformationCollector) {
         this.session = session;
         this.awarenessInformationCollector = awarenessInformationCollector;
     }

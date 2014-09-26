@@ -12,7 +12,6 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.TestRunActivity;
 import de.fu_berlin.inf.dpp.activities.TestRunActivity.State;
-import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatService;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
@@ -51,8 +50,7 @@ public class TestRunManager extends AbstractActivityProducer implements
      *            to display them.
      * */
     public TestRunManager(ISarosSession session,
-        AwarenessInformationCollector awarenessInformationCollector,
-        MultiUserChatService mucs) {
+        AwarenessInformationCollector awarenessInformationCollector) {
         this.session = session;
         this.awarenessInformationCollector = awarenessInformationCollector;
     }
@@ -98,7 +96,7 @@ public class TestRunManager extends AbstractActivityProducer implements
             else if (testResult == Result.FAILURE)
                 currentState = State.FAILURE;
             else {
-                // another state may be 'IGNORED' which is not interesting (now)
+                // another state may be 'IGNORED' which is not interesting
                 return;
             }
 

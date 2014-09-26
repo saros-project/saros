@@ -150,7 +150,6 @@ public class IDEInteractionActivitiesManager extends AbstractActivityProducer
 
         @Override
         public void pageChanged(PageChangedEvent event) {
-
             // FIXME use
             // ((IWizardPage)event.getSource()).getControl().getShell();
             // and check if the shell has the focus / is active
