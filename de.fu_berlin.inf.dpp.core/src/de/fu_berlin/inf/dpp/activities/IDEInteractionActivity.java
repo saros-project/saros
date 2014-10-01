@@ -12,10 +12,7 @@ import de.fu_berlin.inf.dpp.session.User;
  * about opened dialogs or activated views.
  * <p>
  * {@link Element} is used to represent the IDE element with which the user
- * interacted, which can be a 'DIALOG' or a 'VIEW'. {@link Status} is used to
- * represent the kind of IDE activity. 'FOCUS' means, that a dialog was opened
- * or a view was activated and 'UNFOCUS' means, that a dialog was closed or a
- * view was deactivated.
+ * interacted, which can be a 'DIALOG' or a 'VIEW'.
  * */
 @XStreamAlias("ideInteractionActivity")
 public class IDEInteractionActivity extends AbstractActivity {
@@ -28,25 +25,24 @@ public class IDEInteractionActivity extends AbstractActivity {
         DIALOG, VIEW
     }
 
-    /**
-     * Represents the state of an IDE activity, namely whether the dialog or
-     * view was focused or unfocused.
-     */
-    public enum Status {
-        FOCUS, UNFOCUS
-    }
-
     @XStreamAsAttribute
     private final String title;
 
     @XStreamAsAttribute
     private final Element element;
 
-    @XStreamAsAttribute
-    private final Status status;
-
-    public IDEInteractionActivity(User source, String title, Element element,
-        Status status) {
+    /**
+     * Creates a new {@link IDEInteractionActivity} with the title of the ide
+     * element with which was interacted by the given user and the kind of
+     * element, which can be a dialog or a view ({@link Element}).
+     * 
+     * @param title
+     *            The title of the ide element with which was interacted
+     * @param element
+     *            The kind of element, which can be a dialog or a view (
+     *            {@link Element})
+     * */
+    public IDEInteractionActivity(User source, String title, Element element) {
 
         super(source);
 
@@ -54,18 +50,14 @@ public class IDEInteractionActivity extends AbstractActivity {
             throw new IllegalArgumentException("Title must not be null");
         if (element == null)
             throw new IllegalArgumentException("Element must not be null");
-        if (status == null)
-            throw new IllegalArgumentException("Status must not be null");
 
         this.title = title;
         this.element = element;
-        this.status = status;
     }
 
     @Override
     public boolean isValid() {
-        return super.isValid() && (title != null) && (element != null)
-            && (status != null);
+        return super.isValid() && (title != null) && (element != null);
     }
 
     @Override
@@ -81,17 +73,12 @@ public class IDEInteractionActivity extends AbstractActivity {
         return this.element;
     }
 
-    public Status getStatus() {
-        return this.status;
-    }
-
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + ObjectUtils.hashCode(title);
         result = prime * result + ObjectUtils.hashCode(element);
-        result = prime * result + ObjectUtils.hashCode(status);
         return result;
     }
 
@@ -110,8 +97,6 @@ public class IDEInteractionActivity extends AbstractActivity {
             return false;
         if (!ObjectUtils.equals(this.element, other.element))
             return false;
-        if (!ObjectUtils.equals(this.status, other.status))
-            return false;
 
         return true;
     }
@@ -119,6 +104,6 @@ public class IDEInteractionActivity extends AbstractActivity {
     @Override
     public String toString() {
         return "IDEInteractionActivity(" + getSource() + " > " + element + " "
-            + status + " " + title + ")";
+            + title + ")";
     }
 }

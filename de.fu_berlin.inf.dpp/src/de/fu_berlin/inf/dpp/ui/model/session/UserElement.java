@@ -131,16 +131,6 @@ public final class UserElement extends TreeElement {
             children.add(new FollowModeInformationTreeElement(user,
                 editorManager, collector));
         }
-
-        /*
-         * TODO remove this check, if the user tests show which place for
-         * displaying action awareness information fits best
-         */
-        if (Boolean
-            .getBoolean("de.fu_berlin.inf.dpp.awareness.SESSION_OVERVIEW")) {
-            children.add(new UIAwarenessTreeElement(user, editorManager,
-                collector));
-        }
     }
 
     @Override

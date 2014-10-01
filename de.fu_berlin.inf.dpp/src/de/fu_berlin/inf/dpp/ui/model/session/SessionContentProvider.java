@@ -15,14 +15,6 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
-import de.fu_berlin.inf.dpp.awareness.FileCreationListener;
-import de.fu_berlin.inf.dpp.awareness.FileActivityManager;
-import de.fu_berlin.inf.dpp.awareness.IDEInteractionActivitiesListener;
-import de.fu_berlin.inf.dpp.awareness.IDEInteractionActivitiesManager;
-import de.fu_berlin.inf.dpp.awareness.RefactoringListener;
-import de.fu_berlin.inf.dpp.awareness.RefactoringManager;
-import de.fu_berlin.inf.dpp.awareness.TestRunManager;
-import de.fu_berlin.inf.dpp.awareness.TestRunsListener;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
@@ -57,14 +49,6 @@ public class SessionContentProvider extends TreeContentProvider {
 
     private FollowingActivitiesManager followingTracker;
 
-    private IDEInteractionActivitiesManager ideInteractionTracker;
-
-    private TestRunManager testRunTracker;
-
-    private RefactoringManager refactoringTracker;
-
-    private FileActivityManager fileCreationTracker;
-
     @Inject
     private EditorManager editorManager;
 
@@ -86,100 +70,6 @@ public class SessionContentProvider extends TreeContentProvider {
             ViewerUtils.refresh(viewer, true);
             // FIXME expand the sessionHeaderElement not the whole viewer
             ViewerUtils.expandAll(viewer);
-        }
-    };
-
-    private final IDEInteractionActivitiesListener ideInteractionsListener = new IDEInteractionActivitiesListener() {
-        @Override
-        public void dialogOrViewInteractionChanged() {
-            ViewerUtils.refresh(viewer, true);
-        }
-    };
-
-    private final TestRunsListener testRunsListener = new TestRunsListener() {
-
-        @Override
-        public void testRunChanged() {
-            /*
-             * HACK 'TestRunManager.receiverSessionOverview' stores the received
-             * information in the AwarenessInformationCollector and notifies
-             * this provider to refresh the session overview. If
-             * 'TestRunManager.receiverSessionOverview' receives the
-             * information, that the test run has finished, it notifies this
-             * provider to refresh and THEN removes the information from the
-             * AwarenessInformationCollector. Since 'ViewerUtils.refresh(viewer,
-             * true)' is used to refresh, it runs asynchronously and refreshes
-             * AFTER 'TestRunManager.receiverSessionOverview' removed the test
-             * run from the AwarenessInformationCollector, so that it was not
-             * shown that the test run has finished.
-             * 
-             * Therefore it is needed to immeditaley refresh bevore the removal
-             * of the information from the AwarenessInformationCollector. To
-             * reach this, 'viewer.refresh()' instead of
-             * 'ViewerUtils.refresh(viewer, true)' is called.
-             * 
-             * FIXME find a way without adding/removing chain or fix this, if
-             * chain remains
-             */
-            viewer.refresh();
-        }
-    };
-
-    private final RefactoringListener refactoringListener = new RefactoringListener() {
-
-        @Override
-        public void refactoringActivityChanged() {
-            /*
-             * HACK 'RefactoringManager.receiverSessionOverview' stores the
-             * received information in the AwarenessInformationCollector and
-             * notifies this provider to refresh the session overview. If
-             * 'RefactoringManager.receiverSessionOverview' receives the
-             * information, that something was refactored, it notifies this
-             * provider to refresh and THEN removes the information from the
-             * AwarenessInformationCollector. Since 'ViewerUtils.refresh(viewer,
-             * true)' is used to refresh, it runs asynchronously and refreshes
-             * AFTER 'RefactoringManager.receiverSessionOverview' removed the
-             * refactoring from the AwarenessInformationCollector, so that it
-             * was not shown that something was refactored.
-             * 
-             * Therefore it is needed to immediatley refresh before the removal
-             * of the information from the AwarenessInformationCollector. To
-             * reach this, 'viewer.refresh()' instead of
-             * 'ViewerUtils.refresh(viewer, true)' is called.
-             * 
-             * FIXME find a way without adding/removing chain or fix this, if
-             * chain remains
-             */
-            viewer.refresh();
-        }
-    };
-
-    private final FileCreationListener fileCreationListener = new FileCreationListener() {
-
-        @Override
-        public void newFileCreated() {
-            /*
-             * HACK 'FileCreationManager.receiverSessionOverview' stores the
-             * received information in the AwarenessInformationCollector and
-             * notifies this provider to refresh the session overview. If
-             * 'FileCreationManager.receiverSessionOverview' receives the
-             * information, that a file was created, it notifies this provider
-             * to refresh and THEN removes the information from the
-             * AwarenessInformationCollector. Since 'ViewerUtils.refresh(viewer,
-             * true)' is used to refresh, it runs asynchronously and refreshes
-             * AFTER 'FileCreationManager.receiverSessionOverview' removed the
-             * created file from the AwarenessInformationCollector, so that it
-             * was not shown that the file was created.
-             * 
-             * Therefore it is needed to immediately refresh before the removal
-             * of the information from the AwarenessInformationCollector. To
-             * reach this, 'viewer.refresh()' instead of
-             * 'ViewerUtils.refresh(viewer, true)' is called.
-             * 
-             * FIXME find a way without adding/removing chain or fix this, if
-             * chain remains
-             */
-            viewer.refresh();
         }
     };
 
@@ -285,20 +175,6 @@ public class SessionContentProvider extends TreeContentProvider {
         if (followingTracker != null)
             followingTracker.removeListener(followModeChangesListener);
 
-        if (ideInteractionTracker != null)
-            ideInteractionTracker
-                .removeIDEInteractionActivityListener(ideInteractionsListener);
-
-        if (refactoringTracker != null)
-            refactoringTracker.removeRefactoringListener(refactoringListener);
-
-        if (testRunTracker != null)
-            testRunTracker.removeTestRunListener(testRunsListener);
-
-        if (fileCreationTracker != null)
-            fileCreationTracker
-                .removeFileCreationListener(fileCreationListener);
-
         if (additionalContentProvider != null)
             additionalContentProvider.inputChanged(viewer,
                 getContent(oldInput), getContent(newInput));
@@ -327,32 +203,6 @@ public class SessionContentProvider extends TreeContentProvider {
 
             if (followingTracker != null)
                 followingTracker.addListener(followModeChangesListener);
-
-            ideInteractionTracker = (IDEInteractionActivitiesManager) newSession
-                .getComponent(IDEInteractionActivitiesManager.class);
-
-            if (ideInteractionTracker != null)
-                ideInteractionTracker
-                    .addIDEInteractionActivityListener(ideInteractionsListener);
-
-            refactoringTracker = (RefactoringManager) newSession
-                .getComponent(RefactoringManager.class);
-
-            if (refactoringTracker != null)
-                refactoringTracker.addRefactoringListener(refactoringListener);
-
-            testRunTracker = (TestRunManager) newSession
-                .getComponent(TestRunManager.class);
-
-            if (testRunTracker != null)
-                testRunTracker.addTestRunListener(testRunsListener);
-
-            fileCreationTracker = (FileActivityManager) newSession
-                .getComponent(FileActivityManager.class);
-
-            if (fileCreationTracker != null)
-                fileCreationTracker
-                    .addFileCreationListener(fileCreationListener);
         }
 
     }
@@ -398,20 +248,6 @@ public class SessionContentProvider extends TreeContentProvider {
         if (followingTracker != null)
             followingTracker.removeListener(followModeChangesListener);
 
-        if (ideInteractionTracker != null)
-            ideInteractionTracker
-                .removeIDEInteractionActivityListener(ideInteractionsListener);
-
-        if (refactoringTracker != null)
-            refactoringTracker.removeRefactoringListener(refactoringListener);
-
-        if (testRunTracker != null)
-            testRunTracker.removeTestRunListener(testRunsListener);
-
-        if (fileCreationTracker != null)
-            fileCreationTracker
-                .removeFileCreationListener(fileCreationListener);
-
         if (additionalContentProvider != null)
             additionalContentProvider.dispose();
 
@@ -423,10 +259,6 @@ public class SessionContentProvider extends TreeContentProvider {
         editorManager = null;
         additionalContentProvider = null;
         followingTracker = null;
-        ideInteractionTracker = null;
-        refactoringTracker = null;
-        testRunTracker = null;
-        fileCreationTracker = null;
     }
 
     /**

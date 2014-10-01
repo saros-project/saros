@@ -10,7 +10,6 @@ import org.eclipse.swt.widgets.TreeItem;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.model.session.AwarenessInformationTreeElement;
-import de.fu_berlin.inf.dpp.ui.model.session.UIAwarenessTreeElement;
 import de.fu_berlin.inf.dpp.ui.model.session.UserElement;
 
 public class UserInteractionListener extends MouseAdapter {
@@ -77,8 +76,6 @@ public class UserInteractionListener extends MouseAdapter {
         if (treeItemContent instanceof UserElement) {
             User followedUser = editorManager.getFollowedUser();
             editorManager.setFollowing(user.equals(followedUser) ? null : user);
-        } else if (treeItemContent instanceof UIAwarenessTreeElement) {
-            return;
         } else if (treeItemContent instanceof AwarenessInformationTreeElement) {
             editorManager.jumpToUser(user);
         }

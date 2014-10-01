@@ -159,26 +159,10 @@ public class AwarenessInformationCollector {
      *            The type of IDE element, which can be a dialog or a view (
      *            {@link Element}).
      * */
-    public synchronized void updateOpenIDEElement(User user, String title,
+    public synchronized void addOpenIDEElement(User user, String title,
         Element element) {
         activeIDEElement.put(user, title);
         activeIDEElementType.put(user, element);
-    }
-
-    /**
-     * Removes the title of the closed dialog (e.g. "New Java Class", "Search",
-     * etc.) or deactivated view (e.g. "Saros", "Package Explorer" etc.) the
-     * given user has currently stopped to interacting with.
-     * 
-     * @param user
-     *            The user who created this activity.
-     * @param element
-     *            The type of IDE element, which can be a dialog or a view (
-     *            {@link Element}).
-     * */
-    public synchronized void updateCloseIDEElement(User user, Element element) {
-        activeIDEElement.remove(user);
-        activeIDEElementType.remove(user);
     }
 
     /**
@@ -226,18 +210,6 @@ public class AwarenessInformationCollector {
     }
 
     /**
-     * Removes the title and the state of the last running test of the given
-     * user.
-     * 
-     * @param user
-     *            The user who runs the test.
-     * */
-    public synchronized void removeTestRun(User user) {
-        currentTestRunName.remove(user);
-        currentTestRunState.remove(user);
-    }
-
-    /**
      * Returns the name of the currently running test of the given user or
      * <code>null</code>, if <code>user</code> is <code>null</code>.
      * 
@@ -277,17 +249,6 @@ public class AwarenessInformationCollector {
     }
 
     /**
-     * Removes the description of the last performed refactoring of the given
-     * user.
-     * 
-     * @param user
-     *            The user who performed the refactoring.
-     * */
-    public synchronized void removeRefactoring(User user) {
-        currentRefactoringDescription.remove(user);
-    }
-
-    /**
      * Returns the description of the last performed refactoring of the given
      * user or <code>null</code>, if <code>user</code> is <code>null</code>.
      * 
@@ -297,7 +258,7 @@ public class AwarenessInformationCollector {
      *         user or <code>null</code>, if <code>user</code> is
      *         <code>null</code>.
      * */
-    public synchronized String getCurrentRefactoringDescription(User user) {
+    public synchronized String getRefactoringDescription(User user) {
         return currentRefactoringDescription.get(user);
     }
 
@@ -314,16 +275,6 @@ public class AwarenessInformationCollector {
     }
 
     /**
-     * Removes the name of the last created file of the given user.
-     * 
-     * @param user
-     *            The user who created the file.
-     * */
-    public synchronized void removeCreatedFileName(User user) {
-        currentCreatedFileName.remove(user);
-    }
-
-    /**
      * Returns the name of the last created file of the given user or
      * <code>null</code>, if <code>user</code> is <code>null</code>.
      * 
@@ -332,7 +283,7 @@ public class AwarenessInformationCollector {
      * @return The name of the last created file of the given user or
      *         <code>null</code>, if <code>user</code> is <code>null</code>.
      * */
-    public synchronized String currentCreatedFileName(User user) {
+    public synchronized String getCreatedFileName(User user) {
         return currentCreatedFileName.get(user);
     }
 }
