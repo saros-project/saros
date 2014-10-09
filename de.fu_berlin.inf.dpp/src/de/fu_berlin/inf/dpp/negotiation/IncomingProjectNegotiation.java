@@ -27,6 +27,7 @@ import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingRequest
 import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingResponse;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
+import de.fu_berlin.inf.dpp.filesystem.FileSystem;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
@@ -631,7 +632,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             final IFolder folder = project.getFolder(path);
 
             if (!folder.exists())
-                folder.create(false, true);
+                FileSystem.createFolder(folder);
 
         }
 

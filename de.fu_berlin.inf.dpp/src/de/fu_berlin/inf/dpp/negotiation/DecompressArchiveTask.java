@@ -3,10 +3,7 @@ package de.fu_berlin.inf.dpp.negotiation;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Enumeration;
-import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -14,11 +11,9 @@ import java.util.zip.ZipFile;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.OperationCanceledException;
 
-import de.fu_berlin.inf.dpp.filesystem.IContainer;
+import de.fu_berlin.inf.dpp.filesystem.FileSystem;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRunnable;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
@@ -117,11 +112,7 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
 
                 final IFile file = project.getFile(path);
 
-                /*
-                 * do not use FileUtils because it will remove read-only access
-                 * which might not what the user want
-                 */
-                createFoldersForFile(file);
+                FileSystem.createFolder(file);
 
                 monitor.subTask("decompressing: " + path);
 
@@ -153,24 +144,5 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
                     + " : " + e.getMessage());
             }
         }
-    }
-
-    private void createFoldersForFile(IFile file) throws IOException {
-        List<IFolder> parents = new ArrayList<IFolder>();
-
-        IContainer parent = file.getParent();
-
-        while (parent != null && parent.getType() == IResource.FOLDER) {
-            if (parent.exists())
-                break;
-
-            parents.add((IFolder) parent);
-            parent = parent.getParent();
-        }
-
-        Collections.reverse(parents);
-
-        for (IFolder folder : parents)
-            folder.create(false, true);
     }
 }
