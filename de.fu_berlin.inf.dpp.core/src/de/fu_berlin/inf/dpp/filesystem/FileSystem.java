@@ -47,8 +47,7 @@ public class FileSystem {
     private static void createFolders(final IResource resource)
         throws IOException {
 
-        if (resource.getType() != IResource.FILE
-            || resource.getType() != IResource.FOLDER)
+        if (!(resource.getType() == IResource.FILE || resource.getType() == IResource.FOLDER))
             return;
 
         final List<IFolder> parents = new ArrayList<IFolder>();
