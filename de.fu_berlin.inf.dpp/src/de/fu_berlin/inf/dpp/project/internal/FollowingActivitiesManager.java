@@ -15,8 +15,10 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
+import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -80,6 +82,14 @@ public class FollowingActivitiesManager extends AbstractActivityProducer
         }
     };
 
+    private final ISharedProjectListener sessionEventListener = new AbstractSharedProjectListener() {
+        @Override
+        public void userLeft(final User user) {
+            collector.setUserFollowing(user, null);
+            notifyListeners();
+        }
+    };
+
     public FollowingActivitiesManager(final ISarosSession session,
         final AwarenessInformationCollector collector,
         final EditorManager editor) {
@@ -93,6 +103,7 @@ public class FollowingActivitiesManager extends AbstractActivityProducer
         collector.flushFollowModes();
         session.addActivityProducer(this);
         session.addActivityConsumer(consumer);
+        session.addListener(sessionEventListener);
         editor.addSharedEditorListener(followModeListener);
     }
 
@@ -100,6 +111,7 @@ public class FollowingActivitiesManager extends AbstractActivityProducer
     public void stop() {
         session.removeActivityProducer(this);
         session.removeActivityConsumer(consumer);
+        session.removeListener(sessionEventListener);
         editor.removeSharedEditorListener(followModeListener);
         collector.flushFollowModes();
     }
