@@ -290,7 +290,7 @@ public class LocationAnnotationManager {
      *            The originator of the annotations to be deleted.
      * @param editorPart
      */
-    private void clearSelectionForUser(final User user, IEditorPart editorPart) {
+    public void clearSelectionForUser(final User user, IEditorPart editorPart) {
         IAnnotationModel model = annotationModelHelper
             .retrieveAnnotationModel(editorPart);
 

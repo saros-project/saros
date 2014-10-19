@@ -928,6 +928,9 @@ public class EditorManager extends AbstractActivityProducer implements
 
         editorListenerDispatch.editorRemoved(user, path);
 
+        for (final IEditorPart editorPart : editorPool.getEditors(path))
+            locationAnnotationManager.clearSelectionForUser(user, editorPart);
+
         if (user.equals(getFollowedUser())) {
             for (IEditorPart part : editorPool.getEditors(path)) {
                 editorAPI.closeEditor(part);
