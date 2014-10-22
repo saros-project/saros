@@ -49,7 +49,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
     public static final String TREE_TITLE = "Sessions";
     public static final String TREE_TITLE_NO_SESSIONS = "No Sessions Running";
 
-    private final SarosTreeView treeView;
+    private final SessionAndContactsTreeView treeView;
     private final Map<ISarosSession, DefaultMutableTreeNode> sessionNodeList = new HashMap<ISarosSession, DefaultMutableTreeNode>();
     private final Map<User, DefaultMutableTreeNode> userNodeList = new HashMap<User, DefaultMutableTreeNode>();
     private final DefaultTreeModel treeModel;
@@ -115,7 +115,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
         }
     };
 
-    public SessionTreeRootNode(SarosTreeView treeView) {
+    public SessionTreeRootNode(SessionAndContactsTreeView treeView) {
         super(treeView);
         SarosPluginContext.initComponent(this);
         this.treeView = treeView;

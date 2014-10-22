@@ -51,14 +51,14 @@ public class ContactTreeRootNode extends DefaultMutableTreeNode
     implements IRosterListener {
     public static final String TREE_TITLE = "Contacts";
 
-    private final SarosTreeView treeView;
+    private final SessionAndContactsTreeView treeView;
     private final Map<String, ContactInfo> contactMap = new HashMap<String, ContactInfo>();
     private final DefaultTreeModel treeModel;
 
     @Inject
     private XMPPConnectionService connectionService;
 
-    public ContactTreeRootNode(SarosTreeView treeView) {
+    public ContactTreeRootNode(SessionAndContactsTreeView treeView) {
         super(treeView);
         SarosPluginContext.initComponent(this);
 

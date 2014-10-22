@@ -66,7 +66,7 @@ public class ProgressFrame implements IProgressMonitor {
      */
     public ProgressFrame(String title) {
         SarosPluginContext.initComponent(this);
-        Container parent = null; //TODO: replace by saros.getMainPanel();
+        Container parent = saros.getMainPanel();
 
         frmMain = new JFrame(title);
         frmMain.setSize(300, 160);

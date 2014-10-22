@@ -46,7 +46,7 @@ public class TreeClickListener extends MouseAdapter {
     @Inject
     private Saros saros;
 
-    public TreeClickListener(SarosTreeView treeView) {
+    public TreeClickListener(SessionAndContactsTreeView treeView) {
         SarosPluginContext.initComponent(this);
         tree = treeView;
     }

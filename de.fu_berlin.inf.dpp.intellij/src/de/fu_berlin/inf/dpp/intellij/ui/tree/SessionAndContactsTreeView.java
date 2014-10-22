@@ -43,7 +43,7 @@ import java.awt.Component;
 /**
  * Saros tree view for contacts and sessions.
  */
-public class SarosTreeView extends Tree {
+public class SessionAndContactsTreeView extends Tree {
 
     private final SessionTreeRootNode sessionTreeRootNode;
     private final ContactTreeRootNode contactTreeRootNode;
@@ -95,7 +95,7 @@ public class SarosTreeView extends Tree {
 
     };
 
-    public SarosTreeView() {
+    public SessionAndContactsTreeView() {
         super(new SarosTreeRootNode());
         SarosPluginContext.initComponent(this);
 
@@ -113,7 +113,7 @@ public class SarosTreeView extends Tree {
 
     /**
      * Displays the 'user@domain (connected)' string and populates the contact list.
-     *
+     * <p/>
      * Called after a connection was made.
      */
     public void renderConnected() {
@@ -135,7 +135,7 @@ public class SarosTreeView extends Tree {
 
     /**
      * Clears the contact list and title.
-     *
+     * <p/>
      * Called after a connection was disconnected.
      */
     public void renderDisconnected() {

@@ -45,7 +45,7 @@ public class DialogUtils {
 
     static {
         SarosPluginContext.initComponent(new DialogUtils());
-        CONTAINER = null; //saros.getMainPanel(); //TODO Uncomment when SarosMainPanelView was added
+        CONTAINER = saros.getMainPanel();
     }
 
     public static void showError(Component parent, String title, String msg) {

@@ -32,6 +32,7 @@ import de.fu_berlin.inf.dpp.core.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.intellij.context.SarosIntellijContextFactory;
 import de.fu_berlin.inf.dpp.intellij.project.fs.Workspace;
+import de.fu_berlin.inf.dpp.intellij.ui.views.SarosMainPanelView;
 import de.fu_berlin.inf.dpp.misc.pico.DotGraphMonitor;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
@@ -62,8 +63,7 @@ public class Saros {
     private XMPPConnectionService connectionService;
     private PreferenceUtils preferenceUtils;
 
-    //FIXME: Add again when SarosMainPanelView was added
-    //private SarosMainPanelView mainPanel;
+    private SarosMainPanelView mainPanel;
     private IWorkspace workspace;
 
     private SarosContext sarosContext;
@@ -174,14 +174,12 @@ public class Saros {
         this.toolWindow = toolWindow;
     }
 
-    //FIXME: Add again when SarosMainPanelView was added.
-    /*
     public SarosMainPanelView getMainPanel() {
         return mainPanel;
     }
 
     public void setMainPanel(SarosMainPanelView mainPanel) {
         this.mainPanel = mainPanel;
-    }*/
+    }
 }
 
