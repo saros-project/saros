@@ -22,6 +22,7 @@
 
 package de.fu_berlin.inf.dpp.intellij.ui.views.buttons;
 
+import com.intellij.openapi.ui.Messages;
 import de.fu_berlin.inf.dpp.account.XMPPAccount;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.core.context.SarosPluginContext;
@@ -43,7 +44,10 @@ import java.awt.event.ActionListener;
  */
 public class ConnectButton extends ToolbarButton {
     public static final String CONNECT_ICON_PATH = "icons/elcl16/connect.png";
+
     private static final Logger LOG = Logger.getLogger(ConnectButton.class);
+
+    public static final String USERID_SEPARATOR = "@";
 
     private JPopupMenu popupMenu = new JPopupMenu();
     private JMenuItem menuItemAdd;
@@ -154,20 +158,24 @@ public class ConnectButton extends ToolbarButton {
      * Asks for Name, Password and domain and server for a new XMPP account.
      */
     protected XMPPAccount createNewAccount() {
-        final String username = SafeDialogUtils
-            .showInputDialog("Your User-ID", "", "Login");
-        if (username.isEmpty()) {
+        final String userID = SafeDialogUtils.showInputDialog(
+            "Your User-ID, e.g. user@saros-con.imp.fu-berlin.de",
+                "", "Login");
+        if (userID.isEmpty()) {
             return null;
         }
-        final String password = SafeDialogUtils
-            .showInputDialog("Password", "", "Login");
+        if (!userID.contains("@")) {
+            SafeDialogUtils.showError("No @ found in the ID!", "Error");
+            return null;
+        }
+
+        String[] fields = userID.split(USERID_SEPARATOR);
+        String username = fields[0];
+        String domain = fields[1];
+
+        final String password = Messages
+            .showPasswordDialog("Password", "Password");
         if (password.isEmpty()) {
-            return null;
-        }
-        final String domain = SafeDialogUtils.showInputDialog(
-            "XMPP domain " + "(e.g. 'saros-con.imp.fu-berlin.de')",
-            "saros-con.imp.fu-berlin.de", "Server");
-        if (domain.isEmpty()) {
             return null;
         }
         String server = SafeDialogUtils.showInputDialog(
@@ -176,8 +184,8 @@ public class ConnectButton extends ToolbarButton {
 
         try {
             return accountStore
-                .createAccount(username, password, domain, server, 0, false,
-                    false);
+                .createAccount(username, password, domain, server, 0, true,
+                    true);
         } catch (IllegalArgumentException e) {
             LOG.error("Error creating account", e);
             SafeDialogUtils.showError(
