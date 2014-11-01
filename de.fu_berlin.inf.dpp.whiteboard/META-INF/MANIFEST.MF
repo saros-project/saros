@@ -10,8 +10,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.views,
  org.eclipse.ui.editors,
  org.eclipse.jface.text,
- de.fu_berlin.inf.dpp.core,
- de.fu_berlin.inf.dpp
+ de.fu_berlin.inf.dpp.core;bundle-version="[0.1.0,0.1.1)",
+ de.fu_berlin.inf.dpp;bundle-version="14.10.31"
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
  lib/log4j-1.2.16.jar
