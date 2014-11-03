@@ -112,7 +112,8 @@ public final class GeneralPreferencePage extends FieldEditorPreferencePage
         createAccountsGroup();
         createAutomaticConnectField(parent);
         createVersionControlPreferences(parent);
-        createConcurrentUndoField(parent);
+        // see http://sourceforge.net/p/dpp/bugs/836/
+        // createConcurrentUndoField(parent);
     }
 
     /*

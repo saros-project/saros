@@ -11,7 +11,6 @@ import org.picocontainer.MutablePicoContainer;
 
 import de.fu_berlin.inf.dpp.communication.connection.IProxyResolver;
 import de.fu_berlin.inf.dpp.communication.connection.Socks5ProxyResolver;
-import de.fu_berlin.inf.dpp.concurrent.undo.UndoManager;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
@@ -66,7 +65,8 @@ public class SarosEclipseContextFactory extends AbstractSarosContextFactory {
 
         Component.create(PreferenceUtils.class),
         Component.create(SessionViewOpener.class),
-        Component.create(UndoManager.class),
+        // disabled, see http://sourceforge.net/p/dpp/bugs/836/
+        // Component.create(UndoManager.class),
         Component.create(RemoteProgressManager.class),
 
         // UI handlers
