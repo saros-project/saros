@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -108,8 +107,6 @@ public class STFController {
                 }
 
             });
-
-        LogManager.resetConfiguration();
 
         /*
          * HACK this is not the way OSGi works but it currently fulfill its

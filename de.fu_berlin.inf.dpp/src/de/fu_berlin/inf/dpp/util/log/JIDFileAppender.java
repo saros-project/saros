@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.spi.LoggingEvent;
-import org.eclipse.core.runtime.Platform;
 import org.jivesoftware.smack.Connection;
 import org.picocontainer.annotations.Inject;
 
@@ -58,6 +57,9 @@ public class JIDFileAppender extends FileAppender {
     @Inject
     protected XMPPConnectionService connectionService;
 
+    @Inject
+    protected Saros saros;
+
     @Override
     public synchronized void append(LoggingEvent event) {
 
@@ -106,18 +108,17 @@ public class JIDFileAppender extends FileAppender {
         if (newJID == null || newJID.equals(localJID))
             return;
 
-        if (this.localJID != null)
+        if (localJID != null)
             closeFile();
 
-        // Set new JID
-        this.localJID = newJID;
+        localJID = newJID;
 
-        if (this.fileNameBackup == null) {
+        if (fileNameBackup == null) {
             /*
              * Make a back-up of the filename, because we are going to overwrite
              * it
              */
-            this.fileNameBackup = getFile();
+            fileNameBackup = getFile();
         }
 
         // log4j config changed, we are out
@@ -127,11 +128,11 @@ public class JIDFileAppender extends FileAppender {
         }
 
         // directory of the Eclipse log
-        String directory = Platform.getLogFileLocation().toFile().getParent();
+        File directory = saros.getStateLocation().toFile();
 
         String jidString = localJID.getBase();
 
-        String format = String.format(this.fileNameBackup, jidString);
+        String format = String.format(fileNameBackup, jidString);
 
         String actualFileName = directory + File.separator
             + new SimpleDateFormat(format).format(new Date());
@@ -142,9 +143,9 @@ public class JIDFileAppender extends FileAppender {
         activateOptions();
 
         // Flush Cache
-        for (LoggingEvent log : cache) {
+        for (LoggingEvent log : cache)
             append(log);
-        }
+
         cache.clear();
     }
 }
