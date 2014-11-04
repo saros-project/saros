@@ -75,11 +75,14 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
             Messages.AdvancedPreferencePage_enable_consolesharing,
             getFieldEditorParent()));
 
+        addField(new BooleanFieldEditor(
+            PreferenceConstants.ACTIVITY_LOG_ENABLED,
+            Messages.AdvancedPreferencePage_enable_activitylog,
+            getFieldEditorParent()));
     }
 
     @Override
     public void init(IWorkbench workbench) {
         // No init necessary
     }
-
 }

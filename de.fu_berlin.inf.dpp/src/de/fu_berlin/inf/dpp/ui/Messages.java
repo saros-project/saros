@@ -6,6 +6,12 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "de.fu_berlin.inf.dpp.ui.messages"; //$NON-NLS-1$
     public static String ActivityLog_tab_title;
+    public static String ActivityLog_tab_line_text_created_file;
+    public static String ActivityLog_tab_line_text_open_dialog;
+    public static String ActivityLog_tab_line_text_active_view;
+    public static String ActivityLog_tab_line_text_testrun_started;
+    public static String ActivityLog_tab_line_text_testrun_finished;
+
     public static String AddContactWizard_title;
     public static String AddContactWizardPage_nickname;
     public static String AddContactWizardPage_optional;
@@ -38,6 +44,7 @@ public class Messages extends NLS {
     public static String AdvancedPreferencePage_skip_synchronization;
     public static String AdvancedPreferencePage_activate_server;
     public static String AdvancedPreferencePage_enable_consolesharing;
+    public static String AdvancedPreferencePage_enable_activitylog;
 
     public static String ChangeColorAction_message_text;
     public static String ChangeColorAction_message_title;

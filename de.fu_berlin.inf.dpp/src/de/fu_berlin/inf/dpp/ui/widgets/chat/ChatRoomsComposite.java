@@ -55,6 +55,7 @@ import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.ui.widgets.ListExplanationComposite.ListExplanation;
 import de.fu_berlin.inf.dpp.ui.widgets.ListExplanatoryComposite;
+import de.fu_berlin.inf.dpp.ui.widgets.activitylog.ActivityLogControl;
 import de.fu_berlin.inf.dpp.util.Pair;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
@@ -66,7 +67,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 public class ChatRoomsComposite extends ListExplanatoryComposite {
 
-    private static final Logger log = Logger
+    private static final Logger LOG = Logger
         .getLogger(ChatRoomsComposite.class);
 
     static final Color WHITE = Display.getDefault().getSystemColor(
@@ -88,7 +89,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
      * Default image for Activity Log.
      */
     public static final Image activityLogImage = ImageManager
-        .getImage("icons/view16/activitylog_misc.png");
+        .getImage("icons/view16/activitylog/activitylog_misc.png");
 
     private ListExplanation connectFirst = new ListExplanation(
         SWT.ICON_INFORMATION, "To share projects you must connect first.");
@@ -136,41 +137,62 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
     private final IPropertyChangeListener propertyChangeListener = new IPropertyChangeListener() {
 
         @Override
-        public void propertyChange(PropertyChangeEvent event) {
+        public void propertyChange(final PropertyChangeEvent event) {
+
+            SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
+                @Override
+                public void run() {
+                    if (isDisposed())
+                        return;
+
+                    executePropertyChangeEvent(event);
+                }
+            });
+        }
+
+        private void executePropertyChangeEvent(final PropertyChangeEvent event) {
+            // check if activity log tab shall be enabled or disabled
+            if (PreferenceConstants.ACTIVITY_LOG_ENABLED.equals(event
+                .getProperty())) {
+                final boolean activityLogEnabled = preferenceStore
+                    .getBoolean(PreferenceConstants.ACTIVITY_LOG_ENABLED);
+
+                if (activityLogEnabled) {
+                    CTabItem activityLogTab = getActivityLogTab();
+                    if (activityLogTab == null || activityLogTab.isDisposed()) {
+                        createActivityLogTab();
+                        openActivityLog();
+                    }
+                } else {
+                    closeActivityLog();
+                }
+            }
+
             if (!PreferenceConstants.USE_IRC_STYLE_CHAT_LAYOUT.equals(event
                 .getProperty()))
                 return;
 
-            SWTUtils.runSafeSWTAsync(log, new Runnable() {
+            final List<Pair<Integer, IChat>> currentData = new ArrayList<Pair<Integer, IChat>>();
 
-                @Override
-                public void run() {
-                    if (ChatRoomsComposite.this.isDisposed())
-                        return;
+            final int activeIdx = chatRooms.getSelectionIndex();
 
-                    final List<Pair<Integer, IChat>> currentData = new ArrayList<Pair<Integer, IChat>>();
+            int idx = 0;
 
-                    final int activeIdx = chatRooms.getSelectionIndex();
+            for (CTabItem tab : chatRooms.getItems()) {
+                final Object data = tab.getData();
 
-                    int idx = 0;
+                if (data instanceof IChat)
+                    currentData
+                        .add(new Pair<Integer, IChat>(idx, (IChat) data));
 
-                    for (CTabItem tab : chatRooms.getItems()) {
-                        final Object data = tab.getData();
+                idx++;
+            }
 
-                        if (data instanceof IChat)
-                            currentData.add(new Pair<Integer, IChat>(idx,
-                                (IChat) data));
+            for (Pair<Integer, IChat> chatData : currentData)
+                closeChatTab(chatData.v);
 
-                        idx++;
-                    }
-
-                    for (Pair<Integer, IChat> chatData : currentData)
-                        closeChatTab(chatData.v);
-
-                    for (Pair<Integer, IChat> chatData : currentData)
-                        openChat(chatData.v, chatData.p == activeIdx);
-                }
-            });
+            for (Pair<Integer, IChat> chatData : currentData)
+                openChat(chatData.v, chatData.p == activeIdx);
         }
     };
 
@@ -182,14 +204,14 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
         @Override
         public void entriesUpdated(final Collection<String> addresses) {
-            SWTUtils.runSafeSWTAsync(log, new Runnable() {
+            SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
                 @Override
                 public void run() {
 
                     if (ChatRoomsComposite.this.isDisposed())
                         return;
 
-                    log.trace("roster entries changed, refreshing chat tabs");
+                    LOG.trace("roster entries changed, refreshing chat tabs");
 
                     Collection<JID> jids = new ArrayList<JID>();
 
@@ -207,7 +229,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         @Override
         public void connectionStateChanged(ConnectionState state,
             Exception error) {
-            SWTUtils.runSafeSWTAsync(log, new Runnable() {
+            SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
 
                 @Override
                 public void run() {
@@ -223,13 +245,16 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
     protected AbstractSharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
         @Override
         public void colorChanged() {
-            SWTUtils.runSafeSWTAsync(log, new Runnable() {
+            SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
                 @Override
                 public void run() {
                     for (CTabItem tab : chatRooms.getItems()) {
                         Control control = tab.getControl();
-                        if (control instanceof ChatControl)
+                        if (control instanceof ChatControl) {
                             ((ChatControl) control).updateColors();
+                        } else if (control instanceof ActivityLogControl) {
+                            ((ActivityLogControl) control).updateColors();
+                        }
                     }
                 }
             });
@@ -241,7 +266,23 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         @Override
         public void sessionStarting(final ISarosSession session) {
 
-            SWTUtils.runSafeSWTSync(log, new Runnable() {
+            // create activity log tab if enabled
+            SWTUtils.runSafeSWTSync(LOG, new Runnable() {
+                @Override
+                public void run() {
+                    if (isDisposed())
+                        return;
+
+                    final boolean activityLogEnabled = preferenceStore
+                        .getBoolean(PreferenceConstants.ACTIVITY_LOG_ENABLED);
+                    if (activityLogEnabled) {
+                        createActivityLogTab();
+                        openActivityLog();
+                    }
+                }
+            });
+
+            SWTUtils.runSafeSWTSync(LOG, new Runnable() {
                 @Override
                 public void run() {
                     isSessionRunning = true;
@@ -258,7 +299,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
              * now CARL joins the session and BOB leaves afterwards, ALICE and
              * CARLs MUC is broken !
              */
-            ThreadUtils.runSafeAsync("dpp-muc-join", log, new Runnable() {
+            ThreadUtils.runSafeAsync("dpp-muc-join", LOG, new Runnable() {
                 @Override
                 public void run() {
                     synchronized (mucCreationLock) {
@@ -277,8 +318,6 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-
-            createActivityLogTab();
         }
 
         @Override
@@ -286,7 +325,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
             final CountDownLatch mucDestroyed = new CountDownLatch(1);
 
-            SWTUtils.runSafeSWTAsync(log, new Runnable() {
+            SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
                 @Override
                 public void run() {
 
@@ -299,12 +338,14 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
                     isSessionHost = false;
                     sessionChat = null;
 
-                    if (ChatRoomsComposite.this.isDisposed())
+                    if (isDisposed())
                         return;
 
                     if (sessionChatErrorTab != null
                         && !sessionChatErrorTab.isDisposed())
                         sessionChatErrorTab.dispose();
+
+                    closeActivityLog();
                 }
             });
 
@@ -341,7 +382,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
         @Override
         public void chatCreated(final IChat chat, boolean createdLocally) {
-            SWTUtils.runSafeSWTAsync(log, new Runnable() {
+            SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
                 @Override
                 // FIXME: disposed ?!
                 public void run() {
@@ -371,7 +412,6 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
                         sessionChat = null;
                     } else {
                         openChat(chat, false);
-                        openActivityLog();
                     }
                 }
             });
@@ -379,11 +419,11 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
         @Override
         public void chatDestroyed(final IChat chat) {
-            SWTUtils.runSafeSWTAsync(log, new Runnable() {
+            SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
 
                 @Override
                 public void run() {
-                    if (ChatRoomsComposite.this.isDisposed())
+                    if (isDisposed())
                         return;
 
                     closeChatTab(chat);
@@ -416,11 +456,11 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
                             : exception.getMessage());
             }
 
-            SWTUtils.runSafeSWTAsync(log, new Runnable() {
+            SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
 
                 @Override
                 public void run() {
-                    if (ChatRoomsComposite.this.isDisposed())
+                    if (isDisposed())
                         return;
 
                     setErrorMessage(errorMessage);
@@ -537,11 +577,6 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         }
     }
 
-    private void openActivityLog() {
-        CTabItem activityLogItem = createActivityLogTab();
-        chatRooms.setSelection(activityLogItem);
-    }
-
     private CTabItem createChatTab(IChat chat) {
         ChatControl control = new ChatControl(this, chat, chatRooms,
             SWT.BORDER, WHITE, 2);
@@ -563,8 +598,8 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
     }
 
     private CTabItem createActivityLogTab() {
-        ActivityLogControl activityControl = new ActivityLogControl(chatRooms,
-            SWT.BORDER);
+        ActivityLogControl activityControl = new ActivityLogControl(this,
+            chatRooms, SWT.BORDER, WHITE);
 
         CTabItem activityLogTab = new CTabItem(chatRooms, SWT.NONE, 0);
         activityLogTab.setText(Messages.ActivityLog_tab_title);
@@ -572,6 +607,29 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         activityLogTab.setControl(activityControl);
 
         return activityLogTab;
+    }
+
+    private void openActivityLog() {
+        CTabItem activityLogItem = getActivityLogTab();
+        chatRooms.setSelection(activityLogItem);
+    }
+
+    private void closeActivityLog() {
+        CTabItem activityLogItem = getActivityLogTab();
+        if (activityLogItem != null && !activityLogItem.isDisposed()) {
+            activityLogItem.dispose();
+            updateExplanation();
+        }
+    }
+
+    public CTabItem getActivityLogTab() {
+        for (CTabItem tab : chatRooms.getItems()) {
+
+            if (tab.getControl() instanceof ActivityLogControl)
+                return tab;
+        }
+
+        return null;
     }
 
     /*
@@ -583,16 +641,6 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
             // do the equal check this way to allow null values in the tab data
             if (chat.equals(tab.getData()))
-                return tab;
-        }
-
-        return null;
-    }
-
-    public CTabItem getActivityLogTab() {
-        for (CTabItem tab : chatRooms.getItems()) {
-
-            if (tab.getControl() instanceof ActivityLogControl)
                 return tab;
         }
 

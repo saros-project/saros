@@ -10,7 +10,11 @@ public interface AwarenessUpdateListener {
 
     /**
      * Is fired, when there are new awareness information received by other
-     * session participants
+     * session participants.
+     * 
+     * @param data
+     *            The data holder containing information about the executed
+     *            action
      * */
     public void update(ActionTypeDataHolder data);
 

@@ -76,6 +76,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl.
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl.PackageExplorerView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl.ProgressView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.impl.Views;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl.ActivityLog;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl.Chatroom;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl.SarosView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.whiteboard.impl.SarosWhiteboardView;
@@ -265,6 +266,7 @@ public class STFController {
 
         exportObject(WorkTogetherOnContextMenu.getInstance(), "workTogetherOnC");
         exportObject(Chatroom.getInstance(), "chatroom");
+        exportObject(ActivityLog.getInstance(), "activitylog");
         exportObject(SarosPreferences.getInstance(), "sarosPreferences");
         exportObject(Views.getInstance(), "views");
         exportObject(MenuBar.getInstance(), "menuBar");

@@ -3,8 +3,8 @@ package de.fu_berlin.inf.dpp.awareness;
 import org.apache.log4j.Logger;
 import org.eclipse.jdt.junit.JUnitCore;
 import org.eclipse.jdt.junit.TestRunListener;
+import org.eclipse.jdt.junit.model.ITestCaseElement;
 import org.eclipse.jdt.junit.model.ITestElement.Result;
-import org.eclipse.jdt.junit.model.ITestRunSession;
 import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
@@ -76,15 +76,16 @@ public class TestRunManager extends AbstractActivityProducer implements
     private final TestRunListener testRunListener = new TestRunListener() {
 
         @Override
-        public void sessionStarted(ITestRunSession testRunSession) {
+        public void testCaseStarted(final ITestCaseElement testCaseElement) {
             fireActivity(new TestRunActivity(session.getLocalUser(),
-                testRunSession.getTestRunName(), State.UNDEFINED));
+                testCaseElement.getTestClassName() + "."
+                    + testCaseElement.getTestMethodName(), State.UNDEFINED));
         }
 
         @Override
-        public void sessionFinished(ITestRunSession testRunSession) {
+        public void testCaseFinished(final ITestCaseElement testCaseElement) {
 
-            Result testResult = testRunSession.getTestResult(false);
+            Result testResult = testCaseElement.getTestResult(false);
             State currentState = null;
 
             if (testResult == Result.UNDEFINED)
@@ -101,7 +102,8 @@ public class TestRunManager extends AbstractActivityProducer implements
             }
 
             fireActivity(new TestRunActivity(session.getLocalUser(),
-                testRunSession.getTestRunName(), currentState));
+                testCaseElement.getTestClassName() + "."
+                    + testCaseElement.getTestMethodName(), currentState));
         }
     };
 
@@ -111,7 +113,7 @@ public class TestRunManager extends AbstractActivityProducer implements
         session.addActivityConsumer(consumer);
 
         JUnitCore.addTestRunListener(testRunListener);
-        LOG.debug("Added test run listener to the JUnitCore");
+        LOG.debug("attached test run listener to the JUnitCore");
     }
 
     @Override
@@ -120,6 +122,6 @@ public class TestRunManager extends AbstractActivityProducer implements
         session.removeActivityConsumer(consumer);
 
         JUnitCore.removeTestRunListener(testRunListener);
-        LOG.debug("Removed test run listener from the JUnitCore");
+        LOG.debug("detached test run listener from the JUnitCore");
     }
 }

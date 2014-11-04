@@ -40,6 +40,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosv
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.IContextMenusInSessionArea;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.impl.ContextMenusInContactListArea;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.impl.ContextMenusInSessionArea;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.IActivityLog;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.IChatroom;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.ISarosView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.impl.SuperBot;
@@ -407,6 +408,17 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
             return getEditorManager().getFollowedUser().getJID();
         else
             return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public IActivityLog selectActivityLog() throws RemoteException {
+        ActivityLog.getInstance().setActivityLogTab(
+            new SWTBotCTabItem((CTabItem) view.bot().widget(
+                allOf(widgetOfType(CTabItem.class),
+                    withRegex(Pattern.quote(ACTIVITYLOG_TAB_LABEL))),
+                view.getWidget())));
+        return ActivityLog.getInstance();
     }
 
     @Override

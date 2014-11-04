@@ -209,6 +209,7 @@ public interface Constants {
     public static final String SHELL_EDIT_XMPP_JABBER_ACCOUNT = get("shell_edit_xmpp_jabber_account");
 
     public static final String CHATROOM_TAB_LABEL = get("ChatRoomsComposite_roundtable");
+    public static final String ACTIVITYLOG_TAB_LABEL = get("ActivityLog_tab_title");
 
     public static final String LABEL_XMPP_JABBER_ID = get("jid_shortform");
     public static final String LABEL_XMPP_JABBER_SERVER = get("text_label_xmpp_jabber_server");
