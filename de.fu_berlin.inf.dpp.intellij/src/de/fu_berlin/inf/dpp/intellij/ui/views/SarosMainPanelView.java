@@ -24,7 +24,6 @@ package de.fu_berlin.inf.dpp.intellij.ui.views;
 
 import com.intellij.ui.components.JBScrollPane;
 import de.fu_berlin.inf.dpp.intellij.ui.tree.SessionAndContactsTreeView;
-import org.apache.log4j.Logger;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -36,18 +35,17 @@ import java.awt.Dimension;
 import java.awt.HeadlessException;
 
 /**
- * Saros main panel view containing the {qlink SessionAndContactStreeView},
- * the toolbar and empty space for future components.
+ * Saros main panel view containing the {@link SessionAndContactsTreeView},
+ * the {@link SarosToolbar} and empty space for future components.
  */
 public class SarosMainPanelView extends JPanel {
-    private static final Logger LOG = Logger
-        .getLogger(SarosMainPanelView.class);
 
+    /**
+     * Creates the content of the tool window panel, with
+     * {@link SarosToolbar} and the {@link SessionAndContactsTreeView}.
+     */
     public SarosMainPanelView() throws HeadlessException {
         super(new BorderLayout());
-    }
-
-    private void createPanel() {
         SessionAndContactsTreeView sarosTree = new SessionAndContactsTreeView();
         SarosToolbar sarosToolbar = new SarosToolbar(sarosTree);
 
