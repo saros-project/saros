@@ -22,20 +22,6 @@
 
 package de.fu_berlin.inf.dpp.core.ui.util;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import org.apache.log4j.Logger;
-import org.picocontainer.annotations.Inject;
-
 import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.core.context.SarosPluginContext;
 import de.fu_berlin.inf.dpp.core.monitoring.IStatus;
@@ -58,11 +44,24 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.util.Pair;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
+import org.apache.log4j.Logger;
+import org.picocontainer.annotations.Inject;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * Offers convenient methods for collaboration actions like sharing a project
  * resources.
- * 
+ *
  * @author bkahlert
  * @author kheld
  */
@@ -85,7 +84,7 @@ public class CollaborationUtils {
     /**
      * Starts a new session and shares the given resources with given contacts.<br/>
      * Does nothing if a {@link ISarosSession session} is already running.
-     * 
+     *
      * @param resources
      * @param contacts
      * @nonBlocking
@@ -96,12 +95,13 @@ public class CollaborationUtils {
         final Map<IProject, List<IResource>> newResources = acquireResources(
             resources, null);
 
-        UIMonitoredJob sessionStartupJob = new UIMonitoredJob("Session Startup") {
+        UIMonitoredJob sessionStartupJob = new UIMonitoredJob(
+            "Session Startup") {
 
             @Override
             protected IStatus run(IProgressMonitor monitor) {
-                monitor.beginTask("Starting session...",
-                    IProgressMonitor.UNKNOWN);
+                monitor
+                    .beginTask("Starting session...", IProgressMonitor.UNKNOWN);
                 try {
                     sessionManager.startSession(newResources);
                     Set<JID> participantsToAdd = new HashSet<JID>(contacts);
@@ -154,14 +154,14 @@ public class CollaborationUtils {
                 // Do not ask when host is alone...
                 reallyLeave = true;
             } else {
-                reallyLeave = DialogUtils.showConfirm(
+                reallyLeave = DialogUtils.showConfirm(null,
                     Messages.CollaborationUtils_confirm_closing,
                     Messages.CollaborationUtils_confirm_closing_text);
             }
         } else {
-            reallyLeave = DialogUtils.showConfirm(
-                Messages.CollaborationUtils_confirm_leaving,
-                Messages.CollaborationUtils_confirm_leaving_text);
+            reallyLeave = DialogUtils
+                .showConfirm(null, Messages.CollaborationUtils_confirm_leaving,
+                    Messages.CollaborationUtils_confirm_leaving_text);
         }
 
         if (!reallyLeave) {
@@ -179,7 +179,7 @@ public class CollaborationUtils {
     /**
      * Adds the given project resources to the session.<br/>
      * Does nothing if no {@link SarosSession session} is running.
-     * 
+     *
      * @param resourcesToAdd
      * @nonBlocking
      */
@@ -209,7 +209,7 @@ public class CollaborationUtils {
                     return;
                 }
 
-                DialogUtils.showError(
+                DialogUtils.showError(null,
                     Messages.CollaborationUtils_insufficient_privileges,
                     Messages.CollaborationUtils_insufficient_privileges_text);
             }
@@ -219,7 +219,7 @@ public class CollaborationUtils {
     /**
      * Adds the given contacts to the session.<br/>
      * Does nothing if no {@link ISarosSession session} is running.
-     * 
+     *
      * @param contacts
      * @nonBlocking
      */
@@ -255,11 +255,12 @@ public class CollaborationUtils {
      * Creates the message that invitees see on an incoming project share
      * request. Currently it contains the project names along with the number of
      * shared files and total file size for each shared project.
-     * 
+     *
      * @param sarosSession
      * @return
      */
-    private static String getShareProjectDescription(ISarosSession sarosSession) {
+    private static String getShareProjectDescription(
+        ISarosSession sarosSession) {
 
         Set<IProject> projects = sarosSession.getProjects();
 
@@ -275,21 +276,23 @@ public class CollaborationUtils {
                         .getFileCountAndSize(Arrays.asList(project.members()),
                             true, IContainer.FILE);
 
-                    result.append(String.format(
-                        "\nProject: %s, Files: %d, Size: %s",
-                        project.getName(), fileCountAndSize.v,
-                        format(fileCountAndSize.p)));
+                    result.append(String
+                        .format("\nProject: %s, Files: %d, Size: %s",
+                            project.getName(), fileCountAndSize.v,
+                            format(fileCountAndSize.p)));
                 } else {
                     List<IResource> resources = sarosSession
                         .getSharedResources(project);
 
-                    fileCountAndSize = FileUtils.getFileCountAndSize(resources,
-                        false, IResource.NONE);
+                    fileCountAndSize = FileUtils
+                        .getFileCountAndSize(resources, false, IResource.NONE);
 
-                    result.append(String.format(
-                        "\nProject: %s, Files: %s, Size: %s", project.getName()
-                            + " " + Messages.CollaborationUtils_partial,
-                        fileCountAndSize.v, format(fileCountAndSize.p)));
+                    result.append(String
+                        .format("\nProject: %s, Files: %s, Size: %s",
+                            project.getName() + " "
+                                + Messages.CollaborationUtils_partial,
+                            fileCountAndSize.v, format(fileCountAndSize.p)
+                        ));
                 }
             }
         } catch (IOException e) {
@@ -309,7 +312,7 @@ public class CollaborationUtils {
      * </ul>
      * Adds to partial shared projects additional files which are needed for
      * proper project synchronization.
-     * 
+     *
      * @param selectedResources
      * @param sarosSession
      * @return
@@ -371,7 +374,7 @@ public class CollaborationUtils {
             Set<IResource> resources = entry.getValue();
 
             if (resources == // * full shared *//*
-            null) {
+                null) {
                 continue;
             }
 
@@ -381,8 +384,8 @@ public class CollaborationUtils {
              * we need the .iml file, otherwise the project type will not be set
              * correctly on the other side
              */
-            IFolder projectFolder = new FolderImp((ProjectImp) project, project
-                .getFullPath().toFile());
+            IFolder projectFolder = new FolderImp((ProjectImp) project,
+                project.getFullPath().toFile());
             try {
                 for (IResource pFile : projectFolder.members(IResource.FILE)) {
                     String sFileName = pFile.getName().toLowerCase();
@@ -402,8 +405,9 @@ public class CollaborationUtils {
 
         for (Entry<IProject, Set<IResource>> entry : projectsResources
             .entrySet()) {
-            resources.put(entry.getKey(), entry.getValue() == null ? null
-                : new ArrayList<IResource>(entry.getValue()));
+            resources.put(entry.getKey(), entry.getValue() == null ?
+                null :
+                new ArrayList<IResource>(entry.getValue()));
         }
 
         return resources;
@@ -438,8 +442,8 @@ public class CollaborationUtils {
             return String.format(Locale.US, "%.2f MB", size / (1000F * 1000F));
         }
 
-        return String.format(Locale.US, "%.2f GB", size
-            / (1000F * 1000F * 1000F));
+        return String
+            .format(Locale.US, "%.2f GB", size / (1000F * 1000F * 1000F));
     }
 
 }

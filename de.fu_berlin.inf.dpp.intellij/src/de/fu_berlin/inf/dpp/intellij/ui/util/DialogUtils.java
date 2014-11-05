@@ -22,6 +22,7 @@
 
 package de.fu_berlin.inf.dpp.intellij.ui.util;
 
+import com.intellij.openapi.wm.WindowManager;
 import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.core.context.SarosPluginContext;
 import org.picocontainer.annotations.Inject;
@@ -31,74 +32,87 @@ import java.awt.Component;
 import java.awt.Container;
 
 /**
- * Dialog message helper that starts Dialogs in the current Thread.
+ * Dialog message helper that shows Dialogs in the current Thread.
  */
 public class DialogUtils {
 
     @Inject
     private static Saros saros;
 
-    private static final Container CONTAINER;
-
     private DialogUtils() {
     }
 
     static {
         SarosPluginContext.initComponent(new DialogUtils());
-        CONTAINER = saros.getMainPanel();
     }
 
+    /**
+     * Displays an error message.
+     *
+     * @param parent the parent Component. If <code>parent</code> is null, the
+     *               project's window is used.
+     * @param title
+     * @param msg
+     */
     public static void showError(Component parent, String title, String msg) {
-        JOptionPane.showInternalMessageDialog(parent, msg, title,
+        JOptionPane
+            .showInternalMessageDialog(notNullOrDefaultParent(parent), msg,
+                title,
             JOptionPane.ERROR_MESSAGE);
     }
 
-    public static void showError(String title, String msg) {
-        showError(getDefaultContainer(), msg, title);
-    }
-
-    public static void showWarning(Component parent, String title, String msg) {
-        JOptionPane.showInternalMessageDialog(parent, msg, title,
-            JOptionPane.WARNING_MESSAGE);
-    }
-
-    public static void showWarning(String title, String msg) {
-        showWarning(getDefaultContainer(), msg, title);
-    }
-
+    /**
+     * Displays a confirmation dialog.
+     *
+     * @param parent the parent Component. If <code>parent</code> is null, the
+     *               project's window is used.
+     * @param title
+     * @param msg
+     * @return <code>true</code>, if OK was chosen, <code>false</code> otherwise
+     */
     public static boolean showConfirm(Component parent, String title,
         String msg) {
-        int resp = JOptionPane.showConfirmDialog(parent, msg, title,
+        int resp = JOptionPane
+            .showConfirmDialog(notNullOrDefaultParent(parent), msg, title,
             JOptionPane.OK_CANCEL_OPTION);
         return resp == JOptionPane.OK_OPTION;
     }
 
-    public static boolean showConfirm(String title, String msg) {
-        return showConfirm(getDefaultContainer(), msg, title);
-    }
-
+    /**
+     * Shows a Yes/No question dialog.
+     *
+     * @param parent the parent Component. If <code>parent</code> is null, the
+     *               project's window is used.
+     * @param title
+     * @param msg
+     * @return <code>true</code> if Yes was chosen, <code>false</code> otherwise
+     */
     public static boolean showQuestion(Component parent, String title,
         String msg) {
         int answer = JOptionPane
-            .showConfirmDialog(parent, msg, title, JOptionPane.YES_NO_OPTION);
+            .showConfirmDialog(notNullOrDefaultParent(parent), msg, title,
+                JOptionPane.YES_NO_OPTION);
 
         return answer == JOptionPane.YES_OPTION;
     }
 
-    public static boolean showQuestion(String title, String msg) {
-        return showQuestion(getDefaultContainer(), msg, title);
-    }
-
+    /**
+     * Shows an Info dialog.
+     *
+     * @param parent the parent Component. If <code>parent</code> is null, the
+     *               project's window is used.
+     * @param title
+     * @param msg
+     */
     public static void showInfo(Container parent, String title, String msg) {
-        JOptionPane.showMessageDialog(parent, msg, title,
+        JOptionPane
+            .showMessageDialog(notNullOrDefaultParent(parent), msg, title,
             JOptionPane.INFORMATION_MESSAGE);
     }
 
-    public static void showInfo(String title, String msg) {
-        showInfo(getDefaultContainer(), msg, title);
-    }
-
-    public static Container getDefaultContainer() {
-        return CONTAINER;
+    private static Component notNullOrDefaultParent(Component parent) {
+        return parent != null ?
+            parent :
+            WindowManager.getInstance().getFrame(saros.getProject());
     }
 }

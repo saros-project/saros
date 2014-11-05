@@ -22,6 +22,7 @@
 
 package de.fu_berlin.inf.dpp.intellij.ui.widgets.progress;
 
+import com.intellij.openapi.wm.WindowManager;
 import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.core.context.SarosPluginContext;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
@@ -66,11 +67,11 @@ public class ProgressFrame implements IProgressMonitor {
      */
     public ProgressFrame(String title) {
         SarosPluginContext.initComponent(this);
-        Container parent = saros.getMainPanel();
 
         frmMain = new JFrame(title);
         frmMain.setSize(300, 160);
-        frmMain.setLocationRelativeTo(parent);
+        frmMain.setLocationRelativeTo(
+            WindowManager.getInstance().getFrame(saros.getProject()));
 
         Container pane = frmMain.getContentPane();
         pane.setLayout(null);

@@ -263,8 +263,7 @@ public class NegotiationHandler implements INegotiationHandler {
                         new Runnable() {
                             @Override
                             public void run() {
-                                DialogUtils
-                                    .showInfo(
+                                DialogUtils.showInfo(null,
                                         message,
                                         Messages.NegotiationHandler_project_sharing_cancelled_text);
                             }

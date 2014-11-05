@@ -250,7 +250,7 @@ public class AddProjectToSessionWizard extends Wizard {
         };
         runTask(job, "Sharing project...");
         if (job.status != ProjectNegotiation.Status.OK) {
-            DialogUtils.showError( "Error during project negotiation",
+            DialogUtils.showError(null, "Error during project negotiation",
                 "The project could not be shared");
         } else {
             NotificationPanel.showNotification("Project shared",

@@ -23,7 +23,6 @@
 package de.fu_berlin.inf.dpp.core;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.wm.ToolWindow;
 import de.fu_berlin.inf.dpp.SarosConstants;
 import de.fu_berlin.inf.dpp.core.context.SarosContext;
 import de.fu_berlin.inf.dpp.core.context.SarosCoreContextFactory;
@@ -32,7 +31,6 @@ import de.fu_berlin.inf.dpp.core.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.intellij.context.SarosIntellijContextFactory;
 import de.fu_berlin.inf.dpp.intellij.project.fs.Workspace;
-import de.fu_berlin.inf.dpp.intellij.ui.views.SarosMainPanelView;
 import de.fu_berlin.inf.dpp.misc.pico.DotGraphMonitor;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
@@ -58,12 +56,9 @@ public class Saros {
 
     private Project project;
 
-    private ToolWindow toolWindow;
-
     private XMPPConnectionService connectionService;
     private PreferenceUtils preferenceUtils;
 
-    private SarosMainPanelView mainPanel;
     private IWorkspace workspace;
 
     private SarosContext sarosContext;
@@ -162,24 +157,8 @@ public class Saros {
         return project;
     }
 
-    public ToolWindow getToolWindow() {
-        return toolWindow;
-    }
-
     public IWorkspace getWorkspace() {
         return workspace;
-    }
-
-    public void setToolWindow(ToolWindow toolWindow) {
-        this.toolWindow = toolWindow;
-    }
-
-    public SarosMainPanelView getMainPanel() {
-        return mainPanel;
-    }
-
-    public void setMainPanel(SarosMainPanelView mainPanel) {
-        this.mainPanel = mainPanel;
     }
 }
 
