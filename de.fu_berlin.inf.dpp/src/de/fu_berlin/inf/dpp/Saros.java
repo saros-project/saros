@@ -384,13 +384,19 @@ public class Saros extends AbstractUIPlugin {
         final ClassLoader contextClassLoader = Thread.currentThread()
             .getContextClassLoader();
 
+        final boolean isDebugMode = Boolean
+            .getBoolean("de.fu_berlin.inf.dpp.debug") || isDebugging(); //$NON-NLS-1$
+
+        final String log4jPropertyFile = isDebugMode ? "saros_debug.log4j.properties" //$NON-NLS-1$
+            : "saros_release.log4j.properties"; //$NON-NLS-1$
+
         try {
             // change the context class loader so Log4J will find the appenders
             Thread.currentThread().setContextClassLoader(
                 Saros.class.getClassLoader());
 
             PropertyConfigurator.configure(Saros.class.getClassLoader()
-                .getResource("saros.log4j.properties")); //$NON-NLS-1$
+                .getResource(log4jPropertyFile));
         } catch (RuntimeException e) {
             System.err.println("initializing log support failed"); //$NON-NLS-1$
             e.printStackTrace();

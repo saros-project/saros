@@ -121,7 +121,7 @@ public class STFController {
                 STFController.class.getClassLoader());
 
             PropertyConfigurator.configure(STFController.class.getClassLoader()
-                .getResource("saros_testmode.log4j.properties"));
+                .getResource("saros_stf.log4j.properties"));
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
