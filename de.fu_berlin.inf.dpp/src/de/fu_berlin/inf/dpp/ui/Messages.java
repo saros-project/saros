@@ -295,7 +295,6 @@ public class Messages extends NLS {
     public static String NetworkPreferencePage_upnp_label_Text;
     public static String NewContactAction_tooltip;
 
-    public static String PersonalizationPreferencePage_description;
     public static String PersonalizationPreferencePage_enable_balloon_notifications;
     public static String PersonalizationPreferencePage_enable_contribution_annotation;
     public static String PersonalizationPreferencePage_show_contribution_annotations_tooltip;
