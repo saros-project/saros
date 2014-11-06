@@ -17,7 +17,7 @@ import de.fu_berlin.inf.dpp.ui.Messages;
 /**
  * Contains the advanced preferences - consisting of preferences that are geared
  * towards developers and power users and that are not necessary for normal use.
- * 
+ *
  * @author rdjemili
  * @author jurke
  */
@@ -70,10 +70,12 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
                 getFieldEditorParent()));
         }
 
-        addField(new BooleanFieldEditor(
-            PreferenceConstants.CONSOLESHARING_ENABLED,
-            Messages.AdvancedPreferencePage_enable_consolesharing,
-            getFieldEditorParent()));
+        // Currently deactivated for Release 14.10.31
+        //
+        // addField(new BooleanFieldEditor(
+        // PreferenceConstants.CONSOLESHARING_ENABLED,
+        // Messages.AdvancedPreferencePage_enable_consolesharing,
+        // getFieldEditorParent()));
 
     }
 
