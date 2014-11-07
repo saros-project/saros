@@ -23,9 +23,11 @@
 package de.fu_berlin.inf.dpp.intellij.project.fs;
 
 import de.fu_berlin.inf.dpp.filesystem.IPath;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 public class PathImp implements IPath {
     public static final String FILE_SEPARATOR = "/";
@@ -35,18 +37,22 @@ public class PathImp implements IPath {
 
     public PathImp(final String path) {
 
-        String cleanPath = path;
-        if (path.startsWith("file:/") || path.startsWith("file:\\"))
-            cleanPath = path.substring("file:/".length());
+        this.path = path;
+        String splitPath = path;
 
-        //Linux: Removing the first slash makes the file inaccessible, so we only do it for windows
-        if (isWindows()) {
-            if (path.startsWith("\\") || path.startsWith("/"))
-                cleanPath = path.substring(1);
+        //We must remove the first slash, otherwise String.split would
+        //create an empty string as first segment
+        if (path.startsWith("\\") || path.startsWith("/")) {
+            splitPath = path.substring(1);
         }
 
-        this.path = cleanPath;
-        segments = path.split(File.separator);
+        //"foo\bla.txt" is a valid linux path, which would not be handled
+        // correctly by the separatorsToUnix. However, IntelliJ does not handle
+        // these paths correctly and the FS Synchronizer logs an error when
+        // encountering one. Thus it is not possible that PathImp is called with
+        // such a path and we can safely use this method.
+        splitPath = FilenameUtils.separatorsToUnix(splitPath);
+        segments = splitPath.split(Pattern.quote(FILE_SEPARATOR));
     }
 
     public PathImp(File file) {
@@ -88,9 +94,6 @@ public class PathImp implements IPath {
 
     @Override
     public IPath removeFirstSegments(int count) {
-        if (!isWindows()) {
-            count += 1;
-        }
         String[] result = Arrays.copyOfRange(segments, count, segments.length);
 
         return new PathImp(join(result));
@@ -206,10 +209,5 @@ public class PathImp implements IPath {
         PathImp other = (PathImp) obj;
 
         return this.path.equalsIgnoreCase(other.path);
-    }
-
-    private boolean isWindows() {
-        String os = System.getProperty("os.name");
-        return os != null && os.toLowerCase().contains("windows");
     }
 }
