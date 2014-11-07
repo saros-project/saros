@@ -22,6 +22,7 @@
 
 package de.fu_berlin.inf.dpp.intellij.project.fs;
 
+import com.intellij.openapi.vfs.LocalFileSystem;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
@@ -98,7 +99,7 @@ public class FileImp extends ResourceImp implements IFile {
 
     @Override
     public long getSize() throws IOException {
-        return file.length();
+        return getFullPath().toFile().length();
     }
 
     @Override
@@ -106,14 +107,38 @@ public class FileImp extends ResourceImp implements IFile {
         return FILE;
     }
 
+    /**
+     * Deletes the file using {@link File#delete()} and updates the IDE with
+     * {@link LocalFileSystem#refreshAndFindFileByIoFile(File)}.
+     *
+     * @param updateFlags - is ignored at the moment
+     * @throws IOException
+     */
     @Override
     public void delete(int updateFlags) throws IOException {
-        file.delete();
+        boolean result = true;
+        if (!file.isAbsolute()) {
+            File absoluteFile = getFullPath().toFile();
+            result = absoluteFile.delete();
+            LocalFileSystem.getInstance()
+                .refreshAndFindFileByIoFile(absoluteFile);
+        } else {
+            result = file.delete();
+            LocalFileSystem.getInstance().refreshAndFindFileByIoFile(file);
+        }
+        if (!result) {
+            LOG.error("Could not delete " + file);
+        }
     }
 
     @Override
     public void move(IPath destination, boolean force) throws IOException {
-        file.renameTo(destination.toFile());
+        File absoluteFile = getFullPath().toFile();
+        if (absoluteFile.renameTo(destination.toFile())) {
+            IPath newRelativePath = destination
+                .removeFirstSegments(project.getFullPath().segmentCount());
+            file = new File(newRelativePath.toPortableString());
+        }
     }
 
     @Override

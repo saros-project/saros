@@ -125,7 +125,7 @@ public abstract class ResourceImp implements IResource {
 
     @Override
     public boolean isAccessible() {
-        return file.canRead();
+        return getFullPath().toFile().canRead();
     }
 
     @Override
