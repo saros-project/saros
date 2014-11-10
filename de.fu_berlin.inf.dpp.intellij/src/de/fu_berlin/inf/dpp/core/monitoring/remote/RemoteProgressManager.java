@@ -2,16 +2,17 @@ package de.fu_berlin.inf.dpp.core.monitoring.remote;
 
 import de.fu_berlin.inf.dpp.activities.ProgressActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.core.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
-import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
 import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 
 import java.util.ArrayList;
@@ -32,8 +33,7 @@ public class RemoteProgressManager extends AbstractActivityProducer {
 
     private static final Random RANDOM = new Random();
 
-    //TODO: Uncomment when ISarosSessionManager was added
-    //private final ISarosSessionManager sessionManager;
+    private final ISarosSessionManager sessionManager;
 
     private volatile ISarosSession session;
 
@@ -113,10 +113,9 @@ public class RemoteProgressManager extends AbstractActivityProducer {
         }
     };
 
-    //TODO: Uncomment when ISarosSessionManager was added
-    public RemoteProgressManager(/*ISarosSessionManager sessionManager*/) {
-        /*this.sessionManager = sessionManager;
-        this.sessionManager.addSarosSessionListener(sessionListener);*/
+    public RemoteProgressManager(ISarosSessionManager sessionManager) {
+        this.sessionManager = sessionManager;
+        this.sessionManager.addSarosSessionListener(sessionListener);
     }
 
     /**
@@ -150,8 +149,7 @@ public class RemoteProgressManager extends AbstractActivityProducer {
 
         return new RemoteProgressMonitor(this, getNextID(),
             currentSession.getLocalUser(),
-            new ArrayList<User>(new HashSet<User>(users)), monitor
-        );
+            new ArrayList<User>(new HashSet<User>(users)), monitor);
     }
 
     void monitorUpdated(final ProgressActivity activity) {

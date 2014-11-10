@@ -26,6 +26,7 @@ import de.fu_berlin.inf.dpp.AbstractSarosContextFactory;
 import de.fu_berlin.inf.dpp.ISarosContextBindings;
 import de.fu_berlin.inf.dpp.ISarosContextFactory;
 import de.fu_berlin.inf.dpp.core.Saros;
+import de.fu_berlin.inf.dpp.core.concurrent.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.core.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.core.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.core.project.ISarosSessionManager;
@@ -33,16 +34,24 @@ import de.fu_berlin.inf.dpp.core.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.core.ui.eventhandler.NegotiationHandler;
 import de.fu_berlin.inf.dpp.core.ui.eventhandler.UserStatusChangeHandler;
 import de.fu_berlin.inf.dpp.core.ui.eventhandler.XMPPAuthorizationHandler;
+import de.fu_berlin.inf.dpp.core.util.FileUtils;
 import de.fu_berlin.inf.dpp.filesystem.ChecksumCacheImpl;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IFileContentChangedNotifier;
+import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
+import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorAPI;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorHandler;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorManipulator;
 import de.fu_berlin.inf.dpp.intellij.editor.ProjectAPI;
 import de.fu_berlin.inf.dpp.intellij.project.fs.FileContentChangedNotifierBridge;
+import de.fu_berlin.inf.dpp.intellij.project.fs.PathFactory;
+import de.fu_berlin.inf.dpp.intellij.runtime.IntelliJSynchronizer;
 import de.fu_berlin.inf.dpp.intellij.store.PreferenceStore;
+import de.fu_berlin.inf.dpp.intellij.ui.actions.FollowModeAction;
+import de.fu_berlin.inf.dpp.intellij.ui.actions.LeaveSessionAction;
+import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import org.picocontainer.BindKey;
 import org.picocontainer.MutablePicoContainer;
 
@@ -57,12 +66,11 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
 
     private final ISarosContextFactory additionalContext;
 
-    //FIXME: uncomment when classes are submitted
     private final Component[] components = new Component[] {
 
         Component.create(ISarosSessionManager.class, SarosSessionManager.class),
         // Core Managers
-        // Component.create(ConsistencyWatchdogClient.class), //todo
+        Component.create(ConsistencyWatchdogClient.class),
 
         Component.create(EditorAPI.class), Component.create(ProjectAPI.class),
 
@@ -75,19 +83,17 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
         Component.create(UserStatusChangeHandler.class),
         Component.create(XMPPAuthorizationHandler.class),
 
-
         Component.create(IChecksumCache.class, ChecksumCacheImpl.class),
 
-        // Component.create(UISynchronizer.class, IntelliJSynchronizer.class), //todo
+        Component.create(UISynchronizer.class, IntelliJSynchronizer.class),
 
         Component.create(IFileContentChangedNotifier.class,
             FileContentChangedNotifierBridge.class),
 
         Component.create(PreferenceUtils.class),
 
-        // Component.create(FollowModeAction.class), //todo
-        // Component.create(LeaveSessionAction.class),  //todo
-    };
+        Component.create(FollowModeAction.class),
+        Component.create(LeaveSessionAction.class), };
 
     public SarosIntellijContextFactory(Saros saros,
         ISarosContextFactory delegate) {
@@ -97,6 +103,14 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
 
     @Override
     public void createComponents(MutablePicoContainer container) {
+
+        IWorkspace workspace = saros.getWorkspace();
+        FileUtils.workspace = workspace;
+
+        // Saros Core PathIntl Support
+        container.addComponent(IPathFactory.class, new PathFactory());
+
+        container.addComponent(IWorkspace.class, workspace);
 
         if (additionalContext != null) {
             additionalContext.createComponents(container);

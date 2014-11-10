@@ -246,8 +246,7 @@ public final class SarosSession implements ISarosSession {
         // Core Managers
         sessionContainer.addComponent(SharedResourcesManager.class);
         sessionContainer.addComponent(PermissionManager.class);
-        //TODO: uncomment when FollowingActivitiesManager was added
-        //        sessionContainer.addComponent(FollowingActivitiesManager.class);
+        sessionContainer.addComponent(FollowingActivitiesManager.class);
 
         // Handlers
         sessionContainer.addComponent(ConsistencyWatchdogHandler.class);

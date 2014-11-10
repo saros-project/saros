@@ -27,7 +27,13 @@ import de.fu_berlin.inf.dpp.ISarosContextBindings;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatService;
 import de.fu_berlin.inf.dpp.communication.chat.single.SingleUserChatService;
+import de.fu_berlin.inf.dpp.core.awareness.AwarenessInformationCollector;
+import de.fu_berlin.inf.dpp.core.concurrent.IsInconsistentObservable;
 import de.fu_berlin.inf.dpp.core.monitoring.remote.RemoteProgressManager;
+import de.fu_berlin.inf.dpp.core.net.business.CancelInviteHandler;
+import de.fu_berlin.inf.dpp.core.net.business.CancelProjectSharingHandler;
+import de.fu_berlin.inf.dpp.core.net.business.InvitationHandler;
+import de.fu_berlin.inf.dpp.core.net.business.LeaveAndKickHandler;
 import de.fu_berlin.inf.dpp.core.vcs.NullVCSProviderFactoryImpl;
 import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.DispatchThreadContext;
@@ -68,10 +74,7 @@ import java.util.Arrays;
  *
  * @author srossbach
  */
-//todo: adopted from eclipse
 public class SarosCoreContextFactory extends AbstractSarosContextFactory {
-
-    // TODO: uncomment components when submitted to repository
 
     private final Component[] components = new Component[] {
 
@@ -121,18 +124,16 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
         Component.create(FileReplacementInProgressObservable.class),
         Component.create(SessionNegotiationObservable.class),
         Component.create(ProjectNegotiationObservable.class),
-        //Component.create(IsInconsistentObservable.class), //todo
+        Component.create(IsInconsistentObservable.class),
         Component.create(SessionIDObservable.class),
         Component.create(SarosSessionObservable.class),
-        // Component.create(AwarenessInformationCollector.class),//todo
-        // Component.create(FollowingActivitiesManager.class),  //todo
+        Component.create(AwarenessInformationCollector.class),
 
         // Handlers
-        // Component.create(CancelInviteHandler.class), //todo
-        // Component.create(CancelProjectSharingHandler.class), //todo
-        // Component.create(InvitationHandler.class), //todo
-        // Component.create(LeaveAndKickHandler.class), //todo
-
+        Component.create(CancelInviteHandler.class),
+        Component.create(CancelProjectSharingHandler.class),
+        Component.create(InvitationHandler.class),
+        Component.create(LeaveAndKickHandler.class),
         Component.create(RemoteProgressManager.class),
 
     };
