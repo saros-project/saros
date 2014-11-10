@@ -28,11 +28,11 @@ import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.project.Project;
 import de.fu_berlin.inf.dpp.core.Saros;
 import org.apache.log4j.PropertyConfigurator;
+import org.apache.log4j.helpers.LogLog;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.KeyStroke;
 import java.awt.event.KeyEvent;
-import java.net.URL;
 
 /**
  * Component that is initalized when a project is loaded.
@@ -42,9 +42,7 @@ public class SarosComponent
     implements com.intellij.openapi.components.ProjectComponent {
 
     public SarosComponent(final Project project) {
-        //Has to be loaded explicitly
-        URL log4jProperties = getClass().getResource("/log4j.properties");
-        PropertyConfigurator.configure(log4jProperties);
+        loadLoggers();
 
         Keymap keymap = KeymapManager.getInstance().getActiveKeymap();
         keymap.addShortcut("ActivateSarosToolWindow", new KeyboardShortcut(
@@ -53,6 +51,25 @@ public class SarosComponent
         ));
 
         Saros.create(project);
+    }
+
+    private void loadLoggers() {
+        final ClassLoader contextClassLoader = Thread.currentThread()
+            .getContextClassLoader();
+
+        try {
+            // change the context class loader so Log4J will find
+            // the SarosLogFileAppender
+            Thread.currentThread()
+                .setContextClassLoader(SarosComponent.class.getClassLoader());
+
+            PropertyConfigurator.configure(SarosComponent.class.getClassLoader()
+                .getResource("log4j.properties"));
+        } catch (RuntimeException e) {
+            LogLog.error("initializing loggers failed", e);
+        } finally {
+            Thread.currentThread().setContextClassLoader(contextClassLoader);
+        }
     }
 
     @Override
