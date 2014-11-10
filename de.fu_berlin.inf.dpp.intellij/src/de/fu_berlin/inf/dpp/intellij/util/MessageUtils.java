@@ -25,6 +25,7 @@ package de.fu_berlin.inf.dpp.intellij.util;
 import org.apache.log4j.Logger;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -47,7 +48,9 @@ public class MessageUtils {
             for (Field f : clazz.getFields()) {
                 String fieldName = f.getName();
                 String fieldValue = resourceBundle.getString(fieldName);
-                if (f.isAccessible() && f.getType().equals(String.class)) {
+                int modifier = f.getModifiers();
+                if (Modifier.isPublic(modifier) && !Modifier.isFinal(modifier)
+                    && f.getType().equals(String.class)) {
                     f.set(clazz, fieldValue);
                 }
             }

@@ -57,7 +57,9 @@ public class SafeDialogUtils {
                 String option = Messages
                     .showInputDialog(saros.getProject(), message, title,
                         Messages.getQuestionIcon(), initialValue, null);
-                response.append(option);
+                if (option != null) {
+                    response.append(option);
+                }
             }
         });
         return response.toString();

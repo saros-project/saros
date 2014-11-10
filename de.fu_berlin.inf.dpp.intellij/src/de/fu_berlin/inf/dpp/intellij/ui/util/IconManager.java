@@ -61,7 +61,9 @@ public class IconManager {
                 + ". Path does not exist in resources: " + path);
         }
 
-        return new ImageIcon(url, description);
+        return new ImageIcon(new byte[0]);
+        //TODO: Uncomment when icons were moved.
+        //        return new ImageIcon(url, description);
     }
 
 }

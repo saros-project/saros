@@ -45,7 +45,7 @@ public class SarosToolWindowFactory implements ToolWindowFactory {
 
         Content content = toolWindow.getContentManager().getFactory()
             .createContent(sarosMainPanelView, PluginManager
-                .getPlugin(PluginId.getId("de.fu_berlin.inf.dpp.intellij.1"))
+                .getPlugin(PluginId.getId("de.fu_berlin.inf.dpp.intellij"))
                 .getName(), false);
         toolWindow.getContentManager().addContent(content);
     }
