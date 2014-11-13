@@ -28,6 +28,8 @@ import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.core.context.SarosPluginContext;
 import org.picocontainer.annotations.Inject;
 
+import java.awt.Component;
+
 /**
  * Dialog helper used to show messages in safe manner by starting it in UI thread.
  */
@@ -55,7 +57,9 @@ public class SafeDialogUtils {
                 String option = Messages
                     .showInputDialog(saros.getProject(), message, title,
                         Messages.getQuestionIcon(), initialValue, null);
-                response.append(option);
+                if (option != null) {
+                    response.append(option);
+                }
             }
         });
         return response.toString();
@@ -75,6 +79,16 @@ public class SafeDialogUtils {
             @Override
             public void run() {
                 Messages.showErrorDialog(saros.getProject(), message, title);
+            }
+        });
+    }
+
+    public static void showError(final Component component,
+        final String message, final String title) {
+        UIUtil.invokeAndWaitIfNeeded(new Runnable() {
+            @Override
+            public void run() {
+                Messages.showErrorDialog(component, message, title);
             }
         });
     }

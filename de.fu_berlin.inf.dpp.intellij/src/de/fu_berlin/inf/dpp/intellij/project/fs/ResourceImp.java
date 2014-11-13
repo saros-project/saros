@@ -95,22 +95,23 @@ public abstract class ResourceImp implements IResource {
     public IPath getProjectRelativePath() {
         if (project == null) {
             return new PathImp(file);
-        } else {
-            File fPrj = project.getFullPath().toFile();
-            if (fPrj.isFile()) {
-                fPrj = fPrj.getParentFile();
-            }
-
-            String prjPath = fPrj.getAbsolutePath();
-            String myPath = file.getAbsolutePath();
-
-            if (myPath.length() > prjPath.length()) {
-                myPath = myPath.substring(prjPath.length() + 1);
-            }
-
-            return new PathImp(new File(myPath));
         }
 
+        File fPrj = project.getFullPath().toFile();
+        if (fPrj.isFile()) {
+            fPrj = fPrj.getParentFile();
+        }
+
+        if (file.isAbsolute()) {
+            String prjPath = fPrj.getAbsolutePath();
+            String path = file.getAbsolutePath();
+            if (path.length() > prjPath.length()) {
+                path = path.substring(prjPath.length() + 1);
+            }
+            return new PathImp(new File(path));
+        }
+
+        return new PathImp(new File(file.getPath()));
     }
 
     public SPath getSPath() {

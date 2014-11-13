@@ -20,14 +20,14 @@
  * /
  */
 
-package de.fu_berlin.inf.dpp.core.workspace;
+package de.fu_berlin.inf.dpp.intellij.ui.util;
 
-import de.fu_berlin.inf.dpp.core.exceptions.OperationCanceledException;
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
+import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
 
-import java.io.IOException;
+/**
+ * Helper class to run Runnables that return a
+ */
+public abstract class JobWithStatus implements Runnable {
 
-public interface IWorkspaceRunnable {
-    void run(IProgressMonitor progress)
-        throws OperationCanceledException, IOException;
+    public ProjectNegotiation.Status status;
 }

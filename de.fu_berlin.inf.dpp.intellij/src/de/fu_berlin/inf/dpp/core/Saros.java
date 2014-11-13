@@ -23,13 +23,12 @@
 package de.fu_berlin.inf.dpp.core;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.wm.ToolWindow;
-
+import de.fu_berlin.inf.dpp.SarosConstants;
 import de.fu_berlin.inf.dpp.core.context.SarosContext;
 import de.fu_berlin.inf.dpp.core.context.SarosCoreContextFactory;
 import de.fu_berlin.inf.dpp.core.context.SarosPluginContext;
 import de.fu_berlin.inf.dpp.core.preferences.PreferenceUtils;
-import de.fu_berlin.inf.dpp.core.workspace.IWorkspace;
+import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.intellij.context.SarosIntellijContextFactory;
 import de.fu_berlin.inf.dpp.intellij.project.fs.Workspace;
 import de.fu_berlin.inf.dpp.misc.pico.DotGraphMonitor;
@@ -47,38 +46,9 @@ import org.jivesoftware.smackx.ServiceDiscoveryManager;
 public class Saros {
 
     /**
-     * This is the Bundle-SymbolicName (a.k.a the pluginID)
+     * This is the plugin ID that identifies the saros plugin in the IDEA ecosystem.
      */
-    public static final String SAROS = "de.fu_berlin.inf.dpp";
-
-    /**
-     * Default server name
-     */
-    public static final String SAROS_SERVER = "saros-con.imp.fu-berlin.de";
-
-    /**
-     * The name of the XMPP namespace used by SarosEclipse. At the moment it is only
-     * used to advertise the SarosEclipse feature in the Service Discovery.
-     * <p/>
-     * TODO Add version information, so that only compatible versions of Saros
-     * can use each other.
-     */
-    public static final String NAMESPACE = SAROS;
-
-    /**
-     * The name of the resource identifier used by Saros when connecting to the
-     * XMPP server (for instance when logging in as john@doe.com, Saros will
-     * connect using john@doe.com/Saros)
-     * <p/>
-     * //todo
-     */
-    public static final String RESOURCE = "Saros";
-
-    /**
-     * Sub-namespace for the server. It is used advertise when a server is
-     * active.
-     */
-    public static final String NAMESPACE_SERVER = NAMESPACE + ".server";
+    public static final String PLUGIN_ID = "de.fu_berlin.inf.dpp.intellij";
 
     private static Saros instance;
 
@@ -86,13 +56,9 @@ public class Saros {
 
     private Project project;
 
-    private ToolWindow toolWindow;
-
     private XMPPConnectionService connectionService;
     private PreferenceUtils preferenceUtils;
 
-    //FIXME: Add again when SarosMainPanelView was added
-    //private SarosMainPanelView mainPanel;
     private IWorkspace workspace;
 
     private SarosContext sarosContext;
@@ -164,8 +130,8 @@ public class Saros {
                 ConnectionState state) {
 
                 if (state == ConnectionState.CONNECTING) {
-                    ServiceDiscoveryManager.getInstanceFor(connection).addFeature(
-                        NAMESPACE);
+                    ServiceDiscoveryManager.getInstanceFor(connection)
+                        .addFeature(SarosConstants.XMPP_FEATURE_NAMESPACE);
                 }
             }
 
@@ -173,8 +139,8 @@ public class Saros {
 
         //todo: set parameters from config
         connectionService
-            .configure(RESOURCE, false, false, 8888,
-                null, null, true, null, 80, true);
+            .configure(SarosConstants.RESOURCE, false, false, 8888, null, null,
+                true, null, 80, true);
 
         isInitialized = true;
         // Make sure that all components in the container are
@@ -191,26 +157,8 @@ public class Saros {
         return project;
     }
 
-    public ToolWindow getToolWindow() {
-        return toolWindow;
-    }
-
     public IWorkspace getWorkspace() {
         return workspace;
     }
-
-    public void setToolWindow(ToolWindow toolWindow) {
-        this.toolWindow = toolWindow;
-    }
-
-    //FIXME: Add again when SarosMainPanelView was added.
-    /*
-    public SarosMainPanelView getMainPanel() {
-        return mainPanel;
-    }
-
-    public void setMainPanel(SarosMainPanelView mainPanel) {
-        this.mainPanel = mainPanel;
-    }*/
 }
 

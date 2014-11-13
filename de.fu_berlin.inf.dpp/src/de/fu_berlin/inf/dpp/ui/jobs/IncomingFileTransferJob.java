@@ -52,7 +52,7 @@ public final class IncomingFileTransferJob extends FileTransferJob {
         } catch (Exception e) {
             LOG.error("file transfer failed: " + jid, e);
 
-            return new Status(IStatus.ERROR, Saros.SAROS,
+            return new Status(IStatus.ERROR, Saros.PLUGIN_ID,
                 "file transfer failed", e);
         } finally {
             monitor.done();

@@ -23,8 +23,6 @@
 package de.fu_berlin.inf.dpp.core.util;
 
 import de.fu_berlin.inf.dpp.core.exceptions.OperationCanceledException;
-import de.fu_berlin.inf.dpp.core.workspace.IWorkspace;
-import de.fu_berlin.inf.dpp.core.workspace.IWorkspaceRunnable;
 import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
@@ -32,6 +30,8 @@ import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IResourceAttributes;
+import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
+import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRunnable;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.util.Pair;
 import de.fu_berlin.inf.dpp.util.StackTrace;
@@ -222,8 +222,7 @@ public class FileUtils {
             }
         };
 
-        workspace.run(createFileProcedure, workspace.getRoot(),
-            IWorkspace.AVOID_UPDATE, monitor);
+        workspace.run(createFileProcedure);
 
     }
 
@@ -245,8 +244,7 @@ public class FileUtils {
             }
         };
 
-        workspace.run(replaceFileProcedure, workspace.getRoot(),
-            IWorkspace.AVOID_UPDATE, monitor);
+        workspace.run(replaceFileProcedure);
     }
 
     /**
@@ -305,8 +303,7 @@ public class FileUtils {
             }
         };
 
-        workspace.run(createFolderProcedure, workspace.getRoot(),
-            IWorkspace.AVOID_UPDATE, null);
+        workspace.run(createFolderProcedure);
 
     }
 
@@ -339,9 +336,7 @@ public class FileUtils {
             }
         };
 
-        workspace
-            .run(deleteProcedure, workspace.getRoot(), IWorkspace.AVOID_UPDATE,
-                null);
+        workspace.run(deleteProcedure);
 
     }
 
@@ -380,9 +375,7 @@ public class FileUtils {
             }
         };
 
-        workspace
-            .run(moveProcedure, workspace.getRoot(), IWorkspace.AVOID_UPDATE,
-                null);
+        workspace.run(moveProcedure);
 
     }
 

@@ -86,7 +86,7 @@ public final class OutgoingFileTransferJob extends FileTransferJob {
         } catch (XMPPException e) {
             LOG.error("file transfer failed: " + jid, e);
 
-            return new Status(IStatus.ERROR, Saros.SAROS,
+            return new Status(IStatus.ERROR, Saros.PLUGIN_ID,
                 "file transfer failed", e);
         } finally {
             monitor.done();

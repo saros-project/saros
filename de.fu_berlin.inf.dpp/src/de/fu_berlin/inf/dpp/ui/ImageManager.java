@@ -138,7 +138,8 @@ public class ImageManager {
      * @return the image descriptor
      */
     public static ImageDescriptor getImageDescriptor(String path) {
-        return AbstractUIPlugin.imageDescriptorFromPlugin(Saros.SAROS, path);
+        return AbstractUIPlugin
+            .imageDescriptorFromPlugin(Saros.PLUGIN_ID, path);
     }
 
 }

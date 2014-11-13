@@ -1,8 +1,8 @@
 package de.fu_berlin.inf.dpp.core.invitation;
 
 import de.fu_berlin.inf.dpp.core.exceptions.OperationCanceledException;
-import de.fu_berlin.inf.dpp.core.workspace.IWorkspaceRunnable;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
+import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRunnable;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.util.CoreUtils;
 import org.apache.commons.io.IOUtils;
@@ -73,7 +73,8 @@ public class CreateArchiveTask implements IWorkspaceRunnable {
         try {
             zipStream = new ZipOutputStream(
                 new BufferedOutputStream(new FileOutputStream(archive),
-                    BUFFER_SIZE));
+                    BUFFER_SIZE)
+            );
 
             while (fileIt.hasNext()) {
 
@@ -109,7 +110,8 @@ public class CreateArchiveTask implements IWorkspaceRunnable {
                         if (monitor.isCanceled())
                             throw new OperationCanceledException(
                                 "compressing of file '" + originalEntryName
-                                    + "' was canceled");
+                                    + "' was canceled"
+                            );
 
                         zipStream.write(buffer, 0, read);
 

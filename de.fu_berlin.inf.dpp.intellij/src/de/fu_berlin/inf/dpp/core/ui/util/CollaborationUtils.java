@@ -122,7 +122,7 @@ public class CollaborationUtils {
                 } catch (Exception e) {
 
                     LOG.error("could not start a Saros session", e);
-                    return new Status(IStatus.ERROR, Saros.SAROS,
+                    return new Status(IStatus.ERROR, Saros.PLUGIN_ID,
                         e.getMessage(), e);
                 }
 
@@ -154,13 +154,13 @@ public class CollaborationUtils {
                 // Do not ask when host is alone...
                 reallyLeave = true;
             } else {
-                reallyLeave = DialogUtils
-                    .showConfirm(Messages.CollaborationUtils_confirm_closing,
-                        Messages.CollaborationUtils_confirm_closing_text);
+                reallyLeave = DialogUtils.showConfirm(null,
+                    Messages.CollaborationUtils_confirm_closing,
+                    Messages.CollaborationUtils_confirm_closing_text);
             }
         } else {
             reallyLeave = DialogUtils
-                .showConfirm(Messages.CollaborationUtils_confirm_leaving,
+                .showConfirm(null, Messages.CollaborationUtils_confirm_leaving,
                     Messages.CollaborationUtils_confirm_leaving_text);
         }
 
@@ -209,7 +209,7 @@ public class CollaborationUtils {
                     return;
                 }
 
-                DialogUtils.showError(
+                DialogUtils.showError(null,
                     Messages.CollaborationUtils_insufficient_privileges,
                     Messages.CollaborationUtils_insufficient_privileges_text);
             }
@@ -373,7 +373,7 @@ public class CollaborationUtils {
             IProject project = entry.getKey();
             Set<IResource> resources = entry.getValue();
 
-            if (resources == //* full shared *//*
+            if (resources == // * full shared *//*
                 null) {
                 continue;
             }
@@ -381,7 +381,8 @@ public class CollaborationUtils {
             List<IResource> additionalFilesForPartialSharing = new ArrayList<IResource>();
 
             /*
-             * we need the .iml file, otherwise the project type will not be set correctly on the other side
+             * we need the .iml file, otherwise the project type will not be set
+             * correctly on the other side
              */
             IFolder projectFolder = new FolderImp((ProjectImp) project,
                 project.getFullPath().toFile());

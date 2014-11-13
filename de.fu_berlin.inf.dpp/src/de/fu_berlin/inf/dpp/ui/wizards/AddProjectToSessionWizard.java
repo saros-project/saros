@@ -50,9 +50,9 @@ import de.fu_berlin.inf.dpp.negotiation.FileList;
 import de.fu_berlin.inf.dpp.negotiation.FileListDiff;
 import de.fu_berlin.inf.dpp.negotiation.FileListFactory;
 import de.fu_berlin.inf.dpp.negotiation.IncomingProjectNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelLocation;
 import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelOption;
+import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
@@ -363,31 +363,33 @@ public class AddProjectToSessionWizard extends Wizard {
         final Map<String, FileListDiff> modifiedResources) {
 
         String message = Messages.AddProjectToSessionWizard_synchronize_projects;
+        String pluginID = Saros.PLUGIN_ID;
 
-        String PID = Saros.SAROS;
-        MultiStatus info = new MultiStatus(PID, 1, message, null);
+        MultiStatus info = new MultiStatus(pluginID, 1, message, null);
+
         for (String projectName : modifiedResources.keySet()) {
             FileListDiff diff = modifiedResources.get(projectName);
-            info.add(new Status(IStatus.INFO, PID, 1,
-                MessageFormat.format(
-                    Messages.AddProjectToSessionWizard_files_affected,
+            info.add(new Status(IStatus.INFO, pluginID, 1, MessageFormat
+                .format(Messages.AddProjectToSessionWizard_files_affected,
                     projectName), null));
             for (String path : diff.getRemovedPaths()) {
-                info.add(new Status(IStatus.WARNING, PID, 1, MessageFormat
+                info.add(new Status(IStatus.WARNING, pluginID, 1, MessageFormat
                     .format(Messages.AddProjectToSessionWizard_file_toRemove,
                         path), null));
             }
             for (String path : diff.getAlteredPaths()) {
-                info.add(new Status(IStatus.WARNING, PID, 1, MessageFormat
+                info.add(new Status(IStatus.WARNING, pluginID, 1, MessageFormat
                     .format(
                         Messages.AddProjectToSessionWizard_file_overwritten,
                         path), null));
             }
             for (String path : diff.getAddedPaths()) {
-                info.add(new Status(IStatus.INFO, PID, 1, MessageFormat.format(
-                    Messages.AddProjectToSessionWizard_file_added, path), null));
+                info.add(new Status(IStatus.INFO, pluginID, 1,
+                    MessageFormat.format(
+                        Messages.AddProjectToSessionWizard_file_added, path),
+                    null));
             }
-            info.add(new Status(IStatus.INFO, PID, 1, "", null)); //$NON-NLS-1$
+            info.add(new Status(IStatus.INFO, pluginID, 1, "", null)); //$NON-NLS-1$
         }
 
         return new OverwriteErrorDialog(getShell(),
@@ -581,7 +583,7 @@ public class AddProjectToSessionWizard extends Wizard {
                     throw (CoreException) cause;
 
                 throw new CoreException(new org.eclipse.core.runtime.Status(
-                    IStatus.ERROR, Saros.SAROS,
+                    IStatus.ERROR, Saros.PLUGIN_ID,
                     "failed to compute local file list", e));
             }
 

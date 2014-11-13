@@ -68,6 +68,11 @@ import de.fu_berlin.inf.dpp.versioning.VersionManager;
 public class Saros extends AbstractUIPlugin {
 
     /**
+     * This is the Bundle-SymbolicName (a.k.a the pluginID)
+     */
+    public static final String PLUGIN_ID = "de.fu_berlin.inf.dpp"; //$NON-NLS-1$
+
+    /**
      * @JTourBusStop 1, Some Basics:
      * 
      *               This class manages the lifecycle of the Saros plug-in,
@@ -89,39 +94,6 @@ public class Saros extends AbstractUIPlugin {
      * reinject() will be well defined.
      */
     protected static boolean isInitialized;
-
-    /**
-     * This is the Bundle-SymbolicName (a.k.a the pluginID)
-     */
-    public static final String SAROS = "de.fu_berlin.inf.dpp"; //$NON-NLS-1$
-
-    /**
-     * The name of the XMPP namespace used by Saros. At the moment it is only
-     * used to advertise the Saros feature in the Service Discovery.
-     * 
-     * TODO Add version information, so that only compatible versions of Saros
-     * can use each other.
-     */
-    public final static String NAMESPACE = SAROS;
-
-    /**
-     * Sub-namespace for the server. It is used advertise when a server is
-     * active.
-     */
-    public static final String NAMESPACE_SERVER = NAMESPACE + ".server"; //$NON-NLS-1$
-
-    /**
-     * The name of the resource identifier used by Saros when connecting to the
-     * XMPP server (for instance when logging in as john@doe.com, Saros will
-     * connect using john@doe.com/Saros)
-     * 
-     * @deprecated Do not use this resource identifier to build a fully
-     *             qualified Jabber identifier, e.g the logic connects to a XMPP
-     *             server as foo@bar/Saros but the assigned Jabber identifier
-     *             may be something like foo@bar/Saros765E18ED !
-     */
-    @Deprecated
-    public final static String RESOURCE = "Saros"; //$NON-NLS-1$
 
     private static final String VERSION_COMPATIBILITY_PROPERTY_FILE = "version.comp"; //$NON-NLS-1$
 
@@ -253,7 +225,7 @@ public class Saros extends AbstractUIPlugin {
 
         SarosPluginContext.setSarosContext(sarosContext);
 
-        sarosFeatureID = SAROS + "_" + sarosVersion; //$NON-NLS-1$
+        sarosFeatureID = PLUGIN_ID + "_" + sarosVersion; //$NON-NLS-1$
 
         // Remove the Bundle if an instance of it was already registered
         sarosContext.removeComponent(Bundle.class);
@@ -379,7 +351,7 @@ public class Saros extends AbstractUIPlugin {
     public synchronized Preferences getGlobalPreferences() {
         // TODO Singleton-Pattern code smell: ConfigPrefs should be a @component
         if (configPrefs == null) {
-            configPrefs = new ConfigurationScope().getNode(SAROS);
+            configPrefs = new ConfigurationScope().getNode(PLUGIN_ID);
         }
         return configPrefs;
     }
@@ -412,13 +384,19 @@ public class Saros extends AbstractUIPlugin {
         final ClassLoader contextClassLoader = Thread.currentThread()
             .getContextClassLoader();
 
+        final boolean isDebugMode = Boolean
+            .getBoolean("de.fu_berlin.inf.dpp.debug") || isDebugging(); //$NON-NLS-1$
+
+        final String log4jPropertyFile = isDebugMode ? "saros_debug.log4j.properties" //$NON-NLS-1$
+            : "saros_release.log4j.properties"; //$NON-NLS-1$
+
         try {
             // change the context class loader so Log4J will find the appenders
             Thread.currentThread().setContextClassLoader(
                 Saros.class.getClassLoader());
 
             PropertyConfigurator.configure(Saros.class.getClassLoader()
-                .getResource("saros.log4j.properties")); //$NON-NLS-1$
+                .getResource(log4jPropertyFile));
         } catch (RuntimeException e) {
             System.err.println("initializing log support failed"); //$NON-NLS-1$
             e.printStackTrace();

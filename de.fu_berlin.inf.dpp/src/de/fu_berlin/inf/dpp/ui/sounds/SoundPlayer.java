@@ -49,8 +49,8 @@ public class SoundPlayer {
      * Returns a file from path
      */
     private static File getSoundFile(String filename) {
-        URL url = Platform.getBundle(Saros.SAROS)
-            .getEntry(SOUND_DIR + filename);
+        URL url = Platform.getBundle(Saros.PLUGIN_ID).getEntry(
+            SOUND_DIR + filename);
         try {
             url = FileLocator.toFileURL(url);
         } catch (IOException e1) {

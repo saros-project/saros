@@ -45,7 +45,8 @@ public class FolderImp extends ResourceImp implements IFolder {
         if (!file.isAbsolute()) {
             File fileInProject = new File(
                 getProject().getFullPath().toString() + File.separator + file
-                    .getPath());
+                    .getPath()
+            );
             fileInProject.mkdirs();
         } else {
             file.mkdirs();
@@ -54,7 +55,7 @@ public class FolderImp extends ResourceImp implements IFolder {
 
     @Override
     public void create(boolean force, boolean local) throws IOException {
-        file.mkdirs();
+        getFullPath().toFile().mkdirs();
     }
 
     @Override
@@ -71,7 +72,11 @@ public class FolderImp extends ResourceImp implements IFolder {
     public IResource[] members(int memberFlags) {
         List<IResource> list = new ArrayList<IResource>();
 
-        for (File myFile : getFullPath().toFile().listFiles()) {
+        File[] files = getFullPath().toFile().listFiles();
+        if (files == null)
+            return list.toArray(new IResource[] { });
+
+        for (File myFile : files) {
             if (myFile.isFile() && !myFile.isHidden() && (memberFlags == NONE
                 || memberFlags == FILE)) {
                 list.add(new FileImp(project, myFile));

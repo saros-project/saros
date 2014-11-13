@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.stf.test;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosConstants;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 public interface Constants {
@@ -11,9 +11,9 @@ public interface Constants {
      * 
      **********************************************/
     public final static JID TEST_JID = new JID(
-        "edna_stf@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
+        "edna_stf@saros-con.imp.fu-berlin.de/" + SarosConstants.RESOURCE);
     public final static JID TEST_JID2 = new JID(
-        "dave_stf@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE);
+        "dave_stf@saros-con.imp.fu-berlin.de/" + SarosConstants.RESOURCE);
     /* test data for modifying account */
     public final static String SERVER = "saros-con.imp.fu-berlin.de";
     public final static String NEW_XMPP_JABBER_ID = "new_alice_stf@" + SERVER;
@@ -21,11 +21,11 @@ public interface Constants {
     public static final String INVALID_SERVER_NAME = "saros-con";
     // need to change, if you want to test creatAccount
     public static JID JID_TO_CREATE = new JID(
-        ("test3@saros-con.imp.fu-berlin.de/" + Saros.RESOURCE));
+        ("test3@saros-con.imp.fu-berlin.de/" + SarosConstants.RESOURCE));
     public final static JID JID_TO_ADD = new JID(
-        ("bob_stf@" + SERVER + "/" + Saros.RESOURCE));
+        ("bob_stf@" + SERVER + "/" + SarosConstants.RESOURCE));
     public final static JID JID_TO_CHANGE = new JID(
-        (NEW_XMPP_JABBER_ID + "/" + Saros.RESOURCE));
+        (NEW_XMPP_JABBER_ID + "/" + SarosConstants.RESOURCE));
     public static String PASSWORD = "dddfffggg";
     public static String NO_MATCHED_REPEAT_PASSWORD = "dddfffggggg";
     /* Project name */

@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -110,8 +109,6 @@ public class STFController {
 
             });
 
-        LogManager.resetConfiguration();
-
         /*
          * HACK this is not the way OSGi works but it currently fulfill its
          * purpose
@@ -125,7 +122,7 @@ public class STFController {
                 STFController.class.getClassLoader());
 
             PropertyConfigurator.configure(STFController.class.getClassLoader()
-                .getResource("saros_testmode.log4j.properties"));
+                .getResource("saros_stf.log4j.properties"));
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }

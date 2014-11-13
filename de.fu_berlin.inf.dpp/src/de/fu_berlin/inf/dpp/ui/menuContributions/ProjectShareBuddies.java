@@ -16,7 +16,7 @@ import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosConstants;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -61,7 +61,7 @@ public class ProjectShareBuddies extends ContributionItem {
 
         for (final RosterEntry rosterEntry : getSortedRosterEntries()) {
             Boolean sarosSupport = discoveryManager.isFeatureSupported(new JID(
-                rosterEntry.getUser()), Saros.NAMESPACE);
+                rosterEntry.getUser()), SarosConstants.XMPP_FEATURE_NAMESPACE);
 
             if (sarosSupport != null && sarosSupport) {
                 createContactMenuItem(menu, numSarosSupportedContacts++,

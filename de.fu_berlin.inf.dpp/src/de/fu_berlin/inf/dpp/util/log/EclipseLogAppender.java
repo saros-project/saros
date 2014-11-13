@@ -52,7 +52,7 @@ public class EclipseLogAppender extends AppenderSkeleton {
             status = IStatus.WARNING;
         }
 
-        IStatus logMessage = new Status(status, Saros.SAROS, IStatus.OK,
+        IStatus logMessage = new Status(status, Saros.PLUGIN_ID, IStatus.OK,
             message, getThrowable(event));
         saros.getLog().log(logMessage);
     }

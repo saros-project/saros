@@ -20,33 +20,24 @@
  * /
  */
 
-package de.fu_berlin.inf.dpp.core.workspace;
+package de.fu_berlin.inf.dpp.intellij.ui.wizards.pages;
 
-import de.fu_berlin.inf.dpp.core.exceptions.OperationCanceledException;
-import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
-import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
+/**
+ * Interface defines wizard page action listener structure
+ */
+public interface PageActionListener {
+    /**
+     * User clicked on Back button
+     */
+    void back();
 
-import java.io.File;
-import java.io.IOException;
+    /**
+     * User clicked on next or next button
+     */
+    void next();
 
-public interface IWorkspace {
-    public static final int AVOID_UPDATE = 1;
-
-    void run(IWorkspaceRunnable procedure, IProgressMonitor monitor)
-        throws OperationCanceledException, IOException;
-
-    void run(IWorkspaceRunnable procedure, IWorkspaceRoot root, int mode,
-        IProgressMonitor monitor)
-        throws OperationCanceledException, IOException;
-
-    IWorkspaceRoot getRoot();
-
-    IWorkspaceDescription getDescription();
-
-    void setDescription(IWorkspaceDescription description) throws IOException;
-
-    File getPath();
-
-    IPathFactory getPathFactory();
-
+    /**
+     * User clicked on back or cancel button
+     */
+    void cancel();
 }

@@ -46,7 +46,7 @@ public class EclipseWorkspaceImpl implements IWorkspace {
             try {
                 delegate.run(mon);
             } catch (IOException e) {
-                IStatus status = new Status(IStatus.ERROR, Saros.SAROS,
+                IStatus status = new Status(IStatus.ERROR, Saros.PLUGIN_ID,
                     e.getMessage(), e);
                 throw new CoreException(status);
             }
@@ -80,6 +80,17 @@ public class EclipseWorkspaceImpl implements IWorkspace {
         } catch (CoreException e) {
             throw new IOException(e);
         }
+    }
+
+    @Override
+    public IProject getProject(String project) {
+        return ResourceAdapterFactory.create(delegate.getRoot().getProject(
+            project));
+    }
+
+    @Override
+    public IPath getLocation() {
+        return ResourceAdapterFactory.create(delegate.getRoot().getLocation());
     }
 
 }

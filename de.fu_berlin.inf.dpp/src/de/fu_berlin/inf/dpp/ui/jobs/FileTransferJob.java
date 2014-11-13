@@ -39,7 +39,7 @@ abstract class FileTransferJob extends Job {
              */
             String errMsg = error == null ? "File transfer failed. Maybe the remote side cancelled the transfer."
                 : error.getMessage();
-            Status status = new Status(IStatus.ERROR, Saros.SAROS, errMsg,
+            Status status = new Status(IStatus.ERROR, Saros.PLUGIN_ID, errMsg,
                 transfer.getException());
 
             LOG.error("file transfer from " + jid + " failed: " + errMsg,

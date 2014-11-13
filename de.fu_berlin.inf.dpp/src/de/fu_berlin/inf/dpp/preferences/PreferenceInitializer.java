@@ -48,7 +48,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
     @Override
     public void initializeDefaultPreferences() {
         LOG.info("initializing preference default values");
-        Preferences prefs = new DefaultScope().getNode(Saros.SAROS);
+        Preferences prefs = new DefaultScope().getNode(Saros.PLUGIN_ID);
         setPreferences(prefs);
     }
 

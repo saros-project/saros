@@ -20,20 +20,43 @@
  * /
  */
 
-package de.fu_berlin.inf.dpp.core.workspace;
+package de.fu_berlin.inf.dpp.intellij.ui.tree;
 
-import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
+import javax.swing.ImageIcon;
 
-import java.io.File;
+/**
+ * Default class to keep item info in tree with key, title and icon.
+ */
+public class LeafInfo {
+    protected String title;
+    private ImageIcon icon;
 
-public interface IWorkspaceRoot {
+    LeafInfo(String title) {
+        this(title, null);
+    }
 
-    IProject getProject(String project);
+    LeafInfo(String title, ImageIcon icon) {
+        this.title = title;
+        this.icon = icon;
+    }
 
-    IProject addProject(String title, File file);
+    public String getTitle() {
+        return title;
+    }
 
-    IProject getDefaultProject();
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-    IProject locateProject(IPath path);
+    public ImageIcon getIcon() {
+        return icon;
+    }
+
+    public void setIcon(ImageIcon icon) {
+        this.icon = icon;
+    }
+
+    public String toString() {
+        return title;
+    }
 }

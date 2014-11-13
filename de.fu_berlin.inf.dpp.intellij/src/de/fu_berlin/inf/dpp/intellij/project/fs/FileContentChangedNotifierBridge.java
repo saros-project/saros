@@ -22,55 +22,58 @@
 
 package de.fu_berlin.inf.dpp.intellij.project.fs;
 
-import java.io.File;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-
-import org.jetbrains.annotations.NotNull;
-
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFileCopyEvent;
 import com.intellij.openapi.vfs.VirtualFileEvent;
 import com.intellij.openapi.vfs.VirtualFileListener;
 import com.intellij.openapi.vfs.VirtualFileMoveEvent;
 import com.intellij.openapi.vfs.VirtualFilePropertyEvent;
-
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFileContentChangedListener;
 import de.fu_berlin.inf.dpp.filesystem.IFileContentChangedNotifier;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.File;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * Class provide bridge to IntelliJ virtual file listener, supposed to be used
- * in common engine classes
+ * Class provide bridge to IntelliJ virtual file listener, supposed to be used in common engine classes
  */
-public class FileContentChangedNotifierBridge implements
-    IFileContentChangedNotifier, VirtualFileListener {
-    private List<IFileContentChangedListener> listeners = new CopyOnWriteArrayList<IFileContentChangedListener>();
+public class FileContentChangedNotifierBridge
+    implements IFileContentChangedNotifier, VirtualFileListener {
+    //CopyOnWriteArrayList for concurrency safety.
+    private List<IFileContentChangedListener> list = new CopyOnWriteArrayList<IFileContentChangedListener>();
+
+    public FileContentChangedNotifierBridge() {
+        LocalFileSystem.getInstance().addVirtualFileListener(this);
+    }
 
     @Override
     public void addFileContentChangedListener(
         IFileContentChangedListener listener) {
-        listeners.add(listener);
+        list.add(listener);
     }
 
     @Override
     public void removeFileContentChangedListener(
         IFileContentChangedListener listener) {
-        listeners.remove(listener);
+        list.remove(listener);
     }
 
     private void notifyListeners(@NotNull VirtualFileEvent virtualFileEvent) {
-        IFile file = new FileImp(null, new File(virtualFileEvent.getFile()
-            .getPath()));
+        IFile myFile = new FileImp(null,
+            new File(virtualFileEvent.getFile().getPath()));
 
-        for (IFileContentChangedListener listener : listeners) {
-            listener.fileContentChanged(file);
+        for (IFileContentChangedListener listener : list) {
+            listener.fileContentChanged(myFile);
         }
     }
 
     @Override
     public void propertyChanged(
         @NotNull VirtualFilePropertyEvent virtualFilePropertyEvent) {
-        // NOP
+
     }
 
     @Override
@@ -101,17 +104,19 @@ public class FileContentChangedNotifierBridge implements
     @Override
     public void beforePropertyChange(
         @NotNull VirtualFilePropertyEvent virtualFilePropertyEvent) {
-        // NOP
+        //NOP
     }
 
     @Override
-    public void beforeContentsChange(@NotNull VirtualFileEvent virtualFileEvent) {
-        // NOP
+    public void beforeContentsChange(
+        @NotNull
+        VirtualFileEvent virtualFileEvent) {
+        //NOP
     }
 
     @Override
     public void beforeFileDeletion(@NotNull VirtualFileEvent virtualFileEvent) {
-        // NOP
+        //NOP
     }
 
     @Override

@@ -286,7 +286,7 @@ public class StatisticManager extends AbstractFeedbackManager implements
                         e.getMessage(), e.getCause() != null ? e.getCause()
                             .getMessage() : "");
                     log.error(msg);
-                    return new Status(IStatus.ERROR, Saros.SAROS, msg, e);
+                    return new Status(IStatus.ERROR, Saros.PLUGIN_ID, msg, e);
                 } catch (OperationCanceledException e) {
                     return Status.CANCEL_STATUS;
                 } finally {
