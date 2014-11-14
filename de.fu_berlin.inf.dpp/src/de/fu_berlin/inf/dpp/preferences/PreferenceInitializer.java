@@ -95,8 +95,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
             PreferenceConstants.CONTACT_SELECTION_FILTER_NON_SAROS_CONTACTS,
             true);
 
-        prefs.setValue(PreferenceConstants.ACTIVITY_LOG_ENABLED, true);
-
         // Initialize Feedback Preferences
         prefs.setValue(PreferenceConstants.FEEDBACK_SURVEY_DISABLED,
             FeedbackManager.FEEDBACK_ENABLED);

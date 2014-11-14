@@ -16,16 +16,13 @@ import org.eclipse.swtbot.swt.finder.results.WidgetResult;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.hamcrest.Matcher;
 
-import de.fu_berlin.inf.dpp.stf.server.bot.widget.SarosSWTBotActivityLogLine;
 import de.fu_berlin.inf.dpp.stf.server.bot.widget.SarosSWTBotChatInput;
 import de.fu_berlin.inf.dpp.stf.server.bot.widget.SarosSWTBotChatLine;
 import de.fu_berlin.inf.dpp.stf.server.bot.widget.SarosSWTBotChatLinePartnerChangeSeparator;
-import de.fu_berlin.inf.dpp.ui.widgets.activitylog.ActivityLogDisplay;
-import de.fu_berlin.inf.dpp.ui.widgets.activitylog.items.ActivityLogLine;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.items.ChatLine;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.items.ChatLinePartnerChangeSeparator;
-import de.fu_berlin.inf.dpp.ui.widgets.chat.parts.ChatInput;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.parts.SkypeStyleChatDisplay;
+import de.fu_berlin.inf.dpp.ui.widgets.chat.parts.ChatInput;
 
 /**
  * SarosSWTBot is a {@link SWTBot} with capabilities for testing specific GUI
@@ -96,8 +93,7 @@ public final class SarosSWTBot extends SWTBot {
     }
 
     /**
-     * @return the last {@link SarosSWTBotChatLine} in the
-     *         {@link SkypeStyleChatDisplay}.
+     * @return the last {@link SarosSWTBotChatLine} in the {@link SkypeStyleChatDisplay}.
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public SarosSWTBotChatLine lastChatLine() {
@@ -106,23 +102,6 @@ public final class SarosSWTBot extends SWTBot {
 
         Widget lastChatLine = allWidgets.get(allWidgets.size() - 1);
         return new SarosSWTBotChatLine((ChatLine) lastChatLine, matcher);
-    }
-
-    /**
-     * @return an array of {@link SarosSWTBotActivityLogLine}'s in the
-     *         {@link ActivityLogDisplay}.
-     */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public SarosSWTBotActivityLogLine[] activityLogLines() {
-        Matcher matcher = allOf(widgetOfType(ActivityLogLine.class));
-        List<? extends Widget> allWidgets = widgets(matcher);
-        int nrWidgets = allWidgets.size();
-        SarosSWTBotActivityLogLine[] lines = new SarosSWTBotActivityLogLine[nrWidgets];
-        for (int i = 0; i < nrWidgets; i++) {
-            lines[i] = new SarosSWTBotActivityLogLine((ActivityLogLine) widget(
-                matcher, i), matcher);
-        }
-        return lines;
     }
 
     /**

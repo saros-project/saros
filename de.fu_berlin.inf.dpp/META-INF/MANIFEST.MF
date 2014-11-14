@@ -25,10 +25,7 @@ Require-Bundle: org.eclipse.ui,
  org.junit4;resolution:=optional,
  org.eclipse.jdt.launching;resolution:=optional,
  org.eclipse.gef;bundle-version="3.6.0";resolution:=optional,
- de.fu_berlin.inf.dpp.core,
- org.eclipse.jdt.junit.core;resolution:=optional,
- org.eclipse.jdt.junit;bundle-version="3.7.200";resolution:=optional,
- org.eclipse.ltk.core.refactoring;resolution:=optional
+ de.fu_berlin.inf.dpp.core
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
  lib/org.hamcrest_1.1.0.v20090501071000.jar,

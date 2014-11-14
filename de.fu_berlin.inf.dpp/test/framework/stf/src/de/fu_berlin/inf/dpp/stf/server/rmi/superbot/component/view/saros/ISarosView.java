@@ -117,19 +117,6 @@ public interface ISarosView extends Remote {
         throws RemoteException;
 
     /*
-     * Activity Log stuff
-     */
-
-    /**
-     * Selects the activity log.
-     * 
-     * @return an {@link IActivityLog} interface
-     * @throws RemoteException
-     *             if the activity log tab does not exist
-     */
-    public IActivityLog selectActivityLog() throws RemoteException;
-
-    /*
      * Chat stuff
      */
 

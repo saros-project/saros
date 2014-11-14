@@ -127,6 +127,7 @@ public final class UserElement extends TreeElement {
 
         children.add(new AwarenessInformationTreeElement(user, editorManager,
             collector));
+
         if (collector.getFollowedUser(user) != null) {
             children.add(new FollowModeInformationTreeElement(user,
                 editorManager, collector));

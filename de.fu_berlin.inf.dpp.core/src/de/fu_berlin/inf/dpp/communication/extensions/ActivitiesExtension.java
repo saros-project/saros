@@ -34,19 +34,16 @@ import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.IDEInteractionActivity;
 import de.fu_berlin.inf.dpp.activities.JupiterActivity;
 import de.fu_berlin.inf.dpp.activities.NOPActivity;
 import de.fu_berlin.inf.dpp.activities.PermissionActivity;
 import de.fu_berlin.inf.dpp.activities.ProgressActivity;
 import de.fu_berlin.inf.dpp.activities.RecoveryFileActivity;
-import de.fu_berlin.inf.dpp.activities.RefactoringActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.ShareConsoleActivity;
 import de.fu_berlin.inf.dpp.activities.StartFollowingActivity;
 import de.fu_berlin.inf.dpp.activities.StopActivity;
 import de.fu_berlin.inf.dpp.activities.StopFollowingActivity;
-import de.fu_berlin.inf.dpp.activities.TestRunActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.VCSActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
@@ -180,8 +177,6 @@ public class ActivitiesExtension extends SarosSessionPacketExtension {
 
                 FolderActivity.class,
 
-                IDEInteractionActivity.class,
-
                 JupiterActivity.class,
 
                 NOPActivity.class,
@@ -192,8 +187,6 @@ public class ActivitiesExtension extends SarosSessionPacketExtension {
 
                 RecoveryFileActivity.class,
 
-                RefactoringActivity.class,
-
                 ShareConsoleActivity.class,
 
                 StartFollowingActivity.class,
@@ -201,8 +194,6 @@ public class ActivitiesExtension extends SarosSessionPacketExtension {
                 StopActivity.class,
 
                 StopFollowingActivity.class,
-
-                TestRunActivity.class,
 
                 TextSelectionActivity.class,
 

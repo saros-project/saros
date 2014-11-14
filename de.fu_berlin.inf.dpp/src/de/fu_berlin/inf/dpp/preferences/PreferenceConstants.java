@@ -174,8 +174,4 @@ public class PreferenceConstants {
      */
     public static final String CONSOLESHARING_ENABLED = "consolesharing.enabled";
 
-    /*
-     * Action Awareness in the Activity Log Tab
-     */
-    public static final String ACTIVITY_LOG_ENABLED = "activitylog.enabled";
 }

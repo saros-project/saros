@@ -1,15 +1,8 @@
 package de.fu_berlin.inf.dpp.awareness;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
-import de.fu_berlin.inf.dpp.activities.IDEInteractionActivity.Element;
-import de.fu_berlin.inf.dpp.activities.TestRunActivity.State;
-import de.fu_berlin.inf.dpp.awareness.actions.ActionType;
-import de.fu_berlin.inf.dpp.awareness.actions.ActionTypeDataHolder;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.RemoteEditorManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -19,7 +12,7 @@ import de.fu_berlin.inf.dpp.session.User;
 /**
  * Singleton that provides methods to collect and retrieve awareness information
  * for session participants (who is following who, which file is currently
- * opened, which dialog was opened or which view was activated).
+ * opened, etc.)
  * 
  * All methods provided by the interface are <b>not</b> thread safe.
  * 
@@ -31,48 +24,9 @@ public class AwarenessInformationCollector {
     private final ISarosSessionManager sessionManager;
 
     /**
-     * Listener for observing updates in the awareness information
-     * */
-    private final List<AwarenessUpdateListener> listeners = new CopyOnWriteArrayList<AwarenessUpdateListener>();
-
-    /**
      * Who is following who in the session?
      */
     private final Map<User, User> followModes = new ConcurrentHashMap<User, User>();
-
-    /**
-     * Stores the title of the activated IDE element (title of dialog or view)
-     * activated by the given user
-     */
-    private final Map<User, String> activeIDEElement = new HashMap<User, String>();
-
-    /**
-     * Stores the type of the activated IDE element ({@link Element}) activated
-     * by the given user
-     */
-    private final Map<User, Element> activeIDEElementType = new HashMap<User, Element>();
-
-    /**
-     * Stores the name of the currently running test of the given user
-     * */
-    private final Map<User, String> currentTestRunName = new HashMap<User, String>();
-
-    /**
-     * Stores the state ({@link State}) of the currently running test of the
-     * given user
-     * */
-    private final Map<User, State> currentTestRunState = new HashMap<User, State>();
-
-    /**
-     * Stores the description of the currently performed refactoring of the
-     * given user
-     * */
-    private final Map<User, String> currentRefactoringDescription = new HashMap<User, String>();
-
-    /**
-     * Stores the name of the last created file of the given user
-     * */
-    private final Map<User, String> currentCreatedFileName = new HashMap<User, String>();
 
     public AwarenessInformationCollector(ISarosSessionManager sessionManager,
         final EditorManager editorManager) {
@@ -153,198 +107,5 @@ public class AwarenessInformationCollector {
             }
         }
         return editorActive;
-    }
-
-    private void notifyListeners(ActionTypeDataHolder data) {
-        for (AwarenessUpdateListener listener : listeners) {
-            listener.update(data);
-        }
-    }
-
-    /**
-     * Adds the given {@link AwarenessUpdateListener} to the
-     * {@link AwarenessInformationCollector}.
-     * 
-     * @param listener
-     *            The given {@link AwarenessUpdateListener} to add
-     */
-    public void addAwarenessUpdateListener(AwarenessUpdateListener listener) {
-        listeners.add(listener);
-    }
-
-    /**
-     * Removes the given {@link AwarenessUpdateListener} from the
-     * {@link AwarenessInformationCollector}.
-     * 
-     * @param listener
-     *            The given {@link AwarenessUpdateListener} to remove
-     */
-    public void removeAwarenessUpdateListener(AwarenessUpdateListener listener) {
-        listeners.remove(listener);
-    }
-
-    /**
-     * Stores the title of the open dialog (e.g. "New Java Class", "Search",
-     * etc.) or active view (e.g. "Saros", "Package Explorer" etc.) the given
-     * user is currently interacting with. Additonally, it notifies all
-     * observers to inform them that something was changed.
-     * 
-     * @param user
-     *            The user who created this activity.
-     * @param title
-     *            The title of the opened dialog or activated view.
-     * @param element
-     *            The type of IDE element, which can be a dialog or a view (
-     *            {@link Element}).
-     * */
-    public void addOpenIDEElement(User user, String title, Element element) {
-        synchronized (this) {
-            activeIDEElement.put(user, title);
-            activeIDEElementType.put(user, element);
-        }
-        ActionTypeDataHolder actionTypeHolder = new ActionTypeDataHolder(user,
-            ActionType.ADD_IDEELEMENT, title, element);
-        notifyListeners(actionTypeHolder);
-    }
-
-    /**
-     * Returns the title of the currently open dialog or active view for the
-     * given user.
-     * 
-     * @param user
-     *            The user who created this activity.
-     * @return The title of the currently open dialog or active view for the
-     *         given user or <code>null</code> if <code>user</code> is
-     *         <code>null</code>.
-     * */
-    public synchronized String getOpenIDEElementTitle(User user) {
-        return activeIDEElement.get(user);
-    }
-
-    /**
-     * Returns the type of the IDE element ({@link Element}) for the given user,
-     * thus if the user interacted with a dialog or a view.
-     * 
-     * @param user
-     *            The user who created this activity.
-     * @return The type of the IDE element ({@link Element}) with which the user
-     *         interacted, thus a dialog or a view or <code>null</code> if
-     *         <code>user</code> is <code>null</code>.
-     * */
-    public synchronized Element getOpenIDEElementType(User user) {
-        return activeIDEElementType.get(user);
-    }
-
-    /**
-     * Stores the title and the state of the currently running test of the given
-     * user. Additonally, it notifies all observers to inform them that
-     * something was changed.
-     * 
-     * @param user
-     *            The user who runs the test.
-     * @param name
-     *            The name of the test.
-     * @param state
-     *            The state ({@link State}) of the running test.
-     * */
-    public void addTestRun(User user, String name, State state) {
-        synchronized (this) {
-            currentTestRunName.put(user, name);
-            currentTestRunState.put(user, state);
-        }
-        ActionTypeDataHolder actionTypeHolder = new ActionTypeDataHolder(user,
-            ActionType.ADD_TESTRUN, name, state);
-        notifyListeners(actionTypeHolder);
-    }
-
-    /**
-     * Returns the name of the currently running test of the given user or
-     * <code>null</code>, if <code>user</code> is <code>null</code>.
-     * 
-     * @param user
-     *            The user who created this activity.
-     * @return The name of the currently running test of the given user or
-     *         <code>null</code>, if <code>user</code> is <code>null</code>.
-     * */
-    public synchronized String getCurrentTestRunName(User user) {
-        return currentTestRunName.get(user);
-    }
-
-    /**
-     * Returns the state ({@link State}) of the last running test of the given
-     * user or <code>null</code>, if <code>user</code> is <code>null</code>.
-     * 
-     * @param user
-     *            The user who created this activity.
-     * @return The state ({@link State}) of the last running test of the given
-     *         user or <code>null</code>, if <code>user</code> is
-     *         <code>null</code>.
-     * */
-    public synchronized State getCurrentTestRunState(User user) {
-        return currentTestRunState.get(user);
-    }
-
-    /**
-     * Stores the description of the performed refactoring of the given user.
-     * Additonally, it notifies all observers to inform them that something was
-     * changed.
-     * 
-     * @param user
-     *            The user who performed the refactoring.
-     * @param description
-     *            The description of the refactoring.
-     * */
-    public void addRefactoring(User user, String description) {
-        synchronized (this) {
-            currentRefactoringDescription.put(user, description);
-        }
-        ActionTypeDataHolder actionTypeHolder = new ActionTypeDataHolder(user,
-            ActionType.ADD_REFACTORING, description);
-        notifyListeners(actionTypeHolder);
-    }
-
-    /**
-     * Returns the description of the last performed refactoring of the given
-     * user or <code>null</code>, if <code>user</code> is <code>null</code>.
-     * 
-     * @param user
-     *            The user who created this activity.
-     * @return The description of the last performed refactoring of the given
-     *         user or <code>null</code>, if <code>user</code> is
-     *         <code>null</code>.
-     * */
-    public synchronized String getRefactoringDescription(User user) {
-        return currentRefactoringDescription.get(user);
-    }
-
-    /**
-     * Stores the name of the last created file of the given user. Additonally,
-     * it notifies all observers to inform them that something was changed.
-     * 
-     * @param user
-     *            The user who created the file.
-     * @param fileName
-     *            The name of the created file
-     * */
-    public void addCreatedFileName(User user, String fileName) {
-        synchronized (this) {
-            currentCreatedFileName.put(user, fileName);
-        }
-        ActionTypeDataHolder actionTypeHolder = new ActionTypeDataHolder(user,
-            ActionType.ADD_CREATEDFILE, fileName);
-        notifyListeners(actionTypeHolder);
-    }
-
-    /**
-     * Returns the name of the last created file of the given user or
-     * <code>null</code>, if <code>user</code> is <code>null</code>.
-     * 
-     * @param user
-     *            The user who created this activity.
-     * @return The name of the last created file of the given user or
-     *         <code>null</code>, if <code>user</code> is <code>null</code>.
-     * */
-    public synchronized String getCreatedFileName(User user) {
-        return currentCreatedFileName.get(user);
     }
 }

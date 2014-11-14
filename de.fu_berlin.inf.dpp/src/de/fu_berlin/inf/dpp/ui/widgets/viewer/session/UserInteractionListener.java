@@ -79,5 +79,6 @@ public class UserInteractionListener extends MouseAdapter {
         } else if (treeItemContent instanceof AwarenessInformationTreeElement) {
             editorManager.jumpToUser(user);
         }
+
     }
 }

@@ -56,11 +56,6 @@ public abstract class AbstractActivityReceiver implements IActivityReceiver {
     }
 
     @Override
-    public void receive(IDEInteractionActivity ideInteractionActivity) {
-        // do nothing
-    }
-
-    @Override
     public void receive(JupiterActivity jupiterActivity) {
         // do nothing
     }
@@ -81,11 +76,6 @@ public abstract class AbstractActivityReceiver implements IActivityReceiver {
     }
 
     @Override
-    public void receive(RefactoringActivity refactoringActivity) {
-        // do nothing
-    }
-
-    @Override
     public void receive(ShareConsoleActivity shareConsoleActivity) {
         // do nothing
     }
@@ -102,11 +92,6 @@ public abstract class AbstractActivityReceiver implements IActivityReceiver {
 
     @Override
     public void receive(StopFollowingActivity stopFollowingActivity) {
-        // do nothing
-    }
-
-    @Override
-    public void receive(TestRunActivity testRunActivity) {
         // do nothing
     }
 
