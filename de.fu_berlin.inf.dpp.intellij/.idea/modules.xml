@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/../de.fu_berlin.inf.dpp.core/de.fu_berlin.inf.dpp.core.iml" filepath="$PROJECT_DIR$/../de.fu_berlin.inf.dpp.core/de.fu_berlin.inf.dpp.core.iml" />
       <module fileurl="file://$PROJECT_DIR$/de.fu_berlin.inf.dpp.intellij.iml" filepath="$PROJECT_DIR$/de.fu_berlin.inf.dpp.intellij.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../de.fu_berlin.inf.dpp.swt_plugin/de.fu_berlin.inf.dpp.swt_plugin.iml" filepath="$PROJECT_DIR$/../de.fu_berlin.inf.dpp.swt_plugin/de.fu_berlin.inf.dpp.swt_plugin.iml" />
     </modules>
   </component>
 </project>
