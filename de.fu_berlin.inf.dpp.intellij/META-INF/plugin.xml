@@ -55,5 +55,9 @@
         <toolWindow id="Saros" icon="/view16/saros_misc.png"
                     anchor="bottom" secondary="true"
                     factoryClass="de.fu_berlin.inf.dpp.intellij.ui.SarosToolWindowFactory"/>
+
+        <toolWindow id="Swt Browser" icon="/view16/saros_misc.png"
+                    anchor="bottom" secondary="true"
+                    factoryClass="de.fu_berlin.inf.dpp.intellij.ui.swt_browser.SwtToolWindowFactory"/>
     </extensions>
 </idea-plugin>

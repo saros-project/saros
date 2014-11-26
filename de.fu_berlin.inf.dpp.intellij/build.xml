@@ -122,6 +122,7 @@
 
     <path id="libraries.classpath">
         <fileset dir="${core.libdir}" includes="*.jar"/>
+        <fileset dir="${eclipse.dir}/plugins" includes="org.eclipse.swt.*.jar" excludes="org.eclipse.swt.*source*.jar"/>
     </path>
 
     <path id="libraries.test.classpath">
