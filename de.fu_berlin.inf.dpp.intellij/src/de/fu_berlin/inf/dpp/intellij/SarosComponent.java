@@ -64,7 +64,7 @@ public class SarosComponent
                 .setContextClassLoader(SarosComponent.class.getClassLoader());
 
             PropertyConfigurator.configure(SarosComponent.class.getClassLoader()
-                .getResource("log4j.properties"));
+                .getResource("saros.log4j.properties"));
         } catch (RuntimeException e) {
             LogLog.error("initializing loggers failed", e);
         } finally {
