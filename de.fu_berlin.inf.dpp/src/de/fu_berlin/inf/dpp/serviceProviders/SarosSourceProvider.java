@@ -3,12 +3,10 @@ package de.fu_berlin.inf.dpp.serviceProviders;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.core.commands.Command;
 import org.eclipse.core.expressions.Expression;
+import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.ui.AbstractSourceProvider;
 import org.eclipse.ui.ISources;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.commands.ICommandService;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -42,28 +40,16 @@ public class SarosSourceProvider extends AbstractSourceProvider {
      */
     public static final String SAROS_SESSION = "de.fu_berlin.inf.dpp.SarosSession";
 
-    /**
-     * Contains the IDs of commands which change their UI elements on the base
-     * of the {@link #SAROS} variable.
-     */
-    public static final String[] SAROS_DEPENDENT_COMMANDS = {};
-
-    /**
-     * Contains the IDs of commands which change their UI elements on the base
-     * of the {@link #SAROS_SESSION} variable.
-     */
-    public static final String[] SAROS_SESSION_DEPENDENT_COMMANDS = {};
+    @Inject
+    private Saros saros;
 
     @Inject
-    protected Saros saros;
-
-    @Inject
-    protected ISarosSessionManager sarosSessionManager;
+    private ISarosSessionManager sessionManager;
 
     @Inject
     private ConnectionHandler connectionHandler;
 
-    protected IConnectionStateListener connectionStateListener = new IConnectionStateListener() {
+    private IConnectionStateListener connectionStateListener = new IConnectionStateListener() {
         @Override
         public void connectionStateChanged(final ConnectionState state,
             final Exception error) {
@@ -71,16 +57,16 @@ public class SarosSourceProvider extends AbstractSourceProvider {
         }
     };
 
-    protected ISarosSessionListener sarosSessionListener = new NullSarosSessionListener() {
+    private ISarosSessionListener sarosSessionListener = new NullSarosSessionListener() {
 
         @Override
-        public void sessionStarted(ISarosSession newSarosSession) {
-            sessionChanged(newSarosSession);
+        public void sessionStarted(ISarosSession session) {
+            sessionChanged(session);
         }
 
         @Override
-        public void sessionEnding(ISarosSession oldSarosSession) {
-            sessionChanged(new NullSarosSession());
+        public void sessionEnding(ISarosSession session) {
+            sessionChanged(null);
         }
 
     };
@@ -89,16 +75,12 @@ public class SarosSourceProvider extends AbstractSourceProvider {
         SarosPluginContext.initComponent(this);
         connectionHandler.addConnectionStateListener(connectionStateListener);
 
-        sarosSessionManager.addSarosSessionListener(sarosSessionListener);
-
-        fireSourceChanged(ISources.WORKBENCH, SAROS, saros);
-        fireSourceChanged(ISources.WORKBENCH, SAROS_SESSION,
-            sarosSessionManager.getSarosSession());
+        sessionManager.addSarosSessionListener(sarosSessionListener);
     }
 
     @Override
     public void dispose() {
-        sarosSessionManager.removeSarosSessionListener(sarosSessionListener);
+        sessionManager.removeSarosSessionListener(sarosSessionListener);
         connectionHandler
             .removeConnectionStateListener(connectionStateListener);
     }
@@ -110,13 +92,14 @@ public class SarosSourceProvider extends AbstractSourceProvider {
 
     @Override
     public Map<Object, Object> getCurrentState() {
-        ISarosSession sarosSession = this.sarosSessionManager.getSarosSession();
-        if (sarosSession == null)
-            sarosSession = new NullSarosSession();
+        Object session = sessionManager.getSarosSession();
+
+        if (session == null)
+            session = IEvaluationContext.UNDEFINED_VARIABLE;
 
         Map<Object, Object> map = new HashMap<Object, Object>(2);
-        map.put(SAROS, this.saros);
-        map.put(SAROS_SESSION, sarosSession);
+        map.put(SAROS, saros);
+        map.put(SAROS_SESSION, session);
         return map;
     }
 
@@ -125,37 +108,18 @@ public class SarosSourceProvider extends AbstractSourceProvider {
             @Override
             public void run() {
                 fireSourceChanged(ISources.WORKBENCH, SAROS, saros);
-                refreshUIElements(SAROS_DEPENDENT_COMMANDS);
             }
         });
     }
 
-    private final void sessionChanged(final ISarosSession sarosSession) {
+    private final void sessionChanged(final ISarosSession session) {
         SWTUtils.runSafeSWTAsync(null, new Runnable() {
             @Override
             public void run() {
                 fireSourceChanged(ISources.WORKBENCH, SAROS_SESSION,
-                    sarosSession);
-
-                refreshUIElements(SAROS_SESSION_DEPENDENT_COMMANDS);
+                    session == null ? IEvaluationContext.UNDEFINED_VARIABLE
+                        : session);
             }
         });
-    }
-
-    /**
-     * Refreshes all UI elements that display the given {@link Command}s.
-     * 
-     * @param commandIDs
-     */
-    private void refreshUIElements(final String[] commandIDs) {
-        ICommandService commandService = (ICommandService) PlatformUI
-            .getWorkbench().getActiveWorkbenchWindow()
-            .getService(ICommandService.class);
-
-        if (commandService == null)
-            return;
-
-        for (String commandID : commandIDs)
-            commandService.refreshElements(commandID, null);
     }
 }
