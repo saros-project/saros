@@ -6,8 +6,14 @@
    <feature url="features/de.fu_berlin.inf.dpp.feature_13.12.6.TESTING.jar" id="de.fu_berlin.inf.dpp.feature" version="13.12.6.TESTING">
       <category name="DPP_beta"/>
    </feature>
+   <feature url="features/de.fu_berlin.inf.dpp.feature_14.10.31.TESTING.jar" id="de.fu_berlin.inf.dpp.feature" version="14.10.31.TESTING">
+      <category name="DPP_beta"/>
+   </feature>
    <archive path="plugins/de.fu_berlin.inf.dpp.13.12.6.TESTING.jar" url="plugins/de.fu_berlin.inf.dpp.13.12.6.TESTING.jar"/>
    <archive path="plugins/de.fu_berlin.inf.dpp.whiteboard_13.12.6.TESTING.jar" url="plugins/de.fu_berlin.inf.dpp.whiteboard_13.12.6.TESTING.jar"/>
    <archive path="plugins/de.fu_berlin.inf.nebula_13.12.6.TESTING.jar" url="plugins/de.fu_berlin.inf.nebula_13.12.6.TESTING.jar"/>
+   <archive path="plugins/de.fu_berlin.inf.dpp.14.10.31.TESTING.jar" url="plugins/de.fu_berlin.inf.dpp.14.10.31.TESTING.jar"/>
+   <archive path="plugins/de.fu_berlin.inf.dpp.whiteboard_14.10.31.TESTING.jar" url="plugins/de.fu_berlin.inf.dpp.whiteboard_14.10.31.TESTING.jar"/>
+   <archive path="plugins/de.fu_berlin.inf.dpp.core_0.1.0.TESTING.jar" url="plugins/de.fu_berlin.inf.dpp.core_0.1.0.TESTING.jar"/>
    <category-def name="DPP_beta" label="Saros Beta"/>
 </site>
