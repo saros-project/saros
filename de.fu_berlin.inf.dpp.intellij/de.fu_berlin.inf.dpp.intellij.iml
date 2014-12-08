@@ -11,6 +11,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="de.fu_berlin.inf.dpp.core" exported="" />
+    <orderEntry type="module" module-name="de.fu_berlin.inf.dpp.ui" />
   </component>
 </module>
 
