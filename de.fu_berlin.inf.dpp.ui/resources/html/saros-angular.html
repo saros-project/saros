@@ -1,0 +1,55 @@
+<!doctype html>
+<!--
+  ~ /*
+  ~ * DPP - Serious Distributed Pair Programming
+  ~ * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2010
+  ~ * (c) NFQ (www.nfq.com) - 2014
+  ~ *
+  ~ * This program is free software; you can redistribute it and/or modify
+  ~ * it under the terms of the GNU General Public License as published by
+  ~ * the Free Software Foundation; either version 1, or (at your option)
+  ~ * any later version.
+  ~ *
+  ~ * This program is distributed in the hope that it will be useful,
+  ~ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ * GNU General Public License for more details.
+  ~ *
+  ~ * You should have received a copy of the GNU General Public License
+  ~ * along with this program; if not, write to the Free Software
+  ~ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  ~ */
+  -->
+
+<html lang="en" ng-app="app">
+<head>
+    <meta charset="utf-8">
+    <title>Saros Plugin</title>
+    <script src="lib/angular.min.js"></script>
+    <script src="lib/ui-bootstrap-tpls-0.11.2.min.js"></script>
+    <script src="js/controllers.js"></script>
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/saros.css"/>
+</head>
+<body>
+<div id="toolbar" ng-controller="ToolbarController">
+    <div class="btn-group" dropdown>
+        <button type="button" class="btn btn-danger" ng-click="connect()">
+            {{connectButtonText}}
+        </button>
+        <button type="button" class="btn btn-danger dropdown-toggle">
+            <span class="caret"></span>
+            <span class="sr-only">Split button!</span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            <li ng-repeat="account in accounts">
+                <a href="#" ng-click="connectUser(account)">{{account.username}}@{{account.domain}}</a>
+            </li>
+            <li ng-show="accounts" class="divider"></li>
+            <li><a href="#" ng-click="showAddAccountWizard()">Add Account</a> </li>
+        </ul>
+    </div>
+</div>
+</body>
+</html>

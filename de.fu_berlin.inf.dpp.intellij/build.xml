@@ -55,6 +55,11 @@
         <exclude name="**/?*.kt"/>
         <exclude name="**/?*.clj"/>
     </patternset>
+    <patternset id="html.resources">
+        <exclude name="**/?*.html"/>
+        <exclude name="**/?*.css"/>
+        <exclude name="**/?*.js"/>
+    </patternset>
 
     <!-- JDK definitions -->
 
@@ -243,6 +248,19 @@
                       sourcepath="saros-i.main.sourcepath"/>
         <copy-resources dest.dir="${saros-i.output.dir}"
                         src.dir="${saros-i.basedir}/src"/>
+        <antcall target="copy-html-resources"/>
+    </target>
+
+    <target name="check-resources-availability">
+        <available file="${ui.basedir}/resources" type="dir"
+                   property="resources.exist"/>
+    </target>
+
+    <target name="copy-html-resources" depends="check-resources-availability"
+            if="resources.exist">
+        <copy-resources dest.dir="${saros-i.output.dir}"
+                        src.dir="${ui.basedir}/resources"
+                        resource-refid="html.resources"/>
     </target>
 
     <target name="compile.saros-i.tests"

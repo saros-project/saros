@@ -51,7 +51,10 @@ import de.fu_berlin.inf.dpp.intellij.store.IntelliJPreferences;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.FollowModeAction;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.LeaveSessionAction;
 import de.fu_berlin.inf.dpp.preferences.IPreferences;
+import de.fu_berlin.inf.dpp.intellij.ui.swt_browser.IntelliJDialogManager;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
+import de.fu_berlin.inf.dpp.ui.manager.IDialogManager;
+import de.fu_berlin.inf.dpp.util.ComponentLookup;
 import org.picocontainer.BindKey;
 import org.picocontainer.MutablePicoContainer;
 
@@ -94,7 +97,10 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
 
         Component.create(FollowModeAction.class),
         Component.create(LeaveSessionAction.class),
-        Component.create(XMPPAccountLocator.class)
+
+        Component.create(XMPPAccountLocator.class),
+        Component.create(IDialogManager.class, IntelliJDialogManager.class),
+        Component.create(ComponentLookup.class)
     };
 
     public SarosIntellijContextFactory(Saros saros,
