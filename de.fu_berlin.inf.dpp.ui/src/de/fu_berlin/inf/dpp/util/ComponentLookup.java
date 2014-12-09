@@ -24,6 +24,11 @@ package de.fu_berlin.inf.dpp.util;
 
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.ui.manager.IDialogManager;
+
+import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
+import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
+import de.fu_berlin.inf.dpp.net.xmpp.subscription.SubscriptionHandler;
+import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import org.picocontainer.annotations.Inject;
 
 /**
@@ -41,7 +46,31 @@ public class ComponentLookup {
     private static IDialogManager dialogManager;
 
     @Inject
+    private static ConnectionHandler connectionHandler;
+
+    @Inject
+    private static XMPPConnectionService connectionService;
+
+    @Inject
+    private static UISynchronizer uiSynchronizer;
+
+    @Inject
     private static XMPPAccountStore accountStore;
+
+    @Inject
+    private static SubscriptionHandler subscriptionHandler;
+
+    public static ConnectionHandler getConnectionHandler() {
+        return connectionHandler;
+    }
+
+    public static XMPPConnectionService getConnectionService() {
+        return connectionService;
+    }
+
+    public static UISynchronizer getUISynchronizer() {
+        return uiSynchronizer;
+    }
 
     public static IDialogManager getDialogManager() {
         return dialogManager;
@@ -49,5 +78,9 @@ public class ComponentLookup {
 
     public static XMPPAccountStore getAccountStore() {
         return accountStore;
+    }
+
+    public static SubscriptionHandler getSubscriptionHandler() {
+        return subscriptionHandler;
     }
 }

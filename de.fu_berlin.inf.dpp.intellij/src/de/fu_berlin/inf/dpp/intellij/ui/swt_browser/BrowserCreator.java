@@ -22,7 +22,7 @@
 
 package de.fu_berlin.inf.dpp.intellij.ui.swt_browser;
 
-import de.fu_berlin.inf.dpp.ui.browser_functions.AccountBrowserFunctions;
+import de.fu_berlin.inf.dpp.ui.manager.HTMLUIManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.browser.Browser;
@@ -51,7 +51,7 @@ class BrowserCreator {
         Shell shell = SWT_AWT.new_Shell(display, canvas);
         browser = new Browser(shell, SWT.NONE);
 
-        browser.setLocation(5, 30);
+        browser.setLocation(5, 5);
         /* Ideally the size of browser and shell gets set via a resize listener.
          * This does not work when the tool window is re-openend as no size
          * change event is fired. The if clause below sets the size for this case */
@@ -60,7 +60,7 @@ class BrowserCreator {
             browser.setSize(canvas.getWidth(), canvas.getHeight());
         }
 
-        new AccountBrowserFunctions(browser).createJavascriptFunctions();
+        HTMLUIManager.create(browser);
         browser.setUrl(startPage);
         return browser;
     }

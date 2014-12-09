@@ -20,41 +20,9 @@
  * /
  */
 
-package de.fu_berlin.inf.dpp.ui.model;
-
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-
 /**
- * Represents a Saros account of the user.
- * In contrast {@link de.fu_berlin.inf.dpp.ui.model.Contact}
- * represents user in the contact list of an account.
- *
- * Maybe in the future both classes will be merged.
+ * Provides classes for the ui model. This model is intended to represent domain
+ * objects as they are needed for the presentation in the UI, e.g. it abstracts
+ * technical implementation details.
  */
-public class Account {
-
-    private String username;
-    private String domain;
-
-    private JID jid;
-
-    /**
-     * @param username the username of the XMPP account
-     * @param domain the domain part of the XMPP account
-     */
-    public Account(String username, String domain) {
-        this.username = username;
-        this.domain = domain;
-        jid = new JID(username, domain);
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getDomain() {
-        return domain;
-    }
-
-    public String getBareJid() { return jid.getRAW(); }
-}
+package de.fu_berlin.inf.dpp.ui.model;

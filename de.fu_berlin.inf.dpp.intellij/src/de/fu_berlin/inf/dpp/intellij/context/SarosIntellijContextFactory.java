@@ -26,6 +26,7 @@ import de.fu_berlin.inf.dpp.AbstractSarosContextFactory;
 import de.fu_berlin.inf.dpp.ISarosContextBindings;
 import de.fu_berlin.inf.dpp.ISarosContextFactory;
 import de.fu_berlin.inf.dpp.account.XMPPAccountLocator;
+import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.core.concurrent.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.core.project.ISarosSessionManager;
@@ -100,6 +101,7 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
 
         Component.create(XMPPAccountLocator.class),
         Component.create(IDialogManager.class, IntelliJDialogManager.class),
+        Component.create(ConnectionHandler.class),
         Component.create(ComponentLookup.class)
     };
 

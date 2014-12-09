@@ -22,39 +22,33 @@
 
 package de.fu_berlin.inf.dpp.ui.model;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-
 /**
- * Represents a Saros account of the user.
- * In contrast {@link de.fu_berlin.inf.dpp.ui.model.Contact}
- * represents user in the contact list of an account.
- *
- * Maybe in the future both classes will be merged.
+ * Represent an entry in a contact list.
  */
-public class Account {
-
-    private String username;
-    private String domain;
-
-    private JID jid;
+public class Contact {
+    private boolean isOnline;
+    private boolean isHidden;
+    private String displayName;
 
     /**
-     * @param username the username of the XMPP account
-     * @param domain the domain part of the XMPP account
+     * @param displayName the name of the contact as it should be displayed
+     * @param isOnline boolean indicating online status
      */
-    public Account(String username, String domain) {
-        this.username = username;
-        this.domain = domain;
-        jid = new JID(username, domain);
+    public Contact(String displayName, boolean isOnline) {
+        this.displayName = displayName;
+        this.isOnline = isOnline;
+        isHidden = false;
     }
 
-    public String getUsername() {
-        return username;
+    public boolean isOnline() {
+        return isOnline;
     }
 
-    public String getDomain() {
-        return domain;
+    public boolean isHidden() {
+        return isHidden;
     }
 
-    public String getBareJid() { return jid.getRAW(); }
+    public String getDisplayName() {
+        return displayName;
+    }
 }

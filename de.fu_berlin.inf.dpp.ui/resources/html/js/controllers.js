@@ -55,9 +55,37 @@ app.controller('ToolbarController', function ($scope) {
     };
 });
 
+app.controller('ContactListCtrl', function ($scope) {
+    $scope.contacts = [];
+
+    $scope.root = null;
+
+    $scope.add = function (contact) {
+        $scope.contacts.push({name: contact})
+    };
+
+    $scope.displayRoot = function (account) {
+        $scope.root = account.username + '@' + account.domain;
+    };
+
+    $scope.clearAll = function () {
+        $scope.contacts = [];
+    };
+});
+
 __angular_setAccountList = function (accountList) {
     var exposedScope = angular.element(document.getElementById('toolbar')).scope();
     exposedScope.$apply(function () {
         exposedScope.accounts = accountList;
     })
+
+};
+
+__angular_displayContactList = function (contactList) {
+    var exposedScope = angular.element(document.getElementById('contact-list')).scope();
+    exposedScope.$apply(exposedScope.displayRoot(contactList.account));
+    exposedScope.$apply(exposedScope.clearAll());
+    contactList.contactList.forEach(function (user) {
+        exposedScope.$apply(exposedScope.add(user.displayName));
+    });
 };

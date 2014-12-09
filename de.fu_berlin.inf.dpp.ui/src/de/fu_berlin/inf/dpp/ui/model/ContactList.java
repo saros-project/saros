@@ -22,39 +22,46 @@
 
 package de.fu_berlin.inf.dpp.ui.model;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Represents a Saros account of the user.
- * In contrast {@link de.fu_berlin.inf.dpp.ui.model.Contact}
- * represents user in the contact list of an account.
- *
- * Maybe in the future both classes will be merged.
+ * Represents the contact list of an account.
+ * It consists of an {@link de.fu_berlin.inf.dpp.ui.model.Account}
+ * and a list of contact entries.
  */
-public class Account {
+public class ContactList {
 
-    private String username;
-    private String domain;
-
-    private JID jid;
+    private Account account;
+    private List<Contact> contactList = new ArrayList<Contact>();
 
     /**
-     * @param username the username of the XMPP account
-     * @param domain the domain part of the XMPP account
+     * @param account the account the contact list belongs to
      */
-    public Account(String username, String domain) {
-        this.username = username;
-        this.domain = domain;
-        jid = new JID(username, domain);
+    public ContactList(Account account) {
+        this.account = account;
     }
 
-    public String getUsername() {
-        return username;
+    /**
+     * @return the display name of the active account
+     */
+    String getDisplayTitle() {
+        return account.getUsername() + "@" + account.getDomain();
     }
 
-    public String getDomain() {
-        return domain;
+    /**
+     * Adds contact to the contact list
+     * @param contact the contact to be added
+     */
+    public void add(Contact contact) {
+        contactList.add(contact);
     }
 
-    public String getBareJid() { return jid.getRAW(); }
+    /**
+     * Clears all entries of the contact list.
+     * The account remains set.
+     */
+    public void clear() {
+        contactList.clear();
+    }
 }

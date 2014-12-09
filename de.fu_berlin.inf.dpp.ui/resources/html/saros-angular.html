@@ -47,9 +47,21 @@
                 <a href="#" ng-click="connectUser(account)">{{account.username}}@{{account.domain}}</a>
             </li>
             <li ng-show="accounts" class="divider"></li>
-            <li><a href="#" ng-click="showAddAccountWizard()">Add Account</a> </li>
+            <li><a href="#" ng-click="showAddAccountWizard()">Add Account</a>
+            </li>
         </ul>
     </div>
+</div>
+<div id="roster" ng-controller="ContactListCtrl">
+    <h3 ng-show="root" ng-model="root">{{root}}</h3>
+    <h4>No Session Running</h4>
+    <h4>Contacts</h4>
+
+    <ul id="contact-list">
+        <li ng-repeat="contact in contacts">
+            <span>{{contact.name}}</span>
+        </li>
+    </ul>
 </div>
 </body>
 </html>
