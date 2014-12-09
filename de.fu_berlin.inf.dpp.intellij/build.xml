@@ -103,26 +103,28 @@
     <macrodef name="copy-resources">
         <attribute name="dest.dir"/>
         <attribute name="src.dir"/>
+        <attribute name="resource-refid" default="compiler.resources"/>
         <sequential>
             <copy todir="@{dest.dir}">
                 <fileset dir="@{src.dir}">
-                    <patternset refid="compiler.resources"/>
+                    <patternset refid="@{resource-refid}"/>
                     <type type="file"/>
                 </fileset>
             </copy>
         </sequential>
     </macrodef>
 
-
     <!-- Project Libraries -->
 
     <property name="core.basedir"
               value="${basedir}/../de.fu_berlin.inf.dpp.core"/>
     <property name="core.libdir" value="${core.basedir}/lib"/>
+    <property name="ui.basedir" value="${basedir}/../de.fu_berlin.inf.dpp.ui"/>
 
     <path id="libraries.classpath">
         <fileset dir="${core.libdir}" includes="*.jar"/>
-        <fileset dir="${eclipse.dir}/plugins" includes="org.eclipse.swt.*.jar" excludes="org.eclipse.swt.*source*.jar"/>
+        <fileset dir="${eclipse.dir}/plugins" includes="org.eclipse.swt.*.jar"
+                 excludes="org.eclipse.swt.*source*.jar"/>
     </path>
 
     <path id="libraries.test.classpath">
@@ -217,6 +219,7 @@
     <path id="saros-i.main.classpath">
         <path refid="${saros-i.jdk.classpath}"/>
         <pathelement location="${core.output.dir}"/>
+        <pathelement location="${ui.basedir}/bin"/>
         <path refid="libraries.classpath"/>
         <path refid="jdk.classpath.idea_sdk"/>
     </path>

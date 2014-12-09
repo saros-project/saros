@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ /*
+  ~ * DPP - Serious Distributed Pair Programming
+  ~ * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2010
+  ~ * (c) NFQ (www.nfq.com) - 2014
+  ~ *
+  ~ * This program is free software; you can redistribute it and/or modify
+  ~ * it under the terms of the GNU General Public License as published by
+  ~ * the Free Software Foundation; either version 1, or (at your option)
+  ~ * any later version.
+  ~ *
+  ~ * This program is distributed in the hope that it will be useful,
+  ~ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ * GNU General Public License for more details.
+  ~ *
+  ~ * You should have received a copy of the GNU General Public License
+  ~ * along with this program; if not, write to the Free Software
+  ~ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  ~ */
+  -->
+
+<project name="saros-ui" default="build">
+
+    <!-- Compiler options -->
+
+    <property name="compiler.debug" value="on"/>
+    <property name="compiler.generate.no.warnings" value="off"/>
+    <property name="compiler.args" value=""/>
+    <property name="compiler.max.memory" value="256m"/>
+
+    <macrodef name="compile-java">
+        <attribute name="dest.dir"/>
+        <attribute name="java.executable" default="${jdk.bin}/javac"/>
+        <attribute name="compiler.args" default="${compiler.args}"/>
+        <attribute name="classpath"/>
+        <attribute name="sourcepath"/>
+
+        <sequential>
+            <mkdir dir="@{dest.dir}"/>
+
+            <javac destdir="@{dest.dir}" debug="${compiler.debug}"
+                   nowarn="${compiler.generate.no.warnings}"
+                   memorymaximumsize="${compiler.max.memory}" fork="true"
+                   executable="@{java.executable}">
+                <compilerarg line="@{compiler.args}"/>
+                <classpath refid="@{classpath}"/>
+                <src refid="@{sourcepath}"/>
+            </javac>
+        </sequential>
+    </macrodef>
+
+    <property name="build.dir" value="${basedir}/bin"/>
+    <property name="core.basedir"
+              value="${basedir}/../de.fu_berlin.inf.dpp.core"/>
+    <property name="core.libdir" value="${core.basedir}/lib"/>
+    <property name="core.output.dir" value="${core.basedir}/bin" />
+
+    <path id="classpath">
+        <fileset dir="${core.libdir}" includes="*.jar"/>
+        <pathelement location="${core.output.dir}"/>
+        <fileset dir="lib/" includes="*.jar"/>
+        <fileset dir="${eclipse.dir}/plugins" includes="org.eclipse.swt.*.jar"
+                 excludes="org.eclipse.swt.*source*.jar"/>
+    </path>
+
+    <path id="sourcepath">
+        <pathelement location="${basedir}/src/" />
+    </path>
+
+    <target name="clean">
+        <delete dir="${build.dir}" failonerror="false"/>
+    </target>
+
+    <target name="compile" depends="clean" description="compile all">
+        <compile-java dest.dir="${build.dir}" classpath="classpath"
+                      sourcepath="sourcepath"/>
+    </target>
+
+    <target name="build" depends="compile" description="build all"/>
+</project>

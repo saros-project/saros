@@ -25,6 +25,7 @@ package de.fu_berlin.inf.dpp.intellij.context;
 import de.fu_berlin.inf.dpp.AbstractSarosContextFactory;
 import de.fu_berlin.inf.dpp.ISarosContextBindings;
 import de.fu_berlin.inf.dpp.ISarosContextFactory;
+import de.fu_berlin.inf.dpp.account.XMPPAccountLocator;
 import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.core.concurrent.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.core.project.ISarosSessionManager;
@@ -92,7 +93,9 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
         Component.create(IPreferences.class, IntelliJPreferences.class),
 
         Component.create(FollowModeAction.class),
-        Component.create(LeaveSessionAction.class), };
+        Component.create(LeaveSessionAction.class),
+        Component.create(XMPPAccountLocator.class)
+    };
 
     public SarosIntellijContextFactory(Saros saros,
         ISarosContextFactory delegate) {
