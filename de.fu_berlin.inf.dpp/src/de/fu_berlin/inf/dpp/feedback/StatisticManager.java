@@ -17,7 +17,7 @@ import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.preferencePages.FeedbackPreferencePage;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
@@ -141,7 +141,7 @@ public class StatisticManager extends AbstractFeedbackManager implements
      */
     public long getSessionCount() {
         return FeedbackPreferences.getPreferences().getLong(
-            PreferenceConstants.SESSION_COUNT, 0);
+            EclipsePreferenceConstants.SESSION_COUNT, 0);
     }
 
     /**
@@ -152,7 +152,7 @@ public class StatisticManager extends AbstractFeedbackManager implements
      */
     public void putSessionCount(long count) {
         FeedbackPreferences.getPreferences().putLong(
-            PreferenceConstants.SESSION_COUNT, count);
+            EclipsePreferenceConstants.SESSION_COUNT, count);
     }
 
     /**

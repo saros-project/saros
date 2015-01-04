@@ -55,7 +55,7 @@ import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.preferences.IPreferences;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
@@ -89,7 +89,7 @@ public class AddProjectToSessionWizard extends Wizard {
     private IConnectionManager connectionManager;
 
     @Inject
-    private PreferenceUtils preferenceUtils;
+    private IPreferences preferences;
 
     @Inject
     private ISarosSessionManager sessionManager;
@@ -145,7 +145,7 @@ public class AddProjectToSessionWizard extends Wizard {
             return;
 
         namePage = new EnterProjectNamePage(session, connectionManager,
-            preferenceUtils, fileLists, peer, process.getProjectNames());
+            preferences, fileLists, peer, process.getProjectNames());
 
         addPage(namePage);
     }

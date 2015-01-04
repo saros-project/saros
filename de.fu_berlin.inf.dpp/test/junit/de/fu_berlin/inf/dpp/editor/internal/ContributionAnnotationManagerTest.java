@@ -21,7 +21,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.test.util.MemoryPreferenceStore;
@@ -37,7 +37,7 @@ public class ContributionAnnotationManagerTest {
     @Before
     public void setUp() {
         store = new MemoryPreferenceStore();
-        store.setValue(PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS, true);
+        store.setValue(EclipsePreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS, true);
 
         sessionMock = EasyMock.createNiceMock(ISarosSession.class);
         PowerMock.replay(sessionMock);

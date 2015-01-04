@@ -1,70 +1,76 @@
-package de.fu_berlin.inf.dpp.preferences;
+/*
+ *
+ *  DPP - Serious Distributed Pair Programming
+ *  (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2010
+ *  (c) NFQ (www.nfq.com) - 2014
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 1, or (at your option)
+ *  any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * /
+ */
+
+package de.fu_berlin.inf.dpp.intellij.store;
+
+import de.fu_berlin.inf.dpp.preferences.IPreferences;
+import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jface.preference.IPreferenceStore;
+/**
+ * IntelliJPreferences is implementation {@link de.fu_berlin.inf.dpp.preferences.IPreferences} by
+ * using the {@link de.fu_berlin.inf.dpp.intellij.store.PreferenceStore}
+ * to simplify the usage of {@link com.intellij.ide.util.PropertiesComponent}.
+ * It is the IntelliJ specific Preference Store.
+ */
+public class IntelliJPreferences implements IPreferences {
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
+    private PreferenceStore preferenceStore;
 
-@Component(module = "prefs")
-public class PreferenceUtils {
-
-    private IPreferenceStore preferenceStore;
-
-    public PreferenceUtils(IPreferenceStore preferenceStore) {
-        this.preferenceStore = preferenceStore;
+    /**
+     * Creates a new IntelliJPreference object
+     */
+    public IntelliJPreferences() {
+        this.preferenceStore = new PreferenceStore();
     }
 
     public boolean isDebugEnabled() {
         return preferenceStore.getBoolean(PreferenceConstants.DEBUG);
     }
 
-    /**
-     * Returns Saros's XMPP server DNS address.
-     * 
-     * @return
-     */
+    @Override
     public String getSarosXMPPServer() {
         return "saros-con.imp.fu-berlin.de";
     }
 
-    /**
-     * Returns the default server.<br/>
-     * Is never empty or null.
-     * 
-     * @return
-     */
+    @Override
     public String getDefaultServer() {
         return getSarosXMPPServer();
     }
 
-    /**
-     * Returns whether auto-connect is enabled or not.
-     * 
-     * @return true if auto-connect is enabled.
-     */
+    @Override
     public boolean isAutoConnecting() {
         return preferenceStore.getBoolean(PreferenceConstants.AUTO_CONNECT);
     }
 
-    /**
-     * Returns whether port mapping is enabled or not by evaluating the stored
-     * deviceID to be empty or not.
-     * 
-     * @return true of port mapping is enabled, false otherwise
-     */
+    @Override
     public boolean isAutoPortmappingEnabled() {
-        return preferenceStore.getString(
-            PreferenceConstants.AUTO_PORTMAPPING_DEVICEID).isEmpty() == false;
+        return !preferenceStore
+            .getString(PreferenceConstants.AUTO_PORTMAPPING_DEVICEID).isEmpty();
     }
 
-    /**
-     * Returns the Socks5 candidates for the Socks5 proxy.
-     * 
-     * @return
-     */
+    @Override
     public List<String> getSocks5Candidates() {
         String addresses = preferenceStore
             .getString(PreferenceConstants.LOCAL_SOCKS5_PROXY_CANDIDATES);
@@ -83,22 +89,13 @@ public class PreferenceUtils {
         return result;
     }
 
-    /**
-     * Returns whether the external address of the gateway should be used as a
-     * Socks5 candidate or not.
-     * 
-     * @return
-     */
+    @Override
     public boolean useExternalGatewayAddress() {
-        return preferenceStore
-            .getBoolean(PreferenceConstants.LOCAL_SOCKS5_PROXY_USE_UPNP_EXTERNAL_ADDRESS);
+        return preferenceStore.getBoolean(
+            PreferenceConstants.LOCAL_SOCKS5_PROXY_USE_UPNP_EXTERNAL_ADDRESS);
     }
 
-    /**
-     * Returns the device ID of the gateway to perform port mapping on.
-     * 
-     * @return Device ID of the gateway or empty String if disabled.
-     */
+    @Override
     public String getAutoPortmappingGatewayID() {
         return preferenceStore
             .getString(PreferenceConstants.AUTO_PORTMAPPING_DEVICEID);
@@ -109,24 +106,12 @@ public class PreferenceUtils {
             .getInt(PreferenceConstants.AUTO_PORTMAPPING_LASTMAPPEDPORT);
     }
 
-    /**
-     * Returns the Skype user name or an empty string if none was specified.
-     * 
-     * @return the user name.for Skype or an empty string
-     */
+    @Override
     public String getSkypeUserName() {
         return preferenceStore.getString(PreferenceConstants.SKYPE_USERNAME);
     }
 
-    /**
-     * Returns the port for SOCKS5 file transfer. If
-     * {@link PreferenceConstants#USE_NEXT_PORTS_FOR_FILE_TRANSFER} is set, a
-     * negative number is returned (smacks will try next free ports above this
-     * number)
-     * 
-     * @return port for smacks configuration (negative if to try out ports
-     *         above)
-     */
+    @Override
     public int getFileTransferPort() {
         int port = preferenceStore
             .getInt(PreferenceConstants.FILE_TRANSFER_PORT);
@@ -138,54 +123,52 @@ public class PreferenceUtils {
             return port;
     }
 
-    public boolean forceFileTransferByChat() {
+    @Override
+    public boolean forceIBBTransport() {
         return preferenceStore
             .getBoolean(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT);
     }
 
+    @Override
     public boolean isConcurrentUndoActivated() {
         return preferenceStore.getBoolean(PreferenceConstants.CONCURRENT_UNDO);
     }
 
+    @Override
     public boolean useVersionControl() {
         return !preferenceStore
             .getBoolean(PreferenceConstants.DISABLE_VERSION_CONTROL);
     }
 
+    @Override
     public void setUseVersionControl(boolean value) {
-        preferenceStore.setValue(PreferenceConstants.DISABLE_VERSION_CONTROL,
-            !value);
+        preferenceStore
+            .setValue(PreferenceConstants.DISABLE_VERSION_CONTROL, !value);
     }
 
+    @Override
     public boolean isLocalSOCKS5ProxyEnabled() {
         return !preferenceStore
             .getBoolean(PreferenceConstants.LOCAL_SOCKS5_PROXY_DISABLED);
     }
 
+    @Override
     public String getStunIP() {
         return preferenceStore.getString(PreferenceConstants.STUN);
     }
 
+    @Override
     public int getStunPort() {
         return preferenceStore.getInt(PreferenceConstants.STUN_PORT);
     }
 
-    /**
-     * Returns the favorite color ID that should be used during a session.
-     * 
-     * @return the favorite color ID or {@value UserColorID#UNKNOWN} if no
-     *         favorite color ID is available
-     */
+    @Override
     public int getFavoriteColorID() {
         return preferenceStore
             .getInt(PreferenceConstants.FAVORITE_SESSION_COLOR_ID);
     }
 
-    /**
-     * Returns the nickname that should be used in a session.
-     * 
-     * @return the nickname which may be empty if no nickname is available
-     */
+    @Override
     public String getSessionNickname() {
         return preferenceStore.getString(PreferenceConstants.SESSION_NICKNAME);
     }

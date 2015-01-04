@@ -40,7 +40,6 @@ import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.core.concurrent.ConsistencyWatchdogHandler;
 import de.fu_berlin.inf.dpp.core.concurrent.ConsistencyWatchdogServer;
-import de.fu_berlin.inf.dpp.core.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
@@ -55,6 +54,7 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
+import de.fu_berlin.inf.dpp.preferences.IPreferences;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityListener;
 import de.fu_berlin.inf.dpp.session.IActivityProducer;
@@ -161,7 +161,7 @@ public final class SarosSession implements ISarosSession {
     @Inject
     private XMPPConnectionService connectionService;
     @Inject
-    private PreferenceUtils preferenceUtils;
+    private IPreferences preferences;
     @Inject
     private IConnectionManager connectionManager;
     private boolean useVersionControl = true;
@@ -494,8 +494,7 @@ public final class SarosSession implements ISarosSession {
                 // FIXME do not throw a runtime exceptions here
                 throw new RuntimeException(
                     "could not synchronize user list, following users did not respond: "
-                        + StringUtils.join(timedOutUsers, ", ")
-                );
+                        + StringUtils.join(timedOutUsers, ", "));
             }
         }
 
@@ -589,8 +588,7 @@ public final class SarosSession implements ISarosSession {
             if (!timedOutUsers.isEmpty()) {
                 LOG.error(
                     "could not synchronize user list properly, following users did not respond: "
-                        + StringUtils.join(timedOutUsers, ", ")
-                );
+                        + StringUtils.join(timedOutUsers, ", "));
             }
         }
 
@@ -625,8 +623,7 @@ public final class SarosSession implements ISarosSession {
         try {
             transmitter.send(SESSION_CONNECTION_ID, user.getJID(),
                 KickUserExtension.PROVIDER
-                    .create(new KickUserExtension(getID()))
-            );
+                    .create(new KickUserExtension(getID())));
         } catch (IOException e) {
             LOG.warn("could not kick user " + user
                 + " from the session because the connection to the user is already lost");
@@ -705,8 +702,7 @@ public final class SarosSession implements ISarosSession {
             try {
                 transmitter.send(SESSION_CONNECTION_ID, user.getJID(),
                     LeaveSessionExtension.PROVIDER
-                        .create(new LeaveSessionExtension(getID()))
-                );
+                        .create(new LeaveSessionExtension(getID())));
             } catch (IOException e) {
                 LOG.warn("failed to notify user " + user
                     + " about local session stop", e);
@@ -995,7 +991,7 @@ public final class SarosSession implements ISarosSession {
          */
         if (!useVersionControl)
             return false;
-        return useVersionControl = preferenceUtils.useVersionControl();
+        return useVersionControl = preferences.useVersionControl();
     }
 
     @Override

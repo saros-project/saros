@@ -25,12 +25,12 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
-import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.preferences.IPreferences;
 import de.fu_berlin.inf.dpp.ui.Messages;
 
 /**
  * Allows the user to create an XMPP account.
- * 
+ *
  * @author bkahlert
  * @author Stefan Rossbach
  */
@@ -55,7 +55,7 @@ public class CreateXMPPAccountWizardPage extends WizardPage {
     private String lastMessage;
 
     @Inject
-    private PreferenceUtils preferenceUtils;
+    private IPreferences preferences;
 
     @Inject
     private XMPPAccountStore accountStore;
@@ -212,7 +212,7 @@ public class CreateXMPPAccountWizardPage extends WizardPage {
         usernameText.setText("");
         passwordText.setText("");
         repeatPasswordText.setText("");
-        String defaultServer = preferenceUtils.getDefaultServer();
+        String defaultServer = preferences.getDefaultServer();
 
         Set<String> servers = new HashSet<String>(accountStore.getDomains());
         servers.add(defaultServer);
@@ -272,7 +272,7 @@ public class CreateXMPPAccountWizardPage extends WizardPage {
         wasServerValid |= !isServerEmpty;
 
         boolean isSarosServer = getServer().equals(
-            preferenceUtils.getSarosXMPPServer());
+            preferences.getSarosXMPPServer());
 
         // only display those messages after the user has at least typed in one
         // character

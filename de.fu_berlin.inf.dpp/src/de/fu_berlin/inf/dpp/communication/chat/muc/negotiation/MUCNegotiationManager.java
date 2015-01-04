@@ -15,7 +15,7 @@ import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 
@@ -152,10 +152,10 @@ public class MUCNegotiationManager {
         String service = null;
 
         boolean useCustomMUCService = preferences
-            .getBoolean(PreferenceConstants.FORCE_CUSTOM_MUC_SERVICE);
+            .getBoolean(EclipsePreferenceConstants.FORCE_CUSTOM_MUC_SERVICE);
 
         String customMUCService = preferences
-            .getString(PreferenceConstants.CUSTOM_MUC_SERVICE);
+            .getString(EclipsePreferenceConstants.CUSTOM_MUC_SERVICE);
 
         if (useCustomMUCService && customMUCService != null
             && !customMUCService.isEmpty())

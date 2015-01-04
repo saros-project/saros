@@ -17,53 +17,25 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp.preferences;
+
+package de.fu_berlin.inf.dpp.intellij.store;
 
 /**
- * Constant definitions for plug-in preferences
- * 
- * @author rdjemili
- * @author coezbek
+ * Constant for IDE specific configuration.
  */
-public class PreferenceConstants {
+public class IntelliJPreferenceConstants {
+
+    private IntelliJPreferenceConstants() {
+        //hide constructor
+    }
 
     public static final String ACTIVE_ACCOUNT = "active_account";
 
     public static final String ACCOUNT_DATA = "account_data";
 
-    public static final String AUTO_CONNECT = "autoconnect";
-
-    public static final String AUTO_PORTMAPPING_DEVICEID = "autoportmappingdeviceid";
-
-    public static final String AUTO_PORTMAPPING_LASTMAPPEDPORT = "autoportmappinglastmappedport";
-
-    public static final String SKYPE_USERNAME = "skypename";
-
-    public static final String CONCURRENT_UNDO = "concurrent_undo";
-
-    public static final String DEBUG = "debug";
-
-    public static final String FILE_TRANSFER_PORT = "port";
-
-    public static final String USE_NEXT_PORTS_FOR_FILE_TRANSFER = "use_next_ports_for_file_transfer";
-
-    public static final String FORCE_FILETRANSFER_BY_CHAT = "chatfiletransfer";
-
     public static final String GATEWAYCHECKPERFORMED = "gatewaycheckperformed";
 
-    public static final String LOCAL_SOCKS5_PROXY_DISABLED = " local_socks5_proxy_disabled";
-
-    public static final String LOCAL_SOCKS5_PROXY_USE_UPNP_EXTERNAL_ADDRESS = "local_socks5_proxy_use_upnp_external_address";
-
-    public static final String LOCAL_SOCKS5_PROXY_CANDIDATES = "local_socks5_proxy_candidates";
-
-    public static final String STUN = "stun_server";
-
-    public static final String STUN_PORT = "stun_server_port";
-
     public static final String ENABLE_BALLOON_NOTIFICATION = "enable_balloon_notification";
-
-    public static final String DISABLE_VERSION_CONTROL = "disable_version_control";
 
     public static final String SERVER_ACTIVATED = "server_activated";
 
@@ -74,37 +46,53 @@ public class PreferenceConstants {
      * the configuration).
      */
 
-    /** Can be set and read by the FeedbackManager */
+    /**
+     * Can be set and read by the FeedbackManager
+     */
     public static final String FEEDBACK_SURVEY_DISABLED = "feedback.survey.disabled";
 
-    /** Can be set and read by the FeedbackManager */
+    /**
+     * Can be set and read by the FeedbackManager
+     */
     public static final String FEEDBACK_SURVEY_INTERVAL = "feedback.survey.interval";
 
-    /** Can be set and read by the StatisticManager */
+    /**
+     * Can be set and read by the StatisticManager
+     */
     public static final String STATISTIC_ALLOW_SUBMISSION = "statistic.allow.submission";
 
-    /** Can be set and read by the ErrorLogManager */
+    /**
+     * Can be set and read by the ErrorLogManager
+     */
     public static final String ERROR_LOG_ALLOW_SUBMISSION = "error.log.allow.submission";
 
-    /** Can be set and read by the ErrorLogManager */
+    /**
+     * Can be set and read by the ErrorLogManager
+     */
     public static final String ERROR_LOG_ALLOW_SUBMISSION_FULL = "error.log.allow.submission.full";
 
     /*
      * Global preferences, not initialized i.e. no default values
      */
 
-    /** Can be set and read by the StatisticManager */
+    /**
+     * Can be set and read by the StatisticManager
+     */
     public static final String SESSION_COUNT = "session.count";
 
-    /** Can be set and read by the FeedbackManager */
+    /**
+     * Can be set and read by the FeedbackManager
+     */
     public static final String SESSIONS_UNTIL_NEXT = "sessions.until.next.survey";
 
-    /** Can be read by the StatisticManager */
+    /**
+     * Can be read by the StatisticManager
+     */
     public static final String RANDOM_USER_ID = "user.id";
 
     /**
      * Preference used for a way to let the user identify himself.
-     * 
+     * <p/>
      * For instance, this might get a value such as "coezbek" or "rdjemili".
      */
     public static final String STATISTICS_PSEUDONYM_ID = "STATISTICS_PSEUDONYM_ID";
@@ -115,19 +103,20 @@ public class PreferenceConstants {
      */
     public static final String STATISTIC_ALLOW_PSEUDONYM = "STATISTIC_ALLOW_PSEUDONYM";
 
-    /*
-     * Preferences for Communication /Chat
+    /**
+     * Preferences for Communication
      */
 
-    public static final String USE_IRC_STYLE_CHAT_LAYOUT = "chat.irc.layout";
-
+    /**
+     * Custom multiuser-chat service name
+     */
     public static final String CUSTOM_MUC_SERVICE = "custom_muc_service";
 
     public static final String FORCE_CUSTOM_MUC_SERVICE = "force_custom_muc_service";
 
-    /* Sound Events */
-
     public static final String SOUND_ENABLED = "sound.enabled";
+
+    /* Sound Events */
 
     public static final String SOUND_PLAY_EVENT_MESSAGE_SENT = "sound.play.event.message.sent";
 
@@ -153,13 +142,6 @@ public class PreferenceConstants {
      * Stop sessions when alone as host?
      */
     public static final String AUTO_STOP_EMPTY_SESSION = "auto.stop.empty.session";
-
-    /**
-     * color ID that should be used in a session if it is not already occupied
-     */
-    public static final String FAVORITE_SESSION_COLOR_ID = "favorite.session.color.id";
-
-    public static final String SESSION_NICKNAME = "session.nickname";
 
     /*
      * Annotation stuff for the editor

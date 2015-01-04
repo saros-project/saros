@@ -19,6 +19,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.widgets.ColorChooser;
@@ -28,7 +29,7 @@ import de.fu_berlin.inf.dpp.ui.widgets.ColorChooser.ColorSelectionListener;
  * This class is responsible for allowing the user to select his / her favorite
  * color that should be used (if available) when starting or joining a Saros
  * session and for allowing the user to choose the visible annotations.
- * 
+ *
  * @author Maria Spiering
  * @author Stefan Rossbach
  * @author Vera Schlemm
@@ -78,34 +79,34 @@ public final class PersonalizationPreferencePage extends PreferencePage
         }
 
         preferenceStore.setValue(
-            PreferenceConstants.ENABLE_BALLOON_NOTIFICATION,
+            EclipsePreferenceConstants.ENABLE_BALLOON_NOTIFICATION,
             showBalloonNotifications.getSelection());
 
         preferenceStore.setValue(
-            PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS,
+            EclipsePreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS,
             showContributionAnnotation.getSelection());
 
         preferenceStore.setValue(
-            PreferenceConstants.SHOW_SELECTIONFILLUP_ANNOTATIONS,
+            EclipsePreferenceConstants.SHOW_SELECTIONFILLUP_ANNOTATIONS,
             showSelectionFillUpAnnotation.getSelection());
 
-        preferenceStore.setValue(PreferenceConstants.SOUND_ENABLED,
+        preferenceStore.setValue(EclipsePreferenceConstants.SOUND_ENABLED,
             enableSoundEvents.getSelection());
 
         preferenceStore.setValue(
-            PreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_SENT,
+            EclipsePreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_SENT,
             playSoundEventChatMessageSent.getSelection());
 
         preferenceStore.setValue(
-            PreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_RECEIVED,
+            EclipsePreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_RECEIVED,
             playSoundEventChatMessageReceived.getSelection());
 
         preferenceStore.setValue(
-            PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_ONLINE,
+            EclipsePreferenceConstants.SOUND_PLAY_EVENT_CONTACT_ONLINE,
             playSoundEventContactComesOnline.getSelection());
 
         preferenceStore.setValue(
-            PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_OFFLINE,
+            EclipsePreferenceConstants.SOUND_PLAY_EVENT_CONTACT_OFFLINE,
             playSoundEventContactGoesOffline.getSelection());
 
         preferenceStore.setValue(PreferenceConstants.SESSION_NICKNAME,
@@ -124,34 +125,34 @@ public final class PersonalizationPreferencePage extends PreferencePage
 
         showBalloonNotifications
             .setSelection(preferenceStore
-                .getDefaultBoolean(PreferenceConstants.ENABLE_BALLOON_NOTIFICATION));
+                .getDefaultBoolean(EclipsePreferenceConstants.ENABLE_BALLOON_NOTIFICATION));
 
         showContributionAnnotation
             .setSelection(preferenceStore
-                .getDefaultBoolean(PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS));
+                .getDefaultBoolean(EclipsePreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS));
 
         showSelectionFillUpAnnotation
             .setSelection(preferenceStore
-                .getDefaultBoolean(PreferenceConstants.SHOW_SELECTIONFILLUP_ANNOTATIONS));
+                .getDefaultBoolean(EclipsePreferenceConstants.SHOW_SELECTIONFILLUP_ANNOTATIONS));
 
         enableSoundEvents.setSelection(preferenceStore
-            .getDefaultBoolean(PreferenceConstants.SOUND_ENABLED));
+            .getDefaultBoolean(EclipsePreferenceConstants.SOUND_ENABLED));
 
         playSoundEventChatMessageSent
             .setSelection(preferenceStore
-                .getDefaultBoolean(PreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_SENT));
+                .getDefaultBoolean(EclipsePreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_SENT));
 
         playSoundEventChatMessageReceived
             .setSelection(preferenceStore
-                .getDefaultBoolean(PreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_RECEIVED));
+                .getDefaultBoolean(EclipsePreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_RECEIVED));
 
         playSoundEventContactComesOnline
             .setSelection(preferenceStore
-                .getDefaultBoolean(PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_ONLINE));
+                .getDefaultBoolean(EclipsePreferenceConstants.SOUND_PLAY_EVENT_CONTACT_ONLINE));
 
         playSoundEventContactGoesOffline
             .setSelection(preferenceStore
-                .getDefaultBoolean(PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_OFFLINE));
+                .getDefaultBoolean(EclipsePreferenceConstants.SOUND_PLAY_EVENT_CONTACT_OFFLINE));
 
         updateSoundEventButtonStates();
 
@@ -182,8 +183,9 @@ public final class PersonalizationPreferencePage extends PreferencePage
         showBalloonNotifications
             .setText(Messages.PersonalizationPreferencePage_enable_balloon_notifications);
 
-        showBalloonNotifications.setSelection(preferenceStore
-            .getBoolean(PreferenceConstants.ENABLE_BALLOON_NOTIFICATION));
+        showBalloonNotifications
+            .setSelection(preferenceStore
+                .getBoolean(EclipsePreferenceConstants.ENABLE_BALLOON_NOTIFICATION));
 
         showContributionAnnotation = new Button(group, SWT.CHECK);
         showContributionAnnotation
@@ -192,8 +194,9 @@ public final class PersonalizationPreferencePage extends PreferencePage
         showContributionAnnotation
             .setToolTipText(Messages.PersonalizationPreferencePage_show_contribution_annotations_tooltip);
 
-        showContributionAnnotation.setSelection(preferenceStore
-            .getBoolean(PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS));
+        showContributionAnnotation
+            .setSelection(preferenceStore
+                .getBoolean(EclipsePreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS));
 
         showSelectionFillUpAnnotation = new Button(group, SWT.CHECK);
         showSelectionFillUpAnnotation
@@ -202,8 +205,9 @@ public final class PersonalizationPreferencePage extends PreferencePage
         showSelectionFillUpAnnotation
             .setToolTipText(Messages.PersonalizationPreferencePage_show_selectionfillup_annotations_tooltip);
 
-        showSelectionFillUpAnnotation.setSelection(preferenceStore
-            .getBoolean(PreferenceConstants.SHOW_SELECTIONFILLUP_ANNOTATIONS));
+        showSelectionFillUpAnnotation
+            .setSelection(preferenceStore
+                .getBoolean(EclipsePreferenceConstants.SHOW_SELECTIONFILLUP_ANNOTATIONS));
     }
 
     private void createSoundNotificationGroup(Composite parent) {
@@ -278,19 +282,23 @@ public final class PersonalizationPreferencePage extends PreferencePage
             .setText(Messages.PersonalizationPreferencePage_enable_sound_on_contact_goes_offline_button_text);
 
         enableSoundEvents.setSelection(preferenceStore
-            .getBoolean(PreferenceConstants.SOUND_ENABLED));
+            .getBoolean(EclipsePreferenceConstants.SOUND_ENABLED));
 
-        playSoundEventChatMessageSent.setSelection(preferenceStore
-            .getBoolean(PreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_SENT));
+        playSoundEventChatMessageSent
+            .setSelection(preferenceStore
+                .getBoolean(EclipsePreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_SENT));
 
-        playSoundEventChatMessageReceived.setSelection(preferenceStore
-            .getBoolean(PreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_RECEIVED));
+        playSoundEventChatMessageReceived
+            .setSelection(preferenceStore
+                .getBoolean(EclipsePreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_RECEIVED));
 
-        playSoundEventContactComesOnline.setSelection(preferenceStore
-            .getBoolean(PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_ONLINE));
+        playSoundEventContactComesOnline
+            .setSelection(preferenceStore
+                .getBoolean(EclipsePreferenceConstants.SOUND_PLAY_EVENT_CONTACT_ONLINE));
 
-        playSoundEventContactGoesOffline.setSelection(preferenceStore
-            .getBoolean(PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_OFFLINE));
+        playSoundEventContactGoesOffline
+            .setSelection(preferenceStore
+                .getBoolean(EclipsePreferenceConstants.SOUND_PLAY_EVENT_CONTACT_OFFLINE));
 
         updateSoundEventButtonStates();
     }

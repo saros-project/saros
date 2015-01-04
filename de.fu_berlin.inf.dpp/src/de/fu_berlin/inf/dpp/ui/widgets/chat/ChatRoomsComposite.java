@@ -44,7 +44,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.roster.AbstractRosterListener;
 import de.fu_berlin.inf.dpp.net.xmpp.roster.IRosterListener;
 import de.fu_berlin.inf.dpp.net.xmpp.roster.RosterTracker;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
@@ -130,7 +130,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
         @Override
         public void propertyChange(PropertyChangeEvent event) {
-            if (!PreferenceConstants.USE_IRC_STYLE_CHAT_LAYOUT.equals(event
+            if (!EclipsePreferenceConstants.USE_IRC_STYLE_CHAT_LAYOUT.equals(event
                 .getProperty()))
                 return;
 

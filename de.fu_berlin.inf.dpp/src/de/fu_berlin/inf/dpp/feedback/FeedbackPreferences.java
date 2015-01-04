@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.feedback;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.osgi.service.prefs.Preferences;
 
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 
 public class FeedbackPreferences {
 
@@ -34,12 +34,12 @@ public class FeedbackPreferences {
         if (FeedbackPreferences.preferences == null)
             throw new IllegalStateException("preferences are not initialized");
 
-        final String[] keys = { PreferenceConstants.FEEDBACK_SURVEY_DISABLED,
-            PreferenceConstants.FEEDBACK_SURVEY_INTERVAL,
-            PreferenceConstants.STATISTIC_ALLOW_SUBMISSION,
-            PreferenceConstants.STATISTIC_ALLOW_PSEUDONYM,
-            PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION,
-            PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION_FULL };
+        final String[] keys = { EclipsePreferenceConstants.FEEDBACK_SURVEY_DISABLED,
+            EclipsePreferenceConstants.FEEDBACK_SURVEY_INTERVAL,
+            EclipsePreferenceConstants.STATISTIC_ALLOW_SUBMISSION,
+            EclipsePreferenceConstants.STATISTIC_ALLOW_PSEUDONYM,
+            EclipsePreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION,
+            EclipsePreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION_FULL };
 
         for (final String key : keys)
             if (preferences.get(key, null) == null)

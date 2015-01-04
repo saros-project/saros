@@ -15,7 +15,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
@@ -56,7 +56,7 @@ public class ResourceSelectionWizardPage extends WizardPage {
         public void filterClosedProjectsChanged(
             FilterClosedProjectsChangedEvent event) {
             PlatformUI.getPreferenceStore().setValue(
-                PreferenceConstants.PROJECTSELECTION_FILTERCLOSEDPROJECTS,
+                EclipsePreferenceConstants.PROJECTSELECTION_FILTERCLOSEDPROJECTS,
                 event.isFilterClosedProjects());
         }
     };
@@ -98,7 +98,7 @@ public class ResourceSelectionWizardPage extends WizardPage {
         resourceSelectionComposite = new ResourceSelectionComposite(parent,
             SWT.BORDER | SWT.V_SCROLL, PlatformUI.getPreferenceStore()
                 .getBoolean(
-                    PreferenceConstants.PROJECTSELECTION_FILTERCLOSEDPROJECTS));
+                    EclipsePreferenceConstants.PROJECTSELECTION_FILTERCLOSEDPROJECTS));
 
         /*
          * Initialize the selection asynchronously, so the wizard opens

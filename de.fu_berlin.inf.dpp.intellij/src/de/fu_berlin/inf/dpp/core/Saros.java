@@ -27,7 +27,6 @@ import de.fu_berlin.inf.dpp.SarosConstants;
 import de.fu_berlin.inf.dpp.core.context.SarosContext;
 import de.fu_berlin.inf.dpp.core.context.SarosCoreContextFactory;
 import de.fu_berlin.inf.dpp.core.context.SarosPluginContext;
-import de.fu_berlin.inf.dpp.core.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.intellij.context.SarosIntellijContextFactory;
 import de.fu_berlin.inf.dpp.intellij.project.fs.Workspace;
@@ -35,6 +34,7 @@ import de.fu_berlin.inf.dpp.misc.pico.DotGraphMonitor;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
+import de.fu_berlin.inf.dpp.preferences.IPreferences;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import org.apache.log4j.helpers.LogLog;
 import org.jivesoftware.smack.Connection;
@@ -57,7 +57,8 @@ public class Saros {
     private Project project;
 
     private XMPPConnectionService connectionService;
-    private PreferenceUtils preferenceUtils;
+    
+    private IPreferences preferences;
 
     private IWorkspace workspace;
 
@@ -114,14 +115,13 @@ public class Saros {
 
         //CONTEXT
         sarosContext = new SarosContext(new SarosIntellijContextFactory(this,
-            new SarosCoreContextFactory()), new DotGraphMonitor()
-        );
+            new SarosCoreContextFactory()), new DotGraphMonitor());
 
         SarosPluginContext.setSarosContext(sarosContext);
 
         connectionService = sarosContext
             .getComponent(XMPPConnectionService.class);
-        preferenceUtils = sarosContext.getComponent(PreferenceUtils.class);
+        preferences = sarosContext.getComponent(IPreferences.class);
 
         connectionService.addListener(new IConnectionListener() {
 

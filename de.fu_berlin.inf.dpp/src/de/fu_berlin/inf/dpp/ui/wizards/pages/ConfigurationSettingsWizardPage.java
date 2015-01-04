@@ -25,7 +25,7 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.StatisticManagerConfiguration;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
-import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.preferences.IPreferences;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
@@ -37,7 +37,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * Allows the user to enter general configuration parameters for use with Saros.
- * 
+ *
  * @author bkahlert
  */
 public class ConfigurationSettingsWizardPage extends WizardPage {
@@ -49,7 +49,7 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
     public static final String DESCRIPTION = de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_description;
 
     @Inject
-    protected PreferenceUtils preferenceUtils;
+    protected IPreferences preferences;
 
     @Inject
     protected IUPnPService upnpService;
@@ -270,11 +270,11 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
     }
 
     protected void setInitialValues() {
-        this.autoConnectButton.setSelection(preferenceUtils.isAutoConnecting());
-        this.setupPortmappingButton.setSelection(preferenceUtils
+        this.autoConnectButton.setSelection(preferences.isAutoConnecting());
+        this.setupPortmappingButton.setSelection(preferences
             .isAutoPortmappingEnabled());
 
-        String skypeUsername = preferenceUtils.getSkypeUserName();
+        String skypeUsername = preferences.getSkypeUserName();
         this.skypeUsageButton.setSelection(!skypeUsername.isEmpty());
         this.skypeUsernameText.setText(skypeUsername);
 
@@ -429,7 +429,7 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
     /**
      * Setups gateway SWT controls by populating a gateway combobox and
      * configuring an information Label and the enabling checkbox.
-     * 
+     *
      * @param combo
      *            {@link Combo} selector to populate with discovered gateways
      * @param info

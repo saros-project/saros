@@ -17,7 +17,7 @@ import org.osgi.service.prefs.Preferences;
 import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.dialogs.FeedbackDialog;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -62,13 +62,13 @@ public class FeedbackManager extends AbstractFeedbackManager implements
         public void preferenceChange(PreferenceChangeEvent event) {
             final String key = event.getKey();
 
-            if (PreferenceConstants.FEEDBACK_SURVEY_INTERVAL.equals(key)) {
+            if (EclipsePreferenceConstants.FEEDBACK_SURVEY_INTERVAL.equals(key)) {
                 /*
                  * each time the interval changes, reset the number of sessions
                  * until the next request is shown
                  */
                 resetSessionsUntilNextToInterval();
-            } else if (PreferenceConstants.FEEDBACK_SURVEY_DISABLED.equals(key)) {
+            } else if (EclipsePreferenceConstants.FEEDBACK_SURVEY_DISABLED.equals(key)) {
                 Object value = event.getNewValue();
                 int disabled = ((Integer) value).intValue();
                 // if it changed to enabled, reset interval as well
@@ -158,7 +158,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
      */
     public int getSessionsUntilNext() {
         return FeedbackPreferences.getPreferences().getInt(
-            PreferenceConstants.SESSIONS_UNTIL_NEXT, -1);
+            EclipsePreferenceConstants.SESSIONS_UNTIL_NEXT, -1);
     }
 
     /**
@@ -174,7 +174,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
             untilNext = -1;
 
         FeedbackPreferences.getPreferences().putInt(
-            PreferenceConstants.SESSIONS_UNTIL_NEXT, untilNext);
+            EclipsePreferenceConstants.SESSIONS_UNTIL_NEXT, untilNext);
     }
 
     /**
@@ -185,7 +185,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
     public static int getFeedbackStatus() {
 
         return FeedbackPreferences.getPreferences().getInt(
-            PreferenceConstants.FEEDBACK_SURVEY_DISABLED, -1);
+            EclipsePreferenceConstants.FEEDBACK_SURVEY_DISABLED, -1);
     }
 
     /**
@@ -206,7 +206,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
         int status = disabled ? FEEDBACK_DISABLED : FEEDBACK_ENABLED;
 
         FeedbackPreferences.getPreferences().putInt(
-            PreferenceConstants.FEEDBACK_SURVEY_DISABLED, status);
+            EclipsePreferenceConstants.FEEDBACK_SURVEY_DISABLED, status);
     }
 
     /**
@@ -216,7 +216,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
      */
     public static int getSurveyInterval() {
         return FeedbackPreferences.getPreferences().getInt(
-            PreferenceConstants.FEEDBACK_SURVEY_INTERVAL, -1);
+            EclipsePreferenceConstants.FEEDBACK_SURVEY_INTERVAL, -1);
     }
 
     /**
@@ -226,7 +226,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
      */
     public static void setSurveyInterval(final int interval) {
         FeedbackPreferences.getPreferences().putInt(
-            PreferenceConstants.FEEDBACK_SURVEY_INTERVAL, interval);
+            EclipsePreferenceConstants.FEEDBACK_SURVEY_INTERVAL, interval);
     }
 
     /**

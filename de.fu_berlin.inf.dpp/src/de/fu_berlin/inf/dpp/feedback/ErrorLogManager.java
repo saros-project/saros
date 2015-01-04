@@ -17,7 +17,7 @@ import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.ui.preferencePages.FeedbackPreferencePage;
 
@@ -84,7 +84,7 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
     public static int getErrorLogSubmissionStatus() {
 
         return FeedbackPreferences.getPreferences().getInt(
-            PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION, UNDEFINED);
+            EclipsePreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION, UNDEFINED);
     }
 
     /**
@@ -93,7 +93,7 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
     public static void setErrorLogSubmissionAllowed(final boolean allowed) {
         final int submission = allowed ? ALLOW : FORBID;
         FeedbackPreferences.getPreferences().putInt(
-            PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION, submission);
+            EclipsePreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION, submission);
     }
 
     /**
@@ -124,7 +124,7 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
      */
     public static int getFullErrorLogSubmissionStatus() {
         return FeedbackPreferences.getPreferences().getInt(
-            PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION_FULL, UNDEFINED);
+            EclipsePreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION_FULL, UNDEFINED);
     }
 
     /**
@@ -133,7 +133,7 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
     public static void setFullErrorLogSubmissionAllowed(final boolean allowed) {
         final int submission = allowed ? ALLOW : FORBID;
         FeedbackPreferences.getPreferences().putInt(
-            PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION_FULL, submission);
+            EclipsePreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION_FULL, submission);
     }
 
     /**

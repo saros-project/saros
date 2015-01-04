@@ -41,7 +41,7 @@ import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
@@ -223,10 +223,10 @@ public final class ChatControl extends Composite {
         public void messageReceived(final JID sender, final String message) {
 
             final boolean playMessageSentSound = preferenceStore
-                .getBoolean(PreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_SENT);
+                .getBoolean(EclipsePreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_SENT);
 
             final boolean playMessageReceivedSound = preferenceStore
-                .getBoolean(PreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_RECEIVED);
+                .getBoolean(EclipsePreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_RECEIVED);
 
             SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
 
@@ -334,7 +334,7 @@ public final class ChatControl extends Composite {
         sashForm = new SashForm(this, SWT.VERTICAL);
 
         final boolean isIRCLayout = preferenceStore
-            .getBoolean(PreferenceConstants.USE_IRC_STYLE_CHAT_LAYOUT);
+            .getBoolean(EclipsePreferenceConstants.USE_IRC_STYLE_CHAT_LAYOUT);
 
         if (isIRCLayout)
             chatDisplay = new IRCStyleChatDisplay(sashForm, SWT.BORDER);

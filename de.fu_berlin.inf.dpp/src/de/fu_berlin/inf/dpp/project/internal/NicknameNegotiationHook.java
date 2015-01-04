@@ -9,7 +9,7 @@ import java.util.Set;
 import de.fu_berlin.inf.dpp.negotiation.hooks.ISessionNegotiationHook;
 import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.preferences.IPreferences;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.User;
@@ -27,12 +27,12 @@ public class NicknameNegotiationHook implements ISessionNegotiationHook {
     public static final String KEY_CLIENT_NICKNAME = "clientNickname";
     public static final String KEY_HOST_NICKNAME = "hostNickname";
 
-    private final PreferenceUtils preferenceUtils;
+    private final IPreferences preferences;
     private final ISarosSessionManager sessionManager;
 
-    public NicknameNegotiationHook(PreferenceUtils utils,
+    public NicknameNegotiationHook(IPreferences utils,
         SessionNegotiationHookManager hooks, ISarosSessionManager sessionManager) {
-        this.preferenceUtils = utils;
+        this.preferences = utils;
         this.sessionManager = sessionManager;
         hooks.addHook(this);
     }
@@ -40,7 +40,7 @@ public class NicknameNegotiationHook implements ISessionNegotiationHook {
     @Override
     public Map<String, String> tellClientPreferences() {
         return Collections.singletonMap(KEY_CLIENT_NICKNAME,
-            preferenceUtils.getSessionNickname());
+            preferences.getSessionNickname());
     }
 
     @Override

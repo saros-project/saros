@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
 
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 
 public class StatisticManagerConfiguration {
 
@@ -12,7 +12,7 @@ public class StatisticManagerConfiguration {
 
     public static String getStatisticsPseudonymID() {
         return FeedbackPreferences.getPreferences().get(
-            PreferenceConstants.STATISTICS_PSEUDONYM_ID, "");
+            EclipsePreferenceConstants.STATISTICS_PSEUDONYM_ID, "");
     }
 
     public static boolean isStatisticSubmissionAllowed() {
@@ -25,7 +25,7 @@ public class StatisticManagerConfiguration {
 
     public static boolean isPseudonymSubmissionAllowed() {
         return FeedbackPreferences.getPreferences().getBoolean(
-            PreferenceConstants.STATISTIC_ALLOW_PSEUDONYM, false);
+            EclipsePreferenceConstants.STATISTIC_ALLOW_PSEUDONYM, false);
     }
 
     /**
@@ -36,7 +36,7 @@ public class StatisticManagerConfiguration {
      */
     public static int getStatisticSubmissionStatus() {
         return FeedbackPreferences.getPreferences().getInt(
-            PreferenceConstants.STATISTIC_ALLOW_SUBMISSION,
+            EclipsePreferenceConstants.STATISTIC_ALLOW_SUBMISSION,
             AbstractFeedbackManager.UNDEFINED);
     }
 
@@ -44,7 +44,7 @@ public class StatisticManagerConfiguration {
         final boolean isPseudonymAllowed) {
 
         FeedbackPreferences.getPreferences().putBoolean(
-            PreferenceConstants.STATISTIC_ALLOW_PSEUDONYM, isPseudonymAllowed);
+            EclipsePreferenceConstants.STATISTIC_ALLOW_PSEUDONYM, isPseudonymAllowed);
     }
 
     /**
@@ -66,12 +66,12 @@ public class StatisticManagerConfiguration {
      */
     protected static void setStatisticSubmission(final int submission) {
         FeedbackPreferences.getPreferences().putInt(
-            PreferenceConstants.STATISTIC_ALLOW_SUBMISSION, submission);
+            EclipsePreferenceConstants.STATISTIC_ALLOW_SUBMISSION, submission);
     }
 
     public static void setStatisticsPseudonymID(final String userID) {
         FeedbackPreferences.getPreferences().put(
-            PreferenceConstants.STATISTICS_PSEUDONYM_ID, userID);
+            EclipsePreferenceConstants.STATISTICS_PSEUDONYM_ID, userID);
     }
 
     /**
@@ -86,13 +86,13 @@ public class StatisticManagerConfiguration {
     public static String getUserID() {
 
         String userID = FeedbackPreferences.getPreferences().get(
-            PreferenceConstants.RANDOM_USER_ID, null);
+            EclipsePreferenceConstants.RANDOM_USER_ID, null);
 
         if (userID == null) {
             userID = generateUserID();
             // save ID in the global preferences
             FeedbackPreferences.getPreferences().put(
-                PreferenceConstants.RANDOM_USER_ID, userID);
+                EclipsePreferenceConstants.RANDOM_USER_ID, userID);
         }
 
         if (isPseudonymSubmissionAllowed())

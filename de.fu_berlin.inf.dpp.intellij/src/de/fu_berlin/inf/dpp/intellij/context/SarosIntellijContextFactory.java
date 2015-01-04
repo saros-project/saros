@@ -27,8 +27,6 @@ import de.fu_berlin.inf.dpp.ISarosContextBindings;
 import de.fu_berlin.inf.dpp.ISarosContextFactory;
 import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.core.concurrent.ConsistencyWatchdogClient;
-import de.fu_berlin.inf.dpp.core.preferences.IPreferenceStore;
-import de.fu_berlin.inf.dpp.core.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.core.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.core.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.core.ui.eventhandler.NegotiationHandler;
@@ -48,9 +46,10 @@ import de.fu_berlin.inf.dpp.intellij.editor.ProjectAPI;
 import de.fu_berlin.inf.dpp.intellij.project.fs.FileContentChangedNotifierBridge;
 import de.fu_berlin.inf.dpp.intellij.project.fs.PathFactory;
 import de.fu_berlin.inf.dpp.intellij.runtime.IntelliJSynchronizer;
-import de.fu_berlin.inf.dpp.intellij.store.PreferenceStore;
+import de.fu_berlin.inf.dpp.intellij.store.IntelliJPreferences;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.FollowModeAction;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.LeaveSessionAction;
+import de.fu_berlin.inf.dpp.preferences.IPreferences;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import org.picocontainer.BindKey;
 import org.picocontainer.MutablePicoContainer;
@@ -90,7 +89,7 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
         Component.create(IFileContentChangedNotifier.class,
             FileContentChangedNotifierBridge.class),
 
-        Component.create(PreferenceUtils.class),
+        Component.create(IPreferences.class, IntelliJPreferences.class),
 
         Component.create(FollowModeAction.class),
         Component.create(LeaveSessionAction.class), };
@@ -122,15 +121,13 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
         }
 
         container.addComponent(saros);
-        container.addComponent(IPreferenceStore.class, new PreferenceStore());
 
         container.addComponent(BindKey.bindKey(String.class,
-                ISarosContextBindings.SarosVersion.class), "14.1.31.DEVEL"
-        );  //todo
+                ISarosContextBindings.SarosVersion.class),
+            "14.1.31.DEVEL");  //todo
 
         container.addComponent(BindKey.bindKey(String.class,
-                ISarosContextBindings.PlatformVersion.class), "4.3.2"
-        ); //todo
+                ISarosContextBindings.PlatformVersion.class), "4.3.2"); //todo
 
     }
 }

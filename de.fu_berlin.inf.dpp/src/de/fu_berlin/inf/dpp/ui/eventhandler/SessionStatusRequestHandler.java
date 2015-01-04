@@ -13,7 +13,7 @@ import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -60,7 +60,7 @@ public final class SessionStatusRequestHandler {
     }
 
     private void handleStatusRequest(JID from) {
-        if (!preferenceStore.getBoolean(PreferenceConstants.SERVER_ACTIVATED))
+        if (!preferenceStore.getBoolean(EclipsePreferenceConstants.SERVER_ACTIVATED))
             return;
 
         ISarosSession session = sessionManager.getSarosSession();

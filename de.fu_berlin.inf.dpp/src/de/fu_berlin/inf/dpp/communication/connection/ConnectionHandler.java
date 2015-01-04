@@ -22,7 +22,8 @@ import de.fu_berlin.inf.dpp.net.mdns.MDNSService;
 import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.preferences.EclipsePreferences;
+import de.fu_berlin.inf.dpp.preferences.IPreferences;
 
 /**
  * Facade for handling connection establishment and connection events. This
@@ -46,7 +47,7 @@ public class ConnectionHandler {
     private final IProxyResolver proxyResolver;
 
     private final XMPPAccountStore accountStore;
-    private final PreferenceUtils preferences;
+    private final IPreferences preferences;
 
     private final IConnectionManager connectionManager;
 
@@ -84,8 +85,9 @@ public class ConnectionHandler {
     public ConnectionHandler(final XMPPConnectionService connectionService,
         final TCPServer tcpServer, final MDNSService mDNSService,
         final IConnectionManager transferManager,
-        final @Nullable IProxyResolver proxyResolver,
-        final XMPPAccountStore accountStore, final PreferenceUtils preferences) {
+        @Nullable final IProxyResolver proxyResolver,
+        final XMPPAccountStore accountStore,
+        final EclipsePreferences preferences) {
 
         this.connectionService = connectionService;
         this.tcpServer = tcpServer;
@@ -109,7 +111,7 @@ public class ConnectionHandler {
 
     /**
      * Returns the latest connection error.
-     * 
+     *
      * @return the connection error or <code>null</code>
      */
     public Exception getConnectionError() {
@@ -120,7 +122,7 @@ public class ConnectionHandler {
 
     /**
      * Returns a unique id for the current connection.
-     * 
+     *
      * @return a unique id for the current connection or <code>null</code> if no
      *         connection is established or the connection has no unique id
      */
@@ -138,7 +140,7 @@ public class ConnectionHandler {
 
     /**
      * Checks if a connection is currently established.
-     * 
+     *
      * @return <code>true</code> if a connection is established,
      *         <code>false</code> otherwise
      */
@@ -162,10 +164,10 @@ public class ConnectionHandler {
      * Connects using the active account from the {@link XMPPAccountStore}. If a
      * connection establishment (connect or disconnect) is already in progress
      * this connection attempt will be ignored.
-     * 
+     *
      * If there is already an established connection this connection will be
      * disconnected.
-     * 
+     *
      * @param failSilently
      *            if set to <code>true</code> a connection failure will not be
      *            reported to the {@linkplain IConnectingFailureCallback
@@ -323,7 +325,7 @@ public class ConnectionHandler {
 
         try {
 
-            if (preferences.forceFileTransferByChat())
+            if (preferences.forceIBBTransport())
                 connectionManager
                     .setTransport(IConnectionManager.IBB_TRANSPORT);
             else

@@ -12,7 +12,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 public class SoundPlayer {
@@ -32,7 +32,7 @@ public class SoundPlayer {
     public static void playSound(final String filename) {
 
         if (store == null
-            || !store.getBoolean(PreferenceConstants.SOUND_ENABLED)) {
+            || !store.getBoolean(EclipsePreferenceConstants.SOUND_ENABLED)) {
             return;
         }
 

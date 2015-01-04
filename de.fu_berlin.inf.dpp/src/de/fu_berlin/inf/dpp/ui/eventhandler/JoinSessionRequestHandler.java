@@ -15,7 +15,7 @@ import de.fu_berlin.inf.dpp.communication.extensions.JoinSessionRequestExtension
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
@@ -71,7 +71,7 @@ public final class JoinSessionRequestHandler {
         if (session != null && !session.isHost())
             return;
 
-        if (!preferenceStore.getBoolean(PreferenceConstants.SERVER_ACTIVATED)
+        if (!preferenceStore.getBoolean(EclipsePreferenceConstants.SERVER_ACTIVATED)
             || (session != null && extension.isNewSessionRequested())
             || (session == null && !extension.isNewSessionRequested())) {
             sendRejection(from);

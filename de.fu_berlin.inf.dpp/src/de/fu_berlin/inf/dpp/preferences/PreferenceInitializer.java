@@ -2,7 +2,7 @@
  * DPP - Serious Distributed Pair Programming
  * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 1, or (at your option)
@@ -34,7 +34,7 @@ import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 
 /**
  * Class used to initialize default preference values.
- * 
+ *
  * @author rdjemili
  */
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
@@ -64,7 +64,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
         prefs.setValue(PreferenceConstants.AUTO_CONNECT, true);
         prefs.setValue(PreferenceConstants.AUTO_PORTMAPPING_DEVICEID, "");
-        prefs.setValue(PreferenceConstants.GATEWAYCHECKPERFORMED, false);
+        prefs.setValue(EclipsePreferenceConstants.GATEWAYCHECKPERFORMED, false);
         prefs.setValue(PreferenceConstants.SKYPE_USERNAME, "");
         prefs.setValue(PreferenceConstants.DEBUG, false);
         prefs.setValue(PreferenceConstants.FILE_TRANSFER_PORT, 7777);
@@ -86,49 +86,58 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
         // Advanced Preferences
 
-        prefs.setValue(PreferenceConstants.AUTO_STOP_EMPTY_SESSION,
+        prefs.setValue(EclipsePreferenceConstants.AUTO_STOP_EMPTY_SESSION,
             MessageDialogWithToggle.PROMPT);
 
-        prefs.setValue(PreferenceConstants.ENABLE_BALLOON_NOTIFICATION, true);
-
-        prefs.setValue(
-            PreferenceConstants.CONTACT_SELECTION_FILTER_NON_SAROS_CONTACTS,
+        prefs.setValue(EclipsePreferenceConstants.ENABLE_BALLOON_NOTIFICATION,
             true);
 
+        prefs
+            .setValue(
+                EclipsePreferenceConstants.CONTACT_SELECTION_FILTER_NON_SAROS_CONTACTS,
+                true);
+
         // Initialize Feedback Preferences
-        prefs.setValue(PreferenceConstants.FEEDBACK_SURVEY_DISABLED,
+        prefs.setValue(EclipsePreferenceConstants.FEEDBACK_SURVEY_DISABLED,
             FeedbackManager.FEEDBACK_ENABLED);
-        prefs.setValue(PreferenceConstants.FEEDBACK_SURVEY_INTERVAL,
+        prefs.setValue(EclipsePreferenceConstants.FEEDBACK_SURVEY_INTERVAL,
             FeedbackInterval.DEFAULT.getInterval());
-        prefs.setValue(PreferenceConstants.STATISTIC_ALLOW_SUBMISSION,
+        prefs.setValue(EclipsePreferenceConstants.STATISTIC_ALLOW_SUBMISSION,
             AbstractFeedbackManager.UNKNOWN);
-        prefs.setValue(PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION,
+        prefs.setValue(EclipsePreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION,
             AbstractFeedbackManager.UNKNOWN);
-        prefs.setValue(PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION_FULL,
+        prefs.setValue(
+            EclipsePreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION_FULL,
             AbstractFeedbackManager.FORBID);
 
         // Communication default settings
-        prefs.setValue(PreferenceConstants.USE_IRC_STYLE_CHAT_LAYOUT, false);
-        prefs.setValue(PreferenceConstants.CUSTOM_MUC_SERVICE, "");
-        prefs.setValue(PreferenceConstants.FORCE_CUSTOM_MUC_SERVICE, true);
-        prefs.setValue(PreferenceConstants.SOUND_ENABLED, true);
+        prefs.setValue(EclipsePreferenceConstants.USE_IRC_STYLE_CHAT_LAYOUT,
+            false);
+        prefs.setValue(EclipsePreferenceConstants.CUSTOM_MUC_SERVICE, "");
+        prefs.setValue(EclipsePreferenceConstants.FORCE_CUSTOM_MUC_SERVICE,
+            true);
+        prefs.setValue(EclipsePreferenceConstants.SOUND_ENABLED, true);
 
-        prefs.setValue(PreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_SENT, true);
-        prefs.setValue(PreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_RECEIVED,
-            true);
-        prefs.setValue(PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_ONLINE,
-            true);
-        prefs.setValue(PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_OFFLINE,
-            true);
+        prefs.setValue(
+            EclipsePreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_SENT, true);
+        prefs.setValue(
+            EclipsePreferenceConstants.SOUND_PLAY_EVENT_MESSAGE_RECEIVED, true);
+        prefs.setValue(
+            EclipsePreferenceConstants.SOUND_PLAY_EVENT_CONTACT_ONLINE, true);
+        prefs.setValue(
+            EclipsePreferenceConstants.SOUND_PLAY_EVENT_CONTACT_OFFLINE, true);
 
         // consolesharing
-        prefs.setValue(PreferenceConstants.CONSOLESHARING_ENABLED, false);
+        prefs
+            .setValue(EclipsePreferenceConstants.CONSOLESHARING_ENABLED, false);
 
         /*
          * Initially 50/50 distribution Roster/Chatpart in saros view
          */
-        prefs.setValue(PreferenceConstants.SAROSVIEW_SASH_WEIGHT_LEFT, 1);
-        prefs.setValue(PreferenceConstants.SAROSVIEW_SASH_WEIGHT_RIGHT, 1);
+        prefs
+            .setValue(EclipsePreferenceConstants.SAROSVIEW_SASH_WEIGHT_LEFT, 1);
+        prefs.setValue(EclipsePreferenceConstants.SAROSVIEW_SASH_WEIGHT_RIGHT,
+            1);
 
         prefs.setValue(PreferenceConstants.FAVORITE_SESSION_COLOR_ID,
             UserColorID.UNKNOWN);
@@ -143,9 +152,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
          * Editor stuff
          */
 
-        prefs.setValue(PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS,
-            "true");
-        prefs.setValue(PreferenceConstants.SHOW_SELECTIONFILLUP_ANNOTATIONS,
+        prefs.setValue(
+            EclipsePreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS, "true");
+        prefs.setValue(
+            EclipsePreferenceConstants.SHOW_SELECTIONFILLUP_ANNOTATIONS,
             "false"); // set to "false" because of poor performance
     }
 

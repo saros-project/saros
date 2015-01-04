@@ -78,7 +78,7 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
-import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.preferences.IPreferences;
 import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
 import de.fu_berlin.inf.dpp.project.internal.timeout.ClientSessionTimeoutHandler;
 import de.fu_berlin.inf.dpp.project.internal.timeout.ServerSessionTimeoutHandler;
@@ -114,7 +114,7 @@ public final class SarosSession implements ISarosSession {
     private XMPPConnectionService connectionService;
 
     @Inject
-    private PreferenceUtils preferenceUtils;
+    private IPreferences preferences;
 
     @Inject
     private IConnectionManager connectionManager;
@@ -943,7 +943,7 @@ public final class SarosSession implements ISarosSession {
          */
         if (!useVersionControl)
             return false;
-        return useVersionControl = preferenceUtils.useVersionControl();
+        return useVersionControl = preferences.useVersionControl();
     }
 
     @Override

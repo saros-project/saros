@@ -34,7 +34,7 @@ import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.Messages;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.feedback.StatisticManagerConfiguration;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.util.LinkListener;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 
@@ -442,17 +442,17 @@ public class FeedbackPreferencePage extends PreferencePage implements
     protected void performDefaults() {
         // get default values from PreferenceStore
         isFeedbackDisabled = getPreferenceStore().getDefaultInt(
-            PreferenceConstants.FEEDBACK_SURVEY_DISABLED) != FeedbackManager.FEEDBACK_ENABLED;
+            EclipsePreferenceConstants.FEEDBACK_SURVEY_DISABLED) != FeedbackManager.FEEDBACK_ENABLED;
         currentInterval = FeedbackInterval.getFromInterval(getPreferenceStore()
-            .getDefaultInt(PreferenceConstants.FEEDBACK_SURVEY_INTERVAL));
+            .getDefaultInt(EclipsePreferenceConstants.FEEDBACK_SURVEY_INTERVAL));
         setSubmissionAllowed(getPreferenceStore().getDefaultInt(
-            PreferenceConstants.STATISTIC_ALLOW_SUBMISSION) == AbstractFeedbackManager.ALLOW);
+            EclipsePreferenceConstants.STATISTIC_ALLOW_SUBMISSION) == AbstractFeedbackManager.ALLOW);
         setPseudonymAllowed(getPreferenceStore().getDefaultBoolean(
-            PreferenceConstants.STATISTIC_ALLOW_PSEUDONYM));
+            EclipsePreferenceConstants.STATISTIC_ALLOW_PSEUDONYM));
         setErrorLogSubmissionAllowed(getPreferenceStore().getDefaultInt(
-            PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION) == AbstractFeedbackManager.ALLOW);
+            EclipsePreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION) == AbstractFeedbackManager.ALLOW);
         isFullErrorLogSubmissionAllowed = getPreferenceStore().getDefaultInt(
-            PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION_FULL) == AbstractFeedbackManager.ALLOW;
+            EclipsePreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION_FULL) == AbstractFeedbackManager.ALLOW;
 
         // initialize components with defaults
         initComponents();

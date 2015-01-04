@@ -24,7 +24,8 @@ import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.monitoring.remote.RemoteProgressManager;
-import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.preferences.EclipsePreferences;
+import de.fu_berlin.inf.dpp.preferences.IPreferences;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.synchronize.internal.SWTSynchronizer;
 import de.fu_berlin.inf.dpp.ui.eventhandler.ConnectingFailureHandler;
@@ -42,7 +43,7 @@ import de.fu_berlin.inf.dpp.vcs.VCSProviderFactory;
 
 /**
  * Factory used for creating the Saros context when running as Eclipse plugin.
- * 
+ *
  * * @author srossbach
  */
 
@@ -64,7 +65,7 @@ public class SarosEclipseContextFactory extends AbstractSarosContextFactory {
         // page 47
         // Component.create(LocalPresenceTracker.class),
 
-        Component.create(PreferenceUtils.class),
+        Component.create(IPreferences.class, EclipsePreferences.class),
         Component.create(SessionViewOpener.class),
         Component.create(UndoManager.class),
         Component.create(RemoteProgressManager.class),

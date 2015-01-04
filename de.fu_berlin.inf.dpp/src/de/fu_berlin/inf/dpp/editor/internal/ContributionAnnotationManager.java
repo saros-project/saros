@@ -20,7 +20,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 
 import de.fu_berlin.inf.dpp.editor.annotations.ContributionAnnotation;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
@@ -62,7 +62,7 @@ public class ContributionAnnotationManager {
         @Override
         public void propertyChange(final PropertyChangeEvent event) {
 
-            if (!PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS.equals(event
+            if (!EclipsePreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS.equals(event
                 .getProperty()))
                 return;
 
@@ -87,7 +87,7 @@ public class ContributionAnnotationManager {
         this.preferenceStore.addPropertyChangeListener(propertyChangeListener);
         this.sarosSession.addListener(sharedProjectListener);
         contribtionAnnotationsEnabled = this.preferenceStore
-            .getBoolean(PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS);
+            .getBoolean(EclipsePreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS);
     }
 
     /**

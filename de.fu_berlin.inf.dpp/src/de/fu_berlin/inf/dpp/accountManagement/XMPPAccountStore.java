@@ -18,7 +18,7 @@ import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 
 /**
  * Class for the management of multiple XMPP accounts in Saros.
@@ -54,14 +54,14 @@ public final class XMPPAccountStore {
 
         try {
             activeAccountData = securePreferenceStore.getByteArray(
-                PreferenceConstants.ACTIVE_ACCOUNT, null);
+                EclipsePreferenceConstants.ACTIVE_ACCOUNT, null);
         } catch (StorageException e) {
             log.error("error while loading active account", e);
         }
 
         try {
             accountData = securePreferenceStore.getByteArray(
-                PreferenceConstants.ACCOUNT_DATA, null);
+                EclipsePreferenceConstants.ACCOUNT_DATA, null);
         } catch (StorageException e) {
             log.error("error while loading accounts", e);
         }
@@ -125,7 +125,7 @@ public final class XMPPAccountStore {
 
         try {
             securePreferenceStore.putByteArray(
-                PreferenceConstants.ACTIVE_ACCOUNT, out.toByteArray(),
+                EclipsePreferenceConstants.ACTIVE_ACCOUNT, out.toByteArray(),
                 encryptAccount);
         } catch (StorageException e) {
             log.debug("error while saving active account", e);
@@ -145,7 +145,7 @@ public final class XMPPAccountStore {
 
         try {
             securePreferenceStore.putByteArray(
-                PreferenceConstants.ACCOUNT_DATA, out.toByteArray(),
+                EclipsePreferenceConstants.ACCOUNT_DATA, out.toByteArray(),
                 encryptAccount);
         } catch (StorageException e) {
             log.debug("error while saving accounts", e);

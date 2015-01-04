@@ -68,7 +68,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.xmpp.roster.AbstractRosterListener;
 import de.fu_berlin.inf.dpp.net.xmpp.roster.IRosterListener;
 import de.fu_berlin.inf.dpp.net.xmpp.roster.RosterTracker;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.User;
@@ -144,10 +144,10 @@ public class SarosView extends ViewPart {
         public void presenceChanged(Presence presence) {
 
             final boolean playAvailableSound = preferenceStore
-                .getBoolean(PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_ONLINE);
+                .getBoolean(EclipsePreferenceConstants.SOUND_PLAY_EVENT_CONTACT_ONLINE);
 
             final boolean playUnavailableSound = preferenceStore
-                .getBoolean(PreferenceConstants.SOUND_PLAY_EVENT_CONTACT_OFFLINE);
+                .getBoolean(EclipsePreferenceConstants.SOUND_PLAY_EVENT_CONTACT_OFFLINE);
 
             Presence lastPresence = lastPresenceMap.put(presence.getFrom(),
                 presence);
@@ -217,7 +217,7 @@ public class SarosView extends ViewPart {
         @Override
         public void propertyChange(PropertyChangeEvent event) {
             if (event.getProperty().equals(
-                PreferenceConstants.ENABLE_BALLOON_NOTIFICATION)) {
+                EclipsePreferenceConstants.ENABLE_BALLOON_NOTIFICATION)) {
                 showBalloonNotifications = Boolean.valueOf(event.getNewValue()
                     .toString());
             }
@@ -266,7 +266,7 @@ public class SarosView extends ViewPart {
         SarosPluginContext.initComponent(this);
         preferenceStore.addPropertyChangeListener(propertyListener);
         showBalloonNotifications = preferenceStore
-            .getBoolean(PreferenceConstants.ENABLE_BALLOON_NOTIFICATION);
+            .getBoolean(EclipsePreferenceConstants.ENABLE_BALLOON_NOTIFICATION);
     }
 
     /**
@@ -306,10 +306,10 @@ public class SarosView extends ViewPart {
             @Override
             public void controlResized(ControlEvent e) {
                 preferenceStore.setValue(
-                    PreferenceConstants.SAROSVIEW_SASH_WEIGHT_LEFT,
+                    EclipsePreferenceConstants.SAROSVIEW_SASH_WEIGHT_LEFT,
                     baseSashForm.getWeights()[0]);
                 preferenceStore.setValue(
-                    PreferenceConstants.SAROSVIEW_SASH_WEIGHT_RIGHT,
+                    EclipsePreferenceConstants.SAROSVIEW_SASH_WEIGHT_RIGHT,
                     baseSashForm.getWeights()[1]);
             }
 
@@ -376,9 +376,9 @@ public class SarosView extends ViewPart {
          */
         int[] weights = new int[] {
             preferenceStore
-                .getInt(PreferenceConstants.SAROSVIEW_SASH_WEIGHT_LEFT),
+                .getInt(EclipsePreferenceConstants.SAROSVIEW_SASH_WEIGHT_LEFT),
             preferenceStore
-                .getInt(PreferenceConstants.SAROSVIEW_SASH_WEIGHT_RIGHT) };
+                .getInt(EclipsePreferenceConstants.SAROSVIEW_SASH_WEIGHT_RIGHT) };
         baseSashForm.setWeights(weights);
 
         chatRooms = new ChatRoomsComposite(rightComposite, SWT.NONE,

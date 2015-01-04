@@ -25,6 +25,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
+import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.impl.ControlBotImpl;
 import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation.impl.AccountManipulatorImpl;
@@ -150,10 +151,10 @@ public class STFController {
 
         if (preferenceStore != null) {
             preferenceStore.setDefault(
-                PreferenceConstants.AUTO_STOP_EMPTY_SESSION,
+                EclipsePreferenceConstants.AUTO_STOP_EMPTY_SESSION,
                 MessageDialogWithToggle.ALWAYS);
             preferenceStore
-                .setToDefault(PreferenceConstants.AUTO_STOP_EMPTY_SESSION);
+                .setToDefault(EclipsePreferenceConstants.AUTO_STOP_EMPTY_SESSION);
         }
 
         // Revert March 2013 color hack

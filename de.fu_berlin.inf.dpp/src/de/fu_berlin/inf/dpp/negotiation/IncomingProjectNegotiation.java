@@ -42,7 +42,7 @@ import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
-import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.preferences.IPreferences;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.wizards.AddProjectToSessionWizard;
@@ -64,7 +64,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     private List<ProjectNegotiationData> projectInfos;
 
     @Inject
-    private PreferenceUtils preferenceUtils;
+    private IPreferences preferences;
 
     @Inject
     private RemoteProgressManager rpm;
@@ -111,7 +111,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     }
 
     /**
-     * 
+     *
      * @param projectID
      * @return The {@link FileList fileList} which belongs to the project with
      *         the ID <code>projectID</code> from inviter <br />
@@ -138,10 +138,10 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * actions are performed to avoid unintended data loss, i.e this method will
      * do a best effort to backup altered data but no guarantee can be made in
      * doing so!
-     * 
+     *
      * @param projectMapping
      *            mapping from remote project ids to the target local projects
-     * 
+     *
      * @throws IllegalArgumentException
      *             if either a project id is not valid or the referenced project
      *             for that id does not exist
@@ -309,7 +309,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     /**
      * calculates all the files the host/inviter has to send for synchronization
-     * 
+     *
      * @param projectMapping
      *            projectID => projectName (in local workspace)
      */
@@ -349,7 +349,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             VCSAdapter vcs = null;
 
             // FIXME we should stop here for partial shared projects
-            if (preferenceUtils.useVersionControl() && useVersionControl
+            if (preferences.useVersionControl() && useVersionControl
                 && !projectInfo.isPartial()) {
                 vcs = VCSAdapter.getAdapter(projectInfo.getFileList()
                     .getVcsProviderID());
@@ -405,7 +405,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     /**
      * Checks out a project using the provided VCS adapter. If the project does
      * not exists it will be created, otherwise it will be updated.
-     * 
+     *
      * @param vcs
      *            the VCS adapter to use for checkout
      * @param project
@@ -546,13 +546,13 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * Computes the list of files that we're going to request from the host.<br>
      * If a VCS is used, update files if needed, and remove them from the list
      * of requested files if that's possible.
-     * 
+     *
      * @param project
      * @param remoteFileList
      * @param provider
      *            VCS provider of the local project or <code>null</code>
      * @param monitor
-     * 
+     *
      * @return The list of files that we need from the host.
      * @throws LocalCancellationException
      *             If the user requested a cancel.
@@ -592,7 +592,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     /**
      * Determines the missing resources.
-     * 
+     *
      * @param localFileList
      *            The file list of the local project.
      * @param remoteFileList
@@ -706,9 +706,9 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * worst case, every resource has to be changed as many times as the number
      * of segments in its path. Due to these complications, the monitor is only
      * used for cancellation and the label, but not for the progress bar.
-     * 
+     *
      * @param remoteFileList
-     * 
+     *
      * @throws SarosCancellationException
      */
     private void initVcState(org.eclipse.core.resources.IResource resource,
@@ -809,7 +809,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     /**
      * Waits for the activity queuing request from the remote side.
-     * 
+     *
      * @param monitor
      */
     private void awaitActivityQueueingActivation(IProgressMonitor monitor)

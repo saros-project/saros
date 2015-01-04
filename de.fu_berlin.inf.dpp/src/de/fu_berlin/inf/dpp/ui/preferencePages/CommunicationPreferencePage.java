@@ -12,6 +12,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 
 @Component(module = "prefs")
@@ -42,15 +43,15 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
     protected void createFieldEditors() {
 
         useIRCStyleChatLayout = new BooleanFieldEditor(
-            PreferenceConstants.USE_IRC_STYLE_CHAT_LAYOUT,
+            EclipsePreferenceConstants.USE_IRC_STYLE_CHAT_LAYOUT,
             "Use IRC style for chats", getFieldEditorParent());
 
         chatserver = new StringFieldEditor(
-            PreferenceConstants.CUSTOM_MUC_SERVICE, "Custom chatserver: ",
-            getFieldEditorParent());
+            EclipsePreferenceConstants.CUSTOM_MUC_SERVICE,
+            "Custom chatserver: ", getFieldEditorParent());
 
         useCustomChatServer = new BooleanFieldEditor(
-            PreferenceConstants.FORCE_CUSTOM_MUC_SERVICE,
+            EclipsePreferenceConstants.FORCE_CUSTOM_MUC_SERVICE,
             "Always use custom chatserver", getFieldEditorParent());
 
         skypeName = new StringFieldEditor(PreferenceConstants.SKYPE_USERNAME,
@@ -65,7 +66,8 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
     @Override
     public void initialize() {
         super.initialize();
-        if (prefs.getBoolean(PreferenceConstants.FORCE_CUSTOM_MUC_SERVICE)) {
+        if (prefs
+            .getBoolean(EclipsePreferenceConstants.FORCE_CUSTOM_MUC_SERVICE)) {
             useCustomChatServer.setEnabled(!chatserver.getStringValue()
                 .isEmpty(), getFieldEditorParent());
         }
@@ -78,7 +80,7 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
             FieldEditor field = (FieldEditor) event.getSource();
 
             if (field.getPreferenceName().equals(
-                PreferenceConstants.CUSTOM_MUC_SERVICE)) {
+                EclipsePreferenceConstants.CUSTOM_MUC_SERVICE)) {
                 String serverName = event.getNewValue().toString();
                 useCustomChatServer.setEnabled(!serverName.isEmpty(),
                     getFieldEditorParent());

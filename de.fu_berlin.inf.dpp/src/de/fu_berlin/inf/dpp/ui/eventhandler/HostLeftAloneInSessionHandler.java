@@ -5,7 +5,7 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
 
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
@@ -136,7 +136,7 @@ public class HostLeftAloneInSessionHandler {
 
     private void handleHostLeftAlone() {
         String stopSessionPreference = preferenceStore
-            .getString(PreferenceConstants.AUTO_STOP_EMPTY_SESSION);
+            .getString(EclipsePreferenceConstants.AUTO_STOP_EMPTY_SESSION);
 
         boolean prompt = MessageDialogWithToggle.PROMPT
             .equals(stopSessionPreference);
@@ -150,7 +150,7 @@ public class HostLeftAloneInSessionHandler {
                     Messages.HostLeftAloneInSessionDialog_title,
                     Messages.HostLeftAloneInSessionDialog_message,
                     "Remember decision", false, preferenceStore,
-                    PreferenceConstants.AUTO_STOP_EMPTY_SESSION);
+                    EclipsePreferenceConstants.AUTO_STOP_EMPTY_SESSION);
 
             stopSession = dialog.getReturnCode() == IDialogConstants.YES_ID;
         }

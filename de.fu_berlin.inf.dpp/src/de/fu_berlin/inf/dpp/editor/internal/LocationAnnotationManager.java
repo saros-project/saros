@@ -26,7 +26,7 @@ import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.SelectionFillUpAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.Predicate;
@@ -48,7 +48,7 @@ public class LocationAnnotationManager {
         annotationModelHelper = new AnnotationModelHelper();
 
         fillUpEnabled = preferenceStore
-            .getBoolean(PreferenceConstants.SHOW_SELECTIONFILLUP_ANNOTATIONS);
+            .getBoolean(EclipsePreferenceConstants.SHOW_SELECTIONFILLUP_ANNOTATIONS);
     }
 
     /**
@@ -66,7 +66,7 @@ public class LocationAnnotationManager {
     public void propertyChange(final PropertyChangeEvent event,
         final Set<IEditorPart> allEditors) {
 
-        if (!PreferenceConstants.SHOW_SELECTIONFILLUP_ANNOTATIONS.equals(event
+        if (!EclipsePreferenceConstants.SHOW_SELECTIONFILLUP_ANNOTATIONS.equals(event
             .getProperty()))
             return;
 

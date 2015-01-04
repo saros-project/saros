@@ -8,7 +8,7 @@ import de.fu_berlin.inf.dpp.SarosConstants;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 
 public class ServerPreferenceHandler {
 
@@ -26,7 +26,7 @@ public class ServerPreferenceHandler {
             if (ConnectionState.CONNECTED.equals(newState)) {
                 if (Boolean.getBoolean("de.fu_berlin.inf.dpp.server.SUPPORTED")) {
                     if (preferenceStore
-                        .getBoolean(PreferenceConstants.SERVER_ACTIVATED)) {
+                        .getBoolean(EclipsePreferenceConstants.SERVER_ACTIVATED)) {
                         addServerFeature(connection);
                     } else {
                         removeServerFeature(connection);

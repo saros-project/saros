@@ -14,7 +14,7 @@ import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;
-import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.preferences.IPreferences;
 import de.fu_berlin.inf.dpp.stf.server.STFController;
 import de.fu_berlin.inf.dpp.ui.commandHandlers.GettingStartedHandler;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -24,9 +24,9 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 /**
  * An instance of this class is instantiated when Eclipse starts, after the
  * Saros plugin has been started.
- * 
+ *
  * {@link #earlyStartup()} is called after the workbench is initialized.
- * 
+ *
  * @author Lisa Dohrmann, Sandor Szücs, Stefan Rossbach
  */
 @Component(module = "integration")
@@ -44,7 +44,7 @@ public class StartupSaros implements IStartup {
     private ConnectionHandler connectionHandler;
 
     @Inject
-    private PreferenceUtils preferenceUtils;
+    private IPreferences preferences;
 
     @Inject
     private XMPPAccountStore xmppAccountStore;
@@ -101,7 +101,7 @@ public class StartupSaros implements IStartup {
                  * startup !
                  */
 
-                if (!preferenceUtils.isAutoConnecting()
+                if (!preferences.isAutoConnecting()
                     || xmppAccountStore.isEmpty())
                     return;
 

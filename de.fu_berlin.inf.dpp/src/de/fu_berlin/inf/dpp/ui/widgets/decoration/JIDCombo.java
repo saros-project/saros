@@ -13,7 +13,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.preferences.IPreferences;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 
 /**
@@ -27,7 +27,7 @@ import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 public class JIDCombo {
 
     @Inject
-    PreferenceUtils preferenceUtils;
+    IPreferences preferences;
 
     @Inject
     XMPPAccountStore xmppAccountStore;
@@ -52,7 +52,7 @@ public class JIDCombo {
     }
 
     protected void fill() {
-        String defaultServer = this.preferenceUtils.getDefaultServer();
+        String defaultServer = this.preferences.getDefaultServer();
 
         List<String> servers = this.xmppAccountStore.getDomains();
         if (servers.size() == 0)
@@ -113,7 +113,7 @@ public class JIDCombo {
 
     /**
      * Returns the underlying {@link Combo} {@link Control}.
-     * 
+     *
      * @return
      */
     public Combo getControl() {

@@ -23,7 +23,7 @@ import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
-import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.preferences.IPreferences;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
@@ -98,8 +98,7 @@ public class SarosSessionManagerTest {
         XMPPConnectionService network = PowerMock
             .createNiceMock(XMPPConnectionService.class);
 
-        PreferenceUtils preferences = PowerMock
-            .createNiceMock(PreferenceUtils.class);
+        IPreferences preferences = PowerMock.createNiceMock(IPreferences.class);
 
         PowerMock.expectNew(SarosSession.class, EasyMock.isNull(String.class),
             EasyMock.anyInt(), EasyMock.anyObject(ISarosContext.class))
