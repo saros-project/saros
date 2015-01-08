@@ -77,7 +77,6 @@ import de.fu_berlin.inf.dpp.ui.actions.ChangeColorAction;
 import de.fu_berlin.inf.dpp.ui.actions.ChangeWriteAccessAction;
 import de.fu_berlin.inf.dpp.ui.actions.ChangeXMPPAccountAction;
 import de.fu_berlin.inf.dpp.ui.actions.ConsistencyAction;
-import de.fu_berlin.inf.dpp.ui.actions.ContactAvailabilityAction;
 import de.fu_berlin.inf.dpp.ui.actions.DeleteContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.Disposable;
 import de.fu_berlin.inf.dpp.ui.actions.FollowModeAction;
@@ -476,7 +475,6 @@ public class SarosView extends ViewPart {
                 manager.add(getAction(SendFileAction.ACTION_ID));
                 manager.add(getAction(RenameContactAction.ACTION_ID));
                 manager.add(getAction(DeleteContactAction.ACTION_ID));
-                manager.add(getAction(ContactAvailabilityAction.ACTION_ID));
             }
         });
     }
@@ -694,7 +692,6 @@ public class SarosView extends ViewPart {
         registerAction(new SkypeAction());
         registerAction(new RenameContactAction());
         registerAction(new DeleteContactAction());
-        registerAction(new ContactAvailabilityAction());
 
         // ContextMenus Both
         registerAction(new OpenChatAction(chatRooms));
