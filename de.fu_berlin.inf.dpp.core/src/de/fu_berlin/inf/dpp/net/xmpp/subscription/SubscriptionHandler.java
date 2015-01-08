@@ -98,8 +98,7 @@ public class SubscriptionHandler {
         if (connection == null)
             return false;
 
-        boolean success = true;
-        success &= sendSubscribedPresence(jid);
+        boolean success = sendSubscribedPresence(jid);
 
         if (requestSubscription)
             success &= requestSubscription(jid);
@@ -174,7 +173,7 @@ public class SubscriptionHandler {
     }
 
     private synchronized boolean requestSubscription(JID jid) {
-        boolean error = false;
+        boolean success = true;
 
         RosterEntry entry = connection.getRoster().getEntry(jid.getBase());
 
@@ -187,18 +186,18 @@ public class SubscriptionHandler {
 
         } catch (XMPPException e) {
             LOG.error("adding user to roster failed", e);
-            error = true;
+            success = false;
         } catch (IllegalStateException e) {
             LOG.error(
                 "cannot add user to roster, not connected to a XMPP server", e);
-            error = true;
+            success = false;
         }
 
-        return error;
+        return success;
     }
 
     private boolean sendSubscribedPresence(JID jid) {
-        boolean error = false;
+        boolean success = true;
 
         try {
             sendPresence(Presence.Type.subscribed, jid.getBase());
@@ -207,14 +206,14 @@ public class SubscriptionHandler {
                 "failed to send subscribe message, not connected to a XMPP server",
                 e);
 
-            error = true;
+            success = false;
         }
 
-        return error;
+        return success;
     }
 
     private boolean sendUnsubscribedPresence(JID jid) {
-        boolean error = false;
+        boolean success = true;
 
         try {
             sendPresence(Presence.Type.unsubscribed, jid.getBase());
@@ -223,10 +222,10 @@ public class SubscriptionHandler {
                 "failed to send unsubscribed message, not connected to a XMPP server",
                 e);
 
-            error = true;
+            success = false;
         }
 
-        return error;
+        return success;
     }
 
     private void sendPresence(Presence.Type type, String to) {
