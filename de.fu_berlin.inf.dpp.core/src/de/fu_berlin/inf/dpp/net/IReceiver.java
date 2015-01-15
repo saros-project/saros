@@ -9,7 +9,7 @@ import de.fu_berlin.inf.dpp.net.internal.BinaryXMPPExtension;
 public interface IReceiver {
 
     /**
-     * @JTourBusStop 4, Architecture Overview, Network Layer - Receiver:
+     * @JTourBusStop 5, Architecture Overview, Network Layer - Receiver:
      * 
      *               (...) And this Interface is the main entrance point for
      *               receiving them.

@@ -38,7 +38,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 public interface ITransmitter {
 
     /**
-     * @JTourBusStop 3, Architecture Overview, Network Layer - Transmitter:
+     * @JTourBusStop 4, Architecture Overview, Network Layer - Transmitter:
      * 
      *               The Network Layer is responsible for communicating with
      *               other participants by sending and receiving messages. This

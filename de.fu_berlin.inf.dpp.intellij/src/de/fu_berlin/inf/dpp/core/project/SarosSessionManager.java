@@ -74,7 +74,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class SarosSessionManager implements ISarosSessionManager {
 
     /**
-     * @JTourBusStop 5, Architecture Overview, Invitation Management:
+     * @JTourBusStop 6, Architecture Overview, Invitation Management:
      *
      *               While Activities are used to keep a running session
      *               consistent, we use MESSAGES whenever the Session itself is
