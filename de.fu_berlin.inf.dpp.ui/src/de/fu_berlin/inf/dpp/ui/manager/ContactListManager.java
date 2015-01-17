@@ -13,7 +13,11 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
+import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.util.StringUtils;
+
+import java.util.Collection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +38,8 @@ public class ContactListManager {
 
     private ContactList contactList = ContactList.EMPTY_CONTACT_LIST;
 
+    private Roster roster;
+
     private boolean connected = false;
 
     /**
@@ -53,12 +59,10 @@ public class ContactListManager {
             ConnectionState state) {
             switch (state) {
             case CONNECTED:
-                LOG.debug("StateListener: connected!!");
                 synchronized (ContactListManager.this) {
-                    JID jid = new JID(connection.getUser());
                     contactList = new ContactList(
-                        new Account(jid.getName(), jid.getDomain()),
-                        createListOfContacts(connection.getRoster()));
+                        new Account(connection.getUser()),
+                        connection.getRoster());
                     connected = true;
                     //TODO merge render functions, remove null check
                     if (contactListRenderer != null) {
@@ -68,8 +72,9 @@ public class ContactListManager {
                 }
                 break;
             case CONNECTING:
-                LOG.debug("StateListener: connecting ");
                 synchronized (ContactListManager.this) {
+                    roster = connection.getRoster();
+                    roster.addRosterListener(rosterListener);
                     //TODO merge render functions, remove null check
                     if (contactListRenderer != null) {
                         contactListRenderer.renderIsConnecting();
@@ -77,9 +82,9 @@ public class ContactListManager {
                 }
                 break;
             case DISCONNECTING:
-                LOG.debug("StateListener: disconnecting");
                 synchronized (ContactListManager.this) {
-                    //TODO merge render functions, remove null check
+                    //TODO remove null check
+                    roster.removeRosterListener(rosterListener);
                     if (contactListRenderer != null) {
                         contactListRenderer.renderIsDisconnecting();
                     }
@@ -90,7 +95,6 @@ public class ContactListManager {
                 LOG.error("StateListener: error");
                 break;
             case NOT_CONNECTED:
-                LOG.debug("StateListener: not connected");
                 synchronized (ContactListManager.this) {
                     connected = false;
                     contactList = ContactList.EMPTY_CONTACT_LIST;
@@ -105,22 +109,40 @@ public class ContactListManager {
         }
     };
 
-    /**
-     * Adds the roster entries as contact object to a new list.
-     *
-     * @param roster the roster
-     * @return the list containing the roster entries as contacts
-     */
-    private List<Contact> createListOfContacts(Roster roster) {
-        List<Contact> res = new ArrayList<Contact>(roster.getEntries().size());
-        for (RosterEntry contactEntry : roster.getEntries()) {
-            Presence presence = roster.getPresence(contactEntry.getUser());
-            //TODO consider all type, e.g. subscription pending
-            boolean isOnline = presence.getType() == Presence.Type.available;
-            res.add(new Contact(contactEntry.getUser(), isOnline));
+    private final RosterListener rosterListener = new RosterListener() {
+        @Override
+        public void entriesAdded(Collection<String> addresses) {
+            synchronized (ContactListManager.this) {
+                contactList = contactList.rebuild(roster);
+                contactListRenderer.renderContactList(contactList);
+            }
+
         }
-        return res;
-    }
+
+        @Override
+        public void entriesUpdated(Collection<String> addresses) {
+            synchronized (ContactListManager.this) {
+                contactList = contactList.rebuild(roster);
+                contactListRenderer.renderContactList(contactList);
+            }
+        }
+
+        @Override
+        public void entriesDeleted(Collection<String> addresses) {
+            synchronized (ContactListManager.this) {
+                contactList = contactList.rebuild(roster);
+                contactListRenderer.renderContactList(contactList);
+            }
+        }
+
+        @Override
+        public void presenceChanged(Presence presence) {
+            synchronized (ContactListManager.this) {
+                contactList = contactList.rebuild(roster);
+                contactListRenderer.renderContactList(contactList);
+            }
+        }
+    };
 
     /**
      * This methods gets called when the browser has changed. It re-renders the

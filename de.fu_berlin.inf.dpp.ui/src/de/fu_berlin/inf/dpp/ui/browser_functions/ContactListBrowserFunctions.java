@@ -2,7 +2,9 @@ package de.fu_berlin.inf.dpp.ui.browser_functions;
 
 import com.google.gson.Gson;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.ui.manager.IDialogManager;
 import de.fu_berlin.inf.dpp.ui.model.Account;
+import de.fu_berlin.inf.dpp.util.ComponentLookup;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.browser.Browser;
@@ -24,12 +26,15 @@ public class ContactListBrowserFunctions {
 
     private Browser browser;
 
+    private final IDialogManager dialogManager;
+
     /**
      * @param browser the SWT browser in which the functions should be injected
      * @param contactListCoreService
      */
     public ContactListBrowserFunctions(Browser browser,
         ContactListCoreService contactListCoreService) {
+        dialogManager = ComponentLookup.getDialogManager();
         this.browser = browser;
         this.contactListCoreService = contactListCoreService;
     }
@@ -106,8 +111,31 @@ public class ContactListBrowserFunctions {
                     @Override
                     public void run() {
                         contactListCoreService.addContact(new JID((String) arguments[0]));
+
                     }
                 });
+                dialogManager.closeDialogWindow(
+                    ComponentLookup.getAddContactWizard());
+                return null;
+            }
+        };
+
+        new BrowserFunction(browser,
+            "__java_showAddContactWizard") {
+            @Override
+            public Object function(Object[] arguments) {
+                dialogManager.showDialogWindow(
+                    ComponentLookup.getAddContactWizard());
+                return null;
+            }
+        };
+
+        new BrowserFunction(browser,
+            "__java_cancelAddContactWizard") {
+            @Override
+            public Object function(Object[] arguments) {
+                dialogManager.closeDialogWindow(
+                    ComponentLookup.getAddContactWizard());
                 return null;
             }
         };

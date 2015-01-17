@@ -36,6 +36,7 @@ import de.fu_berlin.inf.dpp.ui.browser_functions.ContactListCoreService;
 import de.fu_berlin.inf.dpp.ui.manager.ContactListManager;
 import de.fu_berlin.inf.dpp.ui.manager.IDialogManager;
 import de.fu_berlin.inf.dpp.ui.view_parts.AddAccountWizard;
+import de.fu_berlin.inf.dpp.ui.view_parts.AddContactWizard;
 import de.fu_berlin.inf.dpp.ui.view_parts.SarosMainPage;
 import de.fu_berlin.inf.dpp.util.ComponentLookup;
 import org.picocontainer.BindKey;
@@ -88,6 +89,7 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
         Component.create(ContactListCoreService.class),
         Component.create(SarosMainPage.class),
         Component.create(AddAccountWizard.class),
+        Component.create(AddContactWizard.class),
         Component.create(ComponentLookup.class)
     };
 

@@ -28,6 +28,15 @@ public class Account {
         jid = new JID(username, domain);
     }
 
+    /**
+     * @param jid the jid as string
+     */
+    public Account(String jid) {
+        this.jid = new JID(jid);
+        username = this.jid.getName();
+        domain = this.jid.getDomain();
+    }
+
     public String getUsername() {
         return username;
     }

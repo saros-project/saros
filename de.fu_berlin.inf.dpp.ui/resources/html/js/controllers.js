@@ -51,6 +51,10 @@ app.controller('ToolbarController', function ($scope) {
     $scope.showAddAccountWizard = function () {
         __java_showAddAccountWizard();
     };
+
+    $scope.showAddContactWizard = function () {
+        __java_showAddContactWizard();
+    };
 });
 
 app.controller('ContactListCtrl', function ($scope) {
@@ -58,8 +62,8 @@ app.controller('ContactListCtrl', function ($scope) {
 
     $scope.root = null;
 
-    $scope.add = function (contact) {
-        $scope.contacts.push({name: contact})
+    $scope.add = function (contact, presence, addition) {
+        $scope.contacts.push({name: contact, presence: presence, addition: addition})
     };
 
     $scope.displayRoot = function (account) {
@@ -83,8 +87,8 @@ __angular_displayContactList = function (contactList) {
     var exposedScope = angular.element(document.getElementById('contact-list')).scope();
     exposedScope.$apply(exposedScope.displayRoot(contactList.account));
     exposedScope.$apply(exposedScope.clearAll());
-    contactList.contactList.forEach(function (user) {
-        exposedScope.$apply(exposedScope.add(user.displayName));
+    contactList.contactList.forEach(function (contact) {
+        exposedScope.$apply(exposedScope.add(contact.displayName, contact.presence, contact.addition));
     });
 };
 
