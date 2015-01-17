@@ -1,35 +1,14 @@
-/*
- *
- *  DPP - Serious Distributed Pair Programming
- *  (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2010
- *  (c) NFQ (www.nfq.com) - 2014
- *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 1, or (at your option)
- *  any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- * /
- */
-
 package de.fu_berlin.inf.dpp.ui.browser_functions;
 
 import com.google.gson.Gson;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.ui.manager.ContactListManager;
 import de.fu_berlin.inf.dpp.ui.model.Account;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.BrowserFunction;
+import org.eclipse.swt.widgets.Display;
+import org.jivesoftware.smack.XMPPException;
 
 /**
  * This class implements the functions to be called by Javascript code for
@@ -41,19 +20,18 @@ public class ContactListBrowserFunctions {
     private static final Logger LOG = Logger
         .getLogger(ContactListBrowserFunctions.class);
 
-    private ContactListManager contactListManager;
+    private ContactListCoreService contactListCoreService;
 
     private Browser browser;
 
     /**
      * @param browser the SWT browser in which the functions should be injected
+     * @param contactListCoreService
      */
-    public ContactListBrowserFunctions(Browser browser) {
+    public ContactListBrowserFunctions(Browser browser,
+        ContactListCoreService contactListCoreService) {
         this.browser = browser;
-    }
-
-    public void setContactListManager(ContactListManager contactListManager) {
-        this.contactListManager = contactListManager;
+        this.contactListCoreService = contactListCoreService;
     }
 
     /**
@@ -72,25 +50,13 @@ public class ContactListBrowserFunctions {
                     ThreadUtils.runSafeAsync(LOG, new Runnable() {
                         @Override
                         public void run() {
-                            contactListManager.connect(account);
+                            contactListCoreService.connect(account);
                         }
                     });
                 } else {
-                    ThreadUtils.runSafeAsync(LOG, new Runnable() {
-                        @Override
-                        public void run() {
-                            //        String domain = "saros-con.imp.fu-berlin.de";
-                            //        int port = 0;
-                            //        String server = "";
-                            //        boolean useTLS = false;
-                            //        boolean useSASL = true
-                            //        String username = "dev8_alice_stf";
-                            //        String password = "dev";
-                            contactListManager.connect(
-                                new Account("dev8_alice_stf",
-                                    "saros-con.imp.fu-berlin.de"));
-                        }
-                    });
+                    LOG.error("Connect was called without an account.");
+                    browser.execute(
+                        "alert('Cannot connect because no account was given.');");
                 }
                 return null;
             }
@@ -101,7 +67,7 @@ public class ContactListBrowserFunctions {
                 ThreadUtils.runSafeAsync(LOG, new Runnable() {
                     @Override
                     public void run() {
-                        contactListManager.disconnect();
+                        contactListCoreService.disconnect();
                     }
                 });
                 return null;
@@ -114,8 +80,19 @@ public class ContactListBrowserFunctions {
                 ThreadUtils.runSafeAsync(LOG, new Runnable() {
                     @Override
                     public void run() {
-                        contactListManager
-                            .deleteContact(new JID((String) arguments[0]));
+                        try {
+                            contactListCoreService
+                                .deleteContact(new JID((String) arguments[0]));
+                        } catch (XMPPException e) {
+                            LOG.error("Error deleting contact ", e);
+                            //TODO getDefault() may create a new display when Eclipse shut down
+                            Display.getDefault().asyncExec(new Runnable() {
+                                @Override
+                                public void run() {
+                                    browser.execute( "alert('Error deleting contact');");
+                                }
+                            });
+                        }
                     }
                 });
                 return null;
@@ -128,8 +105,7 @@ public class ContactListBrowserFunctions {
                 ThreadUtils.runSafeAsync(LOG, new Runnable() {
                     @Override
                     public void run() {
-                        contactListManager
-                            .addContact(new JID((String) arguments[0]));
+                        contactListCoreService.addContact(new JID((String) arguments[0]));
                     }
                 });
                 return null;

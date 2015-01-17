@@ -1,29 +1,12 @@
-/*
- *
- *  DPP - Serious Distributed Pair Programming
- *  (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2010
- *  (c) NFQ (www.nfq.com) - 2014
- *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 1, or (at your option)
- *  any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- * /
- */
-
 package de.fu_berlin.inf.dpp.ui.manager;
 
 import de.fu_berlin.inf.dpp.ui.browser_functions.AccountBrowserFunctions;
+import de.fu_berlin.inf.dpp.ui.browser_functions.ContactListBrowserFunctions;
+import de.fu_berlin.inf.dpp.ui.browser_functions.ContactListCoreService;
+import de.fu_berlin.inf.dpp.ui.browser_functions.ContactListRenderer;
 import org.eclipse.swt.browser.Browser;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 
 /**
  * Encloses the different managers for the UI.
@@ -32,20 +15,44 @@ import org.eclipse.swt.browser.Browser;
  */
 public class HTMLUIManager {
 
-    private HTMLUIManager() {
+    private final ContactListManager contactListManager;
+
+    private final ContactListCoreService contactListCoreService;
+
+    public HTMLUIManager(ContactListManager contactListManager,
+        ContactListCoreService contactListCoreService) {
+        this.contactListManager = contactListManager;
+        this.contactListCoreService = contactListCoreService;
     }
 
     /**
-     * Factory method
-     * Up till now the HTMLUiManager is specific for each browser instance.
-     * That means that is has to be re-created when the browser changes.
+     * Creates the appropriate renderer classes for a given SWT browser
+     * and sets the created renderers in its managed classes.
+     * Up till now this is onlye the contact list manager.
      *
      * @param browser the SWT browser
-     * @return the created HTML UI manager object
      */
-    public static HTMLUIManager create(Browser browser) {
-        ContactListManager.createManager(browser);
+    public void createRenderer(Browser browser) {
+        ContactListRenderer contactListRenderer = new ContactListRenderer(
+            browser);
+        contactListManager.setContactListRenderer(contactListRenderer);
+        browser.addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(DisposeEvent e) {
+                contactListManager.removeContactListRenderer();
+            }
+        });
+    }
+
+    /**
+     * Creates the appropriate browser functions for a given SWT browser.
+     *
+     * @param browser the SWT browser
+     */
+    public void createBrowserFunctions(Browser browser) {
+        ContactListBrowserFunctions contactListBrowserFunctions = new ContactListBrowserFunctions(
+            browser, contactListCoreService);
+        contactListBrowserFunctions.createJavascriptFunctions();
         new AccountBrowserFunctions(browser).createJavascriptFunctions();
-        return new HTMLUIManager();
     }
 }

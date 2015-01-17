@@ -1,34 +1,10 @@
-/*
- *
- *  DPP - Serious Distributed Pair Programming
- *  (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2010
- *  (c) NFQ (www.nfq.com) - 2014
- *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 1, or (at your option)
- *  any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- * /
- */
-
 package de.fu_berlin.inf.dpp.util;
 
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
-import de.fu_berlin.inf.dpp.ui.manager.IDialogManager;
-
-import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.net.xmpp.subscription.SubscriptionHandler;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
+import de.fu_berlin.inf.dpp.ui.manager.HTMLUIManager;
+import de.fu_berlin.inf.dpp.ui.manager.IDialogManager;
 import org.picocontainer.annotations.Inject;
 
 /**
@@ -46,9 +22,6 @@ public class ComponentLookup {
     private static IDialogManager dialogManager;
 
     @Inject
-    private static ConnectionHandler connectionHandler;
-
-    @Inject
     private static XMPPConnectionService connectionService;
 
     @Inject
@@ -58,11 +31,8 @@ public class ComponentLookup {
     private static XMPPAccountStore accountStore;
 
     @Inject
-    private static SubscriptionHandler subscriptionHandler;
+    private static HTMLUIManager htmlUIManager;
 
-    public static ConnectionHandler getConnectionHandler() {
-        return connectionHandler;
-    }
 
     public static XMPPConnectionService getConnectionService() {
         return connectionService;
@@ -80,7 +50,7 @@ public class ComponentLookup {
         return accountStore;
     }
 
-    public static SubscriptionHandler getSubscriptionHandler() {
-        return subscriptionHandler;
+    public static HTMLUIManager getHtmlUIManager() {
+        return htmlUIManager;
     }
 }
