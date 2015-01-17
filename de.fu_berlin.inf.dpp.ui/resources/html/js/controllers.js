@@ -1,4 +1,4 @@
-var app = angular.module('app', ['ui.bootstrap']);
+var app = angular.module('app', ['ui.bootstrap', 'ng-context-menu']);
 
 app.controller('ToolbarController', function ($scope) {
     $scope.connectButtonText = "Connect";
@@ -62,6 +62,8 @@ app.controller('ContactListCtrl', function ($scope) {
 
     $scope.root = null;
 
+    $scope.selected = null;
+
     $scope.add = function (contact, presence, addition) {
         $scope.contacts.push({name: contact, presence: presence, addition: addition})
     };
@@ -72,6 +74,18 @@ app.controller('ContactListCtrl', function ($scope) {
 
     $scope.clearAll = function () {
         $scope.contacts = [];
+    };
+
+    $scope.selectContact = function (name) {
+        $scope.selected = name;
+    };
+
+    $scope.renameContact = function () {
+        __java_renameContact($scope.selected);
+    };
+
+    $scope.deleteContact = function () {
+        __java_deleteContact($scope.selected);
     };
 });
 

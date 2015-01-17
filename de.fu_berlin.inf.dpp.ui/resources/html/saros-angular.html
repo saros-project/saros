@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <title>Saros Plugin</title>
     <script src="lib/angular.min.js"></script>
+    <script src="lib/ng-context-menu.js"></script>
     <script src="lib/ui-bootstrap-tpls-0.11.2.min.js"></script>
     <script src="js/controllers.js"></script>
 
@@ -25,25 +26,87 @@
                 <a href="#" ng-click="connectUser(account)">{{account.username}}@{{account.domain}}</a>
             </li>
             <li ng-show="accounts" class="divider"></li>
-            <li><a href="#" ng-click="showAddAccountWizard()">Add Account</a>
+            <li><a href="#" ng-click="showAddAccountWizard()">Add
+                Account</a>
             </li>
         </ul>
     </div>
-    <button type="button" class="btn btn-primary" ng-click="showAddContactWizard()">Add Contact...</button>
+    <button type="button" class="btn btn-primary"
+            ng-click="showAddContactWizard()">Add Contact...
+    </button>
 </div>
 
-<div id="roster" ng-controller="ContactListCtrl">
+<div id="roster"
+     ng-controller="ContactListCtrl">
     <h3 ng-show="root" ng-model="root">{{root}}</h3>
-    <h4>No Session Running</h4>
-    <h4>Contacts</h4>
+    <h4 context-menu data-target="menu-shareproject">No Session Running</h4>
+    <h4 context-menu data-target="menu-addcontact">Contacts</h4>
 
     <ul id="contact-list">
-        <li ng-repeat="contact in contacts">
+        <li context-menu="selectContact(contact.name)" ng-repeat="contact in contacts"
+            data-target="menu-contact">
             <span>{{contact.name}}</span>
             <span>[{{contact.presence}}]</span>
             <span ng-show="contact.addition">({{contact.addition}})</span>
         </li>
     </ul>
+
+    <div class="dropdown position-fixed" id="menu-contact">
+        <ul class="dropdown-menu" role="menu">
+            <li>
+                <a class="pointer" role="menuitem" tabindex="1"
+                   ng-click="">
+                    Work together on...
+                </a>
+            </li>
+            <li>
+                <a class="pointer" role="menuitem" tabindex="2"
+                   ng-click="">
+                    Send File
+                </a>
+            </li>
+            <li>
+                <a class="pointer" role="menuitem" tabindex="3"
+                   ng-click="renameContact()">
+                    Rename...
+                </a>
+            </li>
+            <li>
+                <a class="pointer" role="menuitem" tabindex="4"
+                   ng-click="deleteContact()">
+                    Delete
+                </a>
+            </li>
+            <li>
+                <a class="pointer" role="menuitem" tabindex="5"
+                   ng-click="">
+                    Show Unavailable Message
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="dropdown position-fixed" id="menu-addcontact">
+        <ul class="dropdown-menu" role="menu">
+            <li>
+                <a class="pointer" role="menuitem" tabindex="1"
+                   ng-click="">
+                    Add Contact...
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="dropdown position-fixed" id="menu-shareproject">
+        <ul class="dropdown-menu" role="menu">
+            <li>
+                <a class="pointer" role="menuitem" tabindex="1"
+                   ng-click="">
+                    Share Project...
+                </a>
+            </li>
+        </ul>
+    </div>
 </div>
 </body>
 </html>
