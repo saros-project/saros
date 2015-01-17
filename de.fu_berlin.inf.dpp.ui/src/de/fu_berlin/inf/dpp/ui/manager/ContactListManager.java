@@ -32,7 +32,9 @@ public class ContactListManager {
 
     private ContactListRenderer contactListRenderer;
 
-    private ContactList contactList = ContactList.EMPTY_CONTACT_LIST;;
+    private ContactList contactList = ContactList.EMPTY_CONTACT_LIST;
+
+    private boolean connected = false;
 
     /**
      * This class may be managed by pico container.
@@ -51,18 +53,37 @@ public class ContactListManager {
             ConnectionState state) {
             switch (state) {
             case CONNECTED:
-                JID jid = new JID(connection.getUser());
                 LOG.debug("StateListener: connected!!");
-                contactList = new ContactList(
-                    new Account(jid.getName(), jid.getDomain()),
-                    createListOfContacts(connection.getRoster()));
-                contactListRenderer.renderContactList(contactList);
+                synchronized (ContactListManager.this) {
+                    JID jid = new JID(connection.getUser());
+                    contactList = new ContactList(
+                        new Account(jid.getName(), jid.getDomain()),
+                        createListOfContacts(connection.getRoster()));
+                    connected = true;
+                    //TODO merge render functions, remove null check
+                    if (contactListRenderer != null) {
+                        contactListRenderer.renderIsConnected(true);
+                        contactListRenderer.renderContactList(contactList);
+                    }
+                }
                 break;
             case CONNECTING:
                 LOG.debug("StateListener: connecting ");
+                synchronized (ContactListManager.this) {
+                    //TODO merge render functions, remove null check
+                    if (contactListRenderer != null) {
+                        contactListRenderer.renderIsConnecting();
+                    }
+                }
                 break;
             case DISCONNECTING:
                 LOG.debug("StateListener: disconnecting");
+                synchronized (ContactListManager.this) {
+                    //TODO merge render functions, remove null check
+                    if (contactListRenderer != null) {
+                        contactListRenderer.renderIsDisconnecting();
+                    }
+                }
                 break;
             case ERROR:
                 //TODO better error handling
@@ -70,8 +91,15 @@ public class ContactListManager {
                 break;
             case NOT_CONNECTED:
                 LOG.debug("StateListener: not connected");
-                contactList = ContactList.EMPTY_CONTACT_LIST;
-                contactListRenderer.renderContactList(contactList);
+                synchronized (ContactListManager.this) {
+                    connected = false;
+                    contactList = ContactList.EMPTY_CONTACT_LIST;
+                    //TODO merge render functions, remove null check
+                    if (contactListRenderer != null) {
+                        contactListRenderer.renderContactList(contactList);
+                        contactListRenderer.renderIsConnected(false);
+                    }
+                }
                 break;
             }
         }
@@ -100,9 +128,12 @@ public class ContactListManager {
      *
      * @param renderer the contact list renderer with the current browser
      */
-    public void setContactListRenderer(ContactListRenderer renderer) {
+    public synchronized void setContactListRenderer(
+        ContactListRenderer renderer) {
         contactListRenderer = renderer;
         connectionService.addListener(connectionListener);
+        //TODO merge render functions
+        contactListRenderer.renderIsConnected(connected);
         contactListRenderer.renderContactList(contactList);
     }
 
@@ -110,7 +141,8 @@ public class ContactListManager {
      * Removes the contact list render and the connection listener.
      * This method should be called when the browser is disposed.
      */
-    public void removeContactListRenderer() {
+    public synchronized void removeContactListRenderer() {
+        //TODO no null assignment
         contactListRenderer = null;
         connectionService.removeListener(connectionListener);
     }

@@ -104,9 +104,11 @@ public class AccountBrowserFunctions {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
-                LOG.debug("sending json: " + allAcountsToJson());
-                browser.execute(
-                    "__angular_setAccountList(" + allAcountsToJson() + ")");
+                if (!browser.isDisposed()) {
+                    LOG.debug("sending json: " + allAcountsToJson());
+                    browser.execute(
+                        "__angular_setAccountList(" + allAcountsToJson() + ")");
+                }
             }
         });
     }

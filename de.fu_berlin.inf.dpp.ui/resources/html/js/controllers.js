@@ -5,30 +5,46 @@ app.controller('ToolbarController', function ($scope) {
 
     $scope.connected = false;
 
+    $scope.buttonDisabled = false;
+
     $scope.accounts = [];
 
+    //TODO function name, maybe toggle connect?
     $scope.connect = function () {
         if (!$scope.connected) {
             if ($scope.accounts.length > 0) {
-                $scope.showDisconnect();
                 $scope.connectUser($scope.accounts[0]);
             } else {
                 alert("Cannot connect because no account is configured.");
             }
         } else {
-            $scope.connectButtonText = "Connect";
             __java_disconnect();
-            $scope.connected = false;
         }
+    };
+
+    $scope.showConnect = function () {
+        $scope.connectButtonText = "Connect";
+        $scope.connected = false;
+        $scope.buttonDisabled = false;
     };
 
     $scope.showDisconnect = function () {
         $scope.connectButtonText = "Disconnect";
         $scope.connected = true;
+        $scope.buttonDisabled = false;
+    };
+
+    $scope.showConnecting = function () {
+        $scope.connectButtonText = "Connecting...";
+        $scope.buttonDisabled = true;
+    };
+
+    $scope.showDisconnecting = function () {
+        $scope.connectButtonText = "Disconnecting...";
+        $scope.buttonDisabled = true;
     };
 
     $scope.connectUser = function (account) {
-        $scope.showDisconnect();
         __java_connect(JSON.stringify(account));
     };
 
@@ -70,4 +86,23 @@ __angular_displayContactList = function (contactList) {
     contactList.contactList.forEach(function (user) {
         exposedScope.$apply(exposedScope.add(user.displayName));
     });
+};
+
+__angular_setIsConnected = function (connected) {
+    var exposedScope = angular.element(document.getElementById('toolbar')).scope();
+    if (connected) {
+        exposedScope.$apply(exposedScope.showDisconnect());
+    } else {
+        exposedScope.$apply(exposedScope.showConnect());
+    }
+};
+
+__angular_setIsConnecting = function () {
+    var exposedScope = angular.element(document.getElementById('toolbar')).scope();
+    exposedScope.$apply(exposedScope.showConnecting());
+};
+
+__angular_setIsDisconnecting = function () {
+    var exposedScope = angular.element(document.getElementById('toolbar')).scope();
+    exposedScope.$apply(exposedScope.showDisconnecting());
 };
