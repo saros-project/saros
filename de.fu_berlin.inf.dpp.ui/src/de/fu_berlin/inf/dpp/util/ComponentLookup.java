@@ -3,8 +3,9 @@ package de.fu_berlin.inf.dpp.util;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
-import de.fu_berlin.inf.dpp.ui.manager.HTMLUIManager;
 import de.fu_berlin.inf.dpp.ui.manager.IDialogManager;
+import de.fu_berlin.inf.dpp.ui.view_parts.AddAccountWizard;
+import de.fu_berlin.inf.dpp.ui.view_parts.SarosMainPage;
 import org.picocontainer.annotations.Inject;
 
 /**
@@ -31,8 +32,18 @@ public class ComponentLookup {
     private static XMPPAccountStore accountStore;
 
     @Inject
-    private static HTMLUIManager htmlUIManager;
+    private static AddAccountWizard addAccountWizard;
 
+    @Inject
+    private static SarosMainPage sarosMainPage;
+
+    public static AddAccountWizard getAddAccountWizard() {
+        return addAccountWizard;
+    }
+
+    public static SarosMainPage getSarosMainPage() {
+        return sarosMainPage;
+    }
 
     public static XMPPConnectionService getConnectionService() {
         return connectionService;
@@ -48,9 +59,5 @@ public class ComponentLookup {
 
     public static XMPPAccountStore getAccountStore() {
         return accountStore;
-    }
-
-    public static HTMLUIManager getHtmlUIManager() {
-        return htmlUIManager;
     }
 }

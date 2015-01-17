@@ -34,8 +34,9 @@ import de.fu_berlin.inf.dpp.intellij.ui.swt_browser.IntelliJDialogManager;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.ui.browser_functions.ContactListCoreService;
 import de.fu_berlin.inf.dpp.ui.manager.ContactListManager;
-import de.fu_berlin.inf.dpp.ui.manager.HTMLUIManager;
 import de.fu_berlin.inf.dpp.ui.manager.IDialogManager;
+import de.fu_berlin.inf.dpp.ui.view_parts.AddAccountWizard;
+import de.fu_berlin.inf.dpp.ui.view_parts.SarosMainPage;
 import de.fu_berlin.inf.dpp.util.ComponentLookup;
 import org.picocontainer.BindKey;
 import org.picocontainer.MutablePicoContainer;
@@ -85,7 +86,8 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
         Component.create(ConnectionHandler.class),
         Component.create(ContactListManager.class),
         Component.create(ContactListCoreService.class),
-        Component.create(HTMLUIManager.class),
+        Component.create(SarosMainPage.class),
+        Component.create(AddAccountWizard.class),
         Component.create(ComponentLookup.class)
     };
 

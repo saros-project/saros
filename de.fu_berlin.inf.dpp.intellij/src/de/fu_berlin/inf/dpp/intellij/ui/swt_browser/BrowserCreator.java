@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.intellij.ui.swt_browser;
 
-import de.fu_berlin.inf.dpp.ui.manager.HTMLUIManager;
-import de.fu_berlin.inf.dpp.util.ComponentLookup;
+import de.fu_berlin.inf.dpp.ui.view_parts.BrowserPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.browser.Browser;
@@ -13,22 +12,21 @@ import org.eclipse.swt.widgets.Shell;
  */
 class BrowserCreator {
     private Browser browser;
-    private HTMLUIManager htmlUIManager;
 
     BrowserCreator() {
-        htmlUIManager = ComponentLookup.getHtmlUIManager();
     }
 
     /**
      * This methods creates a SWT shell and browser in the provided
      * AWT canvas.
      *
-     * @param display   the SWT display
-     * @param canvas    the AWT canvas to contain the SWT shell
-     * @param startPage URL of the welcome page as string
+     * @param display the SWT display
+     * @param canvas  the AWT canvas to contain the SWT shell
+     * @param page    the BrowserPage object of the page to be displayed
      * @return this object
      */
-    Browser createBrowser(Display display, final SwtBrowserCanvas canvas, String startPage) {
+    Browser createBrowser(Display display, final SwtBrowserCanvas canvas,
+        BrowserPage page) {
         Shell shell = SWT_AWT.new_Shell(display, canvas);
         browser = new Browser(shell, SWT.NONE);
 
@@ -41,10 +39,9 @@ class BrowserCreator {
             browser.setSize(canvas.getWidth(), canvas.getHeight());
         }
 
-
-        htmlUIManager.createRenderer(browser);
-        htmlUIManager.createBrowserFunctions(browser);
-        browser.setUrl(startPage);
+        page.createRenderer(browser);
+        page.createBrowserFunctions(browser);
+        browser.setUrl(page.getWebpage());
         return browser;
     }
 }

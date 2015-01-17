@@ -1,41 +1,45 @@
-package de.fu_berlin.inf.dpp.ui.manager;
+package de.fu_berlin.inf.dpp.ui.view_parts;
 
 import de.fu_berlin.inf.dpp.ui.browser_functions.AccountBrowserFunctions;
 import de.fu_berlin.inf.dpp.ui.browser_functions.ContactListBrowserFunctions;
 import de.fu_berlin.inf.dpp.ui.browser_functions.ContactListCoreService;
 import de.fu_berlin.inf.dpp.ui.browser_functions.ContactListRenderer;
+import de.fu_berlin.inf.dpp.ui.manager.ContactListManager;
+import de.fu_berlin.inf.dpp.util.BrowserUtils;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 
 /**
- * Encloses the different managers for the UI.
- * Up till now there only exists the {@link de.fu_berlin.inf.dpp.ui.manager.ContactListManager}.
- * Other managers for managing the chat, various user activities etc. will follow.
+ * Represents the Saros main view.
  */
-public class HTMLUIManager {
+public class SarosMainPage implements BrowserPage {
 
     private final ContactListManager contactListManager;
 
     private final ContactListCoreService contactListCoreService;
 
-    public HTMLUIManager(ContactListManager contactListManager,
+    /**
+     * Parameters are injected by pico container.
+     *
+     * @param contactListManager the ContactListManager instance
+     * @param contactListCoreService the ContactListCoreService instance
+     */
+    public SarosMainPage(ContactListManager contactListManager,
         ContactListCoreService contactListCoreService) {
         this.contactListManager = contactListManager;
         this.contactListCoreService = contactListCoreService;
     }
 
-    /**
-     * Creates the appropriate renderer classes for a given SWT browser
-     * and sets the created renderers in its managed classes.
-     * Up till now this is onlye the contact list manager.
-     *
-     * @param browser the SWT browser
-     */
+    @Override
+    public String getWebpage() {
+        return BrowserUtils.getUrlForClasspathFile("/html/saros-angular.html");
+    }
+
+    @Override
     public void createRenderer(Browser browser) {
-        ContactListRenderer contactListRenderer = new ContactListRenderer(
-            browser);
-        contactListManager.setContactListRenderer(contactListRenderer);
+        contactListManager
+            .setContactListRenderer(new ContactListRenderer(browser));
         browser.addDisposeListener(new DisposeListener() {
             @Override
             public void widgetDisposed(DisposeEvent e) {
@@ -44,15 +48,10 @@ public class HTMLUIManager {
         });
     }
 
-    /**
-     * Creates the appropriate browser functions for a given SWT browser.
-     *
-     * @param browser the SWT browser
-     */
+    @Override
     public void createBrowserFunctions(Browser browser) {
-        ContactListBrowserFunctions contactListBrowserFunctions = new ContactListBrowserFunctions(
-            browser, contactListCoreService);
-        contactListBrowserFunctions.createJavascriptFunctions();
         new AccountBrowserFunctions(browser).createJavascriptFunctions();
+        new ContactListBrowserFunctions(browser, contactListCoreService)
+            .createJavascriptFunctions();
     }
 }
