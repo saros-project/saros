@@ -30,6 +30,7 @@ import de.fu_berlin.inf.dpp.core.context.SarosPluginContext;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.intellij.context.SarosIntellijContextFactory;
 import de.fu_berlin.inf.dpp.intellij.project.fs.Workspace;
+import de.fu_berlin.inf.dpp.intellij.ui.swt_browser.SwtLibLoader;
 import de.fu_berlin.inf.dpp.misc.pico.DotGraphMonitor;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
@@ -112,6 +113,8 @@ public class Saros {
         if (isInitialized) {
             return;
         }
+
+        SwtLibLoader.loadSwtLib();
 
         //CONTEXT
         sarosContext = new SarosContext(new SarosIntellijContextFactory(this,

@@ -55,7 +55,7 @@ public class SwtLibLoader {
      *                               is not supported or the SWT libary plug-in
      *                               is not installed correctly.
      */
-    static void loadSwtLib() {
+    public static void loadSwtLib() {
         PluginClassLoader pluginClassLoader = obtainPluginClassLoader();
         URL swtFileUrl = getSwtLibUrl();
 

@@ -48,7 +48,6 @@ public class SwtToolWindowFactory implements ToolWindowFactory {
         // Prevent the SWT initialization from being executed twice
         synchronized (SwtToolWindowFactory.class) {
             if (!swtInitialized) {
-                SwtLibLoader.loadSwtLib();
                 startSwtEventThread();
                 swtInitialized = true;
             }
