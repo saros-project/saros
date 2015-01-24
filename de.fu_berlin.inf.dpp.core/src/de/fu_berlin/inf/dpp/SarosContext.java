@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.osgi.service.prefs.Preferences;
 import org.picocontainer.Characteristics;
 import org.picocontainer.ComponentAdapter;
 import org.picocontainer.MutablePicoContainer;
@@ -43,7 +42,6 @@ import de.fu_berlin.inf.dpp.communication.extensions.UserFinishedProjectNegotiat
 import de.fu_berlin.inf.dpp.communication.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.UserListReceivedExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.VersionExchangeExtension;
-import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;
 import de.fu_berlin.inf.dpp.misc.pico.ChildContainer;
 import de.fu_berlin.inf.dpp.misc.pico.ChildContainerProvider;
 import de.fu_berlin.inf.dpp.misc.pico.DotGraphMonitor;
@@ -58,13 +56,13 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
  * 
  * {@link de.fu_berlin.inf.dpp.SarosContext#getComponent(Class)},
  * {@link de.fu_berlin.inf.dpp.SarosContext#reinject(Object)}
- * 
+ *
  * These methods change the context respectively the PicoContainer!
- * 
+ *
  * If you want to initialize a component with the components of the context
  * without changing the context you can use the method
  * {@link de.fu_berlin.inf.dpp.SarosContext#initComponent(Object)}.
- * 
+ *
  * @author pcordes
  * @author srossbach
  */
@@ -78,7 +76,7 @@ public class SarosContext implements ISarosContext {
 
     private final DotGraphMonitor dotMonitor;
 
-    private final ISarosContextFactory factory;
+    private final List<ISarosContextFactory> factories;
     /**
      * A caching container which holds all the singletons in Saros.
      */
@@ -90,9 +88,9 @@ public class SarosContext implements ISarosContext {
      */
     private Reinjector reinjector;
 
-    public SarosContext(ISarosContextFactory factory,
+    public SarosContext(List<ISarosContextFactory> factories,
         DotGraphMonitor dotGraphMonitor) {
-        this.factory = factory;
+        this.factories = factories;
         this.dotMonitor = dotGraphMonitor;
         init();
     }
@@ -121,6 +119,7 @@ public class SarosContext implements ISarosContext {
             Class.forName(InvitationAcceptedExtension.class.getName());
             Class.forName(InvitationCompletedExtension.class.getName());
             Class.forName(CancelProjectNegotiationExtension.class.getName());
+            Class.forName(ProjectNegotiationOfferingExtension.class.getName());
             Class.forName(ProjectNegotiationMissingFilesExtension.class
                 .getName());
             Class.forName(KickUserExtension.class.getName());
@@ -129,7 +128,6 @@ public class SarosContext implements ISarosContext {
             Class.forName(UserListReceivedExtension.class.getName());
             Class.forName(PingExtension.class.getName());
             Class.forName(PongExtension.class.getName());
-            Class.forName(ProjectNegotiationOfferingExtension.class.getName());
 
             Class.forName(UserFinishedProjectNegotiationExtension.class
                 .getName());
@@ -174,7 +172,9 @@ public class SarosContext implements ISarosContext {
         container.as(Characteristics.NO_CACHE).addAdapter(
             new ProviderAdapter(new ChildContainerProvider(this.container)));
 
-        factory.createComponents(container);
+        for (ISarosContextFactory factory : factories) {
+            factory.createComponents(container);
+        }
 
         container.addComponent(ISarosContext.class, this);
 
@@ -190,11 +190,6 @@ public class SarosContext implements ISarosContext {
 
         XMPPUtils.setDefaultConnectionService(container
             .getComponent(XMPPConnectionService.class));
-
-        // additional initialization
-
-        FeedbackPreferences.setPreferences(container
-            .getComponent(Preferences.class));
 
         log.info("successfully created Saros runtime context");
     }
@@ -244,7 +239,7 @@ public class SarosContext implements ISarosContext {
             // Remove the component if an instance of it was already registered
             Class<?> clazz = toInjectInto.getClass();
             ComponentAdapter<?> removed = container.removeComponent(clazz);
-            if (removed != null && clazz != Saros.class) {
+            if (removed != null) {
                 log.warn(clazz.getName() + " added more than once!",
                     new StackTrace());
             }

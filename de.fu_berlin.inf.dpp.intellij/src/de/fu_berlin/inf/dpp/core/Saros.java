@@ -1,9 +1,10 @@
 package de.fu_berlin.inf.dpp.core;
 
 import com.intellij.openapi.project.Project;
+import de.fu_berlin.inf.dpp.ISarosContextFactory;
+import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.SarosHTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.core.context.SarosContext;
 import de.fu_berlin.inf.dpp.core.context.SarosCoreContextFactory;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.intellij.context.SarosIntellijContextFactory;
@@ -13,6 +14,9 @@ import de.fu_berlin.inf.dpp.misc.pico.DotGraphMonitor;
 import de.fu_berlin.inf.dpp.preferences.IPreferences;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import org.apache.log4j.helpers.LogLog;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Saros plugin class for bundling globally necessary variables like project.
@@ -94,8 +98,10 @@ public class Saros {
         SwtLibLoader.loadSwtLib();
 
         //CONTEXT
-        sarosContext = new SarosContext(new SarosIntellijContextFactory(this,
-            new SarosHTMLUIContextFactory(new SarosCoreContextFactory())), new DotGraphMonitor());
+        List<ISarosContextFactory> factories = Arrays
+            .<ISarosContextFactory>asList(new SarosIntellijContextFactory(this),
+                new SarosHTMLUIContextFactory(), new SarosCoreContextFactory());
+        sarosContext = new SarosContext(factories, new DotGraphMonitor());
 
         SarosPluginContext.setSarosContext(sarosContext);
         preferences = sarosContext.getComponent(IPreferences.class);
