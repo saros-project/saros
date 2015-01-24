@@ -23,7 +23,7 @@
 package de.fu_berlin.inf.dpp.core.ui.util;
 
 import de.fu_berlin.inf.dpp.core.Saros;
-import de.fu_berlin.inf.dpp.core.context.SarosPluginContext;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.core.monitoring.IStatus;
 import de.fu_berlin.inf.dpp.core.monitoring.Status;
 import de.fu_berlin.inf.dpp.core.project.ISarosSessionManager;

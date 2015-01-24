@@ -24,7 +24,7 @@ package de.fu_berlin.inf.dpp.intellij.ui.widgets.progress;
 
 import com.intellij.openapi.wm.WindowManager;
 import de.fu_berlin.inf.dpp.core.Saros;
-import de.fu_berlin.inf.dpp.core.context.SarosPluginContext;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import org.picocontainer.annotations.Inject;
 

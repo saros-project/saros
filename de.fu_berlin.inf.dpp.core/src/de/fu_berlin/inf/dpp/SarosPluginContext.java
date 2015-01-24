@@ -4,18 +4,16 @@ import org.picocontainer.annotations.Inject;
 
 /**
  * Provides the possibility to initialize a component with the components hold
- * in the given {@link de.fu_berlin.inf.dpp.SarosContext}.
+ * in the given {@link de.fu_berlin.inf.dpp.ISarosContext}.
  * 
- * Typically this is the context created by {@link de.fu_berlin.inf.dpp.Saros}
+ * Typically this is the context created by Saros
  * while it's initialization.
- * 
- * @author philipp.cordes
  */
 public class SarosPluginContext {
 
-    private static SarosContext sarosContext;
+    private static ISarosContext sarosContext;
 
-    static void setSarosContext(SarosContext sarosContext) {
+    public static void setSarosContext(ISarosContext sarosContext) {
         SarosPluginContext.sarosContext = sarosContext;
     }
 
@@ -31,7 +29,6 @@ public class SarosPluginContext {
      *            instance of a component which should be initialized
      */
     public static void initComponent(Object instance) {
-        Saros.checkInitialized();
         sarosContext.initComponent(instance);
     }
 }

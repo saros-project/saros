@@ -1,15 +1,17 @@
 package de.fu_berlin.inf.dpp.ui.browser_functions;
 
 import com.google.gson.Gson;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.ui.manager.IDialogManager;
 import de.fu_berlin.inf.dpp.ui.model.Account;
-import de.fu_berlin.inf.dpp.util.ComponentLookup;
+import de.fu_berlin.inf.dpp.ui.view_parts.AddContactWizard;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.BrowserFunction;
 import org.eclipse.swt.widgets.Display;
+import org.picocontainer.annotations.Inject;
 import org.jivesoftware.smack.XMPPException;
 
 /**
@@ -26,7 +28,11 @@ public class ContactListBrowserFunctions {
 
     private Browser browser;
 
-    private final IDialogManager dialogManager;
+    @Inject
+    private IDialogManager dialogManager;
+
+    @Inject
+    private AddContactWizard addContactWizard;
 
     /**
      * @param browser the SWT browser in which the functions should be injected
@@ -34,7 +40,7 @@ public class ContactListBrowserFunctions {
      */
     public ContactListBrowserFunctions(Browser browser,
         ContactListCoreService contactListCoreService) {
-        dialogManager = ComponentLookup.getDialogManager();
+        SarosPluginContext.initComponent(this);
         this.browser = browser;
         this.contactListCoreService = contactListCoreService;
     }
@@ -114,8 +120,7 @@ public class ContactListBrowserFunctions {
 
                     }
                 });
-                dialogManager.closeDialogWindow(
-                    ComponentLookup.getAddContactWizard());
+                dialogManager.closeDialogWindow(addContactWizard);
                 return null;
             }
         };
@@ -124,8 +129,7 @@ public class ContactListBrowserFunctions {
             "__java_showAddContactWizard") {
             @Override
             public Object function(Object[] arguments) {
-                dialogManager.showDialogWindow(
-                    ComponentLookup.getAddContactWizard());
+                dialogManager.showDialogWindow(addContactWizard);
                 return null;
             }
         };
@@ -134,8 +138,7 @@ public class ContactListBrowserFunctions {
             "__java_cancelAddContactWizard") {
             @Override
             public Object function(Object[] arguments) {
-                dialogManager.closeDialogWindow(
-                    ComponentLookup.getAddContactWizard());
+                dialogManager.closeDialogWindow(addContactWizard);
                 return null;
             }
         };

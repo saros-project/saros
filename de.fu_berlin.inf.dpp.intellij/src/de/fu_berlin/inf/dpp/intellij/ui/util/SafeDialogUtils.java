@@ -25,7 +25,7 @@ package de.fu_berlin.inf.dpp.intellij.ui.util;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.util.ui.UIUtil;
 import de.fu_berlin.inf.dpp.core.Saros;
-import de.fu_berlin.inf.dpp.core.context.SarosPluginContext;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.picocontainer.annotations.Inject;
 
 import java.awt.Component;

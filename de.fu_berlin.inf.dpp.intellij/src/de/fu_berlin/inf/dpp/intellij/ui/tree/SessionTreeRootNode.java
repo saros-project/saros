@@ -23,7 +23,7 @@
 package de.fu_berlin.inf.dpp.intellij.ui.tree;
 
 import com.intellij.util.ui.UIUtil;
-import de.fu_berlin.inf.dpp.core.context.SarosPluginContext;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.core.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;

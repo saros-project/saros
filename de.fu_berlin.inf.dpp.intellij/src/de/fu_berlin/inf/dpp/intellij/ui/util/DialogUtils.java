@@ -23,8 +23,8 @@
 package de.fu_berlin.inf.dpp.intellij.ui.util;
 
 import com.intellij.openapi.wm.WindowManager;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.core.Saros;
-import de.fu_berlin.inf.dpp.core.context.SarosPluginContext;
 import org.picocontainer.annotations.Inject;
 
 import javax.swing.JOptionPane;

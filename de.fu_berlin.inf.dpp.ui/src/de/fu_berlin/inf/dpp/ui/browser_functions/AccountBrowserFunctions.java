@@ -1,15 +1,17 @@
 package de.fu_berlin.inf.dpp.ui.browser_functions;
 
 import com.google.gson.Gson;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.account.XMPPAccount;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.ui.manager.IDialogManager;
 import de.fu_berlin.inf.dpp.ui.model.Account;
-import de.fu_berlin.inf.dpp.util.ComponentLookup;
+import de.fu_berlin.inf.dpp.ui.view_parts.AddAccountWizard;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.BrowserFunction;
 import org.eclipse.swt.widgets.Display;
+import org.picocontainer.annotations.Inject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,15 +26,19 @@ public class AccountBrowserFunctions {
     private static final Logger LOG = Logger
         .getLogger(AccountBrowserFunctions.class);
 
-    private final IDialogManager dialogManager;
+    @Inject
+    private IDialogManager dialogManager;
 
-    private final XMPPAccountStore accountStore;
+    @Inject
+    private XMPPAccountStore accountStore;
+
+    @Inject
+    private AddAccountWizard addAccountWizard;
 
     private final Browser browser;
 
     public AccountBrowserFunctions(Browser browser) {
-        dialogManager = ComponentLookup.getDialogManager();
-        accountStore = ComponentLookup.getAccountStore();
+        SarosPluginContext.initComponent(this);
         this.browser = browser;
     }
 
@@ -44,8 +50,7 @@ public class AccountBrowserFunctions {
         new BrowserFunction(browser, "__java_showAddAccountWizard") {
             @Override
             public Object function(Object[] arguments) {
-                dialogManager.showDialogWindow(
-                    ComponentLookup.getAddAccountWizard());
+                dialogManager.showDialogWindow(addAccountWizard);
                 return null;
             }
         };
@@ -53,8 +58,7 @@ public class AccountBrowserFunctions {
         new BrowserFunction(browser, "__java_cancelAddAccountWizard") {
             @Override
             public Object function(Object[] arguments) {
-                dialogManager.closeDialogWindow(
-                    ComponentLookup.getAddAccountWizard());
+                dialogManager.closeDialogWindow(addAccountWizard);
                 return null;
             }
         };
@@ -74,8 +78,7 @@ public class AccountBrowserFunctions {
                         //TODO notify user
                     }
                 }
-                dialogManager.closeDialogWindow(
-                    ComponentLookup.getAddAccountWizard());
+                dialogManager.closeDialogWindow(addAccountWizard);
                 return null;
             }
         };

@@ -22,7 +22,7 @@
 
 package de.fu_berlin.inf.dpp.intellij.ui.tree;
 
-import de.fu_berlin.inf.dpp.core.context.SarosPluginContext;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 import de.fu_berlin.inf.dpp.session.User;
 import org.picocontainer.annotations.Inject;

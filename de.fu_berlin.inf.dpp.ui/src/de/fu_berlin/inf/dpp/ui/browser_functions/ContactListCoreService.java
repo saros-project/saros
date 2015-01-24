@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.browser_functions;
 
-import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
+import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandlerCore;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
@@ -15,13 +15,13 @@ import org.picocontainer.annotations.Inject;
  */
 public class ContactListCoreService {
 
-    private final ConnectionHandler connectionHandler;
+    private final ConnectionHandlerCore connectionHandler;
 
     private final XMPPConnectionService connectionService;
 
     private final SubscriptionHandler subscriptionHandler;
 
-    public ContactListCoreService(ConnectionHandler connectionHandler,
+    public ContactListCoreService(ConnectionHandlerCore connectionHandler,
         XMPPConnectionService connectionService,
         SubscriptionHandler subscriptionHandler) {
         this.connectionHandler = connectionHandler;

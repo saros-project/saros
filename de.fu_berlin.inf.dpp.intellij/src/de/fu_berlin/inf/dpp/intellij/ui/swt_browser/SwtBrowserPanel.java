@@ -1,7 +1,9 @@
 package de.fu_berlin.inf.dpp.intellij.ui.swt_browser;
 
 import com.intellij.ui.AncestorListenerAdapter;
-import de.fu_berlin.inf.dpp.util.ComponentLookup;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
+import de.fu_berlin.inf.dpp.ui.view_parts.SarosMainPage;
+import org.picocontainer.annotations.Inject;
 
 import javax.swing.JPanel;
 import javax.swing.event.AncestorEvent;
@@ -28,8 +30,12 @@ class SwtBrowserPanel extends JPanel {
 
     private boolean initialized = false;
 
+    @Inject
+    private SarosMainPage sarosMainPage;
+
     SwtBrowserPanel() {
         super(new BorderLayout());
+        SarosPluginContext.initComponent(this);
         /* As the browser gets disposed every time the tool window is hidden,
          * it has to be created again when it is re-shown.
          * The AncestorListener listens for that event. */
@@ -43,7 +49,7 @@ class SwtBrowserPanel extends JPanel {
                 }
             }
         });
-        browserCanvas = new SwtBrowserCanvas(ComponentLookup.getSarosMainPage());
+        browserCanvas = new SwtBrowserCanvas(sarosMainPage);
     }
 
     /**
