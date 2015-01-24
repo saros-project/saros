@@ -138,6 +138,15 @@
 					<include name="*.jar" />
 				</fileset>
 
+				<!-- The dependency to the ui package is somewhat optional, it is hidden behind a feature
+				toggle. However, It is added if it is present as easy mock reflective feature might inspect
+				the Saros class too closely.
+				ant4eclipse's buildPlugin-task finds the ui jar file automatically in the workspace.
+				However, this does not work for testing, so we amend the classpath accordingly. --> 
+				<fileset erroronmissingdir="false" dir="${workspaceDirectory}/de.fu_berlin.inf.dpp.ui/build/plugins">
+					<include name="*.jar" />
+				</fileset>
+				
 				<!-- HACK: as the normal class loader cannot find jars inside a jar file -->
 				<fileset dir="${workspaceDirectory}/de.fu_berlin.inf.dpp.core/lib">
 					<include name="*.jar" />

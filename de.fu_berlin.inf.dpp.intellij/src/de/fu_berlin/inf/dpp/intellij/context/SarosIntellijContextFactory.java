@@ -3,8 +3,6 @@ package de.fu_berlin.inf.dpp.intellij.context;
 import de.fu_berlin.inf.dpp.AbstractSarosContextFactory;
 import de.fu_berlin.inf.dpp.ISarosContextBindings;
 import de.fu_berlin.inf.dpp.ISarosContextFactory;
-import de.fu_berlin.inf.dpp.account.XMPPAccountLocator;
-import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandlerCore;
 import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.core.concurrent.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.core.project.ISarosSessionManager;
@@ -29,15 +27,10 @@ import de.fu_berlin.inf.dpp.intellij.runtime.IntelliJSynchronizer;
 import de.fu_berlin.inf.dpp.intellij.store.IntelliJPreferences;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.FollowModeAction;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.LeaveSessionAction;
-import de.fu_berlin.inf.dpp.preferences.IPreferences;
 import de.fu_berlin.inf.dpp.intellij.ui.swt_browser.IntelliJDialogManager;
+import de.fu_berlin.inf.dpp.preferences.IPreferences;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
-import de.fu_berlin.inf.dpp.ui.browser_functions.ContactListCoreService;
-import de.fu_berlin.inf.dpp.ui.manager.ContactListManager;
 import de.fu_berlin.inf.dpp.ui.manager.IDialogManager;
-import de.fu_berlin.inf.dpp.ui.view_parts.AddAccountWizard;
-import de.fu_berlin.inf.dpp.ui.view_parts.AddContactWizard;
-import de.fu_berlin.inf.dpp.ui.view_parts.SarosMainPage;
 import org.picocontainer.BindKey;
 import org.picocontainer.MutablePicoContainer;
 
@@ -81,14 +74,7 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
         Component.create(FollowModeAction.class),
         Component.create(LeaveSessionAction.class),
 
-        Component.create(XMPPAccountLocator.class),
         Component.create(IDialogManager.class, IntelliJDialogManager.class),
-        Component.create(ConnectionHandlerCore.class),
-        Component.create(ContactListManager.class),
-        Component.create(ContactListCoreService.class),
-        Component.create(SarosMainPage.class),
-        Component.create(AddAccountWizard.class),
-        Component.create(AddContactWizard.class)
     };
 
     public SarosIntellijContextFactory(Saros saros,

@@ -221,8 +221,16 @@ public class Saros extends AbstractUIPlugin {
         log.info("Starting Saros " + sarosVersion + " running:\n"
             + getPlatformInfo());
 
+        ISarosContextFactory coreFactory;
+        if (isSwtBrowserEnabled()) {
+            coreFactory = new SarosHTMLUIContextFactory(
+                new SarosCoreContextFactory());
+        } else {
+            coreFactory = new SarosCoreContextFactory();
+        }
+
         sarosContext = new SarosContext(new SarosEclipseContextFactory(this,
-            new SarosCoreContextFactory()), dotMonitor);
+            coreFactory), dotMonitor);
 
         SarosPluginContext.setSarosContext(sarosContext);
 
@@ -574,5 +582,17 @@ public class Saros extends AbstractUIPlugin {
         sb.append("  Hardware Architecture: " + hardware);
 
         return sb.toString();
+    }
+
+    /**
+     * Feature toggle for displaying Saros in a web browser in an additional
+     * view. Also checks if required bundle is present.
+     *
+     * @return true if this feature is enabled, false otherwise
+     */
+    private static boolean isSwtBrowserEnabled() {
+        // TODO store constant string elsewhere
+        return Platform.getBundle("de.fu_berlin.inf.dpp.ui") != null
+            && Boolean.getBoolean("saros.swtbrowser");
     }
 }
