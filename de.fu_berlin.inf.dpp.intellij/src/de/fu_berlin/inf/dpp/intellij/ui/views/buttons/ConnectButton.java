@@ -76,7 +76,7 @@ public class ConnectButton extends ToolbarButton {
         configureAccounts = new NotImplementedAction("configure accounts");
 
         createDisconnectMenuItem();
-        createAddAccountMenuÍtem();
+        createAddAccountMenuItem();
         createConfigureAccountMenuItem();
         createMenuItems();
 
@@ -140,7 +140,7 @@ public class ConnectButton extends ToolbarButton {
         });
     }
 
-    private void createAddAccountMenuÍtem() {
+    private void createAddAccountMenuItem() {
         menuItemAdd = new JMenuItem("Add account...");
         menuItemAdd.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
