@@ -12,7 +12,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="de.fu_berlin.inf.dpp.core" exported="" />
     <orderEntry type="module" module-name="de.fu_berlin.inf.dpp.ui" />
-    <orderEntry type="library" scope="PROVIDED" name="swt-debug" level="project" />
   </component>
 </module>
 
