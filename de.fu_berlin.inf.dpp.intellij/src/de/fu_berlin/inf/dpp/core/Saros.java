@@ -105,6 +105,10 @@ public class Saros {
         this.workspace = new Workspace(project);
     }
 
+    public static boolean isSwtBrowserEnabled() {
+        return Boolean.getBoolean("saros.swtbrowser");
+    }
+
     /**
      * If not initialized yet, this method initializes fields, the SarosPluginContext and the XMPPConnectionService.
      */
