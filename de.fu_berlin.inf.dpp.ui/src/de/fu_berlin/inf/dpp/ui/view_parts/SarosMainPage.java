@@ -1,9 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.view_parts;
 
-import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-
+import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.dpp.ui.browser_functions.AccountBrowserFunctions;
 import de.fu_berlin.inf.dpp.ui.browser_functions.ContactListBrowserFunctions;
 import de.fu_berlin.inf.dpp.ui.browser_functions.ContactListCoreService;
@@ -21,11 +18,9 @@ public class SarosMainPage implements BrowserPage {
 
     /**
      * Parameters are injected by pico container.
-     * 
-     * @param contactListManager
-     *            the ContactListManager instance
-     * @param contactListCoreService
-     *            the ContactListCoreService instance
+     *
+     * @param contactListManager     the ContactListManager instance
+     * @param contactListCoreService the ContactListCoreService instance
      */
     public SarosMainPage(ContactListManager contactListManager,
         ContactListCoreService contactListCoreService) {
@@ -39,19 +34,19 @@ public class SarosMainPage implements BrowserPage {
     }
 
     @Override
-    public void createRenderer(Browser browser) {
-        contactListManager.setContactListRenderer(new ContactListRenderer(
-            browser));
-        browser.addDisposeListener(new DisposeListener() {
+    public void createRenderer(IJQueryBrowser browser) {
+        contactListManager
+            .setContactListRenderer(new ContactListRenderer(browser));
+        browser.runOnDisposal(new Runnable() {
             @Override
-            public void widgetDisposed(DisposeEvent e) {
+            public void run() {
                 contactListManager.removeContactListRenderer();
             }
         });
     }
 
     @Override
-    public void createBrowserFunctions(Browser browser) {
+    public void createBrowserFunctions(IJQueryBrowser browser) {
         new AccountBrowserFunctions(browser).createJavascriptFunctions();
         new ContactListBrowserFunctions(browser, contactListCoreService)
             .createJavascriptFunctions();

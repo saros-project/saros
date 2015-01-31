@@ -7,11 +7,12 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.widgets.Composite;
 import org.jivesoftware.smack.util.StringUtils;
 import org.osgi.framework.Bundle;
 
+import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
+import de.fu_berlin.inf.ag_se.browser.swt.SWTJQueryBrowser;
 import de.fu_berlin.inf.dpp.ui.view_parts.BrowserPage;
 
 /**
@@ -33,7 +34,7 @@ public class EclipseBrowserCreator {
 
     /**
      * Creates a new browser instance.
-     * 
+     *
      * @param composite
      *            the composite enclosing the browser.
      * @param style
@@ -43,7 +44,7 @@ public class EclipseBrowserCreator {
      * @return a browser instance which load and render the given
      *         {@link BrowserPage BrowserPage}
      */
-    public static Browser createBrowser(Composite composite, int style,
+    public static IJQueryBrowser createBrowser(Composite composite, int style,
         BrowserPage page) {
 
         final Bundle bundle = Platform.getBundle(UI_BUNDLE_ID);
@@ -73,7 +74,8 @@ public class EclipseBrowserCreator {
             exception = e;
         }
 
-        Browser browser = new Browser(composite, style);
+        IJQueryBrowser browser = SWTJQueryBrowser.createSWTBrowser(composite,
+            style);
 
         if (exception != null) {
             final String escapedStackTrace = StringUtils
@@ -92,11 +94,11 @@ public class EclipseBrowserCreator {
         /*
          * TODO check if all browser work correctly with invalid Windows URLs
          * like file:/C/... instead of file:///C/...
-         * 
+         *
          * Stefan Rossbach: works with default Browser (whatever that is ...
          * IE?) on Windows
          */
-        browser.setUrl(resourceLocation.toString());
+        browser.open(resourceLocation.toString(), 5000);
         return browser;
 
     }

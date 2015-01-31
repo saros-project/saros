@@ -1,9 +1,8 @@
 package de.fu_berlin.inf.dpp.ui.browser_functions;
 
 import com.google.gson.Gson;
+import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.dpp.ui.model.ContactList;
-import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.widgets.Display;
 
 /**
  * This class is responsible for rendering the contact list by calling
@@ -15,12 +14,12 @@ import org.eclipse.swt.widgets.Display;
  */
 public class ContactListRenderer {
 
-    private Browser browser;
+    private IJQueryBrowser browser;
 
     /**
      * @param browser the SWT browser in which the contact list should be rendered
      */
-    public ContactListRenderer(Browser browser) {
+    public ContactListRenderer(IJQueryBrowser browser) {
         this.browser = browser;
     }
 
@@ -44,7 +43,7 @@ public class ContactListRenderer {
      * @param connected true if connected, false if disconnected
      */
     public void renderIsConnected(boolean connected) {
-        executeInBrowser("__angular_setIsConnected("+ connected +");");
+        executeInBrowser("__angular_setIsConnected(" + connected + ");");
     }
 
     /**
@@ -65,13 +64,6 @@ public class ContactListRenderer {
 
     private void executeInBrowser(final String script) {
         //TODO evaluate results
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                if (!browser.isDisposed()) {
-                    browser.execute(script);
-                }
-            }
-        });
+        browser.run(script);
     }
 }

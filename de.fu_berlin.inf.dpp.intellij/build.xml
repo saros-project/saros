@@ -125,9 +125,11 @@
               value="${basedir}/../de.fu_berlin.inf.dpp.core"/>
     <property name="core.libdir" value="${core.basedir}/lib"/>
     <property name="ui.basedir" value="${basedir}/../de.fu_berlin.inf.dpp.ui"/>
+    <property name="ui.libdir" value="${ui.basedir}/lib" />
 
     <path id="libraries.classpath">
         <fileset dir="${core.libdir}" includes="*.jar"/>
+        <fileset dir="${ui.libdir}" includes="*.jar" />
         <fileset dir="${eclipse.dir}/plugins" includes="org.eclipse.swt.*.jar"
                  excludes="org.eclipse.swt.*source*.jar"/>
     </path>

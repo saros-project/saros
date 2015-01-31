@@ -1,7 +1,7 @@
 package de.fu_berlin.inf.dpp.intellij.ui.swt_browser;
 
+import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.dpp.ui.view_parts.BrowserPage;
-import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Display;
@@ -18,7 +18,7 @@ import java.awt.event.ComponentEvent;
 class SwtBrowserCanvas extends Canvas {
 
     private final BrowserPage startPage;
-    private Browser browser;
+    private IJQueryBrowser browser;
 
     /**
      * @param startPage the BrowserPage object containing the page to be displayed
@@ -60,11 +60,12 @@ class SwtBrowserCanvas extends Canvas {
         };
 
         addComponentListener(resizeListener);
-        browser.addDisposeListener(new DisposeListener() {
+        browser.runOnDisposal(new Runnable() {
             @Override
-            public void widgetDisposed(DisposeEvent e) {
+            public void run() {
                 removeComponentListener(resizeListener);
             }
+
         });
     }
 }

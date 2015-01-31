@@ -1,6 +1,8 @@
 package de.fu_berlin.inf.dpp.ui.browser_functions;
 
 import com.google.gson.Gson;
+import de.fu_berlin.inf.ag_se.browser.IBrowserFunction;
+import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.ui.manager.IDialogManager;
@@ -8,8 +10,6 @@ import de.fu_berlin.inf.dpp.ui.model.Account;
 import de.fu_berlin.inf.dpp.ui.view_parts.AddContactWizard;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import org.apache.log4j.Logger;
-import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.browser.BrowserFunction;
 import org.eclipse.swt.widgets.Display;
 import org.picocontainer.annotations.Inject;
 import org.jivesoftware.smack.XMPPException;
@@ -26,7 +26,7 @@ public class ContactListBrowserFunctions {
 
     private ContactListCoreService contactListCoreService;
 
-    private Browser browser;
+    private IJQueryBrowser browser;
 
     @Inject
     private IDialogManager dialogManager;
@@ -35,10 +35,10 @@ public class ContactListBrowserFunctions {
     private AddContactWizard addContactWizard;
 
     /**
-     * @param browser the SWT browser in which the functions should be injected
+     * @param browser                the SWT browser in which the functions should be injected
      * @param contactListCoreService
      */
-    public ContactListBrowserFunctions(Browser browser,
+    public ContactListBrowserFunctions(IJQueryBrowser browser,
         ContactListCoreService contactListCoreService) {
         SarosPluginContext.initComponent(this);
         this.browser = browser;
@@ -51,7 +51,7 @@ public class ContactListBrowserFunctions {
      */
     public void createJavascriptFunctions() {
         //TODO remember to disable button in HTML while connecting
-        new BrowserFunction(browser, "__java_connect") {
+        browser.createBrowserFunction(new IBrowserFunction("__java_connect") {
             @Override
             public Object function(Object[] arguments) {
                 if (arguments.length > 0 && arguments[0] != null) {
@@ -66,81 +66,80 @@ public class ContactListBrowserFunctions {
                     });
                 } else {
                     LOG.error("Connect was called without an account.");
-                    browser.execute(
+                    browser.run(
                         "alert('Cannot connect because no account was given.');");
                 }
                 return null;
             }
-        };
-        new BrowserFunction(browser, "__java_disconnect") {
-            @Override
-            public Object function(Object[] arguments) {
-                ThreadUtils.runSafeAsync(LOG, new Runnable() {
-                    @Override
-                    public void run() {
-                        contactListCoreService.disconnect();
-                    }
-                });
-                return null;
-            }
-        };
-
-        new BrowserFunction(browser, "__java_deleteContact") {
-            @Override
-            public Object function(final Object[] arguments) {
-                ThreadUtils.runSafeAsync(LOG, new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            contactListCoreService
-                                .deleteContact(new JID((String) arguments[0]));
-                        } catch (XMPPException e) {
-                            LOG.error("Error deleting contact ", e);
-                            //TODO getDefault() may create a new display when Eclipse shut down
-                            Display.getDefault().asyncExec(new Runnable() {
-                                @Override
-                                public void run() {
-                                    browser.execute( "alert('Error deleting contact');");
-                                }
-                            });
+        });
+        browser
+            .createBrowserFunction(new IBrowserFunction("__java_disconnect") {
+                @Override
+                public Object function(Object[] arguments) {
+                    ThreadUtils.runSafeAsync(LOG, new Runnable() {
+                        @Override
+                        public void run() {
+                            contactListCoreService.disconnect();
                         }
-                    }
-                });
-                return null;
-            }
-        };
+                    });
+                    return null;
+                }
+            });
 
-        new BrowserFunction(browser, "__java_addContact") {
-            @Override
-            public Object function(final Object[] arguments) {
-                ThreadUtils.runSafeAsync(LOG, new Runnable() {
-                    @Override
-                    public void run() {
-                        contactListCoreService.addContact(new JID((String) arguments[0]));
+        browser.createBrowserFunction(
+            new IBrowserFunction("__java_deleteContact") {
+                @Override
+                public Object function(final Object[] arguments) {
+                    ThreadUtils.runSafeAsync(LOG, new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                contactListCoreService.deleteContact(
+                                    new JID((String) arguments[0]));
+                            } catch (XMPPException e) {
+                                LOG.error("Error deleting contact ", e);
 
-                    }
-                });
-                dialogManager.closeDialogWindow(addContactWizard);
-                return null;
-            }
-        };
+                                browser.run("alert('Error deleting contact');");
+                            }
+                        }
+                    });
+                    return null;
+                }
+            });
 
-        new BrowserFunction(browser,
-            "__java_showAddContactWizard") {
-            @Override
-            public Object function(Object[] arguments) {
-                dialogManager.showDialogWindow(addContactWizard);
-                return null;
-            }
-        };
+        browser
+            .createBrowserFunction(new IBrowserFunction("__java_addContact") {
+                @Override
+                public Object function(final Object[] arguments) {
+                    ThreadUtils.runSafeAsync(LOG, new Runnable() {
+                        @Override
+                        public void run() {
+                            contactListCoreService
+                                .addContact(new JID((String) arguments[0]));
 
-        new BrowserFunction(browser,
-            "__java_cancelAddContactWizard") {
-            @Override
-            public Object function(Object[] arguments) {
-                dialogManager.closeDialogWindow(addContactWizard);
-                return null;
-            }
-        };
+                        }
+                    });
+                    dialogManager.closeDialogWindow(addContactWizard);
+                    return null;
+                }
+            });
+
+        browser.createBrowserFunction(
+            new IBrowserFunction("__java_showAddContactWizard") {
+                @Override
+                public Object function(Object[] arguments) {
+                    dialogManager.showDialogWindow(addContactWizard);
+                    return null;
+                }
+            });
+
+        browser.createBrowserFunction(
+            new IBrowserFunction("__java_cancelAddContactWizard") {
+                @Override
+                public Object function(Object[] arguments) {
+                    dialogManager.closeDialogWindow(addContactWizard);
+                    return null;
+                }
+            });
     }
 }

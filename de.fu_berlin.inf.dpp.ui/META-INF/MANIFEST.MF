@@ -8,8 +8,12 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: de.fu_berlin.inf.dpp.core,
  org.eclipse.swt
 Bundle-ClassPath: .,
- lib/gson-2.3.jar
-Export-Package: de.fu_berlin.inf.dpp,
+ lib/gson-2.3.jar,
+ lib/swt-browser-improved.jar
+Export-Package: de.fu_berlin.inf.ag_se.browser,
+ de.fu_berlin.inf.ag_se.browser.extensions,
+ de.fu_berlin.inf.ag_se.browser.swt,
+ de.fu_berlin.inf.dpp,
  de.fu_berlin.inf.dpp.account,
  de.fu_berlin.inf.dpp.communication.connection,
  de.fu_berlin.inf.dpp.net.xmpp,

@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.view_parts;
 
-import org.eclipse.swt.browser.Browser;
-
+import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.dpp.ui.browser_functions.AccountBrowserFunctions;
 
 /**
@@ -15,12 +14,11 @@ public class AddAccountWizard implements BrowserPage {
     }
 
     @Override
-    public void createRenderer(Browser browser) {
-
+    public void createRenderer(IJQueryBrowser browser) {
     }
 
     @Override
-    public void createBrowserFunctions(Browser browser) {
+    public void createBrowserFunctions(IJQueryBrowser browser) {
         new AccountBrowserFunctions(browser).createJavascriptFunctions();
     }
 }

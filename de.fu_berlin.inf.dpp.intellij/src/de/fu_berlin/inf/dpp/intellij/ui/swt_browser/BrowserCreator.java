@@ -1,21 +1,20 @@
 package de.fu_berlin.inf.dpp.intellij.ui.swt_browser;
 
-import java.net.URL;
-
+import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
+import de.fu_berlin.inf.ag_se.browser.swt.SWTJQueryBrowser;
+import de.fu_berlin.inf.dpp.ui.view_parts.BrowserPage;
+import de.fu_berlin.inf.dpp.util.BrowserUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
-import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import de.fu_berlin.inf.dpp.ui.view_parts.BrowserPage;
-import de.fu_berlin.inf.dpp.util.BrowserUtils;
+import java.net.URL;
 
 /**
  * This class creates the SWT browser instance and the enclosing shell.
  */
 class BrowserCreator {
-    private Browser browser;
 
     BrowserCreator() {
     }
@@ -31,12 +30,12 @@ class BrowserCreator {
      *            the BrowserPage object of the page to be displayed
      * @return this object
      */
-    Browser createBrowser(Display display, final SwtBrowserCanvas canvas,
+    IJQueryBrowser createBrowser(Display display, final SwtBrowserCanvas canvas,
         BrowserPage page) {
         Shell shell = SWT_AWT.new_Shell(display, canvas);
-        browser = new Browser(shell, SWT.NONE);
+        IJQueryBrowser browser = SWTJQueryBrowser
+            .createSWTBrowser(shell, SWT.NONE);
 
-        browser.setLocation(5, 5);
         /*
          * Ideally the size of browser and shell gets set via a resize listener.
          * This does not work when the tool window is re-openend as no size
@@ -55,7 +54,7 @@ class BrowserCreator {
 
         assert url != null;
 
-        browser.setUrl(url.toString());
+        browser.open(url.toString(), 5000);
         return browser;
     }
 }

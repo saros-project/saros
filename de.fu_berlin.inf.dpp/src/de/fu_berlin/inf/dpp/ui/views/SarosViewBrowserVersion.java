@@ -3,14 +3,12 @@ package de.fu_berlin.inf.dpp.ui.views;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
-import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.browser.ProgressEvent;
-import org.eclipse.swt.browser.ProgressListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.part.ViewPart;
 import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.ui.browser.EclipseBrowserCreator;
 import de.fu_berlin.inf.dpp.ui.view_parts.SarosMainPage;
@@ -38,7 +36,7 @@ public class SarosViewBrowserVersion extends ViewPart {
     private static final Logger LOG = Logger
             .getLogger(SarosViewBrowserVersion.class);
 
-    private Browser browser;
+    private IJQueryBrowser browser;
 
     @Inject
     private SarosMainPage sarosMainPage;
@@ -65,22 +63,6 @@ public class SarosViewBrowserVersion extends ViewPart {
             link.setBounds(10, 10, 140, 40);
             return;
         }
-
-        browser.addProgressListener(new ProgressListener() {
-
-            @Override
-            public void completed(ProgressEvent event) {
-                LOG.debug(browser.getUrl() + " page has fully loaded");
-
-            }
-
-            @Override
-            public void changed(ProgressEvent event) {
-                LOG.debug(browser.getUrl() + " page is loading");
-
-            }
-        });
-
     }
 
     @Override
