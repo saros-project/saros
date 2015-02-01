@@ -59,7 +59,7 @@ public abstract class SarosPermissionsGraphicalEditor extends
     private SarosSessionManager sessionManager;
 
     public SarosPermissionsGraphicalEditor() {
-        SarosPluginContext.reinject(this);
+        SarosPluginContext.initComponent(this);
         sessionManager.addSarosSessionListener(sessionListener);
     }
 

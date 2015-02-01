@@ -76,7 +76,7 @@ public final class SharedDocumentProvider extends TextFileDocumentProvider {
 
         LOG.debug("SharedDocumentProvider created by Eclipse");
 
-        SarosPluginContext.reinject(this);
+        SarosPluginContext.initComponent(this);
 
         final ISarosSession currentSession = sessionManager.getSarosSession();
 
