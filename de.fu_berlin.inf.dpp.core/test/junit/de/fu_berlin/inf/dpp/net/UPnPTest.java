@@ -113,14 +113,8 @@ public class UPnPTest {
     }
 
     @Test
-    public void testIntitialState() {
-        assertTrue(testUpnpManager.getGateways() == null);
-    }
-
-    @Test
     public void testDiscoveryNoDeviceFound() {
-        testUpnpManager.discoverGateways();
-        assertTrue(testUpnpManager.getGateways().isEmpty());
+        assertTrue(testUpnpManager.getGateways(true).isEmpty());
     }
 
     @Test
@@ -130,12 +124,10 @@ public class UPnPTest {
         upnpAccess.addGatewayDevice(testGateway2);
         upnpAccess.addGatewayDevice(testGateway3);
 
-        testUpnpManager.discoverGateways();
-
-        assertEquals(testUpnpManager.getGateways().size(), 3);
-        assertEquals(testUpnpManager.getGateways().get(0), testGateway1);
-        assertEquals(testUpnpManager.getGateways().get(1), testGateway2);
-        assertEquals(testUpnpManager.getGateways().get(2), testGateway3);
+        assertEquals(testUpnpManager.getGateways(false).size(), 3);
+        assertEquals(testUpnpManager.getGateways(false).get(0), testGateway1);
+        assertEquals(testUpnpManager.getGateways(false).get(1), testGateway2);
+        assertEquals(testUpnpManager.getGateways(false).get(2), testGateway3);
     }
 
     @Test
@@ -144,8 +136,6 @@ public class UPnPTest {
         final int port = 4711;
 
         upnpAccess.addGatewayDevice(testGateway1);
-
-        testUpnpManager.discoverGateways();
 
         assertTrue("failed to create port mapping",
             testUpnpManager.createPortMapping(testGateway1, port,

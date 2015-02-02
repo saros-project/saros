@@ -1,5 +1,8 @@
 package de.fu_berlin.inf.dpp.ui.wizards.pages;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.bitlet.weupnp.GatewayDevice;
 import org.eclipse.jface.wizard.WizardPage;
@@ -37,7 +40,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * Allows the user to enter general configuration parameters for use with Saros.
- *
+ * 
  * @author bkahlert
  */
 public class ConfigurationSettingsWizardPage extends WizardPage {
@@ -72,6 +75,8 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
 
     protected Button statisticSubmissionButton;
     protected Button errorLogSubmissionButton;
+
+    private List<GatewayDevice> gateways;
 
     @Override
     public void createControl(Composite parent) {
@@ -345,12 +350,6 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
      */
     protected void populateGatewayCombo() {
 
-        if (upnpService.getGateways() != null) {
-            populateGatewaySelectionControls(upnpService, gatewaysCombo,
-                gatewayInfo, setupPortmappingButton);
-            return;
-        }
-
         gatewaysCombo.setEnabled(false);
         gatewayInfo.setText(Messages.ConfigurationSettingsWizardPage_0);
         gatewayInfo.pack();
@@ -360,7 +359,9 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
 
             @Override
             public void run() {
-                upnpService.discoverGateways();
+
+                final List<GatewayDevice> currentGateways = upnpService
+                    .getGateways(false);
 
                 // GUI work from SWT thread
                 SWTUtils.runSafeSWTAsync(null, new Runnable() {
@@ -371,7 +372,7 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
                             .isDisposed())
                             return;
 
-                        populateGatewaySelectionControls(upnpService,
+                        populateGatewaySelectionControls(currentGateways,
                             gatewaysCombo, gatewayInfo, setupPortmappingButton);
                     }
                 });
@@ -404,7 +405,7 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
         if (setupPortmappingButton.getSelection()) {
             int sel = gatewaysCombo.getSelectionIndex();
             if (sel != -1) {
-                return upnpService.getGateways().get(sel);
+                return gateways.get(sel);
             }
         }
         return null;
@@ -429,7 +430,7 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
     /**
      * Setups gateway SWT controls by populating a gateway combobox and
      * configuring an information Label and the enabling checkbox.
-     *
+     * 
      * @param combo
      *            {@link Combo} selector to populate with discovered gateways
      * @param info
@@ -437,30 +438,31 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
      * @param checkbox
      *            {@link Button} checkbox to enable/disable UPnP support
      */
-    private void populateGatewaySelectionControls(
-        final IUPnPService upnpService, final Combo combo, final Label info,
-        final Button checkbox) {
+    private void populateGatewaySelectionControls(List<GatewayDevice> gateways,
+        final Combo combo, final Label info, final Button checkbox) {
 
         combo.setEnabled(false);
         checkbox.setEnabled(false);
         combo.removeAll();
 
         // if no devices are found, return now - nothing to populate
-        if (upnpService.getGateways() == null
-            || upnpService.getGateways().isEmpty()) {
+        if (gateways == null || gateways.isEmpty()) {
             info.setText(Messages.UPnPUIUtils_no_gateway);
             info.getParent().pack();
             return;
         }
 
+        this.gateways = new ArrayList<GatewayDevice>();
+
         // insert found gateways into combobox
-        for (GatewayDevice gw : upnpService.getGateways()) {
+        for (GatewayDevice gw : gateways) {
             try {
                 String name = gw.getFriendlyName();
                 if (!gw.isConnected())
                     name += Messages.UPnPUIUtils_disconnected;
 
                 combo.add(name);
+                this.gateways.add(gw);
 
             } catch (Exception e) {
                 LOG.debug("Error updating UPnP selector:" + e.getMessage()); //$NON-NLS-1$

@@ -205,7 +205,7 @@ public class XMPPConnectionService {
             @Override
             public void run() {
                 if (upnpService != null)
-                    upnpService.discoverGateways();
+                    upnpService.getGateways(true);
             }
         });
     }
@@ -486,67 +486,72 @@ public class XMPPConnectionService {
 
         if (gatewayDeviceID != null && upnpService != null) {
             final String gatewayDeviceIDToFind = gatewayDeviceID;
-            ThreadUtils.runSafeAsync("CreatePortMapping", LOG, new Runnable() {
-                @Override
-                public void run() {
-                    synchronized (portMappingLock) {
-                        mappingStart.countDown();
+            ThreadUtils.runSafeAsync("dpp-upnp-portmapping", LOG,
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        synchronized (portMappingLock) {
+                            mappingStart.countDown();
 
-                        List<GatewayDevice> devices = upnpService.getGateways();
+                            List<GatewayDevice> devices = upnpService
+                                .getGateways(false);
 
-                        if (devices == null)
-                            devices = upnpService.getGateways();
-
-                        for (GatewayDevice currentDevice : devices) {
-                            if (gatewayDeviceIDToFind.equals(currentDevice
-                                .getUSN())) {
-                                device = currentDevice;
-                                break;
+                            if (devices == null) {
+                                LOG.warn("aborting UPNP port mapping due to network failure");
+                                return;
                             }
-                        }
 
-                        if (device == null) {
-                            LOG.warn("could not find gateway device with id: + "
-                                + gatewayDeviceID
-                                + " in the current network environment");
-                            return;
-                        }
+                            for (GatewayDevice currentDevice : devices) {
+                                if (gatewayDeviceIDToFind.equals(currentDevice
+                                    .getUSN())) {
+                                    device = currentDevice;
+                                    break;
+                                }
+                            }
 
-                        upnpService.deletePortMapping(device, socks5ProxyPort,
-                            IUPnPService.TCP);
+                            if (device == null) {
+                                LOG.warn("could not find gateway device with id: + "
+                                    + gatewayDeviceID
+                                    + " in the current network environment");
+                                return;
+                            }
 
-                        LOG.debug("creating port mapping on device: "
-                            + device.getFriendlyName() + " [" + socks5ProxyPort
-                            + "|" + IUPnPService.TCP + "]");
+                            upnpService.deletePortMapping(device,
+                                socks5ProxyPort, IUPnPService.TCP);
 
-                        if (!upnpService.createPortMapping(device,
-                            socks5ProxyPort, IUPnPService.TCP,
-                            PORT_MAPPING_DESCRIPTION)) {
-
-                            LOG.warn("failed to create port mapping on device: "
-                                + device.getFriendlyName()
-                                + " ["
-                                + socks5ProxyPort
-                                + "|"
-                                + IUPnPService.TCP
+                            LOG.debug("creating port mapping on device: "
+                                + device.getFriendlyName() + " ["
+                                + socks5ProxyPort + "|" + IUPnPService.TCP
                                 + "]");
 
-                            device = null;
-                            return;
+                            if (!upnpService.createPortMapping(device,
+                                socks5ProxyPort, IUPnPService.TCP,
+                                PORT_MAPPING_DESCRIPTION)) {
+
+                                LOG.warn("failed to create port mapping on device: "
+                                    + device.getFriendlyName()
+                                    + " ["
+                                    + socks5ProxyPort
+                                    + "|"
+                                    + IUPnPService.TCP
+                                    + "]");
+
+                                device = null;
+                                return;
+                            }
+
+                            if (!useExternalGatewayDeviceAddress)
+                                return;
+
+                            InetAddress externalAddress = upnpService
+                                .getExternalAddress(device);
+
+                            if (externalAddress != null)
+                                NetworkingUtils.addProxyAddress(
+                                    externalAddress.getHostAddress(), true);
                         }
-
-                        if (!useExternalGatewayDeviceAddress)
-                            return;
-
-                        InetAddress externalAddress = upnpService
-                            .getExternalAddress(device);
-
-                        if (externalAddress != null)
-                            NetworkingUtils.addProxyAddress(
-                                externalAddress.getHostAddress(), true);
                     }
-                }
-            });
+                });
 
             try {
                 mappingStart.await();

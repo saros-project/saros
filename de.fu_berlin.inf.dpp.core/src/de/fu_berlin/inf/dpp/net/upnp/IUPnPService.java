@@ -11,21 +11,16 @@ public interface IUPnPService {
     public static final String UDP = "UDP";
 
     /**
-     * Returns all discovered gateways.
+     * Returns all {@link GatewayDevice UPNP gateway devices} in the current
+     * network environment.
      * 
-     * @see #discoverGateways()
-     * @return {@link List} of {@link GatewayDevice} found during UPnP
-     *         discovery. Is <code>null</code> if discovery was not performed
-     *         yet.
+     * @param forceRefresh
+     *            if <code>true</code> the current network environment will be
+     *            rescanned instead of using cached data
+     * @return {@link List} of {@link GatewayDevice} found during UPnP discovery
+     *         or <code>null</code> if the operation failed
      */
-    public List<GatewayDevice> getGateways();
-
-    /**
-     * Starts a gateway discovery.
-     * 
-     * @see #getGateways()
-     */
-    public void discoverGateways();
+    public List<GatewayDevice> getGateways(boolean forceRefresh);
 
     /**
      * Creates a port mapping (port forwarding) on the given gateway device.

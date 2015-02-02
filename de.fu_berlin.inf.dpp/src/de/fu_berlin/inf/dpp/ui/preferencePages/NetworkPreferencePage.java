@@ -506,66 +506,44 @@ public final class NetworkPreferencePage extends PreferencePage implements
     }
 
     private void discoverUpnpGateways() {
-        if (upnpService.getGateways() == null) {
-            gatewayInfo
-                .setText(Messages.NetworkPreferencePage_discover_upnp_gateway);
-            gatewayInfo.pack();
-            gatewayInfo.setVisible(true);
+        gatewayInfo
+            .setText(Messages.NetworkPreferencePage_discover_upnp_gateway);
+        gatewayInfo.pack();
+        gatewayInfo.setVisible(true);
 
-            ThreadUtils.runSafeAsync("dpp-upnp-resolver-cfg", null,
-                new Runnable() {
+        ThreadUtils.runSafeAsync("dpp-upnp-resolver-cfg", null, new Runnable() {
 
+            @Override
+            public void run() {
+
+                final List<GatewayDevice> gateways = upnpService
+                    .getGateways(false);
+
+                SWTUtils.runSafeSWTAsync(null, new Runnable() {
                     @Override
                     public void run() {
 
-                        upnpService.discoverGateways();
+                        if (gatewayInfo.isDisposed()
+                            || upnpDevicesTable.isDisposed())
+                            return;
 
-                        SWTUtils.runSafeSWTAsync(null, new Runnable() {
-                            @Override
-                            public void run() {
-                                List<GatewayDevice> gateways = upnpService
-                                    .getGateways();
+                        if (gateways == null || gateways.isEmpty()) {
+                            gatewayInfo
+                                .setText(Messages.NetworkPreferencePage_upnp_device_not_found);
+                            gatewayInfo.pack();
+                            return;
+                        }
 
-                                if (gatewayInfo.isDisposed()
-                                    || upnpDevicesTable.isDisposed())
-                                    return;
-
-                                if (gateways.isEmpty()) {
-                                    gatewayInfo
-                                        .setText(Messages.NetworkPreferencePage_upnp_device_not_found);
-                                    gatewayInfo.pack();
-                                    return;
-                                }
-
-                                gatewayInfo.setVisible(false);
-                                updateUpnpDevicesTable(
-                                    upnpService.getGateways(),
-                                    getPreferenceStore()
-                                        .getString(
-                                            PreferenceConstants.AUTO_PORTMAPPING_DEVICEID));
-                                upnpDevicesTable.setVisible(true);
-                            }
-                        });
+                        gatewayInfo.setVisible(false);
+                        updateUpnpDevicesTable(
+                            gateways,
+                            getPreferenceStore().getString(
+                                PreferenceConstants.AUTO_PORTMAPPING_DEVICEID));
+                        upnpDevicesTable.setVisible(true);
                     }
                 });
-
-        } else {
-            List<GatewayDevice> gateways = upnpService.getGateways();
-
-            if (gateways.isEmpty()) {
-                gatewayInfo
-                    .setText(Messages.NetworkPreferencePage_upnp_device_not_found2);
-                gatewayInfo.setVisible(true);
-                gatewayInfo.pack();
-                return;
             }
-
-            updateUpnpDevicesTable(
-                upnpService.getGateways(),
-                getPreferenceStore().getString(
-                    PreferenceConstants.AUTO_PORTMAPPING_DEVICEID));
-            upnpDevicesTable.setVisible(true);
-        }
+        });
 
     }
 

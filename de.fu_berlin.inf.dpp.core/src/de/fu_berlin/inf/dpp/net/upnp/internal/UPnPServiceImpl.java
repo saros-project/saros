@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.log4j.Logger;
 import org.bitlet.weupnp.GatewayDevice;
@@ -44,9 +45,9 @@ public class UPnPServiceImpl implements IUPnPService, Disposable {
 
     private final IUPnPAccess upnpAccess;
 
-    private List<GatewayDevice> gateways;
-
     private Timer mappingRefreshTimer;
+
+    private AtomicReference<List<GatewayDevice>> discoveredGateways = new AtomicReference<List<GatewayDevice>>();
 
     private class MappingRefreshTask extends TimerTask {
         private final GatewayDevice device;
@@ -71,15 +72,6 @@ public class UPnPServiceImpl implements IUPnPService, Disposable {
 
     public UPnPServiceImpl(final IUPnPAccess upnpAccess) {
         this.upnpAccess = upnpAccess;
-    }
-
-    @Override
-    public synchronized List<GatewayDevice> getGateways() {
-
-        if (gateways == null)
-            return null;
-
-        return new ArrayList<GatewayDevice>(gateways);
     }
 
     @Override
@@ -218,9 +210,14 @@ public class UPnPServiceImpl implements IUPnPService, Disposable {
     // TODO this may could take a few seconds and may cause hanging if a GUI
     // thread accesses other methods in the meantime
     @Override
-    public synchronized void discoverGateways() {
+    public List<GatewayDevice> getGateways(boolean forceRefresh) {
 
-        gateways = null;
+        List<GatewayDevice> gateways = discoveredGateways.get();
+
+        if (gateways != null && !forceRefresh) {
+            LOG.debug("aborting gateway discovery due to cached results");
+            return new ArrayList<GatewayDevice>(gateways);
+        }
 
         LOG.debug("performing gateways discovery");
 
@@ -231,16 +228,19 @@ public class UPnPServiceImpl implements IUPnPService, Disposable {
         } catch (Exception e) {
             LOG.error("performing gateway discovery failed: " + e.getMessage(),
                 e);
-            return;
+            return null;
         }
 
         LOG.info("discovered " + gateways.size() + " gateway(s)");
 
-        if (gateways.isEmpty())
-            return;
+        discoveredGateways.set(gateways);
 
-        if (LOG.isTraceEnabled())
+        gateways = new ArrayList<GatewayDevice>(gateways);
+
+        if (!gateways.isEmpty() && LOG.isTraceEnabled())
             LOG.trace("discovered gateways devices: " + gateways);
+
+        return gateways;
     }
 
     @Override
