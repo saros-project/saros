@@ -19,8 +19,7 @@ import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 import de.fu_berlin.inf.dpp.stf.test.Constants;
 
-public class AwarenessInformationsVisibleAfterInvitationTest extends
-    StfTestCase {
+public class AwarenessInformationVisibleAfterInvitationTest extends StfTestCase {
 
     @BeforeClass
     public static void selectTesters() throws Exception {
@@ -33,12 +32,12 @@ public class AwarenessInformationsVisibleAfterInvitationTest extends
     }
 
     @After
-    public void LeaveSession() throws Exception {
+    public void leaveSession() throws Exception {
         leaveSessionHostFirst(ALICE);
     }
 
     /**
-     * Tests that an invited client can see the awareness informations after the
+     * Tests that an invited client can see the awareness information after the
      * projectNegotiation finished for new Sessions
      * 
      * Steps:
@@ -50,7 +49,7 @@ public class AwarenessInformationsVisibleAfterInvitationTest extends
      * 3. Bob checks if he can see which project Alice has opened
      */
     @Test
-    public void AwarenessInformationsVisibleNewSessionTest() throws Exception {
+    public void awarenessInformationVisibleNewSessionTest() throws Exception {
         ALICE.superBot().internal().createJavaProject(Constants.PROJECT1);
         ALICE.superBot().internal()
             .createFile(Constants.PROJECT1, Constants.FILE1, "");
@@ -65,7 +64,7 @@ public class AwarenessInformationsVisibleAfterInvitationTest extends
             .waitUntilResourceIsShared(
                 Constants.PROJECT1 + "/" + Constants.FILE1);
 
-        // Wait for awarenessInformations to arrive
+        // Wait for awareness information to arrive
         BOB.controlBot().getNetworkManipulator()
             .synchronizeOnActivityQueue(ALICE.getJID(), 10000);
 
@@ -84,7 +83,7 @@ public class AwarenessInformationsVisibleAfterInvitationTest extends
 
     /**
      * Tests that a client invited to a running session can see the awareness
-     * informations after the projectNegotiation has finished
+     * information after the projectNegotiation has finished
      * 
      * Steps:
      * 
@@ -100,7 +99,7 @@ public class AwarenessInformationsVisibleAfterInvitationTest extends
      * 
      */
     @Test
-    public void AwarenessInformationsVisableAddToSessionTest() throws Exception {
+    public void awarenessInformationVisableAddToSessionTest() throws Exception {
 
         ALICE.superBot().internal().createJavaProject(Constants.PROJECT1);
         ALICE.superBot().internal()
@@ -135,7 +134,7 @@ public class AwarenessInformationsVisibleAfterInvitationTest extends
             .waitUntilResourceIsShared(
                 Constants.PROJECT1 + "/" + Constants.FILE2);
 
-        // Wait for awarenessInformations from both participants to arrive
+        // Wait for awareness information from both participants to arrive
         CARL.controlBot().getNetworkManipulator()
             .synchronizeOnActivityQueue(ALICE.getJID(), 10000);
 

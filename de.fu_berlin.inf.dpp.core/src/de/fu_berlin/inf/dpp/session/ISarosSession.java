@@ -138,7 +138,7 @@ public interface ISarosSession {
 
     /**
      * Informs all listeners that a user now has Projects and can process
-     * IRessourceActivities.
+     * {@link IResourceActivity}s.
      * 
      * @host This method may only called by the host.
      * @param user
@@ -377,8 +377,8 @@ public interface ISarosSession {
     public List<User> getRemoteUsersWithReadOnlyAccess();
 
     /**
-     * Checks if the user is ready to process IRessourceActivities for a given
-     * project
+     * Checks if the user is ready to process {@link IResourceActivity}s for a
+     * given project
      */
     public boolean userHasProject(User user, IProject project);
 

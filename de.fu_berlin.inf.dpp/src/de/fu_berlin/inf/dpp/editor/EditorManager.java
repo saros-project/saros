@@ -290,7 +290,7 @@ public class EditorManager extends AbstractActivityProducer implements
 
             // TODO The user should be able to ask us for this state
 
-            // Send awareness-informations
+            // Send awareness information
             User localUser = session.getLocalUser();
             for (SPath path : getLocallyOpenEditors()) {
                 fireActivity(new EditorActivity(localUser, Type.ACTIVATED, path));

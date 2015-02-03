@@ -166,7 +166,7 @@ public class ConnectionStateComposite extends Composite {
                     Messages.ConnectionStateComposite_remote_login_warning);
             }
 
-            return Messages.ConnectionStateComposite_error_ressource_conflict;
+            return Messages.ConnectionStateComposite_error_resource_conflict;
         default:
             return Messages.ConnectionStateComposite_error_unknown;
         }

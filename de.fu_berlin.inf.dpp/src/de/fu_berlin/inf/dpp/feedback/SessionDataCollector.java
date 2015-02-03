@@ -29,7 +29,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 
 /**
  * Collects some general session data (session time, session ID, session count),
- * platform informations and settings.
+ * platform information and settings.
  * 
  * @author Lisa Dohrmann
  */

@@ -7,7 +7,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 /**
  * EclipsePreferences implements {@link IPreferences} using Eclipse
- * {@link IPreferenceStore} for storing all Informations.
+ * {@link IPreferenceStore} for storing all Information.
  */
 public class EclipsePreferences implements IPreferences {
 

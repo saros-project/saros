@@ -90,8 +90,8 @@ public class SarosSessionManager implements ISarosSessionManager {
      *               Network Layer is used to send MESSAGES between the host and
      *               the invitees and the Session Management is informed about
      *               joined users and added projects.
-     *
-     *               For more informations about the Invitation Process see the
+     * 
+     *               For more information about the Invitation Process see the
      *               "Invitation Process"-Tour.
      *
      */

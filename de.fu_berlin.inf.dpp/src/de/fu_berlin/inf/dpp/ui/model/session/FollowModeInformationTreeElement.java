@@ -28,7 +28,7 @@ public class FollowModeInformationTreeElement extends
     }
 
     /**
-     * Combines the available awareness informations to a styled string
+     * Combines the available awareness information to a styled string
      * 
      * TODO: (optional) create a new renderer that presents the information in a
      * more user friendly way, not just text

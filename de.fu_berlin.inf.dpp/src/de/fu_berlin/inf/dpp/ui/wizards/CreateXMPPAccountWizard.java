@@ -276,7 +276,7 @@ public class CreateXMPPAccountWizard extends Wizard {
             } else {
                 errorMessage = "Registration via Saros not possible.\n\n"
                     + "Please see the server's web site for\n"
-                    + "informations for how to create an account.";
+                    + "information on how to create an account.";
             }
         } else {
             errorMessage = "No in-band registration. Please create account on provider's website.";

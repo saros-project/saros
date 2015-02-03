@@ -88,7 +88,7 @@ public class SarosSessionManager implements ISarosSessionManager {
      *               the invitees and the Session Management is informed about
      *               joined users and added projects.
      *
-     *               For more informations about the Invitation Process see the
+     *               For more information about the Invitation Process see the
      *               "Invitation Process"-Tour.
      *
      */

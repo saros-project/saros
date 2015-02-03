@@ -12,7 +12,7 @@ import org.junit.runners.Suite;
     Share3UsersLeavingSessionTest.class, Share3UsersSequentiallyTest.class,
     ShareProjectUsingExistingProjectTest.class, ShareProjectWizardUITest.class,
     UserDeclinesInvitationToCurrentSessionTest.class,
-    AwarenessInformationsVisibleAfterInvitationTest.class })
+    AwarenessInformationVisibleAfterInvitationTest.class })
 public class TestSuite {
     // the class remains completely empty,
     // being used only as a holder for the above annotations

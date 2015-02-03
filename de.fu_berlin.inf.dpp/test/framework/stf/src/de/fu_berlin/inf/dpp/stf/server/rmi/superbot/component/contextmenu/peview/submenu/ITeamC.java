@@ -48,7 +48,7 @@ import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
  *     .team().update(&quot;115&quot;);
  * </pre>
  * 
- * More informations about how to write STF-Tests please read the user guide.
+ * For more information on how to write STF-Tests please read the user guide.
  * 
  * @author lchen
  */

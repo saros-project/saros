@@ -497,8 +497,8 @@ public final class SarosSession implements ISarosSession {
             JID jid = user.getJID();
             /**
              * This informs all participants, that a user is now able to process
-             * IRessourceActivities. After receiving this message the
-             * participants will send their awareness-informations.
+             * IResourceActivities. After receiving this message the
+             * participants will send their awareness information.
              */
             userListHandler.sendUserFinishedProjectNegotiation(
                 getRemoteUsers(), jid);

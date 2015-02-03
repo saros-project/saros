@@ -189,9 +189,9 @@ public final class ActivityHandler implements Startable {
         if (item.activity instanceof IResourceActivity) {
             IResourceActivity activity = (IResourceActivity) item.activity;
             /*
-             * HACK: IRessourceActivities with null as path will be treated as
+             * HACK: IResourceActivities with null as path will be treated as
              * not being resource related as we can't decide whether to send
-             * them or not. IRessourceActivities must not have null as path but
+             * them or not. IResourceActivities must not have null as path but
              * as the EditorActivity currently break this and uses null paths
              * for non-shared-files we have to make this distinction for now.
              */

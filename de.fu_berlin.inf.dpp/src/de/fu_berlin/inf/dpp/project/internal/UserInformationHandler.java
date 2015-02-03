@@ -13,6 +13,7 @@ import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.picocontainer.Startable;
 
+import de.fu_berlin.inf.dpp.activities.IResourceActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.extensions.UserFinishedProjectNegotiationExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.UserListExtension;
@@ -222,7 +223,7 @@ public class UserInformationHandler implements Startable {
 
     /**
      * Informs all clients about the fact that a user now has projects and is
-     * able to process IRessourceActivities.
+     * able to process {@link IResourceActivity}s.
      * 
      * @param remoteUsers
      *            The users to be informed

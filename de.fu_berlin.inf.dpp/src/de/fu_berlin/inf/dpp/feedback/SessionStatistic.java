@@ -100,7 +100,7 @@ public class SessionStatistic {
      */
     protected static final String KEY_SESSION_LOCAL_END = "session.local.end";
 
-    // Keys for shared project informations
+    // Keys for shared project information
     protected static final String KEY_COMPLETE_SHARED_PROJECTS = "session.shared.project.complete.count";
     protected static final String KEY_PARTIAL_SHARED_PROJECTS = "session.shared.project.partial.count";
     protected static final String KEY_PARTIAL_SHARED_PROJECTS_FILES = "session.shared.project.partial.files.count";
