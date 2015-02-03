@@ -92,6 +92,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         prefs.setValue(EclipsePreferenceConstants.ENABLE_BALLOON_NOTIFICATION,
             true);
 
+        // TODO Dead preference?
         prefs
             .setValue(
                 EclipsePreferenceConstants.CONTACT_SELECTION_FILTER_NON_SAROS_CONTACTS,

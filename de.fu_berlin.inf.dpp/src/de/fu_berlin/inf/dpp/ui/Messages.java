@@ -34,7 +34,6 @@ public class Messages extends NLS {
 
     public static String AdvancedPreferencePage_description;
     public static String AdvancedPreferencePage_show_xmpp_debug;
-    public static String AdvancedPreferencePage_skip_synchronization;
     public static String AdvancedPreferencePage_activate_server;
     public static String AdvancedPreferencePage_enable_consolesharing;
 
@@ -76,11 +75,6 @@ public class Messages extends NLS {
     public static String CollaborationUtils_confirm_leaving;
     public static String CollaborationUtils_confirm_leaving_text;
     public static String CollaborationUtils_partial;
-    public static String CollaborationUtils_confirm_need_based;
-    public static String CollaborationUtils_confirm_need_based_text;
-    public static String CollaborationUtils_confirm_need_based_file;
-    public static String CollaborationUtils_confirm_need_based_file_text;
-    public static String CollaborationUtils_confirm_need_based_file_balloon_text;
     public static String CollaborationUtils_insufficient_privileges;
     public static String CollaborationUtils_insufficient_privileges_text;
 
@@ -126,8 +120,8 @@ public class Messages extends NLS {
     public static String ConnectionStateComposite_tooltip_connected;
     public static String ConnectionStateComposite_remote_login_warning;
 
+    public static String ConsistencyAction_confirm_dialog_title;
     public static String ConsistencyAction_message_inconsistency_detected;
-    public static String ConsistencyAction_progress_perform_recovery;
     public static String ConsistencyAction_title_inconsistency_deteced;
     public static String ConsistencyAction_tooltip_inconsistency_detected;
     public static String ConsistencyAction_tooltip_no_inconsistency;
@@ -150,7 +144,6 @@ public class Messages extends NLS {
     public static String EditXMPPAccountWizardPage_title;
 
     public static String EnterProjectNamePage_browse;
-    public static String EnterProjectNamePage_create_copy;
     public static String EnterProjectNamePage_create_new_project;
     public static String EnterProjectNamePage_description_direct_filetranfser;
     public static String EnterProjectNamePage_description_file_transfer;
@@ -159,7 +152,7 @@ public class Messages extends NLS {
     public static String EnterProjectNamePage_direct_filetransfer_nan;
     public static String EnterProjectNamePage_error_browser_open;
     public static String EnterProjectNamePage_error_projectname_exists;
-    public static String EnterProjectNamePage_error_set_projectname2;
+    public static String EnterProjectNamePage_error_projectname_in_use;
     public static String EnterProjectNamePage_error_wrong_name;
     public static String EnterProjectNamePage_warning_project_artifacts_found;
     public static String EnterProjectNamePage_faq;
@@ -167,8 +160,6 @@ public class Messages extends NLS {
     public static String EnterProjectNamePage_saros_url;
     public static String EnterProjectNamePage_select_project_for_update;
     public static String EnterProjectNamePage_set_project_name;
-    public static String EnterProjectNamePage_skip_synchronizing;
-    public static String EnterProjectNamePage_skip_synchronizing_warn;
     public static String EnterProjectNamePage_title;
     public static String EnterProjectNamePage_title2;
     public static String EnterProjectNamePage_unknown_transport_method;
@@ -191,7 +182,6 @@ public class Messages extends NLS {
     public static String GeneralPreferencePage_DISABLE_VERSION_CONTROL_TEXT;
     public static String GeneralPreferencePage_ENCRYPT_PASSWORD_TEXT;
     public static String GeneralPreferencePage_FOLLOW_MODE_TEXT;
-    public static String GeneralPreferencePage_ENABLE_NEEDS_BASED_SYNC_TEXT;
     public static String GeneralPreferencePage_STARTUP_CONNECT_TEXT;
     public static String GeneralPreferencePage_REMOVE_ACCOUNT_DIALOG_TITLE;
     public static String GeneralPreferencePage_REMOVE_ACCOUNT_DIALOG_MESSAGE;
@@ -241,7 +231,6 @@ public class Messages extends NLS {
     // TODO names for ui.wirzard.pages
     public static String jid_example;
     public static String jid_format_errorMessage;
-    public static String jid_longform;
     public static String jid_shortform;
     public static String password_empty_errorMessage;
     public static String xmpp_saros_restriction_short;
@@ -251,7 +240,6 @@ public class Messages extends NLS {
     public static String account_exists_errorMessage;
 
     public static String FilteredContactSelectionComposite_add_contact_button_text;
-    public static String FilteredContactSelectionComposite_filter_non_saros_contacts_button_text;
 
     public static String ContactSelectionWizardPage_title;
     public static String ContactSelectionWizardPage_description;
@@ -290,7 +278,6 @@ public class Messages extends NLS {
     public static String NetworkPreferencePage_upnp_activation;
     public static String NetworkPreferencePage_upnp_activation_text;
     public static String NetworkPreferencePage_upnp_device_not_found;
-    public static String NetworkPreferencePage_upnp_device_not_found2;
     public static String NetworkPreferencePage_upnp_devices;
     public static String NetworkPreferencePage_upnp_label_Text;
     public static String NewContactAction_tooltip;
@@ -329,6 +316,10 @@ public class Messages extends NLS {
     public static String ResourceSelectionComposite_new_project;
     public static String ResourceSelectionComposite_undo;
     public static String ResourceSelectionComposite_redo;
+    public static String ResourceSelectionComposite_overwrite_dialog_title;
+    public static String ResourceSelectionComposite_overwrite_dialog_message;
+    public static String ResourceSelectionComposite_delete_dialog_title;
+    public static String ResourceSelectionComposite_delete_dialog_message;
     public static String RestrictToReadOnlyAccessAction_title;
     public static String RestrictToReadOnlyAccessAction_tooltip;
 
@@ -345,8 +336,6 @@ public class Messages extends NLS {
     public static String UserElement_following_paused;
     public static String UserElement_read_only;
     public static String UserElement_host;
-
-    public static String ConsistencyAction_confirm_dialog_title;
 
     public static String DeleteContactAction_confirm_message;
     public static String DeleteContactAction_confirm_title;
@@ -365,14 +354,9 @@ public class Messages extends NLS {
     public static String FollowThisPersonAction_follow_tooltip;
     public static String FollowThisPersonAction_stop_follow_title;
     public static String FollowThisPersonAction_stop_follow_tooltip;
-    public static String EnterProjectNamePage_error_projectname_in_use;
 
     public static String SharedProjectDecorator_shared;
     public static String SharedProjectDecorator_shared_partial;
-    public static String ResourceSelectionComposite_overwrite_dialog_title;
-    public static String ResourceSelectionComposite_overwrite_dialog_message;
-    public static String ResourceSelectionComposite_delete_dialog_title;
-    public static String ResourceSelectionComposite_delete_dialog_message;
 
     public static String SubscriptionManager_incoming_subscription_request_title;
     public static String SubscriptionManager_incoming_subscription_request_message;
