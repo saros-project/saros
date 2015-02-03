@@ -120,7 +120,7 @@ public class Socks5Transport extends ByteStreamTransport {
     protected void waitToCloseResponse(
         final Future<Socks5BytestreamSession> future) {
         LOG.debug(prefix()
-            + "cancelling response connection as it is not needed");
+            + "canceling response connection as it is not needed");
 
         Thread waitToCloseResponse = new Thread(
             "CloseUnneededResponseConnection") {

@@ -182,7 +182,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
         /*
          * file lists are normally very small so we "accept" the circumstance
-         * that this step cannot be cancelled.
+         * that this step cannot be canceled.
          */
 
         monitor.setTaskName("Sending file list...");

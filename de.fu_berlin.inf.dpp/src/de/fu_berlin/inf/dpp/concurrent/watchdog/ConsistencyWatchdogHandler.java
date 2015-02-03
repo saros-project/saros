@@ -126,7 +126,7 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
                     try {
                         throw e.getCause();
                     } catch (CancellationException c) {
-                        LOG.info("Recovery was cancelled by local user");
+                        LOG.info("Recovery was canceled by local user");
                     } catch (Throwable t) {
                         LOG.error("Internal Error: ", t);
                     }

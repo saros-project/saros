@@ -74,7 +74,7 @@ public class RosterEntryElement extends TreeElement {
              */
 
             styledString.append(" ").append( //$NON-NLS-1$
-                Messages.RosterEntryElement_subscription_cancelled,
+                Messages.RosterEntryElement_subscription_canceled,
                 StyledString.COUNTER_STYLER);
 
         } else if (presence.isAway()) {

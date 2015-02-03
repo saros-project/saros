@@ -58,10 +58,10 @@ public class Messages {
     public static String NegotiationHandler_error_during_invitation;
     public static String NegotiationHandler_error_during_invitation_text;
     public static String NegotiationHandler_inviting_user;
-    public static String NegotiationHandler_project_sharing_cancelled_text;
+    public static String NegotiationHandler_project_sharing_canceled_text;
     public static String NegotiationHandler_sharing_project;
-    public static String NegotiationHandler_sharing_project_cancelled_remotely;
-    public static String NegotiationHandler_sharing_project_cancelled_remotely_text;
+    public static String NegotiationHandler_sharing_project_canceled_remotely;
+    public static String NegotiationHandler_sharing_project_canceled_remotely_text;
 
     public static String EnterProjectNamePage_create_new_project;
     public static String EnterProjectNamePage_project_name;
@@ -74,10 +74,10 @@ public class Messages {
     public static String JoinSessionWizard_8;
     public static String JoinSessionWizard_accept;
     public static String JoinSessionWizard_info;
-    public static String JoinSessionWizard_inv_cancelled;
-    public static String JoinSessionWizard_inv_cancelled_text;
-    public static String JoinSessionWizard_inv_cancelled_text2;
-    public static String JoinSessionWizard_inv_cancelled_text3;
+    public static String JoinSessionWizard_inv_canceled;
+    public static String JoinSessionWizard_inv_canceled_text;
+    public static String JoinSessionWizard_inv_canceled_text2;
+    public static String JoinSessionWizard_inv_canceled_text3;
     public static String JoinSessionWizard_title;
 
     public static String UserStatusChangeHandler_user_joined;

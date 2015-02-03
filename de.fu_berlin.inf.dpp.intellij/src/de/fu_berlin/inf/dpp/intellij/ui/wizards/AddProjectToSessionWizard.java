@@ -217,7 +217,7 @@ public class AddProjectToSessionWizard extends Wizard {
      */
     public void cancelWizard(final JID peer, final String errorMsg,
         ProcessTools.CancelLocation type) {
-        final String message = "Wizard cancelled "
+        final String message = "Wizard canceled "
             + (type.equals(ProcessTools.CancelLocation.LOCAL) ?
               "locally " :
               "remotely ")

@@ -35,9 +35,9 @@ abstract class FileTransferJob extends Job {
 
             /*
              * there is currently no chance to determine on the sender side if
-             * the receiving side has cancelled the transfer
+             * the receiving side has canceled the transfer
              */
-            String errMsg = error == null ? "File transfer failed. Maybe the remote side cancelled the transfer."
+            String errMsg = error == null ? "File transfer failed. Maybe the remote side canceled the transfer."
                 : error.getMessage();
             Status status = new Status(IStatus.ERROR, Saros.PLUGIN_ID, errMsg,
                 transfer.getException());

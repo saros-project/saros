@@ -92,7 +92,7 @@ public class SXEIncomingSynchronizationProcess extends SXESynchronization {
 
                     if (stateMessage == null) {
                         log.debug(prefix()
-                            + "Whitebaord synchronization cancelled locally");
+                            + "Whitebaord synchronization canceled locally");
                         return;
                     }
 

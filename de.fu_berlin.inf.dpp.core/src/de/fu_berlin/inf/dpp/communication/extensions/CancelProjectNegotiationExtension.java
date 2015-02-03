@@ -46,7 +46,7 @@ public class CancelProjectNegotiationExtension extends
      * Returns the error message for this cancellation.
      * 
      * @return the error message or <code>null</code> if the remote contact
-     *         cancelled the project negotiation manually
+     *         canceled the project negotiation manually
      */
     public String getErrorMessage() {
         return errorMessage;

@@ -161,7 +161,7 @@ public abstract class ProjectNegotiation extends CancelableProcess {
      *            user. It is the caller's responsibility to call done() on the
      *            given monitor. Accepts <code>null</code>, indicating that no
      *            progress should be reported and that the operation cannot be
-     *            cancelled.
+     *            canceled.
      * 
      * @throws SarosCancellationException
      *             if the transfer was aborted either on local side or remote

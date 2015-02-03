@@ -66,7 +66,7 @@ public class HostLeftAloneInSessionHandler {
             /*
              * only ask to close session if there are no running negotiation
              * processes because if there are, and the last user "left", it was
-             * because he cancelled an IncomingProjectNegotiation, and the
+             * because he canceled an IncomingProjectNegotiation, and the
              * session will be closed anyway.
              */
 

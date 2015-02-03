@@ -243,7 +243,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
     /**
      * Checks the compatibility of the local Saros version with the remote side.
      * If the versions are compatible, the invitation continues. Otherwise, the
-     * invitation is cancelled locally.
+     * invitation is canceled locally.
      * <p/>
      * However, if
      * {@link OutgoingSessionNegotiation#IGNORE_VERSION_COMPATIBILITY} is set to
@@ -509,7 +509,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
          * using the collector when the current thread context is the context
          * for dispatching messages.
          * 
-         * IMPORTANT: Your logic must ensure that the collector is cancelled
+         * IMPORTANT: Your logic must ensure that the collector is canceled
          * after it is no longer used. Failing to do so will result in memory
          * leaks.
          */

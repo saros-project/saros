@@ -158,16 +158,16 @@ public class JoinSessionWizard extends Wizard {
             switch (cancelLocation) {
             case LOCAL:
                 DialogUtils
-                    .showError(this, Messages.JoinSessionWizard_inv_cancelled,
-                        Messages.JoinSessionWizard_inv_cancelled_text
+                    .showError(this, Messages.JoinSessionWizard_inv_canceled,
+                        Messages.JoinSessionWizard_inv_canceled_text
                             + Messages.JoinSessionWizard_8 + errorMsg
                     );
                 break;
             case REMOTE:
                 DialogUtils
-                    .showError(this, Messages.JoinSessionWizard_inv_cancelled,
+                    .showError(this, Messages.JoinSessionWizard_inv_canceled,
                         MessageFormat.format(
-                            Messages.JoinSessionWizard_inv_cancelled_text2,
+                            Messages.JoinSessionWizard_inv_canceled_text2,
                             peer, errorMsg)
                     );
             }
@@ -177,9 +177,9 @@ public class JoinSessionWizard extends Wizard {
                 break;
             case REMOTE:
                 DialogUtils
-                    .showInfo(this, Messages.JoinSessionWizard_inv_cancelled,
+                    .showInfo(this, Messages.JoinSessionWizard_inv_canceled,
                         MessageFormat.format(
-                            Messages.JoinSessionWizard_inv_cancelled_text3,
+                            Messages.JoinSessionWizard_inv_canceled_text3,
                             peer)
                     );
             }

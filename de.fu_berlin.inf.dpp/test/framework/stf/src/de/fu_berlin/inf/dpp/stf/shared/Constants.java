@@ -351,7 +351,7 @@ public interface Constants {
      * title of shells which are pop up by performing the actions on the package
      * explorer view.
      */
-    public static final String SHELL_INVITATION_CANCELLED = get("shell_invitation_cancelled");
+    public static final String SHELL_INVITATION_CANCELED = get("shell_invitation_canceled");
     public static final String SHELL_SESSION_INVITATION = get("shell_session_invitation");
     public static final String SHELL_ADD_PROJECTS = get("shell_add_projects");
     public static final String SHELL_ADD_PROJECTS_TO_SESSION = get("shell_add_projects_to_session");

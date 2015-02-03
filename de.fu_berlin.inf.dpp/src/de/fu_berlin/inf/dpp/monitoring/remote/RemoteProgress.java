@@ -181,7 +181,7 @@ final class RemoteProgress {
                 monitor.done();
                 break update;
             case CANCEL:
-                LOG.debug("progress was cancelled by remote user");
+                LOG.debug("progress was canceled by remote user");
                 monitor.setCanceled(true);
                 break update;
             }

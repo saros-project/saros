@@ -23,7 +23,7 @@ public class CancelInviteExtension extends InvitationExtension {
      * Returns the error message for this cancellation.
      * 
      * @return the error message or <code>null</code> if the remote contact
-     *         cancelled the invitation manually
+     *         canceled the invitation manually
      */
     public String getErrorMessage() {
         return errorMessage;

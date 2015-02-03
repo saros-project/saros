@@ -6,7 +6,7 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.CARL;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.DAVE;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.ACCEPT;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_ADD_PROJECTS;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_INVITATION_CANCELLED;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_INVITATION_CANCELED;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_SESSION_INVITATION;
 
 import java.io.IOException;
@@ -98,9 +98,9 @@ public class ParallelInvitationWithTerminationByHostTest extends StfTestCase {
         // kick BOB
         ALICE.superBot().views().progressView().removeProcess(0);
 
-        BOB.remoteBot().waitLongUntilShellIsOpen(SHELL_INVITATION_CANCELLED);
-        BOB.remoteBot().shell(SHELL_INVITATION_CANCELLED).activate();
-        BOB.remoteBot().shell(SHELL_INVITATION_CANCELLED).close();
+        BOB.remoteBot().waitLongUntilShellIsOpen(SHELL_INVITATION_CANCELED);
+        BOB.remoteBot().shell(SHELL_INVITATION_CANCELED).activate();
+        BOB.remoteBot().shell(SHELL_INVITATION_CANCELED).close();
 
         CARL.remoteBot().shell(SHELL_SESSION_INVITATION).activate();
         CARL.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
@@ -116,7 +116,7 @@ public class ParallelInvitationWithTerminationByHostTest extends StfTestCase {
 
         ALICE.superBot().views().sarosView().leaveSession();
 
-        // TODO we get an invitation cancelled message dialog which is
+        // TODO we get an invitation canceled message dialog which is
         // completely wrong
     }
 }

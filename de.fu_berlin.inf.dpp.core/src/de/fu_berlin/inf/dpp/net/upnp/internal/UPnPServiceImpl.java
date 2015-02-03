@@ -105,7 +105,7 @@ public class UPnPServiceImpl implements IUPnPService, Disposable {
 
             /*
              * as we are working with leases we must remove them (primary to
-             * ensure that the timer is cancelled)
+             * ensure that the timer is canceled)
              */
             if (isMapped(device, port, protocol)
                 && !deletePortMapping(device, port, protocol))

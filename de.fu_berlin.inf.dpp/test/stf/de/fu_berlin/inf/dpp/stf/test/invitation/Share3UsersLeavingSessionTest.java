@@ -75,9 +75,9 @@ public class Share3UsersLeavingSessionTest extends StfTestCase {
         Thread.sleep(2000);
 
         try {
-            CARL.remoteBot().shell("Invitation Cancelled").confirm(OK);
+            CARL.remoteBot().shell("Invitation Canceled").confirm(OK);
         } catch (WidgetNotFoundException e) {
-            fail("Invitation Cancelled is not open: " + e.getMessage());
+            fail("Invitation Canceled is not open: " + e.getMessage());
         }
         assertFalse(CARL + " is in a closed session", CARL.superBot().views()
             .sarosView().isInSession());

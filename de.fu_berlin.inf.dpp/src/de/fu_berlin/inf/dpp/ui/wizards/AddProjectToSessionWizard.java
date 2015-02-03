@@ -409,20 +409,20 @@ public class AddProjectToSessionWizard extends Wizard {
                 DialogUtils
                     .openErrorMessageDialog(
                         shell,
-                        Messages.AddProjectToSessionWizard_invitation_cancelled,
+                        Messages.AddProjectToSessionWizard_invitation_canceled,
                         MessageFormat
                             .format(
-                                Messages.AddProjectToSessionWizard_invitation_cancelled_text,
+                                Messages.AddProjectToSessionWizard_invitation_canceled_text,
                                 errorMsg));
                 break;
             case REMOTE:
                 DialogUtils
                     .openErrorMessageDialog(
                         shell,
-                        Messages.AddProjectToSessionWizard_invitation_cancelled,
+                        Messages.AddProjectToSessionWizard_invitation_canceled,
                         MessageFormat
                             .format(
-                                Messages.AddProjectToSessionWizard_invitation_cancelled_text2,
+                                Messages.AddProjectToSessionWizard_invitation_canceled_text2,
                                 peer, errorMsg));
             }
         } else {
@@ -433,10 +433,10 @@ public class AddProjectToSessionWizard extends Wizard {
                 DialogUtils
                     .openInformationMessageDialog(
                         shell,
-                        Messages.AddProjectToSessionWizard_invitation_cancelled,
+                        Messages.AddProjectToSessionWizard_invitation_canceled,
                         MessageFormat
                             .format(
-                                Messages.AddProjectToSessionWizard_invitation_cancelled_text3,
+                                Messages.AddProjectToSessionWizard_invitation_canceled_text3,
                                 peer));
             }
         }

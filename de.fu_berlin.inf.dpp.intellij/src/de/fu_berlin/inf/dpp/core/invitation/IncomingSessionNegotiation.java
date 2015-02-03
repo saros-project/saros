@@ -112,7 +112,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
             running = true;
         }
 
-        // the process should not be cancelled manually !
+        // the process should not be canceled manually !
         // observeMonitor(monitor);
 
         Exception exception = null;

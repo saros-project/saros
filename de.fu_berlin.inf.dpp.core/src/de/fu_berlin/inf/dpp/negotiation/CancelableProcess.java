@@ -109,7 +109,7 @@ abstract class CancelableProcess {
      * @param cancelOption
      *            the cancel option to use when a local cancellation was set
      * @throws SarosCancellationException
-     *             if the current process should be cancelled
+     *             if the current process should be canceled
      */
     protected synchronized final void checkCancellation(
         CancelOption cancelOption) throws SarosCancellationException {
@@ -154,7 +154,7 @@ abstract class CancelableProcess {
         }
 
         log.debug("process " + this
-            + " was cancelled by the local side, error: "
+            + " was canceled by the local side, error: "
             + (errorMessage == null ? "none" : errorMessage));
 
         notifyCancellationListeners(CancelLocation.LOCAL, errorMessage);
@@ -187,7 +187,7 @@ abstract class CancelableProcess {
         }
 
         log.debug("process " + this
-            + " was cancelled by the remote side, error: "
+            + " was canceled by the remote side, error: "
             + (errorMsg == null ? "none" : errorMsg));
 
         notifyCancellationListeners(CancelLocation.REMOTE, errorMessage);
@@ -227,7 +227,7 @@ abstract class CancelableProcess {
     }
 
     /**
-     * Returns if the current process should be cancelled because of a local
+     * Returns if the current process should be canceled because of a local
      * cancellation request
      * 
      * @return <code>true</code> if cancellation is requested on the local side,
@@ -240,7 +240,7 @@ abstract class CancelableProcess {
     }
 
     /**
-     * Returns if the current process should be cancelled because of a remote
+     * Returns if the current process should be canceled because of a remote
      * cancellation request
      * 
      * @return <code>true</code> if cancellation is requested on the remote
@@ -253,7 +253,7 @@ abstract class CancelableProcess {
     /**
      * Terminates the current process. This method may be called multiple times
      * but only the <b>first</b> call will be taken into account. If the process
-     * was cancelled in the meantime it will invoke {@link #notifyCancellation}
+     * was canceled in the meantime it will invoke {@link #notifyCancellation}
      * and {@link #executeCancellation} in this order.
      * 
      * 
@@ -393,28 +393,28 @@ abstract class CancelableProcess {
 
         if (cancellationCause instanceof LocalCancellationException) {
             if (exceptionMessage != null) {
-                errorMessage = "Invitation was cancelled locally"
+                errorMessage = "Invitation was canceled locally"
                     + " because of an error: " + exceptionMessage;
-                log.error("cancelled process " + this + ", error: "
+                log.error("canceled process " + this + ", error: "
                     + exceptionMessage);
             } else {
                 log.debug("process " + this
-                    + " was cancelled manually by the local user");
+                    + " was canceled manually by the local user");
             }
 
         } else if (cancellationCause instanceof RemoteCancellationException) {
             if (exceptionMessage != null) {
-                errorMessage = "Invitation was cancelled by the remote user "
+                errorMessage = "Invitation was canceled by the remote user "
                     + " because of an error on his/her side: "
                     + exceptionMessage;
 
-                log.error("cancelled process " + this
+                log.error("canceled process " + this
                     + " because the remote side encountered an error: "
                     + exceptionMessage);
 
             } else {
                 log.debug("process " + this
-                    + " was cancelled manually by the remote side");
+                    + " was canceled manually by the remote side");
 
             }
         } else {

@@ -124,7 +124,7 @@ public class MonitorableFileTransfer {
         if (status.equals(Status.error))
             return TransferStatus.ERROR;
 
-        // either cancelled or refused
+        // either canceled or refused
         return TransferStatus.CANCEL;
     }
 }

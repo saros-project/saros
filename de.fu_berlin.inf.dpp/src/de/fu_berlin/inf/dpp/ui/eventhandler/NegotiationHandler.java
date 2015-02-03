@@ -178,7 +178,7 @@ public class NegotiationHandler implements INegotiationHandler {
                 case REMOTE_CANCEL:
                     message = MessageFormat
                         .format(
-                            Messages.NegotiationHandler_project_sharing_cancelled_text,
+                            Messages.NegotiationHandler_project_sharing_canceled_text,
                             peerName);
 
                     SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
@@ -194,11 +194,11 @@ public class NegotiationHandler implements INegotiationHandler {
                 case REMOTE_ERROR:
                     message = MessageFormat
                         .format(
-                            Messages.NegotiationHandler_sharing_project_cancelled_remotely,
+                            Messages.NegotiationHandler_sharing_project_canceled_remotely,
                             peerName, process.getErrorMessage());
                     SarosView
                         .showNotification(
-                            Messages.NegotiationHandler_sharing_project_cancelled_remotely_text,
+                            Messages.NegotiationHandler_sharing_project_canceled_remotely_text,
                             message);
 
                     return new Status(IStatus.ERROR, Saros.PLUGIN_ID, message);

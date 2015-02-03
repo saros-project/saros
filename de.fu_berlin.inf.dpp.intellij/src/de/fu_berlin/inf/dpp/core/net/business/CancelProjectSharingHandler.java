@@ -16,7 +16,7 @@ import org.jivesoftware.smack.packet.Packet;
 
 /**
  * Listens for {@link CancelProjectNegotiationExtension} packets that signal a
- * cancelled project negotation and cancels it locally.
+ * canceled project negotiation and cancels it locally.
  */
 public class CancelProjectSharingHandler {
 
