@@ -11,6 +11,7 @@ import de.fu_berlin.inf.dpp.core.ui.eventhandler.NegotiationHandler;
 import de.fu_berlin.inf.dpp.core.ui.eventhandler.UserStatusChangeHandler;
 import de.fu_berlin.inf.dpp.core.ui.eventhandler.XMPPAuthorizationHandler;
 import de.fu_berlin.inf.dpp.core.util.FileUtils;
+import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.filesystem.ChecksumCacheImpl;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IFileContentChangedNotifier;
@@ -53,6 +54,7 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
 
         Component.create(EditorAPI.class), Component.create(ProjectAPI.class),
 
+        Component.create(IEditorManager.class, EditorManager.class),
         Component.create(EditorManager.class),
         Component.create(LocalEditorHandler.class),
         Component.create(LocalEditorManipulator.class),
@@ -110,7 +112,7 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
             "14.1.31.DEVEL");  //todo
 
         container.addComponent(BindKey.bindKey(String.class,
-                ISarosContextBindings.PlatformVersion.class), "4.3.2"); //todo
+            ISarosContextBindings.PlatformVersion.class), "4.3.2"); //todo
 
     }
 }

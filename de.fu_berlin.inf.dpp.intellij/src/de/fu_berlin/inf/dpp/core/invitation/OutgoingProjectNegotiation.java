@@ -1,35 +1,18 @@
 package de.fu_berlin.inf.dpp.core.invitation;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.CancellationException;
-
-import org.apache.log4j.Logger;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.Packet;
-import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
-import org.picocontainer.annotations.Inject;
-
 import de.fu_berlin.inf.dpp.ISarosContext;
-import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.communication.extensions.ProjectNegotiationMissingFilesExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.ProjectNegotiationOfferingExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingRequest;
 import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingResponse;
 import de.fu_berlin.inf.dpp.core.exceptions.OperationCanceledException;
 import de.fu_berlin.inf.dpp.core.project.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.SubProgressMonitor;
 import de.fu_berlin.inf.dpp.negotiation.FileList;
@@ -43,6 +26,21 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.vcs.VCSProvider;
+import org.apache.log4j.Logger;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
+import org.picocontainer.annotations.Inject;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.CancellationException;
 
 /**
  * TODO: Refactor when merging with Saros/E OPN.
@@ -58,7 +56,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     private final ISarosSession sarosSession;
 
     @Inject
-    private EditorManager editorManager;
+    private IEditorManager editorManager;
     @Inject
     private IChecksumCache checksumCache;
 
@@ -103,12 +101,6 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
             List<FileList> fileLists = getRemoteFileList(monitor);
             monitor.subTask("");
-
-            /*
-             * FIXME why do we unlock the editors here when we are going to
-             * block ourself in the next call ?!
-             */
-            editorManager.unlockAllLocalOpenedEditors();
 
             List<StartHandle> stoppedUsers = null;
             try {
@@ -191,7 +183,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
         /*
          * file lists are normally very small so we "accept" the circumstance
-         * that this step cannot be canceled.
+         * that this step cannot be cancelled.
          */
 
         monitor.setTaskName("Sending file list...");
@@ -212,7 +204,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     /**
      * Retrieve the peer's partial file list and remember which files need to be
      * sent to that user
-     * 
+     *
      * @param monitor
      * @throws IOException
      * @throws SarosCancellationException
@@ -341,21 +333,6 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             return null;
         }
 
-        /*
-         * Use editorManager.saveText() because the EditorAPI.saveProject() will
-         * not save files which were modified in the background. This is what
-         * happens for example if a user edits a file which is not opened by the
-         * local user.
-         * 
-         * Stefan Rossbach: this will still fail if a user edited a file and
-         * then closes the editor without saving it.
-         */
-
-        // FIXME this throws a NPE if the session has already been stopped
-        for (SPath path : editorManager.getRemoteOpenEditors()) {
-            editorManager.saveFile(path);
-        }
-
         checkCancellation(CancelOption.NOTIFY_PEER);
 
         final List<IFile> filesToCompress = new ArrayList<IFile>(fileCount);
@@ -372,6 +349,9 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                     + projectID + " was unshared during synchronization",
                     CancelOption.NOTIFY_PEER);
             }
+
+            if (editorManager != null)
+                editorManager.saveEditors(project);
 
             final StringBuilder aliasBuilder = new StringBuilder();
 
@@ -448,7 +428,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
     /**
      * Method to create list of ProjectExchangeInfo.
-     * 
+     *
      * @param projectsToShare
      *            List of projects to share
      */
@@ -512,14 +492,14 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     /**
      * Sends an activity queuing request to the remote side and awaits the
      * confirmation of the request.
-     * 
+     *
      * @param monitor
      */
     private void sendAndAwaitActivityQueueingActivation(IProgressMonitor monitor)
         throws IOException, SarosCancellationException {
 
         monitor.beginTask("Waiting for " + peer.getName()
-            + " to perform additional initialization...",
+                + " to perform additional initialization...",
             IProgressMonitor.UNKNOWN);
 
         transmitter

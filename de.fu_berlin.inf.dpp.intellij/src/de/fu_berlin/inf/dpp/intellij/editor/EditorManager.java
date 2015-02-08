@@ -39,6 +39,8 @@ import de.fu_berlin.inf.dpp.core.editor.RemoteEditorManager;
 import de.fu_berlin.inf.dpp.core.editor.RemoteWriteAccessManager;
 import de.fu_berlin.inf.dpp.core.editor.SharedEditorListenerDispatch;
 import de.fu_berlin.inf.dpp.core.project.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.editor.IEditorManager;
+import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorManager;
 import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorModel;
 import de.fu_berlin.inf.dpp.intellij.editor.text.LineRange;
@@ -46,12 +48,12 @@ import de.fu_berlin.inf.dpp.intellij.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
-import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
 import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import org.apache.log4j.Logger;
@@ -70,7 +72,8 @@ import java.util.Set;
  * {@link LocalEditorManipulator} and gets called by {@link LocalEditorHandler}
  * for activities from local editors.
  */
-public class EditorManager extends AbstractActivityProducer {
+public class EditorManager extends AbstractActivityProducer implements
+    IEditorManager{
 
     private static final Logger LOG = Logger.getLogger(EditorManager.class);
 
@@ -858,15 +861,6 @@ public class EditorManager extends AbstractActivityProducer {
         editorPool.lockAllDocuments();
     }
 
-    /**
-     * Unlocks all locally open editors by starting them.
-     */
-    public void unlockAllLocalOpenedEditors() {
-        for (Editor editor : editorPool.getEditors()) {
-            startEditor(editor);
-        }
-    }
-
     private void executeInUIThreadSynchronous(Runnable runnable) {
         ApplicationManager.getApplication()
             .invokeAndWait(runnable, ModalityState.NON_MODAL);
@@ -874,5 +868,27 @@ public class EditorManager extends AbstractActivityProducer {
 
     private void executeInUIThreadAsynchronous(Runnable runnable) {
         ApplicationManager.getApplication().invokeLater(runnable);
+    }
+
+    @Override
+    public void saveEditors(final IProject project) {
+        executeInUIThreadSynchronous(new Runnable() {
+            @Override
+            public void run() {
+
+                if (remoteEditorManager == null)
+                    return;
+
+                final Set<SPath> editorPaths = remoteEditorManager
+                    .getRemoteOpenEditors();
+
+                editorPaths.addAll(locallyOpenEditors);
+
+                for (final SPath path : editorPaths) {
+                    if (project == null || project.equals(path.getProject()))
+                        saveFile(path);
+                }
+            }
+        });
     }
 }
