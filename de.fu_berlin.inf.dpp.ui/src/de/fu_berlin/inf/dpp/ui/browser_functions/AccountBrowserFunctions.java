@@ -1,19 +1,14 @@
 package de.fu_berlin.inf.dpp.ui.browser_functions;
 
-import com.google.gson.Gson;
 import de.fu_berlin.inf.ag_se.browser.IBrowserFunction;
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.account.XMPPAccount;
-import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
+import de.fu_berlin.inf.dpp.ui.core_services.AccountCoreService;
 import de.fu_berlin.inf.dpp.ui.manager.IDialogManager;
-import de.fu_berlin.inf.dpp.ui.model.Account;
 import de.fu_berlin.inf.dpp.ui.view_parts.AddAccountWizard;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This class contains functions to be called from Javascript.
@@ -29,7 +24,7 @@ public class AccountBrowserFunctions {
     private IDialogManager dialogManager;
 
     @Inject
-    private XMPPAccountStore accountStore;
+    private AccountCoreService accountCoreService;
 
     @Inject
     private AddAccountWizard addAccountWizard;
@@ -67,36 +62,27 @@ public class AccountBrowserFunctions {
         browser
             .createBrowserFunction(new IBrowserFunction("__java_saveAccount") {
                 @Override
-                public Object function(Object[] arguments) {
-                    if (arguments.length > 0) {
-                        //TODO use JSON object as parameter
-                        String jid = (String) arguments[0];
-                        if (jid.matches(".+@.+")) {
-                            String[] pair = jid.split("@");
-                            accountStore
-                                .createAccount(pair[0], (String) arguments[1],
-                                    pair[1], "", 0, true, true);
-                        } else {
-                            //TODO notify user
-                        }
+                public Object function(final Object[] arguments) {
+                    if (arguments.length <= 0) {
+                        browser.run("alert('Please provide valid inputs'");
+                        return null;
                     }
-                    dialogManager.closeDialogWindow(addAccountWizard);
-                    return null;
+
+                    //TODO use JSON object as parameter
+                    final String jid = (String) arguments[0];
+                    if (jid.matches(".+@.+")) {
+                        ThreadUtils.runSafeAsync(LOG, new Runnable() {
+                                @Override
+                                public void run() {
+                                    accountCoreService.createAccount(jid, (String) arguments[1]); }
+                            });
+                        dialogManager.closeDialogWindow(addAccountWizard);
+                        return true;
+                    } else {
+                        browser.run("alert('Invalid jid: \'" + jid + "\'')");
+                        return false;
+                    }
                 }
             });
-
-        LOG.debug("sending json: " + allAcountsToJson());
-        browser.run("__angular_setAccountList(" + allAcountsToJson() + ")");
-    }
-
-    private String allAcountsToJson() {
-        List<XMPPAccount> allAccounts = accountStore.getAllAccounts();
-        ArrayList<Account> accounts = new ArrayList<Account>();
-        for (XMPPAccount account : allAccounts) {
-            accounts
-                .add(new Account(account.getUsername(), account.getDomain()));
-        }
-        Gson gson = new Gson();
-        return gson.toJson(accounts);
     }
 }

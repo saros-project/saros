@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp;
 
 import de.fu_berlin.inf.dpp.account.XMPPAccountLocator;
 import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandlerCore;
+import de.fu_berlin.inf.dpp.ui.core_services.AccountCoreService;
 import de.fu_berlin.inf.dpp.ui.browser_functions.ContactListCoreService;
 import de.fu_berlin.inf.dpp.ui.manager.ContactListManager;
 import de.fu_berlin.inf.dpp.ui.view_parts.AddAccountWizard;
@@ -36,6 +37,7 @@ public class SarosHTMLUIContextFactory extends AbstractSarosContextFactory {
             Component.create(AddAccountWizard.class),
             Component.create(AddContactWizard.class),
             Component.create(ContactListCoreService.class),
+            Component.create(AccountCoreService.class),
             Component.create(ContactListManager.class),
             Component.create(ConnectionHandlerCore.class) };
 
