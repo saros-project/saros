@@ -74,7 +74,12 @@ public class JoinSessionWizard extends Wizard {
         public void canceled(final CancelLocation location, final String message) {
             /*
              * if location is local it will not matter because the wizard will
-             * is already disposed then
+             * is already disposed at this point
+             */
+            /*
+             * FIXME the message is not the same as returned by
+             * CancelableProcess#getErrorMessage() see TODO in
+             * CancelableProcess#generateErrorMessage
              */
             handleCanceledAsync(location, message);
         }

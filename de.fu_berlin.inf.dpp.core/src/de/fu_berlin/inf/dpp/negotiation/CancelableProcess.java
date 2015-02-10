@@ -167,7 +167,7 @@ abstract class CancelableProcess {
      * the error message. This method will also have <b>NO</b> effect if a local
      * cancellation request was already executed.
      * 
-     * @param errorMsg
+     * @param errorMessage
      *            the reason to cancel the execution in case of an error or
      *            <code>null</code> if this is a cancel abort request
      * @return <code>true</code> if this request was the first cancel request,
@@ -178,9 +178,9 @@ abstract class CancelableProcess {
      * @see #notifyCancellation
      */
 
-    public boolean remoteCancel(String errorMsg) {
+    public boolean remoteCancel(String errorMessage) {
         synchronized (this) {
-            if (!cancel(new RemoteCancellationException(errorMsg)))
+            if (!cancel(new RemoteCancellationException(errorMessage)))
                 return false;
 
             isRemoteCancellation = true;
@@ -188,7 +188,7 @@ abstract class CancelableProcess {
 
         log.debug("process " + this
             + " was canceled by the remote side, error: "
-            + (errorMsg == null ? "none" : errorMsg));
+            + (errorMessage == null ? "none" : errorMessage));
 
         notifyCancellationListeners(CancelLocation.REMOTE, errorMessage);
 
