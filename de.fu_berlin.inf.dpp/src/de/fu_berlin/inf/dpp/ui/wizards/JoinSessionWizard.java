@@ -68,6 +68,8 @@ public class JoinSessionWizard extends Wizard {
 
     private SessionNegotiation.Status status;
 
+    private boolean isAutoCancel;
+
     private final CancelListener cancelListener = new CancelListener() {
 
         @Override
@@ -170,6 +172,15 @@ public class JoinSessionWizard extends Wizard {
 
     @Override
     public boolean performCancel() {
+
+        /*
+         * the localCancel or remoteCancel method of the isn instance has
+         * already been invoked, calling it one more time will do nothing beside
+         * spawning a thread
+         */
+        if (isAutoCancel)
+            return true;
+
         ThreadUtils.runSafeAsync("dpp-isn-cancel", LOG, new Runnable() {
             @Override
             public void run() {
@@ -189,7 +200,7 @@ public class JoinSessionWizard extends Wizard {
         SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
             @Override
             public void run() {
-                cancelWizard(location, message);
+                autoCancelWizard(location, message);
             }
         });
     }
@@ -205,7 +216,7 @@ public class JoinSessionWizard extends Wizard {
     }
 
     // SWT
-    private void cancelWizard(final CancelLocation location,
+    private void autoCancelWizard(final CancelLocation location,
         final String message) {
 
         /*
@@ -217,12 +228,15 @@ public class JoinSessionWizard extends Wizard {
         if (isNegotiationRunning)
             return;
 
-        final Shell shell = JoinSessionWizard.this.getShell();
+        final Shell shell = getShell();
 
         if (shell == null || shell.isDisposed())
             return;
 
-        ((WizardDialog) JoinSessionWizard.this.getContainer()).close();
+        isAutoCancel = true;
+
+        // will call IWizard#performCancel()
+        ((WizardDialog) getContainer()).close();
 
         showCancelMessageAsync(isn.getPeer(), message, location);
     }
