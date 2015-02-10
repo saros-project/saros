@@ -7,15 +7,16 @@ import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.ui.model.ContactList;
+import de.fu_berlin.inf.dpp.ui.renderer.Renderer;
 import org.jivesoftware.smack.Roster;
 
 /**
- * This class is responsible for rendering the contact list by calling
- * a Javascript function.
+ * This class is responsible for transferring the contact list and connection
+ * state to the browser so that they can be displayed.
  * It holds the connection and the contact list state so that the current state
  * can be re-rendered when the browser instance changes.
  */
-public class ContactListRenderer {
+public class ContactListRenderer implements Renderer {
 
     private final BrowserManager browserManager;
 
@@ -28,8 +29,7 @@ public class ContactListRenderer {
     }
 
     /**
-     * Displays the given connection state and contact list in the browser
-     * and saves it.
+     * Displays the given connection state and contact list in the browser.
      *
      * @param state       the connection state
      * @param contactList the contact list
@@ -41,9 +41,7 @@ public class ContactListRenderer {
         render();
     }
 
-    /**
-     * Displays the current state in the browser.
-     */
+    @Override
     public synchronized void render() {
         renderConnectionState();
         renderContactList();

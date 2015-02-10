@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.ui.renderer;
 /**
  * Encapsulates the different renderer for the Saros main page.
  */
-public class SarosMainPageRenderer {
+public class SarosMainPageRenderer implements Renderer{
 
     private final AccountRenderer accountRenderer;
     private final ContactListRenderer contactListRenderer;
@@ -14,9 +14,7 @@ public class SarosMainPageRenderer {
         this.contactListRenderer = contactListRenderer;
     }
 
-    /**
-     * Displays the current state in the browser.
-     */
+    @Override
     public void render() {
         accountRenderer.render();
         contactListRenderer.render();
