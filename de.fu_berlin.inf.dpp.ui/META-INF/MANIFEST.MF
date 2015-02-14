@@ -16,4 +16,5 @@ Export-Package: de.fu_berlin.inf.dpp,
  de.fu_berlin.inf.dpp.ui.browser_functions,
  de.fu_berlin.inf.dpp.ui.manager,
  de.fu_berlin.inf.dpp.ui.model,
+ de.fu_berlin.inf.dpp.ui.view_parts,
  de.fu_berlin.inf.dpp.util

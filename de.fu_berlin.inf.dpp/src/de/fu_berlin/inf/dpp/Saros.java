@@ -26,6 +26,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Random;
@@ -55,13 +56,14 @@ import de.fu_berlin.inf.dpp.preferences.EclipsePreferences;
 import de.fu_berlin.inf.dpp.preferences.IPreferences;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.ui.browser.EclipseHTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import de.fu_berlin.inf.dpp.versioning.VersionManager;
 
 /**
  * The main plug-in of Saros.
- *
+ * 
  * @author rdjemili
  * @author coezbek
  */
@@ -75,14 +77,14 @@ public class Saros extends AbstractUIPlugin {
 
     /**
      * @JTourBusStop 1, Some Basics:
-     *
+     * 
      *               This class manages the lifecycle of the Saros plug-in,
      *               contains some important supporting data members and
      *               provides methods for the integration of Saros into Eclipse.
-     *
+     * 
      *               Browse the data members. Some are quite obvious (version,
      *               feature etc.) some need closer examination.
-     *
+     * 
      */
 
     /**
@@ -111,18 +113,18 @@ public class Saros extends AbstractUIPlugin {
     /**
      * To print an architecture diagram at the end of the plug-in life-cycle
      * initialize the dotMonitor with a new instance:
-     *
+     * 
      * <code>dotMonitor= new DotGraphMonitor();</code>
      */
     protected DotGraphMonitor dotMonitor;
 
     /**
      * @JTourBusStop 2, Some Basics:
-     *
+     * 
      *               Preferences are managed by Eclipse-provided classes. Most
      *               are kept by Preferences, but some sensitive data (like user
      *               account data) is kept in a SecurePreference.
-     *
+     * 
      *               If you press Ctrl+Shift+R and type in "*preference*" you
      *               will see every class in Saros that deals with preferences.
      *               Classes named "*PreferencePage" implement individual pages
@@ -146,10 +148,10 @@ public class Saros extends AbstractUIPlugin {
 
     /**
      * @JTourBusStop 4, Invitation Process:
-     *
+     * 
      *               If you haven't already read about PicoContainer, stop and
      *               do so now (http://picocontainer.codehaus.org).
-     *
+     * 
      *               Saros uses PicoContainer to manage dependencies on our
      *               behalf. The SarosContext class encapsulates our usage of
      *               PicoContainer. It's a well documented class, so take a look
@@ -221,16 +223,17 @@ public class Saros extends AbstractUIPlugin {
         log.info("Starting Saros " + sarosVersion + " running:\n"
             + getPlatformInfo());
 
-        ISarosContextFactory coreFactory;
+        final List<ISarosContextFactory> contextFactories = new ArrayList<ISarosContextFactory>();
+
+        contextFactories.add(new SarosCoreContextFactory());
+
         if (isSwtBrowserEnabled()) {
-            coreFactory = new SarosHTMLUIContextFactory(
-                new SarosCoreContextFactory());
-        } else {
-            coreFactory = new SarosCoreContextFactory();
+            contextFactories.add(new SarosHTMLUIContextFactory(
+                new EclipseHTMLUIContextFactory()));
         }
 
         sarosContext = new SarosContext(new SarosEclipseContextFactory(this,
-            coreFactory), dotMonitor);
+            contextFactories), dotMonitor);
 
         SarosPluginContext.setSarosContext(sarosContext);
 
@@ -352,7 +355,7 @@ public class Saros extends AbstractUIPlugin {
      * of the same JVM without external synchronization. If they are used by
      * multiple JVMs no guarantees can be made concerning data consistency (see
      * {@link Preferences} for details).
-     *
+     * 
      * @return the preferences node for this plug-in containing global
      *         preferences that are visible for all workspaces of this eclipse
      *         installation
@@ -420,10 +423,10 @@ public class Saros extends AbstractUIPlugin {
     /**
      * Returns a string representing the Saros Version number for instance
      * "9.5.7.r1266"
-     *
+     * 
      * This method only returns a valid version string after the plugin has been
      * started.
-     *
+     * 
      * This is equivalent to the bundle version.
      */
     public String getVersion() {
@@ -587,7 +590,7 @@ public class Saros extends AbstractUIPlugin {
     /**
      * Feature toggle for displaying Saros in a web browser in an additional
      * view. Also checks if required bundle is present.
-     *
+     * 
      * @return true if this feature is enabled, false otherwise
      */
     private static boolean isSwtBrowserEnabled() {

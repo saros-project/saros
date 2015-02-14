@@ -1,6 +1,9 @@
 package de.fu_berlin.inf.dpp;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Platform;
@@ -43,14 +46,14 @@ import de.fu_berlin.inf.dpp.vcs.VCSProviderFactory;
 
 /**
  * Factory used for creating the Saros context when running as Eclipse plugin.
- *
+ * 
  * * @author srossbach
  */
 
 // TODO class is misplaced in the current package along with Saros Eclipse stuff
 public class SarosEclipseContextFactory extends AbstractSarosContextFactory {
 
-    private final ISarosContextFactory additionalContext;
+    private final List<ISarosContextFactory> factories;
 
     private final Saros saros;
 
@@ -105,16 +108,20 @@ public class SarosEclipseContextFactory extends AbstractSarosContextFactory {
         // Proxy Support for the XMPP server connection
         Component.create(IProxyResolver.class, Socks5ProxyResolver.class) };
 
-    public SarosEclipseContextFactory(Saros saros, ISarosContextFactory delegate) {
+    public SarosEclipseContextFactory(Saros saros,
+        Collection<ISarosContextFactory> factories) {
         this.saros = saros;
-        this.additionalContext = delegate;
+        this.factories = new ArrayList<ISarosContextFactory>();
+
+        if (factories != null)
+            this.factories.addAll(factories);
     }
 
     @Override
     public void createComponents(MutablePicoContainer container) {
 
-        if (additionalContext != null)
-            additionalContext.createComponents(container);
+        for (final ISarosContextFactory factory : factories)
+            factory.createComponents(container);
 
         for (Component component : Arrays.asList(components))
             container.addComponent(component.getBindKey(),
