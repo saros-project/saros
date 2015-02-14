@@ -1,20 +1,19 @@
 package de.fu_berlin.inf.dpp.ui.view_parts;
 
-import de.fu_berlin.inf.dpp.ui.browser_functions.ContactListBrowserFunctions;
-import de.fu_berlin.inf.dpp.ui.browser_functions.ContactListCoreService;
-import de.fu_berlin.inf.dpp.util.BrowserUtils;
 import org.eclipse.swt.browser.Browser;
 import org.picocontainer.annotations.Inject;
 
-public class AddContactWizard implements BrowserPage{
+import de.fu_berlin.inf.dpp.ui.browser_functions.ContactListBrowserFunctions;
+import de.fu_berlin.inf.dpp.ui.browser_functions.ContactListCoreService;
+
+public class AddContactWizard implements BrowserPage {
 
     @Inject
     private ContactListCoreService contactListCoreService;
 
     @Override
     public String getWebpage() {
-        return BrowserUtils
-            .getUrlForClasspathFile("/html/add-contact-wizard.html");
+        return "html/add-contact-wizard.html";
     }
 
     @Override
@@ -23,6 +22,7 @@ public class AddContactWizard implements BrowserPage{
 
     @Override
     public void createBrowserFunctions(Browser browser) {
-        new ContactListBrowserFunctions(browser, contactListCoreService).createJavascriptFunctions();
+        new ContactListBrowserFunctions(browser, contactListCoreService)
+            .createJavascriptFunctions();
     }
 }

@@ -1,20 +1,23 @@
 package de.fu_berlin.inf.dpp.util;
 
+import java.net.URL;
+
 /**
- * TODO: This class may well be removed as soon as bjoern's browser
- * component is integrated.
+ * TODO: This class may well be removed as soon as bjoern's browser component is
+ * integrated.
  */
 public class BrowserUtils {
 
     /**
-     * Gets a url for a file inside the resource folder.
-     * This does not work for jar files.
-     *
-     * @param filename relative path of the file inside the resource folder
-     * @return file url as string
+     * Gets a URL for a given resource using the class loader of this util
+     * class.
+     * 
+     * @param name
+     *            name of the resource
+     * @return URL of the resource or <code>null</code> if the resource was not
+     *         found
      */
-    public static String getUrlForClasspathFile(String filename) {
-        return BrowserUtils.class
-            .getResource(filename).toString();
+    public static URL getResourceURL(final String name) {
+        return BrowserUtils.class.getClassLoader().getResource(name);
     }
 }
