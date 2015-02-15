@@ -32,7 +32,7 @@ import de.fu_berlin.inf.dpp.core.invitation.OutgoingProjectNegotiation;
 import de.fu_berlin.inf.dpp.core.invitation.OutgoingSessionNegotiation;
 import de.fu_berlin.inf.dpp.core.monitoring.IStatus;
 import de.fu_berlin.inf.dpp.core.monitoring.Status;
-import de.fu_berlin.inf.dpp.core.project.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.core.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.intellij.runtime.UIMonitoredJob;
 import de.fu_berlin.inf.dpp.intellij.ui.Messages;
 import de.fu_berlin.inf.dpp.intellij.ui.util.DialogUtils;
@@ -46,6 +46,7 @@ import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import org.apache.log4j.Logger;
 
 import java.text.MessageFormat;
@@ -63,9 +64,11 @@ public class NegotiationHandler implements INegotiationHandler {
         .getLogger(NegotiationHandler.class);
     private final ISarosSessionManager sessionManager;
 
-    public NegotiationHandler(ISarosSessionManager sessionManager) {
+    // FIXME use ISarosSessionManager interface
+    public NegotiationHandler(SarosSessionManager sessionManager) {
+        sessionManager.setNegotiationHandler(this);
         this.sessionManager = sessionManager;
-        this.sessionManager.setNegotiationHandler(this);
+
     }
 
     private static String getNickname(JID jid) {

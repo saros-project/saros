@@ -1,9 +1,9 @@
 package de.fu_berlin.inf.dpp.core.awareness;
 
 import de.fu_berlin.inf.dpp.core.editor.RemoteEditorManager;
-import de.fu_berlin.inf.dpp.core.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.User;
 
 import java.util.Map;

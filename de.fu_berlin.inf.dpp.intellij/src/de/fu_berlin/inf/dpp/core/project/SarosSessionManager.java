@@ -48,6 +48,7 @@ import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
 import de.fu_berlin.inf.dpp.preferences.IPreferences;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.util.StackTrace;
@@ -154,7 +155,8 @@ public class SarosSessionManager implements ISarosSessionManager {
         this.connectionService.addListener(listener);
     }
 
-    @Override
+    // FIXME add back to interface
+    // @Override
     public void setNegotiationHandler(INegotiationHandler handler) {
         negotiationHandler = handler;
     }

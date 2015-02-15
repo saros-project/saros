@@ -7,7 +7,6 @@ import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcknowledgedExten
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationCompletedExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationOfferingExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationParameterExchangeExtension;
-import de.fu_berlin.inf.dpp.core.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.core.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
@@ -21,6 +20,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.discovery.DiscoveryManager;
 import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.versioning.Compatibility;
 import de.fu_berlin.inf.dpp.versioning.VersionCompatibilityResult;
@@ -65,8 +65,6 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
     @Inject
     private SessionNegotiationObservable currentSessionNegotiations;
 
-    @Inject
-    private ISarosSessionManager sarosSessionManager;
 
     // HACK last residue of the direct connection between SessionNegotation and
     // the color property of users.
@@ -93,7 +91,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
         if (currentSessionNegotiations.list().size() == 0
             && sarosSession.getRemoteUsers().isEmpty()) {
-            sarosSessionManager.stopSarosSession();
+            sessionManager.stopSarosSession();
         }
     }
 
