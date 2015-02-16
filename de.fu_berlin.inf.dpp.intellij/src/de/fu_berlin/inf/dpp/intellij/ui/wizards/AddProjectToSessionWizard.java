@@ -41,6 +41,7 @@ import de.fu_berlin.inf.dpp.intellij.ui.wizards.pages.TextAreaPage;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.SubProgressMonitor;
+import de.fu_berlin.inf.dpp.negotiation.CancelListener;
 import de.fu_berlin.inf.dpp.negotiation.FileList;
 import de.fu_berlin.inf.dpp.negotiation.FileListDiff;
 import de.fu_berlin.inf.dpp.negotiation.FileListFactory;
@@ -175,6 +176,15 @@ public class AddProjectToSessionWizard extends Wizard {
         }
     };
 
+    private final CancelListener cancelListener = new CancelListener() {
+
+        @Override
+        public void canceled(final ProcessTools.CancelLocation location,
+            final String message) {
+            cancelWizard(peer, message, location);
+        }
+    };
+
     /**
      * Creates the wizard and its pages.
      *
@@ -209,7 +219,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
         create();
 
-        process.setProjectInvitationUI(this);
+        process.addCancelListener(cancelListener);
     }
 
     /**

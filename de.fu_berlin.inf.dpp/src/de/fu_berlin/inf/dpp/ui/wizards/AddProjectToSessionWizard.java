@@ -46,10 +46,12 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
+import de.fu_berlin.inf.dpp.negotiation.CancelListener;
 import de.fu_berlin.inf.dpp.negotiation.FileList;
 import de.fu_berlin.inf.dpp.negotiation.FileListDiff;
 import de.fu_berlin.inf.dpp.negotiation.FileListFactory;
 import de.fu_berlin.inf.dpp.negotiation.IncomingProjectNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.ProcessTools;
 import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelLocation;
 import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
@@ -114,6 +116,15 @@ public class AddProjectToSessionWizard extends Wizard {
         }
     }
 
+    private final CancelListener cancelListener = new CancelListener() {
+
+        @Override
+        public void canceled(final ProcessTools.CancelLocation location,
+            final String message) {
+            cancelWizard(peer, message, location);
+        }
+    };
+
     public AddProjectToSessionWizard(IncomingProjectNegotiation process,
         JID peer, List<FileList> fileLists) {
 
@@ -126,11 +137,15 @@ public class AddProjectToSessionWizard extends Wizard {
         setHelpAvailable(true);
         setNeedsProgressMonitor(true);
 
-        process.setProjectInvitationUI(this);
-
         /* holds if the wizard close is because of an exception or not */
         isExceptionCancel = false;
 
+    }
+
+    @Override
+    public void createPageControls(Composite pageContainer) {
+        super.createPageControls(pageContainer);
+        process.addCancelListener(cancelListener);
     }
 
     public void setWizardDlg(WizardDialogAccessable wizardDialog) {

@@ -14,13 +14,11 @@ import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
-import de.fu_berlin.inf.dpp.intellij.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.SubProgressMonitor;
 import de.fu_berlin.inf.dpp.negotiation.FileList;
 import de.fu_berlin.inf.dpp.negotiation.FileListDiff;
 import de.fu_berlin.inf.dpp.negotiation.FileListFactory;
-import de.fu_berlin.inf.dpp.negotiation.ProcessTools;
 import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
@@ -59,7 +57,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     private final ISarosSession session;
 
-    private AddProjectToSessionWizard addIncomingProjectUI;
     private final List<ProjectNegotiationData> projectInfos;
 
     @Inject
@@ -112,11 +109,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 return info.getFileList();
         }
         return null;
-    }
-
-    public synchronized void setProjectInvitationUI(
-        AddProjectToSessionWizard addIncomingProjectUI) {
-        this.addIncomingProjectUI = addIncomingProjectUI;
     }
 
     /**
@@ -397,9 +389,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         if (!super.remoteCancel(errorMsg))
             return false;
 
-        if (addIncomingProjectUI != null)
-            addIncomingProjectUI.cancelWizard(peer, errorMsg,
-                ProcessTools.CancelLocation.REMOTE);
         if (!running)
             terminateProcess(null);
 
@@ -411,10 +400,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         CancelOption cancelOption) {
         if (!super.localCancel(errorMsg, cancelOption))
             return false;
-
-        if (addIncomingProjectUI != null)
-            addIncomingProjectUI.cancelWizard(peer, errorMsg,
-                ProcessTools.CancelLocation.LOCAL);
 
         if (!running)
             terminateProcess(null);

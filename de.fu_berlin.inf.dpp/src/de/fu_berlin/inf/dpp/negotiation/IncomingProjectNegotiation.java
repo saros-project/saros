@@ -37,7 +37,6 @@ import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 import de.fu_berlin.inf.dpp.monitoring.SubProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.remote.RemoteProgressManager;
-import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelLocation;
 import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -45,7 +44,6 @@ import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.preferences.IPreferences;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.util.CoreUtils;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSProvider;
@@ -58,8 +56,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         .getLogger(IncomingProjectNegotiation.class);
 
     private static int MONITOR_WORK_SCALE = 1000;
-
-    private AddProjectToSessionWizard addIncomingProjectUI;
 
     private List<ProjectNegotiationData> projectInfos;
 
@@ -124,11 +120,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 return info.getFileList();
         }
         return null;
-    }
-
-    public synchronized void setProjectInvitationUI(
-        AddProjectToSessionWizard addIncomingProjectUI) {
-        this.addIncomingProjectUI = addIncomingProjectUI;
     }
 
     /**
@@ -516,10 +507,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         if (!super.remoteCancel(errorMsg))
             return false;
 
-        if (addIncomingProjectUI != null)
-            addIncomingProjectUI.cancelWizard(peer, errorMsg,
-                CancelLocation.REMOTE);
-
         if (!running)
             terminateProcess(null);
 
@@ -531,10 +518,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         CancelOption cancelOption) {
         if (!super.localCancel(errorMsg, cancelOption))
             return false;
-
-        if (addIncomingProjectUI != null)
-            addIncomingProjectUI.cancelWizard(peer, errorMsg,
-                CancelLocation.LOCAL);
 
         if (!running)
             terminateProcess(null);
