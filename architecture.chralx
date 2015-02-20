@@ -40,7 +40,7 @@ by calls the session_management's activity producers.
 	+= de.fu_berlin.inf.dpp.ui
 	+= org.eclipse.jface
 
--- session_management <=> ui
+-- ui => session_management
 -- ui => invitation
 
 The invitation component is used to establish a
