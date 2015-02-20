@@ -53,7 +53,7 @@ session begins.
 	+= de.fu_berlin.inf.dpp.invitation
 
 This data exchange is done via the network layer.
-	
+
 -- invitation => network
 
 The network layer is responsible for the exchange
