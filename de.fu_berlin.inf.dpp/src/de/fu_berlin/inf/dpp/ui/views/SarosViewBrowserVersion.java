@@ -34,12 +34,15 @@ public class SarosViewBrowserVersion extends ViewPart {
     public static final String ID = "de.fu_berlin.inf.dpp.ui.views.SarosViewBrowserVersion";
     private static final String TROUBLESHOOTING_URL = "http://www.saros-project.org/troubleshooting";
     private static final Logger LOG = Logger
-            .getLogger(SarosViewBrowserVersion.class);
+        .getLogger(SarosViewBrowserVersion.class);
 
     private IJQueryBrowser browser;
 
     @Inject
     private SarosMainPage sarosMainPage;
+
+    @Inject
+    private EclipseBrowserCreator browserCreator;
 
     public SarosViewBrowserVersion() {
         SarosPluginContext.initComponent(this);
@@ -49,8 +52,8 @@ public class SarosViewBrowserVersion extends ViewPart {
     public void createPartControl(Composite parent) {
 
         try {
-            browser = EclipseBrowserCreator.createBrowser(parent, SWT.NONE,
-                    sarosMainPage);
+            browser = browserCreator.createBrowser(parent, SWT.NONE,
+                sarosMainPage);
 
         } catch (SWTError e) {
             // This might happen when there is no standard browser available
@@ -59,7 +62,7 @@ public class SarosViewBrowserVersion extends ViewPart {
             // Provide a LinkWidget instead
             Link link = new Link(parent, SWT.BORDER);
             link.setText("Saros couldn't initzialisieren the SWT browser widget to display the HTML UI. Find help here <A>"
-                    + TROUBLESHOOTING_URL + "</A>.");
+                + TROUBLESHOOTING_URL + "</A>.");
             link.setBounds(10, 10, 140, 40);
             return;
         }

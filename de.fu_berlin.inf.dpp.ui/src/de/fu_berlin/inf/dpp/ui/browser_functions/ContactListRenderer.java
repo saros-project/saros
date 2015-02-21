@@ -1,69 +1,104 @@
 package de.fu_berlin.inf.dpp.ui.browser_functions;
 
 import com.google.gson.Gson;
-import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
+import de.fu_berlin.inf.ag_se.browser.functions.CallbackFunction;
+import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
+import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.ui.model.ContactList;
+import org.jivesoftware.smack.Roster;
 
 /**
  * This class is responsible for rendering the contact list by calling
  * a Javascript function.
- * TODO this class leaves much room for improvement. Render methods should be merged
- * when the HTML part and the Java/Javascript interface is rewritten
- * so that there is only one call to render the complete current state.
- * Further get rid of constant null checks in ContactListManager
+ * It holds the connection and the contact list state so that the current state
+ * can be re-rendered when the browser instance changes.
  */
 public class ContactListRenderer {
 
-    private IJQueryBrowser browser;
+    private final BrowserManager browserManager;
 
-    /**
-     * @param browser the SWT browser in which the contact list should be rendered
-     */
-    public ContactListRenderer(IJQueryBrowser browser) {
-        this.browser = browser;
+    private ConnectionState connectionState = ConnectionState.NOT_CONNECTED;
+
+    private ContactList contactList = ContactList.EMPTY_CONTACT_LIST;
+
+    public ContactListRenderer(BrowserManager browserManager) {
+        this.browserManager = browserManager;
     }
 
     /**
-     * Renders the contact list in the HTML UI.
-     * The given {@link de.fu_berlin.inf.dpp.ui.model.ContactList} object
-     * is transformed into a JSON string and then transmitted to Javascript.
+     * Displays the given connection state and contact list in the browser
+     * and saves it.
      *
-     * @param contactList the contact list to be rendered
+     * @param state       the connection state
+     * @param contactList the contact list
      */
-    public void renderContactList(ContactList contactList) {
+    public synchronized void render(ConnectionState state,
+        ContactList contactList) {
+        connectionState = state;
+        this.contactList = contactList;
+        render();
+    }
+
+    /**
+     * Displays the current state in the browser.
+     */
+    public synchronized void render() {
+        renderConnectionState();
+        renderContactList();
+    }
+
+    /**
+     * Displays the given connection state in the browser.
+     *
+     * @param state the connection state to be displayed
+     */
+    public synchronized void renderConnectionState(ConnectionState state) {
+        connectionState = state;
+        render();
+    }
+
+    /**
+     * Displays the contact list respresented by the given roster in the browser.
+     *
+     * @param roster the roster containing the contact list
+     */
+    public synchronized void renderContactList(Roster roster) {
+        contactList = contactList.rebuild(roster);
+        render();
+    }
+
+    private synchronized void renderConnectionState() {
+        switch (connectionState) {
+        case CONNECTED:
+            executeInBrowser("__angular_setIsConnected(" + true + ");");
+            break;
+        case NOT_CONNECTED:
+            executeInBrowser("__angular_setIsConnected(" + false + ");");
+            break;
+        case CONNECTING:
+            executeInBrowser("__angular_setIsConnecting();");
+            break;
+        case DISCONNECTING:
+            executeInBrowser("__angular_setIsDisconnecting();");
+            break;
+        default:
+            break;
+        }
+    }
+
+    /**
+     * Displays the currently saved contact list in the HTML UI.
+     * For that, the {@link de.fu_berlin.inf.dpp.ui.model.ContactList} object
+     * is transformed into a JSON string and then transmitted to Javascript.
+     */
+    private synchronized void renderContactList() {
         Gson gson = new Gson();
         final String jsonString = gson.toJson(contactList);
         executeInBrowser("__angular_displayContactList(" + jsonString + ");");
     }
 
-    /**
-     * Reflects the current state in the HTML and Set the text of the connect button
-     * accordingly. This methods just distinguishes between connected and disconnected.
-     *
-     * @param connected true if connected, false if disconnected
-     */
-    public void renderIsConnected(boolean connected) {
-        executeInBrowser("__angular_setIsConnected(" + connected + ");");
-    }
-
-    /**
-     * Connecting in process. Disable the connect button
-     * and set its text accordingly.
-     */
-    public void renderIsConnecting() {
-        executeInBrowser("__angular_setIsConnecting();");
-    }
-
-    /**
-     * Disconnecting in process. Disable the connect button
-     * and set its text accordingly.
-     */
-    public void renderIsDisconnecting() {
-        executeInBrowser("__angular_setIsDisconnecting();");
-    }
-
     private void executeInBrowser(final String script) {
-        //TODO evaluate results
-        browser.run(script);
+        browserManager.getMainViewBrowser()
+            .run(script, CallbackFunction.ERROR_LOGGING_CALLBACK);
     }
 }

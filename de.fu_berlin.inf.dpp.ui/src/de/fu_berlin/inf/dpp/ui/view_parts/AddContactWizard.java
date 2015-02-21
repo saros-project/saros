@@ -3,12 +3,17 @@ package de.fu_berlin.inf.dpp.ui.view_parts;
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.dpp.ui.browser_functions.ContactListBrowserFunctions;
 import de.fu_berlin.inf.dpp.ui.browser_functions.ContactListCoreService;
-import org.picocontainer.annotations.Inject;
 
+/**
+ * Represents the wizard to add new contacts.
+ */
 public class AddContactWizard implements BrowserPage{
 
-    @Inject
-    private ContactListCoreService contactListCoreService;
+    private final ContactListCoreService contactListCoreService;
+
+    public AddContactWizard(ContactListCoreService contactListCoreService) {
+        this.contactListCoreService = contactListCoreService;
+    }
 
     @Override
     public String getWebpage() {
@@ -16,11 +21,11 @@ public class AddContactWizard implements BrowserPage{
     }
 
     @Override
-    public void createRenderer(IJQueryBrowser browser) {
+    public void createBrowserFunctions(IJQueryBrowser browser) {
+        new ContactListBrowserFunctions(browser, contactListCoreService).createJavascriptFunctions();
     }
 
     @Override
-    public void createBrowserFunctions(IJQueryBrowser browser) {
-        new ContactListBrowserFunctions(browser, contactListCoreService).createJavascriptFunctions();
+    public void render() {
     }
 }

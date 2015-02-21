@@ -6,6 +6,7 @@ import de.fu_berlin.inf.dpp.ui.model.Account;
 import de.fu_berlin.inf.dpp.ui.renderer.AccountRenderer;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Bundles all backend calls for the account creation and retrieves accounts
@@ -15,10 +16,12 @@ public class AccountCoreService {
 
     private final XMPPAccountStore accountStore;
 
-    private AccountRenderer renderer;
+    private final AccountRenderer renderer;
 
-    public AccountCoreService(XMPPAccountStore accountStore) {
+    public AccountCoreService(XMPPAccountStore accountStore,
+        AccountRenderer renderer) {
         this.accountStore = accountStore;
+        this.renderer = renderer;
     }
 
     /**
@@ -34,36 +37,6 @@ public class AccountCoreService {
         //TODO result of call
         accountStore
             .createAccount(pair[0], password, pair[1], "", 0, true, true);
-        renderAccounts();
-    }
-
-    /**
-     * May be called from both UI and non-UI thread.
-     */
-    private synchronized void renderAccounts() {
-        if (renderer != null) {
-            ArrayList<Account> res = new ArrayList<Account>();
-            for (XMPPAccount xmppAccount : accountStore.getAllAccounts()) {
-                res.add(new Account(xmppAccount.getUsername(),
-                    xmppAccount.getDomain()));
-            }
-            renderer.renderAccountList(res);
-        }
-    }
-
-    /**
-     * Sets a new renderer and initialially renders the current accounts.
-     * @param renderer the new account renderer
-     */
-    public synchronized void setRenderer(AccountRenderer renderer) {
-        this.renderer = renderer;
-        renderAccounts();
-    }
-
-    /**
-     * Removes the current renderer
-     */
-    public synchronized void removeRenderer() {
-        renderer = null;
+        renderer.render();
     }
 }

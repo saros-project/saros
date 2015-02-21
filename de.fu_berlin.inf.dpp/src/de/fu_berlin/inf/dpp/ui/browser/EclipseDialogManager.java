@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.ui.view_parts.BrowserPage;
 
 /**
  * Eclipse side implementation of the IDialogManager interface
- * 
+ *
  */
 public class EclipseDialogManager implements IDialogManager {
 
@@ -27,6 +27,12 @@ public class EclipseDialogManager implements IDialogManager {
         .getLogger(EclipseDialogManager.class);
 
     private Map<String, Shell> openDialogs = new HashMap<String, Shell>();
+
+    private final EclipseBrowserCreator browserCreator;
+
+    public EclipseDialogManager(EclipseBrowserCreator browserCreator) {
+        this.browserCreator = browserCreator;
+    }
 
     @Override
     public void showDialogWindow(final BrowserPage browserPage) {
@@ -55,8 +61,7 @@ public class EclipseDialogManager implements IDialogManager {
         browserShell.setLayout(new FillLayout());
         browserShell.setSize(640, 480);
 
-        EclipseBrowserCreator
-            .createBrowser(browserShell, SWT.NONE, browserPage);
+        browserCreator.createBrowser(browserShell, SWT.NONE, browserPage);
 
         browserShell.addShellListener(new ShellAdapter() {
 
@@ -93,7 +98,7 @@ public class EclipseDialogManager implements IDialogManager {
      * Set the location of a given dialog to the center of the eclipse instance.
      * If the given browserPage is not currently displayed in a shell/dialog
      * this does nothing.
-     * 
+     *
      * @param browserPage
      *            the BrowserPage
      */
@@ -112,7 +117,7 @@ public class EclipseDialogManager implements IDialogManager {
     }
 
     /**
-     * 
+     *
      * @param browserPage
      * @return true if the browserPage is currently displayed in a shell/dialog
      */

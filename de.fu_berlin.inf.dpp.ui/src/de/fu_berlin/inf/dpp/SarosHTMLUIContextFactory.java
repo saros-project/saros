@@ -5,9 +5,13 @@ import java.util.Arrays;
 import org.picocontainer.MutablePicoContainer;
 
 import de.fu_berlin.inf.dpp.account.XMPPAccountLocator;
-import de.fu_berlin.inf.dpp.ui.core_services.AccountCoreService;
 import de.fu_berlin.inf.dpp.ui.browser_functions.ContactListCoreService;
+import de.fu_berlin.inf.dpp.ui.browser_functions.ContactListRenderer;
+import de.fu_berlin.inf.dpp.ui.core_services.AccountCoreService;
+import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
 import de.fu_berlin.inf.dpp.ui.manager.ContactListManager;
+import de.fu_berlin.inf.dpp.ui.renderer.AccountRenderer;
+import de.fu_berlin.inf.dpp.ui.renderer.SarosMainPageRenderer;
 import de.fu_berlin.inf.dpp.ui.view_parts.AddAccountWizard;
 import de.fu_berlin.inf.dpp.ui.view_parts.AddContactWizard;
 import de.fu_berlin.inf.dpp.ui.view_parts.SarosMainPage;
@@ -29,8 +33,11 @@ public class SarosHTMLUIContextFactory extends AbstractSarosContextFactory {
             Component.create(AddContactWizard.class),
             Component.create(ContactListCoreService.class),
             Component.create(AccountCoreService.class),
-            Component.create(ContactListManager.class) };
-
+            Component.create(ContactListManager.class),
+            Component.create(BrowserManager.class),
+            Component.create(SarosMainPageRenderer.class),
+            Component.create(ContactListRenderer.class),
+            Component.create(AccountRenderer.class) };
         for (Component component : Arrays.asList(components)) {
             container.addComponent(component.getBindKey(),
                 component.getImplementation());

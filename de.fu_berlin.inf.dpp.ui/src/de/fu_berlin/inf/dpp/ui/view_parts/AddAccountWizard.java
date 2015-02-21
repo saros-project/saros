@@ -14,11 +14,11 @@ public class AddAccountWizard implements BrowserPage {
     }
 
     @Override
-    public void createRenderer(IJQueryBrowser browser) {
+    public void createBrowserFunctions(IJQueryBrowser browser) {
+        new AccountBrowserFunctions(browser).createJavascriptFunctions();
     }
 
     @Override
-    public void createBrowserFunctions(IJQueryBrowser browser) {
-        new AccountBrowserFunctions(browser).createJavascriptFunctions();
+    public void render() {
     }
 }

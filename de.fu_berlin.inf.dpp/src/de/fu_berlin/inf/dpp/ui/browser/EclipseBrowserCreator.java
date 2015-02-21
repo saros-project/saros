@@ -19,6 +19,7 @@ import org.osgi.framework.Bundle;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.ag_se.browser.swt.SWTJQueryBrowser;
+import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
 import de.fu_berlin.inf.dpp.ui.view_parts.BrowserPage;
 
 /**
@@ -37,8 +38,10 @@ public class EclipseBrowserCreator {
 
     private static Map<String, String> fileMapping;
 
-    private EclipseBrowserCreator() {
-        // This private constructor hides the implicit public one
+    private final BrowserManager browserManager;
+
+    public EclipseBrowserCreator(BrowserManager browserManager) {
+        this.browserManager = browserManager;
     }
 
     /**
@@ -53,8 +56,8 @@ public class EclipseBrowserCreator {
      * @return a browser instance which load and render the given
      *         {@link BrowserPage BrowserPage}
      */
-    public static IJQueryBrowser createBrowser(Composite composite, int style,
-        BrowserPage page) {
+    public IJQueryBrowser createBrowser(Composite composite, int style,
+        final BrowserPage page) {
 
         final Bundle bundle = Platform.getBundle(UI_BUNDLE_ID);
 
@@ -84,8 +87,14 @@ public class EclipseBrowserCreator {
             return browser;
         }
 
-        page.createRenderer(browser);
         page.createBrowserFunctions(browser);
+        browserManager.setBrowser(page, browser);
+        browser.runOnDisposal(new Runnable() {
+            @Override
+            public void run() {
+                browserManager.removeBrowser(page);
+            }
+        });
 
         /*
          * TODO check if all browser work correctly with invalid Windows URLs

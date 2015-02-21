@@ -16,5 +16,8 @@ public class EclipseHTMLUIContextFactory extends AbstractSarosContextFactory {
     public void createComponents(MutablePicoContainer container) {
         container
             .addComponent(IDialogManager.class, EclipseDialogManager.class);
+
+        // Is not needed by the HTML UI but can only be instantiated in that context
+        container.addComponent(EclipseBrowserCreator.class);
     }
 }
