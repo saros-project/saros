@@ -24,9 +24,8 @@ public class ContactListBrowserFunctions {
     private static final Logger LOG = Logger
         .getLogger(ContactListBrowserFunctions.class);
 
+    @Inject
     private ContactListCoreService contactListCoreService;
-
-    private IJQueryBrowser browser;
 
     @Inject
     private IDialogManager dialogManager;
@@ -34,15 +33,14 @@ public class ContactListBrowserFunctions {
     @Inject
     private AddContactPage addContactPage;
 
+    private IJQueryBrowser browser;
+
     /**
      * @param browser                the SWT browser in which the functions should be injected
-     * @param contactListCoreService
      */
-    public ContactListBrowserFunctions(IJQueryBrowser browser,
-        ContactListCoreService contactListCoreService) {
+    public ContactListBrowserFunctions(IJQueryBrowser browser) {
         SarosPluginContext.initComponent(this);
         this.browser = browser;
-        this.contactListCoreService = contactListCoreService;
     }
 
     /**
@@ -106,37 +104,11 @@ public class ContactListBrowserFunctions {
                 }
             });
 
-        browser
-            .createBrowserFunction(new IBrowserFunction("__java_addContact") {
-                @Override
-                public Object function(final Object[] arguments) {
-                    ThreadUtils.runSafeAsync(LOG, new Runnable() {
-                        @Override
-                        public void run() {
-                            contactListCoreService
-                                .addContact(new JID((String) arguments[0]));
-
-                        }
-                    });
-                    dialogManager.closeDialogWindow(addContactPage);
-                    return null;
-                }
-            });
-
         browser.createBrowserFunction(
             new IBrowserFunction("__java_showAddContactWizard") {
                 @Override
                 public Object function(Object[] arguments) {
                     dialogManager.showDialogWindow(addContactPage);
-                    return null;
-                }
-            });
-
-        browser.createBrowserFunction(
-            new IBrowserFunction("__java_cancelAddContactWizard") {
-                @Override
-                public Object function(Object[] arguments) {
-                    dialogManager.closeDialogWindow(addContactPage);
                     return null;
                 }
             });

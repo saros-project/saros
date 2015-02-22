@@ -1,19 +1,12 @@
 package de.fu_berlin.inf.dpp.ui.view_parts;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
-import de.fu_berlin.inf.dpp.ui.browser_functions.ContactListBrowserFunctions;
-import de.fu_berlin.inf.dpp.ui.core_services.ContactListCoreService;
+import de.fu_berlin.inf.dpp.ui.browser_functions.AddContactBrowserFunctions;
 
 /**
  * Represents the wizard to add new contacts.
  */
 public class AddContactPage implements BrowserPage{
-
-    private final ContactListCoreService contactListCoreService;
-
-    public AddContactPage(ContactListCoreService contactListCoreService) {
-        this.contactListCoreService = contactListCoreService;
-    }
 
     @Override
     public String getWebpage() {
@@ -22,7 +15,7 @@ public class AddContactPage implements BrowserPage{
 
     @Override
     public void createBrowserFunctions(IJQueryBrowser browser) {
-        new ContactListBrowserFunctions(browser, contactListCoreService).createJavascriptFunctions();
+        new AddContactBrowserFunctions(browser).createJavascriptFunctions();
     }
 
     @Override
