@@ -1,40 +1,31 @@
 <!doctype html>
-<!--
-  ~ /*
-  ~ * DPP - Serious Distributed Pair Programming
-  ~ * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2010
-  ~ * (c) NFQ (www.nfq.com) - 2014
-  ~ *
-  ~ * This program is free software; you can redistribute it and/or modify
-  ~ * it under the terms of the GNU General Public License as published by
-  ~ * the Free Software Foundation; either version 1, or (at your option)
-  ~ * any later version.
-  ~ *
-  ~ * This program is distributed in the hope that it will be useful,
-  ~ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ * GNU General Public License for more details.
-  ~ *
-  ~ * You should have received a copy of the GNU General Public License
-  ~ * along with this program; if not, write to the Free Software
-  ~ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-  ~ */
-  -->
-
-<html ng-app="wizard-adduser">
+<html>
 <head lang="en">
     <meta charset="UTF-8">
     <title>Add XMPP Account</title>
-    <script src="lib/angular.min.js"></script>
-    <script src="js/add-user-wizard.js"></script>
+    <script src="lib/jquery-1.11.2.min.js"></script>
+    <script type="text/javascript">
+        //TODO move in separate JS file
+        var saveAccount = function() {
+            var jid = $('#jidInput').val();
+            var password = $('#passwordInput').val() ? $('#passwordInput').val() : "";
+            var result = JSON.parse(__java_validateJID(jid));
+
+            if (!result.valid) {
+                alert(result.message);
+            } else {
+                __java_saveAccount(jid, password);
+            }
+        }
+    </script>
 </head>
 <body>
-<div ng-controller="AddUserController">
-    <form novalidate>
-        JID: <input type="text" ng-model="account.jid" value="@saros-con.imp.fu-berlin.de" />
-        Password: <input type="password" ng-model="account.password" />
-        <button ng-click="saveAccount(account)">Finish</button>
-        <button ng-click="cancel()">Cancel</button>
+<div>
+    <form>
+        JID: <input id="jidInput" type="text" />
+        Password: <input id="passwordInput" type="password" />
+        <button id="finishButton" onClick="saveAccount()">Finish</button>
+        <button id="cancelButton" onClick="__java_cancelAddAccountWizard()">Cancel</button>
     </form>
 </div>
 </body>

@@ -1,12 +1,7 @@
 package de.fu_berlin.inf.dpp.ui.core_services;
 
-import de.fu_berlin.inf.dpp.account.XMPPAccount;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
-import de.fu_berlin.inf.dpp.ui.model.Account;
 import de.fu_berlin.inf.dpp.ui.renderer.AccountRenderer;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Bundles all backend calls for the account creation and retrieves accounts
@@ -38,5 +33,16 @@ public class AccountCoreService {
         accountStore
             .createAccount(pair[0], password, pair[1], "", 0, true, true);
         renderer.render();
+    }
+
+    /**
+     * Tests if an account with the given JID already exists.
+     *
+     * @param jid a string in the form 'user@domain'
+     * @return true if it exists, false otherwise
+     */
+    public boolean existsAccount(String jid) {
+        String[] pair = jid.split("@");
+        return accountStore.exists(pair[0], pair[1], "", 0);
     }
 }
