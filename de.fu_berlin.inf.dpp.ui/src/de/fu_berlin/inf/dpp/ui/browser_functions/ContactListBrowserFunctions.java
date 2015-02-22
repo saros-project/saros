@@ -5,12 +5,12 @@ import de.fu_berlin.inf.ag_se.browser.IBrowserFunction;
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.ui.core_services.ContactListCoreService;
 import de.fu_berlin.inf.dpp.ui.manager.IDialogManager;
 import de.fu_berlin.inf.dpp.ui.model.Account;
-import de.fu_berlin.inf.dpp.ui.view_parts.AddContactWizard;
+import de.fu_berlin.inf.dpp.ui.view_parts.AddContactPage;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import org.apache.log4j.Logger;
-import org.eclipse.swt.widgets.Display;
 import org.picocontainer.annotations.Inject;
 import org.jivesoftware.smack.XMPPException;
 
@@ -32,7 +32,7 @@ public class ContactListBrowserFunctions {
     private IDialogManager dialogManager;
 
     @Inject
-    private AddContactWizard addContactWizard;
+    private AddContactPage addContactPage;
 
     /**
      * @param browser                the SWT browser in which the functions should be injected
@@ -98,7 +98,6 @@ public class ContactListBrowserFunctions {
                                     new JID((String) arguments[0]));
                             } catch (XMPPException e) {
                                 LOG.error("Error deleting contact ", e);
-
                                 browser.run("alert('Error deleting contact');");
                             }
                         }
@@ -119,7 +118,7 @@ public class ContactListBrowserFunctions {
 
                         }
                     });
-                    dialogManager.closeDialogWindow(addContactWizard);
+                    dialogManager.closeDialogWindow(addContactPage);
                     return null;
                 }
             });
@@ -128,7 +127,7 @@ public class ContactListBrowserFunctions {
             new IBrowserFunction("__java_showAddContactWizard") {
                 @Override
                 public Object function(Object[] arguments) {
-                    dialogManager.showDialogWindow(addContactWizard);
+                    dialogManager.showDialogWindow(addContactPage);
                     return null;
                 }
             });
@@ -137,7 +136,7 @@ public class ContactListBrowserFunctions {
             new IBrowserFunction("__java_cancelAddContactWizard") {
                 @Override
                 public Object function(Object[] arguments) {
-                    dialogManager.closeDialogWindow(addContactWizard);
+                    dialogManager.closeDialogWindow(addContactPage);
                     return null;
                 }
             });

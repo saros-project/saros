@@ -6,11 +6,11 @@ import de.fu_berlin.inf.dpp.ui.browser_functions.AccountBrowserFunctions;
 /**
  * Represents the wizard to add new accounts.
  */
-public class AddAccountWizard implements BrowserPage {
+public class AddAccountPage implements BrowserPage {
 
     @Override
     public String getWebpage() {
-        return "html/add-user-wizard.html";
+        return "html/add-account-page.html";
     }
 
     @Override

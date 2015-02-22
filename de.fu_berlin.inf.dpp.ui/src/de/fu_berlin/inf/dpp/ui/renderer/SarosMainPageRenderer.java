@@ -1,7 +1,5 @@
 package de.fu_berlin.inf.dpp.ui.renderer;
 
-import de.fu_berlin.inf.dpp.ui.browser_functions.ContactListRenderer;
-
 /**
  * Encapsulates the different renderer for the Saros main page.
  */

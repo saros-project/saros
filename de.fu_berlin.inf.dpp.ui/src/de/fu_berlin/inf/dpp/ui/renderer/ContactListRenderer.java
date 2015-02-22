@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.browser_functions;
+package de.fu_berlin.inf.dpp.ui.renderer;
 
 import com.google.gson.Gson;
 import de.fu_berlin.inf.ag_se.browser.functions.CallbackFunction;

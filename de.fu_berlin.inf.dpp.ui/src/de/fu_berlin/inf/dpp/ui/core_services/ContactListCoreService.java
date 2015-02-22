@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.browser_functions;
+package de.fu_berlin.inf.dpp.ui.core_services;
 
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPException;

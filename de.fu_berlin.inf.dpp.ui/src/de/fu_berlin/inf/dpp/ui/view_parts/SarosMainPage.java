@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.ui.view_parts;
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.dpp.ui.browser_functions.AccountBrowserFunctions;
 import de.fu_berlin.inf.dpp.ui.browser_functions.ContactListBrowserFunctions;
-import de.fu_berlin.inf.dpp.ui.browser_functions.ContactListCoreService;
+import de.fu_berlin.inf.dpp.ui.core_services.ContactListCoreService;
 import de.fu_berlin.inf.dpp.ui.renderer.SarosMainPageRenderer;
 
 /**
@@ -32,7 +32,6 @@ public class SarosMainPage implements BrowserPage {
         new ContactListBrowserFunctions(browser, contactListCoreService)
             .createJavascriptFunctions();
     }
-
     @Override
     public void render() {
         sarosMainPageRenderer.render();

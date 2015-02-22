@@ -4,15 +4,15 @@ import java.util.Arrays;
 
 import org.picocontainer.MutablePicoContainer;
 
-import de.fu_berlin.inf.dpp.ui.browser_functions.ContactListCoreService;
-import de.fu_berlin.inf.dpp.ui.browser_functions.ContactListRenderer;
+import de.fu_berlin.inf.dpp.ui.renderer.AccountRenderer;
+import de.fu_berlin.inf.dpp.ui.core_services.ContactListCoreService;
+import de.fu_berlin.inf.dpp.ui.renderer.ContactListRenderer;
 import de.fu_berlin.inf.dpp.ui.core_services.AccountCoreService;
 import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
 import de.fu_berlin.inf.dpp.ui.manager.ContactListManager;
-import de.fu_berlin.inf.dpp.ui.renderer.AccountRenderer;
 import de.fu_berlin.inf.dpp.ui.renderer.SarosMainPageRenderer;
-import de.fu_berlin.inf.dpp.ui.view_parts.AddAccountWizard;
-import de.fu_berlin.inf.dpp.ui.view_parts.AddContactWizard;
+import de.fu_berlin.inf.dpp.ui.view_parts.AddAccountPage;
+import de.fu_berlin.inf.dpp.ui.view_parts.AddContactPage;
 import de.fu_berlin.inf.dpp.ui.view_parts.SarosMainPage;
 
 /**
@@ -27,8 +27,8 @@ public class SarosHTMLUIContextFactory extends AbstractSarosContextFactory {
 
         Component[] components = new Component[] {
             Component.create(SarosMainPage.class),
-            Component.create(AddAccountWizard.class),
-            Component.create(AddContactWizard.class),
+            Component.create(AddAccountPage.class),
+            Component.create(AddContactPage.class),
             Component.create(ContactListCoreService.class),
             Component.create(AccountCoreService.class),
             Component.create(ContactListManager.class),

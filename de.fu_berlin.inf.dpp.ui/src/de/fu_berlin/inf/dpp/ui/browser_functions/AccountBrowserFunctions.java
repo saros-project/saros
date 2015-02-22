@@ -8,7 +8,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.ui.core_services.AccountCoreService;
 import de.fu_berlin.inf.dpp.ui.manager.IDialogManager;
 import de.fu_berlin.inf.dpp.ui.model.ValidationResult;
-import de.fu_berlin.inf.dpp.ui.view_parts.AddAccountWizard;
+import de.fu_berlin.inf.dpp.ui.view_parts.AddAccountPage;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -31,7 +31,7 @@ public class AccountBrowserFunctions {
     private AccountCoreService accountCoreService;
 
     @Inject
-    private AddAccountWizard addAccountWizard;
+    private AddAccountPage addAccountPage;
 
     private final IJQueryBrowser browser;
 
@@ -49,7 +49,7 @@ public class AccountBrowserFunctions {
             new IBrowserFunction("__java_showAddAccountWizard") {
                 @Override
                 public Object function(Object[] arguments) {
-                    dialogManager.showDialogWindow(addAccountWizard);
+                    dialogManager.showDialogWindow(addAccountPage);
                     return true;
                 }
             });
@@ -58,7 +58,7 @@ public class AccountBrowserFunctions {
             new IBrowserFunction("__java_cancelAddAccountWizard") {
                 @Override
                 public Object function(Object[] arguments) {
-                    dialogManager.closeDialogWindow(addAccountWizard);
+                    dialogManager.closeDialogWindow(addAccountPage);
                     return true;
                 }
             });
@@ -116,20 +116,22 @@ public class AccountBrowserFunctions {
                     final String password = (String) arguments[1];
 
                     ThreadUtils.runSafeAsync(LOG, new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                accountCoreService.createAccount(jid, password);
-                                dialogManager.closeDialogWindow(addAccountWizard);
-                            } catch (RuntimeException e) {
-                                LOG.error(
-                                    "Unexpected exception while creating account. As the input has been validate, this should not happen.",
-                                    e);
-                                browser.run(
-                                    "alert('An error occurred while saving the account.');");
+                            @Override
+                            public void run() {
+                                try {
+                                    accountCoreService
+                                        .createAccount(jid, password);
+                                    dialogManager
+                                        .closeDialogWindow(addAccountPage);
+                                } catch (RuntimeException e) {
+                                    LOG.error(
+                                        "Unexpected exception while creating account. As the input has been validate, this should not happen.",
+                                        e);
+                                    browser.run(
+                                        "alert('An error occurred while saving the account.');");
+                                }
                             }
-                        }
-                    });
+                        });
 
                     return null;
                 }
