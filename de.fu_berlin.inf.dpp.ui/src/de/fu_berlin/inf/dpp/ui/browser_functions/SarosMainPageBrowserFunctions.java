@@ -8,6 +8,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.ui.core_services.ContactListCoreService;
 import de.fu_berlin.inf.dpp.ui.manager.IDialogManager;
 import de.fu_berlin.inf.dpp.ui.model.Account;
+import de.fu_berlin.inf.dpp.ui.view_parts.AddAccountPage;
 import de.fu_berlin.inf.dpp.ui.view_parts.AddContactPage;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import org.apache.log4j.Logger;
@@ -19,10 +20,10 @@ import org.jivesoftware.smack.XMPPException;
  * the contact list. These are the callback functions to invoke Java code from
  * Javascript.
  */
-public class ContactListBrowserFunctions {
+public class SarosMainPageBrowserFunctions {
 
     private static final Logger LOG = Logger
-        .getLogger(ContactListBrowserFunctions.class);
+        .getLogger(SarosMainPageBrowserFunctions.class);
 
     @Inject
     private ContactListCoreService contactListCoreService;
@@ -33,12 +34,15 @@ public class ContactListBrowserFunctions {
     @Inject
     private AddContactPage addContactPage;
 
+    @Inject
+    private AddAccountPage addAccountPage;
+
     private IJQueryBrowser browser;
 
     /**
-     * @param browser                the SWT browser in which the functions should be injected
+     * @param browser the SWT browser in which the functions should be injected
      */
-    public ContactListBrowserFunctions(IJQueryBrowser browser) {
+    public SarosMainPageBrowserFunctions(IJQueryBrowser browser) {
         SarosPluginContext.initComponent(this);
         this.browser = browser;
     }
@@ -110,6 +114,15 @@ public class ContactListBrowserFunctions {
                 public Object function(Object[] arguments) {
                     dialogManager.showDialogWindow(addContactPage);
                     return null;
+                }
+            });
+
+        browser.createBrowserFunction(
+            new IBrowserFunction("__java_showAddAccountWizard") {
+                @Override
+                public Object function(Object[] arguments) {
+                    dialogManager.showDialogWindow(addAccountPage);
+                    return true;
                 }
             });
     }

@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.ui.manager;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.ui.browser_functions.ContactListBrowserFunctions;
 import de.fu_berlin.inf.dpp.ui.renderer.ContactListRenderer;
 import de.fu_berlin.inf.dpp.ui.model.Account;
 import de.fu_berlin.inf.dpp.ui.model.ContactList;
