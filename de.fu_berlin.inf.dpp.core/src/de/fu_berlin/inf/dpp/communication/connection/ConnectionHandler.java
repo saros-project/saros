@@ -22,7 +22,6 @@ import de.fu_berlin.inf.dpp.net.mdns.MDNSService;
 import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.preferences.EclipsePreferences;
 import de.fu_berlin.inf.dpp.preferences.IPreferences;
 
 /**
@@ -31,7 +30,6 @@ import de.fu_berlin.inf.dpp.preferences.IPreferences;
  * <b>should</b> always be used in UI components and widgets.
  */
 // TODO better name
-// TODO move to core
 public class ConnectionHandler {
 
     private static final Logger LOG = Logger.getLogger(ConnectionHandler.class);
@@ -86,8 +84,7 @@ public class ConnectionHandler {
         final TCPServer tcpServer, final MDNSService mDNSService,
         final IConnectionManager transferManager,
         @Nullable final IProxyResolver proxyResolver,
-        final XMPPAccountStore accountStore,
-        final EclipsePreferences preferences) {
+        final XMPPAccountStore accountStore, final IPreferences preferences) {
 
         this.connectionService = connectionService;
         this.tcpServer = tcpServer;
