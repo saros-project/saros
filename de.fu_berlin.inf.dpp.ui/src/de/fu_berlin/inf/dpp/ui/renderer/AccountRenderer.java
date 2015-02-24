@@ -41,7 +41,7 @@ public class AccountRenderer implements Renderer {
         LOG.debug("sending json: " + accountString);
         IJQueryBrowser browser = browserManager.getMainViewBrowser();
         if (browser != null) {
-            browser.run("__angular_setAccountList(" + accountString + ")");
+            browser.run("Saros.setAccountList(" + accountString + ")");
         }
     }
 

@@ -18,7 +18,7 @@ app.controller('ToolbarController', function ($scope) {
                 alert("Cannot connect because no account is configured.");
             }
         } else {
-            __java_disconnect();
+            Saros.disconnect();
         }
     };
 
@@ -45,16 +45,38 @@ app.controller('ToolbarController', function ($scope) {
     };
 
     $scope.connectUser = function (account) {
-        __java_connect(JSON.stringify(account));
+        Saros.connect(JSON.stringify(account));
     };
 
     $scope.showAddAccountWizard = function () {
-        __java_showAddAccountWizard();
+        Saros.showAddAccountWizard();
     };
 
     $scope.showAddContactWizard = function () {
-        __java_showAddContactWizard();
+        Saros.showAddContactWizard();
     };
+
+    Saros.on('setAccountList', function (accountList) {
+        $scope.$apply( function () {
+            $scope.accounts = accountList;
+        });
+    });
+
+    Saros.on('setIsConnected', function (connected) {
+        if (connected) {
+            $scope.$apply($scope.showDisconnect);
+        } else {
+            $scope.$apply($scope.showConnect);
+        }
+    });
+
+    Saros.on('setIsConnecting', function () {
+        $scope.$apply($scope.showConnecting);
+    });
+
+    Saros.on('setIsDisconnecting', function () {
+        $scope.$apply($scope.showDisconnecting);
+    });
 });
 
 app.controller('ContactListCtrl', function ($scope) {
@@ -81,46 +103,21 @@ app.controller('ContactListCtrl', function ($scope) {
     };
 
     $scope.renameContact = function () {
-        __java_renameContact($scope.selected);
+        Saros.renameContact($scope.selected);
     };
 
     $scope.deleteContact = function () {
-        __java_deleteContact($scope.selected);
+        Saros.deleteContact($scope.selected);
     };
-});
 
-__angular_setAccountList = function (accountList) {
-    var exposedScope = angular.element(document.getElementById('toolbar')).scope();
-    exposedScope.$apply(function () {
-        exposedScope.accounts = accountList;
-    })
+    Saros.on('displayContactList', function (contactList) {
 
-};
-
-__angular_displayContactList = function (contactList) {
-    var exposedScope = angular.element(document.getElementById('contact-list')).scope();
-    exposedScope.$apply(exposedScope.displayRoot(contactList.account));
-    exposedScope.$apply(exposedScope.clearAll());
-    contactList.contactList.forEach(function (contact) {
-        exposedScope.$apply(exposedScope.add(contact.displayName, contact.presence, contact.addition));
+        $scope.$apply( function () {
+            $scope.displayRoot(contactList.account);
+            $scope.clearAll();
+            contactList.contactList.forEach(function (contact) {
+                $scope.add(contact.displayName, contact.presence, contact.addition);
+            });
+        });
     });
-};
-
-__angular_setIsConnected = function (connected) {
-    var exposedScope = angular.element(document.getElementById('toolbar')).scope();
-    if (connected) {
-        exposedScope.$apply(exposedScope.showDisconnect());
-    } else {
-        exposedScope.$apply(exposedScope.showConnect());
-    }
-};
-
-__angular_setIsConnecting = function () {
-    var exposedScope = angular.element(document.getElementById('toolbar')).scope();
-    exposedScope.$apply(exposedScope.showConnecting());
-};
-
-__angular_setIsDisconnecting = function () {
-    var exposedScope = angular.element(document.getElementById('toolbar')).scope();
-    exposedScope.$apply(exposedScope.showDisconnecting());
-};
+});

@@ -70,16 +70,16 @@ public class ContactListRenderer implements Renderer {
     private synchronized void renderConnectionState() {
         switch (connectionState) {
         case CONNECTED:
-            executeInBrowser("__angular_setIsConnected(" + true + ");");
+            executeInBrowser("Saros.setIsConnected(" + true + ");");
             break;
         case NOT_CONNECTED:
-            executeInBrowser("__angular_setIsConnected(" + false + ");");
+            executeInBrowser("Saros.setIsConnected(" + false + ");");
             break;
         case CONNECTING:
-            executeInBrowser("__angular_setIsConnecting();");
+            executeInBrowser("Saros.setIsConnecting();");
             break;
         case DISCONNECTING:
-            executeInBrowser("__angular_setIsDisconnecting();");
+            executeInBrowser("Saros.setIsDisconnecting();");
             break;
         default:
             break;
@@ -94,7 +94,7 @@ public class ContactListRenderer implements Renderer {
     private synchronized void renderContactList() {
         Gson gson = new Gson();
         final String jsonString = gson.toJson(contactList);
-        executeInBrowser("__angular_displayContactList(" + jsonString + ");");
+        executeInBrowser("Saros.displayContactList(" + jsonString + ");");
     }
 
     private void executeInBrowser(final String script) {
