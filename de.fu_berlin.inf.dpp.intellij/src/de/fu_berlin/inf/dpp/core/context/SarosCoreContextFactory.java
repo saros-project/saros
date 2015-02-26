@@ -27,6 +27,7 @@ import de.fu_berlin.inf.dpp.ISarosContextBindings;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatService;
 import de.fu_berlin.inf.dpp.communication.chat.single.SingleUserChatService;
+import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.core.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.core.concurrent.IsInconsistentObservable;
 import de.fu_berlin.inf.dpp.core.monitoring.remote.RemoteProgressManager;
@@ -43,8 +44,10 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.IBBTransport;
 import de.fu_berlin.inf.dpp.net.internal.ITransport;
 import de.fu_berlin.inf.dpp.net.internal.Socks5Transport;
+import de.fu_berlin.inf.dpp.net.internal.TCPServer;
 import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
+import de.fu_berlin.inf.dpp.net.mdns.MDNSService;
 import de.fu_berlin.inf.dpp.net.stun.IStunService;
 import de.fu_berlin.inf.dpp.net.stun.internal.StunServiceImpl;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPAccess;
@@ -78,6 +81,9 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
 
     private final Component[] components = new Component[] {
 
+        // Facades
+        Component.create(ConnectionHandler.class),
+
         // Version support
         Component.create(VersionManager.class),
 
@@ -110,7 +116,8 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
 
         Component.create(RosterTracker.class),
         Component.create(XMPPConnectionService.class),
-
+        Component.create(MDNSService.class),
+        Component.create(TCPServer.class),
         Component.create(IStunService.class, StunServiceImpl.class),
 
         Component.create(SubscriptionHandler.class),

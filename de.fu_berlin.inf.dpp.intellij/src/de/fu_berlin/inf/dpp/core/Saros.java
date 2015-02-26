@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.core;
 
 import com.intellij.openapi.project.Project;
-import de.fu_berlin.inf.dpp.SarosConstants;
 import de.fu_berlin.inf.dpp.SarosHTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.core.context.SarosContext;
@@ -11,14 +10,9 @@ import de.fu_berlin.inf.dpp.intellij.context.SarosIntellijContextFactory;
 import de.fu_berlin.inf.dpp.intellij.project.fs.Workspace;
 import de.fu_berlin.inf.dpp.intellij.ui.swt_browser.SwtLibLoader;
 import de.fu_berlin.inf.dpp.misc.pico.DotGraphMonitor;
-import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.preferences.IPreferences;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import org.apache.log4j.helpers.LogLog;
-import org.jivesoftware.smack.Connection;
-import org.jivesoftware.smackx.ServiceDiscoveryManager;
 
 /**
  * Saros plugin class for bundling globally necessary variables like project.
@@ -35,14 +29,14 @@ public class Saros {
     private static boolean isInitialized;
 
     private Project project;
-
-    private XMPPConnectionService connectionService;
     
     private IPreferences preferences;
 
     private IWorkspace workspace;
 
     private SarosContext sarosContext;
+
+
 
     /**
      * Returns true if the Saros instance has been initialized so that calling
@@ -104,29 +98,7 @@ public class Saros {
             new SarosHTMLUIContextFactory(new SarosCoreContextFactory())), new DotGraphMonitor());
 
         SarosPluginContext.setSarosContext(sarosContext);
-
-        connectionService = sarosContext
-            .getComponent(XMPPConnectionService.class);
         preferences = sarosContext.getComponent(IPreferences.class);
-
-        connectionService.addListener(new IConnectionListener() {
-
-            @Override
-            public void connectionStateChanged(Connection connection,
-                ConnectionState state) {
-
-                if (state == ConnectionState.CONNECTING) {
-                    ServiceDiscoveryManager.getInstanceFor(connection)
-                        .addFeature(SarosConstants.XMPP_FEATURE_NAMESPACE);
-                }
-            }
-
-        });
-
-        //todo: set parameters from config
-        connectionService
-            .configure(SarosConstants.RESOURCE, false, false, 8888, null, null,
-                true, null, 80, true);
 
         isInitialized = true;
         // Make sure that all components in the container are

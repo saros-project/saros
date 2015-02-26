@@ -3,8 +3,10 @@ package de.fu_berlin.inf.dpp.intellij.context;
 import de.fu_berlin.inf.dpp.AbstractSarosContextFactory;
 import de.fu_berlin.inf.dpp.ISarosContextBindings;
 import de.fu_berlin.inf.dpp.ISarosContextFactory;
+import de.fu_berlin.inf.dpp.communication.connection.IProxyResolver;
 import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.core.concurrent.ConsistencyWatchdogClient;
+import de.fu_berlin.inf.dpp.connection.NullProxyResolver;
 import de.fu_berlin.inf.dpp.core.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.core.ui.eventhandler.NegotiationHandler;
 import de.fu_berlin.inf.dpp.core.ui.eventhandler.UserStatusChangeHandler;
@@ -77,6 +79,9 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
         Component.create(LeaveSessionAction.class),
 
         Component.create(IDialogManager.class, IntelliJDialogManager.class),
+
+        // Proxy Support for the XMPP server connection
+        Component.create(IProxyResolver.class, NullProxyResolver.class)
     };
 
     public SarosIntellijContextFactory(Saros saros,
