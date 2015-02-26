@@ -5,7 +5,6 @@ import java.util.Arrays;
 import org.picocontainer.MutablePicoContainer;
 
 import de.fu_berlin.inf.dpp.account.XMPPAccountLocator;
-import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandlerCore;
 import de.fu_berlin.inf.dpp.ui.core_services.AccountCoreService;
 import de.fu_berlin.inf.dpp.ui.browser_functions.ContactListCoreService;
 import de.fu_berlin.inf.dpp.ui.manager.ContactListManager;
@@ -30,8 +29,7 @@ public class SarosHTMLUIContextFactory extends AbstractSarosContextFactory {
             Component.create(AddContactWizard.class),
             Component.create(ContactListCoreService.class),
             Component.create(AccountCoreService.class),
-            Component.create(ContactListManager.class),
-            Component.create(ConnectionHandlerCore.class) };
+            Component.create(ContactListManager.class) };
 
         for (Component component : Arrays.asList(components)) {
             container.addComponent(component.getBindKey(),

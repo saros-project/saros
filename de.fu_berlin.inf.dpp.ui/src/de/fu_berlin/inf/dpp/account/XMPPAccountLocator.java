@@ -31,7 +31,6 @@ import org.picocontainer.annotations.Inject;
  * It is in a new class as {@link de.fu_berlin.inf.dpp.account.XMPPAccountStore}
  * is already pretty big.
  * TODO this has probably to be moved into the core in a more structured way
- * see also {@link de.fu_berlin.inf.dpp.net.xmpp.ConnectionConfigurationFactory}
  */
 public class XMPPAccountLocator {
 
