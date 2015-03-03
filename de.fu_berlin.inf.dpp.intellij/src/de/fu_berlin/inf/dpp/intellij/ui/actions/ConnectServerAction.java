@@ -23,7 +23,6 @@
 package de.fu_berlin.inf.dpp.intellij.ui.actions;
 
 import de.fu_berlin.inf.dpp.account.XMPPAccount;
-import de.fu_berlin.inf.dpp.account.XMPPAccountLocator;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import org.picocontainer.annotations.Inject;
@@ -40,9 +39,6 @@ public class ConnectServerAction extends AbstractSarosAction {
     private XMPPAccountStore accountStore;
 
     @Inject
-    private XMPPAccountLocator accountLocator;
-
-    @Inject
     private ConnectionHandler connectionHandler;
 
     @Override
@@ -54,7 +50,7 @@ public class ConnectServerAction extends AbstractSarosAction {
      * Connects with the given user.
      */
     public void executeWithUser(String user) {
-        XMPPAccount account = accountLocator.findAccount(user);
+        XMPPAccount account = accountStore.findAccount(user);
         connectAccount(account);
         actionPerformed();
     }

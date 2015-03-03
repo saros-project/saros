@@ -95,8 +95,8 @@ public class XMPPAccountStoreTest {
     public void setAccountActive() {
         XMPPAccountStore store = new XMPPAccountStore();
         store.createAccount("a", "a", "a", "a", 1, true, true);
-        XMPPAccount account = store.createAccount("b", "a", "a", "a", 1, true,
-            true);
+        XMPPAccount account = store
+            .createAccount("b", "a", "a", "a", 1, true, true);
         store.setAccountActive(account);
         assertEquals(account, store.getActiveAccount());
     }
@@ -105,8 +105,8 @@ public class XMPPAccountStoreTest {
     public void setNonExistingAccountActive() {
         XMPPAccountStore store = new XMPPAccountStore();
         store.createAccount("a", "a", "a", "a", 1, true, true);
-        XMPPAccount account = store.createAccount("b", "a", "a", "a", 1, true,
-            true);
+        XMPPAccount account = store
+            .createAccount("b", "a", "a", "a", 1, true, true);
         store.deleteAccount(account);
         store.setAccountActive(account);
     }
@@ -116,8 +116,8 @@ public class XMPPAccountStoreTest {
 
         XMPPAccountStore store = new XMPPAccountStore();
         store.createAccount("a", "a", "a", "a", 1, true, true);
-        XMPPAccount account = store.createAccount("b", "a", "a", "a", 1, true,
-            true);
+        XMPPAccount account = store
+            .createAccount("b", "a", "a", "a", 1, true, true);
         store.changeAccountData(account, "a", "a", "a", "a", 1, false, false);
     }
 
@@ -125,8 +125,8 @@ public class XMPPAccountStoreTest {
     public void testChangeAccountData() {
         XMPPAccountStore store = new XMPPAccountStore();
         store.createAccount("a", "a", "a", "a", 1, true, true);
-        store.changeAccountData(store.getActiveAccount(), "b", "b", "b", "b",
-            5, false, false);
+        store.changeAccountData(store.getActiveAccount(), "b", "b", "b", "b", 5,
+            false, false);
 
         XMPPAccount account = store.getActiveAccount();
 
@@ -185,12 +185,12 @@ public class XMPPAccountStoreTest {
     @Test
     public void testComparator() {
         XMPPAccountStore store = new XMPPAccountStore();
-        XMPPAccount account0 = store.createAccount("alice", "alice", "b", "b",
-            1, true, true);
-        XMPPAccount account1 = store.createAccount("bob", "bob", "b", "b", 1,
-            true, true);
-        XMPPAccount account2 = store.createAccount("alice", "alice", "b", "b",
-            2, true, true);
+        XMPPAccount account0 = store
+            .createAccount("alice", "alice", "b", "b", 1, true, true);
+        XMPPAccount account1 = store
+            .createAccount("bob", "bob", "b", "b", 1, true, true);
+        XMPPAccount account2 = store
+            .createAccount("alice", "alice", "b", "b", 2, true, true);
 
         assertEquals(account0, store.getAllAccounts().get(0));
         assertEquals(account2, store.getAllAccounts().get(1));
@@ -201,8 +201,8 @@ public class XMPPAccountStoreTest {
     public void testChangeAccountDataAndThenDeleteAccount() {
         XMPPAccountStore store = new XMPPAccountStore();
         store.createAccount("alice", "alice", "b", "b", 1, true, true);
-        XMPPAccount account1 = store.createAccount("bob", "bob", "b", "b", 1,
-            true, true);
+        XMPPAccount account1 = store
+            .createAccount("bob", "bob", "b", "b", 1, true, true);
         store.changeAccountData(account1, "a", "a", "a", "a", 5, false, false);
         store.deleteAccount(account1);
         assertEquals(1, store.getAllAccounts().size());
@@ -231,8 +231,8 @@ public class XMPPAccountStoreTest {
         store = new XMPPAccountStore();
         store.setAccountFile(tmpAccountFile, null);
 
-        XMPPAccount account = store.createAccount("alice", "alice", "b", "b",
-            1, true, true);
+        XMPPAccount account = store
+            .createAccount("alice", "alice", "b", "b", 1, true, true);
 
         store = new XMPPAccountStore();
         store.setAccountFile(tmpAccountFile, null);
@@ -245,5 +245,48 @@ public class XMPPAccountStoreTest {
             another.getPassword(), another.getDomain(), "", 0, true, true);
 
         assertEquals(another, account);
+    }
+
+    @Test
+    public void testFindsExistingAccount() {
+        XMPPAccountStore store = new XMPPAccountStore();
+
+        XMPPAccount created = store
+            .createAccount("alice", "alice", "domain", "server", 12345, true,
+                true);
+
+        XMPPAccount found = store.findAccount("alice@domain");
+        assertEquals(created, found);
+    }
+
+    @Test
+    public void testUnsuccessfulFindAccount() {
+        XMPPAccountStore store = new XMPPAccountStore();
+
+        XMPPAccount found = store.findAccount("alice@domain");
+        assertEquals(null, found);
+    }
+
+    @Test
+    public void testFindAccountIgnoresCase() {
+        XMPPAccountStore store = new XMPPAccountStore();
+        XMPPAccount created = store
+            .createAccount("alice", "alice", "domain", "server", 12345, true,
+                true);
+        XMPPAccount found = store.findAccount("Alice@Domain");
+        assertEquals(created, found);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testFindAccountWithNull() {
+        XMPPAccountStore store = new XMPPAccountStore();
+        store.findAccount(null);
+    }
+
+    @Test
+    public void testFindAccountWithEmptyString() {
+        XMPPAccountStore store = new XMPPAccountStore();
+        XMPPAccount found = store.findAccount("");
+        assertEquals(null, found);
     }
 }

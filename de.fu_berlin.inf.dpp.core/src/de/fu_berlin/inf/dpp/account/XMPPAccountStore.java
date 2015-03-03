@@ -32,6 +32,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
@@ -526,6 +527,32 @@ public final class XMPPAccountStore {
             }
         }
         return false;
+    }
+
+    /**
+     * Searches for an account in the account store.
+     *
+     * @param jidString the jid of the user as string
+     * @return the matching XMPP account or null in case of no match
+     *
+     * @throws NullPointerException if jidString is null
+     */
+    public XMPPAccount findAccount(String jidString) {
+        if (jidString == null) {
+            throw new NullPointerException("Null argument 'jidString'");
+        }
+        JID jid = new JID(jidString);
+        String username = jid.getName();
+        String domain = jid.getDomain();
+
+        for (XMPPAccount account : getAllAccounts()) {
+            if (domain.equalsIgnoreCase(account.getDomain()) && username
+                .equalsIgnoreCase(account.getUsername())) {
+                return account;
+            }
+        }
+
+        return null;
     }
 
     /**

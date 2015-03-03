@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.browser_functions;
 
 import de.fu_berlin.inf.dpp.account.XMPPAccount;
-import de.fu_berlin.inf.dpp.account.XMPPAccountLocator;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
@@ -23,18 +22,15 @@ public class ContactListCoreService {
 
     private final SubscriptionHandler subscriptionHandler;
 
-    private final XMPPAccountLocator accountLocator;
-
     private final XMPPAccountStore accountStore;
 
     public ContactListCoreService(ConnectionHandler connectionHandler,
         XMPPConnectionService connectionService,
         SubscriptionHandler subscriptionHandler,
-        XMPPAccountLocator accountLocator, XMPPAccountStore accountStore) {
+        XMPPAccountStore accountStore) {
         this.connectionHandler = connectionHandler;
         this.connectionService = connectionService;
         this.subscriptionHandler = subscriptionHandler;
-        this.accountLocator = accountLocator;
         this.accountStore = accountStore;
     }
 
@@ -45,7 +41,7 @@ public class ContactListCoreService {
      * @param account representing an XMPP account
      */
     public void connect(Account account) {
-        XMPPAccount xmppAccount = accountLocator.findAccount(account.getBareJid());
+        XMPPAccount xmppAccount = accountStore.findAccount(account.getBareJid());
         accountStore.setAccountActive(xmppAccount);
         connectionHandler.connect(false);
     }
