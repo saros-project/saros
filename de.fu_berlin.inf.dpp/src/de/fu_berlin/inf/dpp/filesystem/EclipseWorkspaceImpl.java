@@ -7,6 +7,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 
@@ -41,14 +42,26 @@ public class EclipseWorkspaceImpl implements IWorkspace {
         @Override
         public void run(org.eclipse.core.runtime.IProgressMonitor monitor)
             throws CoreException {
-            IProgressMonitor mon = ProgressMonitorAdapterFactory
-                .convertTo(monitor);
+
             try {
-                delegate.run(mon);
+                delegate.run(ProgressMonitorAdapterFactory.convertTo(monitor));
             } catch (IOException e) {
-                IStatus status = new Status(IStatus.ERROR, Saros.PLUGIN_ID,
-                    e.getMessage(), e);
+                final Throwable cause = e.getCause();
+
+                if (cause instanceof CoreException)
+                    throw (CoreException) cause;
+
+                if (cause instanceof org.eclipse.core.runtime.OperationCanceledException)
+                    throw (org.eclipse.core.runtime.OperationCanceledException) cause;
+
+                final IStatus status = new Status(IStatus.ERROR,
+                    Saros.PLUGIN_ID, e.getMessage(), e);
+
                 throw new CoreException(status);
+            } catch (OperationCanceledException e) {
+                org.eclipse.core.runtime.OperationCanceledException wrapped = new org.eclipse.core.runtime.OperationCanceledException();
+                wrapped.initCause(e);
+                throw wrapped;
             }
         }
     }
@@ -59,8 +72,10 @@ public class EclipseWorkspaceImpl implements IWorkspace {
         this.delegate = workspace;
     }
 
+    // TODO support SchedulingRules
     @Override
-    public void run(final IWorkspaceRunnable runnable) throws IOException {
+    public void run(final IWorkspaceRunnable runnable) throws IOException,
+        OperationCanceledException {
         org.eclipse.core.resources.IWorkspaceRunnable eclipseRunnable;
 
         /*
@@ -79,6 +94,13 @@ public class EclipseWorkspaceImpl implements IWorkspace {
                 org.eclipse.core.resources.IWorkspace.AVOID_UPDATE, null);
         } catch (CoreException e) {
             throw new IOException(e);
+        } catch (org.eclipse.core.runtime.OperationCanceledException e) {
+            Throwable cause = e.getCause();
+
+            if (cause instanceof OperationCanceledException)
+                throw (OperationCanceledException) cause;
+
+            throw new OperationCanceledException(e);
         }
     }
 

@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.filesystem;
 
 import java.io.IOException;
 
+import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 
 /**
@@ -10,5 +11,6 @@ import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
  * their Eclipse counterpart.
  */
 public interface IWorkspaceRunnable {
-    public void run(IProgressMonitor monitor) throws IOException;
+    public void run(IProgressMonitor monitor) throws IOException,
+        OperationCanceledException;
 }

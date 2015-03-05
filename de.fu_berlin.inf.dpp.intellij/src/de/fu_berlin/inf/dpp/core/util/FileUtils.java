@@ -22,7 +22,7 @@
 
 package de.fu_berlin.inf.dpp.core.util;
 
-import de.fu_berlin.inf.dpp.core.exceptions.OperationCanceledException;
+import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
 import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
@@ -222,7 +222,11 @@ public class FileUtils {
             }
         };
 
-        workspace.run(createFileProcedure);
+        try {
+            workspace.run(createFileProcedure);
+        } catch (OperationCanceledException e) {
+            throw new IOException(e);
+        }
 
     }
 
@@ -244,7 +248,11 @@ public class FileUtils {
             }
         };
 
-        workspace.run(replaceFileProcedure);
+        try {
+            workspace.run(replaceFileProcedure);
+        } catch (OperationCanceledException e) {
+            throw new IOException(e);
+        }
     }
 
     /**
@@ -303,7 +311,11 @@ public class FileUtils {
             }
         };
 
-        workspace.run(createFolderProcedure);
+        try {
+            workspace.run(createFolderProcedure);
+        } catch (OperationCanceledException e) {
+            throw new IOException(e);
+        }
 
     }
 
@@ -336,7 +348,11 @@ public class FileUtils {
             }
         };
 
-        workspace.run(deleteProcedure);
+        try {
+            workspace.run(deleteProcedure);
+        } catch (OperationCanceledException e) {
+            throw new IOException(e);
+        }
 
     }
 
@@ -375,7 +391,11 @@ public class FileUtils {
             }
         };
 
-        workspace.run(moveProcedure);
+        try {
+            workspace.run(moveProcedure);
+        } catch (OperationCanceledException e) {
+            throw new IOException(e);
+        }
 
     }
 

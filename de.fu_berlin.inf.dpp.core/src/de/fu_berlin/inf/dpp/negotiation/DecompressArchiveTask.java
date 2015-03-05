@@ -9,8 +9,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.OperationCanceledException;
 
+import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
 import de.fu_berlin.inf.dpp.filesystem.FileSystem;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
@@ -34,13 +34,13 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
      * {@link IWorkspace#run}. All necessary folders will be created on the fly.
      * </P> <b>Important:</b> Existing files will be <b>overwritten without
      * confirmation</b>!
-     * 
+     *
      * @param file
      *            Zip file containing the compressed data
      * @param idToProjectMapping
      *            map containing the id to project mapping (see also
      *            {@link ISarosSession#getProjectID(de.fu_berlin.inf.dpp.filesystem.IProject)}
-     * 
+     *
      * @param monitor
      *            monitor that is used for progress report and cancellation or
      *            <code>null</code> to use the monitor provided by the
@@ -61,7 +61,8 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
      * better response if there exists big files in the archive
      */
     @Override
-    public void run(IProgressMonitor monitor) throws IOException {
+    public void run(IProgressMonitor monitor) throws IOException,
+        OperationCanceledException {
         if (this.monitor != null)
             monitor = this.monitor;
 
@@ -81,7 +82,6 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
 
                 final String entryName = entry.getName();
 
-                // FIXME do not throw Eclipse exceptions
                 if (monitor.isCanceled())
                     throw new OperationCanceledException();
 

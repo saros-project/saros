@@ -24,6 +24,7 @@ package de.fu_berlin.inf.dpp.intellij.project.fs;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
+import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
@@ -48,7 +49,8 @@ public class Workspace implements IWorkspace {
         fileSystem.addRootToWatch(project.getBasePath(), true);
     }
 
-    @Override public void run(IWorkspaceRunnable procedure) throws IOException {
+    @Override public void run(IWorkspaceRunnable procedure)
+        throws IOException, OperationCanceledException {
         procedure.run(new NullProgressMonitor());
     }
 

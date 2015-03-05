@@ -444,7 +444,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
          * Inform the host of the session that the current (local) user has
          * started the possibly time consuming SVN checkout via a
          * remoteProgressMonitor
-         * 
+         *
          * The monitor that is created here is shown both locally and remote and
          * is handled like a regular progress monitor.
          */
@@ -484,7 +484,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
         /*
          * Remove the entries from the mapping in the SarosSession.
-         * 
+         *
          * Stefan Rossbach 28.12.2012: This will not gain you anything because
          * the project is marked as shared on the remote side and so will never
          * be able to be shared again to us. Again the whole architecture does
@@ -668,8 +668,10 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         // FIXME run inside workspace runnable !
         try {
             decompressTask.run(monitor);
-
         } catch (OperationCanceledException e) {
+            throw new LocalCancellationException(null,
+                CancelOption.DO_NOT_NOTIFY_PEER);
+        } catch (de.fu_berlin.inf.dpp.exceptions.OperationCanceledException e) {
             throw new LocalCancellationException(null,
                 CancelOption.DO_NOT_NOTIFY_PEER);
         }
