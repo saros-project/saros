@@ -15,6 +15,7 @@ import de.fu_berlin.inf.dpp.preferences.IPreferences;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import org.apache.log4j.helpers.LogLog;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,14 +34,12 @@ public class Saros {
     private static boolean isInitialized;
 
     private Project project;
-    
+
     private IPreferences preferences;
 
     private IWorkspace workspace;
 
     private SarosContext sarosContext;
-
-
 
     /**
      * Returns true if the Saros instance has been initialized so that calling
@@ -95,12 +94,15 @@ public class Saros {
             return;
         }
 
-        SwtLibLoader.loadSwtLib();
+        ArrayList<ISarosContextFactory> factories = new ArrayList<ISarosContextFactory>();
+        factories.add(new SarosIntellijContextFactory(this));
+        factories.add(new SarosCoreContextFactory());
 
-        //CONTEXT
-        List<ISarosContextFactory> factories = Arrays
-            .<ISarosContextFactory>asList(new SarosIntellijContextFactory(this),
-                new SarosHTMLUIContextFactory(), new SarosCoreContextFactory());
+        if (isSwtBrowserEnabled()) {
+            SwtLibLoader.loadSwtLib();
+            factories.add(new SarosHTMLUIContextFactory());
+        }
+
         sarosContext = new SarosContext(factories, new DotGraphMonitor());
 
         SarosPluginContext.setSarosContext(sarosContext);
