@@ -47,8 +47,8 @@ import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.project.internal.ColorNegotiationHook;
-import de.fu_berlin.inf.dpp.project.internal.NicknameNegotiationHook;
+import de.fu_berlin.inf.dpp.session.ColorNegotiationHook;
+import de.fu_berlin.inf.dpp.session.NicknameNegotiationHook;
 import de.fu_berlin.inf.dpp.versioning.VersionManager;
 
 /**

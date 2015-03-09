@@ -22,7 +22,6 @@
 
 package de.fu_berlin.inf.dpp.intellij.ui.wizards;
 
-import de.fu_berlin.inf.dpp.core.invitation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.intellij.ui.Messages;
 import de.fu_berlin.inf.dpp.intellij.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.intellij.ui.util.JobWithStatus;
@@ -31,6 +30,7 @@ import de.fu_berlin.inf.dpp.intellij.ui.wizards.pages.InfoPage;
 import de.fu_berlin.inf.dpp.intellij.ui.wizards.pages.PageActionListener;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
+import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelLocation;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;

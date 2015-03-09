@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.project.internal;
+package de.fu_berlin.inf.dpp.session;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -7,7 +7,6 @@ import de.fu_berlin.inf.dpp.negotiation.hooks.ISessionNegotiationHook;
 import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 
 public class ColorNegotiationHook implements ISessionNegotiationHook {
     private static final String HOOK_IDENTIFIER = "colorManagement";

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.project.internal;
+package de.fu_berlin.inf.dpp.session;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,9 +10,6 @@ import de.fu_berlin.inf.dpp.negotiation.hooks.ISessionNegotiationHook;
 import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.User;
 
 public class NicknameNegotiationHook implements ISessionNegotiationHook {
     private static final String HOOK_IDENTIFIER = "nicknameManagement";

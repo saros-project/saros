@@ -1,5 +1,8 @@
 package de.fu_berlin.inf.dpp.core.invitation;
 
+import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
+
 /**
  * Interface for handling incoming and outgoing session and project
  * negotiations.
