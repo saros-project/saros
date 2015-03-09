@@ -182,7 +182,8 @@ public class CreateXMPPAccountWizard extends Wizard {
                     new Runnable() {
                         @Override
                         public void run() {
-                            connectionHandler.connect(false);
+                            connectionHandler
+                                .connect(createdXMPPAccount, false);
                         }
                     });
             }

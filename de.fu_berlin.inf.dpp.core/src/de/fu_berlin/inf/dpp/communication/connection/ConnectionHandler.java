@@ -14,7 +14,6 @@ import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.SarosConstants;
 import de.fu_berlin.inf.dpp.account.XMPPAccount;
-import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.internal.TCPServer;
@@ -44,7 +43,6 @@ public class ConnectionHandler {
 
     private final IProxyResolver proxyResolver;
 
-    private final XMPPAccountStore accountStore;
     private final IPreferences preferences;
 
     private final IConnectionManager connectionManager;
@@ -84,14 +82,13 @@ public class ConnectionHandler {
         final TCPServer tcpServer, final MDNSService mDNSService,
         final IConnectionManager transferManager,
         @Nullable final IProxyResolver proxyResolver,
-        final XMPPAccountStore accountStore, final IPreferences preferences) {
+        final IPreferences preferences) {
 
         this.connectionService = connectionService;
         this.tcpServer = tcpServer;
         this.mDNSService = mDNSService;
         this.connectionManager = transferManager;
         this.proxyResolver = proxyResolver;
-        this.accountStore = accountStore;
         this.preferences = preferences;
 
         this.connectionService.addListener(xmppConnectionListener);
@@ -108,7 +105,7 @@ public class ConnectionHandler {
 
     /**
      * Returns the latest connection error.
-     *
+     * 
      * @return the connection error or <code>null</code>
      */
     public Exception getConnectionError() {
@@ -119,7 +116,7 @@ public class ConnectionHandler {
 
     /**
      * Returns a unique id for the current connection.
-     *
+     * 
      * @return a unique id for the current connection or <code>null</code> if no
      *         connection is established or the connection has no unique id
      */
@@ -137,7 +134,7 @@ public class ConnectionHandler {
 
     /**
      * Checks if a connection is currently established.
-     *
+     * 
      * @return <code>true</code> if a connection is established,
      *         <code>false</code> otherwise
      */
@@ -158,22 +155,23 @@ public class ConnectionHandler {
     }
 
     /**
-     * Connects using the active account from the {@link XMPPAccountStore}. If a
-     * connection establishment (connect or disconnect) is already in progress
-     * this connection attempt will be ignored.
-     *
+     * Connects to the a XMPP server with the given account. If a connection
+     * establishment (connect or disconnect) is already in progress this
+     * connection attempt will be ignored.
+     * 
      * If there is already an established connection this connection will be
      * disconnected.
-     *
+     * 
+     * @param account
+     *            the account to connect with
      * @param failSilently
      *            if set to <code>true</code> a connection failure will not be
      *            reported to the {@linkplain IConnectingFailureCallback
      *            callback}
      * @blocking this method may block for several seconds
-     * @see XMPPAccountStore#setAccountActive(XMPPAccount)
      */
 
-    public void connect(boolean failSilently) {
+    public void connect(final XMPPAccount account, final boolean failSilently) {
 
         synchronized (this) {
             if (isConnecting || isDisconnecting)
@@ -184,9 +182,9 @@ public class ConnectionHandler {
 
         try {
             if (MDNS_MODE)
-                connectMDNSInternal(failSilently);
+                connectMDNSInternal(account, failSilently);
             else
-                connectXMPPInternal(failSilently);
+                connectXMPPInternal(account, failSilently);
         } finally {
             synchronized (this) {
                 isConnecting = false;
@@ -231,19 +229,9 @@ public class ConnectionHandler {
         setConnectionState(ConnectionState.NOT_CONNECTED, null, true);
     }
 
-    private void connectMDNSInternal(boolean failSilently) {
+    private void connectMDNSInternal(final XMPPAccount account,
+        final boolean failSilently) {
         IConnectingFailureCallback callbackTmp = callback;
-
-        if (accountStore.isEmpty() && callbackTmp != null && !failSilently) {
-            synchronized (this) {
-                isConnecting = false;
-            }
-
-            callbackTmp.connectingFailed(null);
-            return;
-        }
-
-        final XMPPAccount account = accountStore.getActiveAccount();
 
         // misuse the XMPP account credentials for now;
 
@@ -283,19 +271,9 @@ public class ConnectionHandler {
         }
     }
 
-    private void connectXMPPInternal(boolean failSilently) {
+    private void connectXMPPInternal(final XMPPAccount account,
+        final boolean failSilently) {
         IConnectingFailureCallback callbackTmp = callback;
-
-        if (accountStore.isEmpty() && callbackTmp != null && !failSilently) {
-            synchronized (this) {
-                isConnecting = false;
-            }
-
-            callbackTmp.connectingFailed(null);
-            return;
-        }
-
-        XMPPAccount account = accountStore.getActiveAccount();
 
         String username = account.getUsername();
         String password = account.getPassword();

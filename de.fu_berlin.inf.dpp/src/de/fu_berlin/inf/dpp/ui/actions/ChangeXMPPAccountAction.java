@@ -186,7 +186,8 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator,
         });
     }
 
-    private void connect(XMPPAccount account) {
+    private void connect(final XMPPAccount account) {
+        // remember this account for the next connection attempt
         if (account != null)
             accountService.setAccountActive(account);
 
@@ -198,7 +199,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator,
                         LOG.info("User clicked too fast, running already a connect or disconnect.");
                         return;
                     }
-                    connectionHandler.connect(false);
+                    connectionHandler.connect(account, false);
                 } finally {
                     running.set(false);
                 }

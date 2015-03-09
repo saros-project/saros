@@ -122,7 +122,8 @@ public class AddXMPPAccountWizard extends Wizard {
             ThreadUtils.runSafeAsync("dpp-connect-demand", LOG, new Runnable() {
                 @Override
                 public void run() {
-                    connectionHandler.connect(false);
+                    connectionHandler.connect(accountStore.getActiveAccount(),
+                        false);
                 }
             });
     }

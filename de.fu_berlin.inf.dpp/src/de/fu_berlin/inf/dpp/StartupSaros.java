@@ -10,6 +10,7 @@ import org.eclipse.ui.intro.IIntroManager;
 import org.eclipse.ui.intro.IIntroPart;
 import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.account.XMPPAccount;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
@@ -24,9 +25,9 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 /**
  * An instance of this class is instantiated when Eclipse starts, after the
  * Saros plugin has been started.
- *
+ * 
  * {@link #earlyStartup()} is called after the workbench is initialized.
- *
+ * 
  * @author Lisa Dohrmann, Sandor Szücs, Stefan Rossbach
  */
 @Component(module = "integration")
@@ -105,12 +106,14 @@ public class StartupSaros implements IStartup {
                     || xmppAccountStore.isEmpty())
                     return;
 
+                final XMPPAccount account = xmppAccountStore.getActiveAccount();
+
                 ThreadUtils.runSafeAsync("dpp-connect-auto", LOG,
                     new Runnable() {
                         @Override
                         public void run() {
-                            connectionHandler
-                                .connect(/* avoid error popups */true);
+                            // avoid error popups
+                            connectionHandler.connect(account, true);
                         }
                     });
 

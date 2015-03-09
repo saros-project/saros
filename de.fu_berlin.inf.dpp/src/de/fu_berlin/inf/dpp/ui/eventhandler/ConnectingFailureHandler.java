@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.XMPPError;
 
+import de.fu_berlin.inf.dpp.account.XMPPAccount;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.communication.connection.IConnectingFailureCallback;
@@ -90,10 +91,12 @@ public class ConnectingFailureHandler implements IConnectingFailureCallback {
                     .getActiveAccount()) == null)
                     return;
 
+                final XMPPAccount account = accountStore.getActiveAccount();
+
                 ThreadUtils.runSafeAsync(LOG, new Runnable() {
                     @Override
                     public void run() {
-                        connectionHandler.connect(false);
+                        connectionHandler.connect(account, false);
                     }
                 });
             }

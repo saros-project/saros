@@ -22,12 +22,13 @@
 
 package de.fu_berlin.inf.dpp.intellij.ui.actions;
 
+import javax.swing.JOptionPane;
+
+import org.picocontainer.annotations.Inject;
+
 import de.fu_berlin.inf.dpp.account.XMPPAccount;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
-import org.picocontainer.annotations.Inject;
-
-import javax.swing.JOptionPane;
 
 /**
  * Connects to XMPP/Jabber server with given account or active account
@@ -67,22 +68,22 @@ public class ConnectServerAction extends AbstractSarosAction {
 
     /**
      * Connects an Account tothe XMPPService and sets it as active.
-     *
+     * 
      * @param account
      */
     private void connectAccount(XMPPAccount account) {
-        LOG.info("Connecting server: [" + account.getUsername() + "@" + account
-            .getServer() + "]");
+        LOG.info("Connecting server: [" + account.getUsername() + "@"
+            + account.getServer() + "]");
 
         try {
-            accountStore.setAccountActive(account);
-            //TODO don't block UI
-            connectionHandler.connect(false);
+            // TODO don't block UI
+            connectionHandler.connect(account, false);
         } catch (RuntimeException e) {
-            //TODO display user notification in connection listener
-            JOptionPane.showMessageDialog(null,
-                "An unexpected error occured: " + e.getMessage(),
-                "Connection Error", JOptionPane.ERROR_MESSAGE);
+            // TODO display user notification in connection listener
+            JOptionPane
+                .showMessageDialog(null,
+                    "An unexpected error occured: " + e.getMessage(),
+                    "Connection Error", JOptionPane.ERROR_MESSAGE);
             LOG.error("Could not connect " + account, e);
         }
     }
