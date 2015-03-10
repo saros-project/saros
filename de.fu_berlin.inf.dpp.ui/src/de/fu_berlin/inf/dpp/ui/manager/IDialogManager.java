@@ -17,12 +17,16 @@ public interface IDialogManager {
      * If this method is called when the dialog is already displayed,
      * nothing happens.
      *
+     * May be called from any thread.
+     *
      * @param startPage the BrowserPage object to be displayed in the dialog
      */
     public void showDialogWindow(BrowserPage startPage);
 
     /**
      * Closes the dialog displaying the given page.
+     *
+     * May be called from any thread.
      *
      * @param startPage the BrowserPage object the dialog was created with
      */

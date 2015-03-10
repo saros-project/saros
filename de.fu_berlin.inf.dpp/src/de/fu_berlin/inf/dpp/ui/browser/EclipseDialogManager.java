@@ -19,7 +19,6 @@ import de.fu_berlin.inf.dpp.ui.view_parts.BrowserPage;
 
 /**
  * Eclipse side implementation of the IDialogManager interface
- *
  */
 public class EclipseDialogManager implements IDialogManager {
 
@@ -36,62 +35,72 @@ public class EclipseDialogManager implements IDialogManager {
 
     @Override
     public void showDialogWindow(final BrowserPage browserPage) {
-
-        if (dialogIsOpen(browserPage)) {
-            // If the user try to open a dialog that is already open,
-            // the dialog should get active and in the foreground to help the
-            // user find it.
-
-            // TODO: Add this method to IDialog have a common behavior for
-            // Saros/E and Saros/J
-            reopenDialogWindow(browserPage);
-            return;
-        }
-
-        final Shell activeShell = SWTUtils.getShell();
-
-        // should only happen if Eclipse shuts down
-        if (activeShell == null)
-            return;
-
-        final Shell browserShell = new Shell(activeShell);
-
-        // TODO WebPage#getTitle() ?
-        browserShell.setText(browserPage.getWebpage());
-        browserShell.setLayout(new FillLayout());
-        browserShell.setSize(640, 480);
-
-        browserCreator.createBrowser(browserShell, SWT.NONE, browserPage);
-
-        browserShell.addShellListener(new ShellAdapter() {
-
+        SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
             @Override
-            public void shellClosed(ShellEvent e) {
-                openDialogs.remove(browserPage.getWebpage());
-                LOG.debug(browserPage.getWebpage() + " is closed");
+            public void run() {
+                if (dialogIsOpen(browserPage)) {
+                    // If the user try to open a dialog that is already open,
+                    // the dialog should get active and in the foreground to
+                    // help the
+                    // user find it.
+
+                    // TODO: Add this method to IDialog have a common behavior
+                    // for
+                    // Saros/E and Saros/J
+                    reopenDialogWindow(browserPage);
+                    return;
+                }
+
+                final Shell activeShell = SWTUtils.getShell();
+
+                // should only happen if Eclipse shuts down
+                if (activeShell == null)
+                    return;
+
+                final Shell browserShell = new Shell(activeShell);
+
+                // TODO WebPage#getTitle() ?
+                browserShell.setText(browserPage.getWebpage());
+                browserShell.setLayout(new FillLayout());
+                browserShell.setSize(640, 480);
+
+                browserCreator.createBrowser(browserShell, SWT.NONE,
+                    browserPage);
+
+                browserShell.addShellListener(new ShellAdapter() {
+
+                    @Override
+                    public void shellClosed(ShellEvent e) {
+                        openDialogs.remove(browserPage.getWebpage());
+                        LOG.debug(browserPage.getWebpage() + " is closed");
+                    }
+
+                });
+
+                browserShell.open();
+                browserShell.pack();
+
+                centerShellRelativeToParent(browserShell);
+
+                openDialogs.put(browserPage.getWebpage(), browserShell);
             }
-
         });
-
-        browserShell.open();
-        browserShell.pack();
-
-        centerShellRelativeToParent(browserShell);
-
-        openDialogs.put(browserPage.getWebpage(), browserShell);
-
     }
 
     @Override
     public void closeDialogWindow(final BrowserPage browserPage) {
+        SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
+            @Override
+            public void run() {
+                if (!dialogIsOpen(browserPage)) {
+                    LOG.warn(browserPage.getWebpage() + "could not be found");
+                    return;
+                }
 
-        if (!dialogIsOpen(browserPage)) {
-            LOG.warn(browserPage.getWebpage() + "could not be found");
-            return;
-        }
-
-        // shell is removed in the ShellLister
-        openDialogs.get(browserPage.getWebpage()).close();
+                // shell is removed in the ShellLister
+                openDialogs.get(browserPage.getWebpage()).close();
+            }
+        });
     }
 
     /**
@@ -117,7 +126,6 @@ public class EclipseDialogManager implements IDialogManager {
     }
 
     /**
-     *
      * @param browserPage
      * @return true if the browserPage is currently displayed in a shell/dialog
      */
