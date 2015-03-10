@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.ui.renderer;
 
 import com.google.gson.Gson;
+import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.dpp.account.XMPPAccount;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
@@ -38,8 +39,10 @@ public class AccountRenderer {
         Gson gson = new Gson();
         String accountString = gson.toJson(getAccountList());
         LOG.debug("sending json: " + accountString);
-        browserManager.getMainViewBrowser()
-            .run("__angular_setAccountList(" + accountString + ")");
+        IJQueryBrowser browser = browserManager.getMainViewBrowser();
+        if (browser != null) {
+            browser.run("__angular_setAccountList(" + accountString + ")");
+        }
     }
 
     /**

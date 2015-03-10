@@ -40,12 +40,12 @@ public class BrowserManager {
     }
 
     /**
-     * Gets the browser for the main view.
+     * Gets the browser for the main view or null if the view is closed.
      *
-     * @return the browser currently displaying the main view
+     * @return the browser currently displaying the main view or null if not present
      */
     public IJQueryBrowser getMainViewBrowser() {
-        return getBrowser(SarosMainPage.class);
+        return browsers.get(SarosMainPage.class);
     }
 
     /**

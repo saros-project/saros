@@ -1,7 +1,9 @@
 package de.fu_berlin.inf.dpp.ui.renderer;
 
 import com.google.gson.Gson;
+import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.ag_se.browser.functions.CallbackFunction;
+import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.ui.model.ContactList;
@@ -98,7 +100,9 @@ public class ContactListRenderer {
     }
 
     private void executeInBrowser(final String script) {
-        browserManager.getMainViewBrowser()
-            .run(script, CallbackFunction.ERROR_LOGGING_CALLBACK);
+        IJQueryBrowser browser = browserManager.getMainViewBrowser();
+        if (browser != null) {
+            browser.run(script, CallbackFunction.ERROR_LOGGING_CALLBACK);
+        }
     }
 }
