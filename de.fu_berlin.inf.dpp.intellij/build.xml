@@ -127,9 +127,12 @@
     <property name="ui.basedir" value="${basedir}/../de.fu_berlin.inf.dpp.ui"/>
     <property name="ui.libdir" value="${ui.basedir}/lib" />
 
+    <property name="intellij.libdir" value="${basedir}/lib" />
+
     <path id="libraries.classpath">
         <fileset dir="${core.libdir}" includes="*.jar"/>
         <fileset dir="${ui.libdir}" includes="*.jar" />
+        <fileset dir="${intellij.libdir}" includes="*.jar" />
         <fileset dir="${eclipse.dir}/plugins" includes="org.eclipse.swt.*.jar"
                  excludes="org.eclipse.swt.*source*.jar"/>
     </path>

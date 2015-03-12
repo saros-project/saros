@@ -15,7 +15,7 @@ import java.awt.BorderLayout;
  * This class is responsible for starting the SWT thread and managing the creation
  * and display of the browser.
  */
-class SwtBrowserPanel extends JPanel {
+public class SwtBrowserPanel extends JPanel {
 
     /**
      * Required for Linux, harmless for other OS.
