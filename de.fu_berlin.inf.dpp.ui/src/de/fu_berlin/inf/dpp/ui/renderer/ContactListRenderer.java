@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.ag_se.browser.functions.CallbackFunction;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
-import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.ui.model.ContactList;
 import de.fu_berlin.inf.dpp.ui.renderer.Renderer;
@@ -16,17 +15,11 @@ import org.jivesoftware.smack.Roster;
  * It holds the connection and the contact list state so that the current state
  * can be re-rendered when the browser instance changes.
  */
-public class ContactListRenderer implements Renderer {
-
-    private final BrowserManager browserManager;
+public class ContactListRenderer extends Renderer {
 
     private ConnectionState connectionState = ConnectionState.NOT_CONNECTED;
 
     private ContactList contactList = ContactList.EMPTY_CONTACT_LIST;
-
-    public ContactListRenderer(BrowserManager browserManager) {
-        this.browserManager = browserManager;
-    }
 
     /**
      * Displays the given connection state and contact list in the browser.
@@ -58,7 +51,7 @@ public class ContactListRenderer implements Renderer {
     }
 
     /**
-     * Displays the contact list respresented by the given roster in the browser.
+     * Displays the contact list represented by the given roster in the browser.
      *
      * @param roster the roster containing the contact list
      */
@@ -98,9 +91,9 @@ public class ContactListRenderer implements Renderer {
     }
 
     private void executeInBrowser(final String script) {
-        IJQueryBrowser browser = browserManager.getMainViewBrowser();
-        if (browser != null) {
-            browser.run(script, CallbackFunction.ERROR_LOGGING_CALLBACK);
-        }
+        if (browser == null)
+            return;
+
+        browser.run(script, CallbackFunction.ERROR_LOGGING_CALLBACK);
     }
 }

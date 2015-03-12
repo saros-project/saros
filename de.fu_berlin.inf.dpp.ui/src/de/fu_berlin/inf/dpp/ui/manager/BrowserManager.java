@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.ui.manager;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
+import de.fu_berlin.inf.dpp.ui.renderer.Renderer;
 import de.fu_berlin.inf.dpp.ui.view_parts.BrowserPage;
 import de.fu_berlin.inf.dpp.ui.view_parts.SarosMainPage;
 
@@ -26,7 +27,9 @@ public class BrowserManager {
     public synchronized void setBrowser(BrowserPage page,
         IJQueryBrowser browser) {
         browsers.put(page.getClass(), browser);
-        page.render();
+        for (Renderer renderer : page.getRenderer()) {
+            renderer.setBrowser(browser);
+        }
         notifyAll();
     }
 
@@ -37,6 +40,9 @@ public class BrowserManager {
      */
     public synchronized void removeBrowser(BrowserPage page) {
         browsers.remove(page.getClass());
+        for (Renderer renderer : page.getRenderer()) {
+            renderer.removeBrowser();
+        }
     }
 
     /**

@@ -2,6 +2,10 @@ package de.fu_berlin.inf.dpp.ui.view_parts;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.dpp.ui.browser_functions.AddAccountBrowserFunctions;
+import de.fu_berlin.inf.dpp.ui.renderer.Renderer;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Represents the wizard to add new accounts.
@@ -19,6 +23,7 @@ public class AddAccountPage implements BrowserPage {
     }
 
     @Override
-    public void render() {
+    public List<Renderer> getRenderer() {
+        return Collections.emptyList();
     }
 }

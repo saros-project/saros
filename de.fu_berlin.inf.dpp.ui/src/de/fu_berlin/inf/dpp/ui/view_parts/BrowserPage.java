@@ -1,10 +1,15 @@
 package de.fu_berlin.inf.dpp.ui.view_parts;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
+import de.fu_berlin.inf.dpp.ui.renderer.Renderer;
+
+import java.util.List;
 
 /**
- * A browser page encapsulates the location of the HTML page as well as
- * logic to connect the needed Java and Javascript functions.
+ * A browser page encapsulates the location of the HTML page as well as the needed
+ * browsers functions and renderers.
+ * The browser functions are the Java methods that the webpage calls inside Javascript.
+ * The renderers transfer application state from Java to the webpage.
  */
 public interface BrowserPage {
 
@@ -21,7 +26,7 @@ public interface BrowserPage {
     String getWebpage();
 
     /**
-     * Creates the neeeded {@link org.eclipse.swt.browser.BrowserFunction}s for
+     * Creates the needed {@link org.eclipse.swt.browser.BrowserFunction}s for
      * the webpage.
      *
      * @param browser the SWT browser instance
@@ -29,8 +34,10 @@ public interface BrowserPage {
     void createBrowserFunctions(IJQueryBrowser browser);
 
     /**
-     * Displays the current state of the page in the browser.
-     * TODO: maybe it makes sense to implement a Renderer#render(Page) method instead
+     * Gets the list of renderers that can display application state in this
+     * webpage.
+     *
+     * @return the list of renderers for this page
      */
-    void render();
+    List<Renderer> getRenderer();
 }
