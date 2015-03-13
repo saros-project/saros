@@ -28,7 +28,7 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.StatisticManagerConfiguration;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
-import de.fu_berlin.inf.dpp.preferences.IPreferences;
+import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
@@ -52,7 +52,7 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
     public static final String DESCRIPTION = de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_description;
 
     @Inject
-    protected IPreferences preferences;
+    protected Preferences preferences;
 
     @Inject
     protected IUPnPService upnpService;

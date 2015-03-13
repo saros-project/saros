@@ -15,7 +15,7 @@ import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;
-import de.fu_berlin.inf.dpp.preferences.IPreferences;
+import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.stf.server.STFController;
 import de.fu_berlin.inf.dpp.ui.commandHandlers.GettingStartedHandler;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -45,7 +45,7 @@ public class StartupSaros implements IStartup {
     private ConnectionHandler connectionHandler;
 
     @Inject
-    private IPreferences preferences;
+    private Preferences preferences;
 
     @Inject
     private XMPPAccountStore xmppAccountStore;

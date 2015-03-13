@@ -47,7 +47,7 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
-import de.fu_berlin.inf.dpp.preferences.IPreferences;
+import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -84,7 +84,7 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
     protected static final String TYPING_LABEL = "Typing";
 
     @Inject
-    protected IPreferences preferences;
+    protected Preferences preferences;
 
     protected ISarosSessionManager sessionManager;
 

@@ -36,7 +36,7 @@ import de.fu_berlin.inf.dpp.intellij.ui.actions.FollowModeAction;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.LeaveSessionAction;
 import de.fu_berlin.inf.dpp.intellij.ui.swt_browser.IntelliJDialogManager;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
-import de.fu_berlin.inf.dpp.preferences.IPreferences;
+import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.ui.manager.IDialogManager;
@@ -76,7 +76,7 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
 
         Component.create(IPreferenceStore.class,
             PropertiesComponentAdapter.class),
-        Component.create(IPreferences.class, IntelliJPreferences.class),
+        Component.create(Preferences.class, IntelliJPreferences.class),
 
         Component.create(FollowModeAction.class),
         Component.create(LeaveSessionAction.class),

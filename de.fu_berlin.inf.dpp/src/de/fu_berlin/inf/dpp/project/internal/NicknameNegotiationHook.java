@@ -9,7 +9,7 @@ import java.util.Set;
 import de.fu_berlin.inf.dpp.negotiation.hooks.ISessionNegotiationHook;
 import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.preferences.IPreferences;
+import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.User;
@@ -27,12 +27,12 @@ public class NicknameNegotiationHook implements ISessionNegotiationHook {
     public static final String KEY_CLIENT_NICKNAME = "clientNickname";
     public static final String KEY_HOST_NICKNAME = "hostNickname";
 
-    private final IPreferences preferences;
+    private final Preferences preferences;
     private final ISarosSessionManager sessionManager;
 
-    public NicknameNegotiationHook(IPreferences utils,
+    public NicknameNegotiationHook(Preferences preferences,
         SessionNegotiationHookManager hooks, ISarosSessionManager sessionManager) {
-        this.preferences = utils;
+        this.preferences = preferences;
         this.sessionManager = sessionManager;
         hooks.addHook(this);
     }

@@ -25,12 +25,12 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
-import de.fu_berlin.inf.dpp.preferences.IPreferences;
+import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.ui.Messages;
 
 /**
  * Allows the user to create an XMPP account.
- *
+ * 
  * @author bkahlert
  * @author Stefan Rossbach
  */
@@ -55,7 +55,7 @@ public class CreateXMPPAccountWizardPage extends WizardPage {
     private String lastMessage;
 
     @Inject
-    private IPreferences preferences;
+    private Preferences preferences;
 
     @Inject
     private XMPPAccountStore accountStore;

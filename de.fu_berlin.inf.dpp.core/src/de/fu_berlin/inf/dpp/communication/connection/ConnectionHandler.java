@@ -21,7 +21,7 @@ import de.fu_berlin.inf.dpp.net.mdns.MDNSService;
 import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.preferences.IPreferences;
+import de.fu_berlin.inf.dpp.preferences.Preferences;
 
 /**
  * Facade for handling connection establishment and connection events. This
@@ -43,7 +43,7 @@ public class ConnectionHandler {
 
     private final IProxyResolver proxyResolver;
 
-    private final IPreferences preferences;
+    private final Preferences preferences;
 
     private final IConnectionManager connectionManager;
 
@@ -82,7 +82,7 @@ public class ConnectionHandler {
         final TCPServer tcpServer, final MDNSService mDNSService,
         final IConnectionManager transferManager,
         @Nullable final IProxyResolver proxyResolver,
-        final IPreferences preferences) {
+        final Preferences preferences) {
 
         this.connectionService = connectionService;
         this.tcpServer = tcpServer;

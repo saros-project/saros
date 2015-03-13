@@ -6,7 +6,7 @@ import java.util.Map;
 import de.fu_berlin.inf.dpp.negotiation.hooks.ISessionNegotiationHook;
 import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.preferences.IPreferences;
+import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 
 public class ColorNegotiationHook implements ISessionNegotiationHook {
@@ -18,12 +18,12 @@ public class ColorNegotiationHook implements ISessionNegotiationHook {
     public static final String KEY_HOST_COLOR = "hostColor";
     public static final String KEY_HOST_FAV_COLOR = "hostFavoriteColor";
 
-    private IPreferences preferences;
+    private Preferences preferences;
     private ISarosSessionManager sessionManager;
 
-    public ColorNegotiationHook(IPreferences utils,
+    public ColorNegotiationHook(Preferences preferences,
         SessionNegotiationHookManager hooks, ISarosSessionManager sessionManager) {
-        this.preferences = utils;
+        this.preferences = preferences;
         this.sessionManager = sessionManager;
         hooks.addHook(this);
     }

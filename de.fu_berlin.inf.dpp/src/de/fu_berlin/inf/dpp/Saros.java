@@ -53,7 +53,6 @@ import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;
 import de.fu_berlin.inf.dpp.misc.pico.DotGraphMonitor;
-import de.fu_berlin.inf.dpp.preferences.IPreferences;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.browser.EclipseHTMLUIContextFactory;
@@ -106,7 +105,7 @@ public class Saros extends AbstractUIPlugin {
 
     private ISarosSessionManager sessionManager;
 
-    private IPreferences preferences;
+    private de.fu_berlin.inf.dpp.preferences.Preferences preferences;
 
     private ConnectionHandler connectionHandler;
 
@@ -244,7 +243,8 @@ public class Saros extends AbstractUIPlugin {
 
         connectionHandler = sarosContext.getComponent(ConnectionHandler.class);
         sessionManager = sarosContext.getComponent(ISarosSessionManager.class);
-        preferences = sarosContext.getComponent(IPreferences.class);
+        preferences = sarosContext
+            .getComponent(de.fu_berlin.inf.dpp.preferences.Preferences.class);
 
         // additional initialization
 

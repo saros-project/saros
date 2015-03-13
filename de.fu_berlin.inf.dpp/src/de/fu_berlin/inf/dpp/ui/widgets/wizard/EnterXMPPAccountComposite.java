@@ -24,7 +24,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.preferences.IPreferences;
+import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.widgets.decoration.JIDCombo;
 
@@ -47,7 +47,7 @@ public class EnterXMPPAccountComposite extends Composite {
     private Button useSASLButton;
 
     @Inject
-    private IPreferences preferences;
+    private Preferences preferences;
 
     public EnterXMPPAccountComposite(Composite composite, int style) {
         super(composite, style);
@@ -180,7 +180,7 @@ public class EnterXMPPAccountComposite extends Composite {
 
     /**
      * Returns the entered {@link JID}.
-     *
+     * 
      * @return
      */
     public JID getJID() {
@@ -189,7 +189,7 @@ public class EnterXMPPAccountComposite extends Composite {
 
     /**
      * Sets the given {@JID} to the JID field.
-     *
+     * 
      * @param jid
      */
     public void setJID(JID jid) {
@@ -198,7 +198,7 @@ public class EnterXMPPAccountComposite extends Composite {
 
     /**
      * Returns the entered password.
-     *
+     * 
      * @return
      */
     public String getPassword() {
@@ -207,7 +207,7 @@ public class EnterXMPPAccountComposite extends Composite {
 
     /**
      * Sets the given password to the password field.
-     *
+     * 
      * @param password
      */
     public void setPassword(String password) {
@@ -216,7 +216,7 @@ public class EnterXMPPAccountComposite extends Composite {
 
     /**
      * Returns the entered server in lower case letters.
-     *
+     * 
      * @return empty string if no server has been provided
      */
     public String getServer() {
@@ -225,7 +225,7 @@ public class EnterXMPPAccountComposite extends Composite {
 
     /**
      * Sets the given server to the server field.
-     *
+     * 
      * @param server
      */
     public void setServer(String server) {
@@ -254,7 +254,7 @@ public class EnterXMPPAccountComposite extends Composite {
 
     /**
      * Sets the given port to the port field.
-     *
+     * 
      * @param port
      */
     public void setPort(String port) {
@@ -263,7 +263,7 @@ public class EnterXMPPAccountComposite extends Composite {
 
     /**
      * Returns the entered port.
-     *
+     * 
      * @return empty string if no port has been provided
      */
     public String getPort() {

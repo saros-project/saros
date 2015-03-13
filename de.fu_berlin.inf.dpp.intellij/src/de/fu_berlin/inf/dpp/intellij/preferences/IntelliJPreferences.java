@@ -22,7 +22,6 @@
 
 package de.fu_berlin.inf.dpp.intellij.preferences;
 
-import de.fu_berlin.inf.dpp.preferences.IPreferences;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
 
 /**
@@ -31,7 +30,7 @@ import de.fu_berlin.inf.dpp.preferences.Preferences;
  * <p>
  * Preferences that are custom to IntelliJ may be defined here.
  */
-public class IntelliJPreferences extends Preferences implements IPreferences {
+public class IntelliJPreferences extends Preferences {
 
     public IntelliJPreferences(PropertiesComponentAdapter store) {
         super(store);

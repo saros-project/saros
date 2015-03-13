@@ -7,7 +7,7 @@ package de.fu_berlin.inf.dpp.preferences;
  * 
  * Preferences that are custom to Eclipse may be defined here.
  */
-public class EclipsePreferences extends Preferences implements IPreferences {
+public class EclipsePreferences extends Preferences {
 
     public EclipsePreferences(
         org.eclipse.jface.preference.IPreferenceStore store) {

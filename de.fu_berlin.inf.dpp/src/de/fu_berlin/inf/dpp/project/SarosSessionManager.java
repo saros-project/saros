@@ -57,7 +57,7 @@ import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
-import de.fu_berlin.inf.dpp.preferences.IPreferences;
+import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
@@ -69,7 +69,7 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
 /**
  * The SessionManager is responsible for initiating new Saros sessions and for
  * reacting to invitations. The user can be only part of one session at most.
- *
+ * 
  * @author rdjemili
  */
 
@@ -78,12 +78,12 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     /**
      * @JTourBusStop 6, Architecture Overview, Invitation Management:
-     *
+     * 
      *               While Activities are used to keep a running session
      *               consistent, we use MESSAGES whenever the Session itself is
      *               modified. This includes adding users or projects to the
      *               session.
-     *
+     * 
      *               The Invitation Process is managed by the "Invitation
      *               Management"-Component. This class is the main entrance
      *               point of this Component. During the invitation Process, the
@@ -93,7 +93,7 @@ public class SarosSessionManager implements ISarosSessionManager {
      * 
      *               For more information about the Invitation Process see the
      *               "Invitation Process"-Tour.
-     *
+     * 
      */
 
     private static final Logger log = Logger
@@ -109,7 +109,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     private final SessionIDObservable sessionIDObservable;
 
-    private final IPreferences preferences;
+    private final Preferences preferences;
 
     @Inject
     private ISarosContext sarosContext;
@@ -159,7 +159,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         SessionIDObservable sessionID,
         SessionNegotiationObservable currentSessionNegotiations,
         ProjectNegotiationObservable currentProjectNegotiations,
-        IPreferences preferences) {
+        Preferences preferences) {
         this.connectionService = connectionService;
         this.sarosSessionObservable = sarosSessionObservable;
         this.sessionIDObservable = sessionID;
@@ -177,19 +177,19 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     /**
      * @JTourBusStop 3, Invitation Process:
-     *
+     * 
      *               This class manages the current Saros session.
-     *
+     * 
      *               Saros makes a distinction between a session and a shared
      *               project. A session is an on-line collaboration between
      *               users which allows users to carry out activities. The main
      *               activity is to share projects. Hence, before you share a
      *               project, a session has to be started and all users added to
      *               it.
-     *
+     * 
      *               (At the moment, this separation is invisible to the user.
      *               He/she must share a project in order to start a session.)
-     *
+     * 
      */
     @Override
     public void startSession(
@@ -362,7 +362,7 @@ public class SarosSessionManager implements ISarosSessionManager {
      * method. The caller needs to save the returned value to a local variable
      * and do a null check. For new code you should consider being scoped by the
      * SarosSession and get the SarosSession in the constructor.
-     *
+     * 
      * @deprecated Error prone method, which produces NPE if not handled
      *             correctly. Will soon get removed.
      */
@@ -416,7 +416,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     /**
      * This method is called when a new project was added to the session
-     *
+     * 
      * @param from
      *            The one who added the project.
      * @param projectInfos
@@ -515,9 +515,9 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     /**
      * Adds project resources to an existing session.
-     *
+     * 
      * @param projectResourcesMapping
-     *
+     * 
      */
     @Override
     public void addResourcesToSession(
