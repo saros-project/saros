@@ -10,7 +10,6 @@ import java.util.Random;
 import java.util.concurrent.CancellationException;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
@@ -23,10 +22,13 @@ import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingRequest
 import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingResponse;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
+import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.SubProgressMonitor;
 import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelOption;
@@ -48,6 +50,9 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     private final ISarosSession session;
 
     private static final Random NEGOTIATION_ID_GENERATOR = new Random();
+
+    @Inject
+    private IWorkspace workspace;
 
     @Inject
     private IEditorManager editorManager;
@@ -92,7 +97,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
              * inside a Workspace Runnable with file locks !. There is a small
              * gap between saving editors and entering the file lock but it will
              * almost never matter in a real execution environment.
-             *
+             * 
              * Do not save the editors inside the runnable as this may not work
              * depending on the IEditorManager implementation, i.e this thread
              * holds the lock, but saving editors is performed in another thread
@@ -123,7 +128,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 /*
                  * inform all listeners that the peer has started queuing and
                  * can therefore process IResourceActivities now
-                 *
+                 * 
                  * TODO this needs a review as this is called inside the
                  * "blocked" section and so it is not allowed to send resource
                  * activities at this time. Maybe change the description of the
@@ -203,7 +208,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     /**
      * Retrieve the peer's partial file list and remember which files need to be
      * sent to that user
-     *
+     * 
      * @param monitor
      * @throws IOException
      * @throws SarosCancellationException
@@ -259,9 +264,9 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
          * TODO: Make sure that all users are fully registered when stopping
          * them, otherwise failures might occur while a user is currently
          * joining and has not fully initialized yet.
-         *
+         * 
          * See also OutgoingSessionNegotiation#completeInvitation
-         *
+         * 
          * srossbach: This may already be the case ... just review this
          */
 
@@ -317,6 +322,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         final List<IFile> filesToCompress = new ArrayList<IFile>(fileCount);
         final List<String> fileAlias = new ArrayList<String>(fileCount);
 
+        final List<IResource> projectsToLock = new ArrayList<IResource>();
+
         for (final FileList list : fileLists) {
             final String projectID = list.getProjectID();
 
@@ -326,6 +333,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 throw new LocalCancellationException("project with id "
                     + projectID + " was unshared during synchronization",
                     CancelOption.NOTIFY_PEER);
+
+            projectsToLock.add(project);
 
             /*
              * force editor buffer flush because we read the files from the
@@ -356,13 +365,12 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
         try {
             tempArchive = File.createTempFile("saros_" + getID(), ".zip");
-            // TODO run inside workspace ?
-            new CreateArchiveTask(tempArchive, filesToCompress, fileAlias,
-                monitor).run(null);
+            workspace.run(new CreateArchiveTask(tempArchive, filesToCompress,
+                fileAlias, monitor), projectsToLock.toArray(new IResource[0]));
         } catch (OperationCanceledException e) {
-            throw new LocalCancellationException();
-        } catch (de.fu_berlin.inf.dpp.exceptions.OperationCanceledException e) {
-            throw new LocalCancellationException();
+            LocalCancellationException canceled = new LocalCancellationException();
+            canceled.initCause(e);
+            throw canceled;
         }
 
         monitor.done();
@@ -411,7 +419,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
     /**
      * Method to create list of ProjectExchangeInfo.
-     *
+     * 
      * @param projectsToShare
      *            List of projects to share
      */
@@ -488,7 +496,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     /**
      * Sends an activity queuing request to the remote side and awaits the
      * confirmation of the request.
-     *
+     * 
      * @param monitor
      */
     private void sendAndAwaitActivityQueueingActivation(IProgressMonitor monitor)

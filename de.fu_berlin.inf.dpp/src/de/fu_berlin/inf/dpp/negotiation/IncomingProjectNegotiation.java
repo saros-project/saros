@@ -32,6 +32,7 @@ import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
@@ -58,6 +59,9 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     private static int MONITOR_WORK_SCALE = 1000;
 
     private List<ProjectNegotiationData> projectInfos;
+
+    @Inject
+    private IWorkspace workspace;
 
     @Inject
     private Preferences preferences;
@@ -662,15 +666,14 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
          * after it finished!
          */
 
-        // FIXME run inside workspace runnable !
         try {
-            decompressTask.run(monitor);
-        } catch (OperationCanceledException e) {
-            throw new LocalCancellationException(null,
-                CancelOption.DO_NOT_NOTIFY_PEER);
+            workspace.run(decompressTask,
+                projectMapping.values().toArray(new IResource[0]));
         } catch (de.fu_berlin.inf.dpp.exceptions.OperationCanceledException e) {
-            throw new LocalCancellationException(null,
-                CancelOption.DO_NOT_NOTIFY_PEER);
+            LocalCancellationException canceled = new LocalCancellationException(
+                null, CancelOption.DO_NOT_NOTIFY_PEER);
+            canceled.initCause(e);
+            throw canceled;
         }
 
         LOG.debug(String.format("unpacked archive in %d s",

@@ -1,10 +1,14 @@
 package de.fu_berlin.inf.dpp.filesystem;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.ISchedulingRule;
+import org.eclipse.core.runtime.jobs.MultiRule;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
@@ -72,11 +76,17 @@ public class EclipseWorkspaceImpl implements IWorkspace {
         this.delegate = workspace;
     }
 
-    // TODO support SchedulingRules
     @Override
     public void run(final IWorkspaceRunnable runnable) throws IOException,
         OperationCanceledException {
-        org.eclipse.core.resources.IWorkspaceRunnable eclipseRunnable;
+        run(runnable, null);
+    }
+
+    @Override
+    public void run(IWorkspaceRunnable runnable, IResource[] resources)
+        throws IOException, OperationCanceledException {
+
+        final org.eclipse.core.resources.IWorkspaceRunnable eclipseRunnable;
 
         /*
          * Don't wrap the runnable again if its actually a wrapped Eclipse
@@ -89,8 +99,21 @@ public class EclipseWorkspaceImpl implements IWorkspace {
             eclipseRunnable = new EclipseRunnableAdapter(runnable);
         }
 
+        final List<org.eclipse.core.resources.IResource> eclipseResources = ResourceAdapterFactory
+            .convertBack(resources != null ? Arrays.asList(resources) : null);
+
+        final ISchedulingRule schedulingRule;
+
+        if (eclipseResources != null && !eclipseResources.isEmpty()) {
+            schedulingRule = new MultiRule(
+                eclipseResources
+                    .toArray(new org.eclipse.core.resources.IResource[0]));
+        } else {
+            schedulingRule = delegate.getRoot();
+        }
+
         try {
-            delegate.run(eclipseRunnable, delegate.getRoot(),
+            delegate.run(eclipseRunnable, schedulingRule,
                 org.eclipse.core.resources.IWorkspace.AVOID_UPDATE, null);
         } catch (CoreException e) {
             throw new IOException(e);

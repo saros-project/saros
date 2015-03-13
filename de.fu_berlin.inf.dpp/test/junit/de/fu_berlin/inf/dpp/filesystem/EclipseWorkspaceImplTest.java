@@ -73,7 +73,7 @@ public class EclipseWorkspaceImplTest {
 
         try {
             workspace.run(runnable);
-        } catch (Exception e) {
+        } catch (OperationCanceledException e) {
             assertOriginalExceptionNotSwallowed(e, "throwDppOCE");
             throw e;
         }
@@ -92,7 +92,7 @@ public class EclipseWorkspaceImplTest {
 
         try {
             workspace.run(runnable);
-        } catch (Exception e) {
+        } catch (OperationCanceledException e) {
             assertOriginalExceptionNotSwallowed(e, "throwWrappedEclipseOCE");
             throw e;
         }
@@ -111,7 +111,7 @@ public class EclipseWorkspaceImplTest {
 
         try {
             workspace.run(runnable);
-        } catch (Exception e) {
+        } catch (OperationCanceledException e) {
             assertOriginalExceptionNotSwallowed(e, "throwEclipseOCE");
             throw e;
         }
@@ -130,7 +130,7 @@ public class EclipseWorkspaceImplTest {
 
         try {
             workspace.run(runnable);
-        } catch (Exception e) {
+        } catch (IOException e) {
             assertOriginalExceptionNotSwallowed(e, "throwIOException");
             throw e;
         }
