@@ -1,11 +1,16 @@
 package de.fu_berlin.inf.dpp.intellij.context;
 
+import java.util.Arrays;
+
+import org.picocontainer.BindKey;
+import org.picocontainer.MutablePicoContainer;
+
 import de.fu_berlin.inf.dpp.AbstractSarosContextFactory;
 import de.fu_berlin.inf.dpp.ISarosContextBindings;
 import de.fu_berlin.inf.dpp.communication.connection.IProxyResolver;
+import de.fu_berlin.inf.dpp.connection.NullProxyResolver;
 import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.core.concurrent.ConsistencyWatchdogClient;
-import de.fu_berlin.inf.dpp.connection.NullProxyResolver;
 import de.fu_berlin.inf.dpp.core.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.core.ui.eventhandler.NegotiationHandler;
 import de.fu_berlin.inf.dpp.core.ui.eventhandler.UserStatusChangeHandler;
@@ -22,21 +27,19 @@ import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorHandler;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorManipulator;
 import de.fu_berlin.inf.dpp.intellij.editor.ProjectAPI;
+import de.fu_berlin.inf.dpp.intellij.preferences.IntelliJPreferences;
+import de.fu_berlin.inf.dpp.intellij.preferences.PropertiesComponentAdapter;
 import de.fu_berlin.inf.dpp.intellij.project.fs.FileContentChangedNotifierBridge;
 import de.fu_berlin.inf.dpp.intellij.project.fs.PathFactory;
 import de.fu_berlin.inf.dpp.intellij.runtime.IntelliJSynchronizer;
-import de.fu_berlin.inf.dpp.intellij.store.IntelliJPreferences;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.FollowModeAction;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.LeaveSessionAction;
 import de.fu_berlin.inf.dpp.intellij.ui.swt_browser.IntelliJDialogManager;
+import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.preferences.IPreferences;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.ui.manager.IDialogManager;
-import org.picocontainer.BindKey;
-import org.picocontainer.MutablePicoContainer;
-
-import java.util.Arrays;
 
 /**
  * IntelliJ related context
@@ -51,7 +54,8 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
         // Core Managers
         Component.create(ConsistencyWatchdogClient.class),
 
-        Component.create(EditorAPI.class), Component.create(ProjectAPI.class),
+        Component.create(EditorAPI.class),
+        Component.create(ProjectAPI.class),
 
         Component.create(IEditorManager.class, EditorManager.class),
         Component.create(EditorManager.class),
@@ -70,6 +74,8 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
         Component.create(IFileContentChangedNotifier.class,
             FileContentChangedNotifierBridge.class),
 
+        Component.create(IPreferenceStore.class,
+            PropertiesComponentAdapter.class),
         Component.create(IPreferences.class, IntelliJPreferences.class),
 
         Component.create(FollowModeAction.class),
@@ -78,8 +84,7 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
         Component.create(IDialogManager.class, IntelliJDialogManager.class),
 
         // Proxy Support for the XMPP server connection
-        Component.create(IProxyResolver.class, NullProxyResolver.class)
-    };
+        Component.create(IProxyResolver.class, NullProxyResolver.class) };
 
     public SarosIntellijContextFactory(Saros saros) {
         this.saros = saros;
@@ -104,11 +109,10 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
         container.addComponent(saros);
 
         container.addComponent(BindKey.bindKey(String.class,
-                ISarosContextBindings.SarosVersion.class),
-            "14.1.31.DEVEL");  //todo
+            ISarosContextBindings.SarosVersion.class), "14.1.31.DEVEL"); // todo
 
         container.addComponent(BindKey.bindKey(String.class,
-            ISarosContextBindings.PlatformVersion.class), "4.3.2"); //todo
+            ISarosContextBindings.PlatformVersion.class), "4.3.2"); // todo
 
     }
 }
