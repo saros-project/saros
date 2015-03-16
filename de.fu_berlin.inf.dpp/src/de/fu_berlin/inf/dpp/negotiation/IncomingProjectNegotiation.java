@@ -431,11 +431,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             throw new IllegalStateException(
                 "VCS operations on partial shared projects are not supported");
 
-        if (project.exists()) {
-            if (!vcs.isManaged(project)) {
-                progress.done();
-                return null;
-            }
+        // FIXME check if the project is managed by another provider first
+        if (vcs.isManaged(project)) {
 
             final String repositoryRoot = fileList.getRepositoryRoot();
             final String directory = fileList.getProjectInfo().getURL()
@@ -726,14 +723,18 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         if (progress.isCanceled())
             return;
 
-        if (!vcs.isManaged(resource))
+        if (!vcs.isManaged(resource)) {
+            LOG.trace("resource is not managed: " + resource);
             return;
+
+        }
 
         final VCSResourceInfo info = vcs.getCurrentResourceInfo(resource);
         final String path = resource.getProjectRelativePath()
             .toPortableString();
 
         if (resource.getType() == org.eclipse.core.resources.IResource.PROJECT) {
+            LOG.debug("reverting project: " + resource);
             /*
              * We have to revert the project first because the invitee could
              * have deleted a managed resource. Also, we don't want an update or
@@ -757,30 +758,45 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         }
 
         if (!remoteURL.equals(localURL)) {
-            LOG.trace("Switching " + resource.getName() + " from " + localURL
-                + " to " + remoteURL);
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("switching " + resource.getName() + " from "
+                    + localURL + " to " + remoteURL);
+            }
             vcs.switch_(resource, remoteURL, remoteRevision,
                 progress.newChild(0, SubMonitor.SUPPRESS_NONE));
         } else if (!remoteRevision.equals(localRevision)
             && remoteFileList.getPaths().contains(path)) {
-            LOG.trace("Updating " + resource.getName() + " from "
-                + localRevision + " to " + remoteRevision);
+
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("updating " + resource.getName() + " from "
+                    + localRevision + " to " + remoteRevision);
+            }
+
             vcs.update(resource, remoteRevision,
                 progress.newChild(0, SubMonitor.SUPPRESS_NONE));
+        } else if (LOG.isTraceEnabled()) {
+            LOG.trace("local revision of " + resource.getName()
+                + " matches remote revision: " + localRevision);
         }
 
         if (progress.isCanceled())
             return;
 
         if (resource instanceof org.eclipse.core.resources.IContainer) {
-            // Recurse.
             try {
                 List<org.eclipse.core.resources.IResource> children = Arrays
                     .asList(((org.eclipse.core.resources.IContainer) resource)
                         .members());
                 for (org.eclipse.core.resources.IResource child : children) {
-                    if (remoteFileList.getPaths().contains(child.getFullPath()))
+
+                    final String childPath = child.getProjectRelativePath()
+                        .toString();
+
+                    if (remoteFileList.getVCSUrl(childPath) != null
+                        && remoteFileList.getVCSRevision(childPath) != null) {
                         initVcState(child, vcs, remoteFileList, monitor);
+                    }
+
                     if (monitor.isCanceled())
                         break;
                 }
