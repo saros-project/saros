@@ -44,7 +44,7 @@ public final class RosterContentProvider extends TreeContentProvider {
 
             if (SarosConstants.XMPP_FEATURE_NAMESPACE.equals(feature))
                 ViewerUtils.update(viewer, new RosterEntryElement(roster, jid,
-                    true), null);
+                    isSupported), null);
         }
     };
 
@@ -174,8 +174,8 @@ public final class RosterContentProvider extends TreeContentProvider {
                 SarosConstants.XMPP_FEATURE_NAMESPACE);
 
             if (sarosSupported == null)
-                discoveryManager
-                    .queryFeatureSupport(jid, SarosConstants.XMPP_FEATURE_NAMESPACE, true);
+                discoveryManager.queryFeatureSupport(jid,
+                    SarosConstants.XMPP_FEATURE_NAMESPACE, true);
         }
     }
 }
