@@ -651,9 +651,11 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
             .getDelegate();
 
         final String encoding = activity.getEncoding();
-
-        byte[] actualContent = FileUtils.getLocalFileContent(file);
         byte[] newContent = activity.getContent();
+        byte[] actualContent = null;
+
+        if (file.exists())
+            actualContent = FileUtils.getLocalFileContent(file);
 
         if (!Arrays.equals(newContent, actualContent)) {
             FileUtils.writeFile(new ByteArrayInputStream(newContent), file);
