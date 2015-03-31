@@ -19,7 +19,14 @@ public final class XMPPAccount implements Serializable {
 
     private int port;
 
+    /**
+     * Indicates if the account uses Transport Layer Security(TLS) protocol
+     */
     private boolean useTLS;
+    /**
+     * Indicates if the account uses Simple Authentication and Security
+     * Layer(SASL) protocol
+     */
     private boolean useSASL;
 
     XMPPAccount(String username, String password, String domain, String server,

@@ -7,12 +7,12 @@ import de.fu_berlin.inf.dpp.session.User;
 
 /**
  * Subclass of FileActivity that is used during the Recovery-Process and allows
- * the specification of targets. This Activity will is sent from the host to the
+ * the specification of targets. This Activity will be sent from the host to the
  * client that requested the recovery.
  * 
  * TODO This class should be removed once the ITargetedActivities are gone since
  * it is only intended as a separation between FileActivities that are sent to a
- * singleUser and those send to every User
+ * singleUser and those are sent to every User
  */
 @XStreamAlias("recoveryFileActivity")
 public class RecoveryFileActivity extends FileActivity implements
