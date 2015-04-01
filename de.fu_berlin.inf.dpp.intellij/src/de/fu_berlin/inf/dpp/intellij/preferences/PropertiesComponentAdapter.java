@@ -113,6 +113,26 @@ public class PropertiesComponentAdapter implements IPreferenceStore {
     }
 
     @Override
+    public void setDefault(String name, int value) {
+        defaultProperties.put(name, Integer.valueOf(value));
+    }
+
+    @Override
+    public void setDefault(String name, long value) {
+        defaultProperties.put(name, Long.valueOf(value));
+    }
+
+    @Override
+    public void setDefault(String name, String value) {
+        defaultProperties.put(name, value == null ? DEFAULT_STRING : value);
+    }
+
+    @Override
+    public void setDefault(String name, boolean value) {
+        defaultProperties.put(name, Boolean.valueOf(value));
+    }
+
+    @Override
     public int getInt(String name) {
         final Integer value = convertValue(
             properties.getValue(PROPERTY_PREFIX + name), int.class, false);

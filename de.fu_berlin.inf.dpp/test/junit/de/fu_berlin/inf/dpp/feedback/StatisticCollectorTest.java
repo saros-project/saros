@@ -22,7 +22,7 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.preferences.PreferenceInitializer;
+import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceInitializer;
 import de.fu_berlin.inf.dpp.project.internal.SarosSessionTest;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
@@ -115,8 +115,8 @@ public class StatisticCollectorTest {
         final IPreferenceStore store = new MemoryPreferenceStore();
         final Preferences preferences = new MemoryPreferences();
 
-        PreferenceInitializer.setPreferences(store);
-        PreferenceInitializer.setPreferences(preferences);
+        EclipsePreferenceInitializer.setPreferences(store);
+        EclipsePreferenceInitializer.setPreferences(preferences);
 
         container.addComponent(Saros.class,
             SarosSessionTest.createSarosMock(store, preferences));

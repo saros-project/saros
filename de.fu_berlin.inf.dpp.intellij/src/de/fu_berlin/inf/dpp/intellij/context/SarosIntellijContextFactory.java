@@ -76,6 +76,7 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
 
         Component.create(IPreferenceStore.class,
             PropertiesComponentAdapter.class),
+
         Component.create(Preferences.class, IntelliJPreferences.class),
 
         Component.create(FollowModeAction.class),

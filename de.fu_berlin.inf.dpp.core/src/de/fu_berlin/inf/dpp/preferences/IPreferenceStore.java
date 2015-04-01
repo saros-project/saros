@@ -23,6 +23,10 @@ package de.fu_berlin.inf.dpp.preferences;
  * 
  * After the current value was changed through <code>setValue()</code>, all
  * registered {@linkplain IPreferenceChangeListener listeners} will be notified.
+ * <p>
+ * <b>Note:</b> It is up to the implementation to persist default values and so
+ * clients should <b>not</b> rely on those default values until they are (re)set
+ * !
  */
 public interface IPreferenceStore {
 
@@ -146,6 +150,17 @@ public interface IPreferenceStore {
     public void setValue(String name, int value);
 
     /**
+     * Sets the current default value to an Integer valued preference for the
+     * given name. No preferenceChangeEvent will be reported.
+     * 
+     * @param name
+     *            of the named preference
+     * @param value
+     *            new current value
+     */
+    public void setDefault(String name, int value);
+
+    /**
      * Sets the current value to an Long valued preference for the given name.
      * If the new value differ from the old value, a preferenceChangeEvent will
      * be reported.
@@ -153,9 +168,20 @@ public interface IPreferenceStore {
      * @param name
      *            of the named preference
      * @param value
-     *            new current value
+     *            new default value
      */
     public void setValue(String name, long value);
+
+    /**
+     * Sets the current default value to an Long valued preference for the given
+     * name. No preferenceChangeEvent will be reported.
+     * 
+     * @param name
+     *            of the named preference
+     * @param value
+     *            new default value
+     */
+    public void setDefault(String name, long value);
 
     /**
      * Sets the current value to an String valued preference for the given name.
@@ -170,6 +196,17 @@ public interface IPreferenceStore {
     public void setValue(String name, String value);
 
     /**
+     * Sets the current default value to an String valued preference for the
+     * given name. No preferenceChangeEvent will be reported.
+     * 
+     * @param name
+     *            of the named preference
+     * @param value
+     *            new default value, can not be <code>null</code>
+     */
+    public void setDefault(String name, String value);
+
+    /**
      * Sets the current value to an Boolean valued preference for the given
      * name. If the new value differ from the old value, a preferenceChangeEvent
      * will be reported.
@@ -179,5 +216,16 @@ public interface IPreferenceStore {
      * @param value
      *            new current value
      */
-    void setValue(String name, boolean value);
+    public void setValue(String name, boolean value);
+
+    /**
+     * Sets the current default value to an Boolean valued preference for the
+     * given name. No preferenceChangeEvent will be reported.
+     * 
+     * @param name
+     *            of the named preference
+     * @param value
+     *            new default value
+     */
+    public void setDefault(String name, boolean value);
 }

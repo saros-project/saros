@@ -113,6 +113,26 @@ public class EclipsePreferenceStoreAdapter implements
         delegate.setValue(name, value);
     }
 
+    @Override
+    public void setDefault(String name, int value) {
+        delegate.setDefault(name, value);
+    }
+
+    @Override
+    public void setDefault(String name, long value) {
+        delegate.setDefault(name, value);
+    }
+
+    @Override
+    public void setDefault(String name, String value) {
+        delegate.setDefault(name, value);
+    }
+
+    @Override
+    public void setDefault(String name, boolean value) {
+        delegate.setDefault(name, value);
+    }
+
     /**
      * Returns the {@linkplain IPreferenceStore preference store} for this
      * adapter.

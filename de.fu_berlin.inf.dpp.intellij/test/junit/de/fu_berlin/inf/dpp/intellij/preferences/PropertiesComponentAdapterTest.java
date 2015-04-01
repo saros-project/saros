@@ -91,6 +91,52 @@ public class PropertiesComponentAdapterTest {
     }
 
     @Test
+    public void testGetDefaultValuesWithDefaultValuesSet() {
+        final PropertiesComponentAdapter adapter = new PropertiesComponentAdapter();
+
+        adapter.setDefault("foo.boolean", true);
+        adapter.setDefault("foo.integer", Integer.MAX_VALUE);
+        adapter.setDefault("foo.long", Long.MAX_VALUE);
+        adapter.setDefault("foo.string", "foo");
+
+        assertEquals(true, adapter.getDefaultBoolean("foo.boolean"));
+        assertEquals(Integer.MAX_VALUE, adapter.getDefaultInt("foo.integer"));
+        assertEquals(Long.MAX_VALUE, adapter.getDefaultLong("foo.long"));
+        assertEquals("foo", adapter.getDefaultString("foo.string"));
+
+        assertEquals(true, adapter.getBoolean("foo.boolean"));
+        assertEquals(Integer.MAX_VALUE, adapter.getInt("foo.integer"));
+        assertEquals(Long.MAX_VALUE, adapter.getLong("foo.long"));
+        assertEquals("foo", adapter.getString("foo.string"));
+
+    }
+
+    @Test
+    public void testGetValuesWithDefaultValuesAndValuesSet() {
+        final PropertiesComponentAdapter adapter = new PropertiesComponentAdapter();
+
+        adapter.setDefault("foo.boolean", true);
+        adapter.setDefault("foo.integer", Integer.MAX_VALUE);
+        adapter.setDefault("foo.long", Long.MAX_VALUE);
+        adapter.setDefault("foo.string", "foo");
+
+        adapter.setValue("foo.boolean", false);
+        adapter.setValue("foo.integer", Integer.MIN_VALUE);
+        adapter.setValue("foo.long", Long.MIN_VALUE);
+        adapter.setValue("foo.string", "bar");
+
+        assertEquals(true, adapter.getDefaultBoolean("foo.boolean"));
+        assertEquals(Integer.MAX_VALUE, adapter.getDefaultInt("foo.integer"));
+        assertEquals(Long.MAX_VALUE, adapter.getDefaultLong("foo.long"));
+        assertEquals("foo", adapter.getDefaultString("foo.string"));
+
+        assertEquals(false, adapter.getBoolean("foo.boolean"));
+        assertEquals(Integer.MIN_VALUE, adapter.getInt("foo.integer"));
+        assertEquals(Long.MIN_VALUE, adapter.getLong("foo.long"));
+        assertEquals("bar", adapter.getString("foo.string"));
+    }
+
+    @Test
     public void testGetValuesWithNoValuesSet() {
         final PropertiesComponentAdapter adapter = new PropertiesComponentAdapter();
 
