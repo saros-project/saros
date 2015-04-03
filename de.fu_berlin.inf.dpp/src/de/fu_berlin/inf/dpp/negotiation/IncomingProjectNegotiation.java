@@ -58,7 +58,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     private static int MONITOR_WORK_SCALE = 1000;
 
-    private List<ProjectNegotiationData> projectInfos;
+    private final List<ProjectNegotiationData> projectNegotiationData;
 
     @Inject
     private IWorkspace workspace;
@@ -97,15 +97,15 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         super(negotiationID, session.getID(), peer, sarosContext);
 
         this.session = session;
-        this.projectInfos = projectInfos;
+        this.projectNegotiationData = projectInfos;
         this.localProjectMapping = new HashMap<String, IProject>();
     }
 
     @Override
     public Map<String, String> getProjectNames() {
         Map<String, String> result = new HashMap<String, String>();
-        for (ProjectNegotiationData info : projectInfos) {
-            result.put(info.getProjectID(), info.getProjectName());
+        for (ProjectNegotiationData data : projectNegotiationData) {
+            result.put(data.getProjectID(), data.getProjectName());
         }
         return result;
     }
@@ -119,9 +119,9 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      *         fileList}
      */
     public FileList getRemoteFileList(String projectID) {
-        for (ProjectNegotiationData info : projectInfos) {
-            if (info.getProjectID().equals(projectID))
-                return info.getFileList();
+        for (ProjectNegotiationData data : projectNegotiationData) {
+            if (data.getProjectID().equals(projectID))
+                return data.getFileList();
         }
         return null;
     }
@@ -170,6 +170,12 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
             fileTransferManager
                 .addFileTransferListener(archiveTransferListener);
+
+            if (useVersionControl) {
+                switchToVCS(projectNegotiationData, projectMapping, monitor);
+
+                monitor.subTask("");
+            }
 
             List<FileList> missingFiles = calculateMissingFiles(projectMapping,
                 useVersionControl, monitor);
@@ -266,9 +272,9 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     }
 
     public boolean isPartialRemoteProject(String projectID) {
-        for (ProjectNegotiationData info : this.projectInfos) {
-            if (info.getProjectID().equals(projectID))
-                return info.isPartial();
+        for (ProjectNegotiationData data : projectNegotiationData) {
+            if (data.getProjectID().equals(projectID))
+                return data.isPartial();
         }
         return false;
     }
@@ -308,6 +314,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * @param projectMapping
      *            projectID => projectName (in local workspace)
      */
+    // TODO should be renamed to something like synchronizeProject(s)...
     private List<FileList> calculateMissingFiles(
         Map<String, IProject> projectMapping, boolean useVersionControl,
         IProgressMonitor monitor) throws SarosCancellationException,
@@ -331,9 +338,9 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
             ProjectNegotiationData projectInfo = null;
 
-            for (ProjectNegotiationData info : projectInfos) {
-                if (info.getProjectID().equals(projectID))
-                    projectInfo = info;
+            for (ProjectNegotiationData data : projectNegotiationData) {
+                if (data.getProjectID().equals(projectID))
+                    projectInfo = data;
             }
 
             if (projectInfo == null)
@@ -343,7 +350,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
             VCSAdapter vcs = null;
 
-            // FIXME we should stop here for partial shared projects
             if (preferences.useVersionControl() && useVersionControl
                 && !projectInfo.isPartial()) {
                 vcs = VCSAdapter.getAdapter(projectInfo.getFileList()
@@ -354,28 +360,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 throw new IllegalStateException("project " + project
                     + " does not exists");
 
-            int ticksToConsume = MONITOR_WORK_SCALE;
-
-            if (vcs != null) {
-                project = checkoutVCSProject(
-                    vcs,
-                    (org.eclipse.core.resources.IProject) ResourceAdapterFactory
-                        .convertBack(project), projectInfo.getFileList(),
-                    new SubProgressMonitor(monitor, MONITOR_WORK_SCALE / 2));
-
-                if (project == null)
-                    throw new LocalCancellationException("VCS checkout failed",
-                        CancelOption.NOTIFY_PEER);
-
-                LOG.debug("initVcState");
-                initVcState(ResourceAdapterFactory.convertBack(project), vcs,
-                    projectInfo.getFileList(), new SubProgressMonitor(monitor,
-                        0));
-
-                ticksToConsume -= MONITOR_WORK_SCALE / 2;
-
-            }
-
             localProjectMapping.put(projectID, project);
 
             checkCancellation(CancelOption.NOTIFY_PEER);
@@ -385,7 +369,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
             FileList requiredFiles = computeRequiredFiles(project,
                 projectInfo.getFileList(), projectID, vcs,
-                new SubProgressMonitor(monitor, ticksToConsume));
+                new SubProgressMonitor(monitor, 1 * MONITOR_WORK_SCALE));
 
             requiredFiles.setProjectID(projectID);
             checkCancellation(CancelOption.NOTIFY_PEER);
@@ -395,6 +379,92 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         monitor.done();
 
         return missingFiles;
+    }
+
+    /**
+     * Adds VCS support to the given projects denoted by the negotiation data.
+     * When this method returns all projects should be managed by a VCS provider
+     * and are in the same VCS state as described in the file list that is
+     * stored in the project negotiation data for each project.
+     * 
+     * @param negotiationData
+     *            negotiation data describing the project states
+     * @param projectMapping
+     *            mapping to final projects destinations
+     * @param monitor
+     * @throws SarosCancellationException
+     */
+    /*
+     * TODO maybe make this method only takes a single project so that is can be
+     * called from calculateMissingFiles(...) again after the issue with the VCS
+     * provider is resolved when creating the file list DIFF
+     */
+    private void switchToVCS(
+        final List<ProjectNegotiationData> negotiationData,
+        Map<String, IProject> projectMapping, final IProgressMonitor monitor)
+        throws SarosCancellationException {
+
+        monitor.beginTask(null, negotiationData.size() * MONITOR_WORK_SCALE);
+
+        if (!preferences.useVersionControl()) {
+            LOG.warn("aborting VCS synchronization: local VCS support is disabled");
+            monitor.done();
+            return;
+        }
+
+        for (final ProjectNegotiationData data : negotiationData) {
+
+            checkCancellation(CancelOption.NOTIFY_PEER);
+
+            // VCS with partial sharing is currently not supported
+            if (data.isPartial()) {
+                monitor.worked(1 * MONITOR_WORK_SCALE);
+                continue;
+            }
+
+            final String projectID = data.getProjectID();
+            IProject project = projectMapping.get(projectID);
+
+            if (project == null) {
+                LOG.warn("unable to synchronize VCS state for project id "
+                    + projectID + ", no local project found for this id");
+
+                monitor.worked(1 * MONITOR_WORK_SCALE);
+                continue;
+            }
+
+            if (!project.exists()) {
+                throw new IllegalStateException("project " + project
+                    + " does not exists");
+            }
+
+            final String vcsProviderID = data.getFileList().getVcsProviderID();
+            final VCSAdapter vcsAdapter = VCSAdapter.getAdapter(vcsProviderID);
+
+            if (vcsAdapter == null) {
+                LOG.warn("unable to synchronize VCS state for project id "
+                    + projectID + ", no VCS adapter found for provider id "
+                    + vcsProviderID);
+
+                monitor.worked(1 * MONITOR_WORK_SCALE);
+                continue;
+            }
+
+            project = checkoutVCSProject(vcsAdapter,
+                (org.eclipse.core.resources.IProject) ResourceAdapterFactory
+                    .convertBack(project), data.getFileList(),
+                new SubProgressMonitor(monitor, 1 * MONITOR_WORK_SCALE));
+
+            if (project == null)
+                throw new LocalCancellationException("VCS checkout failed",
+                    CancelOption.NOTIFY_PEER);
+
+            synchronizeVCSState(ResourceAdapterFactory.convertBack(project),
+                vcsAdapter, data.getFileList(), new SubProgressMonitor(monitor,
+                    0));
+        }
+
+        monitor.done();
     }
 
     /**
@@ -549,6 +619,14 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
         monitor.beginTask("Compute required Files...", 1 * MONITOR_WORK_SCALE);
 
+        /*
+         * FIXME VCS data is completely ignored during a diff ! It also makes no
+         * sense any longer. Assume we synchronized VCS state properly but in
+         * the meantime someone switched some file reversions. We will never get
+         * them as we are queuing just before the host starts compressing the
+         * files (and so never "seen" them). We might get the correct binary
+         * file content but the meta data (reversions does NOT match) !
+         */
         FileList localFileList = FileListFactory.createFileList(project, null,
             checksumCache, provider, new SubProgressMonitor(monitor,
                 1 * MONITOR_WORK_SCALE, SubProgressMonitor.SUPPRESS_BEGINTASK));
@@ -685,8 +763,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     /**
      * Recursively synchronizes the version control state (URL and revision) of
      * each resource in the project with the host by switching or updating when
-     * necessary.<br>
-     * <br>
+     * necessary.
+     * <p>
      * It's very hard to predict how many resources have to be changed. In the
      * worst case, every resource has to be changed as many times as the number
      * of segments in its path. Due to these complications, the monitor is only
@@ -696,8 +774,9 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * 
      * @throws SarosCancellationException
      */
-    private void initVcState(org.eclipse.core.resources.IResource resource,
-        VCSAdapter vcs, FileList remoteFileList, IProgressMonitor monitor)
+    private void synchronizeVCSState(
+        org.eclipse.core.resources.IResource resource, VCSAdapter vcs,
+        FileList remoteFileList, IProgressMonitor monitor)
         throws SarosCancellationException {
 
         /*
@@ -782,7 +861,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
                     if (remoteFileList.getVCSUrl(childPath) != null
                         && remoteFileList.getVCSRevision(childPath) != null) {
-                        initVcState(child, vcs, remoteFileList, monitor);
+                        synchronizeVCSState(child, vcs, remoteFileList, monitor);
                     }
 
                     if (monitor.isCanceled())
@@ -808,7 +887,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     }
 
     public List<ProjectNegotiationData> getProjectInfos() {
-        return projectInfos;
+        return projectNegotiationData;
     }
 
     /**
