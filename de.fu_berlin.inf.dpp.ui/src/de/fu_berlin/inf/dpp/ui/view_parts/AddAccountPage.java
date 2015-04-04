@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.ui.view_parts;
 
-import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.dpp.ui.browser_functions.AddAccountBrowserFunctions;
 import de.fu_berlin.inf.dpp.ui.renderer.Renderer;
@@ -14,6 +13,12 @@ import java.util.List;
 public class AddAccountPage implements BrowserPage {
 
     public static final String WEB_PAGE = "html/add-account-page.html";
+    
+    private final AddAccountBrowserFunctions browserFunctions;
+
+    public AddAccountPage(AddAccountBrowserFunctions browserFunctions) {
+        this.browserFunctions = browserFunctions;
+    }
 
     @Override
     public String getWebpage() {
@@ -22,8 +27,7 @@ public class AddAccountPage implements BrowserPage {
 
     @Override
     public List<JavascriptFunction> getJavascriptFunctions() {
-        return new AddAccountBrowserFunctions()
-                    .getJavascriptFunctions();
+        return browserFunctions.getJavascriptFunctions();
     }
 
     @Override

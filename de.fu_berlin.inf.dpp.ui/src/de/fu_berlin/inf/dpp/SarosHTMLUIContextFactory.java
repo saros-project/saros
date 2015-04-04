@@ -2,6 +2,9 @@ package de.fu_berlin.inf.dpp;
 
 import java.util.Arrays;
 
+import de.fu_berlin.inf.dpp.ui.browser_functions.AddAccountBrowserFunctions;
+import de.fu_berlin.inf.dpp.ui.browser_functions.AddContactBrowserFunctions;
+import de.fu_berlin.inf.dpp.ui.browser_functions.SarosMainPageBrowserFunctions;
 import org.picocontainer.MutablePicoContainer;
 
 import de.fu_berlin.inf.dpp.ui.renderer.AccountRenderer;
@@ -33,7 +36,12 @@ public class SarosHTMLUIContextFactory extends AbstractSarosContextFactory {
             Component.create(ContactListManager.class),
             Component.create(BrowserManager.class),
             Component.create(ContactListRenderer.class),
-            Component.create(AccountRenderer.class) };
+            Component.create(AccountRenderer.class),
+            Component.create(AddAccountBrowserFunctions.class),
+            Component.create(AddContactBrowserFunctions.class),
+            Component.create(SarosMainPageBrowserFunctions.class)
+        };
+
         for (Component component : Arrays.asList(components)) {
             container.addComponent(component.getBindKey(),
                 component.getImplementation());

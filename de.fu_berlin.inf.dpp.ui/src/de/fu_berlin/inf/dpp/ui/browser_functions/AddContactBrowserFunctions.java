@@ -1,14 +1,12 @@
 package de.fu_berlin.inf.dpp.ui.browser_functions;
 
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.ui.core_services.ContactListCoreService;
 import de.fu_berlin.inf.dpp.ui.manager.IDialogManager;
 import de.fu_berlin.inf.dpp.ui.view_parts.AddContactPage;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import org.apache.log4j.Logger;
-import org.picocontainer.annotations.Inject;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,14 +19,15 @@ public class AddContactBrowserFunctions {
     private static final Logger LOG = Logger
         .getLogger(AddContactBrowserFunctions.class);
 
-    @Inject
-    private ContactListCoreService contactListCoreService;
+    private final ContactListCoreService contactListCoreService;
 
-    @Inject
-    private IDialogManager dialogManager;
+    private final IDialogManager dialogManager;
 
-    public AddContactBrowserFunctions() {
-        SarosPluginContext.initComponent(this);
+    public AddContactBrowserFunctions(
+        ContactListCoreService contactListCoreService,
+        IDialogManager dialogManager) {
+        this.contactListCoreService = contactListCoreService;
+        this.dialogManager = dialogManager;
     }
 
     /**

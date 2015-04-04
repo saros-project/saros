@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.ui.browser_functions;
 
 import com.google.gson.Gson;
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.ui.core_services.AccountCoreService;
 import de.fu_berlin.inf.dpp.ui.manager.IDialogManager;
@@ -11,7 +10,6 @@ import de.fu_berlin.inf.dpp.ui.view_parts.AddAccountPage;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.picocontainer.annotations.Inject;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,14 +22,14 @@ public class AddAccountBrowserFunctions {
     private static final Logger LOG = Logger
         .getLogger(AddAccountBrowserFunctions.class);
 
-    @Inject
-    private IDialogManager dialogManager;
+    private final IDialogManager dialogManager;
 
-    @Inject
-    private AccountCoreService accountCoreService;
+    private final AccountCoreService accountCoreService;
 
-    public AddAccountBrowserFunctions() {
-        SarosPluginContext.initComponent(this);
+    public AddAccountBrowserFunctions(IDialogManager dialogManager,
+        AccountCoreService accountCoreService) {
+        this.dialogManager = dialogManager;
+        this.accountCoreService = accountCoreService;
     }
 
     /**

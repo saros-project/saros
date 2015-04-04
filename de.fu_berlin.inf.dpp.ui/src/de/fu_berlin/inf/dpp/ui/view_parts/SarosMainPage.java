@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.ui.view_parts;
 
-import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.dpp.ui.browser_functions.SarosMainPageBrowserFunctions;
 import de.fu_berlin.inf.dpp.ui.renderer.AccountRenderer;
@@ -19,10 +18,14 @@ public class SarosMainPage implements BrowserPage {
 
     private final ContactListRenderer contactListRenderer;
 
+    private final SarosMainPageBrowserFunctions browserFunctions;
+
     public SarosMainPage(AccountRenderer accountRenderer,
-        ContactListRenderer contactListRenderer) {
+        ContactListRenderer contactListRenderer,
+        SarosMainPageBrowserFunctions browserFunctions) {
         this.accountRenderer = accountRenderer;
         this.contactListRenderer = contactListRenderer;
+        this.browserFunctions = browserFunctions;
     }
 
     @Override
@@ -32,8 +35,7 @@ public class SarosMainPage implements BrowserPage {
 
     @Override
     public List<JavascriptFunction> getJavascriptFunctions() {
-        return  new SarosMainPageBrowserFunctions()
-                    .getJavascriptFunctions();
+        return  browserFunctions.getJavascriptFunctions();
     }
 
     @Override

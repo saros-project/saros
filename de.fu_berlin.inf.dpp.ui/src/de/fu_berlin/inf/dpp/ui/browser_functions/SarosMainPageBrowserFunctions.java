@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.ui.browser_functions;
 
 import com.google.gson.Gson;
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.ui.core_services.ContactListCoreService;
 import de.fu_berlin.inf.dpp.ui.manager.IDialogManager;
@@ -11,7 +10,6 @@ import de.fu_berlin.inf.dpp.ui.view_parts.AddAccountPage;
 import de.fu_berlin.inf.dpp.ui.view_parts.AddContactPage;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import org.apache.log4j.Logger;
-import org.picocontainer.annotations.Inject;
 import org.jivesoftware.smack.XMPPException;
 
 import java.util.Arrays;
@@ -27,20 +25,22 @@ public class SarosMainPageBrowserFunctions {
     private static final Logger LOG = Logger
         .getLogger(SarosMainPageBrowserFunctions.class);
 
-    @Inject
-    private ContactListCoreService contactListCoreService;
+    private final ContactListCoreService contactListCoreService;
 
-    @Inject
-    private IDialogManager dialogManager;
+    private final IDialogManager dialogManager;
 
-    @Inject
-    private AddContactPage addContactPage;
+    private final AddContactPage addContactPage;
 
-    @Inject
-    private AddAccountPage addAccountPage;
+    private final AddAccountPage addAccountPage;
 
-    public SarosMainPageBrowserFunctions() {
-        SarosPluginContext.initComponent(this);
+    public SarosMainPageBrowserFunctions(
+        ContactListCoreService contactListCoreService,
+        IDialogManager dialogManager, AddContactPage addContactPage,
+        AddAccountPage addAccountPage) {
+        this.contactListCoreService = contactListCoreService;
+        this.dialogManager = dialogManager;
+        this.addContactPage = addContactPage;
+        this.addAccountPage = addAccountPage;
     }
 
     /**
