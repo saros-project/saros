@@ -13,9 +13,11 @@ import java.util.List;
  */
 public class AddContactPage implements BrowserPage {
 
+    public static final String WEB_PAGE = "html/add-contact-page.html";
+
     @Override
     public String getWebpage() {
-        return "html/add-contact-page.html";
+        return WEB_PAGE;
     }
 
     @Override

@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.ui.browser_functions;
 
-import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -28,10 +27,6 @@ public class AddContactBrowserFunctions {
     @Inject
     private IDialogManager dialogManager;
 
-    @Inject
-    private AddContactPage addContactPage;
-
-
     public AddContactBrowserFunctions() {
         SarosPluginContext.initComponent(this);
     }
@@ -52,7 +47,7 @@ public class AddContactBrowserFunctions {
 
                         }
                     });
-                    dialogManager.closeDialogWindow(addContactPage);
+                    dialogManager.closeDialogWindow(AddContactPage.WEB_PAGE);
                     return null;
                 }
             },
@@ -60,7 +55,7 @@ public class AddContactBrowserFunctions {
             new JavascriptFunction("__java_cancelAddContactWizard") {
                 @Override
                 public Object function(Object[] arguments) {
-                    dialogManager.closeDialogWindow(addContactPage);
+                    dialogManager.closeDialogWindow(AddContactPage.WEB_PAGE);
                     return null;
                 }
             });

@@ -22,7 +22,7 @@ public class IntelliJDialogManager implements IDialogManager {
 
     private Saros saros;
 
-    private Map<BrowserPage, JDialog> openDialogs = new HashMap<BrowserPage, JDialog>();
+    private Map<String, JDialog> openDialogs = new HashMap<String, JDialog>();
 
     /**
      * TODO just inject project object instead of Saros
@@ -37,14 +37,14 @@ public class IntelliJDialogManager implements IDialogManager {
     public void showDialogWindow(final BrowserPage startPage) {
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             public void run() {
-                if (!openDialogs.containsKey(startPage)) {
+                if (!openDialogs.containsKey(startPage.getWebpage())) {
                     JFrame parent = WindowManager.getInstance()
                         .getFrame(saros.getProject());
                     JDialog jDialog = new JDialog(parent);
                     jDialog.addWindowListener(new WindowAdapter() {
                         @Override
                         public void windowClosing(WindowEvent e) {
-                            openDialogs.remove(startPage);
+                            openDialogs.remove(startPage.getWebpage());
                         }
                     });
                         SwtBrowserCanvas browser = new SwtBrowserCanvas(startPage);
@@ -53,24 +53,24 @@ public class IntelliJDialogManager implements IDialogManager {
                     jDialog.add(browser);
                     jDialog.setVisible(true);
                     browser.launchBrowser();
-                    openDialogs.put(startPage, jDialog);
+                    openDialogs.put(startPage.getWebpage(), jDialog);
                 }
             }
         });
     }
 
     @Override
-    public void closeDialogWindow(final BrowserPage startPage) {
+    public void closeDialogWindow(final String webPage) {
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             @Override
             public void run() {
-                if (openDialogs.containsKey(startPage)) {
-                    JDialog jDialog = openDialogs.get(startPage);
+                if (openDialogs.containsKey(webPage)) {
+                    JDialog jDialog = openDialogs.get(webPage);
                     if (jDialog != null) {
                         //TODO verify that this is sufficient
                         jDialog.dispose();
                     }
-                    openDialogs.remove(startPage);
+                    openDialogs.remove(webPage);
                 }
             }
         });

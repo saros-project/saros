@@ -38,7 +38,7 @@ public class EclipseDialogManager implements IDialogManager {
         SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
             @Override
             public void run() {
-                if (dialogIsOpen(browserPage)) {
+                if (dialogIsOpen(browserPage.getWebpage())) {
                     // If the user try to open a dialog that is already open,
                     // the dialog should get active and in the foreground to
                     // help the
@@ -47,7 +47,7 @@ public class EclipseDialogManager implements IDialogManager {
                     // TODO: Add this method to IDialog have a common behavior
                     // for
                     // Saros/E and Saros/J
-                    reopenDialogWindow(browserPage);
+                    reopenDialogWindow(browserPage.getWebpage());
                     return;
                 }
 
@@ -64,8 +64,8 @@ public class EclipseDialogManager implements IDialogManager {
                 browserShell.setLayout(new FillLayout());
                 browserShell.setSize(640, 480);
 
-                browserCreator.createBrowser(browserShell, SWT.NONE,
-                    browserPage);
+                browserCreator
+                    .createBrowser(browserShell, SWT.NONE, browserPage);
 
                 browserShell.addShellListener(new ShellAdapter() {
 
@@ -88,17 +88,17 @@ public class EclipseDialogManager implements IDialogManager {
     }
 
     @Override
-    public void closeDialogWindow(final BrowserPage browserPage) {
+    public void closeDialogWindow(final String browserPage) {
         SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
             @Override
             public void run() {
                 if (!dialogIsOpen(browserPage)) {
-                    LOG.warn(browserPage.getWebpage() + "could not be found");
+                    LOG.warn(browserPage + "could not be found");
                     return;
                 }
 
                 // shell is removed in the ShellLister
-                openDialogs.get(browserPage.getWebpage()).close();
+                openDialogs.get(browserPage).close();
             }
         });
     }
@@ -108,16 +108,16 @@ public class EclipseDialogManager implements IDialogManager {
      * If the given browserPage is not currently displayed in a shell/dialog
      * this does nothing.
      *
-     * @param browserPage
-     *            the BrowserPage
+     * @param webPage the String identifying the dialog, it can be obtained
+     *                via {@link BrowserPage#getWebpage()}
      */
-    public void reopenDialogWindow(BrowserPage browserPage) {
-        if (!dialogIsOpen(browserPage)) {
-            LOG.warn(browserPage.getWebpage() + "could not be found");
+    public void reopenDialogWindow(String webPage) {
+        if (!dialogIsOpen(webPage)) {
+            LOG.warn(webPage + "could not be found");
             return;
         }
 
-        final Shell browserShell = openDialogs.get(browserPage.getWebpage());
+        final Shell browserShell = openDialogs.get(webPage);
 
         centerShellRelativeToParent(browserShell);
         browserShell.setActive();
@@ -126,11 +126,12 @@ public class EclipseDialogManager implements IDialogManager {
     }
 
     /**
-     * @param browserPage
+     * @param webPage the String identifying the dialog, it can be obtained
+     *                via {@link BrowserPage#getWebpage()}
      * @return true if the browserPage is currently displayed in a shell/dialog
      */
-    public boolean dialogIsOpen(BrowserPage browserPage) {
-        return openDialogs.containsKey(browserPage.getWebpage());
+    public boolean dialogIsOpen(String webPage) {
+        return openDialogs.containsKey(webPage);
     }
 
     private void centerShellRelativeToParent(final Shell shell) {
@@ -145,8 +146,8 @@ public class EclipseDialogManager implements IDialogManager {
         final Rectangle parentShellBounds = parent.getBounds();
         final Point shellSize = shell.getSize();
 
-        shell.setLocation(parentShellBounds.x
-            + (parentShellBounds.width - shellSize.x) / 2, parentShellBounds.y
-            + (parentShellBounds.height - shellSize.y) / 2);
+        shell.setLocation(
+            parentShellBounds.x + (parentShellBounds.width - shellSize.x) / 2,
+            parentShellBounds.y + (parentShellBounds.height - shellSize.y) / 2);
     }
 }

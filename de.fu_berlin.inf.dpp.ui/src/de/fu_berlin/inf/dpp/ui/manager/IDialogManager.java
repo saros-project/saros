@@ -28,7 +28,8 @@ public interface IDialogManager {
      *
      * May be called from any thread.
      *
-     * @param startPage the BrowserPage object the dialog was created with
+     * @param webPage a String representing the page, this string can be obtained
+     *             via {@link BrowserPage#getWebpage()}
      */
-    public void closeDialogWindow(BrowserPage startPage);
+    public void closeDialogWindow(String webPage);
 }

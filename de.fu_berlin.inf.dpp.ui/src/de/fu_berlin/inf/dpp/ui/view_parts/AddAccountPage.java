@@ -13,9 +13,11 @@ import java.util.List;
  */
 public class AddAccountPage implements BrowserPage {
 
+    public static final String WEB_PAGE = "html/add-account-page.html";
+
     @Override
     public String getWebpage() {
-        return "html/add-account-page.html";
+        return WEB_PAGE;
     }
 
     @Override
