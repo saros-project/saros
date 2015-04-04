@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.ui.browser_functions;
 import com.google.gson.Gson;
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.ui.core_services.ContactListCoreService;
+import de.fu_berlin.inf.dpp.ui.core_facades.ContactListFacade;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
 import de.fu_berlin.inf.dpp.ui.model.Account;
 import de.fu_berlin.inf.dpp.ui.webpages.AddAccountPage;
@@ -25,7 +25,7 @@ public class SarosMainPageBrowserFunctions {
     private static final Logger LOG = Logger
         .getLogger(SarosMainPageBrowserFunctions.class);
 
-    private final ContactListCoreService contactListCoreService;
+    private final ContactListFacade contactListFacade;
 
     private final DialogManager dialogManager;
 
@@ -34,10 +34,10 @@ public class SarosMainPageBrowserFunctions {
     private final AddAccountPage addAccountPage;
 
     public SarosMainPageBrowserFunctions(
-        ContactListCoreService contactListCoreService,
+        ContactListFacade contactListFacade,
         DialogManager dialogManager, AddContactPage addContactPage,
         AddAccountPage addAccountPage) {
-        this.contactListCoreService = contactListCoreService;
+        this.contactListFacade = contactListFacade;
         this.dialogManager = dialogManager;
         this.addContactPage = addContactPage;
         this.addAccountPage = addAccountPage;
@@ -58,7 +58,7 @@ public class SarosMainPageBrowserFunctions {
                     ThreadUtils.runSafeAsync(LOG, new Runnable() {
                         @Override
                         public void run() {
-                            contactListCoreService.connect(account);
+                            contactListFacade.connect(account);
                         }
                     });
                 } else {
@@ -74,7 +74,7 @@ public class SarosMainPageBrowserFunctions {
                 ThreadUtils.runSafeAsync(LOG, new Runnable() {
                     @Override
                     public void run() {
-                        contactListCoreService.disconnect();
+                        contactListFacade.disconnect();
                     }
                 });
                 return null;
@@ -86,7 +86,7 @@ public class SarosMainPageBrowserFunctions {
                     @Override
                     public void run() {
                         try {
-                            contactListCoreService
+                            contactListFacade
                                 .deleteContact(new JID((String) arguments[0]));
                         } catch (XMPPException e) {
                             LOG.error("Error deleting contact ", e);

@@ -9,9 +9,9 @@ import de.fu_berlin.inf.dpp.ui.browser_functions.SarosMainPageBrowserFunctions;
 import org.picocontainer.MutablePicoContainer;
 
 import de.fu_berlin.inf.dpp.ui.renderer.AccountRenderer;
-import de.fu_berlin.inf.dpp.ui.core_services.ContactListCoreService;
+import de.fu_berlin.inf.dpp.ui.core_facades.ContactListFacade;
 import de.fu_berlin.inf.dpp.ui.renderer.ContactListRenderer;
-import de.fu_berlin.inf.dpp.ui.core_services.AccountCoreService;
+import de.fu_berlin.inf.dpp.ui.core_facades.AccountStoreFacade;
 import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
 import de.fu_berlin.inf.dpp.ui.manager.ContactListManager;
 import de.fu_berlin.inf.dpp.ui.webpages.AddAccountPage;
@@ -32,8 +32,8 @@ public class SarosHTMLUIContextFactory extends AbstractSarosContextFactory {
             Component.create(SarosMainPage.class),
             Component.create(AddAccountPage.class),
             Component.create(AddContactPage.class),
-            Component.create(ContactListCoreService.class),
-            Component.create(AccountCoreService.class),
+            Component.create(ContactListFacade.class),
+            Component.create(AccountStoreFacade.class),
             Component.create(ContactListManager.class),
             Component.create(BrowserManager.class),
             Component.create(BrowserCreator.class),

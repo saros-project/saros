@@ -1,5 +1,6 @@
-package de.fu_berlin.inf.dpp.ui.core_services;
+package de.fu_berlin.inf.dpp.ui.core_facades;
 
+import de.fu_berlin.inf.dpp.ui.browser_functions.SarosMainPageBrowserFunctions;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPException;
 
@@ -13,9 +14,13 @@ import de.fu_berlin.inf.dpp.net.xmpp.subscription.SubscriptionHandler;
 import de.fu_berlin.inf.dpp.ui.model.Account;
 
 /**
- * Bundles all backend calls for the contact list.
+ * Bundles all backend calls to connect and for managing the contact list.
+ *
+ * TODO: maybe this class should be splitted into connection facade and contactlisfacade
+ * The downside would be that {@link SarosMainPageBrowserFunctions} would have to deal
+ * with one additional class dependency
  */
-public class ContactListCoreService {
+public class ContactListFacade {
 
     private final ConnectionHandler connectionHandler;
 
@@ -25,7 +30,7 @@ public class ContactListCoreService {
 
     private final XMPPAccountStore accountStore;
 
-    public ContactListCoreService(ConnectionHandler connectionHandler,
+    public ContactListFacade(ConnectionHandler connectionHandler,
         XMPPConnectionService connectionService,
         SubscriptionHandler subscriptionHandler, XMPPAccountStore accountStore) {
         this.connectionHandler = connectionHandler;

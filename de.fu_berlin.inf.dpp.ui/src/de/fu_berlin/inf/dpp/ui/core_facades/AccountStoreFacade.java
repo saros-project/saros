@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.core_services;
+package de.fu_berlin.inf.dpp.ui.core_facades;
 
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.ui.renderer.AccountRenderer;
@@ -7,13 +7,13 @@ import de.fu_berlin.inf.dpp.ui.renderer.AccountRenderer;
  * Bundles all backend calls for the account creation and retrieves accounts
  * for rendering.
  */
-public class AccountCoreService {
+public class AccountStoreFacade {
 
     private final XMPPAccountStore accountStore;
 
     private final AccountRenderer renderer;
 
-    public AccountCoreService(XMPPAccountStore accountStore,
+    public AccountStoreFacade(XMPPAccountStore accountStore,
         AccountRenderer renderer) {
         this.accountStore = accountStore;
         this.renderer = renderer;

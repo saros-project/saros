@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.ui.browser_functions;
 import com.google.gson.Gson;
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.ui.core_services.AccountCoreService;
+import de.fu_berlin.inf.dpp.ui.core_facades.AccountStoreFacade;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
 import de.fu_berlin.inf.dpp.ui.model.ValidationResult;
 import de.fu_berlin.inf.dpp.ui.webpages.AddAccountPage;
@@ -24,12 +24,12 @@ public class AddAccountBrowserFunctions {
 
     private final DialogManager dialogManager;
 
-    private final AccountCoreService accountCoreService;
+    private final AccountStoreFacade accountStoreFacade;
 
     public AddAccountBrowserFunctions(DialogManager dialogManager,
-        AccountCoreService accountCoreService) {
+        AccountStoreFacade accountStoreFacade) {
         this.dialogManager = dialogManager;
-        this.accountCoreService = accountCoreService;
+        this.accountStoreFacade = accountStoreFacade;
     }
 
     /**
@@ -73,7 +73,7 @@ public class AddAccountBrowserFunctions {
                                     validationResult = new ValidationResult(
                                         false,
                                         "Invalid JID: domain must not contain upper case letters.");
-                                } else if (accountCoreService
+                                } else if (accountStoreFacade
                                     .existsAccount(jid)) {
                                     validationResult = new ValidationResult(
                                         false, "Account already exists.");
@@ -106,7 +106,7 @@ public class AddAccountBrowserFunctions {
                             @Override
                             public void run() {
                                 try {
-                                    accountCoreService
+                                    accountStoreFacade
                                         .createAccount(jid, password);
                                     dialogManager.closeDialogWindow(
                                         AddAccountPage.WEB_PAGE);

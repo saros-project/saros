@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.ui.browser_functions;
 
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.ui.core_services.ContactListCoreService;
+import de.fu_berlin.inf.dpp.ui.core_facades.ContactListFacade;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
 import de.fu_berlin.inf.dpp.ui.webpages.AddContactPage;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
@@ -19,14 +19,14 @@ public class AddContactBrowserFunctions {
     private static final Logger LOG = Logger
         .getLogger(AddContactBrowserFunctions.class);
 
-    private final ContactListCoreService contactListCoreService;
+    private final ContactListFacade contactListFacade;
 
     private final DialogManager dialogManager;
 
     public AddContactBrowserFunctions(
-        ContactListCoreService contactListCoreService,
+        ContactListFacade contactListFacade,
         DialogManager dialogManager) {
-        this.contactListCoreService = contactListCoreService;
+        this.contactListFacade = contactListFacade;
         this.dialogManager = dialogManager;
     }
 
@@ -41,7 +41,7 @@ public class AddContactBrowserFunctions {
                     ThreadUtils.runSafeAsync(LOG, new Runnable() {
                         @Override
                         public void run() {
-                            contactListCoreService
+                            contactListFacade
                                 .addContact(new JID((String) arguments[0]));
 
                         }
