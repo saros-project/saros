@@ -1,7 +1,7 @@
 package de.fu_berlin.inf.dpp.ui.browser_functions;
 
-import de.fu_berlin.inf.ag_se.browser.IBrowserFunction;
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
+import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.ui.core_services.ContactListCoreService;
@@ -41,7 +41,7 @@ public class AddContactBrowserFunctions {
      */
     public void createJavascriptFunctions() {
         browser
-            .createBrowserFunction(new IBrowserFunction("__java_addContact") {
+            .createBrowserFunction(new JavascriptFunction("__java_addContact") {
                 @Override
                 public Object function(final Object[] arguments) {
                     ThreadUtils.runSafeAsync(LOG, new Runnable() {
@@ -58,7 +58,7 @@ public class AddContactBrowserFunctions {
             });
 
         browser.createBrowserFunction(
-            new IBrowserFunction("__java_cancelAddContactWizard") {
+            new JavascriptFunction("__java_cancelAddContactWizard") {
                 @Override
                 public Object function(Object[] arguments) {
                     dialogManager.closeDialogWindow(addContactPage);

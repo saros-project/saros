@@ -1,8 +1,8 @@
 package de.fu_berlin.inf.dpp.ui.browser_functions;
 
 import com.google.gson.Gson;
-import de.fu_berlin.inf.ag_se.browser.IBrowserFunction;
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
+import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.ui.core_services.ContactListCoreService;
@@ -53,7 +53,7 @@ public class SarosMainPageBrowserFunctions {
      */
     public void createJavascriptFunctions() {
         //TODO remember to disable button in HTML while connecting
-        browser.createBrowserFunction(new IBrowserFunction("__java_connect") {
+        browser.createBrowserFunction(new JavascriptFunction("__java_connect") {
             @Override
             public Object function(Object[] arguments) {
                 if (arguments.length > 0 && arguments[0] != null) {
@@ -75,7 +75,7 @@ public class SarosMainPageBrowserFunctions {
             }
         });
         browser
-            .createBrowserFunction(new IBrowserFunction("__java_disconnect") {
+            .createBrowserFunction(new JavascriptFunction("__java_disconnect") {
                 @Override
                 public Object function(Object[] arguments) {
                     ThreadUtils.runSafeAsync(LOG, new Runnable() {
@@ -89,7 +89,7 @@ public class SarosMainPageBrowserFunctions {
             });
 
         browser.createBrowserFunction(
-            new IBrowserFunction("__java_deleteContact") {
+            new JavascriptFunction("__java_deleteContact") {
                 @Override
                 public Object function(final Object[] arguments) {
                     ThreadUtils.runSafeAsync(LOG, new Runnable() {
@@ -109,7 +109,7 @@ public class SarosMainPageBrowserFunctions {
             });
 
         browser.createBrowserFunction(
-            new IBrowserFunction("__java_showAddContactWizard") {
+            new JavascriptFunction("__java_showAddContactWizard") {
                 @Override
                 public Object function(Object[] arguments) {
                     dialogManager.showDialogWindow(addContactPage);
@@ -118,7 +118,7 @@ public class SarosMainPageBrowserFunctions {
             });
 
         browser.createBrowserFunction(
-            new IBrowserFunction("__java_showAddAccountWizard") {
+            new JavascriptFunction("__java_showAddAccountWizard") {
                 @Override
                 public Object function(Object[] arguments) {
                     dialogManager.showDialogWindow(addAccountPage);

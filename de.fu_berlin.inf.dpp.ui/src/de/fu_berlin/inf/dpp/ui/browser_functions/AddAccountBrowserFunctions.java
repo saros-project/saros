@@ -1,8 +1,8 @@
 package de.fu_berlin.inf.dpp.ui.browser_functions;
 
 import com.google.gson.Gson;
-import de.fu_berlin.inf.ag_se.browser.IBrowserFunction;
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
+import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.ui.core_services.AccountCoreService;
@@ -44,7 +44,7 @@ public class AddAccountBrowserFunctions {
      */
     public void createJavascriptFunctions() {
         browser.createBrowserFunction(
-            new IBrowserFunction("__java_cancelAddAccountWizard") {
+            new JavascriptFunction("__java_cancelAddAccountWizard") {
                 @Override
                 public Object function(Object[] arguments) {
                     dialogManager.closeDialogWindow(addAccountPage);
@@ -53,7 +53,7 @@ public class AddAccountBrowserFunctions {
             });
 
         browser
-            .createBrowserFunction(new IBrowserFunction("__java_validateJID") {
+            .createBrowserFunction(new JavascriptFunction("__java_validateJID") {
                 @Override
                 public Object function(Object[] arguments) {
                     ValidationResult validationResult;
@@ -91,7 +91,7 @@ public class AddAccountBrowserFunctions {
             });
 
         browser
-            .createBrowserFunction(new IBrowserFunction("__java_saveAccount") {
+            .createBrowserFunction(new JavascriptFunction("__java_saveAccount") {
                 @Override
                 public Object function(Object[] arguments) {
                     if (arguments.length != 2
