@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.browser_functions;
 
 import com.google.gson.Gson;
-import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -34,11 +33,8 @@ public class AddAccountBrowserFunctions {
     @Inject
     private AccountCoreService accountCoreService;
 
-    private final IJQueryBrowser browser;
-
-    public AddAccountBrowserFunctions(IJQueryBrowser browser) {
+    public AddAccountBrowserFunctions() {
         SarosPluginContext.initComponent(this);
-        this.browser = browser;
     }
 
     /**

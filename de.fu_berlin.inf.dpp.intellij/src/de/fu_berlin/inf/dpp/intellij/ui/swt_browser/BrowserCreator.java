@@ -56,7 +56,7 @@ class BrowserCreator {
 
         browser.open(url.toString(), 5000);
 
-        for (JavascriptFunction function : page.getJavascriptFunctions(browser)) {
+        for (JavascriptFunction function : page.getJavascriptFunctions()) {
             browser.createBrowserFunction(function);
         }
 

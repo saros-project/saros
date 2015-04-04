@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.browser_functions;
 
 import com.google.gson.Gson;
-import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -40,14 +39,8 @@ public class SarosMainPageBrowserFunctions {
     @Inject
     private AddAccountPage addAccountPage;
 
-    private IJQueryBrowser browser;
-
-    /**
-     * @param browser the SWT browser in which the functions should be injected
-     */
-    public SarosMainPageBrowserFunctions(IJQueryBrowser browser) {
+    public SarosMainPageBrowserFunctions() {
         SarosPluginContext.initComponent(this);
-        this.browser = browser;
     }
 
     /**

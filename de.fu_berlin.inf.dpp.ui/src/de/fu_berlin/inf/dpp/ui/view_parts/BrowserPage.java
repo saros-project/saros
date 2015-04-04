@@ -29,10 +29,8 @@ public interface BrowserPage {
     /**
      * Creates the needed {@link org.eclipse.swt.browser.BrowserFunction}s for
      * the webpage.
-     *
-     * @param browser the SWT browser instance
      */
-    List<JavascriptFunction> getJavascriptFunctions(IJQueryBrowser browser);
+    List<JavascriptFunction> getJavascriptFunctions();
 
     /**
      * Gets the list of renderers that can display application state in this

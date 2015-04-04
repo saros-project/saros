@@ -31,11 +31,9 @@ public class AddContactBrowserFunctions {
     @Inject
     private AddContactPage addContactPage;
 
-    private IJQueryBrowser browser;
 
-    public AddContactBrowserFunctions(IJQueryBrowser browser) {
+    public AddContactBrowserFunctions() {
         SarosPluginContext.initComponent(this);
-        this.browser = browser;
     }
 
     /**

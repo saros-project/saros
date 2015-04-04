@@ -19,9 +19,8 @@ public class AddContactPage implements BrowserPage {
     }
 
     @Override
-    public List<JavascriptFunction> getJavascriptFunctions(
-        IJQueryBrowser browser) {
-        return new AddContactBrowserFunctions(browser).getJavascriptFunctions();
+    public List<JavascriptFunction> getJavascriptFunctions() {
+        return new AddContactBrowserFunctions().getJavascriptFunctions();
     }
 
     @Override

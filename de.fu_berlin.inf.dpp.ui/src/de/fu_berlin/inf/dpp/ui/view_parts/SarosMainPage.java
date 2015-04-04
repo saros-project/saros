@@ -31,9 +31,8 @@ public class SarosMainPage implements BrowserPage {
     }
 
     @Override
-    public List<JavascriptFunction> getJavascriptFunctions(
-        IJQueryBrowser browser) {
-        return  new SarosMainPageBrowserFunctions(browser)
+    public List<JavascriptFunction> getJavascriptFunctions() {
+        return  new SarosMainPageBrowserFunctions()
                     .getJavascriptFunctions();
     }
 

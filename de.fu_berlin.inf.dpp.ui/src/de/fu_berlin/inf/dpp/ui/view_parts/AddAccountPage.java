@@ -19,9 +19,8 @@ public class AddAccountPage implements BrowserPage {
     }
 
     @Override
-    public List<JavascriptFunction> getJavascriptFunctions(
-        IJQueryBrowser browser) {
-        return new AddAccountBrowserFunctions(browser)
+    public List<JavascriptFunction> getJavascriptFunctions() {
+        return new AddAccountBrowserFunctions()
                     .getJavascriptFunctions();
     }
 

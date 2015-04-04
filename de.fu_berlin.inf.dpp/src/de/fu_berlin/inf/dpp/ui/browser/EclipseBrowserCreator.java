@@ -88,7 +88,7 @@ public class EclipseBrowserCreator {
             return browser;
         }
 
-        for (JavascriptFunction function : page.getJavascriptFunctions(browser)) {
+        for (JavascriptFunction function : page.getJavascriptFunctions()) {
             browser.createBrowserFunction(function);
         }
 
@@ -103,7 +103,7 @@ public class EclipseBrowserCreator {
         /*
          * TODO check if all browser work correctly with invalid Windows URLs
          * like file:/C:/... instead of file:///C:/...
-         * 
+         *
          * Stefan Rossbach: works with default Browser (whatever that is ...
          * Internet Explorer ?) on Windows
          */
