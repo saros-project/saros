@@ -1,22 +1,22 @@
-package de.fu_berlin.inf.dpp.ui.view_parts;
+package de.fu_berlin.inf.dpp.ui.webpages;
 
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
-import de.fu_berlin.inf.dpp.ui.browser_functions.AddAccountBrowserFunctions;
+import de.fu_berlin.inf.dpp.ui.browser_functions.AddContactBrowserFunctions;
 import de.fu_berlin.inf.dpp.ui.renderer.Renderer;
 
 import java.util.Collections;
 import java.util.List;
 
 /**
- * Represents the wizard to add new accounts.
+ * Represents the wizard to add new contacts.
  */
-public class AddAccountPage implements BrowserPage {
+public class AddContactPage implements BrowserPage {
 
-    public static final String WEB_PAGE = "html/add-account-page.html";
+    public static final String WEB_PAGE = "html/add-contact-page.html";
     
-    private final AddAccountBrowserFunctions browserFunctions;
+    private final AddContactBrowserFunctions browserFunctions;
 
-    public AddAccountPage(AddAccountBrowserFunctions browserFunctions) {
+    public AddContactPage(AddContactBrowserFunctions browserFunctions) {
         this.browserFunctions = browserFunctions;
     }
 
@@ -34,4 +34,5 @@ public class AddAccountPage implements BrowserPage {
     public List<Renderer> getRenderer() {
         return Collections.emptyList();
     }
+
 }

@@ -14,9 +14,9 @@ import de.fu_berlin.inf.dpp.ui.renderer.ContactListRenderer;
 import de.fu_berlin.inf.dpp.ui.core_services.AccountCoreService;
 import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
 import de.fu_berlin.inf.dpp.ui.manager.ContactListManager;
-import de.fu_berlin.inf.dpp.ui.view_parts.AddAccountPage;
-import de.fu_berlin.inf.dpp.ui.view_parts.AddContactPage;
-import de.fu_berlin.inf.dpp.ui.view_parts.SarosMainPage;
+import de.fu_berlin.inf.dpp.ui.webpages.AddAccountPage;
+import de.fu_berlin.inf.dpp.ui.webpages.AddContactPage;
+import de.fu_berlin.inf.dpp.ui.webpages.SarosMainPage;
 
 /**
  * This is the HTML UI core factory for Saros. All components that are created

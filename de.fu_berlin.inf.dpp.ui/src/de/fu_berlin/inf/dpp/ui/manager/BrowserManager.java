@@ -2,8 +2,8 @@ package de.fu_berlin.inf.dpp.ui.manager;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.dpp.ui.renderer.Renderer;
-import de.fu_berlin.inf.dpp.ui.view_parts.BrowserPage;
-import de.fu_berlin.inf.dpp.ui.view_parts.SarosMainPage;
+import de.fu_berlin.inf.dpp.ui.webpages.BrowserPage;
+import de.fu_berlin.inf.dpp.ui.webpages.SarosMainPage;
 
 import java.util.HashMap;
 import java.util.Map;

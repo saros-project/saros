@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.view_parts;
+package de.fu_berlin.inf.dpp.ui.webpages;
 
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.dpp.ui.renderer.Renderer;

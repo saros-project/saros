@@ -11,7 +11,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.BrowserCreator;
-import de.fu_berlin.inf.dpp.ui.view_parts.SarosMainPage;
+import de.fu_berlin.inf.dpp.ui.webpages.SarosMainPage;
 
 /**
  * This view displays an SWTBrowser. The Browser loads an HTML Page which

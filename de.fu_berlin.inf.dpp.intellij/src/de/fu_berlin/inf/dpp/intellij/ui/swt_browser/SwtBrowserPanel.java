@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.intellij.ui.swt_browser;
 
 import com.intellij.ui.AncestorListenerAdapter;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.ui.view_parts.SarosMainPage;
+import de.fu_berlin.inf.dpp.ui.webpages.SarosMainPage;
 import org.picocontainer.annotations.Inject;
 
 import javax.swing.JPanel;

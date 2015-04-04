@@ -6,7 +6,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.ui.core_services.AccountCoreService;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
 import de.fu_berlin.inf.dpp.ui.model.ValidationResult;
-import de.fu_berlin.inf.dpp.ui.view_parts.AddAccountPage;
+import de.fu_berlin.inf.dpp.ui.webpages.AddAccountPage;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;

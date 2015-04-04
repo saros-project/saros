@@ -6,7 +6,7 @@ import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.IBrowserDialog;
-import de.fu_berlin.inf.dpp.ui.view_parts.BrowserPage;
+import de.fu_berlin.inf.dpp.ui.webpages.BrowserPage;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;

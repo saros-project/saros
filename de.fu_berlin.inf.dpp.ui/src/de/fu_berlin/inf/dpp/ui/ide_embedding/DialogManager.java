@@ -1,7 +1,7 @@
 package de.fu_berlin.inf.dpp.ui.ide_embedding;
 
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
-import de.fu_berlin.inf.dpp.ui.view_parts.BrowserPage;
+import de.fu_berlin.inf.dpp.ui.webpages.BrowserPage;
 import org.apache.log4j.Logger;
 
 import java.util.HashMap;

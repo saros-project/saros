@@ -4,7 +4,7 @@ import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.ag_se.browser.swt.SWTJQueryBrowser;
 import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
-import de.fu_berlin.inf.dpp.ui.view_parts.BrowserPage;
+import de.fu_berlin.inf.dpp.ui.webpages.BrowserPage;
 import org.eclipse.swt.widgets.Composite;
 import org.jivesoftware.smack.util.StringUtils;
 
