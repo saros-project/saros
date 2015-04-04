@@ -4,6 +4,7 @@ import org.picocontainer.MutablePicoContainer;
 
 import de.fu_berlin.inf.dpp.AbstractSarosContextFactory;
 import de.fu_berlin.inf.dpp.SarosHTMLUIContextFactory;
+import de.fu_berlin.inf.dpp.ui.ide_embedding.IWebResourceLocator;
 import de.fu_berlin.inf.dpp.ui.manager.IDialogManager;
 
 /**
@@ -16,8 +17,7 @@ public class EclipseHTMLUIContextFactory extends AbstractSarosContextFactory {
     public void createComponents(MutablePicoContainer container) {
         container
             .addComponent(IDialogManager.class, EclipseDialogManager.class);
-
-        // Is not needed by the HTML UI but can only be instantiated in that context
-        container.addComponent(EclipseBrowserCreator.class);
+        container.addComponent(IWebResourceLocator.class,
+            EclipseResourceLocator.class);
     }
 }

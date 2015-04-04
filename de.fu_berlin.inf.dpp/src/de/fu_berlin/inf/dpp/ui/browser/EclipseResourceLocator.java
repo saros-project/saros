@@ -13,24 +13,18 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.swt.widgets.Composite;
-import org.jivesoftware.smack.util.StringUtils;
 import org.osgi.framework.Bundle;
 
-import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
-import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
-import de.fu_berlin.inf.ag_se.browser.swt.SWTJQueryBrowser;
-import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
-import de.fu_berlin.inf.dpp.ui.view_parts.BrowserPage;
+import de.fu_berlin.inf.dpp.ui.ide_embedding.IWebResourceLocator;
 
 /**
- * This class creates JQuery {@link IJQueryBrowser browser} instances. The
- * displayed content depends on the used {@link BrowserPage} implementation.
+ * This class implements the locating of web resources for Eclipse. It extracts
+ * bundle resources internally and provides the URLs to the extracted resources.
  */
-public class EclipseBrowserCreator {
+public class EclipseResourceLocator implements IWebResourceLocator {
 
     private static final Logger LOG = Logger
-        .getLogger(EclipseBrowserCreator.class);
+        .getLogger(EclipseResourceLocator.class);
 
     // TODO central place
     private static final String UI_BUNDLE_ID = "de.fu_berlin.inf.dpp.ui";
@@ -39,26 +33,8 @@ public class EclipseBrowserCreator {
 
     private static Map<String, String> fileMapping;
 
-    private final BrowserManager browserManager;
-
-    public EclipseBrowserCreator(BrowserManager browserManager) {
-        this.browserManager = browserManager;
-    }
-
-    /**
-     * Creates a new browser instance.
-     *
-     * @param composite
-     *            the composite enclosing the browser.
-     * @param style
-     *            the style of the browser instance.
-     * @param page
-     *            the page which should be displayed.
-     * @return a browser instance which load and render the given
-     *         {@link BrowserPage BrowserPage}
-     */
-    public IJQueryBrowser createBrowser(Composite composite, int style,
-        final BrowserPage page) {
+    @Override
+    public String getResourceLocation(final String resourceName) {
 
         final Bundle bundle = Platform.getBundle(UI_BUNDLE_ID);
 
@@ -66,50 +42,15 @@ public class EclipseBrowserCreator {
             throw new IllegalStateException("bundle with id: " + UI_BUNDLE_ID
                 + " is not installed");
 
-        synchronized (EclipseBrowserCreator.class) {
+        synchronized (EclipseResourceLocator.class) {
             if (fileMapping == null)
                 fileMapping = extractBundleResources(UI_BUNDLE_ID,
                     HTML_ROOT_PATH, null, true);
         }
 
-        final String resourceName = page.getWebpage();
-
         assert resourceName != null;
 
-        final String resourceLocation = fileMapping.get(resourceName);
-
-        final IJQueryBrowser browser = SWTJQueryBrowser.createSWTBrowser(
-            composite, style);
-
-        if (resourceLocation == null) {
-            browser.setText("<html><body><pre>" + "Resource <b>"
-                + StringUtils.escapeForXML(resourceName)
-                + "</b> could not be found.</pre></body></html>");
-            return browser;
-        }
-
-        for (JavascriptFunction function : page.getJavascriptFunctions()) {
-            browser.createBrowserFunction(function);
-        }
-
-        browserManager.setBrowser(page, browser);
-        browser.runOnDisposal(new Runnable() {
-            @Override
-            public void run() {
-                browserManager.removeBrowser(page);
-            }
-        });
-
-        /*
-         * TODO check if all browser work correctly with invalid Windows URLs
-         * like file:/C:/... instead of file:///C:/...
-         *
-         * Stefan Rossbach: works with default Browser (whatever that is ...
-         * Internet Explorer ?) on Windows
-         */
-        browser.open(resourceLocation.toString(), 5000);
-        return browser;
-
+        return fileMapping.get(resourceName);
     }
 
     private static Map<String, String> extractBundleResources(
@@ -204,7 +145,7 @@ public class EclipseBrowserCreator {
 
             final Class<?> wiringClass = Class.forName(
                 "org.osgi.framework.wiring.BundleWiring", true,
-                EclipseBrowserCreator.class.getClassLoader());
+                EclipseResourceLocator.class.getClassLoader());
 
             final Method adapt = Bundle.class.getMethod("adapt",
                 new Class[] { Class.class });

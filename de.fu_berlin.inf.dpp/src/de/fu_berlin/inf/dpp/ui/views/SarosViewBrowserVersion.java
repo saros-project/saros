@@ -10,7 +10,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.ui.browser.EclipseBrowserCreator;
+import de.fu_berlin.inf.dpp.ui.ide_embedding.BrowserCreator;
 import de.fu_berlin.inf.dpp.ui.view_parts.SarosMainPage;
 
 /**
@@ -42,7 +42,7 @@ public class SarosViewBrowserVersion extends ViewPart {
     private SarosMainPage sarosMainPage;
 
     @Inject
-    private EclipseBrowserCreator browserCreator;
+    private BrowserCreator browserCreator;
 
     public SarosViewBrowserVersion() {
         SarosPluginContext.initComponent(this);

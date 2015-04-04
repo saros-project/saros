@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp;
 
 import java.util.Arrays;
 
+import de.fu_berlin.inf.dpp.ui.ide_embedding.BrowserCreator;
 import de.fu_berlin.inf.dpp.ui.browser_functions.AddAccountBrowserFunctions;
 import de.fu_berlin.inf.dpp.ui.browser_functions.AddContactBrowserFunctions;
 import de.fu_berlin.inf.dpp.ui.browser_functions.SarosMainPageBrowserFunctions;
@@ -35,6 +36,7 @@ public class SarosHTMLUIContextFactory extends AbstractSarosContextFactory {
             Component.create(AccountCoreService.class),
             Component.create(ContactListManager.class),
             Component.create(BrowserManager.class),
+            Component.create(BrowserCreator.class),
             Component.create(ContactListRenderer.class),
             Component.create(AccountRenderer.class),
             Component.create(AddAccountBrowserFunctions.class),

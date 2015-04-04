@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.ui.view_parts;
 
-import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.dpp.ui.renderer.Renderer;
 

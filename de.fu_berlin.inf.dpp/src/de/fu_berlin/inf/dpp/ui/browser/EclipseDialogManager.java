@@ -13,6 +13,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
+import de.fu_berlin.inf.dpp.ui.ide_embedding.BrowserCreator;
 import de.fu_berlin.inf.dpp.ui.manager.IDialogManager;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.view_parts.BrowserPage;
@@ -27,9 +28,9 @@ public class EclipseDialogManager implements IDialogManager {
 
     private Map<String, Shell> openDialogs = new HashMap<String, Shell>();
 
-    private final EclipseBrowserCreator browserCreator;
+    private final BrowserCreator browserCreator;
 
-    public EclipseDialogManager(EclipseBrowserCreator browserCreator) {
+    public EclipseDialogManager(BrowserCreator browserCreator) {
         this.browserCreator = browserCreator;
     }
 
@@ -64,8 +65,8 @@ public class EclipseDialogManager implements IDialogManager {
                 browserShell.setLayout(new FillLayout());
                 browserShell.setSize(640, 480);
 
-                browserCreator
-                    .createBrowser(browserShell, SWT.NONE, browserPage);
+                browserCreator.createBrowser(browserShell, SWT.NONE,
+                    browserPage);
 
                 browserShell.addShellListener(new ShellAdapter() {
 
@@ -108,8 +109,9 @@ public class EclipseDialogManager implements IDialogManager {
      * If the given browserPage is not currently displayed in a shell/dialog
      * this does nothing.
      *
-     * @param webPage the String identifying the dialog, it can be obtained
-     *                via {@link BrowserPage#getWebpage()}
+     * @param webPage
+     *            the String identifying the dialog, it can be obtained via
+     *            {@link BrowserPage#getWebpage()}
      */
     public void reopenDialogWindow(String webPage) {
         if (!dialogIsOpen(webPage)) {
@@ -126,8 +128,9 @@ public class EclipseDialogManager implements IDialogManager {
     }
 
     /**
-     * @param webPage the String identifying the dialog, it can be obtained
-     *                via {@link BrowserPage#getWebpage()}
+     * @param webPage
+     *            the String identifying the dialog, it can be obtained via
+     *            {@link BrowserPage#getWebpage()}
      * @return true if the browserPage is currently displayed in a shell/dialog
      */
     public boolean dialogIsOpen(String webPage) {
@@ -146,8 +149,8 @@ public class EclipseDialogManager implements IDialogManager {
         final Rectangle parentShellBounds = parent.getBounds();
         final Point shellSize = shell.getSize();
 
-        shell.setLocation(
-            parentShellBounds.x + (parentShellBounds.width - shellSize.x) / 2,
-            parentShellBounds.y + (parentShellBounds.height - shellSize.y) / 2);
+        shell.setLocation(parentShellBounds.x
+            + (parentShellBounds.width - shellSize.x) / 2, parentShellBounds.y
+            + (parentShellBounds.height - shellSize.y) / 2);
     }
 }
