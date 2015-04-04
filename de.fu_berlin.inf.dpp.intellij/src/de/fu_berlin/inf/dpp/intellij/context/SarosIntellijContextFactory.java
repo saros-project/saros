@@ -41,7 +41,7 @@ import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.IWebResourceLocator;
-import de.fu_berlin.inf.dpp.ui.manager.IDialogManager;
+import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
 
 /**
  * IntelliJ related context
@@ -85,7 +85,7 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
         Component.create(LeaveSessionAction.class),
 
         // IDE-specific classes for the HTML GUI
-        Component.create(IDialogManager.class, IntelliJDialogManager.class),
+        Component.create(DialogManager.class, IntelliJDialogManager.class),
         Component.create(IWebResourceLocator.class, IntelliJWebResourceLocator.class),
 
         // Proxy Support for the XMPP server connection

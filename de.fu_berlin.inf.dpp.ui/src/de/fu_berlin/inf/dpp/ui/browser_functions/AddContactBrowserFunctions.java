@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.ui.browser_functions;
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.ui.core_services.ContactListCoreService;
-import de.fu_berlin.inf.dpp.ui.manager.IDialogManager;
+import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
 import de.fu_berlin.inf.dpp.ui.view_parts.AddContactPage;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import org.apache.log4j.Logger;
@@ -21,11 +21,11 @@ public class AddContactBrowserFunctions {
 
     private final ContactListCoreService contactListCoreService;
 
-    private final IDialogManager dialogManager;
+    private final DialogManager dialogManager;
 
     public AddContactBrowserFunctions(
         ContactListCoreService contactListCoreService,
-        IDialogManager dialogManager) {
+        DialogManager dialogManager) {
         this.contactListCoreService = contactListCoreService;
         this.dialogManager = dialogManager;
     }

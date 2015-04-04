@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.ui.core_services.AccountCoreService;
-import de.fu_berlin.inf.dpp.ui.manager.IDialogManager;
+import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
 import de.fu_berlin.inf.dpp.ui.model.ValidationResult;
 import de.fu_berlin.inf.dpp.ui.view_parts.AddAccountPage;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
@@ -22,11 +22,11 @@ public class AddAccountBrowserFunctions {
     private static final Logger LOG = Logger
         .getLogger(AddAccountBrowserFunctions.class);
 
-    private final IDialogManager dialogManager;
+    private final DialogManager dialogManager;
 
     private final AccountCoreService accountCoreService;
 
-    public AddAccountBrowserFunctions(IDialogManager dialogManager,
+    public AddAccountBrowserFunctions(DialogManager dialogManager,
         AccountCoreService accountCoreService) {
         this.dialogManager = dialogManager;
         this.accountCoreService = accountCoreService;

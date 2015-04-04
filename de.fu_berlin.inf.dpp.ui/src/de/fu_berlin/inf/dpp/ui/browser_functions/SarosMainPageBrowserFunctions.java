@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.ui.core_services.ContactListCoreService;
-import de.fu_berlin.inf.dpp.ui.manager.IDialogManager;
+import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
 import de.fu_berlin.inf.dpp.ui.model.Account;
 import de.fu_berlin.inf.dpp.ui.view_parts.AddAccountPage;
 import de.fu_berlin.inf.dpp.ui.view_parts.AddContactPage;
@@ -27,7 +27,7 @@ public class SarosMainPageBrowserFunctions {
 
     private final ContactListCoreService contactListCoreService;
 
-    private final IDialogManager dialogManager;
+    private final DialogManager dialogManager;
 
     private final AddContactPage addContactPage;
 
@@ -35,7 +35,7 @@ public class SarosMainPageBrowserFunctions {
 
     public SarosMainPageBrowserFunctions(
         ContactListCoreService contactListCoreService,
-        IDialogManager dialogManager, AddContactPage addContactPage,
+        DialogManager dialogManager, AddContactPage addContactPage,
         AddAccountPage addAccountPage) {
         this.contactListCoreService = contactListCoreService;
         this.dialogManager = dialogManager;
