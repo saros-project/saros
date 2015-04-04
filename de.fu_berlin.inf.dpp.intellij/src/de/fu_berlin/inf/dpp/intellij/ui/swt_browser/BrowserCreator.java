@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.intellij.ui.swt_browser;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
+import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.ag_se.browser.swt.SWTJQueryBrowser;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
@@ -50,11 +51,15 @@ class BrowserCreator {
         }
 
         final URL url = BrowserUtils.getResourceURL(page.getWebpage());
-        
+
         assert url != null;
-        
+
         browser.open(url.toString(), 5000);
-        page.createBrowserFunctions(browser);
+
+        for (JavascriptFunction function : page.getJavascriptFunctions(browser)) {
+            browser.createBrowserFunction(function);
+        }
+
         browserManager.setBrowser(page, browser);
         browser.runOnDisposal(new Runnable() {
             @Override
@@ -62,7 +67,7 @@ class BrowserCreator {
                 browserManager.removeBrowser(page);
             }
         });
-        
+
         return browser;
     }
 }

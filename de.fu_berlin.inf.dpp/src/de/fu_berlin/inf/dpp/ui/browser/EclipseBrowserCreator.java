@@ -18,6 +18,7 @@ import org.jivesoftware.smack.util.StringUtils;
 import org.osgi.framework.Bundle;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
+import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.ag_se.browser.swt.SWTJQueryBrowser;
 import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
 import de.fu_berlin.inf.dpp.ui.view_parts.BrowserPage;
@@ -46,7 +47,7 @@ public class EclipseBrowserCreator {
 
     /**
      * Creates a new browser instance.
-     * 
+     *
      * @param composite
      *            the composite enclosing the browser.
      * @param style
@@ -87,7 +88,10 @@ public class EclipseBrowserCreator {
             return browser;
         }
 
-        page.createBrowserFunctions(browser);
+        for (JavascriptFunction function : page.getJavascriptFunctions(browser)) {
+            browser.createBrowserFunction(function);
+        }
+
         browserManager.setBrowser(page, browser);
         browser.runOnDisposal(new Runnable() {
             @Override

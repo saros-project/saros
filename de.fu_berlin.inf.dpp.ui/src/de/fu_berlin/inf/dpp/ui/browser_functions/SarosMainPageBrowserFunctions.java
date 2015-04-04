@@ -15,6 +15,9 @@ import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
 import org.jivesoftware.smack.XMPPException;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * This class implements the functions to be called by Javascript code for
  * the contact list. These are the callback functions to invoke Java code from
@@ -51,9 +54,8 @@ public class SarosMainPageBrowserFunctions {
      * Injects Javascript functions into the HTML page. These functions
      * call Java code below when invoked.
      */
-    public void createJavascriptFunctions() {
-        //TODO remember to disable button in HTML while connecting
-        browser.createBrowserFunction(new JavascriptFunction("__java_connect") {
+    public List<JavascriptFunction> getJavascriptFunctions() {
+        return Arrays.asList(new JavascriptFunction("__java_connect") {
             @Override
             public Object function(Object[] arguments) {
                 if (arguments.length > 0 && arguments[0] != null) {
@@ -73,57 +75,46 @@ public class SarosMainPageBrowserFunctions {
                 }
                 return null;
             }
+        }, new JavascriptFunction("__java_disconnect") {
+            @Override
+            public Object function(Object[] arguments) {
+                ThreadUtils.runSafeAsync(LOG, new Runnable() {
+                    @Override
+                    public void run() {
+                        contactListCoreService.disconnect();
+                    }
+                });
+                return null;
+            }
+        }, new JavascriptFunction("__java_deleteContact") {
+            @Override
+            public Object function(final Object[] arguments) {
+                ThreadUtils.runSafeAsync(LOG, new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            contactListCoreService
+                                .deleteContact(new JID((String) arguments[0]));
+                        } catch (XMPPException e) {
+                            LOG.error("Error deleting contact ", e);
+                            browser.run("alert('Error deleting contact');");
+                        }
+                    }
+                });
+                return null;
+            }
+        }, new JavascriptFunction("__java_showAddContactWizard") {
+            @Override
+            public Object function(Object[] arguments) {
+                dialogManager.showDialogWindow(addContactPage);
+                return null;
+            }
+        }, new JavascriptFunction("__java_showAddAccountWizard") {
+            @Override
+            public Object function(Object[] arguments) {
+                dialogManager.showDialogWindow(addAccountPage);
+                return true;
+            }
         });
-        browser
-            .createBrowserFunction(new JavascriptFunction("__java_disconnect") {
-                @Override
-                public Object function(Object[] arguments) {
-                    ThreadUtils.runSafeAsync(LOG, new Runnable() {
-                        @Override
-                        public void run() {
-                            contactListCoreService.disconnect();
-                        }
-                    });
-                    return null;
-                }
-            });
-
-        browser.createBrowserFunction(
-            new JavascriptFunction("__java_deleteContact") {
-                @Override
-                public Object function(final Object[] arguments) {
-                    ThreadUtils.runSafeAsync(LOG, new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                contactListCoreService.deleteContact(
-                                    new JID((String) arguments[0]));
-                            } catch (XMPPException e) {
-                                LOG.error("Error deleting contact ", e);
-                                browser.run("alert('Error deleting contact');");
-                            }
-                        }
-                    });
-                    return null;
-                }
-            });
-
-        browser.createBrowserFunction(
-            new JavascriptFunction("__java_showAddContactWizard") {
-                @Override
-                public Object function(Object[] arguments) {
-                    dialogManager.showDialogWindow(addContactPage);
-                    return null;
-                }
-            });
-
-        browser.createBrowserFunction(
-            new JavascriptFunction("__java_showAddAccountWizard") {
-                @Override
-                public Object function(Object[] arguments) {
-                    dialogManager.showDialogWindow(addAccountPage);
-                    return true;
-                }
-            });
     }
 }

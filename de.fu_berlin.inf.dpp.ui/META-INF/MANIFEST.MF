@@ -12,6 +12,7 @@ Bundle-ClassPath: .,
  lib/swt-browser-improved.jar
 Export-Package: de.fu_berlin.inf.ag_se.browser,
  de.fu_berlin.inf.ag_se.browser.extensions,
+ de.fu_berlin.inf.ag_se.browser.functions,
  de.fu_berlin.inf.ag_se.browser.swt,
  de.fu_berlin.inf.dpp,
  de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot,

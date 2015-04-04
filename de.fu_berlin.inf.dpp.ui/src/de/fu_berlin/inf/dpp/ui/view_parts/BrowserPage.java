@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.ui.view_parts;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
+import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.dpp.ui.renderer.Renderer;
 
 import java.util.List;
@@ -31,7 +32,7 @@ public interface BrowserPage {
      *
      * @param browser the SWT browser instance
      */
-    void createBrowserFunctions(IJQueryBrowser browser);
+    List<JavascriptFunction> getJavascriptFunctions(IJQueryBrowser browser);
 
     /**
      * Gets the list of renderers that can display application state in this

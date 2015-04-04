@@ -11,6 +11,9 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Encapsulates the browser functions for the add contact page.
  */
@@ -39,9 +42,8 @@ public class AddContactBrowserFunctions {
      * Injects Javascript functions into the HTML page. These functions
      * call Java code below when invoked.
      */
-    public void createJavascriptFunctions() {
-        browser
-            .createBrowserFunction(new JavascriptFunction("__java_addContact") {
+    public List<JavascriptFunction> getJavascriptFunctions() {
+        return Arrays.asList(new JavascriptFunction("__java_addContact") {
                 @Override
                 public Object function(final Object[] arguments) {
                     ThreadUtils.runSafeAsync(LOG, new Runnable() {
@@ -55,9 +57,8 @@ public class AddContactBrowserFunctions {
                     dialogManager.closeDialogWindow(addContactPage);
                     return null;
                 }
-            });
+            },
 
-        browser.createBrowserFunction(
             new JavascriptFunction("__java_cancelAddContactWizard") {
                 @Override
                 public Object function(Object[] arguments) {
