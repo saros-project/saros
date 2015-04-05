@@ -13,6 +13,8 @@ import java.util.Map;
  * the main window.
  * As the browser instance for one window may change, this class allows the
  * replacement of each browser.
+ * Currently, this class is only really needed by the test framework to get
+ * the different browsers for dialogs etc.
  */
 public class BrowserManager {
 

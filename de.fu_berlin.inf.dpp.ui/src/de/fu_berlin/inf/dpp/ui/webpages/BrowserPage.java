@@ -10,6 +10,20 @@ import java.util.List;
  * browsers functions and renderers.
  * The browser functions are the Java methods that the webpage calls inside Javascript.
  * The renderers transfer application state from Java to the webpage.
+ *
+ * @JTourBusStop 2, Extending the HTML GUI, Creating a Java abstraction for a page:
+  *
+  *              Each webpage in Saros has a corresponding implementation of this
+ *               interface. There is one for the Saros main view and one for each
+ *               dialog. So if you add a new .html file, you should add a suitable
+ *               BrowserPage implementation as well.
+ *
+ *               The BrowserPage encapsulates the location of the .html file,
+ *               which is the relative location inside the resource folder.
+ *
+ *               It further creates the list of renderers and browser functions
+ *               needed for this webpage.
+ *
  */
 public interface BrowserPage {
 

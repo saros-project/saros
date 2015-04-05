@@ -16,6 +16,12 @@ import java.util.List;
 
 /**
  * Encapsulates the browser functions for the add account page.
+ *
+ * A note to future developers: the browser functions do not have to be split
+  * according to webpages, it just suited the current state of the prototype.
+  * Instead there may be more BrowserFunction classes per page and each BrowserFunction
+  * class may be used be by many pages. Split them in such a way that no code duplication
+  * arises.
  */
 public class AddAccountBrowserFunctions {
 
@@ -33,8 +39,8 @@ public class AddAccountBrowserFunctions {
     }
 
     /**
-     * Injects Javascript functions into the HTML page. These functions
-     * call Java code below when invoked.
+     * Returns the list of browser functions encapsulated by this class.
+     * They can be injected into a browser so that they can be called from Javascript.
      */
     public List<JavascriptFunction> getJavascriptFunctions() {
         return Arrays

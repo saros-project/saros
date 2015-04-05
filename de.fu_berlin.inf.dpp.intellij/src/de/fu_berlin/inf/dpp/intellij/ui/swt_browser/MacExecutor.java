@@ -28,7 +28,7 @@ import java.util.concurrent.Executor;
 /**
  * This class encapsulates the logic to start a SWT related runnable on Mac OS.
  * As Mac OS requires that all UI related actions happen on the main thread,
- * this class uses reflection to get the corresponding executor and dispatch the
+ * this class uses reflection to get the corresponding executor and dispatches the
  * runnable there.
  *
  * TODO test if method be called more than once or if it blocks after the start of

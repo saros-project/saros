@@ -22,6 +22,11 @@ import de.fu_berlin.inf.dpp.ui.webpages.SarosMainPage;
  * This is the HTML UI core factory for Saros. All components that are created
  * by this factory <b>must</b> be working on any platform the application is
  * running on.
+ *
+ * @JTourBusStop 4, Extending the HTML GUI, PicoContainer components:
+ *
+ *               If you created a new class in the ui module that should be initialised by
+ *               the PicoContainer, you have to add it here.
  */
 public class SarosHTMLUIContextFactory extends AbstractSarosContextFactory {
 

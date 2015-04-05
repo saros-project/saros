@@ -14,10 +14,10 @@ import de.fu_berlin.inf.dpp.net.xmpp.subscription.SubscriptionHandler;
 import de.fu_berlin.inf.dpp.ui.model.Account;
 
 /**
- * Bundles all backend calls to connect and for managing the contact list.
+ * Bundles all backend calls for connecting and for managing the contact list.
  *
- * TODO: maybe this class should be splitted into connection facade and contactlisfacade
- * The downside would be that {@link SarosMainPageBrowserFunctions} would have to deal
+ * TODO: maybe this class should be split into connection facade and contactlisfacade
+ * The downside is that {@link SarosMainPageBrowserFunctions} would have to deal
  * with one additional class dependency
  */
 public class ContactListFacade {

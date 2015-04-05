@@ -15,8 +15,8 @@ import org.jivesoftware.smack.packet.Presence;
 import java.util.Collection;
 
 /**
- * This class encapsulates listeners for chances in the connection state
- * and contact list.
+ * This class encapsulates listeners for changes in the connection state
+ * and the contact list.
  * It delegates the display and management those information
  * to the {@link ContactListRenderer}.
  */
