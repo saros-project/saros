@@ -180,13 +180,4 @@ public class PreferenceUtils {
         return preferenceStore
             .getInt(PreferenceConstants.FAVORITE_SESSION_COLOR_ID);
     }
-
-    /**
-     * Returns the nickname that should be used in a session.
-     * 
-     * @return the nickname which may be empty if no nickname is available
-     */
-    public String getSessionNickname() {
-        return preferenceStore.getString(PreferenceConstants.SESSION_NICKNAME);
-    }
 }

@@ -1,12 +1,5 @@
 package de.fu_berlin.inf.dpp.core.invitation;
 
-import java.io.IOException;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
-import org.jivesoftware.smack.packet.Packet;
-import org.picocontainer.annotations.Inject;
-
 import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcceptedExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcknowledgedExtension;
@@ -24,6 +17,12 @@ import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import org.apache.log4j.Logger;
+import org.jivesoftware.smack.packet.Packet;
+import org.picocontainer.annotations.Inject;
+
+import java.io.IOException;
+import java.util.Map;
 
 /*
  * IMPORTANT: All messages in the cancellation exception are SHOWN to the end user !
@@ -282,7 +281,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
         }
 
         sarosSession = sessionManager.joinSession(parameters.getSessionHost(),
-            null, null, UserColorID.UNKNOWN, UserColorID.UNKNOWN);
+            UserColorID.UNKNOWN, UserColorID.UNKNOWN);
     }
 
     /**

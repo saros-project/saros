@@ -42,13 +42,12 @@ import de.fu_berlin.inf.dpp.net.xmpp.discovery.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.xmpp.roster.RosterTracker;
 import de.fu_berlin.inf.dpp.net.xmpp.subscription.SubscriptionHandler;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
-import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
+import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ColorNegotiationHook;
-import de.fu_berlin.inf.dpp.project.internal.NicknameNegotiationHook;
 import de.fu_berlin.inf.dpp.versioning.VersionManager;
 
 /**
@@ -82,7 +81,6 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
         // Invitation hooks
         Component.create(SessionNegotiationHookManager.class),
         Component.create(ColorNegotiationHook.class),
-        Component.create(NicknameNegotiationHook.class),
         Component.create(MUCNegotiationManager.class),
 
         // Network

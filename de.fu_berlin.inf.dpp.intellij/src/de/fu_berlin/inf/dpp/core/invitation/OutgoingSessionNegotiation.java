@@ -74,10 +74,6 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
     private int clientFavoriteColorID = UserColorID.UNKNOWN;
 
-    // HACK last residue of the direct connection between SessionNegotation and
-    // the nickname property of users.
-    private String clientNickname = null;
-
     public OutgoingSessionNegotiation(JID peer, ISarosSession sarosSession,
         String description, ISarosContext sarosContext) {
 
@@ -466,7 +462,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
         monitor.setTaskName("Synchronizing user list...");
 
-        User user = new User(peer, clientNickname, false, false, clientColorID,
+        User user = new User(peer, false, false, clientColorID,
             clientFavoriteColorID);
 
         synchronized (REMOVE_ME_IF_SESSION_ADD_USER_IS_THREAD_SAFE) {

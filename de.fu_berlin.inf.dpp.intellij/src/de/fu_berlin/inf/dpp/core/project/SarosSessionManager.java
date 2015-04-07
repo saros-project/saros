@@ -22,22 +22,6 @@
 
 package de.fu_berlin.inf.dpp.core.project;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
-import org.apache.log4j.Logger;
-import org.jivesoftware.smack.Connection;
-import org.picocontainer.annotations.Inject;
-
 import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.core.invitation.INegotiationHandler;
 import de.fu_berlin.inf.dpp.core.invitation.IncomingProjectNegotiation;
@@ -67,6 +51,21 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.util.StackTrace;
+import org.apache.log4j.Logger;
+import org.jivesoftware.smack.Connection;
+import org.picocontainer.annotations.Inject;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Random;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * The SessionManager is responsible for initiating new Saros sessions and for
@@ -214,9 +213,8 @@ public class SarosSessionManager implements ISarosSessionManager {
             sessionIDObservable.setValue(String.valueOf(SESSION_ID_GENERATOR
                 .nextInt(Integer.MAX_VALUE)));
 
-            // FIXME should be passed in (colorID, nickname)
+            // FIXME should be passed in (colorID)
             final SarosSession sarosSession = new SarosSession(
-                preferenceUtils.getSessionNickname(),
                 preferenceUtils.getFavoriteColorID(), sarosContext);
 
             sarosSessionObservable.setValue(sarosSession);
@@ -267,13 +265,12 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     // FIXME offer a startSession method for the client and host !
     @Override
-    public ISarosSession joinSession(JID host, String clientNickname,
-        String hostNickname, int clientColor, int hostColor) {
+    public ISarosSession joinSession(JID host, int clientColor, int hostColor) {
 
         assert getSarosSession() == null;
 
-        SarosSession sarosSession = new SarosSession(host, clientNickname,
-            hostNickname, clientColor, hostColor, sarosContext);
+        SarosSession sarosSession = new SarosSession(host, clientColor,
+            hostColor, sarosContext);
 
         sarosSessionObservable.setValue(sarosSession);
 

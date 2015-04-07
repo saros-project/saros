@@ -17,10 +17,10 @@ import de.fu_berlin.inf.dpp.session.User;
 
 public class ActivityOptimizerTest {
 
-    private final User alice = new User(new JID("alice@junit"), null, true,
-        true, 0, 0);
-    private final User bob = new User(new JID("bob@junit"), null, false, false,
+    private final User alice = new User(new JID("alice@junit"), true, true,
         0, 0);
+    private final User bob = new User(new JID("bob@junit"), false, false, 0,
+        0);
 
     private IPath fooPath;
     private IPath barPath;

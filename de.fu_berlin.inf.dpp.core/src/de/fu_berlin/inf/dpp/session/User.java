@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.session;
 
+import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 /**
@@ -59,21 +60,14 @@ public class User {
 
     private volatile boolean isInSession;
 
-    private final String nickname;
-
-    public User(JID jid, String nickname, boolean isHost, boolean isLocal,
-        int colorID, int favoriteColorID) {
+    public User(JID jid, boolean isHost, boolean isLocal, int colorID,
+        int favoriteColorID) {
 
         this.jid = jid;
         this.isHost = isHost;
         this.isLocal = isLocal;
         this.colorID = colorID;
         this.favoriteColorID = favoriteColorID;
-
-        if (nickname == null || nickname.trim().isEmpty())
-            this.nickname = jid.getBareJID().toString();
-        else
-            this.nickname = nickname;
     }
 
     /**
@@ -86,12 +80,19 @@ public class User {
     }
 
     /**
-     * Returns the nickname of the user. The nickname persist through the whole
-     * session and will therefore not change.
+     * Returns the nickname of the user as saved in the XMPP server's roster.
+     * 
+     * TODO Move outta here.
      * 
      * @return the nickname of the user
      */
     public String getNickname() {
+        String nickname = XMPPUtils.getNickname(null, jid);
+
+        if (nickname == null) {
+            return jid.getBase();
+        }
+
         return nickname;
     }
 

@@ -39,7 +39,11 @@ import org.jivesoftware.smack.packet.PacketExtension;
 import org.picocontainer.Startable;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Business Logic for receiving and sending updates of the invitation state of
@@ -349,7 +353,7 @@ public class UserInformationHandler implements Startable {
                     continue;
                 }
 
-                user = new User(userEntry.jid, userEntry.nickname, false, false,
+                user = new User(userEntry.jid, false, false,
                     userEntry.colorID, userEntry.favoriteColorID);
 
                 user.setPermission(userEntry.permission);

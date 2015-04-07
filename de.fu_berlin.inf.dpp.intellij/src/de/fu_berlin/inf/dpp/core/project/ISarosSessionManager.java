@@ -26,8 +26,8 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.core.invitation.INegotiationHandler;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
+import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
@@ -69,8 +69,7 @@ public interface ISarosSessionManager {
      * @param host the host of the session.
      * @return the new Saros session.
      */
-    public ISarosSession joinSession(JID host, String clientNickname,
-        String hostNickname, int clientColor, int hostColor);
+    public ISarosSession joinSession(JID host, int clientColor, int hostColor);
 
     /**
      * Leaves the currently active session. If the local user is the host, this

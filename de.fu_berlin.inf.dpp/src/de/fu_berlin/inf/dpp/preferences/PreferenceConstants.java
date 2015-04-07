@@ -159,8 +159,6 @@ public class PreferenceConstants {
      */
     public static final String FAVORITE_SESSION_COLOR_ID = "favorite.session.color.id";
 
-    public static final String SESSION_NICKNAME = "session.nickname";
-
     /*
      * Annotation stuff for the editor
      */

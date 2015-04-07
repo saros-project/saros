@@ -177,7 +177,7 @@ public final class SarosSession implements ISarosSession {
 
         /**
          * @JTourBusStop 5, Activity sending, Forwarding the IActivity:
-         *
+         * 
          *               This is where the SarosSession will receive the
          *               activity. This listener it is not part of the
          *               ISarosSession interface to avoid misuse.
@@ -204,7 +204,7 @@ public final class SarosSession implements ISarosSession {
             /**
              * @JTourBusStop 10, Activity sending, Local Execution, first
              *               dispatch:
-             *
+             * 
              *               Afterwards, every registered ActivityConsumer is
              *               informed about the remote activity that should be
              *               executed locally.
@@ -223,21 +223,18 @@ public final class SarosSession implements ISarosSession {
     /**
      * Constructor for host.
      */
-    public SarosSession(String nickname, int colorID, ISarosContext sarosContext) {
-
+    public SarosSession(int colorID, ISarosContext sarosContext) {
         this(sarosContext, /* unused */null, colorID, /* unused */
-        -1, nickname, /* unused */null);
+        -1);
     }
 
     /**
      * Constructor for client.
      */
-    public SarosSession(JID hostJID, String clientNickname,
-        String hostNickname, int clientColorID, int hostColorID,
+    public SarosSession(JID hostJID, int clientColorID, int hostColorID,
         ISarosContext sarosContext) {
 
-        this(sarosContext, hostJID, clientColorID, hostColorID, clientNickname,
-            hostNickname);
+        this(sarosContext, hostJID, clientColorID, hostColorID);
     }
 
     @Override
@@ -624,7 +621,7 @@ public final class SarosSession implements ISarosSession {
     /**
      * Stops this session and performing cleanup as necessary. All remote users
      * will also be notified about the local session stop.
-     *
+     * 
      * @throws IllegalStateException
      *             if the session is already stopped or was not started at all
      */
@@ -722,10 +719,10 @@ public final class SarosSession implements ISarosSession {
 
     /**
      * @JTourBusStop 7, Activity sending, Incoming activities:
-     *
+     * 
      *               The ActivitySequencer will call this function for
      *               activities received over the Network Layer.
-     *
+     * 
      */
 
     @Override
@@ -795,7 +792,7 @@ public final class SarosSession implements ISarosSession {
     /**
      * Method to update the project mapper when changes on shared files oder
      * folders happened.
-     *
+     * 
      * @param activity
      *            {@link FileActivity} or {@link FolderActivity} to handle
      * @return <code>true</code> if the activity should be send to the user,
@@ -909,7 +906,7 @@ public final class SarosSession implements ISarosSession {
 
     /**
      * Recursively add non-shared resources
-     *
+     * 
      * @param resource
      *            of type {@link IResource#FOLDER} or {@link IResource#FILE}
      */
@@ -1039,7 +1036,7 @@ public final class SarosSession implements ISarosSession {
     }
 
     private SarosSession(ISarosContext context, JID host, int localColorID,
-        int hostColorID, String localNickname, String hostNickname) {
+        int hostColorID) {
 
         context.initComponent(this);
 
@@ -1056,8 +1053,8 @@ public final class SarosSession implements ISarosSession {
 
         assert localUserJID != null;
 
-        localUser = new User(localUserJID, localNickname, host == null, true,
-            localColorID, localColorID);
+        localUser = new User(localUserJID, host == null, true, localColorID,
+            localColorID);
 
         localUser.setInSession(true);
 
@@ -1065,8 +1062,7 @@ public final class SarosSession implements ISarosSession {
             hostUser = localUser;
             participants.put(hostUser.getJID(), hostUser);
         } else {
-            hostUser = new User(host, hostNickname, true, false, hostColorID,
-                hostColorID);
+            hostUser = new User(host, true, false, hostColorID, hostColorID);
             hostUser.setInSession(true);
             participants.put(hostUser.getJID(), hostUser);
             participants.put(localUser.getJID(), localUser);
@@ -1163,7 +1159,7 @@ public final class SarosSession implements ISarosSession {
     /**
      * This method is only meant to be used by unit tests to verify the cleanup
      * of activity producers and consumers.
-     *
+     * 
      * @return the size of the internal activity producer collection
      */
     boolean hasActivityProducers() {
@@ -1173,7 +1169,7 @@ public final class SarosSession implements ISarosSession {
     /**
      * This method is only meant to be used by unit tests to verify the cleanup
      * of activity producers and consumers.
-     *
+     * 
      * @return the size of the internal activity consumer collection
      */
     boolean hasActivityConsumers() {

@@ -26,7 +26,6 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.discovery.DiscoveryManager;
 import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
 import de.fu_berlin.inf.dpp.project.internal.ColorNegotiationHook;
-import de.fu_berlin.inf.dpp.project.internal.NicknameNegotiationHook;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
@@ -73,10 +72,6 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
     // the color property of users.
     private int clientColorID = UserColorID.UNKNOWN;
     private int clientFavoriteColorID = UserColorID.UNKNOWN;
-
-    // HACK last residue of the direct connection between SessionNegotiation and
-    // the nickname property of users.
-    private String clientNickname = null;
 
     // TODO pull up, when this class is in core
     @Inject
@@ -416,12 +411,6 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
                 clientFavoriteColorID = Integer.parseInt(finalSettings
                     .get(ColorNegotiationHook.KEY_CLIENT_FAV_COLOR));
             }
-
-            // HACK Same hack as above.
-            if (hook instanceof NicknameNegotiationHook) {
-                clientNickname = finalSettings
-                    .get(NicknameNegotiationHook.KEY_CLIENT_NICKNAME);
-            }
         }
 
         return hostParameters;
@@ -484,7 +473,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
         monitor.setTaskName("Synchronizing user list...");
 
-        User user = new User(peer, clientNickname, false, false, clientColorID,
+        User user = new User(peer, false, false, clientColorID,
             clientFavoriteColorID);
 
         synchronized (REMOVE_ME_IF_SESSION_ADD_USER_IS_THREAD_SAFE) {
