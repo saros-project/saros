@@ -47,7 +47,6 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.CoreUtils;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
-import de.fu_berlin.inf.dpp.vcs.VCSProvider;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
 // MAJOR TODO refactor this class !!!
@@ -348,14 +347,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 throw new RuntimeException("cannot add project with id "
                     + projectID + ", this id is unknown");
 
-            VCSAdapter vcs = null;
-
-            if (preferences.useVersionControl() && useVersionControl
-                && !projectInfo.isPartial()) {
-                vcs = VCSAdapter.getAdapter(projectInfo.getFileList()
-                    .getVcsProviderID());
-            }
-
             if (!project.exists())
                 throw new IllegalStateException("project " + project
                     + " does not exists");
@@ -368,8 +359,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 + " with ID: " + projectID);
 
             FileList requiredFiles = computeRequiredFiles(project,
-                projectInfo.getFileList(), projectID, vcs,
-                new SubProgressMonitor(monitor, 1 * MONITOR_WORK_SCALE));
+                projectInfo.getFileList(), projectID, new SubProgressMonitor(
+                    monitor, 1 * MONITOR_WORK_SCALE));
 
             requiredFiles.setProjectID(projectID);
             checkCancellation(CancelOption.NOTIFY_PEER);
@@ -597,14 +588,12 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     }
 
     /**
-     * Computes the list of files that we're going to request from the host.<br>
-     * If a VCS is used, update files if needed, and remove them from the list
-     * of requested files if that's possible.
+     * Computes the list of files that should be requested from the host because
+     * they are either missing in the target project or are containing different
+     * data.
      * 
      * @param project
      * @param remoteFileList
-     * @param provider
-     *            VCS provider of the local project or <code>null</code>
      * @param monitor
      * 
      * @return The list of files that we need from the host.
@@ -613,9 +602,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * @throws IOException
      */
     private FileList computeRequiredFiles(IProject project,
-        FileList remoteFileList, String projectID, VCSProvider provider,
-        IProgressMonitor monitor) throws LocalCancellationException,
-        IOException {
+        FileList remoteFileList, String projectID, IProgressMonitor monitor)
+        throws LocalCancellationException, IOException {
 
         monitor.beginTask("Compute required Files...", 1 * MONITOR_WORK_SCALE);
 
@@ -628,7 +616,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
          * file content but the meta data (reversions does NOT match) !
          */
         FileList localFileList = FileListFactory.createFileList(project, null,
-            checksumCache, provider, new SubProgressMonitor(monitor,
+            checksumCache, null, new SubProgressMonitor(monitor,
                 1 * MONITOR_WORK_SCALE, SubProgressMonitor.SUPPRESS_BEGINTASK));
 
         FileListDiff filesToSynchronize = computeDiff(localFileList,
