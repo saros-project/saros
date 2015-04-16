@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import de.fu_berlin.inf.dpp.net.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -39,10 +38,7 @@ public class FakeConnectionFactory {
         return new FakeConnectionFactory(jids);
     }
 
-    private DispatchThreadContext context;
-
     private boolean useThreadedReceiver;
-
     private boolean strict;
 
     private Set<JID> jids;
@@ -51,9 +47,7 @@ public class FakeConnectionFactory {
         this.jids = new HashSet<JID>(Arrays.asList(jids));
     }
 
-    public FakeConnectionFactory withThreadedReceiver(
-        DispatchThreadContext context) {
-        this.context = context;
+    public FakeConnectionFactory withThreadedReceiver() {
         useThreadedReceiver = true;
         return this;
     }
@@ -68,8 +62,10 @@ public class FakeConnectionFactory {
         Map<JID, ITransmitter> transmitters = new HashMap<JID, ITransmitter>();
         Map<JID, IReceiver> receivers = new HashMap<JID, IReceiver>();
 
-        for (JID jid : jids)
-            receivers.put(jid, new NonThreadedReceiver());
+        for (JID jid : jids) {
+            receivers.put(jid, useThreadedReceiver ? new ThreadedReceiver()
+                : new NonThreadedReceiver());
+        }
 
         JID[] currentJIDs = jids.toArray(new JID[0]);
 
