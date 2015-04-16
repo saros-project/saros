@@ -248,6 +248,7 @@ public class SarosSXETransmitter implements ISXETransmitter {
     public void dispose() {
         disconnect();
         receiver.removePacketListener(invitationListener);
+        sendingDispatch.shutdown();
     }
 
     protected String prefix() {
