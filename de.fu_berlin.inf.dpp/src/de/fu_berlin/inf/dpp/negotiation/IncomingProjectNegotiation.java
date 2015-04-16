@@ -11,9 +11,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smackx.filetransfer.FileTransferListener;
@@ -29,13 +26,12 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.filesystem.FileSystem;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
+import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
-import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 import de.fu_berlin.inf.dpp.monitoring.SubProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.remote.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelOption;
@@ -46,7 +42,7 @@ import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.CoreUtils;
-import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
+import de.fu_berlin.inf.dpp.vcs.VCSProvider;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
 // MAJOR TODO refactor this class !!!
@@ -110,7 +106,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     }
 
     /**
-     * 
+     *
      * @param projectID
      * @return The {@link FileList fileList} which belongs to the project with
      *         the ID <code>projectID</code> from inviter <br />
@@ -132,10 +128,10 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * actions are performed to avoid unintended data loss, i.e this method will
      * do a best effort to backup altered data but no guarantee can be made in
      * doing so!
-     * 
+     *
      * @param projectMapping
      *            mapping from remote project ids to the target local projects
-     * 
+     *
      * @throws IllegalArgumentException
      *             if either a project id is not valid or the referenced project
      *             for that id does not exist
@@ -309,7 +305,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     /**
      * calculates all the files the host/inviter has to send for synchronization
-     * 
+     *
      * @param projectMapping
      *            projectID => projectName (in local workspace)
      */
@@ -377,7 +373,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * When this method returns all projects should be managed by a VCS provider
      * and are in the same VCS state as described in the file list that is
      * stored in the project negotiation data for each project.
-     * 
+     *
      * @param negotiationData
      *            negotiation data describing the project states
      * @param projectMapping
@@ -430,9 +426,10 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             }
 
             final String vcsProviderID = data.getFileList().getVcsProviderID();
-            final VCSAdapter vcsAdapter = VCSAdapter.getAdapter(vcsProviderID);
+            final VCSProvider vcsProvider = vcsProviderFactory
+                .getProvider(vcsProviderID);
 
-            if (vcsAdapter == null) {
+            if (vcsProvider == null) {
                 LOG.warn("unable to synchronize VCS state for project id "
                     + projectID + ", no VCS adapter found for provider id "
                     + vcsProviderID);
@@ -441,18 +438,21 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 continue;
             }
 
-            project = checkoutVCSProject(vcsAdapter,
-                (org.eclipse.core.resources.IProject) ResourceAdapterFactory
-                    .convertBack(project), data.getFileList(),
-                new SubProgressMonitor(monitor, 1 * MONITOR_WORK_SCALE));
+            project = checkoutVCSProject(vcsProvider, project,
+                data.getFileList(), new SubProgressMonitor(monitor,
+                    1 * MONITOR_WORK_SCALE));
 
-            if (project == null)
+            if (monitor.isCanceled()) {
+                checkCancellation(CancelOption.NOTIFY_PEER);
+            }
+
+            if (project == null) {
                 throw new LocalCancellationException("VCS checkout failed",
                     CancelOption.NOTIFY_PEER);
+            }
 
-            synchronizeVCSState(ResourceAdapterFactory.convertBack(project),
-                vcsAdapter, data.getFileList(), new SubProgressMonitor(monitor,
-                    0));
+            synchronizeVCSState(project, vcsProvider, data.getFileList(),
+                new SubProgressMonitor(monitor, 0));
         }
 
         monitor.done();
@@ -461,7 +461,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     /**
      * Checks out a project using the provided VCS adapter. If the project does
      * not exists it will be created, otherwise it will be updated.
-     * 
+     *
      * @param vcs
      *            the VCS adapter to use for checkout
      * @param project
@@ -472,16 +472,14 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * @throws LocalCancellationException
      *             if the process is canceled locally
      */
-    private IProject checkoutVCSProject(final VCSAdapter vcs,
-        org.eclipse.core.resources.IProject project, final FileList fileList,
+    private IProject checkoutVCSProject(final VCSProvider vcs,
+        IProject project, final FileList fileList,
         final IProgressMonitor monitor) throws LocalCancellationException {
 
         int ticksToConsume = 0;
 
         if (monitor instanceof SubProgressMonitor)
             ticksToConsume = ((SubProgressMonitor) monitor).getTotalTicks();
-
-        final org.eclipse.core.runtime.IProgressMonitor progress = getProgressMonitor(monitor);
 
         if (isPartialRemoteProject(fileList.getProjectID()))
             throw new IllegalStateException(
@@ -496,33 +494,27 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
             // FIXME this should at least throw a OperationCanceledException
             vcs.connect(project, repositoryRoot, directory,
-                new org.eclipse.core.runtime.SubProgressMonitor(progress,
-                    ticksToConsume / 2));
+                new SubProgressMonitor(monitor, ticksToConsume / 2));
 
-            return ResourceAdapterFactory.create(project);
+            return project;
         }
 
         /*
          * Inform the host of the session that the current (local) user has
          * started the possibly time consuming SVN checkout via a
          * remoteProgressMonitor
-         * 
+         *
          * The monitor that is created here is shown both locally and remote and
          * is handled like a regular progress monitor.
          */
-        org.eclipse.core.runtime.IProgressMonitor remoteMonitor = rpm
-            .createRemoteProgress(Collections.singletonList(session.getHost()),
-                new org.eclipse.core.runtime.SubProgressMonitor(progress,
-                    ticksToConsume / 2));
+        IProgressMonitor remoteMonitor = rpm.createRemoteProgress(
+            Collections.singletonList(session.getHost()),
+            new SubProgressMonitor(monitor, ticksToConsume / 2));
 
         remoteMonitor.setTaskName("Project checkout via subversion");
 
-        try {
-            project = vcs.checkoutProject(project.getName(), fileList,
-                remoteMonitor);
-        } catch (OperationCanceledException e) {
-            throw new LocalCancellationException();
-        }
+        project = vcs.checkoutProject(project.getName(), fileList,
+            remoteMonitor);
 
         /*
          * HACK: After checking out a project, give Eclipse/the Team provider
@@ -538,7 +530,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             // do nothing
         }
 
-        return ResourceAdapterFactory.create(project);
+        return project;
     }
 
     @Override
@@ -546,7 +538,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
         /*
          * Remove the entries from the mapping in the SarosSession.
-         * 
+         *
          * Stefan Rossbach 28.12.2012: This will not gain you anything because
          * the project is marked as shared on the remote side and so will never
          * be able to be shared again to us. Again the whole architecture does
@@ -590,11 +582,11 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * Computes the list of files that should be requested from the host because
      * they are either missing in the target project or are containing different
      * data.
-     * 
+     *
      * @param project
      * @param remoteFileList
      * @param monitor
-     * 
+     *
      * @return The list of files that we need from the host.
      * @throws LocalCancellationException
      *             If the user requested a cancel.
@@ -641,7 +633,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     /**
      * Determines the missing resources.
-     * 
+     *
      * @param localFileList
      *            The file list of the local project.
      * @param remoteFileList
@@ -756,13 +748,12 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * worst case, every resource has to be changed as many times as the number
      * of segments in its path. Due to these complications, the monitor is only
      * used for cancellation and the label, but not for the progress bar.
-     * 
+     *
      * @param remoteFileList
-     * 
+     *
      * @throws SarosCancellationException
      */
-    private void synchronizeVCSState(
-        org.eclipse.core.resources.IResource resource, VCSAdapter vcs,
+    private void synchronizeVCSState(IResource resource, VCSProvider vcs,
         FileList remoteFileList, IProgressMonitor monitor)
         throws SarosCancellationException {
 
@@ -771,10 +762,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
          * cancellation
          */
 
-        final SubMonitor progress = SubMonitor
-            .convert(getProgressMonitor(monitor));
-
-        if (progress.isCanceled())
+        if (monitor.isCanceled())
             return;
 
         if (!vcs.isManaged(resource)) {
@@ -787,7 +775,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         final String path = resource.getProjectRelativePath()
             .toPortableString();
 
-        if (resource.getType() == org.eclipse.core.resources.IResource.PROJECT) {
+        if (resource.getType() == IResource.PROJECT) {
             LOG.debug("reverting project: " + resource);
             /*
              * We have to revert the project first because the invitee could
@@ -796,7 +784,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
              * leave some unmanaged files, but these will get cleaned up later;
              * we're only concerned with managed files here.
              */
-            vcs.revert(resource, progress.newChild(0, SubMonitor.SUPPRESS_NONE));
+            vcs.revert(resource);
         }
 
         // FIXME both calls may return null
@@ -817,7 +805,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                     + localURL + " to " + remoteURL);
             }
             vcs.switch_(resource, remoteURL, remoteRevision,
-                progress.newChild(0, SubMonitor.SUPPRESS_NONE));
+                new SubProgressMonitor(monitor, 0));
         } else if (!remoteRevision.equals(localRevision)
             && remoteFileList.getPaths().contains(path)) {
 
@@ -826,22 +814,21 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                     + localRevision + " to " + remoteRevision);
             }
 
-            vcs.update(resource, remoteRevision,
-                progress.newChild(0, SubMonitor.SUPPRESS_NONE));
+            vcs.update(resource, remoteRevision, new SubProgressMonitor(
+                monitor, 0));
         } else if (LOG.isTraceEnabled()) {
             LOG.trace("local revision of " + resource.getName()
                 + " matches remote revision: " + localRevision);
         }
 
-        if (progress.isCanceled())
+        if (monitor.isCanceled())
             return;
 
-        if (resource instanceof org.eclipse.core.resources.IContainer) {
+        if (resource instanceof IContainer) {
             try {
-                List<org.eclipse.core.resources.IResource> children = Arrays
-                    .asList(((org.eclipse.core.resources.IContainer) resource)
-                        .members());
-                for (org.eclipse.core.resources.IResource child : children) {
+                List<IResource> children = Arrays
+                    .asList(((IContainer) resource).members());
+                for (IResource child : children) {
 
                     final String childPath = child.getProjectRelativePath()
                         .toString();
@@ -854,7 +841,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                     if (monitor.isCanceled())
                         break;
                 }
-            } catch (CoreException e) {
+            } catch (IOException e) {
                 /*
                  * We shouldn't ever get here. CoreExceptions are thrown e.g. if
                  * the project is closed or the resource doesn't exist, both of
@@ -879,7 +866,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     /**
      * Waits for the activity queuing request from the remote side.
-     * 
+     *
      * @param monitor
      */
     private void awaitActivityQueueingActivation(IProgressMonitor monitor)
@@ -1012,18 +999,5 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     @Override
     public String toString() {
         return "IPN [remote side: " + peer + "]";
-    }
-
-    private static org.eclipse.core.runtime.IProgressMonitor getProgressMonitor(
-        IProgressMonitor monitor) {
-
-        while (monitor instanceof SubProgressMonitor)
-            monitor = ((SubProgressMonitor) monitor).getParent();
-
-        try {
-            return ProgressMonitorAdapterFactory.convert(monitor);
-        } catch (Exception e) {
-            return new org.eclipse.core.runtime.NullProgressMonitor();
-        }
     }
 }

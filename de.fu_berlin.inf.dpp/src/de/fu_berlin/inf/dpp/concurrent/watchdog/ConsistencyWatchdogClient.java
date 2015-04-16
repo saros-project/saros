@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
@@ -304,7 +305,8 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer {
                 pathsOfHandledFiles.size());
 
             final IProgressMonitor remoteProgress = remoteProgressManager
-                .createRemoteProgress(currentSession.getRemoteUsers(), null);
+                .createRemoteProgress(currentSession.getRemoteUsers(),
+                    new NullProgressMonitor());
 
             recoveryID = getNextRecoveryID();
 

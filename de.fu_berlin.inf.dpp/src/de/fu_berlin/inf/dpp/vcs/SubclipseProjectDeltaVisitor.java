@@ -26,6 +26,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
  * resourceChanged events.
  */
 public class SubclipseProjectDeltaVisitor extends ProjectDeltaVisitor {
+
     protected final VCSAdapter vcs;
 
     public SubclipseProjectDeltaVisitor(EditorManager editorManager,
@@ -47,7 +48,9 @@ public class SubclipseProjectDeltaVisitor extends ProjectDeltaVisitor {
 
         assert resource.getProject().isOpen();
 
-        assert vcs != null && vcs.equals(sharedProject.getVCSAdapter());
+        // FIXME the DeltaVisitor should use an SubclipseAdapter instance
+        assert vcs != null && (vcs instanceof SubclipseAdapter)
+            && vcs.equals(sharedProject.getVCSAdapter());
 
         /*
          * Note that it is possible to get a delta with both a sync info change

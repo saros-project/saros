@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 
 import de.fu_berlin.inf.dpp.activities.ProgressActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
@@ -122,21 +123,21 @@ public class RemoteProgressManager extends AbstractActivityProducer {
     /**
      * Returns a new IProgressMonitor which is displayed at the given remote
      * sites.
-     * 
+     *
      * Usage:
-     * 
+     *
      * - Call beginTask with the name of the Task to show to the user and the
      * total amount of work.
-     * 
+     *
      * - Call worked to add amounts of work your task has finished (this will be
      * summed up and should not exceed totalWorked
-     * 
+     *
      * - Call done as a last method to close the progress on the remote side.
-     * 
+     *
      * Caution: This class does not check many invariants, but rather only sends
      * your commands to the remote party.
-     * 
-     * 
+     *
+     *
      * @param users
      * @param monitor
      * @return
@@ -154,6 +155,35 @@ public class RemoteProgressManager extends AbstractActivityProducer {
                 new HashSet<User>(users)), monitor);
     }
 
+    /**
+     * Returns a new IProgressMonitor which is displayed at the given remote
+     * sites.
+     *
+     * Usage:
+     *
+     * - Call beginTask with the name of the Task to show to the user and the
+     * total amount of work.
+     *
+     * - Call worked to add amounts of work your task has finished (this will be
+     * summed up and should not exceed totalWorked
+     *
+     * - Call done as a last method to close the progress on the remote side.
+     *
+     * Caution: This class does not check many invariants, but rather only sends
+     * your commands to the remote party.
+     *
+     *
+     * @param users
+     * @param monitor
+     * @return
+     */
+    public de.fu_berlin.inf.dpp.monitoring.IProgressMonitor createRemoteProgress(
+        final List<User> users,
+        final de.fu_berlin.inf.dpp.monitoring.IProgressMonitor monitor) {
+        return ProgressMonitorAdapterFactory.convert(createRemoteProgress(
+            users, ProgressMonitorAdapterFactory.convert(monitor)));
+    }
+
     void monitorUpdated(final ProgressActivity activity) {
         fireActivity(activity);
     }
@@ -161,7 +191,7 @@ public class RemoteProgressManager extends AbstractActivityProducer {
     /**
      * Removes a {@linkplain RemoteProgress progress}. The progress will no
      * longer receive any updates.
-     * 
+     *
      * @param id
      *            the id of the progress
      */

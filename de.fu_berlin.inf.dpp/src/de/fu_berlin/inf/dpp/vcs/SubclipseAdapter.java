@@ -11,6 +11,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.team.core.RepositoryProvider;
 import org.eclipse.team.core.RepositoryProviderType;
@@ -42,13 +43,10 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 
 /**
  * Adapter for Subclipse 1.6.
- * 
- * @author ahaferburg
  */
 class SubclipseAdapter extends VCSAdapter {
     static final String identifier = "org.tigris.subversion.subclipse.core.svnnature";
 
-    @SuppressWarnings("hiding")
     protected static final Logger log = Logger
         .getLogger(SubclipseAdapter.class);
 
@@ -179,6 +177,8 @@ class SubclipseAdapter extends VCSAdapter {
                 result.refreshLocal(IResource.DEPTH_INFINITE, monitor);
         } catch (CoreException e) {
             log.error("Refresh failed", e);
+        } catch (OperationCanceledException e) {
+            log.debug("Operation has been canceled during SVN checkout");
         }
 
         return result;
@@ -207,6 +207,10 @@ class SubclipseAdapter extends VCSAdapter {
         if (isAddedToVersionControl(revisionString)) {
             addToVersionControl(resource);
             return;
+        }
+
+        if (monitor == null) {
+            monitor = new NullProgressMonitor();
         }
 
         String taskName = "Updating " + resource.getName() + " to revision "
@@ -243,11 +247,13 @@ class SubclipseAdapter extends VCSAdapter {
             resource.refreshLocal(IResource.DEPTH_INFINITE, null);
         } catch (CoreException e) {
             log.error("Refresh failed", e);
+        } catch (OperationCanceledException e) {
+            log.debug("Operation has been canceled during SVN checkout");
         }
     }
 
     @Override
-    public void revert(IResource resource, SubMonitor monitor) {
+    public void revert(IResource resource) {
         if (!isManaged(resource))
             return;
         ISVNLocalResource svnResource = SVNWorkspaceRoot
@@ -298,6 +304,10 @@ class SubclipseAdapter extends VCSAdapter {
             addToVersionControl(resource);
             return;
         }
+        if (monitor == null) {
+            monitor = new NullProgressMonitor();
+        }
+
         String taskName = "Switching " + resource.getName();
         monitor.beginTask(taskName, 1);
         SVNRevision revision = getRevision(revisionString);
@@ -452,29 +462,5 @@ class SubclipseAdapter extends VCSAdapter {
     @Override
     public String getID() {
         return identifier;
-    }
-
-    @Override
-    public String getRepositoryString(
-        de.fu_berlin.inf.dpp.filesystem.IResource resource) {
-        return getRepositoryString(ResourceAdapterFactory.convertBack(resource));
-    }
-
-    @Override
-    public VCSResourceInfo getResourceInfo(
-        de.fu_berlin.inf.dpp.filesystem.IResource resource) {
-        return getResourceInfo(ResourceAdapterFactory.convertBack(resource));
-    }
-
-    @Override
-    public VCSResourceInfo getCurrentResourceInfo(
-        de.fu_berlin.inf.dpp.filesystem.IResource resource) {
-        return getCurrentResourceInfo(ResourceAdapterFactory
-            .convertBack(resource));
-    }
-
-    @Override
-    public String getUrl(de.fu_berlin.inf.dpp.filesystem.IResource resource) {
-        return getUrl(ResourceAdapterFactory.convertBack(resource));
     }
 }

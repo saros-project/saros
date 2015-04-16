@@ -4,8 +4,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.team.core.RepositoryProvider;
 import org.eclipse.team.core.RepositoryProviderType;
 import org.eclipse.team.core.TeamException;
@@ -14,19 +12,30 @@ import org.eclipse.team.core.synchronize.SyncInfo;
 
 import de.fu_berlin.inf.dpp.activities.VCSActivity;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
+import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 import de.fu_berlin.inf.dpp.negotiation.FileList;
 import de.fu_berlin.inf.dpp.project.ProjectDeltaVisitor;
 import de.fu_berlin.inf.dpp.project.SharedProject;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 
 /**
- * Interface to an adapter for a Version Control System (Team Provider).
- * 
+ * Eclipse Adapter for accessing the Version Control System (Team Provider).
+ * <p>
+ * This adapter is capable of handling Eclipse
+ * {@linkplain org.eclipse.core.resources.IResource resources} and virtual DPP
+ * {@linkplain de.fu_berlin.inf.dpp.filesystem.IResource resources}
+ * simultaneously.
+ * <p>
+ * Implementation Note: Clients <b>should</b> only implement the
+ * <code>abstract</code> methods rather than implementing the
+ * {@linkplain VCSProvider} interface.
+ *
  * @author haferburg
  */
 // TODO Maybe change to VCProject implements IAdaptable? Make connect static.
 public abstract class VCSAdapter implements VCSProvider {
-    protected static final Logger log = Logger.getLogger(VCSAdapter.class);
+    private static final Logger log = Logger.getLogger(VCSAdapter.class);
 
     protected RepositoryProviderType provider;
 
@@ -35,14 +44,14 @@ public abstract class VCSAdapter implements VCSProvider {
     }
 
     /**
-     * @param resource
-     * @return True iff the resource is under VC.
+     * @see #isManaged(de.fu_berlin.inf.dpp.filesystem.IResource)
      */
+
     public abstract boolean isManaged(IResource resource);
 
     /**
      * @param resource
-     * @return True iff the resource is in a project that's under VC.
+     * @return<code>true</code> if the resource is in a project that's under VC.
      */
     public abstract boolean isInManagedProject(IResource resource);
 
@@ -77,9 +86,7 @@ public abstract class VCSAdapter implements VCSProvider {
     }
 
     /**
-     * @param resource
-     * @return The URL of the repository root of this resource as a String, or
-     *         null.
+     * @see #getRepositoryString(de.fu_berlin.inf.dpp.filesystem.IResource)
      */
     public abstract String getRepositoryString(IResource resource);
 
@@ -90,93 +97,54 @@ public abstract class VCSAdapter implements VCSProvider {
     public abstract String getUrl(IResource resource);
 
     /**
-     * Checks out the project specified by the {@link FileList} as a new project
-     * under the provided name.
-     * 
-     * @param newProjectName
-     * @param fileList
-     * @param monitor
-     * @return The newly created project.
-     */
-    public abstract IProject checkoutProject(String newProjectName,
-        FileList fileList, IProgressMonitor monitor)
-        throws OperationCanceledException;
-
-    /**
-     * Updates the file to the specified revision.
-     * 
-     * @param resource
-     * @param targetRevision
-     * @param monitor
-     *            must not be null.
-     */
-    public abstract void update(IResource resource, String targetRevision,
-        IProgressMonitor monitor);
-
-    /**
-     * Switches the resource to the specified URL and revision.
-     * 
-     * @param monitor
-     */
-    public abstract void switch_(IResource resource, String url,
-        String revision, IProgressMonitor monitor);
-
-    /**
-     * Reverts the local changes to the resource.
-     * 
-     * @param monitor
-     */
-    public abstract void revert(IResource resource, SubMonitor monitor);
-
-    /**
-     * Returns VCS specific information for the resource. For SVN, it returns
-     * the actual revision of the file (last changed revision), uniquely
-     * identifying the resource in the repository. E.g. if a file was last
-     * changed in revision 121, HEAD is 127, and we do an "svn update -r 124",
-     * then this method returns revision 121. We need this revision to detect
-     * changes: We get sync changed events only if the actual revision of a
-     * resource changes.
-     * 
-     * @param resource
-     * @return
+     * @see #getResourceInfo(de.fu_berlin.inf.dpp.filesystem.IResource)
      */
     public abstract VCSResourceInfo getResourceInfo(IResource resource);
 
     /**
-     * Returns VCS specific information for the resource. For SVN, it returns
-     * the revision that was used to get this file. E.g. if a file was last
-     * changed in revision 121, HEAD is 127, and we do an "svn update -r 124",
-     * then this method returns revision 124. We need this revision to replicate
-     * changes: If we used the actual revision in commands, it's possible that
-     * the URL changes.
-     * 
-     * @param resource
-     * @return
+     * @see #getCurrentResourceInfo(de.fu_berlin.inf.dpp.filesystem.IResource)
      */
     public abstract VCSResourceInfo getCurrentResourceInfo(IResource resource);
 
     /**
-     * Connects the project to the directory in the repository.
-     * 
-     * @param project
-     * @param repositoryRoot
-     * @param directory
-     * @param progress
-     *            may be null.
+     * @see #checkoutProject(String, FileList,
+     *      de.fu_berlin.inf.dpp.monitoring.IProgressMonitor)
+     */
+    public abstract IProject checkoutProject(String newProjectName,
+        FileList fileList, IProgressMonitor monitor);
+
+    /**
+     * @see #connect(de.fu_berlin.inf.dpp.filesystem.IProject, String, String,
+     *      de.fu_berlin.inf.dpp.monitoring.IProgressMonitor)
      */
     public abstract void connect(IProject project, String repositoryRoot,
         String directory, IProgressMonitor progress);
 
     /**
-     * Disconnects the project from the repository.
-     * 
-     * @param project
-     * @param deleteContent
-     * @param progress
-     *            may be null.
+     * @see #disconnect(de.fu_berlin.inf.dpp.filesystem.IProject, boolean,
+     *      de.fu_berlin.inf.dpp.monitoring.IProgressMonitor)
      */
     public abstract void disconnect(IProject project, boolean deleteContent,
         IProgressMonitor progress);
+
+    /**
+     * @see #revert(de.fu_berlin.inf.dpp.filesystem.IResource)
+     */
+    public abstract void revert(IResource resource);
+
+    /**
+     * @see #switch_(de.fu_berlin.inf.dpp.filesystem.IResource, String, String,
+     *      de.fu_berlin.inf.dpp.monitoring.IProgressMonitor)
+     */
+    public abstract void switch_(IResource resource, String url,
+        String revision, IProgressMonitor monitor);
+
+    /**
+     * @see #update(de.fu_berlin.inf.dpp.filesystem.IResource, String,
+     *      de.fu_berlin.inf.dpp.monitoring.IProgressMonitor)
+     */
+    public abstract void update(IResource resource, String targetRevision,
+        IProgressMonitor monitor);
 
     /**
      * Returns true if there is a folder like e.g. SVN's .svn for the project.
@@ -193,7 +161,7 @@ public abstract class VCSAdapter implements VCSProvider {
     /**
      * Determine and instantiate the corresponding {@link VCSAdapter} for the
      * provided identifier.<br>
-     * 
+     *
      * @param identifier
      * @return
      * @see RepositoryProvider#getID()
@@ -225,7 +193,7 @@ public abstract class VCSAdapter implements VCSProvider {
      * corresponding {@link VCSAdapter}. The method will return
      * <code>null</code> if the project is not under version control, or if no
      * <code>VCSAdapter</code> was found for the repository provider used.
-     * 
+     *
      * @param project
      * @return
      */
@@ -245,5 +213,85 @@ public abstract class VCSAdapter implements VCSProvider {
         SharedProject sharedProject) {
         return new ProjectDeltaVisitor(editorManager, sarosSession,
             sharedProject);
+    }
+
+    /*
+     * --------------------------------------------------------------------------
+     * partial VCSProvider interface implementation
+     */
+
+    @Override
+    public boolean isManaged(de.fu_berlin.inf.dpp.filesystem.IResource resource) {
+        return isManaged(ResourceAdapterFactory.convertBack(resource));
+    }
+
+    @Override
+    public String getRepositoryString(
+        de.fu_berlin.inf.dpp.filesystem.IResource resource) {
+        return getRepositoryString(ResourceAdapterFactory.convertBack(resource));
+    }
+
+    @Override
+    public VCSResourceInfo getResourceInfo(
+        de.fu_berlin.inf.dpp.filesystem.IResource resource) {
+        return getResourceInfo(ResourceAdapterFactory.convertBack(resource));
+    }
+
+    @Override
+    public VCSResourceInfo getCurrentResourceInfo(
+        de.fu_berlin.inf.dpp.filesystem.IResource resource) {
+        return getCurrentResourceInfo(ResourceAdapterFactory
+            .convertBack(resource));
+    }
+
+    @Override
+    public String getUrl(de.fu_berlin.inf.dpp.filesystem.IResource resource) {
+        return getUrl(ResourceAdapterFactory.convertBack(resource));
+    }
+
+    @Override
+    public de.fu_berlin.inf.dpp.filesystem.IProject checkoutProject(
+        String newProjectName, FileList fileList,
+        de.fu_berlin.inf.dpp.monitoring.IProgressMonitor monitor) {
+        return ResourceAdapterFactory.create(checkoutProject(newProjectName,
+            fileList, ProgressMonitorAdapterFactory.convert(monitor)));
+    }
+
+    @Override
+    public void connect(de.fu_berlin.inf.dpp.filesystem.IProject project,
+        String repositoryRoot, String directory,
+        de.fu_berlin.inf.dpp.monitoring.IProgressMonitor progress) {
+        connect((IProject) ResourceAdapterFactory.convertBack(project),
+            repositoryRoot, directory,
+            ProgressMonitorAdapterFactory.convert(progress));
+    }
+
+    @Override
+    public void disconnect(de.fu_berlin.inf.dpp.filesystem.IProject project,
+        boolean deleteContent,
+        de.fu_berlin.inf.dpp.monitoring.IProgressMonitor progress) {
+        disconnect((IProject) ResourceAdapterFactory.convertBack(project),
+            deleteContent, ProgressMonitorAdapterFactory.convert(progress));
+    }
+
+    @Override
+    public void revert(de.fu_berlin.inf.dpp.filesystem.IResource resource) {
+        revert(ResourceAdapterFactory.convertBack(resource));
+    }
+
+    @Override
+    public void switch_(de.fu_berlin.inf.dpp.filesystem.IResource resource,
+        String url, String revision,
+        de.fu_berlin.inf.dpp.monitoring.IProgressMonitor monitor) {
+        switch_(ResourceAdapterFactory.convertBack(resource), url, revision,
+            ProgressMonitorAdapterFactory.convert(monitor));
+    }
+
+    @Override
+    public void update(de.fu_berlin.inf.dpp.filesystem.IResource resource,
+        String targetRevision,
+        de.fu_berlin.inf.dpp.monitoring.IProgressMonitor monitor) {
+        update(ResourceAdapterFactory.convertBack(resource), targetRevision,
+            ProgressMonitorAdapterFactory.convert(monitor));
     }
 }

@@ -27,4 +27,5 @@ public interface VCSProviderFactory {
      *         <code>null</code> if no provider can be found
      */
     public VCSProvider getProvider(String identifier);
+    
 }
