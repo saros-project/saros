@@ -50,6 +50,8 @@ import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
+import de.fu_berlin.inf.dpp.net.IReceiver;
+import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
@@ -107,12 +109,16 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     private final SarosSessionObservable sarosSessionObservable;
 
+    // FIMXE remove this crappy global state variable
     private final SessionIDObservable sessionIDObservable;
 
     private final Preferences preferences;
 
+    // FIXME remove @Inject
     @Inject
     private ISarosContext sarosContext;
+
+    private final NegotiationPacketListener negotiationPacketLister;
 
     private final SessionNegotiationObservable currentSessionNegotiations;
 
@@ -159,7 +165,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         SessionIDObservable sessionID,
         SessionNegotiationObservable currentSessionNegotiations,
         ProjectNegotiationObservable currentProjectNegotiations,
-        Preferences preferences) {
+        ITransmitter transmitter, IReceiver receiver, Preferences preferences) {
         this.connectionService = connectionService;
         this.sarosSessionObservable = sarosSessionObservable;
         this.sessionIDObservable = sessionID;
@@ -167,6 +173,10 @@ public class SarosSessionManager implements ISarosSessionManager {
         this.currentProjectNegotiations = currentProjectNegotiations;
         this.preferences = preferences;
         this.connectionService.addListener(listener);
+
+        this.negotiationPacketLister = new NegotiationPacketListener(this,
+            currentSessionNegotiations, currentProjectNegotiations,
+            transmitter, receiver);
     }
 
     // FIXME add back to interface
@@ -233,6 +243,8 @@ public class SarosSessionManager implements ISarosSessionManager {
 
             sessionIDObservable.setValue(String.valueOf(SESSION_ID_GENERATOR
                 .nextInt(Integer.MAX_VALUE)));
+
+            negotiationPacketLister.setRejectSessionNegotiationRequests(true);
 
             // FIXME should be passed in (colorID, nickname)
             final SarosSession sarosSession = new SarosSession(
@@ -352,6 +364,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             log.info("session stopped");
         } finally {
             sessionShutdown = false;
+            negotiationPacketLister.setRejectSessionNegotiationRequests(false);
             startStopSessionLock.unlock();
         }
     }
@@ -393,10 +406,15 @@ public class SarosSessionManager implements ISarosSessionManager {
 
             try {
 
-                if (sessionIDObservable.getValue() != SessionIDObservable.NOT_IN_SESSION) {
+                // should not happen
+                if (negotiationPacketLister
+                    .isRejectingSessionNegotiationsRequests()) {
                     log.error("could not accept invitation because there is already a pending invitation");
                     return;
                 }
+
+                negotiationPacketLister
+                    .setRejectSessionNegotiationRequests(true);
 
                 sessionIDObservable.setValue(sessionID);
 

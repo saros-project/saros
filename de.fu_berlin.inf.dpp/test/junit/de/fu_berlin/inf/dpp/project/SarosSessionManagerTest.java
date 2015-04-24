@@ -18,6 +18,8 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.net.IReceiver;
+import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
@@ -95,8 +97,12 @@ public class SarosSessionManagerTest {
     @Before
     public void setUp() throws Exception {
         SarosSession session = PowerMock.createNiceMock(SarosSession.class);
+
         XMPPConnectionService network = PowerMock
             .createNiceMock(XMPPConnectionService.class);
+
+        ITransmitter transmitter = PowerMock.createNiceMock(ITransmitter.class);
+        IReceiver receiver = PowerMock.createNiceMock(IReceiver.class);
 
         Preferences preferences = PowerMock.createNiceMock(Preferences.class);
 
@@ -109,7 +115,8 @@ public class SarosSessionManagerTest {
         manager = new SarosSessionManager(network,
             new SarosSessionObservable(), new SessionIDObservable(),
             new SessionNegotiationObservable(),
-            new ProjectNegotiationObservable(), preferences);
+            new ProjectNegotiationObservable(), transmitter, receiver,
+            preferences);
     }
 
     @Test

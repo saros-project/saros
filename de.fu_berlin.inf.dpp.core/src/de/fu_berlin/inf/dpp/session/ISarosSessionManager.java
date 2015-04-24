@@ -81,7 +81,9 @@ public interface ISarosSessionManager {
      *            remote Saros version of the inviter side
      * @param description
      *            what this session invitation is about
+     * @deprecated will be removed from the interface - do not use in new code
      */
+    @Deprecated
     public void invitationReceived(JID from, String sessionID,
         String invitationID, String version, String description);
 
