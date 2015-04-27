@@ -47,12 +47,15 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
     @Inject
     private IConnectionManager connectionManager;
 
+    private final String sessionID;
+
     public IncomingSessionNegotiation(ISarosSessionManager sessionManager,
-        JID from, String remoteVersion, String invitationID,
+        String sessionID, JID from, String remoteVersion, String invitationID,
         String description, ISarosContext sarosContext) {
 
         super(invitationID, from, description, sarosContext);
 
+        this.sessionID = sessionID;
         this.sessionManager = sessionManager;
         this.remoteVersion = remoteVersion;
     }
@@ -90,6 +93,11 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
 
     @Override
     protected void executeCancellation() {
+        /*
+         * make sure we can receive negotiations again because they are rejected
+         * until we explicitly call this method even if we do not start any
+         * session at all !
+         */
         sessionManager.stopSarosSession();
     }
 
@@ -302,8 +310,9 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
 
         }
 
-        sarosSession = sessionManager.joinSession(parameters.getSessionHost(),
-            clientNickname, hostNickname, clientColor, hostFavoriteColor);
+        sarosSession = sessionManager.joinSession(sessionID,
+            parameters.getSessionHost(), clientNickname, hostNickname,
+            clientColor, hostFavoriteColor);
     }
 
     /**

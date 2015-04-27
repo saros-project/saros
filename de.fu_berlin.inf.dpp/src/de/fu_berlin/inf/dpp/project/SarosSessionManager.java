@@ -57,7 +57,6 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
-import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
@@ -109,9 +108,6 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     private final SarosSessionObservable sarosSessionObservable;
 
-    // FIMXE remove this crappy global state variable
-    private final SessionIDObservable sessionIDObservable;
-
     private final Preferences preferences;
 
     // FIXME remove @Inject
@@ -162,13 +158,11 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     public SarosSessionManager(XMPPConnectionService connectionService,
         SarosSessionObservable sarosSessionObservable,
-        SessionIDObservable sessionID,
         SessionNegotiationObservable currentSessionNegotiations,
         ProjectNegotiationObservable currentProjectNegotiations,
         ITransmitter transmitter, IReceiver receiver, Preferences preferences) {
         this.connectionService = connectionService;
         this.sarosSessionObservable = sarosSessionObservable;
-        this.sessionIDObservable = sessionID;
         this.currentSessionNegotiations = currentSessionNegotiations;
         this.currentProjectNegotiations = currentProjectNegotiations;
         this.preferences = preferences;
@@ -241,13 +235,13 @@ public class SarosSessionManager implements ISarosSessionManager {
 
             sessionStartup = true;
 
-            sessionIDObservable.setValue(String.valueOf(SESSION_ID_GENERATOR
-                .nextInt(Integer.MAX_VALUE)));
+            final String sessionID = String.valueOf(SESSION_ID_GENERATOR
+                .nextInt(Integer.MAX_VALUE));
 
             negotiationPacketLister.setRejectSessionNegotiationRequests(true);
 
             // FIXME should be passed in (colorID, nickname)
-            final SarosSession sarosSession = new SarosSession(
+            final SarosSession sarosSession = new SarosSession(sessionID,
                 preferences.getSessionNickname(),
                 preferences.getFavoriteColorID(), sarosContext);
 
@@ -281,12 +275,13 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     // FIXME offer a startSession method for the client and host !
     @Override
-    public ISarosSession joinSession(JID host, String clientNickname,
-        String hostNickname, int clientColor, int hostColor) {
+    public ISarosSession joinSession(String id, JID host,
+        String clientNickname, String hostNickname, int clientColor,
+        int hostColor) {
 
         assert getSarosSession() == null;
 
-        SarosSession sarosSession = new SarosSession(host, clientNickname,
+        SarosSession sarosSession = new SarosSession(id, host, clientNickname,
             hostNickname, clientColor, hostColor, sarosContext);
 
         sarosSessionObservable.setValue(sarosSession);
@@ -332,11 +327,8 @@ public class SarosSessionManager implements ISarosSessionManager {
             SarosSession sarosSession = (SarosSession) sarosSessionObservable
                 .getValue();
 
-            if (sarosSession == null) {
-                sessionIDObservable
-                    .setValue(SessionIDObservable.NOT_IN_SESSION);
+            if (sarosSession == null)
                 return;
-            }
 
             sessionShutdown = true;
 
@@ -358,8 +350,6 @@ public class SarosSessionManager implements ISarosSessionManager {
             sarosSessionObservable.setValue(null);
 
             sessionEnded(sarosSession);
-
-            sessionIDObservable.setValue(SessionIDObservable.NOT_IN_SESSION);
 
             log.info("session stopped");
         } finally {
@@ -416,10 +406,8 @@ public class SarosSessionManager implements ISarosSessionManager {
                 negotiationPacketLister
                     .setRejectSessionNegotiationRequests(true);
 
-                sessionIDObservable.setValue(sessionID);
-
-                process = new IncomingSessionNegotiation(this, from, version,
-                    invitationID, description, sarosContext);
+                process = new IncomingSessionNegotiation(this, sessionID, from,
+                    version, invitationID, description, sarosContext);
 
                 process.setNegotiationListener(negotiationListener);
                 currentSessionNegotiations.add(process);

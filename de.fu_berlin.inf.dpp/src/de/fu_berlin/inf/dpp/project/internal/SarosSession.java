@@ -77,7 +77,6 @@ import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
 import de.fu_berlin.inf.dpp.project.internal.timeout.ClientSessionTimeoutHandler;
@@ -223,21 +222,22 @@ public final class SarosSession implements ISarosSession {
     /**
      * Constructor for host.
      */
-    public SarosSession(String nickname, int colorID, ISarosContext sarosContext) {
+    public SarosSession(final String id, String nickname, int colorID,
+        ISarosContext sarosContext) {
 
-        this(sarosContext, /* unused */null, colorID, /* unused */
+        this(id, sarosContext, /* unused */null, colorID, /* unused */
         -1, nickname, /* unused */null);
     }
 
     /**
      * Constructor for client.
      */
-    public SarosSession(JID hostJID, String clientNickname,
+    public SarosSession(final String id, JID hostJID, String clientNickname,
         String hostNickname, int clientColorID, int hostColorID,
         ISarosContext sarosContext) {
 
-        this(sarosContext, hostJID, clientColorID, hostColorID, clientNickname,
-            hostNickname);
+        this(id, sarosContext, hostJID, clientColorID, hostColorID,
+            clientNickname, hostNickname);
     }
 
     @Override
@@ -1032,15 +1032,15 @@ public final class SarosSession implements ISarosSession {
             localUser, localUser, 0));
     }
 
-    private SarosSession(ISarosContext context, JID host, int localColorID,
-        int hostColorID, String localNickname, String hostNickname) {
+    private SarosSession(final String id, ISarosContext context, JID host,
+        int localColorID, int hostColorID, String localNickname,
+        String hostNickname) {
 
         context.initComponent(this);
 
         this.pathFactory = context.getComponent(IPathFactory.class);
 
-        this.sessionID = context.getComponent(SessionIDObservable.class)
-            .getValue();
+        this.sessionID = id;
         this.projectMapper = new SarosProjectMapper();
         this.activityQueuer = new ActivityQueuer();
         this.sarosContext = context;

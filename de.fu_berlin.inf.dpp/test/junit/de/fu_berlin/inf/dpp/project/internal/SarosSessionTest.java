@@ -55,9 +55,8 @@ import de.fu_berlin.inf.dpp.net.internal.BinaryXMPPExtension;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
-import de.fu_berlin.inf.dpp.preferences.EclipsePreferences;
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceInitializer;
+import de.fu_berlin.inf.dpp.preferences.EclipsePreferences;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.test.fakes.synchonize.NonUISynchronizer;
@@ -350,15 +349,13 @@ public class SarosSessionTest {
     @Test
     public void testCreateSarosSession() {
 
-        container.getComponent(SessionIDObservable.class).setValue(
-            SAROS_SESSION_ID);
-
         createWorkspaceMock(workspaceListeners);
 
         final ISarosContext context = createContextMock(container);
 
         // Test creating, starting and stopping the session.
-        SarosSession session = new SarosSession(null, 0, context);
+        SarosSession session = new SarosSession(SAROS_SESSION_ID, null, 0,
+            context);
 
         assertFalse(session.hasActivityConsumers());
         assertFalse(session.hasActivityProducers());

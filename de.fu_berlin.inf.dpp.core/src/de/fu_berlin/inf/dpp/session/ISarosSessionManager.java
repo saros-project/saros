@@ -41,8 +41,9 @@ public interface ISarosSessionManager {
      *            the host of the session.
      * @return the new Saros session.
      */
-    public ISarosSession joinSession(JID host, String clientNickname,
-        String hostNickname, int clientColor, int hostColor);
+    public ISarosSession joinSession(final String id, JID host,
+        String clientNickname, String hostNickname, int clientColor,
+        int hostColor);
 
     /**
      * Leaves the currently active session. If the local user is the host, this
