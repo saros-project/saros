@@ -12,12 +12,14 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.picocontainer.annotations.Inject;
@@ -245,8 +247,7 @@ public class ConsistencyAction extends Action implements Disposable {
         MultiStatus multiStatus = new MultiStatus(
             pluginID,
             0,
-            "Please confirm workspace modifications.\n\n"
-                + "The recovery process will perform changes to files and folders of the current shared project(s).\n\n"
+            "The recovery process will perform changes to files and folders of the currently shared project(s). "
                 + "The affected files and folders may be either modified, created, or deleted.\n\n"
                 + "Press 'Details' for the affected files and folders.", null);
 
@@ -255,10 +256,30 @@ public class ConsistencyAction extends Action implements Disposable {
                 + path.getProject().getName() + ", file:"
                 + path.getProjectRelativePath().toOSString()));
 
-        if (ErrorDialog.openError(shell,
+        class OkCancelErrorDialog extends ErrorDialog {
+            public OkCancelErrorDialog(Shell parentShell, String dialogTitle,
+                String message, IStatus status, int displayMask) {
+                super(parentShell, dialogTitle, message, status, displayMask);
+            }
+
+            @Override
+            protected void createButtonsForButtonBar(Composite parent) {
+                // create OK, Cancel, and Details buttons
+                createButton(parent, IDialogConstants.OK_ID,
+                    IDialogConstants.OK_LABEL, true);
+                createButton(parent, IDialogConstants.CANCEL_ID,
+                    IDialogConstants.CANCEL_LABEL, true);
+                createDetailsButton(parent);
+            }
+        }
+
+        OkCancelErrorDialog consistencyDialog = new OkCancelErrorDialog(shell,
             Messages.ConsistencyAction_confirm_dialog_title, null, multiStatus,
-            IStatus.WARNING) != Window.OK)
+            IStatus.WARNING);
+
+        if (consistencyDialog.open() != Window.OK) {
             return;
+        }
 
         ProgressMonitorDialog dialog = new ProgressMonitorDialog(shell);
 
