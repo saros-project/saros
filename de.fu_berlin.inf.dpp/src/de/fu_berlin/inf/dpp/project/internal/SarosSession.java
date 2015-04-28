@@ -260,8 +260,6 @@ public final class SarosSession implements ISarosSession {
             projectMapper.addProject(projectID, project,
                 dependentResources != null);
 
-            projectMapper.addOwnership(getLocalUser().getJID(), project);
-
             if (dependentResources != null)
                 projectMapper.addResources(project, dependentResources);
 
@@ -976,7 +974,6 @@ public final class SarosSession implements ISarosSession {
         JID ownerJID) {
         if (projectMapper.getProject(projectID) == null) {
             projectMapper.addProject(projectID, project, true);
-            projectMapper.addOwnership(ownerJID, project);
             // HACK
             resourceManager.projectAdded(project);
         }
@@ -986,7 +983,6 @@ public final class SarosSession implements ISarosSession {
     public void removeProjectMapping(String projectID, IProject project,
         JID ownerJID) {
         if (projectMapper.getProject(projectID) != null) {
-            projectMapper.removeOwnership(ownerJID, project);
             projectMapper.removeProject(projectID);
             // HACK
             resourceManager.projectRemoved(project);

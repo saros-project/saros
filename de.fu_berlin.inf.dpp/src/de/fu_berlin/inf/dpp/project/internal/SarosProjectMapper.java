@@ -13,7 +13,6 @@ import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -29,7 +28,7 @@ import de.fu_berlin.inf.dpp.session.User;
  * FIXME: the partial sharing stuff should not be handled here but in the
  * SharedProject class
  */
-
+// TODO remove the smurf naming
 class SarosProjectMapper {
 
     private static final Logger LOG = Logger
@@ -44,22 +43,6 @@ class SarosProjectMapper {
      * Mapping from currently registered shared projects to their id's.
      */
     private Map<IProject, String> projectToIDMapping = new HashMap<IProject, String>();
-    /**
-     * Mapping of which user shared which project in the session. Needed for
-     * partial sharing when the Needbased Feature is enabled.
-     */
-
-    /*
-     * FIXME: the is NOT correctly transmitted during a project negotiation
-     * 
-     * e.g:
-     * 
-     * Session Alice-Bob Bob adds project FOO Alice invites Carl The project
-     * owner for project FOO on Carls side is Alice but should be Bob.
-     * 
-     * FIXME: why is a JID used here ?
-     */
-    private HashMap<JID, List<IProject>> projectOwnershipMapping = new HashMap<JID, List<IProject>>();
 
     /**
      * Map containing the projects of the clients. Used by the host to determine
@@ -207,46 +190,6 @@ class SarosProjectMapper {
 
         LOG.debug("removed project " + project + " with ID " + id);
 
-    }
-
-    public synchronized void addOwnership(JID senderJID, IProject project) {
-
-        List<IProject> ownedProjects = projectOwnershipMapping.get(senderJID);
-
-        if (ownedProjects == null)
-            ownedProjects = new ArrayList<IProject>();
-
-        if (!ownedProjects.contains(project))
-            ownedProjects.add(project);
-
-        projectOwnershipMapping.put(senderJID, ownedProjects);
-    }
-
-    public synchronized void removeOwnership(JID senderJID, IProject project) {
-
-        List<IProject> ownedProjects = projectOwnershipMapping.get(senderJID);
-
-        if (ownedProjects == null)
-            return;
-
-        if (!ownedProjects.contains(project))
-            return;
-
-        ownedProjects.remove(project);
-
-        projectOwnershipMapping.put(senderJID, ownedProjects);
-    }
-
-    public synchronized List<IProject> getOwnedProjects(JID jid) {
-
-        List<IProject> result = new ArrayList<IProject>();
-
-        List<IProject> ownedProjects = projectOwnershipMapping.get(jid);
-
-        if (ownedProjects != null)
-            result.addAll(ownedProjects);
-
-        return result;
     }
 
     /**
