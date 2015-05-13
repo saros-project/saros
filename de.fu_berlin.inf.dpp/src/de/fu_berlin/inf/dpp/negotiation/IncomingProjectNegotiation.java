@@ -203,7 +203,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                  * and the first one is never done without the second. (See also
                  * finally block below.)
                  */
-                session.addProjectMapping(projectID, project, peer);
+                session.addProjectMapping(projectID, project);
                 session.enableQueuing(project);
             }
 
@@ -554,8 +554,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
          * properly !
          */
         for (Entry<String, IProject> entry : localProjectMapping.entrySet()) {
-            session
-                .removeProjectMapping(entry.getKey(), entry.getValue(), peer);
+            session.removeProjectMapping(entry.getKey(), entry.getValue());
         }
 
         // The session might have been stopped already, if not we will stop it.

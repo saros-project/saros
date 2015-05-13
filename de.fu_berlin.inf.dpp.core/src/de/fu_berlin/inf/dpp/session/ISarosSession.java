@@ -462,7 +462,7 @@ public interface ISarosSession {
 
     /**
      * Stores a bidirectional mapping between <code>project</code> and
-     * <code>projectID</code>, and allows to identify the resources' owner.
+     * <code>projectID</code>.
      * <p>
      * This information is necessary for receiving (unserializing)
      * resource-related activities.
@@ -471,20 +471,17 @@ public interface ISarosSession {
      *            Session-wide ID of the project
      * @param project
      *            the local representation of the project
-     * @param ownerJID
-     *            the inviter to this project
      * 
-     * @see #removeProjectMapping(String, IProject, JID)
+     * @see #removeProjectMapping(String, IProject)
      */
-    public void addProjectMapping(String projectID, IProject project,
-        JID ownerJID);
+    public void addProjectMapping(String projectID, IProject project);
 
     /**
      * Removes the bidirectional mapping <code>project</code> and
      * <code>projectId</code> that was created by
-     * {@link #addProjectMapping(String, IProject, JID) addProjectMapping()} .
+     * {@link #addProjectMapping(String, IProject) addProjectMapping()} .
      * <p>
-     * TODO Why are all three parameters needed here? This forces callers to
+     * TODO Why is the project parameter needed here? This forces callers to
      * store the mapping themselves (or retrieve it just before calling this
      * method).
      * 
@@ -492,11 +489,8 @@ public interface ISarosSession {
      *            Session-wide ID of the project
      * @param project
      *            the local representation of the project
-     * @param ownerJID
-     *            the inviter to this project
      */
-    public void removeProjectMapping(String projectID, IProject project,
-        JID ownerJID);
+    public void removeProjectMapping(String projectID, IProject project);
 
     /**
      * Return the stop manager of this session.

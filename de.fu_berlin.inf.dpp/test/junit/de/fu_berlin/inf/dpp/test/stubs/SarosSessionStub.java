@@ -236,14 +236,12 @@ public class SarosSessionStub implements ISarosSession {
     }
 
     @Override
-    public void addProjectMapping(String projectID, IProject project,
-        JID ownerJID) {
+    public void addProjectMapping(String projectID, IProject project) {
         throw new RuntimeException("Unexpected call to Stub");
     }
 
     @Override
-    public void removeProjectMapping(String projectID, IProject project,
-        JID ownerJID) {
+    public void removeProjectMapping(String projectID, IProject project) {
         throw new RuntimeException("Unexpected call to Stub");
     }
 

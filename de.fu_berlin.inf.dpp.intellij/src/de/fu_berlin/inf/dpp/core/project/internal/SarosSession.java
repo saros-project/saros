@@ -1020,19 +1020,15 @@ public final class SarosSession implements ISarosSession {
     }
 
     @Override
-    public void addProjectMapping(String projectID, IProject project,
-        JID ownerJID) {
+    public void addProjectMapping(String projectID, IProject project) {
         if (projectMapper.getProject(projectID) == null) {
             projectMapper.addProject(projectID, project, true);
-            projectMapper.addOwnership(ownerJID, project);
         }
     }
 
     @Override
-    public void removeProjectMapping(String projectID, IProject project,
-        JID ownerJID) {
+    public void removeProjectMapping(String projectID, IProject project) {
         if (projectMapper.getProject(projectID) != null) {
-            projectMapper.removeOwnership(ownerJID, project);
             projectMapper.removeProject(projectID);
         }
     }
