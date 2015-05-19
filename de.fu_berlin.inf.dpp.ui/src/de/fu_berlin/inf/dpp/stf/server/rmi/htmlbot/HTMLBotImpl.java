@@ -12,6 +12,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLButton;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotDialog;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteHTMLButton;
 import de.fu_berlin.inf.dpp.ui.webpages.BrowserPage;
+import de.fu_berlin.inf.dpp.ui.webpages.SarosMainPage;
 
 public class HTMLBotImpl extends HTMLSTFRemoteObject implements IHTMLBot {
 
@@ -53,7 +54,7 @@ public class HTMLBotImpl extends HTMLSTFRemoteObject implements IHTMLBot {
     }
 
     private IJQueryBrowser getBrowser() {
-        return getBrowserManager().getMainViewBrowser();
+        return getBrowserManager().getBrowser(SarosMainPage.class);
     }
 
     public static IHTMLBot getInstance() {

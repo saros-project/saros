@@ -1,10 +1,11 @@
 package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl;
 
+import java.rmi.RemoteException;
+
 import de.fu_berlin.inf.ag_se.browser.html.ISelector;
 import de.fu_berlin.inf.dpp.stf.server.HTMLSTFRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLButton;
-
-import java.rmi.RemoteException;
+import de.fu_berlin.inf.dpp.ui.webpages.SarosMainPage;
 
 public final class RemoteHTMLButton extends HTMLSTFRemoteObject implements
     IRemoteHTMLButton {
@@ -24,6 +25,7 @@ public final class RemoteHTMLButton extends HTMLSTFRemoteObject implements
 
     @Override
     public void click() throws RemoteException {
-        getBrowserManager().getMainViewBrowser().run(selector.getStatement() + ".click();");
+        getBrowserManager().getBrowser(SarosMainPage.class).run(
+            selector.getStatement() + ".click();");
     }
 }
