@@ -26,7 +26,7 @@ abstract class FileTransferJob extends Job {
 
     IStatus monitorTransfer(FileTransfer transfer, IProgressMonitor monitor) {
         MonitorableFileTransfer mtf = new MonitorableFileTransfer(transfer,
-            ProgressMonitorAdapterFactory.convertTo(monitor));
+            ProgressMonitorAdapterFactory.convert(monitor));
         TransferStatus result = mtf.monitorTransfer();
 
         switch (result) {

@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import org.eclipse.core.runtime.CoreException;
 
-import de.fu_berlin.inf.dpp.monitoring.EclipseProgressMonitorImpl;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
+import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 
 /**
  * Takes an {@link org.eclipse.core.resources.IWorkspaceRunnable Eclipse
@@ -22,10 +22,8 @@ public class EclipseWorkspaceRunnableImpl implements IWorkspaceRunnable {
 
     @Override
     public void run(IProgressMonitor monitor) throws IOException {
-        org.eclipse.core.runtime.IProgressMonitor mon = ((EclipseProgressMonitorImpl) monitor)
-            .getDelegate();
         try {
-            delegate.run(mon);
+            delegate.run(ProgressMonitorAdapterFactory.convert(monitor));
         } catch (CoreException e) {
             throw new IOException(e.getMessage(), e);
         }

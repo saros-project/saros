@@ -1021,7 +1021,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             monitor = ((SubProgressMonitor) monitor).getParent();
 
         try {
-            return ProgressMonitorAdapterFactory.convertBack(monitor);
+            return ProgressMonitorAdapterFactory.convert(monitor);
         } catch (Exception e) {
             return new org.eclipse.core.runtime.NullProgressMonitor();
         }

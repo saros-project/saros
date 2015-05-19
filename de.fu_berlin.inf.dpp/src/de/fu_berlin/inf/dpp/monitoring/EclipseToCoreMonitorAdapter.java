@@ -2,10 +2,11 @@ package de.fu_berlin.inf.dpp.monitoring;
 
 import org.eclipse.core.runtime.ProgressMonitorWrapper;
 
-public class EclipseProgressMonitorImpl extends ProgressMonitorWrapper
-    implements IProgressMonitor {
+public class EclipseToCoreMonitorAdapter extends ProgressMonitorWrapper
+    implements de.fu_berlin.inf.dpp.monitoring.IProgressMonitor {
 
-    EclipseProgressMonitorImpl(org.eclipse.core.runtime.IProgressMonitor monitor) {
+    EclipseToCoreMonitorAdapter(
+        org.eclipse.core.runtime.IProgressMonitor monitor) {
         super(monitor);
     }
 

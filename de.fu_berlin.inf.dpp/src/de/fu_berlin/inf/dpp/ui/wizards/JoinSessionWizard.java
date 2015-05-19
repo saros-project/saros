@@ -133,7 +133,7 @@ public class JoinSessionWizard extends Wizard {
                     throws InvocationTargetException, InterruptedException {
                     try {
                         status = isn.accept(ProgressMonitorAdapterFactory
-                            .convertTo(monitor));
+                            .convert(monitor));
                     } catch (Exception e) {
                         throw new InvocationTargetException(e);
                     }

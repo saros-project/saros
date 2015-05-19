@@ -48,7 +48,7 @@ public class EclipseWorkspaceImpl implements IWorkspace {
             throws CoreException {
 
             try {
-                delegate.run(ProgressMonitorAdapterFactory.convertTo(monitor));
+                delegate.run(ProgressMonitorAdapterFactory.convert(monitor));
             } catch (IOException e) {
                 final Throwable cause = e.getCause();
 

@@ -321,7 +321,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
                     final ProjectNegotiation.Status status = process.run(
                         convertedMapping,
-                        ProgressMonitorAdapterFactory.convertTo(monitor),
+                        ProgressMonitorAdapterFactory.convert(monitor),
                         useVersionControl);
 
                     if (isAutoBuilding) {
@@ -589,7 +589,7 @@ public class AddProjectToSessionWizard extends Wizard {
             try {
                 localFileList = FileListFactory.createFileList(adaptedProject,
                     null, checksumCache, vcs, ProgressMonitorAdapterFactory
-                        .convertTo(subMonitor.newChild(1,
+                        .convert(subMonitor.newChild(1,
                             SubMonitor.SUPPRESS_ALL_LABELS)));
             } catch (IOException e) {
                 Throwable cause = e.getCause();

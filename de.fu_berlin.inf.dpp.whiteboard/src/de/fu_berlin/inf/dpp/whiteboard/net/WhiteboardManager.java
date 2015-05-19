@@ -93,7 +93,7 @@ public class WhiteboardManager {
 
                 SXEOutgoingSynchronizationProcess inv = new SXEOutgoingSynchronizationProcess(
                     controller, sxeTransmitter, user.getJID().toString());
-                inv.start(ProgressMonitorAdapterFactory.convertBack(monitor));
+                inv.start(ProgressMonitorAdapterFactory.convert(monitor));
             }
         }
 

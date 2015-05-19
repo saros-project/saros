@@ -83,7 +83,7 @@ public class NegotiationHandler implements INegotiationHandler {
         protected IStatus run(IProgressMonitor monitor) {
             try {
                 SessionNegotiation.Status status = process
-                    .start(ProgressMonitorAdapterFactory.convertTo(monitor));
+                    .start(ProgressMonitorAdapterFactory.convert(monitor));
 
                 switch (status) {
                 case CANCEL:
@@ -161,7 +161,7 @@ public class NegotiationHandler implements INegotiationHandler {
         protected IStatus run(IProgressMonitor monitor) {
             try {
                 ProjectNegotiation.Status status = process
-                    .run(ProgressMonitorAdapterFactory.convertTo(monitor));
+                    .run(ProgressMonitorAdapterFactory.convert(monitor));
 
                 String peerName = getNickname(new JID(peer));
 
