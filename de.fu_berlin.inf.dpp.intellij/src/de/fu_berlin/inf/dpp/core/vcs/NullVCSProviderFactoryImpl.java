@@ -34,12 +34,22 @@ public class NullVCSProviderFactoryImpl implements VCSProviderFactory {
 
     /**
      * Returns null.
-     *
+     * 
      * @param project
      * @return always <code>null</code>
      */
     @Override
-    public VCSProvider getProvider(IProject project) {
+    public VCSProvider getProvider(final IProject project) {
+        return null;
+    }
+
+    /**
+     * Returns <code>null</code> for any given identifier.
+     * 
+     * @return always <code>null</code>
+     */
+    @Override
+    public VCSProvider getProvider(final String identifier) {
         return null;
     }
 }
