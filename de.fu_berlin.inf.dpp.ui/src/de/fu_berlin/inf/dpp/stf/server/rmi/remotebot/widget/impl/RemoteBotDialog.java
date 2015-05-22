@@ -1,13 +1,14 @@
 package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl;
 
+import java.rmi.RemoteException;
+
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.dpp.stf.server.HTMLSTFRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotDialog;
-import de.fu_berlin.inf.dpp.ui.view_parts.BrowserPage;
+import de.fu_berlin.inf.dpp.ui.webpages.BrowserPage;
 
-import java.rmi.RemoteException;
-
-public class RemoteBotDialog extends HTMLSTFRemoteObject implements IRemoteBotDialog {
+public class RemoteBotDialog extends HTMLSTFRemoteObject implements
+    IRemoteBotDialog {
 
     private final static RemoteBotDialog INSTANCE = new RemoteBotDialog();
 
@@ -22,9 +23,8 @@ public class RemoteBotDialog extends HTMLSTFRemoteObject implements IRemoteBotDi
     }
 
     @Override
-    public void fillInputField(String id, String value)  throws RemoteException{
-        getBrowser()
-            .syncRun("$('#" + id + "').val('" + value + "');");
+    public void fillInputField(String id, String value) throws RemoteException {
+        getBrowser().syncRun("$('#" + id + "').val('" + value + "');");
     }
 
     @Override
@@ -33,7 +33,7 @@ public class RemoteBotDialog extends HTMLSTFRemoteObject implements IRemoteBotDi
     }
 
     @Override
-    public void cancel()  throws RemoteException {
+    public void cancel() throws RemoteException {
         getBrowser().syncRun("$('#cancelButton').click();");
     }
 

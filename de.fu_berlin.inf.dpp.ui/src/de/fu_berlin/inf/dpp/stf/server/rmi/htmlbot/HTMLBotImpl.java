@@ -1,5 +1,9 @@
 package de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot;
 
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
+
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.ag_se.browser.html.ISelector;
 import de.fu_berlin.inf.dpp.stf.server.HTMLSTFRemoteObject;
@@ -7,11 +11,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotDialog;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLButton;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotDialog;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteHTMLButton;
-import de.fu_berlin.inf.dpp.ui.view_parts.BrowserPage;
-
-import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.List;
+import de.fu_berlin.inf.dpp.ui.webpages.BrowserPage;
 
 public class HTMLBotImpl extends HTMLSTFRemoteObject implements IHTMLBot {
 
