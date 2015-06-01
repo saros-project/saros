@@ -30,7 +30,7 @@ public class SarosMainPage implements BrowserPage {
 
     @Override
     public String getWebpage() {
-        return "html/saros-angular.html";
+        return "html/main-page.html";
     }
 
     @Override

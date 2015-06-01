@@ -1,7 +1,22 @@
 {
+  "dependencies": {
+    "ampersand-app": "^1.0.0",
+    "ampersand-view": "^7.0.1",
+    "backbone-events-standalone": "^0.2.6",
+    "domready": "^1.0.5",
+    "lodash.bind": "^3.1.0",
+    "bootstrap": "^3.3.4",
+    "jquery": "^2.1.3"
+  },
   "devDependencies": {
-    "grunt": "^0.4.5",
-    "grunt-contrib-jshint": "^0.11.0",
-    "grunt-contrib-watch": "^0.6.1"
+    "browserify": "^9.0.3",
+    "gulp": "^3.8.11",
+    "gulp-util": "^3.0.4",
+    "templatizer": "^1.3.0",
+    "vinyl-source-stream": "^1.1.0"
+  },
+  "scripts": {
+    "build": "gulp browserify",
+    "build-watch": "gulp watch"
   }
 }
