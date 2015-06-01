@@ -38,8 +38,7 @@ public class AccountRenderer extends Renderer {
         Gson gson = new Gson();
         String accountString = gson.toJson(getAccountList());
         LOG.debug("sending json: " + accountString);
-        browser.run("Saros.setAccountList(" + accountString + ")");
-
+        browser.run("SarosApi.trigger('updateAccounts', " + accountString + ")");
     }
 
     private List<Account> getAccountList() {

@@ -2,8 +2,9 @@
 var app = require('ampersand-app');
 var bind = require('lodash.bind');
 var domReady = require('domready');
+var SarosState = require('./models/saros-state');
 var MainView = require('./views/main');
-var SarosApi = require('./saros-api');
+var Accounts = require('./models/accounts');
 
 window.$ = window.jQuery = require('jquery');
 require('bootstrap');
@@ -16,10 +17,13 @@ window.SarosApi = require('./saros-api');
 window.app = app;
 
 app.extend({
+    state: new SarosState(),
+    accounts: new Accounts(),
     init: function() {
 
         new MainView({
-            el: document.body
+            el: document.body,
+            model: this.state
         });
     }
 });
