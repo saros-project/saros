@@ -13,13 +13,11 @@
   },
   "devDependencies": {
     "browserify": "^9.0.3",
-    "gulp": "^3.8.11",
-    "gulp-util": "^3.0.4",
-    "templatizer": "^1.3.0",
-    "vinyl-source-stream": "^1.1.0"
+    "templatizer": "^1.3.0"
   },
   "scripts": {
-    "build": "gulp browserify",
-    "build-watch": "gulp watch"
+    "build": "npm run build:scripts -s && npm run build:jade -s",
+    "build:scripts": "browserify js/app.js -o bundle/bundle.js",
+    "build:jade": "templatizer -d templates/ -o js/templates.js"
   }
 }
