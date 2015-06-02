@@ -1,0 +1,12 @@
+{
+	"boss":      		true,
+	"node":      		true,
+	"eqeqeq":    		true,
+	"strict":    		false,
+	"undef":     		true,
+	"unused":    		true,
+	"onecase":   		true,
+	"lastsemic": 		true,
+	"maxdepth": 		3,
+	"maxcomplexity":	4
+}

@@ -4,29 +4,17 @@ var SarosApi = BackboneEvents.mixin({
 
     connect: function(account) {
 
-        __java_connect(JSON.stringify(account));
+        __java_connect(JSON.stringify(account)); // jshint ignore:line
     },
 
     disconnect: function() {
 
-        __java_disconnect();
+        __java_disconnect(); // jshint ignore:line
     },
 
     manageAccounts: function() {
 
-        __java_showAddAccountWizard();
-    },
-
-    addContact: function(contact) {
-
-    },
-
-    editContact: function(contact) {
-
-    },
-
-    deleteContact: function(contact) {
-
+        __java_showAddAccountWizard(); // jshint ignore:line
     }
 });
 
