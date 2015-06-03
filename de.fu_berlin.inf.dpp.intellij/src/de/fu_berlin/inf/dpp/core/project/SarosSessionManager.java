@@ -50,7 +50,7 @@ import de.fu_berlin.inf.dpp.negotiation.FileList;
 import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationListener;
 import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelOption;
+import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
@@ -77,22 +77,22 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     /**
      * @JTourBusStop 6, Architecture Overview, Invitation Management:
-     * 
+     *
      *               While Activities are used to keep a running session
      *               consistent, we use MESSAGES whenever the Session itself is
      *               modified. This includes adding users or projects to the
      *               session.
-     * 
+     *
      *               The Invitation Process is managed by the "Invitation
      *               Management"-Component. This class is the main entrance
      *               point of this Component. During the invitation Process, the
      *               Network Layer is used to send MESSAGES between the host and
      *               the invitees and the Session Management is informed about
      *               joined users and added projects.
-     * 
+     *
      *               For more information about the Invitation Process see the
      *               "Invitation Process"-Tour.
-     * 
+     *
      */
 
     private static final Logger log = Logger
@@ -102,7 +102,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     private static final long LOCK_TIMEOUT = 10000L;
 
-    private static final long NEGOTIATION_PROCESS_TIMEOUT = 10000L;
+    private static final long NEGOTIATION_TIMEOUT = 10000L;
 
     private final SarosSessionObservable sarosSessionObservable;
 
@@ -113,15 +113,15 @@ public class SarosSessionManager implements ISarosSessionManager {
     private final ProjectNegotiationObservable currentProjectNegotiations;
     private final List<ISarosSessionListener> sarosSessionListeners = new CopyOnWriteArrayList<ISarosSessionListener>();
     private final Lock startStopSessionLock = new ReentrantLock();
-    private final NegotiationListener processListener = new NegotiationListener() {
+    private final NegotiationListener negotiationListener = new NegotiationListener() {
         @Override
-        public void negotiationTerminated(SessionNegotiation process) {
-            currentSessionNegotiations.remove(process);
+        public void negotiationTerminated(SessionNegotiation negotiation) {
+            currentSessionNegotiations.remove(negotiation);
         }
 
         @Override
-        public void negotiationTerminated(ProjectNegotiation process) {
-            currentProjectNegotiations.removeProjectExchangeProcess(process);
+        public void negotiationTerminated(ProjectNegotiation negotiation) {
+            currentProjectNegotiations.remove(negotiation);
         }
     };
     private final IConnectionListener listener = new IConnectionListener() {
@@ -164,19 +164,19 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     /**
      * @JTourBusStop 3, Invitation Process:
-     * 
+     *
      *               This class manages the current Saros session.
-     * 
+     *
      *               Saros makes a distinction between a session and a shared
      *               project. A session is an on-line collaboration between
      *               users which allows users to carry out activities. The main
      *               activity is to share projects. Hence, before you share a
      *               project, a session has to be started and all users added to
      *               it.
-     * 
+     *
      *               (At the moment, this separation is invisible to the user.
      *               He/she must share a project in order to start a session.)
-     * 
+     *
      */
     @Override
     public void startSession(
@@ -330,10 +330,10 @@ public class SarosSessionManager implements ISarosSessionManager {
 
             sessionShutdown = true;
 
-            log.debug("terminating all running negotiation processes");
+            log.debug("terminating all running negotiations");
 
-            if (!terminateNegotiationProcesses()) {
-                log.warn("there are still running negotiation processes");
+            if (!terminateNegotiations()) {
+                log.warn("there are still running negotiations");
             }
 
             sessionEnding(sarosSession);
@@ -365,7 +365,7 @@ public class SarosSessionManager implements ISarosSessionManager {
      * method. The caller needs to save the returned value to a local variable
      * and do a null check. For new code you should consider being scoped by the
      * SarosSession and get the SarosSession in the constructor.
-     * 
+     *
      * @deprecated Error prone method, which produces NPE if not handled
      *             correctly. Will soon get removed.
      */
@@ -386,7 +386,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             return;
         }
 
-        IncomingSessionNegotiation process;
+        IncomingSessionNegotiation negotiation;
 
         synchronized (this) {
             if (!startStopSessionLock.tryLock()) {
@@ -403,34 +403,34 @@ public class SarosSessionManager implements ISarosSessionManager {
 
                 sessionIDObservable.setValue(sessionID);
 
-                process = new IncomingSessionNegotiation(this, sessionID, from,
-                    version, invitationID, description, sarosContext);
+                negotiation = new IncomingSessionNegotiation(this, sessionID,
+                    from, version, invitationID, description, sarosContext);
 
-                process.setNegotiationListener(processListener);
-                currentSessionNegotiations.add(process);
+                negotiation.setNegotiationListener(negotiationListener);
+                currentSessionNegotiations.add(negotiation);
 
             } finally {
                 startStopSessionLock.unlock();
             }
         }
-        handler.handleIncomingSessionNegotiation(process);
+        handler.handleIncomingSessionNegotiation(negotiation);
 
     }
 
     /**
      * This method is called when a new project was added to the session
-     * 
+     *
      * @param from
      *            The one who added the project.
      * @param projectInfos
      *            what projects where added ({@link FileList}, projectName etc.)
      *            see: {@link ProjectNegotiationData}
-     * @param processID
-     *            ID of the exchanging process
+     * @param negotiationID
+     *            ID of the negotiation
      */
     @Override
     public void incomingProjectReceived(JID from,
-        List<ProjectNegotiationData> projectInfos, String processID) {
+        List<ProjectNegotiationData> projectInfos, String negotiationID) {
 
         INegotiationHandler handler = negotiationHandler;
 
@@ -439,7 +439,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             return;
         }
 
-        IncomingProjectNegotiation process;
+        IncomingProjectNegotiation negotiation;
 
         synchronized (this) {
             if (!startStopSessionLock.tryLock()) {
@@ -448,17 +448,17 @@ public class SarosSessionManager implements ISarosSessionManager {
             }
 
             try {
-                process = new IncomingProjectNegotiation(getSarosSession(),
-                    from, processID, projectInfos, sarosContext);
+                negotiation = new IncomingProjectNegotiation(getSarosSession(),
+                    from, negotiationID, projectInfos, sarosContext);
 
-                process.setNegotiationListener(processListener);
-                currentProjectNegotiations.addProjectExchangeProcess(process);
+                negotiation.setNegotiationListener(negotiationListener);
+                currentProjectNegotiations.add(negotiation);
 
             } finally {
                 startStopSessionLock.unlock();
             }
         }
-        handler.handleIncomingProjectNegotiation(process);
+        handler.handleIncomingProjectNegotiation(negotiation);
 
     }
 
@@ -472,7 +472,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             return;
         }
 
-        OutgoingSessionNegotiation process;
+        OutgoingSessionNegotiation negotiation;
 
         synchronized (this) {
             if (!startStopSessionLock.tryLock()) {
@@ -500,17 +500,17 @@ public class SarosSessionManager implements ISarosSessionManager {
                     return;
                 }
 
-                process = new OutgoingSessionNegotiation(toInvite, session,
+                negotiation = new OutgoingSessionNegotiation(toInvite, session,
                     description, sarosContext);
 
-                process.setNegotiationListener(processListener);
-                currentSessionNegotiations.add(process);
+                negotiation.setNegotiationListener(negotiationListener);
+                currentSessionNegotiations.add(negotiation);
 
             } finally {
                 startStopSessionLock.unlock();
             }
         }
-        handler.handleOutgoingSessionNegotiation(process);
+        handler.handleOutgoingSessionNegotiation(negotiation);
     }
 
     @Override
@@ -522,7 +522,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     /**
      * Adds project resources to an existing session.
-     * 
+     *
      * @param projectResourcesMapping
      */
     @Override
@@ -609,13 +609,12 @@ public class SarosSessionManager implements ISarosSessionManager {
             try {
                 for (User user : session.getRemoteUsers()) {
 
-                    OutgoingProjectNegotiation process = new OutgoingProjectNegotiation(
+                    OutgoingProjectNegotiation negotiation = new OutgoingProjectNegotiation(
                         user.getJID(), session, projectsToShare, sarosContext);
 
-                    process.setNegotiationListener(processListener);
-                    currentProjectNegotiations
-                        .addProjectExchangeProcess(process);
-                    negotiations.add(process);
+                    negotiation.setNegotiationListener(negotiationListener);
+                    currentProjectNegotiations.add(negotiation);
+                    negotiations.add(negotiation);
                 }
             } finally {
                 startStopSessionLock.unlock();
@@ -654,7 +653,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             return;
         }
 
-        OutgoingProjectNegotiation process;
+        OutgoingProjectNegotiation negotiation;
 
         synchronized (this) {
             if (!startStopSessionLock.tryLock()) {
@@ -663,17 +662,17 @@ public class SarosSessionManager implements ISarosSessionManager {
             }
 
             try {
-                process = new OutgoingProjectNegotiation(user, session,
+                negotiation = new OutgoingProjectNegotiation(user, session,
                     currentSharedProjects, sarosContext);
 
-                process.setNegotiationListener(processListener);
-                currentProjectNegotiations.addProjectExchangeProcess(process);
+                negotiation.setNegotiationListener(negotiationListener);
+                currentProjectNegotiations.add(negotiation);
 
             } finally {
                 startStopSessionLock.unlock();
             }
         }
-        handler.handleOutgoingProjectNegotiation(process);
+        handler.handleOutgoingProjectNegotiation(negotiation);
     }
 
     @Override
@@ -754,26 +753,25 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
     }
 
-    private boolean terminateNegotiationProcesses() {
+    private boolean terminateNegotiations() {
 
-        for (SessionNegotiation process : currentSessionNegotiations.list()) {
-            process.localCancel(null, CancelOption.NOTIFY_PEER);
+        for (SessionNegotiation negotiation : currentSessionNegotiations.list()) {
+            negotiation.localCancel(null, CancelOption.NOTIFY_PEER);
         }
 
-        for (ProjectNegotiation process : currentProjectNegotiations
-            .getProcesses().values()) {
-            process.localCancel(null, CancelOption.NOTIFY_PEER);
+        for (ProjectNegotiation negotiation : currentProjectNegotiations.list()) {
+            negotiation.localCancel(null, CancelOption.NOTIFY_PEER);
         }
 
-        log.trace("waiting for all invitation and project negotiation processes to terminate");
+        log.trace("waiting for all invitation and project negotiations to terminate");
 
         long startTime = System.currentTimeMillis();
 
         boolean terminated = false;
 
-        while (System.currentTimeMillis() - startTime < NEGOTIATION_PROCESS_TIMEOUT) {
+        while (System.currentTimeMillis() - startTime < NEGOTIATION_TIMEOUT) {
             if (currentSessionNegotiations.list().isEmpty()
-                && currentProjectNegotiations.getProcesses().isEmpty()) {
+                && currentProjectNegotiations.list().isEmpty()) {
                 terminated = true;
                 break;
             }

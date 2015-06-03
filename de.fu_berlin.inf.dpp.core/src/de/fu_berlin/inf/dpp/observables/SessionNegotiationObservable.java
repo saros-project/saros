@@ -18,7 +18,6 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
  */
 @Component(module = "observables")
 // TODO remove the ID part here, there should only be one invitation per JID
-// TODO rename to SessionNegotiationProcessObservable
 public final class SessionNegotiationObservable {
 
     private static final Logger LOG = Logger
@@ -28,7 +27,7 @@ public final class SessionNegotiationObservable {
 
     /**
      * Returns the session negotiation for the given JID with the given id.
-     * 
+     *
      * @param jid
      *            the JID to lookup
      * @param id
@@ -52,7 +51,7 @@ public final class SessionNegotiationObservable {
 
     /**
      * Checks if a session negotiation currently exists for the given JID.
-     * 
+     *
      * @param jid
      *            the JID to lookup
      * @return <code>true</code> if a session negotiation exists for the current
@@ -66,7 +65,7 @@ public final class SessionNegotiationObservable {
 
     /**
      * Adds a session negotiation.
-     * 
+     *
      * @param negotiation
      *            the session negotiation to add
      */
@@ -96,18 +95,18 @@ public final class SessionNegotiationObservable {
 
     /**
      * Removes a session negotiation.
-     * 
+     *
      * @param negotiation
      *            the session negotiation to remove
      */
     public synchronized void remove(SessionNegotiation negotiation) {
-        List<SessionNegotiation> currentProcesses = negotiations
+        List<SessionNegotiation> currentNegotiations = negotiations
             .get(negotiation.getPeer());
 
-        if (currentProcesses == null)
-            currentProcesses = Collections.emptyList();
+        if (currentNegotiations == null)
+            currentNegotiations = Collections.emptyList();
 
-        for (final Iterator<SessionNegotiation> it = currentProcesses
+        for (final Iterator<SessionNegotiation> it = currentNegotiations
             .iterator(); it.hasNext();) {
 
             final SessionNegotiation currentNegotiation = it.next();
@@ -124,14 +123,15 @@ public final class SessionNegotiationObservable {
 
     /**
      * Returns a snap shot of all currently running session negotiation
-     * processes.
-     * 
-     * @return a list of all currently running session negotiation processes
+     * negotiations.
+     *
+     * @return a list of all currently running session negotiation negotiations
      */
     public synchronized List<SessionNegotiation> list() {
         final List<SessionNegotiation> currentNegotiations = new ArrayList<SessionNegotiation>();
 
-        for (final List<SessionNegotiation> negotiationList : negotiations.values())
+        for (final List<SessionNegotiation> negotiationList : negotiations
+            .values())
             currentNegotiations.addAll(negotiationList);
 
         return currentNegotiations;

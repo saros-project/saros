@@ -34,8 +34,8 @@ import org.eclipse.swt.widgets.Shell;
 import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 import de.fu_berlin.inf.dpp.negotiation.CancelListener;
 import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelLocation;
-import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelOption;
+import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelLocation;
+import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
 import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.ui.Messages;
@@ -80,8 +80,8 @@ public class JoinSessionWizard extends Wizard {
              */
             /*
              * FIXME the message is not the same as returned by
-             * CancelableProcess#getErrorMessage() see TODO in
-             * CancelableProcess#generateErrorMessage
+             * Negotiation#getErrorMessage() see TODO in
+             * Negotiation#generateErrorMessage
              */
             handleCanceledAsync(location, message);
         }

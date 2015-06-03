@@ -10,23 +10,23 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelLocation;
-import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelOption;
+import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelLocation;
+import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
 
 /**
- * Abstract base class that offers multiple methods for handling cancellation.
- * 
+ * Abstract base class for implementing specific types of message exchanges
+ * within the Saros protocol. It offers a few utility methods, as well as an
+ * interface for coordinated cancellation of negotiations.
+ *
  * @author srossbach
  */
-
-// TODO rename to CancelableNegotiation ... adapt Javadoc
-abstract class CancelableProcess {
+abstract class Negotiation {
 
     public enum Status {
         OK, CANCEL, REMOTE_CANCEL, ERROR, REMOTE_ERROR
     }
 
-    private static final Logger log = Logger.getLogger(CancelableProcess.class);
+    private static final Logger log = Logger.getLogger(Negotiation.class);
 
     private IProgressMonitor monitorToObserve;
 
@@ -38,7 +38,7 @@ abstract class CancelableProcess {
 
     private String errorMessage;
 
-    private boolean processTerminated;
+    private boolean terminated;
 
     private volatile NegotiationListener listener;
 
@@ -47,9 +47,9 @@ abstract class CancelableProcess {
     private final List<CancelListener> cancelListeners = new CopyOnWriteArrayList<CancelListener>();
 
     /**
-     * Sets a {@linkplain NegotiationListener process listener} for the current
+     * Sets a {@linkplain NegotiationListener negotiation listener} for the
      * negotiation.
-     * 
+     *
      * @param listener
      *            the listener that should be notified
      */
@@ -58,9 +58,9 @@ abstract class CancelableProcess {
     }
 
     /**
-     * Returns the error message if the exit status of the process was either
-     * {@link Status#ERROR} or {@link Status#REMOTE_ERROR}.
-     * 
+     * Returns the error message if the exit status of the negotiation was
+     * either {@link Status#ERROR} or {@link Status#REMOTE_ERROR}.
+     *
      * @return the error message
      */
     public synchronized String getErrorMessage() {
@@ -68,18 +68,18 @@ abstract class CancelableProcess {
     }
 
     /**
-     * This method is called after {@link #terminateProcess} decides to perform
-     * a cleanup because the execution of the process was canceled. Implementing
-     * classes should try a maximum effort to revert all the changes that were
-     * made before the process was aborted.
+     * This method is called after {@link #terminate} decides to perform a
+     * cleanup because the negotiation was canceled. Implementing classes should
+     * try a maximum effort to revert all the changes that were made before the
+     * negotiation was aborted.
      */
     protected abstract void executeCancellation();
 
     /**
-     * This method is called after {@link #terminateProcess} decides to cancel
-     * the current process. It is up to the implementing class to forward this
+     * This method is called after {@link #terminate} decides to cancel the
+     * negotiation. It is up to the implementing class to forward this
      * notification.
-     * 
+     *
      * @param cancellationCause
      *            the cause of the cancellation
      */
@@ -88,11 +88,11 @@ abstract class CancelableProcess {
 
     /**
      * Registers a monitor which should be observed to determine the status of a
-     * local cancellation of the current process.
-     * 
+     * local cancellation of the negotiation.
+     *
      * @param monitor
      *            the monitor to observer
-     * 
+     *
      * @see #isLocalCancellation
      * @see #checkCancellation(CancelOption)
      */
@@ -101,15 +101,15 @@ abstract class CancelableProcess {
     }
 
     /**
-     * Checks the current cancellation status of this process. If a local
+     * Checks the current cancellation status of this negotiation. If a local
      * cancellation request is detected this method will invoke
      * {@link #localCancel(String errorMessage, CancelOption cancelOption)} with
      * <code>null</code> as errorMessage argument.
-     * 
+     *
      * @param cancelOption
      *            the cancel option to use when a local cancellation was set
      * @throws SarosCancellationException
-     *             if the current process should be canceled
+     *             if the negotiation should be canceled
      */
     protected synchronized final void checkCancellation(
         CancelOption cancelOption) throws SarosCancellationException {
@@ -125,11 +125,11 @@ abstract class CancelableProcess {
     }
 
     /**
-     * Informs the current process that it should cancel its operation as soon
-     * as possible. Calling this method multiple times will <b>NOT</b> override
-     * the error message or the cancel option. This method will also have
-     * <b>NO</b> effect if a remote cancellation request was already executed.
-     * 
+     * Informs the negotiation that it should cancel its operation as soon as
+     * possible. Calling this method multiple times will <b>NOT</b> override the
+     * error message or the cancel option. This method will also have <b>NO</b>
+     * effect if a remote cancellation request was already executed.
+     *
      * @param errorMessage
      *            the reason to cancel the execution in case of an error or
      *            <code>null</code> if this is a normal cancel request
@@ -139,7 +139,7 @@ abstract class CancelableProcess {
      *            {@link CancelOption#DO_NOT_NOTIFY_PEER}
      * @return <code>true</code> if this request was the first cancel request,
      *         <code>false</code> otherwise
-     * 
+     *
      * @see #remoteCancel
      * @see #checkCancellation
      * @see #notifyCancellation
@@ -153,7 +153,7 @@ abstract class CancelableProcess {
             isLocalCancellation = true;
         }
 
-        log.debug("process " + this
+        log.debug("negotiation " + this
             + " was canceled by the local side, error: "
             + (errorMessage == null ? "none" : errorMessage));
 
@@ -162,17 +162,17 @@ abstract class CancelableProcess {
     }
 
     /**
-     * Informs the current process that it should cancel its operation as soon
-     * as possible. Calling this method multiple times will <b>NOT</b> override
-     * the error message. This method will also have <b>NO</b> effect if a local
+     * Informs the negotiation that it should cancel its operation as soon as
+     * possible. Calling this method multiple times will <b>NOT</b> override the
+     * error message. This method will also have <b>NO</b> effect if a local
      * cancellation request was already executed.
-     * 
+     *
      * @param errorMessage
      *            the reason to cancel the execution in case of an error or
      *            <code>null</code> if this is a cancel abort request
      * @return <code>true</code> if this request was the first cancel request,
      *         <code>false</code> otherwise
-     * 
+     *
      * @see #localCancel
      * @see #checkCancellation
      * @see #notifyCancellation
@@ -186,7 +186,7 @@ abstract class CancelableProcess {
             isRemoteCancellation = true;
         }
 
-        log.debug("process " + this
+        log.debug("negotiation " + this
             + " was canceled by the remote side, error: "
             + (errorMessage == null ? "none" : errorMessage));
 
@@ -197,7 +197,7 @@ abstract class CancelableProcess {
 
     /**
      * Adds the given listener for cancellation events to this negotiation.
-     * 
+     *
      * @param listener
      *            the listener to add
      */
@@ -208,7 +208,7 @@ abstract class CancelableProcess {
 
     /**
      * Removes the given listener for cancellation events from this negotiation.
-     * 
+     *
      * @param listener
      *            the listener to remove
      */
@@ -217,9 +217,9 @@ abstract class CancelableProcess {
     }
 
     /**
-     * Returns if this process should be canceled.
-     * 
-     * @return <code>true</code> this process should be canceled,
+     * Returns if this negotiation should be canceled.
+     *
+     * @return <code>true</code> this negotiation should be canceled,
      *         <code>false</code> otherwise
      */
     public final synchronized boolean isCanceled() {
@@ -227,9 +227,9 @@ abstract class CancelableProcess {
     }
 
     /**
-     * Returns if the current process should be canceled because of a local
+     * Returns if the negotiation should be canceled because of a local
      * cancellation request
-     * 
+     *
      * @return <code>true</code> if cancellation is requested on the local side,
      *         <code>false</code> otherwise
      */
@@ -240,9 +240,9 @@ abstract class CancelableProcess {
     }
 
     /**
-     * Returns if the current process should be canceled because of a remote
-     * cancellation request
-     * 
+     * Returns if the negotiation should be canceled because of a remote
+     * cancellation request.
+     *
      * @return <code>true</code> if cancellation is requested on the remote
      *         side, <code>false</code> otherwise
      */
@@ -251,22 +251,22 @@ abstract class CancelableProcess {
     }
 
     /**
-     * Terminates the current process. This method may be called multiple times
-     * but only the <b>first</b> call will be taken into account. If the process
+     * Terminates the negotiation. This method may be called multiple times but
+     * only the <b>first</b> call will be taken into account. If the negotiation
      * was canceled in the meantime it will invoke {@link #notifyCancellation}
      * and {@link #executeCancellation} in this order.
-     * 
-     * 
+     *
+     *
      * @param exception
-     *            The exception to analyze or <code>null</code>. If the process
-     *            had already been canceled by a {@link #localCancel} or a
-     *            {@link #remoteCancel} call the exception will be ignored. If
-     *            the exception is <code>null</code> then the exit status will
-     *            be determined on former {@link #localCancel} or
-     *            {@link #remoteCancel} calls.
+     *            The exception to analyze or <code>null</code>. If the
+     *            negotiation had already been canceled by a
+     *            {@link #localCancel} or a {@link #remoteCancel} call the
+     *            exception will be ignored. If the exception is
+     *            <code>null</code> then the exit status will be determined on
+     *            former {@link #localCancel} or {@link #remoteCancel} calls.
      * @return the {@link Status} of the termination
      */
-    protected final Status terminateProcess(Exception exception) {
+    protected final Status terminate(Exception exception) {
 
         final SarosCancellationException cause;
         final Status status;
@@ -275,7 +275,7 @@ abstract class CancelableProcess {
             Status lastExitStatus = null;
 
             // allow multiple calls to log exceptions
-            if (processTerminated)
+            if (terminated)
                 lastExitStatus = exitStatus;
 
             exitStatus = Status.OK;
@@ -316,7 +316,7 @@ abstract class CancelableProcess {
                 exitStatus = Status.ERROR;
             }
 
-            if (processTerminated) {
+            if (terminated) {
                 exitStatus = lastExitStatus;
                 return exitStatus;
             }
@@ -326,13 +326,13 @@ abstract class CancelableProcess {
 
             status = exitStatus;
             cause = cancellationCause;
-            processTerminated = true;
+            terminated = true;
         }
 
         /*
          * must notify the listener here or otherwise calling
          * SessionManager.stopSession in the executeCancellation method will
-         * block because the SessionManager will wait until the process is
+         * block because the SessionManager will wait until the negotiation is
          * terminated (which would not be the case at this moment)
          */
 
@@ -346,19 +346,19 @@ abstract class CancelableProcess {
         if (status != Status.OK) {
             assert cause != null;
             notifyCancellation(cause);
-            log.debug("executing cancellation for process " + this);
+            log.debug("executing cancellation for negotiation " + this);
             executeCancellation();
         }
 
-        log.debug("process " + this + " exit status: " + status);
+        log.debug("negotiation " + this + " exit status: " + status);
         return exitStatus;
     }
 
     /**
-     * Informs the listener, that the process is terminated. Otherwise, the
-     * SessionManager would block the execution and wait until the process is
-     * terminated
-     * 
+     * Informs the listener, that the negotiation is terminated. Otherwise, the
+     * SessionManager would block the execution and wait until the negotiation
+     * is terminated
+     *
      * @param listener
      *            to notify
      */
@@ -395,10 +395,10 @@ abstract class CancelableProcess {
             if (exceptionMessage != null) {
                 errorMessage = "Invitation was canceled locally"
                     + " because of an error: " + exceptionMessage;
-                log.error("canceled process " + this + ", error: "
+                log.error("canceled negotiation " + this + ", error: "
                     + exceptionMessage);
             } else {
-                log.debug("process " + this
+                log.debug("negotiation " + this
                     + " was canceled manually by the local user");
             }
 
@@ -408,12 +408,12 @@ abstract class CancelableProcess {
                     + " because of an error on his/her side: "
                     + exceptionMessage;
 
-                log.error("canceled process " + this
+                log.error("canceled negotiation " + this
                     + " because the remote side encountered an error: "
                     + exceptionMessage);
 
             } else {
-                log.debug("process " + this
+                log.debug("negotiation " + this
                     + " was canceled manually by the remote side");
 
             }

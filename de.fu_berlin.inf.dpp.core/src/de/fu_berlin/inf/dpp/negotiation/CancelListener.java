@@ -1,9 +1,9 @@
 package de.fu_berlin.inf.dpp.negotiation;
 
-import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelLocation;
+import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelLocation;
 
 /**
- * Listener for monitoring {@link CancelableProcess negotiations}.
+ * Listener for monitoring {@link Negotiation negotiations}.
  */
 public interface CancelListener {
 

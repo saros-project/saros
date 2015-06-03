@@ -51,26 +51,26 @@ public class NegotiationHandler implements INegotiationHandler {
         .getLogger(NegotiationHandler.class);
 
     /**
-     * 
+     *
      * OutgoingInvitationJob wraps the instance of
      * {@link OutgoingSessionNegotiation} and cares about handling the
      * exceptions like local or remote cancellation.
-     * 
+     *
      * It notifies the user about the progress using the Eclipse Jobs API and
-     * interrupts the process if the session closes.
-     * 
+     * interrupts the negotiation if the session closes.
+     *
      */
     private class OutgoingInvitationJob extends Job {
 
-        private OutgoingSessionNegotiation process;
+        private OutgoingSessionNegotiation negotiation;
         private String peer;
 
-        public OutgoingInvitationJob(OutgoingSessionNegotiation process) {
+        public OutgoingInvitationJob(OutgoingSessionNegotiation negotiation) {
             super(MessageFormat.format(
                 Messages.NegotiationHandler_inviting_user,
-                getNickname(process.getPeer())));
-            this.process = process;
-            this.peer = process.getPeer().getBase();
+                getNickname(negotiation.getPeer())));
+            this.negotiation = negotiation;
+            this.peer = negotiation.getPeer().getBase();
 
             setUser(true);
             setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.TRUE);
@@ -82,7 +82,7 @@ public class NegotiationHandler implements INegotiationHandler {
         @Override
         protected IStatus run(IProgressMonitor monitor) {
             try {
-                SessionNegotiation.Status status = process
+                SessionNegotiation.Status status = negotiation
                     .start(ProgressMonitorAdapterFactory.convert(monitor));
 
                 switch (status) {
@@ -90,7 +90,7 @@ public class NegotiationHandler implements INegotiationHandler {
                     return Status.CANCEL_STATUS;
                 case ERROR:
                     return new Status(IStatus.ERROR, Saros.PLUGIN_ID,
-                        process.getErrorMessage());
+                        negotiation.getErrorMessage());
                 case OK:
                     break;
                 case REMOTE_CANCEL:
@@ -117,7 +117,7 @@ public class NegotiationHandler implements INegotiationHandler {
                             MessageFormat
                                 .format(
                                     Messages.NegotiationHandler_error_during_invitation_text,
-                                    peer, process.getErrorMessage()));
+                                    peer, negotiation.getErrorMessage()));
 
                     return new Status(
                         IStatus.ERROR,
@@ -125,7 +125,7 @@ public class NegotiationHandler implements INegotiationHandler {
                         MessageFormat
                             .format(
                                 Messages.NegotiationHandler_error_during_invitation_text,
-                                peer, process.getErrorMessage()));
+                                peer, negotiation.getErrorMessage()));
                 }
             } catch (Exception e) {
                 LOG.error("This exception is not expected here: ", e);
@@ -134,7 +134,7 @@ public class NegotiationHandler implements INegotiationHandler {
 
             }
 
-            sessionManager.startSharingProjects(process.getPeer());
+            sessionManager.startSharingProjects(negotiation.getPeer());
 
             return Status.OK_STATUS;
         }
@@ -142,14 +142,14 @@ public class NegotiationHandler implements INegotiationHandler {
 
     private class OutgoingProjectJob extends Job {
 
-        private OutgoingProjectNegotiation process;
+        private OutgoingProjectNegotiation negotiation;
         private String peer;
 
         public OutgoingProjectJob(
             OutgoingProjectNegotiation outgoingProjectNegotiation) {
             super(Messages.NegotiationHandler_sharing_project);
-            process = outgoingProjectNegotiation;
-            peer = process.getPeer().getBase();
+            negotiation = outgoingProjectNegotiation;
+            peer = negotiation.getPeer().getBase();
 
             setUser(true);
             setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.TRUE);
@@ -160,7 +160,7 @@ public class NegotiationHandler implements INegotiationHandler {
         @Override
         protected IStatus run(IProgressMonitor monitor) {
             try {
-                ProjectNegotiation.Status status = process
+                ProjectNegotiation.Status status = negotiation
                     .run(ProgressMonitorAdapterFactory.convert(monitor));
 
                 String peerName = getNickname(new JID(peer));
@@ -172,7 +172,7 @@ public class NegotiationHandler implements INegotiationHandler {
                     return Status.CANCEL_STATUS;
                 case ERROR:
                     return new Status(IStatus.ERROR, Saros.PLUGIN_ID,
-                        process.getErrorMessage());
+                        negotiation.getErrorMessage());
                 case OK:
                     break;
                 case REMOTE_CANCEL:
@@ -195,7 +195,7 @@ public class NegotiationHandler implements INegotiationHandler {
                     message = MessageFormat
                         .format(
                             Messages.NegotiationHandler_sharing_project_canceled_remotely,
-                            peerName, process.getErrorMessage());
+                            peerName, negotiation.getErrorMessage());
                     SarosView
                         .showNotification(
                             Messages.NegotiationHandler_sharing_project_canceled_remotely_text,
@@ -256,7 +256,7 @@ public class NegotiationHandler implements INegotiationHandler {
     }
 
     private void showIncomingInvitationUI(
-        final IncomingSessionNegotiation process) {
+        final IncomingSessionNegotiation negotiation) {
 
         SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
             @Override
@@ -280,7 +280,7 @@ public class NegotiationHandler implements INegotiationHandler {
                  *               the JoinSessionWizard, a dialog for the user to
                  *               decide whether to accept the invitation.
                  */
-                JoinSessionWizard sessionWizard = new JoinSessionWizard(process);
+                JoinSessionWizard sessionWizard = new JoinSessionWizard(negotiation);
 
                 final WizardDialogAccessable wizardDialog = new WizardDialogAccessable(
                     SWTUtils.getShell(), sessionWizard);
@@ -296,8 +296,8 @@ public class NegotiationHandler implements INegotiationHandler {
         });
     }
 
-    private void showIncomingProjectUI(final IncomingProjectNegotiation process) {
-        List<ProjectNegotiationData> pInfos = process.getProjectInfos();
+    private void showIncomingProjectUI(final IncomingProjectNegotiation negotiation) {
+        List<ProjectNegotiationData> pInfos = negotiation.getProjectInfos();
         final List<FileList> fileLists = new ArrayList<FileList>(pInfos.size());
 
         for (ProjectNegotiationData pInfo : pInfos)
@@ -308,7 +308,7 @@ public class NegotiationHandler implements INegotiationHandler {
             @Override
             public void run() {
                 AddProjectToSessionWizard projectWizard = new AddProjectToSessionWizard(
-                    process, process.getPeer(), fileLists);
+                    negotiation, negotiation.getPeer(), fileLists);
 
                 final WizardDialogAccessable wizardDialog = new WizardDialogAccessable(
                     SWTUtils.getShell(), projectWizard, SWT.MIN | SWT.MAX,

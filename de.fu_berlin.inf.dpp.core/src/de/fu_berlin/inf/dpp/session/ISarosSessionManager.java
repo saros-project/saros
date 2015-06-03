@@ -70,14 +70,14 @@ public interface ISarosSessionManager {
     public void removeSarosSessionListener(ISarosSessionListener listener);
 
     /**
-     * Handles the negotiation process for a received invitation.
-     * 
+     * Handles the negotiation for a received invitation.
+     *
      * @param from
      *            the sender of this invitation
      * @param sessionID
      *            the unique session ID of the inviter side
      * @param invitationID
-     *            a unique identifier for the negotiation process
+     *            a unique identifier for the negotiation
      * @param version
      *            remote Saros version of the inviter side
      * @param description
@@ -133,11 +133,11 @@ public interface ISarosSessionManager {
      * @param projectInfos
      *            what projects where added ({@link FileList}, projectName etc.)
      *            see: {@link ProjectNegotiationData}
-     * @param processID
-     *            ID of the exchanging process
+     * @param negotiationID
+     *            ID of the negotiation
      */
     public void incomingProjectReceived(JID from,
-        List<ProjectNegotiationData> projectInfos, String processID);
+        List<ProjectNegotiationData> projectInfos, String negotiationID);
 
     /**
      * Call this when a new project was added.

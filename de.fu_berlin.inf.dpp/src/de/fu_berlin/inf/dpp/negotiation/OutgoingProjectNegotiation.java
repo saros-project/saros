@@ -31,7 +31,7 @@ import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.SubProgressMonitor;
-import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelOption;
+import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -98,7 +98,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
              * holds the lock, but saving editors is performed in another thread
              * !
              */
-            sendFileList(createProjectExchangeInfoList(projects, monitor),
+            sendFileList(createProjectNegotiationDataList(projects, monitor),
                 monitor);
 
             monitor.subTask("");
@@ -163,11 +163,10 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             monitor.done();
         }
 
-        return terminateProcess(exception);
+        return terminate(exception);
     }
 
-    private void sendFileList(
-        List<ProjectNegotiationData> projectExchangeInfos,
+    private void sendFileList(List<ProjectNegotiationData> projectInfos,
         IProgressMonitor monitor) throws IOException,
         SarosCancellationException {
 
@@ -194,7 +193,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
          * current implementation opens a wizard on the remote side)
          */
         ProjectNegotiationOfferingExtension offering = new ProjectNegotiationOfferingExtension(
-            getSessionID(), getID(), projectExchangeInfos);
+            getSessionID(), getID(), projectInfos);
 
         transmitter.send(ISarosSession.SESSION_CONNECTION_ID, peer,
             ProjectNegotiationOfferingExtension.PROVIDER.create(offering));
@@ -412,13 +411,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         LOG.debug(this + " : archive send");
     }
 
-    /**
-     * Method to create list of ProjectExchangeInfo.
-     * 
-     * @param projectsToShare
-     *            List of projects to share
-     */
-    private List<ProjectNegotiationData> createProjectExchangeInfoList(
+    private List<ProjectNegotiationData> createProjectNegotiationDataList(
         final List<IProject> projectsToShare, final IProgressMonitor monitor)
         throws IOException, LocalCancellationException {
 
@@ -478,7 +471,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                  * no existing project negotiation yet
                  */
                 localCancel(e.getMessage(), CancelOption.DO_NOT_NOTIFY_PEER);
-                // throw to LOG this error in the CancelableProcess class
+                // throw to LOG this error in the Negotiation class
                 throw new IOException(e.getMessage(), e);
             }
         }

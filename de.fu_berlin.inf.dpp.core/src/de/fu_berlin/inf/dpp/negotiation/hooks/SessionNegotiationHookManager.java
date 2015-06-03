@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * This component manages extensions of the Invitation process by offering other
- * components to hook in (see {@link ISessionNegotiationHook}).
+ * This component manages extensions of the session negotiation by offering
+ * other components to hook in (see {@link ISessionNegotiationHook}).
  */
 public class SessionNegotiationHookManager {
     private List<ISessionNegotiationHook> hooks;

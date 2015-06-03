@@ -51,9 +51,9 @@ import de.fu_berlin.inf.dpp.negotiation.FileList;
 import de.fu_berlin.inf.dpp.negotiation.FileListDiff;
 import de.fu_berlin.inf.dpp.negotiation.FileListFactory;
 import de.fu_berlin.inf.dpp.negotiation.IncomingProjectNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.ProcessTools;
-import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelLocation;
-import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelOption;
+import de.fu_berlin.inf.dpp.negotiation.NegotiationTools;
+import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelLocation;
+import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -76,7 +76,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
     private EnterProjectNamePage namePage;
     private WizardDialogAccessable wizardDialog;
-    private IncomingProjectNegotiation process;
+    private IncomingProjectNegotiation negotiation;
     private JID peer;
     private List<FileList> fileLists;
     private boolean isExceptionCancel;
@@ -119,18 +119,18 @@ public class AddProjectToSessionWizard extends Wizard {
     private final CancelListener cancelListener = new CancelListener() {
 
         @Override
-        public void canceled(final ProcessTools.CancelLocation location,
+        public void canceled(final NegotiationTools.CancelLocation location,
             final String message) {
             cancelWizard(peer, message, location);
         }
     };
 
-    public AddProjectToSessionWizard(IncomingProjectNegotiation process,
+    public AddProjectToSessionWizard(IncomingProjectNegotiation negotiation,
         JID peer, List<FileList> fileLists) {
 
         SarosPluginContext.initComponent(this);
 
-        this.process = process;
+        this.negotiation = negotiation;
         this.peer = peer;
         this.fileLists = fileLists;
         setWindowTitle(Messages.AddProjectToSessionWizard_title);
@@ -145,7 +145,7 @@ public class AddProjectToSessionWizard extends Wizard {
     @Override
     public void createPageControls(Composite pageContainer) {
         super.createPageControls(pageContainer);
-        process.addCancelListener(cancelListener);
+        negotiation.addCancelListener(cancelListener);
     }
 
     public void setWizardDlg(WizardDialogAccessable wizardDialog) {
@@ -160,7 +160,7 @@ public class AddProjectToSessionWizard extends Wizard {
             return;
 
         namePage = new EnterProjectNamePage(session, connectionManager,
-            preferences, fileLists, peer, process.getProjectNames());
+            preferences, fileLists, peer, negotiation.getProjectNames());
 
         addPage(namePage);
     }
@@ -265,7 +265,7 @@ public class AddProjectToSessionWizard extends Wizard {
                 new Runnable() {
                     @Override
                     public void run() {
-                        process.localCancel(null, CancelOption.NOTIFY_PEER);
+                        negotiation.localCancel(null, CancelOption.NOTIFY_PEER);
                     }
                 });
         }
@@ -319,7 +319,7 @@ public class AddProjectToSessionWizard extends Wizard {
                             ResourceAdapterFactory.create(entry.getValue()));
                     }
 
-                    final ProjectNegotiation.Status status = process.run(
+                    final ProjectNegotiation.Status status = negotiation.run(
                         convertedMapping,
                         ProgressMonitorAdapterFactory.convert(monitor),
                         useVersionControl);
@@ -603,9 +603,9 @@ public class AddProjectToSessionWizard extends Wizard {
             }
 
             final FileListDiff diff = FileListDiff.diff(localFileList,
-                process.getRemoteFileList(projectID));
+                negotiation.getRemoteFileList(projectID));
 
-            if (process.isPartialRemoteProject(projectID))
+            if (negotiation.isPartialRemoteProject(projectID))
                 diff.clearRemovedPaths();
 
             if (!diff.getRemovedPaths().isEmpty()

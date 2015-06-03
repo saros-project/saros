@@ -170,7 +170,7 @@ final class NegotiationPacketListener {
 
     /**
      * Allows to reject incoming session negotiation requests.
-     * 
+     *
      * @param reject
      *            <code>true</code> if requests should be rejected,
      *            <code>false</code> otherwise
@@ -182,7 +182,7 @@ final class NegotiationPacketListener {
     /**
      * Determines if incoming session negotiations requests are currently
      * rejected.
-     * 
+     *
      * @return <code>true</code> if requests are rejected, <code>false</code>
      *         otherwise
      */
@@ -203,10 +203,10 @@ final class NegotiationPacketListener {
     private void sessionNegotiationCanceled(final JID sender,
         final String sessionNegotiationID, final String errorMessage) {
 
-        final SessionNegotiation process = sessionNegotiations.get(sender,
+        final SessionNegotiation negotiation = sessionNegotiations.get(sender,
             sessionNegotiationID);
 
-        if (process == null) {
+        if (negotiation == null) {
             LOG.warn("received session negotiation cancel from " + sender
                 + " for a nonexisting instance with id: "
                 + sessionNegotiationID);
@@ -216,7 +216,7 @@ final class NegotiationPacketListener {
         LOG.debug(sender + " canceled session negotiation [id="
             + sessionNegotiationID + ", reason=" + errorMessage + "]");
 
-        process.remoteCancel(errorMessage);
+        negotiation.remoteCancel(errorMessage);
     }
 
     private void sessionNegotiationRequest(final JID sender,
@@ -269,8 +269,7 @@ final class NegotiationPacketListener {
     private void projectNegotiationCanceled(final JID sender,
         final String errorMessage) {
 
-        final ProjectNegotiation process = projectNegotiations
-            .getProjectExchangeProcess(sender);
+        final ProjectNegotiation negotiation = projectNegotiations.get(sender);
 
         /*
          * FIXME We need the ID here as it is possible to have multiple active
@@ -278,11 +277,11 @@ final class NegotiationPacketListener {
          */
         final String projectNegotiationID = null;
 
-        if (process != null) {
+        if (negotiation != null) {
             LOG.debug(sender + " canceled project negotiation [id="
                 + projectNegotiationID + ", reason=" + errorMessage + "]");
 
-            process.remoteCancel(errorMessage);
+            negotiation.remoteCancel(errorMessage);
         } else {
             LOG.warn("received project negotiation cancel from " + sender
                 + " for a nonexisting instance with id: "

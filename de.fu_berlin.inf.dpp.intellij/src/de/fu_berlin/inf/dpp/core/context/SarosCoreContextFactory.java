@@ -32,7 +32,7 @@ import de.fu_berlin.inf.dpp.core.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.core.concurrent.IsInconsistentObservable;
 import de.fu_berlin.inf.dpp.core.monitoring.remote.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.core.net.business.CancelInviteHandler;
-import de.fu_berlin.inf.dpp.core.net.business.CancelProjectSharingHandler;
+import de.fu_berlin.inf.dpp.core.net.business.ProjectNegotiationCancellationHandler;
 import de.fu_berlin.inf.dpp.core.net.business.InvitationHandler;
 import de.fu_berlin.inf.dpp.core.net.business.LeaveAndKickHandler;
 import de.fu_berlin.inf.dpp.core.vcs.NullVCSProviderFactoryImpl;
@@ -138,7 +138,7 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
 
         // Handlers
         Component.create(CancelInviteHandler.class),
-        Component.create(CancelProjectSharingHandler.class),
+        Component.create(ProjectNegotiationCancellationHandler.class),
         Component.create(InvitationHandler.class),
         Component.create(LeaveAndKickHandler.class),
         Component.create(RemoteProgressManager.class),

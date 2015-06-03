@@ -31,14 +31,14 @@ import de.fu_berlin.inf.dpp.intellij.ui.wizards.pages.PageActionListener;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
 import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
-import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelLocation;
+import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelLocation;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import org.apache.log4j.Logger;
 
 import java.text.MessageFormat;
 
-import static de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelOption;
+import static de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
 
 /**
  * A wizard that guides the user through an incoming invitation process.
@@ -53,7 +53,7 @@ public class JoinSessionWizard extends Wizard {
 
     private static final Logger LOG = Logger.getLogger(JoinSessionWizard.class);
 
-    private final IncomingSessionNegotiation process;
+    private final IncomingSessionNegotiation negotiation;
 
     private final PageActionListener actionListener = new PageActionListener() {
         @Override
@@ -75,27 +75,27 @@ public class JoinSessionWizard extends Wizard {
     /**
      * Creates wizard UI
      *
-     * @param process The negotiation this wizard displays
+     * @param negotiation The negotiation this wizard displays
      */
-    public JoinSessionWizard(IncomingSessionNegotiation process) {
+    public JoinSessionWizard(IncomingSessionNegotiation negotiation) {
         super(Messages.JoinSessionWizard_title, new HeaderPanel(
             Messages.ShowDescriptionPage_title2,
             Messages.ShowDescriptionPage_description));
-        this.process = process;
+        this.negotiation = negotiation;
 
-        InfoPage infoPage = createInfoPage(process);
+        InfoPage infoPage = createInfoPage(negotiation);
 
         registerPage(infoPage);
 
         create();
     }
 
-    private InfoPage createInfoPage(IncomingSessionNegotiation process) {
+    private InfoPage createInfoPage(IncomingSessionNegotiation negotiation) {
         InfoPage infoPage = new InfoPage(PAGE_INFO_ID,
             Messages.JoinSessionWizard_accept, actionListener);
-        infoPage.addText(process.getPeer().getName() + " "
+        infoPage.addText(negotiation.getPeer().getName() + " "
             + Messages.JoinSessionWizard_info);
-        infoPage.addText(process.getDescription());
+        infoPage.addText(negotiation.getDescription());
         return infoPage;
     }
 
@@ -109,7 +109,7 @@ public class JoinSessionWizard extends Wizard {
         JobWithStatus job = new JobWithStatus() {
             @Override
             public void run() {
-                status = process.accept(new NullProgressMonitor());
+                status = negotiation.accept(new NullProgressMonitor());
             }
         };
 
@@ -120,12 +120,12 @@ public class JoinSessionWizard extends Wizard {
             break;
         case CANCEL:
         case ERROR:
-            showCancelMessage(process.getPeer(), process.getErrorMessage(),
+            showCancelMessage(negotiation.getPeer(), negotiation.getErrorMessage(),
                 CancelLocation.LOCAL);
             break;
         case REMOTE_CANCEL:
         case REMOTE_ERROR:
-            showCancelMessage(process.getPeer(), process.getErrorMessage(),
+            showCancelMessage(negotiation.getPeer(), negotiation.getErrorMessage(),
                 CancelLocation.REMOTE);
             break;
         }
@@ -142,7 +142,7 @@ public class JoinSessionWizard extends Wizard {
             .runSafeAsync("CancelJoinSessionWizard", LOG, new Runnable() {
                     @Override
                     public void run() {
-                        process.localCancel(null,
+                        negotiation.localCancel(null,
                             CancelOption.NOTIFY_PEER);
                     }
                 }

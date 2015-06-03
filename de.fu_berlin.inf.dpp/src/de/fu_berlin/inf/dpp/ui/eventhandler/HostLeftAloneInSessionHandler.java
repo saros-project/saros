@@ -21,7 +21,7 @@ import de.fu_berlin.inf.dpp.ui.views.SarosView;
 /**
  * Checks if the host remains alone after a user left the session. If so, ask if
  * the session should be closed (optionally remember choice for workspace...)
- * 
+ *
  * @author Alexander Waldmann (contact@net-corps.de)
  */
 public class HostLeftAloneInSessionHandler {
@@ -64,10 +64,10 @@ public class HostLeftAloneInSessionHandler {
                 return;
 
             /*
-             * only ask to close session if there are no running negotiation
-             * processes because if there are, and the last user "left", it was
-             * because he canceled an IncomingProjectNegotiation, and the
-             * session will be closed anyway.
+             * only ask to close session if there are no running negotiations
+             * because if there are, and the last user "left", it was because he
+             * canceled an IncomingProjectNegotiation, and the session will be
+             * closed anyway.
              */
 
             /*
@@ -77,15 +77,15 @@ public class HostLeftAloneInSessionHandler {
              * This currently does NOT work. It is possible the the project
              * negotiation is about to finish (last cancellation check passed).
              * As we do not have a final synchronization packet in this
-             * negotiation process it is possible that the user left packet
-             * arrives but cancellation packet arrives lately or never. See
-             * stack trace below were the negotiation process passes although
-             * Bob leaves the session during negotiation.
+             * negotiation it is possible that the user left packet arrives but
+             * cancellation packet arrives lately or never. See stack trace
+             * below were the negotiation process passes although Bob leaves the
+             * session during negotiation.
              */
 
             /**
              * Alice side:
-             * 
+             *
              * <pre>
              * DEBUG 16:49:08,878 [main] (HostLeftAloneInSessionHandler.java:44) sessionManager.userLeft
              * INFO  16:49:08,888 [main] (SarosSession.java:612) Buddy [jenkins_bob_stf@saros-con.imp.fu-berlin.de/Saros]  left session
@@ -98,11 +98,11 @@ public class HostLeftAloneInSessionHandler {
              * DEBUG 16:49:09,422 [Worker-9] (OutgoingProjectNegotiation.java:433) OPN [remote side: jenkins_bob_stf@saros-con.imp.fu-berlin.de/Saros] : archive send
              * DEBUG 16:49:09,422 [Worker-9] (CancelableProcess.java:280) process OPN [remote side: jenkins_bob_stf@saros-con.imp.fu-berlin.de/Saros] exit status: OK
              * </pre>
-             * 
+             *
              * Bob side:
-             * 
+             *
              * <pre>
-             * 
+             *
              * DEBUG 16:49:09,402 [Worker-6] (FileUtils.java:205) File written to disk: .project
              * DEBUG 16:49:09,402 [Worker-6] (FileUtils.java:209) Unpacked archive in 0 s
              * TRACE 16:49:09,402 [Worker-6] (ChecksumCacheImpl.java:74) invalidating checksum for existing file: /java/.classpath [0x8F53373DCA77CBCA9383FE23E0132271]
@@ -120,7 +120,7 @@ public class HostLeftAloneInSessionHandler {
              * </pre>
              */
 
-            // if (processes.getProcesses().size() == 0) {
+            // if (negotiations.getProcesses().size() == 0) {
             handleHostLeftAlone();
             // }
         }

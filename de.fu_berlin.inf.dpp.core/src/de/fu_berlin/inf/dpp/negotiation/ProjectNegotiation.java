@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.MonitorableFileTransfer;
 import de.fu_berlin.inf.dpp.monitoring.MonitorableFileTransfer.TransferStatus;
-import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelOption;
+import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
@@ -33,7 +33,7 @@ import de.fu_berlin.inf.dpp.vcs.VCSProviderFactory;
  * This abstract class is the superclass for {@link OutgoingProjectNegotiation}
  * and {@link IncomingProjectNegotiation}.
  */
-public abstract class ProjectNegotiation extends CancelableProcess {
+public abstract class ProjectNegotiation extends Negotiation {
 
     private static final Logger LOG = Logger
         .getLogger(ProjectNegotiation.class);
@@ -98,7 +98,7 @@ public abstract class ProjectNegotiation extends CancelableProcess {
     }
 
     /**
-     * 
+     *
      * @return the names of the projects that are shared by the peer. projectID
      *         => projectName
      */
@@ -106,7 +106,7 @@ public abstract class ProjectNegotiation extends CancelableProcess {
 
     /**
      * Returns the ID of this negotiation.
-     * 
+     *
      * @return the ID
      */
     public final String getID() {
@@ -116,7 +116,7 @@ public abstract class ProjectNegotiation extends CancelableProcess {
     /**
      * Returns the {@linkplain ISarosSession session} id this negotiation
      * belongs to.
-     * 
+     *
      * @return the id of the current session this negotiations belongs to
      */
     public final String getSessionID() {
@@ -156,7 +156,7 @@ public abstract class ProjectNegotiation extends CancelableProcess {
     /**
      * Monitors a {@link FileTransfer} and waits until it is completed or
      * aborted.
-     * 
+     *
      * @param transfer
      *            the transfer to monitor
      * @param monitor
@@ -166,7 +166,7 @@ public abstract class ProjectNegotiation extends CancelableProcess {
      *            given monitor. Accepts <code>null</code>, indicating that no
      *            progress should be reported and that the operation cannot be
      *            canceled.
-     * 
+     *
      * @throws SarosCancellationException
      *             if the transfer was aborted either on local side or remote
      *             side, see also {@link LocalCancellationException} and
@@ -203,7 +203,7 @@ public abstract class ProjectNegotiation extends CancelableProcess {
 
     /**
      * Returns the next packet from a collector.
-     * 
+     *
      * @param collector
      *            the collector to monitor
      * @param timeout
@@ -212,7 +212,7 @@ public abstract class ProjectNegotiation extends CancelableProcess {
      * @return the collected packet or <code>null</code> if no packet was
      *         received
      * @throws SarosCancellationException
-     *             if the process was canceled
+     *             if the negotiation was canceled
      */
     protected final Packet collectPacket(PacketCollector collector, long timeout)
         throws SarosCancellationException {

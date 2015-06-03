@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelOption;
+import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
 import de.fu_berlin.inf.dpp.negotiation.hooks.ISessionNegotiationHook;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -101,7 +101,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
      * @JTourBusStop 5, Invitation Process:
      *
      *               The details of the invitation process are implemented in
-     *               the invitation package. OutgoingSessionNegotiation is an
+     *               the negotiation package. OutgoingSessionNegotiation is an
      *               example of a class that participates in this process.
      *
      *               The host of a session needs negotiations for:
@@ -210,7 +210,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
             monitor.done();
         }
 
-        return terminateProcess(exception);
+        return terminate(exception);
     }
 
     /**

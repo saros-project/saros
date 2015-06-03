@@ -34,7 +34,7 @@ import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.SubProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.remote.RemoteProgressManager;
-import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelOption;
+import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
@@ -215,8 +215,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 acceptArchive(archiveTransferListener, monitor);
 
             /*
-             * We are finished with the exchanging process. Add all projects
-             * resources to the session.
+             * We are finished with the negotiation. Add all projects resources
+             * to the session.
              */
             for (Entry<String, IProject> entry : localProjectMapping.entrySet()) {
 
@@ -258,7 +258,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             monitor.done();
         }
 
-        return terminateProcess(exception);
+        return terminate(exception);
     }
 
     public boolean isPartialRemoteProject(String projectID) {
@@ -465,7 +465,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * @return the checked out project or <code>null</code> if it could not
      *         checked out
      * @throws LocalCancellationException
-     *             if the process is canceled locally
+     *             if the negotiation is canceled locally
      */
     private IProject checkoutVCSProject(final VCSProvider vcs,
         IProject project, final FileList fileList,
@@ -556,7 +556,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             return false;
 
         if (!running)
-            terminateProcess(null);
+            terminate(null);
 
         return true;
     }
@@ -568,7 +568,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             return false;
 
         if (!running)
-            terminateProcess(null);
+            terminate(null);
 
         return true;
     }

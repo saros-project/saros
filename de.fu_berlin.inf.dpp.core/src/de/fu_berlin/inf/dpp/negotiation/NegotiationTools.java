@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.negotiation;
 
-public class ProcessTools {
+public class NegotiationTools {
     public enum CancelOption {
         /**
          * Use this option if the peer should be notified that the invitation

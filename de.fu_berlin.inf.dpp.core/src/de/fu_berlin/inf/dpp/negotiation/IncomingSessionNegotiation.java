@@ -16,7 +16,7 @@ import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelOption;
+import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
 import de.fu_berlin.inf.dpp.negotiation.hooks.ISessionNegotiationHook;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
@@ -59,8 +59,8 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
     }
 
     /*
-     * TODO local/remoteCancel and terminateProcess should not be called inside
-     * the monitor
+     * TODO local/remoteCancel and terminate should not be called inside the
+     * monitor
      */
     @Override
     public synchronized boolean remoteCancel(String errorMsg) {
@@ -68,14 +68,14 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
             return false;
 
         if (!running)
-            terminateProcess(null);
+            terminate(null);
 
         return true;
     }
 
     /*
-     * TODO local/remoteCancel and terminateProcess should not be called inside
-     * the monitor
+     * TODO local/remoteCancel and terminate should not be called inside the
+     * monitor
      */
     @Override
     public synchronized boolean localCancel(String errorMsg,
@@ -84,7 +84,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
             return false;
 
         if (!running)
-            terminateProcess(null);
+            terminate(null);
 
         return true;
     }
@@ -115,7 +115,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
             running = true;
         }
 
-        // the process should not be canceled manually !
+        // the negotiation should not be canceled manually !
         // observeMonitor(monitor);
 
         Exception exception = null;
@@ -185,7 +185,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
             deleteCollectors();
         }
 
-        return terminateProcess(exception);
+        return terminate(exception);
     }
 
     /**

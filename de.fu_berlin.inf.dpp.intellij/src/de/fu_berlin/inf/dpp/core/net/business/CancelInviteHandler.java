@@ -3,14 +3,15 @@
  */
 package de.fu_berlin.inf.dpp.core.net.business;
 
+import org.apache.log4j.Logger;
+import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.packet.Packet;
+
 import de.fu_berlin.inf.dpp.communication.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
-import org.apache.log4j.Logger;
-import org.jivesoftware.smack.PacketListener;
-import org.jivesoftware.smack.packet.Packet;
 
 /**
  * Listens for {@link CancelInviteExtension}-packets that cancel the session
@@ -21,7 +22,7 @@ public class CancelInviteHandler {
     private static final Logger LOG = Logger
         .getLogger(CancelInviteHandler.class);
 
-    private final SessionNegotiationObservable invitationProcesses;
+    private final SessionNegotiationObservable sessionNegotiations;
 
     private final PacketListener cancelInvitationExtensionListener = new PacketListener() {
 
@@ -36,32 +37,33 @@ public class CancelInviteHandler {
     };
 
     public CancelInviteHandler(IReceiver receiver,
-        SessionNegotiationObservable invitationProcessObservable) {
+        SessionNegotiationObservable sessionNegotiations) {
 
-        this.invitationProcesses = invitationProcessObservable;
+        this.sessionNegotiations = sessionNegotiations;
 
         receiver.addPacketListener(cancelInvitationExtensionListener,
             CancelInviteExtension.PROVIDER.getPacketFilter());
     }
 
     /**
-     * Cancels the local session invitation process by calling
+     * Cancels the local session negotiation by calling
      * {@link SessionNegotiation#remoteCancel(String)}.
      */
     private void invitationCanceled(JID sender, String invitationID,
         String errorMsg) {
 
-        SessionNegotiation invitationProcess = invitationProcesses
-            .get(sender, invitationID);
+        SessionNegotiation negotiation = sessionNegotiations.get(sender,
+            invitationID);
 
-        if (invitationProcess == null) {
-            LOG.warn("Inv[" + sender
-                + "]: Received invitation cancel message for unknown invitation process. Ignoring...");
+        if (negotiation == null) {
+            LOG.warn("Inv["
+                + sender
+                + "]: Received invitation cancel message for unknown session negotiation. Ignoring...");
             return;
         }
 
         LOG.debug("Inv[" + sender + "]: Received invitation cancel message");
 
-        invitationProcess.remoteCancel(errorMsg);
+        negotiation.remoteCancel(errorMsg);
     }
 }

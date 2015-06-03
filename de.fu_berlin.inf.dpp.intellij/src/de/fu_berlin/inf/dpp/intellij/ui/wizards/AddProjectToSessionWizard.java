@@ -44,7 +44,7 @@ import de.fu_berlin.inf.dpp.negotiation.CancelListener;
 import de.fu_berlin.inf.dpp.negotiation.FileList;
 import de.fu_berlin.inf.dpp.negotiation.FileListDiff;
 import de.fu_berlin.inf.dpp.negotiation.FileListFactory;
-import de.fu_berlin.inf.dpp.negotiation.ProcessTools;
+import de.fu_berlin.inf.dpp.negotiation.NegotiationTools;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -83,7 +83,7 @@ public class AddProjectToSessionWizard extends Wizard {
     private final String remoteProjectID;
     private final String remoteProjectName;
 
-    private final IncomingProjectNegotiation process;
+    private final IncomingProjectNegotiation negotiation;
     private final JID peer;
     private final List<FileList> fileLists;
 
@@ -142,8 +142,8 @@ public class AddProjectToSessionWizard extends Wizard {
             ThreadUtils.runSafeAsync(LOG, new Runnable() {
                 @Override
                 public void run() {
-                    process.localCancel("Not accepted",
-                        ProcessTools.CancelOption.NOTIFY_PEER);
+                    negotiation.localCancel("Not accepted",
+                        NegotiationTools.CancelOption.NOTIFY_PEER);
                 }
 
             });
@@ -167,8 +167,8 @@ public class AddProjectToSessionWizard extends Wizard {
             ThreadUtils.runSafeAsync(LOG, new Runnable() {
                 @Override
                 public void run() {
-                    process.localCancel("Not accepted",
-                        ProcessTools.CancelOption.NOTIFY_PEER);
+                    negotiation.localCancel("Not accepted",
+                        NegotiationTools.CancelOption.NOTIFY_PEER);
                 }
 
             });
@@ -179,7 +179,7 @@ public class AddProjectToSessionWizard extends Wizard {
     private final CancelListener cancelListener = new CancelListener() {
 
         @Override
-        public void canceled(final ProcessTools.CancelLocation location,
+        public void canceled(final NegotiationTools.CancelLocation location,
             final String message) {
             cancelWizard(peer, message, location);
         }
@@ -188,19 +188,19 @@ public class AddProjectToSessionWizard extends Wizard {
     /**
      * Creates the wizard and its pages.
      *
-     * @param process The IPN this wizard handles
+     * @param negotiation The IPN this wizard handles
      * @param peer The peer
      * @param fileLists The list of resources to be shared
      * @param projectNames The names of the projects to be shared
      */
-    public AddProjectToSessionWizard(IncomingProjectNegotiation process,
+    public AddProjectToSessionWizard(IncomingProjectNegotiation negotiation,
         JID peer, List<FileList> fileLists, Map<String, String> projectNames) {
 
         super(Messages.AddProjectToSessionWizard_title,
             new HeaderPanel(
                 Messages.EnterProjectNamePage_title2, ""));
 
-        this.process = process;
+        this.negotiation = negotiation;
         this.peer = peer;
         this.fileLists = fileLists;
         localProjects = new HashMap<String, IProject>();
@@ -219,16 +219,16 @@ public class AddProjectToSessionWizard extends Wizard {
 
         create();
 
-        process.addCancelListener(cancelListener);
+        negotiation.addCancelListener(cancelListener);
     }
 
     /**
      * Cancels the wizard and gives an informative error message.
      */
     public void cancelWizard(final JID peer, final String errorMsg,
-        ProcessTools.CancelLocation type) {
+        NegotiationTools.CancelLocation type) {
         final String message = "Wizard canceled "
-            + (type.equals(ProcessTools.CancelLocation.LOCAL) ?
+            + (type.equals(NegotiationTools.CancelLocation.LOCAL) ?
               "locally " :
               "remotely ")
             + "by " + peer;
@@ -254,7 +254,7 @@ public class AddProjectToSessionWizard extends Wizard {
         JobWithStatus job = new JobWithStatus() {
             @Override
             public void run() {
-                status = process
+                status = negotiation
                     .run(localProjects, new NullProgressMonitor(), false);
             }
         };
@@ -407,7 +407,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
             FileListDiff diff;
 
-            FileList remoteFileList = process.getRemoteFileList(projectID);
+            FileList remoteFileList = negotiation.getRemoteFileList(projectID);
 
             try {
                 if (session.isShared(project)) {
@@ -433,7 +433,7 @@ public class AddProjectToSessionWizard extends Wizard {
                     );
                 diff = FileListDiff.diff(localFileList, remoteFileList);
 
-                if (process.isPartialRemoteProject(projectID)) {
+                if (negotiation.isPartialRemoteProject(projectID)) {
                     diff.clearRemovedPaths();
                 }
 

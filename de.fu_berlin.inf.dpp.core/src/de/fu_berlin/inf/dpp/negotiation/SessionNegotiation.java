@@ -28,7 +28,7 @@ import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.communication.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
-import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelOption;
+import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
 import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
@@ -42,7 +42,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
  * @author rdjemili
  * @author sotitas
  */
-public abstract class SessionNegotiation extends CancelableProcess {
+public abstract class SessionNegotiation extends Negotiation {
 
     private static final Logger log = Logger
         .getLogger(SessionNegotiation.class);
@@ -147,7 +147,7 @@ public abstract class SessionNegotiation extends CancelableProcess {
      * @return the collected packet or <code>null</code> if no packet was
      *         received
      * @throws SarosCancellationException
-     *             if the process was canceled
+     *             if the negotiation was canceled
      */
     protected final Packet collectPacket(PacketCollector collector, long timeout)
         throws SarosCancellationException {

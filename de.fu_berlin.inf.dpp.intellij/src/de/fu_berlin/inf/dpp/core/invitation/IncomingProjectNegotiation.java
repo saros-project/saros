@@ -36,7 +36,7 @@ import de.fu_berlin.inf.dpp.negotiation.DecompressArchiveTask;
 import de.fu_berlin.inf.dpp.negotiation.FileList;
 import de.fu_berlin.inf.dpp.negotiation.FileListDiff;
 import de.fu_berlin.inf.dpp.negotiation.FileListFactory;
-import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelOption;
+import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
@@ -206,8 +206,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 acceptArchive(archiveTransferListener, monitor);
 
             /*
-             * We are finished with the exchanging process. Add all projects
-             * resources to the session.
+             * We are finished with the negotiation. Add all projects resources
+             * to the session.
              */
             for (Entry<String, IProject> entry : localProjectMapping.entrySet()) {
 
@@ -249,7 +249,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             monitor.done();
         }
 
-        return terminateProcess(exception);
+        return terminate(exception);
     }
 
     public boolean isPartialRemoteProject(String projectID) {
@@ -387,7 +387,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             return false;
 
         if (!running)
-            terminateProcess(null);
+            terminate(null);
 
         return true;
     }
@@ -399,7 +399,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             return false;
 
         if (!running)
-            terminateProcess(null);
+            terminate(null);
 
         return true;
     }
