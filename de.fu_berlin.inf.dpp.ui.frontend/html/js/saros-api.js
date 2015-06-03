@@ -1,3 +1,25 @@
+/*
+ * Saros API Documentation
+ *
+ * In addition to the methods listed below you can trigger and listen
+ * to events on the SarosAPI object. 
+ *
+ * To trigger an event do:
+ * `SarosApi.trigger('eventName' [, data]);`
+ *
+ * To listen to an event do:
+ * `SarosApi.on('eventName', handler);`
+ * where the first parameter of the handler function is the data object,
+ * if available.
+ *
+ * The following events are provided:
+ *
+ * updateState
+ * updateAccounts
+ * updateContacts
+ *
+ */
+
 var BackboneEvents = require('backbone-events-standalone');
 
 var SarosApi = BackboneEvents.mixin({
@@ -14,7 +36,19 @@ var SarosApi = BackboneEvents.mixin({
 
     manageAccounts: function() {
 
-        __java_showAddAccountWizard(); // jshint ignore:line
+        __java_showSarosPreferencesWizard(); // jshint ignore:line
+    },
+
+    addContact: function(jid, displayName) {
+
+        // TODO: nickname in backend
+        __java_addContact(jid, displayName); // jshint ignore:line
+    },
+
+    validateJid: function(jid) {
+
+        // TODO: make __java_validateJid(jid) available
+        return __java_validateJid(jid); // jshint ignore:line
     }
 });
 

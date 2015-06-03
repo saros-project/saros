@@ -7,7 +7,9 @@ var MainView = require('./views/main');
 var Accounts = require('./models/accounts');
 var Contacts = require('./models/contacts');
 
-window.$ = window.jQuery = require('jquery');
+// Hack for now to get jQuery and Bootsrap work together with
+// the injected jQuery version from the SWT browser...
+window.$$ = window.jQuery = require('jquery').noConflict(true);
 require('bootstrap');
 
 // `SarosApi` must be globally available to enable calls from Java.

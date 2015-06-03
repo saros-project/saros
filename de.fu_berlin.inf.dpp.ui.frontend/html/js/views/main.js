@@ -3,6 +3,7 @@ var AmpersandView = require('ampersand-view');
 var templates = require('../templates');
 var AccountsDropdownView = require('../views/accounts-dropdown');
 var ContactsView = require('../views/contacts');
+var AddContactView = require('../views/add-contact');
 var dictionary = require('../dictionary');
 
 module.exports = AmpersandView.extend({
@@ -33,7 +34,8 @@ module.exports = AmpersandView.extend({
         }        
     },
     events: {
-        'click [data-hook=connection-button]': 'toggleConnect'
+        'click [data-hook=connection-button]': 'toggleConnect',
+        'click [data-hook=add-contact]': 'openAddContactDialog'
     },
     bindings: {
         'model.activeAccountLabel': '[data-hook=active-account]',
@@ -54,5 +56,10 @@ module.exports = AmpersandView.extend({
     toggleConnect: function() {
 
         this.model.updateConnectionState();
+    },
+    openAddContactDialog: function() {
+
+        new AddContactView();
     }
 });
+
