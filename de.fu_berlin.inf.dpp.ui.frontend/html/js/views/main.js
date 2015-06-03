@@ -1,10 +1,11 @@
 var app = require('ampersand-app');
-var View = require('ampersand-view');
+var AmpersandView = require('ampersand-view');
 var templates = require('../templates');
 var AccountsDropdownView = require('../views/accounts-dropdown');
+var ContactsView = require('../views/contacts');
 var dictionary = require('../dictionary');
 
-module.exports = View.extend({
+module.exports = AmpersandView.extend({
     template: templates.main,
     // Add the dictionary to the context so that the template
     // engine can use it.
@@ -20,7 +21,16 @@ module.exports = View.extend({
                     collection: app.accounts
                 });
             }
-        }
+        },
+        contacts: {
+            container: '[data-hook=contact-container]',
+            prepareView: function(el) {
+                return new ContactsView({
+                    el: el,
+                    collection: app.contacts
+                });
+            }
+        }        
     },
     events: {
         'click [data-hook=connection-button]': 'toggleConnect'

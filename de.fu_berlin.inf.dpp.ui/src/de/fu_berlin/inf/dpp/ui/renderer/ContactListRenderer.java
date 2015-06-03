@@ -91,7 +91,7 @@ public class ContactListRenderer extends Renderer {
     private synchronized void renderContactList(IJQueryBrowser browser) {
         Gson gson = new Gson();
         final String jsonString = gson.toJson(contactList);
-        browser.run("__angular_displayContactList(" + jsonString + ");");
+        browser.run("SarosApi.trigger('contactsChanged'," + jsonString + ");");
     }
 
 }

@@ -1,13 +1,14 @@
 body
-	div#header
-		nav.navbar.navbar-default
-			p.navbar-text(data-hook="active-account")
-			.navbar-form.btn-group
-				button.btn.btn-default.btn-sm(type="button", data-hook="connection-button")
-				button.btn.btn-default.btn-sm.dropdown-toggle(data-toggle="dropdown")
-					span.caret
-					span.sr-only toggle
-				ul.accounts.dropdown-menu(data-hook="account-list", role="menu")
-					li
-						a(href="#", data-hook="manage-accounts")= d.action.manageAccounts
-					li.divider
+    div#header
+        nav.navbar.navbar-default
+            p.navbar-text(data-hook="active-account")
+            .navbar-form.btn-group
+                button.btn.btn-default.btn-sm(type="button", data-hook="connection-button")
+                button.btn.btn-default.btn-sm.dropdown-toggle(data-toggle="dropdown")
+                    span.caret
+                    span.sr-only toggle
+                ul.accounts.dropdown-menu(data-hook="account-list", role="menu")
+                    li
+                        a(href="#", data-hook="manage-accounts")= d.action.manageAccounts
+                    li.divider
+    div(data-hook="contact-container")
