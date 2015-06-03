@@ -15,6 +15,7 @@ import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
 import de.fu_berlin.inf.dpp.ui.manager.ContactListManager;
 import de.fu_berlin.inf.dpp.ui.renderer.AccountRenderer;
 import de.fu_berlin.inf.dpp.ui.renderer.ContactListRenderer;
+import de.fu_berlin.inf.dpp.ui.renderer.ProjectListRenderer;
 import de.fu_berlin.inf.dpp.ui.webpages.AddAccountPage;
 import de.fu_berlin.inf.dpp.ui.webpages.AddContactPage;
 import de.fu_berlin.inf.dpp.ui.webpages.MainPage;
@@ -47,6 +48,7 @@ public class HTMLUIContextFactory extends AbstractSarosContextFactory {
             Component.create(BrowserCreator.class),
             Component.create(ContactListRenderer.class),
             Component.create(AccountRenderer.class),
+            Component.create(ProjectListRenderer.class),
             Component.create(AddAccountBrowserFunctions.class),
             Component.create(AddContactBrowserFunctions.class),
             Component.create(MainPageBrowserFunctions.class),

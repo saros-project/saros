@@ -1,11 +1,16 @@
 package de.fu_berlin.inf.dpp.ui.model;
 
-import java.util.List;
+import de.fu_berlin.inf.dpp.filesystem.IProject;
 
 /**
- * Represents a project. This class is used to form an JSON equivalent.
+ * Represents a project. This is an abstraction of the different concepts of
+ * what an "project" is in different IDEs. A ProejctTree has a name and
+ * {@link ProjectTreeNode} which represents the root.
  * 
- * A project has a name and a {@link ProjectTreeNode ProjectRoot}.
+ * This class is used to form an JSON equivalent for the HTML UI. This model can
+ * be used to create a common {@link IProject} which is needed for the
+ * ProjectNegotiation.
+ * 
  */
 public class ProjectTree {
 
@@ -24,9 +29,8 @@ public class ProjectTree {
         this.displayName = displayName;
     }
 
-    public List<ProjectTreeNode> getMembers() {
-        return root.getMembers();
-
+    public ProjectTreeNode getRoot() {
+        return root;
     }
 
     public String getProjectName() {
