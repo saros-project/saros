@@ -63,10 +63,22 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
     private PacketCollector startActivityQueuingResponseCollector;
 
-    public OutgoingProjectNegotiation(JID to, ISarosSession session,
+    /**
+     * Initializes an OutgoingProjectNegotiation.
+     *
+     * @param peer
+     *            JID of the peer to negotiate with
+     * @param session
+     *            current Saros session
+     * @param projects
+     *            projects to share
+     * @param sarosContext
+     *            Saros dependency injection context
+     */
+    public OutgoingProjectNegotiation(JID peer, ISarosSession session,
         List<IProject> projects, ISarosContext sarosContext) {
-        super(String.valueOf(NEGOTIATION_ID_GENERATOR.nextLong()), session
-            .getID(), to, sarosContext);
+        super(String.valueOf(NEGOTIATION_ID_GENERATOR.nextLong()), peer,
+            session.getID(), sarosContext);
 
         this.session = session;
         this.projects = projects;
@@ -92,7 +104,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
              * inside a Workspace Runnable with file locks !. There is a small
              * gap between saving editors and entering the file lock but it will
              * almost never matter in a real execution environment.
-             * 
+             *
              * Do not save the editors inside the runnable as this may not work
              * depending on the IEditorManager implementation, i.e this thread
              * holds the lock, but saving editors is performed in another thread
@@ -114,7 +126,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 sendAndAwaitActivityQueueingActivation(monitor);
                 monitor.subTask("");
 
-                User user = session.getUser(peer);
+                User user = session.getUser(getPeer());
 
                 if (user == null)
                     throw new LocalCancellationException(null,
@@ -123,7 +135,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 /*
                  * inform all listeners that the peer has started queuing and
                  * can therefore process IResourceActivities now
-                 * 
+                 *
                  * TODO this needs a review as this is called inside the
                  * "blocked" section and so it is not allowed to send resource
                  * activities at this time. Maybe change the description of the
@@ -141,10 +153,10 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             checkCancellation(CancelOption.NOTIFY_PEER);
 
             if (zipArchive != null)
-                sendArchive(zipArchive, peer, ARCHIVE_TRANSFER_ID + getID(),
-                    monitor);
+                sendArchive(zipArchive, getPeer(), ARCHIVE_TRANSFER_ID
+                    + getID(), monitor);
 
-            User user = session.getUser(peer);
+            User user = session.getUser(getPeer());
 
             if (user == null)
                 throw new LocalCancellationException(null,
@@ -195,14 +207,14 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         ProjectNegotiationOfferingExtension offering = new ProjectNegotiationOfferingExtension(
             getSessionID(), getID(), projectInfos);
 
-        transmitter.send(ISarosSession.SESSION_CONNECTION_ID, peer,
+        transmitter.send(ISarosSession.SESSION_CONNECTION_ID, getPeer(),
             ProjectNegotiationOfferingExtension.PROVIDER.create(offering));
     }
 
     /**
      * Retrieve the peer's partial file list and remember which files need to be
      * sent to that user
-     * 
+     *
      * @param monitor
      * @throws IOException
      * @throws SarosCancellationException
@@ -212,7 +224,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
         LOG.debug(this + " : waiting for remote file list");
 
-        monitor.beginTask("Waiting for " + peer.getName()
+        monitor.beginTask("Waiting for " + getPeer().getName()
             + " to choose project(s) location", IProgressMonitor.UNKNOWN);
 
         checkCancellation(CancelOption.NOTIFY_PEER);
@@ -222,7 +234,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
         if (packet == null)
             throw new LocalCancellationException("received no response from "
-                + peer + " while waiting for the file list",
+                + getPeer() + " while waiting for the file list",
                 CancelOption.DO_NOT_NOTIFY_PEER);
 
         List<FileList> remoteFileLists = ProjectNegotiationMissingFilesExtension.PROVIDER
@@ -258,9 +270,9 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
          * TODO: Make sure that all users are fully registered when stopping
          * them, otherwise failures might occur while a user is currently
          * joining and has not fully initialized yet.
-         * 
+         *
          * See also OutgoingSessionNegotiation#completeInvitation
-         * 
+         *
          * srossbach: This may already be the case ... just review this
          */
 
@@ -373,11 +385,11 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     }
 
     private void createCollectors() {
-        remoteFileListResponseCollector = xmppReceiver
+        remoteFileListResponseCollector = receiver
             .createCollector(ProjectNegotiationMissingFilesExtension.PROVIDER
                 .getPacketFilter(getSessionID(), getID()));
 
-        startActivityQueuingResponseCollector = xmppReceiver
+        startActivityQueuingResponseCollector = receiver
             .createCollector(StartActivityQueuingResponse.PROVIDER
                 .getPacketFilter(getSessionID(), getID()));
     }
@@ -484,18 +496,18 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     /**
      * Sends an activity queuing request to the remote side and awaits the
      * confirmation of the request.
-     * 
+     *
      * @param monitor
      */
     private void sendAndAwaitActivityQueueingActivation(IProgressMonitor monitor)
         throws IOException, SarosCancellationException {
 
-        monitor.beginTask("Waiting for " + peer.getName()
+        monitor.beginTask("Waiting for " + getPeer().getName()
             + " to perform additional initialization...",
             IProgressMonitor.UNKNOWN);
 
         transmitter
-            .send(ISarosSession.SESSION_CONNECTION_ID, peer,
+            .send(ISarosSession.SESSION_CONNECTION_ID, getPeer(),
                 StartActivityQueuingRequest.PROVIDER
                     .create(new StartActivityQueuingRequest(getSessionID(),
                         getID())));
@@ -505,7 +517,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
         if (packet == null)
             throw new LocalCancellationException("received no response from "
-                + peer + " while waiting to finish additional initialization",
+                + getPeer()
+                + " while waiting to finish additional initialization",
                 CancelOption.DO_NOT_NOTIFY_PEER);
 
         monitor.done();
@@ -513,6 +526,6 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
     @Override
     public String toString() {
-        return "OPN [remote side: " + peer + "]";
+        return "OPN [remote side: " + getPeer() + "]";
     }
 }

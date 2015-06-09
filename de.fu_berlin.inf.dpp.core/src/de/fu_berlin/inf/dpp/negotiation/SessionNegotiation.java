@@ -2,7 +2,7 @@
  * DPP - Serious Distributed Pair Programming
  * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 1, or (at your option)
@@ -20,7 +20,6 @@
 package de.fu_berlin.inf.dpp.negotiation;
 
 import org.apache.log4j.Logger;
-import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.picocontainer.annotations.Inject;
 
@@ -30,9 +29,6 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
 import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
-import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
@@ -62,29 +58,18 @@ public abstract class SessionNegotiation extends Negotiation {
         600000L);
 
     @Inject
-    protected ITransmitter transmitter;
-
-    @Inject
-    protected IReceiver receiver;
-
-    @Inject
     protected SessionNegotiationHookManager hookManager;
 
-    private final String negotiationID;
-
     protected final String description;
-
-    // FIXME make final
-    protected JID peer;
 
     protected final String peerNickname;
 
     protected ISarosSession sarosSession;
 
-    public SessionNegotiation(final String negotiationID, final JID peer,
+    public SessionNegotiation(final String id, final JID peer,
         final String description, final ISarosContext sarosContext) {
-        this.negotiationID = negotiationID;
-        this.peer = peer;
+        super(id, peer, sarosContext);
+
         this.description = description;
         sarosContext.initComponent(this);
 
@@ -95,25 +80,12 @@ public abstract class SessionNegotiation extends Negotiation {
             : nickname;
     }
 
-    public JID getPeer() {
-        return peer;
-    }
-
     /**
      * @return the user-provided informal description that can be provided with
      *         an invitation.
      */
     public String getDescription() {
         return description;
-    }
-
-    /**
-     * Returns the ID of this negotiation.
-     * 
-     * @return the ID
-     */
-    public final String getID() {
-        return negotiationID;
     }
 
     @Override
@@ -131,40 +103,9 @@ public abstract class SessionNegotiation extends Negotiation {
             + " of the local cancellation");
 
         PacketExtension notification = CancelInviteExtension.PROVIDER
-            .create(new CancelInviteExtension(negotiationID, cause.getMessage()));
+            .create(new CancelInviteExtension(getID(), cause.getMessage()));
 
         transmitter.sendPacketExtension(getPeer(), notification);
-    }
-
-    /**
-     * Returns the next packet from a collector.
-     * 
-     * @param collector
-     *            the collector to monitor
-     * @param timeout
-     *            the amount of time to wait for the next packet (in
-     *            milliseconds)
-     * @return the collected packet or <code>null</code> if no packet was
-     *         received
-     * @throws SarosCancellationException
-     *             if the negotiation was canceled
-     */
-    protected final Packet collectPacket(PacketCollector collector, long timeout)
-        throws SarosCancellationException {
-
-        Packet packet = null;
-
-        while (timeout > 0) {
-            checkCancellation(CancelOption.NOTIFY_PEER);
-
-            packet = collector.nextResult(1000);
-
-            if (packet != null)
-                break;
-
-            timeout -= 1000;
-        }
-        return packet;
     }
 
     @Override

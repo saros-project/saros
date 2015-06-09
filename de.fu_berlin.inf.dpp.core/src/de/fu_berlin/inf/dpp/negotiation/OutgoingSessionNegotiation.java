@@ -225,8 +225,8 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
         log.debug(this + " : checking Saros support");
         monitor.setTaskName("Checking Saros support...");
 
-        JID resourceQualifiedJID = discoveryManager.getSupportingPresence(peer,
-            SarosConstants.XMPP_FEATURE_NAMESPACE);
+        JID resourceQualifiedJID = discoveryManager.getSupportingPresence(
+            getPeer(), SarosConstants.XMPP_FEATURE_NAMESPACE);
 
         if (resourceQualifiedJID == null)
             throw new LocalCancellationException(
@@ -237,7 +237,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
         log.debug(this + " :  remote contact offers Saros support");
 
         // FIXME accept only RQ JIDs
-        peer = resourceQualifiedJID;
+        setPeer(resourceQualifiedJID);
     }
 
     /**
@@ -256,7 +256,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
         monitor.setTaskName("Checking version compatibility...");
 
         VersionCompatibilityResult result = versionManager
-            .determineVersionCompatibility(peer);
+            .determineVersionCompatibility(getPeer());
 
         checkCancellation(CancelOption.DO_NOT_NOTIFY_PEER);
 
@@ -303,7 +303,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
         InvitationOfferingExtension invitationOffering = new InvitationOfferingExtension(
             getID(), sarosSession.getID(), localVersion, description);
 
-        transmitter.sendPacketExtension(peer,
+        transmitter.sendPacketExtension(getPeer(),
             InvitationOfferingExtension.PROVIDER.create(invitationOffering));
     }
 
@@ -397,7 +397,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
                 .getHookSettings(hook);
 
             Map<String, String> finalSettings = hook.considerClientPreferences(
-                peer, preferredSettings);
+                getPeer(), preferredSettings);
 
             if (finalSettings == null)
                 continue;
@@ -435,7 +435,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
         log.debug(this + " : sending updated session negotiation data");
 
         monitor.setTaskName("Sending local session configuration...");
-        transmitter.sendPacketExtension(peer,
+        transmitter.sendPacketExtension(getPeer(),
             InvitationParameterExchangeExtension.PROVIDER
                 .create(modifiedParameters));
 
@@ -481,27 +481,27 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
         monitor.setTaskName("Synchronizing user list...");
 
-        User user = new User(peer, clientNickname, false, false, clientColorID,
-            clientFavoriteColorID);
+        User user = new User(getPeer(), clientNickname, false, false,
+            clientColorID, clientFavoriteColorID);
 
         synchronized (REMOVE_ME_IF_SESSION_ADD_USER_IS_THREAD_SAFE) {
 
             sarosSession.addUser(user);
-            log.debug(this + " : added " + peer
+            log.debug(this + " : added " + getPeer()
                 + " to the current session, colorID: " + clientColorID);
 
             /* *
-             *
+             * 
              * @JTourBusStop 7, Creating custom network messages, Sending custom
              * messages:
-             *
+             * 
              * This is pretty straight forward. Create an instance of your
              * extension with the proper arguments and use the provider to
              * create a (marshalled) packet extension. The extension can now be
              * send using the various methods of the ITransmitted interface.
              */
 
-            transmitter.send(ISarosSession.SESSION_CONNECTION_ID, peer,
+            transmitter.send(ISarosSession.SESSION_CONNECTION_ID, getPeer(),
                 InvitationAcknowledgedExtension.PROVIDER
                     .create(new InvitationAcknowledgedExtension(getID())));
         }
@@ -514,16 +514,16 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
     private void createCollectors() {
 
         /* *
-         *
+         * 
          * @JTourBusStop 9, Creating custom network messages, Receiving custom
          * messages - Part 2:
-         *
+         * 
          * Another way to receive custom message is to use a collector which you
          * can poll instead. The same rules as in step 7 applies to the
          * collector as well. Pay attention to the filter you use and avoid
          * using the collector when the current thread context is the context
          * for dispatching messages.
-         *
+         * 
          * IMPORTANT: Your logic must ensure that the collector is canceled
          * after it is no longer used. Failing to do so will result in memory
          * leaks.
@@ -555,6 +555,6 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
     @Override
     public String toString() {
-        return "OSN [remote side: " + peer + "]";
+        return "OSN [remote side: " + getPeer() + "]";
     }
 }

@@ -69,12 +69,24 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     @Inject
     private ISarosSessionManager sessionManager;
 
-    public OutgoingProjectNegotiation(JID to, ISarosSession sarosSession,
+    /**
+     * Initializes an OutgoingProjectNegotiation.
+     *
+     * @param peer
+     *            JID of the peer to negotiate with
+     * @param session
+     *            current Saros session
+     * @param projects
+     *            projects to share
+     * @param sarosContext
+     *            Saros dependency injection context
+     */
+    public OutgoingProjectNegotiation(JID peer, ISarosSession session,
         List<IProject> projects, ISarosContext sarosContext) {
-        super(String.valueOf(PROCESS_ID_GENERATOR.nextLong()), sarosSession
-            .getID(), to, sarosContext);
+        super(String.valueOf(PROCESS_ID_GENERATOR.nextLong()), peer, session
+            .getID(), sarosContext);
 
-        this.sarosSession = sarosSession;
+        this.sarosSession = session;
         this.projects = projects;
     }
 
@@ -110,7 +122,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 sendAndAwaitActivityQueueingActivation(monitor);
                 monitor.subTask("");
 
-                User user = sarosSession.getUser(peer);
+                User user = sarosSession.getUser(getPeer());
 
                 if (user == null) {
                     throw new LocalCancellationException(null,
@@ -139,11 +151,11 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             checkCancellation(CancelOption.NOTIFY_PEER);
 
             if (zipArchive != null) {
-                sendArchive(zipArchive, peer, ARCHIVE_TRANSFER_ID + getID(),
-                    monitor);
+                sendArchive(zipArchive, getPeer(), ARCHIVE_TRANSFER_ID
+                    + getID(), monitor);
             }
 
-            User user = sarosSession.getUser(peer);
+            User user = sarosSession.getUser(getPeer());
 
             if (user == null) {
                 throw new LocalCancellationException(null,
@@ -196,7 +208,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         ProjectNegotiationOfferingExtension offering = new ProjectNegotiationOfferingExtension(
             getSessionID(), getID(), projectInfos);
 
-        transmitter.send(ISarosSession.SESSION_CONNECTION_ID, peer,
+        transmitter.send(ISarosSession.SESSION_CONNECTION_ID, getPeer(),
             ProjectNegotiationOfferingExtension.PROVIDER.create(offering));
     }
 
@@ -213,7 +225,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
         LOG.debug(this + " : waiting for remote file list");
 
-        monitor.beginTask("Waiting for " + peer.getName()
+        monitor.beginTask("Waiting for " + getPeer().getName()
             + " to choose project(s) location", IProgressMonitor.UNKNOWN);
 
         checkCancellation(CancelOption.NOTIFY_PEER);
@@ -223,7 +235,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
         if (packet == null) {
             throw new LocalCancellationException("received no response from "
-                + peer + " while waiting for the file list",
+                + getPeer() + " while waiting for the file list",
                 CancelOption.DO_NOT_NOTIFY_PEER);
         }
 
@@ -387,11 +399,11 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     }
 
     private void createCollectors() {
-        remoteFileListResponseCollector = xmppReceiver
+        remoteFileListResponseCollector = receiver
             .createCollector(ProjectNegotiationMissingFilesExtension.PROVIDER
                 .getPacketFilter(getSessionID(), getID()));
 
-        startActivityQueuingResponseCollector = xmppReceiver
+        startActivityQueuingResponseCollector = receiver
             .createCollector(StartActivityQueuingResponse.PROVIDER
                 .getPacketFilter(getSessionID(), getID()));
     }
@@ -491,12 +503,12 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     private void sendAndAwaitActivityQueueingActivation(IProgressMonitor monitor)
         throws IOException, SarosCancellationException {
 
-        monitor.beginTask("Waiting for " + peer.getName()
-                + " to perform additional initialization...",
+        monitor.beginTask("Waiting for " + getPeer().getName()
+            + " to perform additional initialization...",
             IProgressMonitor.UNKNOWN);
 
         transmitter
-            .send(ISarosSession.SESSION_CONNECTION_ID, peer,
+            .send(ISarosSession.SESSION_CONNECTION_ID, getPeer(),
                 StartActivityQueuingRequest.PROVIDER
                     .create(new StartActivityQueuingRequest(getSessionID(),
                         getID())));
@@ -506,7 +518,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
         if (packet == null) {
             throw new LocalCancellationException("received no response from "
-                + peer + " while waiting to finish additional initialization",
+                + getPeer()
+                + " while waiting to finish additional initialization",
                 CancelOption.DO_NOT_NOTIFY_PEER);
         }
 
@@ -515,6 +528,6 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
     @Override
     public String toString() {
-        return "OPN [remote side: " + peer + "]";
+        return "OPN [remote side: " + getPeer() + "]";
     }
 }

@@ -5,13 +5,19 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
+import org.jivesoftware.smack.packet.Packet;
 
+import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelLocation;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
+import de.fu_berlin.inf.dpp.net.IReceiver;
+import de.fu_berlin.inf.dpp.net.ITransmitter;
+import de.fu_berlin.inf.dpp.net.PacketCollector;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 /**
  * Abstract base class for implementing specific types of message exchanges
@@ -27,6 +33,14 @@ abstract class Negotiation {
     }
 
     private static final Logger log = Logger.getLogger(Negotiation.class);
+
+    private final String id;
+
+    private JID peer;
+
+    protected final ITransmitter transmitter;
+
+    protected final IReceiver receiver;
 
     private IProgressMonitor monitorToObserve;
 
@@ -47,6 +61,57 @@ abstract class Negotiation {
     private final List<CancelListener> cancelListeners = new CopyOnWriteArrayList<CancelListener>();
 
     /**
+     * Creates a Negotiation.
+     *
+     * @param id
+     *            unique ID of the negotiation
+     * @param peer
+     *            JID of the peer to negotiate with
+     * @param context
+     *            Saros dependency injection context
+     */
+    protected Negotiation(String id, JID peer, ISarosContext context) {
+        this.id = id;
+        this.peer = peer;
+        this.transmitter = context.getComponent(ITransmitter.class);
+        this.receiver = context.getComponent(IReceiver.class);
+    }
+
+    /**
+     * Returns the unique ID of this negotiation. It is shared between the local
+     * and the remote peer instance of the negotiation.
+     *
+     * @return negotiation ID
+     */
+    public String getID() {
+        return id;
+    }
+
+    /**
+     * Returns the JID of the peer with which the negotiation takes place.
+     *
+     * @return peer JID
+     */
+    public JID getPeer() {
+        return peer;
+    }
+
+    /**
+     * Changes the peer to negotiate with.
+     *
+     * @param peer
+     *            new peer JID
+     *
+     * @deprecated The peer JID should remain constant during the negotiation.
+     *             Code using this method should be changed to find out the
+     *             correct peer JID before the negotiation starts.
+     */
+    @Deprecated
+    protected void setPeer(JID peer) {
+        this.peer = peer;
+    }
+
+    /**
      * Sets a {@linkplain NegotiationListener negotiation listener} for the
      * negotiation.
      *
@@ -65,6 +130,33 @@ abstract class Negotiation {
      */
     public synchronized String getErrorMessage() {
         return errorMessage;
+    }
+
+    /**
+     * Returns the next packet from a collector.
+     *
+     * @param collector
+     *            the collector to monitor
+     * @param timeout
+     *            the amount of time to wait for the next packet (in
+     *            milliseconds)
+     * @return the collected packet or <code>null</code> if no packet was
+     *         received during the timeout period
+     * @throws SarosCancellationException
+     *             if the process was canceled
+     */
+    protected final Packet collectPacket(PacketCollector collector, long timeout)
+        throws SarosCancellationException {
+
+        Packet packet = null;
+
+        for (long timeLeft = timeout; timeLeft > 0; timeLeft -= 1000) {
+            checkCancellation(CancelOption.NOTIFY_PEER);
+            if ((packet = collector.nextResult(1000)) != null)
+                break;
+        }
+
+        return packet;
     }
 
     /**

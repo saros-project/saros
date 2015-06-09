@@ -450,8 +450,8 @@ public class SarosSessionManager implements ISarosSessionManager {
             }
 
             try {
-                negotiation = new IncomingProjectNegotiation(getSarosSession(),
-                    from, negotiationID, projectInfos, sarosContext);
+                negotiation = new IncomingProjectNegotiation(negotiationID,
+                    from, getSarosSession(), projectInfos, sarosContext);
 
                 negotiation.setNegotiationListener(negotiationListener);
                 currentProjectNegotiations.add(negotiation);

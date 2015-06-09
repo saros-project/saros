@@ -81,10 +81,24 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     private PacketCollector startActivityQueuingRequestCollector;
 
-    public IncomingProjectNegotiation(ISarosSession session, JID peer,
-        String negotiationID, List<ProjectNegotiationData> projectInfos,
+    /**
+     * Initializes an IncomingProjectNegotiation.
+     *
+     * @param negotiationID
+     *            unique ID of the negotiation
+     * @param peer
+     *            JID of the peer to negotiate with
+     * @param session
+     *            current Saros session
+     * @param projectInfos
+     *            information about the projects shared by the peer
+     * @param sarosContext
+     *            Saros dependency injection context
+     */
+    public IncomingProjectNegotiation(String negotiationID, JID peer,
+        ISarosSession session, List<ProjectNegotiationData> projectInfos,
         ISarosContext sarosContext) {
-        super(negotiationID, session.getID(), peer, sarosContext);
+        super(negotiationID, peer, session.getID(), sarosContext);
 
         this.session = session;
         this.projectNegotiationData = projectInfos;
@@ -172,7 +186,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
             monitor.subTask("");
 
-            transmitter.send(ISarosSession.SESSION_CONNECTION_ID, peer,
+            transmitter.send(ISarosSession.SESSION_CONNECTION_ID, getPeer(),
                 ProjectNegotiationMissingFilesExtension.PROVIDER
                     .create(new ProjectNegotiationMissingFilesExtension(
                         getSessionID(), getID(), missingFiles)));
@@ -198,7 +212,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 session.enableQueuing(project);
             }
 
-            transmitter.send(ISarosSession.SESSION_CONNECTION_ID, peer,
+            transmitter.send(ISarosSession.SESSION_CONNECTION_ID, getPeer(),
                 StartActivityQueuingResponse.PROVIDER
                     .create(new StartActivityQueuingResponse(getSessionID(),
                         getID())));
@@ -498,7 +512,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
          * Inform the host of the session that the current (local) user has
          * started the possibly time consuming SVN checkout via a
          * remoteProgressMonitor
-         *
+         * 
          * The monitor that is created here is shown both locally and remote and
          * is handled like a regular progress monitor.
          */
@@ -533,7 +547,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
         /*
          * Remove the entries from the mapping in the SarosSession.
-         *
+         * 
          * Stefan Rossbach 28.12.2012: This will not gain you anything because
          * the project is marked as shared on the remote side and so will never
          * be able to be shared again to us. Again the whole architecture does
@@ -867,7 +881,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     private void awaitActivityQueueingActivation(IProgressMonitor monitor)
         throws SarosCancellationException {
 
-        monitor.beginTask("Waiting for " + peer.getName()
+        monitor.beginTask("Waiting for " + getPeer().getName()
             + " to continue the project negotiation...",
             IProgressMonitor.UNKNOWN);
 
@@ -876,14 +890,15 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
         if (packet == null)
             throw new LocalCancellationException("received no response from "
-                + peer + " while waiting to continue the project negotiation",
+                + getPeer()
+                + " while waiting to continue the project negotiation",
                 CancelOption.DO_NOT_NOTIFY_PEER);
 
         monitor.done();
     }
 
     private void createCollectors() {
-        startActivityQueuingRequestCollector = xmppReceiver
+        startActivityQueuingRequestCollector = receiver
             .createCollector(StartActivityQueuingRequest.PROVIDER
                 .getPacketFilter(getSessionID(), getID()));
     }
@@ -993,6 +1008,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     @Override
     public String toString() {
-        return "IPN [remote side: " + peer + "]";
+        return "IPN [remote side: " + getPeer() + "]";
     }
 }

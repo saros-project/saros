@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
-import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smackx.filetransfer.FileTransfer;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
@@ -20,9 +19,6 @@ import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.MonitorableFileTransfer;
 import de.fu_berlin.inf.dpp.monitoring.MonitorableFileTransfer.TransferStatus;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
-import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -61,19 +57,9 @@ public abstract class ProjectNegotiation extends Negotiation {
     protected XMPPConnectionService connectionService;
 
     @Inject
-    protected ITransmitter transmitter;
-
-    @Inject
-    protected IReceiver xmppReceiver;
-
-    @Inject
     protected VCSProviderFactory vcsProviderFactory;
 
-    private final String negotiationID;
-
     private final String sessionID;
-
-    protected final JID peer;
 
     /**
      * The file transfer manager can be <code>null</code> if no connection was
@@ -84,11 +70,23 @@ public abstract class ProjectNegotiation extends Negotiation {
     @Inject
     protected ISarosSessionManager sessionManager;
 
-    public ProjectNegotiation(final String negotiationID,
-        final String sessionID, final JID peer, ISarosContext sarosContext) {
-        this.negotiationID = negotiationID;
+    /**
+     * Initializes a ProjectNegotiation.
+     *
+     * @param negotiationID
+     *            unique ID of the negotiation
+     * @param peer
+     *            JID of the peer to negotiate with
+     * @param sessionID
+     *            ID of the current Saros session
+     * @param sarosContext
+     *            Saros dependency injection context
+     */
+    public ProjectNegotiation(final String negotiationID, final JID peer,
+        final String sessionID, ISarosContext sarosContext) {
+        super(negotiationID, peer, sarosContext);
+
         this.sessionID = sessionID;
-        this.peer = peer;
         sarosContext.initComponent(this);
 
         Connection connection = connectionService.getConnection();
@@ -105,15 +103,6 @@ public abstract class ProjectNegotiation extends Negotiation {
     public abstract Map<String, String> getProjectNames();
 
     /**
-     * Returns the ID of this negotiation.
-     *
-     * @return the ID
-     */
-    public final String getID() {
-        return negotiationID;
-    }
-
-    /**
      * Returns the {@linkplain ISarosSession session} id this negotiation
      * belongs to.
      *
@@ -121,10 +110,6 @@ public abstract class ProjectNegotiation extends Negotiation {
      */
     public final String getSessionID() {
         return sessionID;
-    }
-
-    public final JID getPeer() {
-        return peer;
     }
 
     @Override
@@ -138,7 +123,7 @@ public abstract class ProjectNegotiation extends Negotiation {
         if (cause.getCancelOption() != CancelOption.NOTIFY_PEER)
             return;
 
-        LOG.debug("notifying remote contact " + peer
+        LOG.debug("notifying remote contact " + getPeer()
             + " of the local project negotiation cancellation");
 
         PacketExtension notification = CancelProjectNegotiationExtension.PROVIDER
@@ -199,37 +184,6 @@ public abstract class ProjectNegotiation extends Negotiation {
             throw new LocalCancellationException();
 
         throw new RemoteCancellationException(null);
-    }
-
-    /**
-     * Returns the next packet from a collector.
-     *
-     * @param collector
-     *            the collector to monitor
-     * @param timeout
-     *            the amount of time to wait for the next packet (in
-     *            milliseconds)
-     * @return the collected packet or <code>null</code> if no packet was
-     *         received
-     * @throws SarosCancellationException
-     *             if the negotiation was canceled
-     */
-    protected final Packet collectPacket(PacketCollector collector, long timeout)
-        throws SarosCancellationException {
-
-        Packet packet = null;
-
-        while (timeout > 0) {
-            checkCancellation(CancelOption.NOTIFY_PEER);
-
-            packet = collector.nextResult(1000);
-
-            if (packet != null)
-                break;
-
-            timeout -= 1000;
-        }
-        return packet;
     }
 
     @Override

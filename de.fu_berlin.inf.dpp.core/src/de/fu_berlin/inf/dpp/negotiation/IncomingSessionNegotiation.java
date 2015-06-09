@@ -127,22 +127,22 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
 
             /**
              * @JTourBusStop 9, Invitation Process:
-             * 
+             *
              *               This method is called by the JoinSessionWizard
              *               after the user clicked on "Finish" (indicating that
              *               he is willing to join the session).
-             * 
+             *
              *               (4b) Send acceptance to host.
-             * 
+             *
              *               (5a) Create "wishlist" with session's parameters
              *               (e.g. preferred color) and send it.
-             * 
+             *
              *               (6b) Wait for host's response.
-             * 
+             *
              *               (7) Initialize the session and related components
              *               (e.g. chat, color management) with the parameters
              *               as defined by the host.
-             * 
+             *
              *               (8) Start the session accordingly, inform the host
              *               and wait for his final acknowledgement (which
              *               indicates, that this client has been successfully
@@ -170,8 +170,8 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
              */
             monitor.setTaskName("Negotiating data connection...");
 
-            connectionManager
-                .connect(ISarosSession.SESSION_CONNECTION_ID, peer);
+            connectionManager.connect(ISarosSession.SESSION_CONNECTION_ID,
+                getPeer());
 
             startSession(monitor);
 
@@ -194,7 +194,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
     private void sendInvitationAccepted() {
         LOG.debug(this + " : sending invitation accepted confirmation");
 
-        transmitter.sendPacketExtension(peer,
+        transmitter.sendPacketExtension(getPeer(),
             InvitationAcceptedExtension.PROVIDER
                 .create(new InvitationAcceptedExtension(getID())));
     }
@@ -225,7 +225,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
 
         LOG.debug(this + " : sending session negotiation data");
 
-        transmitter.sendPacketExtension(peer,
+        transmitter.sendPacketExtension(getPeer(),
             InvitationParameterExchangeExtension.PROVIDER.create(parameters));
     }
 
@@ -253,8 +253,8 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
             .getPayload(packet);
 
         if (parameters == null)
-            throw new LocalCancellationException(peer + " sent malformed data",
-                CancelOption.DO_NOT_NOTIFY_PEER);
+            throw new LocalCancellationException(getPeer()
+                + " sent malformed data", CancelOption.DO_NOT_NOTIFY_PEER);
 
         LOG.debug(this + " : received host's session parameters");
 
@@ -340,7 +340,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
      */
     private void sendInvitationCompleted(IProgressMonitor monitor)
         throws IOException {
-        transmitter.send(ISarosSession.SESSION_CONNECTION_ID, peer,
+        transmitter.send(ISarosSession.SESSION_CONNECTION_ID, getPeer(),
             InvitationCompletedExtension.PROVIDER
                 .create(new InvitationCompletedExtension(getID())));
 
@@ -381,6 +381,6 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
 
     @Override
     public String toString() {
-        return "ISN [remote side: " + peer + "]";
+        return "ISN [remote side: " + getPeer() + "]";
     }
 }

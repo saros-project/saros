@@ -49,8 +49,8 @@ import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.negotiation.FileList;
 import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationListener;
-import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
+import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
@@ -448,8 +448,8 @@ public class SarosSessionManager implements ISarosSessionManager {
             }
 
             try {
-                negotiation = new IncomingProjectNegotiation(getSarosSession(),
-                    from, negotiationID, projectInfos, sarosContext);
+                negotiation = new IncomingProjectNegotiation(negotiationID,
+                    from, getSarosSession(), projectInfos, sarosContext);
 
                 negotiation.setNegotiationListener(negotiationListener);
                 currentProjectNegotiations.add(negotiation);

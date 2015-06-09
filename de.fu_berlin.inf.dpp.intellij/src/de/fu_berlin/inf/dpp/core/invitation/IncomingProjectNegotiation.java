@@ -79,10 +79,24 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     @Inject
     private ISarosSessionManager sessionManager;
 
-    public IncomingProjectNegotiation(ISarosSession session, JID peer,
-        String negotiationID, List<ProjectNegotiationData> projectInfos,
+    /**
+     * Initializes an IncomingProjectNegotiation.
+     *
+     * @param negotiationID
+     *            unique ID of the negotiation
+     * @param peer
+     *            JID of the peer to negotiate with
+     * @param session
+     *            current Saros session
+     * @param projectInfos
+     *            information about the projects shared by the peer
+     * @param sarosContext
+     *            Saros dependency injection context
+     */
+    public IncomingProjectNegotiation(String negotiationID, JID peer,
+        ISarosSession session, List<ProjectNegotiationData> projectInfos,
         ISarosContext sarosContext) {
-        super(negotiationID, session.getID(), peer, sarosContext);
+        super(negotiationID, peer, session.getID(), sarosContext);
 
         this.session = session;
         this.projectInfos = projectInfos;
@@ -120,10 +134,10 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * actions are performed to avoid unintended data loss, i.e this method will
      * do a best effort to backup altered data but no guarantee can be made in
      * doing so!
-     * 
+     *
      * @param projectMapping
      *            mapping from remote project ids to the target local projects
-     * 
+     *
      * @throws IllegalArgumentException
      *             if either a project id is not valid or the referenced project
      *             for that id does not exist
@@ -164,7 +178,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             List<FileList> missingFiles = calculateMissingFiles(projectMapping,
                 useVersionControl, monitor);
 
-            transmitter.send(ISarosSession.SESSION_CONNECTION_ID, peer,
+            transmitter.send(ISarosSession.SESSION_CONNECTION_ID, getPeer(),
                 ProjectNegotiationMissingFilesExtension.PROVIDER
                     .create(new ProjectNegotiationMissingFilesExtension(
                         getSessionID(), getID(), missingFiles)));
@@ -189,7 +203,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 session.enableQueuing(project);
             }
 
-            transmitter.send(ISarosSession.SESSION_CONNECTION_ID, peer,
+            transmitter.send(ISarosSession.SESSION_CONNECTION_ID, getPeer(),
                 StartActivityQueuingResponse.PROVIDER
                     .create(new StartActivityQueuingResponse(getSessionID(),
                         getID())));
@@ -295,7 +309,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     /**
      * calculates all the files the host/inviter has to send for synchronization
-     * 
+     *
      * @param projectMapping
      *            projectID => projectName (in local workspace)
      */
@@ -408,7 +422,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * Computes the list of files that we're going to request from the host.<br>
      * If a VCS is used, update files if needed, and remove them from the list
      * of requested files if that's possible.
-     * 
+     *
      * @param project
      * @param remoteFileList
      * @param monitor
@@ -452,7 +466,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     /**
      * Determines the missing resources.
-     * 
+     *
      * @param localFileList
      *            The file list of the local project.
      * @param remoteFileList
@@ -555,13 +569,13 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     /**
      * Waits for the activity queuing request from the remote side.
-     * 
+     *
      * @param monitor
      */
     private void awaitActivityQueueingActivation(IProgressMonitor monitor)
         throws SarosCancellationException {
 
-        monitor.beginTask("Waiting for " + peer.getName()
+        monitor.beginTask("Waiting for " + getPeer().getName()
             + " to continue the project negotiation...",
             IProgressMonitor.UNKNOWN);
 
@@ -570,14 +584,15 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
         if (packet == null)
             throw new LocalCancellationException("received no response from "
-                + peer + " while waiting to continue the project negotiation",
+                + getPeer()
+                + " while waiting to continue the project negotiation",
                 CancelOption.DO_NOT_NOTIFY_PEER);
 
         monitor.done();
     }
 
     private void createCollectors() {
-        startActivityQueuingRequestCollector = xmppReceiver
+        startActivityQueuingRequestCollector = receiver
             .createCollector(StartActivityQueuingRequest.PROVIDER
                 .getPacketFilter(getSessionID(), getID()));
     }
@@ -668,7 +683,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     @Override
     public String toString() {
-        return "IPN [remote side: " + peer + "]";
+        return "IPN [remote side: " + getPeer() + "]";
     }
 
     private static class ArchiveTransferListener implements
