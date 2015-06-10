@@ -33,3 +33,9 @@ label input {
 .modal-header, .modal-body, .modal-footer {
 	padding: 10px;
 }
+
+.panel-heading
+{
+    border-top-left-radius: inherit; 
+    border-top-right-radius: inherit;
+}

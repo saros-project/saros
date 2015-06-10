@@ -1,7 +1,8 @@
 module.exports = {
     'headline': {
         'sessions': 'Sessions',
-        'contacts': 'Contacts'
+        'contacts': 'Contacts',
+        'error': 'Error'
     },
     'action': {
         'manageAccounts': 'Manage Accounts',
@@ -11,6 +12,7 @@ module.exports = {
         'disconnecting': 'Disconnecting...',
         'addContact': 'Add Contact',
         'close': 'Close',
+        'ok': 'Ok',
         'add': 'Add',
         'delete': 'Delete',
         'rename': 'Rename',
