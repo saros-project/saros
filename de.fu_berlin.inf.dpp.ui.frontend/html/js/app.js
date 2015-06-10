@@ -21,10 +21,18 @@ app.extend({
     accounts: new Accounts(),
     init: function() {
 
-        new MainView({
-            el: document.body,
-            model: this.state
-        });
+        // Decide which view to render.
+        // the `page` property is set directly in the .html file.
+        switch (this.page) {
+
+            case 'main-page':
+                
+                new MainView({
+                    el: document.body,
+                    model: this.state
+                });
+                break;
+        }
     }
 });
 
