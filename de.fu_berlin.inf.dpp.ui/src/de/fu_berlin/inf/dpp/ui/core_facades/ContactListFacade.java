@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.core_facades;
 
-import de.fu_berlin.inf.dpp.ui.browser_functions.SarosMainPageBrowserFunctions;
+import de.fu_berlin.inf.dpp.ui.browser_functions.MainPageBrowserFunctions;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPException;
 
@@ -17,7 +17,7 @@ import de.fu_berlin.inf.dpp.ui.model.Account;
  * Bundles all backend calls for connecting and for managing the contact list.
  *
  * TODO: maybe this class should be split into connection facade and contactlisfacade
- * The downside is that {@link SarosMainPageBrowserFunctions} would have to deal
+ * The downside is that {@link MainPageBrowserFunctions} would have to deal
  * with one additional class dependency
  */
 public class ContactListFacade {

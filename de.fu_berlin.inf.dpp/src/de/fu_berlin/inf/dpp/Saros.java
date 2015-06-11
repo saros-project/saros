@@ -227,7 +227,7 @@ public class Saros extends AbstractUIPlugin {
         factories.add(new SarosCoreContextFactory());
 
         if (isSwtBrowserEnabled()) {
-            factories.add(new SarosHTMLUIContextFactory());
+            factories.add(new HTMLUIContextFactory());
             factories.add(new EclipseHTMLUIContextFactory());
         }
 

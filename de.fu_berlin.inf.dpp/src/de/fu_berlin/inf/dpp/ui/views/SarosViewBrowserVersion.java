@@ -11,7 +11,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.BrowserCreator;
-import de.fu_berlin.inf.dpp.ui.webpages.SarosMainPage;
+import de.fu_berlin.inf.dpp.ui.webpages.MainPage;
 
 /**
  * This view displays an SWTBrowser. The Browser loads an HTML Page which
@@ -39,7 +39,7 @@ public class SarosViewBrowserVersion extends ViewPart {
     private IJQueryBrowser browser;
 
     @Inject
-    private SarosMainPage sarosMainPage;
+    private MainPage mainPage;
 
     @Inject
     private BrowserCreator browserCreator;
@@ -53,7 +53,7 @@ public class SarosViewBrowserVersion extends ViewPart {
 
         try {
             browser = browserCreator.createBrowser(parent, SWT.NONE,
-                sarosMainPage);
+                mainPage);
 
         } catch (SWTError e) {
             // This might happen when there is no standard browser available

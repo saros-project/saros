@@ -8,7 +8,7 @@ import com.intellij.openapi.project.Project;
 
 import de.fu_berlin.inf.dpp.ISarosContextFactory;
 import de.fu_berlin.inf.dpp.SarosContext;
-import de.fu_berlin.inf.dpp.SarosHTMLUIContextFactory;
+import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.core.context.SarosCoreContextFactory;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
@@ -102,7 +102,7 @@ public class Saros {
 
         if (isSwtBrowserEnabled()) {
             SwtLibLoader.loadSwtLib();
-            factories.add(new SarosHTMLUIContextFactory());
+            factories.add(new HTMLUIContextFactory());
         }
 
         sarosContext = new SarosContext(factories, new DotGraphMonitor());

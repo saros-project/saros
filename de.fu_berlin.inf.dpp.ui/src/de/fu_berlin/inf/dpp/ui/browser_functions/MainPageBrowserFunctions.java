@@ -50,10 +50,10 @@ import java.util.List;
  *               The classes in the core_facades package can be used to bundle
  *               multiple core classes behind one facade.
  */
-public class SarosMainPageBrowserFunctions {
+public class MainPageBrowserFunctions {
 
     private static final Logger LOG = Logger
-        .getLogger(SarosMainPageBrowserFunctions.class);
+        .getLogger(MainPageBrowserFunctions.class);
 
     private final ContactListFacade contactListFacade;
 
@@ -63,7 +63,7 @@ public class SarosMainPageBrowserFunctions {
 
     private final AddAccountPage addAccountPage;
 
-    public SarosMainPageBrowserFunctions(ContactListFacade contactListFacade,
+    public MainPageBrowserFunctions(ContactListFacade contactListFacade,
         DialogManager dialogManager, AddContactPage addContactPage,
         AddAccountPage addAccountPage) {
         this.contactListFacade = contactListFacade;

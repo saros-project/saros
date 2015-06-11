@@ -1,7 +1,7 @@
 package de.fu_berlin.inf.dpp.ui.webpages;
 
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
-import de.fu_berlin.inf.dpp.ui.browser_functions.SarosMainPageBrowserFunctions;
+import de.fu_berlin.inf.dpp.ui.browser_functions.MainPageBrowserFunctions;
 import de.fu_berlin.inf.dpp.ui.renderer.AccountRenderer;
 import de.fu_berlin.inf.dpp.ui.renderer.ContactListRenderer;
 import de.fu_berlin.inf.dpp.ui.renderer.Renderer;
@@ -12,17 +12,17 @@ import java.util.List;
 /**
  * Represents the Saros main view.
  */
-public class SarosMainPage implements BrowserPage {
+public class MainPage implements BrowserPage {
 
     private final AccountRenderer accountRenderer;
 
     private final ContactListRenderer contactListRenderer;
 
-    private final SarosMainPageBrowserFunctions browserFunctions;
+    private final MainPageBrowserFunctions browserFunctions;
 
-    public SarosMainPage(AccountRenderer accountRenderer,
+    public MainPage(AccountRenderer accountRenderer,
         ContactListRenderer contactListRenderer,
-        SarosMainPageBrowserFunctions browserFunctions) {
+        MainPageBrowserFunctions browserFunctions) {
         this.accountRenderer = accountRenderer;
         this.contactListRenderer = contactListRenderer;
         this.browserFunctions = browserFunctions;

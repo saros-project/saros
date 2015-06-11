@@ -6,7 +6,7 @@ import org.picocontainer.MutablePicoContainer;
 
 import de.fu_berlin.inf.dpp.ui.browser_functions.AddAccountBrowserFunctions;
 import de.fu_berlin.inf.dpp.ui.browser_functions.AddContactBrowserFunctions;
-import de.fu_berlin.inf.dpp.ui.browser_functions.SarosMainPageBrowserFunctions;
+import de.fu_berlin.inf.dpp.ui.browser_functions.MainPageBrowserFunctions;
 import de.fu_berlin.inf.dpp.ui.browser_functions.SessionWizardPageBrowserFunctions;
 import de.fu_berlin.inf.dpp.ui.core_facades.AccountStoreFacade;
 import de.fu_berlin.inf.dpp.ui.core_facades.ContactListFacade;
@@ -17,7 +17,7 @@ import de.fu_berlin.inf.dpp.ui.renderer.AccountRenderer;
 import de.fu_berlin.inf.dpp.ui.renderer.ContactListRenderer;
 import de.fu_berlin.inf.dpp.ui.webpages.AddAccountPage;
 import de.fu_berlin.inf.dpp.ui.webpages.AddContactPage;
-import de.fu_berlin.inf.dpp.ui.webpages.SarosMainPage;
+import de.fu_berlin.inf.dpp.ui.webpages.MainPage;
 import de.fu_berlin.inf.dpp.ui.webpages.SessionWizardPage;
 
 /**
@@ -30,13 +30,13 @@ import de.fu_berlin.inf.dpp.ui.webpages.SessionWizardPage;
  *               If you created a new class in the ui module that should be
  *               initialised by the PicoContainer, you have to add it here.
  */
-public class SarosHTMLUIContextFactory extends AbstractSarosContextFactory {
+public class HTMLUIContextFactory extends AbstractSarosContextFactory {
 
     @Override
     public void createComponents(MutablePicoContainer container) {
 
         Component[] components = new Component[] {
-            Component.create(SarosMainPage.class),
+            Component.create(MainPage.class),
             Component.create(AddAccountPage.class),
             Component.create(AddContactPage.class),
             Component.create(SessionWizardPage.class),
@@ -49,7 +49,7 @@ public class SarosHTMLUIContextFactory extends AbstractSarosContextFactory {
             Component.create(AccountRenderer.class),
             Component.create(AddAccountBrowserFunctions.class),
             Component.create(AddContactBrowserFunctions.class),
-            Component.create(SarosMainPageBrowserFunctions.class),
+            Component.create(MainPageBrowserFunctions.class),
             Component.create(SessionWizardPageBrowserFunctions.class) };
 
         for (Component component : Arrays.asList(components)) {

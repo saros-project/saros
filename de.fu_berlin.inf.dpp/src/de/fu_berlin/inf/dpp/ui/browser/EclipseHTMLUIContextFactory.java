@@ -4,12 +4,12 @@ import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
 import org.picocontainer.MutablePicoContainer;
 
 import de.fu_berlin.inf.dpp.AbstractSarosContextFactory;
-import de.fu_berlin.inf.dpp.SarosHTMLUIContextFactory;
+import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.IWebResourceLocator;
 
 /**
  * Context factory that provides the necessary components that are required for
- * the {@link SarosHTMLUIContextFactory}.
+ * the {@link HTMLUIContextFactory}.
  */
 public class EclipseHTMLUIContextFactory extends AbstractSarosContextFactory {
 

@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.intellij.ui.swt_browser;
 
 import com.intellij.ui.AncestorListenerAdapter;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.ui.webpages.SarosMainPage;
+import de.fu_berlin.inf.dpp.ui.webpages.MainPage;
 import org.picocontainer.annotations.Inject;
 
 import javax.swing.JPanel;
@@ -31,7 +31,7 @@ public class SwtBrowserPanel extends JPanel {
     private boolean initialized = false;
 
     @Inject
-    private SarosMainPage sarosMainPage;
+    private MainPage mainPage;
 
     SwtBrowserPanel() {
         super(new BorderLayout());
@@ -49,7 +49,7 @@ public class SwtBrowserPanel extends JPanel {
                 }
             }
         });
-        browserCanvas = new SwtBrowserCanvas(sarosMainPage);
+        browserCanvas = new SwtBrowserCanvas(mainPage);
     }
 
     /**
