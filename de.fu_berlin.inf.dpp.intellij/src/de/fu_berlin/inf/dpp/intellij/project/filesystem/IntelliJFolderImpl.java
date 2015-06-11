@@ -20,7 +20,7 @@
  * /
  */
 
-package de.fu_berlin.inf.dpp.intellij.project.fs;
+package de.fu_berlin.inf.dpp.intellij.project.filesystem;
 
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
@@ -33,10 +33,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FolderImp extends ResourceImp implements IFolder {
-    private static Logger LOG = Logger.getLogger(FolderImp.class);
+public class IntelliJFolderImpl extends ResourceImp implements IFolder {
+    private static Logger LOG = Logger.getLogger(IntelliJFolderImpl.class);
 
-    public FolderImp(ProjectImp project, File file) {
+    public IntelliJFolderImpl(IntelliJProjectImpl project, File file) {
         super(project, file);
     }
 
@@ -84,7 +84,7 @@ public class FolderImp extends ResourceImp implements IFolder {
 
             if (myFile.isDirectory() && !myFile.isHidden() && (
                 memberFlags == NONE || memberFlags == FOLDER)) {
-                list.add(new FolderImp(project, myFile));
+                list.add(new IntelliJFolderImpl(project, myFile));
             }
         }
 

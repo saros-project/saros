@@ -24,7 +24,7 @@ package de.fu_berlin.inf.dpp.core.editor.adapter;
 
 import com.intellij.openapi.editor.Document;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.intellij.project.fs.ResourceConverter;
+import de.fu_berlin.inf.dpp.intellij.project.filesystem.ResourceConverter;
 
 /**
  * Class for creating IDocuments from IFiles using IntelliJ Document implementation.

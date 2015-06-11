@@ -33,7 +33,8 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.ITextOperation;
 import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorModel;
 import de.fu_berlin.inf.dpp.intellij.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.intellij.editor.text.TextSelection;
-import de.fu_berlin.inf.dpp.intellij.project.fs.ResourceConverter;
+import de.fu_berlin.inf.dpp.intellij.project.filesystem.ResourceConverter;
+
 import org.apache.log4j.Logger;
 
 import java.awt.Color;

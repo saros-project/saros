@@ -20,7 +20,7 @@
  * /
  */
 
-package de.fu_berlin.inf.dpp.intellij.project.fs;
+package de.fu_berlin.inf.dpp.intellij.project.filesystem;
 
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import org.apache.commons.io.FilenameUtils;
@@ -29,13 +29,13 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
-public class PathImp implements IPath {
+public class IntelliJPathImpl implements IPath {
     public static final String FILE_SEPARATOR = "/";
 
     private final String path;
     private final String[] segments;
 
-    public PathImp(final String path) {
+    public IntelliJPathImpl(final String path) {
 
         this.path = path;
         String splitPath = path;
@@ -49,21 +49,21 @@ public class PathImp implements IPath {
         //"foo\bla.txt" is a valid linux path, which would not be handled
         // correctly by the separatorsToUnix. However, IntelliJ does not handle
         // these paths correctly and the FS Synchronizer logs an error when
-        // encountering one. Thus it is not possible that PathImp is called with
+        // encountering one. Thus it is not possible that IntelliJPathImpl is called with
         // such a path and we can safely use this method.
         splitPath = FilenameUtils.separatorsToUnix(splitPath);
         segments = splitPath.split(Pattern.quote(FILE_SEPARATOR));
     }
 
-    public PathImp(File file) {
+    public IntelliJPathImpl(File file) {
         this(file.getPath());
     }
 
     @Override
     public IPath append(IPath path) {
         return this.path.endsWith(FILE_SEPARATOR) ?
-            new PathImp(this.path + path.toPortableString()) :
-            new PathImp(this.path + FILE_SEPARATOR + path.toPortableString());
+            new IntelliJPathImpl(this.path + path.toPortableString()) :
+            new IntelliJPathImpl(this.path + FILE_SEPARATOR + path.toPortableString());
     }
 
     @Override
@@ -89,14 +89,14 @@ public class PathImp implements IPath {
     @Override
     public IPath removeLastSegments(int count) {
         String[] result = Arrays.copyOf(segments, segments.length - count);
-        return new PathImp(join(result));
+        return new IntelliJPathImpl(join(result));
     }
 
     @Override
     public IPath removeFirstSegments(int count) {
         String[] result = Arrays.copyOfRange(segments, count, segments.length);
 
-        return new PathImp(join(result));
+        return new IntelliJPathImpl(join(result));
     }
 
     @Override
@@ -113,7 +113,7 @@ public class PathImp implements IPath {
 
     @Override
     public IPath append(String path) {
-        return new PathImp(this.path.endsWith(FILE_SEPARATOR) ?
+        return new IntelliJPathImpl(this.path.endsWith(FILE_SEPARATOR) ?
             this.path + path :
             this.path + FILE_SEPARATOR + path);
     }
@@ -121,14 +121,14 @@ public class PathImp implements IPath {
     @Override
     public IPath addTrailingSeparator() {
         return path.endsWith(FILE_SEPARATOR) ?
-            new PathImp(path) :
-            new PathImp(path + FILE_SEPARATOR);
+            new IntelliJPathImpl(path) :
+            new IntelliJPathImpl(path + FILE_SEPARATOR);
 
     }
 
     @Override
     public IPath addFileExtension(String extension) {
-        return new PathImp(path + "." + extension);
+        return new IntelliJPathImpl(path + "." + extension);
     }
 
     @Override
@@ -137,7 +137,7 @@ public class PathImp implements IPath {
         if (path.contains(".")) {
             path = path.substring(0, path.lastIndexOf("."));
         }
-        return new PathImp(path);
+        return new IntelliJPathImpl(path);
     }
 
     @Override
@@ -152,7 +152,7 @@ public class PathImp implements IPath {
 
     @Override
     public IPath makeAbsolute() {
-        return new PathImp(new File(path).getAbsolutePath());
+        return new IntelliJPathImpl(new File(path).getAbsolutePath());
     }
 
     @Override
@@ -203,10 +203,10 @@ public class PathImp implements IPath {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof PathImp))
+        if (!(obj instanceof IntelliJPathImpl))
             return false;
 
-        PathImp other = (PathImp) obj;
+        IntelliJPathImpl other = (IntelliJPathImpl) obj;
 
         return this.path.equalsIgnoreCase(other.path);
     }

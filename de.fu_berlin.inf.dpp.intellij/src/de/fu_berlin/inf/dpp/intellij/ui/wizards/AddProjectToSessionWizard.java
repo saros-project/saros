@@ -28,7 +28,7 @@ import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
-import de.fu_berlin.inf.dpp.intellij.project.fs.ProjectImp;
+import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJProjectImpl;
 import de.fu_berlin.inf.dpp.intellij.ui.Messages;
 import de.fu_berlin.inf.dpp.intellij.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.intellij.ui.util.JobWithStatus;
@@ -349,7 +349,7 @@ public class AddProjectToSessionWizard extends Wizard {
     }
 
     /**
-     * Goes through the list of local projects, calls {@link ProjectImp#create()}
+     * Goes through the list of local projects, calls {@link IntelliJProjectImpl#create()}
      * on non-existent ones and {@link IProject#open()} on non-opened projects.
      *
      * @param projectMapping
@@ -360,7 +360,7 @@ public class AddProjectToSessionWizard extends Wizard {
             IProject project = entry.getValue();
             try {
                 if (!project.exists()) {
-                    ((ProjectImp) project).create();
+                    ((IntelliJProjectImpl) project).create();
                 }
 
                 if (!project.isOpen()) {

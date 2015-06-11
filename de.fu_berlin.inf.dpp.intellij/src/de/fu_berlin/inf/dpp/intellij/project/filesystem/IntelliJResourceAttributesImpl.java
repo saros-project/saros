@@ -20,17 +20,17 @@
  * /
  */
 
-package de.fu_berlin.inf.dpp.intellij.project.fs;
+package de.fu_berlin.inf.dpp.intellij.project.filesystem;
 
 import de.fu_berlin.inf.dpp.filesystem.IResourceAttributes;
 
-public class ResourceAttributes implements IResourceAttributes {
+public class IntelliJResourceAttributesImpl implements IResourceAttributes {
     private boolean readOnly = false;
 
-    public ResourceAttributes() {
+    public IntelliJResourceAttributesImpl() {
     }
 
-    public ResourceAttributes(boolean readOnly) {
+    public IntelliJResourceAttributesImpl(boolean readOnly) {
         this.readOnly = readOnly;
     }
 

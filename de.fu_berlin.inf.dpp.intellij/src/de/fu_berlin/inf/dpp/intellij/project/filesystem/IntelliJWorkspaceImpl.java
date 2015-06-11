@@ -20,7 +20,7 @@
  * /
  */
 
-package de.fu_berlin.inf.dpp.intellij.project.fs;
+package de.fu_berlin.inf.dpp.intellij.project.filesystem;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,14 +39,14 @@ import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRunnable;
 import de.fu_berlin.inf.dpp.intellij.project.FileSystemChangeListener;
 import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
 
-public class Workspace implements IWorkspace {
-    public static final Logger LOG = Logger.getLogger(Workspace.class);
+public class IntelliJWorkspaceImpl implements IWorkspace {
+    public static final Logger LOG = Logger.getLogger(IntelliJWorkspaceImpl.class);
 
     private LocalFileSystem fileSystem;
 
     private Project project;
 
-    public Workspace(Project project) {
+    public IntelliJWorkspaceImpl(Project project) {
         this.project = project;
         fileSystem = LocalFileSystem.getInstance();
         fileSystem.addRootToWatch(project.getBasePath(), true);
@@ -66,13 +66,13 @@ public class Workspace implements IWorkspace {
 
     @Override
     public IProject getProject(String projectName) {
-        return new ProjectImp(project, projectName);
+        return new IntelliJProjectImpl(project, projectName);
     }
 
     /**
      * Returns a handle to the project for the given path.
      */
-    public ProjectImp getProjectForPath(String path) {
+    public IntelliJProjectImpl getProjectForPath(String path) {
 
         if (!path.startsWith(project.getBasePath())) {
             return null;
@@ -84,13 +84,13 @@ public class Workspace implements IWorkspace {
             relativePath = relativePath.substring(1);
         }
 
-        String projectName = new PathImp(relativePath).segments()[0];
-        return new ProjectImp(project, projectName);
+        String projectName = new IntelliJPathImpl(relativePath).segments()[0];
+        return new IntelliJProjectImpl(project, projectName);
     }
 
     @Override
     public IPath getLocation() {
-        return new PathImp(project.getBasePath());
+        return new IntelliJPathImpl(project.getBasePath());
     }
 
     public void addResourceListener(FileSystemChangeListener listener) {

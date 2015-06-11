@@ -32,8 +32,8 @@ import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.core.Saros;
-import de.fu_berlin.inf.dpp.intellij.project.fs.FolderImp;
-import de.fu_berlin.inf.dpp.intellij.project.fs.ProjectImp;
+import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJFolderImpl;
+import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJProjectImpl;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
@@ -98,14 +98,14 @@ public class SarosFileShareGroup extends ActionGroup {
         if (roster == null)
             return new AnAction[0];
 
-        ProjectImp project = null;
+        IntelliJProjectImpl project = null;
         try {
             project = getProjectFromVirtFile(virtualFile, ideaProject);
         } catch (UnsupportedOperationException e1) {
             return new AnAction[0];
         }
 
-        FolderImp resFolder = new FolderImp(project,
+        IntelliJFolderImpl resFolder = new IntelliJFolderImpl(project,
             new File(virtualFile.getPath()));
 
         //Holger: This disables partial sharing for the moment, until the need arises
@@ -126,7 +126,7 @@ public class SarosFileShareGroup extends ActionGroup {
         return list.toArray(new AnAction[] { });
     }
 
-    static ProjectImp getProjectFromVirtFile(VirtualFile virtFile,
+    static IntelliJProjectImpl getProjectFromVirtFile(VirtualFile virtFile,
         Project project) {
         Module module = ProjectFileIndex.SERVICE.getInstance(project)
             .getModuleForFile(virtFile);
@@ -138,7 +138,7 @@ public class SarosFileShareGroup extends ActionGroup {
             //(Webstorm)
             throw new UnsupportedOperationException();
         }
-        return new ProjectImp(project, moduleName,
+        return new IntelliJProjectImpl(project, moduleName,
             new File(project.getBasePath(), moduleName));
     }
 
@@ -150,7 +150,7 @@ public class SarosFileShareGroup extends ActionGroup {
      * @param resFolder
      * @return
      */
-    private boolean isCompleteProject(ProjectImp project, FolderImp resFolder) {
+    private boolean isCompleteProject(IntelliJProjectImpl project, IntelliJFolderImpl resFolder) {
         return resFolder.getFullPath().equals(project.getFullPath());
     }
 }

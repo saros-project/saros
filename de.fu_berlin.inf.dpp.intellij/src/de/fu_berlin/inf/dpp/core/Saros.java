@@ -13,7 +13,7 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.core.context.SarosCoreContextFactory;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.intellij.context.SarosIntellijContextFactory;
-import de.fu_berlin.inf.dpp.intellij.project.fs.Workspace;
+import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJWorkspaceImpl;
 import de.fu_berlin.inf.dpp.intellij.ui.swt_browser.SwtLibLoader;
 import de.fu_berlin.inf.dpp.misc.pico.DotGraphMonitor;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
@@ -79,7 +79,7 @@ public class Saros {
 
     private Saros(Project project) {
         this.project = project;
-        this.workspace = new Workspace(project);
+        this.workspace = new IntelliJWorkspaceImpl(project);
     }
 
     public static boolean isSwtBrowserEnabled() {

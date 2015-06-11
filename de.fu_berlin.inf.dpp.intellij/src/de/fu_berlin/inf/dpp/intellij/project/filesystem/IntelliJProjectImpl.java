@@ -20,7 +20,7 @@
  * /
  */
 
-package de.fu_berlin.inf.dpp.intellij.project.fs;
+package de.fu_berlin.inf.dpp.intellij.project.filesystem;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
@@ -50,11 +50,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ProjectImp implements IProject {
+public class IntelliJProjectImpl implements IProject {
     public static final String DEFAULT_CHARSET = "utf8";
 
     public static final String DEFAULT_MODULE_EXTENSION = ".iml";
-    private static final Logger LOG = Logger.getLogger(ProjectImp.class);
+    private static final Logger LOG = Logger.getLogger(IntelliJProjectImpl.class);
 
     private String defaultCharset = DEFAULT_CHARSET;
 
@@ -74,7 +74,7 @@ public class ProjectImp implements IProject {
     private boolean isAccessible;
     private IResourceAttributes attributes;
 
-    public ProjectImp(Project project, String name) {
+    public IntelliJProjectImpl(Project project, String name) {
 
         File path = new File(project.getBasePath() + File.separator + name
         );
@@ -85,7 +85,7 @@ public class ProjectImp implements IProject {
         scan(path);
     }
 
-    public ProjectImp(Project project, String name, File path) {
+    public IntelliJProjectImpl(Project project, String name, File path) {
         this.project = project;
         this.name = name;
         setPath(path);
@@ -98,10 +98,10 @@ public class ProjectImp implements IProject {
 
         isAccessible = false;
 
-        fullPath = new PathImp(path.getAbsolutePath());
-        relativePath = new PathImp(path.getPath());
+        fullPath = new IntelliJPathImpl(path.getAbsolutePath());
+        relativePath = new IntelliJPathImpl(path.getPath());
 
-        attributes = new ResourceAttributes(); //todo
+        attributes = new IntelliJResourceAttributesImpl(); //todo
     }
 
     public void scan(File path) {
@@ -159,7 +159,7 @@ public class ProjectImp implements IProject {
 
     public void addFile(File file) {
         if (file.isDirectory()) {
-            IFolder folder = new FolderImp(this, file);
+            IFolder folder = new IntelliJFolderImpl(this, file);
             addResource(folder);
         }
 
@@ -171,7 +171,7 @@ public class ProjectImp implements IProject {
 
     public void removeFile(File file) {
         if (file.isDirectory()) {
-            IFolder folder = new FolderImp(this, file);
+            IFolder folder = new IntelliJFolderImpl(this, file);
             folderMap.remove(folder);
         }
 
@@ -209,7 +209,7 @@ public class ProjectImp implements IProject {
         if (folderMap.containsKey(name)) {
             return folderMap.get(name);
         } else {
-            return new FolderImp(this, new File(name));
+            return new IntelliJFolderImpl(this, new File(name));
         }
     }
 

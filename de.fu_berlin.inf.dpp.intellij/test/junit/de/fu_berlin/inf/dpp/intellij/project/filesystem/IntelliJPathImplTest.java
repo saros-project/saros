@@ -20,20 +20,22 @@
  * /
  */
 
-package de.fu_berlin.inf.dpp.intellij.project.fs;
+package de.fu_berlin.inf.dpp.intellij.project.filesystem;
 
 import org.junit.Test;
+
+import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJPathImpl;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-public class PathImpTest {
+public class IntelliJPathImplTest {
 
     @Test
     public void parsesLinuxPathCorrectly() {
         String stringPath = "/home/user/saros/project";
 
-        PathImp path = new PathImp(stringPath);
+        IntelliJPathImpl path = new IntelliJPathImpl(stringPath);
 
         String[] expected = { "home", "user", "saros", "project" };
 
@@ -44,7 +46,7 @@ public class PathImpTest {
     @Test
     public void parsesLinuxPathWithTrailingSlashCorrectly() {
         String stringPath = "/home/user/saros/project/";
-        PathImp path = new PathImp(stringPath);
+        IntelliJPathImpl path = new IntelliJPathImpl(stringPath);
 
         String[] expected = { "home", "user", "saros", "project" };
 
@@ -55,7 +57,7 @@ public class PathImpTest {
     @Test
     public void parsesWindowsPathCorrectly() {
         String stringPath = "C:\\Users\\user\\saros\\project";
-        PathImp path = new PathImp(stringPath);
+        IntelliJPathImpl path = new IntelliJPathImpl(stringPath);
 
         String[] expected = { "C:", "Users", "user", "saros", "project" };
 
@@ -66,7 +68,7 @@ public class PathImpTest {
     @Test
     public void parsesWindowsPathWithBeginningAndTrailingSlashCorrectly() {
         String stringPath = "\\C:\\Users\\user\\saros\\project\\";
-        PathImp path = new PathImp(stringPath);
+        IntelliJPathImpl path = new IntelliJPathImpl(stringPath);
 
         String[] expected = { "C:", "Users", "user", "saros", "project" };
 

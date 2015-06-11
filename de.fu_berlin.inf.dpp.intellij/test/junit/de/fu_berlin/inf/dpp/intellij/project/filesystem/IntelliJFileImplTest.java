@@ -19,13 +19,17 @@
  * /
  */
 
-package de.fu_berlin.inf.dpp.intellij.project.fs;
+package de.fu_berlin.inf.dpp.intellij.project.filesystem;
 
 import com.intellij.mock.MockLocalFileSystem;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
+import de.fu_berlin.inf.dpp.intellij.project.filesystem.FileImp;
+import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJPathImpl;
+import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJProjectImpl;
+
 import org.easymock.EasyMock;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,7 +51,7 @@ import static org.junit.Assert.assertTrue;
 
 @PrepareForTest({ LocalFileSystem.class })
 @RunWith(PowerMockRunner.class)
-public class FileImpTest {
+public class IntelliJFileImplTest {
 
     public static final String TESTFILE_NAME = "testfile.txt";
     public static final String NEW_FILE_NAME = "newCreateFile.txt";
@@ -118,9 +122,9 @@ public class FileImpTest {
     public void testMove() throws Exception {
         IFile file = createTestFile();
         String oldPath = file.getFullPath().toPortableString();
-        String newFilePath = folder.getRoot().getPath() + PathImp.FILE_SEPARATOR
-            + TEST_PROJECT_NAME + PathImp.FILE_SEPARATOR + "newFileName.txt";
-        PathImp destination = new PathImp(newFilePath);
+        String newFilePath = folder.getRoot().getPath() + IntelliJPathImpl.FILE_SEPARATOR
+            + TEST_PROJECT_NAME + IntelliJPathImpl.FILE_SEPARATOR + "newFileName.txt";
+        IntelliJPathImpl destination = new IntelliJPathImpl(newFilePath);
 
         file.move(destination, false);
 
@@ -134,8 +138,8 @@ public class FileImpTest {
     public void testGetFullPath() throws Exception {
         IFile file = createTestFile();
 
-        assertEquals(folder.getRoot().getPath() + PathImp.FILE_SEPARATOR
-                + TEST_PROJECT_NAME + PathImp.FILE_SEPARATOR + TESTFILE_NAME,
+        assertEquals(folder.getRoot().getPath() + IntelliJPathImpl.FILE_SEPARATOR
+                + TEST_PROJECT_NAME + IntelliJPathImpl.FILE_SEPARATOR + TESTFILE_NAME,
             file.getFullPath().toPortableString()
         );
     }
@@ -197,12 +201,12 @@ public class FileImpTest {
         PowerMock.replay(LocalFileSystem.class);
     }
 
-    private ProjectImp getMockProject() {
+    private IntelliJProjectImpl getMockProject() {
         Project project = EasyMock.createNiceMock(Project.class);
 
         EasyMock.expect(project.getBasePath())
             .andReturn(folder.getRoot().getAbsolutePath());
         EasyMock.replay(project);
-        return new ProjectImp(project, TEST_PROJECT_NAME);
+        return new IntelliJProjectImpl(project, TEST_PROJECT_NAME);
     }
 }

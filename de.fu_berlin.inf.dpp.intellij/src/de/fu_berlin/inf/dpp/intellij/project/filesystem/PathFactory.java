@@ -20,28 +20,20 @@
  * /
  */
 
-package de.fu_berlin.inf.dpp.intellij.project.fs;
+package de.fu_berlin.inf.dpp.intellij.project.filesystem;
 
-import de.fu_berlin.inf.dpp.filesystem.IResourceAttributes;
+import de.fu_berlin.inf.dpp.filesystem.IPath;
+import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 
-import java.io.File;
-
-public class FileResourceAttributes implements IResourceAttributes {
-
-    private File file;
-
-    public FileResourceAttributes(File file) {
-        this.file = file;
+public class PathFactory implements IPathFactory {
+    @Override
+    public String fromPath(IPath path) {
+        return path.toPortableString();
     }
 
     @Override
-    public boolean isReadOnly() {
-        return this.file.canRead();
+    public IPath fromString(String name) {
+        return new IntelliJPathImpl(name);
     }
 
-    @Override
-    public void setReadOnly(boolean readOnly) {
-        this.file.setReadable(true);
-        this.file.setWritable(!readOnly);
-    }
 }

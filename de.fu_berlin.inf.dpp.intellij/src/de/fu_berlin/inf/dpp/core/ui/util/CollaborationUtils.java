@@ -32,8 +32,8 @@ import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.intellij.project.fs.FolderImp;
-import de.fu_berlin.inf.dpp.intellij.project.fs.ProjectImp;
+import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJFolderImpl;
+import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJProjectImpl;
 import de.fu_berlin.inf.dpp.intellij.runtime.UIMonitoredJob;
 import de.fu_berlin.inf.dpp.intellij.ui.Messages;
 import de.fu_berlin.inf.dpp.intellij.ui.util.DialogUtils;
@@ -384,7 +384,7 @@ public class CollaborationUtils {
              * we need the .iml file, otherwise the project type will not be set
              * correctly on the other side
              */
-            IFolder projectFolder = new FolderImp((ProjectImp) project,
+            IFolder projectFolder = new IntelliJFolderImpl((IntelliJProjectImpl) project,
                 project.getFullPath().toFile());
             try {
                 for (IResource pFile : projectFolder.members(IResource.FILE)) {
@@ -421,7 +421,7 @@ public class CollaborationUtils {
         }
         if (resource.getType() == IResource.FOLDER) {
             fileList.add(resource);
-            for (IResource myResource : ((FolderImp) resource).members()) {
+            for (IResource myResource : ((IntelliJFolderImpl) resource).members()) {
                 addRecursively(fileList, myResource);
             }
         }

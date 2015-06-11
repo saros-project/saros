@@ -20,7 +20,7 @@
  * /
  */
 
-package de.fu_berlin.inf.dpp.intellij.project.fs;
+package de.fu_berlin.inf.dpp.intellij.project.filesystem;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IContainer;
@@ -36,15 +36,15 @@ public abstract class ResourceImp implements IResource {
     public static final String DEFAULT_CHARSET = "utf8";
     private String defaultCharset = DEFAULT_CHARSET;
 
-    protected ProjectImp project;
+    protected IntelliJProjectImpl project;
     protected File file;
     private IResourceAttributes attributes;
     private boolean isDerived = false;
 
-    protected ResourceImp(ProjectImp project, File file) {
+    protected ResourceImp(IntelliJProjectImpl project, File file) {
         this.project = project;
         this.file = file;
-        this.attributes = new FileResourceAttributes(file);
+        this.attributes = new IntelliJFileResourceAttributesImpl(file);
     }
 
     public String getDefaultCharset() {
@@ -64,10 +64,10 @@ public abstract class ResourceImp implements IResource {
     public IPath getFullPath() {
         // TODO Comply with Interface description: workspace-relative paths
         if (project != null && !file.isAbsolute()) {
-            return new PathImp(
+            return new IntelliJPathImpl(
                 project.getFullPath() + File.separator + file.getPath());
         } else {
-            return new PathImp(file.getAbsoluteFile());
+            return new IntelliJPathImpl(file.getAbsoluteFile());
         }
     }
 
@@ -80,21 +80,21 @@ public abstract class ResourceImp implements IResource {
     public IContainer getParent() {
         return file == null || file.getParentFile() == null ?
             null :
-            new FolderImp(project, file.getParentFile());
+            new IntelliJFolderImpl(project, file.getParentFile());
     }
 
-    public ProjectImp getProject() {
+    public IntelliJProjectImpl getProject() {
         return project;
     }
 
-    public void setProject(ProjectImp project) {
+    public void setProject(IntelliJProjectImpl project) {
         this.project = project;
     }
 
     @Override
     public IPath getProjectRelativePath() {
         if (project == null) {
-            return new PathImp(file);
+            return new IntelliJPathImpl(file);
         }
 
         File fPrj = project.getFullPath().toFile();
@@ -108,10 +108,10 @@ public abstract class ResourceImp implements IResource {
             if (path.length() > prjPath.length()) {
                 path = path.substring(prjPath.length() + 1);
             }
-            return new PathImp(new File(path));
+            return new IntelliJPathImpl(new File(path));
         }
 
-        return new PathImp(new File(file.getPath()));
+        return new IntelliJPathImpl(new File(file.getPath()));
     }
 
     public SPath getSPath() {

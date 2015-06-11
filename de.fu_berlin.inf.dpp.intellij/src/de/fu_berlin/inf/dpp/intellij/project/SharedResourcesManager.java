@@ -38,7 +38,7 @@ import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorHandler;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorManipulator;
-import de.fu_berlin.inf.dpp.intellij.project.fs.Workspace;
+import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJWorkspaceImpl;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
@@ -74,7 +74,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
 
     private final LocalEditorManipulator localEditorManipulator;
 
-    private final Workspace workspace;
+    private final IntelliJWorkspaceImpl intelliJWorkspaceImpl;
 
     @Override
     public void start() {
@@ -83,7 +83,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
             @Override public void run() {
                 sarosSession.addActivityProducer(SharedResourcesManager.this);
                 sarosSession.addActivityConsumer(consumer);
-                workspace.addResourceListener(fileSystemListener);
+                intelliJWorkspaceImpl.addResourceListener(fileSystemListener);
 
             }
         }, ModalityState.any());
@@ -94,7 +94,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
         ApplicationManager.getApplication().invokeAndWait(new Runnable() {
 
             @Override public void run() {
-                workspace.removeResourceListener(fileSystemListener);
+                intelliJWorkspaceImpl.removeResourceListener(fileSystemListener);
                 sarosSession
                     .removeActivityProducer(SharedResourcesManager.this);
                 sarosSession.removeActivityConsumer(consumer);
@@ -106,14 +106,14 @@ public class SharedResourcesManager extends AbstractActivityProducer
         EditorManager editorManager,
         FileReplacementInProgressObservable fileReplacementInProgressObservable,
         LocalEditorHandler localEditorHandler,
-        LocalEditorManipulator localEditorManipulator, Workspace workspace) {
+        LocalEditorManipulator localEditorManipulator, IntelliJWorkspaceImpl intelliJWorkspaceImpl) {
 
         this.sarosSession = sarosSession;
         this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
         this.localEditorHandler = localEditorHandler;
         this.localEditorManipulator = localEditorManipulator;
         fileSystemListener = new FileSystemChangeListener(this, editorManager);
-        this.workspace = workspace;
+        this.intelliJWorkspaceImpl = intelliJWorkspaceImpl;
     }
 
     private final IActivityConsumer consumer = new AbstractActivityConsumer() {

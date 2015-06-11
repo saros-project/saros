@@ -29,7 +29,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.core.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.intellij.project.fs.ProjectImp;
+import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJProjectImpl;
 import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import org.apache.log4j.Logger;
@@ -70,7 +70,7 @@ public class ShareWithUserAction extends AnAction {
             return;
         }
 
-        ProjectImp project = SarosFileShareGroup
+        IntelliJProjectImpl project = SarosFileShareGroup
             .getProjectFromVirtFile(virtFile, e.getProject());
 
         List<IResource> resources = new ArrayList<IResource>();

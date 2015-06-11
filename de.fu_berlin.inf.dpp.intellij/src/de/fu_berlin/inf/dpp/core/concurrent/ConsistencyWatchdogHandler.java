@@ -32,7 +32,7 @@ import de.fu_berlin.inf.dpp.core.monitoring.Status;
 import de.fu_berlin.inf.dpp.core.util.FileUtils;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorHandler;
-import de.fu_berlin.inf.dpp.intellij.project.fs.ResourceConverter;
+import de.fu_berlin.inf.dpp.intellij.project.filesystem.ResourceConverter;
 import de.fu_berlin.inf.dpp.intellij.runtime.UIMonitoredJob;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;

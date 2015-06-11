@@ -20,7 +20,7 @@
  * /
  */
 
-package de.fu_berlin.inf.dpp.intellij.project.fs;
+package de.fu_berlin.inf.dpp.intellij.project.filesystem;
 
 import com.intellij.openapi.vfs.LocalFileSystem;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
@@ -42,7 +42,7 @@ import java.io.InputStream;
 public class FileImp extends ResourceImp implements IFile {
     private static Logger LOG = Logger.getLogger(FileImp.class);
 
-    public FileImp(ProjectImp project, File file) {
+    public FileImp(IntelliJProjectImpl project, File file) {
         super(project, file);
     }
 
@@ -94,7 +94,7 @@ public class FileImp extends ResourceImp implements IFile {
 
     @Override
     public IPath getLocation() {
-        return new PathImp(file);
+        return new IntelliJPathImpl(file);
     }
 
     @Override
