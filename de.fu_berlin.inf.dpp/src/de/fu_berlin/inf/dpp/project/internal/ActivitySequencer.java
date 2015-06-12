@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,7 @@ import org.jivesoftware.smack.packet.PacketExtension;
 import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.activities.ActivityOptimizer;
+import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.communication.extensions.ActivitiesExtension;
 import de.fu_berlin.inf.dpp.net.DispatchThreadContext;
@@ -485,27 +487,80 @@ public class ActivitySequencer implements Startable {
         if (activities.size() == 0)
             return;
 
-        PacketExtension activityPacketExtension = ActivitiesExtension.PROVIDER
-            .create(new ActivitiesExtension(currentSessionID, activities,
-                sequenceNumber));
+        /*
+         * HACK the following logic tries to reduce the HEAP usage while
+         * marshalling and sending the data. It is still possible to trigger out
+         * of memory errors.
+         * 
+         * We do not try to marshal more than 256 kB of data. FileActivities are
+         * measured by their content. In addition every activity is approximated
+         * as 512 bytes. Marshalled activities can only be garbage collected
+         * after the activity packet was send.
+         * 
+         * Remark: The hack is very sloppy and allow larger sizes depending on
+         * how large a file activity is.
+         */
 
-        if (LOG.isTraceEnabled()) {
-            LOG.trace("send (" + String.format("%03d", activities.size())
-                + ") " + recipient + " -> " + activities);
-        } else if (LOG.isDebugEnabled()) {
-            LOG.debug("send (" + String.format("%03d", activities.size())
-                + ") " + recipient);
+        final int maxFileActivitySize = 256 * 1024; // 256 kB
+        final int minActivitySize = 512; // bytes
+        int currentFileActivitySize = 0;
+
+        final List<IActivity> activitiesToMarshall = new ArrayList<IActivity>();
+        final Iterator<IActivity> it = activities.iterator();
+
+        while (it.hasNext()) {
+
+            final IActivity activity = it.next();
+
+            if (activity instanceof FileActivity) {
+                final byte[] fileContent = ((FileActivity) (activity))
+                    .getContent();
+
+                if (fileContent != null)
+                    currentFileActivitySize += fileContent.length;
+            }
+
+            currentFileActivitySize += minActivitySize;
+
+            activitiesToMarshall.add(activity);
+
+            if (it.hasNext() && currentFileActivitySize < maxFileActivitySize)
+                continue;
+
+            final PacketExtension activityPacketExtension = ActivitiesExtension.PROVIDER
+                .create(new ActivitiesExtension(currentSessionID,
+                    activitiesToMarshall, sequenceNumber));
+
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("send (" + String.format("%03d", activities.size())
+                    + ") " + recipient + " -> " + activities);
+            } else if (LOG.isDebugEnabled()) {
+                LOG.debug("send (" + String.format("%03d", activities.size())
+                    + ") " + recipient);
+            }
+
+            try {
+                transmitter.send(ISarosSession.SESSION_CONNECTION_ID,
+                    recipient, activityPacketExtension);
+            } catch (IOException e) {
+                LOG.error("failed to sent activities: " + activities, e);
+
+                unregisterUser(recipient);
+                notifyTransmissionError(recipient);
+                return;
+            } finally {
+                sequenceNumber += activitiesToMarshall.size();
+
+                /*
+                 * ensure to clear the list here as the ActivitiesExtension only
+                 * holds a reference to the list and so cannot be deleted until
+                 * the extension was sent
+                 */
+                activitiesToMarshall.clear();
+                currentFileActivitySize = 0;
+            }
         }
 
-        try {
-            transmitter.send(ISarosSession.SESSION_CONNECTION_ID, recipient,
-                activityPacketExtension);
-        } catch (IOException e) {
-            LOG.error("failed to sent activities: " + activities, e);
-
-            unregisterUser(recipient);
-            notifyTransmissionError(recipient);
-        }
     }
 
     private void receiveActivities(Packet activityPacket) {
