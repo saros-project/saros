@@ -19,10 +19,12 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.filesystem.ChecksumCacheImpl;
 import de.fu_berlin.inf.dpp.filesystem.EclipsePathFactory;
 import de.fu_berlin.inf.dpp.filesystem.EclipseWorkspaceImpl;
+import de.fu_berlin.inf.dpp.filesystem.EclipseWorkspaceRootImpl;
 import de.fu_berlin.inf.dpp.filesystem.FileContentNotifierBridge;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
+import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRoot;
 import de.fu_berlin.inf.dpp.monitoring.remote.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferences;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
@@ -89,6 +91,9 @@ public class SarosEclipseContextFactory extends AbstractSarosContextFactory {
 
         Component.create(IWorkspace.class, new EclipseWorkspaceImpl(
             ResourcesPlugin.getWorkspace())),
+
+        Component.create(IWorkspaceRoot.class, new EclipseWorkspaceRootImpl(
+            ResourcesPlugin.getWorkspace().getRoot())),
 
         // Saros Core Path Support
         Component.create(IPathFactory.class, EclipsePathFactory.class),
