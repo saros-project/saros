@@ -27,9 +27,9 @@ public class EclipseResourceLocator implements IWebResourceLocator {
         .getLogger(EclipseResourceLocator.class);
 
     // TODO central place
-    private static final String UI_BUNDLE_ID = "de.fu_berlin.inf.dpp.ui";
+    private static final String UI_BUNDLE_ID = "de.fu_berlin.inf.dpp.ui.frontend";
 
-    private static final String HTML_ROOT_PATH = "html";
+    private static final String HTML_ROOT_PATH = "html/dist";
 
     private static Map<String, String> fileMapping;
 
