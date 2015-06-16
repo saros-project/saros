@@ -1,13 +1,15 @@
 package de.fu_berlin.inf.dpp.ui.model;
 
-import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.RosterPacket;
 
+import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
+
 /**
  * Represent an entry in a contact list.
- *
+ * 
  * This class is immutable.
  */
 public class Contact {
@@ -18,29 +20,41 @@ public class Contact {
 
     private final String addition;
 
+    private final String jid;
+
     /**
-     * @param displayName the name of the contact as it should be displayed
-     * @param presence a string indicating the online status
-     * @param addition a string containing subscription status
+     * @param displayName
+     *            the name of the contact as it should be displayed
+     * @param presence
+     *            a string indicating the online status
+     * @param addition
+     *            a string containing subscription status
+     * @param jid
+     *            a string that represents the {@link jid}
      */
-    public Contact(String displayName, String presence, String addition) {
+    public Contact(String displayName, String presence, String addition,
+        String jid) {
         this.displayName = displayName;
         this.presence = presence;
         this.addition = addition;
+        this.jid = jid;
     }
 
     /**
      * Factory method to create Contact from roster entry.
-     *
-     * @param entry the roster entry of the contact
-     * @param presence the presence object of the contact
+     * 
+     * @param entry
+     *            the roster entry of the contact
+     * @param presence
+     *            the presence object of the contact
      * @return a new contact created from the roster entry
      */
     public static Contact createContact(RosterEntry entry, Presence presence) {
         String displayableName = XMPPUtils.getDisplayableName(entry);
         String addition = createAdditionString(entry, presence);
         String presenceString = createPresenceString(presence);
-        return new Contact(displayableName, presenceString, addition);
+        String jid = entry.getUser();
+        return new Contact(displayableName, presenceString, addition, jid);
     }
 
     private static String createPresenceString(Presence presence) {
@@ -84,8 +98,8 @@ public class Contact {
     }
 
     public String getDisplayName() {
-            return displayName;
-        }
+        return displayName;
+    }
 
     public String getPresenceString() {
         return presence;
@@ -93,5 +107,9 @@ public class Contact {
 
     public String getAddition() {
         return addition;
+    }
+
+    public String getJid() {
+        return jid;
     }
 }
