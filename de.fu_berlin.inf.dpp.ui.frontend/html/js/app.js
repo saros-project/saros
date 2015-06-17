@@ -3,7 +3,7 @@ var app = require('ampersand-app');
 var bind = require('lodash.bind');
 var domReady = require('domready');
 var SarosState = require('./models/saros-state');
-var MainView = require('./views/main');
+var MainPage = require('./pages/main-page');
 var Accounts = require('./models/accounts');
 var Contacts = require('./models/contacts');
 
@@ -31,7 +31,7 @@ app.extend({
 
             case 'main-page':
                 
-                new MainView({
+                new MainPage({
                     el: document.body,
                     model: this.state
                 });

@@ -7,7 +7,7 @@ var AddContactView = require('../views/add-contact');
 var dictionary = require('../dictionary');
 
 module.exports = AmpersandView.extend({
-    template: templates.main,
+    template: templates.mainPage,
     // Add the dictionary to the context so that the template
     // engine can use it.
     d: dictionary,
