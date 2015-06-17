@@ -10,6 +10,7 @@ import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
 import de.fu_berlin.inf.dpp.ui.model.Account;
 import de.fu_berlin.inf.dpp.ui.webpages.AddAccountPage;
 import de.fu_berlin.inf.dpp.ui.webpages.BrowserPage;
+import de.fu_berlin.inf.dpp.ui.webpages.SessionWizardPage;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPException;
@@ -60,11 +61,15 @@ public class MainPageBrowserFunctions {
 
     private final AddAccountPage addAccountPage;
 
+    private final SessionWizardPage sessionWizardPage;
+
     public MainPageBrowserFunctions(ContactListFacade contactListFacade,
-        DialogManager dialogManager, AddAccountPage addAccountPage) {
+        DialogManager dialogManager, AddAccountPage addAccountPage,
+        SessionWizardPage sessionWizardPage) {
         this.contactListFacade = contactListFacade;
         this.dialogManager = dialogManager;
         this.addAccountPage = addAccountPage;
+        this.sessionWizardPage = sessionWizardPage;
     }
 
     /**
@@ -125,6 +130,12 @@ public class MainPageBrowserFunctions {
             public Object function(Object[] arguments) {
                 dialogManager.showDialogWindow(addAccountPage);
                 return true;
+            }
+        }, new JavascriptFunction("__java_showStartSessionWizard") {
+            @Override
+            public Object function(Object[] arguments) {
+                dialogManager.showDialogWindow(sessionWizardPage);
+                return null;
             }
         });
     }

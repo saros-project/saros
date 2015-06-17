@@ -5,6 +5,7 @@ var domReady = require('domready');
 var AmpersandState = require('ampersand-state');
 var SarosState = require('./models/saros-state');
 var MainPage = require('./pages/main-page');
+var StartSessionWizard = require('./pages/start-session-wizard');
 var Accounts = require('./models/accounts');
 var Contacts = require('./models/contacts');
 var ErrorDialog = require('./views/error-dialog');
@@ -38,6 +39,13 @@ app.extend({
                 new MainPage({
                     el: document.getElementById('saros'),
                     model: this.state
+                });
+                break;
+
+            case 'start-session-wizard':
+
+                new StartSessionWizard({
+                    el: document.body
                 });
                 break;
         }
