@@ -1,1 +1,16 @@
-div(data-hook="contacts-container")
+div
+    nav.navbar.navbar-default
+        span.navbar-brand= d.headline.shareProjects
+    div.wizard-content
+        div(data-hook="contacts-container")
+    footer.footer
+        button.btn.btn-danger.btn-sm(type="button", data-hook="cancel")
+            = d.action.cancel
+        button.btn.btn-primary.btn-sm(type="button", data-hook="finish")
+            = d.action.finish
+        button.btn.btn-default.btn-sm(type="button", data-hook="next")
+            = d.action.next
+        button.btn.btn-default.btn-sm(type="button", data-hook="back")
+            = d.action.back
+
+

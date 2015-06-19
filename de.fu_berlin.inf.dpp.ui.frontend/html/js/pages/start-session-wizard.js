@@ -1,7 +1,7 @@
 var app = require('ampersand-app');
 var AmpersandView = require('ampersand-view');
 var templates = require('../templates');
-var SelectableContactsView = require('../views/selectable-contacts-view');
+var SelectableContactsView = require('../views/selectable-contacts');
 var dictionary = require('../dictionary');
 
 module.exports = AmpersandView.extend({

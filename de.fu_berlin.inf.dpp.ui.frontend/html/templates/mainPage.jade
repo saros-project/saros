@@ -11,6 +11,9 @@ div
                     li
                         a(href="#", data-hook="manage-accounts")= d.action.manageAccounts
                     li.divider
-            button.btn.btn-default.btn-sm(type="button", data-hook="add-contact")
-                = d.action.addContact
+            .btn-list
+                button.btn.btn-default.btn-sm(type="button", data-hook="add-contact")
+                    = d.action.addContact
+                button.btn.btn-default.btn-sm(type="button", data-hook="start-session")
+                    = d.action.startSession
     div(data-hook="contact-container")

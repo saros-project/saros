@@ -1,6 +1,6 @@
 var AmpersandView = require('ampersand-view');
 var templates = require('../templates');
-var ContactView = require('../views/contact');
+var SelectableContactView = require('../views/selectable-contact');
 var dictionary = require('../dictionary');
 
 module.exports = AmpersandView.extend({
@@ -11,7 +11,7 @@ module.exports = AmpersandView.extend({
     render: function() {
 
         this.renderWithTemplate(this);
-        this.renderCollection(this.collection, ContactView,
+        this.renderCollection(this.collection, SelectableContactView,
             this.queryByHook('contact-list'));
         return this;
     }

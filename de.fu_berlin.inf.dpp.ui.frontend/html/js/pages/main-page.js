@@ -4,6 +4,7 @@ var templates = require('../templates');
 var AccountsDropdownView = require('../views/accounts-dropdown');
 var ContactsView = require('../views/contacts');
 var AddContactView = require('../views/add-contact');
+var SarosApi = require('../saros-api');
 var dictionary = require('../dictionary');
 
 module.exports = AmpersandView.extend({
@@ -35,7 +36,8 @@ module.exports = AmpersandView.extend({
     },
     events: {
         'click [data-hook=connection-button]': 'toggleConnect',
-        'click [data-hook=add-contact]': 'openAddContactDialog'
+        'click [data-hook=add-contact]': 'openAddContactDialog',
+        'click [data-hook=start-session]': 'startSession',
     },
     bindings: {
         'model.activeAccountLabel': '[data-hook=active-account]',
@@ -60,6 +62,10 @@ module.exports = AmpersandView.extend({
     openAddContactDialog: function() {
 
         new AddContactView();
+    },
+    startSession: function() {
+
+        SarosApi.showStartSessionWizard();
     }
 });
 

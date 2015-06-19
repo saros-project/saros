@@ -21,8 +21,32 @@ label input {
 	font-weight: normal;
 }
 
+.btn-list {
+    display: inline-block;
+    position: relative;
+    vertical-align: middle;
+}
+
+.footer button, .btn-list button {
+    float: right;
+    margin-left: 10px;
+}
+
 .font-bold {
-	font-weight: bold !important;
+    font-weight: bold !important;
+}
+
+/* Wizards */
+div.wizard-content {
+    padding: 0 15px;
+}
+
+.footer {
+    background-color: #f5f5f5;
+    bottom: 0;
+    padding: 10px;
+    position: absolute;
+    width: 100%;
 }
 
 /* Bootstrap customization */
