@@ -35,7 +35,6 @@ import de.fu_berlin.inf.dpp.negotiation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.vcs.VCSProvider;
@@ -63,10 +62,6 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     private PacketCollector remoteFileListResponseCollector;
 
     private PacketCollector startActivityQueuingResponseCollector;
-
-    // TODO pull up, when this class is in core
-    @Inject
-    private ISarosSessionManager sessionManager;
 
     public OutgoingProjectNegotiation(JID to, ISarosSession session,
         List<IProject> projects, ISarosContext sarosContext) {

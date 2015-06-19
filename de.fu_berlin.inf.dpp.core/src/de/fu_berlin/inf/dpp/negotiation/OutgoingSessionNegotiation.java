@@ -47,8 +47,6 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
     private static final Random NEGOTIATION_ID_GENERATOR = new Random();
 
-    private ISarosSession sarosSession;
-
     private String localVersion;
 
     private PacketCollector invitationAcceptedCollector;

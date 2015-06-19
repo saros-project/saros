@@ -37,8 +37,6 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
     private final ISarosSessionManager sessionManager;
     private final String remoteVersion;
 
-    private ISarosSession sarosSession;
-
     private boolean running;
 
     private PacketCollector invitationDataExchangeCollector;

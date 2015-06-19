@@ -36,6 +36,7 @@ import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 
 /**
  * @author rdjemili
@@ -77,6 +78,8 @@ public abstract class SessionNegotiation extends CancelableProcess {
     protected JID peer;
 
     protected final String peerNickname;
+
+    protected ISarosSession sarosSession;
 
     public SessionNegotiation(final String negotiationID, final JID peer,
         final String description, final ISarosContext sarosContext) {

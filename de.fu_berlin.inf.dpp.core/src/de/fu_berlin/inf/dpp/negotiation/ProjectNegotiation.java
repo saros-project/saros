@@ -26,6 +26,7 @@ import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.vcs.VCSProviderFactory;
 
 /**
@@ -79,6 +80,9 @@ public abstract class ProjectNegotiation extends CancelableProcess {
      * established or was lost when the class was instantiated.
      */
     protected FileTransferManager fileTransferManager;
+
+    @Inject
+    protected ISarosSessionManager sessionManager;
 
     public ProjectNegotiation(final String negotiationID,
         final String sessionID, final JID peer, ISarosContext sarosContext) {

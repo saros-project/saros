@@ -40,7 +40,6 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.CoreUtils;
 import de.fu_berlin.inf.dpp.vcs.VCSProvider;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
@@ -81,10 +80,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     private boolean running;
 
     private PacketCollector startActivityQueuingRequestCollector;
-
-    // TODO pull up, when this class is in core
-    @Inject
-    private ISarosSessionManager sessionManager;
 
     public IncomingProjectNegotiation(ISarosSession session, JID peer,
         String negotiationID, List<ProjectNegotiationData> projectInfos,
