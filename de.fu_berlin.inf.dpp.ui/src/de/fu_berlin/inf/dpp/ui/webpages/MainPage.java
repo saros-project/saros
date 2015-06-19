@@ -30,7 +30,7 @@ public class MainPage implements BrowserPage {
 
     @Override
     public String getWebpage() {
-        return "html/main-page.html";
+        return "html/dist/main-page.html";
     }
 
     @Override
