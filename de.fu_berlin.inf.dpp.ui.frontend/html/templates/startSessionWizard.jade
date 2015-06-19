@@ -2,6 +2,7 @@ div
     nav.navbar.navbar-default
         span.navbar-brand= d.headline.shareProjects
     div.wizard-content
+        div(data-hook="projectTrees-container")
         div(data-hook="contacts-container")
     footer.footer
         button.btn.btn-danger.btn-sm(type="button", data-hook="cancel")
@@ -12,5 +13,3 @@ div
             = d.action.next
         button.btn.btn-default.btn-sm(type="button", data-hook="back")
             = d.action.back
-
-

@@ -3,26 +3,26 @@
 @import "jstree.css";
 
 body {
-	font-size: 12px;
-	line-height: 1.2;
+    font-size: 12px;
+    line-height: 1.2;
 }
 
 h4 {
-	margin-left: 10px;
+    margin-left: 10px;
 }
 
 label {
-	display: block;
+    display: block;
 }
 
 label span {
-	display: inline-block;
-	width: 200px;
+    display: inline-block;
+    width: 200px;
 }
 
 label input {
-	width: 300px;
-	font-weight: normal;
+    width: 300px;
+    font-weight: normal;
 }
 
 .btn-list {
@@ -55,11 +55,11 @@ div.wizard-content {
 
 /* Bootstrap customization */
 .navbar {
-	margin-bottom: 10px;
+    margin-bottom: 10px;
 }
 
 .modal-header, .modal-body, .modal-footer {
-	padding: 10px;
+    padding: 10px;
 }
 
 .panel-heading

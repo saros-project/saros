@@ -9,8 +9,9 @@ var StartSessionWizard = require('./pages/start-session-wizard');
 var Accounts = require('./models/accounts');
 var Contacts = require('./models/contacts');
 var ErrorDialog = require('./views/error-dialog');
+var ProjectTrees = require('./models/project-trees');
 
-// Hack for now to get jQuery and Bootsrap work together with
+// Hack for now to get jQuery and Bootstrap etc. work together with
 // the injected jQuery version from the SWT browser...
 window.$$ = window.jQuery = require('jquery').noConflict(true);
 require('bootstrap');
@@ -27,6 +28,7 @@ app.extend({
     state: new SarosState(),
     accounts: new Accounts(),
     contacts: new Contacts(),
+    projectTrees: new ProjectTrees(),
     init: function() {
 
         this.listenTo(SarosApi, 'showError', this.showError);
@@ -46,7 +48,7 @@ app.extend({
             case 'start-session-wizard':
 
                 new StartSessionWizard({
-                    el: document.body
+                    el: document.getElementById('saros')
                 });
                 break;
         }
