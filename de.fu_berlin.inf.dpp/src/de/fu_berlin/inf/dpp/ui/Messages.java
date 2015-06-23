@@ -5,6 +5,7 @@ import org.eclipse.osgi.util.NLS;
 // TODO add a guideline on how to name the strings !!!
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "de.fu_berlin.inf.dpp.ui.messages"; //$NON-NLS-1$
+
     public static String AddContactWizard_title;
     public static String AddContactWizardPage_nickname;
     public static String AddContactWizardPage_optional;
@@ -228,6 +229,11 @@ public class Messages extends NLS {
 
     public static String SessionHeaderElement_no_session_running;
     public static String SessionHeaderElement_session;
+
+    public static String SessionStop_host_closed_session_title;
+    public static String SessionStop_host_closed_session_message;
+    public static String SessionStop_host_removed_you_title;
+    public static String SessionStop_host_removed_you_message;
 
     public static String ShareProjectAddContactsWizard_title;
     public static String ShareProjectAddProjectsWizard_title;

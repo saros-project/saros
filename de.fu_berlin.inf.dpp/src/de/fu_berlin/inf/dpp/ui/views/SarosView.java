@@ -20,6 +20,7 @@ package de.fu_berlin.inf.dpp.ui.views;
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,6 +64,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.net.business.LeaveAndKickHandler.StopReason;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.xmpp.roster.AbstractRosterListener;
@@ -73,6 +75,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.BalloonNotification;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.actions.ChangeColorAction;
 import de.fu_berlin.inf.dpp.ui.actions.ChangeWriteAccessAction;
 import de.fu_berlin.inf.dpp.ui.actions.ChangeXMPPAccountAction;
@@ -119,7 +122,7 @@ import de.fu_berlin.inf.dpp.ui.widgets.viewer.session.XMPPSessionDisplayComposit
 
 /**
  * This view displays the contact list, the Saros Session and Saros Chat.
- *
+ * 
  * @author patbit
  */
 @Component(module = "ui")
@@ -270,14 +273,14 @@ public class SarosView extends ViewPart {
 
     /**
      * @JTourBusStop 2, The Interface Tour:
-     *
+     * 
      *               The createPartControl method constructs the view's
      *               controls.
-     *
+     * 
      *               Notice that the SarosView class doesn't contain everything.
      *               Rather it arranges and manages other components which carry
      *               out most of the functionality.
-     *
+     * 
      *               You should have noticed that the Saros view is divided into
      *               parts, left and right. The left side is a composite of the
      *               session information and the roster. The right side
@@ -385,12 +388,12 @@ public class SarosView extends ViewPart {
 
         /**
          * @JTourBusStop 3, The Interface Tour:
-         *
+         * 
          *               There are a few additional things in the Saros view.
-         *
+         * 
          *               There is tool bar that holds the icons along the top
          *               (also see addToolbarItems() below).
-         *
+         * 
          *               Also, there are context menus which appear when you: -
          *               right-click on a person in your current session -
          *               right-click on a buddy in the buddy list.
@@ -558,7 +561,7 @@ public class SarosView extends ViewPart {
      * Adds the {@link IWorkbenchActionConstants#MB_ADDITIONS additions}
      * {@link Separator} to the {@link MenuManager} in order to let others
      * extend the menu.
-     *
+     * 
      * @param menuManager
      */
     protected void addAdditionsSeparator(MenuManager menuManager) {
@@ -595,7 +598,7 @@ public class SarosView extends ViewPart {
 
     /**
      * Display a notification next to the given control..
-     *
+     * 
      * @param title
      * @param text
      * @param control
@@ -647,7 +650,7 @@ public class SarosView extends ViewPart {
      * current focus. The visibility time of the notification will vary,
      * depending on how much words the text contains. This method <b>SHOULD
      * NOT</b> be called directly from the business logic.
-     *
+     * 
      * @param title
      *            the title of the notification
      * @param text
@@ -657,6 +660,33 @@ public class SarosView extends ViewPart {
      */
     public static void showNotification(final String title, final String text) {
         showNotification(title, text, null);
+    }
+
+    /**
+     * TODO Move to (yet-to-be-created) IDE-independent NotificationHandler
+     * class
+     */
+    public static void showStopNotification(User user, StopReason reason) {
+        String text = null;
+        String title = null;
+
+        switch (reason) {
+        case REMOVED:
+            title = Messages.SessionStop_host_removed_you_title;
+            text = MessageFormat.format(
+                Messages.SessionStop_host_removed_you_message,
+                user.getNickname());
+            break;
+
+        case SESSION_CLOSED:
+            title = Messages.SessionStop_host_closed_session_title;
+            text = MessageFormat.format(
+                Messages.SessionStop_host_closed_session_message,
+                user.getNickname());
+            break;
+        }
+
+        showNotification(title, text);
     }
 
     /**
@@ -725,4 +755,5 @@ public class SarosView extends ViewPart {
 
         return action;
     }
+
 }

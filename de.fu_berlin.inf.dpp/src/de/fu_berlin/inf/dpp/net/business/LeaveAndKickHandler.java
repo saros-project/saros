@@ -19,12 +19,15 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * Business logic for handling Leave Message
- * 
  */
 
 // FIXME move this class into the session context
 @Component(module = "net")
 public class LeaveAndKickHandler {
+
+    public enum StopReason {
+        REMOVED, SESSION_CLOSED
+    }
 
     private static final Logger log = Logger
         .getLogger(LeaveAndKickHandler.class.getName());
@@ -92,8 +95,7 @@ public class LeaveAndKickHandler {
             return;
         }
 
-        stopSession("Removed from the session", user.getNickname()
-            + " removed you from the current session.");
+        stopSession(user, StopReason.REMOVED);
     }
 
     private void leaveReceived(JID from) {
@@ -122,8 +124,7 @@ public class LeaveAndKickHandler {
          * context which executes all incoming packets sequentially
          */
         if (user.isHost()) {
-            stopSession("Closing the session", "Session was closed by inviter "
-                + user.getNickname() + ".");
+            stopSession(user, StopReason.SESSION_CLOSED);
 
         }
 
@@ -147,12 +148,12 @@ public class LeaveAndKickHandler {
 
     }
 
-    private void stopSession(final String topic, final String reason) {
+    private void stopSession(final User user, final StopReason reason) {
         ThreadUtils.runSafeAsync("dpp-stop-host", log, new Runnable() {
             @Override
             public void run() {
                 sessionManager.stopSarosSession();
-                SarosView.showNotification(topic, reason);
+                SarosView.showStopNotification(user, reason);
             }
         });
     }
