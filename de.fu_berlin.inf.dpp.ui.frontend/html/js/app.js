@@ -14,6 +14,7 @@ var ErrorDialog = require('./views/error-dialog');
 // the injected jQuery version from the SWT browser...
 window.$$ = window.jQuery = require('jquery').noConflict(true);
 require('bootstrap');
+require('jstree');
 
 // `SarosApi` must be globally available to enable calls from Java.
 var SarosApi = window.SarosApi = require('./saros-api');
