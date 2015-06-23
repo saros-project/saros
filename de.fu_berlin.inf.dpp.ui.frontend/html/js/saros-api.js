@@ -54,6 +54,11 @@ var SarosApi = BackboneEvents.mixin({
      showStartSessionWizard: function() {
      
          __java_showStartSessionWizard(); // jshint ignore:line
+     },
+
+     closeStartSessionWizard: function() {
+
+        __java_closeStartSessionWizard(); // jshint ignore:line
      }
 });
 

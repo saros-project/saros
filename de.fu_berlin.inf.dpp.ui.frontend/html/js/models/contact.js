@@ -8,6 +8,17 @@ module.exports = AmpersandModel.extend({
         addition: ['string', false, '']
     },
 
+    derived: {
+        isAvailable: {
+            deps: ['presence'],
+            fn: function() {
+
+                // TODO: correct predicate
+                return this.presence === 'Online';
+            }
+        }
+    },
+
     session: {
         isSelected: {
             type: 'boolean',

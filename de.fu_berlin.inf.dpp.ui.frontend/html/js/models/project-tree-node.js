@@ -18,6 +18,9 @@ var ProjectTreeNode = AmpersandState.extend({
     }
 });
 
+// Due to the circular dependency we have to use this
+// "workaround" with the use of the `prototype` property:
+// https://github.com/AmpersandJS/ampersand-state/issues/78
 ProjectTreeNodes.prototype.model = ProjectTreeNode;
 
 module.exports = {

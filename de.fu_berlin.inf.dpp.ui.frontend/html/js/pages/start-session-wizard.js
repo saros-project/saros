@@ -1,11 +1,12 @@
 var app = require('ampersand-app');
-var AmpersandView = require('ampersand-view');
+var bindAll = require('lodash.bindall');
+var AmpersandWizard = require('../views/ampersand-wizard');
 var templates = require('../templates');
-var ProjectTreesView = require('../views/project-trees');
+var SelectableProjectTreesView = require('../views/selectable-project-trees');
 var SelectableContactsView = require('../views/selectable-contacts');
 var dictionary = require('../dictionary');
 
-module.exports = AmpersandView.extend({
+module.exports = AmpersandWizard.extend({
     template: templates.startSessionWizard,
     // Add the dictionary to the context so that the template
     // engine can use it.
@@ -13,22 +14,37 @@ module.exports = AmpersandView.extend({
     autoRender: true,
     subviews: {
         projectTrees: {
-            container: '[data-hook=projectTrees-container]',
+            hook: 'project-trees-container',
             prepareView: function(el) {
-                return new ProjectTreesView({
+                return new SelectableProjectTreesView({
                     el: el,
                     collection: app.projectTrees
                 });
             }
         },
         contacts: {
-            container: '[data-hook=contacts-container]',
+            hook: 'contacts-container',
             prepareView: function(el) {
+
+                var contacts = app.state.contactList.getAvailable();
+
                 return new SelectableContactsView({
                     el: el,
-                    collection: app.contacts
+                    collection: contacts
                 });
             }
         }
+    },
+    order: ['projectTrees', 'contacts'],
+    finish: function() {
+
+        var contacts = this.contacts.getValue();
+        var projectTrees = this.projectTrees.getValue();
+
+        //TODO: SarosApi.???
+    },
+    cancel: function() {
+
+        SarosApi.closeStartSessionWizard();
     }
 });

@@ -2,7 +2,8 @@ module.exports = {
     'headline': {
         'sessions': 'Sessions',
         'contacts': 'Contacts',
-        'shareProjects': 'Share Projects',
+        'selectProjects': 'Select Projects',
+        'selectContacts': 'Select Contacts',
         'error': 'Error'
     },
     'action': {
@@ -30,6 +31,8 @@ module.exports = {
         'jid': 'XMPP/Jabber ID'
     },
     'message': {
-        'noAccount': 'No account selected'
+        'noAccount': 'No account selected',
+        'selectProjects': 'Select the projects, folders or files you want to work on. You can choose projects completely or partially.',
+        'selectContacts': 'Select the contacts(s) to work with.'
     }
 };

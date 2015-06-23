@@ -40,13 +40,7 @@ label input {
     font-weight: bold !important;
 }
 
-/* Wizards */
-div.wizard-content {
-    padding: 0 15px;
-}
-
 .footer {
-    background-color: #f5f5f5;
     bottom: 0;
     padding: 10px;
     position: absolute;
@@ -54,7 +48,18 @@ div.wizard-content {
 }
 
 /* Bootstrap customization */
+.container {
+    padding: 10px;
+    width: 100%;
+}
+
+.list-group {
+    width: 300px;
+    cursor: pointer;
+}
+
 .navbar {
+    padding: 0 10px 10px 10px;
     margin-bottom: 10px;
 }
 

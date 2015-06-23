@@ -42,10 +42,10 @@ public class ProjectListRenderer extends Renderer {
 
     @Override
     public synchronized void render(IJQueryBrowser browser) {
-        // The project model creation shouldn't be done for every browser only
-        // the "SarosApi.updateProjectTree(gson) needs to be called for each
-        // page this render is associated.
-        // TODO: Change the Render interface to avoid multiple model creation.
+        // The project model creation shouldn't be done for every browser, only
+        // the `SarosApi.trigger('updateProjectTrees', json)` needs to be called for each
+        // page this renderer is associated with.
+        // TODO: Change the Renderer interface to avoid multiple model creations.
 
         try {
             projectListManager.createAndMapProjectModels();
@@ -56,7 +56,6 @@ public class ProjectListRenderer extends Renderer {
 
         Gson jsModel = new Gson();
         String json = jsModel.toJson(projectListManager.getProjectModels());
-        browser.run("SarosApi.updateProjectTree(" + json + ")");
-
+        browser.run("SarosApi.trigger('updateProjectTrees', " + json + ")");
     }
 }

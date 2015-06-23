@@ -1,4 +1,6 @@
-
 div
-    h4 Contacts
-    ul.list-group(data-hook="contacts-list")
+    nav.navbar.navbar-default
+        h2= d.headline.selectContacts
+        div= d.message.selectContacts
+    div.container
+        ul.list-group(data-hook="contacts-list")

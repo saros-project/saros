@@ -16,6 +16,12 @@ var ProjectTreeNodeView = AmpersandView.extend({
             type: 'booleanClass',
             name: 'jstree-clicked',
             selector: 'a'
+        },
+        // A litlle bit hackish approach to link the projectTreeNode model
+        // to the jstree instance.
+        'model.cid': {
+            type: 'attribute',
+            name: 'id'
         }
     },
     events: {

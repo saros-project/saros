@@ -12,7 +12,32 @@ module.exports = AmpersandView.extend({
 
         this.renderWithTemplate(this);
         this.renderCollection(this.collection, SelectableContactView,
-            this.queryByHook('contact-list'));
+            this.queryByHook('contacts-list'));
         return this;
+    },
+    // Make sure that at least one contact is selected.
+    // TODO: Is it possible to start session without contact?
+    // In that case this function would always return true.
+    isValid: function() {
+
+        var selected = false;
+
+        this.collection.forEach(function(contact) {
+
+            if (contact.isSelected) {
+                selected = true;
+            }
+        });
+
+        return selected;
+    },
+    // Return the value of this view.
+    // In this case the collection of contacts whih are selected.
+    getValue: function() {
+
+        return this.collection.filter(function(contact) {
+
+            return contact.isSelected;
+        });
     }
 });

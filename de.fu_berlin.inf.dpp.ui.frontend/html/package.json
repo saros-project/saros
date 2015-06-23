@@ -13,7 +13,8 @@
     "jquery": "^2.1.3",
     "jstree": "^3.1.1",
     "lodash.bind": "^3.1.0",
-    "lodash.bindall": "^3.1.0"
+    "lodash.bindall": "^3.1.0",
+    "lodash.foreach": "^3.0.3"
   },
   "devDependencies": {
     "browserify": "^9.0.3",
@@ -26,7 +27,7 @@
   },
   "scripts": {
     "prebuild": "mkdirp bundle dist/bundle/ dist/css",
-    "postbuild": "cp *.html dist/ && cp css/*.css dist/css/ && cp bundle/bundle.js dist/bundle/bundle.js",
+    "postbuild": "cp *.html dist/ && cp css/*.* dist/css/ && cp bundle/bundle.js dist/bundle/bundle.js",
     "build": "npm run build:html -s && npm run build:js -s",
     "build:js": "browserify js/app.js -o bundle/bundle.js",
     "build:html": "templatizer -d templates/ -o js/templates.js",

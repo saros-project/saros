@@ -18,7 +18,7 @@ module.exports = AmpersandView.extend({
         }
     },
     events: {
-        'click input[type="checkbox"]': 'toggleSelect'
+        'click': 'toggleSelect'
     },
     toggleSelect: function(event) {
 

@@ -60,7 +60,7 @@ public class SessionWizardPageBrowserFunctions {
                 }
                 return null;
             }
-        }, new JavascriptFunction("__java_cancelSessionWizard") {
+        }, new JavascriptFunction("__java_closeStartSessionWizard") {
             @Override
             public Object function(Object[] arguments) {
                 dialogManager.closeDialogWindow(SessionWizardPage.WEB_PAGE);

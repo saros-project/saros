@@ -2,6 +2,20 @@ var AmpersandCollection = require('ampersand-collection');
 var Contact = require('./contact');
 var SarosApi = require('../saros-api');
 
-module.exports = AmpersandCollection.extend({
-    model: Contact
+var Contacts = AmpersandCollection.extend({
+
+    model: Contact,
+
+    // Returns a new collection with all contacts which are
+    // currently available (determined by derived property 
+    // contact.isAvailable).
+    getAvailable: function() {
+
+        return new Contacts(this.filter(function(contact) {
+
+            return contact.isAvailable;
+        }));
+    }
 });
+
+module.exports = Contacts;
