@@ -28,16 +28,22 @@ import java.util.List;
 public interface BrowserPage {
 
     /**
-     * Returns the resource name of this <code>BowserPage</code> or <code>null</code> if there is no resource associated with this page.
+     * Returns the resource name of this <code>BowserPage</code>.
      * <p/>
      * E.g: html/index.html
      * <p/>
      * It is up to the caller to resolve the absolute physical location.
      *
-     * @return the resource name or <code>null</code>
+     * @return the resource name
      * @see ClassLoader#getResource(String name)
      */
     String getWebpage();
+
+    /**
+     * Returns the title of this <code>BrowserPage</code>.
+     * @return the title
+     */
+    String getTitle();
 
     /**
      * Creates the needed {@link org.eclipse.swt.browser.BrowserFunction}s for

@@ -32,10 +32,9 @@ public class EclipseDialogManager extends DialogManager {
 
         final Shell browserShell = new Shell(activeShell);
 
-        // TODO WebPage#getTitle() ?
-        browserShell.setText(browserPage.getWebpage());
+        browserShell.setText(browserPage.getTitle());
         browserShell.setLayout(new FillLayout());
-        browserShell.setSize(640, 480);
+        browserShell.setMinimumSize(640, 480);
 
         browserCreator.createBrowser(browserShell, SWT.NONE, browserPage);
 

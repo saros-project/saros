@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.ui.webpages;
 
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
+import de.fu_berlin.inf.dpp.HTMLUIStrings;
 import de.fu_berlin.inf.dpp.ui.browser_functions.AddAccountBrowserFunctions;
 import de.fu_berlin.inf.dpp.ui.renderer.Renderer;
 
@@ -22,16 +23,25 @@ public class AddAccountPage implements BrowserPage {
 
     @Override
     public String getWebpage() {
+
         return WEB_PAGE;
     }
 
     @Override
+    public String getTitle() {
+
+        return HTMLUIStrings.ADD_ACCOUNT_PAGE_TITLE;
+    }
+
+    @Override
     public List<JavascriptFunction> getJavascriptFunctions() {
+
         return browserFunctions.getJavascriptFunctions();
     }
 
     @Override
     public List<Renderer> getRenderer() {
+
         return Collections.emptyList();
     }
 }
