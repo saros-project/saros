@@ -42,7 +42,7 @@ import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.editor.AbstractStoppableListener;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 import de.fu_berlin.inf.dpp.intellij.editor.StoppableDocumentListener;
-import de.fu_berlin.inf.dpp.intellij.project.filesystem.FileImp;
+import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJFileImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJPathImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJProjectImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJWorkspaceImpl;
@@ -102,13 +102,13 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         }
 
         for (IResource resource : members) {
-            SPath oldChildSPath = new FileImp(
+            SPath oldChildSPath = new IntelliJFileImpl(
                 (IntelliJProjectImpl) oldSPath.getProject(), new File(
                 oldSPath.getFullPath().toOSString() + File.separator + resource
                     .getName()
             )
             ).getSPath();
-            SPath newChildSPath = new FileImp(
+            SPath newChildSPath = new IntelliJFileImpl(
                 (IntelliJProjectImpl) newSPath.getProject(), new File(
                 newSPath.getFullPath().toOSString() + File.separator + resource
                     .getName()
@@ -176,7 +176,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
     public void contentsChanged(@NotNull VirtualFileEvent virtualFileEvent) {
         VirtualFile virtualFile = virtualFileEvent.getFile();
         IntelliJProjectImpl project = intelliJWorkspaceImpl.getProjectForPath(virtualFile.getPath());
-        IFile file = new FileImp(project, new File(virtualFile.getPath()));
+        IFile file = new IntelliJFileImpl(project, new File(virtualFile.getPath()));
 
         if (resourceManager.getSession().isShared(file) && newFiles
             .contains(virtualFile)) {

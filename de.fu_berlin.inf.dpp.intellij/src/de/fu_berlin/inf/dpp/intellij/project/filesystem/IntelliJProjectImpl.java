@@ -164,7 +164,7 @@ public class IntelliJProjectImpl implements IProject {
         }
 
         if (file.isFile()) {
-            IFile myFile = new FileImp(this, file);
+            IFile myFile = new IntelliJFileImpl(this, file);
             addResource(myFile);
         }
     }
@@ -176,7 +176,7 @@ public class IntelliJProjectImpl implements IProject {
         }
 
         if (file.isFile()) {
-            IFile myFile = new FileImp(this, file);
+            IFile myFile = new IntelliJFileImpl(this, file);
             resourceMap.remove(myFile.getProjectRelativePath());
         }
     }
@@ -189,10 +189,10 @@ public class IntelliJProjectImpl implements IProject {
 
         IFile file;
         if (path.isAbsolute()) {
-            file = new FileImp(this, new File(name));
+            file = new IntelliJFileImpl(this, new File(name));
 
         } else {
-            file = new FileImp(this,
+            file = new IntelliJFileImpl(this,
                 new File(this.path + File.separator + name));
         }
         addResource(file);

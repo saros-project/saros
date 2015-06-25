@@ -31,7 +31,7 @@ import de.fu_berlin.inf.dpp.filesystem.IResourceAttributes;
 import java.io.File;
 import java.net.URI;
 
-public abstract class ResourceImp implements IResource {
+public abstract class IntelliJResourceImpl implements IResource {
     //TODO resolve charset issue by reading real data
     public static final String DEFAULT_CHARSET = "utf8";
     private String defaultCharset = DEFAULT_CHARSET;
@@ -41,7 +41,7 @@ public abstract class ResourceImp implements IResource {
     private IResourceAttributes attributes;
     private boolean isDerived = false;
 
-    protected ResourceImp(IntelliJProjectImpl project, File file) {
+    protected IntelliJResourceImpl(IntelliJProjectImpl project, File file) {
         this.project = project;
         this.file = file;
         this.attributes = new IntelliJFileResourceAttributesImpl(file);
@@ -169,11 +169,11 @@ public abstract class ResourceImp implements IResource {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof ResourceImp)) {
+        if (!(obj instanceof IntelliJResourceImpl)) {
             return false;
         }
 
-        ResourceImp other = (ResourceImp) obj;
+        IntelliJResourceImpl other = (IntelliJResourceImpl) obj;
 
         if (this.getType() != other.getType()) {
             return false;

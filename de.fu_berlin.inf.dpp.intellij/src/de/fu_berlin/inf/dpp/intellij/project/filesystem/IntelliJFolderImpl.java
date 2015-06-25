@@ -33,7 +33,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IntelliJFolderImpl extends ResourceImp implements IFolder {
+public class IntelliJFolderImpl extends IntelliJResourceImpl implements IFolder {
     private static Logger LOG = Logger.getLogger(IntelliJFolderImpl.class);
 
     public IntelliJFolderImpl(IntelliJProjectImpl project, File file) {
@@ -79,7 +79,7 @@ public class IntelliJFolderImpl extends ResourceImp implements IFolder {
         for (File myFile : files) {
             if (myFile.isFile() && !myFile.isHidden() && (memberFlags == NONE
                 || memberFlags == FILE)) {
-                list.add(new FileImp(project, myFile));
+                list.add(new IntelliJFileImpl(project, myFile));
             }
 
             if (myFile.isDirectory() && !myFile.isHidden() && (

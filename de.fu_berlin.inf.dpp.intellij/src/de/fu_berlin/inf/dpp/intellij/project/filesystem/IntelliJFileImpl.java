@@ -39,10 +39,10 @@ import java.io.InputStream;
  * <p/>
  * FIXME: Remove all hacks regarding absolute files.
  */
-public class FileImp extends ResourceImp implements IFile {
-    private static Logger LOG = Logger.getLogger(FileImp.class);
+public class IntelliJFileImpl extends IntelliJResourceImpl implements IFile {
+    private static Logger LOG = Logger.getLogger(IntelliJFileImpl.class);
 
-    public FileImp(IntelliJProjectImpl project, File file) {
+    public IntelliJFileImpl(IntelliJProjectImpl project, File file) {
         super(project, file);
     }
 

@@ -62,7 +62,7 @@ public class FileContentChangedNotifierBridge
     }
 
     private void notifyListeners(@NotNull VirtualFileEvent virtualFileEvent) {
-        IFile myFile = new FileImp(null,
+        IFile myFile = new IntelliJFileImpl(null,
             new File(virtualFileEvent.getFile().getPath()));
 
         for (IFileContentChangedListener listener : list) {

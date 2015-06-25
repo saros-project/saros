@@ -26,7 +26,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
-import de.fu_berlin.inf.dpp.intellij.project.filesystem.FileImp;
+import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJFileImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJPathImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJProjectImpl;
 
@@ -60,7 +60,7 @@ public class IntelliJFileImplTest {
 
     public static final String TEST_PROJECT_NAME = "project";
 
-    //Since {@link FileImp#getContents} getContents is just creating a
+    //Since {@link IntelliJFileImpl#getContents} getContents is just creating a
     // FileInputStream, a seperate test for getContents is not necessary
     @Test
     public void testSetAndGetContents() throws Exception {
@@ -78,7 +78,7 @@ public class IntelliJFileImplTest {
     @Test
     public void testIfNotPresentExistIsFalse() throws Exception {
         createTestProjectFolder();
-        IFile file = new FileImp(getMockProject(), new File(NEW_FILE_NAME));
+        IFile file = new IntelliJFileImpl(getMockProject(), new File(NEW_FILE_NAME));
 
         assertTrue(!file.exists());
     }
@@ -93,7 +93,7 @@ public class IntelliJFileImplTest {
     @Test
     public void testCreate() throws Exception {
         createTestProjectFolder();
-        IFile file = new FileImp(getMockProject(),
+        IFile file = new IntelliJFileImpl(getMockProject(),
             new File("newCreateFile.txt"));
 
         file.create(new ByteArrayInputStream(new byte[] { }), false);
@@ -166,10 +166,10 @@ public class IntelliJFileImplTest {
         assertTrue(file.isAccessible());
     }
 
-    private FileImp createTestFile() throws IOException {
+    private IntelliJFileImpl createTestFile() throws IOException {
         createTestProjectFolder();
         folder.newFile(TEST_PROJECT_NAME + "/" + TESTFILE_NAME);
-        return new FileImp(getMockProject(), new File(TESTFILE_NAME));
+        return new IntelliJFileImpl(getMockProject(), new File(TESTFILE_NAME));
     }
 
     private void createTestProjectFolder() throws IOException {
