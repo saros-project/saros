@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.ui.browser_functions;
 import com.google.gson.Gson;
 import de.fu_berlin.inf.ag_se.browser.IBrowser;
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.ui.core_facades.ContactListFacade;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.BrowserCreator;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
@@ -13,7 +12,6 @@ import de.fu_berlin.inf.dpp.ui.webpages.BrowserPage;
 import de.fu_berlin.inf.dpp.ui.webpages.SessionWizardPage;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import org.apache.log4j.Logger;
-import org.jivesoftware.smack.XMPPException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -104,23 +102,6 @@ public class MainPageBrowserFunctions {
                     @Override
                     public void run() {
                         contactListFacade.disconnect();
-                    }
-                });
-                return null;
-            }
-        }, new JavascriptFunction("__java_deleteContact") {
-            @Override
-            public Object function(final Object[] arguments) {
-                ThreadUtils.runSafeAsync(LOG, new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            contactListFacade
-                                .deleteContact(new JID((String) arguments[0]));
-                        } catch (XMPPException e) {
-                            LOG.error("Error deleting contact ", e);
-                            browser.run("alert('Error deleting contact');");
-                        }
                     }
                 });
                 return null;

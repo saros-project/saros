@@ -2,11 +2,13 @@ package de.fu_berlin.inf.dpp.ui.webpages;
 
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.dpp.HTMLUIStrings;
+import de.fu_berlin.inf.dpp.ui.browser_functions.ContactSpecificBrowserFunctions;
 import de.fu_berlin.inf.dpp.ui.browser_functions.MainPageBrowserFunctions;
 import de.fu_berlin.inf.dpp.ui.renderer.AccountRenderer;
 import de.fu_berlin.inf.dpp.ui.renderer.ContactListRenderer;
 import de.fu_berlin.inf.dpp.ui.renderer.Renderer;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -21,14 +23,18 @@ public class MainPage implements BrowserPage {
 
     private final ContactListRenderer contactListRenderer;
 
-    private final MainPageBrowserFunctions browserFunctions;
+    private final MainPageBrowserFunctions mainPageBrowserFunctions;
+
+    private final ContactSpecificBrowserFunctions contactSpecificBrowserFunctions;
 
     public MainPage(AccountRenderer accountRenderer,
         ContactListRenderer contactListRenderer,
-        MainPageBrowserFunctions browserFunctions) {
+        MainPageBrowserFunctions mainPageBrowserFunctions,
+        ContactSpecificBrowserFunctions contactSpecificBrowserFunctions) {
         this.accountRenderer = accountRenderer;
         this.contactListRenderer = contactListRenderer;
-        this.browserFunctions = browserFunctions;
+        this.mainPageBrowserFunctions = mainPageBrowserFunctions;
+        this.contactSpecificBrowserFunctions = contactSpecificBrowserFunctions;
     }
     @Override
     public String getWebpage() {
@@ -45,12 +51,17 @@ public class MainPage implements BrowserPage {
     @Override
     public List<JavascriptFunction> getJavascriptFunctions() {
 
-        return  browserFunctions.getJavascriptFunctions();
+        List<JavascriptFunction> javaScriptFunctions = new ArrayList<JavascriptFunction>();
+        javaScriptFunctions.addAll(mainPageBrowserFunctions
+            .getJavascriptFunctions());
+        javaScriptFunctions.addAll(contactSpecificBrowserFunctions
+            .getJavascriptFunctions());
+
+        return javaScriptFunctions;
     }
 
     @Override
     public List<Renderer> getRenderer() {
-
         return Arrays.asList(accountRenderer, contactListRenderer);
     }
 

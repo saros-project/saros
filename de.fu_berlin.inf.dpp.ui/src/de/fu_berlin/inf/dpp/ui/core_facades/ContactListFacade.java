@@ -1,6 +1,8 @@
 package de.fu_berlin.inf.dpp.ui.core_facades;
 
 import de.fu_berlin.inf.dpp.ui.browser_functions.MainPageBrowserFunctions;
+import org.jivesoftware.smack.Connection;
+import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPException;
 
@@ -10,7 +12,6 @@ import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.net.xmpp.subscription.SubscriptionHandler;
 import de.fu_berlin.inf.dpp.ui.model.Account;
 
 /**
@@ -26,16 +27,12 @@ public class ContactListFacade {
 
     private final XMPPConnectionService connectionService;
 
-    private final SubscriptionHandler subscriptionHandler;
-
     private final XMPPAccountStore accountStore;
 
     public ContactListFacade(ConnectionHandler connectionHandler,
-        XMPPConnectionService connectionService,
-        SubscriptionHandler subscriptionHandler, XMPPAccountStore accountStore) {
+        XMPPConnectionService connectionService, XMPPAccountStore accountStore) {
         this.connectionHandler = connectionHandler;
         this.connectionService = connectionService;
-        this.subscriptionHandler = subscriptionHandler;
         this.accountStore = accountStore;
     }
 
@@ -61,24 +58,79 @@ public class ContactListFacade {
 
     /**
      * Deletes a contact from the contact list
-     * 
-     * @param jid
-     *            the JID of the contact to be deleted
+     *
+     * @param jid the JID of the contact to be deleted
      */
     public void deleteContact(JID jid) throws XMPPException {
-        RosterEntry entry = connectionService.getConnection().getRoster()
-            .getEntry(jid.getRAW());
+        Connection connection = connectionService.getConnection();
+
+        if(connection == null){
+            return;
+        }
+
+        Roster roster = connection.getRoster();
+
+        if(roster == null) {
+            return;
+        }
+
+        RosterEntry entry = roster.getEntry(jid.getBase());
+
+        if(entry == null) {
+            return;
+        }
+
         XMPPUtils.removeFromRoster(connectionService.getConnection(), entry);
-        subscriptionHandler.removeSubscription(jid);
+    }
+
+    /**
+     * Renames a contact (given by JID)
+     *
+     * @param jid the JID of the contact to be renamed
+     * @param name the new name of the contact
+     * @throws XMPPException
+     */
+    public void renameContact(JID jid, String name) throws XMPPException {
+        Connection connection = connectionService.getConnection();
+
+        if(connection == null){
+            return;
+        }
+
+        Roster roster = connection.getRoster();
+
+        if(roster == null) {
+            return;
+        }
+
+        RosterEntry entry = roster.getEntry(jid.getBase());
+
+        if(entry == null) {
+            return;
+        }
+
+        entry.setName(name);
     }
 
     /**
      * Adds a contact to the contact list
-     * 
-     * @param jid
-     *            the JID of the contact to be added
+     *
+     * @param jid the JID of the contact to be added
+     * @param nickname the nickname of the contact
      */
-    public void addContact(JID jid) {
-        subscriptionHandler.addSubscription(jid, true);
+    public void addContact(JID jid, String nickname) throws XMPPException {
+        Connection connection = connectionService.getConnection();
+
+        if(connection == null){
+            return;
+        }
+
+        Roster roster = connection.getRoster();
+
+        if(roster == null) {
+            return;
+        }
+
+        roster.createEntry(jid.getBase(), nickname, null);
     }
 }

@@ -5,7 +5,7 @@ import java.util.Arrays;
 import org.picocontainer.MutablePicoContainer;
 
 import de.fu_berlin.inf.dpp.ui.browser_functions.AddAccountBrowserFunctions;
-import de.fu_berlin.inf.dpp.ui.browser_functions.AddContactBrowserFunctions;
+import de.fu_berlin.inf.dpp.ui.browser_functions.ContactSpecificBrowserFunctions;
 import de.fu_berlin.inf.dpp.ui.browser_functions.MainPageBrowserFunctions;
 import de.fu_berlin.inf.dpp.ui.browser_functions.SessionWizardPageBrowserFunctions;
 import de.fu_berlin.inf.dpp.ui.core_facades.AccountStoreFacade;
@@ -53,8 +53,8 @@ public class HTMLUIContextFactory extends AbstractSarosContextFactory {
             Component.create(ProjectListRenderer.class),
             // Browserfunctions
             Component.create(AddAccountBrowserFunctions.class),
-            Component.create(AddContactBrowserFunctions.class),
             Component.create(ProjectListManager.class),
+            Component.create(ContactSpecificBrowserFunctions.class),
             Component.create(MainPageBrowserFunctions.class),
             Component.create(SessionWizardPageBrowserFunctions.class) };
 
