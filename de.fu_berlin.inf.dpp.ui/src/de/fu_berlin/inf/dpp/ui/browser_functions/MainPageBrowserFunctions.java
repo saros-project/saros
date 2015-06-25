@@ -9,7 +9,6 @@ import de.fu_berlin.inf.dpp.ui.ide_embedding.BrowserCreator;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
 import de.fu_berlin.inf.dpp.ui.model.Account;
 import de.fu_berlin.inf.dpp.ui.webpages.AddAccountPage;
-import de.fu_berlin.inf.dpp.ui.webpages.AddContactPage;
 import de.fu_berlin.inf.dpp.ui.webpages.BrowserPage;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import org.apache.log4j.Logger;
@@ -59,16 +58,12 @@ public class MainPageBrowserFunctions {
 
     private final DialogManager dialogManager;
 
-    private final AddContactPage addContactPage;
-
     private final AddAccountPage addAccountPage;
 
     public MainPageBrowserFunctions(ContactListFacade contactListFacade,
-        DialogManager dialogManager, AddContactPage addContactPage,
-        AddAccountPage addAccountPage) {
+        DialogManager dialogManager, AddAccountPage addAccountPage) {
         this.contactListFacade = contactListFacade;
         this.dialogManager = dialogManager;
-        this.addContactPage = addContactPage;
         this.addAccountPage = addAccountPage;
     }
 
@@ -123,12 +118,6 @@ public class MainPageBrowserFunctions {
                         }
                     }
                 });
-                return null;
-            }
-        }, new JavascriptFunction("__java_showAddContactWizard") {
-            @Override
-            public Object function(Object[] arguments) {
-                dialogManager.showDialogWindow(addContactPage);
                 return null;
             }
         }, new JavascriptFunction("__java_showAddAccountWizard") {

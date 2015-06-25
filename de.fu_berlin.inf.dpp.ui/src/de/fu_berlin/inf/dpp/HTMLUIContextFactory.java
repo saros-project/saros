@@ -17,7 +17,6 @@ import de.fu_berlin.inf.dpp.ui.renderer.AccountRenderer;
 import de.fu_berlin.inf.dpp.ui.renderer.ContactListRenderer;
 import de.fu_berlin.inf.dpp.ui.renderer.ProjectListRenderer;
 import de.fu_berlin.inf.dpp.ui.webpages.AddAccountPage;
-import de.fu_berlin.inf.dpp.ui.webpages.AddContactPage;
 import de.fu_berlin.inf.dpp.ui.webpages.MainPage;
 import de.fu_berlin.inf.dpp.ui.webpages.SessionWizardPage;
 
@@ -39,7 +38,6 @@ public class HTMLUIContextFactory extends AbstractSarosContextFactory {
         Component[] components = new Component[] {
             Component.create(MainPage.class),
             Component.create(AddAccountPage.class),
-            Component.create(AddContactPage.class),
             Component.create(SessionWizardPage.class),
             Component.create(ContactListFacade.class),
             Component.create(AccountStoreFacade.class),

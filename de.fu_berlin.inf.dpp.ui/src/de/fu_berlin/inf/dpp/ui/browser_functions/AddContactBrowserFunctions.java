@@ -4,10 +4,10 @@ import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.ui.core_facades.ContactListFacade;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
-import de.fu_berlin.inf.dpp.ui.webpages.AddContactPage;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import org.apache.log4j.Logger;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -40,7 +40,8 @@ public class AddContactBrowserFunctions {
      * They can be injected into a browser so that they can be called from Javascript.
      */
     public List<JavascriptFunction> getJavascriptFunctions() {
-        return Arrays.asList(new JavascriptFunction("__java_addContact") {
+        ArrayList browserFunctions = new ArrayList<JavascriptFunction>();
+        browserFunctions.add(new JavascriptFunction("__java_addContact") {
                 @Override
                 public Object function(final Object[] arguments) {
                     ThreadUtils.runSafeAsync(LOG, new Runnable() {
@@ -51,17 +52,10 @@ public class AddContactBrowserFunctions {
 
                         }
                     });
-                    dialogManager.closeDialogWindow(AddContactPage.WEB_PAGE);
-                    return null;
-                }
-            },
-
-            new JavascriptFunction("__java_cancelAddContactWizard") {
-                @Override
-                public Object function(Object[] arguments) {
-                    dialogManager.closeDialogWindow(AddContactPage.WEB_PAGE);
                     return null;
                 }
             });
+
+        return browserFunctions;
     }
 }
