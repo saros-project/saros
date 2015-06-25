@@ -6,6 +6,7 @@ import java.util.List;
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.dpp.ui.browser_functions.SessionWizardPageBrowserFunctions;
 import de.fu_berlin.inf.dpp.ui.renderer.ContactListRenderer;
+import de.fu_berlin.inf.dpp.ui.renderer.ProjectListRenderer;
 import de.fu_berlin.inf.dpp.ui.renderer.Renderer;
 
 /**
@@ -16,17 +17,17 @@ public class SessionWizardPage implements BrowserPage {
 
     public static final String WEB_PAGE = "html/start-session-wizard.html";
 
-    private final Renderer contactListRenderer;
+    private final ContactListRenderer contactListRenderer;
 
-    // private final ProjectListRenderer projectListRenderer;
+    private final ProjectListRenderer projectListRenderer;
 
     private final SessionWizardPageBrowserFunctions browserFunctions;
 
     public SessionWizardPage(ContactListRenderer contactListRenderer,
-    // ProjectListRenderer projectListRenderer,
+        ProjectListRenderer projectListRenderer,
         SessionWizardPageBrowserFunctions browserFunctions) {
         this.contactListRenderer = contactListRenderer;
-        // this.projectListRenderer = projectListRenderer;
+        this.projectListRenderer = projectListRenderer;
         this.browserFunctions = browserFunctions;
     }
 
@@ -42,6 +43,6 @@ public class SessionWizardPage implements BrowserPage {
 
     @Override
     public List<Renderer> getRenderer() {
-        return Arrays.asList(contactListRenderer);
+        return Arrays.asList(contactListRenderer, projectListRenderer);
     }
 }
