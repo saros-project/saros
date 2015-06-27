@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.ui.browser_functions;
 import com.google.gson.Gson;
 import de.fu_berlin.inf.ag_se.browser.IBrowser;
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
-import de.fu_berlin.inf.dpp.ui.core_facades.ContactListFacade;
+import de.fu_berlin.inf.dpp.ui.core_facades.StateFacade;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.BrowserCreator;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
 import de.fu_berlin.inf.dpp.ui.model.Account;
@@ -17,9 +17,9 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * This class implements the functions to be called by Javascript code for
+ * This class implements the functions to be called by JavaScript code for
  * Saros main page. These are so-called browsers functions to invoke Java code from
- * Javascript.
+ * JavaScript.
  *
  * A note to future developers: the browser functions do not have to be split
  * according to webpages, it just suited the current state of the prototype.
@@ -27,9 +27,9 @@ import java.util.List;
  * class may be used be by many pages. Split them in such a way that no code duplication
  * arises.
  *
- * @JTourBusStop 1, Extending the HTML GUI, Calling Java from Javascript:
+ * @JTourBusStop 1, Extending the HTML GUI, Calling Java from JavaScript:
  *
- *               For calling Java from Javascript an instance of {@link JavascriptFunction}
+ *               For calling Java from JavaScript an instance of {@link JavascriptFunction}
  *               has to be created and injected into the browser
  *               by calling {@link IBrowser#createBrowserFunction(JavascriptFunction)}.
  *
@@ -53,7 +53,7 @@ public class MainPageBrowserFunctions {
     private static final Logger LOG = Logger
         .getLogger(MainPageBrowserFunctions.class);
 
-    private final ContactListFacade contactListFacade;
+    private final StateFacade stateFacade;
 
     private final DialogManager dialogManager;
 
@@ -61,10 +61,10 @@ public class MainPageBrowserFunctions {
 
     private final SessionWizardPage sessionWizardPage;
 
-    public MainPageBrowserFunctions(ContactListFacade contactListFacade,
+    public MainPageBrowserFunctions(StateFacade stateFacade,
         DialogManager dialogManager, AddAccountPage addAccountPage,
         SessionWizardPage sessionWizardPage) {
-        this.contactListFacade = contactListFacade;
+        this.stateFacade = stateFacade;
         this.dialogManager = dialogManager;
         this.addAccountPage = addAccountPage;
         this.sessionWizardPage = sessionWizardPage;
@@ -85,7 +85,7 @@ public class MainPageBrowserFunctions {
                     ThreadUtils.runSafeAsync(LOG, new Runnable() {
                         @Override
                         public void run() {
-                            contactListFacade.connect(account);
+                            stateFacade.connect(account);
                         }
                     });
                 } else {
@@ -101,7 +101,7 @@ public class MainPageBrowserFunctions {
                 ThreadUtils.runSafeAsync(LOG, new Runnable() {
                     @Override
                     public void run() {
-                        contactListFacade.disconnect();
+                        stateFacade.disconnect();
                     }
                 });
                 return null;

@@ -8,15 +8,14 @@ import org.apache.log4j.Logger;
 import com.google.gson.Gson;
 
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
-import de.fu_berlin.inf.dpp.ui.core_facades.ContactListFacade;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
 import de.fu_berlin.inf.dpp.ui.webpages.SessionWizardPage;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
- * This class implements the functions to be called by Javascript code for the
+ * This class implements the functions to be called by JavaScript code for the
  * session wizard page. These are so-called browsers functions to invoke Java
- * code from Javascript.
+ * code from JavaScript.
  */
 
 public class SessionWizardPageBrowserFunctions {
@@ -24,16 +23,9 @@ public class SessionWizardPageBrowserFunctions {
     private static final Logger LOG = Logger
         .getLogger(SessionWizardPageBrowserFunctions.class);
 
-    private final ContactListFacade contactListFacade;
-    // private final ProjectListFacade projectListFacade;
     private final DialogManager dialogManager;
 
-    public SessionWizardPageBrowserFunctions(
-        ContactListFacade contactListFacade,
-        // ProjectListFacade projectListFacade,
-        DialogManager dialogManager) {
-        this.contactListFacade = contactListFacade;
-        // this.projectListFacade = projectListFacade;
+    public SessionWizardPageBrowserFunctions(DialogManager dialogManager) {
         this.dialogManager = dialogManager;
 
     }
@@ -41,7 +33,7 @@ public class SessionWizardPageBrowserFunctions {
     /**
      * Returns the list of browser functions encapsulated by this class. They
      * can be injected into a browser so that they can be called from
-     * Javascript.
+     * JavaScript.
      */
     public List<JavascriptFunction> getJavascriptFunctions() {
         return Arrays.asList(new JavascriptFunction("__java_sendInvitation") {

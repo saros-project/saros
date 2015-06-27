@@ -8,26 +8,21 @@ import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.ui.core_facades.ContactListFacade;
+import de.fu_berlin.inf.dpp.ui.core_facades.StateFacade;
 
 /**
- * Encapsulates the browser functions for the add contact page.
- * 
- * A note to future developers: the browser functions do not have to be split
- * according to webpages, it just suited the current state of the prototype.
- * Instead there may be more BrowserFunction classes per page and each
- * BrowserFunction class may be used be by many pages. Split them in such a way
- * that no code duplication arises.
+ * Encapsulates the contact specific browser functions, for example to add,
+ * rename or delete a contact.
  */
 public class ContactSpecificBrowserFunctions {
 
     private static final Logger LOG = Logger
-        .getLogger(MainPageBrowserFunctions.class);
+        .getLogger(ContactSpecificBrowserFunctions.class);
 
-    private final ContactListFacade contactListFacade;
+    private final StateFacade stateFacade;
 
-    public ContactSpecificBrowserFunctions(ContactListFacade contactListFacade) {
-        this.contactListFacade = contactListFacade;
+    public ContactSpecificBrowserFunctions(StateFacade stateFacade) {
+        this.stateFacade = stateFacade;
     }
 
     /**
@@ -36,12 +31,13 @@ public class ContactSpecificBrowserFunctions {
      * Javascript.
      */
     public List<JavascriptFunction> getJavascriptFunctions() {
-        return Arrays.asList(new JavascriptFunction("__java_addContact") {
-            @Override
-            public Object function(final Object[] arguments) {
+        return Arrays.asList(
+            new JavascriptFunction("__java_addContact") {
+                @Override
+                public Object function(final Object[] arguments) {
 
                 try {
-                    contactListFacade.addContact(new JID((String) arguments[0]),
+                    stateFacade.addContact(new JID((String) arguments[0]),
                         (String) arguments[1]);
                 } catch (XMPPException e) {
                     LOG.error("Error while adding contact ", e);
@@ -57,7 +53,7 @@ public class ContactSpecificBrowserFunctions {
             public Object function(final Object[] arguments) {
 
                 try {
-                    contactListFacade.renameContact(new JID(
+                    stateFacade.renameContact(new JID(
                         (String) arguments[0]), (String) arguments[1]);
                 } catch (XMPPException e) {
                     LOG.error("Error while renaming contact ", e);
@@ -81,7 +77,7 @@ public class ContactSpecificBrowserFunctions {
             public Object function(final Object[] arguments) {
 
                 try {
-                    contactListFacade.deleteContact(new JID(
+                    stateFacade.deleteContact(new JID(
                         (String) arguments[0]));
                 } catch (XMPPException e) {
                     LOG.error("Error while deleting contact ", e);

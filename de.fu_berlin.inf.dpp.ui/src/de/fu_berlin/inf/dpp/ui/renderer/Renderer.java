@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
-import de.fu_berlin.inf.dpp.ui.manager.ContactListManager;
-import de.fu_berlin.inf.dpp.ui.model.ContactList;
+import de.fu_berlin.inf.dpp.ui.model.State;
 
 /**
  * Implementations of this interface can transfer their current state to a list
@@ -20,21 +19,20 @@ import de.fu_berlin.inf.dpp.ui.model.ContactList;
  *               Each renderer class is used to transfer parts of the
  *               application state to the each browser for rendering.
  * 
- *               They may store state themselves, as {@link ContactListRenderer}
- *               does.
+ *               They may store state themselves, as {@link StateRenderer} does.
  * 
  *               There are two ways to get the state from the Saros:
  * 
- *               1. use a listener if supported. See {@link ContactListManager}
- *               for an example.
+ *               1. use a listener if supported. See {@link StateRenderer} for
+ *               an example.
  * 
  *               2. query the state from the core directly the
  *               {@link AccountRenderer} does that.
  * 
  *               For the management of GUI state create custom GUI model class
- *               in the model package, like {@link ContactList}. Those classes
- *               should be converted to JSON strings with the GSON library in
- *               the renderer classes.
+ *               in the model package, like {@link State}. Those classes should
+ *               be converted to JSON strings with the GSON library in the
+ *               renderer classes.
  */
 public abstract class Renderer {
 

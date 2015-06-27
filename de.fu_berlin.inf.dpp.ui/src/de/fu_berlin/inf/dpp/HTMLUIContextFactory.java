@@ -9,14 +9,13 @@ import de.fu_berlin.inf.dpp.ui.browser_functions.ContactSpecificBrowserFunctions
 import de.fu_berlin.inf.dpp.ui.browser_functions.MainPageBrowserFunctions;
 import de.fu_berlin.inf.dpp.ui.browser_functions.SessionWizardPageBrowserFunctions;
 import de.fu_berlin.inf.dpp.ui.core_facades.AccountStoreFacade;
-import de.fu_berlin.inf.dpp.ui.core_facades.ContactListFacade;
+import de.fu_berlin.inf.dpp.ui.core_facades.StateFacade;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.BrowserCreator;
 import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
-import de.fu_berlin.inf.dpp.ui.manager.ContactListManager;
-import de.fu_berlin.inf.dpp.ui.manager.ProjectListManager;
 import de.fu_berlin.inf.dpp.ui.renderer.AccountRenderer;
-import de.fu_berlin.inf.dpp.ui.renderer.ContactListRenderer;
 import de.fu_berlin.inf.dpp.ui.renderer.ProjectListRenderer;
+import de.fu_berlin.inf.dpp.ui.manager.ProjectListManager;
+import de.fu_berlin.inf.dpp.ui.renderer.StateRenderer;
 import de.fu_berlin.inf.dpp.ui.webpages.AddAccountPage;
 import de.fu_berlin.inf.dpp.ui.webpages.MainPage;
 import de.fu_berlin.inf.dpp.ui.webpages.SessionWizardPage;
@@ -42,13 +41,12 @@ public class HTMLUIContextFactory extends AbstractSarosContextFactory {
             Component.create(AddAccountPage.class),
             Component.create(SessionWizardPage.class),
             // Facades and Manager
-            Component.create(ContactListFacade.class),
+            Component.create(StateFacade.class),
             Component.create(AccountStoreFacade.class),
-            Component.create(ContactListManager.class),
             Component.create(BrowserManager.class),
             Component.create(BrowserCreator.class),
             // Renderer
-            Component.create(ContactListRenderer.class),
+            Component.create(StateRenderer.class),
             Component.create(AccountRenderer.class),
             Component.create(ProjectListRenderer.class),
             // Browserfunctions

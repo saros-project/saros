@@ -5,8 +5,8 @@ import de.fu_berlin.inf.dpp.HTMLUIStrings;
 import de.fu_berlin.inf.dpp.ui.browser_functions.ContactSpecificBrowserFunctions;
 import de.fu_berlin.inf.dpp.ui.browser_functions.MainPageBrowserFunctions;
 import de.fu_berlin.inf.dpp.ui.renderer.AccountRenderer;
-import de.fu_berlin.inf.dpp.ui.renderer.ContactListRenderer;
 import de.fu_berlin.inf.dpp.ui.renderer.Renderer;
+import de.fu_berlin.inf.dpp.ui.renderer.StateRenderer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,14 +21,14 @@ public class MainPage implements BrowserPage {
 
     private final AccountRenderer accountRenderer;
 
-    private final ContactListRenderer contactListRenderer;
+    private final StateRenderer contactListRenderer;
 
     private final MainPageBrowserFunctions mainPageBrowserFunctions;
 
     private final ContactSpecificBrowserFunctions contactSpecificBrowserFunctions;
 
     public MainPage(AccountRenderer accountRenderer,
-        ContactListRenderer contactListRenderer,
+        StateRenderer contactListRenderer,
         MainPageBrowserFunctions mainPageBrowserFunctions,
         ContactSpecificBrowserFunctions contactSpecificBrowserFunctions) {
         this.accountRenderer = accountRenderer;

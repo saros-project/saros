@@ -6,9 +6,9 @@ import java.util.List;
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.dpp.HTMLUIStrings;
 import de.fu_berlin.inf.dpp.ui.browser_functions.SessionWizardPageBrowserFunctions;
-import de.fu_berlin.inf.dpp.ui.renderer.ContactListRenderer;
 import de.fu_berlin.inf.dpp.ui.renderer.ProjectListRenderer;
 import de.fu_berlin.inf.dpp.ui.renderer.Renderer;
+import de.fu_berlin.inf.dpp.ui.renderer.StateRenderer;
 
 /**
  * Represents the Saros Session invitation Wizard. This wizard is used to start
@@ -17,17 +17,17 @@ import de.fu_berlin.inf.dpp.ui.renderer.Renderer;
 public class SessionWizardPage implements BrowserPage {
 
     public static final String WEB_PAGE = "html/dist/start-session-wizard.html";
-
-    private final Renderer contactListRenderer;
+    
+    private final Renderer stateRenderer;
 
     private final ProjectListRenderer projectListRenderer;
 
     private final SessionWizardPageBrowserFunctions browserFunctions;
 
-    public SessionWizardPage(ContactListRenderer contactListRenderer,
+    public SessionWizardPage(StateRenderer stateRenderer,
         ProjectListRenderer projectListRenderer,
         SessionWizardPageBrowserFunctions browserFunctions) {
-        this.contactListRenderer = contactListRenderer;
+        this.stateRenderer = stateRenderer;
         this.projectListRenderer = projectListRenderer;
         this.browserFunctions = browserFunctions;
     }
@@ -38,7 +38,9 @@ public class SessionWizardPage implements BrowserPage {
     }
 
     @Override
-    public String getTitle() { return HTMLUIStrings.START_SESSION_WIZARD_TITLE; }
+    public String getTitle() {
+        return HTMLUIStrings.START_SESSION_WIZARD_TITLE;
+    }
 
     @Override
     public List<JavascriptFunction> getJavascriptFunctions() {
@@ -47,6 +49,6 @@ public class SessionWizardPage implements BrowserPage {
 
     @Override
     public List<Renderer> getRenderer() {
-        return Arrays.asList(contactListRenderer, projectListRenderer);
+        return Arrays.asList(stateRenderer, projectListRenderer);
     }
 }
