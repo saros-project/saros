@@ -37,7 +37,7 @@ public class JID implements Serializable {
     private static final long serialVersionUID = 4830741516870940459L;
 
     private static final Pattern userAtHostPattern = Pattern.compile(
-        "^[A-Z0-9._%+-]+@[A-Z0-9.-]+$", Pattern.CASE_INSENSITIVE);
+        "^[A-Z0-9._%#+-]+@[A-Z0-9.-]+$", Pattern.CASE_INSENSITIVE);
 
     private final String jid;
 
