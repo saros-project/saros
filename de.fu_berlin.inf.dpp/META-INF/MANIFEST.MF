@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: de.fu_berlin.inf.dpp;singleton:=true
-Bundle-Version: 13.12.6
+Bundle-Version: 13.12.6.1
 Bundle-Activator: de.fu_berlin.inf.dpp.Saros
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
