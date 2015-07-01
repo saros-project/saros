@@ -23,32 +23,60 @@
 package de.fu_berlin.inf.dpp.intellij.ui.util;
 
 import org.apache.log4j.Logger;
+import org.picocontainer.annotations.Inject;
+
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationDisplayType;
+import com.intellij.notification.NotificationGroup;
+import com.intellij.notification.NotificationType;
+import com.intellij.notification.Notifications;
+import com.intellij.openapi.application.ApplicationManager;
+
+import de.fu_berlin.inf.dpp.SarosPluginContext;
+import de.fu_berlin.inf.dpp.core.Saros;
 
 /**
- * Class should use IntelliJ API to show notifications
+ * Class uses IntelliJ API to show notifications
  */
-//todo: make implementation
 public class NotificationPanel {
     private static final Logger LOG = Logger.getLogger(NotificationPanel.class);
+
+    public static final String GROUP_NOTIFICATION_ID = "sarosNotification";
+    public static final NotificationGroup GROUP_DISPLAY_ID_INFO = new NotificationGroup(
+        GROUP_NOTIFICATION_ID, NotificationDisplayType.BALLOON, true);
+
+    @Inject
+    private static Saros saros;
+
+    static {
+        SarosPluginContext.initComponent(new NotificationPanel());
+    }
 
     private NotificationPanel() {
     }
 
     /**
      * Dispaly the Notification.
-     * TODO: Implement
+     *
+     * TODO: Move to core
+     * TODO: Add different types of notification
      *
      * @param message
+     *            content of the notification
      * @param title
+     *            title of the notification.
      */
     public static void showNotification(String message, String title) {
-        LOG.info("Notification: " + title + ", " + message);
-    }
+        final Notification notification = GROUP_DISPLAY_ID_INFO
+            .createNotification(title, message, NotificationType.INFORMATION,
+                null);
+        ApplicationManager.getApplication().invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                Notifications.Bus.notify(notification, saros.getProject());
+            }
+        });
 
-    /**
-     * Clears all notifications.
-     */
-    public static void clearNotifications() {
-        //todo: implement it
+        LOG.info("Notification: " + title + ", " + message);
     }
 }
