@@ -19,7 +19,6 @@
  */
 package de.fu_berlin.inf.dpp.session;
 
-import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 /**
@@ -77,23 +76,6 @@ public class User {
     @Deprecated
     public JID getJID() {
         return jid;
-    }
-
-    /**
-     * Returns the nickname of the user as saved in the XMPP server's roster.
-     * 
-     * TODO Move outta here.
-     * 
-     * @return the nickname of the user
-     */
-    public String getNickname() {
-        String nickname = XMPPUtils.getNickname(null, jid);
-
-        if (nickname == null) {
-            return jid.getBase();
-        }
-
-        return nickname;
     }
 
     /**

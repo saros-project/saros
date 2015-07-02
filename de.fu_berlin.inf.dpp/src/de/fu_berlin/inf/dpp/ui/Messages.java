@@ -132,6 +132,9 @@ public class Messages extends NLS {
     public static String ConsistencyAction_title_inconsistency_deteced;
     public static String ConsistencyAction_tooltip_inconsistency_detected;
     public static String ConsistencyAction_tooltip_no_inconsistency;
+
+    public static String ContributionAnnotation_text_contributed_by;
+
     public static String CreateXMPPAccountWizard_already_connected;
     public static String CreateXMPPAccountWizard_already_connected_text;
     public static String CreateXMPPAccountWizard_title;
@@ -217,6 +220,9 @@ public class Messages extends NLS {
     public static String LeaveSessionAction_stop_session_tooltip;
     public static String LocalPresenceTracker_eclipse_active;
     public static String LocalPresenceTracker_eclipse_background;
+
+    public static String RemoteProgress_observing_progress_for;
+
     public static String SarosUI_permission_canceled;
     public static String SarosUI_permission_canceled_text;
     public static String SarosUI_permission_change;
@@ -226,6 +232,9 @@ public class Messages extends NLS {
     public static String SendFileAction_filedialog_text;
     public static String SendFileAction_title;
     public static String SendFileAction_tooltip;
+
+    public static String SelectionAnnotation_cursor_of;
+    public static String SelectionAnnotation_selection_of;
 
     public static String SessionHeaderElement_no_session_running;
     public static String SessionHeaderElement_session;
@@ -407,6 +416,8 @@ public class Messages extends NLS {
     public static String UserStatusChangeHandler_read_only;
     public static String UserStatusChangeHandler_write;
     public static String UserStatusChangeHandler_you_have_now_access;
+
+    public static String ViewportAnnotation_visible_scope_of;
 
     static {
         // initialize resource bundle

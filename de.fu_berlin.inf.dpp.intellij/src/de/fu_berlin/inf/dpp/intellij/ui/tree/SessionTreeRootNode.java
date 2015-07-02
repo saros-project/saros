@@ -34,6 +34,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
 import de.fu_berlin.inf.dpp.session.User;
+import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 import org.picocontainer.annotations.Inject;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -225,7 +226,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
         private final ISarosSession session;
 
         private SessionInfo(ISarosSession session) {
-            super(session.getHost().getNickname(),
+            super(ModelFormatUtils.getDisplayName(session.getHost()),
                 IconManager.CONTACT_ONLINE_ICON);
             this.session = session;
         }
@@ -244,7 +245,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
         private final User user;
 
         public UserInfo(User user) {
-            super(user.getNickname(), IconManager.CONTACT_ONLINE_ICON);
+            super(ModelFormatUtils.getDisplayName(user), IconManager.CONTACT_ONLINE_ICON);
             this.user = user;
         }
 

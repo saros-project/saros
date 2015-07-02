@@ -28,6 +28,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
 import de.fu_berlin.inf.dpp.session.User;
+import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import org.picocontainer.annotations.Inject;
 
@@ -115,7 +116,7 @@ public class FollowModeAction extends AbstractSarosAction {
         }
 
         for (User user : getCurrentRemoteSessionUsers()) {
-            String myUserName = user.getNickname();
+            String myUserName = ModelFormatUtils.getDisplayName(user);
             if (myUserName.equalsIgnoreCase(userName)) {
                 return user;
             }

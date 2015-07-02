@@ -36,13 +36,14 @@ import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorHandler;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
-import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
 import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
 import de.fu_berlin.inf.dpp.session.User;
+import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -306,8 +307,8 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer {
             filesRemaining.set(pathsOfHandledFiles.size());
 
             remoteProgress.beginTask(
-                "Consistency recovery for user " + currentSession.getLocalUser()
-                    .getNickname(), filesRemaining.get()
+                "Consistency recovery for user " + ModelFormatUtils.getDisplayName(
+                    currentSession.getLocalUser()), filesRemaining.get()
             );
 
             fireActivity(

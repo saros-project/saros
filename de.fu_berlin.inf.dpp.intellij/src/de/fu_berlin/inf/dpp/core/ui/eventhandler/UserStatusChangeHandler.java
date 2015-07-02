@@ -25,14 +25,13 @@ package de.fu_berlin.inf.dpp.core.ui.eventhandler;
 import de.fu_berlin.inf.dpp.core.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.intellij.ui.Messages;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
-import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
 import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
 import de.fu_berlin.inf.dpp.session.User;
-
-import java.text.MessageFormat;
+import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 
 /**
  * Simple handler that informs the local user of the status changes for users in
@@ -48,23 +47,20 @@ public class UserStatusChangeHandler {
             if (user.isLocal()) {
                 NotificationPanel.showNotification(
                     Messages.UserStatusChangeHandler_permission_changed,
-                    MessageFormat.format(
-                        Messages.UserStatusChangeHandler_you_have_now_access,
-                        user.getNickname(), user.hasWriteAccess() ?
-                            Messages.UserStatusChangeHandler_write :
-                            Messages.UserStatusChangeHandler_read_only
-                    )
-                );
+                    ModelFormatUtils
+                        .format(
+                            Messages.UserStatusChangeHandler_you_have_now_access,
+                            user,
+                            user.hasWriteAccess() ? Messages.UserStatusChangeHandler_write
+                                : Messages.UserStatusChangeHandler_read_only));
             } else {
                 NotificationPanel.showNotification(
                     Messages.UserStatusChangeHandler_permission_changed,
-                    MessageFormat.format(
+                    ModelFormatUtils.format(
                         Messages.UserStatusChangeHandler_he_has_now_access,
-                        user.getNickname(), user.hasWriteAccess() ?
-                            Messages.UserStatusChangeHandler_write :
-                            Messages.UserStatusChangeHandler_read_only
-                    )
-                );
+                        user,
+                        user.hasWriteAccess() ? Messages.UserStatusChangeHandler_write
+                            : Messages.UserStatusChangeHandler_read_only));
 
             }
         }
@@ -73,21 +69,17 @@ public class UserStatusChangeHandler {
         public void userJoined(User user) {
 
             NotificationPanel
-                .showNotification(Messages.UserStatusChangeHandler_user_joined,
-                    MessageFormat.format(
-                        Messages.UserStatusChangeHandler_user_joined_text,
-                        user.getNickname())
-                );
+                .showNotification(Messages.UserStatusChangeHandler_user_joined, ModelFormatUtils
+                    .format(Messages.UserStatusChangeHandler_user_joined_text,
+                        user));
         }
 
         @Override
         public void userLeft(User user) {
             NotificationPanel
-                .showNotification(Messages.UserStatusChangeHandler_user_left,
-                    MessageFormat
-                        .format(Messages.UserStatusChangeHandler_user_left_text,
-                            user.getNickname())
-                );
+                .showNotification(Messages.UserStatusChangeHandler_user_left, ModelFormatUtils
+                    .format(Messages.UserStatusChangeHandler_user_left_text,
+                        user));
         }
     };
     private final ISarosSessionListener sessionListener = new NullSarosSessionListener() {

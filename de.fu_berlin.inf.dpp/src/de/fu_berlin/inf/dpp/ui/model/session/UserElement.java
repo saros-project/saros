@@ -13,6 +13,7 @@ import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.model.TreeContentProvider;
 import de.fu_berlin.inf.dpp.ui.model.TreeElement;
+import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 import de.fu_berlin.inf.dpp.ui.util.SWTBoldStyler;
 
 /**
@@ -80,7 +81,7 @@ public final class UserElement extends TreeElement {
             text.append(Messages.UserElement_host, StyledString.COUNTER_STYLER);
         }
 
-        text.append(user.getNickname());
+        text.append(ModelFormatUtils.getDisplayName(user));
 
         /*
          * Right level
@@ -149,6 +150,25 @@ public final class UserElement extends TreeElement {
 
         UserElement other = (UserElement) obj;
         return user.equals(other.user);
+    }
+
+    public int compareTo(final UserElement other) {
+        final User user1 = this.user;
+        final User user2 = other.user;
+
+        if (user1.equals(user2))
+            return 0;
+
+        if (user1.isHost())
+            return -1;
+
+        if (user2.isHost())
+            return +1;
+
+        String nickname1 = ModelFormatUtils.getDisplayName(user1);
+        String nickname2 = ModelFormatUtils.getDisplayName(user2);
+
+        return nickname1.compareToIgnoreCase(nickname2);
     }
 
 }

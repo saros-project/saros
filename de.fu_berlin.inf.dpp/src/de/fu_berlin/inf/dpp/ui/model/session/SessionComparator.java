@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.ui.model.session;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 
-import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.model.HeaderElement;
 import de.fu_berlin.inf.dpp.ui.model.ITreeElement;
 
@@ -37,19 +36,7 @@ public class SessionComparator extends ViewerComparator {
          * Compares session part
          */
         if (e1 instanceof UserElement && e2 instanceof UserElement) {
-            final User user1 = ((UserElement) e1).getUser();
-            final User user2 = ((UserElement) e2).getUser();
-
-            if (user1.equals(user2))
-                return 0;
-
-            if (user1.isHost())
-                return -1;
-
-            if (user2.isHost())
-                return +1;
-
-            return user1.getNickname().compareToIgnoreCase(user2.getNickname());
+            return ((UserElement) e1).compareTo((UserElement) e2);
         }
 
         /*

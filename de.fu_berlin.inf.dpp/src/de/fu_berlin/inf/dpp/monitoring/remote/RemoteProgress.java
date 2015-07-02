@@ -13,6 +13,8 @@ import org.eclipse.core.runtime.jobs.Job;
 import de.fu_berlin.inf.dpp.activities.ProgressActivity;
 import de.fu_berlin.inf.dpp.activities.ProgressActivity.ProgressAction;
 import de.fu_berlin.inf.dpp.session.User;
+import de.fu_berlin.inf.dpp.ui.Messages;
+import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 
 /**
  * A remote progress represents a progress dialog being shown locally which is
@@ -62,8 +64,8 @@ final class RemoteProgress {
 
         started = true;
 
-        final Job job = new Job("Observing remote progress for "
-            + source.getNickname()) {
+        final Job job = new Job(ModelFormatUtils.format(
+            Messages.RemoteProgress_observing_progress_for, source)) {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                 try {

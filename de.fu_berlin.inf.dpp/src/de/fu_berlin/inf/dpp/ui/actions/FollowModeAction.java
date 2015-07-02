@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -35,6 +34,7 @@ import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
+import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 
@@ -325,7 +325,7 @@ public class FollowModeAction extends Action implements IMenuCreator,
     }
 
     private String getFollowUserMessage(User user) {
-        return MessageFormat.format(Messages.FollowModeAction_follow_user,
-            user.getNickname());
+        return ModelFormatUtils.format(Messages.FollowModeAction_follow_user,
+            user);
     }
 }

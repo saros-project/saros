@@ -7,6 +7,7 @@ import de.fu_berlin.inf.dpp.core.monitoring.Status;
 import de.fu_berlin.inf.dpp.intellij.runtime.UIMonitoredJob;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.session.User;
+import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
 
@@ -61,7 +62,7 @@ final class RemoteProgress {
         started = true;
 
         final UIMonitoredJob job = new UIMonitoredJob(
-            "Observing remote progress for " + source.getNickname()) {
+            "Observing remote progress for " + ModelFormatUtils.getDisplayName(source)) {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                 try {

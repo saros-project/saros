@@ -22,6 +22,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
@@ -116,7 +117,7 @@ public class RemoveUserAction extends Action {
                     List<String> userNames = new ArrayList<String>();
 
                     for (User user : users)
-                        userNames.add(user.getNickname());
+                        userNames.add(ModelFormatUtils.getDisplayName(user));
 
                     monitor.beginTask(
                         "Removing user(s): "

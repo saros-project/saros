@@ -20,7 +20,6 @@ package de.fu_berlin.inf.dpp.ui.views;
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -97,6 +96,7 @@ import de.fu_berlin.inf.dpp.ui.model.roster.RosterEntryElement;
 import de.fu_berlin.inf.dpp.ui.sounds.SoundPlayer;
 import de.fu_berlin.inf.dpp.ui.sounds.Sounds;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
+import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.ui.widgets.ConnectionStateComposite;
@@ -673,16 +673,14 @@ public class SarosView extends ViewPart {
         switch (reason) {
         case REMOVED:
             title = Messages.SessionStop_host_removed_you_title;
-            text = MessageFormat.format(
-                Messages.SessionStop_host_removed_you_message,
-                user.getNickname());
+            text = ModelFormatUtils.format(
+                Messages.SessionStop_host_removed_you_message, user);
             break;
 
         case SESSION_CLOSED:
             title = Messages.SessionStop_host_closed_session_title;
-            text = MessageFormat.format(
-                Messages.SessionStop_host_closed_session_message,
-                user.getNickname());
+            text = ModelFormatUtils.format(
+                Messages.SessionStop_host_closed_session_message, user);
             break;
         }
 

@@ -6,10 +6,11 @@ import de.fu_berlin.inf.dpp.core.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
 import de.fu_berlin.inf.dpp.session.User;
+import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.PacketListener;
@@ -45,8 +46,7 @@ public class LeaveAndKickHandler {
         @Override
         public void sessionStarted(ISarosSession session) {
             receiver.addPacketListener(leaveExtensionListener,
-                LeaveSessionExtension.PROVIDER.getPacketFilter(session.getID())
-            );
+                LeaveSessionExtension.PROVIDER.getPacketFilter(session.getID()));
 
             receiver.addPacketListener(kickExtensionListener,
                 KickUserExtension.PROVIDER.getPacketFilter(session.getID()));
@@ -83,7 +83,7 @@ public class LeaveAndKickHandler {
         }
 
         stopSession(sarosSession, "Removed from the session",
-            user.getNickname() + " removed you from the current session.");
+            ModelFormatUtils.getDisplayName(user) + " removed you from the current session.");
     }
 
     private void leaveReceived(JID from) {
@@ -113,7 +113,8 @@ public class LeaveAndKickHandler {
          */
         if (user.isHost()) {
             stopSession(sarosSession, "Closing the session",
-                "Session was closed by inviter " + user.getNickname() + ".");
+                "Session was closed by inviter " + ModelFormatUtils.getDisplayName(
+                    user) + ".");
 
         }
 

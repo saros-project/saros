@@ -52,6 +52,7 @@ import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.sounds.SoundPlayer;
 import de.fu_berlin.inf.dpp.ui.sounds.Sounds;
+import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.ExplanationComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.events.CharacterEnteredEvent;
@@ -658,7 +659,7 @@ public final class ChatControl extends Composite {
                         final User user = session.getUser(rqJID);
 
                         if (user != null)
-                            return user.getNickname();
+                            return ModelFormatUtils.getDisplayName(user);
                     }
                 }
             }
