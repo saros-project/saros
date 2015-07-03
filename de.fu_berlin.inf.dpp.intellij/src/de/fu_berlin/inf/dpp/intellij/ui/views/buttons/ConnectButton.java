@@ -23,9 +23,9 @@
 package de.fu_berlin.inf.dpp.intellij.ui.views.buttons;
 
 import com.intellij.openapi.ui.Messages;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.account.XMPPAccount;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.AbstractSarosAction;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.ConnectServerAction;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.DisconnectServerAction;
@@ -43,7 +43,7 @@ import java.awt.event.ActionListener;
  * Implementation of connect XMPP/jabber server button
  */
 public class ConnectButton extends ToolbarButton {
-    public static final String CONNECT_ICON_PATH = "icons/elcl16/connect.png";
+    public static final String CONNECT_ICON_PATH = "/icons/famfamfam/connect.png";
 
     private static final Logger LOG = Logger.getLogger(ConnectButton.class);
 

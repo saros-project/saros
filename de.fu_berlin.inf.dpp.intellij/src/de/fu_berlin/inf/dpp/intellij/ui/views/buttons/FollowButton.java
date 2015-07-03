@@ -48,7 +48,7 @@ import java.awt.event.ActionListener;
  * from.
  */
 public class FollowButton extends ToolbarButton {
-    private static final String FOLLOW_ICON_PATH = "icons/ovr16/followmode.png";
+    private static final String FOLLOW_ICON_PATH = "/icons/famfamfam/followmode.png";
     private JPopupMenu popupMenu;
     private final FollowModeAction followModeAction;
 

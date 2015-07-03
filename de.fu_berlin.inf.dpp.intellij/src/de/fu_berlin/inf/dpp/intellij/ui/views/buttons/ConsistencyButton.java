@@ -52,8 +52,8 @@ import java.util.Set;
 public class ConsistencyButton extends ToolbarButton {
     private static final Logger LOG = Logger.getLogger(ConsistencyButton.class);
 
-    private static final String IN_SYNC_ICON_PATH = "icons/etool16/in_sync.png";
-    private static final String OUT_SYNC_ICON_PATH = "icons/etool16/out_sync.png";
+    private static final String IN_SYNC_ICON_PATH = "/icons/famfamfam/in_sync.png";
+    private static final String OUT_SYNC_ICON_PATH = "/icons/famfamfam/out_sync.png";
 
     private final ActionListener actionListener = new ActionListener() {
         @Override
