@@ -19,6 +19,7 @@
 	<property name="lib.dir" value="${basedir}/lib" />
 	<property name="build.dir" value="${basedir}/build" />
 	<property name="report.dir" value="${basedir}/report" />
+	<property name="junit.report.dir" value="${report.dir}/junit" />
 	<property name="findbugs.report.dir" value="${report.dir}/findbugs" />
 	<property name="findbugs.reportfile" value="${findbugs.report.dir}/findbugs.xml" />
 	<property name="pmd.report.dir" value="${report.dir}/pmd" />
@@ -29,6 +30,12 @@
 
 	<!-- PMD setup stuff -->
 	<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask"/>
+
+	<ant4eclipse:jdtClassPathLibrary name="org.eclipse.jdt.junit.JUNIT_CONTAINER/4">
+		  <fileset dir="${eclipse.dir}">
+			<include name="**/junit.jar"/>
+		  </fileset>
+	</ant4eclipse:jdtClassPathLibrary >
 
 	<ant4eclipse:targetPlatform id="osgi-swt">
 		<!-- additional.plugin.dir is auto. expanded to additional.plugin.dir/plugins by this task -->
@@ -44,6 +51,7 @@
 		<delete dir="${findbugs.report.dir}" />
 		<delete file="${pmd.reportfile}" />
 		<delete dir="${pmd.report.dir}" />
+		<delete dir="${junit.report.dir}" />
 		<delete dir="${report.dir}" />
 	</target>
 
@@ -52,8 +60,51 @@
 		<buildPlugin workspaceDirectory="${workspaceDirectory}" projectName="${plugin.name}" targetplatformid="osgi-swt" destination="${build.dir}" />
 	</target>
 
-	<target name="test">
-		<echo message="NYI TBD"/>
+	<target name="test" depends="build">
+		<mkdir dir="${junit.report.dir}" />
+
+		<junit printsummary="yes" fork="yes" forkmode="once">
+
+			<classpath>
+				
+				<fileset dir="${build.dir}/plugins">
+					<include name="*.jar" />
+				</fileset>
+
+				<!-- include the test lib directory first because of some library issues -->
+				<fileset erroronmissingdir="false" dir="${test.lib.dir}" />
+				<fileset erroronmissingdir="false" dir="${lib.dir}" />
+
+				<!-- ant4eclipse's buildPlugin-task finds the core jar file automatically in the workspace.
+				However, this does not work for testing, so we amend the classpath accordingly. --> 
+				<fileset dir="${workspaceDirectory}/de.fu_berlin.inf.dpp.core/build/plugins">
+					<include name="*.jar" />
+				</fileset>
+			
+				<!-- HACK: as the normal class loader cannot find jars inside a jar file -->
+				<fileset dir="${workspaceDirectory}/de.fu_berlin.inf.dpp.core/lib">
+					<include name="*.jar" />
+				</fileset>
+
+				<!-- as the class files from the junit core folder are not included include them -->
+				<dirset  dir="${workspaceDirectory}/de.fu_berlin.inf.dpp.core/bin_test" />
+
+				<fileset dir="${eclipse.dir}/plugins">
+					<include name="*.jar" />
+				</fileset>
+
+			</classpath>
+				
+			<formatter type="xml" />
+			
+			<batchtest todir="${junit.report.dir}">
+				<fileset dir="${src.test.dir}">
+					<exclude name="**/Abstract*.java"/>
+					<exclude name="**/*PluginTest.java"/>
+					<include name="**/*Test.java"/>
+				</fileset>
+			</batchtest>
+		</junit>
 	</target>
 
 	<target name="analyze" depends="findbugs,pmd" />
