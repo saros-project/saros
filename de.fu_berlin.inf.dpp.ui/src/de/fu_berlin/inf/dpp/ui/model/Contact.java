@@ -5,7 +5,6 @@ import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.RosterPacket;
 
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 /**
  * Represent an entry in a contact list.
@@ -30,7 +29,7 @@ public class Contact {
      * @param addition
      *            a string containing subscription status
      * @param jid
-     *            a string that represents the {@link jid}
+     *            a string that represents the {@link #jid}
      */
     public Contact(String displayName, String presence, String addition,
         String jid) {

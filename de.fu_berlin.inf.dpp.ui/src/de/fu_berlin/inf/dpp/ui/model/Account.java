@@ -3,12 +3,11 @@ package de.fu_berlin.inf.dpp.ui.model;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 /**
- * Represents a Saros account of the user.
- * In contrast {@link de.fu_berlin.inf.dpp.ui.model.Contact}
- * represents user in the contact list of an account.
- *
+ * Represents a Saros account of the user. In contrast, {@link Contact}
+ * represents user in the contact list of such an account.
+ * 
  * This class is immutable.
- *
+ * 
  * Maybe in the future both classes will be merged.
  */
 public class Account {
@@ -19,8 +18,10 @@ public class Account {
     private final JID jid;
 
     /**
-     * @param username the username of the XMPP account
-     * @param domain the domain part of the XMPP account
+     * @param username
+     *            the username of the XMPP account
+     * @param domain
+     *            the domain part of the XMPP account
      */
     public Account(String username, String domain) {
         this.username = username;
@@ -29,7 +30,8 @@ public class Account {
     }
 
     /**
-     * @param jid the jid as string
+     * @param jid
+     *            the jid as string
      */
     public Account(String jid) {
         this.jid = new JID(jid);
@@ -45,5 +47,7 @@ public class Account {
         return domain;
     }
 
-    public String getBareJid() { return jid.getRAW(); }
+    public String getBareJid() {
+        return jid.getBareJID().toString();
+    }
 }
