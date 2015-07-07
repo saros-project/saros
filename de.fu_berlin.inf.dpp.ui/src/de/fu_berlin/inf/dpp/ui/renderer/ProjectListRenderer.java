@@ -50,6 +50,7 @@ public class ProjectListRenderer extends Renderer {
         try {
             projectListManager.createAndMapProjectModels();
         } catch (IOException e) {
+            LOG.error("Failed to load workspace resources: ", e);
             browser.run("SarosApi.trigger(‘showError’," + ERROR_MSG + ")");
         }
 

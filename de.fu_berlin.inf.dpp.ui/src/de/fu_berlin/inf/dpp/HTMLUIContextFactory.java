@@ -13,6 +13,7 @@ import de.fu_berlin.inf.dpp.ui.core_facades.ContactListFacade;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.BrowserCreator;
 import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
 import de.fu_berlin.inf.dpp.ui.manager.ContactListManager;
+import de.fu_berlin.inf.dpp.ui.manager.ProjectListManager;
 import de.fu_berlin.inf.dpp.ui.renderer.AccountRenderer;
 import de.fu_berlin.inf.dpp.ui.renderer.ContactListRenderer;
 import de.fu_berlin.inf.dpp.ui.renderer.ProjectListRenderer;
@@ -36,19 +37,24 @@ public class HTMLUIContextFactory extends AbstractSarosContextFactory {
     public void createComponents(MutablePicoContainer container) {
 
         Component[] components = new Component[] {
+            // Pages
             Component.create(MainPage.class),
             Component.create(AddAccountPage.class),
             Component.create(SessionWizardPage.class),
+            // Facades and Manager
             Component.create(ContactListFacade.class),
             Component.create(AccountStoreFacade.class),
             Component.create(ContactListManager.class),
             Component.create(BrowserManager.class),
             Component.create(BrowserCreator.class),
+            // Renderer
             Component.create(ContactListRenderer.class),
             Component.create(AccountRenderer.class),
             Component.create(ProjectListRenderer.class),
+            // Browserfunctions
             Component.create(AddAccountBrowserFunctions.class),
             Component.create(AddContactBrowserFunctions.class),
+            Component.create(ProjectListManager.class),
             Component.create(MainPageBrowserFunctions.class),
             Component.create(SessionWizardPageBrowserFunctions.class) };
 
