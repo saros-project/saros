@@ -60,7 +60,7 @@
 		<buildPlugin workspaceDirectory="${workspaceDirectory}" projectName="${plugin.name}" targetplatformid="osgi-swt" destination="${build.dir}" />
 	</target>
 
-	<target name="test" depends="build">
+	<target name="test">
 		<mkdir dir="${junit.report.dir}" />
 
 		<junit printsummary="yes" fork="yes" forkmode="once">
@@ -88,10 +88,6 @@
 
 				<!-- as the class files from the junit core folder are not included include them -->
 				<dirset  dir="${workspaceDirectory}/de.fu_berlin.inf.dpp.core/bin_test" />
-
-				<fileset dir="${eclipse.dir}/plugins">
-					<include name="*.jar" />
-				</fileset>
 
 			</classpath>
 				
