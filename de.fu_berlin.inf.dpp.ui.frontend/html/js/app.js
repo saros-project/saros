@@ -36,7 +36,7 @@ app.extend({
             case 'main-page':
                 
                 new MainPage({
-                    el: document.body,
+                    el: document.getElementById('saros'),
                     model: this.state
                 });
                 break;
