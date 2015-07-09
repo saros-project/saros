@@ -33,14 +33,15 @@ app.extend({
 
         this.listenTo(SarosApi, 'showError', this.showError);
 
+        var appContainer = document.getElementById('saros');
         // Decide which view to render.
         // the `page` property is set directly in the .html file.
         switch (this.page) {
 
             case 'main-page':
-                
+
                 new MainPage({
-                    el: document.getElementById('saros'),
+                    el: appContainer,
                     model: this.state
                 });
                 break;
@@ -48,25 +49,25 @@ app.extend({
             case 'start-session-wizard':
 
                 new StartSessionWizard({
-                    el: document.getElementById('saros')
+                    el: appContainer
                 });
                 break;
         }
     },
     showError: function(message) {
 
-    	// TODO: introduce dedicated model?
-    	var model = AmpersandState.extend({
-    		props: {
-    			message: 'string'
-    		}
-    	});
+        // TODO: introduce dedicated model?
+        var model = AmpersandState.extend({
+            props: {
+                message: 'string'
+            }
+        });
 
-    	new ErrorDialog({
-    		model: new model({
-    			message: message
-    		})
-    	});
+        new ErrorDialog({
+            model: new model({
+                message: message
+            })
+        });
     }
 });
 

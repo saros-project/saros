@@ -29,7 +29,7 @@ module.exports = AmpersandView.extend({
             prepareView: function(el) {
                 return new ContactsView({
                     el: el,
-                    collection: app.contacts
+                    collection: app.state.contactList
                 });
             }
         }        

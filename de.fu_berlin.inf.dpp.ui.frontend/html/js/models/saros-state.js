@@ -1,7 +1,17 @@
 var AmpersandModel = require('ampersand-model');
 var Account = require('./account');
+var Contacts = require('./contacts');
 var dictionary = require('../dictionary');
 var SarosApi = require('../saros-api');
+
+// Private mapping of connection states.
+// Must correspond with the data given from the backend.
+var CS = {
+    CONNECTED: 'CONNECTED',
+    NOT_CONNECTED: 'NOT_CONNECTED',
+    CONNECTING: 'CONNECTING',
+    DISCONNECTING: 'DISCONNECTING'
+};
 
 module.exports = AmpersandModel.extend({
     initialize: function() {
@@ -11,6 +21,13 @@ module.exports = AmpersandModel.extend({
         SarosApi.on('updateState', function(data) {
 
             self.set(data);
+
+            // If there is an active account, it must explicitly set.
+            // Via the previous set operation it is not added as an
+            // `Account` model but only as plain JSON.
+            if (data.activeAccount) {
+                self.set('activeAccount', new Account(data.activeAccount));
+            }
         });
     },
 
@@ -24,23 +41,55 @@ module.exports = AmpersandModel.extend({
             }
         },
 
-        isConnected: {
-            type: 'boolean',
-            default: false
-        },
-
-        isConnecting: {
-            type: 'boolean',
-            default: false
-        },
-
-        isDisconnecting: {
-            type: 'boolean',
-            default: false
+        connectionState: {
+            type: {
+                type: 'string',
+                values: [
+                    CS.CONNECTED, 
+                    CS.NOT_CONNECTED,
+                    CS.CONNECTING,
+                    CS.DISCONNECTING
+                ]
+            },
+            default: CS.NOT_CONNECTED
         }
     },
 
+    collections: {
+
+        contactList: Contacts
+    },
+
     derived: {
+
+        isConnected: {
+            deps: ['connectionState'],
+            fn: function() {
+
+                return this.connectionState == CS.CONNECTED;
+            }
+        },
+
+        isBusy: {
+            deps: ['connectionState'],
+            fn: function() {
+
+                return this.connectionState == CS.CONNECTING || this.connectionState == CS.DISCONNECTING;
+            }
+        },
+
+        isReady: {
+            deps: ['isBusy', 'activeAccount'],
+            fn: function() {
+
+                // Checks whether there is an active account
+                if (!this.activeAccount.jid) {
+                    return false;
+                }
+
+                return !this.isBusy;
+            }
+        },        
 
         activeAccountLabel: {
             deps: ['activeAccount.jid'],
@@ -54,38 +103,22 @@ module.exports = AmpersandModel.extend({
         },
 
         connectionStateLabel: {
-            deps: ['isConnected', 'isConnecting', 'isDisconnecting'],
+            deps: ['connectionState'],
             fn: function() {
 
-                if (this.isDisconnecting) {
+                if (this.connectionState == CS.DISCONNECTING) {
                     return dictionary.action.disconnecting;
-                } else if (this.isConnecting) {
+                } 
+
+                if (this.connectionState == CS.CONNECTING) {
                     return dictionary.action.connecting;
-                } else if (this.isConnected) {
+                } 
+
+                if (this.connectionState == CS.CONNECTED) {
                     return dictionary.action.disconnect;
                 }
+
                 return dictionary.action.connect;
-            }
-        },
-
-        isBusy: {
-            deps: ['isConnecting', 'isDisconnecting'],
-            fn: function() {
-
-                return !this.isConnecting && !this.isDisconnecting;
-            }
-        },
-
-        isReady: {
-            deps: ['isBusy', 'activeAccount'],
-            fn: function() {
-
-                // Checks whether there is an active account
-                if (!this.activeAccount.jid) {
-                    return false;
-                }
-
-                return this.isBusy;
             }
         }
     },
@@ -103,10 +136,10 @@ module.exports = AmpersandModel.extend({
     updateConnectionState: function() {
 
         if (this.isConnected) {
-            this.isDisconnecting = true;
+            this.connectionState == CS.DISCONNECTING;
             SarosApi.disconnect();
         } else {
-            this.isConnecting = true;
+            this.connectionState == CS.CONNECTING;
             SarosApi.connect(this.activeAccount.toJSON());
         }
     }

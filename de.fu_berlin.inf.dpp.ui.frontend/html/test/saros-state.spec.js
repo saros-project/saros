@@ -35,7 +35,7 @@ describe('saros-state', function(){
 
             var state = new SarosState();
             state.activateAccount(getDummyAccount());
-            state.isConnecting = true;
+            state.connectionState = 'CONNECTING';
             expect(state.isReady).to.be(false);
         });
 
@@ -43,7 +43,7 @@ describe('saros-state', function(){
 
             var state = new SarosState();
             state.activateAccount(getDummyAccount());
-            state.isDisconnecting = true;
+            state.connectionState = 'DISCONNECTING';
             expect(state.isReady).to.be(false);
         });
     });
