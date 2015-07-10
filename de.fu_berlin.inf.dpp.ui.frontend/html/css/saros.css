@@ -25,6 +25,10 @@ label input {
     font-weight: normal;
 }
 
+.info {
+    margin-bottom: 15px;
+}
+
 .btn-list {
     display: inline-block;
     position: relative;

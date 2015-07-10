@@ -3,7 +3,7 @@ var AmpersandView = require('ampersand-view');
 var templates = require('../templates');
 var AccountsDropdownView = require('../views/accounts-dropdown');
 var ContactsView = require('../views/contacts');
-var AddContactView = require('../views/add-contact');
+var AddContactDialog = require('../views/add-contact-dialog');
 var SarosApi = require('../saros-api');
 var dictionary = require('../dictionary');
 
@@ -61,7 +61,7 @@ module.exports = AmpersandView.extend({
     },
     openAddContactDialog: function() {
 
-        new AddContactView();
+        new AddContactDialog();
     },
     startSession: function() {
 

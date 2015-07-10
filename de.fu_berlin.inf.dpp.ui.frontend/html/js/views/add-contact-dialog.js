@@ -58,6 +58,7 @@ module.exports = AmpersandView.extend({
                         function(val) {
                             
                             var validationResult = SarosApi.validateJid(val);
+
                             if (!validationResult.valid) {
                                 return validationResult.message;
                             }

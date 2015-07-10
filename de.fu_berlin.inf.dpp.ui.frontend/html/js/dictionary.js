@@ -33,6 +33,7 @@ module.exports = {
     'message': {
         'noAccount': 'No account selected',
         'selectProjects': 'Select the projects, folders or files you want to work on. You can choose projects completely or partially.',
-        'selectContacts': 'Select the contacts(s) to work with.'
+        'selectContacts': 'Select the contacts(s) to work with.',
+        'addContactInfo': 'Enter the Jabber Identifier of the contact you want to add.'
     }
 };

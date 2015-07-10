@@ -3,6 +3,9 @@ package de.fu_berlin.inf.dpp.ui.browser_functions;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.gson.Gson;
+import de.fu_berlin.inf.dpp.HTMLUIStrings;
+import de.fu_berlin.inf.dpp.ui.model.ValidationResult;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPException;
 
@@ -32,6 +35,24 @@ public class ContactSpecificBrowserFunctions {
      */
     public List<JavascriptFunction> getJavascriptFunctions() {
         return Arrays.asList(
+            new JavascriptFunction("__java_validateJid") {
+                @Override
+                public Object function(final Object[] arguments) {
+
+                    boolean valid = JID.isValid(new JID((String) arguments[0]));
+                    String message = "";
+
+                    if (!valid) {
+                        message = HTMLUIStrings.INVALID_JID;
+                    }
+
+                    ValidationResult result = new ValidationResult(valid, message);
+                    Gson gson = new Gson();
+
+                    return gson.toJson(result);
+                }
+            },
+            
             new JavascriptFunction("__java_addContact") {
                 @Override
                 public Object function(final Object[] arguments) {

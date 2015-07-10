@@ -47,8 +47,7 @@ var SarosApi = BackboneEvents.mixin({
 
     validateJid: function(jid) {
 
-        // TODO: make __java_validateJid(jid) available
-        return __java_validateJid(jid); // jshint ignore:line
+        return JSON.parse(__java_validateJid(jid)); // jshint ignore:line
     },
      
      showStartSessionWizard: function() {

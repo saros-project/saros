@@ -7,6 +7,7 @@ div.modal
                     h4.modal-title= d.action.addContact
                 form
                     div.modal-body
+                        div.info= d.message.addContactInfo
                         fieldset(data-hook="field-container")
                     div.modal-footer
                         button.btn.btn-default.btn-sm(data-dismiss="modal")= d.action.close
