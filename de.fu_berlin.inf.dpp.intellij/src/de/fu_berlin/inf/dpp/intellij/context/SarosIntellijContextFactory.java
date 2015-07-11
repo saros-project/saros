@@ -16,6 +16,7 @@ import de.fu_berlin.inf.dpp.core.ui.eventhandler.NegotiationHandler;
 import de.fu_berlin.inf.dpp.core.ui.eventhandler.UserStatusChangeHandler;
 import de.fu_berlin.inf.dpp.core.ui.eventhandler.XMPPAuthorizationHandler;
 import de.fu_berlin.inf.dpp.core.util.FileUtils;
+import de.fu_berlin.inf.dpp.core.util.IntelliJCollaborationUtilsImpl;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.filesystem.ChecksumCacheImpl;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
@@ -35,13 +36,14 @@ import de.fu_berlin.inf.dpp.intellij.runtime.IntelliJSynchronizer;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.FollowModeAction;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.LeaveSessionAction;
 import de.fu_berlin.inf.dpp.intellij.ui.swt_browser.IntelliJDialogManager;
-import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.intellij.ui.swt_browser.IntelliJWebResourceLocator;
+import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
-import de.fu_berlin.inf.dpp.ui.ide_embedding.IWebResourceLocator;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
+import de.fu_berlin.inf.dpp.ui.ide_embedding.IWebResourceLocator;
+import de.fu_berlin.inf.dpp.ui.util.ICollaborationUtils;
 
 /**
  * IntelliJ related context
@@ -86,7 +88,10 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
 
         // IDE-specific classes for the HTML GUI
         Component.create(DialogManager.class, IntelliJDialogManager.class),
-        Component.create(IWebResourceLocator.class, IntelliJWebResourceLocator.class),
+        Component.create(IWebResourceLocator.class,
+            IntelliJWebResourceLocator.class),
+        Component.create(ICollaborationUtils.class,
+            IntelliJCollaborationUtilsImpl.class),
 
         // Proxy Support for the XMPP server connection
         Component.create(IProxyResolver.class, NullProxyResolver.class) };
