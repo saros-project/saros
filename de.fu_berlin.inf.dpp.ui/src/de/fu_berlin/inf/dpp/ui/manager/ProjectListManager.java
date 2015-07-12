@@ -21,6 +21,9 @@ import de.fu_berlin.inf.dpp.ui.model.ProjectTreeNode.NodeType;
  * models for the HTML UI. It also provides a mapping of the {@link IProject}
  * and its {@link IResource}s associated with a ProjectTree.
  */
+/**
+ * 
+ */
 public class ProjectListManager {
     private IWorkspaceRoot workspaceRoot;
     private List<ProjectTree> projectModels;
@@ -152,14 +155,17 @@ public class ProjectListManager {
     }
 
     /**
+     * <p>
      * For every given {@link ProjectTree} a map of {@link IProject}:
      * {@link IResource}s will be created. In order to do so a given
      * {@link ProjectTree} is identified by its name, a {@link ProjectTreeNode}
      * will be identified by its path.
-     * 
+     * </p>
+     * <p>
      * If there is no match in the mapping for the given model, an empty map
      * will be created. If {@link #createAndMapProjectModels()} hasn't been
      * called yet this returns a list of empty maps.
+     * </p>
      * 
      * @param projectTreeModels
      *            the list of {@link ProjectTree}s to extract the resources list
@@ -167,12 +173,12 @@ public class ProjectListManager {
      * @return a list of mappings for all found resources from the given
      *         ProjectTreeModel
      */
-    public List<Map<IProject, List<IResource>>> getResourcesToShare(
+    public List<Map<IProject, List<IResource>>> getProjectToResourcesMaps(
         ProjectTree[] projectTreeModels) {
         List<Map<IProject, List<IResource>>> resourcesToShare = new ArrayList<Map<IProject, List<IResource>>>();
 
         for (ProjectTree pTree : projectTreeModels) {
-            resourcesToShare.add(getResources(pTree));
+            resourcesToShare.add(getProjectToResourcesMap(pTree));
         }
         return resourcesToShare;
     }
@@ -185,9 +191,9 @@ public class ProjectListManager {
      * added if it still exist in the workspace.
      * </p>
      * <p>
-     * If there is no match in the mapping for the given model, an empty map
-     * will be created. If {@link #createAndMapProjectModels()} hasn't been
-     * called yet this returns an empty map.
+     * If there is no match in the mapping for the given model, an empty list
+     * will be created. This also return an empty map, if
+     * {@link #createAndMapProjectModels()} hasn't been called yet.
      * </p>
      * 
      * @param projectTree
@@ -196,9 +202,10 @@ public class ProjectListManager {
      * @return a map of resources associated to the given ProjectTreeModel, or
      *         an empty map if no association is present.
      */
-    public Map<IProject, List<IResource>> getResources(ProjectTree projectTree) {
+    public Map<IProject, List<IResource>> getProjectToResourcesMap(
+        ProjectTree projectTree) {
         Map<IProject, List<IResource>> result = new HashMap<IProject, List<IResource>>();
-        IProject project = null;
+        IProject project;
         List<IResource> resources = new ArrayList<IResource>();
 
         for (ProjectTree pTree : this.projectModels) {
@@ -220,8 +227,80 @@ public class ProjectListManager {
                 return result;
             }
         }
-        // No match was found
         return result;
+    }
+
+    /**
+     * <p>
+     * For every given {@link ProjectTree} a list of {@link IProject}:
+     * {@link IResource}s will be created and added to the return list. In order
+     * to do so a given {@link ProjectTree} is identified by its name, a
+     * {@link ProjectTreeNode} will be identified by its path.
+     * </p>
+     * 
+     * <p>
+     * If there is no match in the mapping for a given {@link ProjectTree},
+     * nothing will be added. If {@link #createAndMapProjectModels()} hasn't
+     * been called yet this returns a empty list.
+     * </p>
+     * 
+     * @param projectTreeModels
+     *            the list of {@link ProjectTree}s to extract the resources list
+     *            from
+     * @return a list of mappings for all found resources from the given
+     *         ProjectTreeModel
+     */
+    public List<IResource> getAllResources(ProjectTree[] projectTreeModels) {
+        List<IResource> resourcesToShare = new ArrayList<IResource>();
+
+        for (ProjectTree pTree : projectTreeModels) {
+            if (!getResources(pTree).isEmpty()) {
+                resourcesToShare.addAll(getResources(pTree));
+            }
+        }
+        return resourcesToShare;
+    }
+
+    /**
+     * <p>
+     * This will create a list of all {@link IResource}s for the given
+     * ProjectTree. {@link ProjectTree} is identified by it's name , a
+     * {@link ProjectTreeNode} is identified by it's path. The resource is only
+     * added if it still exist in the workspace.
+     * </p>
+     * <p>
+     * If there is no match in the mapping for the given model, an empty list
+     * will be created. This also return an empty list, if
+     * {@link #createAndMapProjectModels()} hasn't been called yet.
+     * </p>
+     * 
+     * @param projectTree
+     *            the {@link ProjectTree}'s to extract the resource list from
+     * 
+     * @return a list of resources associated to the given ProjectTreeModel, or
+     *         an empty map if no association is present.
+     */
+    public List<IResource> getResources(ProjectTree projectTree) {
+        List<IResource> resources = new ArrayList<IResource>();
+
+        for (ProjectTree pTree : this.projectModels) {
+            if (projectNameToProject.containsKey(pTree.getProjectName())) {
+                List<ProjectTreeNode> nodes = new ArrayList<ProjectTreeNode>();
+                getNodes(projectTree.getRoot(), nodes);
+
+                for (ProjectTreeNode node : nodes) {
+                    if (pathToResource.containsKey(node.getPath())) {
+                        IResource resource = pathToResource.get(node.getPath());
+                        if (resource.exists()) {
+                            resources.add(resource);
+                        }
+                    }
+                }
+                return resources;
+            }
+        }
+        // No match was found return empty list
+        return resources;
     }
 
     private ProjectTreeNode getNodes(ProjectTreeNode curNode,
