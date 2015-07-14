@@ -29,6 +29,14 @@ label input {
     margin-bottom: 15px;
 }
 
+div.content-container {
+    top: 100px;
+    bottom: 50px;
+    width: 100%;
+    position: absolute;
+    overflow: scroll;
+}
+
 .btn-list {
     display: inline-block;
     position: relative;
@@ -40,15 +48,16 @@ label input {
     margin-left: 10px;
 }
 
-.font-bold {
-    font-weight: bold !important;
+.footer {
+    width: 100%;
+    height: 50px;
+    bottom: 0;
+    position: fixed;
+    padding: 10px;
 }
 
-.footer {
-    bottom: 0;
-    padding: 10px;
-    position: absolute;
-    width: 100%;
+.font-bold {
+    font-weight: bold !important;
 }
 
 /* Bootstrap customization */
@@ -63,6 +72,9 @@ label input {
 }
 
 .navbar {
+    width: 100%;
+    height: 100px;
+    position: fixed;
     padding: 0 10px 10px 10px;
     margin-bottom: 10px;
 }
