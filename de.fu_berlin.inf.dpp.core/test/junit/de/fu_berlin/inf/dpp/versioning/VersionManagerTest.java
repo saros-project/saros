@@ -84,6 +84,20 @@ public class VersionManagerTest {
     }
 
     @Test
+    public void testVersionsSameOnlyQualifierDiffers() {
+
+        Version local = Version.parseVersion("1.1.1.r1");
+        Version remote = Version.parseVersion("1.1.1.r2");
+
+        init(local, remote);
+
+        VersionCompatibilityResult result = versionManagerLocal
+            .determineVersionCompatibility(bobJID);
+
+        assertEquals(Compatibility.OK, result.getCompatibility());
+    }
+
+    @Test
     public void testlocalVersionsTooOld() {
 
         Version local = Version.parseVersion("1.1.1.r1");
