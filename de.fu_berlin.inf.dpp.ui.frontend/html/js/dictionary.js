@@ -13,8 +13,11 @@ module.exports = {
         'connecting': 'Connecting...',
         'disconnecting': 'Disconnecting...',
         'addContact': 'Add Contact...',
+        'renameContact': 'Rename Contact',
+        'deleteContact': 'Delete Contact',
         'close': 'Close',
         'ok': 'Ok',
+        'save': 'Save',
         'cancel': 'Cancel',
         'add': 'Add',
         'next': 'Next',
@@ -32,6 +35,8 @@ module.exports = {
     },
     'message': {
         'noAccount': 'No account selected',
+        'renameContact': 'If no nickname is given, the JID will be displayed: ',
+        'deleteContact': 'Do you really want to delete this contact?',
         'selectProjects': 'Select the projects, folders or files you want to work on. You can choose projects completely or partially.',
         'selectContacts': 'Select the contacts(s) to work with.',
         'addContactInfo': 'Enter the Jabber Identifier of the contact you want to add.'

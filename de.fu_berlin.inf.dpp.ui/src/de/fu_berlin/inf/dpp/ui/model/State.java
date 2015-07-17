@@ -64,7 +64,7 @@ public class State {
 
     /**
      * Re-create the contact list according to the roster.
-     *
+     * 
      * @param roster
      *            the roster used to fill the contact list
      */
@@ -79,8 +79,9 @@ public class State {
     /**
      * Set the currently active account. May be null if there is no account
      * active.
-     *
-     * @param activeAccount the active account or null
+     * 
+     * @param activeAccount
+     *            the active account or null
      */
     public void setAccount(Account activeAccount) {
         this.activeAccount = activeAccount;
@@ -92,7 +93,7 @@ public class State {
 
     /**
      * Returns the active account or null if there is no account active.
-     *
+     * 
      * @return the active account or null
      */
     public Account getActiveAccount() {
@@ -109,16 +110,27 @@ public class State {
 
     /**
      * Adds the roster entries as contact object to a new list.
-     *
+     * 
      * @param roster
      *            the roster
      * @return the list containing the roster entries as contacts
      */
     private List<Contact> createListOfContacts(Roster roster) {
         List<Contact> res = new ArrayList<Contact>(roster.getEntries().size());
-        for (RosterEntry entry : roster.getEntries()) {
-            Presence presence = roster.getPresence(entry.getUser());
-            res.add(Contact.createContact(entry, presence));
+        /*
+         * Buggish SMACK crap at its best ! The entries returned here can be
+         * just plain references (see implementation) so we have to lookup them
+         * correctly !
+         */
+        for (RosterEntry entryReference : roster.getEntries()) {
+            final RosterEntry correctEntry = roster.getEntry(entryReference
+                .getUser());
+
+            if (correctEntry == null)
+                continue;
+
+            Presence presence = roster.getPresence(correctEntry.getUser());
+            res.add(Contact.createContact(correctEntry, presence));
         }
         return res;
     }

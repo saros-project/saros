@@ -1,8 +1,10 @@
-var AmpersandModel = require('ampersand-model');
+var AmpersandState = require('ampersand-state');
+var SarosApi = require('../saros-api');
 
-module.exports = AmpersandModel.extend({
+module.exports = AmpersandState.extend({
     
     props: {
+        jid: ['string', true],
         displayName: ['string', true],
         presence: ['string', true, 'offline'],
         addition: ['string', false, '']
@@ -24,5 +26,21 @@ module.exports = AmpersandModel.extend({
             type: 'boolean',
             default: false
         }
-    }
+    },
+
+    rename: function(displayName) {
+
+        this.displayName = displayName;
+        SarosApi.renameContact(this.jid, this.displayName);
+    },
+
+    delete: function() {
+
+        SarosApi.deleteContact(this.jid);
+    },
+
+    create: function() {
+
+        SarosApi.addContact(this.jid, this.displayName);
+    }    
 });

@@ -1,0 +1,11 @@
+div.modal
+    div.modal-dialog
+        div.modal-content
+                div.modal-header
+                    button.close(data-dismiss="modal", aria-label="Close")
+                        span(aria-hidden="true") &times;
+                    h4.modal-title= d.action.deleteContact
+                div.modal-body= d.message.deleteContact
+                div.modal-footer
+                    button.btn.btn-default.btn-sm(data-dismiss="modal")= d.action.cancel
+                    button.btn.btn-danger.btn-sm(data-hook="delete", type="submit")= d.action.delete

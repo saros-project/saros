@@ -41,8 +41,17 @@ var SarosApi = BackboneEvents.mixin({
 
     addContact: function(jid, displayName) {
 
-        // TODO: nickname in backend
         __java_addContact(jid, displayName); // jshint ignore:line
+    },
+
+    renameContact: function(jid, displayName) {
+
+        __java_renameContact(jid, displayName); // jshint ignore:line
+    },
+
+    deleteContact: function(jid) {
+
+        __java_deleteContact(jid); // jshint ignore:line
     },
 
     validateJid: function(jid) {

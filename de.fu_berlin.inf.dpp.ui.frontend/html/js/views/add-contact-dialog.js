@@ -6,6 +6,7 @@ var AmpersandInputView = require('ampersand-input-view');
 var templates = require('../templates');
 var dictionary = require('../dictionary');
 var SarosApi = require('../saros-api');
+var Contact = require('../models/contact');
 
 module.exports = AmpersandView.extend({
     template: templates.addContactDialog,
@@ -92,7 +93,9 @@ module.exports = AmpersandView.extend({
     },
     addContact: function(contact) {
 
-        SarosApi.addContact(contact.jid, contact.displayName);
+        //SarosApi.addContact(contact.jid, contact.displayName);
+        var contact  = new Contact(contact);
+        contact.create();
         $$(this.el).modal('hide');
     }
 });

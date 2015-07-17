@@ -1,4 +1,4 @@
-var AmpersandModel = require('ampersand-model');
+var AmpersandState = require('ampersand-state');
 var Account = require('./account');
 var Contacts = require('./contacts');
 var dictionary = require('../dictionary');
@@ -13,7 +13,7 @@ var CS = {
     DISCONNECTING: 'DISCONNECTING'
 };
 
-module.exports = AmpersandModel.extend({
+module.exports = AmpersandState.extend({
     initialize: function() {
 
         var self = this;

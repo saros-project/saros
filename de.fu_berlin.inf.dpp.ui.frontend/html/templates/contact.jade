@@ -1,15 +1,8 @@
-li(data-toggle="context", data-target="[data-hook=context-menu]")
-    span(data-hook="display-name")
+li(data-toggle="context")
+    a(href="#" data-hook="display-name")
     span(data-hook="presence")
     div(data-hook="context-menu")
         ul.dropdown-menu(role="menu")
-            li.dropdown-submenu
-                a(href="#")= d.action.workTogetherOn
-                    ul.dropdown-menu
-                        li
-                            a(href="#") projetc1...
-                        li
-                            a(href="#") project2...
             li
                 a(href="#", data-hook="rename")= d.action.rename
             li

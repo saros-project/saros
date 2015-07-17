@@ -15,6 +15,7 @@ var ProjectTrees = require('./models/project-trees');
 // the injected jQuery version from the SWT browser...
 window.$$ = window.jQuery = require('jquery').noConflict(true);
 require('bootstrap');
+require('./vendor/bootstrap-contextmenu');
 require('jstree');
 
 // `SarosApi` must be globally available to enable calls from Java.
