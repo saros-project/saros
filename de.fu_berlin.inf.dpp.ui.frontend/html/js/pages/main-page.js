@@ -48,12 +48,26 @@ module.exports = AmpersandView.extend({
             no: 'disabled',
             hook: 'connection-button'
         },
-        'model.isConnected': {
-            type: 'booleanClass',
-            yes: 'disabled',
-            no: '',
-            selector: '.account'
-        }
+        'model.isConnected': [
+            {
+                type: 'booleanClass',
+                yes: 'disabled',
+                no: '',
+                selector: '.account'
+            },
+            {
+                type: 'booleanClass',
+                yes: '',
+                no: 'disabled',
+                hook: 'add-contact'
+            },
+            {
+                type: 'booleanClass',
+                yes: '',
+                no: 'disabled',
+                hook: 'start-session'
+            }
+        ]
     },
     toggleConnect: function() {
 
