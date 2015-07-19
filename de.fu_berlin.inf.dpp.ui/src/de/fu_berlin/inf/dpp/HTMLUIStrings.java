@@ -5,6 +5,7 @@ package de.fu_berlin.inf.dpp;
  * This class encapsulates all labels, messages, titles, etc. which will be
  * visible in the HTML UI. <br>
  * TODO: Maybe this feature can be implemented more sophisticated in the future.
+ * BrowserFunction PREFIX should not belong here - find a better place
  */
 public class HTMLUIStrings {
 
@@ -20,4 +21,5 @@ public class HTMLUIStrings {
     // error messages
     public static final String START_SESSION_CANCELD = "Couldn't send session invitaion.";
     public static final String INVALID_JID = "The Jabber ID must be in the format user@domain.";
+    public static final String DELETE_CONTACT_FAILED = "Failed to delete the contact";
 }

@@ -4,19 +4,27 @@ import java.util.Arrays;
 
 import org.picocontainer.MutablePicoContainer;
 
-import de.fu_berlin.inf.dpp.ui.browser_functions.AddAccountBrowserFunctions;
-import de.fu_berlin.inf.dpp.ui.browser_functions.ContactSpecificBrowserFunctions;
-import de.fu_berlin.inf.dpp.ui.browser_functions.MainPageBrowserFunctions;
-import de.fu_berlin.inf.dpp.ui.browser_functions.SessionWizardPageBrowserFunctions;
+import de.fu_berlin.inf.dpp.ui.browser_functions.AddContact;
+import de.fu_berlin.inf.dpp.ui.browser_functions.CloseAccountWizard;
+import de.fu_berlin.inf.dpp.ui.browser_functions.CloseSessionInvitationWizard;
+import de.fu_berlin.inf.dpp.ui.browser_functions.ConnectAccount;
+import de.fu_berlin.inf.dpp.ui.browser_functions.DeleteContact;
+import de.fu_berlin.inf.dpp.ui.browser_functions.DisconnectAccount;
+import de.fu_berlin.inf.dpp.ui.browser_functions.GetValidJID;
+import de.fu_berlin.inf.dpp.ui.browser_functions.RenameContact;
+import de.fu_berlin.inf.dpp.ui.browser_functions.SaveAccount;
+import de.fu_berlin.inf.dpp.ui.browser_functions.SendInvitation;
+import de.fu_berlin.inf.dpp.ui.browser_functions.ShowAccountPage;
+import de.fu_berlin.inf.dpp.ui.browser_functions.ShowSessionWizard;
 import de.fu_berlin.inf.dpp.ui.core_facades.AccountStoreFacade;
 import de.fu_berlin.inf.dpp.ui.core_facades.StateFacade;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.BrowserCreator;
 import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
+import de.fu_berlin.inf.dpp.ui.manager.ProjectListManager;
 import de.fu_berlin.inf.dpp.ui.renderer.AccountRenderer;
 import de.fu_berlin.inf.dpp.ui.renderer.ProjectListRenderer;
-import de.fu_berlin.inf.dpp.ui.manager.ProjectListManager;
 import de.fu_berlin.inf.dpp.ui.renderer.StateRenderer;
-import de.fu_berlin.inf.dpp.ui.webpages.AddAccountPage;
+import de.fu_berlin.inf.dpp.ui.webpages.AccountPage;
 import de.fu_berlin.inf.dpp.ui.webpages.MainPage;
 import de.fu_berlin.inf.dpp.ui.webpages.SessionWizardPage;
 
@@ -38,23 +46,49 @@ public class HTMLUIContextFactory extends AbstractSarosContextFactory {
         Component[] components = new Component[] {
             // Pages
             Component.create(MainPage.class),
-            Component.create(AddAccountPage.class),
+            Component.create(AccountPage.class),
             Component.create(SessionWizardPage.class),
-            // Facades and Manager
+            // Facades
             Component.create(StateFacade.class),
             Component.create(AccountStoreFacade.class),
-            Component.create(BrowserManager.class),
+            // IDE_embedding
             Component.create(BrowserCreator.class),
+            // Manager and Helper
+            Component.create(ProjectListManager.class),
+            Component.create(BrowserManager.class),
             // Renderer
             Component.create(StateRenderer.class),
             Component.create(AccountRenderer.class),
             Component.create(ProjectListRenderer.class),
-            // Browserfunctions
-            Component.create(AddAccountBrowserFunctions.class),
-            Component.create(ProjectListManager.class),
-            Component.create(ContactSpecificBrowserFunctions.class),
-            Component.create(MainPageBrowserFunctions.class),
-            Component.create(SessionWizardPageBrowserFunctions.class) };
+            // BrowserFunctions
+            // contact specific
+            Component.create(AddContact.class),
+            Component.create(DeleteContact.class),
+            Component.create(RenameContact.class),
+            // dialog specific
+            Component.create(ShowAccountPage.class),
+            Component.create(CloseAccountWizard.class),
+            Component.create(ShowSessionWizard.class),
+            Component.create(CloseSessionInvitationWizard.class),
+            // TODO: Eliminate inconsistent naming
+            // "ShowAccountPage" <-> "CloseAccountWizard".
+            // "ShowSessionWizard <-> "CloseSessionInvitationWizard". Don't
+            // forget ui.frontend
+
+            // account specific
+            Component.create(ConnectAccount.class),
+            Component.create(DisconnectAccount.class),
+            Component.create(SaveAccount.class),
+            // TODO: Add BrowserFunctions for alter accounts: "DeleteAccount"
+            // and "EditAccount"
+
+            // session specific
+            Component.create(SendInvitation.class),
+            // TODO: add other session related browser functions like close
+            // session, add project to session, start chat, etc.
+
+            // other
+            Component.create(GetValidJID.class) };
 
         for (Component component : Arrays.asList(components)) {
             container.addComponent(component.getBindKey(),
