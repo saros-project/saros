@@ -71,17 +71,20 @@ public final class JoinSessionRequestHandler {
         if (session != null && !session.isHost())
             return;
 
-        if (!preferenceStore.getBoolean(EclipsePreferenceConstants.SERVER_ACTIVATED)
-            || (session != null && extension.isNewSessionRequested())
-            || (session == null && !extension.isNewSessionRequested())) {
+        if (!preferenceStore
+            .getBoolean(EclipsePreferenceConstants.SERVER_ACTIVATED)) {
             sendRejection(from);
             return;
         }
 
         List<JID> list = Collections.singletonList(from);
 
+        /*
+         * Create a new session if none exists yet, add the user to the existing
+         * session otherwise.
+         */
         // TODO remove calls to CollaborationUtils
-        if (extension.isNewSessionRequested()) {
+        if (session == null) {
             CollaborationUtils.startSession(new ArrayList<IResource>(), list);
         } else {
             CollaborationUtils.addContactsToSession(list);
@@ -89,7 +92,8 @@ public final class JoinSessionRequestHandler {
     }
 
     private void sendRejection(JID to) {
-        transmitter.sendPacketExtension(to, JoinSessionRejectedExtension.PROVIDER
-            .create(new JoinSessionRejectedExtension()));
+        transmitter.sendPacketExtension(to,
+            JoinSessionRejectedExtension.PROVIDER
+                .create(new JoinSessionRejectedExtension()));
     }
 }

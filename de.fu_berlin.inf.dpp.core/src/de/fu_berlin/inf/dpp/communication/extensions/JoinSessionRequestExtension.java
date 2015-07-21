@@ -7,16 +7,6 @@ public class JoinSessionRequestExtension extends SarosPacketExtension {
 
     public static final Provider PROVIDER = new Provider();
 
-    private final boolean newSession;
-
-    public JoinSessionRequestExtension(boolean newSession) {
-        this.newSession = newSession;
-    }
-
-    public boolean isNewSessionRequested() {
-        return newSession;
-    }
-
     public static class Provider extends
         SarosPacketExtension.Provider<JoinSessionRequestExtension> {
 
