@@ -88,6 +88,7 @@ public class JIDCombo {
          * The modification of the list items changes the selection. Now, the
          * saved selection have to be set again.
          */
+        this.control.setText(jid);
         this.control.setSelection(new Point(selection.x, selection.y));
     }
 
