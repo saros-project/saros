@@ -4,11 +4,19 @@
 
 body {
     font-size: 12px;
-    line-height: 1.2;
+    /* avoid "scrolling attempt" */
+    overflow: hidden;
+    /* avoid text selection */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 h4 {
-    margin-left: 10px;
+   margin-top: 0;
 }
 
 label {
@@ -29,12 +37,25 @@ label input {
     margin-bottom: 15px;
 }
 
-div.content-container {
-    top: 100px;
-    bottom: 50px;
+div.content-container,
+div.wizard-content-container {
     width: 100%;
     position: absolute;
+    /* TODO: not so nice z-index hack */
+    z-index: -999;
     overflow: scroll;
+}
+
+div.content-container {
+    top: 50px;
+    bottom: 0;
+    padding: 10px;
+}
+
+div.wizard-content-container {
+    top: 100px;
+    bottom: 50px;
+    padding: 0;
 }
 
 .btn-list {
@@ -43,7 +64,8 @@ div.content-container {
     vertical-align: middle;
 }
 
-.footer button, .btn-list button {
+.footer button,
+.btn-list button {
     float: right;
     margin-left: 10px;
 }
@@ -60,10 +82,23 @@ div.content-container {
     font-weight: bold !important;
 }
 
-/* Bootstrap customization */
-.container {
-    padding: 10px;
+.marked-container {
     width: 100%;
+    padding: 0 10px;
+    border-style: solid;
+    border-color: #eee;
+    border-width: 0 0 0 3px;
+}
+
+/* Bootstrap customization */
+
+.container {
+    width: 100%;
+    padding: 10px;
+}
+
+.nav-pills > li > a{
+    padding: 2px;
 }
 
 .list-group {
@@ -75,11 +110,17 @@ div.content-container {
     width: 100%;
     height: 100px;
     position: fixed;
-    padding: 0 10px 10px 10px;
+    padding: 0px 10px 0px 10px;
     margin-bottom: 0;
 }
 
-.modal-header, .modal-body, .modal-footer {
+#header .navbar {
+    height: 50px;
+}
+
+.modal-header,
+.modal-body,
+.modal-footer {
     padding: 10px;
 }
 
