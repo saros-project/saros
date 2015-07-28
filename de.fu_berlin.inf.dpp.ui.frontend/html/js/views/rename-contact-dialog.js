@@ -18,7 +18,7 @@ module.exports = AmpersandView.extend({
         bindAll(this, 'renameContact');
     },
     bindings: {
-        'model.jid.jid': '[data-hook=jid]'
+        'model.jid': '[data-hook=jid]'
     },
     render: function() {
 
