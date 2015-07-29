@@ -1,6 +1,9 @@
 li(data-toggle="context")
-    a(href="#" data-hook="display-name")
-    span(data-hook="presence")
+    a(href="#")
+        span(data-hook="display-name")
+        span(data-hook="presence")
+        span.label.label-success(data-hook="is-available")
+            = d.label.online
     div(data-hook="context-menu")
         ul.dropdown-menu(role="menu")
             li

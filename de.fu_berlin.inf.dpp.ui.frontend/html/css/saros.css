@@ -15,7 +15,7 @@ body {
     user-select: none;
 }
 
-h4 {
+h5 {
    margin-top: 0;
 }
 
@@ -95,6 +95,10 @@ div.wizard-content-container {
 .container {
     width: 100%;
     padding: 10px;
+}
+
+.label {
+    margin-left: 10px;
 }
 
 .nav-pills > li > a{

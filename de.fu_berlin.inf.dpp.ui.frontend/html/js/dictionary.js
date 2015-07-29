@@ -31,7 +31,8 @@ module.exports = {
     'label': {
         'nickname': 'Nickname',
         'optional': 'Optional',
-        'jid': 'XMPP/Jabber ID'
+        'jid': 'XMPP/Jabber ID',
+        'online': 'Online'
     },
     'message': {
         'noAccount': 'No account selected',

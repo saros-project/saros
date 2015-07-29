@@ -1,4 +1,5 @@
 var AmpersandState = require('ampersand-state');
+var dictionary = require('../dictionary');
 var SarosApi = require('../saros-api');
 
 module.exports = AmpersandState.extend({
@@ -16,7 +17,7 @@ module.exports = AmpersandState.extend({
             fn: function() {
 
                 // TODO: correct predicate
-                return this.presence === 'Online';
+                return this.presence === dictionary.label.online;
             }
         }
     },

@@ -23,6 +23,10 @@ module.exports = AmpersandView.extend({
     },
     bindings: {
         'model.displayName': '[data-hook=display-name]',
+        'model.isAvailable': {
+            type: 'toggle',
+            hook: 'is-available'
+        },
         // Bind the corresponding context-menu with an id to this `li`
         // element.
         'contextMenuBinding': {
