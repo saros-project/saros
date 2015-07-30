@@ -127,10 +127,18 @@ module.exports = AmpersandState.extend({
     // Use this methond instead of `state.activeAccount = acc;`
     activateAccount: function(account) {
 
-        var currentActiveAccount = this.activeAccount;
-        currentActiveAccount.isActive = false;
-        account.isActive = true;
-        this.set('activeAccount', account);
+        // Only allow to set active account when there is no
+        // other account connecting/disconnecting/connected.
+        if (!this.isBusy && !this.isConnected) {
+            var currentActiveAccount = this.activeAccount;
+
+            if (currentActiveAccount) {
+                currentActiveAccount.isActive = false;
+            }
+
+            account.isActive = true;
+            this.set('activeAccount', account);
+        }
     },
 
     updateConnectionState: function() {
