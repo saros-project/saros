@@ -1,10 +1,5 @@
 package de.fu_berlin.inf.dpp.intellij.context;
 
-import java.util.Arrays;
-
-import org.picocontainer.BindKey;
-import org.picocontainer.MutablePicoContainer;
-
 import de.fu_berlin.inf.dpp.AbstractSarosContextFactory;
 import de.fu_berlin.inf.dpp.ISarosContextBindings;
 import de.fu_berlin.inf.dpp.communication.connection.IProxyResolver;
@@ -44,6 +39,10 @@ import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.IWebResourceLocator;
 import de.fu_berlin.inf.dpp.ui.util.ICollaborationUtils;
+import org.picocontainer.BindKey;
+import org.picocontainer.MutablePicoContainer;
+
+import java.util.Arrays;
 
 /**
  * IntelliJ related context
@@ -62,7 +61,6 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
         Component.create(ProjectAPI.class),
 
         Component.create(IEditorManager.class, EditorManager.class),
-        Component.create(EditorManager.class),
         Component.create(LocalEditorHandler.class),
         Component.create(LocalEditorManipulator.class),
 
