@@ -22,13 +22,12 @@
 
 package de.fu_berlin.inf.dpp.intellij.ui.actions;
 
-import javax.swing.JOptionPane;
-
-import org.picocontainer.annotations.Inject;
-
 import de.fu_berlin.inf.dpp.account.XMPPAccount;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
+import org.picocontainer.annotations.Inject;
+
+import javax.swing.JOptionPane;
 
 /**
  * Connects to XMPP/Jabber server with given account or active account
@@ -52,6 +51,7 @@ public class ConnectServerAction extends AbstractSarosAction {
      */
     public void executeWithUser(String user) {
         XMPPAccount account = accountStore.findAccount(user);
+        accountStore.setAccountActive(account);
         connectAccount(account);
         actionPerformed();
     }

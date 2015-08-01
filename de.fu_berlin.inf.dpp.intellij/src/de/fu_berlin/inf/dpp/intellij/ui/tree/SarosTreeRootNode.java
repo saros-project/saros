@@ -29,7 +29,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
  */
 public class SarosTreeRootNode extends DefaultMutableTreeNode {
     public static final String SPACER = " ";
-    public static final String TITLE_JABBER_SERVER = "XMPP/jabber server (Not connected)";
+    public static final String TITLE_JABBER_SERVER = "Not connected";
 
     public SarosTreeRootNode() {
         super(SPACER + TITLE_JABBER_SERVER
