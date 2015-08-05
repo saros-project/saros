@@ -29,6 +29,7 @@ import com.intellij.openapi.module.ModuleWithNameAlreadyExists;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.InvalidDataException;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
@@ -75,6 +76,16 @@ public class IntelliJProjectImpl implements IProject {
     private IResourceAttributes attributes;
 
     public IntelliJProjectImpl(Project project, String name) {
+
+        if (project == null) {
+            throw new NullPointerException(
+                "Can not instantiate project with null project.");
+        }
+
+        if (name == null) {
+            throw new NullPointerException(
+                "Can not instantiate project with null name.");
+        }
 
         File path = new File(project.getBasePath() + File.separator + name
         );
@@ -224,14 +235,14 @@ public class IntelliJProjectImpl implements IProject {
             return ApplicationManager.getApplication()
                 .runReadAction(new Computable<Boolean>() {
 
-                        @Override
-                        public Boolean compute() {
-                            Module mod = ModuleManager.getInstance(project)
-                                .findModuleByName(name);
-                            return mod != null && mod.isLoaded();
-                        }
-                    }
-                );
+                                   @Override
+                                   public Boolean compute() {
+                                       Module mod = ModuleManager
+                                           .getInstance(project)
+                                           .findModuleByName(name);
+                                       return mod != null && mod.isLoaded();
+                                   }
+                               });
 
         } else {
             return isOpen;
@@ -406,7 +417,7 @@ public class IntelliJProjectImpl implements IProject {
         try {
             return new URI(fullPath.toString());
         } catch (URISyntaxException e) {
-            e.printStackTrace();
+            LOG.error("invalid URI syntax", e);
 
             return null;
         }
@@ -427,6 +438,34 @@ public class IntelliJProjectImpl implements IProject {
 
     public File toFile() {
         return path;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        IntelliJProjectImpl that = (IntelliJProjectImpl) o;
+
+        if (!name.equals(that.name)) {
+            return false;
+        }
+        if (!FileUtil.filesEqual(path, that.path)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name.hashCode();
+        result = 31 * result + FileUtil.fileHashCode(path);
+        return result;
     }
 
     public String toString() {

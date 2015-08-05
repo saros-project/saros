@@ -26,13 +26,16 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.event.SelectionEvent;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
+import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.core.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.core.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.core.editor.RemoteEditorManager;
@@ -44,6 +47,7 @@ import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorManager;
 import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorModel;
 import de.fu_berlin.inf.dpp.intellij.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.intellij.editor.text.TextSelection;
+import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJWorkspaceImpl;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
@@ -256,10 +260,23 @@ public class EditorManager extends AbstractActivityProducer implements
                 );
             }
 
+            //HACK: Editors that are already opened have to be added to the EditorPool
+            FileEditorManager fileEditorManager = FileEditorManager.
+                getInstance(saros.getProject());
+            IntelliJWorkspaceImpl workspace = (IntelliJWorkspaceImpl) saros.getWorkspace();
+            for (IProject project : session.getProjects())
+                for (VirtualFile file : fileEditorManager.getOpenFiles()) {
+                    if (project.getFullPath().equals(
+                        workspace.getProjectForPath(file.getPath())
+                            .getFullPath()
+                    )) {
+                        localEditorHandler.openEditor(file);
+                    }
+                }
+
             fireActivity(
                 new EditorActivity(localUser, EditorActivity.Type.ACTIVATED,
-                    activeEditor)
-            );
+                    activeEditor));
 
             if (activeEditor == null) {
                 return;
@@ -452,6 +469,8 @@ public class EditorManager extends AbstractActivityProducer implements
 
     private final EditorPool editorPool = new EditorPool();
 
+    private final Saros saros;
+
     private final SharedEditorListenerDispatch editorListenerDispatch = new SharedEditorListenerDispatch();
     private RemoteEditorManager remoteEditorManager;
     private RemoteWriteAccessManager remoteWriteAccessManager;
@@ -475,13 +494,15 @@ public class EditorManager extends AbstractActivityProducer implements
 
     public EditorManager(ISarosSessionManager sessionManager,
         LocalEditorHandler localEditorHandler,
-        LocalEditorManipulator localEditorManipulator) {
+        LocalEditorManipulator localEditorManipulator, Saros saros) {
 
         remoteEditorManager = new RemoteEditorManager(session);
         sessionManager.addSarosSessionListener(sessionListener);
         addSharedEditorListener(sharedEditorListener);
         this.localEditorHandler = localEditorHandler;
         this.localEditorManipulator = localEditorManipulator;
+
+        this.saros = saros;
 
         documentListener = new StoppableDocumentListener(this);
         fileListener = new StoppableEditorFileListener(this);
@@ -723,8 +744,7 @@ public class EditorManager extends AbstractActivityProducer implements
 
         editorListenerDispatch
             .textEditRecieved(session.getLocalUser(), textEdit.getPath(),
-                textEdit.getText(), textEdit.getReplacedText(),
-                textEdit.getOffset());
+                textEdit.getText(), textEdit.getReplacedText(), textEdit.getOffset());
     }
 
     /**
@@ -859,6 +879,15 @@ public class EditorManager extends AbstractActivityProducer implements
     void lockAllEditors() {
         setListenerEnabled(false);
         editorPool.lockAllDocuments();
+    }
+
+    /**
+     * Unlocks all locally open editors by starting them.
+     */
+    public void unlockAllLocalOpenedEditors() {
+        for (Editor editor : editorPool.getEditors()) {
+            startEditor(editor);
+        }
     }
 
     private void executeInUIThreadSynchronous(Runnable runnable) {
