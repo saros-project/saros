@@ -43,6 +43,7 @@ module.exports = AmpersandView.extend({
     bindings: {
         'model.activeAccountLabel': '[data-hook=active-account]',
         'model.connectionStateLabel': '[data-hook=connection-button]',
+        // disable/enable connection button
         'model.isReady': {
             type: 'booleanClass',
             yes: '',
@@ -50,6 +51,7 @@ module.exports = AmpersandView.extend({
             hook: 'connection-button'
         },
         'model.isConnected': [
+            // disable certain buttons when not connected
             {
                 type: 'booleanClass',
                 yes: 'disabled',
@@ -67,6 +69,11 @@ module.exports = AmpersandView.extend({
                 yes: '',
                 no: 'disabled',
                 hook: 'start-session'
+            },
+            // disable content-container when not connected
+            {
+                type: 'toggle',
+                selector: '.content-container'
             }
         ]
     },
