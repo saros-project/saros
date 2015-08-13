@@ -12,6 +12,9 @@ module.exports = AmpersandWizard.extend({
     // engine can use it.
     d: dictionary,
     autoRender: true,
+    events: {
+        'contextmenu': 'handleContextmenu'
+    },
     subviews: {
         projectTrees: {
             hook: 'project-trees-container',
@@ -46,5 +49,9 @@ module.exports = AmpersandWizard.extend({
     cancel: function() {
 
         SarosApi.closeStartSessionWizard();
+    },
+    handleContextmenu: function(e) {
+
+        e.preventDefault();
     }
 });

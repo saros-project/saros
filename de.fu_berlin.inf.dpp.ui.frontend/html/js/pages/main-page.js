@@ -38,6 +38,7 @@ module.exports = AmpersandView.extend({
         'click [data-hook=connection-button]': 'toggleConnect',
         'click [data-hook=add-contact]': 'openAddContactDialog',
         'click [data-hook=start-session]': 'startSession',
+        'contextmenu': 'handleContextmenu'
     },
     bindings: {
         'model.activeAccountLabel': '[data-hook=active-account]',
@@ -68,6 +69,10 @@ module.exports = AmpersandView.extend({
                 hook: 'start-session'
             }
         ]
+    },
+    handleContextmenu: function(e) {
+
+        e.preventDefault();
     },
     toggleConnect: function() {
 
