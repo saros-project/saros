@@ -138,6 +138,9 @@ module.exports = AmpersandState.extend({
 
             account.isActive = true;
             this.set('activeAccount', account);
+
+            // Trggier auto connect
+            this.updateConnectionState();
         }
     },
 

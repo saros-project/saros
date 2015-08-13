@@ -26,7 +26,9 @@ var SarosApi = BackboneEvents.mixin({
 
     connect: function(account) {
 
-        __java_connect(JSON.stringify(account)); // jshint ignore:line
+        if(typeof __java_connect !== 'undefined') {
+            __java_connect(JSON.stringify(account)); // jshint ignore:line
+        }
     },
 
     disconnect: function() {
