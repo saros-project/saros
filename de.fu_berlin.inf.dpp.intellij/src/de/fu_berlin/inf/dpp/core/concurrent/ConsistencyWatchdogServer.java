@@ -187,7 +187,7 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
     private void calculateChecksums() {
 
         Set<SPath> localEditors = editorManager.getLocallyOpenEditors();
-        Set<SPath> remoteEditors = editorManager.getRemoteOpenEditors();
+        Set<SPath> remoteEditors = editorManager.getRemotelyOpenEditors();
 
         Set<SPath> allEditors = new HashSet<SPath>();
 

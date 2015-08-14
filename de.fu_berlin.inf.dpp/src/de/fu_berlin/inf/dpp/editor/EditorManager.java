@@ -501,25 +501,23 @@ public class EditorManager extends AbstractActivityProducer implements
         connectedFiles.remove(file);
     }
 
+    @Override
+    public Set<SPath> getLocallyOpenEditors() {
+        return locallyOpenEditors;
+    }
+
+    @Override
+    public Set<SPath> getRemotelyOpenEditors() {
+        return remoteEditorManager == null ? Collections.<SPath> emptySet()
+            : remoteEditorManager.getRemoteOpenEditors();
+    }
+
     public void addSharedEditorListener(ISharedEditorListener editorListener) {
         editorListenerDispatch.add(editorListener);
     }
 
     public void removeSharedEditorListener(ISharedEditorListener editorListener) {
         editorListenerDispatch.remove(editorListener);
-    }
-
-    /**
-     * Returns the resource paths of editors that the local user is currently
-     * using.
-     * 
-     * @return all paths (in project-relative format) of files that the local
-     *         user is currently editing by using an editor. Never returns
-     *         <code>null</code>. A empty set is returned if there are no
-     *         currently opened editors.
-     */
-    public Set<SPath> getLocallyOpenEditors() {
-        return locallyOpenEditors;
     }
 
     /**
@@ -1699,11 +1697,6 @@ public class EditorManager extends AbstractActivityProducer implements
         editorPool.setEditable(!lock && session.hasWriteAccess());
 
         isLocked = lock;
-    }
-
-    public Set<SPath> getRemoteOpenEditors() {
-        return remoteEditorManager == null ? Collections.<SPath> emptySet()
-            : remoteEditorManager.getRemoteOpenEditors();
     }
 
     /**

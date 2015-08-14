@@ -513,11 +513,13 @@ public class EditorManager extends AbstractActivityProducer implements
         localEditorManipulator.initialize(this);
     }
 
+    @Override
     public Set<SPath> getLocallyOpenEditors() {
         return editorPool.getFiles();
     }
 
-    public Set<SPath> getRemoteOpenEditors() {
+    @Override
+    public Set<SPath> getRemotelyOpenEditors() {
         return remoteEditorManager.getRemoteOpenEditors();
     }
 
