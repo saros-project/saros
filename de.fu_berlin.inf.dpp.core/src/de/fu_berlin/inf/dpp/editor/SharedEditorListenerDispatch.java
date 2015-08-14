@@ -2,9 +2,6 @@ package de.fu_berlin.inf.dpp.editor;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.eclipse.jface.text.source.ILineRange;
-import org.eclipse.ui.IEditorPart;
-
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
@@ -77,11 +74,9 @@ public class SharedEditorListenerDispatch implements ISharedEditorListener {
     }
 
     @Override
-    public void viewportGenerated(IEditorPart part, ILineRange viewport,
-        SPath path) {
-
+    public void viewportGenerated(ViewportActivity viewport) {
         for (ISharedEditorListener listener : editorListeners)
-            listener.viewportGenerated(part, viewport, path);
+            listener.viewportGenerated(viewport);
     }
 
     @Override

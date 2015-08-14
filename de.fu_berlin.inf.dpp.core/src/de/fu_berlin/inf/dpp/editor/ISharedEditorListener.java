@@ -1,26 +1,26 @@
 package de.fu_berlin.inf.dpp.editor;
 
-import org.eclipse.jface.text.source.ILineRange;
-import org.eclipse.ui.IEditorPart;
-
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 
+/**
+ * Listener type for events related to local and remote {@link IEditorManager
+ * editors} which belong to the current session.
+ */
 public interface ISharedEditorListener {
 
     /**
-     * The editor that the given user is currently editing has changed.
-     * 
-     * This method implies that the editor is being opened.
+     * Fired when a user activates (moves focus to) an editor. Implies that the
+     * editor has been opened if it wasn't open already.
      * 
      * @param path
      *            the project-relative path of the resource that is the new user
      *            with {@link Permission#WRITE_ACCESS} resource.
      * @param user
-     *            the user which removed an editor (can be the local user)
+     *            the user who activated the editor (may be the local user)
      * 
      */
     public void activeEditorChanged(User user, SPath path);
@@ -109,23 +109,20 @@ public interface ISharedEditorListener {
     public void viewportChanged(ViewportActivity viewport);
 
     /**
+     * Is fired when the local user changed the viewport for an edior.
+     * 
+     * @param viewport
+     *            The changed viewport as a {@link ViewportActivity}
+     */
+    public void viewportGenerated(ViewportActivity viewport);
+
+    /**
      * Is fired after a user used the jumpToFeature
      * 
      * @param jumpedTo
      *            the user being jumped to
      */
     public void jumpedToUser(User jumpedTo);
-
-    /**
-     * Is fired when the viewport for the local user gets changed
-     * 
-     * @param part
-     *            The part of the editor as {@link IEditorPart}
-     * @param viewport
-     *            The generated viewport as {@link ILineRange}
-     */
-    public void viewportGenerated(IEditorPart part, ILineRange viewport,
-        SPath path);
 
     public void colorChanged();
 }

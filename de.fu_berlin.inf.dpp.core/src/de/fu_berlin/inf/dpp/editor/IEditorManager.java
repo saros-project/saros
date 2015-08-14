@@ -38,4 +38,22 @@ public interface IEditorManager {
      *            the project which editors should be saved or <code>null</code>
      */
     public void saveEditors(IProject project);
+
+    /**
+     * Adds an {@link ISharedEditorListener} to listen for changes such as
+     * editors getting opened, closed or their content changed.
+     * 
+     * @param listener
+     *            editor listener to add
+     */
+    public void addSharedEditorListener(ISharedEditorListener listener);
+
+    /**
+     * Removes an {@link ISharedEditorListener} that was previously added with
+     * {@link #addSharedEditorListener(ISharedEditorListener)}.
+     * 
+     * @param listener
+     *            editor listener to remove
+     */
+    public void removeSharedEditorListener(ISharedEditorListener listener);
 }

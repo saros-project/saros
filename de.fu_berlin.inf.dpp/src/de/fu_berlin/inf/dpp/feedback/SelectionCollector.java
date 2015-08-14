@@ -24,11 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.jface.text.source.ILineRange;
-import org.eclipse.ui.IEditorPart;
-
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
+import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
@@ -141,10 +139,9 @@ public class SelectionCollector extends AbstractStatisticCollector {
         }
 
         @Override
-        public void viewportGenerated(IEditorPart part, ILineRange viewport,
-            SPath path) {
+        public void viewportGenerated(ViewportActivity viewport) {
             // refresh the SPath of the local active editor
-            localPath = path;
+            localPath = viewport.getPath();
 
         }
 

@@ -512,10 +512,12 @@ public class EditorManager extends AbstractActivityProducer implements
             : remoteEditorManager.getRemoteOpenEditors();
     }
 
+    @Override
     public void addSharedEditorListener(ISharedEditorListener editorListener) {
         editorListenerDispatch.add(editorListener);
     }
 
+    @Override
     public void removeSharedEditorListener(ISharedEditorListener editorListener) {
         editorListenerDispatch.remove(editorListener);
     }
@@ -579,10 +581,12 @@ public class EditorManager extends AbstractActivityProducer implements
         if (path.equals(locallyActiveEditor))
             this.localViewport = viewport;
 
-        fireActivity(new ViewportActivity(session.getLocalUser(),
-            viewport.getStartLine(), viewport.getNumberOfLines(), path));
+        ViewportActivity activity = new ViewportActivity(
+            session.getLocalUser(), viewport.getStartLine(),
+            viewport.getNumberOfLines(), path);
 
-        editorListenerDispatch.viewportGenerated(part, viewport, path);
+        fireActivity(activity);
+        editorListenerDispatch.viewportGenerated(activity);
 
     }
 

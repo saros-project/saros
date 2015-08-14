@@ -36,12 +36,12 @@ import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.core.Saros;
-import de.fu_berlin.inf.dpp.core.editor.AbstractSharedEditorListener;
-import de.fu_berlin.inf.dpp.core.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.core.editor.RemoteEditorManager;
 import de.fu_berlin.inf.dpp.core.editor.RemoteWriteAccessManager;
-import de.fu_berlin.inf.dpp.core.editor.SharedEditorListenerDispatch;
+import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
+import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
+import de.fu_berlin.inf.dpp.editor.SharedEditorListenerDispatch;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorManager;
 import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorModel;
@@ -523,6 +523,16 @@ public class EditorManager extends AbstractActivityProducer implements
         return remoteEditorManager.getRemoteOpenEditors();
     }
 
+    @Override
+    public void addSharedEditorListener(ISharedEditorListener listener) {
+        editorListenerDispatch.add(listener);
+    }
+
+    @Override
+    public void removeSharedEditorListener(ISharedEditorListener listener) {
+        editorListenerDispatch.remove(listener);
+    }
+
     public void saveFile(SPath path) {
         localEditorHandler.saveFile(path);
     }
@@ -553,14 +563,6 @@ public class EditorManager extends AbstractActivityProducer implements
 
     public boolean isActiveEditorShared() {
         return activeEditor != null && isSharedEditor(activeEditor);
-    }
-
-    public void addSharedEditorListener(ISharedEditorListener listener) {
-        editorListenerDispatch.add(listener);
-    }
-
-    public void removeSharedEditorListener(ISharedEditorListener listener) {
-        editorListenerDispatch.remove(listener);
     }
 
     /**
