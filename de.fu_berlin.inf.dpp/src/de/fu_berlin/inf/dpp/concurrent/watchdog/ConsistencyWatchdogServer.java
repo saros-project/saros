@@ -3,9 +3,10 @@ package de.fu_berlin.inf.dpp.concurrent.watchdog;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -28,21 +29,14 @@ import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
- * This class is an eclipse job run on the host side ONLY.
- * 
- * The job computes checksums for all files currently managed by Jupiter (the
- * ConcurrentDocumentManager) and sends them to all guests.
- * 
- * These will call their ConcurrentDocumentManager.check(...) method, to verify
- * that their version is correct.
- * 
- * Once started with schedule() the job is scheduled to rerun every INTERVAL ms.
- * 
- * @author chjacob
- * 
- *         TODO Make ConsistencyWatchDog configurable => Timeout, Whether run or
- *         not, etc.
- * 
+ * The server side of the <i>consistency watchdog</i> infrastructure. It
+ * periodically checksums the files associated with all locally and remotely
+ * open {@link IEditorManager editors} in the current session. It then sends
+ * these checksums to all watchdog clients, which can compare them with their
+ * own checksum calculations to detect inconsistencies and request file recovery
+ * if needed.
+ * <p>
+ * This component is only run on the session's host.
  */
 @Component(module = "consistency")
 public class ConsistencyWatchdogServer extends AbstractActivityProducer
@@ -51,34 +45,36 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
     private static final Logger LOG = Logger
         .getLogger(ConsistencyWatchdogServer.class);
 
-    private static final long INTERVAL = 10000;
-
-    private ScheduledThreadPoolExecutor executor;
-
-    private ScheduledFuture<?> triggerChecksumFuture;
-
-    private final HashMap<SPath, DocumentChecksum> docsChecksums = new HashMap<SPath, DocumentChecksum>();
-
-    private final IEditorManager editorManager;
+    private static final long CHECKSUM_CALCULATION_INTERVAL = 10000;
+    private static final long TERMINATION_TIMEOUT = 10000;
 
     private final ISarosSession session;
-
+    private final IEditorManager editorManager;
     private final StopManager stopManager;
-
     private final UISynchronizer synchronizer;
 
-    private boolean locked;
+    private final Map<SPath, DocumentChecksum> documentChecksums = new HashMap<SPath, DocumentChecksum>();
+    private ScheduledThreadPoolExecutor checksumCalculationExecutor;
+    private Future<?> checksumCalculationFuture;
+    private boolean blocked;
 
-    private final Runnable checksumCalculationTrigger = new Runnable() {
-
+    private final Runnable checksumCalculation = new Runnable() {
+        /**
+         * Called periodically to calculate new checksums for all editors and
+         * send them to clients.
+         */
         @Override
         public void run() {
+            /*
+             * Run on the UI thread to guarantee that the editor contents won't
+             * be changed while we calculate the checksums. We also do this to
+             * synchronize with block().
+             */
             synchronizer.syncExec(ThreadUtils.wrapSafe(LOG, new Runnable() {
                 @Override
                 public void run() {
-                    if (locked)
+                    if (blocked)
                         return;
-
                     calculateChecksums();
                 }
             }));
@@ -95,12 +91,24 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
         public void textEdited(User user, SPath filePath, int offset,
             String deletedText, String insertedText) {
 
-            DocumentChecksum checksum = docsChecksums.get(filePath);
+            DocumentChecksum checksum = documentChecksums.get(filePath);
             if (checksum != null)
                 checksum.markDirty();
         }
     };
 
+    /**
+     * Creates a ConsistencyWatchdogServer.
+     * 
+     * @param session
+     *            the currently running session
+     * @param editorManager
+     *            {@link IEditorManager} to get the document contents from
+     * @param stopManager
+     *            {@link StopManager} to listen to for (un)block requests
+     * @param synchronizer
+     *            {@link UISynchronizer} to use
+     */
     public ConsistencyWatchdogServer(ISarosSession session,
         IEditorManager editorManager, StopManager stopManager,
         UISynchronizer synchronizer) {
@@ -114,19 +122,21 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
     public void start() {
         if (!session.isHost())
             throw new IllegalStateException(
-                "component can only be run on host side");
+                "Component can only be run on the session's host");
 
         session.addActivityProducer(this);
         stopManager.addBlockable(this);
         editorManager.addSharedEditorListener(sharedEditorListener);
 
-        executor = new ScheduledThreadPoolExecutor(1, new NamedThreadFactory(
-            "Consistency-Watchdog-Server", false));
+        checksumCalculationExecutor = new ScheduledThreadPoolExecutor(1,
+            new NamedThreadFactory("Consistency-Watchdog-Server", false));
 
-        executor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
+        checksumCalculationExecutor
+            .setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
 
-        triggerChecksumFuture = executor.scheduleWithFixedDelay(
-            checksumCalculationTrigger, 0, INTERVAL, TimeUnit.MILLISECONDS);
+        checksumCalculationFuture = checksumCalculationExecutor
+            .scheduleWithFixedDelay(checksumCalculation, 0,
+                CHECKSUM_CALCULATION_INTERVAL, TimeUnit.MILLISECONDS);
 
     }
 
@@ -136,22 +146,22 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
         stopManager.removeBlockable(this);
         editorManager.removeSharedEditorListener(sharedEditorListener);
 
-        triggerChecksumFuture.cancel(false);
-        executor.shutdown();
+        checksumCalculationFuture.cancel(false);
+        checksumCalculationExecutor.shutdown();
 
         boolean isTerminated = false;
-        boolean isInterrupted = false;
+        boolean terminationWasInterrupted = false;
 
         try {
-            isTerminated = executor.awaitTermination(10000,
-                TimeUnit.MILLISECONDS);
+            isTerminated = checksumCalculationExecutor.awaitTermination(
+                TERMINATION_TIMEOUT, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
-            LOG.warn("interrupted while waiting for consistency watchdog to terminate");
-            isInterrupted = true;
+            LOG.warn("Interrupted while waiting for consistency watchdog to terminate");
+            terminationWasInterrupted = true;
         }
 
         if (!isTerminated)
-            LOG.error("consistency watchdog is still running");
+            LOG.error("Consistency watchdog server is still running");
 
         /*
          * Make sure we only clear the checksum map after the last checksum
@@ -160,45 +170,55 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
         synchronizer.asyncExec(new Runnable() {
             @Override
             public void run() {
-                docsChecksums.clear();
+                documentChecksums.clear();
             }
         });
 
-        if (isInterrupted)
+        if (terminationWasInterrupted)
             Thread.currentThread().interrupt();
     }
 
     @Override
     public void block() {
-        // sync here to ensure we do not send anything after we return
+        /*
+         * Set the blocking flag synchronously on the UI thread to guarantee
+         * that no checksum calculation is in progress or being started after
+         * this method returns.
+         */
         synchronizer.syncExec(new Runnable() {
             @Override
             public void run() {
-                locked = true;
+                blocked = true;
             }
         });
     }
 
     @Override
     public void unblock() {
-        // unlock lazy is sufficient as it does not matter if we miss one update
-        // cycle
-        locked = false;
+        /*
+         * We don't need to run on the UI thread here - the checksum calculation
+         * runnable will pick up the unset blocking flag eventually. A missed
+         * calculation cycle has no negative impact other than slightly delaying
+         * possibly needed recovery operations.
+         */
+        blocked = false;
     }
 
-    // UI thread access only !
     private void calculateChecksums() {
-
         Set<SPath> localEditors = editorManager.getLocallyOpenEditors();
         Set<SPath> remoteEditors = editorManager.getRemotelyOpenEditors();
 
         Set<SPath> allEditors = new HashSet<SPath>();
-
         allEditors.addAll(localEditors);
         allEditors.addAll(remoteEditors);
 
-        Iterator<Entry<SPath, DocumentChecksum>> it = docsChecksums.entrySet()
-            .iterator();
+        /*
+         * Purge checksums from documents which have been closed since the last
+         * cheksum calculation cycle.
+         */
+
+        Iterator<Entry<SPath, DocumentChecksum>> it = documentChecksums
+            .entrySet().iterator();
 
         while (it.hasNext()) {
             Entry<SPath, DocumentChecksum> entry = it.next();
@@ -208,20 +228,23 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
             }
         }
 
+        /*
+         * Update or create checksums for all currently open documents.
+         */
+
         for (SPath docPath : allEditors) {
             updateChecksum(docPath, localEditors, remoteEditors);
             broadcastChecksum(docPath);
         }
     }
 
-    // UI thread access only !
     private void updateChecksum(SPath docPath, Set<SPath> localEditors,
         Set<SPath> remoteEditors) {
 
-        DocumentChecksum checksum = docsChecksums.get(docPath);
+        DocumentChecksum checksum = documentChecksums.get(docPath);
         if (checksum == null) {
             checksum = new DocumentChecksum(docPath);
-            docsChecksums.put(docPath, checksum);
+            documentChecksums.put(docPath, checksum);
         }
 
         if (!checksum.isDirty())
@@ -241,7 +264,7 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
                  * Since session participants do not report this document as
                  * open, they are right (and our EditorPool might be confused)
                  */
-                docsChecksums.remove(checksum.getPath());
+                documentChecksums.remove(checksum.getPath());
                 return;
             }
         }
@@ -251,7 +274,7 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
 
     private void broadcastChecksum(SPath docPath) {
 
-        DocumentChecksum checksum = docsChecksums.get(docPath);
+        DocumentChecksum checksum = documentChecksums.get(docPath);
         if (checksum == null)
             return;
 
