@@ -10,21 +10,17 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.ui.part.FileEditorInput;
-import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
-import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
+import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
+import de.fu_berlin.inf.dpp.editor.IEditorManager;
+import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
@@ -63,9 +59,7 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
 
     private final HashMap<SPath, DocumentChecksum> docsChecksums = new HashMap<SPath, DocumentChecksum>();
 
-    private final EditorManager editorManager;
-
-    private final IEditorAPI editorAPI;
+    private final IEditorManager editorManager;
 
     private final ISarosSession session;
 
@@ -91,12 +85,27 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
         }
     };
 
+    private ISharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
+        /**
+         * Marks checksums as dirty as soon as their associated documents are
+         * modified. With this information, checksum calculation can be avoided
+         * when the document hasn't changed between checksum iterations.
+         */
+        @Override
+        public void textEdited(User user, SPath filePath, int offset,
+            String deletedText, String insertedText) {
+
+            DocumentChecksum checksum = docsChecksums.get(filePath);
+            if (checksum != null)
+                checksum.markDirty();
+        }
+    };
+
     public ConsistencyWatchdogServer(ISarosSession session,
-        EditorManager editorManager, IEditorAPI editorAPI,
-        StopManager stopManager, UISynchronizer synchronizer) {
+        IEditorManager editorManager, StopManager stopManager,
+        UISynchronizer synchronizer) {
         this.session = session;
         this.editorManager = editorManager;
-        this.editorAPI = editorAPI;
         this.stopManager = stopManager;
         this.synchronizer = synchronizer;
     }
@@ -109,6 +118,7 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
 
         session.addActivityProducer(this);
         stopManager.addBlockable(this);
+        editorManager.addSharedEditorListener(sharedEditorListener);
 
         executor = new ScheduledThreadPoolExecutor(1, new NamedThreadFactory(
             "Consistency-Watchdog-Server", false));
@@ -124,6 +134,7 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
     public void stop() {
         session.removeActivityProducer(this);
         stopManager.removeBlockable(this);
+        editorManager.removeSharedEditorListener(sharedEditorListener);
 
         triggerChecksumFuture.cancel(false);
         executor.shutdown();
@@ -142,12 +153,13 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
         if (!isTerminated)
             LOG.error("consistency watchdog is still running");
 
+        /*
+         * Make sure we only clear the checksum map after the last checksum
+         * calculation cycle that might still be running.
+         */
         synchronizer.asyncExec(new Runnable() {
             @Override
             public void run() {
-                for (DocumentChecksum document : docsChecksums.values())
-                    document.dispose();
-
                 docsChecksums.clear();
             }
         });
@@ -192,13 +204,13 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
             Entry<SPath, DocumentChecksum> entry = it.next();
 
             if (!allEditors.contains(entry.getKey())) {
-                entry.getValue().dispose();
                 it.remove();
             }
         }
 
         for (SPath docPath : allEditors) {
             updateChecksum(localEditors, remoteEditors, docPath);
+            broadcastChecksum(docPath);
         }
     }
 
@@ -206,70 +218,44 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
     private void updateChecksum(final Set<SPath> localEditors,
         final Set<SPath> remoteEditors, final SPath docPath) {
 
-        IFile file = ((EclipseFileImpl) docPath.getFile()).getDelegate();
+        DocumentChecksum checksum = docsChecksums.get(docPath);
+        if (checksum == null) {
+            checksum = new DocumentChecksum(docPath);
+            docsChecksums.put(docPath, checksum);
+        }
 
-        IDocument doc = null;
-        IDocumentProvider provider = null;
-        FileEditorInput input = null;
+        if (!checksum.isDirty())
+            return;
 
-        try {
+        String content = editorManager.getContent(docPath);
 
-            if (file.exists()) {
-                input = new FileEditorInput(file);
-                provider = editorAPI.getDocumentProvider(input);
-                try {
-                    provider.connect(input);
-                    doc = provider.getDocument(input);
-                } catch (CoreException e) {
-                    LOG.warn("could not check checksum of file " + docPath);
-                    provider = null;
-                }
+        if (content == null) {
+            if (localEditors.contains(docPath)) {
+                LOG.error("EditorManager is in an inconsistent state. "
+                    + "It is reporting a locally open editor but no"
+                    + " document could be found in the underlying file system: "
+                    + docPath);
             }
-
-            // Null means that the document does not exist locally
-            if (doc == null) {
-
-                if (localEditors.contains(docPath)) {
-                    LOG.error("EditorManager is in an inconsistent state. "
-                        + "It is reporting a locally open editor but no"
-                        + " document could be found in the underlying file system: "
-                        + docPath);
-                }
-
-                if (!remoteEditors.contains(docPath)) {
-                    /*
-                     * Since session participants do not report this document as
-                     * open, they are right (and our EditorPool might be
-                     * confused)
-                     */
-                    return;
-                }
-            }
-
-            DocumentChecksum checksum = docsChecksums.get(docPath);
-
-            if (checksum == null) {
-                checksum = new DocumentChecksum(docPath);
-                docsChecksums.put(docPath, checksum);
-            }
-
-            /*
-             * Potentially bind to null doc, which will set the Checksum to
-             * represent a missing file (existsFile() == false)
-             */
-            checksum.bind(doc);
-            checksum.update();
-
-            ChecksumActivity checksumActivity = new ChecksumActivity(
-                session.getLocalUser(), checksum.getPath(), checksum.getHash(),
-                checksum.getLength(), null);
-
-            fireActivity(checksumActivity);
-
-        } finally {
-            if (provider != null && input != null) {
-                provider.disconnect(input);
+            if (!remoteEditors.contains(docPath)) {
+                /*
+                 * Since session participants do not report this document as
+                 * open, they are right (and our EditorPool might be confused)
+                 */
+                docsChecksums.remove(docPath);
+                return;
             }
         }
+
+        checksum.update(content);
+    }
+
+    private void broadcastChecksum(SPath docPath) {
+        DocumentChecksum checksum = docsChecksums.get(docPath);
+
+        ChecksumActivity checksumActivity = new ChecksumActivity(
+            session.getLocalUser(), checksum.getPath(), checksum.getHash(),
+            checksum.getLength(), null);
+
+        fireActivity(checksumActivity);
     }
 }
