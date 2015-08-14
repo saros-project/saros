@@ -24,9 +24,11 @@ package de.fu_berlin.inf.dpp.intellij.editor;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.event.SelectionEvent;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
@@ -42,12 +44,15 @@ import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.SharedEditorListenerDispatch;
+import de.fu_berlin.inf.dpp.filesystem.IFile;
+import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorManager;
 import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorModel;
 import de.fu_berlin.inf.dpp.intellij.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.intellij.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJWorkspaceImpl;
+import de.fu_berlin.inf.dpp.intellij.project.filesystem.ResourceConverter;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
@@ -521,6 +526,26 @@ public class EditorManager extends AbstractActivityProducer implements
     @Override
     public Set<SPath> getRemotelyOpenEditors() {
         return remoteEditorManager.getRemoteOpenEditors();
+    }
+
+    @Override
+    public String getContent(final SPath path) {
+        return ApplicationManager.getApplication().runReadAction(
+            new Computable<String>() {
+
+                @Override
+                public String compute() {
+                    IFile file = path.getFile();
+
+                    if (!file.exists())
+                        return null;
+
+                    IPath fullPath = file.getFullPath();
+                    Document doc = ResourceConverter.getDocument(fullPath
+                        .toFile());
+                    return (doc != null) ? doc.getText() : null;
+                }
+            });
     }
 
     @Override

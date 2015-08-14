@@ -23,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -499,6 +500,52 @@ public class EditorManager extends AbstractActivityProducer implements
         documentProvider.disconnect(input);
 
         connectedFiles.remove(file);
+    }
+
+    @Override
+    public String getContent(final SPath path) {
+        try {
+            return SWTUtils.runSWTSync(new Callable<String>() {
+                @Override
+                public String call() throws Exception {
+                    return doGetContent(path);
+                }
+            });
+        } catch (Exception e) {
+            LOG.warn("Failed to get editor content for " + path, e);
+            return null;
+        }
+    }
+
+    private String doGetContent(SPath path) {
+        IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
+        FileEditorInput input = new FileEditorInput(file);
+        IDocumentProvider provider = null;
+        String content;
+
+        try {
+            provider = editorAPI.getDocumentProvider(input);
+            provider.connect(input);
+            IDocument doc = provider.getDocument(input);
+            content = (doc != null) ? doc.get() : null;
+        } catch (CoreException e) {
+            LOG.warn("Failed to retrieve the content of " + path, e);
+            content = null;
+
+            /*
+             * A CoreException means that the provider.connect(input) call
+             * failed. Because the connect() didn't receive, we avoid calling
+             * disconnect() in the finally block by setting the provider
+             * variable to null.
+             */
+            provider = null;
+
+        } finally {
+            if (provider != null)
+                provider.disconnect(input);
+        }
+
+        return content;
     }
 
     @Override

@@ -30,6 +30,21 @@ public interface IEditorManager {
     public Set<SPath> getRemotelyOpenEditors();
 
     /**
+     * Returns the text content of the local editor associated with the
+     * specified file, or the content of the file itself if there is currently
+     * no open editor for it.
+     * <p>
+     * This method must be called on the UI thread.
+     * </p>
+     * 
+     * @param path
+     *            path of the file whose content should be returned
+     * @return the text content of the matching local editor or file, or
+     *         <code>null</code> if no file with the given path exists locally
+     */
+    public String getContent(SPath path);
+
+    /**
      * Saves all currently managed editors that belong to the given project. If
      * the given project is <code>null</code> all currently managed editors will
      * be saved.
