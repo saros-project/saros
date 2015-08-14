@@ -90,6 +90,14 @@ div.wizard-content-container {
     border-width: 0 0 0 3px;
 }
 
+h4.collapsible {
+    cursor: pointer;
+}
+
+.collapse-trigger {
+    margin-left: 10px;
+}
+
 /* Bootstrap customization */
 
 .container {

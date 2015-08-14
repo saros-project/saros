@@ -1,3 +1,6 @@
 div.marked-container
-    h5= d.headline.contacts
+    h4.collapsible
+        span= d.headline.contacts
+        small.collapse-trigger
+            span.glyphicon(data-hook="collapse-trigger")
     ul.nav.nav-pills.nav-stacked(data-hook="contact-list")
