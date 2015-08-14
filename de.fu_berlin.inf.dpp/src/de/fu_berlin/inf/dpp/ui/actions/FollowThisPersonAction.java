@@ -57,7 +57,7 @@ public class FollowThisPersonAction extends Action implements Disposable {
 
     protected ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
         @Override
-        public void followModeChanged(User user, boolean isFollowed) {
+        public void followModeChanged(User target, boolean isFollowed) {
             updateActionEnablement();
         }
     };

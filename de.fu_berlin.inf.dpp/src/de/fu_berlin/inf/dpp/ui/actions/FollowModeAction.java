@@ -122,12 +122,14 @@ public class FollowModeAction extends Action implements IMenuCreator,
 
     private ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
         @Override
-        public void followModeChanged(final User user, final boolean isFollowed) {
+        public void followModeChanged(final User target,
+            final boolean isFollowed) {
+
             SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
 
                 @Override
                 public void run() {
-                    currentlyFollowedUser = user;
+                    currentlyFollowedUser = target;
 
                     if (!isFollowed)
                         currentlyFollowedUser = null;

@@ -4,79 +4,74 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
-import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
- * {@link ISharedEditorListener} which can dispatch to a changing set of
- * {@link ISharedEditorListener}s.
+ * {@link ISharedEditorListener} which can dispatch events to multiple
+ * listeners.
  */
 public class SharedEditorListenerDispatch implements ISharedEditorListener {
 
     private CopyOnWriteArrayList<ISharedEditorListener> editorListeners = new CopyOnWriteArrayList<ISharedEditorListener>();
 
-    public void add(ISharedEditorListener editorListener) {
-        editorListeners.addIfAbsent(editorListener);
+    /**
+     * Adds a listener to the dispatcher, causing all events to be forwarded to
+     * it.
+     * 
+     * @param listener
+     *            the listener to add
+     */
+    public void add(ISharedEditorListener listener) {
+        editorListeners.addIfAbsent(listener);
     }
 
-    public void remove(ISharedEditorListener editorListener) {
-        editorListeners.remove(editorListener);
-    }
-
-    @Override
-    public void activeEditorChanged(User user, SPath path) {
-        for (ISharedEditorListener listener : editorListeners)
-            listener.activeEditorChanged(user, path);
-    }
-
-    @Override
-    public void editorRemoved(User user, SPath path) {
-        for (ISharedEditorListener listener : editorListeners)
-            listener.editorRemoved(user, path);
-    }
-
-    @Override
-    public void userWithWriteAccessEditorSaved(SPath path, boolean replicated) {
-        for (ISharedEditorListener listener : editorListeners)
-            listener.userWithWriteAccessEditorSaved(path, replicated);
+    /**
+     * Removes a listener from the dispatcher that was previously added with
+     * {@link #add}. It will not be forwarded any events afterwards.
+     * 
+     * @param listener
+     *            the listener to remove
+     */
+    public void remove(ISharedEditorListener listener) {
+        editorListeners.remove(listener);
     }
 
     @Override
-    public void followModeChanged(User user, boolean isFollowed) {
+    public void editorActivated(User user, SPath filePath) {
         for (ISharedEditorListener listener : editorListeners)
-            listener.followModeChanged(user, isFollowed);
+            listener.editorActivated(user, filePath);
     }
 
     @Override
-    public void textEditRecieved(User user, SPath editor, String text,
-        String replacedText, int offset) {
-
+    public void editorClosed(User user, SPath filePath) {
         for (ISharedEditorListener listener : editorListeners)
-            listener.textEditRecieved(user, editor, text, replacedText, offset);
+            listener.editorClosed(user, filePath);
     }
 
     @Override
-    public void textSelectionMade(TextSelectionActivity selection) {
+    public void followModeChanged(User target, boolean isFollowed) {
         for (ISharedEditorListener listener : editorListeners)
-            listener.textSelectionMade(selection);
+            listener.followModeChanged(target, isFollowed);
     }
 
     @Override
-    public void viewportChanged(ViewportActivity viewport) {
+    public void textEdited(User user, SPath filePath, int offset,
+        String replacedText, String text) {
+
         for (ISharedEditorListener listener : editorListeners)
-            listener.viewportChanged(viewport);
+            listener.textEdited(user, filePath, offset, replacedText, text);
     }
 
     @Override
-    public void jumpedToUser(User jumpedTo) {
+    public void textSelectionChanged(TextSelectionActivity selection) {
         for (ISharedEditorListener listener : editorListeners)
-            listener.jumpedToUser(jumpedTo);
+            listener.textSelectionChanged(selection);
     }
 
     @Override
-    public void viewportGenerated(ViewportActivity viewport) {
+    public void jumpedToUser(User target) {
         for (ISharedEditorListener listener : editorListeners)
-            listener.viewportGenerated(viewport);
+            listener.jumpedToUser(target);
     }
 
     @Override

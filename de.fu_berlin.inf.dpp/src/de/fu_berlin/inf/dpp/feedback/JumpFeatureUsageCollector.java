@@ -43,8 +43,8 @@ public class JumpFeatureUsageCollector extends AbstractStatisticCollector {
     protected ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
 
         @Override
-        public void jumpedToUser(User jumpedTo) {
-            if (jumpedTo.hasWriteAccess()) {
+        public void jumpedToUser(User target) {
+            if (target.hasWriteAccess()) {
                 jumpedToWriteAccessHolder++;
             } else {
                 jumpedToReadOnlyAccessHolder++;

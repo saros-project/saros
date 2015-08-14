@@ -147,19 +147,17 @@ public class EditorManager extends AbstractActivityProducer implements
                 if (isFollowing(user)) {
                     localEditorManipulator.openEditor(path);
                 }
-                editorListenerDispatch.activeEditorChanged(user, path);
+                editorListenerDispatch.editorActivated(user, path);
                 break;
 
             case CLOSED:
                 if (isFollowing(user)) {
                     localEditorManipulator.closeEditor(path);
                 }
-                editorListenerDispatch.editorRemoved(user, path);
+                editorListenerDispatch.editorClosed(user, path);
                 break;
             case SAVED:
                 localEditorHandler.saveFile(path);
-                editorListenerDispatch
-                    .userWithWriteAccessEditorSaved(path, true);
                 break;
             default:
                 LOG.warn("Unexpected type: " + editorActivity.getType());
@@ -181,9 +179,9 @@ public class EditorManager extends AbstractActivityProducer implements
                     colorModel.getEditColor());
 
             editorListenerDispatch
-                .textEditRecieved(user, path, editorActivity.getText(),
+                .textEdited(user, path, editorActivity.getOffset(),
                     editorActivity.getReplacedText(),
-                    editorActivity.getOffset());
+                    editorActivity.getText());
         }
 
         private void execTextSelection(TextSelectionActivity selection) {
@@ -205,7 +203,7 @@ public class EditorManager extends AbstractActivityProducer implements
                 .selectText(path, selection.getOffset(), selection.getLength(),
                     colorModel);
 
-            editorListenerDispatch.textSelectionMade(selection);
+            editorListenerDispatch.textSelectionChanged(selection);
         }
 
         private void execViewport(ViewportActivity viewport) {
@@ -222,8 +220,6 @@ public class EditorManager extends AbstractActivityProducer implements
                     .setViewPort(path, viewport.getStartLine(),
                         viewport.getStartLine() + viewport.getNumberOfLines());
             }
-
-            editorListenerDispatch.viewportChanged(viewport);
         }
     };
 
@@ -447,7 +443,7 @@ public class EditorManager extends AbstractActivityProducer implements
     private final ISharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
 
         @Override
-        public void activeEditorChanged(User user, SPath path) {
+        public void editorActivated(User user, SPath filePath) {
 
             // We only need to react to remote users changing editor
             if (user.isLocal()) {
@@ -661,7 +657,7 @@ public class EditorManager extends AbstractActivityProducer implements
         }
 
         editorListenerDispatch
-            .activeEditorChanged(session.getLocalUser(), path);
+            .editorActivated(session.getLocalUser(), path);
         fireActivity(new EditorActivity(session.getLocalUser(),
             EditorActivity.Type.ACTIVATED, path));
 
@@ -764,8 +760,8 @@ public class EditorManager extends AbstractActivityProducer implements
         fireActivity(textEdit);
 
         editorListenerDispatch
-            .textEditRecieved(session.getLocalUser(), textEdit.getPath(),
-                textEdit.getText(), textEdit.getReplacedText(), textEdit.getOffset());
+            .textEdited(session.getLocalUser(), textEdit.getPath(),
+                textEdit.getOffset(), textEdit.getReplacedText(), textEdit.getText());
     }
 
     /**

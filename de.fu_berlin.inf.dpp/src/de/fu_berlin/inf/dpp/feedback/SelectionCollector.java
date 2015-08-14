@@ -26,7 +26,6 @@ import java.util.Map;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
-import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
@@ -107,8 +106,8 @@ public class SelectionCollector extends AbstractStatisticCollector {
     protected ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
 
         @Override
-        public void textEditRecieved(User user, SPath editor, String text,
-            String replacedText, int offset) {
+        public void textEdited(User user, SPath filePath, int offset,
+            String replacedText, String text) {
             // the JID of the user who made the text edit
 
             /*
@@ -131,7 +130,7 @@ public class SelectionCollector extends AbstractStatisticCollector {
                  */
                 if (!currentUser.equals(user) && selection.offset <= offset
                     && (selection.offset + selection.length) >= offset
-                    && (selection.path).equals(editor) && !selection.gestured) {
+                    && (selection.path).equals(filePath) && !selection.gestured) {
                     selection.gestured = true;
                     break;
                 }
@@ -139,14 +138,14 @@ public class SelectionCollector extends AbstractStatisticCollector {
         }
 
         @Override
-        public void viewportGenerated(ViewportActivity viewport) {
-            // refresh the SPath of the local active editor
-            localPath = viewport.getPath();
-
+        public void editorActivated(User user, SPath filePath) {
+            if (user.equals(sarosSession.getLocalUser()))
+                // Remember which editor the local user has open.
+                localPath = filePath;
         }
 
         @Override
-        public void textSelectionMade(TextSelectionActivity selection) {
+        public void textSelectionChanged(TextSelectionActivity selection) {
             // details of the occurred selection
             long time = System.currentTimeMillis();
             SPath path = selection.getPath();

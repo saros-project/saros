@@ -75,13 +75,13 @@ public class SessionContentProvider extends TreeContentProvider {
 
     private final ISharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
         @Override
-        public void followModeChanged(User user, boolean isFollowed) {
-            ViewerUtils.update(viewer, new UserElement(user, editorManager,
+        public void followModeChanged(User target, boolean isFollowed) {
+            ViewerUtils.update(viewer, new UserElement(target, editorManager,
                 collector), null);
         }
 
         @Override
-        public void activeEditorChanged(final User user, SPath path) {
+        public void editorActivated(final User user, SPath filePath) {
             SWTUtils.runSafeSWTAsync(null, new Runnable() {
                 @Override
                 public void run() {

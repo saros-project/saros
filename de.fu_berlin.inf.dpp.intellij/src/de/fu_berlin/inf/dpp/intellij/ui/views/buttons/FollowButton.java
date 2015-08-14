@@ -82,7 +82,7 @@ public class FollowButton extends ToolbarButton {
 
     private final ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
         @Override
-        public void followModeChanged(final User user,
+        public void followModeChanged(final User target,
             final boolean isFollowed) {
             updateMenu();
         }

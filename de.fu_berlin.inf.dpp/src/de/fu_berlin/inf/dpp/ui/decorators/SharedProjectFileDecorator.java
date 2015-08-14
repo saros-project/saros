@@ -151,7 +151,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
     private final ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
 
         @Override
-        public void activeEditorChanged(User user, SPath path) {
+        public void editorActivated(User user, SPath filePath) {
             Set<IResource> oldResources = null;
 
             if (user.isLocal())
@@ -159,19 +159,19 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
             if (LOG.isTraceEnabled())
                 LOG.trace("remote user: " + user + " activated an editor -> "
-                    + path);
+                    + filePath);
 
             oldResources = activeEditorResources.remove(user);
 
-            if (path != null) {
+            if (filePath != null) {
 
-                IResource resource = ResourceAdapterFactory.convertBack(path
+                IResource resource = ResourceAdapterFactory.convertBack(filePath
                     .getResource());
 
                 if (resource != null)
                     activeEditorResources.put(user, getResources(resource));
                 else
-                    LOG.warn("resource for editor " + path
+                    LOG.warn("resource for editor " + filePath
                         + " does not exist locally");
             }
 

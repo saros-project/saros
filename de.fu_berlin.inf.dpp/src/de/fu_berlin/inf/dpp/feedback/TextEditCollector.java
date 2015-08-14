@@ -189,8 +189,8 @@ public class TextEditCollector extends AbstractStatisticCollector {
     protected ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
 
         @Override
-        public void textEditRecieved(User user, SPath editor, String text,
-            String replacedText, int offset) {
+        public void textEdited(User user, SPath filePath, int offset,
+            String replacedText, String text) {
             /*
              * delete whitespaces from the text because we don't want to count
              * them. that would result in quite a number of counted characters

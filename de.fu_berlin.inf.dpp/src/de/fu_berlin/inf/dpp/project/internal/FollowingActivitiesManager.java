@@ -45,11 +45,11 @@ public class FollowingActivitiesManager extends AbstractActivityProducer
 
     private final ISharedEditorListener followModeListener = new AbstractSharedEditorListener() {
         @Override
-        public void followModeChanged(User followedUser, boolean isFollowed) {
+        public void followModeChanged(User target, boolean isFollowed) {
 
             if (isFollowed) {
                 fireActivity(new StartFollowingActivity(session.getLocalUser(),
-                    followedUser));
+                    target));
             } else {
                 fireActivity(new StopFollowingActivity(session.getLocalUser()));
             }

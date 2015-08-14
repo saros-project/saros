@@ -287,7 +287,7 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
     protected ISharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
 
         @Override
-        public void activeEditorChanged(User user, SPath newActiveEditor) {
+        public void editorActivated(User user, SPath newActiveEditor) {
 
             if (!user.isLocal()
                 || ObjectUtils.equals(currentActiveEditor, newActiveEditor))
@@ -299,7 +299,7 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
         }
 
         @Override
-        public void editorRemoved(User user, SPath closedEditor) {
+        public void editorClosed(User user, SPath closedEditor) {
             if (ObjectUtils.equals(currentActiveEditor, closedEditor)) {
                 updateCurrentLocalAtomicOperation(null);
                 storeCurrentLocalOperation();

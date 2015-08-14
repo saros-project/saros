@@ -2,9 +2,7 @@ package de.fu_berlin.inf.dpp.editor;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
-import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.session.User.Permission;
 
 /**
  * Listener type for events related to local and remote {@link IEditorManager
@@ -16,113 +14,83 @@ public interface ISharedEditorListener {
      * Fired when a user activates (moves focus to) an editor. Implies that the
      * editor has been opened if it wasn't open already.
      * 
-     * @param path
-     *            the project-relative path of the resource that is the new user
-     *            with {@link Permission#WRITE_ACCESS} resource.
+     * @param filePath
+     *            project-relative path of the file associated with the editor,
+     *            or <code>null</code> if the user activated an editor that is
+     *            not associated with a shared file (or has no open editor at
+     *            all)
      * @param user
      *            the user who activated the editor (may be the local user)
      * 
      */
-    public void activeEditorChanged(User user, SPath path);
+    public void editorActivated(User user, SPath filePath);
 
     /**
-     * Is fired when the given editor is removed from the list of editors that
-     * the given user has currently open.
-     * 
-     * @param path
-     *            the path to the resource that the user with
-     *            {@link Permission#WRITE_ACCESS} was editing.
+     * Fired when a user closes an editor.
      * 
      * @param user
-     *            the user which removed an editor (can be the local user)
+     *            the user who closed the editor (may be the local user)
+     * @param filePath
+     *            project-relative path of the file associated with the closed
+     *            editor
      */
-    public void editorRemoved(User user, SPath path);
+    public void editorClosed(User user, SPath filePath);
 
     /**
-     * Is fired when the user with {@link Permission#WRITE_ACCESS} editor is
-     * saved.
+     * Fired when the local user starts or stops following a remote user.
      * 
-     * @param path
-     *            the project-relative path of the resource that is the new user
-     *            with {@link Permission#WRITE_ACCESS} resource.
-     * 
-     * @param replicated
-     *            <code>false</code> if this action originates on this client.
-     *            <code>false</code> if it is a replication of an action from
-     *            another participant of the shared project.
-     */
-    public void userWithWriteAccessEditorSaved(SPath path, boolean replicated);
-
-    /**
-     * Is fired when the follow mode is changed.
-     * 
-     * @param user
-     *            which is/is not being followed
+     * @param target
+     *            the user who will be or was being followed
      * @param isFollowed
-     *            true if the {@link User} is followed
+     *            <code>true</code> if following has started, <code>false</code>
+     *            if it has ended
      */
-    public void followModeChanged(User user, boolean isFollowed);
+    public void followModeChanged(User target, boolean isFollowed);
 
     /**
-     * Is fired after a text edit has occurred locally and sent to remote peers
-     * (in which case the user is the local user) or has been received from a
-     * remote peer and applied locally.<br>
-     * <br>
-     * 
-     * In both cases does this event occur AFTER the change has been applied
-     * locally and should only be treated as a notification.
-     * 
+     * Fired when a user changes an editor's text content. This should only be
+     * treated as an event notification; it should not be assumed that the
+     * change has already been applied locally when this method is called.
      * 
      * @param user
-     *            the user who performed the text edit, may be local or remote
-     * @param editor
-     *            the path of the file which is altered
-     * @param text
-     *            the text which was inserted at the given offset, after the
-     *            replacedText had been removed
-     * @param replacedText
-     *            the text which will be removed at the given offset before the
-     *            given text will be inserted
+     *            the user who performed the text edit (may be the local user)
+     * @param filePath
+     *            project-relative path of the file whose associated editor was
+     *            changed
      * @param offset
-     *            the character based offset inside the document where this edit
-     *            happened
+     *            character offset inside the file where the edit occurred
+     * @param deletedText
+     *            the text deleted at the offset
+     * @param insertedText
+     *            the text inserted at the offset after deletion
      */
-    public void textEditRecieved(User user, SPath editor, String text,
-        String replacedText, int offset);
+    public void textEdited(User user, SPath filePath, int offset,
+        String deletedText, String insertedText);
 
     /**
-     * Is fired after a text selection is executed locally when received by a
-     * user.
+     * Fired when a user changes the text selection in an editor. The change has
+     * already been applied locally when this method is called.
      * 
      * @param selection
-     *            The text selection made as a {@link TextSelectionActivity}
+     *            The text selection as a {@link TextSelectionActivity}
      */
-    public void textSelectionMade(TextSelectionActivity selection);
+    public void textSelectionChanged(TextSelectionActivity selection);
 
     /**
-     * Is fired after a change in the viewport has occurred.
+     * Fired when the local user uses the "jump to user" feature to jump to the
+     * active editor and viewport of a remote user.
      * 
-     * @param viewport
-     *            The viewport to apply to the local editor as a
-     *            {@link ViewportActivity}
-     */
-    public void viewportChanged(ViewportActivity viewport);
-
-    /**
-     * Is fired when the local user changed the viewport for an edior.
-     * 
-     * @param viewport
-     *            The changed viewport as a {@link ViewportActivity}
-     */
-    public void viewportGenerated(ViewportActivity viewport);
-
-    /**
-     * Is fired after a user used the jumpToFeature
-     * 
-     * @param jumpedTo
+     * @param target
      *            the user being jumped to
      */
-    public void jumpedToUser(User jumpedTo);
+    public void jumpedToUser(User target);
 
+    /**
+     * Fired when a user changes the color assigned to them.
+     */
+    /*
+     * TODO This method doesn't really have to do anything with editors and
+     * should be moved somewhere else.
+     */
     public void colorChanged();
 }

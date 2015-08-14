@@ -407,7 +407,7 @@ public class EditorManager extends AbstractActivityProducer implements
     private final ISharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
 
         @Override
-        public void activeEditorChanged(User user, SPath path) {
+        public void editorActivated(User user, SPath filePath) {
             // #2707089 We must clear annotations from shared editors that are
             // not commonly viewed
 
@@ -582,8 +582,7 @@ public class EditorManager extends AbstractActivityProducer implements
         if (path != null && session.isShared(path.getResource()))
             locallyOpenEditors.add(path);
 
-        editorListenerDispatch
-            .activeEditorChanged(session.getLocalUser(), path);
+        editorListenerDispatch.editorActivated(session.getLocalUser(), path);
 
         fireActivity(new EditorActivity(session.getLocalUser(), Type.ACTIVATED,
             path));
@@ -630,8 +629,6 @@ public class EditorManager extends AbstractActivityProducer implements
             viewport.getNumberOfLines(), path);
 
         fireActivity(activity);
-        editorListenerDispatch.viewportGenerated(activity);
-
     }
 
     /**
@@ -748,8 +745,8 @@ public class EditorManager extends AbstractActivityProducer implements
         fireActivity(textEdit);
 
         // inform all registered ISharedEditorListeners about this text edit
-        editorListenerDispatch.textEditRecieved(session.getLocalUser(), path,
-            text, replacedText, offset);
+        editorListenerDispatch.textEdited(session.getLocalUser(), path, offset,
+            replacedText, text);
 
         /*
          * TODO Investigate if this is really needed here
@@ -836,8 +833,8 @@ public class EditorManager extends AbstractActivityProducer implements
         }
 
         // inform all registered ISharedEditorListeners about this text edit
-        editorListenerDispatch.textEditRecieved(user, path, textEdit.getText(),
-            textEdit.getReplacedText(), textEdit.getOffset());
+        editorListenerDispatch.textEdited(user, path, textEdit.getOffset(),
+            textEdit.getReplacedText(), textEdit.getText());
     }
 
     private void execTextSelection(TextSelectionActivity selection) {
@@ -872,7 +869,7 @@ public class EditorManager extends AbstractActivityProducer implements
          * inform all registered ISharedEditorListeners about a text selection
          * made
          */
-        editorListenerDispatch.textSelectionMade(selection);
+        editorListenerDispatch.textSelectionChanged(selection);
     }
 
     private void execViewport(ViewportActivity viewport) {
@@ -927,18 +924,13 @@ public class EditorManager extends AbstractActivityProducer implements
                 adjustViewport(user, editorPart, lineRange);
             }
         }
-        /*
-         * inform all registered ISharedEditorListeners about a change in
-         * viewport
-         */
-        editorListenerDispatch.viewportChanged(viewport);
     }
 
     private void execActivated(User user, SPath path) {
 
         LOG.trace(".execActivated invoked");
 
-        editorListenerDispatch.activeEditorChanged(user, path);
+        editorListenerDispatch.editorActivated(user, path);
 
         /**
          * Path null means this user with {@link User.Permission#WRITE_ACCESS}
@@ -972,7 +964,7 @@ public class EditorManager extends AbstractActivityProducer implements
 
         LOG.trace(".execClosed invoked");
 
-        editorListenerDispatch.editorRemoved(user, path);
+        editorListenerDispatch.editorClosed(user, path);
 
         for (final IEditorPart editorPart : editorPool.getEditors(path))
             locationAnnotationManager.clearSelectionForUser(user, editorPart);
@@ -1188,7 +1180,7 @@ public class EditorManager extends AbstractActivityProducer implements
 
         locallyOpenEditors.remove(path);
 
-        editorListenerDispatch.editorRemoved(session.getLocalUser(), path);
+        editorListenerDispatch.editorClosed(session.getLocalUser(), path);
 
         fireActivity(new EditorActivity(session.getLocalUser(), Type.CLOSED,
             path));
@@ -1436,8 +1428,6 @@ public class EditorManager extends AbstractActivityProducer implements
             return;
         }
 
-        editorListenerDispatch.userWithWriteAccessEditorSaved(path, true);
-
         FileEditorInput input = new FileEditorInput(file);
         IDocumentProvider provider = editorAPI.getDocumentProvider(input);
 
@@ -1523,7 +1513,6 @@ public class EditorManager extends AbstractActivityProducer implements
         // editorPool, or?
         // What is the reason of this?
 
-        editorListenerDispatch.userWithWriteAccessEditorSaved(path, false);
         fireActivity(new EditorActivity(session.getLocalUser(), Type.SAVED,
             path));
     }
