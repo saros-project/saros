@@ -100,10 +100,7 @@ import de.fu_berlin.inf.dpp.util.Predicate;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
 /**
- * The EditorManager is responsible for handling all editors in a DPP-session.
- * This includes the functionality of listening for user inputs in an editor,
- * locking the editors of the users with {@link Permission#READONLY_ACCESS}. It
- * both produces and consumes activities.
+ * Eclipse implementation of the {@link IEditorManager} interface.
  * <p>
  * The EditorManager contains the testable logic. All untestable logic should
  * only appear in a class of the {@link IEditorAPI} type. (CO: This is the

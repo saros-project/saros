@@ -71,18 +71,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * The EditorManager is responsible for handling all local editors in a DPP-session.
- * <p>
- * This includes the functionality of listening for user inputs in an editor, listening for
- * remote inputs and locking the editors of the users with
- * {@link User.Permission#READONLY_ACCESS}.
- * <p>
- * This implementation delegates edit activites received from remote to
- * {@link LocalEditorManipulator} and gets called by {@link LocalEditorHandler}
- * for activities from local editors.
+ * IntelliJ implementation of the {@link IEditorManager} interface.
  */
 public class EditorManager extends AbstractActivityProducer implements
-    IEditorManager{
+    IEditorManager {
 
     private static final Logger LOG = Logger.getLogger(EditorManager.class);
 

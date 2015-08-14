@@ -6,10 +6,26 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 
 /**
- * This interface gives access to managed editors during a running session. An
- * editor is in the state of being <tt>managed</tt> when it is part of the
- * current sharing settings, i.e modifying its contents will be recognized and
- * broadcasted to other session users.
+ * Tracks and provides access to editors for the set of files shared in the
+ * currently running session. In this context, <i>editor</i> refers to an open
+ * text file displayed to the user for viewing and editing.
+ * <p>
+ * Editors are referred to by {@link SPath paths} to the files they are
+ * associated with. Whenever possible, <code>IEditorManager</code> will make it
+ * transparent to the caller whether there is actually an open editor for the
+ * file; for instance, {@link #getContent(SPath)} automatically falls back to
+ * retrieving the content directly from the file instead of from the editor.
+ * <p>
+ * <code>IEditorManager</code> tracks both locally open editors and editors
+ * opened by remote users. Changes to local editors (such as editors getting
+ * opened, closed, or their content changed) are reported to remote sites as
+ * {@link de.fu_berlin.inf.dpp.activities.IActivity activities}. Objects can
+ * react to both local and remote editor events by installing an
+ * {@link ISharedEditorListener}.
+ * <p>
+ * All methods of <code>IEditorManager</code> automatically take care of any
+ * required synchronization with the UI thread and can be safely called from any
+ * thread.
  */
 public interface IEditorManager {
 
@@ -33,9 +49,6 @@ public interface IEditorManager {
      * Returns the text content of the local editor associated with the
      * specified file, or the content of the file itself if there is currently
      * no open editor for it.
-     * <p>
-     * This method must be called on the UI thread.
-     * </p>
      * 
      * @param path
      *            path of the file whose content should be returned
@@ -45,12 +58,13 @@ public interface IEditorManager {
     public String getContent(SPath path);
 
     /**
-     * Saves all currently managed editors that belong to the given project. If
-     * the given project is <code>null</code> all currently managed editors will
-     * be saved.
+     * Saves the local editors of all shared files belonging to the given
+     * project. If <code>null</code> is passed, the shared files of all projects
+     * will be saved.
      * 
      * @param project
-     *            the project which editors should be saved or <code>null</code>
+     *            the project whose editors should be saved, or
+     *            <code>null</code> to save all editors
      */
     public void saveEditors(IProject project);
 
