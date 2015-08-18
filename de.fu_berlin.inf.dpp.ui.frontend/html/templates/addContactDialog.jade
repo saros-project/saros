@@ -1,5 +1,5 @@
-div.modal
-    div.modal-dialog
+div.modal(role="dialog" tabindex="-1")
+    div.modal-dialog(role="document")
         div.modal-content
                 div.modal-header
                     button.close(data-dismiss="modal", aria-label="Close")
@@ -11,4 +11,4 @@ div.modal
                         fieldset(data-hook="field-container")
                     div.modal-footer
                         button.btn.btn-default.btn-sm(data-dismiss="modal")= d.action.close
-                        button.btn.btn-primary.btn-sm(data-hook="add-button", type="submit")= d.action.add
+                        button.btn.btn-primary.btn-sm(data-hook="add", type="submit")= d.action.add

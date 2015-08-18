@@ -17,7 +17,7 @@ module.exports = AmpersandView.extend({
     initialize: function() {
 
         AmpersandView.prototype.initialize.apply(this, arguments);
-        bindAll(this, 'updateValidity', 'addContact');
+        bindAll(this, 'updateValidity', 'addContact', 'handleEnter');
     },
     props: {
         valid: 'boolean',
@@ -27,8 +27,11 @@ module.exports = AmpersandView.extend({
             type: 'booleanClass',
             yes: '',
             no: 'disabled',
-            hook: 'add-button'
+            hook: 'add'
         }
+    },
+    events: {
+        'keypress': 'handleEnter'
     },
     render: function() {
 
@@ -83,7 +86,9 @@ module.exports = AmpersandView.extend({
         // Call Bootstraps function for modals and ensure to remove this
         // view when closing the modal. The view is attached to `body` by
         // Bootstrap.
-        $$(this.el).modal().on('hidden.bs.modal', this.remove.bind(this));
+        $$(this.el).modal({
+            backdrop: 'static'
+        }).on('hidden.bs.modal', this.remove.bind(this));
     },
     updateValidity: function(valid) {
 
@@ -97,5 +102,17 @@ module.exports = AmpersandView.extend({
         var contact  = new Contact(contact);
         contact.create();
         $$(this.el).modal('hide');
+    },
+    handleEnter: function(e) {
+
+        if (e.keyCode === 13) {
+            if(this.valid) {
+                // Trigger click on add button to add contact
+                $$(this.queryByHook('add')).trigger('click');
+            } else {
+                // Avoid closing the modal on enter
+                e.preventDefault();
+            }
+        }
     }
 });

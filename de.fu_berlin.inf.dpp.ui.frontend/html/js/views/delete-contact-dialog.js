@@ -27,7 +27,9 @@ module.exports = AmpersandView.extend({
         // Call Bootstraps function for modals and ensure to remove this
         // view when closing the modal. The view is attached to `body` by
         // Bootstrap.
-        $$(this.el).modal().on('hidden.bs.modal', this.remove.bind(this));
+        $$(this.el).modal({
+            backdrop: 'static'
+        }).on('hidden.bs.modal', this.remove.bind(this));
 
         return this;
     },

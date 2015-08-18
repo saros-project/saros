@@ -20,6 +20,9 @@ module.exports = AmpersandView.extend({
     bindings: {
         'model.jid': '[data-hook=jid]'
     },
+    events: {
+        'keypress': 'handleEnter'
+    },
     render: function() {
 
         this.renderWithTemplate();
@@ -50,11 +53,20 @@ module.exports = AmpersandView.extend({
         // Call Bootstraps function for modals and ensure to remove this
         // view when closing the modal. The view is attached to `body` by
         // Bootstrap.
-        $$(this.el).modal().on('hidden.bs.modal', this.remove.bind(this));
+        $$(this.el).modal({
+            backdrop: 'static'
+        }).on('hidden.bs.modal', this.remove.bind(this));
     },
     renameContact: function(contact) {
 
         this.model.rename(contact.displayName);
         $$(this.el).modal('hide');
+    },
+    handleEnter: function(e) {
+
+        if (e.keyCode === 13) {
+            // Trigger click on add button to add contact
+            $$(this.queryByHook('save')).trigger('click');
+        }
     }
 });
