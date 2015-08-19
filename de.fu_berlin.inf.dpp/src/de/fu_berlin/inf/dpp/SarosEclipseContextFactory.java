@@ -27,6 +27,8 @@ import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRoot;
 import de.fu_berlin.inf.dpp.monitoring.remote.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferences;
+import de.fu_berlin.inf.dpp.project.internal.SarosEclipseSessionContextFactory;
+import de.fu_berlin.inf.dpp.session.ISarosSessionContextFactory;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.synchronize.internal.SWTSynchronizer;
 import de.fu_berlin.inf.dpp.ui.eventhandler.ConnectingFailureHandler;
@@ -69,6 +71,9 @@ public class SarosEclipseContextFactory extends AbstractSarosContextFactory {
         Component.create(SessionViewOpener.class),
         Component.create(UndoManager.class),
         Component.create(RemoteProgressManager.class),
+
+        Component.create(ISarosSessionContextFactory.class,
+            SarosEclipseSessionContextFactory.class),
 
         // UI handlers
         Component.create(HostLeftAloneInSessionHandler.class),

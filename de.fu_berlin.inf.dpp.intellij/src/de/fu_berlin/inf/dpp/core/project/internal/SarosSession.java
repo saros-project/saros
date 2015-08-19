@@ -55,15 +55,12 @@ import de.fu_berlin.inf.dpp.communication.extensions.KickUserExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.LeaveSessionExtension;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
-import de.fu_berlin.inf.dpp.core.concurrent.ConsistencyWatchdogHandler;
-import de.fu_berlin.inf.dpp.core.concurrent.ConsistencyWatchdogServer;
 import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.intellij.project.SharedResourcesManager;
 import de.fu_berlin.inf.dpp.misc.xstream.SPathConverter;
 import de.fu_berlin.inf.dpp.misc.xstream.UserConverter;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
@@ -76,6 +73,7 @@ import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityListener;
 import de.fu_berlin.inf.dpp.session.IActivityProducer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionContextFactory;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
@@ -230,39 +228,12 @@ public final class SarosSession implements ISarosSession {
 
         sessionContainer = context.createSimpleChildContainer();
         sessionContainer.addComponent(ISarosSession.class, this);
-        sessionContainer.addComponent(StopManager.class);
-        sessionContainer.addComponent(ActivitySequencer.class);
-
-        // Concurrent Editing
-
-        sessionContainer.addComponent(ConcurrentDocumentClient.class);
-        /*
-         * as Pico Container complains about null, just add the server even in
-         * client mode as it will not matter because it is not accessed
-         */
-        sessionContainer.addComponent(ConcurrentDocumentServer.class);
-
-        // Classes belonging to a session
-
-        // Core Managers
-        sessionContainer.addComponent(SharedResourcesManager.class);
-        sessionContainer.addComponent(PermissionManager.class);
-        sessionContainer.addComponent(FollowingActivitiesManager.class);
-
-        // Handlers
-        sessionContainer.addComponent(ConsistencyWatchdogHandler.class);
-        // transforming - thread access
-        sessionContainer.addComponent(ActivityHandler.class);
         sessionContainer.addComponent(IActivityHandlerCallback.class,
             activityCallback);
-        sessionContainer.addComponent(UserInformationHandler.class);
-        // Timeout
-        if (isHost()) {
-            sessionContainer.addComponent(ConsistencyWatchdogServer.class);
-            sessionContainer.addComponent(ServerSessionTimeoutHandler.class);
-        } else {
-            sessionContainer.addComponent(ClientSessionTimeoutHandler.class);
-        }
+
+        ISarosSessionContextFactory factory = context
+            .getComponent(ISarosSessionContextFactory.class);
+        factory.createComponents(this, sessionContainer);
 
         // Force the creation of the above components.
         sessionContainer.getComponents();

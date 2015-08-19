@@ -51,20 +51,6 @@ import de.fu_berlin.inf.dpp.communication.extensions.KickUserExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.LeaveSessionExtension;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
-import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogHandler;
-import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogServer;
-import de.fu_berlin.inf.dpp.feedback.DataTransferCollector;
-import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
-import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
-import de.fu_berlin.inf.dpp.feedback.FollowModeCollector;
-import de.fu_berlin.inf.dpp.feedback.JumpFeatureUsageCollector;
-import de.fu_berlin.inf.dpp.feedback.ParticipantCollector;
-import de.fu_berlin.inf.dpp.feedback.PermissionChangeCollector;
-import de.fu_berlin.inf.dpp.feedback.ProjectCollector;
-import de.fu_berlin.inf.dpp.feedback.SelectionCollector;
-import de.fu_berlin.inf.dpp.feedback.SessionDataCollector;
-import de.fu_berlin.inf.dpp.feedback.StatisticManager;
-import de.fu_berlin.inf.dpp.feedback.TextEditCollector;
 import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
@@ -79,12 +65,11 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
-import de.fu_berlin.inf.dpp.project.internal.timeout.ClientSessionTimeoutHandler;
-import de.fu_berlin.inf.dpp.project.internal.timeout.ServerSessionTimeoutHandler;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityListener;
 import de.fu_berlin.inf.dpp.session.IActivityProducer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionContextFactory;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
@@ -1068,59 +1053,14 @@ public final class SarosSession implements ISarosSession {
 
         sessionContainer = context.createSimpleChildContainer();
         sessionContainer.addComponent(ISarosSession.class, this);
-        sessionContainer.addComponent(StopManager.class);
-        sessionContainer.addComponent(ActivitySequencer.class);
-
-        // Concurrent Editing
-
-        sessionContainer.addComponent(ConcurrentDocumentClient.class);
-        /*
-         * as Pico Container complains about null, just add the server even in
-         * client mode as it will not matter because it is not accessed
-         */
-        sessionContainer.addComponent(ConcurrentDocumentServer.class);
-
-        // Classes belonging to a session
-
-        // Core Managers
-        sessionContainer.addComponent(ChangeColorManager.class);
-        sessionContainer.addComponent(SharedResourcesManager.class);
-        sessionContainer.addComponent(PermissionManager.class);
-        sessionContainer.addComponent(FollowingActivitiesManager.class);
-
-        // Statistic collectors. Make sure to add new collectors to the
-        // StatisticCollectorTest as well
-        sessionContainer.addComponent(StatisticManager.class);
-        sessionContainer.addComponent(DataTransferCollector.class);
-        sessionContainer.addComponent(PermissionChangeCollector.class);
-        sessionContainer.addComponent(ParticipantCollector.class);
-        sessionContainer.addComponent(SessionDataCollector.class);
-        sessionContainer.addComponent(TextEditCollector.class);
-        sessionContainer.addComponent(JumpFeatureUsageCollector.class);
-        sessionContainer.addComponent(FollowModeCollector.class);
-        sessionContainer.addComponent(SelectionCollector.class);
-        sessionContainer.addComponent(ProjectCollector.class);
-
-        // Feedback
-        sessionContainer.addComponent(ErrorLogManager.class);
-        sessionContainer.addComponent(FeedbackManager.class);
-
-        // Handlers
-        sessionContainer.addComponent(ConsistencyWatchdogHandler.class);
-        // transforming - thread access
-        sessionContainer.addComponent(ActivityHandler.class);
         sessionContainer.addComponent(IActivityHandlerCallback.class,
             activityCallback);
-        sessionContainer.addComponent(UserInformationHandler.class);
-        // Timeout
-        if (isHost()) {
-            sessionContainer.addComponent(ConsistencyWatchdogServer.class);
-            sessionContainer.addComponent(ServerSessionTimeoutHandler.class);
-        } else {
-            sessionContainer.addComponent(ClientSessionTimeoutHandler.class);
-        }
 
-        // Force the creation of the above components.
+        ISarosSessionContextFactory factory = context
+            .getComponent(ISarosSessionContextFactory.class);
+        factory.createComponents(this, sessionContainer);
+
+        // Force the creation of the components added to the session container.
         sessionContainer.getComponents();
 
         // HACK
