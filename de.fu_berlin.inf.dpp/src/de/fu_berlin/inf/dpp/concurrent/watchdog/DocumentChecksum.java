@@ -1,128 +1,133 @@
 package de.fu_berlin.inf.dpp.concurrent.watchdog;
 
+import org.eclipse.jface.text.DocumentEvent;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IDocumentListener;
+
 import de.fu_berlin.inf.dpp.activities.SPath;
 
 /**
- * Represents a checksum of a document in the workspace. It consists of the
- * document's project-relative path, the content length and the content's string
- * hash code.
+ * This Class represents a checksum of a document. It contains the path, the
+ * length and the hash code of the document.
+ * 
+ * @author chjacob
  */
 public class DocumentChecksum {
 
     /**
-     * The return value of {@link #getLength()} and {@link #getHash()} if the
-     * checksum's associated document is not available (i.e., the document
-     * doesn't exist).
+     * Constant used for representing a missing file
      */
-    public static final int NOT_AVAILABLE = -1;
+    public static final int NON_EXISTING_DOC = -1;
 
-    private SPath path;
-    private int length;
-    private int hash;
-    private boolean dirty;
+    protected IDocumentListener dirtyListener = new IDocumentListener() {
+
+        @Override
+        public void documentAboutToBeChanged(DocumentEvent event) {
+            // we are only interested in events after the change
+        }
+
+        @Override
+        public void documentChanged(DocumentEvent event) {
+            dirty = true;
+        }
+    };
+
+    // the path to the concurrent document
+    protected final SPath path;
+
+    // the length of the document
+    protected int length;
+
+    // the hash code of the document
+    protected int hash;
+
+    protected IDocument document;
+
+    protected boolean dirty;
 
     /**
-     * Creates a new DocumentChecksum.
+     * Creates a new Checksum for the document represented in the given path.
      * 
-     * @param path
-     *            the document's project-relative path
+     * The checksum is initially created without being bound to a document.
      */
     public DocumentChecksum(SPath path) {
         this.path = path;
         this.dirty = true;
     }
 
-    /**
-     * Returns the project-relative path of the checksum's associated document.
-     * 
-     * @return document path
-     */
     public SPath getPath() {
         return path;
     }
 
-    /**
-     * Returns the length of the associated document's content.
-     * <p>
-     * If the document's content is not available ({@link #update} was not
-     * called yet or called with <code>null</code> the last time),
-     * {@link #NOT_AVAILABLE} is returned.
-     * </p>
-     * 
-     * @return document content length, or {@link #NOT_AVAILABLE} if the
-     *         document doesn't exist
-     */
     public int getLength() {
         return length;
     }
 
-    /**
-     * Returns the hash code of the associated document's content.
-     * <p>
-     * If the document's content is not available ({@link #update} was not
-     * called yet or called with <code>null</code> the last time),
-     * {@link #NOT_AVAILABLE} is returned.
-     * </p>
-     * 
-     * @return document content hash, or {@link #NOT_AVAILABLE} if not
-     *         available, or {@link #NOT_AVAILABLE} if not available
-     */
+    public void setLength(int length) {
+        this.length = length;
+    }
+
     public int getHash() {
         return hash;
     }
 
-    /**
-     * Returns whether the checksum (more specifically, what was calculated for
-     * {@link #getHash()} and {@link #getLength()} in the last call to
-     * {@link #update(String)}) is out-of-sync with the associated document's
-     * current content.
-     * <p>
-     * Note that this determines whether {@link #update(String)} actually does
-     * any checksum calculations, so make sure to call {@link #markDirty()} to
-     * notify the checksum whenever the document changes.
-     * <p>
-     * A DocumentChecksum is automatically marked as dirty when it created.
-     * </p>
-     * 
-     * @return <code>true</code> if the checksum is out-of-sync,
-     *         <code>false</code> if it is up-to-date
-     */
-    public boolean isDirty() {
-        return dirty;
+    public void setHash(int hash) {
+        this.hash = hash;
     }
 
-    /**
-     * Tells the checksum that its content length and hash code are out-of-date
-     * because the associated document changed.
-     */
-    public void markDirty() {
+    public void setDirty(boolean b) {
+        this.dirty = b;
+    }
+
+    public void dispose() {
+        unbind();
+    }
+
+    private void unbind() {
+        if (document != null) {
+            document.removeDocumentListener(dirtyListener);
+        }
+    }
+
+    public void bind(IDocument doc) {
+
+        if (this.document == doc)
+            return;
+
+        unbind();
+
+        this.document = doc;
+
+        if (document != null)
+            doc.addDocumentListener(dirtyListener);
+
         dirty = true;
     }
 
-    /**
-     * Recalculates the checksum's content hash code and updates the returned
-     * content length, provided the checksum is marked as {@link #isDirty()
-     * dirty}. If not, it does nothing.
-     * <p>
-     * This method resets the checksum to be non-dirty.
-     * </p>
-     * 
-     * @param documentContent
-     *            the document's current content, or <code>null</code> if the
-     *            document is does not exist locally
-     */
-    public void update(String documentContent) {
+    public void update() {
+
+        // If document not changed, skip
         if (!dirty)
             return;
 
-        if (documentContent == null) {
-            length = hash = NOT_AVAILABLE;
+        if (document == null) {
+            this.length = this.hash = NON_EXISTING_DOC;
         } else {
-            length = documentContent.length();
-            hash = documentContent.hashCode();
+            this.length = document.getLength();
+            this.hash = document.get().hashCode();
         }
 
         dirty = false;
+    }
+
+    /**
+     * Returns whether this checksum represents a file which exists at the host.
+     * 
+     * If false is returned, then this checksum indicates that the host has no
+     * file under the given path.
+     */
+    public boolean existsFile() {
+        return !(this.length == NON_EXISTING_DOC && this.hash == NON_EXISTING_DOC);
     }
 
     @Override
