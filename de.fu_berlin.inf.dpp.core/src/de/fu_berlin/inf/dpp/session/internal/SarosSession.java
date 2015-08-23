@@ -21,8 +21,8 @@ package de.fu_berlin.inf.dpp.session.internal;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,7 +51,6 @@ import de.fu_berlin.inf.dpp.communication.extensions.KickUserExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.LeaveSessionExtension;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
-import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
@@ -129,9 +128,6 @@ public final class SarosSession implements ISarosSession {
     private final SharedProjectMapper projectMapper;
 
     private boolean useVersionControl = true;
-
-    // KARL HELD YOU ARE MY WTF GUY !!!
-    private List<IResource> selectedResources = new ArrayList<IResource>();
 
     private final MutablePicoContainer sessionContainer;
 
@@ -219,36 +215,67 @@ public final class SarosSession implements ISarosSession {
     }
 
     @Override
-    public void addSharedResources(IProject project, String projectID,
-        List<IResource> dependentResources) {
-        if (!isCompletelyShared(project) && dependentResources != null) {
-            for (IResource resource : dependentResources) {
-                if (resource.getType() == IResource.FOLDER) {
-                    addMembers(resource);
-                }
-            }
-            if (selectedResources != null) {
-                selectedResources.removeAll(dependentResources);
-                dependentResources.addAll(selectedResources);
-                selectedResources.clear();
-            }
+    public void addSharedResources(IProject project, String id,
+        List<IResource> resources) {
+
+        Set<IResource> allResources = null;
+
+        if (resources != null) {
+            allResources = new HashSet<IResource>();
+            for (IResource resource : resources)
+                allResources.addAll(getAllNonSharedChildren(resource));
         }
 
         if (!projectMapper.isShared(project)) {
-            projectMapper.addProject(projectID, project,
-                dependentResources != null);
-
-            if (dependentResources != null)
-                projectMapper.addResources(project, dependentResources);
+            // new project
+            if (allResources == null) {
+                // new fully shared project
+                projectMapper.addProject(id, project, false);
+            } else {
+                // new partially shared project
+                projectMapper.addProject(id, project, true);
+                projectMapper.addResources(project, allResources);
+            }
 
             listenerDispatch.projectAdded(project);
         } else {
-            if (dependentResources == null)
-                // upgrade the project to a completely shared project
-                projectMapper.addProject(projectID, project, false);
-            else
-                projectMapper.addResources(project, dependentResources);
+            // existing project
+            if (allResources == null) {
+                // upgrade partially shared to fully shared project
+                projectMapper.addProject(id, project, false);
+            } else {
+                // increase scope of partially shared project
+                projectMapper.addResources(project, allResources);
+            }
         }
+    }
+
+    /**
+     * Recursively get non-shared resources
+     * 
+     * @param resource
+     *            of type {@link IResource#FOLDER} or {@link IResource#FILE}
+     */
+    private List<IResource> getAllNonSharedChildren(IResource resource) {
+        List<IResource> list = new ArrayList<IResource>();
+
+        if (isShared(resource))
+            return list;
+
+        list.add(resource);
+
+        if (resource.getType() == IResource.FOLDER) {
+            try {
+                IResource[] members = ((IFolder) resource).members();
+
+                for (int i = 0; i < members.length; i++)
+                    list.addAll(getAllNonSharedChildren(members[i]));
+            } catch (IOException e) {
+                log.error("Can't get children of folder " + resource, e);
+            }
+        }
+
+        return list;
     }
 
     @Override
@@ -885,34 +912,6 @@ public final class SarosSession implements ISarosSession {
     @Override
     public List<IResource> getSharedResources() {
         return projectMapper.getPartiallySharedResources();
-    }
-
-    /**
-     * Recursively add non-shared resources
-     * 
-     * @param resource
-     *            of type {@link IResource#FOLDER} or {@link IResource#FILE}
-     */
-    private void addMembers(IResource resource) {
-        if (isShared(resource))
-            return;
-
-        selectedResources.add(resource);
-
-        if (resource.getType() == IResource.FOLDER) {
-            List<IResource> childResources = null;
-            try {
-                childResources = Arrays.asList(((IContainer) resource)
-                    .members());
-            } catch (IOException e) {
-                log.error("Can't get children of folder " + resource, e);
-                return;
-            }
-
-            for (IResource childResource : childResources) {
-                addMembers(childResource);
-            }
-        }
     }
 
     @Override
