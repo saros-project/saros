@@ -299,6 +299,7 @@ public class EditorManager extends AbstractActivityProducer implements
 
             if (locallyActiveEditor == null)
                 return;
+
             if (localViewport != null) {
                 fireActivity(new ViewportActivity(localUser,
                     localViewport.getStartLine(),
@@ -844,8 +845,7 @@ public class EditorManager extends AbstractActivityProducer implements
         SPath path = selection.getPath();
 
         if (path == null) {
-            EditorManager.LOG
-                .error("Received text selection but have no writable editor");
+            LOG.error("Received text selection but have no writable editor");
             return;
         }
 
@@ -1420,7 +1420,7 @@ public class EditorManager extends AbstractActivityProducer implements
 
         IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
 
-        LOG.trace("EditorManager.saveText (" + file.getName() + ") invoked");
+        LOG.trace(".saveEditor (" + file.getName() + ") invoked");
 
         if (!file.exists()) {
             LOG.warn("File not found for saving: " + path.toString(),
@@ -1436,12 +1436,12 @@ public class EditorManager extends AbstractActivityProducer implements
              * This happens when a file which is already saved is saved again by
              * a user.
              */
-            LOG.debug(".saveText File " + file.getName()
+            LOG.debug(".saveEditor File " + file.getName()
                 + " does not need to be saved");
             return;
         }
 
-        LOG.trace(".saveText File " + file.getName() + " will be saved");
+        LOG.trace(".saveEditor File " + file.getName() + " will be saved");
 
         try {
             provider.connect(input);
@@ -1469,8 +1469,7 @@ public class EditorManager extends AbstractActivityProducer implements
             if (model != null)
                 model.connect(doc);
 
-            LOG.trace("EditorManager.saveText Annotations on the IDocument "
-                + "are set");
+            LOG.trace(".saveEditor Annotations on the IDocument are set");
 
             editorPool.setElementStateListenerEnabled(false);
 
@@ -1486,10 +1485,6 @@ public class EditorManager extends AbstractActivityProducer implements
 
             if (model != null)
                 model.disconnect(doc);
-
-            LOG.trace("EditorManager.saveText File " + file.getName()
-                + " will be reseted");
-
         } finally {
             provider.disconnect(input);
             if (!isConnected)
@@ -1505,14 +1500,6 @@ public class EditorManager extends AbstractActivityProducer implements
      *            {@link Permission#WRITE_ACCESS} was editing.
      */
     void sendEditorActivitySaved(SPath path) {
-
-        LOG.trace("EditorManager.sendEditorActivitySaved started for "
-            + path.toString());
-
-        // TODO technically we should mark the file as saved in the
-        // editorPool, or?
-        // What is the reason of this?
-
         fireActivity(new EditorActivity(session.getLocalUser(), Type.SAVED,
             path));
     }
