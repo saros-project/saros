@@ -24,13 +24,6 @@ public class SarosIntellijSessionContextFactory extends
         if (session.isHost())
             container.addComponent(ConsistencyWatchdogServer.class);
 
-        // Session Timeout Handling
-        if (session.isHost()) {
-            container.addComponent(ServerSessionTimeoutHandler.class);
-        } else {
-            container.addComponent(ClientSessionTimeoutHandler.class);
-        }
-
         // Other
         container.addComponent(FollowingActivitiesManager.class);
         container.addComponent(SharedResourcesManager.class);

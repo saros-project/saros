@@ -17,8 +17,6 @@ import de.fu_berlin.inf.dpp.feedback.SessionDataCollector;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.feedback.TextEditCollector;
 import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
-import de.fu_berlin.inf.dpp.project.internal.timeout.ClientSessionTimeoutHandler;
-import de.fu_berlin.inf.dpp.project.internal.timeout.ServerSessionTimeoutHandler;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionContextFactory;
 import de.fu_berlin.inf.dpp.session.SarosCoreSessionContextFactory;
@@ -37,12 +35,6 @@ public class SarosEclipseSessionContextFactory extends
         container.addComponent(ConsistencyWatchdogHandler.class);
         if (session.isHost())
             container.addComponent(ConsistencyWatchdogServer.class);
-
-        // Session Timeout Handling
-        if (session.isHost())
-            container.addComponent(ServerSessionTimeoutHandler.class);
-        else
-            container.addComponent(ClientSessionTimeoutHandler.class);
 
         // Statistic Collectors
         /*

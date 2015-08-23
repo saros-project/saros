@@ -8,6 +8,8 @@ import de.fu_berlin.inf.dpp.session.internal.ActivityHandler;
 import de.fu_berlin.inf.dpp.session.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.session.internal.PermissionManager;
 import de.fu_berlin.inf.dpp.session.internal.UserInformationHandler;
+import de.fu_berlin.inf.dpp.session.internal.timeout.ClientSessionTimeoutHandler;
+import de.fu_berlin.inf.dpp.session.internal.timeout.ServerSessionTimeoutHandler;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 
 /**
@@ -32,6 +34,12 @@ public class SarosCoreSessionContextFactory implements
          */
         container.addComponent(ConcurrentDocumentServer.class);
         container.addComponent(ConcurrentDocumentClient.class);
+
+        // Session Timeout Handling
+        if (session.isHost())
+            container.addComponent(ServerSessionTimeoutHandler.class);
+        else
+            container.addComponent(ClientSessionTimeoutHandler.class);
 
         // Other
         container.addComponent(ActivityHandler.class);

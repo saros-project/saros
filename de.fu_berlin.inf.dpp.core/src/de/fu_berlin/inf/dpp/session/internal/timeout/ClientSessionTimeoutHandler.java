@@ -1,26 +1,10 @@
-/*
- *
- *  DPP - Serious Distributed Pair Programming
- *  (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2010
- *  (c) NFQ (www.nfq.com) - 2014
- *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 1, or (at your option)
- *  any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- * /
- */
+package de.fu_berlin.inf.dpp.session.internal.timeout;
 
-package de.fu_berlin.inf.dpp.core.project.internal;
+import java.io.IOException;
+
+import org.apache.log4j.Logger;
+import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.packet.Packet;
 
 import de.fu_berlin.inf.dpp.communication.extensions.PingExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.PongExtension;
@@ -30,15 +14,10 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
-import org.apache.log4j.Logger;
-import org.jivesoftware.smack.PacketListener;
-import org.jivesoftware.smack.packet.Packet;
-
-import java.io.IOException;
 
 /**
  * Component for detecting network errors on the client side of a session.
- *
+ * 
  * @author srossbach
  */
 public final class ClientSessionTimeoutHandler extends SessionTimeoutHandler {
@@ -51,6 +30,9 @@ public final class ClientSessionTimeoutHandler extends SessionTimeoutHandler {
     private boolean pingReceived;
 
     private long lastPingReceived;
+
+    private Thread workerThread;
+
     private final PacketListener pingPacketListener = new PacketListener() {
 
         @Override
@@ -62,6 +44,7 @@ public final class ClientSessionTimeoutHandler extends SessionTimeoutHandler {
             }
         }
     };
+
     private final Runnable clientSessionTimeoutWatchdog = new Runnable() {
 
         @Override
@@ -78,13 +61,12 @@ public final class ClientSessionTimeoutHandler extends SessionTimeoutHandler {
                                 .wait(PING_PONG_UPDATE_DELAY);
                         } catch (InterruptedException e) {
                             if (!shutdown)
-                                LOG.error("watchdog shutdown prematurly", e);
+                                LOG.error("watchdog shutdown prematurely", e);
 
                             return;
                         }
 
-                        if ((System.currentTimeMillis() - lastPingReceived)
-                            > PING_PONG_TIMEOUT) {
+                        if ((System.currentTimeMillis() - lastPingReceived) > PING_PONG_TIMEOUT) {
                             abort = true;
                             break;
                         }
@@ -99,23 +81,21 @@ public final class ClientSessionTimeoutHandler extends SessionTimeoutHandler {
                 if (abort) {
                     LOG.error("no ping received, reached timeout = "
                         + PING_PONG_TIMEOUT);
-                    handleNetworkError(session.getHost().getJID(), "RxFailure");
+                    handleNetworkError(session.getHost().getJID(), "rx");
                     return;
                 }
 
                 try {
                     transmitter.send(ISarosSession.SESSION_CONNECTION_ID,
                         session.getHost().getJID(), PongExtension.PROVIDER
-                            .create(new PongExtension(currentSessionID))
-                    );
+                            .create(new PongExtension(currentSessionID)));
                 } catch (IOException e) {
                     LOG.error("failed to send pong", e);
-                    handleNetworkError(session.getHost().getJID(), "TxFailure");
+                    handleNetworkError(session.getHost().getJID(), "tx");
                 }
             }
         }
     };
-    private Thread workerThread;
 
     public ClientSessionTimeoutHandler(ISarosSession session,
         ISarosSessionManager sessionManager, ActivitySequencer sequencer,
@@ -137,9 +117,8 @@ public final class ClientSessionTimeoutHandler extends SessionTimeoutHandler {
         receiver.addPacketListener(pingPacketListener,
             PingExtension.PROVIDER.getPacketFilter(currentSessionID));
 
-        workerThread = ThreadUtils
-            .runSafeAsync("ClientSessionTimeoutWatchdog", LOG,
-                clientSessionTimeoutWatchdog);
+        workerThread = ThreadUtils.runSafeAsync("dpp-client-network-watchdog",
+            LOG, clientSessionTimeoutWatchdog);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.project.internal.timeout;
+package de.fu_berlin.inf.dpp.session.internal.timeout;
 
 import org.apache.log4j.Logger;
 import org.picocontainer.Startable;
