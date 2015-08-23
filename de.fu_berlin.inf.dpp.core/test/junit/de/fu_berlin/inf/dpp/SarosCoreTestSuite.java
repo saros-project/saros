@@ -28,6 +28,8 @@ de.fu_berlin.inf.dpp.net.TestSuite.class,
 
 de.fu_berlin.inf.dpp.net.internal.TestSuite.class,
 
+de.fu_berlin.inf.dpp.session.internal.TestSuite.class,
+
 de.fu_berlin.inf.dpp.synchronize.TestSuite.class,
 
 de.fu_berlin.inf.dpp.util.TestSuite.class,

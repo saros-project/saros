@@ -1,9 +1,9 @@
-package de.fu_berlin.inf.dpp.project.internal;
+package de.fu_berlin.inf.dpp.session;
 
 import java.util.List;
 
 import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.session.User;
+import de.fu_berlin.inf.dpp.session.internal.ActivityHandler;
 
 /**
  * Callback interface used by the {@link ActivityHandler} to notify the logic

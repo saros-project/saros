@@ -2,6 +2,8 @@ package de.fu_berlin.inf.dpp.session;
 
 import org.picocontainer.MutablePicoContainer;
 
+import de.fu_berlin.inf.dpp.session.internal.ActivityHandler;
+
 /**
  * Basic {@link ISarosSessionContextFactory} implementation which creates the
  * {@link ISarosSession session} components defined in the core.
@@ -17,7 +19,9 @@ public class SarosCoreSessionContextFactory implements
     public final void createComponents(ISarosSession session,
         MutablePicoContainer container) {
 
-        // TODO Move as many session components as possible to core
+        container.addComponent(ActivityHandler.class);
+
+        // Non-Core Components
         createNonCoreComponents(session, container);
     }
 

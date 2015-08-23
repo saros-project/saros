@@ -1,29 +1,16 @@
-/*
- *
- *  DPP - Serious Distributed Pair Programming
- *  (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2010
- *  (c) NFQ (www.nfq.com) - 2014
- *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 1, or (at your option)
- *  any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- * /
- */
+package de.fu_berlin.inf.dpp.session.internal;
 
-package de.fu_berlin.inf.dpp.core.project.internal;
+import java.awt.Window;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 
+import org.apache.log4j.Logger;
+import org.picocontainer.Startable;
+
+import de.fu_berlin.inf.dpp.activities.ActivityOptimizer;
 import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
-import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.ITargetedActivity;
@@ -32,17 +19,11 @@ import de.fu_berlin.inf.dpp.activities.QueueItem;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.concurrent.management.TransformationResult;
+import de.fu_berlin.inf.dpp.session.IActivityHandlerCallback;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
-import org.apache.log4j.Logger;
-import org.picocontainer.Startable;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * This handler is responsible for handling the correct thread access when
@@ -50,16 +31,14 @@ import java.util.concurrent.LinkedBlockingQueue;
  * {@link ConcurrentDocumentClient}. The sending and executing of activities
  * <b>must</b> be done in {@linkplain IActivityHandlerCallback callback} as it
  * is <b>not</b> performed by this handler !
- *
+ * 
  * @author Stefan Rossbach
  */
 public final class ActivityHandler implements Startable {
 
     private static final Logger LOG = Logger.getLogger(ActivityHandler.class);
 
-    /**
-     * join timeout when stopping this component
-     */
+    /** join timeout when stopping this component */
     private static final long TIMEOUT = 10000;
 
     private static final int DISPATCH_MODE_SYNC = 0;
@@ -69,38 +48,28 @@ public final class ActivityHandler implements Startable {
     private static final int DISPATCH_MODE;
 
     static {
-        int dispatchModeToUse = Integer
-            .getInteger("de.fu_berlin.inf.dpp.session.ACTIVITY_DISPATCH_MODE",
-                DISPATCH_MODE_SYNC);
+        int dispatchModeToUse = Integer.getInteger(
+            "de.fu_berlin.inf.dpp.session.ACTIVITY_DISPATCH_MODE",
+            DISPATCH_MODE_SYNC);
 
-        if (dispatchModeToUse != DISPATCH_MODE_ASYNC) {
+        if (dispatchModeToUse != DISPATCH_MODE_ASYNC)
             dispatchModeToUse = DISPATCH_MODE_SYNC;
-        }
 
         DISPATCH_MODE = dispatchModeToUse;
     }
 
-    private static ConcurrentDocumentClient documentClient;
     private final LinkedBlockingQueue<List<IActivity>> dispatchQueue = new LinkedBlockingQueue<List<IActivity>>();
-    private final IActivityHandlerCallback callback;
-    private final ISarosSession session;
-    private final ConcurrentDocumentServer documentServer;
-    private final UISynchronizer synchronizer;
-    private final Runnable dispatchThreadRunnable = new Runnable() {
 
-        @Override
-        public void run() {
-            LOG.debug("activity dispatcher started");
-            while (!Thread.currentThread().isInterrupted()) {
-                try {
-                    dispatchAndExecuteActivities(dispatchQueue.take());
-                } catch (InterruptedException e) {
-                    break;
-                }
-            }
-            LOG.debug("activity dispatcher stopped");
-        }
-    };
+    private final IActivityHandlerCallback callback;
+
+    private final ISarosSession session;
+
+    private final ConcurrentDocumentServer documentServer;
+
+    private final ConcurrentDocumentClient documentClient;
+
+    private final UISynchronizer synchronizer;
+
     /*
      * We must use a thread for synchronous execution otherwise we would block
      * the DispatchThreadContext which handles the dispatching of all network
@@ -108,15 +77,44 @@ public final class ActivityHandler implements Startable {
      */
     private Thread dispatchThread;
 
+    private final Runnable dispatchThreadRunnable = new Runnable() {
+
+        final List<List<IActivity>> pendingActivities = new ArrayList<List<IActivity>>();
+        final List<IActivity> activitiesToExecute = new ArrayList<IActivity>();
+
+        @Override
+        public void run() {
+            LOG.debug("activity dispatcher started");
+
+            while (!Thread.currentThread().isInterrupted()) {
+                pendingActivities.clear();
+                activitiesToExecute.clear();
+
+                try {
+                    pendingActivities.add(dispatchQueue.take());
+                } catch (InterruptedException e) {
+                    break;
+                }
+
+                dispatchQueue.drainTo(pendingActivities);
+
+                for (final List<IActivity> activities : pendingActivities)
+                    activitiesToExecute.addAll(activities);
+
+                dispatchAndExecuteActivities(activitiesToExecute);
+            }
+
+            LOG.debug("activity dispatcher stopped");
+        }
+    };
+
     public ActivityHandler(ISarosSession session,
         IActivityHandlerCallback callback,
         ConcurrentDocumentServer documentServer,
         ConcurrentDocumentClient documentClient, UISynchronizer synchronizer) {
-
         this.session = session;
         this.callback = callback;
         this.documentServer = documentServer;
-
         this.documentClient = documentClient;
         this.synchronizer = synchronizer;
     }
@@ -125,18 +123,18 @@ public final class ActivityHandler implements Startable {
      * Transforms and dispatches the activities. The
      * {@linkplain IActivityHandlerCallback callback} will be notified about the
      * results.
-     *
-     * @param activities an <b>immutable</b> list containing the activities
+     * 
+     * @param activities
+     *            an <b>immutable</b> list containing the activities
      */
 
-    public synchronized void handleIncomingActivities(
-        List<IActivity> activities) {
+    public synchronized void handleIncomingActivities(List<IActivity> activities) {
 
         if (session.isHost()) {
 
             /**
              * @JTourBusStop 8, Activity sending, Activity Server:
-             *
+             * 
              *               This is where the server receives activities. The
              *               Server may transform activities again if necessary
              *               and afterward sends them to the correct clients.
@@ -153,30 +151,29 @@ public final class ActivityHandler implements Startable {
 
         /**
          * @JTourBusStop 9, Activity sending, Client Receiver:
-         *
+         * 
          *               This is the part where clients will receive activities.
          *               These activities are put into the queue of the activity
          *               dispatcher. This queue is consumed by the
-         *               dispatchThread which transforms activities again if
-         *               necessary and then forwards it to the SarosSession.
-         *
+         *               dispatchThread, which transforms activities again if
+         *               necessary, and then forwards it to the SarosSession.
+         * 
          */
 
-        if (activities.isEmpty()) {
+        if (activities.isEmpty())
             return;
-        }
 
-        if (DISPATCH_MODE == DISPATCH_MODE_ASYNC) {
+        if (DISPATCH_MODE == DISPATCH_MODE_ASYNC)
             dispatchAndExecuteActivities(activities);
-        } else {
+        else
             dispatchQueue.add(activities);
-        }
     }
 
     /**
      * Determines the recipients for a given QueueItem
-     *
-     * @param item the QueueItem for which the participants should be determined
+     * 
+     * @param item
+     *            the QueueItem for which the participants should be determined
      * @return a list of participants this activity should be sent to
      */
     private List<User> getRecipientsForQueueItem(QueueItem item) {
@@ -199,8 +196,8 @@ public final class ActivityHandler implements Startable {
                 recipients = item.recipients;
             } else {
                 for (User user : item.recipients) {
-                    if (session.userHasProject(user,
-                        activity.getPath().getProject())) {
+                    if (session.userHasProject(user, activity.getPath()
+                        .getProject())) {
                         recipients.add(user);
                     }
                 }
@@ -213,11 +210,11 @@ public final class ActivityHandler implements Startable {
 
     /**
      * @JTourBusStop 6, Activity sending, Transforming the IActivity (Client):
-     *
+     * 
      *               This function will transform activities and then forward
      *               them to the callback. E.g. this will turn TextEditActivity
      *               into Jupiter activities.
-     *
+     * 
      *               Saros uses a client-server-architecture. All activities
      *               will first be send to the server located at the Host. The
      *               Host himself also acts as a client, but houses an
@@ -228,8 +225,9 @@ public final class ActivityHandler implements Startable {
      * Transforms and determines the recipients of the activities. The
      * {@linkplain IActivityHandlerCallback callback} will be notified about the
      * results.
-     *
-     * @param activities an <b>immutable</b> list containing the activities
+     * 
+     * @param activities
+     *            an <b>immutable</b> list containing the activities
      */
     /*
      * Note: transformation and executing has to be performed together in the
@@ -257,74 +255,74 @@ public final class ActivityHandler implements Startable {
 
     @Override
     public void start() {
-        if (DISPATCH_MODE == DISPATCH_MODE_ASYNC) {
+        if (DISPATCH_MODE == DISPATCH_MODE_ASYNC)
             return;
-        }
 
-        dispatchThread = ThreadUtils
-            .runSafeAsync("ActivityDispatcher", LOG, dispatchThreadRunnable);
+        dispatchThread = ThreadUtils.runSafeAsync("dpp-activity-dispatcher",
+            LOG, dispatchThreadRunnable);
     }
 
     @Override
     public void stop() {
-        if (DISPATCH_MODE == DISPATCH_MODE_ASYNC) {
+        if (DISPATCH_MODE == DISPATCH_MODE_ASYNC)
             return;
-        }
 
         dispatchThread.interrupt();
         try {
             dispatchThread.join(TIMEOUT);
         } catch (InterruptedException e) {
-            LOG.warn("interrupted while waiting for " + dispatchThread.getName()
-                + " thread to terminate");
+            LOG.warn("interrupted while waiting for "
+                + dispatchThread.getName() + " thread to terminate");
 
             Thread.currentThread().interrupt();
         }
 
-        if (dispatchThread.isAlive()) {
+        if (dispatchThread.isAlive())
             LOG.error(dispatchThread.getName() + " thread is still running");
-        }
     }
 
     /**
+     * 
      * Executes the current activities by dispatching the received activities to
      * the SWT EDT.
-     * <p/>
+     * 
      * We must use synchronous dispatching as it is possible that some handlers
      * or Eclipse itself open dialogs during the execution of an activity.
-     * <p/>
+     * 
      * If the current activity list would be dispatched asynchronously it is
      * possible that further activities may be executed during the currently
      * executed activity list and so leading up to unknown errors.
-     * <p/>
+     * 
      * <pre>
      * Activities to execute:
      * [A, B, C, D, E, F, G, H]
      *           ^
      *           |
      *           --> is currently blocked by a dialog
-     *
+     * 
      * new activities arrive
      * [J, K, L, M]
-     *
+     * 
      * final execution order can be:
-     *
+     * 
      * [A, B, C, D_B, J, K, L, M, D_A, E, F, G, H]
-     *
+     * 
      * Where D_B(efore) is the code that has been executed before
      * entering the modal context and D_A(fter) the code after
      * leaving the modal context.
-     *
+     * 
      * Note: If the next activities list also contains an activity that
      * uses a modal context the execution chain will become even less
      * predictable !
      * </pre>
-     *
-     * @param activities the activities to execute
+     * 
+     * 
      * @see ModalContext
      * @see Window#setBlockOnOpen(boolean shouldBlock)
      * @see IRunnableContext#run(boolean fork, boolean cancelable,
-     * IRunnableWithProgress runnable)
+     *      IRunnableWithProgress runnable)
+     * @param activities
+     *            the activities to execute
      */
     /*
      * Note: transformation and executing has to be performed together in the
@@ -332,13 +330,16 @@ public final class ActivityHandler implements Startable {
      * between transformation and application of remote operations. In other
      * words, the transformation would be applied to an out-dated state.
      */
-    private void dispatchAndExecuteActivities(
-        final List<IActivity> activities) {
-        Runnable transformingRunnable = new Runnable() {
+    private void dispatchAndExecuteActivities(final List<IActivity> activities) {
+
+        final List<IActivity> optimizedActivities = ActivityOptimizer
+            .optimize(activities);
+
+        final Runnable transformingRunnable = new Runnable() {
             @Override
             public void run() {
 
-                for (IActivity activity : activities) {
+                for (IActivity activity : optimizedActivities) {
 
                     User source = activity.getSource();
 
@@ -347,7 +348,7 @@ public final class ActivityHandler implements Startable {
                      * listeners were notified (See SarosSession#removeUser). It
                      * is still possible that a user may left during activity
                      * execution but this is likely no to produce any errors.
-                     *
+                     * 
                      * TODO: as the notification for users who left the session
                      * is send in parallel with the activities there will be
                      * race conditions were one user may execute a given
@@ -355,11 +356,9 @@ public final class ActivityHandler implements Startable {
                      * unwanted inconsistencies if that activity was a resource
                      * activity.
                      */
-                    if (source == null || !source.isInSession()) {
-                        LOG.warn(
-                            "dropping activity for user that is no longer in session: "
-                                + activity
-                        );
+                    if (!source.isInSession()) {
+                        LOG.warn("dropping activity for user that is no longer in session: "
+                            + activity);
                         continue;
                     }
 
@@ -370,37 +369,40 @@ public final class ActivityHandler implements Startable {
                         try {
                             callback.execute(transformedActivity);
                         } catch (Exception e) {
-                            e.printStackTrace();
-                            LOG.error("failed to execute activity: " + activity,
-                                e);
+                            LOG.error(
+                                "failed to execute activity: " + activity, e);
                         }
                     }
                 }
-
             }
         };
 
         if (LOG.isTraceEnabled()) {
-            LOG.trace(
-                "dispatching " + activities.size() + " activities [mode = "
-                    + DISPATCH_MODE + "] : " + activities
-            );
+
+            if (optimizedActivities.size() != activities.size()) {
+                LOG.trace("original activities to dispatch: [#"
+                    + activities.size() + "] " + activities);
+            }
+
+            LOG.trace("dispatching [#" + optimizedActivities.size()
+                + "] optimized activities [mode = " + DISPATCH_MODE + "] : "
+                + optimizedActivities);
         }
 
-        if (DISPATCH_MODE == DISPATCH_MODE_SYNC) {
-            synchronizer
-                .syncExec(ThreadUtils.wrapSafe(LOG, transformingRunnable));
-        } else {
-            synchronizer
-                .asyncExec(ThreadUtils.wrapSafe(LOG, transformingRunnable));
-        }
+        if (DISPATCH_MODE == DISPATCH_MODE_SYNC)
+            synchronizer.syncExec(ThreadUtils.wrapSafe(LOG,
+                transformingRunnable));
+        else
+            synchronizer.asyncExec(ThreadUtils.wrapSafe(LOG,
+                transformingRunnable));
     }
 
     /**
      * This method is responsible for directing activities received at the
      * server to the various clients.
-     *
-     * @param activities A list of incoming activities
+     * 
+     * @param activities
+     *            A list of incoming activities
      * @return A number of targeted activities.
      */
     private TransformationResult directServerActivities(
@@ -413,10 +415,7 @@ public final class ActivityHandler implements Startable {
         final List<User> allUsers = session.getUsers();
 
         for (IActivity activity : activities) {
-
-            if (activity instanceof FileActivity) {
-                documentServer.checkFileDeleted(activity);
-            }
+            documentServer.checkFileDeleted(activity);
 
             if (activity instanceof JupiterActivity
                 || activity instanceof ChecksumActivity) {
