@@ -6,11 +6,11 @@ import org.picocontainer.Startable;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.project.internal.ActivitySequencer;
-import de.fu_berlin.inf.dpp.project.internal.IActivitySequencerCallback;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.User;
+import de.fu_berlin.inf.dpp.session.internal.ActivitySequencer;
+import de.fu_berlin.inf.dpp.session.internal.IActivitySequencerCallback;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**

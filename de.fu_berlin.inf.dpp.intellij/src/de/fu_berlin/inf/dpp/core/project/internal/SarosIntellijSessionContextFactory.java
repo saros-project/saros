@@ -39,7 +39,6 @@ public class SarosIntellijSessionContextFactory extends
         }
 
         // Other
-        container.addComponent(ActivitySequencer.class);
         container.addComponent(FollowingActivitiesManager.class);
         container.addComponent(PermissionManager.class);
         container.addComponent(SharedResourcesManager.class);

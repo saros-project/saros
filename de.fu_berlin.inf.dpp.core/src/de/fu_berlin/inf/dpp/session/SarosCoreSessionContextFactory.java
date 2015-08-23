@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.session;
 import org.picocontainer.MutablePicoContainer;
 
 import de.fu_berlin.inf.dpp.session.internal.ActivityHandler;
+import de.fu_berlin.inf.dpp.session.internal.ActivitySequencer;
 
 /**
  * Basic {@link ISarosSessionContextFactory} implementation which creates the
@@ -20,6 +21,7 @@ public class SarosCoreSessionContextFactory implements
         MutablePicoContainer container) {
 
         container.addComponent(ActivityHandler.class);
+        container.addComponent(ActivitySequencer.class);
 
         // Non-Core Components
         createNonCoreComponents(session, container);
@@ -28,7 +30,7 @@ public class SarosCoreSessionContextFactory implements
     /**
      * Override this method in subclasses to add components to the session that
      * are not part of the core.
-     *
+     * 
      * @param container
      *            DI container to add session components to
      */
