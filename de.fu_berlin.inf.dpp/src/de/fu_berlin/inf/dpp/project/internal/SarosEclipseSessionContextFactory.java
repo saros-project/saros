@@ -2,8 +2,6 @@ package de.fu_berlin.inf.dpp.project.internal;
 
 import org.picocontainer.MutablePicoContainer;
 
-import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
-import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogHandler;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogServer;
 import de.fu_berlin.inf.dpp.feedback.DataTransferCollector;
@@ -24,8 +22,6 @@ import de.fu_berlin.inf.dpp.project.internal.timeout.ServerSessionTimeoutHandler
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionContextFactory;
 import de.fu_berlin.inf.dpp.session.SarosCoreSessionContextFactory;
-import de.fu_berlin.inf.dpp.session.internal.UserInformationHandler;
-import de.fu_berlin.inf.dpp.synchronize.StopManager;
 
 /**
  * Eclipse implementation of the {@link ISarosSessionContextFactory} interface.
@@ -36,14 +32,6 @@ public class SarosEclipseSessionContextFactory extends
     @Override
     public void createNonCoreComponents(ISarosSession session,
         MutablePicoContainer container) {
-
-        // Concurrent Editing
-        /*
-         * As Pico Container complains about null, just add the server even in
-         * client mode as it will not matter because it is not accessed.
-         */
-        container.addComponent(ConcurrentDocumentServer.class);
-        container.addComponent(ConcurrentDocumentClient.class);
 
         // Consistency Watchdog
         container.addComponent(ConsistencyWatchdogHandler.class);
@@ -80,6 +68,5 @@ public class SarosEclipseSessionContextFactory extends
         container.addComponent(ChangeColorManager.class);
         container.addComponent(FollowingActivitiesManager.class);
         container.addComponent(SharedResourcesManager.class);
-        container.addComponent(StopManager.class);
     }
 }

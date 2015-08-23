@@ -2,10 +2,13 @@ package de.fu_berlin.inf.dpp.session;
 
 import org.picocontainer.MutablePicoContainer;
 
+import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
+import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.session.internal.ActivityHandler;
 import de.fu_berlin.inf.dpp.session.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.session.internal.PermissionManager;
 import de.fu_berlin.inf.dpp.session.internal.UserInformationHandler;
+import de.fu_berlin.inf.dpp.synchronize.StopManager;
 
 /**
  * Basic {@link ISarosSessionContextFactory} implementation which creates the
@@ -22,9 +25,19 @@ public class SarosCoreSessionContextFactory implements
     public final void createComponents(ISarosSession session,
         MutablePicoContainer container) {
 
+        // Concurrent Editing
+        /*
+         * As Pico Container complains about null, just add the server even in
+         * client mode as it will not matter because it is not accessed.
+         */
+        container.addComponent(ConcurrentDocumentServer.class);
+        container.addComponent(ConcurrentDocumentClient.class);
+
+        // Other
         container.addComponent(ActivityHandler.class);
         container.addComponent(ActivitySequencer.class);
         container.addComponent(PermissionManager.class);
+        container.addComponent(StopManager.class);
         container.addComponent(UserInformationHandler.class);
 
         // Non-Core Components
