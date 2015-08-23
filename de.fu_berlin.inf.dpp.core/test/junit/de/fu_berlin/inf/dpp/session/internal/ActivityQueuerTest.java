@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.project.internal;
+package de.fu_berlin.inf.dpp.session.internal;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.easymock.EasyMock;
-import org.eclipse.core.runtime.Path;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -23,10 +22,11 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.StartFollowingActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterVectorTime;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
+import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
-import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.User;
+import de.fu_berlin.inf.dpp.session.internal.ActivityQueuer;
 
 public class ActivityQueuerTest {
 
@@ -50,13 +50,13 @@ public class ActivityQueuerTest {
         NOT_SHARED_PROJECT = EasyMock.createMock(IProject.class);
 
         FOO_PATH_SHARED_PROJECT = new SPath(SHARED_PROJECT,
-            ResourceAdapterFactory.create(new Path("foo")));
+            EasyMock.createMock(IPath.class));
 
         BAR_PATH_SHARED_PROJECT = new SPath(SHARED_PROJECT,
-            ResourceAdapterFactory.create(new Path("bar")));
+            EasyMock.createMock(IPath.class));
 
         PATH_TO_NOT_SHARED_PROJECT = new SPath(NOT_SHARED_PROJECT,
-            ResourceAdapterFactory.create(new Path("unshared")));
+            EasyMock.createMock(IPath.class));
     }
 
     @Before

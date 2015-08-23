@@ -1,33 +1,20 @@
-/*
- *
- *  DPP - Serious Distributed Pair Programming
- *  (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2010
- *  (c) NFQ (www.nfq.com) - 2014
- *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 1, or (at your option)
- *  any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- * /
- */
+package de.fu_berlin.inf.dpp.session.internal;
 
-package de.fu_berlin.inf.dpp.core.project.internal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import de.fu_berlin.inf.dpp.activities.*;
+import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
+import de.fu_berlin.inf.dpp.activities.IActivity;
+import de.fu_berlin.inf.dpp.activities.IResourceActivity;
+import de.fu_berlin.inf.dpp.activities.JupiterActivity;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.session.User;
-
-import java.util.*;
 
 /**
  * This class enables the queuing of {@linkplain IActivity activities} for given
@@ -53,11 +40,11 @@ public class ActivityQueuer {
      * resource related activities} which relate to a project that is configured
      * for queuing using {@link #enableQueuing(IProject)} will be queued. The
      * method returns all other activities which should not be queued.
-     * <p/>
+     * 
      * If a flushing of the queue was previously requested by calling
      * {@link #disableQueuing()} than the method will return a list of all
      * queued activities.
-     *
+     * 
      * @param activities
      * @return the activities that are not queued
      */
@@ -90,23 +77,19 @@ public class ActivityQueuer {
 
                     EditorActivity ea = (EditorActivity) resourceActivity;
 
-                    if (!alreadyRememberedEditorActivity(editorActivities, path,
-                        source) && ea.getType() != Type.ACTIVATED) {
-                        activitiesThatWillBeExecuted.add(
-                            new EditorActivity(ea.getSource(), Type.ACTIVATED,
-                                path)
-                        );
+                    if (!alreadyRememberedEditorActivity(editorActivities,
+                        path, source) && ea.getType() != Type.ACTIVATED) {
+                        activitiesThatWillBeExecuted.add(new EditorActivity(ea
+                            .getSource(), Type.ACTIVATED, path));
                     }
 
                     rememberEditorActivity(editorActivities, path, source);
                 } else if (resourceActivity instanceof JupiterActivity
                     && !alreadyRememberedEditorActivity(editorActivities, path,
-                    source)) {
+                        source)) {
 
-                    activitiesThatWillBeExecuted.add(
-                        new EditorActivity(resourceActivity.getSource(),
-                            Type.ACTIVATED, path)
-                    );
+                    activitiesThatWillBeExecuted.add(new EditorActivity(
+                        resourceActivity.getSource(), Type.ACTIVATED, path));
 
                     rememberEditorActivity(editorActivities, path, source);
                 }
@@ -126,8 +109,8 @@ public class ActivityQueuer {
                 SPath path = resourceActivity.getPath();
 
                 // can't queue activities without path
-                if (path != null && projectsThatShouldBeQueued
-                    .contains(path.getProject())) {
+                if (path != null
+                    && projectsThatShouldBeQueued.contains(path.getProject())) {
                     activityQueue.add(resourceActivity);
                     continue;
                 }
@@ -142,7 +125,7 @@ public class ActivityQueuer {
     /**
      * Enables the queuing of {@link IActivity serialized activities} related to
      * the given project.
-     *
+     * 
      * @param project
      */
     public synchronized void enableQueuing(IProject project) {
@@ -153,14 +136,14 @@ public class ActivityQueuer {
     /**
      * Disables the queuing for all projects. Currently queued activities will
      * be flushed after the next invocation of {@link #process(List)}.
-     *
+     * 
      * @Note This method <b>MUST</b> be called at the end of an invitation
-     * process because it stops the queuing for all projects which at
-     * least releases the queued activities to prevent memory leaks. At
-     * the moment stopping the queuing for each project separately is not
-     * needed, since the projects are added after the invitation process
-     * at the same time. When multiple invitations at the same moment will
-     * be possible, this implementation needs to be changed.
+     *       process because it stops the queuing for all projects which at
+     *       least releases the queued activities to prevent memory leaks. At
+     *       the moment stopping the queuing for each project separately is not
+     *       needed, since the projects are added after the invitation process
+     *       at the same time. When multiple invitations at the same moment will
+     *       be possible, this implementation needs to be changed.
      */
     public synchronized void disableQueuing() {
         stopQueuing = true;
@@ -173,8 +156,8 @@ public class ActivityQueuer {
         return users != null && users.contains(user);
     }
 
-    private void rememberEditorActivity(Map<SPath, List<User>> editorActivities,
-        SPath spath, User user) {
+    private void rememberEditorActivity(
+        Map<SPath, List<User>> editorActivities, SPath spath, User user) {
         List<User> users = editorActivities.get(spath);
 
         if (users == null) {

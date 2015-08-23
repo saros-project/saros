@@ -4,7 +4,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ ActivityQueuerTest.class, ActivitySequencerTest.class,
+@Suite.SuiteClasses({ ActivitySequencerTest.class,
     SarosProjectMapperTest.class, SarosSessionTest.class,
     UserInformationHandlerTest.class })
 public class TestSuite {
