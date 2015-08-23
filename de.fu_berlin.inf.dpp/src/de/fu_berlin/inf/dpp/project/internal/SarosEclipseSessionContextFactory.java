@@ -78,7 +78,6 @@ public class SarosEclipseSessionContextFactory extends
         // Other
         container.addComponent(ChangeColorManager.class);
         container.addComponent(FollowingActivitiesManager.class);
-        container.addComponent(PermissionManager.class);
         container.addComponent(SharedResourcesManager.class);
         container.addComponent(StopManager.class);
         container.addComponent(UserInformationHandler.class);

@@ -4,6 +4,7 @@ import org.picocontainer.MutablePicoContainer;
 
 import de.fu_berlin.inf.dpp.session.internal.ActivityHandler;
 import de.fu_berlin.inf.dpp.session.internal.ActivitySequencer;
+import de.fu_berlin.inf.dpp.session.internal.PermissionManager;
 
 /**
  * Basic {@link ISarosSessionContextFactory} implementation which creates the
@@ -22,6 +23,7 @@ public class SarosCoreSessionContextFactory implements
 
         container.addComponent(ActivityHandler.class);
         container.addComponent(ActivitySequencer.class);
+        container.addComponent(PermissionManager.class);
 
         // Non-Core Components
         createNonCoreComponents(session, container);
