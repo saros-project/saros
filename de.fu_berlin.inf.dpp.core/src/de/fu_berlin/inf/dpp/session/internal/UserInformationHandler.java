@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.project.internal;
+package de.fu_berlin.inf.dpp.session.internal;
 
 import java.io.IOException;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.project.internal;
+package de.fu_berlin.inf.dpp.session.internal;
 
 import static org.junit.Assert.assertEquals;
 
@@ -16,6 +16,7 @@ import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
+import de.fu_berlin.inf.dpp.session.internal.UserInformationHandler;
 
 public class UserInformationHandlerTest {
 

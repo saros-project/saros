@@ -42,7 +42,6 @@ public class SarosIntellijSessionContextFactory extends
         container.addComponent(FollowingActivitiesManager.class);
         container.addComponent(SharedResourcesManager.class);
         container.addComponent(StopManager.class);
-        container.addComponent(UserInformationHandler.class);
     }
 
 }

@@ -24,6 +24,7 @@ import de.fu_berlin.inf.dpp.project.internal.timeout.ServerSessionTimeoutHandler
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionContextFactory;
 import de.fu_berlin.inf.dpp.session.SarosCoreSessionContextFactory;
+import de.fu_berlin.inf.dpp.session.internal.UserInformationHandler;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 
 /**
@@ -80,6 +81,5 @@ public class SarosEclipseSessionContextFactory extends
         container.addComponent(FollowingActivitiesManager.class);
         container.addComponent(SharedResourcesManager.class);
         container.addComponent(StopManager.class);
-        container.addComponent(UserInformationHandler.class);
     }
 }
