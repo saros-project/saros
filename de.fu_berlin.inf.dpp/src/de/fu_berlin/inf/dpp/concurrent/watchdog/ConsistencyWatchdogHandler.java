@@ -11,10 +11,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.text.IDocument;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.ui.part.FileEditorInput;
-import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
@@ -85,7 +82,7 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
      * pair of JID of the user and a string representation of the paths of the
      * handled files as key. You can use <code>closeChecksumErrorMessage</code>
      * with the same arguments to close this message again.
-     *
+     * 
      */
     private void triggerRecovery(final ChecksumErrorActivity checksumError) {
 
@@ -263,29 +260,14 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
             charset));
 
         /*
-         * immediately follow up with a new checksum to the remote side can
-         * verify the recovered file
+         * Immediately follow up with a new checksum activity so that the remote
+         * side can verify the recovered file.
          */
-        final FileEditorInput input = new FileEditorInput(file);
-        final IDocumentProvider provider = editorAPI.getDocumentProvider(input);
 
-        try {
-            provider.connect(input);
-            IDocument doc = provider.getDocument(input);
+        DocumentChecksum checksum = new DocumentChecksum(path);
+        checksum.update(editorManager.getContent(path));
 
-            final DocumentChecksum checksum = new DocumentChecksum(path);
-            checksum.bind(doc);
-            checksum.update();
-
-            fireActivity(new ChecksumActivity(user, path, checksum.getHash(),
-                checksum.getLength(), null));
-
-            checksum.dispose();
-
-        } catch (CoreException e) {
-            LOG.warn("could not check checksum of file: " + file, e);
-        } finally {
-            provider.disconnect(input);
-        }
+        fireActivity(new ChecksumActivity(user, path, checksum.getHash(),
+            checksum.getLength(), null));
     }
 }
