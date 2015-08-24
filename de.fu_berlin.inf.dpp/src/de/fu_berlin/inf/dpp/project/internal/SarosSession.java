@@ -78,6 +78,7 @@ import de.fu_berlin.inf.dpp.session.internal.ActivityHandler;
 import de.fu_berlin.inf.dpp.session.internal.ActivityQueuer;
 import de.fu_berlin.inf.dpp.session.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.session.internal.PermissionManager;
+import de.fu_berlin.inf.dpp.session.internal.SharedProjectMapper;
 import de.fu_berlin.inf.dpp.session.internal.UserInformationHandler;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
@@ -132,7 +133,7 @@ public final class SarosSession implements ISarosSession {
 
     private final User hostUser;
 
-    private final SarosProjectMapper projectMapper;
+    private final SharedProjectMapper projectMapper;
 
     private boolean useVersionControl = true;
 
@@ -1032,7 +1033,7 @@ public final class SarosSession implements ISarosSession {
         this.pathFactory = context.getComponent(IPathFactory.class);
 
         this.sessionID = id;
-        this.projectMapper = new SarosProjectMapper();
+        this.projectMapper = new SharedProjectMapper();
         this.activityQueuer = new ActivityQueuer();
         this.sarosContext = context;
 

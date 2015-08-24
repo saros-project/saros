@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.project.internal;
+package de.fu_berlin.inf.dpp.session.internal;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -18,14 +18,15 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.session.internal.SharedProjectMapper;
 
-public class SarosProjectMapperTest {
+public class SharedProjectMapperTest {
 
-    private SarosProjectMapper mapper;
+    private SharedProjectMapper mapper;
 
     @Before
     public void setUp() {
-        mapper = new SarosProjectMapper();
+        mapper = new SharedProjectMapper();
     }
 
     @Test(expected = NullPointerException.class)

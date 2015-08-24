@@ -82,6 +82,7 @@ import de.fu_berlin.inf.dpp.session.internal.ActivityHandler;
 import de.fu_berlin.inf.dpp.session.internal.ActivityQueuer;
 import de.fu_berlin.inf.dpp.session.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.session.internal.PermissionManager;
+import de.fu_berlin.inf.dpp.session.internal.SharedProjectMapper;
 import de.fu_berlin.inf.dpp.session.internal.UserInformationHandler;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
@@ -129,7 +130,7 @@ public final class SarosSession implements ISarosSession {
     private final ConcurrentHashMap<JID, User> participants = new ConcurrentHashMap<JID, User>();
     private final SharedProjectListenerDispatch listenerDispatch = new SharedProjectListenerDispatch();
     private final User hostUser;
-    private final SarosProjectMapper projectMapper;
+    private final SharedProjectMapper projectMapper;
     private final MutablePicoContainer sessionContainer;
     private final StopManager stopManager;
     private final PermissionManager permissionManager;
@@ -207,7 +208,7 @@ public final class SarosSession implements ISarosSession {
         pathFactory = context.getComponent(IPathFactory.class);
 
         sessionID = context.getComponent(SessionIDObservable.class).getValue();
-        projectMapper = new SarosProjectMapper();
+        projectMapper = new SharedProjectMapper();
         activityQueuer = new ActivityQueuer();
         sarosContext = context;
 
@@ -287,8 +288,6 @@ public final class SarosSession implements ISarosSession {
         if (!projectMapper.isShared(project)) {
             projectMapper.addProject(projectID, project,
                 dependentResources != null);
-
-            projectMapper.addOwnership(getLocalUser().getJID(), project);
 
             if (dependentResources != null)
                 projectMapper.addResources(project, dependentResources);
