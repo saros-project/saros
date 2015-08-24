@@ -56,6 +56,7 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceInitializer;
+import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceStoreAdapter;
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferences;
 import de.fu_berlin.inf.dpp.session.ISarosSessionContextFactory;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
@@ -278,7 +279,11 @@ public class SarosSessionTest {
             .addComponent(Saros.class, createSarosMock(store, preferences));
         container.addComponent(EclipsePreferences.class);
 
+        // Eclipse store interface
         container.addComponent(store);
+        // Saros core store interface
+        container.addComponent(new EclipsePreferenceStoreAdapter(store));
+
         container.addComponent(NonUISynchronizer.class);
         container.addComponent(FeedbackManager.class);
 

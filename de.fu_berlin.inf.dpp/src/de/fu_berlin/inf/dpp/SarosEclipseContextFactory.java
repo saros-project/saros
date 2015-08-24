@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.osgi.service.prefs.Preferences;
 import org.picocontainer.BindKey;
 import org.picocontainer.MutablePicoContainer;
@@ -26,7 +25,9 @@ import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRoot;
 import de.fu_berlin.inf.dpp.monitoring.remote.RemoteProgressManager;
+import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceStoreAdapter;
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferences;
+import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.project.internal.SarosEclipseSessionContextFactory;
 import de.fu_berlin.inf.dpp.session.ISarosSessionContextFactory;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
@@ -134,7 +135,14 @@ public class SarosEclipseContextFactory extends AbstractSarosContextFactory {
             Platform.getBundle("org.eclipse.core.runtime").getVersion()
                 .toString());
 
+        // for core logic and extended Eclipse session components
         container.addComponent(IPreferenceStore.class,
+            new EclipsePreferenceStoreAdapter(saros.getPreferenceStore()));
+
+        // TODO remove
+        // for plain Eclipse components like preference pages etc.
+        container.addComponent(
+            org.eclipse.jface.preference.IPreferenceStore.class,
             saros.getPreferenceStore());
 
         container.addComponent(Preferences.class, saros.getGlobalPreferences());

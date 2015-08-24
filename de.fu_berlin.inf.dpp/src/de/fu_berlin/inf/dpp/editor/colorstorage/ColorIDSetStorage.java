@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.eclipse.jface.preference.IPreferenceStore;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 
 /**
  * This class stores {@link ColorIDSet}s when ever a ColorIdSet is added it gets
