@@ -1,0 +1,8 @@
+{
+    "excludeFiles": ["js/vendor/**", "js/templates.js"],
+    "disallowMixedSpacesAndTabs": true,
+    "requireCurlyBraces": true,
+    "validateIndentation": 4,
+    "disallowTrailingWhitespace": true,
+    "disallowTrailingComma": true
+}

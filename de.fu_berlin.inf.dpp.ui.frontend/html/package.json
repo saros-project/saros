@@ -18,7 +18,9 @@
   "devDependencies": {
     "browserify": "^9.0.3",
     "cp": "^0.2.0",
+    "exorcist": "^0.4.0",
     "expect.js": "^0.3.1",
+    "jscs": "^2.1.1",
     "jshint": "^2.8.0",
     "mkdirp": "^0.5.1",
     "mocha": "^2.2.5",
@@ -27,10 +29,12 @@
   "scripts": {
     "prebuild": "mkdirp bundle dist/bundle/ dist/css dist/fonts",
     "postbuild": "cp *.html dist/ && cp css/*.* dist/css/ && cp fonts/*.* dist/fonts/ && cp bundle/bundle.js dist/bundle/bundle.js",
-    "build": "npm run build:html -s && npm run build:js -s",
-    "build:js": "browserify js/app.js -o bundle/bundle.js",
-    "build:html": "templatizer -d templates/ -o js/templates.js",
+    "build": "npm run build:jade -s && npm run build:js -s",
+    "build:js": "browserify --debug js/app.js | exorcist bundle/bundle.js.map > bundle/bundle.js",
+    "build:jade": "templatizer -d templates/ -o js/templates.js",
     "lint": "jshint js --exclude js/templates.js",
-    "test": "mocha test/"
+    "format": "jscs js/**/* --excludeFiles js/vendor/* -x",
+    "test": "mocha test/",
+    "ci-test": "mocha test/ --reporter xunit > test-reports.xml"
   }
 }
