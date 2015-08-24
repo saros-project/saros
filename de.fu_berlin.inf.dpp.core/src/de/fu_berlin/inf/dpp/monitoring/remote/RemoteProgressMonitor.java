@@ -3,45 +3,64 @@ package de.fu_berlin.inf.dpp.monitoring.remote;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 
 import de.fu_berlin.inf.dpp.activities.ProgressActivity;
 import de.fu_berlin.inf.dpp.activities.ProgressActivity.ProgressAction;
+import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
+import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
+/**
+ * An {@link IProgressMonitor} implementation which sends all progress as
+ * activities to a specific set of users. Instances are created by calling
+ * {@link RemoteProgressManager#createRemoteProgressMonitor}.
+ */
 class RemoteProgressMonitor implements IProgressMonitor {
 
     private static final Logger LOG = Logger
         .getLogger(RemoteProgressMonitor.class);
 
     private final RemoteProgressManager rpm;
-    private final User source;
-    private final Collection<User> targets;
-    private final IProgressMonitor monitor;
-
     private final String id;
+    private final User localUser;
+    private final Collection<User> remoteUsers;
+    private final IProgressMonitor monitor;
 
     private int worked = 0;
     private int totalWorked = -1;
 
+    /**
+     * Creates a RemoteProgressMonitor which wraps an existing
+     * {@link IProgressMonitor}. All progress is both forwarded to that monitor
+     * and sent out as progress activities.
+     *
+     * @param rpm
+     *            {@link RemoteProgressManager} which handles the monitor
+     * @param id
+     *            unique ID added to sent progress activities so that their
+     *            receivers can match the activities with their associated
+     *            remote monitors
+     * @param localUser
+     *            the current session's local user
+     * @param remoteUsers
+     *            users to send progress activities to
+     * @param monitor
+     *            {@link IProgressMonitor} to wrap
+     */
     RemoteProgressMonitor(final RemoteProgressManager rpm, final String id,
-        final User source, final Collection<User> targets,
+        final User localUser, final Collection<User> remoteUsers,
         IProgressMonitor monitor) {
         this.rpm = rpm;
         this.id = id;
-        this.source = source;
-        this.targets = targets;
+        this.localUser = localUser;
+        this.remoteUsers = remoteUsers;
         this.monitor = monitor == null ? new NullProgressMonitor() : monitor;
     }
 
     @Override
     public void beginTask(String name, int totalWorked) {
-        // update local progress monitor
         monitor.beginTask(name, totalWorked);
-
-        // report to remote monitor!
         this.totalWorked = totalWorked;
         createProgressActivityForUsers(0, totalWorked, name,
             ProgressAction.BEGINTASK);
@@ -53,25 +72,13 @@ class RemoteProgressMonitor implements IProgressMonitor {
         createProgressActivityForUsers(0, 0, null, ProgressAction.DONE);
     }
 
-    /**
-     * FIXME: This is not yet propagated remotely
-     */
-    @Override
-    public void internalWorked(double work) {
-        monitor.internalWorked(work);
-    }
-
     @Override
     public boolean isCanceled() {
         return monitor.isCanceled();
     }
 
-    /**
-     * FIXME: This is not yet propagated remotely
-     */
     @Override
     public void setCanceled(boolean value) {
-        // waldmann: yep this is a TODO
         monitor.setCanceled(value);
         createProgressActivityForUsers(worked, totalWorked, "Cancellation",
             ProgressAction.CANCEL);
@@ -97,8 +104,9 @@ class RemoteProgressMonitor implements IProgressMonitor {
         worked += work;
 
         if (worked > totalWorked) {
-            LOG.warn(worked + " > " + totalWorked
-                + " (worked > totalworked) | maybe forget to call beginTask()",
+            LOG.warn(
+                worked + " > " + totalWorked
+                    + " (worked > totalworked) | maybe forget to call beginTask()",
                 new StackTrace());
         }
 
@@ -109,8 +117,8 @@ class RemoteProgressMonitor implements IProgressMonitor {
     private void createProgressActivityForUsers(int workCurrent, int workTotal,
         String taskName, ProgressAction action) {
 
-        for (final User target : targets)
-            rpm.monitorUpdated(new ProgressActivity(source, target, id,
+        for (final User target : remoteUsers)
+            rpm.monitorUpdated(new ProgressActivity(localUser, target, id,
                 workCurrent, workTotal, taskName, action));
     }
 }

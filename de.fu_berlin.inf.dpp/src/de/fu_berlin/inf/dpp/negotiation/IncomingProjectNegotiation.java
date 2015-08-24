@@ -516,7 +516,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
          * The monitor that is created here is shown both locally and remote and
          * is handled like a regular progress monitor.
          */
-        IProgressMonitor remoteMonitor = rpm.createRemoteProgress(
+        IProgressMonitor remoteMonitor = rpm.createRemoteProgressMonitor(
             Collections.singletonList(session.getHost()),
             new SubProgressMonitor(monitor, ticksToConsume / 2));
 

@@ -14,6 +14,7 @@ import de.fu_berlin.inf.dpp.communication.chat.single.SingleUserChatService;
 import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
 import de.fu_berlin.inf.dpp.editor.colorstorage.ColorIDSetStorage;
+import de.fu_berlin.inf.dpp.monitoring.remote.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
@@ -52,7 +53,7 @@ import de.fu_berlin.inf.dpp.versioning.VersionManager;
  * This is the basic core factory for Saros. All components that are created by
  * this factory <b>must</b> be working on any platform the application is
  * running on.
- * 
+ *
  * @author srossbach
  */
 public class SarosCoreContextFactory extends AbstractSarosContextFactory {
@@ -111,6 +112,8 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
         Component.create(IUPnPAccess.class, UPnPAccessImpl.class),
         Component.create(IReceiver.class, XMPPReceiver.class),
         Component.create(ITransmitter.class, XMPPTransmitter.class),
+
+        Component.create(RemoteProgressManager.class),
 
         // Observables
         Component.create(FileReplacementInProgressObservable.class),

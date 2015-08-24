@@ -6,6 +6,7 @@ import de.fu_berlin.inf.dpp.communication.connection.IProxyResolver;
 import de.fu_berlin.inf.dpp.connection.NullProxyResolver;
 import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.core.concurrent.ConsistencyWatchdogClient;
+import de.fu_berlin.inf.dpp.core.monitoring.remote.IntelliJRemoteProgressIndicatorFactoryImpl;
 import de.fu_berlin.inf.dpp.core.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.core.project.internal.SarosIntellijSessionContextFactory;
 import de.fu_berlin.inf.dpp.core.ui.eventhandler.NegotiationHandler;
@@ -33,6 +34,7 @@ import de.fu_berlin.inf.dpp.intellij.ui.actions.FollowModeAction;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.LeaveSessionAction;
 import de.fu_berlin.inf.dpp.intellij.ui.swt_browser.IntelliJDialogManager;
 import de.fu_berlin.inf.dpp.intellij.ui.swt_browser.IntelliJWebResourceLocator;
+import de.fu_berlin.inf.dpp.monitoring.remote.IRemoteProgressIndicatorFactory;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.session.ISarosSessionContextFactory;
@@ -88,6 +90,9 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
 
         Component.create(FollowModeAction.class),
         Component.create(LeaveSessionAction.class),
+
+        Component.create(IRemoteProgressIndicatorFactory.class,
+            IntelliJRemoteProgressIndicatorFactoryImpl.class),
 
         // IDE-specific classes for the HTML GUI
         Component.create(DialogManager.class, IntelliJDialogManager.class),

@@ -24,7 +24,8 @@ import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRoot;
-import de.fu_berlin.inf.dpp.monitoring.remote.RemoteProgressManager;
+import de.fu_berlin.inf.dpp.monitoring.remote.EclipseRemoteProgressIndicatorFactoryImpl;
+import de.fu_berlin.inf.dpp.monitoring.remote.IRemoteProgressIndicatorFactory;
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceStoreAdapter;
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferences;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
@@ -71,7 +72,6 @@ public class SarosEclipseContextFactory extends AbstractSarosContextFactory {
             EclipsePreferences.class),
         Component.create(SessionViewOpener.class),
         Component.create(UndoManager.class),
-        Component.create(RemoteProgressManager.class),
 
         Component.create(ISarosSessionContextFactory.class,
             SarosEclipseSessionContextFactory.class),
@@ -112,7 +112,11 @@ public class SarosEclipseContextFactory extends AbstractSarosContextFactory {
             EclipseVCSProviderFactoryImpl.class),
 
         // Proxy Support for the XMPP server connection
-        Component.create(IProxyResolver.class, Socks5ProxyResolver.class) };
+        Component.create(IProxyResolver.class, Socks5ProxyResolver.class),
+
+        // Remote progress indication
+        Component.create(IRemoteProgressIndicatorFactory.class,
+            EclipseRemoteProgressIndicatorFactoryImpl.class) };
 
     public SarosEclipseContextFactory(Saros saros) {
         this.saros = saros;

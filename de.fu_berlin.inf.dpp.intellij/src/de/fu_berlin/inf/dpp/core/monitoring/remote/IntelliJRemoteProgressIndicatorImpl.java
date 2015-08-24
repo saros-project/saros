@@ -1,42 +1,35 @@
-package de.fu_berlin.inf.dpp.monitoring.remote;
+package de.fu_berlin.inf.dpp.core.monitoring.remote;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 
 import de.fu_berlin.inf.dpp.activities.ProgressActivity;
 import de.fu_berlin.inf.dpp.activities.ProgressActivity.ProgressAction;
+import de.fu_berlin.inf.dpp.core.monitoring.IStatus;
+import de.fu_berlin.inf.dpp.core.monitoring.Status;
+import de.fu_berlin.inf.dpp.intellij.runtime.UIMonitoredJob;
+import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
+import de.fu_berlin.inf.dpp.monitoring.remote.IRemoteProgressIndicator;
+import de.fu_berlin.inf.dpp.monitoring.remote.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
- * A remote progress represents a progress dialog being shown locally which is
- * updated via {@link ProgressActivity activities} sent by a remote user.
- * 
+ * IntelliJ implementation of the {@link IRemoteProgressIndicator} interface.
  */
-final class RemoteProgress {
+final class IntelliJRemoteProgressIndicatorImpl
+    implements IRemoteProgressIndicator {
 
-    private static final Logger LOG = Logger.getLogger(RemoteProgress.class);
-
-    /**
-     * The unique ID of this progress.
-     */
-    private final String id;
-
-    /**
-     * The user who requested a progress dialog to be shown.
-     */
-    private final User source;
+    private static final Logger LOG = Logger
+        .getLogger(IntelliJRemoteProgressIndicatorImpl.class);
 
     private final RemoteProgressManager rpm;
+    private final String remoteProgressID;
+    private final User remoteUser;
 
     private boolean running;
-
     private boolean started;
 
     /**
@@ -45,25 +38,42 @@ final class RemoteProgress {
      */
     private LinkedBlockingQueue<ProgressActivity> activities = new LinkedBlockingQueue<ProgressActivity>();
 
-    RemoteProgress(final RemoteProgressManager rpm, final String id,
-        final User source) {
+    /**
+     * Creates an IntelliJRemoteProgressIndicatorImpl.
+     *
+     * @param rpm
+     *            {@link RemoteProgressManager} which creates the indicator
+     * @param remoteProgressID
+     *            ID of the tracked remote progress
+     * @param remoteUser
+     *            user generating the tracked remote progress
+     */
+    IntelliJRemoteProgressIndicatorImpl(final RemoteProgressManager rpm,
+        final String remoteProgressID, final User remoteUser) {
         this.rpm = rpm;
-        this.id = id;
-        this.source = source;
+        this.remoteProgressID = remoteProgressID;
+        this.remoteUser = remoteUser;
     }
 
-    User getSource() {
-        return source;
+    @Override
+    public String getRemoteProgressID() {
+        return remoteProgressID;
     }
 
-    synchronized void start() {
+    @Override
+    public User getRemoteUser() {
+        return remoteUser;
+    }
+
+    @Override
+    public synchronized void start() {
         if (started)
             return;
 
         started = true;
 
-        final Job job = new Job("Observing remote progress for "
-            + source.getNickname()) {
+        final UIMonitoredJob job = new UIMonitoredJob(
+            "Observing remote progress for " + remoteUser.getNickname()) {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                 try {
@@ -73,18 +83,17 @@ final class RemoteProgress {
                     LOG.error(e);
                     return Status.CANCEL_STATUS;
                 } finally {
-                    rpm.removeProgress(id);
+                    rpm.progressIndicatorStopped(
+                        IntelliJRemoteProgressIndicatorImpl.this);
                 }
             }
         };
-
-        job.setPriority(Job.SHORT);
-        job.setUser(true);
         job.schedule();
         running = true;
     }
 
-    synchronized void close() {
+    @Override
+    public synchronized void stop() {
         if (!running)
             return;
 
@@ -97,19 +106,21 @@ final class RemoteProgress {
          * will never be sent over the Network.
          */
 
-        execute(new ProgressActivity(source, source, id, 0, 0, null,
-            ProgressAction.DONE));
+        handleProgress(new ProgressActivity(remoteUser, remoteUser,
+            remoteProgressID, 0, 0, null, ProgressAction.DONE));
     }
 
-    synchronized void execute(ProgressActivity activity) {
-        if (!source.equals(activity.getSource())) {
-            LOG.warn("RemoteProgress with ID: " + id + " is owned by user "
-                + source + " rejecting activity from other user: " + activity);
+    @Override
+    public synchronized void handleProgress(ProgressActivity activity) {
+        if (!remoteUser.equals(activity.getSource())) {
+            LOG.warn("RemoteProgress with ID: " + remoteProgressID
+                + " is owned by user " + remoteUser
+                + " rejecting activity from other user: " + activity);
             return;
         }
 
         if (!running) {
-            LOG.debug("RemoteProgress with ID: " + id
+            LOG.debug("RemoteProgress with ID: " + remoteProgressID
                 + " has already been closed. Discarding activity: " + activity);
             return;
         }
@@ -190,7 +201,7 @@ final class RemoteProgress {
 
     @Override
     public int hashCode() {
-        return ((id == null) ? 0 : id.hashCode());
+        return ((remoteProgressID == null) ? 0 : remoteProgressID.hashCode());
     }
 
     @Override
@@ -198,10 +209,12 @@ final class RemoteProgress {
         if (this == obj)
             return true;
 
-        if (!(obj instanceof RemoteProgress))
+        if (!(obj instanceof IntelliJRemoteProgressIndicatorImpl))
             return false;
 
-        return ObjectUtils.equals(id, ((RemoteProgress) obj).id)
-            && ObjectUtils.equals(source, ((RemoteProgress) obj).source);
+        return ObjectUtils.equals(remoteProgressID,
+            ((IntelliJRemoteProgressIndicatorImpl) obj).remoteProgressID)
+            && ObjectUtils.equals(remoteUser,
+                ((IntelliJRemoteProgressIndicatorImpl) obj).remoteUser);
     }
 }

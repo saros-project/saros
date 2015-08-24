@@ -30,6 +30,7 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
+import de.fu_berlin.inf.dpp.monitoring.ProgressMonitorAdapterFactory;
 import de.fu_berlin.inf.dpp.observables.ValueChangeListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
@@ -288,7 +289,9 @@ public class ConsistencyAction extends Action implements Disposable {
                 @Override
                 public void run(IProgressMonitor monitor)
                     throws InterruptedException {
-                    watchdogClient.runRecovery(monitor);
+
+                    watchdogClient.runRecovery(ProgressMonitorAdapterFactory
+                        .convert(monitor));
                 }
             });
         } catch (InvocationTargetException e) {

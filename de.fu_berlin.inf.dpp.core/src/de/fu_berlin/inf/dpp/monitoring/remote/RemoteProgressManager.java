@@ -1,0 +1,217 @@
+package de.fu_berlin.inf.dpp.monitoring.remote;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
+import de.fu_berlin.inf.dpp.activities.ProgressActivity;
+import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
+import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
+import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
+import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
+import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.session.IActivityConsumer;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
+import de.fu_berlin.inf.dpp.session.User;
+
+/**
+ * The RemoteProgressManager is responsible for creating and managing
+ * {@link RemoteProgressMonitor remote progress monitors} which report task
+ * progress to remote sites, as well as for listening for remote progress and
+ * reporting it through {@link IRemoteProgressIndicator} instances.
+ */
+@Component(module = "core")
+// FIXME this component has NO flow control, it can flood the network layer
+public class RemoteProgressManager extends AbstractActivityProducer {
+
+    private static final Random RANDOM = new Random();
+
+    private final ISarosSessionManager sessionManager;
+    private final IRemoteProgressIndicatorFactory progressIndicatorFactory;
+    private volatile ISarosSession session;
+
+    // the id should be unique enough
+    // closing a progress will remove itself from the map
+    private final Map<String, IRemoteProgressIndicator> progressIndicators = Collections
+        .synchronizedMap(new HashMap<String, IRemoteProgressIndicator>());
+
+    private final IActivityConsumer consumer = new AbstractActivityConsumer() {
+        /**
+         * Forwards incoming remote progress activities to the matching
+         * {@link IRemoteProgressIndicator} instances (and creates those
+         * instances if they don't exist yet).
+         */
+        @Override
+        public void receive(ProgressActivity progressActivity) {
+
+            IRemoteProgressIndicator indicator;
+            final String id = progressActivity.getProgressID();
+
+            synchronized (progressIndicators) {
+                indicator = progressIndicators.get(id);
+
+                if (indicator == null) {
+                    indicator = progressIndicatorFactory.create(
+                        RemoteProgressManager.this, id,
+                        progressActivity.getSource());
+
+                    progressIndicators.put(id, indicator);
+
+                    indicator.start();
+                }
+            }
+
+            indicator.handleProgress(progressActivity);
+        }
+    };
+
+    private ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
+        /**
+         * Stops all remote progress indicators owned by a particular user when
+         * that user leaves the session.
+         */
+        @Override
+        public void userLeft(User user) {
+
+            final List<IRemoteProgressIndicator> indicatorsToStop = new ArrayList<IRemoteProgressIndicator>();
+
+            synchronized (progressIndicators) {
+                for (final IRemoteProgressIndicator progress : progressIndicators
+                    .values()) {
+                    if (progress.getRemoteUser().equals(user))
+                        indicatorsToStop.add(progress);
+                }
+            }
+
+            for (final IRemoteProgressIndicator indicator : indicatorsToStop)
+                indicator.stop();
+        }
+    };
+
+    private ISarosSessionListener sessionListener = new NullSarosSessionListener() {
+
+        /**
+         * Registers the required listeners after a new session has started.
+         */
+        @Override
+        public void sessionStarted(ISarosSession session) {
+            RemoteProgressManager.this.session = session;
+            session.addActivityConsumer(consumer);
+            session.addActivityProducer(RemoteProgressManager.this);
+            session.addListener(sharedProjectListener);
+        }
+
+        /**
+         * Cleans up and stops all remote progress indicators after the current
+         * session has ended.
+         */
+        @Override
+        public void sessionEnded(ISarosSession session) {
+            session.removeActivityConsumer(consumer);
+            session.removeActivityProducer(RemoteProgressManager.this);
+            session.removeListener(sharedProjectListener);
+
+            final List<IRemoteProgressIndicator> indicatorsToStop = new ArrayList<IRemoteProgressIndicator>();
+
+            synchronized (progressIndicators) {
+                indicatorsToStop.addAll(progressIndicators.values());
+            }
+
+            for (final IRemoteProgressIndicator indicator : indicatorsToStop)
+                indicator.stop();
+
+            RemoteProgressManager.this.session = null;
+        }
+    };
+
+    /**
+     * Creates a RemoteProgressManager.
+     *
+     * @param sessionManager
+     *            session manager whose session to listen to for remote progress
+     *            activities
+     * @param progressIndicatorFactory
+     *            factory for creating {@link IRemoteProgressIndicator}
+     *            instances in response to remote progress activities
+     */
+    public RemoteProgressManager(ISarosSessionManager sessionManager,
+        IRemoteProgressIndicatorFactory progressIndicatorFactory) {
+
+        this.sessionManager = sessionManager;
+        this.sessionManager.addSarosSessionListener(sessionListener);
+        this.progressIndicatorFactory = progressIndicatorFactory;
+    }
+
+    /**
+     * Returns a new {@link IProgressMonitor} whose progress is displayed at the
+     * specified remote sites, in addition to being forwarded to the given other
+     * progress monitor. If there is no session currently running, the passed-in
+     * monitor is returned unchanged instead.
+     *
+     * @param users
+     *            users to send progress to
+     * @param monitor
+     *            progress monitor to forward progress to for additional local
+     *            progress reporting; pass a {@link NullProgressMonitor} if you
+     *            want the progress to be shown remotely only
+     * @return remote progress monitor, or the given progress monitor if there
+     *         is no running session
+     *
+     * @see RemoteProgressMonitor
+     * @see IRemoteProgressIndicator
+     */
+    public IProgressMonitor createRemoteProgressMonitor(List<User> users,
+        IProgressMonitor monitor) {
+
+        ISarosSession currentSession = session;
+
+        if (currentSession == null)
+            return monitor;
+
+        return new RemoteProgressMonitor(this, getNextID(),
+            currentSession.getLocalUser(),
+            new ArrayList<User>(new HashSet<User>(users)), monitor);
+    }
+
+    /**
+     * Called by a {@link RemoteProgressMonitor} when it has new progress.
+     * Causes the remote progress manager to send out the given remote progress
+     * activity.
+     *
+     * @param activity
+     *            {@link ProgressActivity} describing the progress made
+     */
+    void monitorUpdated(ProgressActivity activity) {
+        fireActivity(activity);
+    }
+
+    /**
+     * Called by a {@link IRemoteProgressIndicator} if it has stopped, either
+     * because {@link IRemoteProgressIndicator#stop} has been called directly or
+     * {@link IRemoteProgressIndicator#handleProgress} has received an activity
+     * that indicates the end of the remote operation. Causes the remote
+     * progress manager to discard the indicator.
+     *
+     * This method is for use by {@link IRemoteProgressIndicator}
+     * implementations only. Don't use it from anywhere else.
+     *
+     * @param indicator
+     *            the stopped remote progress indicator
+     */
+    public void progressIndicatorStopped(IRemoteProgressIndicator indicator) {
+        progressIndicators.remove(indicator.getRemoteProgressID());
+    }
+
+    private String getNextID() {
+        return Long.toHexString(RANDOM.nextLong());
+    }
+}
