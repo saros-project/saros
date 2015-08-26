@@ -11,7 +11,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceStoreAdapter;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.test.util.MemoryPreferenceStore;
 
@@ -36,8 +35,7 @@ public class ColorIDSetStorageTest {
         dave = "dave@saros.org";
         ids.add(dave);
 
-        preferenceStore = new EclipsePreferenceStoreAdapter(
-            new MemoryPreferenceStore());
+        preferenceStore = new MemoryPreferenceStore();
     }
 
     @Test

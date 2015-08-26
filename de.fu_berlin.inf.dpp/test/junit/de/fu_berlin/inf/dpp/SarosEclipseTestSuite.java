@@ -8,8 +8,6 @@ import org.junit.runners.Suite;
 
 de.fu_berlin.inf.dpp.concurrent.undo.TestSuite.class,
 
-de.fu_berlin.inf.dpp.editor.colorstorage.TestSuite.class,
-
 de.fu_berlin.inf.dpp.editor.internal.TestSuite.class,
 
 de.fu_berlin.inf.dpp.feedback.TestSuite.class,
