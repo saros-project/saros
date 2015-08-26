@@ -16,7 +16,6 @@ import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.activities.ChangeColorActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.colorstorage.ColorIDSet;
 import de.fu_berlin.inf.dpp.editor.colorstorage.ColorIDSetStorage;
 import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
@@ -45,7 +44,6 @@ public class ChangeColorManager extends AbstractActivityProducer implements
         .getLogger(ChangeColorManager.class);
 
     private final ISarosSession sarosSession;
-    private final EditorManager editorManager;
     private final ColorIDSetStorage colorIDSetStorage;
 
     private final Map<User, Integer> favoriteUserColors = new LinkedHashMap<User, Integer>();
@@ -122,9 +120,8 @@ public class ChangeColorManager extends AbstractActivityProducer implements
     };
 
     public ChangeColorManager(ISarosSession sarosSession,
-        EditorManager editorManager, ColorIDSetStorage colorIDSetStorage) {
+        ColorIDSetStorage colorIDSetStorage) {
         this.sarosSession = sarosSession;
-        this.editorManager = editorManager;
         this.colorIDSetStorage = colorIDSetStorage;
     }
 
@@ -268,9 +265,6 @@ public class ChangeColorManager extends AbstractActivityProducer implements
         }
 
         updateColorSet(currentUsers);
-
-        editorManager.colorChanged();
-        editorManager.refreshAnnotations();
         sarosSession.userColorChanged(affected);
     }
 
@@ -394,9 +388,6 @@ public class ChangeColorManager extends AbstractActivityProducer implements
 
             sarosSession.userColorChanged(currentUser);
         }
-
-        editorManager.colorChanged();
-        editorManager.refreshAnnotations();
     }
 
     private void updateColorAndUserPools(Map<User, Integer> assignedColors) {

@@ -322,6 +322,12 @@ public class EditorManager extends AbstractActivityProducer implements
         }
 
         @Override
+        public void userColorChanged(User user) {
+            editorListenerDispatch.colorChanged();
+            refreshAnnotations();
+        }
+
+        @Override
         public void userLeft(final User user) {
 
             // If the user left which I am following, then stop following...
@@ -977,10 +983,6 @@ public class EditorManager extends AbstractActivityProducer implements
         }
     }
 
-    private void execColorChanged() {
-        editorListenerDispatch.colorChanged();
-    }
-
     /**
      * Called when the local user opened an editor part. (called by
      * EditorPartListener)
@@ -1560,17 +1562,10 @@ public class EditorManager extends AbstractActivityProducer implements
         }
     }
 
-    // FIXME this is used from ChangeColorManager which should not know anything
-    // about this component at all
-    public void refreshAnnotations() {
+    private void refreshAnnotations() {
         for (IEditorPart part : editorPool.getAllEditors()) {
             refreshAnnotations(part);
         }
-    }
-
-    // FIXME see #refreshAnnotations()
-    public void colorChanged() {
-        this.execColorChanged();
     }
 
     /**
