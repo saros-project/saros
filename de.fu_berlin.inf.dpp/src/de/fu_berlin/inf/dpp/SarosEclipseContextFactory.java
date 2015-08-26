@@ -49,10 +49,8 @@ import de.fu_berlin.inf.dpp.vcs.VCSProviderFactory;
 /**
  * Factory used for creating the Saros context when running as Eclipse plugin.
  * 
- * * @author srossbach
+ * @author srossbach
  */
-
-// TODO class is misplaced in the current package along with Saros Eclipse stuff
 public class SarosEclipseContextFactory extends AbstractSarosContextFactory {
 
     private final Saros saros;

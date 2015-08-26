@@ -29,11 +29,6 @@ import de.fu_berlin.inf.dpp.session.User.Permission;
  */
 public interface ISessionListener {
     /**
-     * TODO add some easy way to check if given user with
-     * {@link Permission#WRITE_ACCESS} is the client (you)
-     */
-
-    /**
      * The user {@link Permission} of the given participant has been changed.
      * This is called after the {@link Permission} of the user has been updated
      * to represent the new state.

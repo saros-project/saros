@@ -108,11 +108,6 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
  * 
  * @author rdjemili
  * 
- *         TODO CO Since it was forgotten to reset the Editors of users with
- *         {@link Permission#WRITE_ACCESS} after a session closed, it is highly
- *         likely that this whole class needs to be reviewed for restarting
- *         issues
- * 
  *         TODO CO This class contains too many different concerns: TextEdits,
  *         Editor opening and closing, Parsing of activities, executing of
  *         activities, dirty state management,...
@@ -1256,10 +1251,6 @@ public class EditorManager extends AbstractActivityProducer implements
      * 
      * @param path
      *            The path in which the change should be made.
-     * 
-     *            TODO We would like to be able to allow changing editors which
-     *            are not driven by files someday, but it is not possible yet.
-     * 
      * @param offset
      *            The position into the document of the given file, where the
      *            change started.

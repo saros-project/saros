@@ -146,9 +146,6 @@ final class EditorPool {
 
         final IDocumentProvider documentProvider = editorAPI
             .getDocumentProvider(input);
-
-        // TODO Not registering is very helpful to find errors related to file
-        // transfer problems
         dirtyStateListener.register(documentProvider, input);
 
         final IDocument document = editorAPI.getDocument(editorPart);
