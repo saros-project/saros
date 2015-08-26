@@ -6,6 +6,7 @@ import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.session.internal.ActivityHandler;
 import de.fu_berlin.inf.dpp.session.internal.ActivitySequencer;
+import de.fu_berlin.inf.dpp.session.internal.ChangeColorManager;
 import de.fu_berlin.inf.dpp.session.internal.PermissionManager;
 import de.fu_berlin.inf.dpp.session.internal.UserInformationHandler;
 import de.fu_berlin.inf.dpp.session.internal.timeout.ClientSessionTimeoutHandler;
@@ -44,6 +45,7 @@ public class SarosCoreSessionContextFactory implements
         // Other
         container.addComponent(ActivityHandler.class);
         container.addComponent(ActivitySequencer.class);
+        container.addComponent(ChangeColorManager.class);
         container.addComponent(PermissionManager.class);
         container.addComponent(StopManager.class);
         container.addComponent(UserInformationHandler.class);
