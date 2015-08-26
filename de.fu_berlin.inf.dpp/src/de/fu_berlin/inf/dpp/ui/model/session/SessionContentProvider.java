@@ -93,23 +93,6 @@ public class SessionContentProvider extends TreeContentProvider {
                 }
             });
         }
-
-        @Override
-        public void colorChanged() {
-
-            // does not force a redraw
-            // ViewerUtils.refresh(viewer, true);
-
-            SWTUtils.runSafeSWTAsync(null, new Runnable() {
-                @Override
-                public void run() {
-                    if (viewer.getControl().isDisposed())
-                        return;
-
-                    viewer.getControl().redraw();
-                }
-            });
-        }
     };
 
     // TODO call update and not refresh
@@ -157,6 +140,23 @@ public class SessionContentProvider extends TreeContentProvider {
         public void permissionChanged(User user) {
             ViewerUtils.update(viewer, new UserElement(user, editorManager,
                 collector), null);
+        }
+
+        @Override
+        public void userColorChanged(User user) {
+
+            // does not force a redraw
+            // ViewerUtils.refresh(viewer, true);
+
+            SWTUtils.runSafeSWTAsync(null, new Runnable() {
+                @Override
+                public void run() {
+                    if (viewer.getControl().isDisposed())
+                        return;
+
+                    viewer.getControl().redraw();
+                }
+            });
         }
     };
 

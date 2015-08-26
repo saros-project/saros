@@ -323,7 +323,6 @@ public class EditorManager extends AbstractActivityProducer implements
 
         @Override
         public void userColorChanged(User user) {
-            editorListenerDispatch.colorChanged();
             refreshAnnotations();
         }
 

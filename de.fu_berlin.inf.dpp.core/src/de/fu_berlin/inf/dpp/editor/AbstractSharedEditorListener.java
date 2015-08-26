@@ -40,9 +40,4 @@ public abstract class AbstractSharedEditorListener implements
     public void jumpedToUser(User target) {
         // Does nothing by default
     }
-
-    @Override
-    public void colorChanged() {
-        // Does nothing by default
-    }
 }

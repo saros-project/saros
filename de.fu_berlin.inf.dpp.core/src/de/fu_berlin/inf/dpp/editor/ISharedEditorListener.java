@@ -84,13 +84,4 @@ public interface ISharedEditorListener {
      *            the user being jumped to
      */
     public void jumpedToUser(User target);
-
-    /**
-     * Fired when a user changes the color assigned to them.
-     */
-    /*
-     * TODO This method doesn't really have to do anything with editors and
-     * should be moved somewhere else.
-     */
-    public void colorChanged();
 }

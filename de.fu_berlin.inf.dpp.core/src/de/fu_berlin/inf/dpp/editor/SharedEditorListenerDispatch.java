@@ -73,10 +73,4 @@ public class SharedEditorListenerDispatch implements ISharedEditorListener {
         for (ISharedEditorListener listener : editorListeners)
             listener.jumpedToUser(target);
     }
-
-    @Override
-    public void colorChanged() {
-        for (ISharedEditorListener listener : editorListeners)
-            listener.colorChanged();
-    }
 }

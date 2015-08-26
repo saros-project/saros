@@ -36,7 +36,6 @@ import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCNegotiationMan
 import de.fu_berlin.inf.dpp.communication.chat.single.SingleUserChatService;
 import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.communication.connection.IConnectionStateListener;
-import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
@@ -45,10 +44,13 @@ import de.fu_berlin.inf.dpp.net.xmpp.roster.AbstractRosterListener;
 import de.fu_berlin.inf.dpp.net.xmpp.roster.IRosterListener;
 import de.fu_berlin.inf.dpp.net.xmpp.roster.RosterTracker;
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
+import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -205,22 +207,6 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         }
     };
 
-    protected AbstractSharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
-        @Override
-        public void colorChanged() {
-            SWTUtils.runSafeSWTAsync(log, new Runnable() {
-                @Override
-                public void run() {
-                    for (CTabItem tab : chatRooms.getItems()) {
-                        Control control = tab.getControl();
-                        if (control instanceof ChatControl)
-                            ((ChatControl) control).updateColors();
-                    }
-                }
-            });
-        }
-    };
-
     protected ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
 
         @Override
@@ -265,7 +251,14 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         }
 
         @Override
+        public void sessionStarted(final ISarosSession session) {
+            session.addListener(sessionListener);
+        }
+
+        @Override
         public void sessionEnded(final ISarosSession session) {
+
+            session.removeListener(sessionListener);
 
             final CountDownLatch mucDestroyed = new CountDownLatch(1);
 
@@ -306,6 +299,22 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
+        }
+    };
+
+    protected ISessionListener sessionListener = new AbstractSessionListener() {
+        @Override
+        public void userColorChanged(User user) {
+            SWTUtils.runSafeSWTAsync(log, new Runnable() {
+                @Override
+                public void run() {
+                    for (CTabItem tab : chatRooms.getItems()) {
+                        Control control = tab.getControl();
+                        if (control instanceof ChatControl)
+                            ((ChatControl) control).updateColors();
+                    }
+                }
+            });
         }
     };
 
@@ -421,11 +430,15 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         SarosPluginContext.initComponent(this);
 
         sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
-        editorManager.addSharedEditorListener(sharedEditorListener);
         singleUserChatService.addChatServiceListener(chatServiceListener);
         multiUserChatService.addChatServiceListener(chatServiceListener);
         connectionHandler.addConnectionStateListener(connectionStateListener);
         preferenceStore.addPropertyChangeListener(propertyChangeListener);
+
+        ISarosSession session = sessionManager.getSarosSession();
+        if (session != null) {
+            session.addListener(sessionListener);
+        }
 
         setLayout(new FillLayout());
 
@@ -442,10 +455,8 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
          * MultiUserChat's state when this ChatView is reopened.
          */
 
-        ISarosSession session = sessionManager.getSarosSession();
-
-        isSessionRunning = sessionManager.getSarosSession() != null;
-        isSessionHost = session != null && session.isHost();
+        isSessionRunning = session != null;
+        isSessionHost = isSessionRunning && session.isHost();
 
         updateExplanation();
 
@@ -453,10 +464,14 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
             @Override
             public void widgetDisposed(DisposeEvent e) {
+
+                ISarosSession session = sessionManager.getSarosSession();
+                if (session != null) {
+                    session.removeListener(sessionListener);
+                }
+
                 sessionManager
                     .removeSessionLifecycleListener(sessionLifecycleListener);
-
-                editorManager.removeSharedEditorListener(sharedEditorListener);
 
                 preferenceStore
                     .removePropertyChangeListener(propertyChangeListener);

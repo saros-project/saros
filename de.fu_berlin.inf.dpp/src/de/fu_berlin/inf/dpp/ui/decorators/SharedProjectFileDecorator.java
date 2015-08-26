@@ -141,6 +141,12 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
     private final ISessionListener sessionListener = new AbstractSessionListener() {
 
         @Override
+        public void userColorChanged(User user) {
+            updateImageDescriptorMapping();
+            updateDecoration(null);
+        }
+
+        @Override
         public void userLeft(User user) {
             Set<IResource> oldResources = activeEditorResources.remove(user);
             updateImageDescriptorMapping();
@@ -177,12 +183,6 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
             updateImageDescriptorMapping();
             updateDecoration(oldResources);
-        }
-
-        @Override
-        public void colorChanged() {
-            updateImageDescriptorMapping();
-            updateDecoration(null);
         }
     };
 
