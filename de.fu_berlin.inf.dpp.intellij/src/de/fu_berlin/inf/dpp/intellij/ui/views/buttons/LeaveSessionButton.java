@@ -32,7 +32,7 @@ import org.picocontainer.annotations.Inject;
 
 public class LeaveSessionButton extends SimpleButton {
 
-    public static final String LEAVE_SESSION_ICON_PATH = "/icons/famfamfam/project_share_leave_tsk.png";
+    public static final String LEAVE_SESSION_ICON_PATH = "/icons/famfamfam/session_leave_tsk.png";
 
     private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
         @Override

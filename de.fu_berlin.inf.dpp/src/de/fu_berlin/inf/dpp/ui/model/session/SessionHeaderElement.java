@@ -52,7 +52,7 @@ public class SessionHeaderElement extends HeaderElement {
 
     @Override
     public Image getImage() {
-        return ImageManager.ELCL_PROJECT_SHARE;
+        return ImageManager.ELCL_SESSION;
     }
 
     @Override

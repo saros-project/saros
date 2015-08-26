@@ -67,7 +67,7 @@ public class LeaveSessionAction extends Action implements Disposable {
         setImageDescriptor(new ImageDescriptor() {
             @Override
             public ImageData getImageData() {
-                return ImageManager.ELCL_PROJECT_SHARE_LEAVE.getImageData();
+                return ImageManager.ELCL_SESSION_LEAVE.getImageData();
             }
         });
 
@@ -99,7 +99,7 @@ public class LeaveSessionAction extends Action implements Disposable {
             setImageDescriptor(new ImageDescriptor() {
                 @Override
                 public ImageData getImageData() {
-                    return ImageManager.ELCL_PROJECT_SHARE_TERMINATE
+                    return ImageManager.ELCL_SESSION_TERMINATE
                         .getImageData();
                 }
             });
@@ -108,7 +108,7 @@ public class LeaveSessionAction extends Action implements Disposable {
             setImageDescriptor(new ImageDescriptor() {
                 @Override
                 public ImageData getImageData() {
-                    return ImageManager.ELCL_PROJECT_SHARE_LEAVE.getImageData();
+                    return ImageManager.ELCL_SESSION_LEAVE.getImageData();
                 }
             });
         }

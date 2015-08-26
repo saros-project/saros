@@ -74,7 +74,7 @@ public class RemoteProgressManager extends AbstractActivityProducer {
         }
     };
 
-    private ISessionListener sharedProjectListener = new AbstractSessionListener() {
+    private ISessionListener sessionListener = new AbstractSessionListener() {
         /**
          * Stops all remote progress indicators owned by a particular user when
          * that user leaves the session.
@@ -97,7 +97,7 @@ public class RemoteProgressManager extends AbstractActivityProducer {
         }
     };
 
-    private ISessionLifecycleListener sessionListener = new NullSessionLifecycleListener() {
+    private ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
 
         /**
          * Registers the required listeners after a new session has started.
@@ -107,7 +107,7 @@ public class RemoteProgressManager extends AbstractActivityProducer {
             RemoteProgressManager.this.session = session;
             session.addActivityConsumer(consumer);
             session.addActivityProducer(RemoteProgressManager.this);
-            session.addListener(sharedProjectListener);
+            session.addListener(sessionListener);
         }
 
         /**
@@ -118,7 +118,7 @@ public class RemoteProgressManager extends AbstractActivityProducer {
         public void sessionEnded(ISarosSession session) {
             session.removeActivityConsumer(consumer);
             session.removeActivityProducer(RemoteProgressManager.this);
-            session.removeListener(sharedProjectListener);
+            session.removeListener(sessionListener);
 
             final List<IRemoteProgressIndicator> indicatorsToStop = new ArrayList<IRemoteProgressIndicator>();
 
@@ -147,7 +147,7 @@ public class RemoteProgressManager extends AbstractActivityProducer {
         IRemoteProgressIndicatorFactory progressIndicatorFactory) {
 
         this.sessionManager = sessionManager;
-        this.sessionManager.addSessionLifecycleListener(sessionListener);
+        this.sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
         this.progressIndicatorFactory = progressIndicatorFactory;
     }
 

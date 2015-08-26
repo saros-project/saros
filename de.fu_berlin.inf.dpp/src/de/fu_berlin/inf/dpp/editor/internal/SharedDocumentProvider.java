@@ -88,14 +88,13 @@ public final class SharedDocumentProvider extends TextFileDocumentProvider {
 
     @Override
     public boolean isModifiable(Object element) {
-        if (!isInSharedProject(element))
+        if (!isShared(element))
             return super.isModifiable(element);
 
         return hasWriteAccess && super.isModifiable(element);
     }
 
-    private boolean isInSharedProject(Object element) {
-
+    private boolean isShared(Object element) {
         if (!(element instanceof IFileEditorInput))
             return false;
 

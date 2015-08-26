@@ -234,9 +234,9 @@ public class Messages extends NLS {
     public static String SessionStop_host_removed_you_title;
     public static String SessionStop_host_removed_you_message;
 
-    public static String ShareProjectAddContactsWizard_title;
-    public static String ShareProjectAddProjectsWizard_title;
-    public static String ShareProjectWizard_title;
+    public static String SessionAddContactsWizard_title;
+    public static String SessionAddProjectsWizard_title;
+    public static String SessionStartWizard_title;
 
     public static String ShowDescriptionPage_description;
     public static String ShowDescriptionPage_title;
@@ -318,9 +318,8 @@ public class Messages extends NLS {
     public static String ProjectSelectionWizardPage_selected_no_project;
     public static String ProjectSelectionWizardPage_title;
 
-    public static String ProjectShareBuddies_menuItem_no_contacts_available_text;
-
-    public static String ProjectShareProjects_no_projects_in_workspace;
+    public static String SessionWithBuddies_menuItem_no_contacts_available_text;
+    public static String SessionWithProjects_no_projects_in_workspace;
 
     public static String RenameContactAction_new_nickname_dialog_title;
     public static String RenameContactAction_rename_current_nickname_message;

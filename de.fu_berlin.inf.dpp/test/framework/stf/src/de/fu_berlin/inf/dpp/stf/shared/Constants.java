@@ -302,7 +302,7 @@ public interface Constants {
 
     /* *************************************************************** */
 
-    public static final String SHELL_ADD_CONTACT_TO_SESSION = get("ShareProjectAddContactsWizard_title");
+    public static final String SHELL_ADD_CONTACT_TO_SESSION = get("SessionAddContactsWizard_title");
     public static final String SHELL_ERROR_IN_SAROS_PLUGIN = get("shell_error_in_saros_plugin");
     public static final String SHELL_CLOSING_THE_SESSION = get("close_the_session");
     public static final String SHELL_CONFIRM_LEAVING_SESSION = get("confirm_leaving_session");

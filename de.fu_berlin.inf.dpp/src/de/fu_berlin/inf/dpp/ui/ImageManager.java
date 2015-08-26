@@ -28,10 +28,10 @@ public class ImageManager {
     public static final ImageDescriptor WIZBAN_CREATE_XMPP_ACCOUNT = getImageDescriptor("icons/wizban/xmpp_create_account_wiz.gif"); //$NON-NLS-1$
     public static final ImageDescriptor WIZBAN_EDIT_XMPP_ACCOUNT = getImageDescriptor("icons/wizban/xmpp_edit_account_wiz.gif"); //$NON-NLS-1$
     public static final ImageDescriptor WIZBAN_ADD_CONTACT = getImageDescriptor("icons/wizban/add_buddy_wiz.gif"); //$NON-NLS-1$
-    public static final ImageDescriptor WIZBAN_SHARE_PROJECT_OUTGOING = getImageDescriptor("icons/wizban/share_project_outgoing_wiz.gif"); //$NON-NLS-1$
-    public static final ImageDescriptor WIZBAN_SHARE_PROJECT_ADD_PROJECTS = getImageDescriptor("icons/wizban/share_project_add_projects_wiz.gif"); //$NON-NLS-1$
-    public static final ImageDescriptor WIZBAN_SHARE_PROJECT_ADD_CONTACTS = getImageDescriptor("icons/wizban/share_project_add_buddies_wiz.gif"); //$NON-NLS-1$
-    public static final ImageDescriptor WIZBAN_SHARE_PROJECT_INCOMING = getImageDescriptor("icons/wizban/share_project_incoming_wiz.gif"); //$NON-NLS-1$
+    public static final ImageDescriptor WIZBAN_SESSION_INCOMING = getImageDescriptor("icons/wizban/session_incoming_wiz.gif"); //$NON-NLS-1$
+    public static final ImageDescriptor WIZBAN_SESSION_OUTGOING = getImageDescriptor("icons/wizban/session_outgoing_wiz.gif"); //$NON-NLS-1$
+    public static final ImageDescriptor WIZBAN_SESSION_ADD_PROJECTS = getImageDescriptor("icons/wizban/session_add_projects_wiz.gif"); //$NON-NLS-1$
+    public static final ImageDescriptor WIZBAN_SESSION_ADD_CONTACTS = getImageDescriptor("icons/wizban/session_add_buddies_wiz.gif"); //$NON-NLS-1$
 
     /*
      * tool bar
@@ -56,16 +56,16 @@ public class ImageManager {
     public static final Image DLCL_CONTACT_SKYPE_CALL = getImage("icons/dlcl16/buddy_skype_call_tsk.png"); //$NON-NLS-1$
     public static final Image ELCL_CONTACT_ADD = getImage("icons/elcl16/buddy_add_tsk.png"); //$NON-NLS-1$
     public static final Image DLCL_CONTACT_ADD = getImage("icons/dlcl16/buddy_add_tsk.png"); //$NON-NLS-1$
-    public static final Image ELCL_PROJECT_SHARE = getImage("icons/elcl16/project_share_tsk.png"); //$NON-NLS-1$
-    public static final Image DLCL_PROJECT_SHARE = getImage("icons/dlcl16/project_share_tsk.png"); //$NON-NLS-1$
-    public static final Image ELCL_PROJECT_SHARE_LEAVE = getImage("icons/elcl16/project_share_leave_tsk.png"); //$NON-NLS-1$
-    public static final Image DLCL_PROJECT_SHARE_LEAVE = getImage("icons/dlcl16/project_share_leave_tsk.png"); //$NON-NLS-1$
-    public static final Image ELCL_PROJECT_SHARE_TERMINATE = getImage("icons/elcl16/project_share_terminate_tsk.png"); //$NON-NLS-1$
-    public static final Image DLCL_PROJECT_SHARE_TERMINATE = getImage("icons/dlcl16/project_share_terminate_tsk.png"); //$NON-NLS-1$
-    public static final Image ELCL_PROJECT_SHARE_ADD_PROJECTS = getImage("icons/elcl16/project_share_add_projects_tsk.png"); //$NON-NLS-1$
-    public static final Image DLCL_PROJECT_SHARE_ADD_PROJECTS = getImage("icons/dlcl16/project_share_add_projects_tsk.png"); //$NON-NLS-1$
-    public static final Image ELCL_PROJECT_SHARE_ADD_CONTACTS = getImage("icons/elcl16/project_share_add_buddies_tsk.png"); //$NON-NLS-1$
-    public static final Image DLCL_PROJECT_SHARE_ADD_CONTACTS = getImage("icons/dlcl16/project_share_add_buddies_tsk.png"); //$NON-NLS-1$
+    public static final Image ELCL_SESSION = getImage("icons/elcl16/session_tsk.png"); //$NON-NLS-1$
+    public static final Image DLCL_SESSION = getImage("icons/dlcl16/session_tsk.png"); //$NON-NLS-1$
+    public static final Image ELCL_SESSION_LEAVE = getImage("icons/elcl16/session_leave_tsk.png"); //$NON-NLS-1$
+    public static final Image DLCL_SESSION_LEAVE = getImage("icons/dlcl16/session_leave_tsk.png"); //$NON-NLS-1$
+    public static final Image ELCL_SESSION_TERMINATE = getImage("icons/elcl16/session_terminate_tsk.png"); //$NON-NLS-1$
+    public static final Image DLCL_SESSION_TERMINATE = getImage("icons/dlcl16/session_terminate_tsk.png"); //$NON-NLS-1$
+    public static final Image ELCL_SESSION_ADD_PROJECTS = getImage("icons/elcl16/session_add_projects_tsk.png"); //$NON-NLS-1$
+    public static final Image DLCL_SESSION_ADD_PROJECTS = getImage("icons/dlcl16/session_add_projects_tsk.png"); //$NON-NLS-1$
+    public static final Image ELCL_SESSION_ADD_CONTACTS = getImage("icons/elcl16/session_add_buddies_tsk.png"); //$NON-NLS-1$
+    public static final Image DLCL_SESSION_ADD_CONTACTS = getImage("icons/dlcl16/session_add_buddies_tsk.png"); //$NON-NLS-1$
     public static final Image ELCL_SAROS_SESSION_STOP_PROCESS = getImage("icons/elcl16/saros_session_stop_process_tsk.png"); //$NON-NLS-1$
     public static final Image DLCL_SAROS_SESSION_STOP_PROCESS = getImage("icons/dlcl16/saros_session_stop_process_tsk.png"); //$NON-NLS-1$
     public static final Image ELCL_DIALOG = getImage("icons/elcl16/dialog.gif"); //$NON-NLS-1$

@@ -14,7 +14,7 @@ import de.fu_berlin.inf.dpp.ui.wizards.AddResourcesToSessionWizard;
  * in the opening {@link AddResourcesToSessionWizard} to the running
  * {@link ISarosSession}.
  */
-public class SharedProjectAddProjectsHandler extends AbstractHandler {
+public class SessionAddProjectsHandler extends AbstractHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {

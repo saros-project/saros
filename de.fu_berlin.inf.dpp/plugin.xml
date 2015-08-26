@@ -523,27 +523,27 @@
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
-            id="de.fu_berlin.inf.dpp.ui.commands.SharedProjectLeave"
+            id="de.fu_berlin.inf.dpp.ui.commands.SessionLeave"
             name="Leave Session...">
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
-            id="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddResources"
+            id="de.fu_berlin.inf.dpp.ui.commands.SessionAddResources"
             name="Add Projects...">
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
-            id="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddBuddies"
+            id="de.fu_berlin.inf.dpp.ui.commands.SessionAddBuddies"
             name="Add Contacts...">
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
-            id="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddSelectedResources"
+            id="de.fu_berlin.inf.dpp.ui.commands.SessionAddSelectedResources"
             name="Add to Saros Session">
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
-            id="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddSelectedBuddies"
+            id="de.fu_berlin.inf.dpp.ui.commands.SessionAddSelectedBuddies"
             name="Add to Saros Session">
       </command>
    </extension>
@@ -596,8 +596,8 @@
          </activeWhen>
       </handler>
       <handler
-            class="de.fu_berlin.inf.dpp.ui.commandHandlers.SharedProjectLeave"
-            commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectLeave">
+            class="de.fu_berlin.inf.dpp.ui.commandHandlers.SessionLeaveHandler"
+            commandId="de.fu_berlin.inf.dpp.ui.commands.SessionLeave">
          <activeWhen>
             <and>
                <reference
@@ -610,8 +610,8 @@
          </activeWhen>
       </handler>
       <handler
-            class="de.fu_berlin.inf.dpp.ui.commandHandlers.SharedProjectAddProjectsHandler"
-            commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddResources">
+            class="de.fu_berlin.inf.dpp.ui.commandHandlers.SessionAddProjectsHandler"
+            commandId="de.fu_berlin.inf.dpp.ui.commands.SessionAddResources">
          <activeWhen>
             <and>
                <reference
@@ -629,8 +629,8 @@
          </enabledWhen>
       </handler>
       <handler
-            class="de.fu_berlin.inf.dpp.ui.commandHandlers.SharedProjectAddBuddiesHandler"
-            commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddBuddies">
+            class="de.fu_berlin.inf.dpp.ui.commandHandlers.SessionAddBuddiesHandler"
+            commandId="de.fu_berlin.inf.dpp.ui.commands.SessionAddBuddies">
          <activeWhen>
             <and>
                <reference
@@ -643,8 +643,8 @@
          </activeWhen>
       </handler>
       <handler
-            class="de.fu_berlin.inf.dpp.ui.commandHandlers.SharedProjectAddSelectedProjectsHandler"
-            commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddSelectedResources">
+            class="de.fu_berlin.inf.dpp.ui.commandHandlers.SessionAddSelectedProjectsHandler"
+            commandId="de.fu_berlin.inf.dpp.ui.commands.SessionAddSelectedResources">
          <activeWhen>
             <and>
                <reference
@@ -670,8 +670,8 @@
          </enabledWhen>
       </handler>
       <handler
-            class="de.fu_berlin.inf.dpp.ui.commandHandlers.SharedProjectAddSelectedBuddiesHandler"
-            commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddSelectedBuddies">
+            class="de.fu_berlin.inf.dpp.ui.commandHandlers.SessionAddSelectedBuddiesHandler"
+            commandId="de.fu_berlin.inf.dpp.ui.commands.SessionAddSelectedBuddies">
          <activeWhen>
             <and>
                <reference
@@ -761,7 +761,7 @@
             <command
                   commandId="de.fu_berlin.inf.dpp.ui.commands.ShareResource"
                   disabledIcon="icons/dlcl16/spacer.png"
-                  icon="icons/elcl16/project_share_tsk.png"
+                  icon="icons/elcl16/session_tsk.png"
                   style="push">
                <visibleWhen
                      checkEnabled="false">
@@ -773,9 +773,9 @@
                </visibleWhen>
             </command>
            <command
-                  commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddResources"
-                  disabledIcon="icons/dlcl16/project_share_add_projects_tsk.png"
-                  icon="icons/elcl16/project_share_add_projects_tsk.png"
+                  commandId="de.fu_berlin.inf.dpp.ui.commands.SessionAddResources"
+                  disabledIcon="icons/dlcl16/session_add_projects_tsk.png"
+                  icon="icons/elcl16/session_add_projects_tsk.png"
                   style="push">
                <visibleWhen
                      checkEnabled="false">
@@ -793,9 +793,9 @@
                </visibleWhen>
             </command>
             <command
-                  commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddBuddies"
-                  disabledIcon="icons/dlcl16/project_share_add_buddies_tsk.png"
-                  icon="icons/elcl16/project_share_add_buddies_tsk.png"
+                  commandId="de.fu_berlin.inf.dpp.ui.commands.SessionAddBuddies"
+                  disabledIcon="icons/dlcl16/session_add_buddies_tsk.png"
+                  icon="icons/elcl16/session_add_buddies_tsk.png"
                   style="push">
                <visibleWhen
                      checkEnabled="false">
@@ -813,9 +813,9 @@
                </visibleWhen>
             </command>
             <command
-                  commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectLeave"
-                  disabledIcon="icons/dlcl16/project_share_leave_tsk.png"
-                  icon="icons/elcl16/project_share_leave_tsk.png"
+                  commandId="de.fu_berlin.inf.dpp.ui.commands.SessionLeave"
+                  disabledIcon="icons/dlcl16/session_leave_tsk.png"
+                  icon="icons/elcl16/session_leave_tsk.png"
                   label="Leave Session..."
                   style="push">
                <visibleWhen
@@ -836,9 +836,9 @@
                </visibleWhen>
             </command>
             <command
-                  commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectLeave"
-                  disabledIcon="icons/dlcl16/project_share_terminate_tsk.png"
-                  icon="icons/elcl16/project_share_terminate_tsk.png"
+                  commandId="de.fu_berlin.inf.dpp.ui.commands.SessionLeave"
+                  disabledIcon="icons/dlcl16/session_terminate_tsk.png"
+                  icon="icons/elcl16/session_terminate_tsk.png"
                   label="Stop Session..."
                   style="push">
                <visibleWhen
@@ -884,7 +884,7 @@
          <command
                commandId="de.fu_berlin.inf.dpp.ui.commands.ShareResource"
                disabledIcon="icons/dlcl16/spacer.png"
-               icon="icons/elcl16/project_share_tsk.png"
+               icon="icons/elcl16/session_tsk.png"
                style="push">
             <visibleWhen
                   checkEnabled="false">
@@ -904,9 +904,9 @@
             </visibleWhen>
          </command>
          <command
-               commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddResources"
-               disabledIcon="icons/dlcl16/project_share_add_projects_tsk.png"
-               icon="icons/elcl16/project_share_add_projects_tsk.png"
+               commandId="de.fu_berlin.inf.dpp.ui.commands.SessionAddResources"
+               disabledIcon="icons/dlcl16/session_add_projects_tsk.png"
+               icon="icons/elcl16/session_add_projects_tsk.png"
                style="push">
             <visibleWhen
                   checkEnabled="false">
@@ -947,9 +947,9 @@
             </visibleWhen>
          </command>
          <command
-               commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddBuddies"
-               disabledIcon="icons/dlcl16/project_share_add_buddies_tsk.png"
-               icon="icons/elcl16/project_share_add_buddies_tsk.png"
+               commandId="de.fu_berlin.inf.dpp.ui.commands.SessionAddBuddies"
+               disabledIcon="icons/dlcl16/session_add_buddies_tsk.png"
+               icon="icons/elcl16/session_add_buddies_tsk.png"
                style="push">
             <visibleWhen
                   checkEnabled="false">
@@ -989,7 +989,7 @@
             allPopups="false"
             locationURI="popup:org.eclipse.ui.popup.any?after=additions">
             <menu
-                  icon="icons/elcl16/project_share_tsk.png"
+                  icon="icons/elcl16/session_tsk.png"
                   label="Share With"
                   tooltip="Share the Selected Projects With Your Contacts">
                   <visibleWhen
@@ -1054,9 +1054,9 @@
                </separator>
             </menu>
             <command
-                  commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddSelectedResources"
-                  disabledIcon="icons/dlcl16/project_share_add_projects_tsk.png"
-                  icon="icons/elcl16/project_share_add_projects_tsk.png"
+                  commandId="de.fu_berlin.inf.dpp.ui.commands.SessionAddSelectedResources"
+                  disabledIcon="icons/dlcl16/session_add_projects_tsk.png"
+                  icon="icons/elcl16/session_add_projects_tsk.png"
                   style="push">
                <visibleWhen
                      checkEnabled="false">
@@ -1082,7 +1082,7 @@
             allPopups="false"
             locationURI="popup:org.eclipse.ui.popup.any?before=menustart">
          <menu
-               icon="icons/elcl16/project_share_tsk.png"
+               icon="icons/elcl16/session_tsk.png"
                label="Work Together on..."
                tooltip="Share Projects With Selected Contacts">
             <visibleWhen
@@ -1134,9 +1134,9 @@
             </separator>
          </menu>
          <command
-               commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddSelectedBuddies"
-               disabledIcon="icons/dlcl16/project_share_add_buddies_tsk.png"
-               icon="icons/elcl16/project_share_add_buddies_tsk.png"
+               commandId="de.fu_berlin.inf.dpp.ui.commands.SessionAddSelectedBuddies"
+               disabledIcon="icons/dlcl16/session_add_buddies_tsk.png"
+               icon="icons/elcl16/session_add_buddies_tsk.png"
                style="push">
             <visibleWhen
                   checkEnabled="false">

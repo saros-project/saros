@@ -138,7 +138,7 @@ public class ProjectShareProjects extends ContributionItem {
 
         final MenuItem menuItem = new MenuItem(parentMenu, SWT.NONE, index);
         menuItem
-            .setText(Messages.ProjectShareProjects_no_projects_in_workspace);
+            .setText(Messages.SessionWithProjects_no_projects_in_workspace);
         menuItem.setEnabled(false);
         return menuItem;
     }

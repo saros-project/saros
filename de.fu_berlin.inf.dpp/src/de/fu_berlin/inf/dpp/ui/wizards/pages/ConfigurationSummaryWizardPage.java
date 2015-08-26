@@ -115,7 +115,7 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
         SimpleNoteComposite shareProjects = new SimpleNoteComposite(
             autoConnectComposite,
             SWT.BORDER,
-            ImageManager.ELCL_PROJECT_SHARE,
+            ImageManager.ELCL_SESSION,
             de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_share_project);
         shareProjects.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
             false));

@@ -89,12 +89,12 @@ public class ConsistencyAction extends Action implements Disposable {
     private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
-            setSharedProject(newSarosSession);
+            setSession(newSarosSession);
         }
 
         @Override
         public void sessionEnded(ISarosSession oldSarosSession) {
-            setSharedProject(null);
+            setSession(null);
         }
     };
 
@@ -129,24 +129,24 @@ public class ConsistencyAction extends Action implements Disposable {
 
         sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
 
-        setSharedProject(sessionManager.getSarosSession());
+        setSession(sessionManager.getSarosSession());
     }
 
-    private void setSharedProject(ISarosSession newSharedProject) {
+    private void setSession(ISarosSession newSession) {
 
-        // Unregister from previous project
+        // TODO Why are we removing the listener and adding it again?
+
         if (sarosSession != null) {
             inconsistentObservable.remove(isConsistencyListener);
         }
 
-        sarosSession = newSharedProject;
+        sarosSession = newSession;
 
         if (sarosSession != null)
             setDisabledImageDescriptor(IN_SYNC);
         else
             setDisabledImageDescriptor(null);
 
-        // Register to new project
         if (sarosSession != null) {
             inconsistentObservable.addAndNotify(isConsistencyListener);
         } else {

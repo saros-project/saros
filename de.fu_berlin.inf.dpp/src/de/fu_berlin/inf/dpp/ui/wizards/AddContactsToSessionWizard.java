@@ -17,8 +17,8 @@ import de.fu_berlin.inf.dpp.ui.wizards.pages.ContactSelectionWizardPage;
  * @author bkahlert
  */
 public class AddContactsToSessionWizard extends Wizard {
-    public static final String TITLE = Messages.ShareProjectAddContactsWizard_title;
-    public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_SHARE_PROJECT_ADD_CONTACTS;
+    public static final String TITLE = Messages.SessionAddContactsWizard_title;
+    public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_SESSION_ADD_CONTACTS;
 
     private final ContactSelectionWizardPage contactSelectionWizardPage = new ContactSelectionWizardPage();
 

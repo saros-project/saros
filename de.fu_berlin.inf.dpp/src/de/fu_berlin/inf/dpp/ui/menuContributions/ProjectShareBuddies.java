@@ -28,9 +28,9 @@ import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 
 /**
- * This class fills a {@link Menu} with {@link MenuItem}s.<br/>
- * Each {@link MenuItem} represents a Saros enabled contact.<br/>
- * A click leads to a shared project invitation.
+ * This class fills a {@link Menu} with {@link MenuItem}s. Each {@link MenuItem}
+ * represents a contact with Saros support. A click starts a session
+ * negotiation.
  */
 public class ProjectShareBuddies extends ContributionItem {
 
@@ -139,7 +139,7 @@ public class ProjectShareBuddies extends ContributionItem {
     protected MenuItem createInvalidContactsMenuItem(Menu parentMenu, int index) {
         MenuItem menuItem = new MenuItem(parentMenu, SWT.NONE, index);
         menuItem
-            .setText(Messages.ProjectShareBuddies_menuItem_no_contacts_available_text);
+            .setText(Messages.SessionWithBuddies_menuItem_no_contacts_available_text);
         menuItem.setEnabled(false);
         return menuItem;
     }

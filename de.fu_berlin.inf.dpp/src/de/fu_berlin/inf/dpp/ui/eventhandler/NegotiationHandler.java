@@ -76,7 +76,7 @@ public class NegotiationHandler implements INegotiationHandler {
             setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.TRUE);
             setProperty(IProgressConstants.ICON_PROPERTY,
                 ImageManager
-                    .getImageDescriptor("/icons/elcl16/project_share_tsk.png"));
+                    .getImageDescriptor("/icons/elcl16/session_tsk.png"));
         }
 
         @Override

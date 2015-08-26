@@ -34,7 +34,7 @@ public class IconManager {
     public static final Logger LOG = Logger.getLogger(IconManager.class);
 
     public static final ImageIcon SESSIONS_ICON = getIcon(
-        "/icons/famfamfam/project_share_tsk.png", "sessions");
+        "/icons/famfamfam/session_tsk.png", "sessions");
     public static final ImageIcon CONTACT_ONLINE_ICON = getIcon(
         "/icons/famfamfam/buddy_saros_obj.png", "contactOnLine");
     public static final ImageIcon CONTACT_OFFLINE_ICON = getIcon(

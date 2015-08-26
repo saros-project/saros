@@ -97,7 +97,7 @@ public class CollaborationUtils {
                         return Status.CANCEL_STATUS;
 
                     sessionManager.invite(participantsToAdd,
-                        getShareProjectDescription(session));
+                        getSessionDescription(session));
 
                 } catch (Exception e) {
 
@@ -246,7 +246,7 @@ public class CollaborationUtils {
 
                 if (participantsToAdd.size() > 0) {
                     sessionManager.invite(participantsToAdd,
-                        getShareProjectDescription(sarosSession));
+                        getSessionDescription(sarosSession));
                 }
             }
         });
@@ -260,7 +260,7 @@ public class CollaborationUtils {
      * @param sarosSession
      * @return
      */
-    private static String getShareProjectDescription(ISarosSession sarosSession) {
+    private static String getSessionDescription(ISarosSession sarosSession) {
 
         Set<de.fu_berlin.inf.dpp.filesystem.IProject> projects = sarosSession
             .getProjects();

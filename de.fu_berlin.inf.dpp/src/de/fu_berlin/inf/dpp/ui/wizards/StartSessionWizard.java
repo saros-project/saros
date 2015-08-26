@@ -28,8 +28,8 @@ import de.fu_berlin.inf.dpp.ui.wizards.pages.ResourceSelectionWizardPage;
  */
 public class StartSessionWizard extends Wizard {
 
-    public static final String TITLE = Messages.ShareProjectWizard_title;
-    public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_SHARE_PROJECT_OUTGOING;
+    public static final String TITLE = Messages.SessionStartWizard_title;
+    public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_SESSION_OUTGOING;
 
     private final ResourceSelectionWizardPage resourceSelectionWizardPage;
     private final ContactSelectionWizardPage contactSelectionWizardPage;

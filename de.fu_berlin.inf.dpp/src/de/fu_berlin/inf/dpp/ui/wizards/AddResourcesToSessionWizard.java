@@ -20,8 +20,8 @@ import de.fu_berlin.inf.dpp.ui.wizards.pages.ResourceSelectionWizardPage;
  * @author bkahlert
  */
 public class AddResourcesToSessionWizard extends Wizard {
-    public static final String TITLE = Messages.ShareProjectAddProjectsWizard_title;
-    public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_SHARE_PROJECT_ADD_PROJECTS;
+    public static final String TITLE = Messages.SessionAddProjectsWizard_title;
+    public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_SESSION_ADD_PROJECTS;
 
     private final ResourceSelectionWizardPage resourceSelectionWizardPage;
 
