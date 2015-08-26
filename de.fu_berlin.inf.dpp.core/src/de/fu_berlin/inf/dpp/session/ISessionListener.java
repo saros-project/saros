@@ -68,6 +68,14 @@ public interface ISessionListener {
     public void userFinishedProjectNegotiation(User user);
 
     /**
+     * Is fired when the color assigned to a user in the session changed.
+     * 
+     * @param user
+     *            the user whose color changed
+     */
+    public void userColorChanged(User user);
+
+    /**
      * Is fired when an user leaves the shared project.
      * 
      * @param user

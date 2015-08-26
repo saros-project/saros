@@ -288,6 +288,11 @@ public class SarosSessionStub implements ISarosSession {
     }
 
     @Override
+    public void userColorChanged(User user) {
+        throw new RuntimeException("Unexpected call to Stub");
+    }
+
+    @Override
     public boolean userHasProject(User user, IProject project) {
         throw new RuntimeException("Unexpected call to Stub");
     }

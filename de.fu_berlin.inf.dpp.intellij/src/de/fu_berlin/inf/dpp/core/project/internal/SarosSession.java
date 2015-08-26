@@ -530,6 +530,11 @@ public final class SarosSession implements ISarosSession {
                 getRemoteUsers(), jid);
         }
     }
+    
+    @Override
+    public void userColorChanged(User user) {
+        listenerDispatch.userColorChanged(null);
+    }
 
     @Override
     public void removeUser(final User user) {

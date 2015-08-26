@@ -28,6 +28,11 @@ public abstract class AbstractSessionListener implements ISessionListener {
     }
 
     @Override
+    public void userColorChanged(User user) {
+        // Do nothing.
+    }
+
+    @Override
     public void userLeft(User user) {
         // Do nothing.
     }

@@ -154,6 +154,15 @@ public interface ISarosSession {
     public void userFinishedProjectNegotiation(final User user);
 
     /**
+     * Informs all {@link ISessionListener session listeners} that the color
+     * assigned to a user in the session changed.
+     * 
+     * @param user
+     *            the user whose color changed
+     */
+    public void userColorChanged(User user);
+
+    /**
      * Removes a user from this session.
      * 
      * @param user

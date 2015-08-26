@@ -271,6 +271,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements
 
         editorManager.colorChanged();
         editorManager.refreshAnnotations();
+        sarosSession.userColorChanged(affected);
     }
 
     /*
@@ -387,13 +388,15 @@ public class ChangeColorManager extends AbstractActivityProducer implements
             updateColorSet(currentUsers);
         }
 
-        for (User currentUser : currentUsers)
+        for (User currentUser : currentUsers) {
             broadcastColorIDChange(currentUser, currentUsers,
                 currentUser.getColorID());
 
+            sarosSession.userColorChanged(currentUser);
+        }
+
         editorManager.colorChanged();
         editorManager.refreshAnnotations();
-
     }
 
     private void updateColorAndUserPools(Map<User, Integer> assignedColors) {

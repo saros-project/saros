@@ -497,6 +497,11 @@ public final class SarosSession implements ISarosSession {
     }
 
     @Override
+    public void userColorChanged(User user) {
+        listenerDispatch.userColorChanged(user);
+    }
+
+    @Override
     public void removeUser(final User user) {
         synchronized (this) {
             if (!user.isInSession()) {

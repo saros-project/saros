@@ -38,6 +38,12 @@ public class SessionListenerDispatch implements ISessionListener {
     }
 
     @Override
+    public void userColorChanged(User user) {
+        for (ISessionListener listener : listeners)
+            listener.userColorChanged(user);
+    }
+
+    @Override
     public void userLeft(User user) {
         for (ISessionListener listener : listeners)
             listener.userLeft(user);
