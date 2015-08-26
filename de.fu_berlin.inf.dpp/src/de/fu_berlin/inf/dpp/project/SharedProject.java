@@ -21,9 +21,9 @@ import org.eclipse.team.core.subscribers.ISubscriberChangeEvent;
 import org.eclipse.team.core.subscribers.ISubscriberChangeListener;
 import org.eclipse.team.core.subscribers.Subscriber;
 
-import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
@@ -155,7 +155,7 @@ public class SharedProject {
      * Note that this listener is only registered if VCS support is enabled for
      * the session.
      */
-    protected ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
+    protected ISessionListener sessionListener = new AbstractSessionListener() {
         @Override
         public void permissionChanged(User user) {
             boolean writeAccess = sarosSession.hasWriteAccess();
@@ -227,7 +227,7 @@ public class SharedProject {
         this.hasWriteAccess.update(hasWriteAccess);
 
         if (sarosSession.useVersionControl()) {
-            sarosSession.addListener(sharedProjectListener);
+            sarosSession.addListener(sessionListener);
         }
         if (hasWriteAccess) {
             initializeResources();
@@ -497,6 +497,6 @@ public class SharedProject {
 
     public void delete() {
         if (sarosSession.useVersionControl())
-            sarosSession.removeListener(sharedProjectListener);
+            sarosSession.removeListener(sessionListener);
     }
 }

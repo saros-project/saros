@@ -71,14 +71,14 @@ import de.fu_berlin.inf.dpp.session.IActivityListener;
 import de.fu_berlin.inf.dpp.session.IActivityProducer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionContextFactory;
-import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 import de.fu_berlin.inf.dpp.session.internal.ActivityHandler;
 import de.fu_berlin.inf.dpp.session.internal.ActivityQueuer;
 import de.fu_berlin.inf.dpp.session.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.session.internal.PermissionManager;
-import de.fu_berlin.inf.dpp.session.internal.SharedProjectListenerDispatch;
+import de.fu_berlin.inf.dpp.session.internal.SessionListenerDispatch;
 import de.fu_berlin.inf.dpp.session.internal.SharedProjectMapper;
 import de.fu_berlin.inf.dpp.session.internal.UserInformationHandler;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
@@ -130,7 +130,7 @@ public final class SarosSession implements ISarosSession {
 
     private final ConcurrentHashMap<JID, User> participants = new ConcurrentHashMap<JID, User>();
 
-    private final SharedProjectListenerDispatch listenerDispatch = new SharedProjectListenerDispatch();
+    private final SessionListenerDispatch listenerDispatch = new SessionListenerDispatch();
 
     private final User hostUser;
 
@@ -574,12 +574,12 @@ public final class SarosSession implements ISarosSession {
     }
 
     @Override
-    public void addListener(ISharedProjectListener listener) {
+    public void addListener(ISessionListener listener) {
         listenerDispatch.add(listener);
     }
 
     @Override
-    public void removeListener(ISharedProjectListener listener) {
+    public void removeListener(ISessionListener listener) {
         listenerDispatch.remove(listener);
     }
 

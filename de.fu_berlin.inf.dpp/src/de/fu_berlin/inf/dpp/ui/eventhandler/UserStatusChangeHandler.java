@@ -2,11 +2,11 @@ package de.fu_berlin.inf.dpp.ui.eventhandler;
 
 import java.text.MessageFormat;
 
-import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.Messages;
@@ -23,17 +23,17 @@ public class UserStatusChangeHandler {
     private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
         @Override
         public void sessionStarting(ISarosSession session) {
-            session.addListener(userStatusListener);
+            session.addListener(sessionListener);
         }
 
         @Override
         public void sessionEnded(ISarosSession session) {
-            session.removeListener(userStatusListener);
+            session.removeListener(sessionListener);
         }
 
     };
 
-    private ISharedProjectListener userStatusListener = new AbstractSharedProjectListener() {
+    private ISessionListener sessionListener = new AbstractSessionListener() {
 
         /*
          * save to call SarosView.showNotification because it uses asyncExec

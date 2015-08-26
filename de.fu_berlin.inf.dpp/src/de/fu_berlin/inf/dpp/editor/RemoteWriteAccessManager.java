@@ -17,10 +17,10 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
-import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 import de.fu_berlin.inf.dpp.util.StackTrace;
@@ -62,7 +62,7 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
         IEditorAPI editorAPI) {
         this.sarosSession = sarosSession;
         this.editorAPI = editorAPI;
-        this.sarosSession.addListener(sharedProjectListener);
+        this.sarosSession.addListener(sessionListener);
     }
 
     /**
@@ -94,7 +94,7 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
         updateConnectionState(path);
     }
 
-    protected ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
+    protected ISessionListener sessionListener = new AbstractSessionListener() {
 
         /**
          * Remove the user and potentially disconnect from the document
@@ -123,7 +123,7 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
     };
 
     public void dispose() {
-        sarosSession.removeListener(sharedProjectListener);
+        sarosSession.removeListener(sessionListener);
 
         for (Entry<SPath, Set<User>> entry : editorStates.entrySet()) {
             entry.getValue().clear();

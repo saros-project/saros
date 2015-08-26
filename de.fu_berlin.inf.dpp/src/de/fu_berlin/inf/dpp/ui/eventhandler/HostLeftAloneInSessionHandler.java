@@ -6,11 +6,11 @@ import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
-import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.Messages;
@@ -36,7 +36,7 @@ public class HostLeftAloneInSessionHandler {
     private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
         @Override
         public void sessionEnded(ISarosSession session) {
-            session.removeListener(projectListener);
+            session.removeListener(sessionListener);
             /*
              * we need to clear any open notifications because there might be
              * stuff left, like follow mode notifications, or "buddy joined"
@@ -48,11 +48,11 @@ public class HostLeftAloneInSessionHandler {
 
         @Override
         public void sessionStarted(ISarosSession session) {
-            session.addListener(projectListener);
+            session.addListener(sessionListener);
         }
     };
 
-    private final ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
+    private final ISessionListener sessionListener = new AbstractSessionListener() {
 
         @Override
         public void userLeft(User user) {

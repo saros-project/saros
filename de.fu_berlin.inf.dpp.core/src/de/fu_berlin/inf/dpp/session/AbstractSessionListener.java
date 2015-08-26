@@ -1,13 +1,11 @@
 package de.fu_berlin.inf.dpp.session;
 
-
 /**
- * Abstract {@link ISharedProjectListener} that does nothing in all the methods.
- * 
- * Clients can override just the methods they want to act upon.
+ * Abstract {@link ISessionListener} that does nothing by default. Clients can
+ * extend this class to override only those event methods that they want to act
+ * upon.
  */
-public abstract class AbstractSharedProjectListener implements
-    ISharedProjectListener {
+public abstract class AbstractSessionListener implements ISessionListener {
 
     @Override
     public void permissionChanged(User user) {

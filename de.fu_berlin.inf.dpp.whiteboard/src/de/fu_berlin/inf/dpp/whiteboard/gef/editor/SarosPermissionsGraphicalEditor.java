@@ -4,10 +4,10 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -25,18 +25,18 @@ public abstract class SarosPermissionsGraphicalEditor extends
     protected ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
         @Override
         public void sessionStarted(ISarosSession session) {
-            session.addListener(sharedProjectListener);
+            session.addListener(sessionListener);
             setEnabledInSWTThread(session.getLocalUser().hasWriteAccess());
         }
 
         @Override
         public void sessionEnded(ISarosSession session) {
-            session.removeListener(sharedProjectListener);
+            session.removeListener(sessionListener);
             setEnabledInSWTThread(true);
         }
     };
 
-    protected ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
+    protected ISessionListener sessionListener = new AbstractSessionListener() {
         @Override
         public void permissionChanged(User user) {
             if (user.isLocal()) {

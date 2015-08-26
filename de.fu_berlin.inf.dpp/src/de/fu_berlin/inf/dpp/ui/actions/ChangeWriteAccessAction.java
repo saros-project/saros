@@ -19,11 +19,11 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
@@ -76,17 +76,17 @@ public class ChangeWriteAccessAction extends Action implements Disposable {
     private ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
-            newSarosSession.addListener(permissionListener);
+            newSarosSession.addListener(sessionListener);
             updateEnablement();
         }
 
         @Override
         public void sessionEnded(ISarosSession oldSarosSession) {
-            oldSarosSession.removeListener(permissionListener);
+            oldSarosSession.removeListener(sessionListener);
         }
     };
 
-    private ISharedProjectListener permissionListener = new AbstractSharedProjectListener() {
+    private ISessionListener sessionListener = new AbstractSessionListener() {
         @Override
         public void permissionChanged(User user) {
             updateEnablement();

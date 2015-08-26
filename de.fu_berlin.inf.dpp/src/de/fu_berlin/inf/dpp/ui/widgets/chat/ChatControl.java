@@ -42,11 +42,11 @@ import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
-import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.Messages;
@@ -185,10 +185,10 @@ public final class ChatControl extends Composite {
         public void sessionStarted(ISarosSession newSarosSession) {
             synchronized (ChatControl.this) {
                 if (session != null)
-                    session.removeListener(projectListener);
+                    session.removeListener(sessionListener);
 
                 session = newSarosSession;
-                session.addListener(projectListener);
+                session.addListener(sessionListener);
             }
 
             // The chat contains the pre-session colors. Refresh it, to clear
@@ -199,7 +199,7 @@ public final class ChatControl extends Composite {
         @Override
         public void sessionEnding(ISarosSession oldSarosSession) {
             synchronized (ChatControl.this) {
-                session.removeListener(projectListener);
+                session.removeListener(sessionListener);
                 session = null;
             }
 
@@ -209,7 +209,7 @@ public final class ChatControl extends Composite {
         }
     };
 
-    private final ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
+    private final ISessionListener sessionListener = new AbstractSessionListener() {
 
         @Override
         public void userJoined(User user) {
@@ -386,7 +386,7 @@ public final class ChatControl extends Composite {
                 .addSessionLifecycleListener(sessionLifecycleListener);
 
             if (this.session != null)
-                this.session.addListener(projectListener);
+                this.session.addListener(sessionListener);
         }
 
         for (ChatElement chatElement : this.chat.getHistory())
@@ -408,7 +408,7 @@ public final class ChatControl extends Composite {
                     .removeSessionLifecycleListener(sessionLifecycleListener);
                 synchronized (this) {
                     if (session != null)
-                        session.removeListener(projectListener);
+                        session.removeListener(sessionListener);
                 }
                 clearColorCache();
             }

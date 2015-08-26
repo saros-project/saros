@@ -2,49 +2,52 @@ package de.fu_berlin.inf.dpp.session.internal;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 
-// TODO rename this class along with the ISharedProjectListener interface
-public class SharedProjectListenerDispatch implements ISharedProjectListener {
+/**
+ * {@link ISessionListener} implementation which can dispatch events to multiple
+ * listeners.
+ */
+public class SessionListenerDispatch implements ISessionListener {
 
-    private final CopyOnWriteArrayList<ISharedProjectListener> listeners = new CopyOnWriteArrayList<ISharedProjectListener>();
+    private final CopyOnWriteArrayList<ISessionListener> listeners = new CopyOnWriteArrayList<ISessionListener>();
 
     @Override
     public void permissionChanged(User user) {
-        for (ISharedProjectListener listener : listeners)
+        for (ISessionListener listener : listeners)
             listener.permissionChanged(user);
     }
 
     @Override
     public void userJoined(User user) {
-        for (ISharedProjectListener listener : listeners)
+        for (ISessionListener listener : listeners)
             listener.userJoined(user);
     }
 
     @Override
     public void userStartedQueuing(User user) {
-        for (ISharedProjectListener listener : listeners)
+        for (ISessionListener listener : listeners)
             listener.userStartedQueuing(user);
     }
 
     @Override
     public void userFinishedProjectNegotiation(User user) {
-        for (ISharedProjectListener listener : listeners)
+        for (ISessionListener listener : listeners)
             listener.userFinishedProjectNegotiation(user);
     }
 
     @Override
     public void userLeft(User user) {
-        for (ISharedProjectListener listener : listeners)
+        for (ISessionListener listener : listeners)
             listener.userLeft(user);
     }
 
-    public void add(ISharedProjectListener listener) {
+    public void add(ISessionListener listener) {
         listeners.addIfAbsent(listener);
     }
 
-    public void remove(ISharedProjectListener listener) {
+    public void remove(ISessionListener listener) {
         listeners.remove(listener);
     }
 }

@@ -22,9 +22,9 @@ import de.fu_berlin.inf.dpp.net.mdns.MDNSService;
 import de.fu_berlin.inf.dpp.net.xmpp.roster.AbstractRosterListener;
 import de.fu_berlin.inf.dpp.project.internal.FollowingActivitiesManager;
 import de.fu_berlin.inf.dpp.project.internal.IFollowModeChangesListener;
-import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.model.HeaderElement;
 import de.fu_berlin.inf.dpp.ui.model.TreeContentProvider;
@@ -132,7 +132,7 @@ public class SessionContentProvider extends TreeContentProvider {
      * list that are currently part of the session we must currently do a full
      * refresh otherwise the viewer is not correctly updated
      */
-    private final ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
+    private final ISessionListener sessionListener = new AbstractSessionListener() {
         @Override
         public void userLeft(User user) {
             // UserElement userElement = getUserElement(currentRoster, user);
@@ -183,7 +183,7 @@ public class SessionContentProvider extends TreeContentProvider {
             oldRoster.removeRosterListener(rosterListener);
 
         if (oldSession != null)
-            oldSession.removeListener(sharedProjectListener);
+            oldSession.removeListener(sessionListener);
 
         disposeHeaderElements();
 
@@ -196,7 +196,7 @@ public class SessionContentProvider extends TreeContentProvider {
             newRoster.addRosterListener(rosterListener);
 
         if (newSession != null) {
-            newSession.addListener(sharedProjectListener);
+            newSession.addListener(sessionListener);
 
             followingTracker = (FollowingActivitiesManager) newSession
                 .getComponent(FollowingActivitiesManager.class);
@@ -238,7 +238,7 @@ public class SessionContentProvider extends TreeContentProvider {
     @Override
     public void dispose() {
         if (currentSession != null)
-            currentSession.removeListener(sharedProjectListener);
+            currentSession.removeListener(sessionListener);
 
         if (currentRoster != null)
             currentRoster.removeRosterListener(rosterListener);

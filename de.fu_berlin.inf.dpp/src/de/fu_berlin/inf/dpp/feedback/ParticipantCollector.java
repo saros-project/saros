@@ -9,9 +9,9 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -55,7 +55,7 @@ public class ParticipantCollector extends AbstractStatisticCollector {
     protected long sessionStart;
     protected long sessionTime;
 
-    protected ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
+    protected ISessionListener sessionListener = new AbstractSessionListener() {
 
         @Override
         public void userJoined(User user) {
@@ -120,7 +120,7 @@ public class ParticipantCollector extends AbstractStatisticCollector {
 
     @Override
     protected void doOnSessionStart(ISarosSession sarosSession) {
-        sarosSession.addListener(projectListener);
+        sarosSession.addListener(sessionListener);
 
         sessionStart = System.currentTimeMillis();
         timeOfLastEvent = sessionStart;
@@ -137,7 +137,7 @@ public class ParticipantCollector extends AbstractStatisticCollector {
 
     @Override
     protected void doOnSessionEnd(ISarosSession sarosSession) {
-        sarosSession.removeListener(projectListener);
+        sarosSession.removeListener(sessionListener);
 
         sessionTime = Math.max(1, System.currentTimeMillis() - sessionStart);
         handleUserEvent(currentNumberOfParticipants);

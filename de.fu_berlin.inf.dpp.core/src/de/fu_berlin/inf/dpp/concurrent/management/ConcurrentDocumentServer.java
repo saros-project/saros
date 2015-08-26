@@ -17,9 +17,9 @@ import de.fu_berlin.inf.dpp.activities.JupiterActivity;
 import de.fu_berlin.inf.dpp.activities.QueueItem;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
-import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -42,9 +42,9 @@ public class ConcurrentDocumentServer implements Startable {
     private final JupiterServer server;
 
     /**
-     * ISharedProjectListener for updating Jupiter documents on the host.
+     * {@link ISessionListener} for updating Jupiter documents on the host.
      */
-    private final ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
+    private final ISessionListener sessionListener = new AbstractSessionListener() {
 
         @Override
         public void userStartedQueuing(final User user) {
@@ -64,12 +64,12 @@ public class ConcurrentDocumentServer implements Startable {
 
     @Override
     public void start() {
-        sarosSession.addListener(projectListener);
+        sarosSession.addListener(sessionListener);
     }
 
     @Override
     public void stop() {
-        sarosSession.removeListener(projectListener);
+        sarosSession.removeListener(sessionListener);
     }
 
     /**

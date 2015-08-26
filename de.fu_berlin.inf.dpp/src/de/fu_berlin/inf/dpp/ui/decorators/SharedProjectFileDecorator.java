@@ -50,11 +50,11 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
-import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
@@ -126,19 +126,19 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
         @Override
         public void sessionStarting(ISarosSession session) {
-            session.addListener(sessionEventListener);
+            session.addListener(sessionListener);
         }
 
         @Override
         public void sessionEnded(ISarosSession session) {
-            session.removeListener(sessionEventListener);
+            session.removeListener(sessionListener);
             resourceToImageMapping.clear();
             updateDecoration(null);
             activeEditorResources.clear();
         }
     };
 
-    private final ISharedProjectListener sessionEventListener = new AbstractSharedProjectListener() {
+    private final ISessionListener sessionListener = new AbstractSessionListener() {
 
         @Override
         public void userLeft(User user) {

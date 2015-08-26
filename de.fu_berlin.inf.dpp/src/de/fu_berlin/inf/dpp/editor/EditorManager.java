@@ -84,12 +84,12 @@ import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
-import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
@@ -266,7 +266,7 @@ public class EditorManager extends AbstractActivityProducer implements
         }
     };
 
-    private final ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
+    private final ISessionListener sessionListener = new AbstractSessionListener() {
 
         @Override
         public void permissionChanged(final User user) {
@@ -2044,7 +2044,7 @@ public class EditorManager extends AbstractActivityProducer implements
         session.getStopManager().addBlockable(stopManagerListener);
 
         hasWriteAccess = session.hasWriteAccess();
-        session.addListener(sharedProjectListener);
+        session.addListener(sessionListener);
         session.addActivityProducer(this);
         session.addActivityConsumer(consumer);
 
@@ -2109,7 +2109,7 @@ public class EditorManager extends AbstractActivityProducer implements
 
         assert session != null;
         session.getStopManager().removeBlockable(stopManagerListener);
-        session.removeListener(sharedProjectListener);
+        session.removeListener(sessionListener);
         session.removeActivityProducer(this);
         session.removeActivityConsumer(consumer);
         session = null;

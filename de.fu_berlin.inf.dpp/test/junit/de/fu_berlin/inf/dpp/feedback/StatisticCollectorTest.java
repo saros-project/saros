@@ -25,7 +25,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceInitializer;
 import de.fu_berlin.inf.dpp.project.internal.SarosSessionTest;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.test.util.MemoryPreferenceStore;
 import de.fu_berlin.inf.dpp.test.util.MemoryPreferences;
@@ -40,7 +40,7 @@ public class StatisticCollectorTest {
         final List<User> participants = new LinkedList<User>();
         participants.add(bob);
         participants.add(alice);
-        session.addListener(EasyMock.isA(ISharedProjectListener.class));
+        session.addListener(EasyMock.isA(ISessionListener.class));
         EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
 
             @Override
@@ -49,7 +49,7 @@ public class StatisticCollectorTest {
                 return null;
             }
         }).anyTimes();
-        session.removeListener(EasyMock.isA(ISharedProjectListener.class));
+        session.removeListener(EasyMock.isA(ISessionListener.class));
         EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
             @Override
             public Object answer() throws Throwable {

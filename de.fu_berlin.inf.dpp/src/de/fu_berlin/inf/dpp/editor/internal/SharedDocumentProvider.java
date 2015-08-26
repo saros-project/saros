@@ -8,11 +8,11 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
-import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.User;
 
@@ -42,19 +42,19 @@ public final class SharedDocumentProvider extends TextFileDocumentProvider {
         @Override
         public void sessionStarted(final ISarosSession session) {
             hasWriteAccess = session.hasWriteAccess();
-            session.addListener(sharedProjectListener);
+            session.addListener(sessionListener);
             SharedDocumentProvider.this.session = session;
         }
 
         @Override
         public void sessionEnded(final ISarosSession session) {
             assert SharedDocumentProvider.this.session == session;
-            session.removeListener(sharedProjectListener);
+            session.removeListener(sessionListener);
             SharedDocumentProvider.this.session = null;
         }
     };
 
-    private final ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
+    private final ISessionListener sessionListener = new AbstractSessionListener() {
         @Override
         public void permissionChanged(final User user) {
 

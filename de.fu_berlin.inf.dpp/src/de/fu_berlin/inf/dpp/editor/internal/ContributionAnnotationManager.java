@@ -21,9 +21,9 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 
 import de.fu_berlin.inf.dpp.editor.annotations.ContributionAnnotation;
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
-import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 
@@ -46,7 +46,7 @@ public class ContributionAnnotationManager {
 
     private boolean contribtionAnnotationsEnabled;
 
-    private final ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
+    private final ISessionListener sessionListener = new AbstractSessionListener() {
         @Override
         public void userLeft(User user) {
             /*
@@ -85,7 +85,7 @@ public class ContributionAnnotationManager {
         this.sarosSession = sarosSession;
         this.preferenceStore = preferenceStore;
         this.preferenceStore.addPropertyChangeListener(propertyChangeListener);
-        this.sarosSession.addListener(sharedProjectListener);
+        this.sarosSession.addListener(sessionListener);
         contribtionAnnotationsEnabled = this.preferenceStore
             .getBoolean(EclipsePreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS);
     }
@@ -261,7 +261,7 @@ public class ContributionAnnotationManager {
     }
 
     public void dispose() {
-        sarosSession.removeListener(sharedProjectListener);
+        sarosSession.removeListener(sessionListener);
         preferenceStore.removePropertyChangeListener(propertyChangeListener);
         sourceToHistory.clear();
     }

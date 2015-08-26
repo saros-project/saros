@@ -28,9 +28,9 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.core.util.AutoHashMap;
-import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 import org.apache.log4j.Logger;
@@ -71,17 +71,17 @@ public class RemoteWriteAccessManager {
     protected ISarosSession sarosSession;
 
     /**
-     * Creates a new RemoteWriteAccessManager and adds the sharedProjectListener
+     * Creates a new RemoteWriteAccessManager and adds the session listener
      * to the session.
      *
      * @param sarosSession
      */
     public RemoteWriteAccessManager(final ISarosSession sarosSession) {
         this.sarosSession = sarosSession;
-        this.sarosSession.addListener(sharedProjectListener);
+        this.sarosSession.addListener(sessionListener);
     }
 
-    protected ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
+    protected ISessionListener sessionListener = new AbstractSessionListener() {
 
         /**
          * Remove the user and potentially disconnect from the document
@@ -152,7 +152,7 @@ public class RemoteWriteAccessManager {
      * Removes all listener and clears all editorStates.
      */
     public void dispose() {
-        sarosSession.removeListener(sharedProjectListener);
+        sarosSession.removeListener(sessionListener);
 
         for (Entry<SPath, Set<User>> entry : editorStates.entrySet()) {
             entry.getValue().clear();

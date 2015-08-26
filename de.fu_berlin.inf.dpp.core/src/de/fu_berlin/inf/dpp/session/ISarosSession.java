@@ -176,22 +176,22 @@ public interface ISarosSession {
     public void kickUser(User user);
 
     /**
-     * Adds the given shared project listener. This call is ignored if the
-     * listener is already a listener of this session.
+     * Adds the given session listener. This call is ignored if the listener is
+     * already a listener of this session.
      * 
      * @param listener
-     *            The listener that is to be added.
+     *            the listener to add
      */
-    public void addListener(ISharedProjectListener listener);
+    public void addListener(ISessionListener listener);
 
     /**
-     * Removes the given shared project listener. This call is ignored if the
-     * listener does not belong to the current listeners of this session.
+     * Removes the given session listener. This call is ignored if the listener
+     * does not belong to the current listeners of this session.
      * 
      * @param listener
-     *            the listener that is to be removed.
+     *            the listener to remove
      */
-    public void removeListener(ISharedProjectListener listener);
+    public void removeListener(ISessionListener listener);
 
     /**
      * @return the shared projects associated with this session, never

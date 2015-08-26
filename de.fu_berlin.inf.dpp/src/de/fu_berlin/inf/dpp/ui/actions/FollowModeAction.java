@@ -26,11 +26,11 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
-import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
@@ -56,7 +56,7 @@ public class FollowModeAction extends Action implements IMenuCreator,
         }
     };
 
-    private ISharedProjectListener userListener = new AbstractSharedProjectListener() {
+    private ISessionListener sessionListener = new AbstractSessionListener() {
         @Override
         public void userLeft(final User user) {
             SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
@@ -91,7 +91,7 @@ public class FollowModeAction extends Action implements IMenuCreator,
         @Override
         public void sessionStarted(final ISarosSession session) {
 
-            session.addListener(userListener);
+            session.addListener(sessionListener);
 
             SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
 
@@ -107,7 +107,7 @@ public class FollowModeAction extends Action implements IMenuCreator,
 
         @Override
         public void sessionEnded(ISarosSession oldSarosSession) {
-            oldSarosSession.removeListener(userListener);
+            oldSarosSession.removeListener(sessionListener);
             SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
 
                 @Override

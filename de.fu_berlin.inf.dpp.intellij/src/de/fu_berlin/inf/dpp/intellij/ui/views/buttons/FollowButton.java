@@ -28,11 +28,11 @@ import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.FollowModeAction;
-import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.User;
 import org.picocontainer.annotations.Inject;
@@ -52,7 +52,7 @@ public class FollowButton extends ToolbarButton {
     private JPopupMenu popupMenu;
     private final FollowModeAction followModeAction;
 
-    private final ISharedProjectListener userListener = new AbstractSharedProjectListener() {
+    private final ISessionListener sessionListener = new AbstractSessionListener() {
         @Override
         public void userLeft(final User user) {
             updateMenu();
@@ -67,14 +67,14 @@ public class FollowButton extends ToolbarButton {
     private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
         @Override
         public void sessionStarted(final ISarosSession session) {
-            session.addListener(userListener);
+            session.addListener(sessionListener);
             updateMenu();
             setEnabledFromUIThread(true);
         }
 
         @Override
         public void sessionEnded(ISarosSession oldSarosSession) {
-            oldSarosSession.removeListener(userListener);
+            oldSarosSession.removeListener(sessionListener);
             updateMenu();
             setEnabledFromUIThread(false);
         }

@@ -22,15 +22,11 @@ package de.fu_berlin.inf.dpp.session;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 
 /**
- * Listens for events that can happen during a Saros session. For life-cycle
- * events like the start and end of sessions use the
+ * Listens for events that can happen during a {@link ISarosSession session}.
+ * For life-cycle events like the start and end of a session, use
  * {@link ISessionLifecycleListener}.
- * 
- * TODO: Rename, it has nothing to do with projects.
- * 
- * @author rdjemili
  */
-public interface ISharedProjectListener {
+public interface ISessionListener {
     /**
      * TODO add some easy way to check if given user with
      * {@link Permission#WRITE_ACCESS} is the client (you)

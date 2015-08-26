@@ -36,12 +36,12 @@ import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.remote.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
-import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.User;
 import org.apache.log4j.Logger;
@@ -181,7 +181,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer {
     };
 
     private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
-        private final ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
+        private final ISessionListener sessionListener = new AbstractSessionListener() {
 
             @Override
             public void permissionChanged(User user) {
@@ -203,7 +203,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer {
 
             newSarosSession.addActivityConsumer(consumer);
             newSarosSession.addActivityProducer(ConsistencyWatchdogClient.this);
-            newSarosSession.addListener(sharedProjectListener);
+            newSarosSession.addListener(sessionListener);
         }
 
         @Override
@@ -212,7 +212,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer {
             oldSarosSession
                 .removeActivityProducer(ConsistencyWatchdogClient.this);
 
-            oldSarosSession.removeListener(sharedProjectListener);
+            oldSarosSession.removeListener(sessionListener);
 
             latestChecksums.clear();
             pathsWithWrongChecksums.clear();

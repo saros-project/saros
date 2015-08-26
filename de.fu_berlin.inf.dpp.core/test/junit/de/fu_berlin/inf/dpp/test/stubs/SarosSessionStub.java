@@ -15,7 +15,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityProducer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
@@ -62,7 +62,7 @@ public class SarosSessionStub implements ISarosSession {
     }
 
     @Override
-    public void removeListener(ISharedProjectListener listener) {
+    public void removeListener(ISessionListener listener) {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
@@ -186,7 +186,7 @@ public class SarosSessionStub implements ISarosSession {
     }
 
     @Override
-    public void addListener(ISharedProjectListener listener) {
+    public void addListener(ISessionListener listener) {
         throw new RuntimeException("Unexpected call to Stub");
 
     }

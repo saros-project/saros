@@ -8,9 +8,9 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 
@@ -58,7 +58,7 @@ public class PermissionChangeCollector extends AbstractStatisticCollector {
      */
     protected long writeAccessDuration = 0;
 
-    protected ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
+    protected ISessionListener sessionListener = new AbstractSessionListener() {
 
         @Override
         public void permissionChanged(User user) {
@@ -163,14 +163,14 @@ public class PermissionChangeCollector extends AbstractStatisticCollector {
     protected void doOnSessionStart(ISarosSession sarosSession) {
         sessionStart = System.currentTimeMillis();
 
-        sarosSession.addListener(projectListener);
+        sarosSession.addListener(sessionListener);
         permissions.put(sessionStart, sarosSession.getLocalUser()
             .getPermission());
     }
 
     @Override
     protected void doOnSessionEnd(ISarosSession sarosSession) {
-        sarosSession.removeListener(projectListener);
+        sarosSession.removeListener(sessionListener);
         sessionTime = Math.max(1, System.currentTimeMillis() - sessionStart);
     }
 

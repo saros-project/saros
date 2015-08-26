@@ -27,11 +27,11 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
-import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.User;
 import org.picocontainer.annotations.Inject;
@@ -57,7 +57,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
     @Inject
     private ISarosSessionManager sessionManager;
 
-    private final ISharedProjectListener userListener = new AbstractSharedProjectListener() {
+    private final ISessionListener sessionListener = new AbstractSessionListener() {
         @Override
         public void userLeft(final User user) {
             UIUtil.invokeLaterIfNeeded(new Runnable() {
@@ -86,7 +86,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
             UIUtil.invokeLaterIfNeeded(new Runnable() {
                 @Override
                 public void run() {
-                    newSarosSession.addListener(userListener);
+                    newSarosSession.addListener(sessionListener);
                     createSessionNode(newSarosSession);
                 }
             });
@@ -98,7 +98,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
             UIUtil.invokeLaterIfNeeded(new Runnable() {
                 @Override
                 public void run() {
-                    oldSarosSession.removeListener(userListener);
+                    oldSarosSession.removeListener(sessionListener);
                     removeSessionNode(oldSarosSession);
                 }
             });

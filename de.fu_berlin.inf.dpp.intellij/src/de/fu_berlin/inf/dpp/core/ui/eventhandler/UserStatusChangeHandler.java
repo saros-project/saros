@@ -24,11 +24,11 @@ package de.fu_berlin.inf.dpp.core.ui.eventhandler;
 
 import de.fu_berlin.inf.dpp.intellij.ui.Messages;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
-import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.User;
 
@@ -40,7 +40,7 @@ import java.text.MessageFormat;
  */
 public class UserStatusChangeHandler {
 
-    private final ISharedProjectListener userStatusListener = new AbstractSharedProjectListener() {
+    private final ISessionListener sessionListener = new AbstractSessionListener() {
 
         @Override
         public void permissionChanged(User user) {
@@ -93,12 +93,12 @@ public class UserStatusChangeHandler {
     private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
         @Override
         public void sessionStarting(ISarosSession session) {
-            session.addListener(userStatusListener);
+            session.addListener(sessionListener);
         }
 
         @Override
         public void sessionEnded(ISarosSession session) {
-            session.removeListener(userStatusListener);
+            session.removeListener(sessionListener);
         }
 
     };
