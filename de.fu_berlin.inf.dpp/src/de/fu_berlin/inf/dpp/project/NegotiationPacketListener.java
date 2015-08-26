@@ -21,8 +21,8 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
-import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
+import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 
 /**
  * This class is responsible for receiving, handling, and/or forwarding specific
@@ -48,7 +48,7 @@ final class NegotiationPacketListener {
     private boolean rejectSessionNegotiationRequests;
 
     // TODO maybe this should be controlled by the SessionManager itself
-    private final ISarosSessionListener sessionListener = new NullSarosSessionListener() {
+    private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
 
         @Override
         public void sessionStarted(final ISarosSession session) {
@@ -197,7 +197,7 @@ final class NegotiationPacketListener {
         receiver.addPacketListener(sessionNegotiationRequestListener,
             InvitationOfferingExtension.PROVIDER.getPacketFilter());
 
-        sessionManager.addSarosSessionListener(sessionListener);
+        sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
     }
 
     private void sessionNegotiationCanceled(final JID sender,

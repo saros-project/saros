@@ -25,16 +25,16 @@ package de.fu_berlin.inf.dpp.intellij.ui.views.buttons;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.LeaveSessionAction;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
+import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import org.picocontainer.annotations.Inject;
 
 public class LeaveSessionButton extends SimpleButton {
 
     public static final String LEAVE_SESSION_ICON_PATH = "/icons/famfamfam/project_share_leave_tsk.png";
 
-    private final ISarosSessionListener sessionListener = new NullSarosSessionListener() {
+    private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
             setEnabledFromUIThread(true);
@@ -58,7 +58,7 @@ public class LeaveSessionButton extends SimpleButton {
         super(new LeaveSessionAction(), "Leave session",
             LEAVE_SESSION_ICON_PATH, "leave");
         SarosPluginContext.initComponent(this);
-        sessionManager.addSarosSessionListener(sessionListener);
+        sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
         setEnabled(false);
     }
 }

@@ -29,10 +29,10 @@ import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
 import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
+import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.User;
 import org.picocontainer.annotations.Inject;
 
@@ -80,7 +80,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
         }
     };
 
-    private final ISarosSessionListener sessionListener = new NullSarosSessionListener() {
+    private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
         @Override
         public void sessionStarted(final ISarosSession newSarosSession) {
             UIUtil.invokeLaterIfNeeded(new Runnable() {
@@ -122,7 +122,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
         treeModel = (DefaultTreeModel) this.treeView.getModel();
         setUserObject(TREE_TITLE_NO_SESSIONS);
 
-        sessionManager.addSarosSessionListener(sessionListener);
+        sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
     }
 
     private void createSessionNode(ISarosSession newSarosSession) {

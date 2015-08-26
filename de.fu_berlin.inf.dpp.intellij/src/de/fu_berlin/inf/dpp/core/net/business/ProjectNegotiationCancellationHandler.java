@@ -10,9 +10,9 @@ import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
+import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 
 /**
  * Listens for {@link CancelProjectNegotiationExtension} packets that signal a
@@ -38,7 +38,7 @@ public class ProjectNegotiationCancellationHandler {
                 extension.getErrorMessage());
         }
     };
-    private final ISarosSessionListener sessionListener = new NullSarosSessionListener() {
+    private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
 
         @Override
         public void sessionStarted(ISarosSession session) {
@@ -62,7 +62,7 @@ public class ProjectNegotiationCancellationHandler {
         this.sessionManager = sessionManager;
         this.projectNegotiations = projectNegotiationObservable;
 
-        this.sessionManager.addSarosSessionListener(sessionListener);
+        this.sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
     }
 
     private void projectNegotiationCanceled(JID sender, String errorMsg) {

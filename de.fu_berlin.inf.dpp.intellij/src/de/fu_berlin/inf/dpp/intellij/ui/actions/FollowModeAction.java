@@ -24,9 +24,9 @@ package de.fu_berlin.inf.dpp.intellij.ui.actions;
 
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
+import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import org.picocontainer.annotations.Inject;
@@ -41,7 +41,7 @@ public class FollowModeAction extends AbstractSarosAction {
 
     public static final String NAME = "follow";
 
-    private final ISarosSessionListener sessionListener = new NullSarosSessionListener() {
+    private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
         @Override
         public void sessionStarted(final ISarosSession session) {
             ThreadUtils.runSafeAsync(LOG, new Runnable() {
@@ -74,7 +74,7 @@ public class FollowModeAction extends AbstractSarosAction {
     private ISarosSession session;
 
     public FollowModeAction() {
-        sessionManager.addSarosSessionListener(sessionListener);
+        sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
     }
 
     @Override

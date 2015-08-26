@@ -46,9 +46,9 @@ import de.fu_berlin.inf.dpp.net.xmpp.roster.IRosterListener;
 import de.fu_berlin.inf.dpp.net.xmpp.roster.RosterTracker;
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
+import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -130,8 +130,8 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
         @Override
         public void propertyChange(PropertyChangeEvent event) {
-            if (!EclipsePreferenceConstants.USE_IRC_STYLE_CHAT_LAYOUT.equals(event
-                .getProperty()))
+            if (!EclipsePreferenceConstants.USE_IRC_STYLE_CHAT_LAYOUT
+                .equals(event.getProperty()))
                 return;
 
             SWTUtils.runSafeSWTAsync(log, new Runnable() {
@@ -221,7 +221,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         }
     };
 
-    protected ISarosSessionListener sessionListener = new NullSarosSessionListener() {
+    protected ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
 
         @Override
         public void sessionStarting(final ISarosSession session) {
@@ -420,7 +420,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
         SarosPluginContext.initComponent(this);
 
-        sessionManager.addSarosSessionListener(sessionListener);
+        sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
         editorManager.addSharedEditorListener(sharedEditorListener);
         singleUserChatService.addChatServiceListener(chatServiceListener);
         multiUserChatService.addChatServiceListener(chatServiceListener);
@@ -453,7 +453,8 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
             @Override
             public void widgetDisposed(DisposeEvent e) {
-                sessionManager.removeSarosSessionListener(sessionListener);
+                sessionManager
+                    .removeSessionLifecycleListener(sessionLifecycleListener);
 
                 editorManager.removeSharedEditorListener(sharedEditorListener);
 

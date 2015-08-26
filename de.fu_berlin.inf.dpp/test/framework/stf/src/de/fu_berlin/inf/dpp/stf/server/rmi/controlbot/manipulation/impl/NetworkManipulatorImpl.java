@@ -24,7 +24,7 @@ import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityListener;
 import de.fu_berlin.inf.dpp.session.IActivityProducer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.bot.SarosSWTBotPreferences;
@@ -35,7 +35,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation.INetworkManip
  */
 public final class NetworkManipulatorImpl extends StfRemoteObject implements
     INetworkManipulator, IActivityConsumer, IActivityProducer,
-    ISarosSessionListener {
+    ISessionLifecycleListener {
 
     private static final Logger LOG = Logger
         .getLogger(NetworkManipulatorImpl.class);
@@ -166,7 +166,7 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
     };
 
     private NetworkManipulatorImpl() {
-        this.getSessionManager().addSarosSessionListener(this);
+        this.getSessionManager().addSessionLifecycleListener(this);
         getDataTransferManager().addPacketInterceptor(sessionPacketInterceptor);
     }
 

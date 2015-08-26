@@ -7,7 +7,7 @@ import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
  * 
  * @author rdjemili
  */
-public interface ISarosSessionListener {
+public interface ISessionLifecycleListener {
     /*
      * TODO: remove this method as soon as external components like the
      * whiteboard are maintained in another way (i.e. a component interface)

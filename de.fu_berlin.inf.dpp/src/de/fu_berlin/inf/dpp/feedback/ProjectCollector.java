@@ -9,9 +9,9 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
+import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 
 /**
  * A Collector class that collects information for each shared project during a
@@ -31,7 +31,7 @@ public class ProjectCollector extends AbstractStatisticCollector {
 
     private final Map<String, ProjectInformation> sharedProjects = new HashMap<String, ProjectInformation>();
 
-    private final ISarosSessionListener projectListener = new NullSarosSessionListener() {
+    private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
         @Override
         public void projectAdded(String projectID) {
             ProjectInformation info = sharedProjects.get(projectID);
@@ -99,11 +99,11 @@ public class ProjectCollector extends AbstractStatisticCollector {
 
     @Override
     protected void doOnSessionStart(ISarosSession sarosSession) {
-        sessionManager.addSarosSessionListener(projectListener);
+        sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
     }
 
     @Override
     protected void doOnSessionEnd(ISarosSession sarosSession) {
-        sessionManager.removeSarosSessionListener(projectListener);
+        sessionManager.removeSessionLifecycleListener(sessionLifecycleListener);
     }
 }

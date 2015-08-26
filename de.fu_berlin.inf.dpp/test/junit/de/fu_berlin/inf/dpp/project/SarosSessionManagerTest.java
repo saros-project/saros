@@ -27,8 +27,8 @@ import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
-import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
+import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ SarosSession.class, SarosSessionManager.class })
@@ -38,7 +38,7 @@ public class SarosSessionManagerTest {
         private static final long serialVersionUID = 1L;
     }
 
-    private class StateVerifyListener extends NullSarosSessionListener {
+    private class StateVerifyListener extends NullSessionLifecycleListener {
         int state = -1;
 
         @Override
@@ -68,7 +68,7 @@ public class SarosSessionManagerTest {
         }
     }
 
-    private class ErrorThrowingListener extends NullSarosSessionListener {
+    private class ErrorThrowingListener extends NullSessionLifecycleListener {
 
         @Override
         public void sessionStarting(ISarosSession newSarosSession) {
@@ -120,14 +120,14 @@ public class SarosSessionManagerTest {
 
     @Test
     public void testStartStopListenerCallback() {
-        manager.addSarosSessionListener(new StateVerifyListener());
+        manager.addSessionLifecycleListener(new StateVerifyListener());
         manager.startSession(new HashMap<IProject, List<IResource>>());
         manager.stopSarosSession();
     }
 
     @Test
     public void testMultipleStarts() {
-        manager.addSarosSessionListener(new StateVerifyListener());
+        manager.addSessionLifecycleListener(new StateVerifyListener());
         manager.startSession(new HashMap<IProject, List<IResource>>());
         manager.startSession(new HashMap<IProject, List<IResource>>());
         manager.stopSarosSession();
@@ -135,7 +135,7 @@ public class SarosSessionManagerTest {
 
     @Test
     public void testMultipleStops() {
-        manager.addSarosSessionListener(new StateVerifyListener());
+        manager.addSessionLifecycleListener(new StateVerifyListener());
         manager.startSession(new HashMap<IProject, List<IResource>>());
         manager.stopSarosSession();
         manager.stopSarosSession();
@@ -143,14 +143,14 @@ public class SarosSessionManagerTest {
 
     @Test(expected = DummyError.class)
     public void testListenerDispatchIsNotCatchingErrors() {
-        manager.addSarosSessionListener(new ErrorThrowingListener());
+        manager.addSessionLifecycleListener(new ErrorThrowingListener());
         manager.startSession(new HashMap<IProject, List<IResource>>());
         manager.stopSarosSession();
     }
 
     @Test
     public void testRecursiveStop() {
-        ISarosSessionListener listener = new NullSarosSessionListener() {
+        ISessionLifecycleListener listener = new NullSessionLifecycleListener() {
             int count = 0;
 
             @Override
@@ -161,14 +161,14 @@ public class SarosSessionManagerTest {
             }
 
         };
-        manager.addSarosSessionListener(listener);
+        manager.addSessionLifecycleListener(listener);
         manager.startSession(new HashMap<IProject, List<IResource>>());
         manager.stopSarosSession();
     }
 
     @Test
     public void testRecursiveStart() {
-        ISarosSessionListener listener = new NullSarosSessionListener() {
+        ISessionLifecycleListener listener = new NullSessionLifecycleListener() {
             int count = 0;
 
             @Override
@@ -179,7 +179,7 @@ public class SarosSessionManagerTest {
             }
 
         };
-        manager.addSarosSessionListener(listener);
+        manager.addSessionLifecycleListener(listener);
         manager.startSession(new HashMap<IProject, List<IResource>>());
     }
 
@@ -188,7 +188,7 @@ public class SarosSessionManagerTest {
 
         final AtomicReference<RuntimeException> exception = new AtomicReference<RuntimeException>();
 
-        ISarosSessionListener listener = new NullSarosSessionListener() {
+        ISessionLifecycleListener listener = new NullSessionLifecycleListener() {
             @Override
             public void sessionStarting(ISarosSession oldSarosSession) {
                 try {
@@ -199,7 +199,7 @@ public class SarosSessionManagerTest {
             }
 
         };
-        manager.addSarosSessionListener(listener);
+        manager.addSessionLifecycleListener(listener);
         manager.startSession(new HashMap<IProject, List<IResource>>());
 
         RuntimeException rte = exception.get();
@@ -213,7 +213,7 @@ public class SarosSessionManagerTest {
 
         final AtomicReference<RuntimeException> exception = new AtomicReference<RuntimeException>();
 
-        ISarosSessionListener listener = new NullSarosSessionListener() {
+        ISessionLifecycleListener listener = new NullSessionLifecycleListener() {
             @Override
             public void sessionEnding(ISarosSession oldSarosSession) {
                 try {
@@ -225,7 +225,7 @@ public class SarosSessionManagerTest {
             }
 
         };
-        manager.addSarosSessionListener(listener);
+        manager.addSessionLifecycleListener(listener);
         manager.startSession(new HashMap<IProject, List<IResource>>());
         manager.stopSarosSession();
 

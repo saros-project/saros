@@ -15,9 +15,9 @@ import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.communication.connection.IConnectionStateListener;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
+import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 
 /**
@@ -57,7 +57,7 @@ public class SarosSourceProvider extends AbstractSourceProvider {
         }
     };
 
-    private ISarosSessionListener sarosSessionListener = new NullSarosSessionListener() {
+    private ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
 
         @Override
         public void sessionStarted(ISarosSession session) {
@@ -75,12 +75,12 @@ public class SarosSourceProvider extends AbstractSourceProvider {
         SarosPluginContext.initComponent(this);
         connectionHandler.addConnectionStateListener(connectionStateListener);
 
-        sessionManager.addSarosSessionListener(sarosSessionListener);
+        sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
     }
 
     @Override
     public void dispose() {
-        sessionManager.removeSarosSessionListener(sarosSessionListener);
+        sessionManager.removeSessionLifecycleListener(sessionLifecycleListener);
         connectionHandler
             .removeConnectionStateListener(connectionStateListener);
     }

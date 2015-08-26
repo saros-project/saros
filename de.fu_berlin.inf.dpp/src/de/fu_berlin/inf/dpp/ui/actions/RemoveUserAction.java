@@ -17,9 +17,9 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
+import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -44,7 +44,7 @@ public class RemoveUserAction extends Action {
         }
     };
 
-    private ISarosSessionListener sessionListener = new NullSarosSessionListener() {
+    private ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
 
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
@@ -80,7 +80,7 @@ public class RemoveUserAction extends Action {
         SelectionUtils.getSelectionService().addSelectionListener(
             selectionListener);
 
-        sessionManager.addSarosSessionListener(sessionListener);
+        sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
         session = sessionManager.getSarosSession();
 
         updateEnablement();
@@ -138,7 +138,7 @@ public class RemoveUserAction extends Action {
         SelectionUtils.getSelectionService().removeSelectionListener(
             selectionListener);
 
-        sessionManager.removeSarosSessionListener(sessionListener);
+        sessionManager.removeSessionLifecycleListener(sessionLifecycleListener);
 
     }
 

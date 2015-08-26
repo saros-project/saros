@@ -52,10 +52,10 @@ import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
+import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -122,7 +122,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
         }
     }
 
-    private final ISarosSessionListener sessionListener = new NullSarosSessionListener() {
+    private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
 
         @Override
         public void sessionStarting(ISarosSession session) {
@@ -165,8 +165,8 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
             if (filePath != null) {
 
-                IResource resource = ResourceAdapterFactory.convertBack(filePath
-                    .getResource());
+                IResource resource = ResourceAdapterFactory
+                    .convertBack(filePath.getResource());
 
                 if (resource != null)
                     activeEditorResources.put(user, getResources(resource));
@@ -192,13 +192,13 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
         initializeImageDescriptors();
 
-        sessionManager.addSarosSessionListener(sessionListener);
+        sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
         editorManager.addSharedEditorListener(editorListener);
 
         ISarosSession session = sessionManager.getSarosSession();
 
         if (session != null)
-            sessionListener.sessionStarting(session);
+            sessionLifecycleListener.sessionStarting(session);
     }
 
     @Override
@@ -223,7 +223,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
     @Override
     public void dispose() {
-        sessionManager.removeSarosSessionListener(sessionListener);
+        sessionManager.removeSessionLifecycleListener(sessionLifecycleListener);
         editorManager.removeSharedEditorListener(editorListener);
     }
 

@@ -17,10 +17,10 @@ import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
+import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -97,7 +97,7 @@ public class RemoteProgressManager extends AbstractActivityProducer {
         }
     };
 
-    private ISarosSessionListener sessionListener = new NullSarosSessionListener() {
+    private ISessionLifecycleListener sessionListener = new NullSessionLifecycleListener() {
 
         /**
          * Registers the required listeners after a new session has started.
@@ -147,7 +147,7 @@ public class RemoteProgressManager extends AbstractActivityProducer {
         IRemoteProgressIndicatorFactory progressIndicatorFactory) {
 
         this.sessionManager = sessionManager;
-        this.sessionManager.addSarosSessionListener(sessionListener);
+        this.sessionManager.addSessionLifecycleListener(sessionListener);
         this.progressIndicatorFactory = progressIndicatorFactory;
     }
 

@@ -61,8 +61,8 @@ import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.StackTrace;
@@ -70,7 +70,7 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
 /**
  * The SessionManager is responsible for initiating new Saros sessions and for
  * reacting to invitations. The user can be only part of one session at most.
- *
+ * 
  * @author rdjemili
  */
 
@@ -79,22 +79,22 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     /**
      * @JTourBusStop 6, Architecture Overview, Invitation Management:
-     *
+     * 
      *               While Activities are used to keep a running session
      *               consistent, we use MESSAGES whenever the Session itself is
      *               modified. This includes adding users or projects to the
      *               session.
-     *
+     * 
      *               The Invitation Process is managed by the "Invitation
      *               Management"-Component. This class is the main entrance
      *               point of this Component. During the invitation Process, the
      *               Network Layer is used to send MESSAGES between the host and
      *               the invitees and the Session Management is informed about
      *               joined users and added projects.
-     *
+     * 
      *               For more information about the Invitation Process see the
      *               "Invitation Process"-Tour.
-     *
+     * 
      */
 
     private static final Logger log = Logger
@@ -122,7 +122,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     private XMPPConnectionService connectionService;
 
-    private final List<ISarosSessionListener> sarosSessionListeners = new CopyOnWriteArrayList<ISarosSessionListener>();
+    private final List<ISessionLifecycleListener> sessionLifecycleListeners = new CopyOnWriteArrayList<ISessionLifecycleListener>();
 
     private final Lock startStopSessionLock = new ReentrantLock();
 
@@ -144,7 +144,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
     };
 
-    private final IConnectionListener listener = new IConnectionListener() {
+    private final IConnectionListener connectionListener = new IConnectionListener() {
         @Override
         public void connectionStateChanged(Connection connection,
             ConnectionState state) {
@@ -165,7 +165,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         this.currentSessionNegotiations = currentSessionNegotiations;
         this.currentProjectNegotiations = currentProjectNegotiations;
         this.preferences = preferences;
-        this.connectionService.addListener(listener);
+        this.connectionService.addListener(connectionListener);
 
         this.negotiationPacketLister = new NegotiationPacketListener(this,
             currentSessionNegotiations, currentProjectNegotiations,
@@ -180,19 +180,19 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     /**
      * @JTourBusStop 3, Invitation Process:
-     *
+     * 
      *               This class manages the current Saros session.
-     *
+     * 
      *               Saros makes a distinction between a session and a shared
      *               project. A session is an on-line collaboration between
      *               users which allows users to carry out activities. The main
      *               activity is to share projects. Hence, before you share a
      *               project, a session has to be started and all users added to
      *               it.
-     *
+     * 
      *               (At the moment, this separation is invisible to the user.
      *               He/she must share a project in order to start a session.)
-     *
+     * 
      */
     @Override
     public void startSession(
@@ -364,7 +364,7 @@ public class SarosSessionManager implements ISarosSessionManager {
      * method. The caller needs to save the returned value to a local variable
      * and do a null check. For new code you should consider being scoped by the
      * SarosSession and get the SarosSession in the constructor.
-     *
+     * 
      * @deprecated Error prone method, which produces NPE if not handled
      *             correctly. Will soon get removed.
      */
@@ -421,7 +421,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     /**
      * This method is called when a new project was added to the session
-     *
+     * 
      * @param from
      *            The one who added the project.
      * @param projectInfos
@@ -520,9 +520,9 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     /**
      * Adds project resources to an existing session.
-     *
+     * 
      * @param projectResourcesMapping
-     *
+     * 
      */
     @Override
     public void addResourcesToSession(
@@ -655,21 +655,22 @@ public class SarosSessionManager implements ISarosSessionManager {
     }
 
     @Override
-    public void addSarosSessionListener(ISarosSessionListener listener) {
-        sarosSessionListeners.add(listener);
+    public void addSessionLifecycleListener(ISessionLifecycleListener listener) {
+        sessionLifecycleListeners.add(listener);
     }
 
     @Override
-    public void removeSarosSessionListener(ISarosSessionListener listener) {
-        sarosSessionListeners.remove(listener);
+    public void removeSessionLifecycleListener(
+        ISessionLifecycleListener listener) {
+        sessionLifecycleListeners.remove(listener);
     }
 
     @Override
     public void postOutgoingInvitationCompleted(IProgressMonitor monitor,
         User user) {
         try {
-            for (ISarosSessionListener sarosSessionListener : sarosSessionListeners) {
-                sarosSessionListener.postOutgoingInvitationCompleted(
+            for (ISessionLifecycleListener listener : sessionLifecycleListeners) {
+                listener.postOutgoingInvitationCompleted(
                     sarosSessionObservable.getValue(), user, monitor);
             }
         } catch (RuntimeException e) {
@@ -681,8 +682,8 @@ public class SarosSessionManager implements ISarosSessionManager {
     @Override
     public void sessionStarting(ISarosSession sarosSession) {
         try {
-            for (ISarosSessionListener sarosSessionListener : sarosSessionListeners) {
-                sarosSessionListener.sessionStarting(sarosSession);
+            for (ISessionLifecycleListener listener : sessionLifecycleListeners) {
+                listener.sessionStarting(sarosSession);
             }
         } catch (RuntimeException e) {
             log.error("error in notifying listener of session starting: ", e);
@@ -691,9 +692,9 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     @Override
     public void sessionStarted(ISarosSession sarosSession) {
-        for (ISarosSessionListener sarosSessionListener : sarosSessionListeners) {
+        for (ISessionLifecycleListener listener : sessionLifecycleListeners) {
             try {
-                sarosSessionListener.sessionStarted(sarosSession);
+                listener.sessionStarted(sarosSession);
             } catch (RuntimeException e) {
                 log.error("error in notifying listener of session start: ", e);
             }
@@ -701,9 +702,9 @@ public class SarosSessionManager implements ISarosSessionManager {
     }
 
     private void sessionEnding(ISarosSession sarosSession) {
-        for (ISarosSessionListener sarosSessionListener : sarosSessionListeners) {
+        for (ISessionLifecycleListener listener : sessionLifecycleListeners) {
             try {
-                sarosSessionListener.sessionEnding(sarosSession);
+                listener.sessionEnding(sarosSession);
             } catch (RuntimeException e) {
                 log.error("error in notifying listener of session ending: ", e);
             }
@@ -711,9 +712,9 @@ public class SarosSessionManager implements ISarosSessionManager {
     }
 
     private void sessionEnded(ISarosSession sarosSession) {
-        for (ISarosSessionListener sessionlistener : sarosSessionListeners) {
+        for (ISessionLifecycleListener listener : sessionLifecycleListeners) {
             try {
-                sessionlistener.sessionEnded(sarosSession);
+                listener.sessionEnded(sarosSession);
             } catch (RuntimeException e) {
                 log.error("error in notifying listener of session end: ", e);
             }
@@ -722,9 +723,9 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     @Override
     public void projectAdded(String projectID) {
-        for (ISarosSessionListener sessionlistener : sarosSessionListeners) {
+        for (ISessionLifecycleListener listener : sessionLifecycleListeners) {
             try {
-                sessionlistener.projectAdded(projectID);
+                listener.projectAdded(projectID);
             } catch (RuntimeException e) {
                 log.error("error in notifying listener of an added project: ",
                     e);

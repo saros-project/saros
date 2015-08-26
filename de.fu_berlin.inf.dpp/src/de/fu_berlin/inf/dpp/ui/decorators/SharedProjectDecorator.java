@@ -35,9 +35,9 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
+import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -80,7 +80,7 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
 
     private volatile ISarosSession session;
 
-    private final ISarosSessionListener sessionListener = new NullSarosSessionListener() {
+    private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
 
         @Override
         public void sessionStarted(ISarosSession session) {
@@ -104,12 +104,12 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
     public SharedProjectDecorator() {
         SarosPluginContext.initComponent(this);
         session = sessionManager.getSarosSession();
-        sessionManager.addSarosSessionListener(sessionListener);
+        sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
     }
 
     @Override
     public void dispose() {
-        sessionManager.removeSarosSessionListener(sessionListener);
+        sessionManager.removeSessionLifecycleListener(sessionLifecycleListener);
     }
 
     @Override

@@ -24,7 +24,7 @@ import de.fu_berlin.inf.dpp.session.User.Permission;
 /**
  * Listens for events that can happen during a Saros session. For life-cycle
  * events like the start and end of sessions use the
- * {@link ISarosSessionListener}.
+ * {@link ISessionLifecycleListener}.
  * 
  * TODO: Rename, it has nothing to do with projects.
  * 

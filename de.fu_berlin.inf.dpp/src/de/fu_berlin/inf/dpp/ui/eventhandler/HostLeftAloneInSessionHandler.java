@@ -8,10 +8,10 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
+import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
@@ -21,7 +21,7 @@ import de.fu_berlin.inf.dpp.ui.views.SarosView;
 /**
  * Checks if the host remains alone after a user left the session. If so, ask if
  * the session should be closed (optionally remember choice for workspace...)
- *
+ * 
  * @author Alexander Waldmann (contact@net-corps.de)
  */
 public class HostLeftAloneInSessionHandler {
@@ -33,7 +33,7 @@ public class HostLeftAloneInSessionHandler {
 
     private final IPreferenceStore preferenceStore;
 
-    private final ISarosSessionListener sessionListener = new NullSarosSessionListener() {
+    private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
         @Override
         public void sessionEnded(ISarosSession session) {
             session.removeListener(projectListener);
@@ -85,7 +85,7 @@ public class HostLeftAloneInSessionHandler {
 
             /**
              * Alice side:
-             *
+             * 
              * <pre>
              * DEBUG 16:49:08,878 [main] (HostLeftAloneInSessionHandler.java:44) sessionManager.userLeft
              * INFO  16:49:08,888 [main] (SarosSession.java:612) Buddy [jenkins_bob_stf@saros-con.imp.fu-berlin.de/Saros]  left session
@@ -98,11 +98,11 @@ public class HostLeftAloneInSessionHandler {
              * DEBUG 16:49:09,422 [Worker-9] (OutgoingProjectNegotiation.java:433) OPN [remote side: jenkins_bob_stf@saros-con.imp.fu-berlin.de/Saros] : archive send
              * DEBUG 16:49:09,422 [Worker-9] (CancelableProcess.java:280) process OPN [remote side: jenkins_bob_stf@saros-con.imp.fu-berlin.de/Saros] exit status: OK
              * </pre>
-             *
+             * 
              * Bob side:
-             *
+             * 
              * <pre>
-             *
+             * 
              * DEBUG 16:49:09,402 [Worker-6] (FileUtils.java:205) File written to disk: .project
              * DEBUG 16:49:09,402 [Worker-6] (FileUtils.java:209) Unpacked archive in 0 s
              * TRACE 16:49:09,402 [Worker-6] (ChecksumCacheImpl.java:74) invalidating checksum for existing file: /java/.classpath [0x8F53373DCA77CBCA9383FE23E0132271]
@@ -131,7 +131,8 @@ public class HostLeftAloneInSessionHandler {
         final IPreferenceStore preferenceStore) {
         this.sessionManager = sessionManager;
         this.preferenceStore = preferenceStore;
-        this.sessionManager.addSarosSessionListener(sessionListener);
+        this.sessionManager
+            .addSessionLifecycleListener(sessionLifecycleListener);
     }
 
     private void handleHostLeftAlone() {

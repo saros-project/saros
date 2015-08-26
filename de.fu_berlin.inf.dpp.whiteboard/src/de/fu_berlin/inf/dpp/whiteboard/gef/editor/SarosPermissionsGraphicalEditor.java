@@ -6,9 +6,9 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
+import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 
@@ -22,7 +22,7 @@ import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 public abstract class SarosPermissionsGraphicalEditor extends
     BlockableGraphicalEditor {
 
-    protected ISarosSessionListener sessionListener = new NullSarosSessionListener() {
+    protected ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
         @Override
         public void sessionStarted(ISarosSession session) {
             session.addListener(sharedProjectListener);
@@ -60,7 +60,7 @@ public abstract class SarosPermissionsGraphicalEditor extends
 
     public SarosPermissionsGraphicalEditor() {
         SarosPluginContext.initComponent(this);
-        sessionManager.addSarosSessionListener(sessionListener);
+        sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
     }
 
     /*

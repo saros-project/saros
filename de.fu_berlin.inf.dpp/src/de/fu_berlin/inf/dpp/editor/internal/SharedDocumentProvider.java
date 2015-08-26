@@ -10,10 +10,10 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
+import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -37,7 +37,7 @@ public final class SharedDocumentProvider extends TextFileDocumentProvider {
 
     private boolean hasWriteAccess;
 
-    private final ISarosSessionListener sessionListener = new NullSarosSessionListener() {
+    private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
 
         @Override
         public void sessionStarted(final ISarosSession session) {
@@ -81,9 +81,9 @@ public final class SharedDocumentProvider extends TextFileDocumentProvider {
         final ISarosSession currentSession = sessionManager.getSarosSession();
 
         if (currentSession != null)
-            sessionListener.sessionStarted(currentSession);
+            sessionLifecycleListener.sessionStarted(currentSession);
 
-        sessionManager.addSarosSessionListener(sessionListener);
+        sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
     }
 
     @Override

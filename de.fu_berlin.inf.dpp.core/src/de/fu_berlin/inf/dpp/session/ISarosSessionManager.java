@@ -54,24 +54,25 @@ public interface ISarosSessionManager {
     public void stopSarosSession();
 
     /**
-     * Add the given session listener.
+     * Add the given session life-cycle listener.
      * 
      * @param listener
      *            the listener that is to be added.
      */
-    public void addSarosSessionListener(ISarosSessionListener listener);
+    public void addSessionLifecycleListener(ISessionLifecycleListener listener);
 
     /**
-     * Removes the given session listener.
+     * Removes the given session life-cycle listener.
      * 
      * @param listener
      *            the listener that is to be removed.
      */
-    public void removeSarosSessionListener(ISarosSessionListener listener);
+    public void removeSessionLifecycleListener(
+        ISessionLifecycleListener listener);
 
     /**
      * Handles the negotiation for a received invitation.
-     *
+     * 
      * @param from
      *            the sender of this invitation
      * @param sessionID

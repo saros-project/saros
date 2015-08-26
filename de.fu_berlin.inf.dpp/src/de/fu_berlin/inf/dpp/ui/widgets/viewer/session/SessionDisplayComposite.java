@@ -17,9 +17,9 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
+import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.ViewerUtils;
@@ -59,7 +59,7 @@ public abstract class SessionDisplayComposite extends
     // FIXME the filter must be passed in
     private ViewerFilter filter;
 
-    private final ISarosSessionListener sessionListener = new NullSarosSessionListener() {
+    private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
         /*
          * do not use sessionStarting as the context may still start and so we
          * get null in session#getComponent call in the SessionContentProvider
@@ -127,7 +127,7 @@ public abstract class SessionDisplayComposite extends
         getViewer().getControl()
             .setLayoutData(LayoutUtils.createFillGridData());
 
-        sessionManager.addSarosSessionListener(sessionListener);
+        sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
 
         final ISarosSession session = sessionManager.getSarosSession();
 
@@ -139,7 +139,8 @@ public abstract class SessionDisplayComposite extends
         addDisposeListener(new DisposeListener() {
             @Override
             public void widgetDisposed(DisposeEvent e) {
-                sessionManager.removeSarosSessionListener(sessionListener);
+                sessionManager
+                    .removeSessionLifecycleListener(sessionLifecycleListener);
                 filter = null;
             }
         });

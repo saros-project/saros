@@ -16,8 +16,8 @@ import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
-import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
+import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.whiteboard.gef.model.GEFRecordFactory;
@@ -63,11 +63,11 @@ public class WhiteboardManager {
     }
 
     /**
-     * The session listener lets the host initialize a local session, enables
-     * for other peers to be invited and let the host start the synchronization
-     * process.
+     * The session life-cycle listener lets the host initialize a local session,
+     * enables for other peers to be invited and let the host start the
+     * synchronization process.
      */
-    protected ISarosSessionListener sessionListener = new NullSarosSessionListener() {
+    protected ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
 
         @Override
         public void postOutgoingInvitationCompleted(ISarosSession session,
@@ -188,7 +188,7 @@ public class WhiteboardManager {
 
         SarosPluginContext.initComponent(this);
 
-        sessionManager.addSarosSessionListener(sessionListener);
+        sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
         hooks.addHook(hook);
 
         LOG.debug("WhiteboardManager instantiated");

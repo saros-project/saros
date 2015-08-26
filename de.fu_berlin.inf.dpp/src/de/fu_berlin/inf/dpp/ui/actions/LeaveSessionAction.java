@@ -27,9 +27,9 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
+import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
@@ -49,7 +49,7 @@ public class LeaveSessionAction extends Action implements Disposable {
     @Inject
     private ISarosSessionManager sessionManager;
 
-    private final ISarosSessionListener sessionListener = new NullSarosSessionListener() {
+    private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
             updateEnablement();
@@ -72,7 +72,7 @@ public class LeaveSessionAction extends Action implements Disposable {
         });
 
         SarosPluginContext.initComponent(this);
-        sessionManager.addSarosSessionListener(sessionListener);
+        sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
         updateEnablement();
     }
 
@@ -83,7 +83,7 @@ public class LeaveSessionAction extends Action implements Disposable {
 
     @Override
     public void dispose() {
-        sessionManager.removeSarosSessionListener(sessionListener);
+        sessionManager.removeSessionLifecycleListener(sessionLifecycleListener);
     }
 
     private void updateEnablement() {

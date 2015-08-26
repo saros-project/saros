@@ -25,9 +25,11 @@ package de.fu_berlin.inf.dpp.session;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 
 /**
- * A session {@link ISarosSessionListener listener} that does nothing.
+ * An {@link ISessionLifecycleListener} which does nothing by default. Extend
+ * this class if you only want to react to specific lifecycle events.
  */
-public class NullSarosSessionListener implements ISarosSessionListener {
+public class NullSessionLifecycleListener implements
+    ISessionLifecycleListener {
 
     @Override
     public void sessionStarting(ISarosSession session) {

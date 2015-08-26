@@ -33,9 +33,9 @@ import de.fu_berlin.inf.dpp.intellij.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 import de.fu_berlin.inf.dpp.observables.ValueChangeListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
+import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
 
@@ -90,7 +90,7 @@ public class ConsistencyButton extends ToolbarButton {
 
     private ConsistencyAction action;
 
-    private final ISarosSessionListener sessionListener = new NullSarosSessionListener() {
+    private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
             setSarosSession(newSarosSession);
@@ -134,7 +134,7 @@ public class ConsistencyButton extends ToolbarButton {
         action.addActionListener(consistencyActionListener);
 
         setSarosSession(sessionManager.getSarosSession());
-        sessionManager.addSarosSessionListener(sessionListener);
+        sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
 
         addActionListener(actionListener);
         setEnabled(false);

@@ -28,10 +28,10 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
+import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
@@ -87,7 +87,7 @@ public class FollowModeAction extends Action implements IMenuCreator,
         }
     };
 
-    private ISarosSessionListener sessionListener = new NullSarosSessionListener() {
+    private ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
         @Override
         public void sessionStarted(final ISarosSession session) {
 
@@ -179,7 +179,7 @@ public class FollowModeAction extends Action implements IMenuCreator,
 
         session = sessionManager.getSarosSession();
 
-        sessionManager.addSarosSessionListener(sessionListener);
+        sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
         editorManager.addSharedEditorListener(editorListener);
         currentlyFollowedUser = editorManager.getFollowedUser();
 
@@ -209,7 +209,7 @@ public class FollowModeAction extends Action implements IMenuCreator,
         if (followUserMenu != null)
             followUserMenu.dispose();
 
-        sessionManager.removeSarosSessionListener(sessionListener);
+        sessionManager.removeSessionLifecycleListener(sessionLifecycleListener);
         editorManager.removeSharedEditorListener(editorListener);
         SelectionUtils.getSelectionService().removeSelectionListener(
             selectionListener);

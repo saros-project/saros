@@ -51,9 +51,9 @@ import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
+import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.StackTrace;
@@ -257,7 +257,7 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
      * enables and disables the UndoManager and does cleanup works at the begin
      * and the end of a session.
      */
-    protected ISarosSessionListener sessionListener = new NullSarosSessionListener() {
+    protected ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
 
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
@@ -403,7 +403,7 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
         OperationHistoryFactory.getOperationHistory()
             .addOperationHistoryListener(historyListener);
 
-        sessionManager.addSarosSessionListener(sessionListener);
+        sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
         this.sessionManager = sessionManager;
 
         editorManager.addActivityListener(this.activityListener);
@@ -519,7 +519,7 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
     public void dispose() {
         OperationHistoryFactory.getOperationHistory()
             .removeOperationHistoryListener(historyListener);
-        sessionManager.removeSarosSessionListener(sessionListener);
+        sessionManager.removeSessionLifecycleListener(sessionLifecycleListener);
         editorManager.removeActivityListener(activityListener);
         enabled = false;
         eclipseHistory.removeOperationApprover(operationBlocker);

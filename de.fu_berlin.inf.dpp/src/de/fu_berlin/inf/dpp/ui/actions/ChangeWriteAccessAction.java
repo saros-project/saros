@@ -21,10 +21,10 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.session.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
+import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
@@ -73,7 +73,7 @@ public class ChangeWriteAccessAction extends Action implements Disposable {
     @Inject
     private ISarosSessionManager sessionManager;
 
-    private ISarosSessionListener sessionListener = new NullSarosSessionListener() {
+    private ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
             newSarosSession.addListener(permissionListener);
@@ -129,10 +129,11 @@ public class ChangeWriteAccessAction extends Action implements Disposable {
          * the action enablement cannot be updated.
          */
         if (sessionManager.getSarosSession() != null) {
-            sessionListener.sessionStarted(sessionManager.getSarosSession());
+            sessionLifecycleListener.sessionStarted(sessionManager
+                .getSarosSession());
         }
 
-        sessionManager.addSarosSessionListener(sessionListener);
+        sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
         SelectionUtils.getSelectionService().addSelectionListener(
             selectionListener);
         updateEnablement();
@@ -153,7 +154,7 @@ public class ChangeWriteAccessAction extends Action implements Disposable {
     public void dispose() {
         SelectionUtils.getSelectionService().removeSelectionListener(
             selectionListener);
-        sessionManager.removeSarosSessionListener(sessionListener);
+        sessionManager.removeSessionLifecycleListener(sessionLifecycleListener);
     }
 
     @Override

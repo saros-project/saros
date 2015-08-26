@@ -17,9 +17,9 @@ import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.NullSarosSessionListener;
+import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
@@ -43,7 +43,7 @@ public class FollowThisPersonAction extends Action implements Disposable {
     private static final Logger LOG = Logger
         .getLogger(FollowThisPersonAction.class);
 
-    protected ISarosSessionListener sessionListener = new NullSarosSessionListener() {
+    protected ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
             updateActionEnablement();
@@ -90,7 +90,7 @@ public class FollowThisPersonAction extends Action implements Disposable {
         setToolTipText(Messages.FollowThisPersonAction_follow_tooltip);
         setId(ACTION_ID);
 
-        sessionManager.addSarosSessionListener(sessionListener);
+        sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
         editorManager.addSharedEditorListener(editorListener);
         SelectionUtils.getSelectionService().addSelectionListener(
             selectionListener);
@@ -166,7 +166,7 @@ public class FollowThisPersonAction extends Action implements Disposable {
     public void dispose() {
         SelectionUtils.getSelectionService().removeSelectionListener(
             selectionListener);
-        sessionManager.removeSarosSessionListener(sessionListener);
+        sessionManager.removeSessionLifecycleListener(sessionLifecycleListener);
         editorManager.removeSharedEditorListener(editorListener);
     }
 }
