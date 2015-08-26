@@ -10,7 +10,6 @@ import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityProducer;
@@ -41,30 +40,21 @@ public class SarosSessionStub implements ISarosSession {
     @Override
     public void start() {
         throw new RuntimeException("Unexpected call to Stub");
-
     }
 
     @Override
     public void setPermission(User user, Permission permission) {
         throw new RuntimeException("Unexpected call to Stub");
-
-    }
-
-    public void sendActivity(List<User> recipient, IActivity activity) {
-        throw new RuntimeException("Unexpected call to Stub");
-
     }
 
     @Override
     public void removeUser(User user) {
         throw new RuntimeException("Unexpected call to Stub");
-
     }
 
     @Override
     public void removeListener(ISessionListener listener) {
         throw new RuntimeException("Unexpected call to Stub");
-
     }
 
     @Override
@@ -91,15 +81,10 @@ public class SarosSessionStub implements ISarosSession {
     public void initiatePermissionChange(User user, Permission newPermission)
         throws CancellationException, InterruptedException {
         throw new RuntimeException("Unexpected call to Stub");
-
     }
 
     @Override
     public User getUser(JID jid) {
-        throw new RuntimeException("Unexpected call to Stub");
-    }
-
-    public ITransmitter getTransmitter() {
         throw new RuntimeException("Unexpected call to Stub");
     }
 
@@ -171,27 +156,15 @@ public class SarosSessionStub implements ISarosSession {
     @Override
     public void exec(List<IActivity> activities) {
         throw new RuntimeException("Unexpected call to Stub");
-
     }
 
     @Override
     public void addUser(User user) {
         throw new RuntimeException("Unexpected call to Stub");
-
-    }
-
-    public void addSharedProject(IProject project, String projectID) {
-        throw new RuntimeException("Unexpected call to Stub");
-
     }
 
     @Override
     public void addListener(ISessionListener listener) {
-        throw new RuntimeException("Unexpected call to Stub");
-
-    }
-
-    public void execQueuedActivities() {
         throw new RuntimeException("Unexpected call to Stub");
     }
 
@@ -199,7 +172,6 @@ public class SarosSessionStub implements ISarosSession {
     public void addSharedResources(IProject project, String projectID,
         List<IResource> dependentResources) {
         throw new RuntimeException("Unexpected call to Stub");
-
     }
 
     @Override
@@ -217,21 +189,8 @@ public class SarosSessionStub implements ISarosSession {
         throw new RuntimeException("Unexpected call to Stub");
     }
 
-    public void stopQueue() {
-        throw new RuntimeException("Unexpected call to Stub");
-    }
-
-    public void startQueue() {
-        throw new RuntimeException("Unexpected call to Stub");
-    }
-
     @Override
     public List<IResource> getSharedResources(IProject project) {
-        throw new RuntimeException("Unexpected call to Stub");
-    }
-
-    public void addSharedResources(IProject project, String projectID,
-        List<IResource> dependentResources, JID jid) {
         throw new RuntimeException("Unexpected call to Stub");
     }
 
@@ -278,13 +237,11 @@ public class SarosSessionStub implements ISarosSession {
     @Override
     public void userStartedQueuing(User user) {
         throw new RuntimeException("Unexpected call to Stub");
-
     }
 
     @Override
     public void userFinishedProjectNegotiation(User user) {
         throw new RuntimeException("Unexpected call to Stub");
-
     }
 
     @Override
