@@ -11,7 +11,7 @@ import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.communication.connection.IConnectionStateListener;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.mdns.MDNSService;
-import de.fu_berlin.inf.dpp.project.internal.SarosSession;
+import de.fu_berlin.inf.dpp.session.internal.SarosSession;
 import de.fu_berlin.inf.dpp.ui.model.TreeLabelProvider;
 import de.fu_berlin.inf.dpp.ui.model.mdns.MDNSComparator;
 import de.fu_berlin.inf.dpp.ui.model.mdns.MDNSContentProvider;

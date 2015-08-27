@@ -23,10 +23,10 @@ import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceInitializer;
-import de.fu_berlin.inf.dpp.project.internal.SarosSessionTest;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.User;
+import de.fu_berlin.inf.dpp.session.internal.SarosSessionTest;
 import de.fu_berlin.inf.dpp.test.util.MemoryPreferenceStore;
 import de.fu_berlin.inf.dpp.test.util.MemoryPreferences;
 

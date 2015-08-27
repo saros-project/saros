@@ -83,7 +83,7 @@ Export-Package: de.fu_berlin.inf.dpp;
    org.xmlpull.v1,
    de.fu_berlin.inf.dpp.invitation,
    de.fu_berlin.inf.dpp.net",
- de.fu_berlin.inf.dpp.project.internal,
+ de.fu_berlin.inf.dpp.session.internal,
  de.fu_berlin.inf.dpp.ui;
   uses:="org.eclipse.jface.window,
    org.eclipse.jface.resource,

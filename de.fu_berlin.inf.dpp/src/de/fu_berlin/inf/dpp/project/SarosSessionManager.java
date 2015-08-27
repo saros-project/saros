@@ -59,12 +59,12 @@ import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
-import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.session.INegotiationHandler;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.User;
+import de.fu_berlin.inf.dpp.session.internal.SarosSession;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 

@@ -23,7 +23,6 @@
 package de.fu_berlin.inf.dpp.core.project;
 
 import de.fu_berlin.inf.dpp.ISarosContext;
-import de.fu_berlin.inf.dpp.core.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
@@ -51,6 +50,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.User;
+import de.fu_berlin.inf.dpp.session.internal.SarosSession;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
@@ -214,12 +214,13 @@ public class SarosSessionManager implements ISarosSessionManager {
 
             sessionStartup = true;
 
-            sessionIDObservable.setValue(String.valueOf(SESSION_ID_GENERATOR
-                .nextInt(Integer.MAX_VALUE)));
+            String sessionID = String.valueOf(SESSION_ID_GENERATOR
+                .nextInt(Integer.MAX_VALUE));
+            sessionIDObservable.setValue(sessionID);
 
             // FIXME should be passed in (colorID)
             final SarosSession sarosSession = new SarosSession(
-                preferences.getFavoriteColorID(), sarosContext);
+                sessionID, preferences.getFavoriteColorID(), sarosContext);
 
             sarosSessionObservable.setValue(sarosSession);
 
@@ -275,7 +276,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
         assert getSarosSession() == null;
 
-        SarosSession sarosSession = new SarosSession(host, clientColor,
+        SarosSession sarosSession = new SarosSession(id, host, clientColor,
             hostColor, sarosContext);
 
         sarosSessionObservable.setValue(sarosSession);

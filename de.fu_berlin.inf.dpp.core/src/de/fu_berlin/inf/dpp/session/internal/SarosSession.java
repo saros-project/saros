@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp.project.internal;
+package de.fu_berlin.inf.dpp.session.internal;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -73,14 +73,6 @@ import de.fu_berlin.inf.dpp.session.ISarosSessionContextFactory;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
-import de.fu_berlin.inf.dpp.session.internal.ActivityHandler;
-import de.fu_berlin.inf.dpp.session.internal.ActivityQueuer;
-import de.fu_berlin.inf.dpp.session.internal.ActivitySequencer;
-import de.fu_berlin.inf.dpp.session.internal.ChangeColorManager;
-import de.fu_berlin.inf.dpp.session.internal.PermissionManager;
-import de.fu_berlin.inf.dpp.session.internal.SessionListenerDispatch;
-import de.fu_berlin.inf.dpp.session.internal.SharedProjectMapper;
-import de.fu_berlin.inf.dpp.session.internal.UserInformationHandler;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.util.StackTrace;

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.project.internal;
+package de.fu_berlin.inf.dpp.session.internal;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -58,6 +58,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceInitializer;
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceStoreAdapter;
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferences;
+import de.fu_berlin.inf.dpp.project.internal.SarosEclipseSessionContextFactory;
 import de.fu_berlin.inf.dpp.session.ISarosSessionContextFactory;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;

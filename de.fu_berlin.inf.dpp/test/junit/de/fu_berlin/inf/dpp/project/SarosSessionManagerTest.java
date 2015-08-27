@@ -25,10 +25,10 @@ import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
-import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.internal.SarosSession;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ SarosSession.class, SarosSessionManager.class })

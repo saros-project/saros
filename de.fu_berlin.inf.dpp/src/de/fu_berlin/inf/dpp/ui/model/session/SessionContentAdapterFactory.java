@@ -2,8 +2,8 @@ package de.fu_berlin.inf.dpp.ui.model.session;
 
 import org.eclipse.core.runtime.IAdapterFactory;
 
-import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.session.User;
+import de.fu_berlin.inf.dpp.session.internal.SarosSession;
 
 /**
  * Provides adapters for {@link SarosSession} entities which are provided by

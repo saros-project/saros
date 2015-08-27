@@ -1180,7 +1180,7 @@
          <with
                variable="de.fu_berlin.inf.dpp.SarosSession">
             <instanceof
-                  value="de.fu_berlin.inf.dpp.project.internal.SarosSession">
+                  value="de.fu_berlin.inf.dpp.session.internal.SarosSession">
             </instanceof>
          </with>
       </definition>

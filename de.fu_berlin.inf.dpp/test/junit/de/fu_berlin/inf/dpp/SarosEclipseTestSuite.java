@@ -14,7 +14,7 @@ de.fu_berlin.inf.dpp.feedback.TestSuite.class,
 
 de.fu_berlin.inf.dpp.project.TestSuite.class,
 
-de.fu_berlin.inf.dpp.project.internal.TestSuite.class,
+de.fu_berlin.inf.dpp.session.internal.TestSuite.class,
 
 de.fu_berlin.inf.dpp.ui.model.roster.TestSuite.class,
 
