@@ -73,8 +73,10 @@ import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
+import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -155,8 +157,43 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
         }
     };
 
+    private ISessionListener sessionListener = new AbstractSessionListener() {
+        /**
+         * Creates a {@link SharedProject} for every project added to the
+         * session.
+         */
+        @Override
+        public void projectAdded(
+            de.fu_berlin.inf.dpp.filesystem.IProject project) {
+
+            synchronized (sharedProjects) {
+                IProject eclipseProject = ((EclipseProjectImpl) project)
+                    .getDelegate();
+                sharedProjects.put(eclipseProject, new SharedProject(
+                    eclipseProject, sarosSession));
+            }
+        }
+
+        /**
+         * Deletes a {@link SharedProject} when the project it represents is
+         * removed from the session.
+         */
+        @Override
+        public void projectRemoved(
+            de.fu_berlin.inf.dpp.filesystem.IProject project) {
+
+            synchronized (sharedProjects) {
+                SharedProject sharedProject = sharedProjects
+                    .remove(((EclipseProjectImpl) project).getDelegate());
+                if (sharedProject != null)
+                    sharedProject.delete();
+            }
+        }
+    };
+
     @Override
     public void start() {
+        sarosSession.addListener(sessionListener);
         sarosSession.addActivityProducer(this);
         sarosSession.addActivityConsumer(consumer);
         stopManager.addBlockable(stopManagerListener);
@@ -167,6 +204,7 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
     @Override
     public void stop() {
         ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
+        sarosSession.removeListener(sessionListener);
         sarosSession.removeActivityProducer(this);
         sarosSession.removeActivityConsumer(consumer);
         stopManager.removeBlockable(stopManagerListener);
@@ -755,27 +793,6 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
             throw new IllegalStateException(e);
         } catch (InterruptedException e) {
             log.error("Code not designed to be interrupted!");
-        }
-    }
-
-    // HACK
-    public void projectAdded(de.fu_berlin.inf.dpp.filesystem.IProject project) {
-        synchronized (sharedProjects) {
-            IProject eclipseProject = ((EclipseProjectImpl) project)
-                .getDelegate();
-            sharedProjects.put(eclipseProject, new SharedProject(
-                eclipseProject, sarosSession));
-        }
-    }
-
-    // HACK
-    public void projectRemoved(de.fu_berlin.inf.dpp.filesystem.IProject project) {
-        synchronized (sharedProjects) {
-
-            SharedProject sharedProject = sharedProjects
-                .remove(((EclipseProjectImpl) project).getDelegate());
-            if (sharedProject != null)
-                sharedProject.delete();
         }
     }
 }

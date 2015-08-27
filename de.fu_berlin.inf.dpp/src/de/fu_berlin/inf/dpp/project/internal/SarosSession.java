@@ -64,7 +64,6 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
-import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityHandlerCallback;
 import de.fu_berlin.inf.dpp.session.IActivityListener;
@@ -163,9 +162,6 @@ public final class SarosSession implements ISarosSession {
 
     private final Object componentAccessLock = new Object();
 
-    // HACK to be able to move most parts to core
-    private final SharedResourcesManager resourceManager;
-
     private final IActivityListener activityListener = new IActivityListener() {
 
         /**
@@ -258,8 +254,6 @@ public final class SarosSession implements ISarosSession {
                 projectMapper.addResources(project, dependentResources);
 
             listenerDispatch.projectAdded(project);
-            // HACK
-            resourceManager.projectAdded(project);
         } else {
             if (dependentResources == null)
                 // upgrade the project to a completely shared project
@@ -974,8 +968,6 @@ public final class SarosSession implements ISarosSession {
         if (projectMapper.getProject(projectID) == null) {
             projectMapper.addProject(projectID, project, true);
             listenerDispatch.projectAdded(project);
-            // HACK
-            resourceManager.projectAdded(project);
         }
     }
 
@@ -984,8 +976,6 @@ public final class SarosSession implements ISarosSession {
         if (projectMapper.getProject(projectID) != null) {
             projectMapper.removeProject(projectID);
             listenerDispatch.projectRemoved(project);
-            // HACK
-            resourceManager.projectRemoved(project);
         }
     }
 
@@ -1079,10 +1069,6 @@ public final class SarosSession implements ISarosSession {
 
         // Force the creation of the components added to the session container.
         sessionContainer.getComponents();
-
-        // HACK
-        resourceManager = sessionContainer
-            .getComponent(SharedResourcesManager.class);
 
         concurrentDocumentServer = sessionContainer
             .getComponent(ConcurrentDocumentServer.class);
