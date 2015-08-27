@@ -257,6 +257,7 @@ public final class SarosSession implements ISarosSession {
             if (dependentResources != null)
                 projectMapper.addResources(project, dependentResources);
 
+            listenerDispatch.projectAdded(project);
             // HACK
             resourceManager.projectAdded(project);
         } else {
@@ -972,6 +973,7 @@ public final class SarosSession implements ISarosSession {
     public void addProjectMapping(String projectID, IProject project) {
         if (projectMapper.getProject(projectID) == null) {
             projectMapper.addProject(projectID, project, true);
+            listenerDispatch.projectAdded(project);
             // HACK
             resourceManager.projectAdded(project);
         }
@@ -981,6 +983,7 @@ public final class SarosSession implements ISarosSession {
     public void removeProjectMapping(String projectID, IProject project) {
         if (projectMapper.getProject(projectID) != null) {
             projectMapper.removeProject(projectID);
+            listenerDispatch.projectRemoved(project);
             // HACK
             resourceManager.projectRemoved(project);
         }

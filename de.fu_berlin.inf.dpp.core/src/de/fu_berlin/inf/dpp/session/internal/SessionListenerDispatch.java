@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.session.internal;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 
@@ -47,6 +48,18 @@ public class SessionListenerDispatch implements ISessionListener {
     public void userLeft(User user) {
         for (ISessionListener listener : listeners)
             listener.userLeft(user);
+    }
+
+    @Override
+    public void projectAdded(IProject project) {
+        for (ISessionListener listener : listeners)
+            listener.projectAdded(project);
+    }
+
+    @Override
+    public void projectRemoved(IProject project) {
+        for (ISessionListener listener : listeners)
+            listener.projectRemoved(project);
     }
 
     public void add(ISessionListener listener) {

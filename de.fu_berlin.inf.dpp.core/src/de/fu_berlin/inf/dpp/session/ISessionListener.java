@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.session;
 
+import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 
 /**
@@ -36,6 +37,9 @@ public interface ISessionListener {
      * The user {@link Permission} of the given participant has been changed.
      * This is called after the {@link Permission} of the user has been updated
      * to represent the new state.
+     * <p>
+     * This method is called on the UI thread.
+     * </p>
      * 
      * @param user
      *            the user whose {@link Permission} changed.
@@ -44,6 +48,9 @@ public interface ISessionListener {
 
     /**
      * Is fired when an user joins the shared project.
+     * <p>
+     * This method is called on the UI thread.
+     * </p>
      * 
      * @param user
      *            the user that has joined.
@@ -52,7 +59,10 @@ public interface ISessionListener {
 
     /**
      * Is fired when a user started queuing and is now able to process all
-     * Activities
+     * activities.
+     * <p>
+     * This method is called on the UI thread.
+     * </p>
      * 
      * @param user
      *            the user that has joined.
@@ -61,6 +71,9 @@ public interface ISessionListener {
 
     /**
      * Is fired when a finished the Project Negotiation
+     * <p>
+     * This method is called on the UI thread.
+     * </p>
      * 
      * @param user
      *            the user that has joined.
@@ -69,6 +82,9 @@ public interface ISessionListener {
 
     /**
      * Is fired when the color assigned to a user in the session changed.
+     * <p>
+     * This method is called on the UI thread.
+     * </p>
      * 
      * @param user
      *            the user whose color changed
@@ -77,9 +93,43 @@ public interface ISessionListener {
 
     /**
      * Is fired when an user leaves the shared project.
+     * <p>
+     * This method is called on the UI thread.
+     * </p>
      * 
      * @param user
      *            the user that has left.
      */
     public void userLeft(User user);
+
+    /**
+     * Is fired then a project has been made part of the session, either because
+     * the local user began sharing it or because it is being shared by a remote
+     * user.
+     * <p>
+     * Note that this event is also fired if a project is re-shared with a
+     * different set of shared resources (e.g. by sharing a previously unshared
+     * folder of a partially shared project).
+     * <p>
+     * This method is <i>not</i> called on the UI thread.
+     * </p>
+     * 
+     * @param project
+     *            the project that was added
+     * 
+     * @see ISessionLifecycleListener#projectResourcesAvailable(String)
+     */
+    public void projectAdded(IProject project);
+
+    /**
+     * Is fired then a project has been removed from the session, meaning it is
+     * not shared between the session's users anymore.
+     * <p>
+     * This method is <i>not</i> called on the UI thread.
+     * </p>
+     * 
+     * @param project
+     *            the project that was removed
+     */
+    public void projectRemoved(IProject project);
 }
