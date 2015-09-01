@@ -167,7 +167,9 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
             return;
         }
 
-        boolean isJIDValid = getJID().isValid();
+        boolean isJIDValid = getJID().isValid()
+            && !getJID().isResourceQualifiedJID();
+
         boolean isPasswordValid = !getPassword().isEmpty();
         boolean isServerValid = (getServer().isEmpty() && getPort().isEmpty())
             || !getServer().isEmpty();
