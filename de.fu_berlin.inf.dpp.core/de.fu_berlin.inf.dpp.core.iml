@@ -21,6 +21,7 @@
     <orderEntry type="library" exported="" name="weupnp" level="project" />
     <orderEntry type="library" exported="" name="xpp3-1.1.4c" level="project" />
     <orderEntry type="library" exported="" name="xstream-1.4-20101008.163445-1" level="project" />
+    <orderEntry type="library" exported="" name="libidn-1.32" level="project" />
     <orderEntry type="module-library" scope="TEST">
       <library name="cglib-nodep-2.2.2">
         <CLASSES>

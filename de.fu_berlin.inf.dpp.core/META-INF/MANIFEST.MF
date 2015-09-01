@@ -143,4 +143,5 @@ Bundle-ClassPath: .,
  lib/xpp3-1.1.4c.jar,
  lib/picocontainer-2.11.2.jar,
  lib/weupnp.jar,
- lib/jmdns-3.4.1.jar
+ lib/jmdns-3.4.1.jar,
+ lib/libidn-1.32.jar

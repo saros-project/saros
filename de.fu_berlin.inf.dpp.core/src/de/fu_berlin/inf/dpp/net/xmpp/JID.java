@@ -20,10 +20,11 @@
 package de.fu_berlin.inf.dpp.net.xmpp;
 
 import java.io.Serializable;
-import java.util.regex.Pattern;
 
 import org.jivesoftware.smack.util.StringUtils;
 import org.jivesoftware.smackx.muc.MultiUserChat;
+
+import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 
 /**
  * A JID which is used to identify the users of the XMPP network.
@@ -35,9 +36,6 @@ import org.jivesoftware.smackx.muc.MultiUserChat;
 public class JID implements Serializable {
 
     private static final long serialVersionUID = 4830741516870940459L;
-
-    private static final Pattern userAtHostPattern = Pattern.compile(
-        "^[A-Z0-9._%+-]+@[A-Z0-9.-]+$", Pattern.CASE_INSENSITIVE);
 
     private final String jid;
 
@@ -70,8 +68,7 @@ public class JID implements Serializable {
      */
     public JID(String jid) {
         if (jid == null)
-            throw new IllegalArgumentException(JID.class.getSimpleName()
-                + " cannot be null");
+            throw new IllegalArgumentException("jid cannot be null");
 
         this.jid = jid;
     }
@@ -86,21 +83,18 @@ public class JID implements Serializable {
         this.jid = name + "@" + domain;
     }
 
-    /**
-     * Checks whether the {@link #getBase() base} portion is correctly formatted.
-     * 
-     * @param jid
-     * @return
-     */
-    public static boolean isValid(JID jid) {
-        return userAtHostPattern.matcher(jid.getBase()).matches();
+    // TODO remove this method from the class
+    public static boolean isValid(final JID jid) {
+        return XMPPUtils.validateJID(jid);
     }
 
     /**
-     * Checks whether the {@link #getBase() base} portion is correctly formatted.
+     * Checks whether the {@link #getBase() base} portion is correctly
+     * formatted.
      * 
      * @return
      */
+    // TODO remove this method from the class
     public boolean isValid() {
         return isValid(this);
     }
@@ -110,7 +104,7 @@ public class JID implements Serializable {
      * @see StringUtils#parseName(String)
      */
     public String getName() {
-        return StringUtils.parseName(this.jid);
+        return StringUtils.parseName(jid);
     }
 
     /**
@@ -118,7 +112,7 @@ public class JID implements Serializable {
      * @see StringUtils#parseBareAddress(String)
      */
     public String getBase() {
-        return StringUtils.parseBareAddress(this.jid);
+        return StringUtils.parseBareAddress(jid);
     }
 
     /**
@@ -126,7 +120,7 @@ public class JID implements Serializable {
      * @see StringUtils#parseServer(String)
      */
     public String getDomain() {
-        return StringUtils.parseServer(this.jid);
+        return StringUtils.parseServer(jid);
     }
 
     /**
@@ -135,7 +129,7 @@ public class JID implements Serializable {
      * @see StringUtils#parseResource(String)
      */
     public String getResource() {
-        return StringUtils.parseResource(this.jid);
+        return StringUtils.parseResource(jid);
     }
 
     /**
@@ -165,7 +159,7 @@ public class JID implements Serializable {
      * @return
      */
     public String getRAW() {
-        return this.jid;
+        return jid;
     }
 
     /**
@@ -190,7 +184,7 @@ public class JID implements Serializable {
      * includes the resource unlike equals)
      */
     public boolean strictlyEquals(JID other) {
-        return this.jid.equals(other.jid);
+        return jid.equals(other.jid);
     }
 
     @Override
@@ -203,6 +197,6 @@ public class JID implements Serializable {
      */
     @Override
     public String toString() {
-        return this.jid;
+        return jid;
     }
 }

@@ -15,6 +15,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/smackx-3.4.1-0cec571.jar" sourcepath="lib/smack-3.4.1-0cec571-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/smackx-debug-3.4.1-0cec571.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jmdns-3.4.1.jar" sourcepath="lib/jmdns-3.4.1-sources.jar"/>
+	<classpathentry kind="lib" path="lib/libidn-1.32.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>

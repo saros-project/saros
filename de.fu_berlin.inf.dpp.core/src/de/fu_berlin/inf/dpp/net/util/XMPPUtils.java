@@ -1,5 +1,8 @@
 package de.fu_berlin.inf.dpp.net.util;
 
+import gnu.inet.encoding.Stringprep;
+import gnu.inet.encoding.StringprepException;
+
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
@@ -437,5 +440,57 @@ public class XMPPUtils {
                 + userDirectoryService + "' failed", e);
             return false;
         }
+    }
+
+    /**
+     * Validates the given JID.<br>
+     * See: <i>https://tools.ietf.org/html/rfc6122#section-2</i> for details.
+     * 
+     * @param jid
+     *            the JID to validate
+     * @return <code>true</code> if the given JID is valid, <code>false</code>
+     *         otherwise
+     */
+    /*
+     * TODO check if Smack 4.X contains Stringprep methods and / or JID
+     * validation methods so this one can be replaced and the GNU libidn library
+     * can be removed
+     */
+    public static boolean validateJID(final JID jid) {
+
+        // TODO length check
+
+        // TODO try to detect IP4/6 addresses and check them for valid ranges
+
+        final String localpart = jid.getName();
+        final String domainpart = jid.getDomain();
+        final String resourcepart = jid.getResource();
+
+        if (localpart != null && !localpart.isEmpty()) {
+            try {
+                Stringprep.nodeprep(localpart);
+            } catch (StringprepException e) {
+                return false;
+            }
+        }
+
+        if (domainpart != null && !domainpart.isEmpty()) {
+            try {
+                Stringprep.nameprep(domainpart);
+            } catch (StringprepException e) {
+                return false;
+            }
+        } else if (domainpart == null || domainpart.isEmpty())
+            return false;
+
+        if (resourcepart != null && !resourcepart.isEmpty()) {
+            try {
+                Stringprep.nodeprep(resourcepart);
+            } catch (StringprepException e) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
