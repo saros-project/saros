@@ -105,7 +105,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
         }
 
         @Override
-        public void projectAdded(final String projectID) {
+        public void projectResourcesAvailable(final String projectID) {
             UIUtil.invokeLaterIfNeeded(new Runnable() {
                 @Override
                 public void run() {

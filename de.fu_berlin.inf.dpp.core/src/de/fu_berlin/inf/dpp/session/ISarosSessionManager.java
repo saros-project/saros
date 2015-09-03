@@ -141,12 +141,13 @@ public interface ISarosSessionManager {
         List<ProjectNegotiationData> projectInfos, String negotiationID);
 
     /**
-     * Call this when a new project was added.
+     * Call this as soon as all shared resources of a project in the session are
+     * available.
      * 
      * @param projectID
-     *            TODO
+     *            ID of the project whose shared resources are now available
      */
-    void projectAdded(String projectID);
+    void projectResourcesAvailable(String projectID);
 
     /**
      * Call this before a ISarosSession is started.

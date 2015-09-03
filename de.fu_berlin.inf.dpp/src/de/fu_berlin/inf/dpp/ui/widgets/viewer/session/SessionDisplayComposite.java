@@ -105,7 +105,7 @@ public abstract class SessionDisplayComposite extends
         }
 
         @Override
-        public void projectAdded(String projectID) {
+        public void projectResourcesAvailable(String projectID) {
             ViewerUtils.refresh(getViewer(), true);
         }
     };

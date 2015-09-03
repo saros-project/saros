@@ -331,7 +331,7 @@ public class EditorManager extends AbstractActivityProducer implements
         }
 
         @Override
-        public void projectAdded(String projectID) {
+        public void projectResourcesAvailable(String projectID) {
             if (!isFollowing()) {
                 return;
             }

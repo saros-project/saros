@@ -79,5 +79,5 @@ public interface ISessionLifecycleListener {
      * 
      * @see ISessionListener#projectAdded(IProject)
      */
-    public void projectAdded(String projectID);
+    public void projectResourcesAvailable(String projectID);
 }

@@ -52,7 +52,7 @@ public class NullSessionLifecycleListener implements
     }
 
     @Override
-    public void projectAdded(String projectID) {
+    public void projectResourcesAvailable(String projectID) {
         // NOP
     }
 

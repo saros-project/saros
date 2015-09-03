@@ -95,7 +95,7 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
         }
 
         @Override
-        public void projectAdded(String projectID) {
+        public void projectResourcesAvailable(String projectID) {
             LOG.debug("updating project decoration for all shared projects");
             updateDecoratorsAsync(null); // update all labels
         }

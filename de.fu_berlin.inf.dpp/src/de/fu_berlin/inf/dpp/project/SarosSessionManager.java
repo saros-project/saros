@@ -263,7 +263,7 @@ public class SarosSessionManager implements ISarosSessionManager {
                 sarosSession.addSharedResources(project, projectID,
                     resourcesList);
 
-                projectAdded(projectID);
+                projectResourcesAvailable(projectID);
             }
 
             log.info("session started");
@@ -563,7 +563,7 @@ public class SarosSessionManager implements ISarosSessionManager {
                         .nextInt(Integer.MAX_VALUE));
 
                 session.addSharedResources(project, projectID, resourcesList);
-                projectAdded(projectID);
+                projectResourcesAvailable(projectID);
                 projectsToShare.add(project);
             }
         }
@@ -723,10 +723,10 @@ public class SarosSessionManager implements ISarosSessionManager {
     }
 
     @Override
-    public void projectAdded(String projectID) {
+    public void projectResourcesAvailable(String projectID) {
         for (ISessionLifecycleListener listener : sessionLifecycleListeners) {
             try {
-                listener.projectAdded(projectID);
+                listener.projectResourcesAvailable(projectID);
             } catch (RuntimeException e) {
                 log.error("error in notifying listener of an added project: ",
                     e);

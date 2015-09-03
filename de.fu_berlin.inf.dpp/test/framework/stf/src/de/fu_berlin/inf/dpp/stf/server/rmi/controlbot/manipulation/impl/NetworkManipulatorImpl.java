@@ -523,7 +523,7 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
     }
 
     @Override
-    public void projectAdded(String projectID) {
+    public void projectResourcesAvailable(String projectID) {
         // NOP
     }
 }

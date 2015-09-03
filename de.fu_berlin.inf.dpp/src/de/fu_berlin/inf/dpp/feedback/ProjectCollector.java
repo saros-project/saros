@@ -33,7 +33,7 @@ public class ProjectCollector extends AbstractStatisticCollector {
 
     private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
         @Override
-        public void projectAdded(String projectID) {
+        public void projectResourcesAvailable(String projectID) {
             ProjectInformation info = sharedProjects.get(projectID);
 
             if (info == null) {
