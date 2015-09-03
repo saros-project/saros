@@ -4,15 +4,20 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
+import org.jivesoftware.smack.provider.IQProvider;
+import org.jivesoftware.smack.provider.ProviderManager;
 import org.picocontainer.annotations.Inject;
+import org.xmlpull.v1.XmlPullParser;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcknowledgedExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationOfferingExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.ProjectNegotiationOfferingExtension;
+import de.fu_berlin.inf.dpp.communication.extensions.VersionExchangeExtension;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
@@ -40,6 +45,48 @@ public class InvitationHandler {
     public InvitationHandler(IReceiver receiver,
         SessionIDObservable sessionIDObservablePar) {
         this.sessionIDObservable = sessionIDObservablePar;
+
+        /**
+         * Adds a listener to catch and answer 13.12.6 versionInfo objects,
+         * because 14.10.31 uses an incompatible version format.
+         * 
+         * HACK: Introduced to ensure 13.12.* compatibility, do not merge into
+         * master (this is part 1, see VersionManager for part 2)
+         */
+        ProviderManager.getInstance().addIQProvider("payload",
+            "de.fu_berlin.inf.dpp", new IQProvider() {
+
+                @Override
+                public IQ parseIQ(XmlPullParser parser) throws Exception {
+
+                    parser.next();
+                    // <major>
+                    parser.next();
+                    // 13
+                    final String major = parser.nextText();
+                    parser.next();
+                    // 12
+                    final String minor = parser.nextText();
+                    parser.next();
+                    // 6
+                    final String micro = parser.nextText();
+                    parser.next();
+                    // "" if empty, else contains the qualifier
+                    final String qualifier = parser.nextText();
+                    parser.next();
+
+                    VersionExchangeExtension versionExchangeRequest = new VersionExchangeExtension();
+
+                    String version = major + "." + minor + "." + micro
+                        + (!qualifier.isEmpty() ? ("." + qualifier) : "");
+                    versionExchangeRequest.set("version", version);
+                    versionExchangeRequest.set("id", String.valueOf(1));
+
+                    return VersionExchangeExtension.PROVIDER
+                        .createIQ(versionExchangeRequest);
+                }
+
+            });
 
         /**
          * Adds the packetListener that listens to incoming Session Negotiation

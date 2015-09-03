@@ -54,6 +54,27 @@ public class VersionManager {
      */
     private volatile Map<Version, List<Version>> compatibilityChart = new HashMap<Version, List<Version>>();
 
+    /**
+     * This is a response IQ in a format that versions < 14.10.31 understand.
+     * 
+     * HACK: Introduced to ensure 13.12.* compatibility, do not merge into
+     * master (this is part 2, see InvitationHandler for part 1, see below for
+     * part 3)
+     */
+    private static class DownwardsCompatibleVersionReply extends IQ {
+
+        @Override
+        public String getChildElementXML() {
+            return "<sarosVersion xmlns=\"de.fu_berlin.inf.dpp\">"
+                + "<payload class=\"de.fu_berlin.inf.dpp.util.VersionManager$VersionInfo\">"
+                + "<version>" + "<major>14</major>" + "<minor>10</minor>"
+                + "<micro>31</micro>" + "<qualifier/>" + "</version>"
+                + "<compatibility>TOO_OLD</compatibility>" + "</payload>"
+                + "</sarosVersion>";
+        }
+
+    }
+
     private final Version version;
     private final ITransmitter transmitter;
     private final IReceiver receiver;
@@ -78,6 +99,8 @@ public class VersionManager {
 
             VersionExchangeExtension versionExchangeResponse = new VersionExchangeExtension();
 
+            IQ reply = null;
+
             createResponseData: {
 
                 versionExchangeResponse.set(VERSION_KEY, version.toString());
@@ -89,6 +112,15 @@ public class VersionManager {
 
                 if (remoteVersionString == null) {
                     LOG.warn("remote version string not found in version exchange data");
+                    break createResponseData;
+                }
+
+                // HACK: Introduced to ensure 13.12.* compatibility, do not
+                // merge into master (this part 3, see above for part 2)
+                if (remoteVersionString.startsWith("13.12")) {
+                    reply = new DownwardsCompatibleVersionReply();
+                    reply.setPacketID(packet.getPacketID());
+                    reply.setFrom(packet.getTo());
                     break createResponseData;
                 }
 
@@ -110,8 +142,11 @@ public class VersionManager {
                     versionExchangeRequest.get(ID_KEY));
             }
 
-            IQ reply = VersionExchangeExtension.PROVIDER
-                .createIQ(versionExchangeResponse);
+            if (reply == null) {
+                reply = VersionExchangeExtension.PROVIDER
+                    .createIQ(versionExchangeResponse);
+            }
+
             reply.setType(IQ.Type.RESULT);
             reply.setTo(packet.getFrom());
 
@@ -125,7 +160,6 @@ public class VersionManager {
             LOG.debug("send version response to " + packet.getFrom());
 
         }
-
     };
 
     public VersionManager(@SarosVersion String version,
