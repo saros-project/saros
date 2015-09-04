@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.project;
+package de.fu_berlin.inf.dpp.session;
 
 import de.fu_berlin.inf.dpp.negotiation.IncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
