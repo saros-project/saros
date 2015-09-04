@@ -26,7 +26,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.core.invitation.INegotiationHandler;
-import de.fu_berlin.inf.dpp.core.invitation.OutgoingProjectNegotiation;
 import de.fu_berlin.inf.dpp.core.monitoring.IStatus;
 import de.fu_berlin.inf.dpp.core.monitoring.Status;
 import de.fu_berlin.inf.dpp.core.project.SarosSessionManager;
@@ -40,6 +39,7 @@ import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.negotiation.FileList;
 import de.fu_berlin.inf.dpp.negotiation.IncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.OutgoingProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
@@ -243,7 +243,7 @@ public class NegotiationHandler implements INegotiationHandler {
         @Override
         protected IStatus run(IProgressMonitor monitor) {
             try {
-                ProjectNegotiation.Status status = negotiation.start(monitor);
+                ProjectNegotiation.Status status = negotiation.run(monitor);
                 String peerName = getNickname(new JID(peer));
 
                 final String message;
