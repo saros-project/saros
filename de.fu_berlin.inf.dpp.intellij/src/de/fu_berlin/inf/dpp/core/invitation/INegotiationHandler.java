@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.core.invitation;
 
+import de.fu_berlin.inf.dpp.negotiation.IncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
 

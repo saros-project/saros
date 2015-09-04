@@ -23,7 +23,7 @@
 package de.fu_berlin.inf.dpp.intellij.ui.wizards;
 
 import com.intellij.util.ui.UIUtil;
-import de.fu_berlin.inf.dpp.core.invitation.IncomingProjectNegotiation;
+
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
@@ -44,6 +44,7 @@ import de.fu_berlin.inf.dpp.negotiation.CancelListener;
 import de.fu_berlin.inf.dpp.negotiation.FileList;
 import de.fu_berlin.inf.dpp.negotiation.FileListDiff;
 import de.fu_berlin.inf.dpp.negotiation.FileListFactory;
+import de.fu_berlin.inf.dpp.negotiation.IncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
