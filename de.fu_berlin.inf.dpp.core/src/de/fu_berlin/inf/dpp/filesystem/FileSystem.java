@@ -1,9 +1,13 @@
 package de.fu_berlin.inf.dpp.filesystem;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.zip.Adler32;
+
+import org.apache.commons.io.IOUtils;
 
 /**
  * Utility class offering static methods to perform file and folder
@@ -13,8 +17,44 @@ import java.util.List;
  */
 public class FileSystem {
 
+    private static final int BUFFER_SIZE = 32 * 1024;
+
     private FileSystem() {
         // NOP
+    }
+
+    /**
+     * Calculate Adler32 checksum for given file.
+     * 
+     * @return checksum of file
+     * 
+     * @throws IOException
+     *             if an I/O error occurred
+     */
+    public static long checksum(IFile file) throws IOException {
+
+        InputStream in;
+
+        try {
+            in = file.getContents();
+        } catch (IOException e) {
+            throw new IOException("failed to calculate checksum", e);
+        }
+
+        byte[] buffer = new byte[BUFFER_SIZE];
+
+        Adler32 adler = new Adler32();
+
+        int read;
+
+        try {
+            while ((read = in.read(buffer)) != -1)
+                adler.update(buffer, 0, read);
+        } finally {
+            IOUtils.closeQuietly(in);
+        }
+
+        return adler.getValue();
     }
 
     /**

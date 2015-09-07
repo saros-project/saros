@@ -1,16 +1,14 @@
 package de.fu_berlin.inf.dpp.negotiation;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.zip.Adler32;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
+import de.fu_berlin.inf.dpp.filesystem.FileSystem;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
@@ -36,8 +34,6 @@ import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 public class FileListFactory {
 
     private static final Logger LOG = Logger.getLogger(FileListFactory.class);
-
-    private static final int BUFFER_SIZE = 32 * 1024;
 
     private IChecksumCache checksumCache;
     private IProgressMonitor monitor;
@@ -192,7 +188,8 @@ public class FileListFactory {
                 if (checksumCache != null)
                     checksum = checksumCache.getChecksum(file);
 
-                data.checksum = checksum == null ? checksum(file) : checksum;
+                data.checksum = checksum == null ? FileSystem.checksum(file)
+                    : checksum;
 
                 if (checksumCache != null) {
                     boolean isInvalid = checksumCache.addChecksum(file,
@@ -209,41 +206,5 @@ public class FileListFactory {
 
             monitor.worked(1);
         }
-    }
-
-    /**
-     * Calculate Adler32 checksum for given file.
-     * <p>
-     * TODO This method's signature is a temporary "anomaly" in this class, and
-     * will be removed in future patches.
-     * 
-     * @return checksum of file
-     * 
-     * @throws IOException
-     *             if checksum calculation has been failed.
-     */
-    private static long checksum(IFile file) throws IOException {
-
-        InputStream in;
-        try {
-            in = file.getContents();
-        } catch (IOException e) {
-            throw new IOException("failed to calculate checksum", e);
-        }
-
-        byte[] buffer = new byte[BUFFER_SIZE];
-
-        Adler32 adler = new Adler32();
-
-        int read;
-
-        try {
-            while ((read = in.read(buffer)) != -1)
-                adler.update(buffer, 0, read);
-        } finally {
-            IOUtils.closeQuietly(in);
-        }
-
-        return adler.getValue();
     }
 }
