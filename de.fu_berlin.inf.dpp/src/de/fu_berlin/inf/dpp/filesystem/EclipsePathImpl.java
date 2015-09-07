@@ -85,16 +85,6 @@ public class EclipsePathImpl implements IPath {
     }
 
     @Override
-    public IPath addFileExtension(String extension) {
-        return new EclipsePathImpl(delegate.addFileExtension(extension));
-    }
-
-    @Override
-    public IPath removeFileExtension() {
-        return new EclipsePathImpl(delegate.removeFileExtension());
-    }
-
-    @Override
     public IPath makeAbsolute() {
         return new EclipsePathImpl(delegate.makeAbsolute());
     }

@@ -53,10 +53,6 @@ public interface IPath {
 
     public IPath addTrailingSeparator();
 
-    public IPath addFileExtension(String extension);
-
-    public IPath removeFileExtension();
-
     public IPath makeAbsolute();
 
     public boolean isAbsolute();

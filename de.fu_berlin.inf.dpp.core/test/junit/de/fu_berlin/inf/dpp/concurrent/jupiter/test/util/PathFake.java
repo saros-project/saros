@@ -108,16 +108,6 @@ public class PathFake implements IPath {
     }
 
     @Override
-    public IPath addFileExtension(String extension) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public IPath removeFileExtension() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public String getFileExtension() {
         throw new UnsupportedOperationException();
     }

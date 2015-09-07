@@ -22,12 +22,13 @@
 
 package de.fu_berlin.inf.dpp.intellij.project.filesystem;
 
-import de.fu_berlin.inf.dpp.filesystem.IPath;
-import org.apache.commons.io.FilenameUtils;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.regex.Pattern;
+
+import org.apache.commons.io.FilenameUtils;
+
+import de.fu_berlin.inf.dpp.filesystem.IPath;
 
 public class IntelliJPathImpl implements IPath {
     public static final String FILE_SEPARATOR = "/";
@@ -40,16 +41,17 @@ public class IntelliJPathImpl implements IPath {
         this.path = path;
         String splitPath = path;
 
-        //We must remove the first slash, otherwise String.split would
-        //create an empty string as first segment
+        // We must remove the first slash, otherwise String.split would
+        // create an empty string as first segment
         if (path.startsWith("\\") || path.startsWith("/")) {
             splitPath = path.substring(1);
         }
 
-        //"foo\bla.txt" is a valid linux path, which would not be handled
+        // "foo\bla.txt" is a valid linux path, which would not be handled
         // correctly by the separatorsToUnix. However, IntelliJ does not handle
         // these paths correctly and the FS Synchronizer logs an error when
-        // encountering one. Thus it is not possible that IntelliJPathImpl is called with
+        // encountering one. Thus it is not possible that IntelliJPathImpl is
+        // called with
         // such a path and we can safely use this method.
         splitPath = FilenameUtils.separatorsToUnix(splitPath);
         segments = splitPath.split(Pattern.quote(FILE_SEPARATOR));
@@ -61,9 +63,9 @@ public class IntelliJPathImpl implements IPath {
 
     @Override
     public IPath append(IPath path) {
-        return this.path.endsWith(FILE_SEPARATOR) ?
-            new IntelliJPathImpl(this.path + path.toPortableString()) :
-            new IntelliJPathImpl(this.path + FILE_SEPARATOR + path.toPortableString());
+        return this.path.endsWith(FILE_SEPARATOR) ? new IntelliJPathImpl(
+            this.path + path.toPortableString()) : new IntelliJPathImpl(
+            this.path + FILE_SEPARATOR + path.toPortableString());
     }
 
     @Override
@@ -113,31 +115,16 @@ public class IntelliJPathImpl implements IPath {
 
     @Override
     public IPath append(String path) {
-        return new IntelliJPathImpl(this.path.endsWith(FILE_SEPARATOR) ?
-            this.path + path :
-            this.path + FILE_SEPARATOR + path);
+        return new IntelliJPathImpl(
+            this.path.endsWith(FILE_SEPARATOR) ? this.path + path : this.path
+                + FILE_SEPARATOR + path);
     }
 
     @Override
     public IPath addTrailingSeparator() {
-        return path.endsWith(FILE_SEPARATOR) ?
-            new IntelliJPathImpl(path) :
-            new IntelliJPathImpl(path + FILE_SEPARATOR);
+        return path.endsWith(FILE_SEPARATOR) ? new IntelliJPathImpl(path)
+            : new IntelliJPathImpl(path + FILE_SEPARATOR);
 
-    }
-
-    @Override
-    public IPath addFileExtension(String extension) {
-        return new IntelliJPathImpl(path + "." + extension);
-    }
-
-    @Override
-    public IPath removeFileExtension() {
-        String path = this.path;
-        if (path.contains(".")) {
-            path = path.substring(0, path.lastIndexOf("."));
-        }
-        return new IntelliJPathImpl(path);
     }
 
     @Override
@@ -192,6 +179,7 @@ public class IntelliJPathImpl implements IPath {
         return sb.toString();
     }
 
+    @Override
     public String toString() {
         return path;
     }
