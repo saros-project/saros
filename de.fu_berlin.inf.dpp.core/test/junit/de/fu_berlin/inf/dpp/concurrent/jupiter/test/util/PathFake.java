@@ -88,27 +88,12 @@ public class PathFake implements IPath {
     }
 
     @Override
-    public boolean isEmpty() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public String[] segments() {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public IPath append(String path) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public IPath addTrailingSeparator() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public String getFileExtension() {
         throw new UnsupportedOperationException();
     }
 

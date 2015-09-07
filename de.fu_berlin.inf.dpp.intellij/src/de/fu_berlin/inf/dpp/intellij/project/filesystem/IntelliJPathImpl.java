@@ -102,11 +102,6 @@ public class IntelliJPathImpl implements IPath {
     }
 
     @Override
-    public boolean isEmpty() {
-        return new File(path).exists();
-    }
-
-    @Override
     public String[] segments() {
         String[] segmentCopy = new String[segments.length];
         System.arraycopy(segments, 0, segmentCopy, 0, segments.length);
@@ -118,23 +113,6 @@ public class IntelliJPathImpl implements IPath {
         return new IntelliJPathImpl(
             this.path.endsWith(FILE_SEPARATOR) ? this.path + path : this.path
                 + FILE_SEPARATOR + path);
-    }
-
-    @Override
-    public IPath addTrailingSeparator() {
-        return path.endsWith(FILE_SEPARATOR) ? new IntelliJPathImpl(path)
-            : new IntelliJPathImpl(path + FILE_SEPARATOR);
-
-    }
-
-    @Override
-    public String getFileExtension() {
-        String path = this.path;
-        if (path.contains(".")) {
-            path = path.substring(path.lastIndexOf("."));
-        }
-
-        return path;
     }
 
     @Override

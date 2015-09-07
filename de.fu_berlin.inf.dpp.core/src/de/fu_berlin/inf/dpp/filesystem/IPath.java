@@ -45,13 +45,9 @@ public interface IPath {
 
     public IPath removeLastSegments(int count);
 
-    public boolean isEmpty();
-
     public String[] segments();
 
     public IPath append(String path);
-
-    public IPath addTrailingSeparator();
 
     public IPath makeAbsolute();
 
@@ -62,7 +58,5 @@ public interface IPath {
     public String toOSString();
 
     public File toFile();
-
-    public String getFileExtension();
 
 }

@@ -65,11 +65,6 @@ public class EclipsePathImpl implements IPath {
     }
 
     @Override
-    public boolean isEmpty() {
-        return delegate.isEmpty();
-    }
-
-    @Override
     public String[] segments() {
         return delegate.segments();
     }
@@ -77,11 +72,6 @@ public class EclipsePathImpl implements IPath {
     @Override
     public IPath append(String path) {
         return new EclipsePathImpl(delegate.append(path));
-    }
-
-    @Override
-    public IPath addTrailingSeparator() {
-        return new EclipsePathImpl(delegate.addTrailingSeparator());
     }
 
     @Override
@@ -122,11 +112,6 @@ public class EclipsePathImpl implements IPath {
     @Override
     public String toString() {
         return delegate.toString();
-    }
-
-    @Override
-    public String getFileExtension() {
-        return delegate.getFileExtension();
     }
 
 }
