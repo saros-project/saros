@@ -22,12 +22,21 @@
 
 package de.fu_berlin.inf.dpp.core.util;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.zip.Adler32;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
+import org.picocontainer.annotations.Inject;
+
 import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
 import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IResourceAttributes;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
@@ -35,17 +44,6 @@ import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRunnable;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.util.Pair;
 import de.fu_berlin.inf.dpp.util.StackTrace;
-import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
-import org.picocontainer.annotations.Inject;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.concurrent.CancellationException;
-import java.util.zip.Adler32;
 
 public class FileUtils {
 
@@ -60,9 +58,10 @@ public class FileUtils {
 
     /**
      * Calculate Adler32 checksum for given file.
-     *
+     * 
      * @return checksum of file
-     * @throws IOException if checksum calculation has been failed.
+     * @throws IOException
+     *             if checksum calculation has been failed.
      */
     public static long checksum(IFile file) throws IOException {
 
@@ -93,10 +92,12 @@ public class FileUtils {
     /**
      * Makes the given file read-only (</code>readOnly == true</code>) or
      * writable (<code>readOnly == false</code>).
-     *
-     * @param file     the resource whose read-only attribute is to be set or removed
-     * @param readOnly <code>true</code> to set the given file to be read-only,
-     *                 <code>false</code> to make writable
+     * 
+     * @param file
+     *            the resource whose read-only attribute is to be set or removed
+     * @param readOnly
+     *            <code>true</code> to set the given file to be read-only,
+     *            <code>false</code> to make writable
      * @return The state before setting read-only to the given value.
      */
     public static boolean setReadOnly(IResource file, boolean readOnly) {
@@ -105,9 +106,8 @@ public class FileUtils {
 
         if (attributes == null) {
             // TODO Throw a FileNotFoundException and deal with it everywhere!
-            log.error(
-                "File does not exist for setting readOnly == " + readOnly + ": "
-                    + file, new StackTrace());
+            log.error("File does not exist for setting readOnly == " + readOnly
+                + ": " + file, new StackTrace());
             return false;
         }
         boolean result = attributes.isReadOnly();
@@ -122,8 +122,8 @@ public class FileUtils {
             file.setResourceAttributes(attributes);
         } catch (IOException e) {
             // failure is not an option
-            log.warn(
-                "Failed to set resource readonly == " + readOnly + ": " + file);
+            log.warn("Failed to set resource readonly == " + readOnly + ": "
+                + file);
         }
         return result;
     }
@@ -131,12 +131,15 @@ public class FileUtils {
     /**
      * Writes the given input stream to the given file.
      * <p/>
-     * This operation will removeAll a possible readOnly flag and re-set if after
-     * the operation.
-     *
-     * @param input the input stream to write to the file
-     * @param file  the file to create/overwrite
-     * @throws IOException if the file could not be written.
+     * This operation will removeAll a possible readOnly flag and re-set if
+     * after the operation.
+     * 
+     * @param input
+     *            the input stream to write to the file
+     * @param file
+     *            the file to create/overwrite
+     * @throws IOException
+     *             if the file could not be written.
      */
     public static void writeFile(InputStream input, IFile file,
         IProgressMonitor monitor) throws IOException {
@@ -149,51 +152,13 @@ public class FileUtils {
     }
 
     /**
-     * Move the file to the same location, adding the file extension "BACKUP" or
-     * "_BACKUP_X" on file name where X is a number that matches a not used file
-     * name.
-     *
-     * @param file    the {@link IFile} to rename
-     * @param monitor a progress monitor to show progress to user
-     * @throws IOException
-     * @throws CancellationException
-     */
-    public static void backupFile(IFile file, IProgressMonitor monitor)
-        throws CancellationException, IOException {
-
-        if (!file.exists()) {
-            throw new FileNotFoundException();
-        }
-
-        IProject project = file.getProject();
-
-        IPath originalBackupPath = file.getProjectRelativePath()
-            .addFileExtension("BACKUP");
-
-        IPath backupPath = originalBackupPath;
-
-        for (int i = 0; i < 1000; i++) {
-            if (!project.exists(backupPath)) {
-                break;
-            }
-
-            backupPath = originalBackupPath.removeFileExtension()
-                .addFileExtension("BACKUP_" + i);
-        }
-
-        file.move(file.getFullPath().removeLastSegments(1)
-            .append(backupPath.lastSegment()), true);
-
-    }
-
-    /**
      * Creates the given file and any missing parent directories.
      * <p/>
      * This method will try to removeAll read-only settings on the parent
      * directories and reset them at the end of the operation.
-     *
+     * 
      * @pre the file must not exist. Use writeFile() for getting this cases
-     * handled.
+     *      handled.
      */
     public static void createFile(final InputStream input, final IFile file,
         IProgressMonitor monitor) throws IOException {
@@ -232,7 +197,7 @@ public class FileUtils {
 
     /**
      * Updates the data in the file with the data from the given InputStream.
-     *
+     * 
      * @pre the file must exist
      */
     public static void updateFile(final InputStream input, final IFile file,
@@ -303,10 +268,10 @@ public class FileUtils {
 
                 folder.create(IResource.NONE, true);
 
-                //TODO: find out about exceptions that get thrown here
+                // TODO: find out about exceptions that get thrown here
                 // if (monitor.isCanceled()) {
-                //       log.warn("Creating folder failed: " + folder);
-                //  }
+                // log.warn("Creating folder failed: " + folder);
+                // }
 
             }
         };
@@ -361,19 +326,21 @@ public class FileUtils {
      * given {@link IPath}.
      * <p/>
      * This method excepts both variables to be relative to the workspace.
-     *
-     * @param destination Destination of moving the given resource.
-     * @param source      Resource, that is going to be moved
+     * 
+     * @param destination
+     *            Destination of moving the given resource.
+     * @param source
+     *            Resource, that is going to be moved
      */
     public static void move(final IPath destination, final IResource source)
         throws IOException {
 
-        log.trace(".move(" + destination.toOSString() + " , " + source.getName()
-            + ")");
+        log.trace(".move(" + destination.toOSString() + " , "
+            + source.getName() + ")");
 
         if (!source.isAccessible()) {
-            log.warn(".move Source file can not be accessed  " + source
-                .getFullPath());
+            log.warn(".move Source file can not be accessed  "
+                + source.getFullPath());
             return;
         }
 
@@ -439,14 +406,19 @@ public class FileUtils {
 
     /**
      * Calculates the total file count and size for all resources.
-     *
-     * @param resources      collection containing the resources that file sizes and file
-     *                       count should be calculated
-     * @param includeMembers <code>true</code> to include the members of resources that
-     *                       represents a {@linkplain IContainer container}
-     * @param flags          additional flags on how to process the members of containers
-     * @return a pair containing the {@linkplain de.fu_berlin.inf.dpp.util.Pair#p file size} and
-     * {@linkplain de.fu_berlin.inf.dpp.util.Pair#v file count} for the given resources
+     * 
+     * @param resources
+     *            collection containing the resources that file sizes and file
+     *            count should be calculated
+     * @param includeMembers
+     *            <code>true</code> to include the members of resources that
+     *            represents a {@linkplain IContainer container}
+     * @param flags
+     *            additional flags on how to process the members of containers
+     * @return a pair containing the
+     *         {@linkplain de.fu_berlin.inf.dpp.util.Pair#p file size} and
+     *         {@linkplain de.fu_berlin.inf.dpp.util.Pair#v file count} for the
+     *         given resources
      */
     public static Pair<Long, Long> getFileCountAndSize(
         Collection<? extends IResource> resources, boolean includeMembers,
@@ -462,13 +434,14 @@ public class FileUtils {
                 totalFileCount++;
 
                 try {
-                    long filesize = -1; //todo // EFS.getStore(resource.getLocationURI()).fetchInfo().getLength();
+                    long filesize = -1; // todo //
+                                        // EFS.getStore(resource.getLocationURI()).fetchInfo().getLength();
 
                     totalFileSize += filesize;
                 } catch (Exception e) {
-                    log.warn("failed to retrieve file size of file " + resource
-                            .getLocationURI(), e
-                    );
+                    log.warn(
+                        "failed to retrieve file size of file "
+                            + resource.getLocationURI(), e);
                 }
                 break;
             case IResource.PROJECT:
@@ -504,11 +477,11 @@ public class FileUtils {
 
     /**
      * Retrieves the content of a local file
-     *
+     * 
      * @param localFile
      * @return Byte array of the file contents. Is <code>null</code> if the file
-     * does not exist or is out of sync, the reference points to no
-     * file, or the conversion to a byte array failed.
+     *         does not exist or is out of sync, the reference points to no
+     *         file, or the conversion to a byte array failed.
      */
     public static byte[] getLocalFileContent(IFile localFile) {
 
@@ -517,8 +490,7 @@ public class FileUtils {
         try {
             in = localFile.getContents();
         } catch (IOException e) {
-            log.warn(
-                "could not get content of file " + localFile.getFullPath());
+            log.warn("could not get content of file " + localFile.getFullPath());
         }
 
         if (in == null) {
@@ -537,4 +509,3 @@ public class FileUtils {
     }
 
 }
-
