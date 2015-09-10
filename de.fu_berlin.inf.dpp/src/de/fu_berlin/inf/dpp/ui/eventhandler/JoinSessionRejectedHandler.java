@@ -44,11 +44,7 @@ public final class JoinSessionRejectedHandler {
     private void handleRejection(JID from,
         JoinSessionRejectedExtension extension) {
 
-        String name = XMPPUtils.getNickname(null, from);
-
-        if (name == null) {
-            name = from.getBase();
-        }
+        String name = XMPPUtils.getNickname(null, from, from.getBase());
 
         DialogUtils.openInformationMessageDialog(SWTUtils.getShell(),
             "Join Session Request Rejected",

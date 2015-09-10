@@ -290,10 +290,8 @@ public class SendFileAction extends Action implements Disposable {
         final long fileSize = request.getFileSize();
         final JID jid = new JID(request.getRequestor());
 
-        String nickname = XMPPUtils.getNickname(null, jid);
-
-        if (nickname == null)
-            nickname = new JID(request.getRequestor()).getBase();
+        String nickname = XMPPUtils.getNickname(null, jid,
+            new JID(request.getRequestor()).getBase());
 
         final boolean accept = MessageDialog.openQuestion(SWTUtils.getShell(),
             "File Transfer Request",

@@ -22,8 +22,15 @@
 
 package de.fu_berlin.inf.dpp.core.ui.eventhandler;
 
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
+
 import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.core.monitoring.IStatus;
 import de.fu_berlin.inf.dpp.core.monitoring.Status;
@@ -47,11 +54,6 @@ import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.INegotiationHandler;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import org.apache.log4j.Logger;
-
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This handler is responsible for presenting and running the session and
@@ -72,13 +74,7 @@ public class NegotiationHandler implements INegotiationHandler {
     }
 
     private static String getNickname(JID jid) {
-        String nickname = XMPPUtils.getNickname(null, jid);
-
-        if (nickname == null) {
-            nickname = jid.getBareJID().toString();
-        }
-
-        return nickname;
+        return XMPPUtils.getNickname(null, jid, jid.getBase());
     }
 
     @Override
@@ -125,7 +121,8 @@ public class NegotiationHandler implements INegotiationHandler {
 
     }
 
-    private void showIncomingProjectUI(final IncomingProjectNegotiation negotiation) {
+    private void showIncomingProjectUI(
+        final IncomingProjectNegotiation negotiation) {
 
         List<ProjectNegotiationData> pInfos = negotiation.getProjectInfos();
         final List<FileList> fileLists = new ArrayList<FileList>(pInfos.size());
@@ -266,7 +263,9 @@ public class NegotiationHandler implements INegotiationHandler {
                         new Runnable() {
                             @Override
                             public void run() {
-                                DialogUtils.showInfo(null,
+                                DialogUtils
+                                    .showInfo(
+                                        null,
                                         message,
                                         Messages.NegotiationHandler_project_sharing_canceled_text);
                             }

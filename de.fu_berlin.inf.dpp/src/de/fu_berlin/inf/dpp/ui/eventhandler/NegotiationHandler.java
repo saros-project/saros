@@ -51,14 +51,14 @@ public class NegotiationHandler implements INegotiationHandler {
         .getLogger(NegotiationHandler.class);
 
     /**
-     *
+     * 
      * OutgoingInvitationJob wraps the instance of
      * {@link OutgoingSessionNegotiation} and cares about handling the
      * exceptions like local or remote cancellation.
-     *
+     * 
      * It notifies the user about the progress using the Eclipse Jobs API and
      * interrupts the negotiation if the session closes.
-     *
+     * 
      */
     private class OutgoingInvitationJob extends Job {
 
@@ -280,7 +280,8 @@ public class NegotiationHandler implements INegotiationHandler {
                  *               the JoinSessionWizard, a dialog for the user to
                  *               decide whether to accept the invitation.
                  */
-                JoinSessionWizard sessionWizard = new JoinSessionWizard(negotiation);
+                JoinSessionWizard sessionWizard = new JoinSessionWizard(
+                    negotiation);
 
                 final WizardDialogAccessable wizardDialog = new WizardDialogAccessable(
                     SWTUtils.getShell(), sessionWizard);
@@ -296,7 +297,8 @@ public class NegotiationHandler implements INegotiationHandler {
         });
     }
 
-    private void showIncomingProjectUI(final IncomingProjectNegotiation negotiation) {
+    private void showIncomingProjectUI(
+        final IncomingProjectNegotiation negotiation) {
         List<ProjectNegotiationData> pInfos = negotiation.getProjectInfos();
         final List<FileList> fileLists = new ArrayList<FileList>(pInfos.size());
 
@@ -341,11 +343,6 @@ public class NegotiationHandler implements INegotiationHandler {
     }
 
     private static String getNickname(JID jid) {
-        String nickname = XMPPUtils.getNickname(null, jid);
-
-        if (nickname == null)
-            nickname = jid.getBareJID().toString();
-
-        return nickname;
+        return XMPPUtils.getNickname(null, jid, jid.getBase());
     }
 }

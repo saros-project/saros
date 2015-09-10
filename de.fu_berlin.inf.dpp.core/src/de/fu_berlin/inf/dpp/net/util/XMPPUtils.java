@@ -63,36 +63,43 @@ public class XMPPUtils {
      *            or <code>null</code> to use the default one
      * @param jid
      *            the JID to resolve the nickname for
+     * @param alternative
+     *            nickname to return if no nickname is available, can be
+     *            <code>null</code>
      * @return The nickname associated with the given JID in the current roster
-     *         or null if the current roster is not available or the nickname
-     *         has not been set.
+     *         or the <tt>alternative</tt> representation if the current roster
+     *         is not available or the nickname has not been set.
      */
     public static String getNickname(XMPPConnectionService connectionService,
-        JID jid) {
+        final JID jid, final String alternative) {
 
         if (connectionService == null)
             connectionService = defaultConnectionService;
 
         if (connectionService == null)
-            return null;
+            return alternative;
 
         Connection connection = connectionService.getConnection();
+
         if (connection == null)
-            return null;
+            return alternative;
 
         Roster roster = connection.getRoster();
+
         if (roster == null)
-            return null;
+            return alternative;
 
         RosterEntry entry = roster.getEntry(jid.getBase());
+
         if (entry == null)
-            return null;
+            return alternative;
 
         String nickName = entry.getName();
-        if (nickName != null && nickName.trim().length() > 0) {
+
+        if (nickName != null && nickName.trim().length() > 0)
             return nickName;
-        }
-        return null;
+
+        return alternative;
     }
 
     public static String getDisplayableName(RosterEntry entry) {

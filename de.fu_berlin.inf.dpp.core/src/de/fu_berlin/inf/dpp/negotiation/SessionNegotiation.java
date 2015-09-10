@@ -73,11 +73,9 @@ public abstract class SessionNegotiation extends Negotiation {
         this.description = description;
         sarosContext.initComponent(this);
 
-        String nickname = XMPPUtils.getNickname(
-            sarosContext.getComponent(XMPPConnectionService.class), peer);
-
-        peerNickname = nickname == null ? peer.getBareJID().toString()
-            : nickname;
+        peerNickname = XMPPUtils.getNickname(
+            sarosContext.getComponent(XMPPConnectionService.class), peer,
+            peer.getBase());
     }
 
     /**

@@ -41,10 +41,7 @@ public final class OutgoingFileTransferJob extends FileTransferJob {
     @Override
     protected IStatus run(IProgressMonitor monitor) {
 
-        String nickname = XMPPUtils.getNickname(null, jid);
-
-        if (nickname == null)
-            nickname = jid.getBase();
+        String nickname = XMPPUtils.getNickname(null, jid, jid.getBase());
 
         try {
             transfer.sendFile(file, file.getName());

@@ -15,8 +15,8 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.roster.IRosterListener;
 import de.fu_berlin.inf.dpp.net.xmpp.roster.AbstractRosterListener;
+import de.fu_berlin.inf.dpp.net.xmpp.roster.IRosterListener;
 import de.fu_berlin.inf.dpp.net.xmpp.roster.RosterTracker;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
@@ -110,10 +110,7 @@ public class ContactAvailabilityAction extends Action implements Disposable {
         if (message.isEmpty())
             return;
 
-        String nickname = XMPPUtils.getNickname(null, jid);
-
-        if (nickname == null)
-            nickname = jid.getRAW();
+        String nickname = XMPPUtils.getNickname(null, jid, jid.getRAW());
 
         MessageDialog.openInformation(SWTUtils.getShell(),
             "Unavailable Message for " + nickname, message);

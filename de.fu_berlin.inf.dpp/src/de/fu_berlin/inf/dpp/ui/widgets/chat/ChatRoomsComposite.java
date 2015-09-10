@@ -699,8 +699,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
             return Messages.ChatRoomsComposite_roundtable;
         else {
             JID jid = chat.getParticipants().iterator().next();
-            String nickname = XMPPUtils.getNickname(null, jid);
-            return nickname == null ? jid.getBase() : nickname;
+            return XMPPUtils.getNickname(null, jid, jid.getBase());
         }
     }
 }

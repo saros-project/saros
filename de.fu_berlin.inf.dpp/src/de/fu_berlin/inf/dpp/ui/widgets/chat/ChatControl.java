@@ -672,12 +672,7 @@ public final class ChatControl extends Composite {
          * which is always hard to read
          */
 
-        String name = XMPPUtils.getNickname(connectionService, jid);
-
-        if (name == null)
-            name = jid.getBase();
-
-        return name;
+        return XMPPUtils.getNickname(connectionService, jid, jid.getBase());
     }
 
     private Collection<JID> getChatJIDsFromHistory() {
