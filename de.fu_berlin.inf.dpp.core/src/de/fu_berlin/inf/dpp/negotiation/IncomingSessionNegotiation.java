@@ -126,22 +126,22 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
 
             /**
              * @JTourBusStop 9, Invitation Process:
-             *
+             * 
              *               This method is called by the JoinSessionWizard
              *               after the user clicked on "Finish" (indicating that
              *               he is willing to join the session).
-             *
+             * 
              *               (4b) Send acceptance to host.
-             *
+             * 
              *               (5a) Create "wishlist" with session's parameters
              *               (e.g. preferred color) and send it.
-             *
+             * 
              *               (6b) Wait for host's response.
-             *
+             * 
              *               (7) Initialize the session and related components
              *               (e.g. chat, color management) with the parameters
              *               as defined by the host.
-             *
+             * 
              *               (8) Start the session accordingly, inform the host
              *               and wait for his final acknowledgement (which
              *               indicates, that this client has been successfully
@@ -153,7 +153,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
             InvitationParameterExchangeExtension clientSessionPreferences;
             clientSessionPreferences = createClientSessionPreferences();
 
-            sendSessionPreferences(clientSessionPreferences);
+            sendSessionPreferences(clientSessionPreferences, monitor);
 
             InvitationParameterExchangeExtension actualSessionParameters;
             actualSessionParameters = awaitActualSessionParameters(monitor);
@@ -167,7 +167,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
              * will trigger the ClientSessionTimeoutHandler which will just
              * terminate the session !
              */
-            monitor.setTaskName("Negotiating data connection...");
+            monitor.setTaskName("Establishing connection...");
 
             connectionManager.connect(ISarosSession.SESSION_CONNECTION_ID,
                 getPeer());
@@ -220,10 +220,12 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
      * during the negotiation.
      */
     private void sendSessionPreferences(
-        InvitationParameterExchangeExtension parameters) {
+        InvitationParameterExchangeExtension parameters,
+        IProgressMonitor monitor) {
 
         LOG.debug(this + " : sending session negotiation data");
 
+        monitor.setTaskName("Sending session configuration data...");
         transmitter.sendPacketExtension(getPeer(),
             InvitationParameterExchangeExtension.PROVIDER.create(parameters));
     }
@@ -235,15 +237,16 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
     private InvitationParameterExchangeExtension awaitActualSessionParameters(
         IProgressMonitor monitor) throws SarosCancellationException {
 
-        LOG.debug(this + " : waiting for host's session parameters");
+        LOG.debug(this
+            + " : waiting for host's session negotiation configuration data");
 
-        monitor.setTaskName("Waiting for host's session parameters...");
+        monitor.setTaskName("Waiting for remote session configuration data...");
 
         Packet packet = collectPacket(invitationDataExchangeCollector,
             PACKET_TIMEOUT);
 
         if (packet == null)
-            throw new LocalCancellationException(peerNickname
+            throw new LocalCancellationException(getPeer()
                 + " does not respond. (Timeout)",
                 CancelOption.DO_NOT_NOTIFY_PEER);
 
@@ -338,11 +341,10 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
      */
     private void awaitFinalAcknowledgement(IProgressMonitor monitor)
         throws SarosCancellationException {
-        monitor.setTaskName("Waiting for " + peerNickname
-            + " to perform final initialization...");
+        monitor.setTaskName("Awaiting current session data...");
 
         if (collectPacket(invitationAcknowledgedCollector, PACKET_TIMEOUT) == null)
-            throw new LocalCancellationException(peerNickname
+            throw new LocalCancellationException(getPeer()
                 + " does not respond. (Timeout)",
                 CancelOption.DO_NOT_NOTIFY_PEER);
     }

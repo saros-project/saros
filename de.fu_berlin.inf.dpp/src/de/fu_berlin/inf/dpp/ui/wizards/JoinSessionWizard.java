@@ -37,6 +37,7 @@ import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelLocation;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
 import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
+import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
@@ -90,7 +91,8 @@ public class JoinSessionWizard extends Wizard {
     public JoinSessionWizard(IncomingSessionNegotiation isn) {
         this.isn = isn;
 
-        setWindowTitle(Messages.JoinSessionWizard_title);
+        setWindowTitle(Messages.JoinSessionWizard_title + " from "
+            + getNickname(isn.getPeer()) + " (" + isn.getPeer().getRAW() + ")");
         setHelpAvailable(false);
         setNeedsProgressMonitor(true);
 
@@ -245,7 +247,7 @@ public class JoinSessionWizard extends Wizard {
     private void showCancelMessage(JID jid, String errorMsg,
         CancelLocation cancelLocation) {
 
-        String peer = jid.getBase();
+        String nickname = getNickname(jid);
 
         Shell shell = SWTUtils.getShell();
 
@@ -261,7 +263,7 @@ public class JoinSessionWizard extends Wizard {
                 DialogUtils.openErrorMessageDialog(shell,
 
                 Messages.JoinSessionWizard_inv_canceled, MessageFormat.format(
-                    Messages.JoinSessionWizard_inv_canceled_text2, peer,
+                    Messages.JoinSessionWizard_inv_canceled_text2, nickname,
                     errorMsg));
             }
         } else {
@@ -272,8 +274,12 @@ public class JoinSessionWizard extends Wizard {
                 DialogUtils.openInformationMessageDialog(shell,
                     Messages.JoinSessionWizard_inv_canceled, MessageFormat
                         .format(Messages.JoinSessionWizard_inv_canceled_text3,
-                            peer));
+                            nickname));
             }
         }
+    }
+
+    private static String getNickname(JID jid) {
+        return XMPPUtils.getNickname(null, jid, jid.getBase());
     }
 }

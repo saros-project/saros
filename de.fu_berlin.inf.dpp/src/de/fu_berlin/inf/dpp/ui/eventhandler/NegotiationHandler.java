@@ -66,9 +66,12 @@ public class NegotiationHandler implements INegotiationHandler {
         private String peer;
 
         public OutgoingInvitationJob(OutgoingSessionNegotiation negotiation) {
+
             super(MessageFormat.format(
                 Messages.NegotiationHandler_inviting_user,
-                getNickname(negotiation.getPeer())));
+                getNickname(negotiation.getPeer()), negotiation.getPeer()
+                    .getRAW()));
+
             this.negotiation = negotiation;
             this.peer = negotiation.getPeer().getBase();
 

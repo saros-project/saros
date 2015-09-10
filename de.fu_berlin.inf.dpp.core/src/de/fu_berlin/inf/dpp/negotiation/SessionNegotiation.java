@@ -29,9 +29,7 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
 import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
-import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 
 /**
@@ -62,8 +60,6 @@ public abstract class SessionNegotiation extends Negotiation {
 
     protected final String description;
 
-    protected final String peerNickname;
-
     protected ISarosSession sarosSession;
 
     public SessionNegotiation(final String id, final JID peer,
@@ -72,10 +68,6 @@ public abstract class SessionNegotiation extends Negotiation {
 
         this.description = description;
         sarosContext.initComponent(this);
-
-        peerNickname = XMPPUtils.getNickname(
-            sarosContext.getComponent(XMPPConnectionService.class), peer,
-            peer.getBase());
     }
 
     /**
