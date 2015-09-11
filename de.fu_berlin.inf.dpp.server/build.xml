@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+
+<project name="saros-server"
+         default="test"
+         xmlns:ivy="antlib:org.apache.ivy.ant">
+
+    <property environment="env"/>
+    <property name="ivy.install.version" value="2.4.0"/>
+
+    <property name="core.basedirname" value="de.fu_berlin.inf.dpp.core"/>
+    <property name="core.basedir" value="${basedir}/../${core.basedirname}"/>
+    <property name="core.srcdir" value="${core.basedir}/src"/>
+    <property name="core.libdir" value="${core.basedir}/lib"/>
+    <property name="core.testlibdir" value="${core.basedir}/test/lib"/>
+
+    <property name="server.srcdir" value="${basedir}/src"/>
+    <property name="server.testdir" value="${basedir}/test/junit"/>
+    <property name="server.builddir" value="${basedir}/bin"/>
+    <property name="server.reportdir" value="${basedir}/report"/>
+    <property name="server.reportdir.junit" value="${server.reportdir}/junit"/>
+    <property name="server.libdir" value="${basedir}/lib"/>
+
+    <target name="resolve" depends="init-ivy">
+        <ivy:retrieve/>
+    </target>
+
+    <target name="build" depends="resolve">
+        <mkdir dir="${server.builddir}"/>
+        <javac destdir="${server.builddir}" includeantruntime="false">
+            <src>
+                <pathelement path="${core.srcdir}"/>
+                <pathelement path="${server.srcdir}"/>
+            </src>
+            <classpath>
+                <fileset dir="${core.libdir}" includes="*.jar"/>
+            </classpath>
+        </javac>
+        <javac destdir="${server.builddir}" includeantruntime="false">
+            <src>
+                <pathelement path="${server.testdir}"/>
+            </src>
+            <classpath>
+                <pathelement path="${server.builddir}"/>
+                <fileset dir="${core.libdir}" includes="*.jar"/>
+                <fileset dir="${core.testlibdir}" includes="*.jar"/>
+                <fileset dir="${server.libdir}" includes="*.jar"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="test" depends="build">
+        <mkdir dir="${server.reportdir.junit}"/>
+        <junit printsummary="yes">
+            <formatter type="xml"/>
+            <classpath>
+                <pathelement path="${server.builddir}"/>
+                <fileset dir="${core.libdir}" includes="*.jar"/>
+                <fileset dir="${core.testlibdir}" includes="*.jar"/>
+                <fileset dir="${server.libdir}" includes="*.jar"/>
+            </classpath>
+            <batchtest todir="${server.reportdir.junit}">
+                <fileset dir="${server.builddir}" includes="**/*Test.class"/>
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="clean">
+      <delete dir="${server.builddir}"/>
+      <delete dir="${server.reportdir.junit}"/>
+    </target>
+
+    <!--
+        Apache Ivy Auto-Installation
+        https://ant.apache.org/ivy/history/latest-milestone/install.html
+    -->
+
+    <condition property="ivy.home" value="${env.IVY_HOME}">
+        <isset property="env.IVY_HOME" />
+    </condition>
+    <property name="ivy.home" value="${user.home}/.ant"/>
+    <property name="ivy.jar.dir" value="${ivy.home}/lib"/>
+    <property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar"/>
+
+    <target name="download-ivy" unless="offline">
+        <mkdir dir="${ivy.jar.dir}"/>
+        <get src="https://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar"
+             dest="${ivy.jar.file}"
+             usetimestamp="true"/>
+    </target>
+
+    <target name="init-ivy" depends="download-ivy">
+        <path id="ivy.lib.path">
+            <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
+        </path>
+        <taskdef resource="org/apache/ivy/ant/antlib.xml"
+                 uri="antlib:org.apache.ivy.ant"
+                 classpathref="ivy.lib.path"/>
+    </target>
+</project>

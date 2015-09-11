@@ -5,6 +5,8 @@ bin_test/
 */.idea/workspace.xml
 */.idea/copyright/profiles_settings.xml
 /de.fu_berlin.inf.dpp.intellij/build.properties
+/de.fu_berlin.inf.dpp.server/lib/
+/de.fu_berlin.inf.dpp.server/report/
 /de.fu_berlin.inf.dpp.ui/lib/swt-src.zip
 /de.fu_berlin.inf.dpp.ui/lib/swt-debug.jar
 /de.fu_berlin.inf.dpp.ui.frontend/html/node_modules/

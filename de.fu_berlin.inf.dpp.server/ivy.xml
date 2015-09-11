@@ -1,0 +1,9 @@
+<ivy-module version="2.0">
+    <info organisation="de.fu_berlin.inf.dpp" module="server"/>
+    <configurations>
+        <conf name="test"/>
+    </configurations>
+    <dependencies>
+        <dependency org="junit" name="junit" rev="4.11" conf="test->default"/>
+    </dependencies>
+</ivy-module>
