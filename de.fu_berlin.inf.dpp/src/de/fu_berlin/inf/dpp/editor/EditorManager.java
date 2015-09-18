@@ -281,9 +281,9 @@ public class EditorManager extends AbstractActivityProducer implements
         @Override
         public void userFinishedProjectNegotiation(User user) {
 
-            // TODO The user should be able to ask us for this state
-
             // Send awareness information
+
+            // TODO The user should be able to ask for this
             User localUser = session.getLocalUser();
             for (SPath path : getLocallyOpenEditors()) {
                 fireActivity(new EditorActivity(localUser, Type.ACTIVATED, path));
@@ -882,32 +882,23 @@ public class EditorManager extends AbstractActivityProducer implements
 
         {
             /**
-             * Check if source is an observed user with
-             * {@link User.Permission#WRITE_ACCESS} and his cursor is outside
-             * the viewport.
+             * Check if the activity source is a followed user with his cursor
+             * is outside the viewport.
              */
-            ITextSelection userWithWriteAccessSelection = remoteEditorManager
-                .getSelection(user);
+            ITextSelection selection = remoteEditorManager.getSelection(user);
             /**
-             * user with {@link User.Permission#WRITE_ACCESS} selection can be
-             * null if ViewportActivity came before the first
-             * TextSelectActivity.
+             * selection can be null if the {@link ViewportActivity} came before
+             * the first {@link TextSelectionActivity}
              */
-            if (userWithWriteAccessSelection != null) {
-                /**
-                 * TODO MR Taking the last line of the last selection of the
-                 * user with {@link User.Permission#WRITE_ACCESS} might be a bit
-                 * inaccurate.
-                 */
-                int userWithWriteAccessCursor = userWithWriteAccessSelection
-                    .getEndLine();
+            if (selection != null) {
+                // TODO Taking the selection's last line might be inaccurate
+                int cursor = selection.getEndLine();
 
                 int top = viewport.getStartLine();
                 int bottom = viewport.getStartLine()
                     + viewport.getNumberOfLines();
 
-                following = following
-                    && (userWithWriteAccessCursor < top || userWithWriteAccessCursor > bottom);
+                following = following && (cursor < top || cursor > bottom);
             }
         }
 
