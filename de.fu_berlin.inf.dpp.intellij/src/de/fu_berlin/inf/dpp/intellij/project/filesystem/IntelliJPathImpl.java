@@ -69,6 +69,11 @@ public class IntelliJPathImpl implements IPath {
     }
 
     @Override
+    public String segment(int index) {
+        return (index >= 0 && index < segments.length) ? segments[index] : null;
+    }
+
+    @Override
     public String lastSegment() {
         return segments[segments.length - 1];
     }

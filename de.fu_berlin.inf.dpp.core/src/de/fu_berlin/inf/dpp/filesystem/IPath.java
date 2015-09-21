@@ -33,6 +33,8 @@ public interface IPath {
 
     public IPath append(IPath path);
 
+    public String segment(int index);
+
     public String lastSegment();
 
     public boolean hasTrailingSeparator();

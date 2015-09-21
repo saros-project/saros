@@ -40,6 +40,11 @@ public class EclipsePathImpl implements IPath {
     }
 
     @Override
+    public String segment(int index) {
+        return delegate.segment(index);
+    }
+
+    @Override
     public String lastSegment() {
         return delegate.lastSegment();
     }

@@ -63,6 +63,11 @@ public class PathFake implements IPath {
     }
 
     @Override
+    public String segment(int index) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public String lastSegment() {
         throw new UnsupportedOperationException();
     }
