@@ -124,6 +124,7 @@ public class IntelliJFolderImpl extends IntelliJResourceImpl implements IFolder 
         return null;
     }
 
+    @Override
     public IPath getLocation() {
         return this.getFullPath();
     }

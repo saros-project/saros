@@ -55,16 +55,6 @@ public class EclipseFileImpl extends EclipseResourceImpl implements IFile {
         }
     }
 
-    @Override
-    public IPath getLocation() {
-        org.eclipse.core.runtime.IPath location = getDelegate().getLocation();
-
-        if (location == null)
-            return null;
-
-        return new EclipsePathImpl(location);
-    }
-
     /**
      * Returns the original {@link org.eclipse.core.resources.IFile IFile}
      * object.

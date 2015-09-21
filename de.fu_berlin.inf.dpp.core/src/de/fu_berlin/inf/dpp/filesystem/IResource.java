@@ -68,6 +68,8 @@ public interface IResource {
     public void setResourceAttributes(IResourceAttributes attributes)
         throws IOException;
 
+    public IPath getLocation();
+
     public URI getLocationURI();
 
     public Object getAdapter(Class<? extends IResource> clazz);
