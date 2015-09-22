@@ -272,37 +272,28 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
 
         monitor.setTaskName("Initializing session...");
 
-        // HACK (Part 1/3)
+        // HACK
         int clientColor = UserColorID.UNKNOWN;
         int hostFavoriteColor = UserColorID.UNKNOWN;
-
-        // HACK (Part 2/3)
-
-        // TODO Remove these two variables
-        String clientNickname = null;
-        String hostNickname = null;
 
         for (ISessionNegotiationHook hook : hookManager.getHooks()) {
             Map<String, String> settings = parameters.getHookSettings(hook);
             hook.applyActualParameters(settings);
 
-            // HACK (Part 2½/3)
             if (settings == null)
                 continue;
 
-            // HACK (Part 3/3)
             if (hook instanceof ColorNegotiationHook) {
                 clientColor = Integer.parseInt(settings
                     .get(ColorNegotiationHook.KEY_CLIENT_COLOR));
                 hostFavoriteColor = Integer.parseInt(settings
                     .get(ColorNegotiationHook.KEY_HOST_FAV_COLOR));
             }
-
         }
+        // end of HACK
 
         sarosSession = sessionManager.joinSession(sessionID,
-            parameters.getSessionHost(), clientNickname, hostNickname,
-            clientColor, hostFavoriteColor);
+            parameters.getSessionHost(), clientColor, hostFavoriteColor);
     }
 
     /**

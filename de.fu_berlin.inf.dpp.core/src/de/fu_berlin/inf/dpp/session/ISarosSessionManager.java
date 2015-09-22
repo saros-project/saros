@@ -39,14 +39,11 @@ public interface ISarosSessionManager {
      * 
      * @param host
      *            the host of the session.
-     * @return the new Saros session.
      * 
-     *         TODO remove clientNickname and hostNickname parameters (are
-     *         always null, anyway)
+     * @return the new Saros session.
      */
     public ISarosSession joinSession(final String id, JID host,
-        String clientNickname, String hostNickname, int clientColor,
-        int hostColor);
+        int clientColor, int hostColor);
 
     /**
      * Leaves the currently active session. If the local user is the host, this

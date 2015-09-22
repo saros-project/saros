@@ -271,8 +271,7 @@ public class SarosSessionManager implements ISarosSessionManager {
     // FIXME offer a startSession method for the client and host !
     @Override
     public ISarosSession joinSession(String id, JID host,
-        String clientNickname, String hostNickname, int clientColor,
-        int hostColor) {
+        int clientColor, int hostColor) {
 
         assert getSarosSession() == null;
 
