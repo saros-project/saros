@@ -20,7 +20,7 @@ import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 import de.fu_berlin.inf.dpp.stf.test.Constants;
 
-public class NonHostInvitesBuddyTest extends StfTestCase {
+public class NonHostInvitesContactTest extends StfTestCase {
 
     /**
      * Preconditions:

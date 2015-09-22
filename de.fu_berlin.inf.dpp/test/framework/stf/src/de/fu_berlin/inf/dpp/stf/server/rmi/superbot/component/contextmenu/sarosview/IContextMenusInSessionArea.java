@@ -15,13 +15,13 @@ public interface IContextMenusInSessionArea extends IContextMenusInSarosView {
      **********************************************/
 
     /**
-     * Grant the selected buddy a write access by clicking his contextMenu
+     * Grant the selected participant a write access by clicking his contextMenu
      * {@link StfRemoteObject#CM_GRANT_WRITE_ACCESS}.
      */
     public void grantWriteAccess() throws RemoteException;
 
     /**
-     * Restrict the selected buddy to read only access by clicking his
+     * Restrict the selected participant to read only access by clicking his
      * contextMenu {@link StfRemoteObject#CM_RESTRICT_TO_READ_ONLY_ACCESS}
      * 
      * @throws RemoteException
@@ -29,7 +29,7 @@ public interface IContextMenusInSessionArea extends IContextMenusInSarosView {
     public void restrictToReadOnlyAccess() throws RemoteException;
 
     /**
-     * Follow the selected buddy by clicking his contextMenu
+     * Follow the selected participant by clicking his contextMenu
      * {@link StfRemoteObject#CM_FOLLOW_PARTICIPANT}
      * 
      * @throws RemoteException
@@ -37,7 +37,7 @@ public interface IContextMenusInSessionArea extends IContextMenusInSarosView {
     public void followParticipant() throws RemoteException;
 
     /**
-     * Stop following the selected buddy by clicking his contextMenu
+     * Stop following the selected participant by clicking his contextMenu
      * {@link StfRemoteObject#CM_STOP_FOLLOWING}
      * 
      * @throws RemoteException
@@ -45,37 +45,39 @@ public interface IContextMenusInSessionArea extends IContextMenusInSarosView {
     public void stopFollowing() throws RemoteException;
 
     /**
-     * Jump to the position of the selected buddy by clicking his contextMenu
-     * {@link StfRemoteObject#CM_JUMP_TO_POSITION_SELECTED_BUDDY}
+     * Jump to the position of the selected participant by clicking his
+     * contextMenu {@link StfRemoteObject#CM_JUMP_TO_POSITION_OF_PARTICIPANT}
      * 
      * @throws RemoteException
      */
-    public void jumpToPositionOfSelectedBuddy() throws RemoteException;
+    public void jumpToPositionOfSelectedParticipant() throws RemoteException;
 
     public void addProjects(String... projectNames) throws RemoteException;
 
-    public void addBuddies(String... jidOfInvitees) throws RemoteException;
+    public void addContactsToSession(String... jidOfInvitees)
+        throws RemoteException;
 
     public void shareProjects(String projectName, JID... jids)
         throws RemoteException;
 
     /**
      * 
-     * @return<tt>true</tt>, if the selected buddy has write access.
+     * @return<tt>true</tt>, if the selected participant has write access.
      * @throws RemoteException
      */
     public boolean hasWriteAccess() throws RemoteException;
 
     /**
      * 
-     * @return<tt>true</tt>, if the selected buddy has read only access.
+     * @return<tt>true</tt>, if the selected participant has read only access.
      * @throws RemoteException
      */
     public boolean hasReadOnlyAccess() throws RemoteException;
 
     /**
      * 
-     * @return<tt>true</tt>, if the local user is following the selected buddy
+     * @return<tt>true</tt>, if the local user is following the selected
+     *                       participant
      * @throws RemoteException
      */
     public boolean isFollowing() throws RemoteException;

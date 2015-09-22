@@ -67,7 +67,7 @@ public final class ContextMenusInContactListArea extends
     public void addContact(JID jid) throws RemoteException {
         if (!sarosView.isInContactList(jid)) {
             getTreeItem().select();
-            ContextMenuHelper.clickContextMenu(tree, "Add Buddy...");
+            ContextMenuHelper.clickContextMenu(tree, CM_ADD_CONTACT);
             SuperBot.getInstance().confirmShellAddContact(jid);
             // wait for tree update in saros session view
             new SWTBot().sleep(500);

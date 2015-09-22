@@ -14,7 +14,7 @@ import de.fu_berlin.inf.dpp.ui.wizards.AddResourcesToSessionWizard;
  * opening {@link AddResourcesToSessionWizard} to the running
  * {@link ISarosSession}.
  */
-public class SessionAddBuddiesHandler extends AbstractHandler {
+public class SessionAddContactsHandler extends AbstractHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {

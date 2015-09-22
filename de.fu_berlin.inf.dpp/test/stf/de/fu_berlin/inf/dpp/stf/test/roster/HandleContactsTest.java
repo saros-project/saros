@@ -34,24 +34,21 @@ public class HandleContactsTest extends StfTestCase {
         resetContacts();
     }
 
-    // FIXME these testAddContact assumes that testRemoveContact succeeds
-    // FIXME all the other tests in the suite would fail if testAddContact fails
-
     /**
      * Steps:
      * <ol>
-     * <li>BOB delete buddy ALICE.</li>
+     * <li>BOB deletes contact ALICE.</li>
      * </ol>
      * 
      * Result:
      * <ol>
-     * <li>BOB and ALICE don't contact each other.</li>
+     * <li>BOB and ALICE are not each other's contacts.</li>
      * </ol>
      * 
      * @throws RemoteException
      */
     @Test
-    public void testBobRemoveBuddyAlice() throws Exception {
+    public void testBobRemoveContactAlice() throws Exception {
         assertTrue(ALICE.superBot().views().sarosView()
             .isInContactList(BOB.getJID()));
         assertTrue(BOB.superBot().views().sarosView()
@@ -66,18 +63,18 @@ public class HandleContactsTest extends StfTestCase {
     /**
      * Steps:
      * <ol>
-     * <li>ALICE delete buddy BOB.</li>
+     * <li>ALICE deletes contact BOB.</li>
      * </ol>
      * 
      * Result:
      * <ol>
-     * <li>BOB and ALICE don't contact each other.</li>
+     * <li>BOB and ALICE are not each other's contacts.</li>
      * </ol>
      * 
      * @throws RemoteException
      */
     @Test
-    public void testAliceRemoveBuddyBob() throws Exception {
+    public void testAliceRemoveContactBob() throws Exception {
         assertTrue(ALICE.superBot().views().sarosView()
             .isInContactList(BOB.getJID()));
         assertTrue(BOB.superBot().views().sarosView()
@@ -92,18 +89,18 @@ public class HandleContactsTest extends StfTestCase {
     /**
      * Steps:
      * <ol>
-     * <li>ALICE delete buddy BOB first and then add BOB.</li>
+     * <li>ALICE deletes contact BOB first and then adds BOB.</li>
      * </ol>
      * 
      * Result:
      * <ol>
-     * <li>BOB and ALICE contact each other.</li>
+     * <li>BOB and ALICE are each other's contacts.</li>
      * </ol>
      * 
      * @throws RemoteException
      */
     @Test
-    public void testAliceAddBuddyBob() throws Exception {
+    public void testAliceAddContactBob() throws Exception {
         Util.removeTestersFromContactList(ALICE, BOB);
         Util.addTestersToContactList(ALICE, BOB);
         assertTrue(BOB.superBot().views().sarosView()
@@ -115,18 +112,18 @@ public class HandleContactsTest extends StfTestCase {
     /**
      * Steps:
      * <ol>
-     * <li>BOB delete buddy ALICE first and then add ALICE again.</li>
+     * <li>BOB deletes contact ALICE first and then adds ALICE again.</li>
      * </ol>
      * 
      * Result:
      * <ol>
-     * <li>BOB and ALICE contact each other.</li>
+     * <li>BOB and ALICE are each other's contacts.</li>
      * </ol>
      * 
      * @throws RemoteException
      */
     @Test
-    public void testBobAddBuddyAlice() throws Exception {
+    public void testBobAddContactAlice() throws Exception {
         Util.removeTestersFromContactList(BOB, ALICE);
         Util.addTestersToContactList(BOB, ALICE);
         assertTrue(BOB.superBot().views().sarosView()
@@ -138,8 +135,8 @@ public class HandleContactsTest extends StfTestCase {
     /**
      * Steps:
      * <ol>
-     * <li>ALICE click toolbar button "Add a new contact".</li>
-     * <li>ALICE enter invalid contact name in the popup window "New contact"</li>
+     * <li>ALICE clicks toolbar button "Add a new contact".</li>
+     * <li>ALICE enters invalid contact name in the popup window "New contact"</li>
      * </ol>
      * 
      * Result:

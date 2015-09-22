@@ -16,15 +16,15 @@ import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 import de.fu_berlin.inf.dpp.stf.test.Constants;
 
-public class BuddiesByAliceBobTest extends StfTestCase {
+public class ContactsByAliceBobTest extends StfTestCase {
 
     /**
      * Preconditions:
      * <ol>
      * <li>Alice (Host, Write Access)</li>
      * <li>Bob (Read-Only Access)</li>
-     * <li>Car (Read-Only Access)</li>
-     * <li>Alice share a java project with BOB</li>
+     * <li>Carl (Read-Only Access)</li>
+     * <li>Alice shares a java project with BOB</li>
      * </ol>
      * 
      * @throws RemoteException
@@ -43,10 +43,10 @@ public class BuddiesByAliceBobTest extends StfTestCase {
     }
 
     @Test
-    public void testAddExistingBuddy() throws RemoteException {
+    public void testAddExistingContact() throws RemoteException {
         assertTrue(ALICE.superBot().views().sarosView()
             .isInContactList(BOB.getJID()));
-        ALICE.superBot().views().sarosView().selectBuddies()
+        ALICE.superBot().views().sarosView().selectContacts()
             .addContact(BOB.getJID());
         assertTrue(ALICE.superBot().views().sarosView()
             .isInContactList(BOB.getJID()));
@@ -55,14 +55,14 @@ public class BuddiesByAliceBobTest extends StfTestCase {
     /**
      * Steps:
      * <ol>
-     * <li>ALICE rename BOB to "BOB_stf".</li>
-     * <li>ALICE rename BOB to "new BOB".</li>
+     * <li>ALICE renames BOB to "BOB_stf".</li>
+     * <li>ALICE renames BOB to "new BOB".</li>
      * </ol>
      * 
      * Result:
      * <ol>
-     * <li>ALICE hat contact with BOB and BOB'name is changed.</li>
-     * <li>ALICE hat contact with BOB and BOB'name is changed.</li>
+     * <li>ALICE has contact with BOB and BOB's name is changed.</li>
+     * <li>ALICE has contact with BOB and BOB's name is changed.</li>
      * </ol>
      * 
      * @throws RemoteException
@@ -72,7 +72,7 @@ public class BuddiesByAliceBobTest extends StfTestCase {
      *             test case.
      */
     @Test
-    public void renameBuddy() throws RemoteException {
+    public void renameContact() throws RemoteException {
         assertTrue(ALICE.superBot().views().sarosView()
             .isInContactList(BOB.getJID()));
         ALICE.superBot().views().sarosView().selectContact(BOB.getJID())
@@ -92,7 +92,7 @@ public class BuddiesByAliceBobTest extends StfTestCase {
     }
 
     @Test
-    public void addBuddy() throws Exception {
+    public void addContact() throws Exception {
         Util.removeTestersFromContactList(ALICE, BOB);
         assertFalse(ALICE.superBot().views().sarosView()
             .isInContactList(BOB.getJID()));
@@ -108,7 +108,7 @@ public class BuddiesByAliceBobTest extends StfTestCase {
     /**
      * Steps:
      * <ol>
-     * <li>ALICE delete BOB</li>
+     * <li>ALICE deletes BOB</li>
      * </ol>
      * 
      * Result:
@@ -119,7 +119,7 @@ public class BuddiesByAliceBobTest extends StfTestCase {
      * @throws RemoteException
      */
     @Test
-    public void deleteBuddy() throws Exception {
+    public void deleteContact() throws Exception {
         assertTrue(ALICE.superBot().views().sarosView()
             .isInContactList(BOB.getJID()));
         Util.removeTestersFromContactList(ALICE, BOB);

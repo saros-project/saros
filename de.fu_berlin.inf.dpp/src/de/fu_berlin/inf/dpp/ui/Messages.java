@@ -318,7 +318,7 @@ public class Messages extends NLS {
     public static String ProjectSelectionWizardPage_selected_no_project;
     public static String ProjectSelectionWizardPage_title;
 
-    public static String SessionWithBuddies_menuItem_no_contacts_available_text;
+    public static String SessionWithContacts_menuItem_no_contacts_available_text;
     public static String SessionWithProjects_no_projects_in_workspace;
 
     public static String RenameContactAction_new_nickname_dialog_title;

@@ -17,7 +17,7 @@ import de.fu_berlin.inf.dpp.ui.util.selection.retriever.impl.SelectionRetriever;
  * For example,
  * 
  * <pre>
- * List&lt;JID&gt; buddies = SelectionRetrieverFactory.getSelectionRetriever(JID.class)
+ * List&lt;JID&gt; contacts = SelectionRetrieverFactory.getSelectionRetriever(JID.class)
  *     .getSelection();
  * </pre>
  * 

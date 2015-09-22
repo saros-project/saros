@@ -16,7 +16,7 @@ import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 import de.fu_berlin.inf.dpp.stf.test.Constants;
 
-public class InviteBuddiesByAliceBobCarlTest extends StfTestCase {
+public class InviteContactsByAliceBobCarlTest extends StfTestCase {
 
     @BeforeClass
     public static void selectTesters() throws Exception {
@@ -39,7 +39,7 @@ public class InviteBuddiesByAliceBobCarlTest extends StfTestCase {
      * @throws InterruptedException
      */
     @Test
-    public void inviteBuddy() throws Exception {
+    public void inviteContact() throws Exception {
         Util.setUpSessionWithJavaProjectAndClass(Constants.PROJECT1,
             Constants.PKG1, Constants.CLS1, ALICE, BOB);
 

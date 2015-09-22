@@ -28,23 +28,22 @@ import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 
 /**
- * This class fills a {@link Menu} with {@link MenuItem}s. Each {@link MenuItem}
- * represents a contact with Saros support. A click starts a session
- * negotiation.
+ * This class fills a {@link Menu} with {@link MenuItem}s. Each entry represents
+ * a contact with Saros support. A click starts a session negotiation.
  */
-public class ProjectShareBuddies extends ContributionItem {
+public class StartSessionWithContacts extends ContributionItem {
 
     @Inject
-    protected XMPPConnectionService connectionService;
+    private XMPPConnectionService connectionService;
 
     @Inject
-    protected DiscoveryManager discoveryManager;
+    private DiscoveryManager discoveryManager;
 
-    public ProjectShareBuddies() {
+    public StartSessionWithContacts() {
         this(null);
     }
 
-    public ProjectShareBuddies(String id) {
+    public StartSessionWithContacts(String id) {
         super(id);
         SarosPluginContext.initComponent(this);
     }
@@ -76,10 +75,8 @@ public class ProjectShareBuddies extends ContributionItem {
 
     /**
      * Returns a sorted array of {@link Roster}'s contacts.
-     * 
-     * @return
      */
-    protected RosterEntry[] getSortedRosterEntries() {
+    private RosterEntry[] getSortedRosterEntries() {
         RosterEntry[] rosterEntries = connectionService.getRoster()
             .getEntries().toArray(new RosterEntry[0]);
 
@@ -97,14 +94,8 @@ public class ProjectShareBuddies extends ContributionItem {
     /**
      * Creates a menu entry which shares projects with the given
      * {@link RosterEntry}.
-     * 
-     * @param parentMenu
-     * @param index
-     * @param rosterEntry
-     * @param resources
-     * @return
      */
-    protected MenuItem createContactMenuItem(Menu parentMenu, int index,
+    private MenuItem createContactMenuItem(Menu parentMenu, int index,
         final RosterEntry rosterEntry, final List<IResource> resources) {
 
         /*
@@ -129,17 +120,13 @@ public class ProjectShareBuddies extends ContributionItem {
     }
 
     /**
-     * Creates a menu entry which indicates that no Saros enabled contacts are
+     * Creates a menu entry which indicates that no contacts with Saros are
      * online.
-     * 
-     * @param parentMenu
-     * @param index
-     * @return
      */
-    protected MenuItem createInvalidContactsMenuItem(Menu parentMenu, int index) {
+    private MenuItem createInvalidContactsMenuItem(Menu parentMenu, int index) {
         MenuItem menuItem = new MenuItem(parentMenu, SWT.NONE, index);
         menuItem
-            .setText(Messages.SessionWithBuddies_menuItem_no_contacts_available_text);
+            .setText(Messages.SessionWithContacts_menuItem_no_contacts_available_text);
         menuItem.setEnabled(false);
         return menuItem;
     }

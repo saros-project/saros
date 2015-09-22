@@ -46,7 +46,7 @@ import java.awt.event.ActionListener;
  * FIXME: Replace by IDEA toolbar class.
  */
 public class SarosToolbar extends JToolBar {
-    public static final String ADD_CONTACT_ICON_PATH = "/icons/famfamfam/buddy_add_tsk.png";
+    public static final String ADD_CONTACT_ICON_PATH = "/icons/famfamfam/contact_add_tsk.png";
     public static final String OPEN_REFS_ICON_PATH = "/icons/famfamfam/test_con.gif";
 
     private final SessionAndContactsTreeView sarosTree;

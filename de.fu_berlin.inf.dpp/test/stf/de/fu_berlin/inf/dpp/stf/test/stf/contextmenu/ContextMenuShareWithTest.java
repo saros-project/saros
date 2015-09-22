@@ -24,7 +24,7 @@ public class ContextMenuShareWithTest extends StfTestCase {
     }
 
     @Test
-    public void testShareWithMultipleBuddies() throws Exception {
+    public void testShareWithMultipleUsers() throws Exception {
         ALICE
             .superBot()
             .views()
@@ -35,7 +35,7 @@ public class ContextMenuShareWithTest extends StfTestCase {
                 Constants.CLS1);
         ALICE.superBot().views().packageExplorerView()
             .selectJavaProject(Constants.PROJECT1).shareWith()
-            .buddy(BOB.getJID());
+            .contact(BOB.getJID());
         BOB.superBot().confirmShellSessionInvitationAndShellAddProject(
             Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT);
 

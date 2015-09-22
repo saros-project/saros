@@ -26,23 +26,23 @@ import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactor
 import de.fu_berlin.inf.dpp.ui.wizards.StartSessionWizard;
 
 /**
- * Creates a context menu filled with entries that represents a project that
- * currently exists in the workspace. Each entry will trigger a session start
- * with the given project and an invitation with the currently selected
- * contact(s) in the roster. </p> In addition if multiple projects are present
- * in the workspace an additional entry will be displayed which will open a
- * {@linkplain StartSessionWizard wizard} to start a session instead.
+ * Creates a context menu filled with entries, each of which represents a
+ * project that currently exists in the workspace. Each entry will trigger a
+ * session negotiation with the given project.
+ * <p>
+ * In addition, if multiple projects are present in the workspace, an additional
+ * entry will be displayed which will open a {@linkplain StartSessionWizard
+ * wizard} instead.
  */
-// FIXME rename this class, the name is confusing
-public class ProjectShareProjects extends ContributionItem {
+public class StartSessionWithProjects extends ContributionItem {
 
     private final WorkbenchLabelProvider workbenchLabelProvider = new WorkbenchLabelProvider();
 
-    public ProjectShareProjects() {
+    public StartSessionWithProjects() {
         this(null);
     }
 
-    public ProjectShareProjects(final String id) {
+    public StartSessionWithProjects(final String id) {
         super(id);
     }
 
@@ -71,11 +71,8 @@ public class ProjectShareProjects extends ContributionItem {
 
     /**
      * Returns a sorted list of all {@link IProject}s in the {@link IWorkspace}.
-     * 
-     * @return
      */
     private IProject[] getSortedWorkspaceProjects() {
-
         final IProject[] workspaceProjects = ResourcesPlugin.getWorkspace()
             .getRoot().getProjects();
 
@@ -92,7 +89,6 @@ public class ProjectShareProjects extends ContributionItem {
     /**
      * Creates a menu entry which shares projects with the given
      * {@link RosterEntry}.
-     * 
      */
     private MenuItem createProjectMenuItem(final Menu parentMenu,
         final int index, final IProject project, final List<JID> contacts) {

@@ -256,7 +256,7 @@ public class STFController {
         exportObject(ShareWithC.getInstance(), "shareWithC");
         exportObject(ContextMenusInPEView.getInstance(), "contextMenu");
         exportObject(ContextMenusInContactListArea.getInstance(),
-            "buddiesContextMenu");
+            "contactsContextMenu");
 
         exportObject(ContextMenusInSessionArea.getInstance(),
             "sessionContextMenu");

@@ -32,7 +32,7 @@ public final class ShareWithC extends StfRemoteObject implements IShareWithC {
 
     // FIXME can not click the context menu.
     @Override
-    public void multipleBuddies(String projectName, JID... baseJIDOfInvitees)
+    public void multipleContacts(String projectName, JID... baseJIDOfInvitees)
         throws RemoteException {
         treeItem.select();
         ContextMenuHelper.clickContextMenu(tree, CM_SHARE_WITH,
@@ -42,7 +42,7 @@ public final class ShareWithC extends StfRemoteObject implements IShareWithC {
     }
 
     @Override
-    public void buddy(JID jid) throws RemoteException {
+    public void contact(JID jid) throws RemoteException {
         treeItem.select();
         ContextMenuHelper.clickContextMenu(tree, CM_SHARE_WITH, jid.getBase());
     }

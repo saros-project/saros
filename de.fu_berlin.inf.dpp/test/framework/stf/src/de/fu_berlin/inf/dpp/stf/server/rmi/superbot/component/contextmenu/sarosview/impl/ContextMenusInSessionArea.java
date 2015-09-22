@@ -134,7 +134,7 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
     }
 
     @Override
-    public void jumpToPositionOfSelectedBuddy() throws RemoteException {
+    public void jumpToPositionOfSelectedParticipant() throws RemoteException {
         if (SuperBot.getInstance().getJID().equals(participantJID)) {
             throw new RuntimeException(
                 "you can't jump to the position of yourself");
@@ -143,12 +143,12 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
         SWTBotTreeItem treeItem = getTreeItem();
 
         log.trace("clicking on context menu item: "
-            + CM_JUMP_TO_POSITION_SELECTED_BUDDY);
+            + CM_JUMP_TO_POSITION_OF_PARTICIPANT);
 
         try {
             treeItem.select();
             ContextMenuHelper.clickContextMenu(tree,
-                CM_JUMP_TO_POSITION_SELECTED_BUDDY);
+                CM_JUMP_TO_POSITION_OF_PARTICIPANT);
         } catch (RuntimeException e) {
             logError(log, e, tree, treeItem);
             throw e;
@@ -175,7 +175,7 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
     }
 
     @Override
-    public void addBuddies(String... jidOfInvitees) throws RemoteException {
+    public void addContactsToSession(String... jidOfInvitees) throws RemoteException {
         SWTBotTreeItem treeItem = getTreeItem();
 
         log.trace("clicking on context menu item: "

@@ -65,12 +65,12 @@ public class PackageExplorerViewTest extends StfTestCase {
     }
 
     @Test
-    @Ignore("can't click the menu 'multiple buddies'")
+    @Ignore("can't click the menu 'Multiple Contacts...'")
     public void testShareWith() throws RemoteException {
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .javaProject(Constants.PROJECT1);
         ALICE.superBot().views().packageExplorerView()
             .selectProject(Constants.PROJECT1).shareWith()
-            .multipleBuddies(Constants.PROJECT1, BOB.getJID());
+            .multipleContacts(Constants.PROJECT1, BOB.getJID());
     }
 }

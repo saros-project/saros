@@ -37,7 +37,7 @@ import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
  * // alice share the project Foo_bar with bob
  * //
  * alice.superBot().views().packageExplorerView().selectProject(&quot;Foo_bar&quot;)
- *     .shareWith().buddy(bob.getJID());
+ *     .shareWith().contact(bob.getJID());
  * </pre>
  * 
  * For more information on how to write STF-Tests please read the user guide.
@@ -47,8 +47,8 @@ import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 public interface IShareWithC extends Remote {
 
     /**
-     * Perform the action share project with multiple buddies which should be
-     * activated by clicking the contextMenu Share With-> multiple buddies of
+     * Perform the action share project with multiple contacts which should be
+     * activated by clicking the contextMenu Share With-> multiple contacts of
      * the given project in the package explorer view.
      * <p>
      * <b>Attention:</b>
@@ -67,7 +67,7 @@ public interface IShareWithC extends Remote {
      * 
      *             FIXME: Can't click the contextMenu
      */
-    public void multipleBuddies(String projectName, JID... inviteeBaseJIDS)
+    public void multipleContacts(String projectName, JID... inviteeBaseJIDS)
         throws RemoteException;
 
     /**
@@ -85,7 +85,7 @@ public interface IShareWithC extends Remote {
      * @param jid
      * @throws RemoteException
      */
-    public void buddy(JID jid) throws RemoteException;
+    public void contact(JID jid) throws RemoteException;
 
     public void addToSarosSession() throws RemoteException;
 }

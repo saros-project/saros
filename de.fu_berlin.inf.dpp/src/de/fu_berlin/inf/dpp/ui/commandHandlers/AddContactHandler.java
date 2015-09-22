@@ -6,7 +6,7 @@ import org.eclipse.core.commands.ExecutionException;
 
 import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 
-public class AddBuddyHandler extends AbstractHandler {
+public class AddContactHandler extends AbstractHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {

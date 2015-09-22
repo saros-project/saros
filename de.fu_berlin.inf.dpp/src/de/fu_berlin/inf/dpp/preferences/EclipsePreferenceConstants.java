@@ -112,7 +112,7 @@ public class EclipsePreferenceConstants {
      * Wizard options that need to be permanently saved
      */
     public static final String PROJECTSELECTION_FILTERCLOSEDPROJECTS = "projectselection.filterClosedProjects";
-    public static final String CONTACT_SELECTION_FILTER_NON_SAROS_CONTACTS = "projectselection.filterNonSarosBuddies";
+    public static final String CONTACT_SELECTION_FILTER_NON_SAROS_CONTACTS = "projectselection.filterNonSarosContacts";
 
     /*
      * Preferences to remember the saros view settings

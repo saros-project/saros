@@ -15,7 +15,7 @@ import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactor
  * Handles the addition of selected {@link JID}s to the running
  * {@link ISarosSession}.
  */
-public class SessionAddSelectedBuddiesHandler extends AbstractHandler {
+public class SessionAddSelectedContactsHandler extends AbstractHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {

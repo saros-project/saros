@@ -503,7 +503,7 @@
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
-            id="de.fu_berlin.inf.dpp.ui.commands.AddBuddy"
+            id="de.fu_berlin.inf.dpp.ui.commands.AddContact"
             name="Add Contact...">
       </command>
       <command
@@ -533,7 +533,7 @@
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
-            id="de.fu_berlin.inf.dpp.ui.commands.SessionAddBuddies"
+            id="de.fu_berlin.inf.dpp.ui.commands.SessionAddContacts"
             name="Add Contacts...">
       </command>
       <command
@@ -543,7 +543,7 @@
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
-            id="de.fu_berlin.inf.dpp.ui.commands.SessionAddSelectedBuddies"
+            id="de.fu_berlin.inf.dpp.ui.commands.SessionAddSelectedContacts"
             name="Add to Saros Session">
       </command>
    </extension>
@@ -566,8 +566,8 @@
             commandId="de.fu_berlin.inf.dpp.ui.commands.AddXMPPAccount">
       </handler>
       <handler
-            class="de.fu_berlin.inf.dpp.ui.commandHandlers.AddBuddyHandler"
-            commandId="de.fu_berlin.inf.dpp.ui.commands.AddBuddy">
+            class="de.fu_berlin.inf.dpp.ui.commandHandlers.AddContactHandler"
+            commandId="de.fu_berlin.inf.dpp.ui.commands.AddContact">
          <activeWhen>
                 <reference definitionId="de.fu_berlin.inf.dpp.ui.definitions.isXMPPEnabled" />
          </activeWhen>
@@ -629,8 +629,8 @@
          </enabledWhen>
       </handler>
       <handler
-            class="de.fu_berlin.inf.dpp.ui.commandHandlers.SessionAddBuddiesHandler"
-            commandId="de.fu_berlin.inf.dpp.ui.commands.SessionAddBuddies">
+            class="de.fu_berlin.inf.dpp.ui.commandHandlers.SessionAddContactsHandler"
+            commandId="de.fu_berlin.inf.dpp.ui.commands.SessionAddContacts">
          <activeWhen>
             <and>
                <reference
@@ -670,8 +670,8 @@
          </enabledWhen>
       </handler>
       <handler
-            class="de.fu_berlin.inf.dpp.ui.commandHandlers.SessionAddSelectedBuddiesHandler"
-            commandId="de.fu_berlin.inf.dpp.ui.commands.SessionAddSelectedBuddies">
+            class="de.fu_berlin.inf.dpp.ui.commandHandlers.SessionAddSelectedContactsHandler"
+            commandId="de.fu_berlin.inf.dpp.ui.commands.SessionAddSelectedContacts">
          <activeWhen>
             <and>
                <reference
@@ -681,11 +681,11 @@
                      definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
                </reference>
                <reference
-                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.buddiesSelected">
+                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.contactsSelected">
                </reference>
                <not>
                   <reference
-                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.buddiesSelectedInSarosSession">
+                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.contactsSelectedInSarosSession">
                   </reference>
                </not>
             </and>
@@ -742,9 +742,9 @@
                 </visibleWhen>
             </command>
             <command
-                  commandId="de.fu_berlin.inf.dpp.ui.commands.AddBuddy"
-                  disabledIcon="icons/dlcl16/buddy_add_tsk.png"
-                  icon="icons/elcl16/buddy_add_tsk.png"
+                  commandId="de.fu_berlin.inf.dpp.ui.commands.AddContact"
+                  disabledIcon="icons/dlcl16/contact_add_tsk.png"
+                  icon="icons/elcl16/contact_add_tsk.png"
                   style="push">
                <visibleWhen>
                   <reference definitionId="de.fu_berlin.inf.dpp.ui.definitions.isXMPPEnabled" />
@@ -793,9 +793,9 @@
                </visibleWhen>
             </command>
             <command
-                  commandId="de.fu_berlin.inf.dpp.ui.commands.SessionAddBuddies"
-                  disabledIcon="icons/dlcl16/session_add_buddies_tsk.png"
-                  icon="icons/elcl16/session_add_buddies_tsk.png"
+                  commandId="de.fu_berlin.inf.dpp.ui.commands.SessionAddContacts"
+                  disabledIcon="icons/dlcl16/session_add_contacts_tsk.png"
+                  icon="icons/elcl16/session_add_contacts_tsk.png"
                   style="push">
                <visibleWhen
                      checkEnabled="false">
@@ -927,15 +927,15 @@
             </visibleWhen>
          </command>
          <command
-               commandId="de.fu_berlin.inf.dpp.ui.commands.AddBuddy"
-               disabledIcon="icons/dlcl16/buddy_add_tsk.png"
-               icon="icons/elcl16/buddy_add_tsk.png"
+               commandId="de.fu_berlin.inf.dpp.ui.commands.AddContact"
+               disabledIcon="icons/dlcl16/contact_add_tsk.png"
+               icon="icons/elcl16/contact_add_tsk.png"
                style="push">
             <visibleWhen checkEnabled="false">
                <and>
                   <reference definitionId="de.fu_berlin.inf.dpp.ui.definitions.isXMPPEnabled" />
                   <not>
-                     <reference definitionId="de.fu_berlin.inf.dpp.ui.definitions.buddiesSelected" />
+                     <reference definitionId="de.fu_berlin.inf.dpp.ui.definitions.contactsSelected" />
                   </not>
                   <not>
                      <reference definitionId="de.fu_berlin.inf.dpp.ui.definitions.participantsSelected" />
@@ -947,9 +947,9 @@
             </visibleWhen>
          </command>
          <command
-               commandId="de.fu_berlin.inf.dpp.ui.commands.SessionAddBuddies"
-               disabledIcon="icons/dlcl16/session_add_buddies_tsk.png"
-               icon="icons/elcl16/session_add_buddies_tsk.png"
+               commandId="de.fu_berlin.inf.dpp.ui.commands.SessionAddContacts"
+               disabledIcon="icons/dlcl16/session_add_contacts_tsk.png"
+               icon="icons/elcl16/session_add_contacts_tsk.png"
                style="push">
             <visibleWhen
                   checkEnabled="false">
@@ -1006,7 +1006,7 @@
                      </and>
             </visibleWhen>
                <separator
-                     name="BuddiesStart"
+                     name="ContactsStart"
                      visible="true">
                </separator>
                <command
@@ -1023,8 +1023,8 @@
                   </visibleWhen>
                </command>
                <dynamic
-                     class="de.fu_berlin.inf.dpp.ui.menuContributions.ProjectShareBuddies"
-                     id="de.fu_berlin.inf.dpp.ui.menus.ProjectShareBuddies">
+                     class="de.fu_berlin.inf.dpp.ui.menuContributions.StartSessionWithContacts"
+                     id="de.fu_berlin.inf.dpp.ui.menus.ProjectShareContacts">
                   <visibleWhen
                         checkEnabled="false">
                      <reference
@@ -1033,7 +1033,7 @@
                   </visibleWhen>
                </dynamic>
                <separator
-                     name="BuddiesEnd"
+                     name="ContactsEnd"
                      visible="true">
                </separator>
                <command
@@ -1094,7 +1094,7 @@
                      </reference>
                   </not>
                   <reference
-                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.buddiesSelected">
+                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.contactsSelected">
                   </reference>
                </and>
             </visibleWhen>
@@ -1116,7 +1116,7 @@
                </visibleWhen>
             </command>
             <dynamic
-                  class="de.fu_berlin.inf.dpp.ui.menuContributions.ProjectShareProjects"
+                  class="de.fu_berlin.inf.dpp.ui.menuContributions.StartSessionWithProjects"
                   id="de.fu_berlin.inf.dpp.ui.menus.ProjectShareResources">
                <visibleWhen
                      checkEnabled="false">
@@ -1134,9 +1134,9 @@
             </separator>
          </menu>
          <command
-               commandId="de.fu_berlin.inf.dpp.ui.commands.SessionAddSelectedBuddies"
-               disabledIcon="icons/dlcl16/session_add_buddies_tsk.png"
-               icon="icons/elcl16/session_add_buddies_tsk.png"
+               commandId="de.fu_berlin.inf.dpp.ui.commands.SessionAddSelectedContacts"
+               disabledIcon="icons/dlcl16/session_add_contacts_tsk.png"
+               icon="icons/elcl16/session_add_contacts_tsk.png"
                style="push">
             <visibleWhen
                   checkEnabled="false">
@@ -1148,7 +1148,7 @@
                         definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
                   </reference>
                   <reference
-                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.buddiesSelected">
+                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.contactsSelected">
                   </reference>
                   <reference
                         definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionHost">
@@ -1283,46 +1283,46 @@
          </with>
       </definition>
       <definition
-            id="de.fu_berlin.inf.dpp.ui.definitions.buddiesSelected">
+            id="de.fu_berlin.inf.dpp.ui.definitions.contactsSelected">
          <with
                variable="selection">
             <iterate
                   ifEmpty="false"
                   operator="and">
                <reference
-                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.isBuddy">
+                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.isContact">
                </reference>
             </iterate>
          </with>
       </definition>
       <definition
-            id="de.fu_berlin.inf.dpp.ui.definitions.isBuddy">
+            id="de.fu_berlin.inf.dpp.ui.definitions.isContact">
          <adapt
                type="de.fu_berlin.inf.dpp.net.xmpp.JID">
          </adapt>
       </definition>
       <definition
-            id="de.fu_berlin.inf.dpp.ui.definitions.buddiesSelected">
+            id="de.fu_berlin.inf.dpp.ui.definitions.contactsSelected">
          <with
                variable="selection">
             <iterate
                   ifEmpty="false"
                   operator="and">
                <reference
-                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.isBuddy">
+                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.isContact">
                </reference>
             </iterate>
          </with>
       </definition>
       <definition
-            id="de.fu_berlin.inf.dpp.ui.definitions.buddiesSelectedInSarosSession">
+            id="de.fu_berlin.inf.dpp.ui.definitions.contactsSelectedInSarosSession">
          <with
                variable="selection">
             <iterate
                   ifEmpty="true"
                   operator="and">
                <reference
-                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.isBuddy">
+                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.isContact">
                </reference>
                <reference
                      definitionId="de.fu_berlin.inf.dpp.ui.definitions.isInSarosSession">

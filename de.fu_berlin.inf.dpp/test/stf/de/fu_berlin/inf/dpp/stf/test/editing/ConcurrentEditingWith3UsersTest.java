@@ -15,12 +15,12 @@ import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.test.util.EclipseTestThread;
 
 /**
- * This class tests the concurrent editing of three buddies during a session.
+ * This class tests the concurrent editing of three users during a session.
  * 
  * @author nwarnatsch
  */
 
-public class ConcurrentEditingWith3BuddiesTest extends StfTestCase {
+public class ConcurrentEditingWith3UsersTest extends StfTestCase {
     private EclipseTestThread aliceEditTaskThread;
     private EclipseTestThread bobEditTaskThread;
     private EclipseTestThread carlEditTaskThread;
@@ -203,8 +203,8 @@ public class ConcurrentEditingWith3BuddiesTest extends StfTestCase {
     }
 
     /**
-     * Three Buddies (everyone in one thread) insert text in the same file on
-     * the same line (Line 1).
+     * Three users (everyone in one thread) insert text in the same file on the
+     * same line (Line 1).
      * 
      * @throws Exception
      */

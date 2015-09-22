@@ -155,7 +155,7 @@ public class SessionAliceBobTest extends StfTestCase {
      * @throws RemoteException
      */
     @Test
-    public void jumpToSelectedBuddy() throws Exception {
+    public void jumpToSelectedParticipant() throws Exception {
 
         BOB.remoteBot().closeAllEditors();
 
@@ -169,7 +169,7 @@ public class SessionAliceBobTest extends StfTestCase {
         assertFalse(BOB.remoteBot().isEditorOpen(Constants.CLS2_SUFFIX));
 
         BOB.superBot().views().sarosView().selectUser(ALICE.getJID())
-            .jumpToPositionOfSelectedBuddy();
+            .jumpToPositionOfSelectedParticipant();
 
         Thread.sleep(500);
 
@@ -188,7 +188,7 @@ public class SessionAliceBobTest extends StfTestCase {
         Thread.sleep(500);
 
         BOB.superBot().views().sarosView().selectUser(ALICE.getJID())
-            .jumpToPositionOfSelectedBuddy();
+            .jumpToPositionOfSelectedParticipant();
 
         assertTrue(BOB.remoteBot().editor(Constants.CLS1_SUFFIX).isActive());
     }

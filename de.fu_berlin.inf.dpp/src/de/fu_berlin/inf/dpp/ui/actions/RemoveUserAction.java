@@ -76,7 +76,7 @@ public class RemoveUserAction extends Action {
 
         setId(ACTION_ID);
         setImageDescriptor(ImageManager
-            .getImageDescriptor("icons/elcl16/buddy_remove_tsk.png"));
+            .getImageDescriptor("icons/elcl16/contact_remove_tsk.png"));
 
         SelectionUtils.getSelectionService().addSelectionListener(
             selectionListener);

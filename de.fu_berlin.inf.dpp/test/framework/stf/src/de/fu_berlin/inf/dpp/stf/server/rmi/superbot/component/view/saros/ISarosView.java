@@ -74,7 +74,7 @@ public interface ISarosView extends Remote {
 
     /**
      * Selects the contact specified with the given JID which is located under
-     * node "Buddies".
+     * node "Contacts".
      * 
      * @param jid
      *            the {@link JID} of the contact
@@ -85,9 +85,9 @@ public interface ISarosView extends Remote {
         throws RemoteException;
 
     /**
-     * Selects the tree node "Buddies"
+     * Selects the tree node "Contacts"
      */
-    public IContextMenusInContactListArea selectBuddies()
+    public IContextMenusInContactListArea selectContacts()
         throws RemoteException;
 
     /**
@@ -197,7 +197,7 @@ public interface ISarosView extends Remote {
      * 
      * @param jid
      *            {@link JID} of the contact
-     * @return <code>true</code>, if the buddy specified with the given
+     * @return <code>true</code>, if the contact specified with the given
      *         {@link JID} exists, <code>false</code> otherwise
      * @throws RemoteException
      */
@@ -271,9 +271,9 @@ public interface ISarosView extends Remote {
      */
 
     /**
-     * Performs the action "Send a file to selected buddy" which should be
+     * Performs the action "Send a file to selected contact" which should be
      * activated by clicking the tool bar button with the tooltip text
-     * {@link StfRemoteObject#TB_SEND_A_FILE_TO_SELECTED_BUDDY} on the session
+     * {@link StfRemoteObject#TB_SEND_A_FILE_TO_SELECTED_CONTACT} on the session
      * view.
      * <p>
      * <b>Attention:</b>
@@ -309,28 +309,6 @@ public interface ISarosView extends Remote {
      * @throws RemoteException
      */
     public void leaveSession() throws RemoteException;
-
-    // /**
-    // * performs the action "Open invitation interface" which should be
-    // activated
-    // * by clicking the tool bar button with the tooltip text
-    // * {@link STF#TB_ADD_A_NEW_BUDDY} on the session view. The button is only
-    // * enabled, if you are host.
-    // * <p>
-    // * <b>Attention:</b>
-    // * <ol>
-    // * <li>Makes sure, the session view is open and active.</li>
-    // * <li>All iterative triggered events by the action should be handled in
-    // the
-    // * method(exclude remote triggered events). E.g. a popup window.</li>
-    // * </ol>
-    // *
-    // * @param jidOfInvitees
-    // * the buddy whom you want to invite to your session.
-    // * @throws RemoteException
-    // */
-    // public void addBuddyToSession(String... jidOfInvitees)
-    // throws RemoteException;
 
     /**
      * Performs the action "inconsistency detected in ..." which should be

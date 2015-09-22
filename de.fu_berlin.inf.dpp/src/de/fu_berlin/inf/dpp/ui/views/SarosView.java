@@ -396,7 +396,7 @@ public class SarosView extends ViewPart {
          *
          *               Also, there are context menus which appear when you: -
          *               right-click on a person in your current session -
-         *               right-click on a buddy in the buddy list.
+         *               right-click on a contact in the contact list.
          */
 
         createActions();
@@ -418,12 +418,11 @@ public class SarosView extends ViewPart {
         addSessionMenuItems(menuManager);
         addAdditionsSeparator(menuManager);
 
-        Viewer buddySessionViewer = sessionDisplay.getViewer();
-        Menu menu = menuManager.createContextMenu(buddySessionViewer
-            .getControl());
-        buddySessionViewer.getControl().setMenu(menu);
-        getSite().registerContextMenu(menuManager, buddySessionViewer);
-        getSite().setSelectionProvider(buddySessionViewer);
+        Viewer sessionViewer = sessionDisplay.getViewer();
+        Menu menu = menuManager.createContextMenu(sessionViewer.getControl());
+        sessionViewer.getControl().setMenu(menu);
+        getSite().registerContextMenu(menuManager, sessionViewer);
+        getSite().setSelectionProvider(sessionViewer);
 
         rosterTracker.addRosterListener(rosterListener);
         rosterListener.rosterChanged(connectionService.getRoster());
@@ -509,10 +508,10 @@ public class SarosView extends ViewPart {
                  * Do not display the following actions if non-participants are
                  * selected.
                  */
-                List<JID> buddies = SelectionRetrieverFactory
+                List<JID> contacts = SelectionRetrieverFactory
                     .getSelectionRetriever(JID.class).getSelection();
 
-                if (buddies.size() > 0)
+                if (contacts.size() > 0)
                     return;
 
                 boolean isHost = false;

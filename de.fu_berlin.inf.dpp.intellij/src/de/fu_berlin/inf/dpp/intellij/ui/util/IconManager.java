@@ -36,9 +36,9 @@ public class IconManager {
     public static final ImageIcon SESSIONS_ICON = getIcon(
         "/icons/famfamfam/session_tsk.png", "sessions");
     public static final ImageIcon CONTACT_ONLINE_ICON = getIcon(
-        "/icons/famfamfam/buddy_saros_obj.png", "contactOnLine");
+        "/icons/famfamfam/contact_saros_obj.png", "contactOnLine");
     public static final ImageIcon CONTACT_OFFLINE_ICON = getIcon(
-        "/icons/famfamfam/buddy_offline_obj.png", "contactOffLine");
+        "/icons/famfamfam/contact_offline_obj.png", "contactOffLine");
     public static final ImageIcon CONTACTS_ICON = getIcon(
         "/icons/famfamfam/group.png", "contacts");
 

@@ -282,13 +282,14 @@ public interface Constants {
     public static final String CM_ADD_CONTACTS_TO_SESSION = get("cm_add_contacts_to_session");
     public static final String CM_GRANT_WRITE_ACCESS = get("cm_grant_write_access");
     public static final String CM_RESTRICT_TO_READ_ONLY_ACCESS = get("cm_restrict_to_read_only_access");
-    public static final String CM_FOLLOW_PARTICIPANT = get("cm_follow_this_buddy");
-    public static final String CM_STOP_FOLLOWING = get("cm_stop_following_this_buddy");
-    public static final String CM_JUMP_TO_POSITION_SELECTED_BUDDY = get("cm_jump_to_position_of_selected_buddy");
+    public static final String CM_FOLLOW_PARTICIPANT = get("cm_follow_participant");
+    public static final String CM_STOP_FOLLOWING = get("cm_stop_following");
+    public static final String CM_JUMP_TO_POSITION_OF_PARTICIPANT = get("cm_jump_to_position_of_participant");
     public static final String CM_CHANGE_COLOR = get("cm_change_color");
     public static final String CM_STOP_SAROS_SESSION = get("cm_stop_saros_session");
 
     /* ************************** contact list ********************** */
+    public static final String CM_ADD_CONTACT = get("cm_add_contact");
     public static final String CM_DELETE = get("cm_delete");
     public static final String CM_RENAME = get("cm_rename");
     public static final String CM_OPEN_CHAT = get("OpenChatAction_MenuItem");
@@ -317,7 +318,7 @@ public interface Constants {
     public static final String TB_DISCONNECT = get("tb_disconnect");
     public static final String TB_ADD_NEW_CONTACT = get("NewContactAction_tooltip");
     public static final String TB_CONNECT = get("tb_connect");
-    public static final String TB_SEND_A_FILE_TO_SELECTED_BUDDY = get("tb_send_a_file_to_selected_buddy");
+    public static final String TB_SEND_A_FILE_TO_SELECTED_CONTACT = get("tb_send_a_file_to_selected_contact");
     public static final String TB_NO_INCONSISTENCIES = get("tb_no_inconsistencies");
     public static final String TB_INCONSISTENCY_DETECTED = get("tb_inconsistency_detected_in");
     public static final String TB_RESTRICT_INVITEES_TO_READ_ONLY_ACCESS = get("tb_restrict_invitees_to_read_only_access");

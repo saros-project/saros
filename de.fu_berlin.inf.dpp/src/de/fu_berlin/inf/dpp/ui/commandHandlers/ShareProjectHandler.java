@@ -5,6 +5,8 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IResource;
 
+import de.fu_berlin.inf.dpp.ui.menuContributions.StartSessionWithContacts;
+import de.fu_berlin.inf.dpp.ui.menuContributions.StartSessionWithProjects;
 import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 
@@ -21,8 +23,9 @@ import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactor
  *               important configuration file for the project. Take a look at
  *               plugin.xml to see how it works.
  * 
- *               (Also see ProjectShareProjects and ProjectShareBuddies for
- *               alternative invitation methods.)
+ *               (Also see {@link StartSessionWithProjects} and
+ *               {@link StartSessionWithContacts} for alternative invitation
+ *               methods.)
  * 
  *               This begins a process that includes:
  * 

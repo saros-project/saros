@@ -143,7 +143,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     @Override
     public void sendFileToUser(JID jid) throws RemoteException {
         selectParticipant(jid, "you cannot send a file to youself");
-        clickToolbarButtonWithTooltip(TB_SEND_A_FILE_TO_SELECTED_BUDDY);
+        clickToolbarButtonWithTooltip(TB_SEND_A_FILE_TO_SELECTED_CONTACT);
     }
 
     @Override
@@ -198,9 +198,9 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
      **********************************************/
 
     @Override
-    public IContextMenusInContactListArea selectBuddies()
+    public IContextMenusInContactListArea selectContacts()
         throws RemoteException {
-        initBuddiesContextMenuWrapper(Pattern.quote((NODE_CONTACTS)));
+        initContactsContextMenuWrapper(Pattern.quote((NODE_CONTACTS)));
         return ContextMenusInContactListArea.getInstance();
     }
 
@@ -208,10 +208,10 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     public IContextMenusInContactListArea selectContact(JID jid)
         throws RemoteException {
         if (getNickname(jid) == null) {
-            throw new RuntimeException("no buddy exists with the JID: "
+            throw new RuntimeException("no contact exists with the JID: "
                 + jid.getBase());
         }
-        initBuddiesContextMenuWrapper(Pattern.quote(NODE_CONTACTS),
+        initContactsContextMenuWrapper(Pattern.quote(NODE_CONTACTS),
             Pattern.quote(getNickname(jid)) + ".*");
         return ContextMenusInContactListArea.getInstance();
     }
@@ -293,12 +293,12 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     @Override
     public List<String> getContacts() throws RemoteException {
         SWTBotTreeItem items = tree.getTreeItem(NODE_CONTACTS);
-        List<String> buddies = new ArrayList<String>();
+        List<String> contacts = new ArrayList<String>();
 
         for (SWTBotTreeItem item : items.getItems())
-            buddies.add(item.getText());
+            contacts.add(item.getText());
 
-        return buddies;
+        return contacts;
     }
 
     @Override
@@ -384,11 +384,11 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     @Override
     public boolean isFollowing() throws RemoteException {
         try {
-            JID followedBuddy = getFollowedUser();
-            if (followedBuddy == null)
+            JID followee = getFollowedUser();
+            if (followee == null)
                 return false;
 
-            return selectUser(followedBuddy).isFollowing();
+            return selectUser(followee).isFollowing();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return false;
@@ -628,7 +628,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         ContextMenusInSessionArea.getInstance().setSarosView(this);
     }
 
-    private void initBuddiesContextMenuWrapper(String... treeItemNodes) {
+    private void initContactsContextMenuWrapper(String... treeItemNodes) {
         ContextMenusInContactListArea.getInstance().setTree(tree);
         ContextMenusInContactListArea.getInstance().setTreeItemNodes(
             treeItemNodes);

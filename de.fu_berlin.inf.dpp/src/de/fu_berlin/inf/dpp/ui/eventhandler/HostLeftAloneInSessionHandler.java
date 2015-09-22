@@ -39,8 +39,8 @@ public class HostLeftAloneInSessionHandler {
             session.removeListener(sessionListener);
             /*
              * we need to clear any open notifications because there might be
-             * stuff left, like follow mode notifications, or "buddy joined"
-             * notification in case a buddy joined the session but aborted the
+             * stuff left, like follow mode notifications, or "user joined"
+             * notification in case a user joined the session but aborted the
              * incoming project negotiation...
              */
             SarosView.clearNotifications();
