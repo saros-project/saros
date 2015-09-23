@@ -34,22 +34,19 @@ public class UserListExtension extends SarosSessionPacketExtension {
 
         public long flags;
         public JID jid;
-        public String nickname;
         public int colorID;
         public int favoriteColorID;
         public Permission permission;
 
         private static UserListEntry create(User user, long flags) {
-            return new UserListEntry(user.getJID(), user.getNickname(),
-                user.getColorID(), user.getFavoriteColorID(),
-                user.getPermission(), flags);
+            return new UserListEntry(user.getJID(), user.getColorID(),
+                user.getFavoriteColorID(), user.getPermission(), flags);
         }
 
-        private UserListEntry(final JID jid, final String nickname,
-            final int colorID, final int favoriteColorID,
-            final Permission permission, final long flags) {
+        private UserListEntry(final JID jid, final int colorID,
+            final int favoriteColorID, final Permission permission,
+            final long flags) {
             this.jid = jid;
-            this.nickname = nickname;
             this.colorID = colorID;
             this.favoriteColorID = favoriteColorID;
             this.permission = permission;

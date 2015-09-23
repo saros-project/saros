@@ -29,11 +29,10 @@ public class ColorIDSetTest {
         userList = new ArrayList<User>();
         userMap = new HashMap<String, UserColorID>();
 
-        alice = new User(new JID("alice@saros.org"), null, false, false, 0, -1);
-        bob = new User(new JID("bob@saros.org"), null, false, false, 1, -1);
-        carl = new User(new JID("carl@lagerfeld.org"), null, false, false, 2,
-            -1);
-        dave = new User(new JID("dave@saros.org"), null, false, false, 0, -1);
+        alice = new User(new JID("alice@saros.org"), false, false, 0, -1);
+        bob = new User(new JID("bob@saros.org"), false, false, 1, -1);
+        carl = new User(new JID("carl@lagerfeld.org"), false, false, 2, -1);
+        dave = new User(new JID("dave@saros.org"), false, false, 0, -1);
     }
 
     private ColorIDSet createColorIDSet(Collection<User> users) {

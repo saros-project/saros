@@ -13,13 +13,15 @@ import org.eclipse.core.runtime.jobs.Job;
 import de.fu_berlin.inf.dpp.activities.ProgressActivity;
 import de.fu_berlin.inf.dpp.activities.ProgressActivity.ProgressAction;
 import de.fu_berlin.inf.dpp.session.User;
+import de.fu_berlin.inf.dpp.ui.Messages;
+import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 
 /**
  * Eclipse-specific implementation of the {@link IRemoteProgressIndicator}
  * interface.
  */
-final class EclipseRemoteProgressIndicatorImpl
-    implements IRemoteProgressIndicator {
+final class EclipseRemoteProgressIndicatorImpl implements
+    IRemoteProgressIndicator {
 
     private static final Logger LOG = Logger
         .getLogger(EclipseRemoteProgressIndicatorImpl.class);
@@ -71,8 +73,8 @@ final class EclipseRemoteProgressIndicatorImpl
 
         started = true;
 
-        final Job job = new Job(
-            "Observing remote progress for " + remoteUser.getNickname()) {
+        final Job job = new Job(ModelFormatUtils.format(
+            Messages.RemoteProgress_observing_progress_for, remoteUser)) {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                 try {
@@ -82,8 +84,7 @@ final class EclipseRemoteProgressIndicatorImpl
                     LOG.error(e);
                     return Status.CANCEL_STATUS;
                 } finally {
-                    rpm.progressIndicatorStopped(
-                        EclipseRemoteProgressIndicatorImpl.this);
+                    rpm.progressIndicatorStopped(EclipseRemoteProgressIndicatorImpl.this);
                 }
             }
         };

@@ -213,13 +213,4 @@ public abstract class Preferences {
         return store.getInt(PreferenceConstants.FAVORITE_SESSION_COLOR_ID);
     }
 
-    /**
-     * Returns the nickname that should be used in a session.
-     * 
-     * @return the nickname which may be empty if no nickname is available
-     */
-    public String getSessionNickname() {
-        return store.getString(PreferenceConstants.SESSION_NICKNAME);
-    }
-
 }

@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.core.monitoring.remote;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
 
@@ -41,12 +42,9 @@ final class IntelliJRemoteProgressIndicatorImpl
     /**
      * Creates an IntelliJRemoteProgressIndicatorImpl.
      *
-     * @param rpm
-     *            {@link RemoteProgressManager} which creates the indicator
-     * @param remoteProgressID
-     *            ID of the tracked remote progress
-     * @param remoteUser
-     *            user generating the tracked remote progress
+     * @param rpm              {@link RemoteProgressManager} which creates the indicator
+     * @param remoteProgressID ID of the tracked remote progress
+     * @param remoteUser       user generating the tracked remote progress
      */
     IntelliJRemoteProgressIndicatorImpl(final RemoteProgressManager rpm,
         final String remoteProgressID, final User remoteUser) {
@@ -72,8 +70,8 @@ final class IntelliJRemoteProgressIndicatorImpl
 
         started = true;
 
-        final UIMonitoredJob job = new UIMonitoredJob(
-            "Observing remote progress for " + remoteUser.getNickname()) {
+        final UIMonitoredJob job = new UIMonitoredJob(ModelFormatUtils
+            .format("Observing remote progress for {0}", remoteUser)) {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                 try {
@@ -106,8 +104,9 @@ final class IntelliJRemoteProgressIndicatorImpl
          * will never be sent over the Network.
          */
 
-        handleProgress(new ProgressActivity(remoteUser, remoteUser,
-            remoteProgressID, 0, 0, null, ProgressAction.DONE));
+        handleProgress(
+            new ProgressActivity(remoteUser, remoteUser, remoteProgressID, 0, 0,
+                null, ProgressAction.DONE));
     }
 
     @Override
@@ -132,7 +131,8 @@ final class IntelliJRemoteProgressIndicatorImpl
         int worked = 0;
         boolean firstTime = true;
 
-        update: while (true) {
+        update:
+        while (true) {
 
             final ProgressActivity activity;
 
@@ -215,6 +215,6 @@ final class IntelliJRemoteProgressIndicatorImpl
         return ObjectUtils.equals(remoteProgressID,
             ((IntelliJRemoteProgressIndicatorImpl) obj).remoteProgressID)
             && ObjectUtils.equals(remoteUser,
-                ((IntelliJRemoteProgressIndicatorImpl) obj).remoteUser);
+            ((IntelliJRemoteProgressIndicatorImpl) obj).remoteUser);
     }
 }

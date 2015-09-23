@@ -1,3 +1,53 @@
+14.10.31
+========
+
+[Fixes]
+0637 | files modified by document provider are no longer transmitted | Stefan Rossbach
+1506 | #823 Check Whiteboard availability during invitation | Franz Zieris 
+1220 | #802: Viewport is not correctly updated in Follow Mode |  Nils Bussas
+1296 | Socks5 proxy is always enabled | Stefan Rossbach
+1357 | #824 Unhandled event loop exception, share multiple projects | Stefan Rossbach
+1300 | changing accounts on the fly was not working | Stefan Rossbach
+1390 | #825 Client disappear from roster after leaving the session | Stefan Rossbach
+1401 | #678 Choose only one "XMPP ID" vs "Jabber ID" | Stefan Rossbach
+1409 | #781 removed need based feature  | Stefan Rossbach
+1505 | #734 Whiteboard can stall forever in the network layer | Stephan Salinger
+1609 | session overview was wrongly sorted | Stefan Rossbach
+1677 | #570 Senseless option in Roster when no projects in workspace | Stefan Rossbach
+1915 | #460 Read-only participants can edit using keyboard shortucts | Stefan Rossbach
+1979 | #838 Follow mode states are not cleared when users leave the session  | Stefan Rossbach
+2744 | #854 Allow hash character in JIDs | Franz Zieris
+
+
+[GUI]
+1074 | allow the user to choose the Socks5 candidates | Stefan Rossbach
+1234 | Show additional "cursor" in remote users' selections | Franz Zieris
+1236 | Complement the SelectionAnnotation to a full highlighted block | Franz Zieris
+1241 | Introduce option to enable full selection annotations | Franz Zieris
+1332 | removed Screen Sharing | Stefan Rossbach
+1354 | added simple notification for Whiteboard session establishment | Stefan Rossbach
+1397 | notify the user on unavailable charset(s) | Stefan Rossbach
+1454 | Improve UPnP explanation on preference page "Network" | Franz Zieris
+1604 | reduced overhead of transfer description | Stefan Rossbach
+1616 | add option to create a session nickname | Stefan Rossbach
+1679 | added additional information on how to share projects | Stefan Rossbach
+1727 | SingleUserChat is no longer colored with session user colors | Stefan Rossbach
+1859 | display the session nickname in session chat | Stefan Rossbach
+1909 | added option to enable alternate chat layout | Stefan Rossbach
+1910 | changing chat layout will now apply on the fly | Stefan Rossbach
+
+[Features]
+0418 | Use the user directory before querying the server for a JID | Stefan Rossbach
+1281 | #100 Restructure dialog "Add XMPP/Jabber Account" | Stefan Rossbach
+1327 | show unavailable messages of contacts | Stefan Rossbach
+1422 | XMPPAccountStore is now platform independent | Stefan Rossbach
+1619 | user can now choose their own nicknames for a session | Stefan Rossbach
+
+[API]
+1340 | removed VOIP feature | Stefan Rossbach
+1335 | re-implemented file transfer | Stefan Rossbach
+
+
 13.12.6
 =======
 

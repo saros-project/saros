@@ -1,7 +1,5 @@
 package de.fu_berlin.inf.dpp.ui.eventhandler;
 
-import java.text.MessageFormat;
-
 import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
@@ -10,6 +8,7 @@ import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.Messages;
+import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 
 /**
@@ -47,19 +46,19 @@ public class UserStatusChangeHandler {
                 SarosView
                     .showNotification(
                         Messages.UserStatusChangeHandler_permission_changed,
-                        MessageFormat
+                        ModelFormatUtils
                             .format(
                                 Messages.UserStatusChangeHandler_you_have_now_access,
-                                user.getNickname(),
+                                user,
                                 user.hasWriteAccess() ? Messages.UserStatusChangeHandler_write
                                     : Messages.UserStatusChangeHandler_read_only));
             } else {
                 SarosView
                     .showNotification(
                         Messages.UserStatusChangeHandler_permission_changed,
-                        MessageFormat.format(
+                        ModelFormatUtils.format(
                             Messages.UserStatusChangeHandler_he_has_now_access,
-                            user.getNickname(),
+                            user,
                             user.hasWriteAccess() ? Messages.UserStatusChangeHandler_write
                                 : Messages.UserStatusChangeHandler_read_only));
 
@@ -70,17 +69,17 @@ public class UserStatusChangeHandler {
         public void userJoined(User user) {
 
             SarosView.showNotification(
-                Messages.UserStatusChangeHandler_user_joined, MessageFormat
+                Messages.UserStatusChangeHandler_user_joined, ModelFormatUtils
                     .format(Messages.UserStatusChangeHandler_user_joined_text,
-                        user.getNickname()));
+                        user));
         }
 
         @Override
         public void userLeft(User user) {
             SarosView.showNotification(
-                Messages.UserStatusChangeHandler_user_left, MessageFormat
+                Messages.UserStatusChangeHandler_user_left, ModelFormatUtils
                     .format(Messages.UserStatusChangeHandler_user_left_text,
-                        user.getNickname()));
+                        user));
         }
     };
 

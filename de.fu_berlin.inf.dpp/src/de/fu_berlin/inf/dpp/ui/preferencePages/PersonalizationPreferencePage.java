@@ -12,7 +12,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.picocontainer.annotations.Inject;
@@ -58,11 +57,8 @@ public final class PersonalizationPreferencePage extends PreferencePage
     private Button playSoundEventContactComesOnline;
     private Button playSoundEventContactGoesOffline;
 
-    private Text sessionNicknameText;
-
     public PersonalizationPreferencePage() {
         SarosPluginContext.initComponent(this);
-        setDescription(Messages.PersonalizationPreferencePage_description);
     }
 
     @Override
@@ -109,17 +105,11 @@ public final class PersonalizationPreferencePage extends PreferencePage
             EclipsePreferenceConstants.SOUND_PLAY_EVENT_CONTACT_OFFLINE,
             playSoundEventContactGoesOffline.getSelection());
 
-        preferenceStore.setValue(PreferenceConstants.SESSION_NICKNAME,
-            sessionNicknameText.getText().trim());
-
         return super.performOk();
     }
 
     @Override
     protected final void performDefaults() {
-
-        sessionNicknameText.setText(preferenceStore
-            .getDefaultString(PreferenceConstants.SESSION_NICKNAME));
 
         colorChooser.selectColor(DEFAULT_COLOR_ID);
 
@@ -329,21 +319,6 @@ public final class PersonalizationPreferencePage extends PreferencePage
         };
 
         colorChooser.addSelectionListener(colorSelectionListener);
-
-        Composite row = new Composite(group, SWT.NONE);
-        row.setLayout(new GridLayout(2, false));
-        row.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-
-        final Label sessionNickName = new Label(row, SWT.CENTER);
-        sessionNickName.setText("Nickname:");
-
-        sessionNicknameText = new Text(row, SWT.SINGLE | SWT.BORDER);
-        sessionNicknameText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
-            true, false));
-
-        sessionNicknameText.setText(preferenceStore
-            .getString(PreferenceConstants.SESSION_NICKNAME));
-
     }
 
     private void updateSoundEventButtonStates() {

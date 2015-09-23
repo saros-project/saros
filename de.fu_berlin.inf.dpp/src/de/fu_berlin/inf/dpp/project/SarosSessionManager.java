@@ -238,11 +238,10 @@ public class SarosSessionManager implements ISarosSessionManager {
             final String sessionID = String.valueOf(SESSION_ID_GENERATOR
                 .nextInt(Integer.MAX_VALUE));
 
+            // FIXME should be passed in (colorID)
             negotiationPacketLister.setRejectSessionNegotiationRequests(true);
 
-            // FIXME should be passed in (colorID, nickname)
             final SarosSession sarosSession = new SarosSession(sessionID,
-                preferences.getSessionNickname(),
                 preferences.getFavoriteColorID(), sarosContext);
 
             sarosSessionObservable.setValue(sarosSession);
@@ -281,8 +280,8 @@ public class SarosSessionManager implements ISarosSessionManager {
 
         assert getSarosSession() == null;
 
-        SarosSession sarosSession = new SarosSession(id, host, clientNickname,
-            hostNickname, clientColor, hostColor, sarosContext);
+        SarosSession sarosSession = new SarosSession(id, host, clientColor,
+            hostColor, sarosContext);
 
         sarosSessionObservable.setValue(sarosSession);
 

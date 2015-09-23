@@ -363,8 +363,7 @@ public class SarosSessionTest {
         final ISarosContext context = createContextMock(container);
 
         // Test creating, starting and stopping the session.
-        SarosSession session = new SarosSession(SAROS_SESSION_ID, null, 0,
-            context);
+        SarosSession session = new SarosSession(SAROS_SESSION_ID, 0, context);
 
         assertFalse(session.hasActivityConsumers());
         assertFalse(session.hasActivityProducers());

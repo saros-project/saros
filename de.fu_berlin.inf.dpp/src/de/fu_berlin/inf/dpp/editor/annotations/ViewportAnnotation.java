@@ -11,7 +11,9 @@ import org.eclipse.swt.widgets.Display;
 
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.ColorUtils;
+import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 
 /**
  * The annotation that shows the viewports of users with
@@ -39,8 +41,8 @@ public class ViewportAnnotation extends SarosAnnotation implements
     private boolean multipleLines = false;
 
     public ViewportAnnotation(User source) {
-        super(ViewportAnnotation.TYPE, true, "Visible scope of "
-            + source.getNickname(), source);
+        super(ViewportAnnotation.TYPE, true, ModelFormatUtils.format(
+            Messages.ViewportAnnotation_visible_scope_of, source), source);
 
         Display display = Display.getDefault();
 

@@ -46,7 +46,6 @@ import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ColorNegotiationHook;
-import de.fu_berlin.inf.dpp.session.NicknameNegotiationHook;
 import de.fu_berlin.inf.dpp.versioning.VersionManager;
 
 /**
@@ -80,7 +79,6 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
         // Invitation hooks
         Component.create(SessionNegotiationHookManager.class),
         Component.create(ColorNegotiationHook.class),
-        Component.create(NicknameNegotiationHook.class),
         Component.create(MUCNegotiationManager.class),
 
         // Network

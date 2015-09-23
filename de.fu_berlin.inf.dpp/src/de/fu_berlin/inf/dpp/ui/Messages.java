@@ -5,6 +5,7 @@ import org.eclipse.osgi.util.NLS;
 // TODO add a guideline on how to name the strings !!!
 public class Messages extends NLS {
     private static final String BUNDLE_NAME = "de.fu_berlin.inf.dpp.ui.messages"; //$NON-NLS-1$
+
     public static String AddContactWizard_title;
     public static String AddContactWizardPage_nickname;
     public static String AddContactWizardPage_optional;
@@ -125,6 +126,9 @@ public class Messages extends NLS {
     public static String ConsistencyAction_title_inconsistency_deteced;
     public static String ConsistencyAction_tooltip_inconsistency_detected;
     public static String ConsistencyAction_tooltip_no_inconsistency;
+
+    public static String ContributionAnnotation_text_contributed_by;
+
     public static String CreateXMPPAccountWizard_already_connected;
     public static String CreateXMPPAccountWizard_already_connected_text;
     public static String CreateXMPPAccountWizard_title;
@@ -206,6 +210,9 @@ public class Messages extends NLS {
     public static String LeaveSessionAction_stop_session_tooltip;
     public static String LocalPresenceTracker_eclipse_active;
     public static String LocalPresenceTracker_eclipse_background;
+
+    public static String RemoteProgress_observing_progress_for;
+
     public static String SarosUI_permission_canceled;
     public static String SarosUI_permission_canceled_text;
     public static String SarosUI_permission_change;
@@ -216,8 +223,16 @@ public class Messages extends NLS {
     public static String SendFileAction_title;
     public static String SendFileAction_tooltip;
 
+    public static String SelectionAnnotation_cursor_of;
+    public static String SelectionAnnotation_selection_of;
+
     public static String SessionHeaderElement_no_session_running;
     public static String SessionHeaderElement_session;
+
+    public static String SessionStop_host_closed_session_title;
+    public static String SessionStop_host_closed_session_message;
+    public static String SessionStop_host_removed_you_title;
+    public static String SessionStop_host_removed_you_message;
 
     public static String ShareProjectAddContactsWizard_title;
     public static String ShareProjectAddProjectsWizard_title;
@@ -282,7 +297,6 @@ public class Messages extends NLS {
     public static String NetworkPreferencePage_upnp_label_Text;
     public static String NewContactAction_tooltip;
 
-    public static String PersonalizationPreferencePage_description;
     public static String PersonalizationPreferencePage_enable_balloon_notifications;
     public static String PersonalizationPreferencePage_enable_contribution_annotation;
     public static String PersonalizationPreferencePage_show_contribution_annotations_tooltip;
@@ -386,6 +400,8 @@ public class Messages extends NLS {
     public static String UserStatusChangeHandler_read_only;
     public static String UserStatusChangeHandler_write;
     public static String UserStatusChangeHandler_you_have_now_access;
+
+    public static String ViewportAnnotation_visible_scope_of;
 
     static {
         // initialize resource bundle

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Saros Core
 Bundle-SymbolicName: de.fu_berlin.inf.dpp.core
-Bundle-Version: 1.0.0.DEVEL
+Bundle-Version: 0.1.0
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: com.strangeberry.jmdns.tools,
  com.thoughtworks.xstream,

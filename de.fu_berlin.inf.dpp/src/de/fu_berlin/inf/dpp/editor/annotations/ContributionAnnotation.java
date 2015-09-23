@@ -4,6 +4,8 @@ import org.eclipse.jface.text.source.IAnnotationModel;
 
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
+import de.fu_berlin.inf.dpp.ui.Messages;
+import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 
 /**
  * Marks text contributions done by a user with {@link Permission#WRITE_ACCESS}.
@@ -22,8 +24,9 @@ public class ContributionAnnotation extends SarosAnnotation {
     protected IAnnotationModel model;
 
     public ContributionAnnotation(User source, IAnnotationModel model) {
-        super(ContributionAnnotation.TYPE, true, "Text contributed by "
-            + source.getNickname(), source);
+        super(ContributionAnnotation.TYPE, true, ModelFormatUtils.format(
+            Messages.ContributionAnnotation_text_contributed_by, source),
+            source);
         this.model = model;
     }
 

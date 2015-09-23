@@ -9,6 +9,7 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
+import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 
 /**
  * This is a tree element that can be displayed as a child element of the user
@@ -42,7 +43,8 @@ public class FollowModeInformationTreeElement extends
         User followee = collector.getFollowedUser(user);
         if (followee != null) {
             if (collector.isActiveEditorShared(followee)) {
-                styledString.append("following " + followee.getNickname());
+                styledString.append("following "
+                    + ModelFormatUtils.getDisplayName(followee));
             } else {
                 styledString.append(following_paused);
             }

@@ -40,6 +40,9 @@ public interface ISarosSessionManager {
      * @param host
      *            the host of the session.
      * @return the new Saros session.
+     * 
+     *         TODO remove clientNickname and hostNickname parameters (are
+     *         always null, anyway)
      */
     public ISarosSession joinSession(final String id, JID host,
         String clientNickname, String hostNickname, int clientColor,

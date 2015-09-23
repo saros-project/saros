@@ -44,6 +44,7 @@ import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.actions.ConsistencyAction;
+import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 
 /**
@@ -313,9 +314,10 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer {
 
             filesRemaining.set(pathsOfHandledFiles.size());
 
-            remoteProgress.beginTask("Consistency recovery for user "
-                + currentSession.getLocalUser().getNickname(),
-                filesRemaining.get());
+            remoteProgress.beginTask(
+                "Consistency recovery for user "
+                    + ModelFormatUtils.getDisplayName(currentSession
+                        .getLocalUser()), filesRemaining.get());
 
             fireActivity(new ChecksumErrorActivity(
                 currentSession.getLocalUser(), currentSession.getHost(),

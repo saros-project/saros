@@ -35,6 +35,7 @@ import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.User;
+import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 import org.picocontainer.annotations.Inject;
 
 import javax.swing.JButton;
@@ -152,7 +153,7 @@ public class FollowButton extends ToolbarButton {
     }
 
     private JMenuItem createItemForUser(User user) {
-        String userName = user.getNickname();
+        String userName = ModelFormatUtils.getDisplayName(user);
         String userNameShort = userName;
         int index = userNameShort.indexOf("@");
         if (index > -1) {
@@ -164,7 +165,7 @@ public class FollowButton extends ToolbarButton {
         User currentlyFollowedUser = followModeAction
             .getCurrentlyFollowedUser();
         if (currentlyFollowedUser != null) {
-            String currentUserName = currentlyFollowedUser.getNickname();
+            String currentUserName = ModelFormatUtils.getDisplayName(currentlyFollowedUser);
             if (currentUserName.equalsIgnoreCase(userNameShort)) {
                 menuItem.setEnabled(false);
             }

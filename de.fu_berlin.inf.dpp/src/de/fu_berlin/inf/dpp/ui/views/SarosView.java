@@ -63,6 +63,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.net.business.LeaveAndKickHandler.StopReason;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.net.xmpp.roster.AbstractRosterListener;
@@ -73,11 +74,11 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.BalloonNotification;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.actions.ChangeColorAction;
 import de.fu_berlin.inf.dpp.ui.actions.ChangeWriteAccessAction;
 import de.fu_berlin.inf.dpp.ui.actions.ChangeXMPPAccountAction;
 import de.fu_berlin.inf.dpp.ui.actions.ConsistencyAction;
-import de.fu_berlin.inf.dpp.ui.actions.ContactAvailabilityAction;
 import de.fu_berlin.inf.dpp.ui.actions.DeleteContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.Disposable;
 import de.fu_berlin.inf.dpp.ui.actions.FollowModeAction;
@@ -95,6 +96,7 @@ import de.fu_berlin.inf.dpp.ui.model.roster.RosterEntryElement;
 import de.fu_berlin.inf.dpp.ui.sounds.SoundPlayer;
 import de.fu_berlin.inf.dpp.ui.sounds.Sounds;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
+import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.ui.widgets.ConnectionStateComposite;
@@ -476,7 +478,6 @@ public class SarosView extends ViewPart {
                 manager.add(getAction(SendFileAction.ACTION_ID));
                 manager.add(getAction(RenameContactAction.ACTION_ID));
                 manager.add(getAction(DeleteContactAction.ACTION_ID));
-                manager.add(getAction(ContactAvailabilityAction.ACTION_ID));
             }
         });
     }
@@ -662,6 +663,31 @@ public class SarosView extends ViewPart {
     }
 
     /**
+     * TODO Move to (yet-to-be-created) IDE-independent NotificationHandler
+     * class
+     */
+    public static void showStopNotification(User user, StopReason reason) {
+        String text = null;
+        String title = null;
+
+        switch (reason) {
+        case REMOVED:
+            title = Messages.SessionStop_host_removed_you_title;
+            text = ModelFormatUtils.format(
+                Messages.SessionStop_host_removed_you_message, user);
+            break;
+
+        case SESSION_CLOSED:
+            title = Messages.SessionStop_host_closed_session_title;
+            text = ModelFormatUtils.format(
+                Messages.SessionStop_host_closed_session_message, user);
+            break;
+        }
+
+        showNotification(title, text);
+    }
+
+    /**
      * Remove any balloon notifications that might be left, because they have
      * become obsolete for a reason
      */
@@ -694,7 +720,6 @@ public class SarosView extends ViewPart {
         registerAction(new SkypeAction());
         registerAction(new RenameContactAction());
         registerAction(new DeleteContactAction());
-        registerAction(new ContactAvailabilityAction());
 
         // ContextMenus Both
         registerAction(new OpenChatAction(chatRooms));

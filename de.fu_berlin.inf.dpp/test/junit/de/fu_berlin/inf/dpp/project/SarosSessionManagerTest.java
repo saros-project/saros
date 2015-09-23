@@ -106,7 +106,7 @@ public class SarosSessionManagerTest {
         Preferences preferences = PowerMock.createNiceMock(Preferences.class);
 
         PowerMock.expectNew(SarosSession.class,
-            EasyMock.anyObject(String.class), EasyMock.isNull(String.class),
+            EasyMock.anyObject(String.class),
             EasyMock.anyInt(), EasyMock.anyObject(ISarosContext.class))
             .andStubReturn(session);
 

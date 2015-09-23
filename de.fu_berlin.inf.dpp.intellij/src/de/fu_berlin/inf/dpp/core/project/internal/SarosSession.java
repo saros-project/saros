@@ -184,25 +184,24 @@ public final class SarosSession implements ISarosSession {
     /**
      * Constructor for host.
      */
-    public SarosSession(String nickname, int colorID, ISarosContext sarosContext) {
+    public SarosSession(int colorID,
+        ISarosContext sarosContext) {
 
         this(sarosContext, /* unused */null, colorID, /* unused */
-        -1, nickname, /* unused */null);
+            -1);
     }
 
     /**
      * Constructor for client.
      */
-    public SarosSession(JID hostJID, String clientNickname,
-        String hostNickname, int clientColorID, int hostColorID,
+    public SarosSession(JID hostJID, int clientColorID, int hostColorID,
         ISarosContext sarosContext) {
 
-        this(sarosContext, hostJID, clientColorID, hostColorID, clientNickname,
-            hostNickname);
+        this(sarosContext, hostJID, clientColorID, hostColorID);
     }
 
     private SarosSession(ISarosContext context, JID host, int localColorID,
-        int hostColorID, String localNickname, String hostNickname) {
+        int hostColorID) {
 
         context.initComponent(this);
 
@@ -218,7 +217,7 @@ public final class SarosSession implements ISarosSession {
 
         assert localUserJID != null;
 
-        localUser = new User(localUserJID, localNickname, host == null, true,
+        localUser = new User(localUserJID, host == null, true,
             localColorID, localColorID);
 
         localUser.setInSession(true);
@@ -227,7 +226,7 @@ public final class SarosSession implements ISarosSession {
             hostUser = localUser;
             participants.put(hostUser.getJID(), hostUser);
         } else {
-            hostUser = new User(host, hostNickname, true, false, hostColorID,
+            hostUser = new User(host, true, false, hostColorID,
                 hostColorID);
             hostUser.setInSession(true);
             participants.put(hostUser.getJID(), hostUser);

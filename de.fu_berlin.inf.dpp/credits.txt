@@ -20,7 +20,7 @@ This project uses the following libraries:
 This is a list of people (in alphabetical order) who have been part of the 
 Saros team over the years and have contributed to the product: 
 	* Alena Kiwitt
-	* Alexander Narweleit 	
+	* Alexander Narweleit
 	* Alexander Waldmann
 	* Andreas Haferburg
 	* Andrej Szaffranietz
@@ -35,15 +35,19 @@ Saros team over the years and have contributed to the product:
 	* Christoph Viebig
 	* Christopher Oezbek
 	* Conrad Läßig
+	* Denis Washington
 	* Edna Rosen
 	* Eike Starkmann
+	* Felix Dietz
 	* Florian Pütz
 	* Florian Thiel
-	* Franz Zieris	
+	* Franz Zieris
+	* Graham Allan
 	* Hans-Christian Halfbrodt
 	* Hendrik Degener
 	* Henning Staib
-	* Holger Hans Peter Freyther   	
+	* Holger Hans Peter Freyther
+	* Holger Schmeisky
 	* Karl Beecher
 	* Karl Held
 	* Kevin Funk
@@ -64,6 +68,7 @@ Saros team over the years and have contributed to the product:
 	* Patrick Schlott
 	* Patrick Steinhardt
 	* Philipp Cordes
+	* Raimondas Kvietkauskas
 	* Riad Djemili
 	* Richard Möhn
 	* Sandor Szücs
