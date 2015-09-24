@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp.project;
+package de.fu_berlin.inf.dpp.session;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -59,14 +59,7 @@ import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
-import de.fu_berlin.inf.dpp.session.INegotiationHandler;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.SessionEndReason;
-import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.internal.SarosSession;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
 /**
@@ -295,8 +288,6 @@ public class SarosSessionManager implements ISarosSessionManager {
      */
     @Override
     public void stopSarosSession(SessionEndReason reason) {
-
-        assert !SWTUtils.isSWT() : "stopSarosSession must not be called from SWT";
 
         try {
             if (!startStopSessionLock.tryLock(LOCK_TIMEOUT,

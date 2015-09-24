@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.project;
+package de.fu_berlin.inf.dpp.session;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -25,10 +25,6 @@ import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.internal.SarosSession;
 
 @RunWith(PowerMockRunner.class)
@@ -109,9 +105,8 @@ public class SarosSessionManagerTest {
         Preferences preferences = PowerMock.createNiceMock(Preferences.class);
 
         PowerMock.expectNew(SarosSession.class,
-            EasyMock.anyObject(String.class),
-            EasyMock.anyInt(), EasyMock.anyObject(ISarosContext.class))
-            .andStubReturn(session);
+            EasyMock.anyObject(String.class), EasyMock.anyInt(),
+            EasyMock.anyObject(ISarosContext.class)).andStubReturn(session);
 
         PowerMock.replayAll();
 

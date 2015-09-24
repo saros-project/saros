@@ -30,9 +30,6 @@ import de.fu_berlin.inf.dpp.communication.chat.single.SingleUserChatService;
 import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.core.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.core.concurrent.IsInconsistentObservable;
-import de.fu_berlin.inf.dpp.core.net.business.CancelInviteHandler;
-import de.fu_berlin.inf.dpp.core.net.business.ProjectNegotiationCancellationHandler;
-import de.fu_berlin.inf.dpp.core.net.business.InvitationHandler;
 import de.fu_berlin.inf.dpp.core.vcs.NullVCSProviderFactoryImpl;
 import de.fu_berlin.inf.dpp.editor.colorstorage.ColorIDSetStorage;
 import de.fu_berlin.inf.dpp.monitoring.remote.RemoteProgressManager;
@@ -138,9 +135,6 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
         Component.create(AwarenessInformationCollector.class),
 
         // Handlers
-        Component.create(CancelInviteHandler.class),
-        Component.create(ProjectNegotiationCancellationHandler.class),
-        Component.create(InvitationHandler.class),
         Component.create(RemoteProgressManager.class),
 
     };
