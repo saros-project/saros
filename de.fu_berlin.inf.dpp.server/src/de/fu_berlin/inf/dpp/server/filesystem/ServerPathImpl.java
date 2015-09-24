@@ -177,4 +177,14 @@ public class ServerPathImpl implements IPath {
     public int hashCode() {
         return delegate.hashCode();
     }
+
+    /**
+     * Returns the {@link java.nio.files.Path} underlying this path object. For
+     * internal use only.
+     * 
+     * @return the underlying {@link java.nio.files.Path}
+     */
+    Path getDelegate() {
+        return delegate;
+    }
 }
