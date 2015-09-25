@@ -27,6 +27,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
@@ -55,7 +56,9 @@ public class FollowModeAction extends AbstractSarosAction {
         }
 
         @Override
-        public void sessionEnded(ISarosSession oldSarosSession) {
+        public void sessionEnded(ISarosSession oldSarosSession, 
+            SessionEndReason reason) {
+
             ThreadUtils.runSafeAsync(LOG, new Runnable() {
 
                 @Override

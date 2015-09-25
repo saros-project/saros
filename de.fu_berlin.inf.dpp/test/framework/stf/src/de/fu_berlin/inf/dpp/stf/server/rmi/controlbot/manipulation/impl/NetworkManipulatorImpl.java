@@ -25,6 +25,7 @@ import de.fu_berlin.inf.dpp.session.IActivityListener;
 import de.fu_berlin.inf.dpp.session.IActivityProducer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.bot.SarosSWTBotPreferences;
@@ -517,7 +518,7 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
     }
 
     @Override
-    public void sessionEnded(ISarosSession session) {
+    public void sessionEnded(ISarosSession session, SessionEndReason reason) {
         // NOP
 
     }

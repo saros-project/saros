@@ -20,6 +20,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.ViewerUtils;
@@ -85,7 +86,7 @@ public abstract class SessionDisplayComposite extends
         }
 
         @Override
-        public void sessionEnded(ISarosSession session) {
+        public void sessionEnded(ISarosSession session, SessionEndReason reason) {
             SWTUtils.runSafeSWTAsync(LOGGER, new Runnable() {
 
                 @Override

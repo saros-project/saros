@@ -63,6 +63,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import org.apache.log4j.Logger;
@@ -317,7 +318,9 @@ public class EditorManager extends AbstractActivityProducer implements
         }
 
         @Override
-        public void sessionEnded(ISarosSession oldSarosSession) {
+        public void sessionEnded(ISarosSession oldSarosSession, 
+            SessionEndReason reason) {
+            
             assert session == oldSarosSession;
             session.getStopManager()
                 .removeBlockable(stopManagerListener); //todo

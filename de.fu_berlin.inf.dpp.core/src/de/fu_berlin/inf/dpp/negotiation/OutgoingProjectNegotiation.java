@@ -35,6 +35,7 @@ import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.vcs.VCSProvider;
@@ -261,7 +262,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     @Override
     protected void executeCancellation() {
         if (session.getRemoteUsers().isEmpty())
-            sessionManager.stopSarosSession();
+            sessionManager.stopSarosSession(SessionEndReason.LOCAL_USER_LEFT);
     }
 
     private List<StartHandle> stopUsers(IProgressMonitor monitor) {

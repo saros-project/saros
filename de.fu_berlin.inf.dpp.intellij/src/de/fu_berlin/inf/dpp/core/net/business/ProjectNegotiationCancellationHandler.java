@@ -13,6 +13,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.SessionEndReason;
 
 /**
  * Listens for {@link CancelProjectNegotiationExtension} packets that signal a
@@ -48,7 +49,7 @@ public class ProjectNegotiationCancellationHandler {
         }
 
         @Override
-        public void sessionEnded(ISarosSession session) {
+        public void sessionEnded(ISarosSession session, SessionEndReason reason) {
             receiver.removePacketListener(cancelProjectNegotiationListener);
         }
     };

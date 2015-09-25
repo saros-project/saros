@@ -49,6 +49,7 @@ import de.fu_berlin.inf.dpp.session.INegotiationHandler;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.internal.SarosSession;
 import de.fu_berlin.inf.dpp.util.StackTrace;
@@ -129,7 +130,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             ConnectionState state) {
 
             if (state == ConnectionState.DISCONNECTING) {
-                stopSarosSession();
+                stopSarosSession(SessionEndReason.CONNECTION_LOST);
             }
         }
     };
@@ -279,7 +280,7 @@ public class SarosSessionManager implements ISarosSessionManager {
      * @nonSWT
      */
     @Override
-    public void stopSarosSession() {
+    public void stopSarosSession(SessionEndReason reason) {
 
         try {
             if (!startStopSessionLock.tryLock(LOCK_TIMEOUT,
@@ -336,7 +337,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
             sarosSessionObservable.setValue(null);
 
-            sessionEnded(sarosSession);
+            sessionEnded(sarosSession, reason);
 
             sessionIDObservable.setValue(SessionIDObservable.NOT_IN_SESSION);
 
@@ -709,10 +710,12 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
     }
 
-    private void sessionEnded(ISarosSession sarosSession) {
+    private void sessionEnded(ISarosSession sarosSession,
+        SessionEndReason reason) {
+
         for (ISessionLifecycleListener listener : sessionLifecycleListeners) {
             try {
-                listener.sessionEnded(sarosSession);
+                listener.sessionEnded(sarosSession, reason);
             } catch (RuntimeException e) {
                 log.error("error in notifying listener of session end: ", e);
             }

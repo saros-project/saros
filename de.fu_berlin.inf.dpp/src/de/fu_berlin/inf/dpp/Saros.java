@@ -55,6 +55,7 @@ import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;
 import de.fu_berlin.inf.dpp.misc.pico.DotGraphMonitor;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.ui.browser.EclipseHTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
@@ -316,7 +317,8 @@ public class Saros extends AbstractUIPlugin {
 
                         try {
 
-                            sessionManager.stopSarosSession();
+                            sessionManager
+                                .stopSarosSession(SessionEndReason.LOCAL_USER_LEFT);
                             connectionHandler.disconnect();
                         } finally {
                             /*

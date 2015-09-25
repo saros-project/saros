@@ -67,8 +67,10 @@ public interface ISessionLifecycleListener {
      * 
      * @param session
      *            the session that has been ended
+     * @param reason
+     *            the reason why the session ended
      */
-    public void sessionEnded(ISarosSession session);
+    public void sessionEnded(ISarosSession session, SessionEndReason reason);
 
     /**
      * Is fired as soon as all shared resources of a recently-added project in

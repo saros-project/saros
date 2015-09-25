@@ -28,6 +28,7 @@ import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.internal.SarosSession;
 
 @RunWith(PowerMockRunner.class)
@@ -57,7 +58,8 @@ public class SarosSessionManagerTest {
         }
 
         @Override
-        public void sessionEnded(ISarosSession oldSarosSession) {
+        public void sessionEnded(ISarosSession oldSarosSession,
+            SessionEndReason reason) {
             checkAndSetState(2, -1);
         }
 
@@ -86,7 +88,8 @@ public class SarosSessionManagerTest {
         }
 
         @Override
-        public void sessionEnded(ISarosSession oldSarosSession) {
+        public void sessionEnded(ISarosSession oldSarosSession,
+            SessionEndReason reason) {
             throw new DummyError();
         }
     }
@@ -122,7 +125,7 @@ public class SarosSessionManagerTest {
     public void testStartStopListenerCallback() {
         manager.addSessionLifecycleListener(new StateVerifyListener());
         manager.startSession(new HashMap<IProject, List<IResource>>());
-        manager.stopSarosSession();
+        manager.stopSarosSession(SessionEndReason.LOCAL_USER_LEFT);
     }
 
     @Test
@@ -130,22 +133,22 @@ public class SarosSessionManagerTest {
         manager.addSessionLifecycleListener(new StateVerifyListener());
         manager.startSession(new HashMap<IProject, List<IResource>>());
         manager.startSession(new HashMap<IProject, List<IResource>>());
-        manager.stopSarosSession();
+        manager.stopSarosSession(SessionEndReason.LOCAL_USER_LEFT);
     }
 
     @Test
     public void testMultipleStops() {
         manager.addSessionLifecycleListener(new StateVerifyListener());
         manager.startSession(new HashMap<IProject, List<IResource>>());
-        manager.stopSarosSession();
-        manager.stopSarosSession();
+        manager.stopSarosSession(SessionEndReason.LOCAL_USER_LEFT);
+        manager.stopSarosSession(SessionEndReason.LOCAL_USER_LEFT);
     }
 
     @Test(expected = DummyError.class)
     public void testListenerDispatchIsNotCatchingErrors() {
         manager.addSessionLifecycleListener(new ErrorThrowingListener());
         manager.startSession(new HashMap<IProject, List<IResource>>());
-        manager.stopSarosSession();
+        manager.stopSarosSession(SessionEndReason.LOCAL_USER_LEFT);
     }
 
     @Test
@@ -157,13 +160,13 @@ public class SarosSessionManagerTest {
             public void sessionEnding(ISarosSession oldSarosSession) {
                 assertTrue("stopSession is executed recusive", count == 0);
                 count++;
-                manager.stopSarosSession();
+                manager.stopSarosSession(SessionEndReason.LOCAL_USER_LEFT);
             }
 
         };
         manager.addSessionLifecycleListener(listener);
         manager.startSession(new HashMap<IProject, List<IResource>>());
-        manager.stopSarosSession();
+        manager.stopSarosSession(SessionEndReason.LOCAL_USER_LEFT);
     }
 
     @Test
@@ -192,7 +195,7 @@ public class SarosSessionManagerTest {
             @Override
             public void sessionStarting(ISarosSession oldSarosSession) {
                 try {
-                    manager.stopSarosSession();
+                    manager.stopSarosSession(SessionEndReason.LOCAL_USER_LEFT);
                 } catch (RuntimeException e) {
                     exception.set(e);
                 }
@@ -227,7 +230,7 @@ public class SarosSessionManagerTest {
         };
         manager.addSessionLifecycleListener(listener);
         manager.startSession(new HashMap<IProject, List<IResource>>());
-        manager.stopSarosSession();
+        manager.stopSarosSession(SessionEndReason.LOCAL_USER_LEFT);
 
         RuntimeException rte = exception.get();
 

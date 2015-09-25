@@ -24,6 +24,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ColorNegotiationHook;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.SessionEndReason;
 
 /*
  * IMPORTANT: All messages in the cancellation exception are SHOWN to the end user !
@@ -95,7 +96,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
          * until we explicitly call this method even if we do not start any
          * session at all !
          */
-        sessionManager.stopSarosSession();
+        sessionManager.stopSarosSession(SessionEndReason.LOCAL_USER_LEFT);
     }
 
     /**

@@ -33,6 +33,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 import org.picocontainer.annotations.Inject;
@@ -94,7 +95,8 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
         }
 
         @Override
-        public void sessionEnded(final ISarosSession oldSarosSession) {
+        public void sessionEnded(final ISarosSession oldSarosSession, 
+            SessionEndReason reason) {
 
             UIUtil.invokeLaterIfNeeded(new Runnable() {
                 @Override

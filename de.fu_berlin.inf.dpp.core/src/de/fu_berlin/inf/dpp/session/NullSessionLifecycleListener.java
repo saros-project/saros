@@ -47,7 +47,7 @@ public class NullSessionLifecycleListener implements
     }
 
     @Override
-    public void sessionEnded(ISarosSession session) {
+    public void sessionEnded(ISarosSession session, SessionEndReason reason) {
         // NOP
     }
 

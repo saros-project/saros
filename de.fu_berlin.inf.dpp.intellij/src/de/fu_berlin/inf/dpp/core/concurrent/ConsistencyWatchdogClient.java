@@ -43,6 +43,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 import org.apache.log4j.Logger;
@@ -208,7 +209,9 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer {
         }
 
         @Override
-        public void sessionEnded(ISarosSession oldSarosSession) {
+        public void sessionEnded(ISarosSession oldSarosSession,
+            SessionEndReason reason) {
+
             oldSarosSession.removeActivityConsumer(consumer);
             oldSarosSession
                 .removeActivityProducer(ConsistencyWatchdogClient.this);

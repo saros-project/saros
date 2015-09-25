@@ -6,6 +6,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
@@ -26,7 +27,7 @@ public class UserStatusChangeHandler {
         }
 
         @Override
-        public void sessionEnded(ISarosSession session) {
+        public void sessionEnded(ISarosSession session, SessionEndReason reason) {
             session.removeListener(sessionListener);
         }
 

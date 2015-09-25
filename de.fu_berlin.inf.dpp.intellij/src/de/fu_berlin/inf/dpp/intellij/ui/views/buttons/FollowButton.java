@@ -34,6 +34,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 import org.picocontainer.annotations.Inject;
@@ -74,7 +75,9 @@ public class FollowButton extends ToolbarButton {
         }
 
         @Override
-        public void sessionEnded(ISarosSession oldSarosSession) {
+        public void sessionEnded(ISarosSession oldSarosSession, 
+            SessionEndReason reason) {
+
             oldSarosSession.removeListener(sessionListener);
             updateMenu();
             setEnabledFromUIThread(false);

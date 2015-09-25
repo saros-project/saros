@@ -9,6 +9,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
@@ -53,7 +54,7 @@ public class LeaveAndKickHandler {
         }
 
         @Override
-        public void sessionEnded(ISarosSession session) {
+        public void sessionEnded(ISarosSession session, SessionEndReason reason) {
             receiver.removePacketListener(leaveExtensionListener);
             receiver.removePacketListener(kickExtensionListener);
         }
@@ -143,7 +144,7 @@ public class LeaveAndKickHandler {
         ThreadUtils.runSafeAsync("StopSessionOnHostLeave", log, new Runnable() {
             @Override
             public void run() {
-                sessionManager.stopSarosSession();
+                sessionManager.stopSarosSession(SessionEndReason.HOST_LEFT);
                 NotificationPanel.showNotification(topic, reason);
             }
         });

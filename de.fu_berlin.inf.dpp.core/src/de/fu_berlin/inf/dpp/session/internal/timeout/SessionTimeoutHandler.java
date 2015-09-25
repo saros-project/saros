@@ -8,6 +8,7 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.session.internal.IActivitySequencerCallback;
@@ -112,7 +113,8 @@ abstract class SessionTimeoutHandler implements Startable {
                 new Runnable() {
                     @Override
                     public void run() {
-                        sessionManager.stopSarosSession();
+                        sessionManager
+                            .stopSarosSession(SessionEndReason.CONNECTION_LOST);
                     }
                 });
         }

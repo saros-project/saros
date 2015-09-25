@@ -48,10 +48,14 @@ public interface ISarosSessionManager {
     /**
      * Leaves the currently active session. If the local user is the host, this
      * will close the session for everybody.
-     * 
+     * <p>
      * Has no effect if there is no open session.
+     * </p>
+     * 
+     * @param reason
+     *            the reason why the session ended
      */
-    public void stopSarosSession();
+    public void stopSarosSession(SessionEndReason reason);
 
     /**
      * Add the given session life-cycle listener.

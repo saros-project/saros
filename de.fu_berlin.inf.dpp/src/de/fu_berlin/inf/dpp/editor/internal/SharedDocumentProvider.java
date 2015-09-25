@@ -14,6 +14,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -47,7 +48,7 @@ public final class SharedDocumentProvider extends TextFileDocumentProvider {
         }
 
         @Override
-        public void sessionEnded(final ISarosSession session) {
+        public void sessionEnded(final ISarosSession session, SessionEndReason reason) {
             assert SharedDocumentProvider.this.session == session;
             session.removeListener(sessionListener);
             SharedDocumentProvider.this.session = null;

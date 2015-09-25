@@ -31,6 +31,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
@@ -106,7 +107,7 @@ public class FollowModeAction extends Action implements IMenuCreator,
         }
 
         @Override
-        public void sessionEnded(ISarosSession oldSarosSession) {
+        public void sessionEnded(ISarosSession oldSarosSession, SessionEndReason reason) {
             oldSarosSession.removeListener(sessionListener);
             SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
 

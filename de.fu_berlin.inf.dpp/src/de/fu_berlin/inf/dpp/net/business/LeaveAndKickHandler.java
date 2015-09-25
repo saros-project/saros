@@ -13,6 +13,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
@@ -24,10 +25,6 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 // FIXME move this class into the session context
 @Component(module = "net")
 public class LeaveAndKickHandler {
-
-    public enum StopReason {
-        REMOVED, SESSION_CLOSED
-    }
 
     private static final Logger log = Logger
         .getLogger(LeaveAndKickHandler.class.getName());
@@ -50,7 +47,7 @@ public class LeaveAndKickHandler {
         }
 
         @Override
-        public void sessionEnded(ISarosSession session) {
+        public void sessionEnded(ISarosSession session, SessionEndReason reason) {
             receiver.removePacketListener(leaveExtensionListener);
             receiver.removePacketListener(kickExtensionListener);
         }
@@ -96,7 +93,7 @@ public class LeaveAndKickHandler {
             return;
         }
 
-        stopSession(user, StopReason.REMOVED);
+        stopSession(user, SessionEndReason.KICKED);
     }
 
     private void leaveReceived(JID from) {
@@ -125,7 +122,7 @@ public class LeaveAndKickHandler {
          * context which executes all incoming packets sequentially
          */
         if (user.isHost()) {
-            stopSession(user, StopReason.SESSION_CLOSED);
+            stopSession(user, SessionEndReason.HOST_LEFT);
 
         }
 
@@ -149,11 +146,11 @@ public class LeaveAndKickHandler {
 
     }
 
-    private void stopSession(final User user, final StopReason reason) {
+    private void stopSession(final User user, final SessionEndReason reason) {
         ThreadUtils.runSafeAsync("dpp-stop-host", log, new Runnable() {
             @Override
             public void run() {
-                sessionManager.stopSarosSession();
+                sessionManager.stopSarosSession(reason);
                 SarosView.showStopNotification(user, reason);
             }
         });

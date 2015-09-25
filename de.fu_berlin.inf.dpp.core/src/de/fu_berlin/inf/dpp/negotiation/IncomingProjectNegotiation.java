@@ -40,6 +40,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.util.CoreUtils;
 import de.fu_berlin.inf.dpp.vcs.VCSProvider;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
@@ -561,7 +562,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         // The session might have been stopped already, if not we will stop it.
         if (session.getProjectResourcesMapping().keySet().isEmpty()
             || session.getRemoteUsers().isEmpty())
-            sessionManager.stopSarosSession();
+            sessionManager.stopSarosSession(SessionEndReason.LOCAL_USER_LEFT);
     }
 
     @Override

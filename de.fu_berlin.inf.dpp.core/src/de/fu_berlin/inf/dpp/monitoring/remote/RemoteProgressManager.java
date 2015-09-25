@@ -21,6 +21,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
@@ -115,7 +116,7 @@ public class RemoteProgressManager extends AbstractActivityProducer {
          * session has ended.
          */
         @Override
-        public void sessionEnded(ISarosSession session) {
+        public void sessionEnded(ISarosSession session, SessionEndReason reason) {
             session.removeActivityConsumer(consumer);
             session.removeActivityProducer(RemoteProgressManager.this);
             session.removeListener(sessionListener);

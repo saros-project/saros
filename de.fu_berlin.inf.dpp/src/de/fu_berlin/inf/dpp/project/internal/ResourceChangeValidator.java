@@ -20,6 +20,7 @@ import de.fu_berlin.inf.dpp.project.Messages;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 
 /**
@@ -116,7 +117,7 @@ public class ResourceChangeValidator extends ModelProvider {
             }
 
             @Override
-            public void sessionEnded(ISarosSession oldSarosSession) {
+            public void sessionEnded(ISarosSession oldSarosSession, SessionEndReason reason) {
                 assert sarosSession == oldSarosSession;
                 sarosSession = null;
             }

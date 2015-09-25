@@ -34,6 +34,7 @@ import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.internal.SarosSession;
 import de.fu_berlin.inf.dpp.ui.Messages;
@@ -154,7 +155,8 @@ public class CollaborationUtils {
         ThreadUtils.runSafeAsync("StopSession", LOG, new Runnable() {
             @Override
             public void run() {
-                sessionManager.stopSarosSession();
+                sessionManager
+                    .stopSarosSession(SessionEndReason.LOCAL_USER_LEFT);
             }
         });
     }

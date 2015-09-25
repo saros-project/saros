@@ -23,6 +23,7 @@ import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.SessionEndReason;
 
 /**
  * This class is responsible for receiving, handling, and/or forwarding specific
@@ -62,7 +63,7 @@ final class NegotiationPacketListener {
         }
 
         @Override
-        public void sessionEnded(ISarosSession session) {
+        public void sessionEnded(ISarosSession session, SessionEndReason reason) {
             receiver.removePacketListener(projectNegotiationRequestListener);
             receiver.removePacketListener(projectNegotiationCanceledListener);
         }
