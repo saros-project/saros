@@ -15,11 +15,11 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.test.Constants;
-import de.fu_berlin.inf.dpp.test.util.TestThread;
+import de.fu_berlin.inf.dpp.test.util.EclipseTestThread;
 
 public class EditDuringNonHostInvitationTest extends StfTestCase {
 
-    private TestThread aliceIsWriting;
+    private EclipseTestThread aliceIsWriting;
 
     @BeforeClass
     public static void selectTesters() throws Exception {
@@ -48,7 +48,7 @@ public class EditDuringNonHostInvitationTest extends StfTestCase {
 
         CARL.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
 
-        aliceIsWriting = createTestThread(new TestThread.Runnable() {
+        aliceIsWriting = createTestThread(new EclipseTestThread.Runnable() {
 
             @Override
             public void run() throws Exception {

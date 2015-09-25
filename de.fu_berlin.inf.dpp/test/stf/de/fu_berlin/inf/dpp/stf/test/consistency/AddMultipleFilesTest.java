@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
-import de.fu_berlin.inf.dpp.test.util.TestThread;
+import de.fu_berlin.inf.dpp.test.util.EclipseTestThread;
 
 public class AddMultipleFilesTest extends StfTestCase {
 
@@ -18,8 +18,8 @@ public class AddMultipleFilesTest extends StfTestCase {
         select(ALICE, BOB);
     }
 
-    private TestThread alice;
-    private TestThread bob;
+    private EclipseTestThread alice;
+    private EclipseTestThread bob;
 
     /*
      * So what is going wrong here ? Alice sends a big file, that is now
@@ -38,7 +38,7 @@ public class AddMultipleFilesTest extends StfTestCase {
         BOB.superBot().views().packageExplorerView()
             .waitUntilResourceIsShared("foo/main");
 
-        TestThread.Runnable aliceFileTask = new TestThread.Runnable() {
+        EclipseTestThread.Runnable aliceFileTask = new EclipseTestThread.Runnable() {
             @Override
             public void run() throws Exception {
                 for (int i = 0; i < 10; i++) {
@@ -55,7 +55,7 @@ public class AddMultipleFilesTest extends StfTestCase {
             }
         };
 
-        TestThread.Runnable bobFileTask = new TestThread.Runnable() {
+        EclipseTestThread.Runnable bobFileTask = new EclipseTestThread.Runnable() {
             @Override
             public void run() throws Exception {
                 for (int i = 0; i < 1000; i++) {

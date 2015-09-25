@@ -12,7 +12,7 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
-import de.fu_berlin.inf.dpp.test.util.TestThread;
+import de.fu_berlin.inf.dpp.test.util.EclipseTestThread;
 
 /**
  * This class tests the concurrent editing of three buddies during a session.
@@ -21,9 +21,9 @@ import de.fu_berlin.inf.dpp.test.util.TestThread;
  */
 
 public class ConcurrentEditingWith3BuddiesTest extends StfTestCase {
-    private TestThread aliceEditTaskThread;
-    private TestThread bobEditTaskThread;
-    private TestThread carlEditTaskThread;
+    private EclipseTestThread aliceEditTaskThread;
+    private EclipseTestThread bobEditTaskThread;
+    private EclipseTestThread carlEditTaskThread;
 
     /*
      * The interval is the period of time in which the users edit the file. The
@@ -81,7 +81,7 @@ public class ConcurrentEditingWith3BuddiesTest extends StfTestCase {
         /*
          * The Alice-Thread insert the lower case characters
          */
-        TestThread.Runnable aliceEditTask = new TestThread.Runnable() {
+        EclipseTestThread.Runnable aliceEditTask = new EclipseTestThread.Runnable() {
             @Override
             public void run() throws Exception {
 
@@ -105,7 +105,7 @@ public class ConcurrentEditingWith3BuddiesTest extends StfTestCase {
         /*
          * The Carl-Thread delete a range of characters
          */
-        TestThread.Runnable carlEditTask = new TestThread.Runnable() {
+        EclipseTestThread.Runnable carlEditTask = new EclipseTestThread.Runnable() {
             @Override
             public void run() throws Exception {
                 int i = 48;
@@ -131,7 +131,7 @@ public class ConcurrentEditingWith3BuddiesTest extends StfTestCase {
         /*
          * The Bob-Thread insert the upper case characters
          */
-        TestThread.Runnable bobEditTask = new TestThread.Runnable() {
+        EclipseTestThread.Runnable bobEditTask = new EclipseTestThread.Runnable() {
             @Override
             public void run() throws Exception {
                 int i = 65;
@@ -236,7 +236,7 @@ public class ConcurrentEditingWith3BuddiesTest extends StfTestCase {
         /*
          * The Alice-Thread insert the lower case characters
          */
-        TestThread.Runnable aliceEditTask = new TestThread.Runnable() {
+        EclipseTestThread.Runnable aliceEditTask = new EclipseTestThread.Runnable() {
             @Override
             public void run() throws Exception {
                 int i = 97;
@@ -258,7 +258,7 @@ public class ConcurrentEditingWith3BuddiesTest extends StfTestCase {
         /*
          * The Carl-Thread insert numbers
          */
-        TestThread.Runnable carlEditTask = new TestThread.Runnable() {
+        EclipseTestThread.Runnable carlEditTask = new EclipseTestThread.Runnable() {
             @Override
             public void run() throws Exception {
                 int i = 48;
@@ -280,7 +280,7 @@ public class ConcurrentEditingWith3BuddiesTest extends StfTestCase {
         /*
          * The Bob-Thread insert the upper case characters
          */
-        TestThread.Runnable bobEditTask = new TestThread.Runnable() {
+        EclipseTestThread.Runnable bobEditTask = new EclipseTestThread.Runnable() {
             @Override
             public void run() throws Exception {
                 int i = 65;

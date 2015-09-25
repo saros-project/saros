@@ -3,10 +3,14 @@ package de.fu_berlin.inf.dpp.test.util;
 /**
  * A Thread which runs the give Runnable. After the thread finished, you might
  * call verify to ensure that no exceptions where thrown during execution of the
- * given Runnable
+ * given Runnable.
+ * 
+ * TODO: This is a copy of 'TestThread' in the core project. One could either
+ * export that class from the core bundle as well, or provide it in a separate
+ * bundle to be used for STF tests.
  */
 
-public class TestThread extends Thread {
+public class EclipseTestThread extends Thread {
 
     public interface Runnable {
         public void run() throws Exception;
@@ -19,12 +23,12 @@ public class TestThread extends Thread {
     private java.lang.Runnable runnableToRun;
     private Runnable testThreadRunnable;
 
-    public TestThread(java.lang.Runnable runnable) {
+    public EclipseTestThread(java.lang.Runnable runnable) {
         this.runnableToRun = runnable;
         this.setName("Test-Thread:" + runnable.toString());
     }
 
-    public TestThread(Runnable runnable) {
+    public EclipseTestThread(Runnable runnable) {
         this.testThreadRunnable = runnable;
         this.setName("Test-Thread:" + runnable.toString());
     }

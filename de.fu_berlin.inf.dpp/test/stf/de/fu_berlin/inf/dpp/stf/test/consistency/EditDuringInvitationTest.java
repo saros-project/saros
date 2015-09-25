@@ -15,7 +15,7 @@ import de.fu_berlin.inf.dpp.stf.annotation.TestLink;
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.test.Constants;
-import de.fu_berlin.inf.dpp.test.util.TestThread;
+import de.fu_berlin.inf.dpp.test.util.EclipseTestThread;
 
 @TestLink(id = "Saros-36_edit_during_invitation")
 public class EditDuringInvitationTest extends StfTestCase {
@@ -46,7 +46,7 @@ public class EditDuringInvitationTest extends StfTestCase {
 
         CARL.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
 
-        TestThread bobIsWriting = createTestThread(new TestThread.Runnable() {
+        EclipseTestThread bobIsWriting = createTestThread(new EclipseTestThread.Runnable() {
 
             @Override
             public void run() throws Exception {

@@ -10,7 +10,7 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
-import de.fu_berlin.inf.dpp.test.util.TestThread;
+import de.fu_berlin.inf.dpp.test.util.EclipseTestThread;
 
 public class EditDifferentFilesTest extends StfTestCase {
 
@@ -35,7 +35,7 @@ public class EditDifferentFilesTest extends StfTestCase {
         BOB.superBot().views().packageExplorerView()
             .waitUntilResourceIsShared("foo/src/bar/HelloWorld.java");
 
-        TestThread.Runnable aliceEditTask = new TestThread.Runnable() {
+        EclipseTestThread.Runnable aliceEditTask = new EclipseTestThread.Runnable() {
             @Override
             public void run() throws Exception {
                 String textToType = "This is a long, long, long and\n long working test that bla bla bla";
@@ -49,7 +49,7 @@ public class EditDifferentFilesTest extends StfTestCase {
             }
         };
 
-        TestThread.Runnable bobEditTask = new TestThread.Runnable() {
+        EclipseTestThread.Runnable bobEditTask = new EclipseTestThread.Runnable() {
             @Override
             public void run() throws Exception {
                 String textToType = "Dieses ist ein sehr, sehr, sehr,\n langer bla bla bla";
@@ -66,8 +66,8 @@ public class EditDifferentFilesTest extends StfTestCase {
             }
         };
 
-        TestThread alice = createTestThread(aliceEditTask);
-        TestThread bob = createTestThread(bobEditTask);
+        EclipseTestThread alice = createTestThread(aliceEditTask);
+        EclipseTestThread bob = createTestThread(bobEditTask);
 
         alice.start();
         bob.start();

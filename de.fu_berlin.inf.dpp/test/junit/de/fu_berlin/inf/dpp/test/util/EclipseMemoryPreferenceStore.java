@@ -8,7 +8,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 
-public class MemoryPreferenceStore implements IPreferenceStore {
+public class EclipseMemoryPreferenceStore implements IPreferenceStore {
 
     // TODO fire property changes
 

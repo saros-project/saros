@@ -24,7 +24,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.IRemoteWorkbenchBot;
-import de.fu_berlin.inf.dpp.test.util.TestThread;
+import de.fu_berlin.inf.dpp.test.util.EclipseTestThread;
 
 public abstract class StfTestCase {
 
@@ -103,7 +103,7 @@ public abstract class StfTestCase {
 
     private static List<AbstractTester> currentTesters = new ArrayList<AbstractTester>();
 
-    private static List<TestThread> currentTestThreads = new ArrayList<TestThread>();
+    private static List<EclipseTestThread> currentTestThreads = new ArrayList<EclipseTestThread>();
 
     private static Class<?> lastTestClass;
 
@@ -617,16 +617,18 @@ public abstract class StfTestCase {
     }
 
     /**
-     * Creates a new {@link TestThread}. The test thread can be terminated by
-     * calling {@link #terminateTestThreads}. The test thread is automatically
-     * terminated after the <b>last</b> test of the test class is executed.
+     * Creates a new {@link EclipseTestThread}. The test thread can be
+     * terminated by calling {@link #terminateTestThreads}. The test thread is
+     * automatically terminated after the <b>last</b> test of the test class is
+     * executed.
      * 
      * @param runnable
      *            the runnable that should be executed in this test thread
      * @return a new, not yet started, test thread
      */
-    public static TestThread createTestThread(TestThread.Runnable runnable) {
-        TestThread thread = new TestThread(runnable);
+    public static EclipseTestThread createTestThread(
+        EclipseTestThread.Runnable runnable) {
+        EclipseTestThread thread = new EclipseTestThread(runnable);
         currentTestThreads.add(thread);
         return thread;
     }
@@ -642,19 +644,19 @@ public abstract class StfTestCase {
      *             if there are still test threads running
      */
     public static void terminateTestThreads(long timeout) {
-        for (TestThread thread : currentTestThreads)
+        for (EclipseTestThread thread : currentTestThreads)
             thread.interrupt();
 
-        if (Util
-            .joinAll(timeout, currentTestThreads.toArray(new TestThread[0]))) {
+        if (Util.joinAll(timeout,
+            currentTestThreads.toArray(new EclipseTestThread[0]))) {
             currentTestThreads.clear();
             return;
         }
 
-        for (Iterator<TestThread> it = currentTestThreads.iterator(); it
+        for (Iterator<EclipseTestThread> it = currentTestThreads.iterator(); it
             .hasNext();) {
 
-            TestThread thread = it.next();
+            EclipseTestThread thread = it.next();
 
             if (!thread.isAlive())
                 it.remove();
@@ -684,7 +686,7 @@ public abstract class StfTestCase {
 
         StfTestCase.abortAllTests = true;
 
-        for (TestThread thread : currentTestThreads)
+        for (EclipseTestThread thread : currentTestThreads)
             thread.stop();
 
         currentTestThreads.clear();

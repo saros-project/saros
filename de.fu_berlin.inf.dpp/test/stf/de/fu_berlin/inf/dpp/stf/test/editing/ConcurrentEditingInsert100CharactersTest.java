@@ -12,7 +12,7 @@ import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
-import de.fu_berlin.inf.dpp.test.util.TestThread;
+import de.fu_berlin.inf.dpp.test.util.EclipseTestThread;
 
 public class ConcurrentEditingInsert100CharactersTest extends StfTestCase {
 
@@ -20,13 +20,13 @@ public class ConcurrentEditingInsert100CharactersTest extends StfTestCase {
 
     private static final int KEYSTROKE_LIMIT = 100;
 
-    private TestThread aliceEditTaskThread;
+    private EclipseTestThread aliceEditTaskThread;
 
-    private TestThread bobEditTaskThread;
+    private EclipseTestThread bobEditTaskThread;
 
-    private TestThread carlEditTaskThread;
+    private EclipseTestThread carlEditTaskThread;
 
-    private static class TypeTask implements TestThread.Runnable {
+    private static class TypeTask implements EclipseTestThread.Runnable {
 
         private AbstractTester tester;
         private String editorName;

@@ -24,7 +24,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.test.util.MemoryPreferenceStore;
+import de.fu_berlin.inf.dpp.test.util.EclipseMemoryPreferenceStore;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(User.class)
@@ -36,7 +36,7 @@ public class ContributionAnnotationManagerTest {
 
     @Before
     public void setUp() {
-        store = new MemoryPreferenceStore();
+        store = new EclipseMemoryPreferenceStore();
         store.setValue(
             EclipsePreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS, true);
 

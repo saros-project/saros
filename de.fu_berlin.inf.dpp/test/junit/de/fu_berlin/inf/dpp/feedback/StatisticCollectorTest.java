@@ -27,7 +27,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.internal.SarosSessionTest;
-import de.fu_berlin.inf.dpp.test.util.MemoryPreferenceStore;
+import de.fu_berlin.inf.dpp.test.util.EclipseMemoryPreferenceStore;
 import de.fu_berlin.inf.dpp.test.util.MemoryPreferences;
 
 public class StatisticCollectorTest {
@@ -112,7 +112,7 @@ public class StatisticCollectorTest {
         EditorManager editorManager = createEditorManagerMock(editorListeners);
         container.addComponent(EditorManager.class, editorManager);
 
-        final IPreferenceStore store = new MemoryPreferenceStore();
+        final IPreferenceStore store = new EclipseMemoryPreferenceStore();
         final Preferences preferences = new MemoryPreferences();
 
         EclipsePreferenceInitializer.setPreferences(store);

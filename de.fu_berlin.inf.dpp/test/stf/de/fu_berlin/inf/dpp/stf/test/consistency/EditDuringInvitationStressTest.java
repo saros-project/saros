@@ -18,11 +18,11 @@ import de.fu_berlin.inf.dpp.stf.client.tester.SarosTester;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 import de.fu_berlin.inf.dpp.stf.test.Constants;
-import de.fu_berlin.inf.dpp.test.util.TestThread;
+import de.fu_berlin.inf.dpp.test.util.EclipseTestThread;
 
 public class EditDuringInvitationStressTest extends StfTestCase {
 
-    private TestThread bobIsWriting;
+    private EclipseTestThread bobIsWriting;
     private final String[] CLASS_NAMES = { "ClassA", "ClassB", "ClassC",
         "ClassD", "ClassE" };
 
@@ -56,7 +56,7 @@ public class EditDuringInvitationStressTest extends StfTestCase {
 
         CARL.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
 
-        bobIsWriting = createTestThread(new TestThread.Runnable() {
+        bobIsWriting = createTestThread(new EclipseTestThread.Runnable() {
 
             private final Random random = new Random();
 

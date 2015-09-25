@@ -63,7 +63,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSessionContextFactory;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.test.fakes.synchonize.NonUISynchronizer;
-import de.fu_berlin.inf.dpp.test.util.MemoryPreferenceStore;
+import de.fu_berlin.inf.dpp.test.util.EclipseMemoryPreferenceStore;
 import de.fu_berlin.inf.dpp.test.util.MemoryPreferences;
 
 @RunWith(PowerMockRunner.class)
@@ -270,7 +270,7 @@ public class SarosSessionTest {
         container.addComponent(ISarosSessionContextFactory.class,
             SarosEclipseSessionContextFactory.class);
 
-        final IPreferenceStore store = new MemoryPreferenceStore();
+        final IPreferenceStore store = new EclipseMemoryPreferenceStore();
         EclipsePreferenceInitializer.setPreferences(store);
 
         final Preferences preferences = new MemoryPreferences();

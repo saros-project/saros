@@ -10,12 +10,12 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.stf.annotation.TestLink;
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
-import de.fu_berlin.inf.dpp.test.util.TestThread;
+import de.fu_berlin.inf.dpp.test.util.EclipseTestThread;
 
 @TestLink(id = "Saros-7_consistency_watchdog_and_stop_manager")
 public class RecoveryWhileTypingTest extends StfTestCase {
 
-    private TestThread aliceEditTaskThread;
+    private EclipseTestThread aliceEditTaskThread;
 
     @BeforeClass
     public static void selectTesters() throws Exception {
@@ -36,7 +36,7 @@ public class RecoveryWhileTypingTest extends StfTestCase {
         ALICE.superBot().views().packageExplorerView()
             .selectFile("foo", "readme.txt").open();
 
-        TestThread.Runnable aliceEditTask = new TestThread.Runnable() {
+        EclipseTestThread.Runnable aliceEditTask = new EclipseTestThread.Runnable() {
             @Override
             public void run() throws Exception {
 
