@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.server.filesystem;
 
+import static de.fu_berlin.inf.dpp.server.filesystem.FileSystemTestUtils.absolutePath;
+import static de.fu_berlin.inf.dpp.server.filesystem.FileSystemTestUtils.path;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -7,8 +9,6 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -16,16 +16,6 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 
 public class ServerPathImplTest {
-
-    private IPath path(String pathString) {
-        return ServerPathImpl.fromString(pathString);
-    }
-
-    private IPath absolutePath(String pathString) {
-        Path root = Paths.get("").toAbsolutePath().getRoot();
-        Path relative = Paths.get(pathString);
-        return ServerPathImpl.fromString(root.resolve(relative).toString());
-    }
 
     private IPath nativePath(String pathString) {
         return path(pathString.replace("/", File.separator));

@@ -1,5 +1,8 @@
 package de.fu_berlin.inf.dpp.server.filesystem;
 
+import static de.fu_berlin.inf.dpp.server.filesystem.FileSystemTestUtils.createFile;
+import static de.fu_berlin.inf.dpp.server.filesystem.FileSystemTestUtils.createWorkspaceFolder;
+import static de.fu_berlin.inf.dpp.server.filesystem.FileSystemTestUtils.path;
 import static org.easymock.EasyMock.expect;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -9,8 +12,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMockSupport;
@@ -51,20 +52,9 @@ public class ServerResourceImplTest extends EasyMockSupport {
     }
 
     private IResource resource;
-    private Path workspaceDir;
     private IWorkspace workspace;
     private IProject project;
     private IFolder parent;
-
-    private IPath path(String pathString) {
-        return ServerPathImpl.fromString(pathString);
-    }
-
-    private void createFile(IPath path) throws IOException {
-        Path nioPath = ((ServerPathImpl) path).getDelegate();
-        Files.createDirectories(nioPath.getParent());
-        Files.createFile(nioPath);
-    }
 
     @Before
     public void setUp() throws Exception {
@@ -72,12 +62,11 @@ public class ServerResourceImplTest extends EasyMockSupport {
         project = createMock(IProject.class);
         parent = createMock(IFolder.class);
 
-        workspaceDir = Files.createTempDirectory("saros-server-test");
-        expect(workspace.getLocation()).andStubReturn(
-            path(workspaceDir.toString()));
+        expect(workspace.getLocation()).andStubReturn(createWorkspaceFolder());
 
         expect(workspace.getProject("project")).andStubReturn(project);
         expect(project.getFolder(path("folder"))).andStubReturn(parent);
+
         replayAll();
 
         resource = new ExampleResource(path("project/folder/file"), workspace);
@@ -122,14 +111,14 @@ public class ServerResourceImplTest extends EasyMockSupport {
     @Test
     public void exists() throws Exception {
         assertFalse(resource.exists());
-        createFile(resource.getLocation());
+        createFileForResource();
         assertTrue(resource.exists());
     }
 
     @Test
     public void isAccessible() throws Exception {
         assertFalse(resource.isAccessible());
-        createFile(resource.getLocation());
+        createFileForResource();
         assertTrue(resource.isAccessible());
     }
 
@@ -141,12 +130,11 @@ public class ServerResourceImplTest extends EasyMockSupport {
 
     @Test
     public void getResourceAttributes() throws Exception {
-        IPath resourceLocation = resource.getLocation();
-        createFile(resourceLocation);
+        createFileForResource();
 
-        resourceLocation.toFile().setWritable(false);
+        resource.getLocation().toFile().setWritable(false);
         assertTrue(resource.getResourceAttributes().isReadOnly());
-        resourceLocation.toFile().setWritable(true);
+        resource.getLocation().toFile().setWritable(true);
         assertFalse(resource.getResourceAttributes().isReadOnly());
     }
 
@@ -157,8 +145,8 @@ public class ServerResourceImplTest extends EasyMockSupport {
 
     @Test
     public void setResourceAttributes() throws Exception {
+        createFileForResource();
         IPath resourceLocation = resource.getLocation();
-        createFile(resourceLocation);
 
         IResourceAttributes attributes = new ServerResourceAttributesImpl();
 
@@ -183,5 +171,9 @@ public class ServerResourceImplTest extends EasyMockSupport {
         assertSame(resource, resource.getAdapter(ExampleResource.class));
         assertSame(resource, resource.getAdapter(IResource.class));
         assertNull(resource.getAdapter(IFile.class));
+    }
+
+    private void createFileForResource() throws IOException {
+        createFile(workspace, "project/folder/file");
     }
 }
