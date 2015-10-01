@@ -36,6 +36,15 @@ public abstract class ServerResourceImpl implements IResource {
         this.workspace = workspace;
     }
 
+    /**
+     * Returns the workspace the resource belongs to.
+     * 
+     * @return the containing workspace
+     */
+    public IWorkspace getWorkspace() {
+        return workspace;
+    }
+
     @Override
     public IPath getFullPath() {
         return path;
@@ -64,7 +73,9 @@ public abstract class ServerResourceImpl implements IResource {
     @Override
     public IContainer getParent() {
         IPath parentPath = getProjectRelativePath().removeLastSegments(1);
-        return getProject().getFolder(parentPath);
+        IProject project = getProject();
+        return parentPath.segmentCount() == 0 ? project : project
+            .getFolder(parentPath);
     }
 
     @Override

@@ -109,6 +109,12 @@ public class ServerResourceImplTest extends EasyMockSupport {
     }
 
     @Test
+    public void getParentIfParentIsProject() {
+        resource = new ExampleResource(path("project/file"), workspace);
+        assertEquals(project, resource.getParent());
+    }
+
+    @Test
     public void exists() throws Exception {
         assertFalse(resource.exists());
         createFileForResource();
