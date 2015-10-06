@@ -3,7 +3,9 @@ package de.fu_berlin.inf.dpp.ui.model.roster;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.Viewer;
@@ -42,9 +44,8 @@ public final class RosterContentProvider extends TreeContentProvider {
         public void featureSupportUpdated(final JID jid, String feature,
             boolean isSupported) {
 
-            if (SarosConstants.XMPP_FEATURE_NAMESPACE.equals(feature))
-                ViewerUtils.update(viewer, new RosterEntryElement(roster, jid,
-                    isSupported), null);
+            // TODO maybe use display.timerExec to avoid massive refresh calls
+            ViewerUtils.refresh(viewer, true);
         }
     };
 
@@ -126,13 +127,29 @@ public final class RosterContentProvider extends TreeContentProvider {
         Roster roster = (Roster) inputElement;
         final List<Object> elements = new ArrayList<Object>();
 
+        /*
+         * always show contacts that support Saros regardless of any other
+         * source, i.e the user is online with:
+         * 
+         * alice@foo/Saros (<- has Saros support)
+         * 
+         * and
+         * 
+         * alice@foo/Pidgen
+         * 
+         * so always display alice@foo/Saros
+         */
+
         for (RosterGroup group : roster.getGroups()) {
             elements.add(new RosterGroupElement(group,
-                createRosterEntryElements(group.getEntries()).toArray(
+                filterRosterEntryElements(
+                    createRosterEntryElements(group.getEntries())).toArray(
                     new RosterEntryElement[0])));
         }
 
-        elements.addAll(createRosterEntryElements(roster.getUnfiledEntries()));
+        elements
+            .addAll(filterRosterEntryElements(createRosterEntryElements(roster
+                .getUnfiledEntries())));
 
         return elements.toArray();
     }
@@ -177,5 +194,36 @@ public final class RosterContentProvider extends TreeContentProvider {
                 discoveryManager.queryFeatureSupport(jid,
                     SarosConstants.XMPP_FEATURE_NAMESPACE, true);
         }
+    }
+
+    /**
+     * Filters the given roster entry elements by removing entries which bare
+     * JID are equal. Furthermore if two entries are equal the one with possible
+     * Saros support will always be kept and the other one will be discarded.
+     */
+    private final List<RosterEntryElement> filterRosterEntryElements(
+        final Collection<RosterEntryElement> elements) {
+
+        final Map<JID, RosterEntryElement> filteredElements = new HashMap<JID, RosterEntryElement>(
+            elements.size());
+
+        for (final RosterEntryElement element : elements) {
+
+            final JID bareJID = element.getJID().getBareJID();
+
+            final RosterEntryElement filteredElement = filteredElements
+                .get(bareJID);
+
+            if (filteredElement != null && filteredElement.isSarosSupported()) {
+                continue;
+            } else if (filteredElement != null
+                && !filteredElement.isSarosSupported()) {
+                filteredElements.remove(bareJID);
+            }
+
+            filteredElements.put(bareJID, element);
+        }
+
+        return new ArrayList<RosterEntryElement>(filteredElements.values());
     }
 }
