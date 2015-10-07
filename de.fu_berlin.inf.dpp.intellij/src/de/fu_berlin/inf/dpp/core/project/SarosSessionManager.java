@@ -27,10 +27,10 @@ import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.negotiation.FileList;
+import de.fu_berlin.inf.dpp.negotiation.IncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationListener;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
-import de.fu_berlin.inf.dpp.negotiation.IncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.OutgoingProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
@@ -233,16 +233,6 @@ public class SarosSessionManager implements ISarosSessionManager {
 
                 IProject project = mapEntry.getKey();
                 List<IResource> resourcesList = mapEntry.getValue();
-
-                if (!project.isOpen()) {
-                    try {
-                        project.open();
-                    } catch (IOException e) {
-                        log.error("an error occurred while opening project: "
-                            + project.getName(), e);
-                        continue;
-                    }
-                }
 
                 try {
                     if (resourcesList == null) {
@@ -550,16 +540,6 @@ public class SarosSessionManager implements ISarosSessionManager {
             .entrySet()) {
             IProject project = mapEntry.getKey();
             List<IResource> resourcesList = mapEntry.getValue();
-
-            if (!project.isOpen()) {
-                try {
-                    project.open();
-                } catch (IOException e) {
-                    log.error("an error occurred while opening project: "
-                        + project.getName(), e);
-                    continue;
-                }
-            }
 
             try {
                 if (resourcesList == null && !session.isShared(project)) {

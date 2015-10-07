@@ -22,15 +22,8 @@
 
 package de.fu_berlin.inf.dpp.intellij.project.filesystem;
 
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleManager;
-import com.intellij.openapi.module.ModuleWithNameAlreadyExists;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Computable;
-import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.openapi.vfs.LocalFileSystem;
 import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
@@ -40,7 +33,6 @@ import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IResourceAttributes;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.jdom.JDOMException;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,12 +46,10 @@ import java.util.Map;
 public class IntelliJProjectImpl implements IProject {
     public static final String DEFAULT_CHARSET = "utf8";
 
-    public static final String DEFAULT_MODULE_EXTENSION = ".iml";
     private static final Logger LOG = Logger.getLogger(IntelliJProjectImpl.class);
 
     private String defaultCharset = DEFAULT_CHARSET;
 
-    private Project project;
     private String name;
     private File path;
 
@@ -68,7 +58,6 @@ public class IntelliJProjectImpl implements IProject {
     private Map<String, IFile> fileMap = new HashMap<String, IFile>();
     private Map<String, IFolder> folderMap = new HashMap<String, IFolder>();
 
-    private boolean isOpen;
     private IPath fullPath;
     private IPath relativePath;
     private IContainer parent;
@@ -87,20 +76,10 @@ public class IntelliJProjectImpl implements IProject {
                 "Can not instantiate project with null name.");
         }
 
-        File path = new File(project.getBasePath() + File.separator + name
-        );
+        File path = new File(project.getBasePath(), name);
 
-        this.project = project;
         this.name = name;
         setPath(path);
-        scan(path);
-    }
-
-    public IntelliJProjectImpl(Project project, String name, File path) {
-        this.project = project;
-        this.name = name;
-        setPath(path);
-
         scan(path);
     }
 
@@ -227,48 +206,6 @@ public class IntelliJProjectImpl implements IProject {
     @Override
     public IFolder getFolder(IPath path) {
         return getFolder(path.toPortableString());
-    }
-
-    @Override
-    public boolean isOpen() {
-        if (ModuleManager.getInstance(project) != null) {
-            return ApplicationManager.getApplication()
-                .runReadAction(new Computable<Boolean>() {
-
-                                   @Override
-                                   public Boolean compute() {
-                                       Module mod = ModuleManager
-                                           .getInstance(project)
-                                           .findModuleByName(name);
-                                       return mod != null && mod.isLoaded();
-                                   }
-                               });
-
-        } else {
-            return isOpen;
-        }
-    }
-
-    @Override
-    public void open() throws IOException {
-        if (ModuleManager.getInstance(project) != null) {
-
-            //this is only called when the .iml file already exists on disk (after IPN)
-            //TODO: Does not work with projects shared from Eclipse, would need
-            //independent metadata for that
-            LoadModuleRunnable loader = new LoadModuleRunnable();
-            ApplicationManager.getApplication().invokeLater(loader);
-            if (loader.getException() != null) {
-                throw loader.getException();
-            }
-
-        } else {
-            if (!getFullPath().toFile().mkdirs()) {
-                LOG.error("Could not open project: " + getName());
-                throw new IOException("Could not open project");
-            }
-            isOpen = true;
-        }
     }
 
     public void create() throws IOException {
@@ -485,45 +422,4 @@ public class IntelliJProjectImpl implements IProject {
 
         return getClass().getName() + sb;
     }
-
-    private class LoadModuleRunnable implements Runnable {
-
-        public IOException getException() {
-            return exception;
-        }
-
-        private IOException exception = null;
-
-        @Override
-        public void run() {
-            ApplicationManager.getApplication().runWriteAction(new Runnable() {
-                @Override
-                public void run() {
-                    final String projectFile =
-                        path + File.separator + name + DEFAULT_MODULE_EXTENSION;
-                    try {
-                        List<File> refreshList = new ArrayList<File>();
-                        refreshList.add(new File(projectFile));
-                        LocalFileSystem.getInstance()
-                            .refreshIoFiles(refreshList);
-                        ModuleManager.getInstance(project)
-                            .loadModule(projectFile);
-                    } catch (InvalidDataException e) {
-                        exception = new IOException(
-                            "invalid data in project file " + projectFile, e);
-                    } catch (JDOMException e) {
-                        exception = new IOException(
-                            "invalid data in project file " + projectFile, e);
-                    } catch (ModuleWithNameAlreadyExists e) {
-                        exception = new IOException(
-                            "module with name already exists for file "
-                                + projectFile, e);
-                    } catch (IOException e) {
-                        exception = e;
-                    }
-                }
-            });
-        }
-    }
-
 }

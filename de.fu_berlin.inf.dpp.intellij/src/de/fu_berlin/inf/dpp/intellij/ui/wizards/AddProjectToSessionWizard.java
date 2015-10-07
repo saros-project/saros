@@ -363,11 +363,6 @@ public class AddProjectToSessionWizard extends Wizard {
                 if (!project.exists()) {
                     ((IntelliJProjectImpl) project).create();
                 }
-
-                if (!project.isOpen()) {
-                    project.open();
-                }
-
             } catch (IOException e) {
                 LOG.error("Could not create project", e);
                 DialogUtils

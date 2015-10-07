@@ -18,7 +18,6 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.session.internal.SharedProjectMapper;
 
 public class SharedProjectMapperTest {
 
@@ -364,7 +363,6 @@ public class SharedProjectMapperTest {
     private IProject createProjectMock() {
         IProject projectMock = EasyMock.createNiceMock(IProject.class);
         EasyMock.expect(projectMock.isAccessible()).andStubReturn(true);
-        EasyMock.expect(projectMock.isOpen()).andStubReturn(true);
         EasyMock.expect(projectMock.getType()).andStubReturn(IResource.PROJECT);
         EasyMock.replay(projectMock);
         return projectMock;

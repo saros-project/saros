@@ -44,8 +44,6 @@ public class SharedProject {
     protected final ISarosSession sarosSession;
     protected final IProject project;
     /* Stored state values: */
-    protected UpdatableValue<Boolean> projectIsOpen = new UpdatableValue<Boolean>(
-        false);
     protected UpdatableValue<VCSProvider> vcs = new UpdatableValue<VCSProvider>(
         null);
     /**
@@ -107,8 +105,6 @@ public class SharedProject {
         this.sarosSession = sarosSession;
 
         this.project = project;
-
-        projectIsOpen.update(project.isOpen());
 
         boolean hasWriteAccess = sarosSession.hasWriteAccess();
         this.hasWriteAccess.update(hasWriteAccess);
@@ -187,16 +183,8 @@ public class SharedProject {
                 Messages.SharedProject_resource_is_null);
         else if (!contains(resource))
             throw new IllegalArgumentException(
-                Messages.SharedProject_resource_not_in_map + resource.toString()
-            );
-    }
-
-    /**
-     * Updates if the SharedProject is currently open, and returns true if the
-     * value changed.
-     */
-    public boolean updateProjectIsOpen(boolean newValue) {
-        return projectIsOpen.update(newValue);
+                Messages.SharedProject_resource_not_in_map + resource
+                    .toString());
     }
 
     /**

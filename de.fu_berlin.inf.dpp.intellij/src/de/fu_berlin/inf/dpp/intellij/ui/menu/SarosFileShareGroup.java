@@ -138,8 +138,7 @@ public class SarosFileShareGroup extends ActionGroup {
             //(Webstorm)
             throw new UnsupportedOperationException();
         }
-        return new IntelliJProjectImpl(project, moduleName,
-            new File(project.getBasePath(), moduleName));
+        return new IntelliJProjectImpl(project, moduleName);
     }
 
     /**
