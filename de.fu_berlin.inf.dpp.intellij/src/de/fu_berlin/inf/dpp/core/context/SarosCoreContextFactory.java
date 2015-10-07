@@ -35,6 +35,7 @@ import de.fu_berlin.inf.dpp.core.net.business.ProjectNegotiationCancellationHand
 import de.fu_berlin.inf.dpp.core.net.business.InvitationHandler;
 import de.fu_berlin.inf.dpp.core.net.business.LeaveAndKickHandler;
 import de.fu_berlin.inf.dpp.core.vcs.NullVCSProviderFactoryImpl;
+import de.fu_berlin.inf.dpp.editor.colorstorage.ColorIDSetStorage;
 import de.fu_berlin.inf.dpp.monitoring.remote.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.DispatchThreadContext;
@@ -91,6 +92,7 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
         Component.create(SingleUserChatService.class),
 
         Component.create(XMPPAccountStore.class),
+        Component.create(ColorIDSetStorage.class),
 
         // Invitation hooks
         Component.create(SessionNegotiationHookManager.class),
