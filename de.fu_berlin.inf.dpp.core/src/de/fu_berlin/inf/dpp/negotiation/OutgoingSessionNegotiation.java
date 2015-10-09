@@ -120,7 +120,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
         observeMonitor(monitor);
 
-        monitor.beginTask("Staring session negotiation...",
+        monitor.beginTask("Starting session negotiation...",
             IProgressMonitor.UNKNOWN);
 
         createCollectors();
