@@ -91,8 +91,7 @@ public class JoinSessionWizard extends Wizard {
     public JoinSessionWizard(IncomingSessionNegotiation isn) {
         this.isn = isn;
 
-        setWindowTitle(Messages.JoinSessionWizard_title + " from "
-            + getNickname(isn.getPeer()) + " (" + isn.getPeer().getRAW() + ")");
+        setWindowTitle(Messages.JoinSessionWizard_title);
         setHelpAvailable(false);
         setNeedsProgressMonitor(true);
 
