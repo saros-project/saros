@@ -1,10 +1,7 @@
 package de.fu_berlin.inf.dpp.concurrent.watchdog;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -25,7 +22,6 @@ import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.ChecksumErrorActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
@@ -35,14 +31,11 @@ import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.remote.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
-import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.actions.ConsistencyAction;
 import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
@@ -98,14 +91,6 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer {
 
     private final Set<SPath> pathsWithWrongChecksums = new CopyOnWriteArraySet<SPath>();
 
-    /*
-     * TODO make sure latestChecksums is accessed in the SWT thread when
-     * invoking sessionXYZ listener methods so the synchronized wrapper is not
-     * needed
-     */
-    private final Map<SPath, ChecksumActivity> latestChecksums = Collections
-        .synchronizedMap(new HashMap<SPath, ChecksumActivity>());
-
     private final RemoteProgressManager remoteProgressManager;
 
     private final ISarosSessionManager sessionManager;
@@ -130,18 +115,6 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer {
         sessionManager.removeSessionLifecycleListener(sessionLifecycleListener);
     }
 
-    private final ISessionListener sessionListener = new AbstractSessionListener() {
-        @Override
-        public void permissionChanged(User user) {
-
-            if (user.isRemote())
-                return;
-
-            // Clear our checksums
-            latestChecksums.clear();
-        }
-    };
-
     private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
 
         @Override
@@ -153,7 +126,6 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer {
 
             newSarosSession.addActivityConsumer(consumer);
             newSarosSession.addActivityProducer(ConsistencyWatchdogClient.this);
-            newSarosSession.addListener(sessionListener);
         }
 
         @Override
@@ -161,9 +133,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer {
             oldSarosSession.removeActivityConsumer(consumer);
             oldSarosSession
                 .removeActivityProducer(ConsistencyWatchdogClient.this);
-            oldSarosSession.removeListener(sessionListener);
 
-            latestChecksums.clear();
             pathsWithWrongChecksums.clear();
 
             session = null;
@@ -176,14 +146,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer {
     private final IActivityConsumer consumer = new AbstractActivityConsumer() {
         @Override
         public void receive(ChecksumActivity checksumActivity) {
-            latestChecksums.put(checksumActivity.getPath(), checksumActivity);
-
             performCheck(checksumActivity);
-        }
-
-        @Override
-        public void receive(TextEditActivity text) {
-            latestChecksums.remove(text.getPath());
         }
 
         @Override
@@ -199,34 +162,15 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer {
 
         @Override
         public void receive(FileActivity fileActivity) {
-            if (fileActivity.isRecovery()) {
-                int currentValue;
-                while ((currentValue = filesRemaining.get()) > 0) {
-                    if (filesRemaining.compareAndSet(currentValue,
-                        currentValue - 1)) {
-                        break;
-                    }
-                }
-                // Recoveries do not invalidate checksums :-)
+            if (!fileActivity.isRecovery())
                 return;
-            }
 
-            /*
-             * (we do not need to handle FolderActivities because all files are
-             * created/deleted via FileActivity)
-             */
-
-            switch (fileActivity.getType()) {
-            case CREATED:
-            case REMOVED:
-                latestChecksums.remove(fileActivity.getPath());
-                break;
-            case MOVED:
-                latestChecksums.remove(fileActivity.getPath());
-                latestChecksums.remove(fileActivity.getOldPath());
-                break;
-            default:
-                LOG.error("Unhandled FileActivity.Type: " + fileActivity);
+            int currentValue;
+            while ((currentValue = filesRemaining.get()) > 0) {
+                if (filesRemaining
+                    .compareAndSet(currentValue, currentValue - 1)) {
+                    break;
+                }
             }
         }
     };
@@ -245,7 +189,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer {
      * The <strong>cancellation</strong> of this method is <strong>not
      * implemented</strong>, so canceling the given monitor does not have any
      * effect.
-     *
+     * 
      * @noSWT This method should not be called from SWT
      * @blocking This method returns after the recovery has finished
      * @client Can only be called on the client!
