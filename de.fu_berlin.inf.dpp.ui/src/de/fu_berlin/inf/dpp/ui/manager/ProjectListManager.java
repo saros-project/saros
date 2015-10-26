@@ -21,9 +21,6 @@ import de.fu_berlin.inf.dpp.ui.model.ProjectTreeNode.NodeType;
  * models for the HTML UI. It also provides a mapping of the {@link IProject}
  * and its {@link IResource}s associated with a ProjectTree.
  */
-/**
- * 
- */
 public class ProjectListManager {
     private IWorkspaceRoot workspaceRoot;
     private List<ProjectTree> projectModels;
