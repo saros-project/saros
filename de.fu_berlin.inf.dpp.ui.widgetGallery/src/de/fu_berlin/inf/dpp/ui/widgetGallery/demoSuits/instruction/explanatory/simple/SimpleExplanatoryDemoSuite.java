@@ -12,7 +12,7 @@ import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
 public class SimpleExplanatoryDemoSuite extends AbstractDemo {
     @Override
     public void createDemo(Composite parent) {
-
+        // Nothing to do
     }
 
 }

@@ -91,7 +91,7 @@ public abstract class AbstractDemo {
     public abstract void createDemo(Composite composite);
 
     public void dispose() {
-
+        // Do nothing by default
     }
 
     /**

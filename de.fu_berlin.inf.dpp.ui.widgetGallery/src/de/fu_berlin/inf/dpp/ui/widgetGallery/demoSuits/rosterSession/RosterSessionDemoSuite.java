@@ -11,6 +11,6 @@ import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
 public class RosterSessionDemoSuite extends AbstractDemo {
     @Override
     public void createDemo(Composite parent) {
-
+        // Nothing to do
     }
 }

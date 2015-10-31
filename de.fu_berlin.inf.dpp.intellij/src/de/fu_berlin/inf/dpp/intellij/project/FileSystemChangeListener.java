@@ -460,7 +460,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
     @Override
     public void beforePropertyChange(
         @NotNull VirtualFilePropertyEvent filePropertyEvent) {
-
+        // Not interested
     }
 
     /**

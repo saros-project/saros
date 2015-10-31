@@ -92,7 +92,7 @@ public class ChatControlDemo extends AbstractDemo {
 
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
-
+                // Not interested
             }
         });
 
@@ -111,7 +111,7 @@ public class ChatControlDemo extends AbstractDemo {
 
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
-
+                // Not interested
             }
         });
 
@@ -130,7 +130,7 @@ public class ChatControlDemo extends AbstractDemo {
 
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
-
+                // Not interested
             }
         });
 
@@ -145,7 +145,7 @@ public class ChatControlDemo extends AbstractDemo {
 
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
-
+                // Not interested
             }
         });
 
@@ -160,7 +160,7 @@ public class ChatControlDemo extends AbstractDemo {
 
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
-
+                // Not interested
             }
         });
 

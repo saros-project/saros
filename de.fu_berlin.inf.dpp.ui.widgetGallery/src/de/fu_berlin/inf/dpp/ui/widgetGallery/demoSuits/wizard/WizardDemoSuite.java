@@ -15,7 +15,7 @@ import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.wizard.wizards.AllWizards
 public class WizardDemoSuite extends AbstractDemo {
     @Override
     public void createDemo(Composite parent) {
-
+        // Nothing to do
     }
 
 }

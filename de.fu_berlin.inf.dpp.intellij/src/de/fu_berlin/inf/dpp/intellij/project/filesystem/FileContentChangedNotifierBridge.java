@@ -73,7 +73,7 @@ public class FileContentChangedNotifierBridge
     @Override
     public void propertyChanged(
         @NotNull VirtualFilePropertyEvent virtualFilePropertyEvent) {
-
+        // Not interested
     }
 
     @Override

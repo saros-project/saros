@@ -108,7 +108,7 @@ public class AddProjectToSessionWizard extends Wizard {
     private final PageActionListener selectProjectsPageListener = new PageActionListener() {
         @Override
         public void back() {
-
+            // Nothing to do
         }
 
         /**
@@ -155,7 +155,7 @@ public class AddProjectToSessionWizard extends Wizard {
     private final PageActionListener fileListPageListener = new PageActionListener() {
         @Override
         public void back() {
-
+            // Nothing to do
         }
 
         @Override

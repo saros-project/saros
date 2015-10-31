@@ -31,9 +31,6 @@ public class DemoContentProvider extends TreeContentProvider {
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         this.viewer = viewer;
 
-        if (oldInput instanceof Class<?>) {
-        }
-
         if (newInput instanceof Class<?>) {
             this.demo = (Class<? extends AbstractDemo>) newInput;
         } else {
@@ -43,8 +40,7 @@ public class DemoContentProvider extends TreeContentProvider {
 
     @Override
     public void dispose() {
-        if (this.demo != null) {
-        }
+        // Nothing to do
     }
 
     /**

@@ -15,7 +15,7 @@ import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.instruction.explanatory.s
 public class ExplanatoryDemoSuite extends AbstractDemo {
     @Override
     public void createDemo(Composite parent) {
-
+        // Nothing to do
     }
 
 }

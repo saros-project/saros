@@ -54,7 +54,7 @@ public abstract class AbstractWizardPage extends JPanel {
      * Method called before hiding panel
      */
     public void aboutToHidePanel() {
-
+        // Do nothing by default
     }
 
     /**

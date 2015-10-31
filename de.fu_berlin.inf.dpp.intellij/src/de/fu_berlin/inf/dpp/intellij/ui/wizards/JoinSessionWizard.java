@@ -58,7 +58,7 @@ public class JoinSessionWizard extends Wizard {
     private final PageActionListener actionListener = new PageActionListener() {
         @Override
         public void back() {
-
+            // Not interested
         }
 
         @Override

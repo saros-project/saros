@@ -126,9 +126,8 @@ public class LocalEditorHandler {
         }
     }
 
-    //FIXME: not sure how to do it intelliJ
     public void sendEditorActivitySaved(SPath path) {
-
+        // FIXME: not sure how to do it intelliJ
     }
 
     /**

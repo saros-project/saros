@@ -15,6 +15,6 @@ import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.instruction.note.NoteComp
 public class InstructionDemoSuite extends AbstractDemo {
     @Override
     public void createDemo(Composite parent) {
-
+        // Nothing to do
     }
 }

@@ -33,15 +33,18 @@ public class Status implements IStatus {
     public static final Status OK_STATUS = new Status(1);
 
     public Status() {
+        // Do nothing
     }
 
     public Status(int status) {
+        // Do nothing
     }
 
     public Status(int status, String msg, String title) {
+        // Do nothing
     }
 
     public Status(int status, String msg, String title, Exception ex) {
+        // Do nothing
     }
-
 }

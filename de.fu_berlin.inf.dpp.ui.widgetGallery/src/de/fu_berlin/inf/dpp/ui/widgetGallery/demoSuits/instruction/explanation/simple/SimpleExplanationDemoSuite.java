@@ -15,7 +15,7 @@ public class SimpleExplanationDemoSuite extends AbstractDemo {
 
     @Override
     public void createDemo(Composite parent) {
-
+        // Nothing to do
     }
 
 }
