@@ -44,8 +44,8 @@ public class DemoContentProvider extends TreeContentProvider {
     }
 
     /**
-     * Returns {@link DemoGroup}s followed by {@link DemoEntry}s which don't
-     * belong to any {@link DemoGroup}.
+     * Returns {@link DemoSuite}s followed by {@link AbstractDemo}s which don't
+     * belong to any {@link DemoSuite}.
      */
     @SuppressWarnings("unchecked")
     @Override

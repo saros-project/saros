@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.session.internal;
 
-import java.awt.Window;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -316,11 +315,6 @@ public final class ActivityHandler implements Startable {
      * predictable !
      * </pre>
      * 
-     * 
-     * @see ModalContext
-     * @see Window#setBlockOnOpen(boolean shouldBlock)
-     * @see IRunnableContext#run(boolean fork, boolean cancelable,
-     *      IRunnableWithProgress runnable)
      * @param activities
      *            the activities to execute
      */

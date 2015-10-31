@@ -209,7 +209,6 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
      * IRunnableWithProgress to report feedback of the execution in the active
      * workbench windows status bar.
      * 
-     * 
      * @nonblocking
      * @cancelable
      */

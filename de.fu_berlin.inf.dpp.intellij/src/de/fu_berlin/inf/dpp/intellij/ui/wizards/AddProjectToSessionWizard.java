@@ -350,8 +350,8 @@ public class AddProjectToSessionWizard extends Wizard {
     }
 
     /**
-     * Goes through the list of local projects, calls {@link IntelliJProjectImpl#create()}
-     * on non-existent ones and {@link IProject#open()} on non-opened projects.
+     * Goes through the list of local projects and calls {@link IntelliJProjectImpl#create()}
+     * on non-existent ones.
      *
      * @param projectMapping
      */

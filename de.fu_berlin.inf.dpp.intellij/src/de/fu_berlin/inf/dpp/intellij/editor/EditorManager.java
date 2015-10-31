@@ -32,6 +32,7 @@ import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
+import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
@@ -648,11 +649,12 @@ public class EditorManager extends AbstractActivityProducer implements
 
     /**
      * Sets the local editor 'opened' and fires an {@link EditorActivity} of
-     * type {@link EditorActivity.Type#ACTIVATED}.
-     *
-     * @param path the project-relative path to the resource that the editor is
-     *             currently editing or <code>null</code> if the local user has
-     *             no editor open.
+     * type {@link Type#ACTIVATED}.
+     * 
+     * @param path
+     *            the project-relative path to the resource that the editor is
+     *            currently editing or <code>null</code> if the local user has
+     *            no editor open.
      */
     void generateEditorActivated(SPath path) {
 

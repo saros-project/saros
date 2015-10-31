@@ -30,7 +30,6 @@ import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
@@ -60,8 +59,7 @@ public interface ISarosSession {
      */
 
     /**
-     * Connection identifier to use for sending data. See
-     * {@link ITransmitter#sendToSessionUser}
+     * Connection identifier to use for sending data.
      */
     public static final String SESSION_CONNECTION_ID = "saros-main-session";
 
@@ -525,7 +523,7 @@ public interface ISarosSession {
      * project is received and extracted.
      * <p>
      * That queuing relies on an existing project-to-projectID mapping (see
-     * {@link #addProjectMapping(String, IProject, JID)}), otherwise incoming
+     * {@link #addProjectMapping(String, IProject)}), otherwise incoming
      * activities cannot be queued and will be lost.
      * 
      * @param project

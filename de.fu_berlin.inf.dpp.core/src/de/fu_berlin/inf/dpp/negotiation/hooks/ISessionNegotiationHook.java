@@ -2,6 +2,8 @@ package de.fu_berlin.inf.dpp.negotiation.hooks;
 
 import java.util.Map;
 
+import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
+import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 /**

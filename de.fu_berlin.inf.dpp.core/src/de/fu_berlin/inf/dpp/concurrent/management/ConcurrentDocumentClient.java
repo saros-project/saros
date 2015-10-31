@@ -190,7 +190,7 @@ public class ConcurrentDocumentClient {
      * 
      * When this is called on the client (or on the host for one of his
      * JupiterClient), a call to
-     * {@link ConcurrentDocumentServer#reset(de.fu_berlin.inf.dpp.net.JID, SPath)}
+     * {@link ConcurrentDocumentServer#reset(de.fu_berlin.inf.dpp.session.User, SPath)}
      * should be executed at the same time on the side of the given user.
      * 
      * @client and @host This can be called on the host as well, if the host

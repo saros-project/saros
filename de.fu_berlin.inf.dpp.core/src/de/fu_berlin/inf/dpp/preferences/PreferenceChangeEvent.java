@@ -6,7 +6,8 @@ package de.fu_berlin.inf.dpp.preferences;
  * This event is given to a listener and stores the old value, the new value and
  * the name of the changed preference.
  * 
- * @see IPreferences
+ * @see IPreferenceChangeListener
+ * @see Preferences
  */
 public class PreferenceChangeEvent {
 
