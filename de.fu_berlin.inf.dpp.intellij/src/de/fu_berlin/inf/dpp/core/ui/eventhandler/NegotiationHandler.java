@@ -22,15 +22,8 @@
 
 package de.fu_berlin.inf.dpp.core.ui.eventhandler;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.log4j.Logger;
-
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
-
 import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.core.monitoring.IStatus;
 import de.fu_berlin.inf.dpp.core.monitoring.Status;
@@ -54,6 +47,11 @@ import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.INegotiationHandler;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+import org.apache.log4j.Logger;
+
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This handler is responsible for presenting and running the session and
@@ -117,7 +115,7 @@ public class NegotiationHandler implements INegotiationHandler {
                 wizard.setModal(true);
                 wizard.open();
             }
-        }, ModalityState.current());
+        }, ModalityState.defaultModalityState());
 
     }
 
@@ -134,6 +132,7 @@ public class NegotiationHandler implements INegotiationHandler {
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             @Override
             public void run() {
+
                 AddProjectToSessionWizard wizard = new AddProjectToSessionWizard(
                     negotiation, negotiation.getPeer(), fileLists,
                     negotiation.getProjectNames());
@@ -141,7 +140,7 @@ public class NegotiationHandler implements INegotiationHandler {
                 wizard.open();
 
             }
-        }, ModalityState.current());
+        }, ModalityState.defaultModalityState());
     }
 
     /**
