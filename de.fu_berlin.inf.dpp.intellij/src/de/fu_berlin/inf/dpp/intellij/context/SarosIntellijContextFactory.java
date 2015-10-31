@@ -6,7 +6,6 @@ import de.fu_berlin.inf.dpp.communication.connection.IProxyResolver;
 import de.fu_berlin.inf.dpp.connection.NullProxyResolver;
 import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.core.awareness.AwarenessInformationCollector;
-import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
 import de.fu_berlin.inf.dpp.core.monitoring.remote.IntelliJRemoteProgressIndicatorFactoryImpl;
 import de.fu_berlin.inf.dpp.core.project.internal.SarosIntellijSessionContextFactory;
@@ -64,7 +63,6 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
     private final Component[] components = new Component[] {
 
         // Core Managers
-        Component.create(ConsistencyWatchdogClient.class),
 
         Component.create(EditorAPI.class),
 

@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.core.project.internal;
 
+import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import org.picocontainer.MutablePicoContainer;
 
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogServer;
@@ -23,7 +24,8 @@ public class SarosIntellijSessionContextFactory extends
         container.addComponent(ConsistencyWatchdogHandler.class);
         if (session.isHost())
             container.addComponent(ConsistencyWatchdogServer.class);
-
+        else
+            container.addComponent(ConsistencyWatchdogClient.class);
         // Other
         container.addComponent(FollowingActivitiesManager.class);
         container.addComponent(SharedResourcesManager.class);

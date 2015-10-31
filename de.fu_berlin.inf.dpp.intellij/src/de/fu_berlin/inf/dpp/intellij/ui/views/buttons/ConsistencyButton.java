@@ -50,6 +50,9 @@ import java.util.Set;
 /**
  * Button for triggering a {@link ConsistencyAction}. Displays a different symbol
  * when state is inconsistent or not.
+ *
+ * FIXME: Remove awkward session handling together with UI components created
+ * with session.
  */
 public class ConsistencyButton extends ToolbarButton {
     private static final Logger LOG = Logger.getLogger(ConsistencyButton.class);
@@ -60,37 +63,29 @@ public class ConsistencyButton extends ToolbarButton {
     private final ActionListener actionListener = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (isEnabled() && isInconsistent) {
-                setEnabledFromUIThread(false);
+            if (!isEnabled() || sessionInconsistencyState == null)
+                return;
 
-                final Set<SPath> paths = new HashSet<SPath>(
-                    watchdogClient.getPathsWithWrongChecksums());
+            if (!sessionInconsistencyState.isInconsistent)
+                return;
 
-                String inconsistentFiles = createConfirmationMessage(paths);
+            setEnabledFromUIThread(false);
 
-                if (!DialogUtils.showQuestion(null, inconsistentFiles,
-                    Messages.ConsistencyAction_confirm_dialog_title)) {
-                    setEnabledFromUIThread(true);
-                    return;
-                }
+            final Set<SPath> paths = new HashSet<SPath>(
+                sessionInconsistencyState.watchdogClient.getPathsWithWrongChecksums());
 
-                action.execute();
+            String inconsistentFiles = createConfirmationMessage(paths);
+
+            if (!DialogUtils.showQuestion(null, inconsistentFiles,
+                Messages.ConsistencyAction_confirm_dialog_title)) {
+                setEnabledFromUIThread(true);
+                return;
             }
+
+            sessionInconsistencyState.action.execute();
+
         }
     };
-
-    private final ActionListener consistencyActionListener = new ActionListener() {
-
-        @Override
-        public void actionPerformed(ActionEvent actionEvent) {
-            setInconsistent(
-                !watchdogClient.getPathsWithWrongChecksums().isEmpty());
-        }
-    };
-
-    private boolean isInconsistent = false;
-
-    private ConsistencyAction action;
 
     private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
         @Override
@@ -100,7 +95,7 @@ public class ConsistencyButton extends ToolbarButton {
         }
 
         @Override
-        public void sessionEnded(ISarosSession oldSarosSession, 
+        public void sessionEnded(ISarosSession oldSarosSession,
             SessionEndReason reason) {
             setSarosSession(null);
             setEnabledFromUIThread(false);
@@ -119,12 +114,9 @@ public class ConsistencyButton extends ToolbarButton {
     private ISarosSessionManager sessionManager;
 
     @Inject
-    private ConsistencyWatchdogClient watchdogClient;
-
-    @Inject
     private IsInconsistentObservable inconsistentObservable;
 
-    private ISarosSession sarosSession;
+    private volatile SessionInconsistencyState sessionInconsistencyState;
 
     /**
      * Creates a Consistency button, adds a sessionListener and disables the button.
@@ -133,8 +125,6 @@ public class ConsistencyButton extends ToolbarButton {
         super(ConsistencyAction.NAME, "Recover inconsistencies",
             IN_SYNC_ICON_PATH, "Files are consistent");
         SarosPluginContext.initComponent(this);
-        action = new ConsistencyAction();
-        action.addActionListener(consistencyActionListener);
 
         setSarosSession(sessionManager.getSarosSession());
         sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
@@ -143,8 +133,40 @@ public class ConsistencyButton extends ToolbarButton {
         setEnabled(false);
     }
 
+    private class SessionInconsistencyState {
+
+        private ConsistencyAction action;
+
+        private final ActionListener consistencyActionListener = new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                setInconsistent(
+                    !watchdogClient.getPathsWithWrongChecksums().isEmpty());
+            }
+        };
+
+        private boolean isInconsistent = false;
+
+        private ConsistencyWatchdogClient watchdogClient;
+
+        /**
+         * Creates an object to store the inconsistency warning state for a
+         * session.
+         */
+        public SessionInconsistencyState(ISarosSession sarosSession) {
+
+            watchdogClient = (ConsistencyWatchdogClient) sarosSession
+                .getComponent(ConsistencyWatchdogClient.class);
+
+            action = new ConsistencyAction(watchdogClient);
+            action.addActionListener(consistencyActionListener);
+        }
+
+    }
+
     public void setInconsistent(boolean isInconsistent) {
-        this.isInconsistent = isInconsistent;
+        sessionInconsistencyState.isInconsistent = isInconsistent;
 
         if (isInconsistent) {
             setEnabledFromUIThread(true);
@@ -156,13 +178,14 @@ public class ConsistencyButton extends ToolbarButton {
     }
 
     private void setSarosSession(ISarosSession newSession) {
-        if (sarosSession != null) {
+        if (sessionInconsistencyState != null) {
             inconsistentObservable.remove(isConsistencyListener);
         }
 
-        sarosSession = newSession;
+        if (newSession != null)
+            sessionInconsistencyState = new SessionInconsistencyState(newSession);
 
-        if (sarosSession != null) {
+        if (sessionInconsistencyState != null) {
             inconsistentObservable.addAndNotify(isConsistencyListener);
         }
     }
@@ -190,7 +213,7 @@ public class ConsistencyButton extends ToolbarButton {
         }
 
         final Set<SPath> paths = new HashSet<SPath>(
-            watchdogClient.getPathsWithWrongChecksums());
+            sessionInconsistencyState.watchdogClient.getPathsWithWrongChecksums());
 
         final String files = createInconsistentPathsMessage(paths);
 

@@ -29,7 +29,6 @@ import de.fu_berlin.inf.dpp.intellij.ui.widgets.progress.MonitorProgressBar;
 import de.fu_berlin.inf.dpp.intellij.ui.widgets.progress.ProgressFrame;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
-import org.picocontainer.annotations.Inject;
 
 /**
  * Performs project recovery, when inconsistency was detected.
@@ -42,7 +41,10 @@ public class ConsistencyAction extends AbstractSarosAction {
         return NAME;
     }
 
-    @Inject
+    public ConsistencyAction(ConsistencyWatchdogClient watchdogClient) {
+        this.watchdogClient = watchdogClient;
+    }
+
     private ConsistencyWatchdogClient watchdogClient;
 
     /**
