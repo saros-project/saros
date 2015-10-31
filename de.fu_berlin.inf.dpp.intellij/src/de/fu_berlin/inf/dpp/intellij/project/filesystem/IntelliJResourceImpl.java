@@ -83,6 +83,7 @@ public abstract class IntelliJResourceImpl implements IResource {
             new IntelliJFolderImpl(project, file.getParentFile());
     }
 
+    @Override
     public IntelliJProjectImpl getProject() {
         return project;
     }
@@ -146,10 +147,12 @@ public abstract class IntelliJResourceImpl implements IResource {
         return file;
     }
 
+    @Override
     public IResourceAttributes getResourceAttributes() {
         return attributes;
     }
 
+    @Override
     public void setResourceAttributes(IResourceAttributes attributes) {
         this.attributes = attributes;
     }

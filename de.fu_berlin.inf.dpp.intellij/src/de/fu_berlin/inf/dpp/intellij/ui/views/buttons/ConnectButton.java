@@ -81,6 +81,7 @@ public class ConnectButton extends ToolbarButton {
         createMenuItems();
 
         addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent ev) {
                 if (accountStore.isEmpty()) {
                     XMPPAccount account = createNewAccount();
@@ -115,6 +116,7 @@ public class ConnectButton extends ToolbarButton {
     private JMenuItem createMenuItemForUser(final String userName) {
         JMenuItem accountItem = new JMenuItem(userName);
         accountItem.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 connectAction.executeWithUser(userName);
             }
@@ -125,6 +127,7 @@ public class ConnectButton extends ToolbarButton {
     private void createDisconnectMenuItem() {
         disconnect = new JMenuItem("Disconnect server");
         disconnect.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 disconnectAction.execute();
             }
@@ -134,7 +137,8 @@ public class ConnectButton extends ToolbarButton {
     private void createConfigureAccountMenuItem() {
         configure = new JMenuItem("Configure accounts...");
         configure.addActionListener(new ActionListener() {
-            @Override public void actionPerformed(ActionEvent actionEvent) {
+            @Override 
+            public void actionPerformed(ActionEvent actionEvent) {
                 configureAccounts.execute();
             }
         });
@@ -143,6 +147,7 @@ public class ConnectButton extends ToolbarButton {
     private void createAddAccountMenuItem() {
         menuItemAdd = new JMenuItem("Add account...");
         menuItemAdd.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 XMPPAccount account = createNewAccount();
                 if (account == null) {

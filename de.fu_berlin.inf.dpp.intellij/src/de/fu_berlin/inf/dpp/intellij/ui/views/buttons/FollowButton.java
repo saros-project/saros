@@ -146,6 +146,7 @@ public class FollowButton extends ToolbarButton {
         JMenuItem leaveItem = new JMenuItem("Leave follow mode");
         leaveItem.setActionCommand(null);
         leaveItem.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 followModeAction.execute(e.getActionCommand());
             }
@@ -176,6 +177,7 @@ public class FollowButton extends ToolbarButton {
 
         menuItem.setActionCommand(userName);
         menuItem.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 followModeAction.execute(e.getActionCommand());
             }

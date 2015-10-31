@@ -237,6 +237,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
             return session;
         }
 
+        @Override
         public String toString() {
             return "Host " + title;
         }
@@ -275,6 +276,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
             return project;
         }
 
+        @Override
         public String toString() {
             if (resList != null) {
                 StringBuilder sbOut = new StringBuilder();

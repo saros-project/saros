@@ -369,6 +369,7 @@ public class IntelliJProjectImpl implements IProject {
         return null;
     }
 
+    @Override
     public IPath getLocation() {
         return this.fullPath;
     }
@@ -405,6 +406,7 @@ public class IntelliJProjectImpl implements IProject {
         return result;
     }
 
+    @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder(" ");

@@ -155,6 +155,7 @@ public class IntelliJFileImpl extends IntelliJResourceImpl implements IFile {
         return null;
     }
 
+    @Override
     public String toString() {
         return file.getPath();
     }

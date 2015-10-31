@@ -84,6 +84,7 @@ public class EditorManager extends AbstractActivityProducer implements
         @Override
         public void unblock() {
             executeInUIThreadSynchronous(new Runnable() {
+                @Override
                 public void run() {
                     unlockAllEditors();
                 }
@@ -93,6 +94,7 @@ public class EditorManager extends AbstractActivityProducer implements
         @Override
         public void block() {
             executeInUIThreadSynchronous(new Runnable() {
+                @Override
                 public void run() {
                     lockAllEditors();
                 }
@@ -326,7 +328,7 @@ public class EditorManager extends AbstractActivityProducer implements
                 .removeBlockable(stopManagerListener); //todo
 
             executeInUIThreadSynchronous(new Runnable() {
-
+                @Override
                 public void run() {
                     endSession();
                 }
@@ -339,6 +341,7 @@ public class EditorManager extends AbstractActivityProducer implements
                 return;
             }
             executeInUIThreadAsynchronous(new Runnable() {
+                @Override
                 public void run() {
                     addProject();
                 }

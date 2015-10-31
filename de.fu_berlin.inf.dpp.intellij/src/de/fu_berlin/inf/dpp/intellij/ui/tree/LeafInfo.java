@@ -56,6 +56,7 @@ public class LeafInfo {
         this.icon = icon;
     }
 
+    @Override
     public String toString() {
         return title;
     }

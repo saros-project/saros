@@ -83,6 +83,7 @@ public class ShareWithUserAction extends AnAction {
         CollaborationUtils.startSession(resources, contacts);
     }
 
+    @Override
     public String toString() {
         return super.toString() + " " + title;
     }

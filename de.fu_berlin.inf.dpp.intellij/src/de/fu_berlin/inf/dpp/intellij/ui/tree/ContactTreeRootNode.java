@@ -235,6 +235,7 @@ public class ContactTreeRootNode extends DefaultMutableTreeNode
             }
         }
 
+        @Override
         public String toString() {
             return status == null ? title : title + " (" + status + ")";
         }
