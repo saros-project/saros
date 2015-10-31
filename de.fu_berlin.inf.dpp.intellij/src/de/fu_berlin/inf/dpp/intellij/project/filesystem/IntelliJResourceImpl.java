@@ -64,10 +64,10 @@ public abstract class IntelliJResourceImpl implements IResource {
     public IPath getFullPath() {
         // TODO Comply with Interface description: workspace-relative paths
         if (!file.isAbsolute()) {
-            return new IntelliJPathImpl(
-                project.getFullPath() + File.separator + file.getPath());
+            return IntelliJPathImpl.fromString(
+                project.getFullPath().toPortableString()).append(file.getPath());
         }
-        return new IntelliJPathImpl(file.getAbsoluteFile());
+        return IntelliJPathImpl.fromString(file.getAbsoluteFile().getPath());
     }
 
     @Override
@@ -93,21 +93,22 @@ public abstract class IntelliJResourceImpl implements IResource {
 
     @Override
     public IPath getProjectRelativePath() {
-        if (file.isAbsolute()) {
-            File fPrj = project.getFullPath().toFile();
-            if (fPrj.isFile()) {
-                fPrj = fPrj.getParentFile();
-            }
 
-            String prjPath = fPrj.getAbsolutePath();
-            String path = file.getAbsolutePath();
-            if (path.length() > prjPath.length()) {
-                path = path.substring(prjPath.length() + 1);
-            }
-            return new IntelliJPathImpl(new File(path));
+        if (!file.isAbsolute()) {
+            return IntelliJPathImpl.fromString(file.getPath());
         }
 
-        return new IntelliJPathImpl(new File(file.getPath()));
+        File fPrj = project.getFullPath().toFile();
+        if (fPrj.isFile()) {
+            fPrj = fPrj.getParentFile();
+        }
+
+        String prjPath = fPrj.getAbsolutePath();
+        String path = file.getAbsolutePath();
+        if (path.length() > prjPath.length()) {
+            path = path.substring(prjPath.length() + 1);
+        }
+        return IntelliJPathImpl.fromString(path);
     }
 
     public SPath getSPath() {

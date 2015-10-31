@@ -88,8 +88,8 @@ public class IntelliJProjectImpl implements IProject {
 
         isAccessible = false;
 
-        fullPath = new IntelliJPathImpl(path.getAbsolutePath());
-        relativePath = new IntelliJPathImpl(path.getPath());
+        fullPath = IntelliJPathImpl.fromString(path.getAbsolutePath());
+        relativePath = IntelliJPathImpl.fromString(path.getPath());
 
         attributes = new IntelliJResourceAttributesImpl(); //todo
     }

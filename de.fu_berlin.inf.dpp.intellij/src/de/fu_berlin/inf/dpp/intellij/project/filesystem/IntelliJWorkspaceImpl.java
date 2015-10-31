@@ -22,14 +22,8 @@
 
 package de.fu_berlin.inf.dpp.intellij.project.filesystem;
 
-import java.io.File;
-import java.io.IOException;
-
-import org.apache.log4j.Logger;
-
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
-
 import de.fu_berlin.inf.dpp.exceptions.OperationCanceledException;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
@@ -38,6 +32,10 @@ import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRunnable;
 import de.fu_berlin.inf.dpp.intellij.project.FileSystemChangeListener;
 import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
+import org.apache.log4j.Logger;
+
+import java.io.File;
+import java.io.IOException;
 
 public class IntelliJWorkspaceImpl implements IWorkspace {
     public static final Logger LOG = Logger.getLogger(IntelliJWorkspaceImpl.class);
@@ -84,13 +82,13 @@ public class IntelliJWorkspaceImpl implements IWorkspace {
             relativePath = relativePath.substring(1);
         }
 
-        String projectName = new IntelliJPathImpl(relativePath).segments()[0];
+        String projectName = IntelliJPathImpl.fromString(relativePath).segments()[0];
         return new IntelliJProjectImpl(project, projectName);
     }
 
     @Override
     public IPath getLocation() {
-        return new IntelliJPathImpl(project.getBasePath());
+        return IntelliJPathImpl.fromString(project.getBasePath());
     }
 
     public void addResourceListener(FileSystemChangeListener listener) {
