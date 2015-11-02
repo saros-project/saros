@@ -3,7 +3,7 @@ bin_test/
 */.idea/*.iws
 */.idea/tasks.xml
 */.idea/workspace.xml
-*/.idea/copyright/profiles_settings.xml
+*/.idea/inspectionProfiles/
 /de.fu_berlin.inf.dpp.intellij/build.properties
 /de.fu_berlin.inf.dpp.server/lib/
 /de.fu_berlin.inf.dpp.server/report/
