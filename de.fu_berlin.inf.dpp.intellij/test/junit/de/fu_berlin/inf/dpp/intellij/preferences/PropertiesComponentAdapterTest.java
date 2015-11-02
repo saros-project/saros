@@ -184,4 +184,15 @@ public class PropertiesComponentAdapterTest {
         assertEquals(PropertiesComponentAdapter.DEFAULT_LONG,
             adapter.getLong("foo.long"));
     }
+
+    @Test
+    public void testSetValueNonASCIICharacters() {
+        final String data = new String("<&ハローキティ&>");
+        final PropertiesComponentAdapter adapter = new PropertiesComponentAdapter();
+
+        adapter.setValue("hello.kitty.with.xml.control.characters", data);
+
+        assertEquals(data,
+            adapter.getString("hello.kitty.with.xml.control.characters"));
+    }
 }

@@ -22,7 +22,10 @@
 
 package de.fu_berlin.inf.dpp.intellij.preferences;
 
+import java.nio.charset.Charset;
 import java.util.Properties;
+
+import org.apache.commons.codec.binary.Base64;
 
 import com.intellij.ide.util.PropertiesComponent;
 
@@ -39,6 +42,9 @@ import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 public class PropertiesComponentAdapter implements IPreferenceStore {
 
     private static final String PROPERTY_PREFIX = "de.fu_berlin.inf.dpp.config.";
+
+    private static final Charset PROPERTY_CHARSET = Charset.forName("UTF-8");
+    private static final Charset BASE64_CHARSET = Charset.forName("ISO-8859-1");
 
     private PropertiesComponent properties;
 
@@ -134,32 +140,32 @@ public class PropertiesComponentAdapter implements IPreferenceStore {
 
     @Override
     public int getInt(String name) {
-        final Integer value = convertValue(
-            properties.getValue(PROPERTY_PREFIX + name), int.class, false);
+        final Integer value = convertValue(getPropertyValue(name), int.class,
+            false);
 
         return value != null ? value : getDefaultInt(name);
     }
 
     @Override
     public long getLong(String name) {
-        final Long value = convertValue(
-            properties.getValue(PROPERTY_PREFIX + name), long.class, false);
+        final Long value = convertValue(getPropertyValue(name), long.class,
+            false);
 
         return value != null ? value : getDefaultLong(name);
     }
 
     @Override
     public boolean getBoolean(String name) {
-        final Boolean value = convertValue(
-            properties.getValue(PROPERTY_PREFIX + name), boolean.class, false);
+        final Boolean value = convertValue(getPropertyValue(name),
+            boolean.class, false);
 
         return value != null ? value : getDefaultBoolean(name);
     }
 
     @Override
     public String getString(String name) {
-        final String value = convertValue(
-            properties.getValue(PROPERTY_PREFIX + name), String.class, false);
+        final String value = convertValue(getPropertyValue(name), String.class,
+            false);
 
         return value != null ? value : getDefaultString(name);
     }
@@ -181,7 +187,24 @@ public class PropertiesComponentAdapter implements IPreferenceStore {
 
     @Override
     public void setValue(String name, String value) {
-        properties.setValue(PROPERTY_PREFIX + name, value);
+        setPropertyValue(name, value);
+    }
+
+    private void setPropertyValue(final String name, final String value) {
+        final String encodedValue = new String(Base64.encodeBase64(value
+            .getBytes(PROPERTY_CHARSET)), BASE64_CHARSET);
+
+        properties.setValue(PROPERTY_PREFIX + name, encodedValue);
+    }
+
+    private String getPropertyValue(final String name) {
+        final String value = properties.getValue(PROPERTY_PREFIX + name);
+
+        if (value == null)
+            return null;
+
+        return new String(Base64.decodeBase64(value.getBytes(BASE64_CHARSET)),
+            PROPERTY_CHARSET);
     }
 
     /**
