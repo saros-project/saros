@@ -63,12 +63,11 @@ public abstract class IntelliJResourceImpl implements IResource {
     @Override
     public IPath getFullPath() {
         // TODO Comply with Interface description: workspace-relative paths
-        if (project != null && !file.isAbsolute()) {
+        if (!file.isAbsolute()) {
             return new IntelliJPathImpl(
                 project.getFullPath() + File.separator + file.getPath());
-        } else {
-            return new IntelliJPathImpl(file.getAbsoluteFile());
         }
+        return new IntelliJPathImpl(file.getAbsoluteFile());
     }
 
     @Override
@@ -94,16 +93,12 @@ public abstract class IntelliJResourceImpl implements IResource {
 
     @Override
     public IPath getProjectRelativePath() {
-        if (project == null) {
-            return new IntelliJPathImpl(file);
-        }
-
-        File fPrj = project.getFullPath().toFile();
-        if (fPrj.isFile()) {
-            fPrj = fPrj.getParentFile();
-        }
-
         if (file.isAbsolute()) {
+            File fPrj = project.getFullPath().toFile();
+            if (fPrj.isFile()) {
+                fPrj = fPrj.getParentFile();
+            }
+
             String prjPath = fPrj.getAbsolutePath();
             String path = file.getAbsolutePath();
             if (path.length() > prjPath.length()) {
@@ -137,10 +132,6 @@ public abstract class IntelliJResourceImpl implements IResource {
     @Override
     public boolean isDerived() {
         return isDerived;
-    }
-
-    public void setDerived(boolean derived) {
-        isDerived = derived;
     }
 
     public File toFile() {
