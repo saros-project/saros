@@ -22,18 +22,14 @@ package de.fu_berlin.inf.dpp.feedback;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.TimeZone;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.session.User.Permission;
 
@@ -42,7 +38,7 @@ import de.fu_berlin.inf.dpp.session.User.Permission;
  * statistical data can be stored as simple key/value pairs. This data can then
  * be saved to disk as a file.<br>
  * <br>
- *
+ * 
  * TODO Add a field user.saros.team to the SessionStatistic which is set to true
  * if:<br>
  * - the associated button on the FeedbackPreferencePage is true <br>
@@ -50,13 +46,10 @@ import de.fu_berlin.inf.dpp.session.User.Permission;
  * - the version number is just [X]X.[X]X.[X]X (with [X] being optional)<br>
  * The value should be determined by the SessionDataCollector and written to the
  * statistic on the end of a session.
- *
+ * 
  * @author Lisa Dohrmann
  */
 public class SessionStatistic {
-
-    protected static final Logger log = Logger.getLogger(SessionStatistic.class
-        .getName());
 
     protected static final String SAROS_VERSION = "saros.version";
     protected static final String JAVA_VERSION = "java.version";
@@ -82,20 +75,20 @@ public class SessionStatistic {
 
     /**
      * ISO DateTime (UTC) of the time the session started for the local user.
-     *
+     * 
      * This might not be equal to the start of the whole session, because the
      * local user might not be host.
-     *
+     * 
      * @since 9.9.11
      */
     protected static final String KEY_SESSION_LOCAL_START = "session.local.start";
 
     /**
      * ISO DateTime (UTC) of the time the session ended for the local user.
-     *
+     * 
      * This might not be equal to the end of the whole session, because the
      * local user might not be host.
-     *
+     * 
      * @since 9.9.11
      */
     protected static final String KEY_SESSION_LOCAL_END = "session.local.end";
@@ -140,7 +133,7 @@ public class SessionStatistic {
      * can be used to track the randomly generated
      * {@link SessionStatistic#KEY_USER_ID} to a "real" person if the user
      * chooses to do so.
-     *
+     * 
      * @since 9.9.11
      */
     protected static final String KEY_PSEUDONYM = "user.pseudonym";
@@ -224,54 +217,37 @@ public class SessionStatistic {
     }
 
     /**
-     * Returns the properties object of this SessionStatistic that holds the
-     * statistical data.
-     *
-     * @return the wrapped {@link #data} properties object
-     */
-    public Properties getData() {
-        return data;
-    }
-
-    /**
-     * Clears all gathered statistical data.
-     */
-    public void clear() {
-        data.clear();
-    }
-
-    /**
      * Adds the contents of the given SessionStatistic to this SessionStatistic.
-     *
+     * 
      * @param statistic
      */
     public void addAll(SessionStatistic statistic) {
-        data.putAll(statistic.getData());
+        data.putAll(statistic.data);
     }
 
     @Override
     public String toString() {
-        ArrayList<String> lines = new ArrayList<String>();
+        StringWriter out = new StringWriter(512);
 
-        for (Entry<Object, Object> e : data.entrySet()) {
-            lines.add("  " + e.getKey() + "=" + e.getValue());
+        try {
+            data.store(out, "Saros session data");
+        } catch (IOException e) {
+            // cannot happen
+        } finally {
+            IOUtils.closeQuietly(out);
         }
-
-        Collections.sort(lines);
-
-        return "Session statistic:\n" + StringUtils.join(lines, '\n');
+        return out.toString();
     }
 
     /**
      * Writes the session data to a file.
-     *
+     * 
      * @param file
      *            the file to save the current session statistic into
      */
     public void toFile(File file) throws IOException {
 
         FileOutputStream fos = null;
-        log.info("Writing statistic data to " + file.getAbsolutePath());
 
         // write the statistic to the file
         try {
@@ -283,79 +259,39 @@ public class SessionStatistic {
     }
 
     /*------------------------------------------------------*
-     * Access methods to get and set the value for each key *
+     * Access methods to set the value for each key *
      *------------------------------------------------------*/
-
-    public String getSarosVersion() {
-        return data.getProperty(SAROS_VERSION);
-    }
 
     public void setSarosVersion(String version) {
         data.setProperty(SAROS_VERSION, version);
-    }
-
-    public String getJavaVersion() {
-        return data.getProperty(JAVA_VERSION);
     }
 
     public void setJavaVersion(String version) {
         data.setProperty(JAVA_VERSION, version);
     }
 
-    public String getOSName() {
-        return data.getProperty(OS_NAME);
-    }
-
     public void setOSName(String osName) {
         data.setProperty(OS_NAME, osName);
-    }
-
-    public String getPlatformVersion() {
-        return data.getProperty(PLATFORM_VERSION);
     }
 
     public void setPlatformVersion(String version) {
         data.setProperty(PLATFORM_VERSION, version);
     }
 
-    public boolean getFeedbackDisabled(boolean disabled) {
-        return Boolean.parseBoolean(data.getProperty(KEY_FEEDBACK_DISABLED));
-    }
-
     public void setFeedbackDisabled(boolean disabled) {
         data.setProperty(KEY_FEEDBACK_DISABLED, String.valueOf(disabled));
-    }
-
-    public int getFeedbackInterval() {
-        return Integer.parseInt(data.getProperty(KEY_FEEDBACK_INTERVAL));
     }
 
     public void setFeedbackInterval(int interval) {
         data.setProperty(KEY_FEEDBACK_INTERVAL, String.valueOf(interval));
     }
 
-    public long getSessionCount() {
-        return Long.parseLong(data.getProperty(KEY_SESSION_COUNT));
-    }
-
     public void setSessionCount(long count) {
         data.setProperty(KEY_SESSION_COUNT, String.valueOf(count));
     }
 
-    public double getLocalSessionDuration() {
-        return Double.parseDouble(data.getProperty(KEY_SESSION_LOCAL_DURATION));
-    }
-
     public void setLocalSessionDuration(double time) {
         data.setProperty(KEY_SESSION_LOCAL_DURATION, String.valueOf(time));
-    }
-
-    /**
-     * Returns the time the given number of users were together in the session.
-     */
-    public double getSessionTimeForUsers(int numberOfUsers) {
-        return Double.parseDouble(data.getProperty(appendToKey(
-            KEY_SESSION_TIME_USERS, numberOfUsers)));
     }
 
     /**
@@ -364,15 +300,6 @@ public class SessionStatistic {
     public void setSessionTimeForUsers(int numberOfUsers, double time) {
         data.setProperty(appendToKey(KEY_SESSION_TIME_USERS, numberOfUsers),
             String.valueOf(time));
-    }
-
-    /**
-     * Returns for the given number of users the percentage of the total session
-     * time they were together in the session.
-     */
-    public int getSessionTimePercentForUsers(int numberOfUsers) {
-        return Integer.parseInt(data.getProperty(appendToKey(
-            KEY_SESSION_TIME_USERS, numberOfUsers, KEY_PERCENT)));
     }
 
     /**
@@ -385,20 +312,12 @@ public class SessionStatistic {
             String.valueOf(percent));
     }
 
-    public String getSessionID() {
-        return data.getProperty(KEY_SESSION_ID);
-    }
-
     public void setSessionID(String sessionID) {
         data.setProperty(KEY_SESSION_ID, sessionID);
     }
 
-    /**
-     * Returns the total number of users that participated in the session, they
-     * didn't had to be present at the same time.
-     */
-    public int getSessionUsersTotal() {
-        return Integer.parseInt(data.getProperty(KEY_SESSION_USERS_TOTAL));
+    public String getSessionID() {
+        return data.getProperty(KEY_SESSION_ID);
     }
 
     /**
@@ -410,25 +329,10 @@ public class SessionStatistic {
     }
 
     /**
-     * Returns the n-th permission of the user.
-     */
-    public String getPermission(int n) {
-        return data.getProperty(appendToKey(KEY_PERMISSION, n));
-    }
-
-    /**
      * Sets the n-th permission of the user.
      */
     public void setPermission(int n, String permission) {
         data.setProperty(appendToKey(KEY_PERMISSION, n), permission);
-    }
-
-    /**
-     * Returns the time the user executed the n-th permission.
-     */
-    public double getPermissionDuration(int n) {
-        return Double.parseDouble(data.getProperty(appendToKey(KEY_PERMISSION,
-            n, KEY_DURATION)));
     }
 
     /**
@@ -440,22 +344,10 @@ public class SessionStatistic {
     }
 
     /**
-     * Returns the total amount of the local user's permission changes.
-     */
-    public int getPermissionChanges() {
-        return Integer.parseInt(data.getProperty(KEY_PERMISSION_CHANGES));
-    }
-
-    /**
      * Sets the total amount of the local user's permission changes.
      */
     public void setPermissionChanges(int changes) {
         data.setProperty(KEY_PERMISSION_CHANGES, String.valueOf(changes));
-    }
-
-    public double getTotalPermissionDurationReadOnlyAccess() {
-        return Double.parseDouble(data.getProperty(appendToKey(
-            KEY_PERMISSION_READONLY, KEY_DURATION)));
     }
 
     public void setTotalPermissionDurationReadOnlyAccess(double time) {
@@ -463,19 +355,9 @@ public class SessionStatistic {
             String.valueOf(time));
     }
 
-    public int getTotalPermissionPercentReadOnlyAccess() {
-        return Integer.parseInt(data.getProperty(appendToKey(
-            KEY_PERMISSION_READONLY, KEY_PERCENT)));
-    }
-
     public void setTotalPermissionPercentReadOnlyAccess(int percent) {
         data.setProperty(appendToKey(KEY_PERMISSION_READONLY, KEY_PERCENT),
             String.valueOf(percent));
-    }
-
-    public double getTotalPermissionDurationWriteAccess() {
-        return Double.parseDouble(data.getProperty(appendToKey(
-            KEY_PERMISSION_WRITE, KEY_DURATION)));
     }
 
     public void setTotalPermissionDurationWriteAccess(double time) {
@@ -483,21 +365,9 @@ public class SessionStatistic {
             String.valueOf(time));
     }
 
-    public int getTotalPermissionPercentWriteAccess() {
-        return Integer.parseInt(data.getProperty(appendToKey(
-            KEY_PERMISSION_WRITE, KEY_PERCENT)));
-    }
-
     public void setTotalPermissionPercentWriteAccess(int percent) {
         data.setProperty(appendToKey(KEY_PERMISSION_WRITE, KEY_PERCENT),
             String.valueOf(percent));
-    }
-
-    /**
-     * Returns the number of characters the local user has written.
-     */
-    public long getTextEditChars() {
-        return Long.parseLong(data.getProperty(KEY_TEXTEDIT_CHARS));
     }
 
     /**
@@ -508,26 +378,10 @@ public class SessionStatistic {
     }
 
     /**
-     * Returns the number of text edits the local user performed.
-     */
-    public long getTextEditsCount() {
-        return Long.parseLong(data.getProperty(KEY_TEXTEDIT_COUNT));
-    }
-
-    /**
      * Sets the number of text edits the local user performed.
      */
     public void setTextEditsCount(int count) {
         data.setProperty(KEY_TEXTEDIT_COUNT, String.valueOf(count));
-    }
-
-    /**
-     * Returns the number of characters the user has written simultaneously in
-     * the given interval with other users.
-     */
-    public long getParallelTextEdits(int interval) {
-        return Long.parseLong(data.getProperty(appendToKey(
-            KEY_PARALLEL_TEXT_EDITS, interval, KEY_CHARS)));
     }
 
     /**
@@ -541,15 +395,6 @@ public class SessionStatistic {
     }
 
     /**
-     * Returns the percentage of the simultaneously written characters in the
-     * given interval.
-     */
-    public int getParallelTextEditsPercent(int interval) {
-        return Integer.parseInt(data.getProperty(appendToKey(
-            KEY_PARALLEL_TEXT_EDITS, interval, KEY_PERCENT)));
-    }
-
-    /**
      * Sets the percentage of the simultaneously written characters in the given
      * interval.
      */
@@ -559,20 +404,10 @@ public class SessionStatistic {
             String.valueOf(percent));
     }
 
-    public int getParallelTextEditsCount(int interval) {
-        return Integer.parseInt(data.getProperty(appendToKey(
-            KEY_PARALLEL_TEXT_EDITS, interval, KEY_COUNT)));
-    }
-
     public void setParallelTextEditsCount(int interval, int count) {
         data.setProperty(
             appendToKey(KEY_PARALLEL_TEXT_EDITS, interval, KEY_COUNT),
             String.valueOf(count));
-    }
-
-    public long getNonParallelTextEdits() {
-        return Long.parseLong(data.getProperty(appendToKey(
-            KEY_NON_PARALLEL_TEXT_EDITS, KEY_CHARS)));
     }
 
     public void setNonParallelTextEdits(long chars) {
@@ -580,26 +415,13 @@ public class SessionStatistic {
             String.valueOf(chars));
     }
 
-    public int getNonParallelTextEditsPercent() {
-        return Integer.parseInt(data.getProperty(appendToKey(
-            KEY_NON_PARALLEL_TEXT_EDITS, KEY_PERCENT)));
-    }
-
     public void setNonParallelTextEditsPercent(int percent) {
         data.setProperty(appendToKey(KEY_NON_PARALLEL_TEXT_EDITS, KEY_PERCENT),
             String.valueOf(percent));
     }
 
-    public String getUserID() {
-        return data.getProperty(KEY_USER_ID);
-    }
-
     public void setUserID(String userID) {
         data.setProperty(KEY_USER_ID, userID);
-    }
-
-    public boolean getIsHost() {
-        return Boolean.parseBoolean(data.getProperty(KEY_USER_IS_HOST));
     }
 
     public void setIsHost(boolean isHost) {
@@ -664,52 +486,6 @@ public class SessionStatistic {
     }
 
     /**
-     * Returns the number of jumps to the position of a user with
-     * {@link Permission#READONLY_ACCESS}
-     */
-    public int getJumpedToUserWithReadOnlyAccessCount() {
-        return Integer.parseInt(data
-            .getProperty(KEY_JUMPED_TO_USER_WITH_READONLY_ACCESS));
-    }
-
-    /**
-     * Returns the number of jumps to the position of a user with
-     * {@link Permission#WRITE_ACCESS}
-     */
-    public int getJumpedToUserWithWriteAccessCount() {
-        return Integer.parseInt(data
-            .getProperty(KEY_JUMPED_TO_USER_WITH_WRITE_ACCESS));
-    }
-
-    /**
-     * Returns total number of jumps performed
-     */
-    public int getJumpedToCount() {
-        return Integer.parseInt(data.getProperty(KEY_TOTAL_JUMP_COUNT));
-    }
-
-    /**
-     * Returns the number of follow mode toggles
-     */
-    public int getFollowModeTogglesCount() {
-        return Integer.parseInt(data.getProperty(KEY_FOLLOWMODE_TOGGLES));
-    }
-
-    /**
-     * Returns the percentage of time spent in follow mode
-     */
-    public int getFollowModeTimePercentage() {
-        return Integer.parseInt(data.getProperty(KEY_FOLLOWMODE_PERCENT));
-    }
-
-    /**
-     * Returns the total time spent in follow mode
-     */
-    public double getFollowModeTimeTotal() {
-        return Double.parseDouble(data.getProperty(KEY_FOLLOWMODE_TOTAL));
-    }
-
-    /**
      * Sets the total number of follow mode toggles
      */
     public void setFollowModeTogglesCount(int count) {
@@ -740,18 +516,9 @@ public class SessionStatistic {
     }
 
     /**
-     * Returns the state as <code>boolean</code> of the auto follow mode feature
-     * from the configuration settings
-     */
-    public boolean getAutoFollowModeEnabled() {
-        return Boolean.parseBoolean(data
-            .getProperty(KEY_AUTO_FOLLOW_MODE_ENABLED));
-    }
-
-    /**
      * Sets the count of selections made by users with
      * {@link Permission#READONLY_ACCESS}
-     *
+     * 
      * @param userWithReadOnlyAccessSelectionCount
      */
     public void setTotalOberserverSelectionCount(
@@ -764,7 +531,7 @@ public class SessionStatistic {
     /**
      * Sets the count of user with {@link Permission#READONLY_ACCESS} selections
      * that were witnessed by another user
-     *
+     * 
      * @param numberOfWitnessedUserWithReadOnlyAccessSelections
      */
     public void setWitnessedUserWithReadOnlyAccessSelections(
@@ -777,7 +544,7 @@ public class SessionStatistic {
     /**
      * Sets the number of user with {@link Permission#READONLY_ACCESS}
      * selections where an edit occurred.
-     *
+     * 
      * @param userWithWriteAccessSelectionCount
      */
     public void setGestureCount(int userWithWriteAccessSelectionCount) {
@@ -786,34 +553,8 @@ public class SessionStatistic {
     }
 
     /**
-     * Returns the number of user with {@link Permission#READONLY_ACCESS}
-     * selections made
-     */
-    public int getTotalOberserverSelectionCount() {
-        return Integer.parseInt(data
-            .getProperty(KEY_TOTAL_USER_WITH_READONLY_ACCESS_SELECTION_COUNT));
-    }
-
-    /**
-     * Returns the number of witnessed user with
-     * {@link Permission#READONLY_ACCESS} selections
-     */
-    public int getWitnessedUserWithReadOnlyAccessSelections() {
-        return Integer
-            .parseInt(data
-                .getProperty(KEY_WITNESSED_USER_WITH_READONLY_ACCESS_SELECTION_COUNT));
-    }
-
-    /**
-     * Returns the gesture count
-     */
-    public int getGestureCount() {
-        return Integer.parseInt(data.getProperty(KEY_GESTURE_COUNT));
-    }
-
-    /**
      * Sets the characters edited by each user.
-     *
+     * 
      * @param userNumber
      * @param charCount
      */
@@ -824,7 +565,7 @@ public class SessionStatistic {
 
     /**
      * Sets the number of remote paste events for each user.
-     *
+     * 
      * @param userNumber
      * @param pasteCount
      */
@@ -835,7 +576,7 @@ public class SessionStatistic {
 
     /**
      * Sets the number of local paste events
-     *
+     * 
      * @param pasteCount
      */
     public void setLocalUserPastes(int pasteCount) {
@@ -845,7 +586,7 @@ public class SessionStatistic {
 
     /**
      * Sets the number of chars that were added through a remote paste
-     *
+     * 
      * @param userNumber
      * @param pasteChars
      */
@@ -857,99 +598,12 @@ public class SessionStatistic {
 
     /**
      * Sets the number of chars that were added through a paste
-     *
+     * 
      * @param pasteChars
      */
     public void setLocalUserPasteChars(Integer pasteChars) {
         data.setProperty(appendToKey(KEY_TEXTEDIT_PASTES, KEY_CHARS),
             String.valueOf(pasteChars));
-    }
-
-    /**
-     * Returns the remote chars for user with number n
-     */
-    public int getRemoteUserCharCount(int n) {
-        return Integer.parseInt(data.getProperty(appendToKey(KEY_CHARS, n,
-            KEY_REMOTE_USER)));
-    }
-
-    /**
-     * Returns the number of pastes conducted by user n
-     */
-    public int getRemoteUserPastes(int n) {
-        return Integer.parseInt(data.getProperty(appendToKey(KEY_PASTES, n,
-            KEY_REMOTE_USER)));
-    }
-
-    /**
-     * Returns the total pastes made by the local user
-     */
-    public int getLocalUserPastes() {
-        return Integer.parseInt(data.getProperty(KEY_TEXTEDIT_PASTES));
-    }
-
-    /**
-     * Returns the number of chars contained within the pastes of user n
-     */
-    public int getRemoteUserPasteChars(int n) {
-        return Integer.parseInt(data.getProperty(appendToKey(KEY_PASTES,
-            KEY_CHARS, n, KEY_REMOTE_USER)));
-    }
-
-    public int getLocalUserPasteChars() {
-        return Integer.parseInt(data.getProperty(appendToKey(
-            KEY_TEXTEDIT_PASTES, KEY_CHARS)));
-    }
-
-    /**
-     * Sets the time spent in VoIP sessions in minutes
-     *
-     * @param timeInMinutes
-     */
-    public void setVoIPTime(double timeInMinutes) {
-        data.setProperty(KEY_VOIP_TOTAL, String.valueOf(timeInMinutes));
-    }
-
-    /**
-     * Sets the percentage spent in VoIP sessions in respect to the session
-     * length
-     *
-     * @param percentage
-     */
-    public void setVoIPPercentage(int percentage) {
-        data.setProperty(appendToKey(KEY_VOIP_PERCENT),
-            String.valueOf(percentage));
-    }
-
-    /**
-     * Sets the number of established VoIP sessions
-     *
-     * @param numberVoIPSessions
-     */
-    public void setVoIPSessionCount(int numberVoIPSessions) {
-        data.setProperty(appendToKey(KEY_VOIP_COUNT),
-            String.valueOf(numberVoIPSessions));
-    }
-
-    /**
-     * Returns the time spent in VoIP sessions
-     */
-    public double getVoIPTime() {
-        return Double.parseDouble(data.getProperty(KEY_VOIP_TOTAL));
-    }
-
-    /**
-     * Returns the percentage of time of a session spent in VoIP sessions
-     */
-    public int getVoIPPercentage() {
-        return Integer.parseInt(data.getProperty(KEY_VOIP_PERCENT));
-    }
-
-    /**
-     * Returns the total number of VoIP sessions in a session
-     */
-    public int getVoIPSessionCount() {
-        return Integer.parseInt(data.getProperty(KEY_VOIP_COUNT));
     }
 
     public void setSharedProjectStatistic(int completeSharedProjectCount,
