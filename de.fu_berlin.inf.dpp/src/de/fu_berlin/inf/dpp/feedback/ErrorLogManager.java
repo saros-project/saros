@@ -1,10 +1,15 @@
 package de.fu_berlin.inf.dpp.feedback;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Appender;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
@@ -40,6 +45,9 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
 
     private static final Logger log = Logger.getLogger(ErrorLogManager.class
         .getName());
+
+    private static final String ERROR_LOG_UPLOAD_URL = System
+        .getProperty("de.fu_berlin.inf.dpp.feedback.ERROR_LOG_UPLOAD_URL");
 
     protected final String sessionID;
     private static String mostRecentSessionID;
@@ -124,7 +132,8 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
      */
     public static int getFullErrorLogSubmissionStatus() {
         return FeedbackPreferences.getPreferences().getInt(
-            EclipsePreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION_FULL, UNDEFINED);
+            EclipsePreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION_FULL,
+            UNDEFINED);
     }
 
     /**
@@ -133,7 +142,8 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
     public static void setFullErrorLogSubmissionAllowed(final boolean allowed) {
         final int submission = allowed ? ALLOW : FORBID;
         FeedbackPreferences.getPreferences().putInt(
-            EclipsePreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION_FULL, submission);
+            EclipsePreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION_FULL,
+            submission);
     }
 
     /**
@@ -199,7 +209,6 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
      * IRunnableWithProgress to report feedback of the execution in the active
      * workbench windows status bar.
      * 
-     * @see FileSubmitter#uploadErrorLog(String, String, File, IProgressMonitor)
      * 
      * @nonblocking
      * @cancelable
@@ -228,8 +237,7 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                 try {
-                    FileSubmitter.uploadErrorLog(logNameExtended, errorLog,
-                        monitor);
+                    uploadErrorLog(logNameExtended, errorLog, monitor);
                 } catch (IOException e) {
                     String msg = String.format("Couldn't upload file: %s. %s",
                         e.getMessage(), e.getCause() != null ? e.getCause()
@@ -255,5 +263,56 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
         sb.append("  Full Error log submission allowed: "
             + isFullErrorLogSubmissionAllowed());
         log.info(sb.toString());
+    }
+
+    /**
+     * Convenience wrapper method to upload an error log file to the server. To
+     * save time and storage space, the log is compressed to a zip archive with
+     * the given zipName.
+     * 
+     * @param zipName
+     *            a name for the zip archive, e.g. with added user ID to make it
+     *            unique, zipName must be at least 3 characters long!
+     * @throws IOException
+     *             if an I/O error occurs
+     */
+    private static void uploadErrorLog(String zipName, File file,
+        IProgressMonitor monitor) throws IOException {
+
+        if (ERROR_LOG_UPLOAD_URL == null) {
+            log.warn("error log upload url is not configured, cannot upload error log file");
+            return;
+        }
+
+        File archive = new File(System.getProperty("java.io.tmpdir"), zipName
+            + ".zip");
+
+        ZipOutputStream out = null;
+        FileInputStream in = null;
+
+        byte[] buffer = new byte[8192];
+
+        try {
+
+            in = new FileInputStream(file);
+
+            out = new ZipOutputStream(new FileOutputStream(archive));
+
+            out.putNextEntry(new ZipEntry(file.getName()));
+
+            int read;
+
+            while ((read = in.read(buffer)) > 0)
+                out.write(buffer, 0, read);
+
+            out.finish();
+            out.close();
+
+            FileSubmitter.uploadFile(archive, ERROR_LOG_UPLOAD_URL, monitor);
+        } finally {
+            IOUtils.closeQuietly(out);
+            IOUtils.closeQuietly(in);
+            archive.delete();
+        }
     }
 }

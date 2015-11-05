@@ -34,6 +34,9 @@ public class StatisticManager extends AbstractFeedbackManager implements
     private static final Logger log = Logger.getLogger(StatisticManager.class
         .getName());
 
+    private static final String STATISTIC_UPLOAD_URL = System
+        .getProperty("de.fu_berlin.inf.dpp.feedback.STATISTIC_UPLOAD_URL");
+
     private static final Random RANDOM = new Random();
 
     public static final String INFO_URL = "http://www.saros-project.org/Feedback"; //$NON-NLS-1$
@@ -270,7 +273,7 @@ public class StatisticManager extends AbstractFeedbackManager implements
      * submission in an IRunnableWithProgress to report feedback of the
      * execution in the active workbench windows status bar.
      * 
-     * @see FileSubmitter#uploadStatisticFile(File, IProgressMonitor)
+     * @see StatisticManager#uploadStatisticFile(File, IProgressMonitor)
      * @nonblocking
      * @cancelable
      */
@@ -280,7 +283,7 @@ public class StatisticManager extends AbstractFeedbackManager implements
             @Override
             public IStatus run(IProgressMonitor monitor) {
                 try {
-                    FileSubmitter.uploadStatisticFile(file, monitor);
+                    StatisticManager.uploadStatisticFile(file, monitor);
                 } catch (IOException e) {
                     String msg = String.format("Couldn't upload file: %s. %s",
                         e.getMessage(), e.getCause() != null ? e.getCause()
@@ -338,5 +341,27 @@ public class StatisticManager extends AbstractFeedbackManager implements
 
     public int getActiveCollectorCount() {
         return activeCollectors == null ? 0 : activeCollectors.size();
+    }
+
+    /**
+     * Convenience wrapper method to upload a statistic file to the server.
+     * 
+     * @param file
+     *            the file to be uploaded
+     * @throws IOException
+     *             is thrown if the upload failed; the exception wraps the
+     *             target exception that contains the main cause for the failure
+     * 
+     * @blocking
+     */
+    private static void uploadStatisticFile(File file, IProgressMonitor monitor)
+        throws IOException {
+
+        if (STATISTIC_UPLOAD_URL == null) {
+            log.warn("statistic upload url is not configured, cannot upload statistic file");
+            return;
+        }
+
+        FileSubmitter.uploadFile(file, STATISTIC_UPLOAD_URL, monitor);
     }
 }

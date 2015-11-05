@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.feedback;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -10,8 +9,6 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Random;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -19,101 +16,23 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
 /**
- * The FileSubmitter class provides static methods to upload a file to a server.
- * 
- * @author Lisa Dohrmann
+ * The <code>FileSubmitter</code> provides the functionality to upload a file to
+ * a HTTP server.
  */
 public class FileSubmitter {
 
-    private static final Logger log = Logger.getLogger(FileSubmitter.class
-        .getName());
-
-    private static final String STATISTIC_UPLOAD_URL = System
-        .getProperty("de.fu_berlin.inf.dpp.feedback.STATISTIC_UPLOAD_URL");
-
-    private static final String ERROR_LOG_UPLOAD_URL = System
-        .getProperty("de.fu_berlin.inf.dpp.feedback.ERROR_LOG_UPLOAD_URL");
+    private static final Logger log = Logger.getLogger(FileSubmitter.class);
 
     /** Value for connection timeout */
     private static final int TIMEOUT = 30000;
 
-    /**
-     * Convenience wrapper method to upload a statistic file to the server
-     * 
-     * @param file
-     *            the file to be uploaded
-     * @throws IOException
-     *             is thrown if the upload failed; the exception wraps the
-     *             target exception that contains the main cause for the failure
-     * 
-     * @blocking
-     */
-    public static void uploadStatisticFile(File file, IProgressMonitor monitor)
-        throws IOException {
-
-        if (STATISTIC_UPLOAD_URL == null) {
-            log.warn("statistic upload url is not configured, cannot upload statistic file");
-            return;
-        }
-
-        uploadFile(file, STATISTIC_UPLOAD_URL, monitor);
+    private FileSubmitter() {
+        // NOP
     }
 
     /**
-     * Convenience wrapper method to upload an error log file to the server. To
-     * save time and storage space, the log is compressed to a zip archive with
-     * the given zipName.
-     * 
-     * @param zipName
-     *            a name for the zip archive, e.g. with added user ID to make it
-     *            unique, zipName must be at least 3 characters long!
-     * @throws IOException
-     *             if an I/O error occurs
-     */
-    public static void uploadErrorLog(String zipName, File file,
-        IProgressMonitor monitor) throws IOException {
-
-        if (ERROR_LOG_UPLOAD_URL == null) {
-            log.warn("error log upload url is not configured, cannot upload error log file");
-            return;
-        }
-
-        File archive = new File(System.getProperty("java.io.tmpdir"), zipName
-            + ".zip");
-
-        ZipOutputStream out = null;
-        FileInputStream in = null;
-
-        byte[] buffer = new byte[8192];
-
-        try {
-
-            in = new FileInputStream(file);
-
-            out = new ZipOutputStream(new FileOutputStream(archive));
-
-            out.putNextEntry(new ZipEntry(file.getName()));
-
-            int read;
-
-            while ((read = in.read(buffer)) > 0)
-                out.write(buffer, 0, read);
-
-            out.finish();
-            out.close();
-
-            uploadFile(archive, ERROR_LOG_UPLOAD_URL, monitor);
-        } finally {
-            IOUtils.closeQuietly(out);
-            IOUtils.closeQuietly(in);
-            archive.delete();
-        }
-    }
-
-    /**
-     * Tries to upload the given file to the given server (via POST method). A
-     * different name under which the file should be processed by the server can
-     * be specified.
+     * Tries to upload the given file to the given HTTP server (via POST
+     * method).
      * 
      * @param file
      *            the file to upload
@@ -124,11 +43,9 @@ public class FileSubmitter {
      * @throws IOException
      *             if an I/O error occurs
      * 
-     * @blocking
-     * @cancelable
      */
 
-    private static void uploadFile(File file, String url,
+    public static void uploadFile(final File file, final String url,
         IProgressMonitor monitor) throws IOException {
 
         final String CRLF = "\r\n";
