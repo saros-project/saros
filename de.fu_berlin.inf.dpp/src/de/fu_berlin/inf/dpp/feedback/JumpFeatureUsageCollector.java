@@ -21,7 +21,7 @@ package de.fu_berlin.inf.dpp.feedback;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
@@ -38,7 +38,7 @@ public class JumpFeatureUsageCollector extends AbstractStatisticCollector {
     protected int jumpedToWriteAccessHolder = 0;
     protected int jumpedToReadOnlyAccessHolder = 0;
 
-    private final EditorManager editorManager;
+    private final IEditorManager editorManager;
 
     protected ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
 
@@ -53,7 +53,7 @@ public class JumpFeatureUsageCollector extends AbstractStatisticCollector {
     };
 
     public JumpFeatureUsageCollector(StatisticManager statisticManager,
-        ISarosSession session, EditorManager editorManager) {
+        ISarosSession session, IEditorManager editorManager) {
         super(statisticManager, session);
         this.editorManager = editorManager;
     }

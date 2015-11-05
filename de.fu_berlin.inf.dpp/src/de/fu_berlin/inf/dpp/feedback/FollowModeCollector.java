@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
@@ -88,7 +88,7 @@ public class FollowModeCollector extends AbstractStatisticCollector {
     protected List<FollowModeToggleEvent> followModeChangeEvents = Collections
         .synchronizedList(new ArrayList<FollowModeToggleEvent>());
 
-    private final EditorManager editorManager;
+    private final IEditorManager editorManager;
 
     protected ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
 
@@ -123,7 +123,7 @@ public class FollowModeCollector extends AbstractStatisticCollector {
     };
 
     public FollowModeCollector(StatisticManager statisticManager,
-        ISarosSession session, EditorManager editorManager) {
+        ISarosSession session, IEditorManager editorManager) {
         super(statisticManager, session);
         this.editorManager = editorManager;
     }
