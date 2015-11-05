@@ -11,7 +11,7 @@ import de.fu_berlin.inf.dpp.activities.StopFollowingActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
@@ -41,7 +41,7 @@ public class FollowingActivitiesManager extends AbstractActivityProducer
 
     private final AwarenessInformationCollector collector;
 
-    private final EditorManager editor;
+    private final IEditorManager editor;
 
     private final ISharedEditorListener followModeListener = new AbstractSharedEditorListener() {
         @Override
@@ -92,7 +92,7 @@ public class FollowingActivitiesManager extends AbstractActivityProducer
 
     public FollowingActivitiesManager(final ISarosSession session,
         final AwarenessInformationCollector collector,
-        final EditorManager editor) {
+        final IEditorManager editor) {
         this.session = session;
         this.collector = collector;
         this.editor = editor;
@@ -122,10 +122,10 @@ public class FollowingActivitiesManager extends AbstractActivityProducer
     }
 
     public void addListener(IFollowModeChangesListener listener) {
-        this.listeners.add(listener);
+        listeners.add(listener);
     }
 
     public void removeListener(IFollowModeChangesListener listener) {
-        this.listeners.remove(listener);
+        listeners.remove(listener);
     }
 }
