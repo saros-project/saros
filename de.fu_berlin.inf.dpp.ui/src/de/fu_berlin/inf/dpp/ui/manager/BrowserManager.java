@@ -5,7 +5,7 @@ import java.util.Map;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.dpp.ui.renderer.Renderer;
-import de.fu_berlin.inf.dpp.ui.webpages.BrowserPage;
+import de.fu_berlin.inf.dpp.ui.webpages.IBrowserPage;
 
 /**
  * This class manages the different browser instances for the dialogs and the
@@ -14,7 +14,7 @@ import de.fu_berlin.inf.dpp.ui.webpages.BrowserPage;
  */
 public class BrowserManager {
 
-    private Map<Class<? extends BrowserPage>, IJQueryBrowser> browsers = new HashMap<Class<? extends BrowserPage>, IJQueryBrowser>();
+    private Map<Class<? extends IBrowserPage>, IJQueryBrowser> browsers = new HashMap<Class<? extends IBrowserPage>, IJQueryBrowser>();
 
     /**
      * Sets or replaces the browser for the given page and all corresponding
@@ -25,9 +25,9 @@ public class BrowserManager {
      * @param browser
      *            the browser to be set for the given page
      */
-    public synchronized void setBrowser(BrowserPage page, IJQueryBrowser browser) {
+    public synchronized void setBrowser(IBrowserPage page, IJQueryBrowser browser) {
         browsers.put(page.getClass(), browser);
-        for (Renderer renderer : page.getRenderer()) {
+        for (Renderer renderer : page.getRenderers()) {
             renderer.addBrowser(browser);
         }
         notifyAll();
@@ -39,9 +39,9 @@ public class BrowserManager {
      * @param page
      *            the page whose browser should be removed
      */
-    public synchronized void removeBrowser(BrowserPage page) {
+    public synchronized void removeBrowser(IBrowserPage page) {
 
-        for (Renderer renderer : page.getRenderer()) {
+        for (Renderer renderer : page.getRenderers()) {
             renderer.removeBrowser(browsers.get(page.getClass()));
         }
         browsers.remove(page.getClass());
@@ -59,7 +59,7 @@ public class BrowserManager {
      *             if the time out is over
      */
     public synchronized IJQueryBrowser getBrowser(
-        Class<? extends BrowserPage> browserPageClass) {
+        Class<? extends IBrowserPage> browserPageClass) {
         long current = System.currentTimeMillis();
         while (!browsers.containsKey(browserPageClass)
             && System.currentTimeMillis() - current < 3000) {

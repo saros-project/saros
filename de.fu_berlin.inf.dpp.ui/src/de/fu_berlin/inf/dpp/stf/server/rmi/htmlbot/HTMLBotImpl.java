@@ -11,7 +11,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotDialog;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLButton;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotDialog;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteHTMLButton;
-import de.fu_berlin.inf.dpp.ui.webpages.BrowserPage;
+import de.fu_berlin.inf.dpp.ui.webpages.IBrowserPage;
 import de.fu_berlin.inf.dpp.ui.webpages.MainPage;
 
 public class HTMLBotImpl extends HTMLSTFRemoteObject implements IHTMLBot {
@@ -28,7 +28,7 @@ public class HTMLBotImpl extends HTMLSTFRemoteObject implements IHTMLBot {
 
     @Override
     public IRemoteBotDialog getDialogWindow(
-        Class<? extends BrowserPage> pageClass) throws RemoteException {
+        Class<? extends IBrowserPage> pageClass) throws RemoteException {
         dialog.setBrowserPage(pageClass);
         return dialog;
     }
@@ -45,7 +45,7 @@ public class HTMLBotImpl extends HTMLSTFRemoteObject implements IHTMLBot {
             "var names = []; " + "$('.accountEntry').each(function (i) { "
                 + "names[i] = $(this).text().trim(); }); " + "return names; ");
 
-        ArrayList<String> strings = new ArrayList<String>();
+        List<String> strings = new ArrayList<String>();
         for (Object o : objects) {
             strings.add(o.toString());
         }

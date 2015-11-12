@@ -1,63 +1,76 @@
 package de.fu_berlin.inf.dpp.ui.webpages;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.dpp.ui.renderer.Renderer;
 
 /**
- * A browser page encapsulates the location of the HTML page as well as the
- * needed browsers functions and renderers. The browser functions are the Java
- * methods that the webpage calls inside Javascript. The renderers transfer
- * application state from Java to the webpage.
- * 
- * @JTourBusStop 2, Extending the HTML GUI, Creating a Java abstraction for a
- *               page:
- * 
- *               Each webpage in Saros has a corresponding implementation of
- *               this interface. There is one for the Saros main view and one
- *               for each dialog. So if you add a new .html file, you should add
- *               a suitable BrowserPage implementation as well.
- * 
- *               The BrowserPage encapsulates the location of the .html file,
- *               which is the relative location inside the resource folder.
- * 
- *               It further creates the list of renderers and browser functions
- *               needed for this webpage.
- * 
+ * Abstract implementation of {@link IBrowserPage} which offers convenience
+ * methods for registering browser functions and renderer.
  */
-public interface BrowserPage {
-    // TODO: Refactor to IBrowserPage to follow convention
-    /**
-     * Returns the resource name of this <code>BowserPage</code>.
-     * <p/>
-     * E.g: html/dist/index.html
-     * <p/>
-     * It is up to the caller to resolve the absolute physical location.
-     * 
-     * @return the resource name
-     * @see ClassLoader#getResource(String name)
-     */
-    String getWebpage();
+public abstract class BrowserPage implements IBrowserPage {
 
     /**
-     * Returns the title of this <code>BrowserPage</code>.
-     * 
-     * @return the title
+     * Common HTML document location
      */
-    String getTitle();
+    private static final String PATH = "html/dist/";
+    private String relativePageLocation;
 
     /**
-     * Returns the needed {@link org.eclipse.swt.browser.BrowserFunction}s for
-     * the webpage.
+     * The title is shown to the user in the dialog.
      */
-    List<JavascriptFunction> getJavascriptFunctions();
+    private String pageTitle;
+
+    private final List<JavascriptFunction> browserFunctions = new ArrayList<JavascriptFunction>();
+    private final List<Renderer> renderers = new ArrayList<Renderer>();
 
     /**
-     * Gets the list of renderers that can display application state in this
-     * webpage.
+     * Creates a new BrowserPage that encapsulates the location and title of the
+     * HTML page as well as the needed browsers functions and renderer.
      * 
-     * @return the list of renderers for this page
+     * @param htmlDocName
+     *            the file name of the HTML document without any path addition
+     * @param pageTitle
+     *            the title that will be shown in the dialog
      */
-    List<Renderer> getRenderer();
+    public BrowserPage(String htmlDocName, String pageTitle) {
+        this.relativePageLocation = PATH + htmlDocName;
+        this.pageTitle = pageTitle;
+    }
+
+    // TODO: The prefix WEB is misleading, because there is no "WEB" involved
+    // here. Eliminate all usage of "web" in naming inside the UI project
+    @Override
+    public String getWebpageResource() {
+        return relativePageLocation;
+    }
+
+    @Override
+    public String getTitle() {
+        return pageTitle;
+    }
+
+    @Override
+    public List<JavascriptFunction> getJavascriptFunctions() {
+        return browserFunctions;
+    }
+
+    @Override
+    public List<Renderer> getRenderers() {
+        return renderers;
+    }
+
+    protected void addBrowserFunctions(JavascriptFunction... browserfunctions) {
+        for (JavascriptFunction function : browserfunctions) {
+            this.browserFunctions.add(function);
+        }
+    }
+
+    protected void addRenderer(Renderer... renderers) {
+        for (Renderer renderer : renderers) {
+            this.renderers.add(renderer);
+        }
+    }
 }

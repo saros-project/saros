@@ -11,7 +11,7 @@ import de.fu_berlin.inf.dpp.ui.ide_embedding.BrowserCreator;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.IBrowserDialog;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.ui.webpages.BrowserPage;
+import de.fu_berlin.inf.dpp.ui.webpages.IBrowserPage;
 
 /**
  * Eclipse side implementation of the IDialogManager interface
@@ -27,7 +27,7 @@ public class EclipseDialogManager extends DialogManager {
     }
 
     @Override
-    protected IBrowserDialog createDialog(final BrowserPage browserPage) {
+    protected IBrowserDialog createDialog(final IBrowserPage browserPage) {
         final Shell activeShell = SWTUtils.getShell();
 
         final Shell browserShell = new Shell(activeShell);
@@ -42,7 +42,7 @@ public class EclipseDialogManager extends DialogManager {
 
             @Override
             public void shellClosed(ShellEvent e) {
-                removeDialogEntry(browserPage.getWebpage());
+                removeDialogEntry(browserPage.getWebpageResource());
             }
 
         });

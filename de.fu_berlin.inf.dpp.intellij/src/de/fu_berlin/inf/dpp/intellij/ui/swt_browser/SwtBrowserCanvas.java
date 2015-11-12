@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.intellij.ui.swt_browser;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.ui.webpages.BrowserPage;
+import de.fu_berlin.inf.dpp.ui.webpages.IBrowserPage;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.BrowserCreator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
@@ -21,7 +21,7 @@ import java.awt.event.ComponentEvent;
  */
 class SwtBrowserCanvas extends Canvas {
 
-    private final BrowserPage startPage;
+    private final IBrowserPage startPage;
     private IJQueryBrowser browser;
 
     @Inject
@@ -30,7 +30,7 @@ class SwtBrowserCanvas extends Canvas {
     /**
      * @param startPage the BrowserPage object containing the page to be displayed
      */
-    SwtBrowserCanvas(BrowserPage startPage) {
+    SwtBrowserCanvas(IBrowserPage startPage) {
         SarosPluginContext.initComponent(this);
         this.startPage = startPage;
     }

@@ -5,8 +5,8 @@ import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
 import de.fu_berlin.inf.dpp.ui.webpages.AccountPage;
 
 /**
- * Offers a via Javascript invokable method to close an open
- * {@link AccountPage} Dialog.
+ * Offers a via Javascript invokable method to close an open {@link AccountPage}
+ * Dialog.
  * <p>
  * JS-signature: "void __java_closeAddAccountWizard();"
  */
@@ -21,7 +21,7 @@ public class CloseAccountWizard extends JavascriptFunction {
 
     @Override
     public Object function(Object[] arguments) {
-        dialogManager.closeDialogWindow(AccountPage.WEB_PAGE);
+        dialogManager.closeDialogWindow(AccountPage.HTML_DOC_NAME);
         return null;
     }
 

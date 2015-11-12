@@ -6,7 +6,7 @@ import java.util.List;
 
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotDialog;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLButton;
-import de.fu_berlin.inf.dpp.ui.webpages.BrowserPage;
+import de.fu_berlin.inf.dpp.ui.webpages.IBrowserPage;
 
 /**
  * This interface is part of the HTML GUI test framework. It provides methods to
@@ -23,7 +23,7 @@ public interface IHTMLBot extends Remote {
      * @return an instance of {@link IRemoteBotDialog}
      * @throws RemoteException
      */
-    IRemoteBotDialog getDialogWindow(Class<? extends BrowserPage> pageClass)
+    IRemoteBotDialog getDialogWindow(Class<? extends IBrowserPage> pageClass)
         throws RemoteException;
 
     /**

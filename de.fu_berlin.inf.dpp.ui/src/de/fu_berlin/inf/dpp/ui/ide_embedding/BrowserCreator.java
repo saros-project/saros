@@ -4,7 +4,7 @@ import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.ag_se.browser.swt.SWTJQueryBrowser;
 import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
-import de.fu_berlin.inf.dpp.ui.webpages.BrowserPage;
+import de.fu_berlin.inf.dpp.ui.webpages.IBrowserPage;
 import org.eclipse.swt.widgets.Composite;
 import org.jivesoftware.smack.util.StringUtils;
 
@@ -32,12 +32,12 @@ public class BrowserCreator {
      * @param style     the style of the browser instance.
      * @param page      the page which should be displayed.
      * @return a browser instance which loads and renders the given
-     * {@link BrowserPage BrowserPage}
+     * {@link IBrowserPage BrowserPage}
      */
     public IJQueryBrowser createBrowser(Composite composite, int style,
-        final BrowserPage page) {
+        final IBrowserPage page) {
 
-        final String resourceName = page.getWebpage();
+        final String resourceName = page.getWebpageResource();
         assert resourceName != null;
 
         final IJQueryBrowser browser = SWTJQueryBrowser

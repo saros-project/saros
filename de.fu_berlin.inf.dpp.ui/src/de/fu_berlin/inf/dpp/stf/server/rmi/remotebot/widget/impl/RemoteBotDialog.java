@@ -5,14 +5,14 @@ import java.rmi.RemoteException;
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.dpp.stf.server.HTMLSTFRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotDialog;
-import de.fu_berlin.inf.dpp.ui.webpages.BrowserPage;
+import de.fu_berlin.inf.dpp.ui.webpages.IBrowserPage;
 
 public class RemoteBotDialog extends HTMLSTFRemoteObject implements
     IRemoteBotDialog {
 
     private final static RemoteBotDialog INSTANCE = new RemoteBotDialog();
 
-    private Class<? extends BrowserPage> browserPageClass;
+    private Class<? extends IBrowserPage> browserPageClass;
 
     public RemoteBotDialog() {
 
@@ -41,7 +41,7 @@ public class RemoteBotDialog extends HTMLSTFRemoteObject implements
         return getBrowserManager().getBrowser(browserPageClass);
     }
 
-    public void setBrowserPage(Class<? extends BrowserPage> browserPageClass) {
+    public void setBrowserPage(Class<? extends IBrowserPage> browserPageClass) {
         this.browserPageClass = browserPageClass;
     }
 }

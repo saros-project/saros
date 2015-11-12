@@ -21,7 +21,7 @@ public class CloseSessionInvitationWizard extends JavascriptFunction {
 
     @Override
     public Object function(Object[] arguments) {
-        this.dialogManager.closeDialogWindow(SessionWizardPage.WEB_PAGE);
+        this.dialogManager.closeDialogWindow(SessionWizardPage.HTML_DOC_NAME);
         return null;
     }
 
