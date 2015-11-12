@@ -35,9 +35,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
-import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -77,6 +75,7 @@ import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.LocationAnnotationManager;
 import de.fu_berlin.inf.dpp.editor.internal.SafePartListener2;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
+import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
@@ -165,7 +164,7 @@ public class EditorManager extends AbstractActivityProducer implements
 
     private Set<SPath> locallyOpenEditors = new HashSet<SPath>();
 
-    private ITextSelection localSelection;
+    private TextSelection localSelection;
 
     private LineRange localViewport;
 
@@ -635,7 +634,7 @@ public class EditorManager extends AbstractActivityProducer implements
     }
 
     /**
-     * Fires an update of the given {@link ITextSelection} for the given
+     * Fires an update of the given {@link TextSelection} for the given
      * {@link IEditorPart} so that all remote parties know that the user
      * selected some text in the given part.
      * 
@@ -646,7 +645,7 @@ public class EditorManager extends AbstractActivityProducer implements
      *            The ITextSelection in the given part which represents the
      *            currently selected text in editor.
      */
-    void generateSelection(IEditorPart part, ITextSelection newSelection) {
+    void generateSelection(IEditorPart part, TextSelection newSelection) {
 
         SPath path = editorAPI.getEditorPath(part);
         if (path == null) {
@@ -886,14 +885,19 @@ public class EditorManager extends AbstractActivityProducer implements
              * Check if the activity source is a followed user with his cursor
              * is outside the viewport.
              */
-            ITextSelection selection = remoteEditorManager.getSelection(user);
+            TextSelection selection = remoteEditorManager.getSelection(user);
             /**
              * selection can be null if the {@link ViewportActivity} came before
              * the first {@link TextSelectionActivity}
              */
             if (selection != null) {
-                // TODO Taking the selection's last line might be inaccurate
-                int cursor = selection.getEndLine();
+                // FIXME Find another way to determine the cursor position.
+                // The hard-coded '-1' only reflects the old behavior where
+                // Eclipse JFace's TextSelection() was always created without
+                // a Document and .getEndLine() always returned that value.
+
+                // int cursor = selection.getEndLine()
+                int cursor = -1;
 
                 int top = viewport.getStartLine();
                 int bottom = viewport.getStartLine()
@@ -1073,7 +1077,7 @@ public class EditorManager extends AbstractActivityProducer implements
 
         SPath editorPath = editorAPI.getEditorPath(editorPart);
         LineRange viewport = editorAPI.getViewport(editorPart);
-        ITextSelection selection = editorAPI.getSelection(editorPart);
+        TextSelection selection = editorAPI.getSelection(editorPart);
 
         // Set (and thus send) in this order:
         generateEditorActivated(editorPath);
@@ -1608,7 +1612,7 @@ public class EditorManager extends AbstractActivityProducer implements
                 }
             }
 
-            ITextSelection selection = remoteEditor.getSelection();
+            TextSelection selection = remoteEditor.getSelection();
             if (selection != null) {
                 locationAnnotationManager.setSelection(editorPart, selection,
                     user);
@@ -1858,7 +1862,7 @@ public class EditorManager extends AbstractActivityProducer implements
      *            text selection of the followed user
      */
     private void adjustViewport(User followedUser, IEditorPart editorPart,
-        ITextSelection selection) {
+        TextSelection selection) {
         if (selection == null)
             return;
 
@@ -1884,7 +1888,7 @@ public class EditorManager extends AbstractActivityProducer implements
             return;
 
         // selection can be null
-        ITextSelection selection = remoteEditorManager
+        TextSelection selection = remoteEditorManager
             .getSelection(followedUser);
         adjustViewport(editorPart, range, selection);
     }
@@ -1903,7 +1907,7 @@ public class EditorManager extends AbstractActivityProducer implements
      * 
      */
     private void adjustViewport(IEditorPart editorPart, LineRange range,
-        ITextSelection selection) {
+        TextSelection selection) {
         ITextViewer viewer = EditorAPI.getViewer(editorPart);
         if (viewer == null)
             return;

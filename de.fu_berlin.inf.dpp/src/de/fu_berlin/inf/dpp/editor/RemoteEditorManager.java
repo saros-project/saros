@@ -9,8 +9,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.eclipse.jface.text.ITextSelection;
-import org.eclipse.jface.text.TextSelection;
 
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
@@ -18,6 +16,7 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
+import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -44,7 +43,7 @@ public class RemoteEditorManager implements IActivityConsumer {
 
         protected SPath path;
 
-        protected ITextSelection selection;
+        protected TextSelection selection;
 
         protected LineRange viewport;
 
@@ -64,11 +63,11 @@ public class RemoteEditorManager implements IActivityConsumer {
             this.viewport = viewport;
         }
 
-        public void setSelection(ITextSelection selection) {
+        public void setSelection(TextSelection selection) {
             this.selection = selection;
         }
 
-        public ITextSelection getSelection() {
+        public TextSelection getSelection() {
             return this.selection;
         }
     }
@@ -126,7 +125,7 @@ public class RemoteEditorManager implements IActivityConsumer {
 
             @Override
             public void receive(TextSelectionActivity textSelectionActivity) {
-                ITextSelection selection = new TextSelection(
+                TextSelection selection = new TextSelection(
                     textSelectionActivity.getOffset(),
                     textSelectionActivity.getLength());
 
@@ -253,7 +252,7 @@ public class RemoteEditorManager implements IActivityConsumer {
      * null if the user has no active editor or no selection in the active
      * editor.
      */
-    public ITextSelection getSelection(User user) {
+    public TextSelection getSelection(User user) {
         RemoteEditor activeEditor = getEditorState(user).getActiveEditor();
 
         if (activeEditor == null)

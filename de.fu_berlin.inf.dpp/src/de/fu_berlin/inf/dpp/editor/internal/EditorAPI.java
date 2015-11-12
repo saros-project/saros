@@ -18,7 +18,6 @@ import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.ITextViewerExtension6;
-import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.TextViewer;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.custom.VerifyKeyListener;
@@ -45,6 +44,7 @@ import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
+import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.ui.dialogs.WarningMessageDialog;
@@ -302,7 +302,7 @@ public class EditorAPI implements IEditorAPI {
     }
 
     @Override
-    public ITextSelection getSelection(IEditorPart editorPart) {
+    public TextSelection getSelection(IEditorPart editorPart) {
 
         if (!(editorPart instanceof ITextEditor)) {
             return TextSelection.emptySelection();
@@ -312,8 +312,14 @@ public class EditorAPI implements IEditorAPI {
         ISelectionProvider selectionProvider = textEditor
             .getSelectionProvider();
 
-        return selectionProvider == null ? TextSelection.emptySelection()
-            : (ITextSelection) selectionProvider.getSelection();
+        if (selectionProvider == null) {
+            return TextSelection.emptySelection();
+        }
+
+        ITextSelection jfaceSelection = (ITextSelection) selectionProvider
+            .getSelection();
+        return new TextSelection(jfaceSelection.getOffset(),
+            jfaceSelection.getLength());
     }
 
     @Override

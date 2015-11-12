@@ -3,8 +3,6 @@ package de.fu_berlin.inf.dpp.editor.internal;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.ITextSelection;
-import org.eclipse.jface.text.TextSelection;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.texteditor.IDocumentProvider;
@@ -12,6 +10,7 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
+import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 
 /**
  * A humble interface that is responsible for editor functionality. The idea
@@ -74,7 +73,7 @@ public interface IEditorAPI {
      *         exists.
      * 
      */
-    public ITextSelection getSelection(IEditorPart editorPart);
+    public TextSelection getSelection(IEditorPart editorPart);
 
     /**
      * @return the path of the file the given editor is displaying or null if

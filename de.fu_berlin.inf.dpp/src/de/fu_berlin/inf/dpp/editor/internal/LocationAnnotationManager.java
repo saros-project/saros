@@ -8,7 +8,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
@@ -26,6 +25,7 @@ import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.SelectionFillUpAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
+import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -211,7 +211,7 @@ public class LocationAnnotationManager {
      *            {@link IEditorPart} that displays the opened document of which
      *            the annotations should be updated.
      */
-    public void setSelection(IEditorPart editorPart, ITextSelection selection,
+    public void setSelection(IEditorPart editorPart, TextSelection selection,
         User source) {
 
         if (!(editorPart instanceof ITextEditor))
