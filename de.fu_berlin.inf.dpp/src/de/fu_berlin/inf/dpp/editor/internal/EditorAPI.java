@@ -20,8 +20,6 @@ import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.ITextViewerExtension6;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.TextViewer;
-import org.eclipse.jface.text.source.ILineRange;
-import org.eclipse.jface.text.source.LineRange;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.events.VerifyEvent;
@@ -46,6 +44,7 @@ import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.ui.dialogs.WarningMessageDialog;
@@ -369,7 +368,7 @@ public class EditorAPI implements IEditorAPI {
         }
     }
 
-    public static ILineRange getViewport(ITextViewer viewer) {
+    public static LineRange getViewport(ITextViewer viewer) {
 
         int top = viewer.getTopIndex();
         // Have to add +1 because a LineRange should excludes the bottom line
@@ -387,7 +386,7 @@ public class EditorAPI implements IEditorAPI {
     }
 
     @Override
-    public ILineRange getViewport(IEditorPart editorPart) {
+    public LineRange getViewport(IEditorPart editorPart) {
 
         ITextViewer textViewer = EditorAPI.getViewer(editorPart);
         if (textViewer == null)

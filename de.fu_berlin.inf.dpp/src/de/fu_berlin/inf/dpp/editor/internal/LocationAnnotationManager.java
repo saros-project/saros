@@ -13,7 +13,6 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
-import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.IEditorInput;
@@ -26,6 +25,7 @@ import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.SelectionFillUpAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
+import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
@@ -66,8 +66,8 @@ public class LocationAnnotationManager {
     public void propertyChange(final PropertyChangeEvent event,
         final Set<IEditorPart> allEditors) {
 
-        if (!EclipsePreferenceConstants.SHOW_SELECTIONFILLUP_ANNOTATIONS.equals(event
-            .getProperty()))
+        if (!EclipsePreferenceConstants.SHOW_SELECTIONFILLUP_ANNOTATIONS
+            .equals(event.getProperty()))
             return;
 
         SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
@@ -103,10 +103,10 @@ public class LocationAnnotationManager {
      *            The {@link IEditorPart} which shows the file that the remote
      *            user has opened, too.
      * @param lineRange
-     *            The {@link ILineRange} that is visible to the remote user.
+     *            The {@link LineRange} that is visible to the remote user.
      */
     public void setViewportForUser(final User user, IEditorPart editorPart,
-        ILineRange lineRange) {
+        LineRange lineRange) {
 
         ITextViewer viewer = EditorAPI.getViewer(editorPart);
         if (!(viewer instanceof ISourceViewer)) {

@@ -10,8 +10,6 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.IViewportListener;
 import org.eclipse.jface.text.TextEvent;
 import org.eclipse.jface.text.TextSelection;
-import org.eclipse.jface.text.source.ILineRange;
-import org.eclipse.jface.text.source.LineRange;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.custom.StyledText;
@@ -24,6 +22,7 @@ import org.eclipse.swt.events.MouseListener;
 import org.eclipse.ui.IEditorPart;
 
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
+import de.fu_berlin.inf.dpp.editor.text.LineRange;
 
 /**
  * Listener for tracking the selection and viewport of an IEditorPart and
@@ -42,7 +41,7 @@ public class EditorListener {
 
     protected ITextSelection lastSelection = new TextSelection(-1, -1);
 
-    protected ILineRange lastViewport = new LineRange(-1, -1);
+    protected LineRange lastViewport = new LineRange(-1, -1);
 
     protected boolean isUnsupportedEditor;
 
@@ -214,7 +213,7 @@ public class EditorListener {
         }
     }
 
-    public boolean equals(ILineRange one, ILineRange two) {
+    public boolean equals(LineRange one, LineRange two) {
 
         if (one == null)
             return two == null;
@@ -228,7 +227,7 @@ public class EditorListener {
 
     protected void generateViewport() {
 
-        ILineRange viewport = EditorAPI.getViewport(viewer);
+        LineRange viewport = EditorAPI.getViewport(viewer);
 
         if (!equals(viewport, lastViewport)) {
             lastViewport = viewport;

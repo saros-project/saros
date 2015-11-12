@@ -23,7 +23,7 @@
 package de.fu_berlin.inf.dpp.core.editor;
 
 import de.fu_berlin.inf.dpp.activities.*;
-import de.fu_berlin.inf.dpp.intellij.editor.text.LineRange;
+import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.intellij.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;

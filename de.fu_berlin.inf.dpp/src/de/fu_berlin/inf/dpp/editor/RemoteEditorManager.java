@@ -11,14 +11,13 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.TextSelection;
-import org.eclipse.jface.text.source.ILineRange;
-import org.eclipse.jface.text.source.LineRange;
 
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
+import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -47,7 +46,7 @@ public class RemoteEditorManager implements IActivityConsumer {
 
         protected ITextSelection selection;
 
-        protected ILineRange viewport;
+        protected LineRange viewport;
 
         public RemoteEditor(SPath path) {
             this.path = path;
@@ -57,11 +56,11 @@ public class RemoteEditorManager implements IActivityConsumer {
             return path;
         }
 
-        public ILineRange getViewport() {
+        public LineRange getViewport() {
             return viewport;
         }
 
-        public void setViewport(ILineRange viewport) {
+        public void setViewport(LineRange viewport) {
             this.viewport = viewport;
         }
 
@@ -111,7 +110,7 @@ public class RemoteEditorManager implements IActivityConsumer {
 
             @Override
             public void receive(ViewportActivity viewportActivity) {
-                ILineRange lineRange = new LineRange(
+                LineRange lineRange = new LineRange(
                     viewportActivity.getStartLine(),
                     viewportActivity.getNumberOfLines());
                 SPath path = viewportActivity.getPath();
@@ -267,7 +266,7 @@ public class RemoteEditorManager implements IActivityConsumer {
      * @return the viewport of the given user in the currently active editor or
      *         <code>null</code> if the user has no active editor.
      */
-    public ILineRange getViewport(User user) {
+    public LineRange getViewport(User user) {
         if (sarosSession.getLocalUser().equals(user)) {
             throw new IllegalArgumentException(
                 "Viewport of the local user was queried.");

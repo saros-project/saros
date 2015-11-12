@@ -5,13 +5,13 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.TextSelection;
-import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.editor.text.LineRange;
 
 /**
  * A humble interface that is responsible for editor functionality. The idea
@@ -87,7 +87,7 @@ public interface IEditorAPI {
      * @return Return the viewport for given editor or null, if this editorPart
      *         does not have ITextViewer associated.
      */
-    public ILineRange getViewport(IEditorPart editorPart);
+    public LineRange getViewport(IEditorPart editorPart);
 
     /**
      * Enables/disables the ability to edit the document in given editor.

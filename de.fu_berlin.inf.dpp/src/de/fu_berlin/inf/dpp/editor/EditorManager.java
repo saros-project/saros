@@ -40,9 +40,7 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
-import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.jface.text.source.LineRange;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.IEditorInput;
@@ -78,6 +76,7 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.LocationAnnotationManager;
 import de.fu_berlin.inf.dpp.editor.internal.SafePartListener2;
+import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
@@ -168,7 +167,7 @@ public class EditorManager extends AbstractActivityProducer implements
 
     private ITextSelection localSelection;
 
-    private ILineRange localViewport;
+    private LineRange localViewport;
 
     /** all files that have connected document providers */
     private final Set<IFile> connectedFiles = new HashSet<IFile>();
@@ -354,7 +353,8 @@ public class EditorManager extends AbstractActivityProducer implements
         }
 
         @Override
-        public void sessionEnded(final ISarosSession session, SessionEndReason reason) {
+        public void sessionEnded(final ISarosSession session,
+            SessionEndReason reason) {
             SWTUtils.runSafeSWTSync(LOG, new Runnable() {
                 @Override
                 public void run() {
@@ -607,11 +607,11 @@ public class EditorManager extends AbstractActivityProducer implements
      *            The IEditorPart for which to generate a ViewportActivity.
      * 
      * @param viewport
-     *            The ILineRange in the given part which represents the
-     *            currently visible portion of the editor. (again visible does
-     *            not mean that this editor is actually the active one)
+     *            The LineRange in the given part which represents the currently
+     *            visible portion of the editor. (again visible does not mean
+     *            that this editor is actually the active one)
      */
-    void generateViewport(IEditorPart part, ILineRange viewport) {
+    void generateViewport(IEditorPart part, LineRange viewport) {
 
         if (this.session == null) {
             LOG.warn("SharedEditorListener not correctly unregistered!");
@@ -905,7 +905,7 @@ public class EditorManager extends AbstractActivityProducer implements
 
         Set<IEditorPart> editors = editorPool.getEditors(viewport.getPath());
 
-        ILineRange lineRange = new LineRange(viewport.getStartLine(),
+        LineRange lineRange = new LineRange(viewport.getStartLine(),
             viewport.getNumberOfLines());
 
         for (IEditorPart editorPart : editors) {
@@ -1072,7 +1072,7 @@ public class EditorManager extends AbstractActivityProducer implements
         }
 
         SPath editorPath = editorAPI.getEditorPath(editorPart);
-        ILineRange viewport = editorAPI.getViewport(editorPart);
+        LineRange viewport = editorAPI.getViewport(editorPart);
         ITextSelection selection = editorAPI.getSelection(editorPart);
 
         // Set (and thus send) in this order:
@@ -1601,7 +1601,7 @@ public class EditorManager extends AbstractActivityProducer implements
             RemoteEditor remoteEditor = remoteEditorState.getRemoteEditor(path);
 
             if (user.hasWriteAccess() || user.equals(followedUser)) {
-                ILineRange lineRange = remoteEditor.getViewport();
+                LineRange lineRange = remoteEditor.getViewport();
                 if (lineRange != null) {
                     locationAnnotationManager.setViewportForUser(user,
                         editorPart, lineRange);
@@ -1658,7 +1658,7 @@ public class EditorManager extends AbstractActivityProducer implements
             return;
         }
 
-        ILineRange viewport = activeEditor.getViewport();
+        LineRange viewport = activeEditor.getViewport();
 
         if (viewport == null) {
             LOG.warn("user " + jumpTo + " has no viewport in editor: "
@@ -1863,7 +1863,7 @@ public class EditorManager extends AbstractActivityProducer implements
             return;
 
         // range can be null
-        ILineRange range = remoteEditorManager.getViewport(followedUser);
+        LineRange range = remoteEditorManager.getViewport(followedUser);
         adjustViewport(editorPart, range, selection);
     }
 
@@ -1879,7 +1879,7 @@ public class EditorManager extends AbstractActivityProducer implements
      *            viewport of the followed user
      */
     private void adjustViewport(User followedUser, IEditorPart editorPart,
-        ILineRange range) {
+        LineRange range) {
         if (range == null)
             return;
 
@@ -1902,14 +1902,14 @@ public class EditorManager extends AbstractActivityProducer implements
      *            text selection of the followed user. Can be <code>null</code>.
      * 
      */
-    private void adjustViewport(IEditorPart editorPart, ILineRange range,
+    private void adjustViewport(IEditorPart editorPart, LineRange range,
         ITextSelection selection) {
         ITextViewer viewer = EditorAPI.getViewer(editorPart);
         if (viewer == null)
             return;
 
         IDocument document = viewer.getDocument();
-        ILineRange localViewport = EditorAPI.getViewport(viewer);
+        LineRange localViewport = EditorAPI.getViewport(viewer);
 
         if (localViewport == null || document == null)
             return;

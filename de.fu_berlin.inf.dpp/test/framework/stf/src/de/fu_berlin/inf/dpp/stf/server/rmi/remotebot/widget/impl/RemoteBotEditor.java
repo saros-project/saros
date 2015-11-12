@@ -11,7 +11,6 @@ import org.eclipse.jface.bindings.keys.ParseException;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
-import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
@@ -27,6 +26,7 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
+import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotEditor;
@@ -280,7 +280,7 @@ public class RemoteBotEditor extends StfRemoteObject implements
                 @Override
                 public List<Integer> run() {
                     List<Integer> viewPort = new ArrayList<Integer>(2);
-                    ILineRange r = getEditorAPI().getViewport(editorPart);
+                    LineRange r = getEditorAPI().getViewport(editorPart);
                     viewPort.add(r.getStartLine());
                     viewPort.add(r.getNumberOfLines());
                     return viewPort;
