@@ -48,12 +48,27 @@ import de.fu_berlin.inf.dpp.session.User;
 @Component(module = "feedback")
 public class FollowModeCollector extends AbstractStatisticCollector {
 
+    private static final Logger log = Logger
+        .getLogger(FollowModeCollector.class);
+
+    /**
+     * Percentage of time in respect to total session length spent in follow
+     * mode
+     */
+    private static final String KEY_FOLLOWMODE_PERCENT = "followmode.time.percent";
+
+    /** Total count of follow mode toggles */
+    private static final String KEY_FOLLOWMODE_TOGGLES = "followmode.toggles";
+
+    /** Total time spent in follow mode */
+    private static final String KEY_FOLLOWMODE_TOTAL = "followmode.time.total";
+
     /**
      * A FollowModeEvent has a <code>boolean</code> attribute enabled for the
      * state of follow mode and a <code>long</code> which declares the time when
      * the toggle occurred
      */
-    protected static class FollowModeToggleEvent {
+    private static class FollowModeToggleEvent {
         long time;
         boolean enabled;
 
@@ -63,60 +78,35 @@ public class FollowModeCollector extends AbstractStatisticCollector {
         }
     }
 
-    protected static final Logger log = Logger
-        .getLogger(FollowModeCollector.class.getName());
-
-    /** reflects the current state of the follow mode */
-    protected boolean followModeEnabled = false;
-
     /** starting time of the session */
-    protected long sessionStart = 0;
+    private long sessionStart = 0;
 
     /** ending time of the session */
-    protected long sessionEnd = 0;
+    private long sessionEnd = 0;
 
     /** accumulated time spent in follow mode */
-    protected long timeInFollowMode = 0;
+    private long timeInFollowMode = 0;
 
     /** length of the session */
-    protected long sessionDuration = 0;
+    private long sessionDuration = 0;
 
     /** total count of the follow mode toggles */
-    protected int countFollowModeChanges = 0;
+    private int countFollowModeChanges = 0;
 
     /** Structure to store local follow mode toggle events */
-    protected List<FollowModeToggleEvent> followModeChangeEvents = Collections
+    private List<FollowModeToggleEvent> followModeChangeEvents = Collections
         .synchronizedList(new ArrayList<FollowModeToggleEvent>());
 
     private final IEditorManager editorManager;
 
-    protected ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
+    private ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
 
         @Override
         public void followModeChanged(User target, boolean isFollowed) {
-            /*
-             * set the appropriate mode of follow mode
-             */
-            followModeEnabled = isFollowed;
 
-            // do some logging
-            if (log.isTraceEnabled()) {
-                if (!followModeEnabled) {
-                    log.trace(String.format("Follow Mode was deactivated"));
-                } else {
-                    log.trace(String.format("Now following " + target));
-                }
-            }
-
-            /*
-             * when followModeChanged was fired, create a new followModeToggle
-             * event
-             */
             FollowModeToggleEvent event = new FollowModeToggleEvent(
-                System.currentTimeMillis(), followModeEnabled);
-            /*
-             * store the event in an array list
-             */
+                System.currentTimeMillis(), isFollowed);
+
             followModeChangeEvents.add(event);
             ++countFollowModeChanges;
         }
@@ -128,21 +118,14 @@ public class FollowModeCollector extends AbstractStatisticCollector {
         this.editorManager = editorManager;
     }
 
-    /** Process the collected data */
     @Override
     protected void processGatheredData() {
-        // get starting time of processing
-        long start = System.currentTimeMillis();
         /*
          * local variable where total time where follow mode was enabled is
          * accumulated
          */
         long timeFollowModeEnabled = 0;
 
-        // set the number of toggles
-        data.setFollowModeTogglesCount(countFollowModeChanges);
-
-        // calculate duration of the session
         sessionDuration = getDiffTime(sessionStart, sessionEnd);
 
         /*
@@ -151,38 +134,29 @@ public class FollowModeCollector extends AbstractStatisticCollector {
         for (Iterator<FollowModeToggleEvent> iterator = followModeChangeEvents
             .iterator(); iterator.hasNext();) {
             FollowModeToggleEvent currentEntry = iterator.next();
-            // if follow mode got enabled, set time stamp
+
             if (currentEntry.enabled == true) {
                 timeFollowModeEnabled = currentEntry.time;
-            }
-            /*
-             * if follow mode got disabled, calculate the time spent in follow
-             * mode and add that time to the total time spent in follow mode. In
-             * order to do so, use getDiffTime.
-             */
-            else {
+            } else {
                 timeInFollowMode += getDiffTime(timeFollowModeEnabled,
                     currentEntry.time);
             }
         }
-        data.setFollowModeTimeTotal(StatisticManager
-            .getTimeInMinutes(timeInFollowMode));
 
-        /*
-         * call to getPercentage to store percentage of time spent in follow
-         * mode in respect to the total session time.
-         */
-        data.setFollowModeTimePercentage(getPercentage(timeInFollowMode,
-            sessionDuration));
-        log.debug("Processing follow mode changes took "
-            + (System.currentTimeMillis() - start) / 1000.0 + " s");
+        data.put(KEY_FOLLOWMODE_TOGGLES, countFollowModeChanges);
+
+        data.put(KEY_FOLLOWMODE_TOTAL,
+            StatisticManager.getTimeInMinutes(timeInFollowMode));
+
+        data.put(KEY_FOLLOWMODE_PERCENT,
+            getPercentage(timeInFollowMode, sessionDuration));
     }
 
     /**
      * auxiliary function for calculating duration between
      * <code>start and <end>end</code>
      */
-    protected long getDiffTime(long start, long end) {
+    private long getDiffTime(long start, long end) {
         long diffTime = end - start;
         if (diffTime < 0) {
             log.warn("Time was negative " + diffTime

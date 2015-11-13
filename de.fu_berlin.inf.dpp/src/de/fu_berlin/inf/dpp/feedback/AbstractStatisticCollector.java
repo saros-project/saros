@@ -68,9 +68,12 @@ public abstract class AbstractStatisticCollector implements Startable {
      * Helper method that calculates the percentage of the given value from the
      * given total value.
      * 
-     * @return value / totalValue * 100
+     * @return value / totalValue * 100 or 0 if totalValue = 0
      */
     protected int getPercentage(long value, long totalValue) {
+        if (totalValue == 0)
+            return 0;
+
         return (int) Math.round(((double) value / totalValue) * 100);
     }
 

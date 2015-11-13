@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
-
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -35,47 +33,43 @@ import de.fu_berlin.inf.dpp.session.User;
 @Component(module = "feedback")
 public class ParticipantCollector extends AbstractStatisticCollector {
 
-    protected static final Logger log = Logger
-        .getLogger(PermissionChangeCollector.class.getName());
+    private static final String KEY_PERCENT = "percent";
+
+    private static final String KEY_SESSION_TIME_USERS = "session.time.users";
+    private static final String KEY_SESSION_USERS_TOTAL = "session.users.total";
 
     /** a map to contain the number of participants and the associated times */
-    protected Map<Integer, Long> participantTimes = new HashMap<Integer, Long>();
+    private Map<Integer, Long> participantTimes = new HashMap<Integer, Long>();
 
     /** a set to contain all users that participated in the session */
-    protected Set<User> users = new HashSet<User>();
+    private Set<User> users = new HashSet<User>();
 
-    protected long timeOfLastEvent;
+    private long timeOfLastEvent;
 
     /**
      * contains the current number of participants of the session at each point
      * in time
      */
-    protected int currentNumberOfParticipants = 0;
+    private int currentNumberOfParticipants = 0;
 
-    protected long sessionStart;
-    protected long sessionTime;
+    private long sessionStart;
+    private long sessionTime;
 
-    protected ISessionListener sessionListener = new AbstractSessionListener() {
+    private final ISessionListener sessionListener = new AbstractSessionListener() {
 
         @Override
         public void userJoined(User user) {
-            ++currentNumberOfParticipants;
+            currentNumberOfParticipants++;
             handleUserEvent(currentNumberOfParticipants - 1);
 
             users.add(user);
-
-            log.info(user + " joined - session now contains "
-                + currentNumberOfParticipants + " users");
         }
 
         @Override
         public void userLeft(User user) {
-            --currentNumberOfParticipants;
+            currentNumberOfParticipants--;
 
             handleUserEvent(currentNumberOfParticipants + 1);
-
-            log.info(user + " left - session now contains "
-                + currentNumberOfParticipants + " users");
         }
 
     };
@@ -89,11 +83,12 @@ public class ParticipantCollector extends AbstractStatisticCollector {
      * Handles events in which the number of participants changed (session
      * started, user joined, user left, session ended). The time difference to
      * the last event is stored, together with the number of participants that
-     * were present in this time frame.<br>
+     * were present in this time frame.
+     * <p>
      * If the same number of participants were together earlier in the session,
      * the time difference is added to the existing time frame.
      */
-    protected void handleUserEvent(int numberOfParticipants) {
+    private void handleUserEvent(int numberOfParticipants) {
         Long timeDiff = System.currentTimeMillis() - timeOfLastEvent;
         Long time = participantTimes.get(numberOfParticipants);
 
@@ -106,16 +101,13 @@ public class ParticipantCollector extends AbstractStatisticCollector {
 
     @Override
     protected void processGatheredData() {
-        // store the total amount of users that participated in the session
-        data.setSessionUsersTotal(users.size());
 
         // store the number of users and associated times
-        for (Entry<Integer, Long> e : participantTimes.entrySet()) {
-            int percent = getPercentage(e.getValue(), sessionTime);
-            data.setSessionTimeForUsers(e.getKey(),
-                StatisticManager.getTimeInMinutes(e.getValue()));
-            data.setSessionTimePercentForUsers(e.getKey(), percent);
-        }
+        for (Entry<Integer, Long> e : participantTimes.entrySet())
+            storeSessionTimeForUsers(e.getKey(), e.getValue(), sessionTime);
+
+        data.put(KEY_SESSION_USERS_TOTAL, users.size());
+
     }
 
     @Override
@@ -125,14 +117,10 @@ public class ParticipantCollector extends AbstractStatisticCollector {
         sessionStart = System.currentTimeMillis();
         timeOfLastEvent = sessionStart;
 
-        // add all users to the set and store the number of participants
         users.addAll(sarosSession.getUsers());
-        currentNumberOfParticipants = sarosSession.getUsers().size();
+        currentNumberOfParticipants = users.size();
 
         handleUserEvent(currentNumberOfParticipants);
-
-        log.info("Session started: Current number of participants: "
-            + currentNumberOfParticipants);
     }
 
     @Override
@@ -141,9 +129,16 @@ public class ParticipantCollector extends AbstractStatisticCollector {
 
         sessionTime = Math.max(1, System.currentTimeMillis() - sessionStart);
         handleUserEvent(currentNumberOfParticipants);
-
-        log.info("Session ended: Current number of participants: "
-            + currentNumberOfParticipants);
     }
 
+    private void storeSessionTimeForUsers(int numberOfUsers, long duration,
+        long totalSessionDurationTime) {
+
+        data.put(KEY_SESSION_TIME_USERS,
+            StatisticManager.getTimeInMinutes(duration), numberOfUsers);
+
+        data.put(KEY_SESSION_TIME_USERS,
+            getPercentage(duration, totalSessionDurationTime), numberOfUsers,
+            KEY_PERCENT);
+    }
 }

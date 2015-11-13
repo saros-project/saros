@@ -19,6 +19,19 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 @Component(module = "feedback")
 public class DataTransferCollector extends AbstractStatisticCollector {
 
+    private static final String KEY_TRANSFER_STATS = "data_transfer";
+
+    private static final String TRANSFER_STATS_EVENT_SUFFIX = "number_of_events";
+
+    /** Total size in KB */
+    private static final String TRANSFER_STATS_SIZE_SUFFIX = "total_size_kb";
+
+    /** Total size for transfers in milliseconds */
+    private static final String TRANSFER_STATS_TIME_SUFFIX = "total_time_ms";
+
+    /** Convenience value of total_size / total_time in KB/s */
+    private static final String TRANSFER_STATS_THROUGHPUT_SUFFIX = "average_throughput_kbs";
+
     // we currently do not distinguish between sent and received data
     private static class TransferStatisticHolder {
         private long bytesTransferred;
@@ -74,16 +87,12 @@ public class DataTransferCollector extends AbstractStatisticCollector {
 
         for (final Entry<ConnectionMode, TransferStatisticHolder> entry : statistic
             .entrySet()) {
+
             final ConnectionMode mode = entry.getKey();
             final TransferStatisticHolder holder = entry.getValue();
 
-            data.setTransferStatistic(
-                mode.toString(),
-                holder.count,
-                holder.bytesTransferred / 1024,
-                holder.transferTime,
-                holder.bytesTransferred * 1000.0 / 1024.0
-                    / Math.max(1.0, holder.transferTime));
+            storeTransferStatisticForMode(mode.toString(), holder.count,
+                holder.bytesTransferred, holder.transferTime);
 
         }
     }
@@ -96,5 +105,23 @@ public class DataTransferCollector extends AbstractStatisticCollector {
     @Override
     protected void doOnSessionEnd(ISarosSession sarosSession) {
         connectionManager.removeTransferListener(dataTransferlistener);
+    }
+
+    private void storeTransferStatisticForMode(final String transferMode,
+        final int transferEvents, final long totalSize,
+        final long totalTransferTime) {
+
+        data.put(KEY_TRANSFER_STATS, transferEvents, transferMode,
+            TRANSFER_STATS_EVENT_SUFFIX);
+
+        data.put(KEY_TRANSFER_STATS, totalSize / 1024, transferMode,
+            TRANSFER_STATS_SIZE_SUFFIX);
+
+        data.put(KEY_TRANSFER_STATS, totalTransferTime, transferMode,
+            TRANSFER_STATS_TIME_SUFFIX);
+
+        data.put(KEY_TRANSFER_STATS,
+            totalSize * 1000.0 / 1024.0 / Math.max(1.0, totalTransferTime),
+            transferMode, TRANSFER_STATS_THROUGHPUT_SUFFIX);
     }
 }

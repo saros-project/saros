@@ -35,12 +35,25 @@ import de.fu_berlin.inf.dpp.session.User.Permission;
 @Component(module = "feedback")
 public class JumpFeatureUsageCollector extends AbstractStatisticCollector {
 
-    protected int jumpedToWriteAccessHolder = 0;
-    protected int jumpedToReadOnlyAccessHolder = 0;
+    /**
+     * Count of jumps to a user with {@link Permission#READONLY_ACCESS} position
+     */
+    private static final String KEY_JUMPED_TO_USER_WITH_READONLY_ACCESS = "jumped.observer.count";
+
+    /**
+     * Count of jumps to a user with {@link Permission#WRITE_ACCESS} position
+     */
+    private static final String KEY_JUMPED_TO_USER_WITH_WRITE_ACCESS = "jumped.driver.count";
+
+    /** Total count of jumps */
+    private static final String KEY_TOTAL_JUMP_COUNT = "jumped.count";
+
+    private int jumpedToWriteAccessHolder = 0;
+    private int jumpedToReadOnlyAccessHolder = 0;
 
     private final IEditorManager editorManager;
 
-    protected ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
+    private final ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
 
         @Override
         public void jumpedToUser(User target) {
@@ -60,10 +73,11 @@ public class JumpFeatureUsageCollector extends AbstractStatisticCollector {
 
     @Override
     protected void processGatheredData() {
-        // write counts to statistics
-        data.setJumpedToUserWithReadOnlyAccessCount(jumpedToReadOnlyAccessHolder);
-        data.setJumpedToUserWithWriteAccessCount(jumpedToWriteAccessHolder);
-        data.setJumpedToCount(jumpedToWriteAccessHolder
+        data.put(KEY_JUMPED_TO_USER_WITH_READONLY_ACCESS,
+            jumpedToReadOnlyAccessHolder);
+        data.put(KEY_JUMPED_TO_USER_WITH_WRITE_ACCESS,
+            jumpedToWriteAccessHolder);
+        data.put(KEY_TOTAL_JUMP_COUNT, jumpedToWriteAccessHolder
             + jumpedToReadOnlyAccessHolder);
     }
 

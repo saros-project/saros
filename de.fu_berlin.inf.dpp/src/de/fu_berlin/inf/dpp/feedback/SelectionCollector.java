@@ -53,6 +53,21 @@ import de.fu_berlin.inf.dpp.session.User.Permission;
 public class SelectionCollector extends AbstractStatisticCollector {
 
     /**
+     * Key for total users with {@link Permission#READONLY_ACCESS} selection
+     * count
+     */
+    private static final String KEY_TOTAL_USER_WITH_READONLY_ACCESS_SELECTION_COUNT = "observer.selection.count";
+
+    /**
+     * Key for witnessed users with {@link Permission#READONLY_ACCESS}
+     * selections
+     */
+    private static final String KEY_WITNESSED_USER_WITH_READONLY_ACCESS_SELECTION_COUNT = "observer.selection.count.witnessed";
+
+    /** Key for gesture count */
+    private static final String KEY_GESTURE_COUNT = "gesture.count";
+
+    /**
      * A SelectionEvent encapsulates information about a selection made. This
      * information includes:
      * <ul>
@@ -67,13 +82,13 @@ public class SelectionCollector extends AbstractStatisticCollector {
      * selection
      * </ul>
      */
-    protected static class SelectionEvent {
-        long time;
-        SPath path;
-        int offset;
-        int length;
-        boolean withinFile;
-        boolean gestured;
+    private static class SelectionEvent {
+        private long time;
+        private SPath path;
+        private int offset;
+        private int length;
+        private boolean withinFile;
+        private boolean gestured;
 
         public SelectionEvent(long time, SPath path, int offset, int length,
             boolean withinFile, boolean gestured) {
@@ -87,28 +102,27 @@ public class SelectionCollector extends AbstractStatisticCollector {
     }
 
     /** Represents the current active editor of the local {@link User} */
-    protected SPath localPath = null;
+    private SPath localPath = null;
 
     /**
      * A map where the latest selections information for each each user as
      * {@link JID} are stored.
      */
-    protected Map<User, SelectionEvent> activeSelections = new HashMap<User, SelectionEvent>();
+    private final Map<User, SelectionEvent> activeSelections = new HashMap<User, SelectionEvent>();
 
     /**
      * A list where all selection events made by a remote user with
      * {@link Permission#READONLY_ACCESS} are being stored<br>
      */
-    protected List<SelectionEvent> userWithReadOnlyAccessSelectionEvents = new ArrayList<SelectionEvent>();
+    private final List<SelectionEvent> userWithReadOnlyAccessSelectionEvents = new ArrayList<SelectionEvent>();
 
     private final IEditorManager editorManager;
 
-    protected ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
+    private final ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
 
         @Override
         public void textEdited(User user, SPath filePath, int offset,
             String replacedText, String text) {
-            // the JID of the user who made the text edit
 
             /*
              * for each edit check if it is made within the range of a current
@@ -155,7 +169,6 @@ public class SelectionCollector extends AbstractStatisticCollector {
             boolean withinFile = false;
             boolean gestured = false;
 
-            // get user who made the selection
             User source = selection.getSource();
 
             /*
@@ -166,7 +179,6 @@ public class SelectionCollector extends AbstractStatisticCollector {
                 withinFile = true;
             }
 
-            // create an event for the current selection
             SelectionEvent currentSelection = new SelectionEvent(time, path,
                 offset, length, withinFile, gestured);
 
@@ -176,7 +188,6 @@ public class SelectionCollector extends AbstractStatisticCollector {
              * than 0
              */
             if (length > 0 && source.hasReadOnlyAccess()) {
-                // store the selection event in the array list
                 userWithReadOnlyAccessSelectionEvents.add(currentSelection);
                 /*
                  * check if there is already a selection stored for this user
@@ -220,11 +231,12 @@ public class SelectionCollector extends AbstractStatisticCollector {
             }
         }
 
-        data.setTotalOberserverSelectionCount((userWithReadOnlyAccessSelectionEvents
-            .size()));
-        data.setGestureCount(numberOfGestures);
-        data.setWitnessedUserWithReadOnlyAccessSelections(numberOfWitnessedUserWithReadOnlyAccessSelections);
+        data.put(KEY_TOTAL_USER_WITH_READONLY_ACCESS_SELECTION_COUNT,
+            userWithReadOnlyAccessSelectionEvents.size());
 
+        data.put(KEY_GESTURE_COUNT, numberOfGestures);
+        data.put(KEY_WITNESSED_USER_WITH_READONLY_ACCESS_SELECTION_COUNT,
+            numberOfWitnessedUserWithReadOnlyAccessSelections);
     }
 
     @Override

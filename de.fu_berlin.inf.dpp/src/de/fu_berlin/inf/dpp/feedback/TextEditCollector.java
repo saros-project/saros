@@ -20,12 +20,12 @@
 package de.fu_berlin.inf.dpp.feedback;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -43,7 +43,6 @@ import de.fu_berlin.inf.dpp.session.User;
  * <p>
  * A collector class that collects local TextEditActivitys and compares them in
  * relation to parallelism or rather concurrency with remote text events.
- * </p>
  * <p>
  * It is measured how many characters the local user wrote in a session
  * (whitespaces are omitted, because Eclipse produces many of them automatically
@@ -51,11 +50,9 @@ import de.fu_berlin.inf.dpp.session.User;
  * (which can be different to the number of characters he wrote, e.g. when
  * copy&paste or Eclipse's method generation was used) and how concurrent the
  * local user's writing was to remote users using different sample intervals.
- * </p>
  * <p>
  * Furthermore, it accumulates the characters edited for all remote
  * participants.
- * </p>
  * <p>
  * A little addition was made to track possible paste / auto generations. If a
  * single text edit activity produces more than a certain number
@@ -72,28 +69,22 @@ import de.fu_berlin.inf.dpp.session.User;
  * typer is typing instead of a paste). Unfortunately, this relatively high
  * threshold will cause the collector to slip some true pastes as well. (E.g. an
  * auto completion of a comment block)
- * </p>
  * <p>
  * NOTE: TextEditActivitys that are triggered by Eclipse (e.g. when restoring an
  * editor) are counted as well. And refactorings can produce quite a large
  * number of characters that are counted. <br>
- * </p>
  * <p>
  * Fixed: The number of non parallel edits was set to 100% if there are no
  * concurrent edits, which is fine. But if there are no edits at all, the non
  * parallel edits are still set to 100% even though this should rather be 0%.
- * </p>
  * <p>
  * Example:<br>
  * The percent numbers (for all intervals + non-parallel) should add up to
  * (nearly) 100, slight rounding errors are possible. The counted chars for all
- * intervals and non-parallel edits should add up to textedits.chars
- * </p>
- * <code>
+ * intervals and non-parallel edits should add up to textedits.chars <code>
  * textedits.chars=5 <br>
- * textedits.count=5 <br>
- * textedits.pastes.chars=0
- * textedits.pastes=0
+ * textedits.pastes.chars=0 <br>
+ * textedits.pastes=0 <br>
  * textedits.nonparallel.chars=1 <br>
  * textedits.nonparallel.percent=20 <br>
  * textedits.parallel.interval.1.chars=1 <br>
@@ -109,14 +100,8 @@ import de.fu_berlin.inf.dpp.session.User;
  * textedits.remote.user.1.pastes.chars=0<br>
  * textedits.remote.user.1.pastes=0<br>
  * </code>
- * 
- * TODO: replace the HashMaps by AutoHashMaps which initializes missing values
- * with a default. This will lead to easier code and help to get rid of these
- * constructs:
- * 
- * Integer currentPasteCount = possiblePastes.get(id); if (currentPasteCount ==
- * null) { currentPasteCount = 0; } possiblePastes.put(id, currentPasteCount +
- * 1);
+ */
+/*
  * 
  * TODO: synchronize the numbers the users get with the other collectors (E.g.
  * Alice as user should appear as user.2 in all statistic fields.
@@ -126,9 +111,23 @@ import de.fu_berlin.inf.dpp.session.User;
 @Component(module = "feedback")
 public class TextEditCollector extends AbstractStatisticCollector {
 
-    protected static class EditEvent {
-        long time;
-        int chars;
+    private static final Logger log = Logger.getLogger(TextEditCollector.class);
+
+    private static final String KEY_PERCENT = "percent";
+
+    private static final String KEY_CHARS = "chars";
+    private static final String KEY_PASTES = "pastes";
+    private static final String KEY_COUNT = "count";
+
+    private static final String KEY_NON_PARALLEL_TEXT_EDITS = "textedits.nonparallel";
+    private static final String KEY_PARALLEL_TEXT_EDITS = "textedits.parallel.interval";
+
+    private static final String KEY_REMOTE_USER = "textedits.remote.user";
+    private static final String KEY_LOCAL_USER = "textedits.local";
+
+    private static class EditEvent {
+        private long time;
+        private int chars;
 
         public EditEvent(long time, int chars) {
             this.time = time;
@@ -136,18 +135,15 @@ public class TextEditCollector extends AbstractStatisticCollector {
         }
     }
 
-    protected static final Logger log = Logger
-        .getLogger(TextEditCollector.class.getName());
-
     /**
      * Different sample intervals (in milliseconds) for measuring parallel text
      * edits. It is determined for each local text edit if there occurred a
      * remote text edit X seconds before or after
      */
-    protected static final int[] sampleIntervals = { 1000, 2000, 5000, 10000,
+    private static final int[] sampleIntervals = { 1000, 2000, 5000, 10000,
         15000 };
 
-    protected long charsWritten = 0;
+    private long charsWritten = 0;
 
     /**
      * This threshold is the upper limit that is believed to have been produced
@@ -156,37 +152,38 @@ public class TextEditCollector extends AbstractStatisticCollector {
      * occurred. That paste action could either mean an auto completion /
      * generation using eclipse or a simple paste from the clip board.
      */
-    protected int pasteThreshold = 16;
+    private int pasteThreshold = 16;
 
-    protected User localUser = null;
+    private User localUser = null;
 
     /** List to contain local {@link EditEvent}s */
-    protected List<EditEvent> localEvents = Collections
+    private final List<EditEvent> localEvents = Collections
         .synchronizedList(new ArrayList<EditEvent>());
+
     /** List to contain remote {@link EditEvent}s */
-    protected List<EditEvent> remoteEvents = Collections
+    private final List<EditEvent> remoteEvents = Collections
         .synchronizedList(new ArrayList<EditEvent>());
 
     /** Maps sample interval to chars written in this interval */
-    protected Map<Integer, Integer> parallelTextEdits = new HashMap<Integer, Integer>();
+    private final Map<Integer, Integer> parallelTextEdits = new HashMap<Integer, Integer>();
     /** Maps sample interval to number of edits in this interval */
-    protected Map<Integer, Integer> parallelTextEditsCount = new HashMap<Integer, Integer>();
+    private final Map<Integer, Integer> parallelTextEditsCount = new HashMap<Integer, Integer>();
 
     /** A map which should possible detect auto generation and paste actions */
-    protected Map<User, Integer> pastes = new HashMap<User, Integer>();
+    private final Map<User, Integer> pastes = new HashMap<User, Integer>();
 
     /** A map which accumulates the characters produced within paste actions */
-    protected Map<User, Integer> pastesCharCount = new HashMap<User, Integer>();
+    private final Map<User, Integer> pastesCharCount = new HashMap<User, Integer>();
 
     /**
      * for each key {@link User} an Integer is stored which represents the total
      * chars edited.
      */
-    protected Map<User, Integer> remoteCharCount = new HashMap<User, Integer>();
+    private final Map<User, Integer> remoteCharCount = new HashMap<User, Integer>();
 
     private final IEditorManager editorManager;
 
-    protected ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
+    private final ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
 
         @Override
         public void textEdited(User user, SPath filePath, int offset,
@@ -198,17 +195,15 @@ public class TextEditCollector extends AbstractStatisticCollector {
              * starts lines with tabs or spaces
              */
             int textLength = StringUtils.deleteWhitespace(text).length();
-            // get the JID for the current edit
 
             EditEvent event = new EditEvent(System.currentTimeMillis(),
                 textLength);
 
             /*
              * if the edit activity text length exceeds the threshold for
-             * possible pastes store this as a possible paste and file it under
-             * the according JID for the user who made that possible paste.
-             * Moreover, store the number of characters that were "pasted" or
-             * auto generated.
+             * possible pastes store this as a possible paste and file it for
+             * the user who made that possible paste. Moreover, store the number
+             * of characters that were "pasted" or auto generated.
              */
             if (textLength > pasteThreshold) {
                 Integer currentPasteCount = pastes.get(user);
@@ -239,11 +234,6 @@ public class TextEditCollector extends AbstractStatisticCollector {
                      */
                     addToCharsWritten(textLength);
                     localEvents.add(event);
-
-                    if (log.isTraceEnabled()) {
-                        log.trace("Edits=" + localEvents.size() + " Written="
-                            + getCharsWritten());
-                    }
                 } else {
                     /*
                      * store all remote text edits for future comparison. As
@@ -270,15 +260,14 @@ public class TextEditCollector extends AbstractStatisticCollector {
         ISarosSession session, IEditorManager editorManager) {
         super(statisticManager, session);
 
-        // TODO: remove
         this.editorManager = editorManager;
     }
 
-    protected synchronized void addToCharsWritten(int chars) {
+    private synchronized void addToCharsWritten(int chars) {
         charsWritten += chars;
     }
 
-    protected synchronized long getCharsWritten() {
+    private synchronized long getCharsWritten() {
         return charsWritten;
     }
 
@@ -291,96 +280,74 @@ public class TextEditCollector extends AbstractStatisticCollector {
          */
         int userNumber = 1;
 
-        // iterate through the map and write written char count to session data
+        // store C&P statistic for remote users
+
         for (Map.Entry<User, Integer> entry : remoteCharCount.entrySet()) {
+
             User currentId = entry.getKey();
-            // get character count for this user
-            Integer charCount = entry.getValue();
-            // write the count to the session data
-            data.setRemoteUserCharCount(userNumber, charCount);
+            int charCount = entry.getValue();
 
-            /*
-             * check, whether pastes have been recorded for this user. if so,
-             * write those to the sessions statistics and if not, set the total
-             * pastes for this user to null.
-             */
+            int pasteCount = 0;
+            int pasteChars = 0;
 
-            if (pastes.get(currentId) == null) {
-                data.setRemoteUserPastes(userNumber, 0);
-                data.setRemoteUserPasteChars(userNumber, 0);
-            } else {
-                Integer pasteCount = pastes.get(currentId);
-                Integer pasteChars = pastesCharCount.get(currentId);
-                data.setRemoteUserPastes(userNumber, pasteCount);
-                data.setRemoteUserPasteChars(userNumber, pasteChars);
+            if (pastes.get(currentId) != null) {
+                pasteCount = pastes.get(currentId);
+                pasteChars = pastesCharCount.get(currentId);
             }
-            // increment n (so that next remote peer gets a different number)
+
+            storeRemoteUserTextEditsStatistic(userNumber, pasteCount,
+                pasteChars, charCount);
+
+            // increment userNumber (so that next remote peer gets a different
+            // number)
             userNumber++;
         }
 
-        // determine the possible pastes for the local user
-        if (pastes.get(localUser) == null) {
-            data.setLocalUserPastes(0);
-            data.setLocalUserPasteChars(0);
-        } else {
-            Integer pasteCount = pastes.get(localUser);
-            Integer pasteChars = pastesCharCount.get(localUser);
-            data.setLocalUserPastes(pasteCount);
-            data.setLocalUserPasteChars(pasteChars);
+        final long totalCharsWritten = getCharsWritten();
+
+        // store C&P statistic for local user
+
+        int pasteCount = 0;
+        int pasteChars = 0;
+
+        if (pastes.get(localUser) != null) {
+            pasteCount = pastes.get(localUser);
+            pasteChars = pastesCharCount.get(localUser);
         }
 
-        data.setTextEditsCount(localEvents.size());
-        data.setTextEditChars(getCharsWritten());
+        storeLocalUserTextEditsStatistic(pasteCount, pasteChars,
+            totalCharsWritten);
 
-        long start = System.currentTimeMillis();
+        // generate and store parallel text edits
 
-        /*
-         * see if we can find a local edit that was parallel to a remote one for
-         * one of the given sample intervals
-         */
-        for (int interval : sampleIntervals) {
+        // process(...) modifies localEvents collection !
+        for (int interval : sampleIntervals)
             process(interval);
-        }
-
-        /* store the results in the data map */
-        if (parallelTextEditsCount.isEmpty()) {
-            /*
-             * there were no parallel text edits i.e. every edit was
-             * non-parallel
-             */
-            data.setNonParallelTextEdits(getCharsWritten());
-            if (!(localEvents.isEmpty()) || !(remoteEvents.isEmpty())) {
-                data.setNonParallelTextEditsPercent(100);
-            } else {
-                data.setNonParallelTextEditsPercent(0);
-            }
-
-            return;
-        }
-
-        for (Entry<Integer, Integer> e : parallelTextEdits.entrySet()) {
-            data.setParallelTextEdits(e.getKey(), e.getValue());
-            data.setParallelTextEditsPercent(e.getKey(),
-                getPercentage(e.getValue(), getCharsWritten()));
-        }
-
-        for (Entry<Integer, Integer> e : parallelTextEditsCount.entrySet()) {
-            data.setParallelTextEditsCount(e.getKey(), e.getValue());
-        }
 
         // all in the localEvents list remaining events were non-parallel
         long nonParallelTextEdits = 0;
-        for (EditEvent local : localEvents) {
+
+        for (EditEvent local : localEvents)
             nonParallelTextEdits += local.chars;
+
+        storeNonParallelTextEditsStatistic(nonParallelTextEdits,
+            totalCharsWritten);
+
+        if (parallelTextEditsCount.isEmpty())
+            return;
+
+        assert (parallelTextEdits.size() == parallelTextEditsCount.size());
+        assert (parallelTextEdits.keySet().equals(parallelTextEditsCount
+            .keySet()));
+
+        final List<Integer> intervalRanges = Arrays.asList(parallelTextEdits
+            .keySet().toArray(new Integer[0]));
+
+        for (int intervalRange : intervalRanges) {
+            storeParallelTextEditsStatistic(intervalRange,
+                parallelTextEditsCount.get(intervalRange),
+                parallelTextEdits.get(intervalRange), totalCharsWritten);
         }
-
-        data.setNonParallelTextEdits(nonParallelTextEdits);
-        data.setNonParallelTextEditsPercent(getPercentage(nonParallelTextEdits,
-            getCharsWritten()));
-
-        log.debug("Processing text edits took "
-            + (System.currentTimeMillis() - start) / 1000.0 + " s");
-
     }
 
     /**
@@ -394,8 +361,9 @@ public class TextEditCollector extends AbstractStatisticCollector {
      * @param intervalWidth
      *            the width of the interval to be considered
      */
-    public void process(int intervalWidth) {
+    private void process(int intervalWidth) {
 
+        // FIXME synchronized(remoteEvents) { synchronized(localEvents) { ...
         Iterator<EditEvent> remote = remoteEvents.iterator();
         EditEvent lastRemote = (remote.hasNext() ? remote.next() : null);
 
@@ -403,6 +371,13 @@ public class TextEditCollector extends AbstractStatisticCollector {
             .hasNext();) {
             EditEvent local = localIterator.next();
 
+            /*
+             * FIXME why is this done in the for loop when the iterator is only
+             * obtained once ?! If this is intended either move the while loop
+             * out of the for loop or correct this, which may lead to another
+             * serious performance issue for very long sessions. O(n^2)
+             * performance
+             */
             // Skip all remote events too far in the past
             while (lastRemote != null
                 && local.time > lastRemote.time + intervalWidth) {
@@ -440,7 +415,7 @@ public class TextEditCollector extends AbstractStatisticCollector {
      * @param key
      * @param value
      */
-    public static void addToMap(Map<Integer, Integer> map, Integer key,
+    private static void addToMap(Map<Integer, Integer> map, Integer key,
         Integer value) {
         Integer oldValue = map.get(key);
 
@@ -460,5 +435,44 @@ public class TextEditCollector extends AbstractStatisticCollector {
     @Override
     protected void doOnSessionEnd(ISarosSession sarosSession) {
         editorManager.removeSharedEditorListener(editorListener);
+    }
+
+    private void storeRemoteUserTextEditsStatistic(int userNumber,
+        int pasteCount, long pasteCharCount, long totalCharCount) {
+
+        data.put(KEY_REMOTE_USER, totalCharCount, userNumber, KEY_CHARS);
+        data.put(KEY_REMOTE_USER, pasteCount, userNumber, KEY_PASTES);
+        data.put(KEY_REMOTE_USER, pasteCharCount, userNumber, KEY_PASTES,
+            KEY_CHARS);
+    }
+
+    private void storeLocalUserTextEditsStatistic(int pasteCount,
+        long pasteCharCount, long totalCharCount) {
+
+        data.put(KEY_LOCAL_USER, totalCharCount, KEY_CHARS);
+        data.put(KEY_LOCAL_USER, pasteCount, KEY_PASTES);
+        data.put(KEY_LOCAL_USER, pasteCharCount, KEY_PASTES, KEY_CHARS);
+    }
+
+    private void storeParallelTextEditsStatistic(int intervalRange,
+        int intervalTextEditCount, long intervalCharCount, long totalCharCount) {
+
+        data.put(KEY_PARALLEL_TEXT_EDITS, intervalCharCount, intervalRange,
+            KEY_CHARS);
+
+        data.put(KEY_PARALLEL_TEXT_EDITS,
+            getPercentage(intervalCharCount, totalCharCount), intervalRange,
+            KEY_PERCENT);
+
+        data.put(KEY_PARALLEL_TEXT_EDITS, intervalTextEditCount, intervalRange,
+            KEY_COUNT);
+    }
+
+    private void storeNonParallelTextEditsStatistic(long localCharCount,
+        long totalCharCount) {
+        data.put(KEY_NON_PARALLEL_TEXT_EDITS, localCharCount, KEY_CHARS);
+
+        data.put(KEY_NON_PARALLEL_TEXT_EDITS,
+            getPercentage(localCharCount, totalCharCount), KEY_PERCENT);
     }
 }

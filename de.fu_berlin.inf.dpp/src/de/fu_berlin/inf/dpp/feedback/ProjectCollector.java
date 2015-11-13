@@ -22,6 +22,11 @@ import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 @Component(module = "feedback")
 public class ProjectCollector extends AbstractStatisticCollector {
 
+    // Keys for shared project information
+    private static final String KEY_COMPLETE_SHARED_PROJECTS = "session.shared.project.complete.count";
+    private static final String KEY_PARTIAL_SHARED_PROJECTS = "session.shared.project.partial.count";
+    private static final String KEY_PARTIAL_SHARED_PROJECTS_FILES = "session.shared.project.partial.files.count";
+
     private final ISarosSessionManager sessionManager;
 
     private static class ProjectInformation {
@@ -93,8 +98,9 @@ public class ProjectCollector extends AbstractStatisticCollector {
                 completeSharedProjects++;
         }
 
-        data.setSharedProjectStatistic(completeSharedProjects,
-            partialSharedProjects, partialSharedFiles);
+        data.put(KEY_COMPLETE_SHARED_PROJECTS, completeSharedProjects);
+        data.put(KEY_PARTIAL_SHARED_PROJECTS, partialSharedProjects);
+        data.put(KEY_PARTIAL_SHARED_PROJECTS_FILES, partialSharedFiles);
     }
 
     @Override

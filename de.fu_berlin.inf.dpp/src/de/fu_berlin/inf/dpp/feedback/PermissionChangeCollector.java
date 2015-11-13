@@ -33,8 +33,16 @@ import de.fu_berlin.inf.dpp.session.User.Permission;
 @Component(module = "feedback")
 public class PermissionChangeCollector extends AbstractStatisticCollector {
 
-    protected static final Logger log = Logger
+    private static final Logger log = Logger
         .getLogger(PermissionChangeCollector.class.getName());
+
+    private static final String KEY_DURATION = "duration";
+    private static final String KEY_PERCENT = "percent";
+
+    private static final String KEY_PERMISSION = "role";
+    private static final String KEY_PERMISSION_CHANGES = "role.changes";
+    private static final String KEY_PERMISSION_READONLY = "role.observer";
+    private static final String KEY_PERMISSION_WRITE = "role.driver";
 
     /**
      * The map to hold the local users {@link Permission} changes and times. A
@@ -42,23 +50,23 @@ public class PermissionChangeCollector extends AbstractStatisticCollector {
      * calculate the time differences between two consecutive {@link Permission}
      * changes.
      */
-    protected Map<Long, Permission> permissions = new LinkedHashMap<Long, Permission>();
+    private Map<Long, Permission> permissions = new LinkedHashMap<Long, Permission>();
 
-    protected int countLocalPermissionChanges = 0;
-    protected long sessionStart;
-    protected long sessionTime;
+    private int countLocalPermissionChanges = 0;
+    private long sessionStart;
+    private long sessionTime;
 
     /**
      * accumulators for the total duration of the
      * {@link Permission#READONLY_ACCESS}
      */
-    protected long readOnlyAccessDuration = 0;
+    private long readOnlyAccessDuration = 0;
     /**
      * accumulator for the total duration of the {@link Permission#WRITE_ACCESS}
      */
-    protected long writeAccessDuration = 0;
+    private long writeAccessDuration = 0;
 
-    protected ISessionListener sessionListener = new AbstractSessionListener() {
+    private final ISessionListener sessionListener = new AbstractSessionListener() {
 
         @Override
         public void permissionChanged(User user) {
@@ -86,9 +94,6 @@ public class PermissionChangeCollector extends AbstractStatisticCollector {
         Iterator<Entry<Long, Permission>> it = permissions.entrySet()
             .iterator();
 
-        // store the total amount of permission changes
-        data.setPermissionChanges(countLocalPermissionChanges);
-
         // store the time spent in each permission
         if (it.hasNext()) {
             e1 = it.next();
@@ -105,19 +110,21 @@ public class PermissionChangeCollector extends AbstractStatisticCollector {
 
             assert count == permissions.size();
         } else {
-            log.warn("the permission of the user could not be determined");
-            data.setPermission(0, "none");
+            /*
+             * FIXME this is wrong, users start with a permission, why are only
+             * changes are collected ?
+             */
+            // log.warn("the permission of the user could not be determined");
+            // data.put(KEY_PERMISSION, "none", 0);
+
+            return; // do not store anything until this is fixed
         }
 
-        // store total duration and percentage for each possible permission
-        data.setTotalPermissionDurationReadOnlyAccess(StatisticManager
-            .getTimeInMinutes(readOnlyAccessDuration));
-        data.setTotalPermissionDurationWriteAccess(StatisticManager
-            .getTimeInMinutes(writeAccessDuration));
-        data.setTotalPermissionPercentReadOnlyAccess(getPercentage(
-            readOnlyAccessDuration, sessionTime));
-        data.setTotalPermissionPercentWriteAccess(getPercentage(
-            writeAccessDuration, sessionTime));
+        storeReadOnlyPermissionStatistic(readOnlyAccessDuration, sessionTime);
+        storeWritePermissionStatistic(writeAccessDuration, sessionTime);
+
+        // store the total amount of permission changes
+        data.put(KEY_PERMISSION_CHANGES, countLocalPermissionChanges);
     }
 
     /**
@@ -133,23 +140,21 @@ public class PermissionChangeCollector extends AbstractStatisticCollector {
      * @param count
      *            the {@link Permission} number, starting with 1
      */
-    protected void processSinglePermissionChange(long start, long end,
+    private void processSinglePermissionChange(long start, long end,
         Permission permission, int count) {
-        long diffTime = getDiffTime(start, end);
+        long duration = getDuration(start, end);
 
-        data.setPermission(count, permission.toString().toLowerCase());
-        data.setPermissionDuration(count,
-            StatisticManager.getTimeInMinutes(diffTime));
+        storePermissionInterval(count, permission, duration);
 
         // add diffTime depending on the permission to the right accumulator
         if (permission.equals(Permission.READONLY_ACCESS)) {
-            readOnlyAccessDuration += diffTime;
+            readOnlyAccessDuration += duration;
         } else {
-            writeAccessDuration += diffTime;
+            writeAccessDuration += duration;
         }
     }
 
-    protected long getDiffTime(long start, long end) {
+    private long getDuration(long start, long end) {
         long diffTime = end - start;
         if (diffTime < 0) {
             log.warn("Time between two consecutive permission changes was negative "
@@ -174,4 +179,37 @@ public class PermissionChangeCollector extends AbstractStatisticCollector {
         sessionTime = Math.max(1, System.currentTimeMillis() - sessionStart);
     }
 
+    private void storePermissionInterval(int intervalNumber,
+        Permission permission, long duration) {
+
+        data.put(KEY_PERMISSION, permission.toString().toLowerCase(),
+            intervalNumber);
+
+        data.put(KEY_PERMISSION, StatisticManager.getTimeInMinutes(duration),
+            intervalNumber, KEY_DURATION);
+    }
+
+    private void storeReadOnlyPermissionStatistic(
+        long readOnlyModeDurationTime, long totalSessionDurationTime) {
+
+        data.put(KEY_PERMISSION_READONLY,
+            StatisticManager.getTimeInMinutes(readOnlyModeDurationTime),
+            KEY_DURATION);
+
+        data.put(KEY_PERMISSION_READONLY,
+            getPercentage(readOnlyModeDurationTime, totalSessionDurationTime),
+            KEY_PERCENT);
+    }
+
+    private void storeWritePermissionStatistic(long writeModeDurationTime,
+        long totalSessionDurationTime) {
+
+        data.put(KEY_PERMISSION_WRITE,
+            StatisticManager.getTimeInMinutes(writeModeDurationTime),
+            KEY_DURATION);
+
+        data.put(KEY_PERMISSION_WRITE,
+            getPercentage(writeModeDurationTime, totalSessionDurationTime),
+            KEY_PERCENT);
+    }
 }
