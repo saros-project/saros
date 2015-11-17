@@ -45,7 +45,6 @@ import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ColorNegotiationHook;
-import de.fu_berlin.inf.dpp.session.internal.LeaveAndKickHandler;
 import de.fu_berlin.inf.dpp.versioning.VersionManager;
 
 /**
@@ -120,10 +119,7 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
         Component.create(IsInconsistentObservable.class),
         Component.create(SessionIDObservable.class),
         Component.create(SarosSessionObservable.class),
-        Component.create(AwarenessInformationCollector.class),
-
-        // Handlers
-        Component.create(LeaveAndKickHandler.class), };
+        Component.create(AwarenessInformationCollector.class) };
 
     @Override
     public void createComponents(MutablePicoContainer container) {

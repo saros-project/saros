@@ -63,7 +63,6 @@ import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
-import de.fu_berlin.inf.dpp.session.internal.LeaveAndKickHandler;
 import de.fu_berlin.inf.dpp.vcs.VCSProviderFactory;
 import de.fu_berlin.inf.dpp.versioning.VersionManager;
 import org.picocontainer.BindKey;
@@ -142,7 +141,6 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
         Component.create(CancelInviteHandler.class),
         Component.create(ProjectNegotiationCancellationHandler.class),
         Component.create(InvitationHandler.class),
-        Component.create(LeaveAndKickHandler.class),
         Component.create(RemoteProgressManager.class),
 
     };
