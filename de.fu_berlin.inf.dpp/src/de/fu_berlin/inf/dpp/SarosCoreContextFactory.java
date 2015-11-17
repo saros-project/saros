@@ -20,7 +20,6 @@ import de.fu_berlin.inf.dpp.net.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.business.LeaveAndKickHandler;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.IBBTransport;
 import de.fu_berlin.inf.dpp.net.internal.ITransport;
@@ -46,13 +45,14 @@ import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ColorNegotiationHook;
+import de.fu_berlin.inf.dpp.session.internal.LeaveAndKickHandler;
 import de.fu_berlin.inf.dpp.versioning.VersionManager;
 
 /**
  * This is the basic core factory for Saros. All components that are created by
  * this factory <b>must</b> be working on any platform the application is
  * running on.
- *
+ * 
  * @author srossbach
  */
 public class SarosCoreContextFactory extends AbstractSarosContextFactory {

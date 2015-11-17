@@ -1,8 +1,12 @@
-package de.fu_berlin.inf.dpp.core.net.business;
+package de.fu_berlin.inf.dpp.session.internal;
 
+import org.apache.log4j.Logger;
+import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.packet.Packet;
+
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.extensions.KickUserExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.LeaveSessionExtension;
-import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -11,15 +15,13 @@ import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
-import org.apache.log4j.Logger;
-import org.jivesoftware.smack.PacketListener;
-import org.jivesoftware.smack.packet.Packet;
 
 /**
  * Business logic for handling Leave Message
  */
+// FIXME move this class into the session context
+@Component(module = "net")
 public class LeaveAndKickHandler {
 
     private static final Logger log = Logger
@@ -28,26 +30,15 @@ public class LeaveAndKickHandler {
     private final ISarosSessionManager sessionManager;
 
     private final IReceiver receiver;
-    private final PacketListener leaveExtensionListener = new PacketListener() {
 
-        @Override
-        public void processPacket(Packet packet) {
-            leaveReceived(new JID(packet.getFrom()));
-        }
-    };
-    private final PacketListener kickExtensionListener = new PacketListener() {
-
-        @Override
-        public void processPacket(Packet packet) {
-            kickReceived(new JID(packet.getFrom()));
-        }
-    };
     private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
 
         @Override
         public void sessionStarted(ISarosSession session) {
-            receiver.addPacketListener(leaveExtensionListener,
-                LeaveSessionExtension.PROVIDER.getPacketFilter(session.getID()));
+            receiver
+                .addPacketListener(leaveExtensionListener,
+                    LeaveSessionExtension.PROVIDER.getPacketFilter(session
+                        .getID()));
 
             receiver.addPacketListener(kickExtensionListener,
                 KickUserExtension.PROVIDER.getPacketFilter(session.getID()));
@@ -60,6 +51,22 @@ public class LeaveAndKickHandler {
         }
     };
 
+    private final PacketListener leaveExtensionListener = new PacketListener() {
+
+        @Override
+        public void processPacket(Packet packet) {
+            leaveReceived(new JID(packet.getFrom()));
+        }
+    };
+
+    private final PacketListener kickExtensionListener = new PacketListener() {
+
+        @Override
+        public void processPacket(Packet packet) {
+            kickReceived(new JID(packet.getFrom()));
+        }
+    };
+
     public LeaveAndKickHandler(IReceiver receiver,
         ISarosSessionManager sessionManager) {
 
@@ -67,7 +74,8 @@ public class LeaveAndKickHandler {
 
         this.sessionManager = sessionManager;
 
-        this.sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
+        this.sessionManager
+            .addSessionLifecycleListener(sessionLifecycleListener);
     }
 
     private void kickReceived(JID from) {
@@ -83,8 +91,7 @@ public class LeaveAndKickHandler {
             return;
         }
 
-        stopSession(sarosSession, "Removed from the session",
-            ModelFormatUtils.getDisplayName(user) + " removed you from the current session.");
+        stopSession(user, SessionEndReason.KICKED);
     }
 
     private void leaveReceived(JID from) {
@@ -113,9 +120,7 @@ public class LeaveAndKickHandler {
          * context which executes all incoming packets sequentially
          */
         if (user.isHost()) {
-            stopSession(sarosSession, "Closing the session",
-                "Session was closed by inviter " + ModelFormatUtils.getDisplayName(
-                    user) + ".");
+            stopSession(user, SessionEndReason.HOST_LEFT);
 
         }
 
@@ -130,7 +135,7 @@ public class LeaveAndKickHandler {
          * must be run async. otherwise the user list synchronization will time
          * out as we block the packet receive thread here
          */
-        ThreadUtils.runSafeAsync("RemoveUser-" + user, log, new Runnable() {
+        ThreadUtils.runSafeAsync("dpp-remove-" + user, log, new Runnable() {
             @Override
             public void run() {
                 sarosSession.removeUser(user);
@@ -139,13 +144,11 @@ public class LeaveAndKickHandler {
 
     }
 
-    private void stopSession(final ISarosSession session, final String topic,
-        final String reason) {
-        ThreadUtils.runSafeAsync("StopSessionOnHostLeave", log, new Runnable() {
+    private void stopSession(final User user, final SessionEndReason reason) {
+        ThreadUtils.runSafeAsync("dpp-stop-host", log, new Runnable() {
             @Override
             public void run() {
-                sessionManager.stopSarosSession(SessionEndReason.HOST_LEFT);
-                NotificationPanel.showNotification(topic, reason);
+                sessionManager.stopSarosSession(reason);
             }
         });
     }
