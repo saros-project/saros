@@ -71,6 +71,8 @@ import de.fu_berlin.inf.dpp.net.xmpp.roster.RosterTracker;
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.BalloonNotification;
@@ -226,6 +228,13 @@ public class SarosView extends ViewPart {
         }
     };
 
+    private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
+        @Override
+        public void sessionEnded(ISarosSession session, SessionEndReason reason) {
+            showStopNotification(session.getHost(), reason);
+        }
+    };
+
     protected Composite leftComposite;
 
     protected ViewerComposite<?> sessionDisplay;
@@ -267,6 +276,8 @@ public class SarosView extends ViewPart {
         super();
         SarosPluginContext.initComponent(this);
         preferenceStore.addPropertyChangeListener(propertyListener);
+        sarosSessionManager
+            .addSessionLifecycleListener(sessionLifecycleListener);
         showBalloonNotifications = preferenceStore
             .getBoolean(EclipsePreferenceConstants.ENABLE_BALLOON_NOTIFICATION);
     }
