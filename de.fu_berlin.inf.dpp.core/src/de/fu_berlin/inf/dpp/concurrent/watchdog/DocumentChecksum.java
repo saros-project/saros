@@ -15,7 +15,6 @@ public class DocumentChecksum {
      * doesn't exist).
      */
     public static final int NOT_AVAILABLE = -1;
-
     private SPath path;
     private int length;
     private int hash;

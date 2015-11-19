@@ -27,6 +27,7 @@ import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.ChecksumErrorActivity;
 import de.fu_berlin.inf.dpp.activities.RecoveryFileActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.concurrent.watchdog.DocumentChecksum;
 import de.fu_berlin.inf.dpp.core.monitoring.IStatus;
 import de.fu_berlin.inf.dpp.core.monitoring.Status;
 import de.fu_berlin.inf.dpp.core.util.FileUtils;
@@ -236,13 +237,10 @@ public class ConsistencyWatchdogHandler extends AbstractActivityProducer
          * verify the recovered file
          */
         final DocumentChecksum checksum = new DocumentChecksum(path);
-        checksum
-            .bind(ResourceConverter.getDocument(path.getFullPath().toFile()));
-        checksum.update();
+        checksum.update(ResourceConverter.getDocument(path.getFullPath().toFile()).getText());
 
         fireActivity(new ChecksumActivity(user, path, checksum.hashCode(),
                 checksum.getLength(), null)
         );
-        checksum.dispose();
     }
 }

@@ -253,13 +253,13 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
         String content = editorManager.getContent(checksum.getPath());
 
         if (content == null) {
-            if (localEditors.contains(checksum)) {
+            if (localEditors.contains(checksum.getPath())) {
                 LOG.error("EditorManager is in an inconsistent state. "
                     + "It is reporting a locally open editor but no"
                     + " document could be found in the underlying file system: "
                     + checksum);
             }
-            if (!remoteEditors.contains(checksum)) {
+            if (!remoteEditors.contains(checksum.getPath())) {
                 /*
                  * Since session participants do not report this document as
                  * open, they are right (and our EditorPool might be confused)

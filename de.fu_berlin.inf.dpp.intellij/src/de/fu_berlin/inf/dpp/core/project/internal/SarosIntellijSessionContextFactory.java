@@ -2,8 +2,8 @@ package de.fu_berlin.inf.dpp.core.project.internal;
 
 import org.picocontainer.MutablePicoContainer;
 
+import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogServer;
 import de.fu_berlin.inf.dpp.core.concurrent.ConsistencyWatchdogHandler;
-import de.fu_berlin.inf.dpp.core.concurrent.ConsistencyWatchdogServer;
 import de.fu_berlin.inf.dpp.intellij.project.SharedResourcesManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionContextFactory;
