@@ -41,7 +41,7 @@ public class EditorListener {
 
     protected ITextSelection lastSelection = new TextSelection(-1, -1);
 
-    protected LineRange lastViewport = new LineRange(-1, -1);
+    private LineRange lastViewport;
 
     protected boolean isUnsupportedEditor;
 
@@ -213,29 +213,19 @@ public class EditorListener {
         }
     }
 
-    public boolean equals(LineRange one, LineRange two) {
-
-        if (one == null)
-            return two == null;
-
-        if (two == null)
-            return false;
-
-        return one.getNumberOfLines() == two.getNumberOfLines()
-            && one.getStartLine() == two.getStartLine();
-    }
-
-    protected void generateViewport() {
-
+    private void generateViewport() {
         LineRange viewport = EditorAPI.getViewport(viewer);
 
-        if (!equals(viewport, lastViewport)) {
-            lastViewport = viewport;
-            if (log.isDebugEnabled() && viewport != null) {
-                log.debug("Viewport changed: " + viewport.getStartLine() + "+"
-                    + viewport.getNumberOfLines());
-            }
-            manager.generateViewport(part, viewport);
+        if (viewport.equals(lastViewport))
+            return;
+
+        lastViewport = viewport;
+
+        if (log.isDebugEnabled()) {
+            log.debug("Viewport changed: " + viewport.getStartLine() + "+"
+                + viewport.getNumberOfLines());
         }
+
+        manager.generateViewport(part, viewport);
     }
 }

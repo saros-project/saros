@@ -19,4 +19,25 @@ public class LineRange {
     public int getNumberOfLines() {
         return numberOfLines;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof LineRange)) {
+            return false;
+        }
+
+        LineRange other = (LineRange) o;
+
+        return this.getNumberOfLines() == other.getNumberOfLines()
+            && this.getStartLine() == other.getStartLine();
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + startLine;
+        result = prime * result + numberOfLines;
+        return result;
+    }
 }
