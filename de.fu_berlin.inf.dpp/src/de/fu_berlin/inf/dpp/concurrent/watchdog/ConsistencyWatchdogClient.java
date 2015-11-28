@@ -23,7 +23,6 @@ import de.fu_berlin.inf.dpp.activities.ChecksumErrorActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
@@ -86,8 +85,6 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer {
 
     private final IsInconsistentObservable inconsistencyToResolve;
 
-    private final EditorManager editorManager;
-
     private final IEditorAPI editorAPI;
 
     private final Set<SPath> pathsWithWrongChecksums = new CopyOnWriteArraySet<SPath>();
@@ -100,11 +97,10 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer {
 
     public ConsistencyWatchdogClient(final ISarosSessionManager sessionManager,
         final IsInconsistentObservable inconsistencyToResolve,
-        final EditorManager editorManager, final IEditorAPI editorAPI,
+        final IEditorAPI editorAPI,
         final RemoteProgressManager remoteProgressManager) {
         this.sessionManager = sessionManager;
         this.inconsistencyToResolve = inconsistencyToResolve;
-        this.editorManager = editorManager;
         this.editorAPI = editorAPI;
         this.remoteProgressManager = remoteProgressManager;
 
@@ -237,17 +233,6 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer {
 
             final ArrayList<SPath> pathsOfHandledFiles = new ArrayList<SPath>(
                 pathsWithWrongChecksums);
-
-            for (SPath path : pathsOfHandledFiles) {
-
-                if (cancelRecovery.get() || monitor.isCanceled())
-                    return;
-
-                editorManager.saveLazy(path);
-            }
-
-            if (cancelRecovery.get())
-                return;
 
             monitor.beginTask("Consistency recovery",
                 pathsOfHandledFiles.size());
