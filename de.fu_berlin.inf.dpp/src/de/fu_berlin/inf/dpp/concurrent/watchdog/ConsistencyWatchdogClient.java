@@ -12,19 +12,13 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.ui.part.FileEditorInput;
-import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.ChecksumErrorActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
-import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
+import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.remote.RemoteProgressManager;
@@ -85,7 +79,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer {
 
     private final IsInconsistentObservable inconsistencyToResolve;
 
-    private final IEditorAPI editorAPI;
+    private final IEditorManager editorManager;
 
     private final Set<SPath> pathsWithWrongChecksums = new CopyOnWriteArraySet<SPath>();
 
@@ -97,11 +91,11 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer {
 
     public ConsistencyWatchdogClient(final ISarosSessionManager sessionManager,
         final IsInconsistentObservable inconsistencyToResolve,
-        final IEditorAPI editorAPI,
+        final IEditorManager editorManager,
         final RemoteProgressManager remoteProgressManager) {
         this.sessionManager = sessionManager;
         this.inconsistencyToResolve = inconsistencyToResolve;
-        this.editorAPI = editorAPI;
+        this.editorManager = editorManager;
         this.remoteProgressManager = remoteProgressManager;
 
         this.sessionManager
@@ -296,61 +290,40 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer {
 
     private boolean isInconsistent(ChecksumActivity checksum) {
 
-        SPath path = checksum.getPath();
-        IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
+        final SPath path = checksum.getPath();
 
-        if (!checksum.existsFile()) {
+        final String editorContent = editorManager.getContent(path);
+
+        if (editorContent != null && !checksum.existsFile()) {
             /*
              * If the checksum tells us that the file does not exist at the
              * host, check whether we still have it. If it exists, we do have an
              * inconsistency
              */
-            return file.exists();
+            return true;
         }
 
         /*
          * If the checksum tells us, that the file exists, but we do not have
          * it, it is an inconsistency as well
          */
-        if (!file.exists()) {
+        if (editorContent == null)
+            return true;
+
+        if ((editorContent.length() != checksum.getLength())
+            || (editorContent.hashCode() != checksum.getHash())) {
+
+            LOG.debug(String.format(
+                "Inconsistency detected: %s L(%d %s %d) H(%x %s %x)",
+                path.toString(), editorContent.length(),
+                editorContent.length() == checksum.getLength() ? "==" : "!=",
+                checksum.getLength(), editorContent.hashCode(),
+                editorContent.hashCode() == checksum.getHash() ? "==" : "!=",
+                checksum.getHash()));
+
             return true;
         }
 
-        FileEditorInput input = new FileEditorInput(file);
-        IDocumentProvider provider = editorAPI.getDocumentProvider(input);
-
-        try {
-            provider.connect(input);
-        } catch (CoreException e) {
-            LOG.warn("Could not check checksum of file " + path.toString());
-            return false;
-        }
-
-        try {
-            IDocument doc = provider.getDocument(input);
-
-            // if doc is still null give up
-            if (doc == null) {
-                LOG.warn("Could not check checksum of file " + path.toString());
-                return false;
-            }
-
-            if ((doc.getLength() != checksum.getLength())
-                || (doc.get().hashCode() != checksum.getHash())) {
-
-                LOG.debug(String.format(
-                    "Inconsistency detected: %s L(%d %s %d) H(%x %s %x)", path
-                        .toString(), doc.getLength(),
-                    doc.getLength() == checksum.getLength() ? "==" : "!=",
-                    checksum.getLength(), doc.get().hashCode(), doc.get()
-                        .hashCode() == checksum.getHash() ? "==" : "!=",
-                    checksum.getHash()));
-
-                return true;
-            }
-        } finally {
-            provider.disconnect(input);
-        }
         return false;
     }
 
