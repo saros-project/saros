@@ -112,14 +112,11 @@ public class ConsistencyAction extends Action implements Disposable {
     protected ISarosSessionManager sessionManager;
 
     @Inject
-    protected ConsistencyWatchdogClient watchdogClient;
-
-    @Inject
     protected IsInconsistentObservable inconsistentObservable;
 
     private boolean isFading;
 
-    private ISarosSession sarosSession;
+    private volatile ISarosSession sarosSession;
 
     public ConsistencyAction() {
 
@@ -170,11 +167,25 @@ public class ConsistencyAction extends Action implements Disposable {
 
     private void handleConsistencyChange(Boolean isInconsistent) {
 
-        if (sarosSession.isHost() && isInconsistent) {
+        final ISarosSession currentSession = sarosSession;
+
+        if (currentSession == null)
+            return;
+
+        final ConsistencyWatchdogClient watchdogClient = (ConsistencyWatchdogClient) currentSession
+            .getComponent(ConsistencyWatchdogClient.class);
+
+        if (watchdogClient == null) {
+            LOG.warn("watchdog client component is not available, cannot perform inconsistency notification");
+            return;
+        }
+
+        if (currentSession.isHost() && isInconsistent) {
             LOG.warn("No inconsistency should ever be reported" //$NON-NLS-1$
                 + " to the host"); //$NON-NLS-1$
             return;
         }
+
         LOG.debug("Inconsistency indicator goes: " //$NON-NLS-1$
             + (isInconsistent ? "on" : "off")); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -238,6 +249,20 @@ public class ConsistencyAction extends Action implements Disposable {
 
     @Override
     public void run() {
+
+        final ISarosSession currentSession = sarosSession;
+
+        if (currentSession == null)
+            return;
+
+        final ConsistencyWatchdogClient watchdogClient = (ConsistencyWatchdogClient) currentSession
+            .getComponent(ConsistencyWatchdogClient.class);
+
+        if (watchdogClient == null) {
+            LOG.warn("watchdog client component is not available, cannot perform recovery");
+            return;
+        }
+
         LOG.debug("user activated CW recovery."); //$NON-NLS-1$
 
         Shell shell = SWTUtils.getShell();

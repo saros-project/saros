@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.project.internal;
 
 import org.picocontainer.MutablePicoContainer;
 
+import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogHandler;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogServer;
 import de.fu_berlin.inf.dpp.feedback.DataTransferCollector;
@@ -31,10 +32,13 @@ public class SarosEclipseSessionContextFactory extends
     public void createNonCoreComponents(ISarosSession session,
         MutablePicoContainer container) {
 
-        // Consistency Watchdog
+        // FIXME this should only be added to the host context
         container.addComponent(ConsistencyWatchdogHandler.class);
+
         if (session.isHost())
             container.addComponent(ConsistencyWatchdogServer.class);
+        else
+            container.addComponent(ConsistencyWatchdogClient.class);
 
         // Statistic Collectors
         /*

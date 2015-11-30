@@ -12,6 +12,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
+import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.ChecksumErrorActivity;
@@ -26,10 +27,6 @@ import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.ui.actions.ConsistencyAction;
 import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
@@ -48,7 +45,8 @@ import de.fu_berlin.inf.dpp.ui.views.SarosView;
  * This class both produces and consumes activities.
  */
 @Component(module = "consistency")
-public class ConsistencyWatchdogClient extends AbstractActivityProducer {
+public class ConsistencyWatchdogClient extends AbstractActivityProducer
+    implements Startable {
 
     private static Logger LOG = Logger
         .getLogger(ConsistencyWatchdogClient.class);
@@ -85,55 +83,17 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer {
 
     private final RemoteProgressManager remoteProgressManager;
 
-    private final ISarosSessionManager sessionManager;
+    private final ISarosSession session;
 
-    private volatile ISarosSession session;
-
-    public ConsistencyWatchdogClient(final ISarosSessionManager sessionManager,
+    public ConsistencyWatchdogClient(final ISarosSession session,
         final IsInconsistentObservable inconsistencyToResolve,
         final IEditorManager editorManager,
         final RemoteProgressManager remoteProgressManager) {
-        this.sessionManager = sessionManager;
+        this.session = session;
         this.inconsistencyToResolve = inconsistencyToResolve;
         this.editorManager = editorManager;
         this.remoteProgressManager = remoteProgressManager;
-
-        this.sessionManager
-            .addSessionLifecycleListener(sessionLifecycleListener);
     }
-
-    public void dispose() {
-        sessionManager.removeSessionLifecycleListener(sessionLifecycleListener);
-    }
-
-    private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
-
-        @Override
-        public void sessionStarted(ISarosSession newSarosSession) {
-            session = newSarosSession;
-
-            pathsWithWrongChecksums.clear();
-            inconsistencyToResolve.setValue(false);
-
-            newSarosSession.addActivityConsumer(consumer);
-            newSarosSession.addActivityProducer(ConsistencyWatchdogClient.this);
-        }
-
-        @Override
-        public void sessionEnded(ISarosSession oldSarosSession,
-            SessionEndReason reason) {
-            oldSarosSession.removeActivityConsumer(consumer);
-            oldSarosSession
-                .removeActivityProducer(ConsistencyWatchdogClient.this);
-
-            pathsWithWrongChecksums.clear();
-
-            session = null;
-
-            // abort running recoveries
-            cancelRecovery.set(true);
-        }
-    };
 
     private final IActivityConsumer consumer = new AbstractActivityConsumer() {
         @Override
@@ -166,6 +126,25 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer {
             }
         }
     };
+
+    @Override
+    public void start() {
+        inconsistencyToResolve.setValue(false);
+
+        session.addActivityConsumer(consumer);
+        session.addActivityProducer(this);
+    }
+
+    @Override
+    public void stop() {
+        session.removeActivityConsumer(consumer);
+        session.removeActivityProducer(this);
+
+        pathsWithWrongChecksums.clear();
+
+        // abort running recoveries
+        cancelRecovery.set(true);
+    }
 
     /**
      * Returns the set of files for which the ConsistencyWatchdog has identified
