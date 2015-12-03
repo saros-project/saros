@@ -5,7 +5,9 @@ import de.fu_berlin.inf.dpp.ISarosContextBindings;
 import de.fu_berlin.inf.dpp.communication.connection.IProxyResolver;
 import de.fu_berlin.inf.dpp.connection.NullProxyResolver;
 import de.fu_berlin.inf.dpp.core.Saros;
+import de.fu_berlin.inf.dpp.core.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.core.concurrent.ConsistencyWatchdogClient;
+import de.fu_berlin.inf.dpp.core.concurrent.IsInconsistentObservable;
 import de.fu_berlin.inf.dpp.core.monitoring.remote.IntelliJRemoteProgressIndicatorFactoryImpl;
 import de.fu_berlin.inf.dpp.core.project.internal.SarosIntellijSessionContextFactory;
 import de.fu_berlin.inf.dpp.core.ui.eventhandler.NegotiationHandler;
@@ -17,6 +19,7 @@ import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
+import de.fu_berlin.inf.dpp.filesystem.NullChecksumCacheImpl;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorAPI;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorHandler;
@@ -24,7 +27,6 @@ import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorManipulator;
 import de.fu_berlin.inf.dpp.intellij.editor.ProjectAPI;
 import de.fu_berlin.inf.dpp.intellij.preferences.IntelliJPreferences;
 import de.fu_berlin.inf.dpp.intellij.preferences.PropertiesComponentAdapter;
-import de.fu_berlin.inf.dpp.filesystem.NullChecksumCacheImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.PathFactory;
 import de.fu_berlin.inf.dpp.intellij.runtime.IntelliJSynchronizer;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.FollowModeAction;
@@ -60,6 +62,7 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
         Component.create(ConsistencyWatchdogClient.class),
 
         Component.create(EditorAPI.class),
+
         Component.create(ProjectAPI.class),
 
         Component.create(IEditorManager.class, EditorManager.class),
@@ -78,8 +81,8 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
 
         Component.create(UISynchronizer.class, IntelliJSynchronizer.class),
 
-        Component.create(IPreferenceStore.class,
-            PropertiesComponentAdapter.class),
+        Component
+            .create(IPreferenceStore.class, PropertiesComponentAdapter.class),
 
         Component.create(Preferences.class, IntelliJPreferences.class),
 
@@ -93,11 +96,17 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
         Component.create(DialogManager.class, IntelliJDialogManager.class),
         Component.create(IWebResourceLocator.class,
             IntelliJWebResourceLocator.class),
+
         Component.create(ICollaborationUtils.class,
             IntelliJCollaborationUtilsImpl.class),
 
         // Proxy Support for the XMPP server connection
-        Component.create(IProxyResolver.class, NullProxyResolver.class) };
+        Component.create(IProxyResolver.class, NullProxyResolver.class),
+
+        Component.create(AwarenessInformationCollector.class),
+        Component.create(IsInconsistentObservable.class)
+
+    };
 
     public SarosIntellijContextFactory(Saros saros) {
         this.saros = saros;
@@ -122,10 +131,11 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
         container.addComponent(saros);
 
         container.addComponent(BindKey.bindKey(String.class,
-            ISarosContextBindings.SarosVersion.class), "14.1.31.DEVEL"); // todo
+                ISarosContextBindings.SarosVersion.class),
+            "14.1.31.DEVEL"); // todo
 
         container.addComponent(BindKey.bindKey(String.class,
-            ISarosContextBindings.PlatformVersion.class), "4.3.2"); // todo
+                ISarosContextBindings.PlatformVersion.class), "4.3.2"); // todo
 
     }
 }

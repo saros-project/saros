@@ -1,40 +1,19 @@
-/*
- *
- *  DPP - Serious Distributed Pair Programming
- *  (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2010
- *  (c) NFQ (www.nfq.com) - 2014
- *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 1, or (at your option)
- *  any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- * /
- */
+package de.fu_berlin.inf.dpp;
 
-package de.fu_berlin.inf.dpp.core.context;
+import java.util.Arrays;
 
-import de.fu_berlin.inf.dpp.AbstractSarosContextFactory;
-import de.fu_berlin.inf.dpp.ISarosContextBindings;
+import org.picocontainer.BindKey;
+import org.picocontainer.MutablePicoContainer;
+
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatService;
 import de.fu_berlin.inf.dpp.communication.chat.single.SingleUserChatService;
 import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
-import de.fu_berlin.inf.dpp.core.awareness.AwarenessInformationCollector;
-import de.fu_berlin.inf.dpp.core.concurrent.IsInconsistentObservable;
-import de.fu_berlin.inf.dpp.core.vcs.NullVCSProviderFactoryImpl;
 import de.fu_berlin.inf.dpp.editor.colorstorage.ColorIDSetStorage;
 import de.fu_berlin.inf.dpp.monitoring.remote.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.DispatchThreadContext;
+import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
@@ -60,21 +39,21 @@ import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
-import de.fu_berlin.inf.dpp.vcs.VCSProviderFactory;
+import de.fu_berlin.inf.dpp.session.ColorNegotiationHook;
+import de.fu_berlin.inf.dpp.session.SarosSessionManager;
 import de.fu_berlin.inf.dpp.versioning.VersionManager;
-import org.picocontainer.BindKey;
-import org.picocontainer.MutablePicoContainer;
-
-import java.util.Arrays;
 
 /**
  * This is the basic core factory for Saros. All components that are created by
  * this factory <b>must</b> be working on any platform the application is
  * running on.
- *
+ * 
  * @author srossbach
  */
 public class SarosCoreContextFactory extends AbstractSarosContextFactory {
+
+    // TODO we must abstract the IPrefenceStore stuff otherwise anything here is
+    // broken
 
     private final Component[] components = new Component[] {
 
@@ -87,35 +66,34 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
         Component.create(MultiUserChatService.class),
         Component.create(SingleUserChatService.class),
 
+        Component.create(SarosSessionManager.class),
+
         Component.create(XMPPAccountStore.class),
         Component.create(ColorIDSetStorage.class),
 
         // Invitation hooks
         Component.create(SessionNegotiationHookManager.class),
-
-        // VCS (only dummy to satisfy dependencies)
-        Component
-            .create(VCSProviderFactory.class, NullVCSProviderFactoryImpl.class),
+        Component.create(ColorNegotiationHook.class),
 
         // Network
         Component.create(DispatchThreadContext.class),
 
-        Component.create(DataTransferManager.class),
+        Component.create(IConnectionManager.class, DataTransferManager.class),
 
         Component.create(DiscoveryManager.class),
 
         Component.create(BindKey.bindKey(ITransport.class,
             ISarosContextBindings.IBBTransport.class), IBBTransport.class),
 
-        Component.create(BindKey.bindKey(ITransport.class,
+        Component
+            .create(BindKey.bindKey(ITransport.class,
                 ISarosContextBindings.Socks5Transport.class),
-            Socks5Transport.class
-        ),
+                Socks5Transport.class),
 
         Component.create(RosterTracker.class),
         Component.create(XMPPConnectionService.class),
-        Component.create(MDNSService.class),
-        Component.create(TCPServer.class),
+        Component.create(MDNSService.class), Component.create(TCPServer.class),
+
         Component.create(IStunService.class, StunServiceImpl.class),
 
         Component.create(SubscriptionHandler.class),
@@ -125,26 +103,19 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
         Component.create(IReceiver.class, XMPPReceiver.class),
         Component.create(ITransmitter.class, XMPPTransmitter.class),
 
+        Component.create(RemoteProgressManager.class),
+
         // Observables
         Component.create(FileReplacementInProgressObservable.class),
         Component.create(SessionNegotiationObservable.class),
         Component.create(ProjectNegotiationObservable.class),
-        Component.create(IsInconsistentObservable.class),
         Component.create(SessionIDObservable.class),
-        Component.create(SarosSessionObservable.class),
-        Component.create(AwarenessInformationCollector.class),
-
-        // Handlers
-        Component.create(RemoteProgressManager.class),
-
-    };
+        Component.create(SarosSessionObservable.class) };
 
     @Override
     public void createComponents(MutablePicoContainer container) {
-        for (Component component : Arrays.asList(components)) {
-
+        for (Component component : Arrays.asList(components))
             container.addComponent(component.getBindKey(),
                 component.getImplementation());
-        }
     }
 }

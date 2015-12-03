@@ -8,9 +8,13 @@ import org.osgi.service.prefs.Preferences;
 import org.picocontainer.BindKey;
 import org.picocontainer.MutablePicoContainer;
 
+import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
+import de.fu_berlin.inf.dpp.communication.SkypeManager;
+import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCNegotiationManager;
 import de.fu_berlin.inf.dpp.communication.connection.IProxyResolver;
 import de.fu_berlin.inf.dpp.communication.connection.Socks5ProxyResolver;
 import de.fu_berlin.inf.dpp.concurrent.undo.UndoManager;
+import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
@@ -112,7 +116,13 @@ public class SarosEclipseContextFactory extends AbstractSarosContextFactory {
 
         // Remote progress indication
         Component.create(IRemoteProgressIndicatorFactory.class,
-            EclipseRemoteProgressIndicatorFactoryImpl.class) };
+            EclipseRemoteProgressIndicatorFactoryImpl.class),
+
+        Component.create(MUCNegotiationManager.class),
+        Component.create(SkypeManager.class),
+
+        Component.create(IsInconsistentObservable.class),
+        Component.create(AwarenessInformationCollector.class) };
 
     public SarosEclipseContextFactory(Saros saros) {
         this.saros = saros;

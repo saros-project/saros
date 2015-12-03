@@ -40,6 +40,7 @@ import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.ISarosContextBindings;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosCoreContextFactory;
+import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
@@ -286,6 +287,7 @@ public class SarosSessionTest {
 
         container.addComponent(NonUISynchronizer.class);
         container.addComponent(FeedbackManager.class);
+        container.addComponent(AwarenessInformationCollector.class);
 
         // Init Feedback
         FeedbackPreferences.setPreferences(preferences);
