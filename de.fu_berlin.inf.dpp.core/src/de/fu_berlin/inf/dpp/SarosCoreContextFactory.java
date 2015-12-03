@@ -52,9 +52,13 @@ import de.fu_berlin.inf.dpp.versioning.VersionManager;
  */
 public class SarosCoreContextFactory extends AbstractSarosContextFactory {
 
-    // TODO we must abstract the IPrefenceStore stuff otherwise anything here is
-    // broken
-
+    /**
+     * Must not be static in order to avoid heavy work during class
+     * initialization
+     * 
+     * @see <a
+     *      href="https://github.com/saros-project/saros/commit/237daca">commit&nbsp;237daca</a>
+     */
     private final Component[] components = new Component[] {
 
         // Facades
