@@ -10,7 +10,7 @@ import de.fu_berlin.inf.dpp.ui.renderer.Renderer;
  * Abstract implementation of {@link IBrowserPage} which offers convenience
  * methods for registering browser functions and renderer.
  */
-public abstract class BrowserPage implements IBrowserPage {
+public abstract class AbstractBrowserPage implements IBrowserPage {
 
     /**
      * Common HTML document location
@@ -35,7 +35,7 @@ public abstract class BrowserPage implements IBrowserPage {
      * @param pageTitle
      *            the title that will be shown in the dialog
      */
-    public BrowserPage(String htmlDocName, String pageTitle) {
+    public AbstractBrowserPage(String htmlDocName, String pageTitle) {
         this.relativePageLocation = PATH + htmlDocName;
         this.pageTitle = pageTitle;
     }

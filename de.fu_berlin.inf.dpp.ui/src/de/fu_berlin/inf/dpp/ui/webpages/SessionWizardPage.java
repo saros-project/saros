@@ -14,7 +14,7 @@ import de.fu_berlin.inf.dpp.ui.renderer.StateRenderer;
  * Represents the Saros Session invitation Wizard. This wizard is used to start
  * a Session by sharing Projects with multiple contacts.
  */
-public class SessionWizardPage extends BrowserPage {
+public class SessionWizardPage extends AbstractBrowserPage {
 
     public static final String HTML_DOC_NAME = "start-session-wizard.html";
     // Injection of used Renderer

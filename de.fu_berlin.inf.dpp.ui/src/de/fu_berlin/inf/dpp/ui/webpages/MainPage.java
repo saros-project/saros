@@ -18,7 +18,7 @@ import de.fu_berlin.inf.dpp.ui.renderer.StateRenderer;
 /**
  * Represents the Saros main view.
  */
-public class MainPage extends BrowserPage {
+public class MainPage extends AbstractBrowserPage {
 
     public static final String HTML_DOC_NAME = "main-page.html";
 

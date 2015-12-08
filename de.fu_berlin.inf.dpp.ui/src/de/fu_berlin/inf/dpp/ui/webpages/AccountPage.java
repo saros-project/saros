@@ -10,7 +10,7 @@ import de.fu_berlin.inf.dpp.ui.browser_functions.SaveAccount;
 /**
  * Represents the wizard to manage accounts.
  */
-public class AccountPage extends BrowserPage {
+public class AccountPage extends AbstractBrowserPage {
     // TODO: NOT USED AT THE MOMENT! Create HTML page and open it in the
     // main-page.html by calling "__java_showAccountPage();".
 
