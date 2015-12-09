@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.concurrent.watchdog;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -27,9 +28,7 @@ import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.ui.actions.ConsistencyAction;
-import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
-import de.fu_berlin.inf.dpp.ui.views.SarosView;
+import de.fu_berlin.inf.dpp.session.UserFormatUtils;
 
 /**
  * This class is responsible for two things:
@@ -48,7 +47,7 @@ import de.fu_berlin.inf.dpp.ui.views.SarosView;
 public class ConsistencyWatchdogClient extends AbstractActivityProducer
     implements Startable {
 
-    private static Logger LOG = Logger
+    private static final Logger LOG = Logger
         .getLogger(ConsistencyWatchdogClient.class);
 
     private static final Random RANDOM = new Random();
@@ -204,7 +203,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer
         try {
             cancelRecovery.set(false);
 
-            final ArrayList<SPath> pathsOfHandledFiles = new ArrayList<SPath>(
+            final List<SPath> pathsOfHandledFiles = new ArrayList<SPath>(
                 pathsWithWrongChecksums);
 
             monitor.beginTask("Consistency recovery",
@@ -220,7 +219,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer
 
             remoteProgress.beginTask(
                 "Consistency recovery for user "
-                    + ModelFormatUtils.getDisplayName(currentSession
+                    + UserFormatUtils.getDisplayName(currentSession
                         .getLocalUser()), filesRemaining.get());
 
             fireActivity(new ChecksumErrorActivity(

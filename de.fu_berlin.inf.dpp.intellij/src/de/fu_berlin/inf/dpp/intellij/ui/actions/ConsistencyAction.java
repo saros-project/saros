@@ -23,7 +23,7 @@
 package de.fu_berlin.inf.dpp.intellij.ui.actions;
 
 import com.intellij.openapi.application.ApplicationManager;
-import de.fu_berlin.inf.dpp.core.concurrent.ConsistencyWatchdogClient;
+import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.intellij.ui.Messages;
 import de.fu_berlin.inf.dpp.intellij.ui.widgets.progress.MonitorProgressBar;
 import de.fu_berlin.inf.dpp.intellij.ui.widgets.progress.ProgressFrame;
