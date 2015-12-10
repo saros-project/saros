@@ -3,27 +3,26 @@ package de.fu_berlin.inf.dpp.ui.renderer;
 import java.util.Collection;
 import java.util.Collections;
 
-import de.fu_berlin.inf.dpp.ui.model.Contact;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smack.packet.Presence;
 
-import com.google.gson.Gson;
-
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
+import de.fu_berlin.inf.dpp.ui.JavaScriptAPI;
 import de.fu_berlin.inf.dpp.ui.model.Account;
+import de.fu_berlin.inf.dpp.ui.model.Contact;
 import de.fu_berlin.inf.dpp.ui.model.State;
 
 /**
  * This class is responsible for transferring information about the state of the
  * application to the browser so they can be displayed. These information are
  * encapsulated in {@link de.fu_berlin.inf.dpp.ui.model.State}.
- *
+ * 
  * For convenience, this class also manages the
  * {@link de.fu_berlin.inf.dpp.ui.model.State} via listeners for the
  * {@link de.fu_berlin.inf.dpp.net.ConnectionState} and the
@@ -47,9 +46,7 @@ public class StateRenderer extends Renderer {
 
     @Override
     public synchronized void render(IJQueryBrowser browser) {
-        Gson gson = new Gson();
-        final String jsonString = gson.toJson(this.state);
-        browser.run("SarosApi.trigger('updateState'," + jsonString + ");");
+        JavaScriptAPI.updateState(browser, this.state);
     }
 
     private final IConnectionListener connectionListener = new IConnectionListener() {
@@ -85,10 +82,12 @@ public class StateRenderer extends Renderer {
             case ERROR:
                 state.setAccount(null);
                 state.setContactList(Collections.<Contact> emptyList());
-                state.setConnectionState(connectionState.NOT_CONNECTED);
+                state.setConnectionState(ConnectionState.NOT_CONNECTED);
                 // TODO better error handling
                 LOG.error("StateListener: error");
                 break;
+            default:
+                LOG.error("Undefined connection state");
             }
 
             render();

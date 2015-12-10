@@ -5,6 +5,8 @@ import org.apache.log4j.Logger;
 import com.google.gson.Gson;
 
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
+import de.fu_berlin.inf.dpp.HTMLUIStrings;
+import de.fu_berlin.inf.dpp.ui.JavaScriptAPI;
 import de.fu_berlin.inf.dpp.ui.core_facades.StateFacade;
 import de.fu_berlin.inf.dpp.ui.model.Account;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
@@ -39,11 +41,8 @@ public class ConnectAccount extends JavascriptFunction {
             });
         } else {
             LOG.error("Connect was called without an account.");
-            // TODO: handle exception, signal that operation have been failed
-            // to the user. Use HTMLUIStrings for all MSG, and
-            // JavaScriptAPI.showMSG() in all Browserfunctions
-            browser
-                .run("alert('Cannot connect because no account was given.');");
+            JavaScriptAPI.showError(browser,
+                HTMLUIStrings.CONNECT_WITHOUT_ACCOUNT);
         }
         return null;
     }

@@ -7,10 +7,10 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
-import com.google.gson.Gson;
-
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
+import de.fu_berlin.inf.dpp.HTMLUIStrings;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRoot;
+import de.fu_berlin.inf.dpp.ui.JavaScriptAPI;
 import de.fu_berlin.inf.dpp.ui.manager.ProjectListManager;
 import de.fu_berlin.inf.dpp.ui.model.ProjectTree;
 
@@ -30,7 +30,6 @@ public class ProjectListRenderer extends Renderer {
         .getLogger(ProjectListRenderer.class);
 
     private ProjectListManager projectListManager;
-    private static final String ERROR_MSG = "An error occurred while trying to create a list of all files to share. There might be some files missing from your worksapce.";
 
     /**
      * @param projectListManager
@@ -43,19 +42,22 @@ public class ProjectListRenderer extends Renderer {
     @Override
     public synchronized void render(IJQueryBrowser browser) {
         // The project model creation shouldn't be done for every browser, only
-        // the `SarosApi.trigger('updateProjectTrees', json)` needs to be called for each
-        // page this renderer is associated with.
-        // TODO: Change the Renderer interface to avoid multiple model creations.
+        // the `SarosApi.trigger('updateProjectTrees', json)` needs to be called
+        // for each page this renderer is associated with.
+        // TODO: Change the Renderer interface to avoid multiple model
+        // creations.
 
         try {
             projectListManager.createAndMapProjectModels();
         } catch (IOException e) {
             LOG.error("Failed to load workspace resources: ", e);
-            browser.run("SarosApi.trigger(‘showError’," + ERROR_MSG + ")");
+            JavaScriptAPI.showError(browser,
+                HTMLUIStrings.PROJECT_LIST_IOEXCEPTION);
         }
 
-        Gson jsModel = new Gson();
-        String json = jsModel.toJson(projectListManager.getProjectModels());
-        browser.run("SarosApi.trigger('updateProjectTrees', " + json + ")");
+        // FIXME: Workspaces with a big number of files cause massive
+        // performance problems.See BUG: https://sourceforge.net/p/dpp/bugs/861/
+        JavaScriptAPI.updateProjects(browser,
+            projectListManager.getProjectModels());
     }
 }

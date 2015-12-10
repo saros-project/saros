@@ -4,7 +4,9 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
+import de.fu_berlin.inf.dpp.HTMLUIStrings;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.ui.JavaScriptAPI;
 import de.fu_berlin.inf.dpp.ui.core_facades.StateFacade;
 
 /**
@@ -27,18 +29,21 @@ public class RenameContact extends JavascriptFunction {
 
     @Override
     public Object function(final Object[] arguments) {
-
-        // TODO: Check arguments
+        if (arguments.length != 2 || arguments[0] == null
+            || arguments[1] == null) {
+            LOG.error("Called with invalid arguments");
+            JavaScriptAPI.showError(browser,
+                HTMLUIStrings.RENAME_CONTACT_FAILED);
+            return null;
+        }
         try {
             stateFacade.renameContact(new JID((String) arguments[0]),
                 (String) arguments[1]);
         } catch (XMPPException e) {
             LOG.error("Error while renaming contact ", e);
-            // TODO: handle exception, signal that operation have been failed
-            // to the user. Use HTMLUIStrings for all MSG, and
-            // JavaScriptAPI.showMSG() in all Browserfunctions
+            JavaScriptAPI.showError(browser,
+                HTMLUIStrings.RENAME_CONTACT_FAILED);
         }
-
         return null;
     }
 }

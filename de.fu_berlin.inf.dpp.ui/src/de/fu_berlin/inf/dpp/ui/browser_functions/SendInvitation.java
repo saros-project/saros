@@ -5,12 +5,13 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
+import de.fu_berlin.inf.dpp.HTMLUIStrings;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.ui.JavaScriptAPI;
 import de.fu_berlin.inf.dpp.ui.manager.ProjectListManager;
 import de.fu_berlin.inf.dpp.ui.model.Contact;
 import de.fu_berlin.inf.dpp.ui.model.ProjectTree;
@@ -34,9 +35,7 @@ public class SendInvitation extends JavascriptFunction {
     private ICollaborationUtils collaborationUtils;
     private List<JID> usersToInvite;
     private List<IResource> resourcesToShare;
-    private Gson gson = new Gson();
 
-    private static final String ERROR_LOG_INVALID_CALL = "Error while starting session invitation: Invalid arguments.";
     private static final String JS_NAME = "sendInvitation";
 
     public SendInvitation(ProjectListManager projectListManager,
@@ -50,7 +49,9 @@ public class SendInvitation extends JavascriptFunction {
     public Object function(Object[] arguments) {
         if (arguments.length != 2 || arguments[0] == null
             || arguments[1] == null) {
-            LOG.error(ERROR_LOG_INVALID_CALL);
+            LOG.error("Error while starting session invitation: Invalid arguments.");
+            JavaScriptAPI.showError(browser,
+                HTMLUIStrings.START_SESSION_CANCELED);
             return null;
         }
 
@@ -64,6 +65,8 @@ public class SendInvitation extends JavascriptFunction {
         } catch (JsonSyntaxException e) {
             LOG.error("Error while converting JSON to Java. Malformed json: ",
                 e);
+            JavaScriptAPI.showError(browser,
+                HTMLUIStrings.START_SESSION_CANCELED);
             return null;
         }
         ThreadUtils.runSafeAsync(LOG, new Runnable() {
@@ -86,7 +89,7 @@ public class SendInvitation extends JavascriptFunction {
      */
     private ProjectTree[] extractProjects(String projectTreesJson)
         throws JsonSyntaxException {
-        return gson.fromJson(projectTreesJson, ProjectTree[].class);
+        return JavaScriptAPI.fromJson(projectTreesJson, ProjectTree[].class);
     }
 
     /**
@@ -99,7 +102,7 @@ public class SendInvitation extends JavascriptFunction {
      */
     private Contact[] extractContacts(String contactListJson)
         throws JsonSyntaxException {
-        return gson.fromJson(contactListJson, Contact[].class);
+        return JavaScriptAPI.fromJson(contactListJson, Contact[].class);
     }
 
     private List<JID> createUserInviteList(Contact[] contactList) {

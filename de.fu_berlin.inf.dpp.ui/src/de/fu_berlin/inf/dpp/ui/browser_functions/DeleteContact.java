@@ -4,7 +4,9 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
+import de.fu_berlin.inf.dpp.HTMLUIStrings;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.ui.JavaScriptAPI;
 import de.fu_berlin.inf.dpp.ui.core_facades.StateFacade;
 
 /**
@@ -30,10 +32,8 @@ public class DeleteContact extends JavascriptFunction {
             stateFacade.deleteContact(new JID((String) arguments[0]));
         } catch (XMPPException e) {
             LOG.error("Error while deleting contact ", e);
-            // TODO: handle exception, signal that operation have been failed
-            // to the user. Use HTMLUIStrings for all MSG, and
-            // JavaScriptAPI.showMSG() in all Browserfunctions
-            return null;
+            JavaScriptAPI.showError(browser,
+                HTMLUIStrings.DELETE_CONTACT_FAILED);
         }
         return null;
     }

@@ -4,7 +4,9 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
+import de.fu_berlin.inf.dpp.HTMLUIStrings;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.ui.JavaScriptAPI;
 import de.fu_berlin.inf.dpp.ui.core_facades.StateFacade;
 
 /**
@@ -15,7 +17,7 @@ import de.fu_berlin.inf.dpp.ui.core_facades.StateFacade;
  */
 public class AddContact extends JavascriptFunction {
     private static final Logger LOG = Logger.getLogger(AddContact.class);
-    public final static String JS_NAME = "addContact";
+    public static final String JS_NAME = "addContact";
 
     private final StateFacade stateFacade;
 
@@ -31,9 +33,7 @@ public class AddContact extends JavascriptFunction {
                 (String) arguments[1]);
         } catch (XMPPException e) {
             LOG.error("Error while adding contact ", e);
-            // TODO: handle exception, signal that operation have been failed
-            // to the user. Use HTMLUIStrings for all MSG, and
-            // JavaScriptAPI.showMSG() in all BrowserFunctions
+            JavaScriptAPI.showError(browser, HTMLUIStrings.ADD_CONTACT_FAILED);
         }
         return null;
     }
