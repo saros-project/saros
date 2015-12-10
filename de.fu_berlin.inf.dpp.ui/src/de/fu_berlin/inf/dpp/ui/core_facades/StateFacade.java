@@ -5,6 +5,7 @@ import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPException;
 
+import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.account.XMPPAccount;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
@@ -24,6 +25,14 @@ public class StateFacade {
 
     private final XMPPAccountStore accountStore;
 
+    /**
+     * Created by PicoContainer
+     * 
+     * @param connectionHandler
+     * @param connectionService
+     * @param accountStore
+     * @see HTMLUIContextFactory
+     */
     public StateFacade(ConnectionHandler connectionHandler,
         XMPPConnectionService connectionService, XMPPAccountStore accountStore) {
         this.connectionHandler = connectionHandler;
@@ -60,19 +69,19 @@ public class StateFacade {
     public void deleteContact(JID jid) throws XMPPException {
         Connection connection = connectionService.getConnection();
 
-        if(connection == null){
+        if (connection == null) {
             return;
         }
 
         Roster roster = connection.getRoster();
 
-        if(roster == null) {
+        if (roster == null) {
             return;
         }
 
         RosterEntry entry = roster.getEntry(jid.getBase());
 
-        if(entry == null) {
+        if (entry == null) {
             return;
         }
 
@@ -81,27 +90,29 @@ public class StateFacade {
 
     /**
      * Renames a contact (given by JID)
-     *
-     * @param jid the JID of the contact to be renamed
-     * @param name the new name of the contact
+     * 
+     * @param jid
+     *            the JID of the contact to be renamed
+     * @param name
+     *            the new name of the contact
      * @throws XMPPException
      */
     public void renameContact(JID jid, String name) throws XMPPException {
         Connection connection = connectionService.getConnection();
 
-        if(connection == null){
+        if (connection == null) {
             return;
         }
 
         Roster roster = connection.getRoster();
 
-        if(roster == null) {
+        if (roster == null) {
             return;
         }
 
         RosterEntry entry = roster.getEntry(jid.getBase());
 
-        if(entry == null) {
+        if (entry == null) {
             return;
         }
 
@@ -110,20 +121,22 @@ public class StateFacade {
 
     /**
      * Adds a contact to the contact list
-     *
-     * @param jid the JID of the contact to be added
-     * @param nickname the nickname of the contact
+     * 
+     * @param jid
+     *            the JID of the contact to be added
+     * @param nickname
+     *            the nickname of the contact
      */
     public void addContact(JID jid, String nickname) throws XMPPException {
         Connection connection = connectionService.getConnection();
 
-        if(connection == null){
+        if (connection == null) {
             return;
         }
 
         Roster roster = connection.getRoster();
 
-        if(roster == null) {
+        if (roster == null) {
             return;
         }
 

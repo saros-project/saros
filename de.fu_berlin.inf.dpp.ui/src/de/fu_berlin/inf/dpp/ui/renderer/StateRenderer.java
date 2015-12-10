@@ -10,6 +10,7 @@ import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smack.packet.Presence;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
+import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
@@ -39,6 +40,12 @@ public class StateRenderer extends Renderer {
 
     private State state = State.INIT_STATE;
 
+    /**
+     * Created by PicoContainer
+     * 
+     * @param connectionService
+     * @see HTMLUIContextFactory
+     */
     public StateRenderer(XMPPConnectionService connectionService) {
         this.connectionService = connectionService;
         this.connectionService.addListener(connectionListener);

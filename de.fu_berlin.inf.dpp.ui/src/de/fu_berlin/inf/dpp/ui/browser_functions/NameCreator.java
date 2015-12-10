@@ -7,9 +7,13 @@ package de.fu_berlin.inf.dpp.ui.browser_functions;
  */
 public class NameCreator {
 
+    private NameCreator() {
+        // Hide implicit constructor
+    }
+
     // Current convention is that every BF has an prefix that signals that this
-    // will function will invoke Javacode.
-    public final static String PREFIX = "__java_";
+    // function will invoke Javacode.
+    private final static String PREFIX = "__java_";
 
     /**
      * This will return the name of an BF that follows the naming convention

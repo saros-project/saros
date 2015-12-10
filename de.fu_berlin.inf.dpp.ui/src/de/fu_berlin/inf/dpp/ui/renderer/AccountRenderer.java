@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
+import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.account.XMPPAccount;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.ui.JavaScriptAPI;
@@ -20,6 +21,12 @@ public class AccountRenderer extends Renderer {
 
     private final XMPPAccountStore accountStore;
 
+    /**
+     * Created by PicoContainer
+     * 
+     * @param accountStore
+     * @see HTMLUIContextFactory
+     */
     public AccountRenderer(XMPPAccountStore accountStore) {
         this.accountStore = accountStore;
     }

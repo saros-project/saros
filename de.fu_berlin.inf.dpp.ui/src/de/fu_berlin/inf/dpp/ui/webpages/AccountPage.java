@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.ui.webpages;
 
 import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.HTMLUIStrings;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.ui.browser_functions.CloseAccountWizard;
@@ -21,6 +22,11 @@ public class AccountPage extends AbstractBrowserPage {
     @Inject
     private CloseAccountWizard closeAccountWizard;
 
+    /**
+     * Created by PicoContainer
+     * 
+     * @see HTMLUIContextFactory
+     */
     public AccountPage() {
         super(HTML_DOC_NAME, HTMLUIStrings.ADD_ACCOUNT_PAGE_TITLE);
         SarosPluginContext.initComponent(this);

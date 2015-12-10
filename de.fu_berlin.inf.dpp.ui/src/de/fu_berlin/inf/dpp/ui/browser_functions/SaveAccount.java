@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.ui.browser_functions;
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
+import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.HTMLUIStrings;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.ui.JavaScriptAPI;
@@ -24,6 +25,12 @@ public class SaveAccount extends JavascriptFunction {
     private AccountStoreFacade accountStoreFacade;
     public static final String JS_NAME = "saveAccount";
 
+    /**
+     * Created by PicoContainer
+     * 
+     * @param accountStoreFacade
+     * @see HTMLUIContextFactory
+     */
     public SaveAccount(AccountStoreFacade accountStoreFacade) {
         super(NameCreator.getConventionName(JS_NAME));
         this.accountStoreFacade = accountStoreFacade;

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
@@ -29,8 +30,11 @@ public class ProjectListManager {
     private Map<IPath, IResource> pathToResource;
 
     /**
+     * Created by PicoContainer
+     * 
      * @param workspaceRoot
      *            the workspace root of the current workspace
+     * @see HTMLUIContextFactory
      */
     public ProjectListManager(IWorkspaceRoot workspaceRoot) {
         this.workspaceRoot = workspaceRoot;

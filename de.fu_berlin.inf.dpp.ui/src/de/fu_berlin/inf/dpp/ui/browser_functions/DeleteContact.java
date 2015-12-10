@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
+import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.HTMLUIStrings;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.ui.JavaScriptAPI;
@@ -21,6 +22,12 @@ public class DeleteContact extends JavascriptFunction {
     private final StateFacade stateFacade;
     public static final String JS_NAME = "deleteContact";
 
+    /**
+     * Created by PicoContainer
+     * 
+     * @param stateFacade
+     * @see HTMLUIContextFactory
+     */
     public DeleteContact(StateFacade stateFacade) {
         super(NameCreator.getConventionName(JS_NAME));
         this.stateFacade = stateFacade;

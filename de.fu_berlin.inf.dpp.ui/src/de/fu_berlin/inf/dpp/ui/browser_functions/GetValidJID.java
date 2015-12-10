@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.ui.browser_functions;
 import com.google.gson.Gson;
 
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
+import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.HTMLUIStrings;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.ui.model.ValidationResult;
@@ -17,6 +18,11 @@ import de.fu_berlin.inf.dpp.ui.model.ValidationResult;
 public class GetValidJID extends JavascriptFunction {
     public static final String JS_NAME = "validateJid";
 
+    /**
+     * Created by PicoContainer
+     * 
+     * @see HTMLUIContextFactory
+     */
     public GetValidJID() {
         super(NameCreator.getConventionName(JS_NAME));
     }

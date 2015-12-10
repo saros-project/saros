@@ -1,16 +1,18 @@
 package de.fu_berlin.inf.dpp.ui.ide_embedding;
 
-import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
-import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
-import de.fu_berlin.inf.ag_se.browser.swt.SWTJQueryBrowser;
-import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
-import de.fu_berlin.inf.dpp.ui.webpages.IBrowserPage;
 import org.eclipse.swt.widgets.Composite;
 import org.jivesoftware.smack.util.StringUtils;
 
+import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
+import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
+import de.fu_berlin.inf.ag_se.browser.swt.SWTJQueryBrowser;
+import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
+import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
+import de.fu_berlin.inf.dpp.ui.webpages.IBrowserPage;
+
 /**
- * This class represents the IDE-independent part of the browser creation.
- * It resorts to IDE-specific resource location however by using the correct
+ * This class represents the IDE-independent part of the browser creation. It
+ * resorts to IDE-specific resource location however by using the correct
  * instance of {@link IWebResourceLocator} which is injected by PicoContainer.
  */
 public class BrowserCreator {
@@ -19,6 +21,13 @@ public class BrowserCreator {
 
     private final IWebResourceLocator resourceLocator;
 
+    /**
+     * Created by PicoContainer
+     * 
+     * @param browserManager
+     * @param resourceLocator
+     * @see HTMLUIContextFactory
+     */
     public BrowserCreator(BrowserManager browserManager,
         IWebResourceLocator resourceLocator) {
         this.browserManager = browserManager;
@@ -27,12 +36,15 @@ public class BrowserCreator {
 
     /**
      * Creates a new browser instance.
-     *
-     * @param composite the composite enclosing the browser.
-     * @param style     the style of the browser instance.
-     * @param page      the page which should be displayed.
+     * 
+     * @param composite
+     *            the composite enclosing the browser.
+     * @param style
+     *            the style of the browser instance.
+     * @param page
+     *            the page which should be displayed.
      * @return a browser instance which loads and renders the given
-     * {@link IBrowserPage BrowserPage}
+     *         {@link IBrowserPage BrowserPage}
      */
     public IJQueryBrowser createBrowser(Composite composite, int style,
         final IBrowserPage page) {
@@ -40,15 +52,15 @@ public class BrowserCreator {
         final String resourceName = page.getWebpageResource();
         assert resourceName != null;
 
-        final IJQueryBrowser browser = SWTJQueryBrowser
-            .createSWTBrowser(composite, style);
+        final IJQueryBrowser browser = SWTJQueryBrowser.createSWTBrowser(
+            composite, style);
 
         String resourceLocation = resourceLocator
             .getResourceLocation(resourceName);
 
         if (resourceLocation == null) {
-            browser.setText("<html><body><pre>" + "Resource <b>" + StringUtils
-                .escapeForXML(resourceName)
+            browser.setText("<html><body><pre>" + "Resource <b>"
+                + StringUtils.escapeForXML(resourceName)
                 + "</b> could not be found.</pre></body></html>");
             return browser;
         }

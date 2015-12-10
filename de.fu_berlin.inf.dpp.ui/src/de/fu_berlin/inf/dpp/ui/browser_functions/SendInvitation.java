@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import com.google.gson.JsonSyntaxException;
 
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
+import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.HTMLUIStrings;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -38,6 +39,13 @@ public class SendInvitation extends JavascriptFunction {
 
     private static final String JS_NAME = "sendInvitation";
 
+    /**
+     * Created by PicoContainer
+     * 
+     * @param projectListManager
+     * @param collaborationUtils
+     * @see HTMLUIContextFactory
+     */
     public SendInvitation(ProjectListManager projectListManager,
         ICollaborationUtils collaborationUtils) {
         super(NameCreator.getConventionName(JS_NAME));

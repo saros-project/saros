@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.ui.webpages;
 
 import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.HTMLUIStrings;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.ui.browser_functions.CloseSessionInvitationWizard;
@@ -31,6 +32,11 @@ public class SessionWizardPage extends AbstractBrowserPage {
     @Inject
     private GetValidJID getValidJID;
 
+    /**
+     * Created by PicoContainer
+     * 
+     * @see HTMLUIContextFactory
+     */
     public SessionWizardPage() {
         super(HTML_DOC_NAME, HTMLUIStrings.START_SESSION_WIZARD_TITLE);
         SarosPluginContext.initComponent(this);

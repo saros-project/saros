@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import com.google.gson.Gson;
 
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
+import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.HTMLUIStrings;
 import de.fu_berlin.inf.dpp.ui.JavaScriptAPI;
 import de.fu_berlin.inf.dpp.ui.core_facades.StateFacade;
@@ -22,6 +23,12 @@ public class ConnectAccount extends JavascriptFunction {
     private final StateFacade stateFacade;
     public static final String JS_NAME = "connect";
 
+    /**
+     * Created by PicoContainer
+     * 
+     * @param stateFacade
+     * @see HTMLUIContextFactory
+     */
     public ConnectAccount(StateFacade stateFacade) {
         super(NameCreator.getConventionName(JS_NAME));
         this.stateFacade = stateFacade;

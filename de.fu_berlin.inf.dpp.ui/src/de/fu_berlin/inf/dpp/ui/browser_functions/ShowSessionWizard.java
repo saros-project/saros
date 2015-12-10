@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.ui.browser_functions;
 
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
+import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
 import de.fu_berlin.inf.dpp.ui.webpages.SessionWizardPage;
 
@@ -17,6 +18,13 @@ public class ShowSessionWizard extends JavascriptFunction {
 
     // TODO: Rename to openXYZ for more convenient naming
 
+    /**
+     * Created by PicoContainer
+     * 
+     * @param dialogManager
+     * @param sessionWizardPage
+     * @see HTMLUIContextFactory
+     */
     public ShowSessionWizard(DialogManager dialogManager,
         SessionWizardPage sessionWizardPage) {
         super(NameCreator.getConventionName(JS_NAME));

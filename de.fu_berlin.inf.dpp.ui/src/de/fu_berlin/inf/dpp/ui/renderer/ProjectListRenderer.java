@@ -8,6 +8,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
+import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.HTMLUIStrings;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRoot;
 import de.fu_berlin.inf.dpp.ui.JavaScriptAPI;
@@ -32,8 +33,11 @@ public class ProjectListRenderer extends Renderer {
     private ProjectListManager projectListManager;
 
     /**
+     * Created by PicoContainer
+     * 
      * @param projectListManager
      *            the projectListManager
+     * @see HTMLUIContextFactory
      */
     public ProjectListRenderer(ProjectListManager projectListManager) {
         this.projectListManager = projectListManager;

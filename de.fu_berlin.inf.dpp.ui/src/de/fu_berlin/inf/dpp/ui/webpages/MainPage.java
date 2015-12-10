@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.ui.webpages;
 
 import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.HTMLUIStrings;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.ui.browser_functions.AddContact;
@@ -46,6 +47,11 @@ public class MainPage extends AbstractBrowserPage {
     @Inject
     private ShowAccountPage showAccountPage;
 
+    /**
+     * Created by PicoContainer
+     * 
+     * @see HTMLUIContextFactory
+     */
     public MainPage() {
         super(HTML_DOC_NAME, HTMLUIStrings.MAIN_PAGE_TITLE);
         SarosPluginContext.initComponent(this);
