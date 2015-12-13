@@ -103,7 +103,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
 
         for (IResource resource : members) {
             SPath oldChildSPath = new IntelliJFileImpl(
-                project, new File(
+                (IntelliJProjectImpl) oldSPath.getProject(), new File(
                 oldSPath.getFullPath().toOSString() + File.separator + resource
                     .getName()
             )
@@ -178,32 +178,31 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         IntelliJProjectImpl project = intelliJWorkspaceImpl.getProjectForPath(virtualFile.getPath());
         IFile file = new IntelliJFileImpl(project, new File(virtualFile.getPath()));
 
-        if (!resourceManager.getSession().isShared(file) && newFiles
+        if (resourceManager.getSession().isShared(file) && newFiles
             .contains(virtualFile)) {
-            return;
-        }
 
-        newFiles.remove(virtualFile);
+            newFiles.remove(virtualFile);
 
-        SPath spath = new SPath(project, file.getProjectRelativePath());
+            SPath spath = new SPath(project, file.getProjectRelativePath());
 
-        //Files created from templates have initial content and are opened in
-        // an editor, but do not have a DocumentListener. Their initial content
-        // is transferred here, because the DocumentListener is added after
-        // it was inserted
-        if (editorManager.isOpenedInEditor(spath)) {
-            String initialContent = null;
-            try {
-                byte[] content = new byte[0];
-                content = virtualFile.contentsToByteArray();
-                initialContent = new String(content, getEncoding(file));
-            } catch (IOException e) {
-                LOG.error("Could not access newly created file: " + file,
-                    e);
-            }
+            //Files created from templates have initial content and are opened in
+            // an editor, but do not have a DocumentListener. Their initial content
+            // is transferred here, because the DocumentListener is added after
+            // it was inserted
+            if (editorManager.isOpenedInEditor(spath)) {
+                String initialContent = null;
+                try {
+                    byte[] content = new byte[0];
+                    content = virtualFile.contentsToByteArray();
+                    initialContent = new String(content, getEncoding(file));
+                } catch (IOException e) {
+                    LOG.error("Could not access newly created file: " + file,
+                        e);
+                }
 
-            if (initialContent != null && !initialContent.isEmpty()) {
-                editorManager.sendTemplateContent(spath, initialContent);
+                if (initialContent != null && !initialContent.isEmpty()) {
+                    editorManager.sendTemplateContent(spath, initialContent);
+                }
             }
         }
     }
@@ -221,10 +220,10 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         }
 
         File file = convertVirtualFileEventToFile(virtualFileEvent);
-        IPath path = IntelliJPathImpl.fromString(file.getPath());
+        IPath path = new IntelliJPathImpl(file);
         IntelliJProjectImpl project = intelliJWorkspaceImpl.getProjectForPath(file.getPath());
 
-        if (!isValidProject(project)) {
+        if (project == null || !project.exists()) {
             return;
         }
 
@@ -234,16 +233,16 @@ public class FileSystemChangeListener extends AbstractStoppableListener
             return;
         }
 
-        if (incomingFilesToFilterFor.remove(file)) {
-            project.addFile(file);
+        if (incomingFilesToFilterFor.contains(file)) {
+            incomingFilesToFilterFor.remove(file);
+            ((IntelliJProjectImpl) project).addFile(file);
             return;
         }
 
-        if (path.equals(project.getFullPath())) {
-            if (!isCompletelyShared(project)) {
+        if (path.equals(project.getFullPath()))
+            if (!resourceManager.getSession().isCompletelyShared(project)) {
                 return;
             }
-        }
 
         path = makeAbsolutePathProjectRelative(path, project);
 
@@ -266,7 +265,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
                 spath);
         }
 
-         project.addFile(file);
+        ((IntelliJProjectImpl) project).addFile(file);
 
         resourceManager.internalFireActivity(activity);
     }
@@ -278,14 +277,19 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         }
 
         File file = convertVirtualFileEventToFile(virtualFileEvent);
-        if (incomingFilesToFilterFor.remove(file)) {
+        if (incomingFilesToFilterFor.contains(file)) {
+            incomingFilesToFilterFor.remove(file);
             return;
         }
 
-        IPath path = IntelliJPathImpl.fromString(file.getPath());
+        IPath path = new IntelliJPathImpl(file);
         IntelliJProjectImpl project = intelliJWorkspaceImpl.getProjectForPath(file.getPath());
 
-        if (!isValidProject(project) || !isCompletelyShared(project)) {
+        if (project == null || !project.exists()) {
+            return;
+        }
+
+        if (!resourceManager.getSession().isCompletelyShared(project)) {
             return;
         }
 
@@ -303,7 +307,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
                 .removed(user, spath, FileActivity.Purpose.ACTIVITY);
         }
 
-        project.removeFile(file);
+        ((IntelliJProjectImpl) project).removeFile(file);
         editorManager.removeAllEditorsForPath(spath);
 
         resourceManager.internalFireActivity(activity);
@@ -316,14 +320,19 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         }
 
         File newFile = convertVirtualFileEventToFile(virtualFileMoveEvent);
-        if (incomingFilesToFilterFor.remove(newFile)) {
+        if (incomingFilesToFilterFor.contains(newFile)) {
+            incomingFilesToFilterFor.remove(newFile);
             return;
         }
 
-        IPath path = IntelliJPathImpl.fromString(newFile.getPath());
+        IPath path = new IntelliJPathImpl(newFile);
         IntelliJProjectImpl project = intelliJWorkspaceImpl.getProjectForPath(newFile.getPath());
 
-        if (!isValidProject(project) || !isCompletelyShared(project)) {
+        if (project == null || !project.exists()) {
+            return;
+        }
+
+        if (!resourceManager.getSession().isCompletelyShared(project)) {
             return;
         }
 
@@ -331,9 +340,10 @@ public class FileSystemChangeListener extends AbstractStoppableListener
 
         SPath newSPath = new SPath(project, path);
 
-        IPath oldParent = IntelliJPathImpl.fromString(
-            virtualFileMoveEvent.getOldParent().getPath());
-        IPath oldPath = oldParent.append(virtualFileMoveEvent.getFileName());
+        IPath oldPath = new IntelliJPathImpl(new File(
+            virtualFileMoveEvent.getOldParent() + File.separator
+                + virtualFileMoveEvent.getFileName()
+        ));
         IProject oldProject = intelliJWorkspaceImpl
             .getProjectForPath(oldPath.toPortableString());
 
@@ -369,21 +379,22 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         );
         File newFile = convertVirtualFileEventToFile(filePropertyEvent);
 
-        if (incomingFilesToFilterFor.remove(newFile)) {
+        if (incomingFilesToFilterFor.contains(newFile)) {
+            incomingFilesToFilterFor.remove(newFile);
             return;
         }
 
-        IPath oldPath = IntelliJPathImpl.fromString(oldFile.getPath());
+        IPath oldPath = new IntelliJPathImpl(oldFile);
         IntelliJProjectImpl project = intelliJWorkspaceImpl.getProjectForPath(newFile.getPath());
 
-        if (!isValidProject(project)) {
+        if (project == null || !project.exists()) {
             return;
         }
 
         oldPath = makeAbsolutePathProjectRelative(oldPath, project);
         SPath oldSPath = new SPath(project, oldPath);
 
-        IPath newPath = IntelliJPathImpl.fromString(newFile.getPath());
+        IPath newPath = new IntelliJPathImpl(newFile);
         newPath = makeAbsolutePathProjectRelative(newPath, project);
 
         SPath newSPath = new SPath(project, newPath);
@@ -404,14 +415,19 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         VirtualFile virtualFile = virtualFileCopyEvent.getFile();
         File newFile = new File(virtualFile.getPath());
 
-        if (incomingFilesToFilterFor.remove(newFile)) {
+        if (incomingFilesToFilterFor.contains(newFile)) {
+            incomingFilesToFilterFor.remove(newFile);
             return;
         }
 
-        IPath path = IntelliJPathImpl.fromString(newFile.getPath());
+        IPath path = new IntelliJPathImpl(newFile);
         IntelliJProjectImpl project = intelliJWorkspaceImpl.getProjectForPath(newFile.getPath());
 
-        if (!isValidProject(project) || !isCompletelyShared(project)) {
+        if (project == null || !project.exists()) {
+            return;
+        }
+
+        if (!resourceManager.getSession().isCompletelyShared(project)) {
             return;
         }
 
@@ -427,7 +443,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
             bytes = virtualFileCopyEvent.getOriginalFile()
                 .contentsToByteArray();
         } catch (IOException e) {
-            LOG.error("could not read content of original file "
+            IntelliJWorkspaceImpl.LOG.error("could not read content of original file "
                 + virtualFileCopyEvent.getOriginalFile(), e);
             return;
         }
@@ -436,11 +452,10 @@ public class FileSystemChangeListener extends AbstractStoppableListener
             .created(user, spath, bytes, virtualFile.getCharset().name(),
                 FileActivity.Purpose.ACTIVITY);
 
-        project.addFile(newFile);
+        ((IntelliJProjectImpl) project).addFile(newFile);
 
         resourceManager.internalFireActivity(activity);
     }
-
 
     @Override
     public void beforePropertyChange(
@@ -488,7 +503,8 @@ public class FileSystemChangeListener extends AbstractStoppableListener
     private IPath makeAbsolutePathProjectRelative(IPath path,
         IProject project) {
         int projSegmentCount = project.getFullPath().segments().length;
-        return path.removeFirstSegments(projSegmentCount);
+        path = path.removeFirstSegments(projSegmentCount);
+        return path;
     }
 
     private File convertVirtualFileEventToFile(
@@ -509,13 +525,5 @@ public class FileSystemChangeListener extends AbstractStoppableListener
                 .name();
 
         return charset;
-    }
-
-    private boolean isCompletelyShared(IntelliJProjectImpl project) {
-        return resourceManager.getSession().isCompletelyShared(project);
-    }
-
-    private boolean isValidProject(IntelliJProjectImpl project) {
-        return project == null || !project.exists();
     }
 }

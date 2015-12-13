@@ -26,12 +26,14 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
+import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJFileImpl;
+import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJPathImpl;
+import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJProjectImpl;
 
 import org.easymock.EasyMock;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Rule;
-import de.fu_berlin.inf.dpp.filesystem.IPath;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
@@ -120,26 +122,26 @@ public class IntelliJFileImplTest {
     public void testMove() throws Exception {
         IFile file = createTestFile();
         String oldPath = file.getFullPath().toPortableString();
-        IPath destination = IntelliJPathImpl.fromString(folder.getRoot().getPath())
-            .append(TEST_PROJECT_NAME)
-            .append("newFileName.txt");
+        String newFilePath = folder.getRoot().getPath() + IntelliJPathImpl.FILE_SEPARATOR
+            + TEST_PROJECT_NAME + IntelliJPathImpl.FILE_SEPARATOR + "newFileName.txt";
+        IntelliJPathImpl destination = new IntelliJPathImpl(newFilePath);
 
         file.move(destination, false);
 
         assertTrue(!new File(oldPath).exists());
         assertTrue(file.exists());
-        assertEquals(file.getFullPath(), destination);
-        assertTrue(new File(destination.toPortableString()).exists());
+        assertEquals(file.getFullPath().toPortableString(), newFilePath);
+        assertTrue(new File(newFilePath).exists());
     }
 
     @Test
     public void testGetFullPath() throws Exception {
         IFile file = createTestFile();
 
-        assertEquals(IntelliJPathImpl.fromString(folder.getRoot().getPath())
-                .append(TEST_PROJECT_NAME)
-                .append(TESTFILE_NAME),
-            file.getFullPath());
+        assertEquals(folder.getRoot().getPath() + IntelliJPathImpl.FILE_SEPARATOR
+                + TEST_PROJECT_NAME + IntelliJPathImpl.FILE_SEPARATOR + TESTFILE_NAME,
+            file.getFullPath().toPortableString()
+        );
     }
 
     @Test
