@@ -1,17 +1,11 @@
 package de.fu_berlin.inf.dpp.concurrent.watchdog;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.swt.graphics.Image;
 import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
@@ -20,7 +14,6 @@ import de.fu_berlin.inf.dpp.activities.RecoveryFileActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
@@ -28,8 +21,9 @@ import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
+import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.util.FileUtils;
+import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
  * This component is responsible for handling Consistency Errors on the host. It
@@ -46,7 +40,7 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
 
     private final ISarosSession session;
 
-    private final IEditorAPI editorAPI;
+    private final UISynchronizer synchronizer;
 
     private final IActivityConsumer consumer = new AbstractActivityConsumer() {
         @Override
@@ -69,89 +63,45 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
     }
 
     public ConsistencyWatchdogHandler(final ISarosSession session,
-        final EditorManager editorManager, final IEditorAPI editorAPI) {
+        final EditorManager editorManager, final UISynchronizer synchronizer) {
         this.session = session;
         this.editorManager = editorManager;
-        this.editorAPI = editorAPI;
+        this.synchronizer = synchronizer;
     }
 
-    /**
-     * This method creates and opens an error message which informs the user
-     * that inconsistencies are handled and he should wait until the
-     * inconsistencies are resolved. The Message are saved in a HashMap with a
-     * pair of JID of the user and a string representation of the paths of the
-     * handled files as key. You can use <code>closeChecksumErrorMessage</code>
-     * with the same arguments to close this message again.
-     * 
-     */
     private void triggerRecovery(final ChecksumErrorActivity checksumError) {
 
         LOG.debug("received Checksum Error: " + checksumError);
 
-        final ProgressMonitorDialog dialog = new ProgressMonitorDialog(
-            SWTUtils.getShell()) {
-            @Override
-            protected Image getImage() {
-                return getWarningImage();
-            }
+        /*
+         * fork a thread as this is normally called from the UI thread and so we
+         * would not be able to receive lock confirmations and so the blocking
+         * the session would cause a timeout in the StopManager
+         */
 
-            // TODO add some text
-            // "Inconsistent file state has detected. File "
-            // + paths
-            // + " from user "
-            // + from.getBase()
-            // +
-            // " has to be synchronized with project host. Please wait until the inconsistencies are resolved."
-        };
-
-        // execute async so outstanding activities could be dispatched
-        SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
+        /*
+         * TODO ensure that only one recovery is run at the same time ? i.e use
+         * a single ThreadWorker ?
+         */
+        ThreadUtils.runSafeAsync(LOG, new Runnable() {
             @Override
             public void run() {
-                try {
-                    /*
-                     * run in a modal context otherwise we would block again the
-                     * dispatching of activities
-                     */
-                    dialog.run(true, true, new IRunnableWithProgress() {
-                        @Override
-                        public void run(IProgressMonitor monitor) {
-                            runRecovery(checksumError, monitor);
-                        }
-                    });
-                } catch (InvocationTargetException e) {
-                    try {
-                        throw e.getCause();
-                    } catch (CancellationException c) {
-                        LOG.info("Recovery was canceled by local user");
-                    } catch (Throwable t) {
-                        LOG.error("Internal Error: ", t);
-                    }
-                } catch (InterruptedException e) {
-                    LOG.error("Code not designed to be interruptible", e);
-                }
+                runRecovery(checksumError);
             }
         });
     }
 
-    private void runRecovery(final ChecksumErrorActivity checksumError,
-        final IProgressMonitor monitor) throws CancellationException {
+    private void runRecovery(final ChecksumErrorActivity checksumError)
+        throws CancellationException {
 
         List<StartHandle> startHandles = null;
 
-        final SubMonitor progress = SubMonitor.convert(monitor,
-            "Performing recovery...", 1000);
-
         try {
-
-            progress.subTask("locking session");
 
             startHandles = session.getStopManager().stop(session.getUsers(),
                 "Consistency recovery");
 
-            progress.worked(100);
-
-            recoverFiles(checksumError, progress.newChild(800));
+            recoverFiles(checksumError);
 
             /*
              * We have to start the StartHandle of the inconsistent user first
@@ -159,7 +109,6 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
              * started before the inconsistent user completely processed the
              * consistency recovery.
              */
-            progress.subTask("unlocking session");
 
             // find the StartHandle of the inconsistent user
             StartHandle inconsistentStartHandle = null;
@@ -181,37 +130,27 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
             if (startHandles != null)
                 for (StartHandle startHandle : startHandles)
                     startHandle.start();
-            progress.done();
         }
     }
 
-    private void recoverFiles(final ChecksumErrorActivity checksumError,
-        final IProgressMonitor monitor) {
+    private void recoverFiles(final ChecksumErrorActivity checksumError) {
 
-        final List<SPath> inconsistentPaths = checksumError.getPaths();
+        synchronizer.syncExec(new Runnable() {
+            @Override
+            public void run() {
 
-        monitor.beginTask("Performing recovery...", inconsistentPaths.size());
+                for (final SPath path : checksumError.getPaths()) {
 
-        try {
-            for (final SPath path : inconsistentPaths) {
-                monitor.subTask("recovering file: " + path.getFullPath());
+                    recoverFile(checksumError.getSource(), path);
 
-                SWTUtils.runSafeSWTSync(LOG, new Runnable() {
-                    @Override
-                    public void run() {
-                        recoverFile(checksumError.getSource(), path);
-                    }
-                });
+                    // Tell the user that we sent all files
+                    fireActivity(new ChecksumErrorActivity(session
+                        .getLocalUser(), checksumError.getSource(), null,
+                        checksumError.getRecoveryID()));
 
-                monitor.worked(1);
+                }
             }
-
-            // Tell the user that we sent all files
-            fireActivity(new ChecksumErrorActivity(session.getLocalUser(),
-                checksumError.getSource(), null, checksumError.getRecoveryID()));
-        } finally {
-            monitor.done();
-        }
+        });
     }
 
     /**
@@ -228,7 +167,6 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
         final User user = session.getLocalUser();
 
         if (!file.exists()) {
-            // TODO Warn the user...
             // Tell the client to delete the file
             fireActivity(RecoveryFileActivity.removed(user, path, from, null));
             fireActivity(ChecksumActivity.missing(user, path));
