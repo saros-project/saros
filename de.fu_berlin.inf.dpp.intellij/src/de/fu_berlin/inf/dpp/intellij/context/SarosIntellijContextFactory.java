@@ -15,6 +15,7 @@ import de.fu_berlin.inf.dpp.core.ui.eventhandler.UserStatusChangeHandler;
 import de.fu_berlin.inf.dpp.core.ui.eventhandler.XMPPAuthorizationHandler;
 import de.fu_berlin.inf.dpp.core.util.FileUtils;
 import de.fu_berlin.inf.dpp.core.util.IntelliJCollaborationUtilsImpl;
+import de.fu_berlin.inf.dpp.core.vcs.NullVCSProviderFactoryImpl;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
@@ -37,12 +38,11 @@ import de.fu_berlin.inf.dpp.monitoring.remote.IRemoteProgressIndicatorFactory;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.session.ISarosSessionContextFactory;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.SarosSessionManager;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.IWebResourceLocator;
 import de.fu_berlin.inf.dpp.ui.util.ICollaborationUtils;
+import de.fu_berlin.inf.dpp.vcs.VCSProviderFactory;
 import org.picocontainer.BindKey;
 import org.picocontainer.MutablePicoContainer;
 
@@ -63,7 +63,6 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
      */
     private final Component[] components = new Component[] {
 
-        Component.create(ISarosSessionManager.class, SarosSessionManager.class),
         // Core Managers
         Component.create(ConsistencyWatchdogClient.class),
 
@@ -77,6 +76,10 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
 
         Component.create(ISarosSessionContextFactory.class,
             SarosIntellijSessionContextFactory.class),
+
+        // VCS (only dummy to satisfy dependencies)
+        Component
+            .create(VCSProviderFactory.class, NullVCSProviderFactoryImpl.class),
 
         // UI handlers
         Component.create(NegotiationHandler.class),
@@ -92,6 +95,7 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
 
         Component.create(Preferences.class, IntelliJPreferences.class),
 
+        // UI actions
         Component.create(FollowModeAction.class),
         Component.create(LeaveSessionAction.class),
 
