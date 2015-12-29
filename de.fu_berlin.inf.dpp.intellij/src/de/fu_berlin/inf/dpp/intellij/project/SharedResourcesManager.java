@@ -221,6 +221,8 @@ public class SharedResourcesManager extends AbstractActivityProducer
     }
 
     private void handleFileMove(FileActivity activity) throws IOException {
+        //FIXME: This only works by accident because ProjectImpl.getFullPath is broken
+        //this will come in the net patch
         IPath newFilePath = activity.getPath().getFullPath();
         IResource oldResource = activity.getOldPath().getResource();
 
@@ -248,7 +250,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
             //because a fileCreated event will be fired asynchronously,
             //so we have to add this file to the filter list
             fileSystemListener
-                .addIncomingFileToFilterFor(file.getFullPath().toFile());
+                .addIncomingFileToFilterFor(file.getLocation().toFile());
         } finally {
             fileSystemListener.setEnabled(true);
         }
@@ -295,7 +297,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
             //because a fileCreated event will be fired asynchronously,
             //so we have to add this file to the filter list
             fileSystemListener
-                .addIncomingFileToFilterFor(file.getFullPath().toFile());
+                .addIncomingFileToFilterFor(file.getLocation().toFile());
         } finally {
             fileSystemListener.setEnabled(true);
         }
@@ -323,7 +325,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
 
             }
             fileSystemListener
-                .addIncomingFileToFilterFor(folder.getFullPath().toFile());
+                .addIncomingFileToFilterFor(folder.getLocation().toFile());
         } finally {
             fileSystemListener.setEnabled(true);
         }

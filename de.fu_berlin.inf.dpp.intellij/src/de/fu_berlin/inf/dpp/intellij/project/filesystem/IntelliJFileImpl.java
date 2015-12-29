@@ -37,7 +37,6 @@ import java.io.InputStream;
 /**
  * IDEA implementation of the IFile interface.
  * <p/>
- * FIXME: Remove all hacks regarding absolute files.
  */
 public class IntelliJFileImpl extends IntelliJResourceImpl implements IFile {
     private static Logger LOG = Logger.getLogger(IntelliJFileImpl.class);
@@ -53,12 +52,8 @@ public class IntelliJFileImpl extends IntelliJResourceImpl implements IFile {
 
     @Override
     public InputStream getContents() throws IOException {
-        if (file.isAbsolute() && file.exists()) {
-            return new FileInputStream(file);
-        }
-
-        if (!file.isAbsolute() & getFullPath().toFile().exists()) {
-            return new FileInputStream(getFullPath().toFile());
+        if (getLocation().toFile().exists()) {
+            return new FileInputStream(getLocation().toFile());
         }
 
         return null;
@@ -69,11 +64,7 @@ public class IntelliJFileImpl extends IntelliJResourceImpl implements IFile {
         boolean keepHistory) throws IOException {
 
         FileOutputStream fos = null;
-        if (!file.isAbsolute()) {
-            fos = new FileOutputStream(getFullPath().toFile());
-        } else {
-            fos = new FileOutputStream(file);
-        }
+        fos = new FileOutputStream(getLocation().toFile());
 
         try {
             int read = -1;
@@ -93,13 +84,8 @@ public class IntelliJFileImpl extends IntelliJResourceImpl implements IFile {
     }
 
     @Override
-    public IPath getLocation() {
-        return IntelliJPathImpl.fromString(file.getPath());
-    }
-
-    @Override
     public long getSize() throws IOException {
-        return getFullPath().toFile().length();
+        return getLocation().toFile().length();
     }
 
     @Override
@@ -116,28 +102,23 @@ public class IntelliJFileImpl extends IntelliJResourceImpl implements IFile {
      */
     @Override
     public void delete(int updateFlags) throws IOException {
-        boolean result = true;
-        if (!file.isAbsolute()) {
-            File absoluteFile = getFullPath().toFile();
-            result = absoluteFile.delete();
-            LocalFileSystem.getInstance()
-                .refreshAndFindFileByIoFile(absoluteFile);
-        } else {
-            result = file.delete();
-            LocalFileSystem.getInstance().refreshAndFindFileByIoFile(file);
-        }
+
+        File absoluteFile = getLocation().toFile();
+        boolean result = absoluteFile.delete();
+        LocalFileSystem.getInstance().refreshAndFindFileByIoFile(absoluteFile);
+
         if (!result) {
-            LOG.error("Could not delete " + file);
+            LOG.error("Could not delete " + projectRelativeFile);
         }
     }
 
     @Override
     public void move(IPath destination, boolean force) throws IOException {
-        File absoluteFile = getFullPath().toFile();
+        File absoluteFile = getLocation().toFile();
         if (absoluteFile.renameTo(destination.toFile())) {
             IPath newRelativePath = destination
-                .removeFirstSegments(project.getFullPath().segmentCount());
-            file = new File(newRelativePath.toPortableString());
+                .removeFirstSegments(project.getLocation().segmentCount());
+            projectRelativeFile = new File(newRelativePath.toPortableString());
         }
     }
 
@@ -157,6 +138,6 @@ public class IntelliJFileImpl extends IntelliJResourceImpl implements IFile {
 
     @Override
     public String toString() {
-        return file.getPath();
+        return projectRelativeFile.getPath();
     }
 }

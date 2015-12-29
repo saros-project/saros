@@ -37,50 +37,51 @@ public abstract class IntelliJResourceImpl implements IResource {
     private String defaultCharset = DEFAULT_CHARSET;
 
     protected IntelliJProjectImpl project;
-    protected File file;
+    protected File projectRelativeFile;
     private IResourceAttributes attributes;
-    private boolean isDerived = false;
 
-    protected IntelliJResourceImpl(IntelliJProjectImpl project, File file) {
+    protected IntelliJResourceImpl(IntelliJProjectImpl project,
+        File projectRelativeFile) {
         this.project = project;
-        this.file = file;
-        this.attributes = new IntelliJFileResourceAttributesImpl(file);
+        if (project.getLocation().isPrefixOf(
+            IntelliJPathImpl.fromString(projectRelativeFile.getPath())))
+            this.projectRelativeFile = IntelliJPathImpl
+                .fromString(projectRelativeFile.getPath())
+                .removeFirstSegments(project.getLocation().segmentCount())
+                .toFile();
+        else
+            this.projectRelativeFile = projectRelativeFile;
+        this.attributes = new IntelliJFileResourceAttributesImpl(
+            this.projectRelativeFile);
     }
 
     public String getDefaultCharset() {
         return defaultCharset;
     }
 
-    public void setDefaultCharset(String defaultCharset) {
-        this.defaultCharset = defaultCharset;
-    }
-
     @Override
     public boolean exists() {
-        return getFullPath().toFile().exists();
+        return getLocation().toFile().exists();
     }
 
     @Override
     public IPath getFullPath() {
-        // TODO Comply with Interface description: workspace-relative paths
-        if (!file.isAbsolute()) {
-            return IntelliJPathImpl
-                .fromString(project.getFullPath().toPortableString())
-                .append(file.getPath());
-        }
-        return IntelliJPathImpl.fromString(file.getAbsoluteFile().getPath());
+        return IntelliJPathImpl.fromString(project.getName())
+            .append(projectRelativeFile.getPath());
     }
 
     @Override
     public String getName() {
-        return file.getName();
+        return projectRelativeFile.getName();
     }
 
     @Override
     public IContainer getParent() {
-        return file == null || file.getParentFile() == null ?
+        return projectRelativeFile == null
+            || projectRelativeFile.getParentFile() == null ?
             null :
-            new IntelliJFolderImpl(project, file.getParentFile());
+            new IntelliJFolderImpl(project,
+                projectRelativeFile.getParentFile());
     }
 
     @Override
@@ -88,28 +89,9 @@ public abstract class IntelliJResourceImpl implements IResource {
         return project;
     }
 
-    public void setProject(IntelliJProjectImpl project) {
-        this.project = project;
-    }
-
     @Override
     public IPath getProjectRelativePath() {
-
-        if (!file.isAbsolute()) {
-            return IntelliJPathImpl.fromString(file.getPath());
-        }
-
-        File fPrj = project.getFullPath().toFile();
-        if (fPrj.isFile()) {
-            fPrj = fPrj.getParentFile();
-        }
-
-        String prjPath = fPrj.getAbsolutePath();
-        String path = file.getAbsolutePath();
-        if (path.length() > prjPath.length()) {
-            path = path.substring(prjPath.length() + 1);
-        }
-        return IntelliJPathImpl.fromString(path);
+        return IntelliJPathImpl.fromString(projectRelativeFile.getPath());
     }
 
     public SPath getSPath() {
@@ -123,21 +105,18 @@ public abstract class IntelliJResourceImpl implements IResource {
 
     @Override
     public boolean isAccessible() {
-        return getFullPath().toFile().canRead();
+        return getLocation().toFile().canRead();
     }
 
     @Override
     public boolean isDerived(boolean checkAncestors) {
-        return isDerived(); //todo.
+        return isDerived();
     }
 
     @Override
     public boolean isDerived() {
-        return isDerived;
-    }
-
-    public File toFile() {
-        return file;
+        //TODO: Query ModuleRootManager.getExcludedRoots whether this is ignored
+        return false;
     }
 
     @Override
@@ -151,15 +130,21 @@ public abstract class IntelliJResourceImpl implements IResource {
     }
 
     @Override
+    public IPath getLocation() {
+        return project.getLocation().append(projectRelativeFile.getPath());
+    }
+
+    @Override
     public URI getLocationURI() {
-        return file.toURI();
+        return getLocation().toFile().toURI();
     }
 
     @Override
     public int hashCode() {
         int hash = 1;
 
-        hash = hash * 31 + this.file.getName().toLowerCase().hashCode();
+        hash = hash * 31 + this.projectRelativeFile.getName().toLowerCase()
+            .hashCode();
         return hash;
     }
 
@@ -175,22 +160,6 @@ public abstract class IntelliJResourceImpl implements IResource {
             return false;
         }
 
-        String thisPath;
-        if (this.file.isAbsolute() || this.project == null) {
-            thisPath = this.file.getAbsolutePath();
-        } else {
-            thisPath = this.project.getFullPath().toFile().getAbsolutePath()
-                + this.file.getPath();
-        }
-
-        String otherPath;
-        if (other.file.isAbsolute() || other.project == null) {
-            otherPath = other.file.getAbsolutePath();
-        } else {
-            otherPath = other.project.getFullPath().toFile().getAbsolutePath()
-                + File.separator + other.file.getPath();
-        }
-
-        return otherPath.equalsIgnoreCase(thisPath);
+        return getLocation().equals(other.getLocation());
     }
 }

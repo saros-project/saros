@@ -534,7 +534,7 @@ public class EditorManager extends AbstractActivityProducer
                     if (!file.exists())
                         return null;
 
-                    IPath fullPath = file.getFullPath();
+                    IPath fullPath = file.getLocation();
                     Document doc = ResourceConverter
                         .getDocument(fullPath.toFile());
                     return (doc != null) ? doc.getText() : null;

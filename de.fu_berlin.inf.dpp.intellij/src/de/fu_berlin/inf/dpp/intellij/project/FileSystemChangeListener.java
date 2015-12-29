@@ -234,7 +234,8 @@ public class FileSystemChangeListener extends AbstractStoppableListener
 
         //This is true, when a new folder for an incoming project was created.
         //If this is the case, we do not want to send an FolderActivity back.
-        if (path.equals(project.getFullPath())) {
+
+        if (path.equals(project.getLocation())) {
             return;
         }
 
@@ -503,8 +504,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
 
     private IPath makeAbsolutePathProjectRelative(IPath path,
         IProject project) {
-        int projSegmentCount = project.getFullPath().segments().length;
-        return path.removeFirstSegments(projSegmentCount);
+        return path.removeFirstSegments(project.getLocation().segmentCount());
     }
 
     private File convertVirtualFileEventToFile(

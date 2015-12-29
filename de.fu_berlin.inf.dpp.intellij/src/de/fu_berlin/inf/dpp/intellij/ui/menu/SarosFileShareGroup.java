@@ -151,6 +151,6 @@ public class SarosFileShareGroup extends ActionGroup {
      */
     private boolean isCompleteProject(IntelliJProjectImpl project,
         IntelliJFolderImpl resFolder) {
-        return resFolder.getFullPath().equals(project.getFullPath());
+        return resFolder.getLocation().equals(project.getLocation());
     }
 }

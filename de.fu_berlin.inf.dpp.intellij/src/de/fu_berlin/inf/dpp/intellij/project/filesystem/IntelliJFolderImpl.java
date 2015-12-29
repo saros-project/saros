@@ -43,24 +43,17 @@ public class IntelliJFolderImpl extends IntelliJResourceImpl
 
     @Override
     public void create(int updateFlags, boolean local) throws IOException {
-        if (!file.isAbsolute()) {
-            File fileInProject = new File(
-                getProject().getFullPath().toString() + File.separator + file
-                    .getPath());
-            fileInProject.mkdirs();
-        } else {
-            file.mkdirs();
-        }
+        create(false, local);
     }
 
     @Override
     public void create(boolean force, boolean local) throws IOException {
-        getFullPath().toFile().mkdirs();
+        getLocation().toFile().mkdirs();
     }
 
     @Override
     public boolean exists(IPath path) {
-        return new File(path.toString()).exists();
+        return getLocation().append(path).toFile().exists();
     }
 
     @Override
@@ -72,7 +65,7 @@ public class IntelliJFolderImpl extends IntelliJResourceImpl
     public IResource[] members(int memberFlags) {
         List<IResource> list = new ArrayList<IResource>();
 
-        File[] files = getFullPath().toFile().listFiles();
+        File[] files = getLocation().toFile().listFiles();
         if (files == null)
             return list.toArray(new IResource[] {});
 
@@ -103,16 +96,12 @@ public class IntelliJFolderImpl extends IntelliJResourceImpl
 
     @Override
     public void delete(int updateFlags) throws IOException {
-        if (file.isAbsolute()) {
-            FileUtils.deleteDirectory(file);
-        } else {
-            FileUtils.deleteDirectory(getFullPath().toFile());
-        }
+        FileUtils.deleteDirectory(getLocation().toFile());
     }
 
     @Override
     public void move(IPath destination, boolean force) throws IOException {
-        file.renameTo(destination.toFile());
+        projectRelativeFile.renameTo(destination.toFile());
     }
 
     @Override
@@ -122,10 +111,5 @@ public class IntelliJFolderImpl extends IntelliJResourceImpl
         }
 
         return null;
-    }
-
-    @Override
-    public IPath getLocation() {
-        return this.getFullPath();
     }
 }

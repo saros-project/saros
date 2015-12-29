@@ -137,14 +137,14 @@ public class IntelliJProjectImpl implements IProject {
 
     protected void addResource(IFile file) {
         addResource((IResource) file);
-        String key = file.getFullPath().toString();
+        String key = file.getProjectRelativePath().toString();
 
         fileMap.put(key, file);
     }
 
     protected void addResource(IFolder folder) {
         addResource((IResource) folder);
-        String key = folder.getFullPath().toString();
+        String key = folder.getProjectRelativePath().toString();
         folderMap.put(key, folder);
     }
 
