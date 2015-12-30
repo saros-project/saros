@@ -94,7 +94,7 @@ public class IntelliJFileImpl extends IntelliJResourceImpl implements IFile {
 
     @Override
     public IPath getLocation() {
-        return IntelliJPathImpl.fromString(file.getPath());
+        return new IntelliJPathImpl(file);
     }
 
     @Override

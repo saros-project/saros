@@ -33,7 +33,7 @@ public class PathFactory implements IPathFactory {
 
     @Override
     public IPath fromString(String name) {
-        return IntelliJPathImpl.fromString(name);
+        return new IntelliJPathImpl(name);
     }
 
 }
