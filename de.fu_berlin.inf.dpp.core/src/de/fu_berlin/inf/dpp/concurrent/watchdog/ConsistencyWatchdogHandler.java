@@ -1,11 +1,11 @@
 package de.fu_berlin.inf.dpp.concurrent.watchdog;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
 import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
@@ -13,8 +13,8 @@ import de.fu_berlin.inf.dpp.activities.ChecksumErrorActivity;
 import de.fu_berlin.inf.dpp.activities.RecoveryFileActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
+import de.fu_berlin.inf.dpp.editor.IEditorManager;
+import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
@@ -22,7 +22,6 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
-import de.fu_berlin.inf.dpp.util.FileUtils;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
@@ -33,10 +32,10 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
     implements Startable {
 
-    private static Logger LOG = Logger
+    private static final Logger LOG = Logger
         .getLogger(ConsistencyWatchdogHandler.class);
 
-    private final EditorManager editorManager;
+    private final IEditorManager editorManager;
 
     private final ISarosSession session;
 
@@ -63,7 +62,7 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
     }
 
     public ConsistencyWatchdogHandler(final ISarosSession session,
-        final EditorManager editorManager, final UISynchronizer synchronizer) {
+        final IEditorManager editorManager, final UISynchronizer synchronizer) {
         this.session = session;
         this.editorManager = editorManager;
         this.synchronizer = synchronizer;
@@ -159,7 +158,7 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
      */
     private void recoverFile(final User from, final SPath path) {
 
-        final IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
+        final IFile file = path.getFile();
 
         // Reset jupiter
         session.getConcurrentDocumentServer().reset(from, path);
@@ -173,24 +172,29 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
             return;
         }
 
-        /*
-         * save the editor the dirty contents are flushed to the underlying
-         * storage
-         */
-        editorManager.saveLazy(path);
-
         String charset = null;
 
         try {
             charset = file.getCharset();
-        } catch (CoreException e) {
-            LOG.warn("could not determine encoding for file: " + file, e);
+        } catch (IOException e) {
+            LOG.error("could not determine encoding for file: " + file, e);
+            return;
         }
 
-        byte[] content = FileUtils.getLocalFileContent(file);
+        byte[] content;
+        String text;
 
-        if (content == null) {
-            LOG.error("could not read file: " + file);
+        try {
+            text = editorManager.getContent(path);
+
+            if (text == null) {
+                LOG.error("could retrieve content of file: " + file);
+                return;
+            }
+
+            content = text.getBytes(charset);
+        } catch (UnsupportedEncodingException e) {
+            LOG.error("could not decode file: " + file, e);
             return;
         }
 
@@ -203,7 +207,7 @@ public final class ConsistencyWatchdogHandler extends AbstractActivityProducer
          */
 
         DocumentChecksum checksum = new DocumentChecksum(path);
-        checksum.update(editorManager.getContent(path));
+        checksum.update(text);
 
         fireActivity(new ChecksumActivity(user, path, checksum.getHash(),
             checksum.getLength(), null));

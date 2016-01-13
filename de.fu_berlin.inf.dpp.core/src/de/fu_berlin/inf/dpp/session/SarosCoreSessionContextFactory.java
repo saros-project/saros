@@ -4,6 +4,9 @@ import org.picocontainer.MutablePicoContainer;
 
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
+import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
+import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogHandler;
+import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogServer;
 import de.fu_berlin.inf.dpp.session.internal.ActivityHandler;
 import de.fu_berlin.inf.dpp.session.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.session.internal.ChangeColorManager;
@@ -42,6 +45,15 @@ public class SarosCoreSessionContextFactory implements
             container.addComponent(ServerSessionTimeoutHandler.class);
         else
             container.addComponent(ClientSessionTimeoutHandler.class);
+
+        // Watchdogs
+        // FIXME this should only be added to the host context
+        container.addComponent(ConsistencyWatchdogHandler.class);
+
+        if (session.isHost())
+            container.addComponent(ConsistencyWatchdogServer.class);
+        else
+            container.addComponent(ConsistencyWatchdogClient.class);
 
         // Other
         container.addComponent(ActivityHandler.class);

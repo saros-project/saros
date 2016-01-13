@@ -14,11 +14,11 @@
  * <li>management --- manages all JupiterActivities (operations 
  * processed by the users of a Saros session with WRITE_ACCESS)</li>
  * 
- * <li>undo --- package for undo/redo operations within a Saros 
- * session</li>
- * 
  * <li>watchdog --- since inconsistencies might appear the 
  * Consistency Watchdog takes care of them</li>
+ * 
+ * <li>undo (not in core yet) --- package for undo/redo operations within a Saros 
+ * session</li>
  * </ul>
  */
 package de.fu_berlin.inf.dpp.concurrent;

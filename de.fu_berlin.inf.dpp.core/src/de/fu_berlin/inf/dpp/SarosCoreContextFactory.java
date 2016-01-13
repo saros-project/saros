@@ -9,6 +9,7 @@ import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatService;
 import de.fu_berlin.inf.dpp.communication.chat.single.SingleUserChatService;
 import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
+import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
 import de.fu_berlin.inf.dpp.editor.colorstorage.ColorIDSetStorage;
 import de.fu_berlin.inf.dpp.monitoring.remote.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
@@ -114,7 +115,8 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
         Component.create(SessionNegotiationObservable.class),
         Component.create(ProjectNegotiationObservable.class),
         Component.create(SessionIDObservable.class),
-        Component.create(SarosSessionObservable.class) };
+        Component.create(SarosSessionObservable.class),
+        Component.create(IsInconsistentObservable.class) };
 
     @Override
     public void createComponents(MutablePicoContainer container) {
