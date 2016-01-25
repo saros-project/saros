@@ -18,7 +18,7 @@ import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
-import de.fu_berlin.inf.dpp.filesystem.NullChecksumCacheImpl;
+import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRoot;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorAPI;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorHandler;
@@ -26,6 +26,8 @@ import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorManipulator;
 import de.fu_berlin.inf.dpp.intellij.editor.ProjectAPI;
 import de.fu_berlin.inf.dpp.intellij.preferences.IntelliJPreferences;
 import de.fu_berlin.inf.dpp.intellij.preferences.PropertiesComponentAdapter;
+import de.fu_berlin.inf.dpp.filesystem.NullChecksumCacheImpl;
+import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJWorkspaceRootImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.PathFactory;
 import de.fu_berlin.inf.dpp.intellij.runtime.IntelliJSynchronizer;
 import de.fu_berlin.inf.dpp.intellij.ui.actions.FollowModeAction;
@@ -106,6 +108,7 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
 
         Component.create(ICollaborationUtils.class,
             IntelliJCollaborationUtilsImpl.class),
+        Component.create(IWorkspaceRoot.class, IntelliJWorkspaceRootImpl.class),
 
         // Proxy Support for the XMPP server connection
         Component.create(IProxyResolver.class, NullProxyResolver.class),

@@ -23,6 +23,7 @@ import de.fu_berlin.inf.dpp.ui.model.ProjectTreeNode.NodeType;
  * and its {@link IResource}s associated with a ProjectTree.
  */
 public class ProjectListManager {
+
     private IWorkspaceRoot workspaceRoot;
     private List<ProjectTree> projectModels;
 
@@ -38,9 +39,10 @@ public class ProjectListManager {
      */
     public ProjectListManager(IWorkspaceRoot workspaceRoot) {
         this.workspaceRoot = workspaceRoot;
-        // This assumes that a project must have a unique project name in
-        // every IDE. Multiple projects with the same name will result in
-        // errors.
+        // TODO Use ID instead. This assumes that a project must have a unique
+        // project name in every IDE. Multiple projects with the same name will
+        // result in unexpected misbehavior.
+
         this.projectNameToProject = new HashMap<String, IProject>();
         this.pathToResource = new HashMap<IPath, IResource>();
     }
@@ -78,9 +80,10 @@ public class ProjectListManager {
         this.pathToResource = new HashMap<IPath, IResource>();
 
         if (workspaceRoot.getProjects().length == 0) {
-            // No projects inside this workspace
+            // No projects inside this workspace | IDE
             return;
         }
+
         try {
             for (IProject project : workspaceRoot.getProjects()) {
                 ProjectTreeNode root = new ProjectTreeNode(
