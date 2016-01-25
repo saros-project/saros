@@ -44,7 +44,7 @@ module.exports = AmpersandWizard.extend({
         var contacts = this.contacts.getValue();
         var projectTrees = this.projectTrees.getValue();
 
-        //TODO: SarosApi.???
+        SarosApi.sendInvitation(projectTrees, contacts);
     },
     cancel: function() {
 

@@ -61,9 +61,14 @@ var SarosApi = BackboneEvents.mixin({
         return JSON.parse(__java_validateJid(jid)); // jshint ignore:line
     },
      
-     showStartSessionWizard: function() {
+     showSessionWizard: function() {
      
-         __java_showStartSessionWizard(); // jshint ignore:line
+         __java_showSessionWizard(); // jshint ignore:line
+     },
+     
+     sendInvitation: function (projectTrees, contacts) {
+    	 
+    	 __java_sendInvitation(projectTrees, contacts); // jshint ignore:line
      },
 
      closeStartSessionWizard: function() {

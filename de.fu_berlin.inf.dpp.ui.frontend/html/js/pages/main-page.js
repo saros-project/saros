@@ -91,7 +91,7 @@ module.exports = AmpersandView.extend({
     },
     startSession: function() {
 
-        SarosApi.showStartSessionWizard();
+        SarosApi.showSessionWizard();
     }
 });
 
