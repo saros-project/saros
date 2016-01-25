@@ -1,7 +1,6 @@
 /*
  *  DPP - Serious Distributed Pair Programming
  *  (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2010
- *  (c) NFQ (www.nfq.com) - 2014
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
