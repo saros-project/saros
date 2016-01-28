@@ -41,7 +41,6 @@ import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
@@ -57,7 +56,6 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.ui.browser.EclipseHTMLUIContextFactory;
-import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import de.fu_berlin.inf.dpp.versioning.VersionManager;
 
@@ -86,11 +84,6 @@ public class Saros extends AbstractUIPlugin {
      *               feature etc.) some need closer examination.
      * 
      */
-
-    /**
-     * The single instance of the Saros plugin.
-     */
-    protected static Saros plugin;
 
     /**
      * True if the Saros instance has been initialized so that calling
@@ -158,7 +151,7 @@ public class Saros extends AbstractUIPlugin {
      *               at it.
      */
 
-    protected SarosContext sarosContext;
+    private SarosContext applicationContext;
 
     /**
      * Create the shared instance.
@@ -186,18 +179,10 @@ public class Saros extends AbstractUIPlugin {
         assert (dotMonitor = new DotGraphMonitor()) != null;
 
         setInitialized(false);
-        setDefault(this);
     }
 
     protected static void setInitialized(boolean initialized) {
         isInitialized = initialized;
-    }
-
-    protected static void checkInitialized() {
-        if (plugin == null || !isInitialized()) {
-            LogLog.error("Saros not initialized", new StackTrace());
-            throw new IllegalStateException();
-        }
     }
 
     /**
@@ -232,32 +217,28 @@ public class Saros extends AbstractUIPlugin {
             factories.add(new EclipseHTMLUIContextFactory());
         }
 
-        sarosContext = new SarosContext(factories, dotMonitor);
+        applicationContext = new SarosContext(factories, dotMonitor);
 
-        SarosPluginContext.setSarosContext(sarosContext);
+        applicationContext.initialize();
 
         sarosFeatureID = PLUGIN_ID + "_" + sarosVersion; //$NON-NLS-1$
 
-        // Remove the Bundle if an instance of it was already registered
-        sarosContext.removeComponent(Bundle.class);
-        sarosContext.addComponent(Bundle.class, getBundle());
-
-        connectionHandler = sarosContext.getComponent(ConnectionHandler.class);
-        sessionManager = sarosContext.getComponent(ISarosSessionManager.class);
-        preferences = sarosContext
+        connectionHandler = applicationContext
+            .getComponent(ConnectionHandler.class);
+        sessionManager = applicationContext
+            .getComponent(ISarosSessionManager.class);
+        preferences = applicationContext
             .getComponent(de.fu_berlin.inf.dpp.preferences.Preferences.class);
 
         // additional initialization
 
-        FeedbackPreferences.setPreferences(sarosContext
+        FeedbackPreferences.setPreferences(applicationContext
             .getComponent(Preferences.class));
 
         initVersionCompatibilityChart(VERSION_COMPATIBILITY_PROPERTY_FILE,
-            sarosContext.getComponent(VersionManager.class));
+            applicationContext.getComponent(VersionManager.class));
 
-        // Make sure that all components in the container are
-        // instantiated
-        sarosContext.getComponents(Object.class);
+        SarosPluginContext.setSarosContext(applicationContext);
 
         isInitialized = true;
 
@@ -321,17 +302,7 @@ public class Saros extends AbstractUIPlugin {
                                 .stopSarosSession(SessionEndReason.LOCAL_USER_LEFT);
                             connectionHandler.disconnect();
                         } finally {
-                            /*
-                             * Always shutdown the network to ensure a proper
-                             * cleanup(currently only UPNP)
-                             */
-
-                            /*
-                             * This will cause dispose() to be called on all
-                             * components managed by PicoContainer which
-                             * implement {@link Disposable}.
-                             */
-                            sarosContext.dispose();
+                            applicationContext.dispose();
                         }
                     }
                 });
@@ -345,12 +316,6 @@ public class Saros extends AbstractUIPlugin {
         }
 
         isInitialized = false;
-        setDefault(null);
-    }
-
-    public static void setDefault(Saros newPlugin) {
-        Saros.plugin = newPlugin;
-
     }
 
     /**
@@ -447,7 +412,7 @@ public class Saros extends AbstractUIPlugin {
     @Deprecated
     public void convertAccountStore() {
 
-        final XMPPAccountStore accountStore = sarosContext
+        final XMPPAccountStore accountStore = applicationContext
             .getComponent(XMPPAccountStore.class);
 
         if (!accountStore.isEmpty()) {

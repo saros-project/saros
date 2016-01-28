@@ -107,13 +107,12 @@ public class Saros {
 
         sarosContext = new SarosContext(factories, new DotGraphMonitor());
 
+        sarosContext.initialize();
+        
         SarosPluginContext.setSarosContext(sarosContext);
         preferences = sarosContext.getComponent(Preferences.class);
 
         isInitialized = true;
-        // Make sure that all components in the container are
-        // instantiated
-        sarosContext.getComponents(Object.class);
     }
 
     // FIXME: Properly stop network and context classes

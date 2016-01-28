@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Platform;
+import org.osgi.framework.Bundle;
 import org.osgi.service.prefs.Preferences;
 import org.picocontainer.BindKey;
 import org.picocontainer.MutablePicoContainer;
@@ -140,6 +141,8 @@ public class SarosEclipseContextFactory extends AbstractSarosContextFactory {
                 component.getImplementation());
 
         container.addComponent(saros);
+
+        container.addComponent(Bundle.class, saros.getBundle());
 
         container.addComponent(BindKey.bindKey(String.class,
             ISarosContextBindings.SarosVersion.class), saros.getBundle()

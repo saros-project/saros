@@ -23,7 +23,6 @@ import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import de.fu_berlin.inf.dpp.ISarosContext;
-import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
@@ -136,13 +135,6 @@ public class STFController {
 
         for (String key : propertyKeys)
             log.info("java property: " + key + " = " + System.getProperty(key));
-
-        /*
-         * cast is ok for now, do not flood the interface with seldom used
-         * methods
-         */
-        for (Object object : ((SarosContext) context).getComponents())
-            log.debug("container component: " + object.getClass().getName());
 
         StfRemoteObject.setContext(context);
 

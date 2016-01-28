@@ -6,7 +6,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.picocontainer.ComponentMonitor;
 import org.picocontainer.MutablePicoContainer;
-import org.picocontainer.Parameter;
 import org.picocontainer.PicoBuilder;
 import org.picocontainer.PicoContainer;
 import org.picocontainer.injectors.AnnotatedFieldInjection;
@@ -43,34 +42,51 @@ import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 
 /**
- * Represents the application context. All components created in this context
- * are tied to the lifetime of the application, i.e the components are only
- * created once.
+ * Represents the application context. All components that are created and
+ * initialized in this context are tied to the lifetime of the application, i.e
+ * the components are only created once.
+ * <p>
+ * <b>Note:</b> The <code>create</code> and <code>dispose</code> methods are not
+ * thread safe.
  * 
  * @author pcordes
  * @author srossbach
  */
 public class SarosContext implements ISarosContext {
 
-    private static final Logger log = Logger.getLogger(SarosContext.class);
+    private static final Logger LOG = Logger.getLogger(SarosContext.class);
 
     private static final String SAROS_DATA_DIRECTORY = ".saros";
 
     private static final String SAROS_XMPP_ACCOUNT_FILE = "config.dat";
 
-    private final ComponentMonitor componentMonitor;
-
     private final List<ISarosContextFactory> factories;
     /**
      * A caching container which holds all the singletons in Saros.
      */
-    private MutablePicoContainer container;
+    private final MutablePicoContainer container;
+
+    private boolean initialized;
+    private boolean disposed;
 
     public SarosContext(final List<ISarosContextFactory> factories,
         final ComponentMonitor componentMonitor) {
         this.factories = factories;
-        this.componentMonitor = componentMonitor;
-        init();
+
+        /*
+         * Ensure to use the caching characteristic otherwise we would create
+         * multiple instances of components that should be only present once in
+         * the context.
+         */
+
+        PicoBuilder builder = new PicoBuilder(new CompositeInjection(
+            new ConstructorInjection(), new AnnotatedFieldInjection()))
+            .withCaching().withLifecycle();
+
+        if (componentMonitor != null)
+            builder = builder.withMonitor(componentMonitor);
+
+        container = builder.build();
     }
 
     private void installPacketExtensionProviders() {
@@ -124,24 +140,18 @@ public class SarosContext implements ISarosContext {
         }
     }
 
-    private void init() {
+    /**
+     * Initialize this context and instantiates all components created by the
+     * context factories. Does nothing if called more than once.
+     * 
+     * @see #dispose()
+     */
+    public void initialize() {
 
-        log.info("creating Saros runtime context...");
+        if (initialized)
+            return;
 
-        /*
-         * Ensure to use the caching characteristic otherwise we would create
-         * multiple instances of components that should be only present once in
-         * the context.
-         */
-
-        PicoBuilder picoBuilder = new PicoBuilder(new CompositeInjection(
-            new ConstructorInjection(), new AnnotatedFieldInjection()))
-            .withCaching().withLifecycle();
-
-        if (componentMonitor != null)
-            picoBuilder = picoBuilder.withMonitor(componentMonitor);
-
-        container = picoBuilder.build();
+        LOG.info("initializing application context...");
 
         for (ISarosContextFactory factory : factories)
             factory.createComponents(container);
@@ -155,7 +165,39 @@ public class SarosContext implements ISarosContext {
         XMPPUtils.setDefaultConnectionService(container
             .getComponent(XMPPConnectionService.class));
 
-        log.info("successfully created Saros runtime context");
+        /*
+         * ensure all components are instantiated as some of them may have not
+         * dependencies at all and so would never be instantiated although they
+         * do critical work, e.g listening to several events
+         */
+        final List<Object> components = container.getComponents();
+
+        if (LOG.isDebugEnabled()) {
+            for (final Object component : components) {
+                LOG.debug("created context component: "
+                    + component.getClass().getName());
+            }
+        }
+
+        initialized = true;
+
+        LOG.info("successfully initialized application context");
+    }
+
+    /**
+     * Disposes this context by disposing all components in this context. After
+     * the context is disposed it can no longer be used. Does nothing if the
+     * context is not initialized yet or already disposed.
+     */
+    public void dispose() {
+
+        if (!initialized || disposed)
+            return;
+
+        LOG.info("disposing application context...");
+        disposed = true;
+        container.dispose();
+        LOG.info("successfully disposed application context");
     }
 
     private void initAccountStore(XMPPAccountStore store) {
@@ -182,7 +224,7 @@ public class SarosContext implements ISarosContext {
             homeDirectory = System.getProperty("user.home");
 
         if (homeDirectory == null) {
-            log.warn("home directory not set, cannot save and load account data");
+            LOG.warn("home directory not set, cannot save and load account data");
             return;
         }
 
@@ -193,7 +235,18 @@ public class SarosContext implements ISarosContext {
     }
 
     @Override
+    @Deprecated
     public void initComponent(final Object component) {
+
+        /*
+         * it is unlikely that this method is called while creating or disposing
+         * the context so this is sufficient for now
+         */
+        if (!initialized)
+            throw new IllegalStateException("context is not initialized yet");
+
+        if (disposed)
+            throw new IllegalStateException("context is disposed");
 
         final MutablePicoContainer reinjectionContainer = container
             .makeChildContainer();
@@ -208,33 +261,13 @@ public class SarosContext implements ISarosContext {
     }
 
     @Override
-    public <T> T getComponent(Class<T> tClass) {
-        return container.getComponent(tClass);
-    }
-
-    public <T> List<T> getComponents(Class<T> tClass) {
-        return container.getComponents(tClass);
-    }
-
-    public List<Object> getComponents() {
-        return container.getComponents();
-    }
-
-    public void addComponent(Object o, Object o1, Parameter... parameters) {
-        container.addComponent(o, o1, parameters);
-    }
-
-    public void removeComponent(Object o) {
-        container.removeComponent(o);
+    public <T> T getComponent(Class<T> clazz) {
+        return container.getComponent(clazz);
     }
 
     @Override
     public boolean removeChildContainer(PicoContainer picoContainer) {
         return container.removeChildContainer(picoContainer);
-    }
-
-    public void dispose() {
-        container.dispose();
     }
 
     @Override
