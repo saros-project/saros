@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.picocontainer.ComponentAdapter;
+import org.picocontainer.ComponentMonitor;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.Parameter;
 import org.picocontainer.PicoBuilder;
@@ -41,7 +42,6 @@ import de.fu_berlin.inf.dpp.communication.extensions.UserFinishedProjectNegotiat
 import de.fu_berlin.inf.dpp.communication.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.UserListReceivedExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.VersionExchangeExtension;
-import de.fu_berlin.inf.dpp.misc.pico.DotGraphMonitor;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.util.StackTrace;
@@ -71,7 +71,7 @@ public class SarosContext implements ISarosContext {
 
     private static final String SAROS_XMPP_ACCOUNT_FILE = "config.dat";
 
-    private final DotGraphMonitor dotMonitor;
+    private final ComponentMonitor componentMonitor;
 
     private final List<ISarosContextFactory> factories;
     /**
@@ -85,10 +85,10 @@ public class SarosContext implements ISarosContext {
      */
     private Reinjector reinjector;
 
-    public SarosContext(List<ISarosContextFactory> factories,
-        DotGraphMonitor dotGraphMonitor) {
+    public SarosContext(final List<ISarosContextFactory> factories,
+        final ComponentMonitor componentMonitor) {
         this.factories = factories;
-        this.dotMonitor = dotGraphMonitor;
+        this.componentMonitor = componentMonitor;
         init();
     }
 
@@ -159,8 +159,8 @@ public class SarosContext implements ISarosContext {
          * If given, the dotMonitor is used to capture an architecture diagram
          * of the application
          */
-        if (dotMonitor != null)
-            picoBuilder = picoBuilder.withMonitor(dotMonitor);
+        if (componentMonitor != null)
+            picoBuilder = picoBuilder.withMonitor(componentMonitor);
 
         // Initialize our dependency injection container
         container = picoBuilder.build();
