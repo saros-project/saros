@@ -124,7 +124,7 @@ import de.fu_berlin.inf.dpp.ui.widgets.viewer.session.XMPPSessionDisplayComposit
 
 /**
  * This view displays the contact list, the Saros Session and Saros Chat.
- *
+ * 
  * @author patbit
  */
 @Component(module = "ui")
@@ -284,14 +284,14 @@ public class SarosView extends ViewPart {
 
     /**
      * @JTourBusStop 2, The Interface Tour:
-     *
+     * 
      *               The createPartControl method constructs the view's
      *               controls.
-     *
+     * 
      *               Notice that the SarosView class doesn't contain everything.
      *               Rather it arranges and manages other components which carry
      *               out most of the functionality.
-     *
+     * 
      *               You should have noticed that the Saros view is divided into
      *               parts, left and right. The left side is a composite of the
      *               session information and the roster. The right side
@@ -399,12 +399,12 @@ public class SarosView extends ViewPart {
 
         /**
          * @JTourBusStop 3, The Interface Tour:
-         *
+         * 
          *               There are a few additional things in the Saros view.
-         *
+         * 
          *               There is tool bar that holds the icons along the top
          *               (also see addToolbarItems() below).
-         *
+         * 
          *               Also, there are context menus which appear when you: -
          *               right-click on a person in your current session -
          *               right-click on a contact in the contact list.
@@ -571,7 +571,7 @@ public class SarosView extends ViewPart {
      * Adds the {@link IWorkbenchActionConstants#MB_ADDITIONS additions}
      * {@link Separator} to the {@link MenuManager} in order to let others
      * extend the menu.
-     *
+     * 
      * @param menuManager
      */
     protected void addAdditionsSeparator(MenuManager menuManager) {
@@ -607,8 +607,8 @@ public class SarosView extends ViewPart {
     }
 
     /**
-     * Display a notification next to the given control..
-     *
+     * Display a notification next to the given control.
+     * 
      * @param title
      * @param text
      * @param control
@@ -660,7 +660,7 @@ public class SarosView extends ViewPart {
      * current focus. The visibility time of the notification will vary,
      * depending on how much words the text contains. This method <b>SHOULD
      * NOT</b> be called directly from the business logic.
-     *
+     * 
      * @param title
      *            the title of the notification
      * @param text
@@ -692,6 +692,14 @@ public class SarosView extends ViewPart {
             text = ModelFormatUtils.format(
                 Messages.SessionStop_host_closed_session_message, user);
             break;
+        case CONNECTION_LOST:
+            // TODO display the error
+            return;
+        case LOCAL_USER_LEFT:
+            return;
+        default:
+            LOG.warn("no UI notification available for stop reason: " + reason);
+            return;
         }
 
         showNotification(title, text);
