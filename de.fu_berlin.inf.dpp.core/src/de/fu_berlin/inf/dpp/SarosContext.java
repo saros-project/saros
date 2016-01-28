@@ -4,14 +4,11 @@ import java.io.File;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.picocontainer.ComponentAdapter;
 import org.picocontainer.ComponentMonitor;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.Parameter;
 import org.picocontainer.PicoBuilder;
-import org.picocontainer.PicoCompositionException;
 import org.picocontainer.PicoContainer;
-import org.picocontainer.annotations.Inject;
 import org.picocontainer.injectors.AnnotatedFieldInjection;
 import org.picocontainer.injectors.CompositeInjection;
 import org.picocontainer.injectors.ConstructorInjection;
@@ -44,21 +41,11 @@ import de.fu_berlin.inf.dpp.communication.extensions.UserListReceivedExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.VersionExchangeExtension;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.util.StackTrace;
 
 /**
- * Encapsulates a {@link org.picocontainer.PicoContainer} and its Saros-specific
- * initialization. Basically it's used to get or reinject components in the
- * context:
- * 
- * {@link de.fu_berlin.inf.dpp.SarosContext#getComponent(Class)},
- * {@link de.fu_berlin.inf.dpp.SarosContext#reinject(Object)}
- * 
- * These methods change the context respectively the PicoContainer!
- * 
- * If you want to initialize a component with the components of the context
- * without changing the context you can use the method
- * {@link de.fu_berlin.inf.dpp.SarosContext#initComponent(Object)}.
+ * Represents the application context. All components created in this context
+ * are tied to the lifetime of the application, i.e the components are only
+ * created once.
  * 
  * @author pcordes
  * @author srossbach
@@ -78,12 +65,6 @@ public class SarosContext implements ISarosContext {
      * A caching container which holds all the singletons in Saros.
      */
     private MutablePicoContainer container;
-
-    /**
-     * The reinjector used to inject dependencies into those objects that are
-     * created by Eclipse and not by our PicoContainer.
-     */
-    private Reinjector reinjector;
 
     public SarosContext(final List<ISarosContextFactory> factories,
         final ComponentMonitor componentMonitor) {
@@ -146,36 +127,26 @@ public class SarosContext implements ISarosContext {
     private void init() {
 
         log.info("creating Saros runtime context...");
+
         /*
-         * All singletons which exist for the whole plug-in life-cycle are
-         * managed by PicoContainer for us.
+         * Ensure to use the caching characteristic otherwise we would create
+         * multiple instances of components that should be only present once in
+         * the context.
          */
 
         PicoBuilder picoBuilder = new PicoBuilder(new CompositeInjection(
             new ConstructorInjection(), new AnnotatedFieldInjection()))
             .withCaching().withLifecycle();
 
-        /*
-         * If given, the dotMonitor is used to capture an architecture diagram
-         * of the application
-         */
         if (componentMonitor != null)
             picoBuilder = picoBuilder.withMonitor(componentMonitor);
 
-        // Initialize our dependency injection container
         container = picoBuilder.build();
 
-        for (ISarosContextFactory factory : factories) {
+        for (ISarosContextFactory factory : factories)
             factory.createComponents(container);
-        }
 
         container.addComponent(ISarosContext.class, this);
-
-        /*
-         * Create a reinjector to allow platform specific stuff to reinject
-         * itself into the context.
-         */
-        reinjector = new Reinjector(container);
 
         initAccountStore(container.getComponent(XMPPAccountStore.class));
 
@@ -221,41 +192,6 @@ public class SarosContext implements ISarosContext {
         store.setAccountFile(accountFile, System.getProperty("user.name"));
     }
 
-    /**
-     * Adds the object to Saros container, and injects dependencies into the
-     * annotated fields of the given object. It should only be used for objects
-     * that were created by a third party, which have the same life cycle as the
-     * Saros plug-in.
-     */
-    public synchronized void reinject(final Object component) {
-        try {
-
-            Class<?> clazz = component.getClass();
-            ComponentAdapter<?> removed = container.removeComponent(clazz);
-            if (removed != null) {
-                log.warn(clazz.getName() + " added more than once!",
-                    new StackTrace());
-            }
-
-            container.addComponent(clazz, component);
-
-            /*
-             * Ask PicoContainer to inject into the component via fields
-             * annotated with @Inject
-             */
-            reinjector.reinject(clazz, new AnnotatedFieldInjection());
-        } catch (PicoCompositionException e) {
-            log.error("Internal error in reinjection:", e);
-        }
-    }
-
-    /**
-     * Injects dependencies into the annotated fields of the given object. This
-     * method should only be used for objects that cannot be put directly into
-     * the context scope, i.e the objects are created by a third party.
-     * 
-     * @see Inject
-     */
     @Override
     public void initComponent(final Object component) {
 

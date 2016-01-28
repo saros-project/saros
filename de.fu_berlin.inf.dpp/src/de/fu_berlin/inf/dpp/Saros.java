@@ -202,7 +202,7 @@ public class Saros extends AbstractUIPlugin {
 
     /**
      * Returns true if the Saros instance has been initialized so that calling
-     * {@link SarosContext#reinject(Object)} will be well defined.
+     * {@link SarosPluginContext#initComponent(Object)} will be well defined.
      */
     public static boolean isInitialized() {
         return isInitialized;
