@@ -212,6 +212,6 @@ public class EclipseResourceImpl implements IResource {
 
     @Override
     public String toString() {
-        return super.toString() + " - " + delegate.toString();
+        return delegate.toString() + " (" + getClass().getSimpleName() + ")";
     }
 }
