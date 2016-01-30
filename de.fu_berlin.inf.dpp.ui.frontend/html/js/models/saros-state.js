@@ -34,7 +34,7 @@ module.exports = AmpersandState.extend({
     props: {
 
         activeAccount: {
-            type: Account,
+            type: 'object',
             default: function() {
 
                 return new Account();
@@ -42,15 +42,13 @@ module.exports = AmpersandState.extend({
         },
 
         connectionState: {
-            type: {
-                type: 'string',
-                values: [
-                    CS.CONNECTED, 
-                    CS.NOT_CONNECTED,
-                    CS.CONNECTING,
-                    CS.DISCONNECTING
-                ]
-            },
+            type: 'string',
+            values: [
+                CS.CONNECTED,
+                CS.NOT_CONNECTED,
+                CS.CONNECTING,
+                CS.DISCONNECTING
+            ],
             default: CS.NOT_CONNECTED
         }
     },
