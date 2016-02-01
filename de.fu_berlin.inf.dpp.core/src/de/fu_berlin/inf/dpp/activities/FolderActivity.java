@@ -8,7 +8,8 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import de.fu_berlin.inf.dpp.session.User;
 
 @XStreamAlias("folderActivity")
-public class FolderActivity extends AbstractResourceActivity {
+public class FolderActivity extends AbstractResourceActivity implements
+    IFileSystemModificationActivity {
 
     public static enum Type {
         CREATED, REMOVED

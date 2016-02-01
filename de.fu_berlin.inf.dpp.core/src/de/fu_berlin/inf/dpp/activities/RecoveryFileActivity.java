@@ -16,7 +16,7 @@ import de.fu_berlin.inf.dpp.session.User;
  */
 @XStreamAlias("recoveryFileActivity")
 public class RecoveryFileActivity extends FileActivity implements
-    ITargetedActivity {
+    ITargetedActivity, IFileSystemModificationActivity {
 
     @XStreamAsAttribute
     private User target;

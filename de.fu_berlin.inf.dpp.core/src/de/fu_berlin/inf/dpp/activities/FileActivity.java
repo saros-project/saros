@@ -10,7 +10,8 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import de.fu_berlin.inf.dpp.session.User;
 
 @XStreamAlias("fileActivity")
-public class FileActivity extends AbstractResourceActivity {
+public class FileActivity extends AbstractResourceActivity implements
+    IFileSystemModificationActivity {
 
     /**
      * Enumeration used to distinguish file activities which are caused as part
