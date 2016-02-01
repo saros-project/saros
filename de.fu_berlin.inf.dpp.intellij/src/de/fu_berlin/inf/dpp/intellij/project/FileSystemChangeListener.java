@@ -30,7 +30,8 @@ import com.intellij.openapi.vfs.VirtualFileMoveEvent;
 import com.intellij.openapi.vfs.VirtualFilePropertyEvent;
 import com.intellij.openapi.vfs.encoding.EncodingProjectManager;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.activities.FolderActivity;
+import de.fu_berlin.inf.dpp.activities.FolderCreatedActivity;
+import de.fu_berlin.inf.dpp.activities.FolderDeletedActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.core.util.FileUtils;
@@ -88,8 +89,8 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         boolean before) {
         User user = resourceManager.getSession().getLocalUser();
         IntelliJProjectImpl project = (IntelliJProjectImpl) oldSPath.getProject();
-        IActivity createActivity = new FolderActivity(user,
-            FolderActivity.Type.CREATED, newSPath);
+        IActivity createActivity = new FolderCreatedActivity(user,
+             newSPath);
         resourceManager.internalFireActivity(createActivity);
 
         IFolder folder = before ? oldSPath.getFolder() : newSPath.getFolder();
@@ -121,8 +122,8 @@ public class FileSystemChangeListener extends AbstractStoppableListener
             }
         }
 
-        IActivity removeActivity = new FolderActivity(user,
-            FolderActivity.Type.REMOVED, oldSPath);
+        IActivity removeActivity = new FolderDeletedActivity(user,
+             oldSPath);
         resourceManager.internalFireActivity(removeActivity);
 
         project.addFile(newSPath.getFile().getLocation().toFile());
@@ -261,7 +262,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
             //so we check for newly created files' content in {@link #contentsChanged},
             newFiles.add(virtualFileEvent.getFile());
         } else {
-            activity = new FolderActivity(user, FolderActivity.Type.CREATED,
+            activity = new FolderCreatedActivity(user,
                 spath);
         }
 
@@ -300,7 +301,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
 
         IActivity activity;
         if (virtualFileEvent.getFile().isDirectory()) {
-            activity = new FolderActivity(user, FolderActivity.Type.REMOVED,
+            activity = new FolderDeletedActivity(user,
                 spath);
         } else {
             activity = FileActivity

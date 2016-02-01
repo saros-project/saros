@@ -32,7 +32,9 @@ import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.ChecksumErrorActivity;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.activities.FolderActivity;
+import de.fu_berlin.inf.dpp.activities.FolderCreatedActivity;
+import de.fu_berlin.inf.dpp.activities.FolderDeletedActivity;
+import de.fu_berlin.inf.dpp.activities.FolderMovedActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.JupiterActivity;
 import de.fu_berlin.inf.dpp.activities.NOPActivity;
@@ -175,7 +177,11 @@ public class ActivitiesExtension extends SarosSessionPacketExtension {
 
                 FileActivity.class,
 
-                FolderActivity.class,
+                FolderCreatedActivity.class,
+
+                FolderDeletedActivity.class,
+
+                FolderMovedActivity.class,
 
                 JupiterActivity.class,
 

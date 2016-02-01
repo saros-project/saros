@@ -17,7 +17,8 @@ import de.fu_berlin.inf.dpp.session.User;
  * Activity for VCS operations like Switch, Update.
  */
 @XStreamAlias("vcsActivity")
-public class VCSActivity extends AbstractResourceActivity {
+public class VCSActivity extends AbstractResourceActivity implements
+    IFileSystemModificationActivity {
 
     public enum Type {
         /**
@@ -203,8 +204,7 @@ public class VCSActivity extends AbstractResourceActivity {
             return false;
         }
         if (vcsPath.equals(otherPath)) {
-            return otherActivity instanceof FileActivity
-                || otherActivity instanceof FolderActivity;
+            return otherActivity instanceof IFileSystemModificationActivity;
         }
 
         return true;

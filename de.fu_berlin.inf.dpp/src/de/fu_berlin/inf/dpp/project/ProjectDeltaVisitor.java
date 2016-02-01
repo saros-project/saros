@@ -17,7 +17,8 @@ import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity.Purpose;
-import de.fu_berlin.inf.dpp.activities.FolderActivity;
+import de.fu_berlin.inf.dpp.activities.FolderCreatedActivity;
+import de.fu_berlin.inf.dpp.activities.FolderDeletedActivity;
 import de.fu_berlin.inf.dpp.activities.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
@@ -221,8 +222,7 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
                     Purpose.ACTIVITY));
 
         } else {
-            addActivity(new FolderActivity(user, FolderActivity.Type.CREATED,
-                spath));
+            addActivity(new FolderCreatedActivity(user, spath));
         }
     }
 
@@ -257,8 +257,8 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
             addActivity(FileActivity.removed(user, new SPath(
                 ResourceAdapterFactory.create(resource)), Purpose.ACTIVITY));
         } else {
-            addActivity(new FolderActivity(user, FolderActivity.Type.REMOVED,
-                new SPath(ResourceAdapterFactory.create(resource))));
+            addActivity(new FolderDeletedActivity(user, new SPath(
+                ResourceAdapterFactory.create(resource))));
         }
     }
 

@@ -36,10 +36,10 @@ import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.ISarosContext;
-import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.activities.FolderActivity;
+import de.fu_berlin.inf.dpp.activities.FolderCreatedActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
+import de.fu_berlin.inf.dpp.activities.IFileSystemModificationActivity;
 import de.fu_berlin.inf.dpp.activities.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.JupiterActivity;
 import de.fu_berlin.inf.dpp.activities.NOPActivity;
@@ -188,7 +188,8 @@ public final class SarosSession implements ISarosSession {
              */
             for (IActivityConsumer consumer : activityConsumers) {
                 consumer.exec(activity);
-                updatePartialSharedResources(activity);
+                if (activity instanceof IFileSystemModificationActivity)
+                    updatePartialSharedResources((IFileSystemModificationActivity) activity);
             }
         }
     };
@@ -208,8 +209,8 @@ public final class SarosSession implements ISarosSession {
     /**
      * Constructor for client.
      */
-    public SarosSession(final String id, JID hostJID, int clientColorID, int hostColorID,
-        ISarosContext sarosContext) {
+    public SarosSession(final String id, JID hostJID, int clientColorID,
+        int hostColorID, ISarosContext sarosContext) {
 
         this(id, sarosContext, hostJID, clientColorID, hostColorID);
     }
@@ -767,8 +768,7 @@ public final class SarosSession implements ISarosSession {
          * EditorActivities.
          */
         if (projectMapper.size() == 0
-            && (activity instanceof EditorActivity
-                || activity instanceof FolderActivity || activity instanceof FileActivity)) {
+            && (activity instanceof IResourceActivity)) {
             return;
         }
 
@@ -784,9 +784,8 @@ public final class SarosSession implements ISarosSession {
 
         boolean send = true;
         // handle FileActivities and FolderActivities to update ProjectMapper
-        if (activity instanceof FolderActivity
-            || activity instanceof FileActivity) {
-            send = updatePartialSharedResources(activity);
+        if (activity instanceof IFileSystemModificationActivity) {
+            send = updatePartialSharedResources((IFileSystemModificationActivity) activity);
         }
 
         if (!send)
@@ -800,18 +799,16 @@ public final class SarosSession implements ISarosSession {
     }
 
     /**
-     * Method to update the project mapper when changes on shared files oder
-     * folders happened.
+     * Must be called to update the project mapper when changes on shared files
+     * oder folders happened.
      * 
      * @param activity
-     *            {@link FileActivity} or {@link FolderActivity} to handle
+     *            {@link IFileSystemModificationActivity} to handle
      * @return <code>true</code> if the activity should be send to the user,
      *         <code>false</code> otherwise
      */
-    private boolean updatePartialSharedResources(IActivity activity) {
-        if (!(activity instanceof FileActivity)
-            && !(activity instanceof FolderActivity))
-            return true;
+    private boolean updatePartialSharedResources(
+        IFileSystemModificationActivity activity) {
 
         if (activity instanceof FileActivity) {
             FileActivity fileActivity = ((FileActivity) activity);
@@ -854,29 +851,33 @@ public final class SarosSession implements ISarosSession {
 
                 break;
             }
-        } else if (activity instanceof FolderActivity) {
-            FolderActivity folderActivity = ((FolderActivity) activity);
-            IFolder folder = folderActivity.getPath().getFolder();
+        } else if (activity instanceof FolderCreatedActivity) {
+            IFolder folder = activity.getPath().getFolder();
 
             if (folder == null)
                 return true;
 
             IProject project = folder.getProject();
 
-            switch (folderActivity.getType()) {
-            case CREATED:
-                if (projectMapper.isPartiallyShared(project)
-                    && isShared(folder.getParent()))
-                    projectMapper.addResources(project,
-                        Collections.singletonList(folder));
-                break;
-            case REMOVED:
-                if (!isShared(folder))
-                    return false;
+            if (projectMapper.isPartiallyShared(project)
+                && isShared(folder.getParent())) {
+                projectMapper.addResources(project,
+                    Collections.singletonList(folder));
+            }
+        } else if (activity instanceof FolderCreatedActivity) {
+            IFolder folder = activity.getPath().getFolder();
 
-                if (projectMapper.isPartiallyShared(project))
-                    projectMapper.removeResources(project,
-                        Collections.singletonList(folder));
+            if (folder == null)
+                return true;
+
+            IProject project = folder.getProject();
+
+            if (!isShared(folder))
+                return false;
+
+            if (projectMapper.isPartiallyShared(project)) {
+                projectMapper.removeResources(project,
+                    Collections.singletonList(folder));
             }
         }
         return true;
@@ -1011,8 +1012,8 @@ public final class SarosSession implements ISarosSession {
             localUser, localUser, 0));
     }
 
-    private SarosSession(final String id, ISarosContext context, JID host, int localColorID,
-        int hostColorID) {
+    private SarosSession(final String id, ISarosContext context, JID host,
+        int localColorID, int hostColorID) {
 
         context.initComponent(this);
 

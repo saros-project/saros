@@ -51,7 +51,17 @@ public abstract class AbstractActivityReceiver implements IActivityReceiver {
     }
 
     @Override
-    public void receive(FolderActivity folderActivity) {
+    public void receive(FolderCreatedActivity folderCreatedActivity) {
+        // do nothing
+    }
+
+    @Override
+    public void receive(FolderDeletedActivity folderDeletedActivity) {
+        // do nothing
+    }
+
+    @Override
+    public void receive(FolderMovedActivity folderMovedActivity) {
         // do nothing
     }
 

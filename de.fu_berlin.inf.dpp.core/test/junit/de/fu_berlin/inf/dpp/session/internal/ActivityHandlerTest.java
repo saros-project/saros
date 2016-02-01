@@ -22,7 +22,9 @@ import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.ChecksumErrorActivity;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.activities.FolderActivity;
+import de.fu_berlin.inf.dpp.activities.FolderCreatedActivity;
+import de.fu_berlin.inf.dpp.activities.FolderDeletedActivity;
+import de.fu_berlin.inf.dpp.activities.FolderMovedActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.ITargetedActivity;
@@ -44,7 +46,6 @@ import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.session.IActivityHandlerCallback;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.session.internal.ActivityHandler;
 import de.fu_berlin.inf.dpp.test.fakes.synchonize.NonUISynchronizer;
 
 public class ActivityHandlerTest {
@@ -382,7 +383,9 @@ public class ActivityHandlerTest {
         activities.add(EasyMock.createNiceMock(ViewportActivity.class));
         activities.add(EasyMock.createNiceMock(TextSelectionActivity.class));
         activities.add(EasyMock.createNiceMock(PermissionActivity.class));
-        activities.add(EasyMock.createNiceMock(FolderActivity.class));
+        activities.add(EasyMock.createNiceMock(FolderCreatedActivity.class));
+        activities.add(EasyMock.createNiceMock(FolderDeletedActivity.class));
+        activities.add(EasyMock.createNiceMock(FolderMovedActivity.class));
         activities.add(EasyMock.createNiceMock(FileActivity.class));
         activities.add(EasyMock.createNiceMock(EditorActivity.class));
         activities.add(EasyMock.createNiceMock(StopActivity.class));

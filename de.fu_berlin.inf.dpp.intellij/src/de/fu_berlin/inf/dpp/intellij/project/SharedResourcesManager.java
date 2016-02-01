@@ -26,8 +26,10 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.vfs.encoding.EncodingProjectManager;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.activities.FolderActivity;
+import de.fu_berlin.inf.dpp.activities.FolderCreatedActivity;
+import de.fu_berlin.inf.dpp.activities.FolderDeletedActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
+import de.fu_berlin.inf.dpp.activities.IFileSystemModificationActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.VCSActivity;
 import de.fu_berlin.inf.dpp.core.util.FileUtils;
@@ -119,9 +121,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
     private final IActivityConsumer consumer = new AbstractActivityConsumer() {
         @Override
         public void exec(IActivity activity) {
-            if (!(activity instanceof FileActivity
-                || activity instanceof FolderActivity
-                || activity instanceof VCSActivity))
+            if (!(activity instanceof IFileSystemModificationActivity))
                 return;
 
         /*
@@ -151,7 +151,16 @@ public class SharedResourcesManager extends AbstractActivityProducer
         }
 
         @Override
-        public void receive(FolderActivity activity) {
+        public void receive(FolderCreatedActivity activity) {
+            try {
+                handleFolderActivity(activity);
+            } catch (IOException e) {
+                LOG.error("Failed to execute activity: " + activity, e);
+            }
+        }
+
+        @Override
+        public void receive(FolderDeletedActivity activity) {
             try {
                 handleFolderActivity(activity);
             } catch (IOException e) {
@@ -289,7 +298,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
         }
     }
 
-    private void handleFolderActivity(FolderActivity activity)
+    private void handleFolderActivity(IFileSystemModificationActivity activity)
         throws IOException {
 
         SPath path = activity.getPath();
@@ -301,9 +310,9 @@ public class SharedResourcesManager extends AbstractActivityProducer
         //because a fileCreated event will be fired asynchronously,
         //so we have to add this file to the filter list
         try {
-            if (activity.getType() == FolderActivity.Type.CREATED) {
+            if (activity instanceof FolderCreatedActivity) {
                 FileUtils.create(folder);
-            } else if (activity.getType() == FolderActivity.Type.REMOVED) {
+            } else if (activity instanceof FolderDeletedActivity) {
 
                 if (folder.exists()) {
                     FileUtils.delete(folder);

@@ -7,7 +7,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.activities.FolderActivity;
+import de.fu_berlin.inf.dpp.activities.FolderCreatedActivity;
+import de.fu_berlin.inf.dpp.activities.FolderDeletedActivity;
 import de.fu_berlin.inf.dpp.activities.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.VCSActivity;
 
@@ -58,13 +59,10 @@ class ResourceActivityFilter {
                 vcsActivities.add(activity);
             } else if (activity instanceof FileActivity) {
                 fileActivities.add(activity);
-            } else if (activity instanceof FolderActivity) {
-                FolderActivity.Type tFolder = ((FolderActivity) activity)
-                    .getType();
-                if (tFolder == FolderActivity.Type.CREATED)
-                    folderCreateActivities.add(activity);
-                else if (tFolder == FolderActivity.Type.REMOVED)
-                    folderRemoveActivities.add(activity);
+            } else if (activity instanceof FolderCreatedActivity) {
+                folderCreateActivities.add(activity);
+            } else if (activity instanceof FolderDeletedActivity) {
+                folderRemoveActivities.add(activity);
             } else {
                 otherActivities.add(activity);
             }

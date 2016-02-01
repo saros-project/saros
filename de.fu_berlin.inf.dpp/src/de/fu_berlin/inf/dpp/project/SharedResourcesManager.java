@@ -57,8 +57,10 @@ import org.picocontainer.Startable;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.activities.FolderActivity;
+import de.fu_berlin.inf.dpp.activities.FolderCreatedActivity;
+import de.fu_berlin.inf.dpp.activities.FolderDeletedActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
+import de.fu_berlin.inf.dpp.activities.IFileSystemModificationActivity;
 import de.fu_berlin.inf.dpp.activities.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.VCSActivity;
@@ -492,8 +494,7 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
     private final IActivityConsumer consumer = new AbstractActivityConsumer() {
         @Override
         public void exec(IActivity activity) {
-            if (!(activity instanceof FileActivity
-                || activity instanceof FolderActivity || activity instanceof VCSActivity))
+            if (!(activity instanceof IFileSystemModificationActivity))
                 return;
 
             /*
@@ -520,9 +521,32 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
         }
 
         @Override
-        public void receive(FolderActivity activity) {
+        public void receive(FolderCreatedActivity activity) {
+
+            SPath path = activity.getPath();
+
+            IFolder folder = ((EclipseFolderImpl) path.getProject().getFolder(
+                path.getProjectRelativePath())).getDelegate();
+
             try {
-                handleFolderActivity(activity);
+                FileUtils.create(folder);
+            } catch (CoreException e) {
+                log.error("Failed to execute activity: " + activity, e);
+            }
+        }
+
+        @Override
+        public void receive(FolderDeletedActivity activity) {
+
+            SPath path = activity.getPath();
+
+            IFolder folder = ((EclipseFolderImpl) path.getProject().getFolder(
+                path.getProjectRelativePath())).getDelegate();
+
+            try {
+                if (folder.exists())
+                    FileUtils.delete(folder);
+
             } catch (CoreException e) {
                 log.error("Failed to execute activity: " + activity, e);
             }
@@ -703,26 +727,6 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
 
         if (encoding != null)
             updateFileEncoding(encoding, file);
-    }
-
-    protected void handleFolderActivity(FolderActivity activity)
-        throws CoreException {
-
-        SPath path = activity.getPath();
-
-        IFolder folder = ((EclipseFolderImpl) path.getProject().getFolder(
-            path.getProjectRelativePath())).getDelegate();
-
-        if (activity.getType() == FolderActivity.Type.CREATED) {
-            FileUtils.create(folder);
-        } else if (activity.getType() == FolderActivity.Type.REMOVED) {
-            try {
-                if (folder.exists())
-                    FileUtils.delete(folder);
-            } catch (CoreException e) {
-                log.warn("Removing folder failed: " + folder);
-            }
-        }
     }
 
     protected void handleVCSActivity(VCSActivity activity) {

@@ -34,7 +34,11 @@ public interface IActivityReceiver {
 
     void receive(FileActivity fileActivity);
 
-    void receive(FolderActivity folderActivity);
+    void receive(FolderCreatedActivity folderCreatedActivity);
+
+    void receive(FolderDeletedActivity folderDeletedActivity);
+
+    void receive(FolderMovedActivity folderMovedActivity);
 
     void receive(JupiterActivity jupiterActivity);
 
