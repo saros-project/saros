@@ -29,7 +29,6 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.Random;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -48,9 +47,7 @@ import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
-import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.ui.browser.EclipseHTMLUIContextFactory;
@@ -67,31 +64,25 @@ import de.fu_berlin.inf.dpp.versioning.VersionManager;
 public class Saros extends AbstractUIPlugin {
 
     /**
-     * This is the Bundle-SymbolicName (a.k.a the pluginID)
-     */
-    public static final String PLUGIN_ID = "de.fu_berlin.inf.dpp"; //$NON-NLS-1$
-
-    /**
      * @JTourBusStop 1, Some Basics:
      * 
      *               This class manages the lifecycle of the Saros plug-in,
      *               contains some important supporting data members and
      *               provides methods for the integration of Saros into Eclipse.
      * 
-     *               Browse the data members. Some are quite obvious (version,
-     *               feature etc.) some need closer examination.
-     * 
+     *               Eclipse will instantiate this class during startup.
      */
 
-    private static boolean isInitialized;
+    /**
+     * This is the Bundle-SymbolicName (a.k.a the pluginID)
+     */
+    public static final String PLUGIN_ID = "de.fu_berlin.inf.dpp"; //$NON-NLS-1$
 
     private static final String VERSION_COMPATIBILITY_PROPERTY_FILE = "version.comp"; //$NON-NLS-1$
 
-    private String sarosVersion;
+    private static boolean isInitialized;
 
     private ISarosSessionManager sessionManager;
-
-    private de.fu_berlin.inf.dpp.preferences.Preferences preferences;
 
     private ConnectionHandler connectionHandler;
 
@@ -113,15 +104,15 @@ public class Saros extends AbstractUIPlugin {
      * The global plug-in preferences, shared among all workspaces. Should only
      * be accessed over {@link #getGlobalPreferences()} from outside this class.
      */
-    protected Preferences configPrefs;
+    private Preferences globalPreferences;
 
     /**
      * The secure preferences store, used to store sensitive data that may (at
      * the user's option) be stored encrypted.
      */
-    protected ISecurePreferences securePrefs;
+    private ISecurePreferences securePreferences;
 
-    protected Logger log;
+    private Logger log;
 
     /**
      * @JTourBusStop 4, Invitation Process:
@@ -137,9 +128,6 @@ public class Saros extends AbstractUIPlugin {
 
     private SarosContext applicationContext;
 
-    /**
-     * Create the shared instance.
-     */
     public Saros() {
 
         try {
@@ -162,7 +150,7 @@ public class Saros extends AbstractUIPlugin {
         setInitialized(false);
     }
 
-    protected static void setInitialized(boolean initialized) {
+    private static void setInitialized(boolean initialized) {
         isInitialized = initialized;
     }
 
@@ -184,10 +172,8 @@ public class Saros extends AbstractUIPlugin {
 
         setupLoggers();
 
-        sarosVersion = getBundle().getVersion().toString();
-
-        log.info("Starting Saros " + sarosVersion + " running:\n"
-            + getPlatformInfo());
+        log.info("Starting Saros " + getBundle().getVersion() + " running:\n"
+            + getPlatformInformation());
 
         ArrayList<ISarosContextFactory> factories = new ArrayList<ISarosContextFactory>();
         factories.add(new SarosEclipseContextFactory(this));
@@ -204,10 +190,9 @@ public class Saros extends AbstractUIPlugin {
 
         connectionHandler = applicationContext
             .getComponent(ConnectionHandler.class);
+
         sessionManager = applicationContext
             .getComponent(ISarosSessionManager.class);
-        preferences = applicationContext
-            .getComponent(de.fu_berlin.inf.dpp.preferences.Preferences.class);
 
         // additional initialization
 
@@ -227,37 +212,14 @@ public class Saros extends AbstractUIPlugin {
          */
         SarosAnnotation.resetColors();
 
-        /*
-         * Hack for MARCH 2013 release, ensure a good favorite color
-         * distribution for upgrading clients
-         */
-
-        int favoriteColorID = preferences.getFavoriteColorID();
-
-        if (!UserColorID.isValid(favoriteColorID)
-            && getPreferenceStore().getBoolean(
-                "FAVORITE_COLOR_ID_HACK_CREATE_RANDOM_COLOR")) {
-            favoriteColorID = new Random().nextInt(SarosAnnotation.SIZE);
-            log.debug("autogenerated favorite color id is: " + favoriteColorID);
-            getPreferenceStore().setValue(
-                PreferenceConstants.FAVORITE_SESSION_COLOR_ID, favoriteColorID);
-        }
-
-        getPreferenceStore().setValue(
-            "FAVORITE_COLOR_ID_HACK_CREATE_RANDOM_COLOR", false);
-
         convertAccountStore();
     }
 
-    /**
-     * This method is called when the plug-in is stopped
-     */
     @Override
     public void stop(BundleContext context) throws Exception {
 
-        // TODO Devise a general way to stop and dispose our components
         saveGlobalPreferences();
-        saveSecurePrefs();
+        saveSecurePreferences();
 
         try {
             Thread shutdownThread = ThreadUtils.runSafeAsync(
@@ -289,8 +251,8 @@ public class Saros extends AbstractUIPlugin {
 
     /**
      * Returns the global {@link Preferences} with {@link ConfigurationScope}
-     * for this plug-in or null if the node couldn't be determined. <br>
-     * <br>
+     * for this plug-in or null if the node couldn't be determined.
+     * <p>
      * The returned Preferences can be accessed concurrently by multiple threads
      * of the same JVM without external synchronization. If they are used by
      * multiple JVMs no guarantees can be made concerning data consistency (see
@@ -302,10 +264,10 @@ public class Saros extends AbstractUIPlugin {
      */
     public synchronized Preferences getGlobalPreferences() {
         // TODO Singleton-Pattern code smell: ConfigPrefs should be a @component
-        if (configPrefs == null) {
-            configPrefs = new ConfigurationScope().getNode(PLUGIN_ID);
+        if (globalPreferences == null) {
+            globalPreferences = new ConfigurationScope().getNode(PLUGIN_ID);
         }
-        return configPrefs;
+        return globalPreferences;
     }
 
     /**
@@ -315,20 +277,21 @@ public class Saros extends AbstractUIPlugin {
      */
     public synchronized void saveGlobalPreferences() {
         /*
-         * Note: If multiple JVMs use the config preferences and the underlying
+         * Note: If multiple JVMs use the global preferences and the underlying
          * backing store, they might not always work with latest data, e.g. when
          * using multiple instances of the same eclipse installation.
          */
-        if (configPrefs != null) {
-            try {
-                configPrefs.flush();
-            } catch (BackingStoreException e) {
-                log.error("Couldn't store global plug-in preferences", e);
-            }
+        if (globalPreferences == null)
+            return;
+        try {
+            globalPreferences.flush();
+        } catch (BackingStoreException e) {
+            log.error("Couldn't store global plug-in preferences", e);
         }
+
     }
 
-    protected void setupLoggers() {
+    private void setupLoggers() {
         /*
          * HACK this is not the way OSGi works but it currently fulfill its
          * purpose
@@ -356,21 +319,8 @@ public class Saros extends AbstractUIPlugin {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
 
-        log = Logger.getLogger("de.fu_berlin.inf.dpp"); //$NON-NLS-1$
+        log = Logger.getLogger(this.getClass()); //$NON-NLS-1$
 
-    }
-
-    /**
-     * Returns a string representing the Saros Version number for instance
-     * "9.5.7.r1266"
-     * 
-     * This method only returns a valid version string after the plugin has been
-     * started.
-     * 
-     * This is equivalent to the bundle version.
-     */
-    public String getVersion() {
-        return sarosVersion;
     }
 
     /**
@@ -391,7 +341,7 @@ public class Saros extends AbstractUIPlugin {
 
         try {
             de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore oldStore = new de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore(
-                getPreferenceStore(), getSecurePrefs());
+                getPreferenceStore(), getSecurePreferences());
 
             if (oldStore.isEmpty())
                 return;
@@ -428,45 +378,47 @@ public class Saros extends AbstractUIPlugin {
      * @deprecated remove after next release
      */
     @Deprecated
-    private synchronized ISecurePreferences getSecurePrefs() {
+    private synchronized ISecurePreferences getSecurePreferences() {
 
-        if (securePrefs == null) {
-            try {
-                File storeFile = new File(getStateLocation().toFile(), "/.pref"); //$NON-NLS-1$
-                URI workspaceURI = storeFile.toURI();
+        if (securePreferences != null)
+            return securePreferences;
 
-                /*
-                 * The SecurePreferencesFactory does not accept percent-encoded
-                 * URLs, so we must decode the URL before passing it.
-                 */
-                String prefLocation = URLDecoder.decode(
-                    workspaceURI.toString(), "UTF-8"); //$NON-NLS-1$
-                URL prefURL = new URL(prefLocation);
+        try {
+            File storeFile = new File(getStateLocation().toFile(), "/.pref"); //$NON-NLS-1$
+            URI workspaceURI = storeFile.toURI();
 
-                securePrefs = SecurePreferencesFactory.open(prefURL, null);
-            } catch (MalformedURLException e) {
-                log.error("Problem with URL when attempting to access secure preferences: "
-                    + e);
-            } catch (IOException e) {
-                log.error("I/O problem when attempting to access secure preferences: "
-                    + e);
-            } finally {
-                if (securePrefs == null)
-                    securePrefs = SecurePreferencesFactory.getDefault();
-            }
+            /*
+             * The SecurePreferencesFactory does not accept percent-encoded
+             * URLs, so we must decode the URL before passing it.
+             */
+            String prefLocation = URLDecoder.decode(workspaceURI.toString(),
+                "UTF-8"); //$NON-NLS-1$
+            URL prefURL = new URL(prefLocation);
+
+            securePreferences = SecurePreferencesFactory.open(prefURL, null);
+        } catch (MalformedURLException e) {
+            log.error("Problem with URL when attempting to access secure preferences: "
+                + e);
+        } catch (IOException e) {
+            log.error("I/O problem when attempting to access secure preferences: "
+                + e);
+        } finally {
+            if (securePreferences == null)
+                securePreferences = SecurePreferencesFactory.getDefault();
         }
 
-        return securePrefs;
+        return securePreferences;
     }
 
     /**
      * @deprecated remove after next release
      */
     @Deprecated
-    private synchronized void saveSecurePrefs() {
+    private synchronized void saveSecurePreferences() {
+
         try {
-            if (securePrefs != null) {
-                securePrefs.flush();
+            if (securePreferences != null) {
+                securePreferences.flush();
             }
         } catch (IOException e) {
             log.error("Exception when trying to store secure preferences: " + e);
@@ -505,7 +457,7 @@ public class Saros extends AbstractUIPlugin {
         versionManager.setCompatibilityChart(chart);
     }
 
-    private String getPlatformInfo() {
+    private String getPlatformInformation() {
 
         String javaVersion = System.getProperty("java.version",
             "Unknown Java Version");
