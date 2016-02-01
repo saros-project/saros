@@ -35,7 +35,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.helpers.LogLog;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
@@ -51,7 +50,6 @@ import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;
-import de.fu_berlin.inf.dpp.misc.pico.DotGraphMonitor;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
@@ -85,31 +83,17 @@ public class Saros extends AbstractUIPlugin {
      * 
      */
 
-    /**
-     * True if the Saros instance has been initialized so that calling
-     * reinject() will be well defined.
-     */
-    protected static boolean isInitialized;
+    private static boolean isInitialized;
 
     private static final String VERSION_COMPATIBILITY_PROPERTY_FILE = "version.comp"; //$NON-NLS-1$
 
     private String sarosVersion;
-
-    private String sarosFeatureID;
 
     private ISarosSessionManager sessionManager;
 
     private de.fu_berlin.inf.dpp.preferences.Preferences preferences;
 
     private ConnectionHandler connectionHandler;
-
-    /**
-     * To print an architecture diagram at the end of the plug-in life-cycle
-     * initialize the dotMonitor with a new instance:
-     * 
-     * <code>dotMonitor= new DotGraphMonitor();</code>
-     */
-    protected DotGraphMonitor dotMonitor;
 
     /**
      * @JTourBusStop 2, Some Basics:
@@ -175,9 +159,6 @@ public class Saros extends AbstractUIPlugin {
                 "could not load saros property file 'saros.properties'", e); //$NON-NLS-1$
         }
 
-        // Only start a DotGraphMonitor if asserts are enabled (aka debug mode)
-        assert (dotMonitor = new DotGraphMonitor()) != null;
-
         setInitialized(false);
     }
 
@@ -217,11 +198,9 @@ public class Saros extends AbstractUIPlugin {
             factories.add(new EclipseHTMLUIContextFactory());
         }
 
-        applicationContext = new SarosContext(factories, dotMonitor);
+        applicationContext = new SarosContext(factories, null);
 
         applicationContext.initialize();
-
-        sarosFeatureID = PLUGIN_ID + "_" + sarosVersion; //$NON-NLS-1$
 
         connectionHandler = applicationContext
             .getComponent(ConnectionHandler.class);
@@ -279,16 +258,6 @@ public class Saros extends AbstractUIPlugin {
         // TODO Devise a general way to stop and dispose our components
         saveGlobalPreferences();
         saveSecurePrefs();
-
-        if (dotMonitor != null) {
-            File file = ResourcesPlugin.getWorkspace().getRoot().getLocation()
-                .toFile();
-            file = new File(file, ".metadata"); //$NON-NLS-1$
-            file = new File(file, "saros-" + sarosFeatureID + ".dot"); //$NON-NLS-1$ //$NON-NLS-2$
-            log.info("Saving Saros architecture diagram dot file: "
-                + file.getAbsolutePath());
-            dotMonitor.save(file);
-        }
 
         try {
             Thread shutdownThread = ThreadUtils.runSafeAsync(

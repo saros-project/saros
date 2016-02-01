@@ -6,16 +6,15 @@ import org.apache.log4j.helpers.LogLog;
 
 import com.intellij.openapi.project.Project;
 
+import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.ISarosContextFactory;
 import de.fu_berlin.inf.dpp.SarosContext;
-import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.SarosCoreContextFactory;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.intellij.context.SarosIntellijContextFactory;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJWorkspaceImpl;
 import de.fu_berlin.inf.dpp.intellij.ui.swt_browser.SwtLibLoader;
-import de.fu_berlin.inf.dpp.misc.pico.DotGraphMonitor;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
@@ -105,7 +104,7 @@ public class Saros {
             factories.add(new HTMLUIContextFactory());
         }
 
-        sarosContext = new SarosContext(factories, new DotGraphMonitor());
+        sarosContext = new SarosContext(factories, null);
 
         sarosContext.initialize();
         
