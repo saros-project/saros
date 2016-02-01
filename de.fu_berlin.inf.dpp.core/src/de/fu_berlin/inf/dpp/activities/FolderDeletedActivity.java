@@ -14,11 +14,19 @@ public class FolderDeletedActivity extends AbstractResourceActivity implements
 
     public FolderDeletedActivity(final User source, final SPath path) {
         super(source, path);
+
+        if (path == null)
+            throw new IllegalArgumentException("path must not be null");
     }
 
     @Override
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
+    }
+
+    @Override
+    public boolean isValid() {
+        return super.isValid() && (getPath() != null);
     }
 
     @Override

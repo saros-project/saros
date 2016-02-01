@@ -18,11 +18,28 @@ public class FolderMovedActivity extends AbstractResourceActivity implements
     public FolderMovedActivity(final User source, final SPath origin,
         final SPath destination) {
         super(source, origin);
+
+        if (origin == null)
+            throw new IllegalArgumentException("origin must not be null");
+
+        if (destination == null)
+            throw new IllegalArgumentException("destination must not be null");
+
         this.destination = destination;
     }
 
+    /**
+     * Returns the destination path to move the original folder to.
+     * 
+     * @see #getPath()
+     */
     public SPath getDestination() {
         return destination;
+    }
+
+    @Override
+    public boolean isValid() {
+        return super.isValid() && (getPath() != null) && destination != null;
     }
 
     @Override
