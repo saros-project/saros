@@ -30,8 +30,6 @@ import de.fu_berlin.inf.dpp.filesystem.NullChecksumCacheImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJWorkspaceRootImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.PathFactory;
 import de.fu_berlin.inf.dpp.intellij.runtime.IntelliJSynchronizer;
-import de.fu_berlin.inf.dpp.intellij.ui.actions.FollowModeAction;
-import de.fu_berlin.inf.dpp.intellij.ui.actions.LeaveSessionAction;
 import de.fu_berlin.inf.dpp.intellij.ui.swt_browser.IntelliJDialogManager;
 import de.fu_berlin.inf.dpp.intellij.ui.swt_browser.IntelliJWebResourceLocator;
 import de.fu_berlin.inf.dpp.monitoring.remote.IRemoteProgressIndicatorFactory;
@@ -93,10 +91,6 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
             .create(IPreferenceStore.class, PropertiesComponentAdapter.class),
 
         Component.create(Preferences.class, IntelliJPreferences.class),
-
-        // UI actions
-        Component.create(FollowModeAction.class),
-        Component.create(LeaveSessionAction.class),
 
         Component.create(IRemoteProgressIndicatorFactory.class,
             IntelliJRemoteProgressIndicatorFactoryImpl.class),
