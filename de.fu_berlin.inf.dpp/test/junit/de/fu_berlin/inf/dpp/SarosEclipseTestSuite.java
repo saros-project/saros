@@ -22,6 +22,10 @@ de.fu_berlin.inf.dpp.ui.wizards.pages.TestSuite.class,
 
 de.fu_berlin.inf.dpp.util.UtilTestSuite.class,
 
+de.fu_berlin.inf.dpp.SarosEclipseContextFactoryTest.class,
+
+de.fu_berlin.inf.dpp.SarosEclipseContextTest.class
+
 })
 public class SarosEclipseTestSuite {
     // the class remains completely empty,

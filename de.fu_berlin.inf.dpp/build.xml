@@ -148,6 +148,11 @@
 				</fileset>
 				
 				<!-- HACK: as the normal class loader cannot find jars inside a jar file -->
+				<fileset dir="${workspaceDirectory}/de.fu_berlin.inf.dpp.ui/lib">
+					<include name="*.jar" />
+				</fileset>
+				
+				<!-- HACK: as the normal class loader cannot find jars inside a jar file -->
 				<fileset dir="${workspaceDirectory}/de.fu_berlin.inf.dpp.core/lib">
 					<include name="*.jar" />
 				</fileset>
