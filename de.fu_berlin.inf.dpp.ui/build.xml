@@ -17,6 +17,7 @@
 	<property name="src.dir" value="${basedir}/src" />
 	<property name="bin.dir" value="${basedir}/bin" />
 	<property name="lib.dir" value="${basedir}/lib" />
+	<property name="test.lib.dir" value="${basedir}/test/lib" />
 	<property name="build.dir" value="${basedir}/build" />
 	<property name="report.dir" value="${basedir}/report" />
 	<property name="junit.report.dir" value="${report.dir}/junit" />
