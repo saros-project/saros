@@ -185,6 +185,23 @@
         </dirset>
     </path>
 
+    <path id="core.test.classpath">
+        <path refid="core.main.classpath"/>
+        <pathelement location="${core.output.dir}"/>
+        <path refid="libraries.test.classpath"/>
+
+        <!-- necessary because the core test utilities need to be compiled
+             outside of a junit ant task -->
+        <fileset dir="${idea.home}/lib" includes="junit*.jar"/>
+    </path>
+
+    <path id="core.test.sourcepath">
+        <dirset dir="${core.basedir}/test">
+            <!-- only compile the test utilities -->
+            <include name="**/test/"/>
+        </dirset>
+    </path>
+
 
     <target name="compile.core" depends="compile.core.main,compile.core.tests"
             description="Compile core"/>
@@ -202,7 +219,13 @@
 
     <target name="compile.core.tests"
             depends="register.custom.compilers,compile.core.main"
-            description="compile core; test classes" unless="skip.tests"/>
+            description="compile core; test classes" unless="skip.tests">
+        <compile-java dest.dir="${core.testoutput.dir}"
+                      classpath="core.test.classpath"
+                      sourcepath="core.test.sourcepath"/>
+        <copy-resources dest.dir="${core.testoutput.dir}"
+                        src.dir="${core.basedir}/test/junit"/>
+    </target>
 
     <target name="clean.core" description="cleanup core">
         <delete dir="${core.output.dir}" failonerror="false"/>
@@ -283,6 +306,7 @@
         <path refid="libraries.test.classpath"/>
         <path refid="saros-i.main.classpath"/>
         <pathelement location="${saros-i.output.dir}"/>
+        <pathelement location="${core.testoutput.dir}"/>
     </path>
 
     <property name="saros-i.test.dir" value="${saros-i.basedir}/test/junit"/>
