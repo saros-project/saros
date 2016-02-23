@@ -72,7 +72,7 @@ public abstract class ProjectNegotiation extends Negotiation {
 
     /**
      * Initializes a ProjectNegotiation.
-     *
+     * 
      * @param negotiationID
      *            unique ID of the negotiation
      * @param peer
@@ -96,7 +96,7 @@ public abstract class ProjectNegotiation extends Negotiation {
     }
 
     /**
-     *
+     * 
      * @return the names of the projects that are shared by the peer. projectID
      *         => projectName
      */
@@ -105,7 +105,7 @@ public abstract class ProjectNegotiation extends Negotiation {
     /**
      * Returns the {@linkplain ISarosSession session} id this negotiation
      * belongs to.
-     *
+     * 
      * @return the id of the current session this negotiations belongs to
      */
     public final String getSessionID() {
@@ -127,8 +127,8 @@ public abstract class ProjectNegotiation extends Negotiation {
             + " of the local project negotiation cancellation");
 
         PacketExtension notification = CancelProjectNegotiationExtension.PROVIDER
-            .create(new CancelProjectNegotiationExtension(getSessionID(), cause
-                .getMessage()));
+            .create(new CancelProjectNegotiationExtension(getSessionID(),
+                getID(), cause.getMessage()));
 
         try {
             transmitter.send(ISarosSession.SESSION_CONNECTION_ID, getPeer(),
@@ -141,7 +141,7 @@ public abstract class ProjectNegotiation extends Negotiation {
     /**
      * Monitors a {@link FileTransfer} and waits until it is completed or
      * aborted.
-     *
+     * 
      * @param transfer
      *            the transfer to monitor
      * @param monitor
@@ -151,7 +151,7 @@ public abstract class ProjectNegotiation extends Negotiation {
      *            given monitor. Accepts <code>null</code>, indicating that no
      *            progress should be reported and that the operation cannot be
      *            canceled.
-     *
+     * 
      * @throws SarosCancellationException
      *             if the transfer was aborted either on local side or remote
      *             side, see also {@link LocalCancellationException} and

@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.communication.extensions;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 /**
  * @JTourBusStop 3, Creating custom network messages, Providing hints for
@@ -32,12 +33,18 @@ public class CancelProjectNegotiationExtension extends
 
     public static final Provider PROVIDER = new Provider();
 
+    @XStreamAsAttribute
+    private String negotiationID;
+
     @XStreamAlias("error")
     private String errorMessage;
 
     public CancelProjectNegotiationExtension(String sessionID,
-        String errorMessage) {
+        String negotiationID, String errorMessage) {
         super(sessionID);
+
+        this.negotiationID = negotiationID;
+
         if ((errorMessage != null) && (errorMessage.length() > 0))
             this.errorMessage = errorMessage;
     }
@@ -50,6 +57,15 @@ public class CancelProjectNegotiationExtension extends
      */
     public String getErrorMessage() {
         return errorMessage;
+    }
+
+    /**
+     * Returns the id for the specific project negotiation that was cancelled.
+     * 
+     * @return id of a project negotiation
+     */
+    public String getNegotiationID() {
+        return negotiationID;
     }
 
     /* *

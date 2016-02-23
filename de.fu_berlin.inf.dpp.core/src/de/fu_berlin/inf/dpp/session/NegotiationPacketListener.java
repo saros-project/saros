@@ -20,7 +20,6 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
-import de.fu_berlin.inf.dpp.session.SessionEndReason;
 
 /**
  * This class is responsible for receiving, handling, and/or forwarding specific
@@ -124,7 +123,7 @@ final class NegotiationPacketListener {
             }
 
             projectNegotiationCanceled(new JID(packet.getFrom()),
-                extension.getErrorMessage());
+                extension.getNegotiationID(), extension.getErrorMessage());
         }
     };
 
@@ -168,7 +167,7 @@ final class NegotiationPacketListener {
 
     /**
      * Allows to reject incoming session negotiation requests.
-     *
+     * 
      * @param reject
      *            <code>true</code> if requests should be rejected,
      *            <code>false</code> otherwise
@@ -180,7 +179,7 @@ final class NegotiationPacketListener {
     /**
      * Determines if incoming session negotiations requests are currently
      * rejected.
-     *
+     * 
      * @return <code>true</code> if requests are rejected, <code>false</code>
      *         otherwise
      */
@@ -265,25 +264,19 @@ final class NegotiationPacketListener {
     }
 
     private void projectNegotiationCanceled(final JID sender,
-        final String errorMessage) {
+        final String negotiationID, final String errorMessage) {
 
-        final ProjectNegotiation negotiation = projectNegotiations.get(sender);
-
-        /*
-         * FIXME We need the ID here as it is possible to have multiple active
-         * project negotiations for a specific JID !!!
-         */
-        final String projectNegotiationID = null;
+        final ProjectNegotiation negotiation = projectNegotiations.get(sender,
+            negotiationID);
 
         if (negotiation != null) {
             LOG.debug(sender + " canceled project negotiation [id="
-                + projectNegotiationID + ", reason=" + errorMessage + "]");
+                + negotiationID + ", reason=" + errorMessage + "]");
 
             negotiation.remoteCancel(errorMessage);
         } else {
             LOG.warn("received project negotiation cancel from " + sender
-                + " for a nonexisting instance with id: "
-                + projectNegotiationID);
+                + " for a nonexisting instance with id: " + negotiationID);
         }
     }
 
