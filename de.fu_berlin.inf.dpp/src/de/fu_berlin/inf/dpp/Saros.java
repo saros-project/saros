@@ -26,7 +26,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -45,12 +44,7 @@ import org.osgi.service.prefs.Preferences;
 
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
-import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.SessionEndReason;
-import de.fu_berlin.inf.dpp.ui.browser.EclipseHTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import de.fu_berlin.inf.dpp.versioning.VersionManager;
 
@@ -82,9 +76,7 @@ public class Saros extends AbstractUIPlugin {
 
     private static boolean isInitialized;
 
-    private ISarosSessionManager sessionManager;
-
-    private ConnectionHandler connectionHandler;
+    private EclipseSarosLifecycle lifecycle;
 
     /**
      * @JTourBusStop 2, Some Basics:
@@ -114,20 +106,6 @@ public class Saros extends AbstractUIPlugin {
 
     private Logger log;
 
-    /**
-     * @JTourBusStop 4, Invitation Process:
-     * 
-     *               If you haven't already read about PicoContainer, stop and
-     *               do so now (http://picocontainer.codehaus.org).
-     * 
-     *               Saros uses PicoContainer to manage dependencies on our
-     *               behalf. The SarosContext class encapsulates our usage of
-     *               PicoContainer. It's a well documented class, so take a look
-     *               at it.
-     */
-
-    private SarosContext applicationContext;
-
     public Saros() {
 
         try {
@@ -148,6 +126,8 @@ public class Saros extends AbstractUIPlugin {
         }
 
         setInitialized(false);
+
+        lifecycle = EclipseSarosLifecycle.getInstance(this);
     }
 
     private static void setInitialized(boolean initialized) {
@@ -175,34 +155,10 @@ public class Saros extends AbstractUIPlugin {
         log.info("Starting Saros " + getBundle().getVersion() + " running:\n"
             + getPlatformInformation());
 
-        ArrayList<ISarosContextFactory> factories = new ArrayList<ISarosContextFactory>();
-        factories.add(new SarosEclipseContextFactory(this));
-        factories.add(new SarosCoreContextFactory());
-
-        if (isSwtBrowserEnabled()) {
-            factories.add(new HTMLUIContextFactory());
-            factories.add(new EclipseHTMLUIContextFactory());
-        }
-
-        applicationContext = new SarosContext(factories, null);
-
-        applicationContext.initialize();
-
-        connectionHandler = applicationContext
-            .getComponent(ConnectionHandler.class);
-
-        sessionManager = applicationContext
-            .getComponent(ISarosSessionManager.class);
-
-        // additional initialization
-
-        FeedbackPreferences.setPreferences(applicationContext
-            .getComponent(Preferences.class));
+        lifecycle.start();
 
         initVersionCompatibilityChart(VERSION_COMPATIBILITY_PROPERTY_FILE,
-            applicationContext.getComponent(VersionManager.class));
-
-        SarosPluginContext.setSarosContext(applicationContext);
+            lifecycle.getSarosContext().getComponent(VersionManager.class));
 
         isInitialized = true;
 
@@ -226,15 +182,7 @@ public class Saros extends AbstractUIPlugin {
                 "dpp-shutdown", log, new Runnable() { //$NON-NLS-1$
                     @Override
                     public void run() {
-
-                        try {
-
-                            sessionManager
-                                .stopSarosSession(SessionEndReason.LOCAL_USER_LEFT);
-                            connectionHandler.disconnect();
-                        } finally {
-                            applicationContext.dispose();
-                        }
+                        lifecycle.stop();
                     }
                 });
 
@@ -331,7 +279,7 @@ public class Saros extends AbstractUIPlugin {
     @Deprecated
     public void convertAccountStore() {
 
-        final XMPPAccountStore accountStore = applicationContext
+        final XMPPAccountStore accountStore = lifecycle.getSarosContext()
             .getComponent(XMPPAccountStore.class);
 
         if (!accountStore.isEmpty()) {
@@ -477,17 +425,5 @@ public class Saros extends AbstractUIPlugin {
         sb.append("  Hardware Architecture: " + hardware);
 
         return sb.toString();
-    }
-
-    /**
-     * Feature toggle for displaying Saros in a web browser in an additional
-     * view. Also checks if required bundle is present.
-     * 
-     * @return true if this feature is enabled, false otherwise
-     */
-    private static boolean isSwtBrowserEnabled() {
-        // TODO store constant string elsewhere
-        return Platform.getBundle("de.fu_berlin.inf.dpp.ui") != null
-            && Boolean.getBoolean("saros.swtbrowser");
     }
 }

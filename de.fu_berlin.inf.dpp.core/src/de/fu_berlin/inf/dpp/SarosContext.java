@@ -42,6 +42,18 @@ import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 
 /**
+ * @JTourBusStop 4, Some Basics:
+ * 
+ *               If you haven't already read about PicoContainer, stop and
+ *               do so now (http://picocontainer.codehaus.org).
+ * 
+ *               Saros uses PicoContainer to manage dependencies on our
+ *               behalf. The SarosContext class encapsulates our usage of
+ *               PicoContainer. It's a well documented class, so take a look
+ *               at it.
+ */
+
+/**
  * Represents the application context. All components that are created and
  * initialized in this context are tied to the lifetime of the application, i.e
  * the components are only created once.
