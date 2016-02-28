@@ -22,10 +22,11 @@
 
 package de.fu_berlin.inf.dpp.intellij.ui.actions;
 
-import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
+
+import com.intellij.openapi.project.Project;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -39,11 +40,11 @@ public abstract class AbstractSarosAction {
     protected static final Logger LOG = Logger
         .getLogger(AbstractSarosAction.class);
 
-    @Inject
-    protected Saros saros;
-
     private final List<ActionListener> actionListeners = new ArrayList<ActionListener>();
 
+    @Inject
+    protected Project project;
+    
     protected AbstractSarosAction() {
         SarosPluginContext.initComponent(this);
     }

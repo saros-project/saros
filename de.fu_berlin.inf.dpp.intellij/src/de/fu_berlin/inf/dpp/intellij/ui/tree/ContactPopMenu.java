@@ -24,13 +24,17 @@ package de.fu_berlin.inf.dpp.intellij.ui.tree;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
-import de.fu_berlin.inf.dpp.core.Saros;
+import com.intellij.openapi.project.Project;
+
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.core.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import org.apache.log4j.Logger;
+import org.picocontainer.annotations.Inject;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -50,28 +54,34 @@ class ContactPopMenu extends JPopupMenu {
 
     private static final Logger LOG = Logger.getLogger(ContactPopMenu.class);
 
-    private Saros saros;
+    @Inject
+    private IWorkspace workspace;
+    
+    @Inject
+    private Project project;
 
     private final ContactTreeRootNode.ContactInfo contactInfo;
 
-    public ContactPopMenu(Saros saros,
-        ContactTreeRootNode.ContactInfo contactInfo) {
+    public ContactPopMenu(ContactTreeRootNode.ContactInfo contactInfo) {
         this.contactInfo = contactInfo;
-        this.saros = saros;
 
+        if (workspace == null && project == null) {
+            SarosPluginContext.initComponent(this);
+        }
+        
         JMenu menuShareProject = new JMenu("Work together on...");
         menuShareProject.setIcon(IconManager.SESSIONS_ICON);
 
-        if (saros.getProject() == null) {
+        if (project == null) {
             return;
         }
 
         ModuleManager moduleManager = ModuleManager
-            .getInstance(saros.getProject());
+            .getInstance(project);
         if (moduleManager != null) {
             for (Module module : moduleManager.getModules()) {
 
-                if (saros.getProject().getName()
+                if (project.getName()
                     .equalsIgnoreCase(module.getName())) {
                     continue;
                 }
@@ -85,7 +95,7 @@ class ContactPopMenu extends JPopupMenu {
             }
 
         } else {
-            File dir = new File(saros.getProject().getBasePath());
+            File dir = new File(project.getBasePath());
             for (File myDir : dir.listFiles()) {
                 if (myDir.getName().startsWith(".") || myDir.isFile()) {
                     continue;
@@ -117,7 +127,7 @@ class ContactPopMenu extends JPopupMenu {
             try {
                 List<IResource> resources;
 
-                IProject proj = saros.getWorkspace().getProject(dir.getName());
+                IProject proj = workspace.getProject(dir.getName());
                 proj.refreshLocal();
 
                 resources = Arrays.asList((IResource) proj);

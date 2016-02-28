@@ -26,7 +26,6 @@ import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.project.Project;
-import de.fu_berlin.inf.dpp.core.Saros;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.helpers.LogLog;
 import org.jetbrains.annotations.NotNull;
@@ -36,11 +35,17 @@ import java.awt.event.KeyEvent;
 
 /**
  * Component that is initalized when a project is loaded.
- * It initializes the logging, shortcuts and the {@link Saros} object.
+ * It initializes the logging, shortcuts and the {@link IntelliJSarosLifecycle} singleton.
  */
 public class SarosComponent
     implements com.intellij.openapi.components.ProjectComponent {
 
+    /**
+     * This is the plugin ID that identifies the saros plugin in the IDEA
+     * ecosystem.
+     */
+    public static final String PLUGIN_ID = "de.fu_berlin.inf.dpp.intellij";
+    
     public SarosComponent(final Project project) {
         loadLoggers();
 
@@ -50,7 +55,12 @@ public class SarosComponent
                 java.awt.event.InputEvent.ALT_DOWN_MASK), null
         ));
 
-        Saros.create(project);
+        IntellijSarosLifecycle.getInstance(project).start();
+    }
+    
+
+    public static boolean isSwtBrowserEnabled() {
+        return Boolean.getBoolean("saros.swtbrowser");
     }
 
     private void loadLoggers() {

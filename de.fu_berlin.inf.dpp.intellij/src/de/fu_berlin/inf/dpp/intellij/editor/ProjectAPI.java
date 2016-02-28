@@ -32,7 +32,6 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.ui.UIUtil;
-import de.fu_berlin.inf.dpp.core.Saros;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -44,7 +43,6 @@ public class ProjectAPI {
     private Application application;
     private FileDocumentManager fileDocumentManager;
 
-    private Project project;
     private FileEditorManager editorFileManager;
 
     private class WriteAction implements Runnable {
@@ -76,8 +74,7 @@ public class ProjectAPI {
     /**
      * Creates an ProjectAPI with the current Project and initializes Fields.
      */
-    public ProjectAPI(Saros saros) {
-        this.project = saros.getProject();
+    public ProjectAPI(Project project) {
         this.editorFileManager = FileEditorManager.getInstance(project);
 
         this.application = ApplicationManager.getApplication();

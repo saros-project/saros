@@ -1,7 +1,5 @@
 package de.fu_berlin.inf.dpp.intellij.test;
 
-import de.fu_berlin.inf.dpp.core.Saros;
-import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.powermock.api.easymock.PowerMock;
@@ -9,9 +7,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createNiceMock;
-import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
 
 public class IntellijMocker {
     /**
@@ -57,14 +53,5 @@ public class IntellijMocker {
 
         expectLastCall().andStubReturn(instance);
         PowerMock.replay(clazz);
-    }
-
-    public static Saros mockSaros() {
-        Saros saros = createNiceMock(Saros.class);
-        IWorkspace workspace = createNiceMock(IWorkspace.class);
-        expect(saros.getWorkspace()).andStubReturn(workspace);
-        replay(saros, workspace);
-
-        return saros;
     }
 }

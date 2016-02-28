@@ -5,13 +5,13 @@ import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.ISarosContextFactory;
 import de.fu_berlin.inf.dpp.SarosCoreContextFactory;
-import de.fu_berlin.inf.dpp.core.Saros;
-import de.fu_berlin.inf.dpp.intellij.test.IntellijMocker;
 import de.fu_berlin.inf.dpp.test.mocks.ContextMocker;
+import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,39 +23,42 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import java.util.ArrayList;
 import java.util.List;
 
+import static de.fu_berlin.inf.dpp.intellij.test.IntellijMocker.mockStaticGetInstance;
+
 /**
  * Checks the Saros/I context for integrity.
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ CommandProcessor.class, FileDocumentManager.class,
-    FileEditorManager.class, PropertiesComponent.class })
+    FileEditorManager.class, LocalFileSystem.class, PropertiesComponent.class })
 public class SarosIntellijContextTest {
 
     private MutablePicoContainer container;
-    private Saros saros;
+    private Project project;
 
     @Before
     public void setup() {
         container = ContextMocker.emptyContext();
 
         // mock IntelliJ dependencies
-        IntellijMocker.mockStaticGetInstance(CommandProcessor.class, null);
-        IntellijMocker.mockStaticGetInstance(FileDocumentManager.class, null);
-        IntellijMocker
-            .mockStaticGetInstance(FileEditorManager.class, Project.class);
-        IntellijMocker.mockStaticGetInstance(PropertiesComponent.class, null);
+        mockStaticGetInstance(CommandProcessor.class, null);
+        mockStaticGetInstance(FileDocumentManager.class, null);
+        mockStaticGetInstance(FileEditorManager.class, Project.class);
+        mockStaticGetInstance(LocalFileSystem.class, null);
+        mockStaticGetInstance(PropertiesComponent.class, null);
+
+        project = EasyMock.createNiceMock(Project.class);
+        EasyMock.replay(project);
 
         // mock Saros environment
         ContextMocker.addMock(container, ISarosContext.class);
-
-        saros = IntellijMocker.mockSaros();
     }
 
     @Test
     public void createComponentsWithoutSWT() {
         List<ISarosContextFactory> factories = new ArrayList<ISarosContextFactory>();
 
-        factories.add(new SarosIntellijContextFactory(saros));
+        factories.add(new SarosIntellijContextFactory(project));
         factories.add(new SarosCoreContextFactory());
 
         for (ISarosContextFactory factory : factories) {
@@ -69,7 +72,7 @@ public class SarosIntellijContextTest {
     public void createComponentsWithSWT() {
         List<ISarosContextFactory> factories = new ArrayList<ISarosContextFactory>();
 
-        factories.add(new SarosIntellijContextFactory(saros));
+        factories.add(new SarosIntellijContextFactory(project));
         factories.add(new SarosCoreContextFactory());
         factories.add(new HTMLUIContextFactory());
 

@@ -1,8 +1,7 @@
 package de.fu_berlin.inf.dpp.intellij.ui.swt_browser;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.WindowManager;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.IBrowserDialog;
@@ -10,6 +9,9 @@ import de.fu_berlin.inf.dpp.ui.pages.IBrowserPage;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+
+import org.picocontainer.annotations.Inject;
+
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -18,23 +20,18 @@ import java.awt.event.WindowEvent;
  */
 public class IntelliJDialogManager extends DialogManager {
 
-    private Saros saros;
+    private Project project;
 
-    /**
-     * TODO just inject project object instead of Saros
-     *
-     * @param saros Saros object (needed to display dialog
-     *              in the IntelliJ Window)
-     */
-    public IntelliJDialogManager(Saros saros, UISynchronizer uiSynchronizer) {
+    public IntelliJDialogManager(UISynchronizer uiSynchronizer, Project project) {
         super(uiSynchronizer);
-        this.saros = saros;
+        
+        this.project = project;
     }
 
     @Override
     protected IBrowserDialog createDialog(final IBrowserPage startPage) {
         JFrame parent = WindowManager.getInstance()
-            .getFrame(saros.getProject());
+            .getFrame(project);
         JDialog jDialog = new JDialog(parent);
         jDialog.addWindowListener(new WindowAdapter() {
             @Override

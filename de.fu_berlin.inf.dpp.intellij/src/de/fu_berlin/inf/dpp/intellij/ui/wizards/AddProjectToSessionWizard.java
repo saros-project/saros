@@ -123,7 +123,7 @@ public class AddProjectToSessionWizard extends Wizard {
             //and it is unclear how that resolves.
             final String newProjectName = selectProjectPage
                 .getLocalProjectName();
-            IProject project = saros.getWorkspace().getProject(newProjectName);
+            IProject project = workspace.getProject(newProjectName);
 
             localProjects.put(remoteProjectID, project);
 

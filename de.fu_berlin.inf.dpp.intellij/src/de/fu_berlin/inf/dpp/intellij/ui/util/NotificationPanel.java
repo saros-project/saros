@@ -22,18 +22,17 @@
 
 package de.fu_berlin.inf.dpp.intellij.ui.util;
 
-import org.apache.log4j.Logger;
-import org.picocontainer.annotations.Inject;
-
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.Project;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.core.Saros;
+import org.apache.log4j.Logger;
+import org.picocontainer.annotations.Inject;
 
 /**
  * Class uses IntelliJ API to show notifications
@@ -46,7 +45,7 @@ public class NotificationPanel {
         GROUP_NOTIFICATION_ID, NotificationDisplayType.BALLOON, true);
 
     @Inject
-    private static Saros saros;
+    private static Project project;
 
     static {
         SarosPluginContext.initComponent(new NotificationPanel());
@@ -73,7 +72,7 @@ public class NotificationPanel {
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             @Override
             public void run() {
-                Notifications.Bus.notify(notification, saros.getProject());
+                Notifications.Bus.notify(notification, project);
             }
         });
 

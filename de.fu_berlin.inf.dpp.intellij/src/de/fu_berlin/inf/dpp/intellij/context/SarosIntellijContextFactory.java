@@ -4,7 +4,6 @@ import de.fu_berlin.inf.dpp.AbstractSarosContextFactory;
 import de.fu_berlin.inf.dpp.ISarosContextBindings;
 import de.fu_berlin.inf.dpp.communication.connection.IProxyResolver;
 import de.fu_berlin.inf.dpp.connection.NullProxyResolver;
-import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.core.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.core.monitoring.remote.IntelliJRemoteProgressIndicatorFactoryImpl;
 import de.fu_berlin.inf.dpp.core.project.internal.SarosIntellijSessionContextFactory;
@@ -19,6 +18,7 @@ import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRoot;
+import de.fu_berlin.inf.dpp.filesystem.NullChecksumCacheImpl;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorAPI;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorHandler;
@@ -26,7 +26,7 @@ import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorManipulator;
 import de.fu_berlin.inf.dpp.intellij.editor.ProjectAPI;
 import de.fu_berlin.inf.dpp.intellij.preferences.IntelliJPreferences;
 import de.fu_berlin.inf.dpp.intellij.preferences.PropertiesComponentAdapter;
-import de.fu_berlin.inf.dpp.filesystem.NullChecksumCacheImpl;
+import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJWorkspaceImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJWorkspaceRootImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.PathFactory;
 import de.fu_berlin.inf.dpp.intellij.runtime.IntelliJSynchronizer;
@@ -44,14 +44,14 @@ import de.fu_berlin.inf.dpp.vcs.VCSProviderFactory;
 import org.picocontainer.BindKey;
 import org.picocontainer.MutablePicoContainer;
 
+import com.intellij.openapi.project.Project;
+
 import java.util.Arrays;
 
 /**
  * IntelliJ related context
  */
 public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
-
-    private Saros saros;
 
     /**
      * Must not be static in order to avoid heavy work during class
@@ -110,28 +110,29 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
         Component.create(AwarenessInformationCollector.class)
 
     };
-
-    public SarosIntellijContextFactory(Saros saros) {
-        this.saros = saros;
+    
+    private Project project;
+    
+    public SarosIntellijContextFactory(Project project) {
+        this.project = project;
     }
 
     @Override
     public void createComponents(MutablePicoContainer container) {
 
-        IWorkspace workspace = saros.getWorkspace();
+        IWorkspace workspace = new IntelliJWorkspaceImpl(project); 
         FileUtils.workspace = workspace;
 
         // Saros Core PathIntl Support
         container.addComponent(IPathFactory.class, new PathFactory());
 
         container.addComponent(IWorkspace.class, workspace);
+        container.addComponent(Project.class, project);
 
         for (Component component : Arrays.asList(components)) {
             container.addComponent(component.getBindKey(),
                 component.getImplementation());
         }
-
-        container.addComponent(saros);
 
         container.addComponent(BindKey.bindKey(String.class,
                 ISarosContextBindings.SarosVersion.class),

@@ -23,7 +23,6 @@
 package de.fu_berlin.inf.dpp.core.ui.util;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.core.monitoring.IStatus;
 import de.fu_berlin.inf.dpp.core.monitoring.Status;
 import de.fu_berlin.inf.dpp.core.util.FileUtils;
@@ -31,6 +30,7 @@ import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.intellij.SarosComponent;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJFolderImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJProjectImpl;
 import de.fu_berlin.inf.dpp.intellij.runtime.UIMonitoredJob;
@@ -123,8 +123,8 @@ public class CollaborationUtils {
                 } catch (Exception e) {
 
                     LOG.error("could not start a Saros session", e);
-                    return new Status(IStatus.ERROR, Saros.PLUGIN_ID,
-                        e.getMessage(), e);
+                    return new Status(IStatus.ERROR,
+                        SarosComponent.PLUGIN_ID, e.getMessage(), e);
                 }
 
                 return Status.OK_STATUS;

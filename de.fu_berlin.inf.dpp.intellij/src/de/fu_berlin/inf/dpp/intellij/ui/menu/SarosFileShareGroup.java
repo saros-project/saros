@@ -31,7 +31,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJFolderImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJProjectImpl;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -72,15 +71,16 @@ public class SarosFileShareGroup extends ActionGroup {
     public AnAction[] getChildren(
         @Nullable
         AnActionEvent e) {
-        //the object has to be initialized here, because it is created before
-        //{@link Saros}.
-        if (sessionManager == null && connectionService == null && Saros
-            .isInitialized()) {
+        // This has to be initialized here, because doing it in the
+        // constructor would be too early. The lifecycle is not
+        // running yet when this class is instanciated.
+        // To make the dependency injection work,
+        // SarosPluginContext.initComponent has to be called here.
+        if (sessionManager == null && connectionService == null) {
             SarosPluginContext.initComponent(this);
         }
 
-        if (e == null || !Saros.isInitialized()
-            || sessionManager.getSarosSession() != null) {
+        if (e == null || sessionManager.getSarosSession() != null) {
             return new AnAction[0];
         }
 

@@ -28,6 +28,7 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.event.SelectionEvent;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -38,7 +39,6 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
-import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.core.editor.RemoteWriteAccessManager;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
@@ -50,6 +50,7 @@ import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorManager;
 import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorModel;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJWorkspaceImpl;
@@ -259,12 +260,11 @@ public class EditorManager extends AbstractActivityProducer implements
 
             //HACK: Editors that are already opened have to be added to the EditorPool
             FileEditorManager fileEditorManager = FileEditorManager.
-                getInstance(saros.getProject());
-            IntelliJWorkspaceImpl workspace = (IntelliJWorkspaceImpl) saros.getWorkspace();
-            for (IProject project : session.getProjects())
+                getInstance(project);
+            for (IProject proj : session.getProjects())
                 for (VirtualFile file : fileEditorManager.getOpenFiles()) {
-                    if (project.getFullPath().equals(
-                        workspace.getProjectForPath(file.getPath())
+                    if (proj.getFullPath().equals(
+                        ((IntelliJWorkspaceImpl)workspace).getProjectForPath(file.getPath())
                             .getFullPath()
                     )) {
                         localEditorHandler.openEditor(file);
@@ -469,7 +469,9 @@ public class EditorManager extends AbstractActivityProducer implements
 
     private final EditorPool editorPool = new EditorPool();
 
-    private final Saros saros;
+    private IWorkspace workspace;
+    
+    private Project project;
 
     private final SharedEditorListenerDispatch editorListenerDispatch = new SharedEditorListenerDispatch();
     private RemoteEditorManager remoteEditorManager;
@@ -494,15 +496,17 @@ public class EditorManager extends AbstractActivityProducer implements
 
     public EditorManager(ISarosSessionManager sessionManager,
         LocalEditorHandler localEditorHandler,
-        LocalEditorManipulator localEditorManipulator, Saros saros) {
+        LocalEditorManipulator localEditorManipulator,
+        IWorkspace workspace,
+        Project project) {
 
         remoteEditorManager = new RemoteEditorManager(session);
         sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
         addSharedEditorListener(sharedEditorListener);
         this.localEditorHandler = localEditorHandler;
         this.localEditorManipulator = localEditorManipulator;
-
-        this.saros = saros;
+        this.workspace = workspace;
+        this.project = project;
 
         documentListener = new StoppableDocumentListener(this);
         fileListener = new StoppableEditorFileListener(this);

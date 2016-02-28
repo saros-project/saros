@@ -35,7 +35,6 @@ import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.ui.UIUtil;
-import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorModel;
 
 import java.awt.Color;
@@ -50,13 +49,14 @@ public class EditorAPI {
 
     private Application application;
     private CommandProcessor commandProcessor;
+    
     private Project project;
 
     /**
      * Creates an EditorAPI with the current Project and initializes Fields.
      */
-    public EditorAPI(Saros saros) {
-        this.project = saros.getProject();
+    public EditorAPI(Project project) {
+        this.project = project;
         this.application = ApplicationManager.getApplication();
         this.commandProcessor = CommandProcessor.getInstance();
     }

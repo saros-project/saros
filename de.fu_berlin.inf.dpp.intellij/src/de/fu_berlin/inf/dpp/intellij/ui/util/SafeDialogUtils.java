@@ -22,9 +22,9 @@
 
 package de.fu_berlin.inf.dpp.intellij.ui.util;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.util.ui.UIUtil;
-import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.picocontainer.annotations.Inject;
 
@@ -35,7 +35,7 @@ import java.awt.Component;
  */
 public class SafeDialogUtils {
     @Inject
-    private static Saros saros;
+    private static Project project;
 
     static {
         SarosPluginContext.initComponent(new SafeDialogUtils());
@@ -55,7 +55,7 @@ public class SafeDialogUtils {
             @Override
             public void run() {
                 String option = Messages
-                    .showInputDialog(saros.getProject(), message, title,
+                    .showInputDialog(project, message, title,
                         Messages.getQuestionIcon(), initialValue, null);
                 if (option != null) {
                     response.append(option);
@@ -69,7 +69,7 @@ public class SafeDialogUtils {
         UIUtil.invokeAndWaitIfNeeded(new Runnable() {
             @Override
             public void run() {
-                Messages.showWarningDialog(saros.getProject(), message, title);
+                Messages.showWarningDialog(project, message, title);
             }
         });
     }
@@ -78,7 +78,7 @@ public class SafeDialogUtils {
         UIUtil.invokeAndWaitIfNeeded(new Runnable() {
             @Override
             public void run() {
-                Messages.showErrorDialog(saros.getProject(), message, title);
+                Messages.showErrorDialog(project, message, title);
             }
         });
     }

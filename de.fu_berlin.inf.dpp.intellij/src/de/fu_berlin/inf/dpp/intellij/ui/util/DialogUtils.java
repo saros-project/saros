@@ -22,9 +22,9 @@
 
 package de.fu_berlin.inf.dpp.intellij.ui.util;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.WindowManager;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.core.Saros;
 import org.picocontainer.annotations.Inject;
 
 import javax.swing.JOptionPane;
@@ -37,8 +37,8 @@ import java.awt.Container;
 public class DialogUtils {
 
     @Inject
-    private static Saros saros;
-
+    private static Project project;
+    
     private DialogUtils() {
     }
 
@@ -113,6 +113,6 @@ public class DialogUtils {
     private static Component notNullOrDefaultParent(Component parent) {
         return parent != null ?
             parent :
-            WindowManager.getInstance().getFrame(saros.getProject());
+            WindowManager.getInstance().getFrame(project);
     }
 }

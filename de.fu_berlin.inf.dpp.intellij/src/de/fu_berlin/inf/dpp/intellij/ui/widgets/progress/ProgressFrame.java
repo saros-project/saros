@@ -22,8 +22,8 @@
 
 package de.fu_berlin.inf.dpp.intellij.ui.widgets.progress;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.WindowManager;
-import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import org.picocontainer.annotations.Inject;
@@ -48,7 +48,7 @@ public class ProgressFrame implements IProgressMonitor {
     private MonitorProgressBar monitorProgressBar;
 
     @Inject
-    private Saros saros;
+    private Project project;
 
     private JFrame frmMain;
     private JButton btnCancel;
@@ -71,7 +71,7 @@ public class ProgressFrame implements IProgressMonitor {
         frmMain = new JFrame(title);
         frmMain.setSize(300, 160);
         frmMain.setLocationRelativeTo(
-            WindowManager.getInstance().getFrame(saros.getProject()));
+            WindowManager.getInstance().getFrame(project));
 
         Container pane = frmMain.getContentPane();
         pane.setLayout(null);

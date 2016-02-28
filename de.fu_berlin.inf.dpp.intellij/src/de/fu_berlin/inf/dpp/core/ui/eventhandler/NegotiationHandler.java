@@ -24,9 +24,9 @@ package de.fu_berlin.inf.dpp.core.ui.eventhandler;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
-import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.core.monitoring.IStatus;
 import de.fu_berlin.inf.dpp.core.monitoring.Status;
+import de.fu_berlin.inf.dpp.intellij.SarosComponent;
 import de.fu_berlin.inf.dpp.intellij.runtime.UIMonitoredJob;
 import de.fu_berlin.inf.dpp.intellij.ui.Messages;
 import de.fu_berlin.inf.dpp.intellij.ui.util.DialogUtils;
@@ -173,7 +173,8 @@ public class NegotiationHandler implements INegotiationHandler {
                 case CANCEL:
                     return Status.CANCEL_STATUS;
                 case ERROR:
-                    return new Status(IStatus.ERROR, Saros.PLUGIN_ID,
+                    return new Status(IStatus.ERROR,
+                        SarosComponent.PLUGIN_ID,
                         negotiation.getErrorMessage());
                 case OK:
                     break;
@@ -188,7 +189,7 @@ public class NegotiationHandler implements INegotiationHandler {
 
                     return new Status(
                         IStatus.CANCEL,
-                        Saros.PLUGIN_ID,
+                        SarosComponent.PLUGIN_ID,
                         MessageFormat
                             .format(
                                 Messages.NegotiationHandler_canceled_invitation_text,
@@ -205,7 +206,7 @@ public class NegotiationHandler implements INegotiationHandler {
 
                     return new Status(
                         IStatus.ERROR,
-                        Saros.PLUGIN_ID,
+                        SarosComponent.PLUGIN_ID,
                         MessageFormat
                             .format(
                                 Messages.NegotiationHandler_error_during_invitation_text,
@@ -213,7 +214,7 @@ public class NegotiationHandler implements INegotiationHandler {
                 }
             } catch (Exception e) {
                 LOG.error("This exception is not expected here: ", e);
-                return new Status(IStatus.ERROR, Saros.PLUGIN_ID,
+                return new Status(IStatus.ERROR, SarosComponent.PLUGIN_ID,
                     e.getMessage(), e);
 
             }
@@ -248,7 +249,8 @@ public class NegotiationHandler implements INegotiationHandler {
                 case CANCEL:
                     return Status.CANCEL_STATUS;
                 case ERROR:
-                    return new Status(IStatus.ERROR, Saros.PLUGIN_ID,
+                    return new Status(IStatus.ERROR,
+                        SarosComponent.PLUGIN_ID,
                         negotiation.getErrorMessage());
                 case OK:
                     break;
@@ -270,7 +272,8 @@ public class NegotiationHandler implements INegotiationHandler {
                             }
                         });
 
-                    return new Status(IStatus.CANCEL, Saros.PLUGIN_ID, message);
+                    return new Status(IStatus.CANCEL,
+                        SarosComponent.PLUGIN_ID, message);
 
                 case REMOTE_ERROR:
                     message = MessageFormat
@@ -282,12 +285,13 @@ public class NegotiationHandler implements INegotiationHandler {
                             Messages.NegotiationHandler_sharing_project_canceled_remotely_text,
                             message);
 
-                    return new Status(IStatus.ERROR, Saros.PLUGIN_ID, message);
+                    return new Status(IStatus.ERROR,
+                        SarosComponent.PLUGIN_ID, message);
                 }
             } catch (Exception e) {
                 LOG.error("This exception is not expected here: ", e);
-                return new Status(IStatus.ERROR, Saros.PLUGIN_ID,
-                    e.getMessage(), e);
+                return new Status(IStatus.ERROR,
+                    SarosComponent.PLUGIN_ID, e.getMessage(), e);
 
             }
 

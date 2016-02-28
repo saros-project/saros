@@ -23,7 +23,6 @@
 package de.fu_berlin.inf.dpp.intellij.ui.tree;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.User;
 import org.picocontainer.annotations.Inject;
@@ -42,9 +41,6 @@ public class TreeClickListener extends MouseAdapter {
 
     @Inject
     private ISarosSessionManager sessionManager;
-
-    @Inject
-    private Saros saros;
 
     public TreeClickListener(SessionAndContactsTreeView treeView) {
         SarosPluginContext.initComponent(this);
@@ -79,8 +75,7 @@ public class TreeClickListener extends MouseAdapter {
                 ContactTreeRootNode.ContactInfo contactInfo = (ContactTreeRootNode.ContactInfo) node
                     .getUserObject();
                 if (contactInfo.isOnline()) {
-                    ContactPopMenu menu = new ContactPopMenu(saros,
-                        contactInfo);
+                    ContactPopMenu menu = new ContactPopMenu(contactInfo);
                     menu.show(e.getComponent(), e.getX(), e.getY());
                 }
             } else if (
