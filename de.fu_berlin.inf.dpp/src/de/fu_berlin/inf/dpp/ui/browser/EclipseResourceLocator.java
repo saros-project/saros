@@ -15,13 +15,13 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 import org.osgi.framework.Bundle;
 
-import de.fu_berlin.inf.dpp.ui.ide_embedding.IWebResourceLocator;
+import de.fu_berlin.inf.dpp.ui.ide_embedding.IUiResourceLocator;
 
 /**
  * This class implements the locating of web resources for Eclipse. It extracts
  * bundle resources internally and provides the URLs to the extracted resources.
  */
-public class EclipseResourceLocator implements IWebResourceLocator {
+public class EclipseResourceLocator implements IUiResourceLocator {
 
     private static final Logger LOG = Logger
         .getLogger(EclipseResourceLocator.class);

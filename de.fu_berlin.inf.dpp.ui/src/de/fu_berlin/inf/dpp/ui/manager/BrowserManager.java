@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
+import de.fu_berlin.inf.dpp.ui.pages.IBrowserPage;
 import de.fu_berlin.inf.dpp.ui.renderer.Renderer;
-import de.fu_berlin.inf.dpp.ui.webpages.IBrowserPage;
 
 /**
  * This class manages the different browser instances for the dialogs and the
@@ -21,11 +21,12 @@ public class BrowserManager {
      * renderers.
      * 
      * @param page
-     *            the webpage
+     *            the page
      * @param browser
      *            the browser to be set for the given page
      */
-    public synchronized void setBrowser(IBrowserPage page, IJQueryBrowser browser) {
+    public synchronized void setBrowser(IBrowserPage page,
+        IJQueryBrowser browser) {
         browsers.put(page.getClass(), browser);
         for (Renderer renderer : page.getRenderers()) {
             renderer.addBrowser(browser);

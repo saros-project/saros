@@ -5,7 +5,7 @@ import java.rmi.RemoteException;
 import de.fu_berlin.inf.ag_se.browser.html.ISelector;
 import de.fu_berlin.inf.dpp.stf.server.HTMLSTFRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLButton;
-import de.fu_berlin.inf.dpp.ui.webpages.MainPage;
+import de.fu_berlin.inf.dpp.ui.pages.MainPage;
 
 public final class RemoteHTMLButton extends HTMLSTFRemoteObject implements
     IRemoteHTMLButton {

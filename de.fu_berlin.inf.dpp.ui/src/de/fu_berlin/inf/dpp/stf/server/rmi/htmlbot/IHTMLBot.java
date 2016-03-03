@@ -6,7 +6,7 @@ import java.util.List;
 
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotDialog;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLButton;
-import de.fu_berlin.inf.dpp.ui.webpages.IBrowserPage;
+import de.fu_berlin.inf.dpp.ui.pages.IBrowserPage;
 
 /**
  * This interface is part of the HTML GUI test framework. It provides methods to

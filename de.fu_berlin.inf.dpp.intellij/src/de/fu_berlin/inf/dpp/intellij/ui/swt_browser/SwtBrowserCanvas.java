@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.intellij.ui.swt_browser;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.ui.webpages.IBrowserPage;
+import de.fu_berlin.inf.dpp.ui.pages.IBrowserPage;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.BrowserCreator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;

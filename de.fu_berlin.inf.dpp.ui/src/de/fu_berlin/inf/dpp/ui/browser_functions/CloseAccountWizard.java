@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.ui.browser_functions;
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
-import de.fu_berlin.inf.dpp.ui.webpages.AccountPage;
+import de.fu_berlin.inf.dpp.ui.pages.AccountPage;
 
 /**
  * Offers a via Javascript invokable method to close an open {@link AccountPage}

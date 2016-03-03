@@ -10,8 +10,8 @@ import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.BrowserCreator;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.IBrowserDialog;
+import de.fu_berlin.inf.dpp.ui.pages.IBrowserPage;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.ui.webpages.IBrowserPage;
 
 /**
  * Eclipse side implementation of the IDialogManager interface
@@ -42,7 +42,7 @@ public class EclipseDialogManager extends DialogManager {
 
             @Override
             public void shellClosed(ShellEvent e) {
-                removeDialogEntry(browserPage.getWebpageResource());
+                removeDialogEntry(browserPage.getRelativePath());
             }
 
         });

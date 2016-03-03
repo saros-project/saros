@@ -5,7 +5,7 @@ import java.rmi.RemoteException;
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.dpp.stf.server.HTMLSTFRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotDialog;
-import de.fu_berlin.inf.dpp.ui.webpages.IBrowserPage;
+import de.fu_berlin.inf.dpp.ui.pages.IBrowserPage;
 
 public class RemoteBotDialog extends HTMLSTFRemoteObject implements
     IRemoteBotDialog {

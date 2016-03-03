@@ -5,15 +5,17 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import de.fu_berlin.inf.ag_se.browser.IBrowser;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
-import de.fu_berlin.inf.dpp.ui.webpages.IBrowserPage;
+import de.fu_berlin.inf.dpp.ui.pages.IBrowserPage;
 
 /**
  * IDE-independent base class for managing HTML dialogs.
  * 
  * Those dialogs are displayed in a new window inside a browser. The
  * simultaneous display of multiple dialogs is supported. However, there may
- * only be one dialog open for each webpage at the same time.
+ * only be one dialog open for each {@link IBrowserPage IBrowserPage} at the
+ * same time.
  */
 public abstract class DialogManager {
 
@@ -28,9 +30,10 @@ public abstract class DialogManager {
     }
 
     /**
-     * Shows a dialog displaying an HTML page. For each page there may only be
-     * one open dialog window. If this method is called when the dialog is
-     * already displayed, nothing happens.
+     * Shows a dialog displaying an HTML page inside a {@link IBrowser}. For
+     * each {@link IBrowserPage} there may only be one open dialog window. If
+     * this method is called when the dialog is already displayed, nothing
+     * happens.
      * <p/>
      * May be called from any thread.
      * 
@@ -41,20 +44,20 @@ public abstract class DialogManager {
         uiSynchronizer.asyncExec(new Runnable() {
             @Override
             public void run() {
-                String webpageResource = browserPage.getWebpageResource();
+                String resource = browserPage.getRelativePath();
 
-                if (dialogIsOpen(webpageResource)) {
+                if (dialogIsOpen(resource)) {
                     // If the user try to open a dialog that is already open,
                     // the dialog should get active and in the foreground to
                     // help the user find it.
 
-                    reopenDialogWindow(webpageResource);
+                    reopenDialogWindow(resource);
                     return;
                 }
 
                 IBrowserDialog dialog = createDialog(browserPage);
 
-                openDialogs.put(webpageResource, dialog);
+                openDialogs.put(resource, dialog);
             }
         });
     }
@@ -74,21 +77,22 @@ public abstract class DialogManager {
      * <p/>
      * May be called from any thread.
      * 
-     * @param webPage
-     *            a String representing the page, this string can be obtained
-     *            via {@link IBrowserPage#getWebpageResource()}
+     * @param pageId
+     *            a String representing the page that should be closed. Since we
+     *            use the pageResource as an identifier, this string can be
+     *            obtained via {@link IBrowserPage#getRelativePath()}
      */
-    public void closeDialogWindow(final String webPage) {
+    public void closeDialogWindow(final String pageId) {
         uiSynchronizer.asyncExec(new Runnable() {
             @Override
             public void run() {
-                if (!dialogIsOpen(webPage)) {
-                    LOG.warn(webPage + "could not be found");
+                if (!dialogIsOpen(pageId)) {
+                    LOG.warn(pageId + "could not be found");
                     return;
                 }
 
                 // shell is removed in the ShellLister
-                openDialogs.get(webPage).close();
+                openDialogs.get(pageId).close();
             }
         });
     }
@@ -98,40 +102,43 @@ public abstract class DialogManager {
      * If the given browserPage is not currently displayed in a shell/dialog
      * this does nothing.
      * 
-     * @param webPage
-     *            a String representing the page, this string can be obtained
-     *            via {@link IBrowserPage#getWebpageResource()}
+     * @param pageId
+     *            a String representing the HTML page. Since we use the
+     *            pageResource as an identifier, this string can be obtained via
+     *            {@link IBrowserPage#getRelativePath()}
      */
-    private void reopenDialogWindow(String webPage) {
-        if (!dialogIsOpen(webPage)) {
-            LOG.warn(webPage + "could not be found");
+    private void reopenDialogWindow(String pageId) {
+        if (!dialogIsOpen(pageId)) {
+            LOG.warn(pageId + "could not be found");
             return;
         }
 
-        IBrowserDialog dialog = openDialogs.get(webPage);
+        IBrowserDialog dialog = openDialogs.get(pageId);
         dialog.reopen();
     }
 
     /**
-     * @param webPage
-     *            a String representing the page, this string can be obtained
-     *            via {@link IBrowserPage#getWebpageResource()}
+     * @param pageId
+     *            a String representing the page. Since we use the pageResource
+     *            as an identifier, this string can be obtained via
+     *            {@link IBrowserPage#getRelativePath()}
      * @return true if the browserPage is currently displayed in a shell/dialog
      */
-    private boolean dialogIsOpen(String webPage) {
-        return openDialogs.containsKey(webPage);
+    private boolean dialogIsOpen(String pageId) {
+        return openDialogs.containsKey(pageId);
     }
 
     /**
      * This method should be called in the IDE-specific close listeners to
      * remove the entry for the dialog.
      * 
-     * @param webPage
-     *            a String representing the page, this string can be obtained
-     *            via {@link IBrowserPage#getWebpageResource()}
+     * @param pageId
+     *            a String representing the page. Since we use the pageResource
+     *            as an identifier, this string can be obtained via
+     *            {@link IBrowserPage#getRelativePath()}
      */
-    protected void removeDialogEntry(String webPage) {
-        LOG.debug(webPage + " is closed");
-        openDialogs.remove(webPage);
+    protected void removeDialogEntry(String pageId) {
+        LOG.debug(pageId + " is closed");
+        openDialogs.remove(pageId);
     }
 }

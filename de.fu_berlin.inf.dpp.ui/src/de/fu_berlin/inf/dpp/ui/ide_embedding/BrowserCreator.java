@@ -8,18 +8,18 @@ import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.ag_se.browser.swt.SWTJQueryBrowser;
 import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
-import de.fu_berlin.inf.dpp.ui.webpages.IBrowserPage;
+import de.fu_berlin.inf.dpp.ui.pages.IBrowserPage;
 
 /**
  * This class represents the IDE-independent part of the browser creation. It
  * resorts to IDE-specific resource location however by using the correct
- * instance of {@link IWebResourceLocator} which is injected by PicoContainer.
+ * instance of {@link IUiResourceLocator} which is injected by PicoContainer.
  */
 public class BrowserCreator {
 
     private final BrowserManager browserManager;
 
-    private final IWebResourceLocator resourceLocator;
+    private final IUiResourceLocator resourceLocator;
 
     /**
      * Created by PicoContainer
@@ -29,7 +29,7 @@ public class BrowserCreator {
      * @see HTMLUIContextFactory
      */
     public BrowserCreator(BrowserManager browserManager,
-        IWebResourceLocator resourceLocator) {
+        IUiResourceLocator resourceLocator) {
         this.browserManager = browserManager;
         this.resourceLocator = resourceLocator;
     }
@@ -49,7 +49,7 @@ public class BrowserCreator {
     public IJQueryBrowser createBrowser(Composite composite, int style,
         final IBrowserPage page) {
 
-        final String resourceName = page.getWebpageResource();
+        final String resourceName = page.getRelativePath();
         assert resourceName != null;
 
         final IJQueryBrowser browser = SWTJQueryBrowser.createSWTBrowser(

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.webpages;
+package de.fu_berlin.inf.dpp.ui.pages;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,12 +38,11 @@ public abstract class AbstractBrowserPage implements IBrowserPage {
     public AbstractBrowserPage(String htmlDocName, String pageTitle) {
         this.relativePageLocation = PATH + htmlDocName;
         this.pageTitle = pageTitle;
+
     }
 
-    // TODO: The prefix WEB is misleading, because there is no "WEB" involved
-    // here. Eliminate all usage of "web" in naming inside the UI project
     @Override
-    public String getWebpageResource() {
+    public String getRelativePath() {
         return relativePageLocation;
     }
 

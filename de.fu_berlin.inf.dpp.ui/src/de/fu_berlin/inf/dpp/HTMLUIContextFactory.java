@@ -21,12 +21,12 @@ import de.fu_berlin.inf.dpp.ui.core_facades.StateFacade;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.BrowserCreator;
 import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
 import de.fu_berlin.inf.dpp.ui.manager.ProjectListManager;
+import de.fu_berlin.inf.dpp.ui.pages.AccountPage;
+import de.fu_berlin.inf.dpp.ui.pages.MainPage;
+import de.fu_berlin.inf.dpp.ui.pages.SessionWizardPage;
 import de.fu_berlin.inf.dpp.ui.renderer.AccountRenderer;
 import de.fu_berlin.inf.dpp.ui.renderer.ProjectListRenderer;
 import de.fu_berlin.inf.dpp.ui.renderer.StateRenderer;
-import de.fu_berlin.inf.dpp.ui.webpages.AccountPage;
-import de.fu_berlin.inf.dpp.ui.webpages.MainPage;
-import de.fu_berlin.inf.dpp.ui.webpages.SessionWizardPage;
 
 /**
  * This is the HTML UI core factory for Saros. All components that are created

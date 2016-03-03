@@ -5,7 +5,7 @@ import org.picocontainer.MutablePicoContainer;
 import de.fu_berlin.inf.dpp.AbstractSarosContextFactory;
 import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
-import de.fu_berlin.inf.dpp.ui.ide_embedding.IWebResourceLocator;
+import de.fu_berlin.inf.dpp.ui.ide_embedding.IUiResourceLocator;
 import de.fu_berlin.inf.dpp.ui.util.ICollaborationUtils;
 import de.fu_berlin.inf.dpp.util.EclipseCollaborationUtilsImpl;
 
@@ -19,7 +19,7 @@ public class EclipseHTMLUIContextFactory extends AbstractSarosContextFactory {
     @Override
     public void createComponents(MutablePicoContainer container) {
         container.addComponent(DialogManager.class, EclipseDialogManager.class);
-        container.addComponent(IWebResourceLocator.class,
+        container.addComponent(IUiResourceLocator.class,
             EclipseResourceLocator.class);
         container.addComponent(ICollaborationUtils.class,
             EclipseCollaborationUtilsImpl.class);

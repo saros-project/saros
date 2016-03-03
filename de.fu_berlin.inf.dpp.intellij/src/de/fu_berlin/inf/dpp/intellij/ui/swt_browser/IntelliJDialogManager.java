@@ -6,7 +6,7 @@ import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.IBrowserDialog;
-import de.fu_berlin.inf.dpp.ui.webpages.IBrowserPage;
+import de.fu_berlin.inf.dpp.ui.pages.IBrowserPage;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -39,7 +39,7 @@ public class IntelliJDialogManager extends DialogManager {
         jDialog.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                removeDialogEntry(startPage.getWebpageResource());
+                removeDialogEntry(startPage.getRelativePath());
             }
         });
         jDialog.setSize(600, 600);

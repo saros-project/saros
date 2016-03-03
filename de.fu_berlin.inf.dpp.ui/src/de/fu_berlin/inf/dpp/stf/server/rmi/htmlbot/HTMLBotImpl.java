@@ -11,8 +11,8 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotDialog;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteHTMLButton;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotDialog;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteHTMLButton;
-import de.fu_berlin.inf.dpp.ui.webpages.IBrowserPage;
-import de.fu_berlin.inf.dpp.ui.webpages.MainPage;
+import de.fu_berlin.inf.dpp.ui.pages.IBrowserPage;
+import de.fu_berlin.inf.dpp.ui.pages.MainPage;
 
 public class HTMLBotImpl extends HTMLSTFRemoteObject implements IHTMLBot {
 

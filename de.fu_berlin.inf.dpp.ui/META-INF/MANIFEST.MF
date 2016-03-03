@@ -20,5 +20,5 @@ Export-Package: de.fu_berlin.inf.ag_se.browser,
  de.fu_berlin.inf.dpp.ui.ide_embedding,
  de.fu_berlin.inf.dpp.ui.manager,
  de.fu_berlin.inf.dpp.ui.model,
- de.fu_berlin.inf.dpp.ui.util,
- de.fu_berlin.inf.dpp.ui.webpages
+ de.fu_berlin.inf.dpp.ui.pages,
+ de.fu_berlin.inf.dpp.ui.util

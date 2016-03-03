@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.webpages;
+package de.fu_berlin.inf.dpp.ui.pages;
 
 import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.HTMLUIStrings;
