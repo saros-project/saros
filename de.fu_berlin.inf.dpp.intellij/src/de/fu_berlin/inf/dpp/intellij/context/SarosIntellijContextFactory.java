@@ -31,14 +31,14 @@ import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJWorkspaceRootImp
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.PathFactory;
 import de.fu_berlin.inf.dpp.intellij.runtime.IntelliJSynchronizer;
 import de.fu_berlin.inf.dpp.intellij.ui.swt_browser.IntelliJDialogManager;
-import de.fu_berlin.inf.dpp.intellij.ui.swt_browser.IntelliJWebResourceLocator;
+import de.fu_berlin.inf.dpp.intellij.ui.swt_browser.IntelliJUIResourceLocator;
 import de.fu_berlin.inf.dpp.monitoring.remote.IRemoteProgressIndicatorFactory;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.session.ISarosSessionContextFactory;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
-import de.fu_berlin.inf.dpp.ui.ide_embedding.IUiResourceLocator;
+import de.fu_berlin.inf.dpp.ui.ide_embedding.IUIResourceLocator;
 import de.fu_berlin.inf.dpp.ui.util.ICollaborationUtils;
 import de.fu_berlin.inf.dpp.vcs.VCSProviderFactory;
 import org.picocontainer.BindKey;
@@ -97,8 +97,8 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
 
         // IDE-specific classes for the HTML GUI
         Component.create(DialogManager.class, IntelliJDialogManager.class),
-        Component.create(IUiResourceLocator.class,
-            IntelliJWebResourceLocator.class),
+        Component.create(IUIResourceLocator.class,
+            IntelliJUIResourceLocator.class),
 
         Component.create(ICollaborationUtils.class,
             IntelliJCollaborationUtilsImpl.class),

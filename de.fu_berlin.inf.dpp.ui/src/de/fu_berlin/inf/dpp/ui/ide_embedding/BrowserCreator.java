@@ -13,13 +13,13 @@ import de.fu_berlin.inf.dpp.ui.pages.IBrowserPage;
 /**
  * This class represents the IDE-independent part of the browser creation. It
  * resorts to IDE-specific resource location however by using the correct
- * instance of {@link IUiResourceLocator} which is injected by PicoContainer.
+ * instance of {@link IUIResourceLocator} which is injected by PicoContainer.
  */
 public class BrowserCreator {
 
     private final BrowserManager browserManager;
 
-    private final IUiResourceLocator resourceLocator;
+    private final IUIResourceLocator resourceLocator;
 
     /**
      * Created by PicoContainer
@@ -29,7 +29,7 @@ public class BrowserCreator {
      * @see HTMLUIContextFactory
      */
     public BrowserCreator(BrowserManager browserManager,
-        IUiResourceLocator resourceLocator) {
+        IUIResourceLocator resourceLocator) {
         this.browserManager = browserManager;
         this.resourceLocator = resourceLocator;
     }

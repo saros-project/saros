@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.ui.pages;
 import java.util.List;
 
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
-import de.fu_berlin.inf.dpp.ui.ide_embedding.IUiResourceLocator;
+import de.fu_berlin.inf.dpp.ui.ide_embedding.IUIResourceLocator;
 import de.fu_berlin.inf.dpp.ui.renderer.Renderer;
 
 /**
@@ -38,7 +38,7 @@ public interface IBrowserPage {
      * 
      * @return the relative path of this {@link IBrowserPage} which can be used
      *         as the resource name
-     * @see IUiResourceLocator#getResourceLocation(String resourceName)
+     * @see IUIResourceLocator#getResourceLocation(String resourceName)
      */
     String getRelativePath();
 

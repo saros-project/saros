@@ -5,7 +5,7 @@ package de.fu_berlin.inf.dpp.ui.ide_embedding;
  * Concretely, the URL to the resource is different in Eclipse and IntelliJ.
  * Therefore, both platforms have an own implementation of this interface.
  */
-public interface IUiResourceLocator {
+public interface IUIResourceLocator {
 
     /**
      * Gets a URL for a given resource.

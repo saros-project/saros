@@ -14,7 +14,7 @@ import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRoot;
 import de.fu_berlin.inf.dpp.test.mocks.ContextMocker;
 import de.fu_berlin.inf.dpp.test.mocks.PrepareCoreComponents;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
-import de.fu_berlin.inf.dpp.ui.ide_embedding.IUiResourceLocator;
+import de.fu_berlin.inf.dpp.ui.ide_embedding.IUIResourceLocator;
 import de.fu_berlin.inf.dpp.ui.util.ICollaborationUtils;
 
 /**
@@ -36,7 +36,7 @@ public class HTMLUIContextFactoryTest {
 
         // mock dependencies normally provided by the IDE plugin
         Class<?>[] dependencies = { DialogManager.class,
-            ICollaborationUtils.class, IUiResourceLocator.class,
+            ICollaborationUtils.class, IUIResourceLocator.class,
             IWorkspaceRoot.class };
 
         ContextMocker.addMocks(container, Arrays.asList(dependencies));
