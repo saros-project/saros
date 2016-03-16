@@ -1,10 +1,8 @@
 package de.fu_berlin.inf.dpp.intellij.preferences;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.Properties;
-
+import com.intellij.ide.util.PropertiesComponent;
 import org.easymock.EasyMock;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,7 +10,9 @@ import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import com.intellij.ide.util.PropertiesComponent;
+import java.util.Properties;
+
+import static org.junit.Assert.assertEquals;
 
 @PrepareForTest({ PropertiesComponent.class })
 @RunWith(PowerMockRunner.class)
@@ -48,6 +48,27 @@ public class PropertiesComponentAdapterTest {
         }
 
         @Override
+        public void setValue(
+            @NotNull
+            String s, float v, float v1) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void setValue(
+            @NotNull
+            String s, int i, int i1) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void setValue(
+            @NotNull
+            String s, boolean b, boolean b1) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
         public void setValues(String name, String[] values) {
             throw new UnsupportedOperationException();
         }
@@ -67,8 +88,8 @@ public class PropertiesComponentAdapterTest {
 
         PowerMock.mockStatic(PropertiesComponent.class);
 
-        EasyMock.expect(PropertiesComponent.getInstance()).andStubReturn(
-            propertiesComponentStub);
+        EasyMock.expect(PropertiesComponent.getInstance())
+            .andStubReturn(propertiesComponentStub);
 
         PowerMock.replay(PropertiesComponent.class);
     }
