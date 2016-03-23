@@ -74,26 +74,38 @@ public class ContactTreeRootNode extends DefaultMutableTreeNode
      */
     public void createContactNodes() {
         removeAllChildren();
-        DefaultMutableTreeNode node;
 
         Roster roster = connectionService.getRoster();
         //add contacts
         for (RosterEntry contactEntry : roster.getEntries()) {
-            ContactInfo contactInfo = new ContactInfo(contactEntry);
-            Presence presence = roster.getPresence(contactEntry.getUser());
-
-            if (presence.getType() == Presence.Type.available) {
-                contactInfo.setOnline(true);
-            } else {
-                contactInfo.setOnline(false);
-            }
-
-            node = new DefaultMutableTreeNode(contactInfo);
-
-            add(node);
-
-            contactMap.put(contactInfo.getTitle(), contactInfo);
+            addContact(contactEntry,
+                roster.getPresence(contactEntry.getUser()));
         }
+    }
+
+    private void addContact(RosterEntry contactEntry, Presence presence) {
+        ContactInfo contactInfo = new ContactInfo(contactEntry);
+
+        if (presence.getType() == Presence.Type.available) {
+            contactInfo.setOnline(true);
+        } else {
+            contactInfo.setOnline(false);
+        }
+
+        contactMap.put(contactInfo.getTitle(), contactInfo);
+
+        final DefaultMutableTreeNode node = new DefaultMutableTreeNode(
+            contactInfo);
+
+        final MutableTreeNode parent = this;
+
+        UIUtil.invokeAndWaitIfNeeded(new Runnable() {
+
+            @Override
+            public void run() {
+                treeModel.insertNodeInto(node, parent, getChildCount());
+            }
+        });
     }
 
     /**
@@ -116,21 +128,33 @@ public class ContactTreeRootNode extends DefaultMutableTreeNode
      */
     public void hideContact(final String name) {
         ContactInfo contactInfo = contactMap.get(name);
+
         if (contactInfo == null || contactInfo.isHidden()) {
             return;
         }
 
+        MutableTreeNode node = getContactNode(contactInfo);
+
+        if (node == null) {
+            return;
+        }
+
+        treeModel.removeNodeFromParent(node);
+        node.setUserObject(null);
+
         contactInfo.setHidden(true);
+    }
+
+    private MutableTreeNode getContactNode(final ContactInfo contact) {
         for (int i = 0; i < getChildCount(); i++) {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) getChildAt(
                 i);
-            if (contactInfo.equals(node.getUserObject())) {
-                treeModel.removeNodeFromParent(node);
-                node.setUserObject(null);
-                break;
+            if (contact.equals(node.getUserObject())) {
+                return node;
             }
         }
 
+        return null;
     }
 
     /**
@@ -148,7 +172,11 @@ public class ContactTreeRootNode extends DefaultMutableTreeNode
 
     @Override
     public void entriesAdded(Collection<String> addresses) {
-        //NOP
+        Roster roster = connectionService.getRoster();
+
+        for (String address : addresses) {
+            addContact(roster.getEntry(address), roster.getPresence(address));
+        }
     }
 
     @Override
@@ -167,25 +195,23 @@ public class ContactTreeRootNode extends DefaultMutableTreeNode
     @Override
     public void presenceChanged(Presence presence) {
         String user = new JID(presence.getFrom()).getBareJID().toString();
+        final ContactInfo info = contactMap.get(user);
 
-        ContactInfo info = contactMap.get(user);
-        if (info != null) {
-            if (presence.getType() == Presence.Type.available) {
-                info.setOnline(true);
-            } else {
-                info.setOnline(false);
-            }
+        if (info == null)
+            return;
 
-            Runnable action = new Runnable() {
-                @Override
-                public void run() {
-                    treeView.collapseRow(2);
-                    treeView.expandRow(2);
-                }
-            };
-
-            UIUtil.invokeAndWaitIfNeeded(action);
+        if (presence.getType() == Presence.Type.available) {
+            info.setOnline(true);
+        } else {
+            info.setOnline(false);
         }
+
+        UIUtil.invokeAndWaitIfNeeded(new Runnable() {
+            @Override
+            public void run() {
+                treeModel.nodeChanged(getContactNode(info));
+            }
+        });
     }
 
     /**

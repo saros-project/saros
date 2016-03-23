@@ -24,11 +24,12 @@ package de.fu_berlin.inf.dpp.intellij.ui.util;
 
 import com.intellij.openapi.ui.Messages;
 import com.intellij.util.ui.UIUtil;
-import de.fu_berlin.inf.dpp.core.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
+import de.fu_berlin.inf.dpp.core.Saros;
 import org.picocontainer.annotations.Inject;
 
 import java.awt.Component;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Dialog helper used to show messages in safe manner by starting it in UI thread.
@@ -91,5 +92,24 @@ public class SafeDialogUtils {
                 Messages.showErrorDialog(component, message, title);
             }
         });
+    }
+
+    public static boolean showYesNoDialog(final String message, final String title) {
+
+        final AtomicBoolean choice = new AtomicBoolean(false);
+
+        UIUtil.invokeAndWaitIfNeeded(new Runnable() {
+            @Override
+            public void run() {
+                int returnValue = Messages
+                    .showYesNoDialog(saros.getProject(), message, title,
+                        Messages.getQuestionIcon());
+                if (returnValue == Messages.YES) {
+                    choice.set(true);
+                }
+            }
+        });
+
+        return choice.get();
     }
 }
