@@ -49,7 +49,7 @@ public class IntelliJResourceImplTest extends AbstractResourceTest {
 
     @NotNull
     private DummyResource getTestResource() {
-        return new DummyResource(getMockProject(), new File(TESTFILE_NAME));
+        return new DummyResource(getMockProject(), new File(TEST_FILE_NAME));
     }
 
     @Test
@@ -71,7 +71,7 @@ public class IntelliJResourceImplTest extends AbstractResourceTest {
     public void testGetName() throws Exception {
         IResource resource = getTestResource();
 
-        assertEquals(TESTFILE_NAME, resource.getName());
+        assertEquals(TEST_FILE_NAME, resource.getName());
     }
 
     @Test
@@ -100,7 +100,7 @@ public class IntelliJResourceImplTest extends AbstractResourceTest {
         IResource resource = getTestResource();
 
         assertEquals(IntelliJPathImpl.fromString(
-            folder.getRoot().getPath() + "/" + RELATIVE_TEST_RESOURCE_PATH),
+                folder.getRoot().getPath() + "/" + RELATIVE_TEST_RESOURCE_PATH),
             resource.getLocation());
     }
 
@@ -136,7 +136,7 @@ public class IntelliJResourceImplTest extends AbstractResourceTest {
     }
 
     private void assertProjectRelativePathIsCorrect(IResource resource) {
-        assertEquals(TESTFILE_NAME,
+        assertEquals(TEST_FILE_NAME,
             resource.getProjectRelativePath().toPortableString());
     }
 }

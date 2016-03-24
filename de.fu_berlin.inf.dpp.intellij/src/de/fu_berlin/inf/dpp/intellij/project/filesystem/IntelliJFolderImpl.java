@@ -1,10 +1,11 @@
 package de.fu_berlin.inf.dpp.intellij.project.filesystem;
 
+import com.intellij.openapi.util.ThrowableComputable;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
-import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,7 +14,6 @@ import java.util.List;
 
 public class IntelliJFolderImpl extends IntelliJResourceImpl
     implements IFolder {
-    private static Logger LOG = Logger.getLogger(IntelliJFolderImpl.class);
 
     public IntelliJFolderImpl(IntelliJProjectImpl project, File file) {
         super(project, file);
@@ -26,10 +26,20 @@ public class IntelliJFolderImpl extends IntelliJResourceImpl
 
     @Override
     public void create(boolean force, boolean local) throws IOException {
-        getLocation().toFile().mkdirs();
+        writeInUIThread(new ThrowableComputable<Void, IOException>() {
+
+            @Override
+            public Void compute() throws IOException {
+                getParent().getVirtualFile()
+                    .createChildDirectory(this, getName());
+                return null;
+            }
+        });
     }
 
-    @Override
+    /**
+     * Equivalent to the exists method of the IContainer interface from eclipse.
+     */
     public boolean exists(IPath path) {
         return getLocation().append(path).toFile().exists();
     }
@@ -41,45 +51,46 @@ public class IntelliJFolderImpl extends IntelliJResourceImpl
 
     @Override
     public IResource[] members(int memberFlags) {
+        VirtualFile virtualFile = LocalFileSystem.getInstance()
+            .refreshAndFindFileByIoFile(toFile());
+
+        if (virtualFile == null) {
+            return new IResource[0];
+        }
+
+        VirtualFile[] files = virtualFile.getChildren();
+
+        if (files == null) {
+            return new IResource[0];
+        }
+
         List<IResource> list = new ArrayList<IResource>();
 
-        File[] files = getLocation().toFile().listFiles();
-        if (files == null)
-            return list.toArray(new IResource[] {});
-
-        for (File myFile : files) {
-            if (myFile.isFile() && !myFile.isHidden() && (memberFlags == NONE
-                || memberFlags == FILE)) {
-                list.add(new IntelliJFileImpl(project, myFile));
+        for (VirtualFile file : files) {
+            if (file.isDirectory() && (memberFlags == FOLDER
+                || memberFlags == NONE)) {
+                list.add(
+                    new IntelliJFolderImpl(project, new File(file.getPath())));
             }
 
-            if (myFile.isDirectory() && !myFile.isHidden() && (
-                memberFlags == NONE || memberFlags == FOLDER)) {
-                list.add(new IntelliJFolderImpl(project, myFile));
+            if (!file.isDirectory() && (memberFlags == FILE
+                || memberFlags == NONE)) {
+                list.add(
+                    new IntelliJFileImpl(project, new File(file.getPath())));
             }
         }
 
-        return list.toArray(new IResource[] {});
+        return list.toArray(new IResource[list.size()]);
     }
 
     @Override
     public void refreshLocal() throws IOException {
-        LOG.trace("FolderIntl.refreshLocal //todo");
+        getVirtualFile().refresh(false, true);
     }
 
     @Override
     public int getType() {
         return FOLDER;
-    }
-
-    @Override
-    public void delete(int updateFlags) throws IOException {
-        FileUtils.deleteDirectory(getLocation().toFile());
-    }
-
-    @Override
-    public void move(IPath destination, boolean force) throws IOException {
-        projectRelativeFile.renameTo(destination.toFile());
     }
 
     @Override

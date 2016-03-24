@@ -6,6 +6,10 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
 
+    IntelliJResourceImplTest.class,
+
+    IntelliJFolderImplTest.class,
+
     IntelliJFileImplTest.class,
 
     IntelliJPathImplTest.class })
