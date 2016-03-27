@@ -324,9 +324,10 @@
 
     <target name="test" depends="compile.saros-i.tests"
             description="run saros-i unit tests">
+
         <mkdir dir="${saros-i.junit.report.dir}"/>
         <junit printsummary="yes" fork="yes" forkmode="once"
-               haltonfailure="yes">
+               haltonfailure="yes" jvm="${jdk.bin}/java">
 
             <classpath>
                 <path refid="saros-i.test.classpath"/>
