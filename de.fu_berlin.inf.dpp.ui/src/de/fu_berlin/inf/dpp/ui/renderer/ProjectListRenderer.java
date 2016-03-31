@@ -52,7 +52,7 @@ public class ProjectListRenderer extends Renderer {
         // creations.
 
         try {
-            projectListManager.createAndMapProjectModels();
+            projectListManager.createProjectModels();
         } catch (IOException e) {
             LOG.error("Failed to load workspace resources: ", e);
             JavaScriptAPI.showError(browser,

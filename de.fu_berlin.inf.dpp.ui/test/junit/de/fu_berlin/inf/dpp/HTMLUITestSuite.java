@@ -6,6 +6,8 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
 
+de.fu_berlin.inf.dpp.ui.manager.TestSuite.class,
+
 de.fu_berlin.inf.dpp.ui.model.TestSuite.class,
 
 de.fu_berlin.inf.dpp.HTMLUIContextFactoryTest.class })

@@ -23,7 +23,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
  * Offers a via Javascript invokable method to send an invitation request with
  * the given resources wrapped by {@link ProjectTree}s to the given
  * {@link Contact}s. Note that this will fail if
- * {@link ProjectListManager#createAndMapProjectModels()} hasn't been called
+ * {@link ProjectListManager#createProjectModels()} hasn't been called
  * yet.
  * <p>
  * JS-signature:
