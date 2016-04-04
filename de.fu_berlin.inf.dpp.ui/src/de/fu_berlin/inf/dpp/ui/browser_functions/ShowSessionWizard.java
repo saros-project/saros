@@ -1,22 +1,19 @@
 package de.fu_berlin.inf.dpp.ui.browser_functions;
 
-import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
 import de.fu_berlin.inf.dpp.ui.pages.SessionWizardPage;
 
 /**
- * Offers a via Javascript invokable method to open and display the
- * {@link SessionWizardPage} dialog.
- * <p>
- * JS-signature: "void __java_showSessionWizard()".
+ * Open and display the {@link SessionWizardPage} dialog.
  */
-public class ShowSessionWizard extends JavascriptFunction {
-    private DialogManager dialogManager;
-    private SessionWizardPage sessionWizardPage;
-    public static final String JS_NAME = "showSessionWizard";
+public class ShowSessionWizard extends TypedJavascriptFunction {
 
     // TODO: Rename to openXYZ for more convenient naming
+    public static final String JS_NAME = "showSessionWizard";
+
+    private final DialogManager dialogManager;
+    private final SessionWizardPage sessionWizardPage;
 
     /**
      * Created by PicoContainer
@@ -27,16 +24,18 @@ public class ShowSessionWizard extends JavascriptFunction {
      */
     public ShowSessionWizard(DialogManager dialogManager,
         SessionWizardPage sessionWizardPage) {
-        super(NameCreator.getConventionName(JS_NAME));
+
+        super(JS_NAME);
         this.dialogManager = dialogManager;
         this.sessionWizardPage = sessionWizardPage;
-
     }
 
-    @Override
-    public Object function(Object[] arguments) {
+    /**
+     * Open and display the {@link SessionWizardPage} dialog.
+     */
+    @BrowserFunction
+    public void showSessionWizard() {
         dialogManager.showDialogWindow(sessionWizardPage);
-        return null;
     }
 
 }

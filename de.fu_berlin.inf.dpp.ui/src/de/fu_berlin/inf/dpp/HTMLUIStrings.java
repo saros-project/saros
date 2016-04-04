@@ -25,6 +25,5 @@ public class HTMLUIStrings {
     public static final String ADD_CONTACT_FAILED = "Failed to add contact.";
     public static final String RENAME_CONTACT_FAILED = "Failed to rename contact.";
     public static final String SAVE_ACCOUNT_FAILED = "Couldn't save the account.";
-    public static final String CONNECT_WITHOUT_ACCOUNT = "Cannot connect without an account.";
     public static final String PROJECT_LIST_IOEXCEPTION = "An error occurred while trying to create a list of all files to share.";
 }

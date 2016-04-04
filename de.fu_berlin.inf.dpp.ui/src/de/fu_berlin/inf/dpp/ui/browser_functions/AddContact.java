@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.ui.browser_functions;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPException;
 
-import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.HTMLUIStrings;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -11,13 +10,12 @@ import de.fu_berlin.inf.dpp.ui.JavaScriptAPI;
 import de.fu_berlin.inf.dpp.ui.core_facades.StateFacade;
 
 /**
- * Offers a via Javascript invokable method to add a given contact to the
- * roster.
- * <p>
- * JS-signature: "void __java_addContact(String JID, String nickname);"
+ * Add a given contact to the roster.
  */
-public class AddContact extends JavascriptFunction {
+public class AddContact extends TypedJavascriptFunction {
+
     private static final Logger LOG = Logger.getLogger(AddContact.class);
+
     public static final String JS_NAME = "addContact";
 
     private final StateFacade stateFacade;
@@ -29,19 +27,27 @@ public class AddContact extends JavascriptFunction {
      * @see HTMLUIContextFactory
      */
     public AddContact(StateFacade stateFacade) {
-        super(NameCreator.getConventionName(JS_NAME));
+        super(JS_NAME);
         this.stateFacade = stateFacade;
     }
 
-    @Override
-    public Object function(final Object[] arguments) {
+    /**
+     * Adds contact (given by its JID) to the roster of the active user.
+     * <p>
+     * An error is shown to the user if this operation fails.
+     * 
+     * @param jid
+     *            The JID of the new contact
+     * @param nickname
+     *            How the new contact should be displayed in the roster
+     */
+    @BrowserFunction
+    public void addContact(String jid, String nickname) {
         try {
-            stateFacade.addContact(new JID((String) arguments[0]),
-                (String) arguments[1]);
+            stateFacade.addContact(new JID(jid), nickname);
         } catch (XMPPException e) {
-            LOG.error("Error while adding contact ", e);
+            LOG.error("Error while adding contact", e);
             JavaScriptAPI.showError(browser, HTMLUIStrings.ADD_CONTACT_FAILED);
         }
-        return null;
     }
 }

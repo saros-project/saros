@@ -1,20 +1,18 @@
 package de.fu_berlin.inf.dpp.ui.browser_functions;
 
-import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
 import de.fu_berlin.inf.dpp.ui.pages.AccountPage;
 
 /**
- * Offers a via Javascript invokable method to open and display the
- * {@link AccountPage} dialog.
- * <p>
- * JS-signature: "void __java_showAccountPage()".
+ * Open and display {@link AccountPage} dialog.
  */
-public class ShowAccountPage extends JavascriptFunction {
-    private DialogManager dialogManager;
-    private AccountPage accountPage;
+public class ShowAccountPage extends TypedJavascriptFunction {
+
     public static final String JS_NAME = "showAccountPage";
+
+    private final DialogManager dialogManager;
+    private final AccountPage accountPage;
 
     /**
      * Created by PicoContainer
@@ -24,15 +22,16 @@ public class ShowAccountPage extends JavascriptFunction {
      * @see HTMLUIContextFactory
      */
     public ShowAccountPage(DialogManager dialogManager, AccountPage accountPage) {
-        super(NameCreator.getConventionName(JS_NAME));
+        super(JS_NAME);
         this.dialogManager = dialogManager;
         this.accountPage = accountPage;
     }
 
-    @Override
-    public Object function(Object[] arguments) {
-        this.dialogManager.showDialogWindow(accountPage);
-        return null;
+    /**
+     * Open and display {@link AccountPage} dialog.
+     */
+    @BrowserFunction
+    public void showAccountPage() {
+        dialogManager.showDialogWindow(accountPage);
     }
-
 }

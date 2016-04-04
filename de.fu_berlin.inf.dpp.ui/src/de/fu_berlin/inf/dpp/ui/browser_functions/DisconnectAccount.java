@@ -1,22 +1,17 @@
 package de.fu_berlin.inf.dpp.ui.browser_functions;
 
-import org.apache.log4j.Logger;
-
-import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
+import de.fu_berlin.inf.dpp.ui.browser_functions.BrowserFunction.Policy;
 import de.fu_berlin.inf.dpp.ui.core_facades.StateFacade;
-import de.fu_berlin.inf.dpp.util.ThreadUtils;
 
 /**
- * Offers a via Javascript invokable method to disconnect the active Account.
- * <p>
- * JS-signature: "void __java_disconnect();"
+ * Disconnect the active account.
  */
-public class DisconnectAccount extends JavascriptFunction {
-    private static final Logger LOG = Logger.getLogger(DisconnectAccount.class);
+public class DisconnectAccount extends TypedJavascriptFunction {
+
+    public static final String JS_NAME = "disconnect";
 
     private final StateFacade stateFacade;
-    public static final String JS_NAME = "disconnect";
 
     /**
      * Created by PicoContainer
@@ -25,18 +20,15 @@ public class DisconnectAccount extends JavascriptFunction {
      * @see HTMLUIContextFactory
      */
     public DisconnectAccount(StateFacade stateFacade) {
-        super(NameCreator.getConventionName(JS_NAME));
+        super(JS_NAME);
         this.stateFacade = stateFacade;
     }
 
-    @Override
-    public Object function(Object[] arguments) {
-        ThreadUtils.runSafeAsync(LOG, new Runnable() {
-            @Override
-            public void run() {
-                stateFacade.disconnect();
-            }
-        });
-        return null;
+    /**
+     * Disconnect the active account.
+     */
+    @BrowserFunction(Policy.ASYNC)
+    public void disconnect() {
+        stateFacade.disconnect();
     }
 }
