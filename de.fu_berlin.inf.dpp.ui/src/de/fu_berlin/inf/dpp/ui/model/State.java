@@ -115,6 +115,8 @@ public class State {
      * @return the list containing the roster entries as contacts
      */
     private List<Contact> createListOfContacts(Roster roster) {
+        // TODO Move this logic to a renderer class
+
         List<Contact> res = new ArrayList<Contact>(roster.getEntries().size());
         /*
          * Buggish SMACK crap at its best ! The entries returned here can be

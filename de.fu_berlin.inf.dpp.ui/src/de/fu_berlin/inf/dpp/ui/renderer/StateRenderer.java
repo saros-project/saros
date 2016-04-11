@@ -61,6 +61,7 @@ public class StateRenderer extends Renderer {
         JavaScriptAPI.updateState(browser, this.state);
     }
 
+    // TODO This logic should be hidden behind one or more core facades
     private final IConnectionListener connectionListener = new IConnectionListener() {
         @Override
         public void connectionStateChanged(Connection connection,
@@ -109,6 +110,7 @@ public class StateRenderer extends Renderer {
         }
     };
 
+    // TODO: This logic should be hidden behind a core facade
     private final RosterListener rosterListener = new RosterListener() {
         @Override
         public void entriesAdded(Collection<String> addresses) {

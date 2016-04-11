@@ -49,6 +49,8 @@ public class Contact {
      * @return a new contact created from the roster entry
      */
     public static Contact createContact(RosterEntry entry, Presence presence) {
+        // TODO Move this logic to a renderer class
+
         String displayableName = XMPPUtils.getDisplayableName(entry);
         String addition = createAdditionString(entry, presence);
         String presenceString = createPresenceString(presence);

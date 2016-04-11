@@ -30,6 +30,7 @@ import de.fu_berlin.inf.dpp.ui.model.ProjectTree.Node.Type;
  * {@link #getAllResources(ProjectTree[])} to get back the actual resources
  * selected for sharing.
  */
+// TODO Make this a core facade
 public class ProjectListManager {
 
     private IWorkspaceRoot workspaceRoot;

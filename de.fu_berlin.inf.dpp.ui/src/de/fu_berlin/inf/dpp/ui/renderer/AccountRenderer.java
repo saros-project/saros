@@ -12,6 +12,7 @@ import de.fu_berlin.inf.dpp.ui.JavaScriptAPI;
  * listeners, this class actively queries the state on each render request from
  * the {@link XMPPAccountStore}.
  */
+// Let AccountRenderer be a Listener on a core facade
 public class AccountRenderer extends Renderer {
 
     private final XMPPAccountStore accountStore;
