@@ -33,7 +33,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IntelliJFolderImpl extends IntelliJResourceImpl implements IFolder {
+public class IntelliJFolderImpl extends IntelliJResourceImpl
+    implements IFolder {
     private static Logger LOG = Logger.getLogger(IntelliJFolderImpl.class);
 
     public IntelliJFolderImpl(IntelliJProjectImpl project, File file) {
@@ -45,8 +46,7 @@ public class IntelliJFolderImpl extends IntelliJResourceImpl implements IFolder 
         if (!file.isAbsolute()) {
             File fileInProject = new File(
                 getProject().getFullPath().toString() + File.separator + file
-                    .getPath()
-            );
+                    .getPath());
             fileInProject.mkdirs();
         } else {
             file.mkdirs();
@@ -74,7 +74,7 @@ public class IntelliJFolderImpl extends IntelliJResourceImpl implements IFolder 
 
         File[] files = getFullPath().toFile().listFiles();
         if (files == null)
-            return list.toArray(new IResource[] { });
+            return list.toArray(new IResource[] {});
 
         for (File myFile : files) {
             if (myFile.isFile() && !myFile.isHidden() && (memberFlags == NONE
@@ -88,7 +88,7 @@ public class IntelliJFolderImpl extends IntelliJResourceImpl implements IFolder 
             }
         }
 
-        return list.toArray(new IResource[] { });
+        return list.toArray(new IResource[] {});
     }
 
     @Override

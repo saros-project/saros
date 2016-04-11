@@ -38,7 +38,7 @@ public class DialogUtils {
 
     @Inject
     private static Project project;
-    
+
     private DialogUtils() {
     }
 
@@ -57,8 +57,7 @@ public class DialogUtils {
     public static void showError(Component parent, String title, String msg) {
         JOptionPane
             .showInternalMessageDialog(notNullOrDefaultParent(parent), msg,
-                title,
-            JOptionPane.ERROR_MESSAGE);
+                title, JOptionPane.ERROR_MESSAGE);
     }
 
     /**
@@ -74,7 +73,7 @@ public class DialogUtils {
         String msg) {
         int resp = JOptionPane
             .showConfirmDialog(notNullOrDefaultParent(parent), msg, title,
-            JOptionPane.OK_CANCEL_OPTION);
+                JOptionPane.OK_CANCEL_OPTION);
         return resp == JOptionPane.OK_OPTION;
     }
 
@@ -107,7 +106,7 @@ public class DialogUtils {
     public static void showInfo(Container parent, String title, String msg) {
         JOptionPane
             .showMessageDialog(notNullOrDefaultParent(parent), msg, title,
-            JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.INFORMATION_MESSAGE);
     }
 
     private static Component notNullOrDefaultParent(Component parent) {

@@ -48,20 +48,19 @@ public class UserStatusChangeHandler {
             if (user.isLocal()) {
                 NotificationPanel.showNotification(
                     Messages.UserStatusChangeHandler_permission_changed,
-                    ModelFormatUtils
-                        .format(
-                            Messages.UserStatusChangeHandler_you_have_now_access,
-                            user,
-                            user.hasWriteAccess() ? Messages.UserStatusChangeHandler_write
-                                : Messages.UserStatusChangeHandler_read_only));
+                    ModelFormatUtils.format(
+                        Messages.UserStatusChangeHandler_you_have_now_access,
+                        user, user.hasWriteAccess() ?
+                            Messages.UserStatusChangeHandler_write :
+                            Messages.UserStatusChangeHandler_read_only));
             } else {
                 NotificationPanel.showNotification(
                     Messages.UserStatusChangeHandler_permission_changed,
                     ModelFormatUtils.format(
                         Messages.UserStatusChangeHandler_he_has_now_access,
-                        user,
-                        user.hasWriteAccess() ? Messages.UserStatusChangeHandler_write
-                            : Messages.UserStatusChangeHandler_read_only));
+                        user, user.hasWriteAccess() ?
+                            Messages.UserStatusChangeHandler_write :
+                            Messages.UserStatusChangeHandler_read_only));
 
             }
         }
@@ -70,17 +69,19 @@ public class UserStatusChangeHandler {
         public void userJoined(User user) {
 
             NotificationPanel
-                .showNotification(Messages.UserStatusChangeHandler_user_joined, ModelFormatUtils
-                    .format(Messages.UserStatusChangeHandler_user_joined_text,
+                .showNotification(Messages.UserStatusChangeHandler_user_joined,
+                    ModelFormatUtils.format(
+                        Messages.UserStatusChangeHandler_user_joined_text,
                         user));
         }
 
         @Override
         public void userLeft(User user) {
             NotificationPanel
-                .showNotification(Messages.UserStatusChangeHandler_user_left, ModelFormatUtils
-                    .format(Messages.UserStatusChangeHandler_user_left_text,
-                        user));
+                .showNotification(Messages.UserStatusChangeHandler_user_left,
+                    ModelFormatUtils
+                        .format(Messages.UserStatusChangeHandler_user_left_text,
+                            user));
         }
     };
     private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
@@ -90,7 +91,8 @@ public class UserStatusChangeHandler {
         }
 
         @Override
-        public void sessionEnded(ISarosSession session, SessionEndReason reason) {
+        public void sessionEnded(ISarosSession session,
+            SessionEndReason reason) {
             session.removeListener(sessionListener);
         }
 

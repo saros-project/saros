@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Singleton that provides methods to collect and retrieve awareness information
  * for session participants (who is following who, which file is currently
  * opened, etc.)
- *
+ * <p/>
  * All methods provided by the interface are <b>not</b> thread safe.
  *
  * @author waldmann
@@ -94,7 +94,7 @@ public class AwarenessInformationCollector {
      * user can be the local or remote one.
      *
      * @return <code>true</code>, if the active editor of the given user is
-     *         shared, <code>false</code> otherwise
+     * shared, <code>false</code> otherwise
      */
     public boolean isActiveEditorShared(User user) {
         boolean editorActive = false;

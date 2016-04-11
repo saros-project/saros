@@ -33,7 +33,7 @@ import java.awt.FlowLayout;
  * Usage:
  * <p/>
  * InfoPage page = new InfoPage("New session wizard", "Accept", actionListener);
- *
+ * <p/>
  * infoPage.addText("This is a lengthy info text");
  * infoPage.addText("spanning several text areas");
  */

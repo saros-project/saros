@@ -236,7 +236,7 @@ public abstract class Wizard extends JDialog {
     /**
      * Default wizard model. Class keeps information about
      * wizard position, acts as container for
-     * <p>
+     * <p/>
      * FIXME: Replace back, current and next page fields by index of current page
      * and calculation
      */
@@ -302,8 +302,7 @@ public abstract class Wizard extends JDialog {
             if (index < 0) {
                 throw new IllegalArgumentException(
                     "WizardPageModel called with "
-                        + "illegal page it does not contain."
-                );
+                        + "illegal page it does not contain.");
             }
             if (index > 0) {
                 backPage = pageList.get(index - 1);

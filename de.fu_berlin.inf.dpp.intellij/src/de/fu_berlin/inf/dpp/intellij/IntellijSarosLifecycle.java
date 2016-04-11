@@ -21,16 +21,17 @@ import java.util.List;
 public class IntellijSarosLifecycle extends AbstractSarosLifecycle {
 
     private static IntellijSarosLifecycle instance;
-    
+
     /**
      * Creates a new IntelliJSarosLifecycle singleton instance from a project.
      *
      * @param project
      * @return
      */
-    public static synchronized IntellijSarosLifecycle getInstance(Project project) {
+    public static synchronized IntellijSarosLifecycle getInstance(
+        Project project) {
         instance = new IntellijSarosLifecycle(project);
-        
+
         return instance;
     }
 
@@ -39,7 +40,7 @@ public class IntellijSarosLifecycle extends AbstractSarosLifecycle {
     private IntellijSarosLifecycle(Project project) {
         this.project = project;
     }
-    
+
     @Override
     protected Collection<ISarosContextFactory> additionalContextFactories() {
         List<ISarosContextFactory> nonCoreFactories = new ArrayList<ISarosContextFactory>();

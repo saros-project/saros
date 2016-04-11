@@ -32,15 +32,15 @@ import java.util.Date;
 /**
  * SarosLogFileAppender is used to create log files that contain information on
  * the current date and time in the file name in the JetBrains IDE log folder.
- *
+ * <p/>
  * It is constructed with a filePattern, that is formatted by
  * {@link SimpleDateFormat#format(Date)}.
- *
+ * <p/>
  * For example:
- *   '/SarosLogs/Saros_'yyyy-MM-dd_HH-mm-ss'.log'
- *   becomes
- *   $LOG_DIR$/SarosLogs/Saros_2014-10-01-10:00:01.log
- *
+ * '/SarosLogs/Saros_'yyyy-MM-dd_HH-mm-ss'.log'
+ * becomes
+ * $LOG_DIR$/SarosLogs/Saros_2014-10-01-10:00:01.log
+ * <p/>
  * where $LOG_DIR$ is the log folder according to {@link PathManager#getLogPath()}.
  */
 public class SarosLogFileAppender extends FileAppender {

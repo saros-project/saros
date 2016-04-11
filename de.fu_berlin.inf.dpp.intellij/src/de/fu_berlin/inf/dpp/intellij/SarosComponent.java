@@ -45,19 +45,17 @@ public class SarosComponent
      * ecosystem.
      */
     public static final String PLUGIN_ID = "de.fu_berlin.inf.dpp.intellij";
-    
+
     public SarosComponent(final Project project) {
         loadLoggers();
 
         Keymap keymap = KeymapManager.getInstance().getActiveKeymap();
         keymap.addShortcut("ActivateSarosToolWindow", new KeyboardShortcut(
             KeyStroke.getKeyStroke(KeyEvent.VK_F11,
-                java.awt.event.InputEvent.ALT_DOWN_MASK), null
-        ));
+                java.awt.event.InputEvent.ALT_DOWN_MASK), null));
 
         IntellijSarosLifecycle.getInstance(project).start();
     }
-    
 
     public static boolean isSwtBrowserEnabled() {
         return Boolean.getBoolean("saros.swtbrowser");

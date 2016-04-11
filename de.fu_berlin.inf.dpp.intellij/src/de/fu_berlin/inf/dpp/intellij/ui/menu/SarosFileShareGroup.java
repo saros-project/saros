@@ -123,7 +123,7 @@ public class SarosFileShareGroup extends ActionGroup {
             }
         }
 
-        return list.toArray(new AnAction[] { });
+        return list.toArray(new AnAction[] {});
     }
 
     static IntelliJProjectImpl getProjectFromVirtFile(VirtualFile virtFile,
@@ -149,7 +149,8 @@ public class SarosFileShareGroup extends ActionGroup {
      * @param resFolder
      * @return
      */
-    private boolean isCompleteProject(IntelliJProjectImpl project, IntelliJFolderImpl resFolder) {
+    private boolean isCompleteProject(IntelliJProjectImpl project,
+        IntelliJFolderImpl resFolder) {
         return resFolder.getFullPath().equals(project.getFullPath());
     }
 }

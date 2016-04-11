@@ -46,7 +46,8 @@ import java.util.Map;
 public class IntelliJProjectImpl implements IProject {
     public static final String DEFAULT_CHARSET = "utf8";
 
-    private static final Logger LOG = Logger.getLogger(IntelliJProjectImpl.class);
+    private static final Logger LOG = Logger
+        .getLogger(IntelliJProjectImpl.class);
 
     private String defaultCharset = DEFAULT_CHARSET;
 
@@ -224,7 +225,7 @@ public class IntelliJProjectImpl implements IProject {
 
     @Override
     public IResource[] members() {
-        return resourceMap.values().toArray(new IResource[] { });
+        return resourceMap.values().toArray(new IResource[] {});
     }
 
     @Override
@@ -240,7 +241,7 @@ public class IntelliJProjectImpl implements IProject {
             }
         }
 
-        return list.toArray(new IResource[] { });
+        return list.toArray(new IResource[] {});
 
     }
 

@@ -123,8 +123,8 @@ public class CollaborationUtils {
                 } catch (Exception e) {
 
                     LOG.error("could not start a Saros session", e);
-                    return new Status(IStatus.ERROR,
-                        SarosComponent.PLUGIN_ID, e.getMessage(), e);
+                    return new Status(IStatus.ERROR, SarosComponent.PLUGIN_ID,
+                        e.getMessage(), e);
                 }
 
                 return Status.OK_STATUS;
@@ -172,7 +172,8 @@ public class CollaborationUtils {
         ThreadUtils.runSafeAsync("StopSession", LOG, new Runnable() {
             @Override
             public void run() {
-                sessionManager.stopSarosSession(SessionEndReason.LOCAL_USER_LEFT);
+                sessionManager
+                    .stopSarosSession(SessionEndReason.LOCAL_USER_LEFT);
             }
         });
     }
@@ -292,8 +293,7 @@ public class CollaborationUtils {
                         .format("\nProject: %s, Files: %s, Size: %s",
                             project.getName() + " "
                                 + Messages.CollaborationUtils_partial,
-                            fileCountAndSize.v, format(fileCountAndSize.p)
-                        ));
+                            fileCountAndSize.v, format(fileCountAndSize.p)));
                 }
             }
         } catch (IOException e) {
@@ -385,8 +385,8 @@ public class CollaborationUtils {
              * we need the .iml file, otherwise the project type will not be set
              * correctly on the other side
              */
-            IFolder projectFolder = new IntelliJFolderImpl((IntelliJProjectImpl) project,
-                project.getFullPath().toFile());
+            IFolder projectFolder = new IntelliJFolderImpl(
+                (IntelliJProjectImpl) project, project.getFullPath().toFile());
             try {
                 for (IResource pFile : projectFolder.members(IResource.FILE)) {
                     String sFileName = pFile.getName().toLowerCase();
@@ -422,7 +422,8 @@ public class CollaborationUtils {
         }
         if (resource.getType() == IResource.FOLDER) {
             fileList.add(resource);
-            for (IResource myResource : ((IntelliJFolderImpl) resource).members()) {
+            for (IResource myResource : ((IntelliJFolderImpl) resource)
+                .members()) {
                 addRecursively(fileList, myResource);
             }
         }

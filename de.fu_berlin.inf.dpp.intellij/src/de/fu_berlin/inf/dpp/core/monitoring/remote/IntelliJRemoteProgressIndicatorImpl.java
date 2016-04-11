@@ -1,12 +1,5 @@
 package de.fu_berlin.inf.dpp.core.monitoring.remote;
 
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
-
-import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.log4j.Logger;
-
 import de.fu_berlin.inf.dpp.activities.ProgressActivity;
 import de.fu_berlin.inf.dpp.activities.ProgressActivity.ProgressAction;
 import de.fu_berlin.inf.dpp.core.monitoring.IStatus;
@@ -16,6 +9,12 @@ import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.remote.IRemoteProgressIndicator;
 import de.fu_berlin.inf.dpp.monitoring.remote.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.session.User;
+import de.fu_berlin.inf.dpp.ui.util.ModelFormatUtils;
+import org.apache.commons.lang.ObjectUtils;
+import org.apache.log4j.Logger;
+
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * IntelliJ implementation of the {@link IRemoteProgressIndicator} interface.

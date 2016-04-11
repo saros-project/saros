@@ -34,7 +34,7 @@ public class NullVCSProviderFactoryImpl implements VCSProviderFactory {
 
     /**
      * Returns null.
-     * 
+     *
      * @param project
      * @return always <code>null</code>
      */
@@ -45,7 +45,7 @@ public class NullVCSProviderFactoryImpl implements VCSProviderFactory {
 
     /**
      * Returns <code>null</code> for any given identifier.
-     * 
+     *
      * @return always <code>null</code>
      */
     @Override

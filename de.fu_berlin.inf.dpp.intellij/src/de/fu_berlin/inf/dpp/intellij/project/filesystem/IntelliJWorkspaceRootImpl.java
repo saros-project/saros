@@ -1,14 +1,14 @@
 package de.fu_berlin.inf.dpp.intellij.project.filesystem;
 
-import java.io.IOException;
-import java.net.URI;
-
 import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IResourceAttributes;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRoot;
+
+import java.io.IOException;
+import java.net.URI;
 
 /**
  * IntelliJ implementation of {@link IWorkspaceRoot}.
@@ -23,7 +23,7 @@ public class IntelliJWorkspaceRootImpl implements IWorkspaceRoot {
          *  This IWorspaceRoot implementation is needed to avoid IntellJ crash when activating the HTML UI.
          *  Until the core filesystem is reworked, this throws an Exception to indicate that the implementation is missing.
          */
-    throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException();
     }
 
     @Override

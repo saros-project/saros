@@ -37,11 +37,17 @@ public class SwtLibLoaderTest {
 
     @Test
     public void createJarFilename() {
-        assertEquals(JAR_FILENAME_OSX_32, SwtLibLoader.getJarFilename("mac", "86"));
-        assertEquals(JAR_FILENAME_OSX_64, SwtLibLoader.getJarFilename("mac", "64"));
-        assertEquals(JAR_FILENAME_LINUX_32, SwtLibLoader.getJarFilename("linux", "86"));
-        assertEquals(JAR_FILENAME_LINUX_64, SwtLibLoader.getJarFilename("linux", "64"));
-        assertEquals(JAR_FILENAME_WIN_32, SwtLibLoader.getJarFilename("win", "86"));
-        assertEquals(JAR_FILENAME_WIN_64, SwtLibLoader.getJarFilename("win", "64"));
+        assertEquals(JAR_FILENAME_OSX_32,
+            SwtLibLoader.getJarFilename("mac", "86"));
+        assertEquals(JAR_FILENAME_OSX_64,
+            SwtLibLoader.getJarFilename("mac", "64"));
+        assertEquals(JAR_FILENAME_LINUX_32,
+            SwtLibLoader.getJarFilename("linux", "86"));
+        assertEquals(JAR_FILENAME_LINUX_64,
+            SwtLibLoader.getJarFilename("linux", "64"));
+        assertEquals(JAR_FILENAME_WIN_32,
+            SwtLibLoader.getJarFilename("win", "86"));
+        assertEquals(JAR_FILENAME_WIN_64,
+            SwtLibLoader.getJarFilename("win", "64"));
     }
 }

@@ -56,7 +56,7 @@ public class LocalEditorHandler {
      * Initializes all fields that require an EditorManager. It has to be called
      * after the constructor and before the object is used, otherwise it will not
      * work.
-     * <p>
+     * <p/>
      * The reason for this late initialization is that this way the LocalEditorHandler
      * can be instantiated by the PicoContainer, otherwise there would be a cyclic
      * dependency.

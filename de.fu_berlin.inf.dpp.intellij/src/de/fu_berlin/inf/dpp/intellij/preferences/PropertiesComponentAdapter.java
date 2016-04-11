@@ -22,20 +22,18 @@
 
 package de.fu_berlin.inf.dpp.intellij.preferences;
 
-import java.nio.charset.Charset;
-import java.util.Properties;
-
-import org.apache.commons.codec.binary.Base64;
-
 import com.intellij.ide.util.PropertiesComponent;
-
 import de.fu_berlin.inf.dpp.preferences.IPreferenceChangeListener;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
+import org.apache.commons.codec.binary.Base64;
+
+import java.nio.charset.Charset;
+import java.util.Properties;
 
 /**
  * This class adapts the {@link PropertiesComponent} to the IPreferenceStore
  * interface.
- * <p>
+ * <p/>
  * The actual values can be found in $IDEA_HOME/config/options/options.xml and
  * are prefixed with {@link #PROPERTY_PREFIX}.
  */
@@ -86,7 +84,8 @@ public class PropertiesComponentAdapter implements IPreferenceStore {
     }
 
     @Override
-    public void addPreferenceChangeListener(IPreferenceChangeListener listener) {
+    public void addPreferenceChangeListener(
+        IPreferenceChangeListener listener) {
         throw new UnsupportedOperationException(
             "IntelliJ PreferenceStore does not support listening for preference changes.");
     }
@@ -191,8 +190,9 @@ public class PropertiesComponentAdapter implements IPreferenceStore {
     }
 
     private void setPropertyValue(final String name, final String value) {
-        final String encodedValue = new String(Base64.encodeBase64(value
-            .getBytes(PROPERTY_CHARSET)), BASE64_CHARSET);
+        final String encodedValue = new String(
+            Base64.encodeBase64(value.getBytes(PROPERTY_CHARSET)),
+            BASE64_CHARSET);
 
         properties.setValue(PROPERTY_PREFIX + name, encodedValue);
     }
@@ -212,8 +212,8 @@ public class PropertiesComponentAdapter implements IPreferenceStore {
      * this method return null on null values instead of default values !
      */
     @SuppressWarnings("unchecked")
-    private static <T> T convertValue(final Object value,
-        final Class<T> toType, boolean useTypeDefault) {
+    private static <T> T convertValue(final Object value, final Class<T> toType,
+        boolean useTypeDefault) {
 
         Object defaultValue = null;
 
@@ -226,8 +226,8 @@ public class PropertiesComponentAdapter implements IPreferenceStore {
         else if (toType == String.class)
             defaultValue = DEFAULT_STRING;
         else
-            throw new IllegalArgumentException("unknown conversion type: "
-                + toType.getName());
+            throw new IllegalArgumentException(
+                "unknown conversion type: " + toType.getName());
 
         if (value == null && useTypeDefault)
             return (T) defaultValue;

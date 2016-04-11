@@ -9,9 +9,6 @@ import de.fu_berlin.inf.dpp.ui.pages.IBrowserPage;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-
-import org.picocontainer.annotations.Inject;
-
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -22,16 +19,16 @@ public class IntelliJDialogManager extends DialogManager {
 
     private Project project;
 
-    public IntelliJDialogManager(UISynchronizer uiSynchronizer, Project project) {
+    public IntelliJDialogManager(UISynchronizer uiSynchronizer,
+        Project project) {
         super(uiSynchronizer);
-        
+
         this.project = project;
     }
 
     @Override
     protected IBrowserDialog createDialog(final IBrowserPage startPage) {
-        JFrame parent = WindowManager.getInstance()
-            .getFrame(project);
+        JFrame parent = WindowManager.getInstance().getFrame(project);
         JDialog jDialog = new JDialog(parent);
         jDialog.addWindowListener(new WindowAdapter() {
             @Override

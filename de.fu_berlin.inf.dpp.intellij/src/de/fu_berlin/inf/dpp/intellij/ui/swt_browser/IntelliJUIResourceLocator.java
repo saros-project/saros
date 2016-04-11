@@ -10,6 +10,7 @@ public class IntelliJUIResourceLocator implements IUIResourceLocator {
 
     @Override
     public String getResourceLocation(String resourceName) {
-        return IntelliJUIResourceLocator.class.getClassLoader().getResource(resourceName).toString();
+        return IntelliJUIResourceLocator.class.getClassLoader()
+            .getResource(resourceName).toString();
     }
 }

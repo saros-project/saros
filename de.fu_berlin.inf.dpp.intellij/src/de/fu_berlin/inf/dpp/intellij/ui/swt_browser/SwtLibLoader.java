@@ -33,7 +33,7 @@ import java.net.URL;
 /**
  * This class loads the appropriate swt library from the swt plugin depending on
  * the operating system and the processor architecture.
- *
+ * <p/>
  * This class is not intended to be subclassed.
  */
 public class SwtLibLoader {

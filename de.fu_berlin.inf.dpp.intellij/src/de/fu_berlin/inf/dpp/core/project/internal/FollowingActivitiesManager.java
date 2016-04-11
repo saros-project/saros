@@ -62,8 +62,8 @@ public class FollowingActivitiesManager extends AbstractActivityProducer
         public void followModeChanged(User target, boolean isFollowed) {
 
             if (isFollowed) {
-                fireActivity(new StartFollowingActivity(session.getLocalUser(),
-                    target));
+                fireActivity(
+                    new StartFollowingActivity(session.getLocalUser(), target));
             } else {
                 fireActivity(new StopFollowingActivity(session.getLocalUser()));
             }
@@ -79,8 +79,7 @@ public class FollowingActivitiesManager extends AbstractActivityProducer
             if (LOG.isDebugEnabled())
                 LOG.debug(
                     "received new follow mode from: " + source + " , followed: "
-                        + target
-                );
+                        + target);
 
             collector.setUserFollowing(source, target);
             notifyListeners();

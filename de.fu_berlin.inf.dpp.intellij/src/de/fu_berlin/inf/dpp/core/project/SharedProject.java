@@ -70,8 +70,8 @@ public class SharedProject {
                 project.getFullPath().toString() + "/"; //$NON-NLS-1$
 
             for (Map.Entry<?, ?> entry : sortedMap.entrySet())
-                result.append(fullPath).append(entry.getKey()).append(
-                    " -> ") //$NON-NLS-1$
+                result.append(fullPath).append(entry.getKey())
+                    .append(" -> ") //$NON-NLS-1$
                     .append(entry.getValue()).append('\n');
 
             result.setLength(result.length() - 1);

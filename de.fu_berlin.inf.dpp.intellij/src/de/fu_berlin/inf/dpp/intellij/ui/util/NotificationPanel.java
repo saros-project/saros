@@ -29,7 +29,6 @@ import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
-
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
@@ -56,14 +55,12 @@ public class NotificationPanel {
 
     /**
      * Dispaly the Notification.
-     *
+     * <p/>
      * TODO: Move to core
      * TODO: Add different types of notification
      *
-     * @param message
-     *            content of the notification
-     * @param title
-     *            title of the notification.
+     * @param message content of the notification
+     * @param title   title of the notification.
      */
     public static void showNotification(String message, String title) {
         final Notification notification = GROUP_DISPLAY_ID_INFO

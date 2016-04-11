@@ -157,9 +157,9 @@ public class NegotiationHandler implements INegotiationHandler {
         private final String peer;
 
         public OutgoingInvitationJob(OutgoingSessionNegotiation negotiation) {
-            super(MessageFormat.format(
-                Messages.NegotiationHandler_inviting_user,
-                getNickname(negotiation.getPeer())));
+            super(MessageFormat
+                .format(Messages.NegotiationHandler_inviting_user,
+                    getNickname(negotiation.getPeer())));
             this.negotiation = negotiation;
             peer = negotiation.getPeer().getBase();
         }
@@ -173,44 +173,33 @@ public class NegotiationHandler implements INegotiationHandler {
                 case CANCEL:
                     return Status.CANCEL_STATUS;
                 case ERROR:
-                    return new Status(IStatus.ERROR,
-                        SarosComponent.PLUGIN_ID,
+                    return new Status(IStatus.ERROR, SarosComponent.PLUGIN_ID,
                         negotiation.getErrorMessage());
                 case OK:
                     break;
                 case REMOTE_CANCEL:
-                    NotificationPanel
-                        .showNotification(
-                            Messages.NegotiationHandler_canceled_invitation,
-                            MessageFormat
-                                .format(
-                                    Messages.NegotiationHandler_canceled_invitation_text,
-                                    peer));
+                    NotificationPanel.showNotification(
+                        Messages.NegotiationHandler_canceled_invitation,
+                        MessageFormat.format(
+                            Messages.NegotiationHandler_canceled_invitation_text,
+                            peer));
 
-                    return new Status(
-                        IStatus.CANCEL,
-                        SarosComponent.PLUGIN_ID,
-                        MessageFormat
-                            .format(
-                                Messages.NegotiationHandler_canceled_invitation_text,
-                                peer));
+                    return new Status(IStatus.CANCEL, SarosComponent.PLUGIN_ID,
+                        MessageFormat.format(
+                            Messages.NegotiationHandler_canceled_invitation_text,
+                            peer));
 
                 case REMOTE_ERROR:
-                    NotificationPanel
-                        .showNotification(
-                            Messages.NegotiationHandler_error_during_invitation,
-                            MessageFormat
-                                .format(
-                                    Messages.NegotiationHandler_error_during_invitation_text,
-                                    peer, negotiation.getErrorMessage()));
+                    NotificationPanel.showNotification(
+                        Messages.NegotiationHandler_error_during_invitation,
+                        MessageFormat.format(
+                            Messages.NegotiationHandler_error_during_invitation_text,
+                            peer, negotiation.getErrorMessage()));
 
-                    return new Status(
-                        IStatus.ERROR,
-                        SarosComponent.PLUGIN_ID,
-                        MessageFormat
-                            .format(
-                                Messages.NegotiationHandler_error_during_invitation_text,
-                                peer, negotiation.getErrorMessage()));
+                    return new Status(IStatus.ERROR, SarosComponent.PLUGIN_ID,
+                        MessageFormat.format(
+                            Messages.NegotiationHandler_error_during_invitation_text,
+                            peer, negotiation.getErrorMessage()));
                 }
             } catch (Exception e) {
                 LOG.error("This exception is not expected here: ", e);
@@ -249,49 +238,42 @@ public class NegotiationHandler implements INegotiationHandler {
                 case CANCEL:
                     return Status.CANCEL_STATUS;
                 case ERROR:
-                    return new Status(IStatus.ERROR,
-                        SarosComponent.PLUGIN_ID,
+                    return new Status(IStatus.ERROR, SarosComponent.PLUGIN_ID,
                         negotiation.getErrorMessage());
                 case OK:
                     break;
                 case REMOTE_CANCEL:
-                    message = MessageFormat
-                        .format(
-                            Messages.NegotiationHandler_project_sharing_canceled_text,
-                            peerName);
+                    message = MessageFormat.format(
+                        Messages.NegotiationHandler_project_sharing_canceled_text,
+                        peerName);
 
-                    ApplicationManager.getApplication().invokeLater(
-                        new Runnable() {
+                    ApplicationManager.getApplication()
+                        .invokeLater(new Runnable() {
                             @Override
                             public void run() {
-                                DialogUtils
-                                    .showInfo(
-                                        null,
-                                        message,
-                                        Messages.NegotiationHandler_project_sharing_canceled_text);
+                                DialogUtils.showInfo(null, message,
+                                    Messages.NegotiationHandler_project_sharing_canceled_text);
                             }
                         });
 
-                    return new Status(IStatus.CANCEL,
-                        SarosComponent.PLUGIN_ID, message);
+                    return new Status(IStatus.CANCEL, SarosComponent.PLUGIN_ID,
+                        message);
 
                 case REMOTE_ERROR:
-                    message = MessageFormat
-                        .format(
-                            Messages.NegotiationHandler_sharing_project_canceled_remotely,
-                            peerName, negotiation.getErrorMessage());
-                    NotificationPanel
-                        .showNotification(
-                            Messages.NegotiationHandler_sharing_project_canceled_remotely_text,
-                            message);
+                    message = MessageFormat.format(
+                        Messages.NegotiationHandler_sharing_project_canceled_remotely,
+                        peerName, negotiation.getErrorMessage());
+                    NotificationPanel.showNotification(
+                        Messages.NegotiationHandler_sharing_project_canceled_remotely_text,
+                        message);
 
-                    return new Status(IStatus.ERROR,
-                        SarosComponent.PLUGIN_ID, message);
+                    return new Status(IStatus.ERROR, SarosComponent.PLUGIN_ID,
+                        message);
                 }
             } catch (Exception e) {
                 LOG.error("This exception is not expected here: ", e);
-                return new Status(IStatus.ERROR,
-                    SarosComponent.PLUGIN_ID, e.getMessage(), e);
+                return new Status(IStatus.ERROR, SarosComponent.PLUGIN_ID,
+                    e.getMessage(), e);
 
             }
 

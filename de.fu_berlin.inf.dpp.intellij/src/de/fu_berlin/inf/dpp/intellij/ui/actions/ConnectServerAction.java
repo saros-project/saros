@@ -68,22 +68,21 @@ public class ConnectServerAction extends AbstractSarosAction {
 
     /**
      * Connects an Account tothe XMPPService and sets it as active.
-     * 
+     *
      * @param account
      */
     private void connectAccount(XMPPAccount account) {
-        LOG.info("Connecting server: [" + account.getUsername() + "@"
-            + account.getServer() + "]");
+        LOG.info("Connecting server: [" + account.getUsername() + "@" + account
+            .getServer() + "]");
 
         try {
             // TODO don't block UI
             connectionHandler.connect(account, false);
         } catch (RuntimeException e) {
             // TODO display user notification in connection listener
-            JOptionPane
-                .showMessageDialog(null,
-                    "An unexpected error occured: " + e.getMessage(),
-                    "Connection Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null,
+                "An unexpected error occured: " + e.getMessage(),
+                "Connection Error", JOptionPane.ERROR_MESSAGE);
             LOG.error("Could not connect " + account, e);
         }
     }

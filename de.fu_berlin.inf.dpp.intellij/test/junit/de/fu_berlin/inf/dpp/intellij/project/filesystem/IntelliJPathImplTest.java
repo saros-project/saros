@@ -249,8 +249,8 @@ public class IntelliJPathImplTest {
     @Test
     @Ignore
     public void makeAbsoluteIsIdempotent() {
-        assertSame(absolutePath("foo/bar"), absolutePath("foo/bar")
-            .makeAbsolute());
+        assertSame(absolutePath("foo/bar"),
+            absolutePath("foo/bar").makeAbsolute());
     }
 
     @Test

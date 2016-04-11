@@ -23,7 +23,6 @@
 package de.fu_berlin.inf.dpp.intellij.ui.wizards;
 
 import com.intellij.util.ui.UIUtil;
-
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
@@ -61,17 +60,17 @@ import java.util.Map;
 
 /**
  * Wizard for adding projects to a session.
- *
+ * <p/>
  * It consists of a selection page, where the user can select how to handle the
  * incoming project:
  * <ul>
- *     <li> create a new project
- *     <li reuse an existing project
+ * <li> create a new project
+ * <li reuse an existing project
  * </ul>
- *
+ * <p/>
  * If the option to reuse an existing project is chosen, a second page is displayed,
  * that displays the files necessary to modify.
- *
+ * <p/>
  * FIXME: Add facility for more than one project.
  */
 public class AddProjectToSessionWizard extends Wizard {
@@ -189,17 +188,16 @@ public class AddProjectToSessionWizard extends Wizard {
     /**
      * Creates the wizard and its pages.
      *
-     * @param negotiation The IPN this wizard handles
-     * @param peer The peer
-     * @param fileLists The list of resources to be shared
+     * @param negotiation  The IPN this wizard handles
+     * @param peer         The peer
+     * @param fileLists    The list of resources to be shared
      * @param projectNames The names of the projects to be shared
      */
     public AddProjectToSessionWizard(IncomingProjectNegotiation negotiation,
         JID peer, List<FileList> fileLists, Map<String, String> projectNames) {
 
         super(Messages.AddProjectToSessionWizard_title,
-            new HeaderPanel(
-                Messages.EnterProjectNamePage_title2, ""));
+            new HeaderPanel(Messages.EnterProjectNamePage_title2, ""));
 
         this.negotiation = negotiation;
         this.peer = peer;
@@ -228,11 +226,10 @@ public class AddProjectToSessionWizard extends Wizard {
      */
     public void cancelWizard(final JID peer, final String errorMsg,
         NegotiationTools.CancelLocation type) {
-        final String message = "Wizard canceled "
-            + (type.equals(NegotiationTools.CancelLocation.LOCAL) ?
-              "locally " :
-              "remotely ")
-            + "by " + peer;
+        final String message = "Wizard canceled " + (type
+            .equals(NegotiationTools.CancelLocation.LOCAL) ?
+            "locally " :
+            "remotely ") + "by " + peer;
         UIUtil.invokeLaterIfNeeded(new Runnable() {
             @Override
             public void run() {
@@ -247,7 +244,7 @@ public class AddProjectToSessionWizard extends Wizard {
     /**
      * Runs {@link IncomingProjectNegotiation#run(java.util.Map, IProgressMonitor, boolean)}
      * as a background task through {@link #runTask(Runnable, String)}.
-     *
+     * <p/>
      * On success, a success notification is displayed, on error, a dialog is shown.
      */
     private void triggerProjectNegotiation() {
@@ -276,21 +273,20 @@ public class AddProjectToSessionWizard extends Wizard {
         final Map<String, FileListDiff> modifiedResources = new HashMap<String, FileListDiff>();
 
         runTask(new Runnable() {
-                    @Override
-                    public void run() {
-                        modifiedResources.putAll(
-                            getModifiedResourcesFromMofifiableProjects(
-                                projectMapping, new NullProgressMonitor())
-                        );
-                    }
-                }, "Gathering files that have to be modified..."
-        );
+            @Override
+            public void run() {
+                modifiedResources.putAll(
+                    getModifiedResourcesFromMofifiableProjects(projectMapping,
+                        new NullProgressMonitor()));
+            }
+        }, "Gathering files that have to be modified...");
         fillFileListPage(modifiedResources);
     }
 
     private void fillFileListPage(Map<String, FileListDiff> modifiedResources) {
         boolean empty = true;
-        for (Map.Entry<String, FileListDiff> key : modifiedResources.entrySet()) {
+        for (Map.Entry<String, FileListDiff> key : modifiedResources
+            .entrySet()) {
             fileListPage.addLine("Project [" + key.getKey() + "]:");
             FileListDiff diff = modifiedResources.get(key.getKey());
             for (String path : diff.getAlteredPaths()) {
@@ -332,9 +328,9 @@ public class AddProjectToSessionWizard extends Wizard {
     /**
      * Returns a project mapping that contains all projects that will be
      * modified on synchronization.
-     *
+     * <p/>
      * Currently these are simply all projects from projectMapping.
-     *
+     * <p/>
      * FIXME: Add a check for non-overwritable projects.
      */
     private Map<String, IProject> getModifiedProjects(
@@ -374,7 +370,7 @@ public class AddProjectToSessionWizard extends Wizard {
     /**
      * Returns all modified resources (either changed or deleted) for the
      * current project mapping.
-     *
+     * <p/>
      * <b>Important:</b> Do not call this inside the UI Thread. This is a long
      * running operation !
      */
@@ -414,8 +410,7 @@ public class AddProjectToSessionWizard extends Wizard {
                         .createFileList(project, eclipseResources,
                             checksumCache, null,
                             new SubProgressMonitor(monitor, 1,
-                                SubProgressMonitor.SUPPRESS_SETTASKNAME)
-                        );
+                                SubProgressMonitor.SUPPRESS_SETTASKNAME));
 
                     remoteFileList.getPaths().addAll(sharedFileList.getPaths());
                 } else {
@@ -425,8 +420,7 @@ public class AddProjectToSessionWizard extends Wizard {
                 FileList localFileList = FileListFactory
                     .createFileList(project, null, checksumCache, null,
                         new SubProgressMonitor(monitor, 1,
-                            SubProgressMonitor.SUPPRESS_SETTASKNAME)
-                    );
+                            SubProgressMonitor.SUPPRESS_SETTASKNAME));
                 diff = FileListDiff.diff(localFileList, remoteFileList);
 
                 if (negotiation.isPartialRemoteProject(projectID)) {

@@ -56,7 +56,7 @@ public class FollowModeAction extends AbstractSarosAction {
         }
 
         @Override
-        public void sessionEnded(ISarosSession oldSarosSession, 
+        public void sessionEnded(ISarosSession oldSarosSession,
             SessionEndReason reason) {
 
             ThreadUtils.runSafeAsync(LOG, new Runnable() {

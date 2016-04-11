@@ -85,12 +85,10 @@ public class SarosToolbar extends JToolBar {
         add(connectionButton);
 
         add(new SimpleButton(new NotImplementedAction("addContact"),
-                "Add contact to list", ADD_CONTACT_ICON_PATH, "addContact")
-        );
+            "Add contact to list", ADD_CONTACT_ICON_PATH, "addContact"));
 
         add(new SimpleButton(new NotImplementedAction("preferences"),
-                "Open preferences", OPEN_REFS_ICON_PATH, "preferences")
-        );
+            "Open preferences", OPEN_REFS_ICON_PATH, "preferences"));
 
         add(new FollowButton());
 

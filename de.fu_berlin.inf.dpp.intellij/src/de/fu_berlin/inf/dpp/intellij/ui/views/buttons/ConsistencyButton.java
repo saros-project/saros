@@ -37,7 +37,6 @@ import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
-
 import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
 
@@ -50,7 +49,7 @@ import java.util.Set;
 /**
  * Button for triggering a {@link ConsistencyAction}. Displays a different symbol
  * when state is inconsistent or not.
- *
+ * <p/>
  * FIXME: Remove awkward session handling together with UI components created
  * with session.
  */
@@ -72,7 +71,8 @@ public class ConsistencyButton extends ToolbarButton {
             setEnabledFromUIThread(false);
 
             final Set<SPath> paths = new HashSet<SPath>(
-                sessionInconsistencyState.watchdogClient.getPathsWithWrongChecksums());
+                sessionInconsistencyState.watchdogClient
+                    .getPathsWithWrongChecksums());
 
             String inconsistentFiles = createConfirmationMessage(paths);
 
@@ -183,7 +183,8 @@ public class ConsistencyButton extends ToolbarButton {
         }
 
         if (newSession != null)
-            sessionInconsistencyState = new SessionInconsistencyState(newSession);
+            sessionInconsistencyState = new SessionInconsistencyState(
+                newSession);
 
         if (sessionInconsistencyState != null) {
             inconsistentObservable.addAndNotify(isConsistencyListener);
@@ -213,7 +214,8 @@ public class ConsistencyButton extends ToolbarButton {
         }
 
         final Set<SPath> paths = new HashSet<SPath>(
-            sessionInconsistencyState.watchdogClient.getPathsWithWrongChecksums());
+            sessionInconsistencyState.watchdogClient
+                .getPathsWithWrongChecksums());
 
         final String files = createInconsistentPathsMessage(paths);
 
@@ -229,8 +231,7 @@ public class ConsistencyButton extends ToolbarButton {
                     Messages.ConsistencyAction_title_inconsistency_detected,
                     MessageFormat.format(
                         Messages.ConsistencyAction_message_inconsistency_detected,
-                        files)
-                );
+                        files));
             }
         });
     }

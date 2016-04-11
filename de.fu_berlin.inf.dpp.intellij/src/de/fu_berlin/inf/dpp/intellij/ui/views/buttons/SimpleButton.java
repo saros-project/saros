@@ -41,7 +41,8 @@ public class SimpleButton extends ToolbarButton {
         super(action.getActionName(), tooltipText, iconPath, altText);
         this.action = action;
         addActionListener(new ActionListener() {
-            @Override public void actionPerformed(ActionEvent actionEvent) {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
                 SimpleButton.this.action.execute();
             }
         });

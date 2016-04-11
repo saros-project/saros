@@ -82,8 +82,7 @@ public class AutoHashMap<K, V> implements Map<K, V> {
                 public BlockingQueue<V> apply(K u) {
                     return new LinkedBlockingQueue<V>();
                 }
-            }
-        );
+            });
     }
 
     /**
@@ -99,7 +98,8 @@ public class AutoHashMap<K, V> implements Map<K, V> {
         });
     }
 
-    @Override @SuppressWarnings("unchecked")
+    @Override
+    @SuppressWarnings("unchecked")
     public V get(Object k) {
         if (!containsKey(k)) {
             put((K) k, provider.apply((K) k));

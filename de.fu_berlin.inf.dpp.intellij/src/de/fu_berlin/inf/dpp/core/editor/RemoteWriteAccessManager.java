@@ -142,6 +142,7 @@ public class RemoteWriteAccessManager {
 
     /**
      * This method is called from the shared project when a new Activity arrives
+     *
      * @param activity activity to dispatch
      */
     public void exec(final IActivity activity) {

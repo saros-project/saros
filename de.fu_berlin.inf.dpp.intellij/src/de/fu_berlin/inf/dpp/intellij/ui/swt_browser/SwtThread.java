@@ -41,7 +41,8 @@ class SwtThread extends Thread {
     @Override
     public void run() {
         // Execute the SWT event dispatch loop...
-        Display display = Display.getDefault(); // creates new one if none present
+        Display display = Display
+            .getDefault(); // creates new one if none present
         displayCreatedLatch.countDown();
         while (!display.isDisposed()) {
             if (!display.readAndDispatch()) {

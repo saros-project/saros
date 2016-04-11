@@ -65,7 +65,8 @@ public abstract class ToolbarButton extends JButton {
      */
     protected void setEnabledFromUIThread(final boolean enabled) {
         UIUtil.invokeAndWaitIfNeeded(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 setEnabled(enabled);
             }
         });

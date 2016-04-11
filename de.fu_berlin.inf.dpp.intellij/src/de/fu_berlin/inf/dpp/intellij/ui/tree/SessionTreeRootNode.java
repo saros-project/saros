@@ -95,7 +95,7 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
         }
 
         @Override
-        public void sessionEnded(final ISarosSession oldSarosSession, 
+        public void sessionEnded(final ISarosSession oldSarosSession,
             SessionEndReason reason) {
 
             UIUtil.invokeLaterIfNeeded(new Runnable() {
@@ -248,7 +248,8 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
         private final User user;
 
         public UserInfo(User user) {
-            super(ModelFormatUtils.getDisplayName(user), IconManager.CONTACT_ONLINE_ICON);
+            super(ModelFormatUtils.getDisplayName(user),
+                IconManager.CONTACT_ONLINE_ICON);
             this.user = user;
         }
 

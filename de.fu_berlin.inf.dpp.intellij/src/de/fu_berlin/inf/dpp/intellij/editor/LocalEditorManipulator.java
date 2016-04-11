@@ -34,14 +34,12 @@ import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorModel;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.ResourceConverter;
-
 import org.apache.log4j.Logger;
 
 import java.awt.Color;
 
 /**
  * This class applies the logic for activities that were received from remote.
- *
  */
 public class LocalEditorManipulator {
 
@@ -77,7 +75,7 @@ public class LocalEditorManipulator {
      *
      * @param path
      * @return the editor for the given path,
-     *      or <code>null</code> if the file does not exist
+     * or <code>null</code> if the file does not exist
      */
     public Editor openEditor(SPath path) {
 
@@ -124,8 +122,8 @@ public class LocalEditorManipulator {
      * @param path path of the editor
      * @param text text to set the document's content to
      * @return Returns <code>true</code> if replacement was successful,
-     *     <code>false</code> if the path was <code>null></code>, if the path points
-     *     to a non-existing document or the document was not writable.
+     * <code>false</code> if the path was <code>null></code>, if the path points
+     * to a non-existing document or the document was not writable.
      */
     public boolean replaceText(SPath path, String text) {
         Document doc = editorPool.getDocument(path);

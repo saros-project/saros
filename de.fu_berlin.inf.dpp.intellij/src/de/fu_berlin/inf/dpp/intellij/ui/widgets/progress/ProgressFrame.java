@@ -113,27 +113,33 @@ public class ProgressFrame implements IProgressMonitor {
         frmMain.dispose();
     }
 
-    @Override public void subTask(String name) {
+    @Override
+    public void subTask(String name) {
         monitorProgressBar.subTask(name);
     }
 
-    @Override public void setTaskName(String name) {
+    @Override
+    public void setTaskName(String name) {
         monitorProgressBar.setTaskName(name);
     }
 
-    @Override public void worked(int amount) {
+    @Override
+    public void worked(int amount) {
         monitorProgressBar.worked(amount);
     }
 
-    @Override public void setCanceled(boolean canceled) {
+    @Override
+    public void setCanceled(boolean canceled) {
         monitorProgressBar.setCanceled(canceled);
     }
 
-    @Override public boolean isCanceled() {
+    @Override
+    public boolean isCanceled() {
         return monitorProgressBar.isCanceled();
     }
 
-    @Override public void beginTask(String name, int size) {
+    @Override
+    public void beginTask(String name, int size) {
         monitorProgressBar.beginTask(name, size);
     }
 

@@ -76,8 +76,8 @@ import java.util.Set;
 /**
  * IntelliJ implementation of the {@link IEditorManager} interface.
  */
-public class EditorManager extends AbstractActivityProducer implements
-    IEditorManager {
+public class EditorManager extends AbstractActivityProducer
+    implements IEditorManager {
 
     private static final Logger LOG = Logger.getLogger(EditorManager.class);
 
@@ -185,8 +185,7 @@ public class EditorManager extends AbstractActivityProducer implements
 
             editorListenerDispatch
                 .textEdited(user, path, editorActivity.getOffset(),
-                    editorActivity.getReplacedText(),
-                    editorActivity.getText());
+                    editorActivity.getReplacedText(), editorActivity.getText());
         }
 
         private void execTextSelection(TextSelectionActivity selection) {
@@ -254,8 +253,7 @@ public class EditorManager extends AbstractActivityProducer implements
             for (SPath path : getLocallyOpenEditors()) {
                 fireActivity(
                     new EditorActivity(localUser, EditorActivity.Type.ACTIVATED,
-                        path)
-                );
+                        path));
             }
 
             //HACK: Editors that are already opened have to be added to the EditorPool
@@ -264,9 +262,8 @@ public class EditorManager extends AbstractActivityProducer implements
             for (IProject proj : session.getProjects())
                 for (VirtualFile file : fileEditorManager.getOpenFiles()) {
                     if (proj.getFullPath().equals(
-                        ((IntelliJWorkspaceImpl)workspace).getProjectForPath(file.getPath())
-                            .getFullPath()
-                    )) {
+                        ((IntelliJWorkspaceImpl) workspace)
+                            .getProjectForPath(file.getPath()).getFullPath())) {
                         localEditorHandler.openEditor(file);
                     }
                 }
@@ -295,8 +292,7 @@ public class EditorManager extends AbstractActivityProducer implements
 
                 fireActivity(
                     new TextSelectionActivity(localUser, offset, length,
-                        activeEditor)
-                );
+                        activeEditor));
             } else {
                 LOG.warn(
                     "No selection for locallyActivateEditor: " + activeEditor);
@@ -321,9 +317,9 @@ public class EditorManager extends AbstractActivityProducer implements
         }
 
         @Override
-        public void sessionEnded(ISarosSession oldSarosSession, 
+        public void sessionEnded(ISarosSession oldSarosSession,
             SessionEndReason reason) {
-            
+
             assert session == oldSarosSession;
             session.getStopManager()
                 .removeBlockable(stopManagerListener); //todo
@@ -470,7 +466,7 @@ public class EditorManager extends AbstractActivityProducer implements
     private final EditorPool editorPool = new EditorPool();
 
     private IWorkspace workspace;
-    
+
     private Project project;
 
     private final SharedEditorListenerDispatch editorListenerDispatch = new SharedEditorListenerDispatch();
@@ -496,8 +492,7 @@ public class EditorManager extends AbstractActivityProducer implements
 
     public EditorManager(ISarosSessionManager sessionManager,
         LocalEditorHandler localEditorHandler,
-        LocalEditorManipulator localEditorManipulator,
-        IWorkspace workspace,
+        LocalEditorManipulator localEditorManipulator, IWorkspace workspace,
         Project project) {
 
         remoteEditorManager = new RemoteEditorManager(session);
@@ -529,8 +524,8 @@ public class EditorManager extends AbstractActivityProducer implements
 
     @Override
     public String getContent(final SPath path) {
-        return ApplicationManager.getApplication().runReadAction(
-            new Computable<String>() {
+        return ApplicationManager.getApplication()
+            .runReadAction(new Computable<String>() {
 
                 @Override
                 public String compute() {
@@ -540,8 +535,8 @@ public class EditorManager extends AbstractActivityProducer implements
                         return null;
 
                     IPath fullPath = file.getFullPath();
-                    Document doc = ResourceConverter.getDocument(fullPath
-                        .toFile());
+                    Document doc = ResourceConverter
+                        .getDocument(fullPath.toFile());
                     return (doc != null) ? doc.getText() : null;
                 }
             });
@@ -654,11 +649,10 @@ public class EditorManager extends AbstractActivityProducer implements
     /**
      * Sets the local editor 'opened' and fires an {@link EditorActivity} of
      * type {@link Type#ACTIVATED}.
-     * 
-     * @param path
-     *            the project-relative path to the resource that the editor is
-     *            currently editing or <code>null</code> if the local user has
-     *            no editor open.
+     *
+     * @param path the project-relative path to the resource that the editor is
+     *             currently editing or <code>null</code> if the local user has
+     *             no editor open.
      */
     void generateEditorActivated(SPath path) {
 
@@ -668,8 +662,7 @@ public class EditorManager extends AbstractActivityProducer implements
             locallyOpenEditors.add(path);
         }
 
-        editorListenerDispatch
-            .editorActivated(session.getLocalUser(), path);
+        editorListenerDispatch.editorActivated(session.getLocalUser(), path);
         fireActivity(new EditorActivity(session.getLocalUser(),
             EditorActivity.Type.ACTIVATED, path));
 
@@ -715,8 +708,7 @@ public class EditorManager extends AbstractActivityProducer implements
 
         fireActivity(
             new TextSelectionActivity(session.getLocalUser(), offset, length,
-                path)
-        );
+                path));
     }
 
     /**
@@ -743,8 +735,8 @@ public class EditorManager extends AbstractActivityProducer implements
     /**
      * Generates a TextEditActivity and fires it.
      */
-    void generateTextEdit(int offset, String newText,
-        String replacedText, SPath path) {
+    void generateTextEdit(int offset, String newText, String replacedText,
+        SPath path) {
 
         if (session == null) {
             return;
@@ -773,7 +765,8 @@ public class EditorManager extends AbstractActivityProducer implements
 
         editorListenerDispatch
             .textEdited(session.getLocalUser(), textEdit.getPath(),
-                textEdit.getOffset(), textEdit.getReplacedText(), textEdit.getText());
+                textEdit.getOffset(), textEdit.getReplacedText(),
+                textEdit.getText());
     }
 
     /**

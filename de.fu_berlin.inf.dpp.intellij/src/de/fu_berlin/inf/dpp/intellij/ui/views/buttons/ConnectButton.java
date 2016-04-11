@@ -137,7 +137,7 @@ public class ConnectButton extends ToolbarButton {
     private void createConfigureAccountMenuItem() {
         configure = new JMenuItem("Configure accounts...");
         configure.addActionListener(new ActionListener() {
-            @Override 
+            @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 configureAccounts.execute();
             }
@@ -164,8 +164,7 @@ public class ConnectButton extends ToolbarButton {
      */
     protected XMPPAccount createNewAccount() {
         final String userID = SafeDialogUtils.showInputDialog(
-            "Your User-ID, e.g. user@saros-con.imp.fu-berlin.de",
-                "", "Login");
+            "Your User-ID, e.g. user@saros-con.imp.fu-berlin.de", "", "Login");
         if (userID.isEmpty()) {
             return null;
         }
@@ -195,8 +194,7 @@ public class ConnectButton extends ToolbarButton {
             LOG.error("Error creating account", e);
             SafeDialogUtils.showError(
                 "There was an error creating the account.\n Details:\n\n" + e
-                    .getMessage(), "Error"
-            );
+                    .getMessage(), "Error");
         }
         return null;
     }

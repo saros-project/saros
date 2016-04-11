@@ -19,6 +19,7 @@ public class Messages {
     public static String SharedProject_resource_not_in_project;
     public static String SharedProject_revision_out_of_sync;
     public static String SharedProject_vcs_url_out_of_sync;
+
     static {
         // initialize resource bundle
         MessageUtils.initializeMessages(BUNDLE_NAME, Messages.class);

@@ -45,8 +45,11 @@ public class StoppableEditorFileListener extends AbstractStoppableListener
      * @param virtualFile
      */
     @Override
-    public void fileOpened(@NotNull FileEditorManager fileEditorManager,
-        @NotNull VirtualFile virtualFile) {
+    public void fileOpened(
+        @NotNull
+        FileEditorManager fileEditorManager,
+        @NotNull
+        VirtualFile virtualFile) {
         if (!enabled) {
             return;
         }
@@ -61,8 +64,11 @@ public class StoppableEditorFileListener extends AbstractStoppableListener
      * @param virtualFile
      */
     @Override
-    public void fileClosed(@NotNull FileEditorManager fileEditorManager,
-        @NotNull VirtualFile virtualFile) {
+    public void fileClosed(
+        @NotNull
+        FileEditorManager fileEditorManager,
+        @NotNull
+        VirtualFile virtualFile) {
         if (!enabled) {
             return;
         }
@@ -76,7 +82,9 @@ public class StoppableEditorFileListener extends AbstractStoppableListener
      * @param event
      */
     @Override
-    public void selectionChanged(@NotNull FileEditorManagerEvent event) {
+    public void selectionChanged(
+        @NotNull
+        FileEditorManagerEvent event) {
         if (!enabled) {
             return;
         }

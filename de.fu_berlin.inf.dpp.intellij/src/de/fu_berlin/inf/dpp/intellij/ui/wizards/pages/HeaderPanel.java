@@ -62,8 +62,7 @@ public class HeaderPanel extends JPanel {
     private void create(String title, String text) {
         setLayout(new FlowLayout());
 
-        icon = IconManager
-            .getIcon("/icons/saros/invitation.png", "invitation");
+        icon = IconManager.getIcon("/icons/saros/invitation.png", "invitation");
         textMain = new JTextArea();
         textMain.setEditable(false);
 

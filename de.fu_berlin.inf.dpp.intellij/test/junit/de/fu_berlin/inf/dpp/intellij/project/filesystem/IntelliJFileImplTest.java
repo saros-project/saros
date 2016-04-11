@@ -26,12 +26,11 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
-
+import de.fu_berlin.inf.dpp.filesystem.IPath;
 import org.easymock.EasyMock;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Rule;
-import de.fu_berlin.inf.dpp.filesystem.IPath;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
@@ -76,7 +75,8 @@ public class IntelliJFileImplTest {
     @Test
     public void testIfNotPresentExistIsFalse() throws Exception {
         createTestProjectFolder();
-        IFile file = new IntelliJFileImpl(getMockProject(), new File(NEW_FILE_NAME));
+        IFile file = new IntelliJFileImpl(getMockProject(),
+            new File(NEW_FILE_NAME));
 
         assertTrue(!file.exists());
     }
@@ -94,7 +94,7 @@ public class IntelliJFileImplTest {
         IFile file = new IntelliJFileImpl(getMockProject(),
             new File("newCreateFile.txt"));
 
-        file.create(new ByteArrayInputStream(new byte[] { }), false);
+        file.create(new ByteArrayInputStream(new byte[] {}), false);
 
         assertTrue(file.exists());
     }
@@ -120,8 +120,8 @@ public class IntelliJFileImplTest {
     public void testMove() throws Exception {
         IFile file = createTestFile();
         String oldPath = file.getFullPath().toPortableString();
-        IPath destination = IntelliJPathImpl.fromString(folder.getRoot().getPath())
-            .append(TEST_PROJECT_NAME)
+        IPath destination = IntelliJPathImpl
+            .fromString(folder.getRoot().getPath()).append(TEST_PROJECT_NAME)
             .append("newFileName.txt");
 
         file.move(destination, false);
@@ -137,8 +137,7 @@ public class IntelliJFileImplTest {
         IFile file = createTestFile();
 
         assertEquals(IntelliJPathImpl.fromString(folder.getRoot().getPath())
-                .append(TEST_PROJECT_NAME)
-                .append(TESTFILE_NAME),
+                .append(TEST_PROJECT_NAME).append(TESTFILE_NAME),
             file.getFullPath());
     }
 

@@ -64,8 +64,9 @@ public abstract class IntelliJResourceImpl implements IResource {
     public IPath getFullPath() {
         // TODO Comply with Interface description: workspace-relative paths
         if (!file.isAbsolute()) {
-            return IntelliJPathImpl.fromString(
-                project.getFullPath().toPortableString()).append(file.getPath());
+            return IntelliJPathImpl
+                .fromString(project.getFullPath().toPortableString())
+                .append(file.getPath());
         }
         return IntelliJPathImpl.fromString(file.getAbsoluteFile().getPath());
     }

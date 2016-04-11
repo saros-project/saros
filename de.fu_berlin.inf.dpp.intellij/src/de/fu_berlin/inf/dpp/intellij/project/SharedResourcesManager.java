@@ -31,7 +31,6 @@ import de.fu_berlin.inf.dpp.activities.FolderDeletedActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IFileSystemModificationActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.VCSActivity;
 import de.fu_berlin.inf.dpp.core.util.FileUtils;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
@@ -82,7 +81,8 @@ public class SharedResourcesManager extends AbstractActivityProducer
     public void start() {
         ApplicationManager.getApplication().invokeAndWait(new Runnable() {
 
-            @Override public void run() {
+            @Override
+            public void run() {
                 sarosSession.addActivityProducer(SharedResourcesManager.this);
                 sarosSession.addActivityConsumer(consumer);
                 intelliJWorkspaceImpl.addResourceListener(fileSystemListener);
@@ -95,8 +95,10 @@ public class SharedResourcesManager extends AbstractActivityProducer
     public void stop() {
         ApplicationManager.getApplication().invokeAndWait(new Runnable() {
 
-            @Override public void run() {
-                intelliJWorkspaceImpl.removeResourceListener(fileSystemListener);
+            @Override
+            public void run() {
+                intelliJWorkspaceImpl
+                    .removeResourceListener(fileSystemListener);
                 sarosSession
                     .removeActivityProducer(SharedResourcesManager.this);
                 sarosSession.removeActivityConsumer(consumer);
@@ -108,7 +110,8 @@ public class SharedResourcesManager extends AbstractActivityProducer
         EditorManager editorManager,
         FileReplacementInProgressObservable fileReplacementInProgressObservable,
         LocalEditorHandler localEditorHandler,
-        LocalEditorManipulator localEditorManipulator, IntelliJWorkspaceImpl intelliJWorkspaceImpl) {
+        LocalEditorManipulator localEditorManipulator,
+        IntelliJWorkspaceImpl intelliJWorkspaceImpl) {
 
         this.sarosSession = sarosSession;
         this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;

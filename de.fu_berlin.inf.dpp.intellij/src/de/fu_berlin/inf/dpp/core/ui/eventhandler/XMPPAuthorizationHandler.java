@@ -63,11 +63,10 @@ public class XMPPAuthorizationHandler {
     private void handleAuthorizationRequest(final JID jid) {
 
         boolean accept = DialogUtils.showConfirm(null,
-                Messages.SubscriptionManager_incoming_subscription_request_title,
-                MessageFormat.format(
-                    Messages.SubscriptionManager_incoming_subscription_request_message,
-                    jid.getBareJID())
-            );
+            Messages.SubscriptionManager_incoming_subscription_request_title,
+            MessageFormat.format(
+                Messages.SubscriptionManager_incoming_subscription_request_message,
+                jid.getBareJID()));
         if (accept) {
             subscriptionHandler.addSubscription(jid, true);
         } else {

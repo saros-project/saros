@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.intellij.context;
 
+import com.intellij.openapi.project.Project;
 import de.fu_berlin.inf.dpp.AbstractSarosContextFactory;
 import de.fu_berlin.inf.dpp.ISarosContextBindings;
 import de.fu_berlin.inf.dpp.communication.connection.IProxyResolver;
@@ -44,8 +45,6 @@ import de.fu_berlin.inf.dpp.vcs.VCSProviderFactory;
 import org.picocontainer.BindKey;
 import org.picocontainer.MutablePicoContainer;
 
-import com.intellij.openapi.project.Project;
-
 import java.util.Arrays;
 
 /**
@@ -75,8 +74,8 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
             SarosIntellijSessionContextFactory.class),
 
         // VCS (only dummy to satisfy dependencies)
-        Component
-            .create(VCSProviderFactory.class, NullVCSProviderFactoryImpl.class),
+        Component.create(VCSProviderFactory.class,
+            NullVCSProviderFactoryImpl.class),
 
         // UI handlers
         Component.create(NegotiationHandler.class),
@@ -87,8 +86,8 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
 
         Component.create(UISynchronizer.class, IntelliJSynchronizer.class),
 
-        Component
-            .create(IPreferenceStore.class, PropertiesComponentAdapter.class),
+        Component.create(IPreferenceStore.class,
+            PropertiesComponentAdapter.class),
 
         Component.create(Preferences.class, IntelliJPreferences.class),
 
@@ -110,9 +109,9 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
         Component.create(AwarenessInformationCollector.class)
 
     };
-    
+
     private Project project;
-    
+
     public SarosIntellijContextFactory(Project project) {
         this.project = project;
     }
@@ -120,7 +119,7 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
     @Override
     public void createComponents(MutablePicoContainer container) {
 
-        IWorkspace workspace = new IntelliJWorkspaceImpl(project); 
+        IWorkspace workspace = new IntelliJWorkspaceImpl(project);
         FileUtils.workspace = workspace;
 
         // Saros Core PathIntl Support
@@ -134,12 +133,13 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
                 component.getImplementation());
         }
 
-        container.addComponent(BindKey.bindKey(String.class,
-                ISarosContextBindings.SarosVersion.class),
+        container.addComponent(BindKey
+                .bindKey(String.class, ISarosContextBindings.SarosVersion.class),
             "14.1.31.DEVEL"); // todo
 
-        container.addComponent(BindKey.bindKey(String.class,
-                ISarosContextBindings.PlatformVersion.class), "4.3.2"); // todo
+        container.addComponent(BindKey
+                .bindKey(String.class, ISarosContextBindings.PlatformVersion.class),
+            "4.3.2"); // todo
 
     }
 }

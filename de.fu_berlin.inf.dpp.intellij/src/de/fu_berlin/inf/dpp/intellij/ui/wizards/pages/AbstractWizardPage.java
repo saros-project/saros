@@ -28,7 +28,7 @@ import javax.swing.JPanel;
 
 /**
  * Abstract base class for wizard pages.
- *
+ * <p/>
  * FIXME: Make layouts resizable
  */
 public abstract class AbstractWizardPage extends JPanel {

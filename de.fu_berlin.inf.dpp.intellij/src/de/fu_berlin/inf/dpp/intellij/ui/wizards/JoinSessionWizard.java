@@ -44,9 +44,9 @@ import static de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
  * A wizard that guides the user through an incoming invitation process.
  * <p/>
  * FIXME:
- *  Long-Running Operation after each step
- *  cancellation by a remote party
- *  auto-advance.
+ * Long-Running Operation after each step
+ * cancellation by a remote party
+ * auto-advance.
  */
 public class JoinSessionWizard extends Wizard {
     public static final String PAGE_INFO_ID = "JoinSessionInfo";
@@ -78,9 +78,9 @@ public class JoinSessionWizard extends Wizard {
      * @param negotiation The negotiation this wizard displays
      */
     public JoinSessionWizard(IncomingSessionNegotiation negotiation) {
-        super(Messages.JoinSessionWizard_title, new HeaderPanel(
-            Messages.ShowDescriptionPage_title2,
-            Messages.ShowDescriptionPage_description));
+        super(Messages.JoinSessionWizard_title,
+            new HeaderPanel(Messages.ShowDescriptionPage_title2,
+                Messages.ShowDescriptionPage_description));
         this.negotiation = negotiation;
 
         InfoPage infoPage = createInfoPage(negotiation);
@@ -120,13 +120,13 @@ public class JoinSessionWizard extends Wizard {
             break;
         case CANCEL:
         case ERROR:
-            showCancelMessage(negotiation.getPeer(), negotiation.getErrorMessage(),
-                CancelLocation.LOCAL);
+            showCancelMessage(negotiation.getPeer(),
+                negotiation.getErrorMessage(), CancelLocation.LOCAL);
             break;
         case REMOTE_CANCEL:
         case REMOTE_ERROR:
-            showCancelMessage(negotiation.getPeer(), negotiation.getErrorMessage(),
-                CancelLocation.REMOTE);
+            showCancelMessage(negotiation.getPeer(),
+                negotiation.getErrorMessage(), CancelLocation.REMOTE);
             break;
         }
 
@@ -140,13 +140,11 @@ public class JoinSessionWizard extends Wizard {
     public void performCancel() {
         ThreadUtils
             .runSafeAsync("CancelJoinSessionWizard", LOG, new Runnable() {
-                    @Override
-                    public void run() {
-                        negotiation.localCancel(null,
-                            CancelOption.NOTIFY_PEER);
-                    }
+                @Override
+                public void run() {
+                    negotiation.localCancel(null, CancelOption.NOTIFY_PEER);
                 }
-            );
+            });
     }
 
     private void showCancelMessage(JID jid, String errorMsg,
@@ -160,16 +158,14 @@ public class JoinSessionWizard extends Wizard {
                 DialogUtils
                     .showError(this, Messages.JoinSessionWizard_inv_canceled,
                         Messages.JoinSessionWizard_inv_canceled_text
-                            + Messages.JoinSessionWizard_8 + errorMsg
-                    );
+                            + Messages.JoinSessionWizard_8 + errorMsg);
                 break;
             case REMOTE:
                 DialogUtils
                     .showError(this, Messages.JoinSessionWizard_inv_canceled,
                         MessageFormat.format(
-                            Messages.JoinSessionWizard_inv_canceled_text2,
-                            peer, errorMsg)
-                    );
+                            Messages.JoinSessionWizard_inv_canceled_text2, peer,
+                            errorMsg));
             }
         } else {
             switch (cancelLocation) {
@@ -180,8 +176,7 @@ public class JoinSessionWizard extends Wizard {
                     .showInfo(this, Messages.JoinSessionWizard_inv_canceled,
                         MessageFormat.format(
                             Messages.JoinSessionWizard_inv_canceled_text3,
-                            peer)
-                    );
+                            peer));
             }
         }
     }

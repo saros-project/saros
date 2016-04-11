@@ -75,7 +75,7 @@ public class FollowButton extends ToolbarButton {
         }
 
         @Override
-        public void sessionEnded(ISarosSession oldSarosSession, 
+        public void sessionEnded(ISarosSession oldSarosSession,
             SessionEndReason reason) {
 
             oldSarosSession.removeListener(sessionListener);
@@ -151,7 +151,8 @@ public class FollowButton extends ToolbarButton {
                 followModeAction.execute(e.getActionCommand());
             }
         });
-        leaveItem.setEnabled(followModeAction.getCurrentlyFollowedUser() != null);
+        leaveItem
+            .setEnabled(followModeAction.getCurrentlyFollowedUser() != null);
 
         popupMenu.add(leaveItem);
     }
@@ -169,7 +170,8 @@ public class FollowButton extends ToolbarButton {
         User currentlyFollowedUser = followModeAction
             .getCurrentlyFollowedUser();
         if (currentlyFollowedUser != null) {
-            String currentUserName = ModelFormatUtils.getDisplayName(currentlyFollowedUser);
+            String currentUserName = ModelFormatUtils
+                .getDisplayName(currentlyFollowedUser);
             if (currentUserName.equalsIgnoreCase(userNameShort)) {
                 menuItem.setEnabled(false);
             }

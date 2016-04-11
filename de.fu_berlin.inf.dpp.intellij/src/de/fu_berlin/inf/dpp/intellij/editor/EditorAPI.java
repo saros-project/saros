@@ -49,7 +49,7 @@ public class EditorAPI {
 
     private Application application;
     private CommandProcessor commandProcessor;
-    
+
     private Project project;
 
     /**
@@ -218,8 +218,7 @@ public class EditorAPI {
                             });
                         }
                     }, "deleteText(" + start + "," + end + ")",
-                    commandProcessor.getCurrentCommandGroupId()
-                );
+                    commandProcessor.getCurrentCommandGroupId());
             }
         };
 

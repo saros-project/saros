@@ -25,7 +25,6 @@ package de.fu_berlin.inf.dpp.intellij.ui.tree;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
-
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.core.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
@@ -56,7 +55,7 @@ class ContactPopMenu extends JPopupMenu {
 
     @Inject
     private IWorkspace workspace;
-    
+
     @Inject
     private Project project;
 
@@ -68,7 +67,7 @@ class ContactPopMenu extends JPopupMenu {
         if (workspace == null && project == null) {
             SarosPluginContext.initComponent(this);
         }
-        
+
         JMenu menuShareProject = new JMenu("Work together on...");
         menuShareProject.setIcon(IconManager.SESSIONS_ICON);
 
@@ -76,13 +75,11 @@ class ContactPopMenu extends JPopupMenu {
             return;
         }
 
-        ModuleManager moduleManager = ModuleManager
-            .getInstance(project);
+        ModuleManager moduleManager = ModuleManager.getInstance(project);
         if (moduleManager != null) {
             for (Module module : moduleManager.getModules()) {
 
-                if (project.getName()
-                    .equalsIgnoreCase(module.getName())) {
+                if (project.getName().equalsIgnoreCase(module.getName())) {
                     continue;
                 }
 

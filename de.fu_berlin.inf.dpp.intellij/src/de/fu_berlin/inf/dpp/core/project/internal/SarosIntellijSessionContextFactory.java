@@ -1,17 +1,16 @@
 package de.fu_berlin.inf.dpp.core.project.internal;
 
-import org.picocontainer.MutablePicoContainer;
-
 import de.fu_berlin.inf.dpp.intellij.project.SharedResourcesManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionContextFactory;
 import de.fu_berlin.inf.dpp.session.SarosCoreSessionContextFactory;
+import org.picocontainer.MutablePicoContainer;
 
 /**
  * IntelliJ implementation of the {@link ISarosSessionContextFactory} interface.
  */
-public class SarosIntellijSessionContextFactory extends
-    SarosCoreSessionContextFactory {
+public class SarosIntellijSessionContextFactory
+    extends SarosCoreSessionContextFactory {
 
     @Override
     public void createNonCoreComponents(ISarosSession session,

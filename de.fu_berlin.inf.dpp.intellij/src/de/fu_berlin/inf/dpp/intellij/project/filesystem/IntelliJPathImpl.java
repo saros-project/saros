@@ -37,7 +37,8 @@ public class IntelliJPathImpl implements IPath {
     private Path delegate;
     private boolean trailingSeparator;
 
-    public static final IPath EMPTY = new IntelliJPathImpl(Paths.get(""), false);
+    public static final IPath EMPTY = new IntelliJPathImpl(Paths.get(""),
+        false);
 
     public static IPath fromString(String pathString) {
         if (pathString == null || pathString.isEmpty()) {
@@ -52,8 +53,9 @@ public class IntelliJPathImpl implements IPath {
          * OpenJDK 7 on Linux has a bug which causes normalize() to throw an
          * ArrayIndexOutOfBoundsException if called on the empty path.
          */
-        this.delegate = delegate.equals(Paths.get("")) ? delegate : delegate
-            .normalize();
+        this.delegate = delegate.equals(Paths.get("")) ?
+            delegate :
+            delegate.normalize();
         this.trailingSeparator = trailingSeparator;
     }
 

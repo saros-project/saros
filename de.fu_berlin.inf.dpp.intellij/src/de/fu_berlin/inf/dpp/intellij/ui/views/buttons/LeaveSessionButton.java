@@ -29,7 +29,6 @@ import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
-
 import org.picocontainer.annotations.Inject;
 
 public class LeaveSessionButton extends SimpleButton {
@@ -43,7 +42,7 @@ public class LeaveSessionButton extends SimpleButton {
         }
 
         @Override
-        public void sessionEnded(ISarosSession oldSarosSession, 
+        public void sessionEnded(ISarosSession oldSarosSession,
             SessionEndReason reason) {
 
             setEnabledFromUIThread(false);

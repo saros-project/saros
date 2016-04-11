@@ -1,9 +1,6 @@
 package de.fu_berlin.inf.dpp.intellij.preferences;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.Properties;
-
+import com.intellij.ide.util.PropertiesComponent;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,7 +9,9 @@ import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import com.intellij.ide.util.PropertiesComponent;
+import java.util.Properties;
+
+import static org.junit.Assert.assertEquals;
 
 @PrepareForTest({ PropertiesComponent.class })
 @RunWith(PowerMockRunner.class)
@@ -67,8 +66,8 @@ public class PropertiesComponentAdapterTest {
 
         PowerMock.mockStatic(PropertiesComponent.class);
 
-        EasyMock.expect(PropertiesComponent.getInstance()).andStubReturn(
-            propertiesComponentStub);
+        EasyMock.expect(PropertiesComponent.getInstance())
+            .andStubReturn(propertiesComponentStub);
 
         PowerMock.replay(PropertiesComponent.class);
     }
