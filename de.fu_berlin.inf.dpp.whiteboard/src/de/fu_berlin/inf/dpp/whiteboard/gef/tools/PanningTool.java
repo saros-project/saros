@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.whiteboard.gef.tools;
 
-import org.eclipse.gef.SharedCursors;
+import org.eclipse.draw2d.Cursors;
 import org.eclipse.gef.palette.ToolEntry;
 import org.eclipse.gef.tools.PanningSelectionTool;
 import org.eclipse.swt.graphics.Cursor;
@@ -29,7 +29,7 @@ public class PanningTool extends PanningSelectionTool {
      */
     @Override
     protected Cursor getDefaultCursor() {
-        return SharedCursors.HAND;
+        return Cursors.HAND;
     }
 
     public static class PanningToolEntry extends ToolEntry {

@@ -133,8 +133,7 @@ public class StartSessionWithProjects extends ContributionItem {
         final int index) {
 
         final MenuItem menuItem = new MenuItem(parentMenu, SWT.NONE, index);
-        menuItem
-            .setText(Messages.SessionWithProjects_no_projects_in_workspace);
+        menuItem.setText(Messages.SessionWithProjects_no_projects_in_workspace);
         menuItem.setEnabled(false);
         return menuItem;
     }

@@ -84,7 +84,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     /**
      * Initializes an IncomingProjectNegotiation.
-     *
+     * 
      * @param negotiationID
      *            unique ID of the negotiation
      * @param peer
@@ -116,7 +116,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     }
 
     /**
-     *
+     * 
      * @param projectID
      * @return The {@link FileList fileList} which belongs to the project with
      *         the ID <code>projectID</code> from inviter <br />
@@ -138,10 +138,10 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * actions are performed to avoid unintended data loss, i.e this method will
      * do a best effort to backup altered data but no guarantee can be made in
      * doing so!
-     *
+     * 
      * @param projectMapping
      *            mapping from remote project ids to the target local projects
-     *
+     * 
      * @throws IllegalArgumentException
      *             if either a project id is not valid or the referenced project
      *             for that id does not exist
@@ -315,7 +315,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     /**
      * calculates all the files the host/inviter has to send for synchronization
-     *
+     * 
      * @param projectMapping
      *            projectID => projectName (in local workspace)
      */
@@ -383,7 +383,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * When this method returns all projects should be managed by a VCS provider
      * and are in the same VCS state as described in the file list that is
      * stored in the project negotiation data for each project.
-     *
+     * 
      * @param negotiationData
      *            negotiation data describing the project states
      * @param projectMapping
@@ -471,7 +471,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     /**
      * Checks out a project using the provided VCS adapter. If the project does
      * not exists it will be created, otherwise it will be updated.
-     *
+     * 
      * @param vcs
      *            the VCS adapter to use for checkout
      * @param project
@@ -592,11 +592,11 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * Computes the list of files that should be requested from the host because
      * they are either missing in the target project or are containing different
      * data.
-     *
+     * 
      * @param project
      * @param remoteFileList
      * @param monitor
-     *
+     * 
      * @return The list of files that we need from the host.
      * @throws LocalCancellationException
      *             If the user requested a cancel.
@@ -643,7 +643,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     /**
      * Determines the missing resources.
-     *
+     * 
      * @param localFileList
      *            The file list of the local project.
      * @param remoteFileList
@@ -758,9 +758,9 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * worst case, every resource has to be changed as many times as the number
      * of segments in its path. Due to these complications, the monitor is only
      * used for cancellation and the label, but not for the progress bar.
-     *
+     * 
      * @param remoteFileList
-     *
+     * 
      * @throws SarosCancellationException
      */
     private void synchronizeVCSState(IResource resource, VCSProvider vcs,
@@ -876,7 +876,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     /**
      * Waits for the activity queuing request from the remote side.
-     *
+     * 
      * @param monitor
      */
     private void awaitActivityQueueingActivation(IProgressMonitor monitor)

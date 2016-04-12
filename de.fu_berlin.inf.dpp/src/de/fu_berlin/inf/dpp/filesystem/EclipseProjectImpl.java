@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.filesystem;
 
-
 public class EclipseProjectImpl extends EclipseContainerImpl implements
     IProject {
 

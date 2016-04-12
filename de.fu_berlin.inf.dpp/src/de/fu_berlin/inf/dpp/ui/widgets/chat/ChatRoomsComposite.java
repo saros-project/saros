@@ -257,7 +257,8 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         }
 
         @Override
-        public void sessionEnded(final ISarosSession session, SessionEndReason reason) {
+        public void sessionEnded(final ISarosSession session,
+            SessionEndReason reason) {
 
             session.removeListener(sessionListener);
 

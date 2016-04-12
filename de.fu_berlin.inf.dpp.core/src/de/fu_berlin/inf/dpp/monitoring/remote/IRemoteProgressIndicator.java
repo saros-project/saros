@@ -14,14 +14,14 @@ public interface IRemoteProgressIndicator {
     /**
      * Returns the ID of the tracked remote progress. This is equivalent to the
      * ID of the {@link RemoteProgressMonitor} on the sender's side.
-     *
+     * 
      * @return unique ID of the remote progress
      */
     public String getRemoteProgressID();
 
     /**
      * Returns the user which generates the tracked remote progress.
-     *
+     * 
      * @return associated remote user
      */
     public User getRemoteUser();
@@ -42,7 +42,7 @@ public interface IRemoteProgressIndicator {
      * Called when a new progress activity has been received from the
      * indicator's associated remote monitor. The indicator is expected to
      * display the progress to the user.
-     *
+     * 
      * @param activity
      *            received progress activity
      */

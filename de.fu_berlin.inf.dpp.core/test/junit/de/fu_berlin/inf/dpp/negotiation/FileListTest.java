@@ -37,9 +37,6 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.basic.BooleanConverter;
 import com.thoughtworks.xstream.io.xml.CompactWriter;
 
-import de.fu_berlin.inf.dpp.negotiation.FileList;
-import de.fu_berlin.inf.dpp.negotiation.FileListFactory;
-
 /**
  * TODO [TEST] Add Testcases for non-existing files florianthiel: Does FileList
  * care about existence of files?

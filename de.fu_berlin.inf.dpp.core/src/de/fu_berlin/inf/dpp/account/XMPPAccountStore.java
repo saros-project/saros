@@ -32,11 +32,11 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 /**
  * The XMPPAccountStore is responsible for administering XMPP account
@@ -531,11 +531,13 @@ public final class XMPPAccountStore {
 
     /**
      * Searches for an account in the account store.
-     *
-     * @param jidString the jid of the user as string
+     * 
+     * @param jidString
+     *            the jid of the user as string
      * @return the matching XMPP account or null in case of no match
-     *
-     * @throws NullPointerException if jidString is null
+     * 
+     * @throws NullPointerException
+     *             if jidString is null
      */
     public XMPPAccount findAccount(String jidString) {
         if (jidString == null) {
@@ -546,8 +548,8 @@ public final class XMPPAccountStore {
         String domain = jid.getDomain();
 
         for (XMPPAccount account : getAllAccounts()) {
-            if (domain.equalsIgnoreCase(account.getDomain()) && username
-                .equalsIgnoreCase(account.getUsername())) {
+            if (domain.equalsIgnoreCase(account.getDomain())
+                && username.equalsIgnoreCase(account.getUsername())) {
                 return account;
             }
         }

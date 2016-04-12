@@ -443,8 +443,9 @@ public class FeedbackPreferencePage extends PreferencePage implements
         // get default values from PreferenceStore
         isFeedbackDisabled = getPreferenceStore().getDefaultInt(
             EclipsePreferenceConstants.FEEDBACK_SURVEY_DISABLED) != FeedbackManager.FEEDBACK_ENABLED;
-        currentInterval = FeedbackInterval.getFromInterval(getPreferenceStore()
-            .getDefaultInt(EclipsePreferenceConstants.FEEDBACK_SURVEY_INTERVAL));
+        currentInterval = FeedbackInterval
+            .getFromInterval(getPreferenceStore().getDefaultInt(
+                EclipsePreferenceConstants.FEEDBACK_SURVEY_INTERVAL));
         setSubmissionAllowed(getPreferenceStore().getDefaultInt(
             EclipsePreferenceConstants.STATISTIC_ALLOW_SUBMISSION) == AbstractFeedbackManager.ALLOW);
         setPseudonymAllowed(getPreferenceStore().getDefaultBoolean(

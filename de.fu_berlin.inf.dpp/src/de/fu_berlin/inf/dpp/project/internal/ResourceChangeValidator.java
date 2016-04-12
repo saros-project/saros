@@ -110,18 +110,20 @@ public class ResourceChangeValidator extends ModelProvider {
 
         SarosPluginContext.initComponent(this);
 
-        sessionManager.addSessionLifecycleListener(new NullSessionLifecycleListener() {
-            @Override
-            public void sessionStarted(ISarosSession newSarosSession) {
-                sarosSession = newSarosSession;
-            }
+        sessionManager
+            .addSessionLifecycleListener(new NullSessionLifecycleListener() {
+                @Override
+                public void sessionStarted(ISarosSession newSarosSession) {
+                    sarosSession = newSarosSession;
+                }
 
-            @Override
-            public void sessionEnded(ISarosSession oldSarosSession, SessionEndReason reason) {
-                assert sarosSession == oldSarosSession;
-                sarosSession = null;
-            }
-        });
+                @Override
+                public void sessionEnded(ISarosSession oldSarosSession,
+                    SessionEndReason reason) {
+                    assert sarosSession == oldSarosSession;
+                    sarosSession = null;
+                }
+            });
         sarosSession = sessionManager.getSarosSession();
     }
 

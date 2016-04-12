@@ -19,9 +19,9 @@ import org.jivesoftware.smack.Connection;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.fu_berlin.inf.dpp.net.ConnectionMode;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
-import de.fu_berlin.inf.dpp.net.ConnectionMode;
 import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
@@ -212,8 +212,8 @@ public class DataTransferManagerTest {
     @Test(expected = NullPointerException.class)
     public void testEstablishConnectionWithNullPeer() throws Exception {
 
-        IConnectionManager dtm = new DataTransferManager(
-            connectionServiceStub, null, null, null);
+        IConnectionManager dtm = new DataTransferManager(connectionServiceStub,
+            null, null, null);
 
         connectionListener.getValue().connectionStateChanged(connectionMock,
             ConnectionState.CONNECTED);
@@ -224,8 +224,8 @@ public class DataTransferManagerTest {
     @Test(expected = NullPointerException.class)
     public void testEstablishConnectionWithNullConnectionID() throws Exception {
 
-        IConnectionManager dtm = new DataTransferManager(
-            connectionServiceStub, null, null, null);
+        IConnectionManager dtm = new DataTransferManager(connectionServiceStub,
+            null, null, null);
 
         connectionListener.getValue().connectionStateChanged(connectionMock,
             ConnectionState.CONNECTED);
@@ -236,8 +236,8 @@ public class DataTransferManagerTest {
     @Test(expected = IOException.class)
     public void testEstablishConnectionWithNoTransports() throws Exception {
 
-        IConnectionManager dtm = new DataTransferManager(
-            connectionServiceStub, null, null, null);
+        IConnectionManager dtm = new DataTransferManager(connectionServiceStub,
+            null, null, null);
 
         connectionListener.getValue().connectionStateChanged(connectionMock,
             ConnectionState.CONNECTED);
@@ -252,8 +252,8 @@ public class DataTransferManagerTest {
         ITransport mainTransport = new Transport(ConnectionMode.SOCKS5_DIRECT);
         ITransport fallbackTransport = new Transport(ConnectionMode.IBB);
 
-        IConnectionManager dtm = new DataTransferManager(
-            connectionServiceStub, null, mainTransport, fallbackTransport);
+        IConnectionManager dtm = new DataTransferManager(connectionServiceStub,
+            null, mainTransport, fallbackTransport);
 
         connectionListener.getValue().connectionStateChanged(connectionMock,
             ConnectionState.CONNECTED);
@@ -285,8 +285,8 @@ public class DataTransferManagerTest {
 
         EasyMock.replay(mainTransport);
 
-        IConnectionManager dtm = new DataTransferManager(
-            connectionServiceStub, null, mainTransport, fallbackTransport);
+        IConnectionManager dtm = new DataTransferManager(connectionServiceStub,
+            null, mainTransport, fallbackTransport);
 
         connectionListener.getValue().connectionStateChanged(connectionMock,
             ConnectionState.CONNECTED);
@@ -308,7 +308,7 @@ public class DataTransferManagerTest {
         DataTransferManager dtm = new DataTransferManager(
             connectionServiceStub, null, mainTransport, fallbackTransport);
 
-        dtm.setTransport(DataTransferManager.IBB_TRANSPORT);
+        dtm.setTransport(IConnectionManager.IBB_TRANSPORT);
 
         connectionListener.getValue().connectionStateChanged(connectionMock,
             ConnectionState.CONNECTED);
@@ -325,8 +325,8 @@ public class DataTransferManagerTest {
 
         Transport mainTransport = new Transport(ConnectionMode.SOCKS5_DIRECT);
 
-        IConnectionManager dtm = new DataTransferManager(
-            connectionServiceStub, null, mainTransport, null);
+        IConnectionManager dtm = new DataTransferManager(connectionServiceStub,
+            null, mainTransport, null);
 
         connectionListener.getValue().connectionStateChanged(connectionMock,
             ConnectionState.CONNECTED);
@@ -347,8 +347,8 @@ public class DataTransferManagerTest {
     public void testGetTransferMode() throws Exception {
         ITransport mainTransport = new Transport(ConnectionMode.SOCKS5_DIRECT);
 
-        IConnectionManager dtm = new DataTransferManager(
-            connectionServiceStub, null, mainTransport, null);
+        IConnectionManager dtm = new DataTransferManager(connectionServiceStub,
+            null, mainTransport, null);
 
         connectionListener.getValue().connectionStateChanged(connectionMock,
             ConnectionState.CONNECTED);
@@ -375,8 +375,7 @@ public class DataTransferManagerTest {
         connectionListener.getValue().connectionStateChanged(connectionMock,
             ConnectionState.CONNECTED);
 
-        TransferDescription description = TransferDescription
-            .newDescription();
+        TransferDescription description = TransferDescription.newDescription();
 
         description.setRecipient(new JID("foo@bar.com"));
 
@@ -393,8 +392,7 @@ public class DataTransferManagerTest {
         connectionListener.getValue().connectionStateChanged(connectionMock,
             ConnectionState.CONNECTED);
 
-        TransferDescription description = TransferDescription
-            .newDescription();
+        TransferDescription description = TransferDescription.newDescription();
 
         dtm.connect("bar", new JID("foo@bar.com"));
 
@@ -413,8 +411,7 @@ public class DataTransferManagerTest {
         connectionListener.getValue().connectionStateChanged(connectionMock,
             ConnectionState.CONNECTED);
 
-        TransferDescription description = TransferDescription
-            .newDescription();
+        TransferDescription description = TransferDescription.newDescription();
 
         dtm.connect("foo", new JID("foo@bar.com"));
 
@@ -523,8 +520,8 @@ public class DataTransferManagerTest {
     public void connectWithRemoteSideConnectedFirst() throws Exception {
         Transport mainTransport = new Transport(ConnectionMode.SOCKS5_DIRECT);
 
-        IConnectionManager dtm = new DataTransferManager(
-            connectionServiceStub, null, mainTransport, null);
+        IConnectionManager dtm = new DataTransferManager(connectionServiceStub,
+            null, mainTransport, null);
 
         connectionListener.getValue().connectionStateChanged(connectionMock,
             ConnectionState.CONNECTED);
@@ -576,8 +573,7 @@ public class DataTransferManagerTest {
         connectThread0.join(10000);
         connectThread0.verify();
 
-        TransferDescription description = TransferDescription
-            .newDescription();
+        TransferDescription description = TransferDescription.newDescription();
 
         description.setRecipient(new JID("foo@bar.com"));
 
@@ -594,8 +590,8 @@ public class DataTransferManagerTest {
     public void testConnectionClosureOnManualClose() throws Exception {
         Transport mainTransport = new Transport(ConnectionMode.SOCKS5_DIRECT);
 
-        IConnectionManager dtm = new DataTransferManager(
-            connectionServiceStub, null, mainTransport, null);
+        IConnectionManager dtm = new DataTransferManager(connectionServiceStub,
+            null, mainTransport, null);
 
         connectionListener.getValue().connectionStateChanged(connectionMock,
             ConnectionState.CONNECTED);
@@ -619,8 +615,8 @@ public class DataTransferManagerTest {
     public void testConnectionClosureOnDisconnect() throws Exception {
         Transport mainTransport = new Transport(ConnectionMode.SOCKS5_DIRECT);
 
-        IConnectionManager dtm = new DataTransferManager(
-            connectionServiceStub, null, mainTransport, null);
+        IConnectionManager dtm = new DataTransferManager(connectionServiceStub,
+            null, mainTransport, null);
 
         connectionListener.getValue().connectionStateChanged(connectionMock,
             ConnectionState.CONNECTED);

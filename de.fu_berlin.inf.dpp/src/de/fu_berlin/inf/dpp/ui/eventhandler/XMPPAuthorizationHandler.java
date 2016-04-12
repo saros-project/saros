@@ -38,8 +38,7 @@ public class XMPPAuthorizationHandler {
     public XMPPAuthorizationHandler(
         final SubscriptionHandler subscriptionHandler) {
         this.subscriptionHandler = subscriptionHandler;
-        this.subscriptionHandler
-            .addSubscriptionListener(subscriptionListener);
+        this.subscriptionHandler.addSubscriptionListener(subscriptionListener);
     }
 
     private void handleAuthorizationRequest(final JID jid) {

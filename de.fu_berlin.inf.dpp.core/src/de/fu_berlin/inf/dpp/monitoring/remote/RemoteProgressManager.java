@@ -136,7 +136,7 @@ public class RemoteProgressManager extends AbstractActivityProducer {
 
     /**
      * Creates a RemoteProgressManager.
-     *
+     * 
      * @param sessionManager
      *            session manager whose session to listen to for remote progress
      *            activities
@@ -148,7 +148,8 @@ public class RemoteProgressManager extends AbstractActivityProducer {
         IRemoteProgressIndicatorFactory progressIndicatorFactory) {
 
         this.sessionManager = sessionManager;
-        this.sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
+        this.sessionManager
+            .addSessionLifecycleListener(sessionLifecycleListener);
         this.progressIndicatorFactory = progressIndicatorFactory;
     }
 
@@ -157,7 +158,7 @@ public class RemoteProgressManager extends AbstractActivityProducer {
      * specified remote sites, in addition to being forwarded to the given other
      * progress monitor. If there is no session currently running, the passed-in
      * monitor is returned unchanged instead.
-     *
+     * 
      * @param users
      *            users to send progress to
      * @param monitor
@@ -166,7 +167,7 @@ public class RemoteProgressManager extends AbstractActivityProducer {
      *            want the progress to be shown remotely only
      * @return remote progress monitor, or the given progress monitor if there
      *         is no running session
-     *
+     * 
      * @see RemoteProgressMonitor
      * @see IRemoteProgressIndicator
      */
@@ -179,15 +180,15 @@ public class RemoteProgressManager extends AbstractActivityProducer {
             return monitor;
 
         return new RemoteProgressMonitor(this, getNextID(),
-            currentSession.getLocalUser(),
-            new ArrayList<User>(new HashSet<User>(users)), monitor);
+            currentSession.getLocalUser(), new ArrayList<User>(
+                new HashSet<User>(users)), monitor);
     }
 
     /**
      * Called by a {@link RemoteProgressMonitor} when it has new progress.
      * Causes the remote progress manager to send out the given remote progress
      * activity.
-     *
+     * 
      * @param activity
      *            {@link ProgressActivity} describing the progress made
      */
@@ -201,10 +202,10 @@ public class RemoteProgressManager extends AbstractActivityProducer {
      * {@link IRemoteProgressIndicator#handleProgress} has received an activity
      * that indicates the end of the remote operation. Causes the remote
      * progress manager to discard the indicator.
-     *
+     * 
      * This method is for use by {@link IRemoteProgressIndicator}
      * implementations only. Don't use it from anywhere else.
-     *
+     * 
      * @param indicator
      *            the stopped remote progress indicator
      */

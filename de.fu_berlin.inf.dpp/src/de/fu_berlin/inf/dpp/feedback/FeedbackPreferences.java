@@ -34,7 +34,8 @@ public class FeedbackPreferences {
         if (FeedbackPreferences.preferences == null)
             throw new IllegalStateException("preferences are not initialized");
 
-        final String[] keys = { EclipsePreferenceConstants.FEEDBACK_SURVEY_DISABLED,
+        final String[] keys = {
+            EclipsePreferenceConstants.FEEDBACK_SURVEY_DISABLED,
             EclipsePreferenceConstants.FEEDBACK_SURVEY_INTERVAL,
             EclipsePreferenceConstants.STATISTIC_ALLOW_SUBMISSION,
             EclipsePreferenceConstants.STATISTIC_ALLOW_PSEUDONYM,

@@ -30,7 +30,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
  * Implementation Note: Clients <b>should</b> only implement the
  * <code>abstract</code> methods rather than implementing the
  * {@linkplain VCSProvider} interface.
- *
+ * 
  * @author haferburg
  */
 // TODO Maybe change to VCProject implements IAdaptable? Make connect static.
@@ -161,7 +161,7 @@ public abstract class VCSAdapter implements VCSProvider {
     /**
      * Determine and instantiate the corresponding {@link VCSAdapter} for the
      * provided identifier.<br>
-     *
+     * 
      * @param identifier
      * @return
      * @see RepositoryProvider#getID()
@@ -193,7 +193,7 @@ public abstract class VCSAdapter implements VCSProvider {
      * corresponding {@link VCSAdapter}. The method will return
      * <code>null</code> if the project is not under version control, or if no
      * <code>VCSAdapter</code> was found for the repository provider used.
-     *
+     * 
      * @param project
      * @return
      */

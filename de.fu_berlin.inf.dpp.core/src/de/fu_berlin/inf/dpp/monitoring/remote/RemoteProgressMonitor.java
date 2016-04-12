@@ -34,7 +34,7 @@ class RemoteProgressMonitor implements IProgressMonitor {
      * Creates a RemoteProgressMonitor which wraps an existing
      * {@link IProgressMonitor}. All progress is both forwarded to that monitor
      * and sent out as progress activities.
-     *
+     * 
      * @param rpm
      *            {@link RemoteProgressManager} which handles the monitor
      * @param id
@@ -104,9 +104,8 @@ class RemoteProgressMonitor implements IProgressMonitor {
         worked += work;
 
         if (worked > totalWorked) {
-            LOG.warn(
-                worked + " > " + totalWorked
-                    + " (worked > totalworked) | maybe forget to call beginTask()",
+            LOG.warn(worked + " > " + totalWorked
+                + " (worked > totalworked) | maybe forget to call beginTask()",
                 new StackTrace());
         }
 

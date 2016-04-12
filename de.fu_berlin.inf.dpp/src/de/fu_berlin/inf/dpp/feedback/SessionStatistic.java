@@ -41,7 +41,7 @@ import org.apache.commons.io.IOUtils;
  * <p>
  * For example: <code><pre>
  *      SessionStatistic statistic = new SessionStatistic();
- *      
+ * 
  *      for (int i = 1; i < x; i++)
  *          put("foo.bar", true, i, "enabled");
  * </pre></code> Will add the boolean value <code>true</code> to the keys:

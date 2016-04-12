@@ -31,7 +31,8 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
  * @author bkahlert
  */
 class MultiUserChatStateManager {
-    private static final Logger log = Logger.getLogger(MultiUserChatStateManager.class);
+    private static final Logger log = Logger
+        .getLogger(MultiUserChatStateManager.class);
     protected static final Map<MultiUserChat, MultiUserChatStateManager> managers = new WeakHashMap<MultiUserChat, MultiUserChatStateManager>();
 
     /**
@@ -52,8 +53,8 @@ class MultiUserChatStateManager {
      * @param muc
      * @return
      */
-    public static MultiUserChatStateManager getInstance(final Connection connection,
-        final MultiUserChat muc) {
+    public static MultiUserChatStateManager getInstance(
+        final Connection connection, final MultiUserChat muc) {
 
         if (connection == null) {
             return null;

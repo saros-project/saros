@@ -270,7 +270,8 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
         }
 
         @Override
-        public void sessionEnded(ISarosSession oldSarosSession, SessionEndReason reason) {
+        public void sessionEnded(ISarosSession oldSarosSession,
+            SessionEndReason reason) {
             oldSarosSession.removeActivityConsumer(UndoManager.this);
             undoHistory.clear();
             enabled = false;

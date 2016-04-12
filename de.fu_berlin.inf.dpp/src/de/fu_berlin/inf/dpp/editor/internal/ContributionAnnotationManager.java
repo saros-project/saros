@@ -62,8 +62,8 @@ public class ContributionAnnotationManager {
         @Override
         public void propertyChange(final PropertyChangeEvent event) {
 
-            if (!EclipsePreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS.equals(event
-                .getProperty()))
+            if (!EclipsePreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS
+                .equals(event.getProperty()))
                 return;
 
             SWTUtils.runSafeSWTAsync(log, new Runnable() {

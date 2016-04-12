@@ -1,10 +1,11 @@
 package de.fu_berlin.inf.dpp.ui.browser;
 
-import de.fu_berlin.inf.dpp.ui.ide_embedding.IBrowserDialog;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
+
+import de.fu_berlin.inf.dpp.ui.ide_embedding.IBrowserDialog;
 
 /**
  * Implements the Eclipse wrapper for the SWT-specific dialog shell.
@@ -41,8 +42,8 @@ public class EclipseBrowserDialog implements IBrowserDialog {
         final Rectangle parentShellBounds = parent.getBounds();
         final Point shellSize = shell.getSize();
 
-        shell.setLocation(
-            parentShellBounds.x + (parentShellBounds.width - shellSize.x) / 2,
-            parentShellBounds.y + (parentShellBounds.height - shellSize.y) / 2);
+        shell.setLocation(parentShellBounds.x
+            + (parentShellBounds.width - shellSize.x) / 2, parentShellBounds.y
+            + (parentShellBounds.height - shellSize.y) / 2);
     }
 }

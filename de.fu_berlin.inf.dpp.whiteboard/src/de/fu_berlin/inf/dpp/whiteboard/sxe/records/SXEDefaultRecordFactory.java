@@ -57,6 +57,7 @@ public class SXEDefaultRecordFactory implements ISXERecordFactory {
      * de.fu_berlin.inf.dpp.whiteboard.sxe.records.ISXERecordFactory#createDocument
      * (de.fu_berlin.inf.dpp.whiteboard.sxe.ISXEController)
      */
+    @Override
     public DocumentRecord createDocument(SXEController controller) {
         return new DocumentRecord(controller);
     }

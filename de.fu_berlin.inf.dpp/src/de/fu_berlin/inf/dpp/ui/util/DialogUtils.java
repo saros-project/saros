@@ -34,7 +34,7 @@ public class DialogUtils {
      * Opens a MessageDialog of the type {@link MessageDialog#ERROR} and
      * dispatches a call to forceActive (which gives a visual hint on the
      * taskbar that the application wants focus).
-     *
+     * 
      * @param shell
      *            the parent shell
      * @param dialogTitle
@@ -54,7 +54,7 @@ public class DialogUtils {
     /**
      * Shows an error window and sets monitors subTask to <code>message</code>
      * or exceptions message.
-     *
+     * 
      * @param title
      *            Title of error window
      * @param message
@@ -86,7 +86,7 @@ public class DialogUtils {
      * Opens a MessageDialog of the type {@link MessageDialog#INFORMATION} and
      * dispatches a call to forceActive (which gives a visual hint on the
      * taskbar that the application wants focus).
-     *
+     * 
      * @param shell
      *            the parent shell
      * @param dialogTitle
@@ -107,7 +107,7 @@ public class DialogUtils {
      * Opens a MessageDialog of the type {@link MessageDialog#WARNING} and
      * dispatches a call to forceActive (which gives a visual hint on the
      * taskbar that the application wants focus).
-     *
+     * 
      * @param shell
      *            the parent shell
      * @param dialogTitle
@@ -128,7 +128,7 @@ public class DialogUtils {
      * Opens a MessageDialog of the type {@link MessageDialog#QUESTION} and
      * dispatches a call to forceActive (which gives a visual hint on the
      * task-bar that the application wants focus).
-     *
+     * 
      * @param shell
      *            the parent shell
      * @param dialogTitle
@@ -148,7 +148,7 @@ public class DialogUtils {
     /**
      * Ask the User a given question. It pops up a QuestionDialog with given
      * title and message. Additionally custom button labels are applicable.
-     *
+     * 
      * @param title
      *            dialog title
      * @param message
@@ -157,7 +157,7 @@ public class DialogUtils {
      *            custom button labels
      * @param failSilently
      *            don`t open the dialog
-     *
+     * 
      * @return boolean indicating whether the user said Yes or No
      */
     public static boolean popUpCustomQuestion(final String title,
@@ -187,7 +187,7 @@ public class DialogUtils {
     /**
      * Ask the User a given question. It pops up a QuestionDialog with given
      * title and message.
-     *
+     * 
      * @return boolean indicating whether the user said Yes or No
      */
     public static boolean popUpYesNoQuestion(final String title,

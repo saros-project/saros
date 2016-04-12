@@ -21,8 +21,8 @@ import de.fu_berlin.inf.dpp.stf.server.bot.widget.SarosSWTBotChatLine;
 import de.fu_berlin.inf.dpp.stf.server.bot.widget.SarosSWTBotChatLinePartnerChangeSeparator;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.items.ChatLine;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.items.ChatLinePartnerChangeSeparator;
-import de.fu_berlin.inf.dpp.ui.widgets.chat.parts.SkypeStyleChatDisplay;
 import de.fu_berlin.inf.dpp.ui.widgets.chat.parts.ChatInput;
+import de.fu_berlin.inf.dpp.ui.widgets.chat.parts.SkypeStyleChatDisplay;
 
 /**
  * SarosSWTBot is a {@link SWTBot} with capabilities for testing specific GUI
@@ -93,7 +93,8 @@ public final class SarosSWTBot extends SWTBot {
     }
 
     /**
-     * @return the last {@link SarosSWTBotChatLine} in the {@link SkypeStyleChatDisplay}.
+     * @return the last {@link SarosSWTBotChatLine} in the
+     *         {@link SkypeStyleChatDisplay}.
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public SarosSWTBotChatLine lastChatLine() {

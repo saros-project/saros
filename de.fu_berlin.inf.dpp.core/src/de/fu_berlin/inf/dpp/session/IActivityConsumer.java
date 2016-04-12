@@ -30,19 +30,19 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
  *        // do this first
  *      }
  *   };
- *   
+ * 
  *   private IActivityConsumer consumer = new IActivityConsumer() {
  *      &#064;Override
  *      public void exec(IActivity activity) {
- *        otherConsumer.exec(activity);      
+ *        otherConsumer.exec(activity);
  *        // do this after
  *      }
  *   };
- *   
+ * 
  *   void start() {
  *     sarosSession.addActivityConsumer(consumer);
  *   }
- *   
+ * 
  *   void stop() {
  *     sarosSession.removeActivityConsumer(consumer);
  *   }

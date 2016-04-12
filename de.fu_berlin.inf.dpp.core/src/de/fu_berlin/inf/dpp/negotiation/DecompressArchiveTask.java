@@ -34,13 +34,13 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
      * {@link IWorkspace#run}. All necessary folders will be created on the fly.
      * </P> <b>Important:</b> Existing files will be <b>overwritten without
      * confirmation</b>!
-     *
+     * 
      * @param file
      *            Zip file containing the compressed data
      * @param idToProjectMapping
      *            map containing the id to project mapping (see also
      *            {@link ISarosSession#getProjectID(de.fu_berlin.inf.dpp.filesystem.IProject)}
-     *
+     * 
      * @param monitor
      *            monitor that is used for progress report and cancellation or
      *            <code>null</code> to use the monitor provided by the

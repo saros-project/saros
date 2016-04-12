@@ -175,7 +175,8 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
     }
 
     @Override
-    public void addContactsToSession(String... jidOfInvitees) throws RemoteException {
+    public void addContactsToSession(String... jidOfInvitees)
+        throws RemoteException {
         SWTBotTreeItem treeItem = getTreeItem();
 
         log.trace("clicking on context menu item: "

@@ -107,7 +107,8 @@ public class FollowModeAction extends Action implements IMenuCreator,
         }
 
         @Override
-        public void sessionEnded(ISarosSession oldSarosSession, SessionEndReason reason) {
+        public void sessionEnded(ISarosSession oldSarosSession,
+            SessionEndReason reason) {
             oldSarosSession.removeListener(sessionListener);
             SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
 

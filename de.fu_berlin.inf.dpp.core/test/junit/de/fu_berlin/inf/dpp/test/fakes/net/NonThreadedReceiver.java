@@ -41,13 +41,12 @@ class NonThreadedReceiver implements IReceiver {
 
     @Override
     public PacketCollector createCollector(PacketFilter filter) {
-        final PacketCollector collector = new PacketCollector(
-            new CancelHook() {
-                @Override
-                public void cancelPacketCollector(PacketCollector collector) {
-                    removePacketListener(collector);
-                }
-            }, filter);
+        final PacketCollector collector = new PacketCollector(new CancelHook() {
+            @Override
+            public void cancelPacketCollector(PacketCollector collector) {
+                removePacketListener(collector);
+            }
+        }, filter);
         addPacketListener(collector, filter);
 
         return collector;

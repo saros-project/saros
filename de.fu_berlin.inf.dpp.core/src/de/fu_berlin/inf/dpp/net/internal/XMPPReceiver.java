@@ -97,13 +97,12 @@ public class XMPPReceiver implements IReceiver {
 
     @Override
     public PacketCollector createCollector(PacketFilter filter) {
-        final PacketCollector collector = new PacketCollector(
-            new CancelHook() {
-                @Override
-                public void cancelPacketCollector(PacketCollector collector) {
-                    removePacketListener(collector);
-                }
-            }, filter);
+        final PacketCollector collector = new PacketCollector(new CancelHook() {
+            @Override
+            public void cancelPacketCollector(PacketCollector collector) {
+                removePacketListener(collector);
+            }
+        }, filter);
         addPacketListener(collector, filter);
 
         return collector;
@@ -154,8 +153,7 @@ public class XMPPReceiver implements IReceiver {
      * This method is <b>not</b> thread safe and <b>must not</b> accessed by
      * multiple threads concurrently.
      */
-    private Packet convertBinaryXMPPExtension(
-        BinaryXMPPExtension transferObject) {
+    private Packet convertBinaryXMPPExtension(BinaryXMPPExtension transferObject) {
 
         TransferDescription description = transferObject
             .getTransferDescription();

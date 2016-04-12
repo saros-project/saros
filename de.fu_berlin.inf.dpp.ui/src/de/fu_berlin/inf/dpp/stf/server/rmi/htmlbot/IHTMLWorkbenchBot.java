@@ -11,14 +11,14 @@ public interface IHTMLWorkbenchBot extends Remote {
 
     /**
      * Opens the HTML view of Saros inside the IDE.
-     *
+     * 
      * @throws RemoteException
      */
     void openSarosBrowserView() throws RemoteException;
 
     /**
      * Tests if the HTML view is already open.
-     *
+     * 
      * @return true if it is open, false otherwise
      * @throws RemoteException
      */

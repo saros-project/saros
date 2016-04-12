@@ -1,9 +1,9 @@
 package de.fu_berlin.inf.dpp.preferences;
 
-import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 
 /**
  * Preferences provide methods to get and set preferences on an IDE-specific

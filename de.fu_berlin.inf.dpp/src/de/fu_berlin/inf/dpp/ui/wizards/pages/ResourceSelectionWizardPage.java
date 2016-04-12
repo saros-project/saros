@@ -55,9 +55,11 @@ public class ResourceSelectionWizardPage extends WizardPage {
         @Override
         public void filterClosedProjectsChanged(
             FilterClosedProjectsChangedEvent event) {
-            PlatformUI.getPreferenceStore().setValue(
-                EclipsePreferenceConstants.PROJECTSELECTION_FILTERCLOSEDPROJECTS,
-                event.isFilterClosedProjects());
+            PlatformUI
+                .getPreferenceStore()
+                .setValue(
+                    EclipsePreferenceConstants.PROJECTSELECTION_FILTERCLOSEDPROJECTS,
+                    event.isFilterClosedProjects());
         }
     };
 
@@ -95,8 +97,11 @@ public class ResourceSelectionWizardPage extends WizardPage {
      */
     private void createResourceSelectionComposite(Composite parent) {
 
-        resourceSelectionComposite = new ResourceSelectionComposite(parent,
-            SWT.BORDER | SWT.V_SCROLL, PlatformUI.getPreferenceStore()
+        resourceSelectionComposite = new ResourceSelectionComposite(
+            parent,
+            SWT.BORDER | SWT.V_SCROLL,
+            PlatformUI
+                .getPreferenceStore()
                 .getBoolean(
                     EclipsePreferenceConstants.PROJECTSELECTION_FILTERCLOSEDPROJECTS));
 

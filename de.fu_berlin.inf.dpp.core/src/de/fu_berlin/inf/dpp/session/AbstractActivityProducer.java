@@ -21,11 +21,11 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
  *   void start() {
  *     sarosSession.addActivityProducer(<b>this</b>);
  *   }
- *   
+ * 
  *   void stop() {
  *     sarosSession.removeActivityProducer(<b>this</b>);
  *   }
- *   
+ * 
  *   void something() {
  *     fireActivity(new MyActivity());
  *   }

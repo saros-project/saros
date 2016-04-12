@@ -1,9 +1,9 @@
 package de.fu_berlin.inf.dpp.stf.server.rmi.htmlbot;
 
+import java.rmi.RemoteException;
+
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.IRemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
-
-import java.rmi.RemoteException;
 
 public class EclipseHTMLWorkbenchBot implements IHTMLWorkbenchBot {
 
@@ -17,8 +17,8 @@ public class EclipseHTMLWorkbenchBot implements IHTMLWorkbenchBot {
 
     @Override
     public void openSarosBrowserView() throws RemoteException {
-        workbenchBot.openViewById(
-            "de.fu_berlin.inf.dpp.ui.views.SarosViewBrowserVersion");
+        workbenchBot
+            .openViewById("de.fu_berlin.inf.dpp.ui.views.SarosViewBrowserVersion");
     }
 
     @Override

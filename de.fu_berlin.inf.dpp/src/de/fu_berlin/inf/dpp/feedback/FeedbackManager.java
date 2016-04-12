@@ -68,7 +68,8 @@ public class FeedbackManager extends AbstractFeedbackManager implements
                  * until the next request is shown
                  */
                 resetSessionsUntilNextToInterval();
-            } else if (EclipsePreferenceConstants.FEEDBACK_SURVEY_DISABLED.equals(key)) {
+            } else if (EclipsePreferenceConstants.FEEDBACK_SURVEY_DISABLED
+                .equals(key)) {
                 Object value = event.getNewValue();
                 int disabled = ((Integer) value).intValue();
                 // if it changed to enabled, reset interval as well

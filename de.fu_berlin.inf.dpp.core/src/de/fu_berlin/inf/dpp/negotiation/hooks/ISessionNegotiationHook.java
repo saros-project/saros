@@ -5,6 +5,7 @@ import java.util.Map;
 import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.OutgoingSessionNegotiation;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.session.SarosSessionManager;
 
 /**
  * A SessionNegotiationHook is a component that wishes to take part in the

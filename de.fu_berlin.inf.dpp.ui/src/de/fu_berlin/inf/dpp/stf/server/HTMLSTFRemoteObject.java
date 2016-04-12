@@ -12,10 +12,11 @@ public abstract class HTMLSTFRemoteObject {
     private static ISarosContext context;
 
     /**
-     * This method must be called at the start of the test framework
-     * in order for future lookups to succeed.
-     *
-     * @param context the Saros context to use for the GUI tests
+     * This method must be called at the start of the test framework in order
+     * for future lookups to succeed.
+     * 
+     * @param context
+     *            the Saros context to use for the GUI tests
      */
     static void setContext(ISarosContext context) {
         HTMLSTFRemoteObject.context = context;
@@ -26,8 +27,8 @@ public abstract class HTMLSTFRemoteObject {
     }
 
     /**
-     * @return the {@link BrowserManager} which is required to get a certain browser
-     * and execute test code in it
+     * @return the {@link BrowserManager} which is required to get a certain
+     *         browser and execute test code in it
      */
     protected BrowserManager getBrowserManager() {
         return getContext().getComponent(BrowserManager.class);

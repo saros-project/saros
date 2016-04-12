@@ -44,7 +44,8 @@ public class StatisticManagerConfiguration {
         final boolean isPseudonymAllowed) {
 
         FeedbackPreferences.getPreferences().putBoolean(
-            EclipsePreferenceConstants.STATISTIC_ALLOW_PSEUDONYM, isPseudonymAllowed);
+            EclipsePreferenceConstants.STATISTIC_ALLOW_PSEUDONYM,
+            isPseudonymAllowed);
     }
 
     /**

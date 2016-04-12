@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.filesystem;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-
 @RunWith(Suite.class)
 @Suite.SuiteClasses({ ChecksumCacheTest.class })
 public class TestSuite {

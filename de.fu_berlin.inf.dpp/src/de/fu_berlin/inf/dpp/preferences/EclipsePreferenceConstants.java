@@ -75,7 +75,7 @@ public class EclipsePreferenceConstants {
 
     /**
      * Preference used for a way to let the user identify himself.
-     *
+     * 
      * For instance, this might get a value such as "coezbek" or "rdjemili".
      */
     public static final String STATISTICS_PSEUDONYM_ID = "STATISTICS_PSEUDONYM_ID";

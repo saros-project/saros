@@ -267,7 +267,7 @@ public class Saros extends AbstractUIPlugin {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
 
-        log = Logger.getLogger(this.getClass()); //$NON-NLS-1$
+        log = Logger.getLogger(this.getClass());
 
     }
 

@@ -52,8 +52,7 @@ public class SarosViewBrowserVersion extends ViewPart {
     public void createPartControl(Composite parent) {
 
         try {
-            browser = browserCreator.createBrowser(parent, SWT.NONE,
-                mainPage);
+            browser = browserCreator.createBrowser(parent, SWT.NONE, mainPage);
 
         } catch (SWTError e) {
             // This might happen when there is no standard browser available

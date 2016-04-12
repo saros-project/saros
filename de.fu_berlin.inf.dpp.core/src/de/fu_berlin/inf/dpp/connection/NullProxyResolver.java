@@ -1,7 +1,8 @@
 package de.fu_berlin.inf.dpp.connection;
 
-import de.fu_berlin.inf.dpp.communication.connection.IProxyResolver;
 import org.jivesoftware.smack.proxy.ProxyInfo;
+
+import de.fu_berlin.inf.dpp.communication.connection.IProxyResolver;
 
 /**
  * A {@link IProxyResolver} that does nothing.

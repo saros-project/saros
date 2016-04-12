@@ -28,7 +28,7 @@ import de.fu_berlin.inf.dpp.session.User;
 /*
  * FIXME: the partial sharing stuff should not be handled here but in the
  * SharedProject class
- *
+ * 
  * TODO: Make package-private after SarosSession has moved to core
  */
 public class SharedProjectMapper {
@@ -76,7 +76,7 @@ public class SharedProjectMapper {
      * shared project by just adding the same project with the same ID again
      * that must now marked as not partially shared.
      * </p>
-     *
+     * 
      * @param id
      *            the ID for the project
      * @param project
@@ -85,7 +85,7 @@ public class SharedProjectMapper {
      *            <code>true</code> if the project should be treated as a
      *            partially shared project, <code>false</code> if it should be
      *            treated as completely shared
-     *
+     * 
      * @throws NullPointerException
      *             if the ID or project is <code>null</code>
      * @throws IllegalStateException
@@ -105,10 +105,10 @@ public class SharedProjectMapper {
         IProject currentProject = idToProjectMapping.get(id);
 
         if (currentProjectID != null && !id.equals(currentProjectID)) {
-            throw new IllegalStateException(
-                "cannot assign ID " + id + " to project " + project
-                    + " because it is already registered with ID "
-                    + currentProjectID);
+            throw new IllegalStateException("cannot assign ID " + id
+                + " to project " + project
+                + " because it is already registered with ID "
+                + currentProjectID);
         }
 
         if (currentProject != null && !project.equals(currentProject)) {
@@ -117,16 +117,18 @@ public class SharedProjectMapper {
         }
 
         if (isPartially && partiallySharedProjects.contains(project))
-            throw new IllegalStateException(
-                "project " + project + " is already partially shared");
+            throw new IllegalStateException("project " + project
+                + " is already partially shared");
 
         if (!isPartially && completelySharedProjects.contains(project))
-            throw new IllegalStateException(
-                "project " + project + " is already completely shared");
+            throw new IllegalStateException("project " + project
+                + " is already completely shared");
 
         if (isPartially && completelySharedProjects.contains(project))
-            throw new IllegalStateException("project " + project
-                + " is already completely shared (cannot downgrade a completely shared project)");
+            throw new IllegalStateException(
+                "project "
+                    + project
+                    + " is already completely shared (cannot downgrade a completely shared project)");
 
         if (!isPartially && partiallySharedProjects.contains(project)) {
             partiallySharedProjects.remove(project);
@@ -166,7 +168,7 @@ public class SharedProjectMapper {
     /**
      * Removes a project from the set of currently shared projects. Does nothing
      * if the project is not shared.
-     *
+     * 
      * @param id
      *            the ID of the project to remove
      */
@@ -174,9 +176,8 @@ public class SharedProjectMapper {
         IProject project = idToProjectMapping.get(id);
 
         if (project == null) {
-            LOG.warn(
-                "could not remove project, no project is registerid with ID: "
-                    + id);
+            LOG.warn("could not remove project, no project is registerid with ID: "
+                + id);
             return;
         }
 
@@ -194,7 +195,7 @@ public class SharedProjectMapper {
 
     /**
      * Adds the given resources to a <b>partially</b> shared project.
-     *
+     * 
      * @param project
      *            a project that was added as a partially shared project
      * @param resources
@@ -202,7 +203,7 @@ public class SharedProjectMapper {
      */
     /*
      * TODO needs proper sync. in the SarosSession class
-     *
+     * 
      * @throws IllegalStateException if the project is completely or not shared
      * at all
      */
@@ -230,8 +231,8 @@ public class SharedProjectMapper {
             .get(project);
 
         if (partiallySharedResources.isEmpty()) {
-            partiallySharedResources = new HashSet<IResource>(
-                Math.max(1024, (resources.size() * 3) / 2));
+            partiallySharedResources = new HashSet<IResource>(Math.max(1024,
+                (resources.size() * 3) / 2));
 
             partiallySharedResourceMapping.put(project,
                 partiallySharedResources);
@@ -242,7 +243,7 @@ public class SharedProjectMapper {
 
     /**
      * Removes the given resources from a <b>partially</b> shared project.
-     *
+     * 
      * @param project
      *            a project that was added as a partially shared project
      * @param resources
@@ -250,7 +251,7 @@ public class SharedProjectMapper {
      */
     /*
      * TODO needs proper sync. in the SarosSession class
-     *
+     * 
      * @throws IllegalStateException if the project is completely or not shared
      * at all
      */
@@ -284,7 +285,7 @@ public class SharedProjectMapper {
     /**
      * Atomically removes and adds resources. The resources to remove will be
      * removed first before the resources to add will be added.
-     *
+     * 
      * @param project
      *            a project that was added as a partially shared project
      * @param resourcesToRemove
@@ -294,7 +295,7 @@ public class SharedProjectMapper {
      */
     /*
      * TODO needs proper sync. in the SarosSession class
-     *
+     * 
      * @throws IllegalStateException if the project is completely or not shared
      * at all
      */
@@ -308,7 +309,7 @@ public class SharedProjectMapper {
 
     /**
      * Returns the ID assigned to the given shared project.
-     *
+     * 
      * @param project
      *            the project to look up the ID for
      * @return the shared project's ID or <code>null</code> if the project is
@@ -320,7 +321,7 @@ public class SharedProjectMapper {
 
     /**
      * Returns the shared project with the given ID.
-     *
+     * 
      * @param id
      *            the ID to look up the project for
      * @return the shared project for the given ID or <code>null</code> if no
@@ -333,7 +334,7 @@ public class SharedProjectMapper {
     /**
      * Returns whether the given resource is included in one of the currently
      * shared projects.
-     *
+     * 
      * @param resource
      *            the resource to check for
      * @return <code>true</code> if the resource is shared, <code>false</code>
@@ -355,13 +356,13 @@ public class SharedProjectMapper {
             // TODO how should partial sharing handle this case ?
             return !resource.isDerived(true);
         else
-            return partiallySharedResourceMapping.get(project)
-                .contains(resource);
+            return partiallySharedResourceMapping.get(project).contains(
+                resource);
     }
 
     /**
      * Returns the currently shared projects.
-     *
+     * 
      * @return a newly created {@link Set} with the shared projects
      */
     public synchronized Set<IProject> getProjects() {
@@ -370,7 +371,7 @@ public class SharedProjectMapper {
 
     /**
      * Returns all resources from all partially shared projects.
-     *
+     * 
      * @return a newly created {@link List} with all of the partially shared
      *         projects' resources
      */
@@ -394,7 +395,7 @@ public class SharedProjectMapper {
 
     /**
      * Returns the current number of shared projects.
-     *
+     * 
      * @return number of shared projects
      */
     public synchronized int size() {
@@ -405,7 +406,7 @@ public class SharedProjectMapper {
      * Returns a mapping for each shared project and its containing resources.
      * The resource list is <b>always</b> <code>null</code> for completely
      * shared projects.
-     *
+     * 
      * @return a map from project to resource list (partially shared) or
      *         <code>null</code> (completely shared)
      */
@@ -430,7 +431,7 @@ public class SharedProjectMapper {
 
     /**
      * Checks whether a project is completely shared.
-     *
+     * 
      * @param project
      *            the project to check for
      * @return <code>true</code> if the project is completely shared,
@@ -442,7 +443,7 @@ public class SharedProjectMapper {
 
     /**
      * Checks if a project is partially shared.
-     *
+     * 
      * @param project
      *            the project to check
      * @return <code>true</code> if the project is partially shared,
@@ -458,7 +459,7 @@ public class SharedProjectMapper {
      * <p>
      * This method should only be called by the session's host.
      * </p>
-     *
+     * 
      * @param user
      *            The user to be checked
      * @param project
@@ -479,10 +480,10 @@ public class SharedProjectMapper {
      * <p>
      * This method should only be called by the session's host.
      * </p>
-     *
+     * 
      * @param user
      *            user who now has all projects
-     *
+     * 
      * @see #userHasProject(User, IProject)
      */
     public synchronized void addMissingProjectsToUser(User user) {
@@ -499,10 +500,10 @@ public class SharedProjectMapper {
      * <p>
      * This method should only be called by the session's host.
      * </p>
-     *
+     * 
      * @param user
      *            user who left the session
-     *
+     * 
      * @see #userHasProject(User, IProject)
      */
     public void userLeft(User user) {

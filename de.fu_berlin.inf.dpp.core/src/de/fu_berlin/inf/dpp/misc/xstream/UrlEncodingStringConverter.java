@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.misc.xstream;
 
 import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
 
-
 /**
  * Converter for URL encoding strings to use them as attribute values.
  */

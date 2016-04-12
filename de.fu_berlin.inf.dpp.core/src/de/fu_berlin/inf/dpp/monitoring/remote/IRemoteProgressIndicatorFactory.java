@@ -12,7 +12,7 @@ public interface IRemoteProgressIndicatorFactory {
 
     /**
      * Creates a remote progress indicator.
-     *
+     * 
      * @param remoteProgressManager
      *            {@link RemoteProgressManager} which manages the indicator
      * @param remoteProgressID

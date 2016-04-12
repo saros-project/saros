@@ -18,7 +18,7 @@ import de.fu_berlin.inf.dpp.ui.Messages;
 /**
  * Contains the advanced preferences - consisting of preferences that are geared
  * towards developers and power users and that are not necessary for normal use.
- *
+ * 
  * @author rdjemili
  * @author jurke
  */

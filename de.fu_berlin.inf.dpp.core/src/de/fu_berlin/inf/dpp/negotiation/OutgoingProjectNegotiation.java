@@ -66,7 +66,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
     /**
      * Initializes an OutgoingProjectNegotiation.
-     *
+     * 
      * @param peer
      *            JID of the peer to negotiate with
      * @param session
@@ -105,7 +105,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
              * inside a Workspace Runnable with file locks !. There is a small
              * gap between saving editors and entering the file lock but it will
              * almost never matter in a real execution environment.
-             *
+             * 
              * Do not save the editors inside the runnable as this may not work
              * depending on the IEditorManager implementation, i.e this thread
              * holds the lock, but saving editors is performed in another thread
@@ -136,7 +136,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 /*
                  * inform all listeners that the peer has started queuing and
                  * can therefore process IResourceActivities now
-                 *
+                 * 
                  * TODO this needs a review as this is called inside the
                  * "blocked" section and so it is not allowed to send resource
                  * activities at this time. Maybe change the description of the
@@ -215,7 +215,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     /**
      * Retrieve the peer's partial file list and remember which files need to be
      * sent to that user
-     *
+     * 
      * @param monitor
      * @throws IOException
      * @throws SarosCancellationException
@@ -271,9 +271,9 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
          * TODO: Make sure that all users are fully registered when stopping
          * them, otherwise failures might occur while a user is currently
          * joining and has not fully initialized yet.
-         *
+         * 
          * See also OutgoingSessionNegotiation#completeInvitation
-         *
+         * 
          * srossbach: This may already be the case ... just review this
          */
 
@@ -497,7 +497,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     /**
      * Sends an activity queuing request to the remote side and awaits the
      * confirmation of the request.
-     *
+     * 
      * @param monitor
      */
     private void sendAndAwaitActivityQueueingActivation(IProgressMonitor monitor)

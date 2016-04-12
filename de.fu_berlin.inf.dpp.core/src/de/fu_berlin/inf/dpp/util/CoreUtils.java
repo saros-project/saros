@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.util;
 
-
 public class CoreUtils {
 
     /**

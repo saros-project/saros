@@ -22,8 +22,9 @@ package de.fu_berlin.inf.dpp.filesystem;
 
 /**
  * A checksum cache that always makes callers recalculate checksums.
- *
- * Useful if your implementation has difficulties using the {@link ChecksumCacheImpl}.
+ * 
+ * Useful if your implementation has difficulties using the
+ * {@link ChecksumCacheImpl}.
  */
 public class NullChecksumCacheImpl implements IChecksumCache {
     @Override

@@ -60,7 +60,8 @@ public final class SessionStatusRequestHandler {
     }
 
     private void handleStatusRequest(JID from) {
-        if (!preferenceStore.getBoolean(EclipsePreferenceConstants.SERVER_ACTIVATED))
+        if (!preferenceStore
+            .getBoolean(EclipsePreferenceConstants.SERVER_ACTIVATED))
             return;
 
         ISarosSession session = sessionManager.getSarosSession();

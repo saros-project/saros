@@ -19,7 +19,7 @@ public class LayoutUtils {
 
     /**
      * Creates a {@link GridLayout} with the the given parameters
-     *
+     * 
      * @param numColumns
      * @param makeColumnsEqualWidth
      * @param marginWidth
@@ -41,7 +41,7 @@ public class LayoutUtils {
 
     /**
      * Creates a {@link GridLayout} with the the given parameters
-     *
+     * 
      * @param numColumns
      * @param makeColumnsEqualWidth
      * @param margin
@@ -58,7 +58,7 @@ public class LayoutUtils {
 
     /**
      * Creates a {@link GridLayout} with one column and the the given parameters
-     *
+     * 
      * @param margin
      *            used for marginWidth and marginHeight
      * @param spacing
@@ -73,7 +73,7 @@ public class LayoutUtils {
      * Creates a {@link GridLayout} with one column, no margin and the default
      * {@link GridLayout#horizontalSpacing} and
      * {@link GridLayout#verticalSpacing}.
-     *
+     * 
      * @return
      */
     public static GridLayout createGridLayout() {
@@ -84,7 +84,7 @@ public class LayoutUtils {
 
     /**
      * Create a {@link GridData} that fills its cell and grabs the space.
-     *
+     * 
      * @return
      */
     public static GridData createFillGridData() {
@@ -94,7 +94,7 @@ public class LayoutUtils {
     /**
      * Create a {@link GridData} that fills its cell and grabs the horizontal
      * space.
-     *
+     * 
      * @return
      */
     public static GridData createFillHGrabGridData() {

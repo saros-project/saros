@@ -27,7 +27,7 @@ public final class SessionNegotiationObservable {
 
     /**
      * Returns the session negotiation for the given JID with the given id.
-     *
+     * 
      * @param jid
      *            the JID to lookup
      * @param id
@@ -51,7 +51,7 @@ public final class SessionNegotiationObservable {
 
     /**
      * Checks if a session negotiation currently exists for the given JID.
-     *
+     * 
      * @param jid
      *            the JID to lookup
      * @return <code>true</code> if a session negotiation exists for the current
@@ -65,7 +65,7 @@ public final class SessionNegotiationObservable {
 
     /**
      * Adds a session negotiation.
-     *
+     * 
      * @param negotiation
      *            the session negotiation to add
      */
@@ -95,7 +95,7 @@ public final class SessionNegotiationObservable {
 
     /**
      * Removes a session negotiation.
-     *
+     * 
      * @param negotiation
      *            the session negotiation to remove
      */
@@ -124,7 +124,7 @@ public final class SessionNegotiationObservable {
     /**
      * Returns a snap shot of all currently running session negotiation
      * negotiations.
-     *
+     * 
      * @return a list of all currently running session negotiation negotiations
      */
     public synchronized List<SessionNegotiation> list() {

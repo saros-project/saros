@@ -4,7 +4,6 @@
  */
 package de.fu_berlin.inf.dpp.observables;
 
-
 /**
  * Listener interface for listening to changes of a {@link ObservableValue}.
  * 

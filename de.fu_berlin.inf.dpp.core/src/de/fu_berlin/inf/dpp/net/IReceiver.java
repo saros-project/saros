@@ -57,8 +57,8 @@ public interface IReceiver {
      * 
      * @param filter
      *            a filter that packets must match to be added to the collector.
-     * @return a {@linkplain PacketCollector collector} which <b>must</b>
-     *         be canceled if it is no longer used
+     * @return a {@linkplain PacketCollector collector} which <b>must</b> be
+     *         canceled if it is no longer used
      * 
      * @see PacketCollector#cancel()
      */

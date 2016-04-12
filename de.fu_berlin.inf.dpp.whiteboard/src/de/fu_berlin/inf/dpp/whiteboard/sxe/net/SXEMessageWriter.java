@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
@@ -108,7 +109,7 @@ public class SXEMessageWriter {
             closeOutputStream();
             stream = os;
             StreamResult streamResult = new StreamResult(stream);
-            SAXTransformerFactory tf = (SAXTransformerFactory) SAXTransformerFactory
+            SAXTransformerFactory tf = (SAXTransformerFactory) TransformerFactory
                 .newInstance();
             handler = tf.newTransformerHandler();
             Transformer serializer = handler.getTransformer();

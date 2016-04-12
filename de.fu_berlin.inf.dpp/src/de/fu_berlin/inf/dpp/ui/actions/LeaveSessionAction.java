@@ -57,7 +57,8 @@ public class LeaveSessionAction extends Action implements Disposable {
         }
 
         @Override
-        public void sessionEnded(ISarosSession oldSarosSession, SessionEndReason reason) {
+        public void sessionEnded(ISarosSession oldSarosSession,
+            SessionEndReason reason) {
             updateEnablement();
         }
     };
@@ -100,8 +101,7 @@ public class LeaveSessionAction extends Action implements Disposable {
             setImageDescriptor(new ImageDescriptor() {
                 @Override
                 public ImageData getImageData() {
-                    return ImageManager.ELCL_SESSION_TERMINATE
-                        .getImageData();
+                    return ImageManager.ELCL_SESSION_TERMINATE.getImageData();
                 }
             });
         } else {

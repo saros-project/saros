@@ -13,9 +13,9 @@ import de.fu_berlin.inf.dpp.ui.widgets.SimpleExplanationComposite.SimpleExplanat
  * Although this composite may be subclasses <strong>only the control registered
  * trough {@link SimpleExplanatoryComposite#setContentControl(Control)} can be
  * displayed</strong>.
- *
+ * 
  * <p>
- *
+ * 
  * <dl>
  * <dt><b>Styles:</b></dt>
  * <dd>{@link SWT#H_SCROLL}, {@link SWT#V_SCROLL}, {@link SWT#BORDER} - these
@@ -26,44 +26,44 @@ import de.fu_berlin.inf.dpp.ui.widgets.SimpleExplanationComposite.SimpleExplanat
  * <dd>(none)</dd>
  * <dt><b>Example:</b></dt>
  * <dd>
- *
+ * 
  * <pre>
  * <code>
  * final SimpleExplanatoryComposite explanatoryComposite
  *      = new SimpleExplanatoryComposite(tabFolder, SWT.NONE);
- *
+ * 
  * Button contentControl = new Button(explanatoryComposite, SWT.NONE);
  * explanatoryComposite.setContentControl(contentControl);
  * contentControl.setText("Show the explanation...");
  * contentControl.addSelectionListener(new SelectionAdapter() {
- *
+ * 
  *         public void widgetSelected(SelectionEvent e) {
  *              int icon = SWT.ICON_INFORMATION;
  *              String text = "I'm supposed to tell you how to use this composite.\n"
  *                          + "This message closes in 5 seconds.";
  *              SimpleExplanation expl = new SimpleExplanation(icon, text);
  *              explanatoryComposite.showExplanation(expl);
- *
+ * 
  *              Display.getCurrent().timerExec(5000, new Runnable() {
- *
+ * 
  *                      public void run() {
  *                              explanatoryComposite.hideExplanation();
  *                     }
- *
+ * 
  *              });
  *         }
- *
+ * 
  * });
  * </code>
  * </pre>
- *
+ * 
  * </dd>
  * </dl>
- *
+ * 
  * @see SimpleExplanationComposite
  * @see Composite
  * @author bkahlert
- *
+ * 
  */
 public class SimpleExplanatoryComposite extends ExplanatoryComposite {
     protected SimpleExplanationComposite simpleExplanationComposite;
@@ -71,7 +71,7 @@ public class SimpleExplanatoryComposite extends ExplanatoryComposite {
     /**
      * Constructs a new {@link SimpleExplanatoryComposite} with a given parent
      * and the passed style information.
-     *
+     * 
      * @param parent
      * @param style
      */
@@ -84,7 +84,7 @@ public class SimpleExplanatoryComposite extends ExplanatoryComposite {
 
     /**
      * Hides the content and displays an explanation.
-     *
+     * 
      * @param explanation
      *            The explanation to be displayed; if null the explanation gets
      *            hidden

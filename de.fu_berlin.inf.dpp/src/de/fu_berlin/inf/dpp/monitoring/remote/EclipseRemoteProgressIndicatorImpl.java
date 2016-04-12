@@ -41,7 +41,7 @@ final class EclipseRemoteProgressIndicatorImpl implements
 
     /**
      * Creates an EclipseRemoteProgressIndicatorImpl.
-     *
+     * 
      * @param rpm
      *            {@link RemoteProgressManager} which creates the indicator
      * @param remoteProgressID

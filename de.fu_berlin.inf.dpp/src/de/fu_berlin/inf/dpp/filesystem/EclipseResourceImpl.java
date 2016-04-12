@@ -48,7 +48,8 @@ public class EclipseResourceImpl implements IResource {
             return new EclipseProjectImpl(
                 (org.eclipse.core.resources.IProject) container);
         case org.eclipse.core.resources.IResource.ROOT:
-            return new EclipseWorkspaceRootImpl((org.eclipse.core.resources.IWorkspaceRoot) container);
+            return new EclipseWorkspaceRootImpl(
+                (org.eclipse.core.resources.IWorkspaceRoot) container);
         default:
             return null;
         }

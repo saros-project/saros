@@ -16,7 +16,6 @@ import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.session.internal.UserInformationHandler;
 
 public class UserInformationHandlerTest {
 
@@ -48,8 +47,7 @@ public class UserInformationHandlerTest {
         UserInformationHandler handler = new UserInformationHandler(session,
             transmitter, receiver);
 
-        User alice = new User(new JID("alice@test/Saros"), false, false, 0,
-            0);
+        User alice = new User(new JID("alice@test/Saros"), false, false, 0, 0);
 
         handler.start();
 
@@ -66,8 +64,7 @@ public class UserInformationHandlerTest {
         UserInformationHandler handler = new UserInformationHandler(session,
             transmitter, receiver);
 
-        User alice = new User(new JID("alice@test/Saros"), false, false, 0,
-            0);
+        User alice = new User(new JID("alice@test/Saros"), false, false, 0, 0);
 
         handler.start();
 
@@ -84,8 +81,7 @@ public class UserInformationHandlerTest {
         UserInformationHandler handler = new UserInformationHandler(session,
             transmitter, receiver);
 
-        User alice = new User(new JID("alice@test/Saros"), false, false, 0,
-            0);
+        User alice = new User(new JID("alice@test/Saros"), false, false, 0, 0);
 
         handler.start();
 
@@ -102,8 +98,7 @@ public class UserInformationHandlerTest {
         UserInformationHandler handler = new UserInformationHandler(session,
             transmitter, receiver);
 
-        User alice = new User(new JID("alice@test/Saros"), false, false, 0,
-            0);
+        User alice = new User(new JID("alice@test/Saros"), false, false, 0, 0);
 
         handler.start();
 
@@ -121,8 +116,7 @@ public class UserInformationHandlerTest {
         UserInformationHandler handler = new UserInformationHandler(session,
             transmitter, receiver);
 
-        User alice = new User(new JID("alice@test/Saros"), false, false, 0,
-            0);
+        User alice = new User(new JID("alice@test/Saros"), false, false, 0, 0);
         User bob = new User(new JID("bob@test/Saros"), false, false, 0, 0);
 
         alice.setInSession(false);

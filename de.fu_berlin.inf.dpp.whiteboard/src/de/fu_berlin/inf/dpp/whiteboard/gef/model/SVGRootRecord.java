@@ -15,6 +15,7 @@ public class SVGRootRecord extends SVGRectRecord {
         setNs(SVGConstants.SVG_NAMESPACE_URI);
     }
 
+    @Override
     public boolean isComposite() {
         return true;
     }

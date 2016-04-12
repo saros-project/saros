@@ -51,7 +51,8 @@ public class FollowThisPersonAction extends Action implements Disposable {
         }
 
         @Override
-        public void sessionEnded(ISarosSession oldSarosSession, SessionEndReason reason) {
+        public void sessionEnded(ISarosSession oldSarosSession,
+            SessionEndReason reason) {
             updateActionEnablement();
         }
     };

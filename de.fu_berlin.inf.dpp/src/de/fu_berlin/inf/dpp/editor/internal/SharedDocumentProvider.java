@@ -48,7 +48,8 @@ public final class SharedDocumentProvider extends TextFileDocumentProvider {
         }
 
         @Override
-        public void sessionEnded(final ISarosSession session, SessionEndReason reason) {
+        public void sessionEnded(final ISarosSession session,
+            SessionEndReason reason) {
             assert SharedDocumentProvider.this.session == session;
             session.removeListener(sessionListener);
             SharedDocumentProvider.this.session = null;

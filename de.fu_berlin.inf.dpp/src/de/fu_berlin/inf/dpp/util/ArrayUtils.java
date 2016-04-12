@@ -17,7 +17,7 @@ public class ArrayUtils {
 
     /**
      * Returns a list of elements that are instances of this class.
-     *
+     * 
      * @param objects
      * @param clazz
      * @return all objects that are instances of this class or <code>null</code>
@@ -40,14 +40,14 @@ public class ArrayUtils {
 
     /**
      * Tries to adapt each object to the given class.
-     *
+     * 
      * @param objects
      *            objects that are tried to adapted
      * @param clazz
      *            class to adapt each object to
      * @return all objects that were adapted or <code>null</code> if the object
      *         array is <code>null</code>
-     *
+     * 
      * @deprecated use
      *             {@link #getAdaptableObjects(Object[] objects, Class clazz, IAdapterManager adapterManager)}
      **/
@@ -60,14 +60,14 @@ public class ArrayUtils {
 
     /**
      * Tries to adapt each object to the given class.
-     *
+     * 
      * @param objects
      *            objects that are tried to adapted
      * @param clazz
      *            class to adapt each object to
      * @param adapterManager
      *            the adapterManager that is used to adapt the objects
-     *
+     * 
      * @return all objects that were adapted or <code>null</code> if the object
      *         array is <code>null</code>
      */

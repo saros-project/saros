@@ -16,8 +16,7 @@ public abstract class EclipseContainerImpl extends EclipseResourceImpl
 
     @Override
     public boolean exists(IPath path) {
-        return getDelegate().exists(((EclipsePathImpl) path)
-            .getDelegate());
+        return getDelegate().exists(((EclipsePathImpl) path).getDelegate());
     }
 
     @Override
