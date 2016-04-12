@@ -914,7 +914,7 @@ public class EditorManager extends AbstractActivityProducer
 
     private void executeInUIThreadSynchronous(Runnable runnable) {
         ApplicationManager.getApplication()
-            .invokeAndWait(runnable, ModalityState.NON_MODAL);
+            .invokeAndWait(runnable, ModalityState.defaultModalityState());
     }
 
     private void executeInUIThreadAsynchronous(Runnable runnable) {

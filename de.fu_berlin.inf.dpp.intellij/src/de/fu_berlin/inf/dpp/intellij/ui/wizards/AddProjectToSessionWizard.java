@@ -229,7 +229,7 @@ public class AddProjectToSessionWizard extends Wizard {
         final String message = "Wizard canceled " + (type
             .equals(NegotiationTools.CancelLocation.LOCAL) ?
             "locally " :
-            "remotely ") + "by " + peer;
+            "remotely by " + peer);
         UIUtil.invokeLaterIfNeeded(new Runnable() {
             @Override
             public void run() {
