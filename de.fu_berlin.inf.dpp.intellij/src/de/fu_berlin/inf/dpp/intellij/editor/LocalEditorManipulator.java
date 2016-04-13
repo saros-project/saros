@@ -79,11 +79,6 @@ public class LocalEditorManipulator {
         VirtualFile virtualFile = ResourceConverter.toVirtualFile(path);
         if (virtualFile != null && virtualFile.exists()) {
             if (projectAPI.isOpen(virtualFile)) {
-                Document doc = editorPool.getDocument(path);
-                if (doc != null) {
-                    manager.getDocumentListener().stopListening();
-                }
-
                 projectAPI.closeEditor(virtualFile);
             }
             editorPool.removeEditor(path);

@@ -336,6 +336,8 @@ public class EditorManager extends AbstractActivityProducer
             session.addActivityProducer(EditorManager.this);
             session.addActivityConsumer(consumer);
 
+            documentListener.startListening();
+
             remoteEditorManager = new RemoteEditorManager(session);
             remoteWriteAccessManager = new RemoteWriteAccessManager(session);
 
@@ -355,6 +357,8 @@ public class EditorManager extends AbstractActivityProducer
             session.removeListener(sessionListener);
             session.removeActivityProducer(EditorManager.this);
             session.removeActivityConsumer(consumer);
+
+            documentListener.stopListening();
 
             session = null;
 
@@ -616,10 +620,6 @@ public class EditorManager extends AbstractActivityProducer
         return session != null;
     }
 
-    StoppableDocumentListener getDocumentListener() {
-        return documentListener;
-    }
-
     StoppableEditorFileListener getFileListener() {
         return fileListener;
     }
@@ -852,17 +852,6 @@ public class EditorManager extends AbstractActivityProducer
         editor.getDocument().setReadOnly(isLocked || !hasWriteAccess);
         editor.getSelectionModel().addSelectionListener(selectionListener);
         editor.getScrollingModel().addVisibleAreaListener(viewportListener);
-        documentListener.startListening(editor.getDocument());
-    }
-
-    /**
-     * Stops an editor by removing all listeners.
-     */
-    void stopEditor(Editor editor) {
-        editor.getDocument().setReadOnly(false);
-        editor.getSelectionModel().removeSelectionListener(selectionListener);
-        editor.getScrollingModel().removeVisibleAreaListener(viewportListener);
-        documentListener.stopListening();
     }
 
     /**
