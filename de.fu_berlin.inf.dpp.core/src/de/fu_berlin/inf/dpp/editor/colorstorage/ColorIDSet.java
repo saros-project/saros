@@ -51,8 +51,7 @@ public final class ColorIDSet implements Serializable {
      * @param ids
      * 
      */
-    // TODO Make package-private once ColorIDSetStorage is in Core.
-    public ColorIDSet(Collection<String> ids) {
+    ColorIDSet(Collection<String> ids) {
         assignedUserColorIDs = new HashMap<String, UserColorID>();
         for (String id : ids)
             assignedUserColorIDs.put(id, new UserColorID());
@@ -99,15 +98,6 @@ public final class ColorIDSet implements Serializable {
     }
 
     /**
-     * Tells when the set was used last.
-     * 
-     * @return timestamp of that last usage
-     */
-    public long getTimestamp() {
-        return timestamp;
-    }
-
-    /**
      * Returns whether colorId is not yet in use of this set
      * 
      * @param colorID
@@ -115,7 +105,6 @@ public final class ColorIDSet implements Serializable {
      *         otherwise, because it is still available
      */
     public boolean isAvailable(int colorID) {
-
         for (UserColorID c : assignedUserColorIDs.values())
             if (c.getCurrent() == colorID)
                 return false;
@@ -165,11 +154,12 @@ public final class ColorIDSet implements Serializable {
     }
 
     /**
-     * Resets the timestamp to the current system.
+     * Tells when the set was used last.
+     * 
+     * @return timestamp of that last usage
      */
-    // TODO Make package-private once ColorIDSetStorage is in Core.
-    public void resetTimestamp() {
-        timestamp = System.currentTimeMillis();
+    long getTimestamp() {
+        return timestamp;
     }
 
     /**
@@ -183,14 +173,19 @@ public final class ColorIDSet implements Serializable {
     }
 
     /**
+     * Resets the timestamp to the current system.
+     */
+    void resetTimestamp() {
+        timestamp = System.currentTimeMillis();
+    }
+
+    /**
      * Set the colorId of the set for a given user id.
      * 
      * @param id
      * @param colorID
      */
-    // TODO Make package-private once ColorIDSetStorage is in Core.
-    public void setColor(String id, int colorID)
-        throws IllegalArgumentException {
+    void setColor(String id, int colorID) throws IllegalArgumentException {
         if (containsColorConflicts(id, colorID))
             throw new IllegalArgumentException(
                 "a color ID is set multiple times");
@@ -208,8 +203,7 @@ public final class ColorIDSet implements Serializable {
      * @param id
      * @param colorID
      */
-    // TODO Make package-private once ColorIDSetStorage is in Core.
-    public void setFavoriteColor(String id, int colorID)
+    void setFavoriteColor(String id, int colorID)
         throws IllegalArgumentException {
 
         if (!assignedUserColorIDs.containsKey(id))
@@ -228,7 +222,6 @@ public final class ColorIDSet implements Serializable {
      * @return
      */
     private boolean containsColorConflicts(String id, int colorID) {
-
         if (colorID == UserColorID.UNKNOWN || getColor(id) == colorID)
             return false;
 
@@ -243,7 +236,6 @@ public final class ColorIDSet implements Serializable {
      *         <code>false</code> otherwise
      */
     private boolean isValidMap(Map<String, UserColorID> colorIDs) {
-
         HashSet<Integer> usedColorIDs = new HashSet<Integer>();
 
         for (UserColorID id : colorIDs.values()) {
@@ -265,8 +257,7 @@ public final class ColorIDSet implements Serializable {
      * @param ids
      * @return
      */
-    // TODO Make package-private once ColorIDSetStorage is in Core.
-    public ColorIDSet extendSet(Collection<String> ids) {
+    ColorIDSet extendSet(Collection<String> ids) {
         Map<String, UserColorID> newColorIDs = new HashMap<String, UserColorID>();
 
         newColorIDs.putAll(assignedUserColorIDs);
