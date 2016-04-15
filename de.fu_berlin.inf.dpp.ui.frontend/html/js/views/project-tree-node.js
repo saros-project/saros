@@ -11,7 +11,7 @@ var ProjectTreeNodeView = AmpersandView.extend({
         bindAll(this, 'toggleSelect');
     },
     bindings: {
-        'model.displayName': '[data-hook=display-name]',
+        'model.label': '[data-hook=display-name]',
         'model.isSelectedForSharing': {
             type: 'booleanClass',
             name: 'jstree-clicked',
