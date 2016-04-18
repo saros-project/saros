@@ -43,8 +43,22 @@ public class AddContact extends TypedJavascriptFunction {
      */
     @BrowserFunction
     public void addContact(String jid, String nickname) {
+        if (jid == null || nickname == null) {
+            JavaScriptAPI.showError(browser,
+                "Internal error: " + this.getName()
+                    + ". Null arguments are not allowed.");
+            return;
+        }
+
+        JID newContact = new JID(jid);
+        if (!(JID.isValid(newContact))) {
+            JavaScriptAPI.showError(browser, "Invalid input: '" + jid
+                + "'. Not a valid JID.");
+            return;
+        }
+
         try {
-            stateFacade.addContact(new JID(jid), nickname);
+            stateFacade.addContact(newContact, nickname);
         } catch (XMPPException e) {
             LOG.error("Error while adding contact", e);
             JavaScriptAPI.showError(browser, HTMLUIStrings.ADD_CONTACT_FAILED);

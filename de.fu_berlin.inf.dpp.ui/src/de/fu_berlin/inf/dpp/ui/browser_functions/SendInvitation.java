@@ -3,9 +3,13 @@ package de.fu_berlin.inf.dpp.ui.browser_functions;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
+import de.fu_berlin.inf.dpp.HTMLUIStrings;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.ui.JavaScriptAPI;
 import de.fu_berlin.inf.dpp.ui.browser_functions.BrowserFunction.Policy;
 import de.fu_berlin.inf.dpp.ui.manager.ProjectListManager;
 import de.fu_berlin.inf.dpp.ui.model.Contact;
@@ -17,6 +21,7 @@ import de.fu_berlin.inf.dpp.ui.util.ICollaborationUtils;
  */
 public class SendInvitation extends TypedJavascriptFunction {
 
+    private static final Logger LOG = Logger.getLogger(SendInvitation.class);
     private static final String JS_NAME = "sendInvitation";
 
     private final ProjectListManager projectListManager;
@@ -55,8 +60,17 @@ public class SendInvitation extends TypedJavascriptFunction {
         final Contact[] contactList) {
 
         List<JID> usersToInvite = new ArrayList<JID>();
-        for (Contact contact : contactList)
-            usersToInvite.add(new JID(contact.getJid()));
+        for (Contact contact : contactList) {
+            JID contactJID = new JID(contact.getJid());
+
+            if (!JID.isValid(contactJID)) {
+                LOG.error("Received jid is invalid");
+                JavaScriptAPI.showError(browser,
+                    HTMLUIStrings.START_SESSION_CANCELED);
+                return;
+            }
+            usersToInvite.add(contactJID);
+        }
 
         List<IResource> resourcesToShare = projectListManager
             .getAllResources(projectTrees);

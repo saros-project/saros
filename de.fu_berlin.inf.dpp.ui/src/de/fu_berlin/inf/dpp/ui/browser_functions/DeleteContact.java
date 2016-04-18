@@ -42,6 +42,13 @@ public class DeleteContact extends TypedJavascriptFunction {
      */
     @BrowserFunction
     public void deleteContact(String jid) {
+        if (jid == null) {
+            JavaScriptAPI.showError(browser,
+                "Internal error: " + this.getName()
+                    + ". Null arguments are not allowed.");
+            return;
+        }
+
         try {
             stateFacade.deleteContact(new JID(jid));
         } catch (XMPPException e) {

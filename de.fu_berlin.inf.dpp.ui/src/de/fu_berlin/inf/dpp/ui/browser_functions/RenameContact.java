@@ -44,6 +44,13 @@ public class RenameContact extends TypedJavascriptFunction {
      */
     @BrowserFunction
     public void renameContact(String jid, String newNickname) {
+        if (jid == null || newNickname == null) {
+            JavaScriptAPI.showError(browser,
+                "Internal error: " + this.getName()
+                    + ". Null arguments are not allowed.");
+            return;
+        }
+
         try {
             stateFacade.renameContact(new JID(jid), newNickname);
         } catch (XMPPException e) {
@@ -51,5 +58,6 @@ public class RenameContact extends TypedJavascriptFunction {
             JavaScriptAPI.showError(browser,
                 HTMLUIStrings.RENAME_CONTACT_FAILED);
         }
+
     }
 }
