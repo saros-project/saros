@@ -272,21 +272,22 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer
 
         final String editorContent = editorManager.getContent(path);
 
-        if (editorContent != null && !checksum.existsFile()) {
+        if (!checksum.existsFile()) {
             /*
              * If the checksum tells us that the file does not exist at the
              * host, check whether we still have it. If it exists, we do have an
              * inconsistency
              */
-            return true;
+            return editorContent != null;
         }
 
-        /*
-         * If the checksum tells us, that the file exists, but we do not have
-         * it, it is an inconsistency as well
-         */
-        if (editorContent == null)
+        if (editorContent == null) {
+            /*
+             * If the checksum tells us that the file exists, but we do not have
+             * it, it is an inconsistency as well
+             */
             return true;
+        }
 
         if ((editorContent.length() != checksum.getLength())
             || (editorContent.hashCode() != checksum.getHash())) {
