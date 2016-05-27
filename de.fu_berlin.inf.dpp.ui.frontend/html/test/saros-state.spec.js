@@ -1,7 +1,7 @@
 var expect = require('expect.js');
-var SarosState = require('../js/models/saros-state');
-var SarosApi = require('../js/saros-api');
-var Account = require('../js/models/account');
+var SarosState = require('../src/elements/saros-state');
+var SarosApi = require('../src/saros-api');
+var Account = require('../src/elements/account/models/account');
 
 function getDummyAccount() {
 

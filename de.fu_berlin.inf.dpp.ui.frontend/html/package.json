@@ -4,37 +4,39 @@
     "ampersand-collection": "^1.4.5",
     "ampersand-form-view": "^3.1.1",
     "ampersand-input-view": "^4.0.5",
-    "ampersand-state": "^4.5.6",
-    "ampersand-view": "^7.0.1",
+    "ampersand-state": "^5.0.2",
+    "ampersand-view": "^10.0.1",
     "backbone-events-standalone": "^0.2.6",
     "bootstrap": "^3.3.5",
     "domready": "^1.0.5",
     "jquery": "^2.1.3",
     "jstree": "^3.1.1",
-    "lodash.bind": "^3.1.0",
+    "lodash.bind": "^4.1.4",
     "lodash.bindall": "^3.1.0",
-    "lodash.foreach": "^3.0.3"
+    "lodash.foreach": "^4.3.0"
   },
   "devDependencies": {
     "browserify": "^9.0.3",
     "cp": "^0.2.0",
     "exorcist": "^0.4.0",
     "expect.js": "^0.3.1",
+    "jadeify": "^4.6.0",
     "jscs": "^2.1.1",
     "jshint": "^2.8.0",
     "mkdirp": "^0.5.1",
     "mocha": "^2.2.5",
-    "templatizer": "^1.3.0"
+    "watchify": "^3.7.0"
   },
   "scripts": {
-    "prebuild": "mkdirp bundle dist/bundle/ dist/css dist/fonts",
-    "postbuild": "cp *.html dist/ && cp css/*.* dist/css/ && cp fonts/*.* dist/fonts/ && cp bundle/bundle.js dist/bundle/bundle.js",
-    "build": "npm run build:jade -s && npm run build:js -s",
-    "build:js": "browserify --debug js/app.js | exorcist bundle/bundle.js.map > bundle/bundle.js",
-    "build:jade": "templatizer -d templates/ -o js/templates.js",
-    "lint": "jshint js --exclude js/templates.js",
-    "format": "jscs js/**/* --excludeFiles js/vendor/* -x",
+    "prebuild": "npm run createdist",
+    "postbuild": "npm run copysrcs",
+    "build": "browserify -t jadeify --debug src/app.js | exorcist dist/bundle/bundle.js.map > dist/bundle/bundle.js",
+    "prewatch": "npm run createdist && npm run copysrcs",
+    "watch": "watchify -v -d -t jadeify src/app.js -o dist/bundle/bundle.js",
+    "lint": "jshint js --exclude src/templates.js",
     "test": "mocha test/",
-    "ci-test": "mocha test/ --reporter xunit > test-reports.xml"
+    "ci-test": "mocha test/ --reporter xunit > test-reports.xml",
+    "createdist": "mkdirp dist/bundle/ dist/css dist/fonts",
+    "copysrcs": "cp src/pages/*/*.html dist/ && cp src/css/*.* dist/css/ && cp src/fonts/*.* dist/fonts/"
   }
 }
