@@ -11,7 +11,6 @@ import de.fu_berlin.inf.dpp.core.project.internal.SarosIntellijSessionContextFac
 import de.fu_berlin.inf.dpp.core.ui.eventhandler.NegotiationHandler;
 import de.fu_berlin.inf.dpp.core.ui.eventhandler.UserStatusChangeHandler;
 import de.fu_berlin.inf.dpp.core.ui.eventhandler.XMPPAuthorizationHandler;
-import de.fu_berlin.inf.dpp.core.util.FileUtils;
 import de.fu_berlin.inf.dpp.core.util.IntelliJCollaborationUtilsImpl;
 import de.fu_berlin.inf.dpp.core.vcs.NullVCSProviderFactoryImpl;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
@@ -119,14 +118,11 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
     @Override
     public void createComponents(MutablePicoContainer container) {
 
-        IWorkspace workspace = new IntelliJWorkspaceImpl(project);
-        FileUtils.workspace = workspace;
-
         // Saros Core PathIntl Support
         container.addComponent(IPathFactory.class, new PathFactory());
 
-        container.addComponent(IWorkspace.class, workspace);
         container.addComponent(Project.class, project);
+        container.addComponent(IWorkspace.class, IntelliJWorkspaceImpl.class);
 
         for (Component component : Arrays.asList(components)) {
             container.addComponent(component.getBindKey(),
