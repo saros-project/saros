@@ -24,11 +24,9 @@ import de.fu_berlin.inf.dpp.negotiation.hooks.ISessionNegotiationHook;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.discovery.DiscoveryManager;
-import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
 import de.fu_berlin.inf.dpp.session.ColorNegotiationHook;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.versioning.Compatibility;
 import de.fu_berlin.inf.dpp.versioning.VersionCompatibilityResult;
@@ -63,17 +61,10 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
     @Inject
     private ISarosSessionManager sessionManager;
 
-    @Inject
-    private SessionNegotiationObservable currentSessionNegotiations;
-
     // HACK last residue of the direct connection between SessionNegotiation and
     // the color property of users.
     private int clientColorID = UserColorID.UNKNOWN;
     private int clientFavoriteColorID = UserColorID.UNKNOWN;
-
-    // TODO pull up, when this class is in core
-    @Inject
-    private ISarosSessionManager sarosSessionManager;
 
     public OutgoingSessionNegotiation(JID peer, ISarosSession sarosSession,
         String description, ISarosContext sarosContext) {
@@ -86,12 +77,10 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
     @Override
     protected void executeCancellation() {
-        // TODO remove the user from the session !
+        final User user = sarosSession.getUser(getPeer());
 
-        if (currentSessionNegotiations.list().size() == 0
-            && sarosSession.getRemoteUsers().isEmpty())
-            sarosSessionManager
-                .stopSarosSession(SessionEndReason.LOCAL_USER_LEFT);
+        if (user != null)
+            sarosSession.removeUser(user);
     }
 
     /**

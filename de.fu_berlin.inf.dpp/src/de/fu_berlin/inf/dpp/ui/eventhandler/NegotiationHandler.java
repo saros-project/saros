@@ -27,7 +27,6 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.session.INegotiationHandler;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
@@ -219,8 +218,7 @@ public class NegotiationHandler implements INegotiationHandler {
 
     private final ISarosSessionManager sessionManager;
 
-    // FIXME use ISarosSessionManager interface
-    public NegotiationHandler(SarosSessionManager sessionManager,
+    public NegotiationHandler(ISarosSessionManager sessionManager,
         XMPPConnectionService connectionService) {
         sessionManager.setNegotiationHandler(this);
         this.sessionManager = sessionManager;

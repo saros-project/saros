@@ -32,7 +32,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
-import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -55,8 +54,6 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
-import de.fu_berlin.inf.dpp.observables.SessionNegotiationObservable;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.session.internal.SarosSession;
 import de.fu_berlin.inf.dpp.util.StackTrace;
@@ -104,9 +101,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     private final Preferences preferences;
 
-    // FIXME remove @Inject
-    @Inject
-    private ISarosContext sarosContext;
+    private final ISarosContext applicationContext;
 
     private final NegotiationPacketListener negotiationPacketLister;
 
@@ -149,13 +144,14 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
     };
 
-    public SarosSessionManager(XMPPConnectionService connectionService,
-        SessionNegotiationObservable currentSessionNegotiations,
-        ProjectNegotiationObservable currentProjectNegotiations,
-        ITransmitter transmitter, IReceiver receiver, Preferences preferences) {
+    public SarosSessionManager(ISarosContext applicationContext,
+        XMPPConnectionService connectionService, ITransmitter transmitter,
+        IReceiver receiver, Preferences preferences) {
+
+        this.applicationContext = applicationContext;
         this.connectionService = connectionService;
-        this.currentSessionNegotiations = currentSessionNegotiations;
-        this.currentProjectNegotiations = currentProjectNegotiations;
+        this.currentSessionNegotiations = new SessionNegotiationObservable();
+        this.currentProjectNegotiations = new ProjectNegotiationObservable();
         this.preferences = preferences;
         this.connectionService.addListener(connectionListener);
 
@@ -164,8 +160,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             transmitter, receiver);
     }
 
-    // FIXME add back to interface
-    // @Override
+    @Override
     public void setNegotiationHandler(INegotiationHandler handler) {
         negotiationHandler = handler;
     }
@@ -233,7 +228,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
             // FIXME should be passed in (colorID)
             session = new SarosSession(sessionID,
-                preferences.getFavoriteColorID(), sarosContext);
+                preferences.getFavoriteColorID(), applicationContext);
 
             sessionStarting(session);
             session.start();
@@ -268,7 +263,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         assert session == null;
 
         session = new SarosSession(id, host, clientColor, hostColor,
-            sarosContext);
+            applicationContext);
 
         log.info("joined uninitialized Saros session");
 
@@ -390,7 +385,7 @@ public class SarosSessionManager implements ISarosSessionManager {
                     .setRejectSessionNegotiationRequests(true);
 
                 negotiation = new IncomingSessionNegotiation(this, sessionID,
-                    from, version, invitationID, description, sarosContext);
+                    from, version, invitationID, description, applicationContext);
 
                 negotiation.setNegotiationListener(negotiationListener);
                 currentSessionNegotiations.add(negotiation);
@@ -435,7 +430,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
             try {
                 negotiation = new IncomingProjectNegotiation(negotiationID,
-                    from, session, projectInfos, sarosContext);
+                    from, session, projectInfos, applicationContext);
 
                 negotiation.setNegotiationListener(negotiationListener);
                 currentProjectNegotiations.add(negotiation);
@@ -482,7 +477,7 @@ public class SarosSessionManager implements ISarosSessionManager {
                     return;
 
                 negotiation = new OutgoingSessionNegotiation(toInvite, session,
-                    description, sarosContext);
+                    description, applicationContext);
 
                 negotiation.setNegotiationListener(negotiationListener);
                 currentSessionNegotiations.add(negotiation);
@@ -575,7 +570,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
                     OutgoingProjectNegotiation negotiation = new OutgoingProjectNegotiation(
                         user.getJID(), currentSession, projectsToShare,
-                        sarosContext);
+                        applicationContext);
 
                     negotiation.setNegotiationListener(negotiationListener);
                     currentProjectNegotiations.add(negotiation);
@@ -626,7 +621,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
             try {
                 negotiation = new OutgoingProjectNegotiation(user,
-                    currentSession, currentSharedProjects, sarosContext);
+                    currentSession, currentSharedProjects, applicationContext);
 
                 negotiation.setNegotiationListener(negotiationListener);
                 currentProjectNegotiations.add(negotiation);

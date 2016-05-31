@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.observables;
+package de.fu_berlin.inf.dpp.session;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,20 +9,16 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-
-// FIXME component of the SessionManager, should not be public accessible
 
 /**
  * Observable which keeps track of all {@link ProjectNegotiation project
  * negotiations} currently running.
  */
-@Component(module = "observables")
-public class ProjectNegotiationObservable {
+final class ProjectNegotiationObservable {
 
-    private static Logger LOG = Logger
+    private static final Logger LOG = Logger
         .getLogger(ProjectNegotiationObservable.class);
 
     private final Map<JID, List<ProjectNegotiation>> negotiations = new HashMap<JID, List<ProjectNegotiation>>();

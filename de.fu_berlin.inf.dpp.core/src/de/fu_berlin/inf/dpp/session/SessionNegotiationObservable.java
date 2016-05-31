@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.observables;
+package de.fu_berlin.inf.dpp.session;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,16 +9,14 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.negotiation.SessionNegotiation;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 /**
  * Observable which keeps track of all session negotiations currently running.
  */
-@Component(module = "observables")
 // TODO remove the ID part here, there should only be one invitation per JID
-public final class SessionNegotiationObservable {
+final class SessionNegotiationObservable {
 
     private static final Logger LOG = Logger
         .getLogger(SessionNegotiationObservable.class);
@@ -78,7 +76,7 @@ public final class SessionNegotiationObservable {
             negotiations.put(negotiation.getPeer(), currentNegotiations);
         }
 
-        if (currentNegotiations.size() >= 1)
+        if (!currentNegotiations.isEmpty())
             LOG.warn("there is already a running session negotiation for contact: "
                 + negotiation.getPeer());
 

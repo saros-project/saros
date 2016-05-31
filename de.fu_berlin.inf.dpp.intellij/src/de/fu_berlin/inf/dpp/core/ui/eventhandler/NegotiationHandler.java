@@ -24,7 +24,6 @@ import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.INegotiationHandler;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.SarosSessionManager;
 import org.apache.log4j.Logger;
 
 import java.text.MessageFormat;
@@ -42,8 +41,7 @@ public class NegotiationHandler implements INegotiationHandler {
         .getLogger(NegotiationHandler.class);
     private final ISarosSessionManager sessionManager;
 
-    // FIXME use ISarosSessionManager interface
-    public NegotiationHandler(SarosSessionManager sessionManager) {
+    public NegotiationHandler(ISarosSessionManager sessionManager) {
         sessionManager.setNegotiationHandler(this);
         this.sessionManager = sessionManager;
 

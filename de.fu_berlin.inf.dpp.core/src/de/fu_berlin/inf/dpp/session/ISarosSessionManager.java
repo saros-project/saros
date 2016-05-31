@@ -169,16 +169,14 @@ public interface ISarosSessionManager {
      */
     void postOutgoingInvitationCompleted(IProgressMonitor monitor, User newUser);
 
-    // FIXME add back
-    // /**
-    // * Sets the {@link INegotiationHandler negotiation handler} that will
-    // handle
-    // * incoming and outgoing session and project negotiations requests.
-    // *
-    // * @param handler
-    // * the handler to handle the request or <code>null</code> if the
-    // * requests should not be handled
-    // *
-    // */
-    // public void setNegotiationHandler(INegotiationHandler handler);
+    /**
+     * Sets the {@link INegotiationHandler negotiation handler} that will handle
+     * incoming and outgoing session and project negotiations requests.
+     * 
+     * @param handler
+     *            the handler to handle the request or <code>null</code> if the
+     *            requests should not be handled
+     * 
+     */
+    public void setNegotiationHandler(INegotiationHandler handler);
 }
