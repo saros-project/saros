@@ -17,6 +17,7 @@
  * updateState
  * updateAccounts
  * updateContacts
+ * updateProjectTrees
  *
  */
 

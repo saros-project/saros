@@ -7,7 +7,7 @@ var ProjectTreeNodes = AmpersandCollection.extend({
 var ProjectTreeNode = AmpersandState.extend({
 
     props: {
-        displayName: ['string', true],
+        label: ['string', true],
         path: ['object'],
         type: ['string', true],
         isSelectedForSharing: ['boolean', true, true]

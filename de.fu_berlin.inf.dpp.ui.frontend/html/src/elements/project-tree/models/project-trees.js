@@ -8,7 +8,6 @@ module.exports = AmpersandCollection.extend({
         var self = this;
 
         SarosApi.on('updateProjectTrees', function(data) {
-
             self.set(data);
         });
     },
