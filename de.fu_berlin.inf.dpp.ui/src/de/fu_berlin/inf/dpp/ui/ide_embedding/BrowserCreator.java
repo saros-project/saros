@@ -7,6 +7,8 @@ import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.ag_se.browser.swt.SWTJQueryBrowser;
 import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
+import de.fu_berlin.inf.dpp.ui.browser_functions.BrowserFunctions;
+import de.fu_berlin.inf.dpp.ui.browser_functions.TypedJavascriptFunction;
 import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
 import de.fu_berlin.inf.dpp.ui.pages.IBrowserPage;
 
@@ -14,6 +16,10 @@ import de.fu_berlin.inf.dpp.ui.pages.IBrowserPage;
  * This class represents the IDE-independent part of the browser creation. It
  * resorts to IDE-specific resource location however by using the correct
  * instance of {@link IUIResourceLocator} which is injected by PicoContainer.
+ * <p>
+ * During the creation of a {@link IJQueryBrowser} all
+ * {@link TypedJavascriptFunction}s that are registered in the
+ * {@link BrowserFunctions} are injected into this browser instance.
  */
 public class BrowserCreator {
 
@@ -22,7 +28,7 @@ public class BrowserCreator {
     private final IUIResourceLocator resourceLocator;
 
     /**
-     * Created by PicoContainer
+     * Injected via PicoContainer
      * 
      * @param browserManager
      * @param resourceLocator
@@ -67,9 +73,8 @@ public class BrowserCreator {
 
         browser.open(resourceLocation, 5000);
 
-        for (JavascriptFunction function : page.getJavascriptFunctions()) {
+        for (JavascriptFunction function : BrowserFunctions.getAll())
             browser.createBrowserFunction(function);
-        }
 
         browserManager.setBrowser(page, browser);
         browser.runOnDisposal(new Runnable() {

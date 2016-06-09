@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.ui.pages;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.dpp.ui.renderer.Renderer;
 
 /**
@@ -23,7 +22,6 @@ public abstract class AbstractBrowserPage implements IBrowserPage {
      */
     private String pageTitle;
 
-    private final List<JavascriptFunction> browserFunctions = new ArrayList<JavascriptFunction>();
     private final List<Renderer> renderers = new ArrayList<Renderer>();
 
     /**
@@ -52,19 +50,8 @@ public abstract class AbstractBrowserPage implements IBrowserPage {
     }
 
     @Override
-    public List<JavascriptFunction> getJavascriptFunctions() {
-        return browserFunctions;
-    }
-
-    @Override
     public List<Renderer> getRenderers() {
         return renderers;
-    }
-
-    protected void addBrowserFunctions(JavascriptFunction... browserfunctions) {
-        for (JavascriptFunction function : browserfunctions) {
-            this.browserFunctions.add(function);
-        }
     }
 
     protected void addRenderer(Renderer... renderers) {

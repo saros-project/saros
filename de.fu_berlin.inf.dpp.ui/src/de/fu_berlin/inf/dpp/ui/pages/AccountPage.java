@@ -2,8 +2,6 @@ package de.fu_berlin.inf.dpp.ui.pages;
 
 import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.HTMLUIStrings;
-import de.fu_berlin.inf.dpp.ui.browser_functions.CloseAccountWizard;
-import de.fu_berlin.inf.dpp.ui.browser_functions.SaveAccount;
 
 /**
  * Represents the wizard to manage accounts.
@@ -19,11 +17,8 @@ public class AccountPage extends AbstractBrowserPage {
      * 
      * @see HTMLUIContextFactory
      */
-    public AccountPage(SaveAccount saveAccount,
-        CloseAccountWizard closeAccountWizard) {
+    public AccountPage() {
         super(HTML_DOC_NAME, HTMLUIStrings.ADD_ACCOUNT_PAGE_TITLE);
-
-        this.addBrowserFunctions(closeAccountWizard, saveAccount);
         // No renderer used, so let renderers list be empty
     }
 }

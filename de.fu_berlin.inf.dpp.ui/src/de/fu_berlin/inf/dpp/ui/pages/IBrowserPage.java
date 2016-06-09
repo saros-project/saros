@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.ui.pages;
 
 import java.util.List;
 
-import de.fu_berlin.inf.ag_se.browser.functions.JavascriptFunction;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.IUIResourceLocator;
 import de.fu_berlin.inf.dpp.ui.renderer.Renderer;
 
@@ -48,14 +47,6 @@ public interface IBrowserPage {
      * @return the title
      */
     String getTitle();
-
-    /**
-     * Returns the usable {@link JavascriptFunction}s for the page.
-     * 
-     * @return list of JavascriptFunctions in this page
-     */
-
-    List<JavascriptFunction> getJavascriptFunctions();
 
     /**
      * Gets the list of {@link Renderer}s that can display application state in

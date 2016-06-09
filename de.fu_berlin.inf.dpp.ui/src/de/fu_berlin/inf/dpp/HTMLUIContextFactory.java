@@ -7,6 +7,7 @@ import java.util.Arrays;
 import org.picocontainer.MutablePicoContainer;
 
 import de.fu_berlin.inf.dpp.ui.browser_functions.AddContact;
+import de.fu_berlin.inf.dpp.ui.browser_functions.BrowserFunctions;
 import de.fu_berlin.inf.dpp.ui.browser_functions.CloseAccountWizard;
 import de.fu_berlin.inf.dpp.ui.browser_functions.CloseSessionInvitationWizard;
 import de.fu_berlin.inf.dpp.ui.browser_functions.ConnectAccount;
@@ -57,7 +58,8 @@ public class HTMLUIContextFactory extends AbstractSarosContextFactory {
     private void createBrowserfunctions() {
         // please use alphabetic order
         add(new Component[] { 
-            create(AddContact.class),
+            create(AddContact.class), 
+            create(BrowserFunctions.class), // List of all BFs
             create(CloseAccountWizard.class),
             create(CloseSessionInvitationWizard.class),
             create(ConnectAccount.class),
@@ -71,7 +73,7 @@ public class HTMLUIContextFactory extends AbstractSarosContextFactory {
             create(SendInvitation.class),
             // create(SetActiveAccount.class), //TODO: Will be added
             create(ShowAccountPage.class), 
-            create(ShowSessionWizard.class), });
+            create(ShowSessionWizard.class) });
     }
 
     private void createPages() {
