@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp;
 
+import static de.fu_berlin.inf.dpp.AbstractSarosContextFactory.Component.create;
+
 import java.util.Arrays;
 
 import org.picocontainer.MutablePicoContainer;
@@ -40,56 +42,76 @@ import de.fu_berlin.inf.dpp.ui.renderer.StateRenderer;
  */
 public class HTMLUIContextFactory extends AbstractSarosContextFactory {
 
+    private MutablePicoContainer container;
+
     @Override
     public void createComponents(MutablePicoContainer container) {
+        this.container = container;
+        createBrowserfunctions();
+        createPages();
+        createRenderer();
+        createFacades();
+        createMisc();
+    }
 
-        Component[] components = new Component[] {
-            // Pages
-            Component.create(MainPage.class),
-            Component.create(AccountPage.class),
-            Component.create(SessionWizardPage.class),
-            // Facades
-            Component.create(StateFacade.class),
-            Component.create(AccountStoreFacade.class),
-            // IDE_embedding
-            Component.create(BrowserCreator.class),
-            // Manager and Helper
-            Component.create(ProjectListManager.class),
-            Component.create(BrowserManager.class),
-            // Renderer
-            Component.create(StateRenderer.class),
-            Component.create(AccountRenderer.class),
-            Component.create(ProjectListRenderer.class),
-            // BrowserFunctions
-            // contact specific
-            Component.create(AddContact.class),
-            Component.create(DeleteContact.class),
-            Component.create(RenameContact.class),
-            // dialog specific
-            Component.create(ShowAccountPage.class),
-            Component.create(CloseAccountWizard.class),
-            Component.create(ShowSessionWizard.class),
-            Component.create(CloseSessionInvitationWizard.class),
-            // TODO: Eliminate inconsistent naming
-            // "ShowAccountPage" <-> "CloseAccountWizard".
-            // "ShowSessionWizard <-> "CloseSessionInvitationWizard". Don't
-            // forget ui.frontend
+    private void createBrowserfunctions() {
+        // please use alphabetic order
+        add(new Component[] { 
+            create(AddContact.class),
+            create(CloseAccountWizard.class),
+            create(CloseSessionInvitationWizard.class),
+            create(ConnectAccount.class),
+            // create(DeleteAccount.class), //TODO: Will be added
+            create(DeleteContact.class), 
+            create(DisconnectAccount.class),
+            // create(EditAccount.class), //TODO: Will be added
+            create(GetValidJID.class), 
+            create(RenameContact.class),
+            create(SaveAccount.class), 
+            create(SendInvitation.class),
+            // create(SetActiveAccount.class), //TODO: Will be added
+            create(ShowAccountPage.class), 
+            create(ShowSessionWizard.class), });
+    }
 
-            // account specific
-            Component.create(ConnectAccount.class),
-            Component.create(DisconnectAccount.class),
-            Component.create(SaveAccount.class),
-            // TODO: Add BrowserFunctions for alter accounts: "DeleteAccount"
-            // and "EditAccount"
+    private void createPages() {
+        add(new Component[] { 
+            create(AccountPage.class),
+            create(MainPage.class), 
+            create(SessionWizardPage.class) });
+    }
 
-            // session specific
-            Component.create(SendInvitation.class),
-            // TODO: add other session related browser functions like close
-            // session, add project to session, start chat, etc.
+    private void createRenderer() {
+        add(new Component[] { 
+            create(AccountRenderer.class),
+            create(StateRenderer.class), 
+            create(ProjectListRenderer.class) });
+    }
 
-            // other
-            Component.create(GetValidJID.class) };
+    private void createFacades() {
+        add(new Component[] { 
+            create(AccountStoreFacade.class),
+            create(StateFacade.class) });
+    }
 
+    /**
+     * For UI components that fits no where else.
+     */
+    private void createMisc() {
+        // TODO: Dodgy naming
+        add(new Component[] { 
+            create(BrowserCreator.class),
+            create(BrowserManager.class), 
+            create(ProjectListManager.class) });
+    }
+
+    /**
+     * Add the components to the container
+     * 
+     * @param components
+     *            to add
+     */
+    private void add(Component[] components) {
         for (Component component : Arrays.asList(components)) {
             container.addComponent(component.getBindKey(),
                 component.getImplementation());
