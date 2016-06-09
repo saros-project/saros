@@ -1,6 +1,6 @@
 var AmpersandView = require('ampersand-view');
 var tmpl = require('./contacts.jade');
-var ContactView = require('./models/contact');
+var ContactView = require('./contact');
 var dictionary = require('../../dictionary');
 
 module.exports = AmpersandView.extend({
