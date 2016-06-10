@@ -12,13 +12,13 @@ module.exports = AmpersandWizard.extend({
     // engine can use it.
     d: dictionary,
     autoRender: true,
-    events: {
-        'contextmenu': 'handleContextmenu'
-    },
+    // Inherit all events from the WizardView Prototype
+    events: WizardView.prototype.events,
     subviews: {
         projectTrees: {
             hook: 'project-trees-container',
             prepareView: function(el) {
+
                 return new SelectableProjectTreesView({
                     el: el,
                     collection: app.projectTrees
@@ -42,7 +42,7 @@ module.exports = AmpersandWizard.extend({
         var contacts = this.contacts.getValue();
         var projectTrees = this.projectTrees.getValue();
 
-        //TODO: SarosApi.???
+        SarosApi.sendInvitation(projectTrees, contacts);
     },
     cancel: function() {
 
