@@ -29,11 +29,9 @@ module.exports = AmpersandWizard.extend({
             hook: 'contacts-container',
             prepareView: function(el) {
 
-                var contacts = app.state.contactList.getAvailable();
-
                 return new SelectableContactsView({
                     el: el,
-                    collection: contacts
+                    collection: app.state.contactList
                 });
             }
         }

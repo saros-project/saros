@@ -12,6 +12,11 @@ module.exports = AmpersandView.extend({
     },
     bindings: {
         'model.displayName': '[data-hook=display-name]',
+        'model.isAvailable': {
+            type: 'booleanClass',
+            name: 'disabled',
+            invert: true
+        },
         'model.isSelected': {
             type: 'booleanClass',
             name: 'active'
@@ -22,6 +27,8 @@ module.exports = AmpersandView.extend({
     },
     toggleSelect: function(event) {
 
-        this.model.isSelected = !this.model.isSelected;
+        if(this.model.isAvailable){
+            this.model.isSelected = !this.model.isSelected;
+        }
     }
 });
