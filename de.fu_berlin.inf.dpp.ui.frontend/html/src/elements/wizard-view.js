@@ -3,7 +3,7 @@ var bindAll = require('lodash.bindall');
 var forEach = require('lodash.foreach');
 var AmpersandView = require('ampersand-view');
 
-var errorPrefix = 'Wizard: ';
+var errorPrefix = 'WizardView: ';
 
 module.exports = AmpersandView.extend({
 
@@ -80,7 +80,8 @@ module.exports = AmpersandView.extend({
         'click button[data-hook=back]': 'back',
         'click button[data-hook=next]': 'next',
         'click button[data-hook=finish]': 'finish',
-        'click button[data-hook=cancel]': 'cancel'
+        'click button[data-hook=cancel]': 'cancel',
+        'contextmenu': 'handleContextmenu'
     },
     render: function() {
 
@@ -116,5 +117,9 @@ module.exports = AmpersandView.extend({
     },
     cancel: function() {
 
+    },
+    handleContextmenu: function(e) {
+
+        e.preventDefault();
     }
 });

@@ -1,12 +1,12 @@
 var app = require('ampersand-app');
 var bindAll = require('lodash.bindall');
-var AmpersandWizard = require('../../elements/wizard');
+var WizardView = require('../../elements/wizard-view');
 var tmpl = require('./start-session-wizard.jade');
 var SelectableProjectTreesView = require('../../elements/project-tree/selectable-project-trees');
 var SelectableContactsView = require('../../elements/contact/selectable-contacts');
 var dictionary = require('../../dictionary');
 
-module.exports = AmpersandWizard.extend({
+module.exports = WizardView.extend({
     template: tmpl,
     // Add the dictionary to the context so that the template
     // engine can use it.
@@ -47,9 +47,5 @@ module.exports = AmpersandWizard.extend({
     cancel: function() {
 
         SarosApi.closeStartSessionWizard();
-    },
-    handleContextmenu: function(e) {
-
-        e.preventDefault();
     }
 });
