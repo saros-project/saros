@@ -36,7 +36,7 @@
     "lint": "jshint js --exclude src/templates.js",
     "test": "mocha test/",
     "ci-test": "mocha test/ --reporter xunit > test-reports.xml",
-    "createdist": "mkdirp dist/bundle/ dist/css dist/fonts",
-    "copysrcs": "cp src/pages/*/*.html dist/ && cp src/css/*.* dist/css/ && cp src/fonts/*.* dist/fonts/"
+    "createdist": "mkdirp dist/bundle/ dist/css dist/fonts dist/images",
+    "copysrcs": "cp src/pages/*/*.html dist/ && cp src/css/*.* dist/css/ && cp src/fonts/*.* dist/fonts/ && cp src/images/*.* dist/images/"
   }
 }
