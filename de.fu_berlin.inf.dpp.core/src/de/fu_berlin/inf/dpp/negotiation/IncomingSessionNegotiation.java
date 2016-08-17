@@ -126,7 +126,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
             checkCancellation(CancelOption.NOTIFY_PEER);
 
             /**
-             * @JTourBusStop 9, Invitation Process:
+             * @JTourBusStop 8, Invitation Process:
              * 
              *               This method is called by the JoinSessionWizard
              *               after the user clicked on "Finish" (indicating that

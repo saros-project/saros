@@ -97,7 +97,7 @@ public class EditorManager extends AbstractActivityProducer implements
     IEditorManager {
 
     /**
-     * @JTourBusStop 5, Some Basics:
+     * @JTourBusStop 6, Some Basics:
      * 
      *               When you work on a project using Saros, you still use the
      *               standard Eclipse Editor, however Saros adds a little extra

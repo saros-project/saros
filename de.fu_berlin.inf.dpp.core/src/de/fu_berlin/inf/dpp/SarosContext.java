@@ -42,10 +42,10 @@ import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 
 /**
- * @JTourBusStop 4, Some Basics:
+ * @JTourBusStop 5, Some Basics:
  * 
  *               If you haven't already read about PicoContainer, stop and
- *               do so now (http://picocontainer.codehaus.org).
+ *               do so now (http://picocontainer.com/introduction.html).
  * 
  *               Saros uses PicoContainer to manage dependencies on our
  *               behalf. The SarosContext class encapsulates our usage of

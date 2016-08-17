@@ -272,7 +272,7 @@ public class NegotiationHandler implements INegotiationHandler {
             @Override
             public void run() {
                 /**
-                 * @JTourBusStop 8, Invitation Process:
+                 * @JTourBusStop 7, Invitation Process:
                  * 
                  *               (4a) The SessionManager then hands over the
                  *               control to the NegotiationHandler (this class)

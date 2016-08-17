@@ -240,7 +240,7 @@ final class NegotiationPacketListener {
 
         /* *
          * 
-         * @JTourBusStop 7, Invitation Process:
+         * @JTourBusStop 6, Invitation Process:
          * 
          * (3b) If the invited user (from now on referred to as "client")
          * receives an invitation (and if he is not already in a running

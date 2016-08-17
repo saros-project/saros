@@ -84,7 +84,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
     }
 
     /**
-     * @JTourBusStop 5, Invitation Process:
+     * @JTourBusStop 4, Invitation Process:
      * 
      *               The details of the invitation process are implemented in
      *               the negotiation package. OutgoingSessionNegotiation is an
@@ -120,7 +120,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
 
         try {
             /**
-             * @JTourBusStop 6, Invitation Process:
+             * @JTourBusStop 5, Invitation Process:
              * 
              *               For starting a session, the host does the following
              *               things (see next JTourBusStops for the
