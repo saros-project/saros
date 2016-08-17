@@ -18,7 +18,6 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.widgets.SimpleNoteComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.wizard.EnterXMPPAccountComposite;
-import de.fu_berlin.inf.dpp.ui.wizards.CreateXMPPAccountWizard;
 
 /**
  * Allows the user to enter an XMPP account defined by a {@link JID}, a password
@@ -37,10 +36,10 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
     private EnterXMPPAccountComposite enterXMPPAccountComposite;
 
     /**
-     * True if the entered account was freshly created by the
-     * {@link CreateXMPPAccountWizard}.
+     * True if the entered account already exists in the
+     * {@linkplain XMPPAccountStore}.
      */
-    private boolean isXMPPAccountCreated = false;
+    private boolean isExistingAccount = false;
 
     /**
      * This flag is true if {@link JID} was already valid.
@@ -133,26 +132,42 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
     /**
      * Fills out the account credentials required by this page using the given
      * account.
+     * <p>
+     * <b>Note:</b> It is the callers responsibility to ensure that the account
+     * already exists if this method is called with
+     * <code>isExistingAccount=true</code> .
      * 
      * @param account
      *            the account whose credentials to use
-     * @param disableInput
+     * @param isExistingAccount
      *            if <code>true</code> it will no longer be possible to fill out
      *            the credentials manually, in other words the user input fields
      *            for inserting account credentials will be disabled
      */
-    public void setAccount(XMPPAccount account, boolean disableInput) {
+    public void setAccount(XMPPAccount account, boolean isExistingAccount) {
         if (account == null)
             return;
 
-        enterXMPPAccountComposite.setEnabled(!disableInput);
+        enterXMPPAccountComposite.setEnabled(!isExistingAccount);
         enterXMPPAccountComposite.setJID(new JID(account.getUsername(), account
             .getDomain()));
+
         enterXMPPAccountComposite.setPassword(account.getPassword());
+
+        /*
+         * TODO this is currently only called when an account was registered so
+         * the server and port values are always not set, same applies to TLS
+         * and SASL
+         */
+
         enterXMPPAccountComposite.setServer("");
         enterXMPPAccountComposite.setPort("");
+
         enterXMPPAccountComposite.setUsingTLS(true);
         enterXMPPAccountComposite.setUsingSASL(true);
+
+        this.isExistingAccount = isExistingAccount;
+        updatePageCompletion();
     }
 
     private void updatePageCompletion() {
@@ -162,7 +177,8 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
         else
             setMessage(null);
 
-        if (isXMPPAccountCreated) {
+        if (isExistingAccount) {
+            setErrorMessage(null);
             setPageComplete(true);
             return;
         }
@@ -295,11 +311,11 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
     }
 
     /**
-     * True if the entered account was freshly created by the
-     * {@link CreateXMPPAccountWizard}.
+     * True if the entered account already exists in the
+     * {@link XMPPAccountStore}.
      */
-    public boolean isXMPPAccountCreated() {
-        return isXMPPAccountCreated;
+    public boolean isExistingAccount() {
+        return isExistingAccount;
     }
 
     /**

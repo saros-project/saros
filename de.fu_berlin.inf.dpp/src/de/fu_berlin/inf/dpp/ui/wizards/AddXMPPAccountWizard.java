@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.ui.wizards;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.wizard.Wizard;
 import org.picocontainer.annotations.Inject;
 
@@ -11,7 +10,7 @@ import de.fu_berlin.inf.dpp.account.XMPPAccount;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.EnterXMPPAccountWizardPage;
@@ -29,7 +28,7 @@ public class AddXMPPAccountWizard extends Wizard {
         .getLogger(AddXMPPAccountWizard.class);
 
     @Inject
-    private IPreferenceStore store;
+    private Preferences preferences;
 
     @Inject
     private XMPPAccountStore accountStore;
@@ -55,14 +54,21 @@ public class AddXMPPAccountWizard extends Wizard {
 
     @Override
     public boolean performFinish() {
-        addXMPPAccount();
+        if (!enterXMPPAccountWizardPage.isExistingAccount())
+            addXMPPAccount();
+
+        assert accountStore.getActiveAccount() != null;
+
+        if (preferences.isAutoConnecting())
+            autoConnectXMPPAccount();
+
         return true;
     }
 
     @Override
     public boolean performCancel() {
 
-        if (!enterXMPPAccountWizardPage.isXMPPAccountCreated())
+        if (!enterXMPPAccountWizardPage.isExistingAccount())
             return true;
 
         return MessageDialog.openQuestion(getShell(),
@@ -77,36 +83,34 @@ public class AddXMPPAccountWizard extends Wizard {
      */
     private void addXMPPAccount() {
 
-        if (!enterXMPPAccountWizardPage.isXMPPAccountCreated()) {
-            JID jid = enterXMPPAccountWizardPage.getJID();
+        JID jid = enterXMPPAccountWizardPage.getJID();
 
-            String username = jid.getName();
-            String password = enterXMPPAccountWizardPage.getPassword();
-            String domain = jid.getDomain().toLowerCase();
-            String server = enterXMPPAccountWizardPage.getServer();
+        String username = jid.getName();
+        String password = enterXMPPAccountWizardPage.getPassword();
+        String domain = jid.getDomain().toLowerCase();
+        String server = enterXMPPAccountWizardPage.getServer();
 
-            int port;
+        int port;
 
-            if (enterXMPPAccountWizardPage.getPort().length() != 0)
-                port = Integer.valueOf(enterXMPPAccountWizardPage.getPort());
-            else
-                port = 0;
+        if (enterXMPPAccountWizardPage.getPort().length() != 0)
+            port = Integer.valueOf(enterXMPPAccountWizardPage.getPort());
+        else
+            port = 0;
 
-            boolean useTLS = enterXMPPAccountWizardPage.isUsingTLS();
-            boolean useSASL = enterXMPPAccountWizardPage.isUsingSASL();
+        boolean useTLS = enterXMPPAccountWizardPage.isUsingTLS();
+        boolean useSASL = enterXMPPAccountWizardPage.isUsingSASL();
 
-            accountStore.createAccount(username, password, domain, server,
-                port, useTLS, useSASL);
-        }
+        accountStore.createAccount(username, password, domain, server, port,
+            useTLS, useSASL);
+    }
 
-        if (accountStore.getAllAccounts().size() == 1
-            && store.getBoolean(PreferenceConstants.AUTO_CONNECT))
-            ThreadUtils.runSafeAsync("dpp-connect-demand", LOG, new Runnable() {
-                @Override
-                public void run() {
-                    connectionHandler.connect(accountStore.getActiveAccount(),
-                        false);
-                }
-            });
+    private void autoConnectXMPPAccount() {
+        ThreadUtils.runSafeAsync("dpp-connect-demand", LOG, new Runnable() {
+            @Override
+            public void run() {
+                connectionHandler.connect(accountStore.getActiveAccount(),
+                    false);
+            }
+        });
     }
 }
