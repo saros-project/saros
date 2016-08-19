@@ -109,7 +109,6 @@ public class ExplanatoryComposite extends Composite {
     public void showExplanation(ExplanationComposite composite) {
 
         if (composite == null) {
-            Control contentControl = this.getContentControl();
             if (contentControl == null)
                 throw new IllegalStateException(
                     "The content control was not set!", null);

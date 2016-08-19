@@ -124,7 +124,7 @@ public final class RosterContentProvider extends TreeContentProvider {
         if (!(inputElement instanceof Roster))
             return new Object[0];
 
-        Roster roster = (Roster) inputElement;
+        Roster inputRoster = (Roster) inputElement;
         final List<Object> elements = new ArrayList<Object>();
 
         /*
@@ -140,7 +140,7 @@ public final class RosterContentProvider extends TreeContentProvider {
          * so always display alice@foo/Saros
          */
 
-        for (RosterGroup group : roster.getGroups()) {
+        for (RosterGroup group : inputRoster.getGroups()) {
             elements.add(new RosterGroupElement(group,
                 filterRosterEntryElements(
                     createRosterEntryElements(group.getEntries())).toArray(
@@ -148,7 +148,7 @@ public final class RosterContentProvider extends TreeContentProvider {
         }
 
         elements
-            .addAll(filterRosterEntryElements(createRosterEntryElements(roster
+            .addAll(filterRosterEntryElements(createRosterEntryElements(inputRoster
                 .getUnfiledEntries())));
 
         return elements.toArray();

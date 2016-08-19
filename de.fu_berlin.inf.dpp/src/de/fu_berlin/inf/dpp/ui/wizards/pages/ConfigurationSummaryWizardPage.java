@@ -219,7 +219,7 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
 
         boolean uPnPEnabled = configurationPage.getPortmappingDevice() != null;
 
-        String skypeUsername = configurationPage.isSkypeUsage() ? configurationPage
+        String currentSkypeUsername = configurationPage.isSkypeUsage() ? configurationPage
             .getSkypeUsername() : ""; //$NON-NLS-1$
 
         boolean statisticSubmissionAllowed = configurationPage
@@ -266,14 +266,14 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
                     de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_use_upnp_not));
         }
 
-        if (!skypeUsername.isEmpty()) {
+        if (!currentSkypeUsername.isEmpty()) {
             this.skypeUsername
                 .setContent(new IllustratedText(
                     ImageManager.ELCL_CONTACT_SKYPE_CALL,
                     MessageFormat
                         .format(
                             de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_skype_show_username,
-                            skypeUsername)));
+                            currentSkypeUsername)));
         } else {
             this.skypeUsername
                 .setContent(new IllustratedText(

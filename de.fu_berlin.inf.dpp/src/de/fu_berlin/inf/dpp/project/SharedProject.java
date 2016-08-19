@@ -196,10 +196,10 @@ public class SharedProject {
                     resource.getFullPath().toPortableString());
 
                 if (syncChanged) {
-                    VCSAdapter vcs = VCSAdapter.getAdapter(resource
+                    VCSAdapter currentVcs = VCSAdapter.getAdapter(resource
                         .getProject());
-                    if (vcs.isManaged(resource)) {
-                        VCSResourceInfo info = vcs.getResourceInfo(resource);
+                    if (currentVcs.isManaged(resource)) {
+                        VCSResourceInfo info = currentVcs.getResourceInfo(resource);
                         result.append(format(" ({0}:{1})", info.getURL(), //$NON-NLS-1$
                             info.getRevision()));
                     }
@@ -223,13 +223,13 @@ public class SharedProject {
 
         projectIsOpen.update(project.isOpen());
 
-        boolean hasWriteAccess = sarosSession.hasWriteAccess();
-        this.hasWriteAccess.update(hasWriteAccess);
+        boolean userHasWriteAccess = sarosSession.hasWriteAccess();
+        this.hasWriteAccess.update(userHasWriteAccess);
 
         if (sarosSession.useVersionControl()) {
             sarosSession.addListener(sessionListener);
         }
-        if (hasWriteAccess) {
+        if (userHasWriteAccess) {
             initializeResources();
         }
     }
@@ -246,9 +246,9 @@ public class SharedProject {
         if (!sarosSession.useVersionControl())
             return;
 
-        VCSAdapter vcs = VCSAdapter.getAdapter(project);
-        this.vcs.update(vcs);
-        if (vcs == null)
+        VCSAdapter currentVcs = VCSAdapter.getAdapter(project);
+        this.vcs.update(currentVcs);
+        if (currentVcs == null)
             return;
         if (log.isTraceEnabled()) {
             RepositoryProvider provider = RepositoryProvider
@@ -263,7 +263,7 @@ public class SharedProject {
         for (IPath path : paths) {
             IResource resource = project.findMember(path);
             assert resource != null : "Resource not found at " + path;
-            VCSResourceInfo info = vcs.getResourceInfo(resource);
+            VCSResourceInfo info = currentVcs.getResourceInfo(resource);
 
             updateVcsUrl(resource, info.getURL());
             updateRevision(resource, info.getRevision());
@@ -409,7 +409,7 @@ public class SharedProject {
     public boolean checkIntegrity() {
         boolean illegalState = false;
         Set<Entry<IPath, ResourceInfo>> entrySet = resourceMap.entrySet();
-        final VCSAdapter vcs = this.vcs.getValue();
+        final VCSAdapter vcsAdapter = this.vcs.getValue();
         final String projectName = project.getName();
         for (Entry<IPath, ResourceInfo> entry : entrySet) {
             IPath path = entry.getKey();
@@ -424,10 +424,10 @@ public class SharedProject {
                 continue;
             }
             assert resource.exists();
-            if (vcs == null)
+            if (vcsAdapter == null)
                 continue;
 
-            VCSResourceInfo expected = vcs.getResourceInfo(resource);
+            VCSResourceInfo expected = vcsAdapter.getResourceInfo(resource);
             ResourceInfo found = entry.getValue();
             String foundUrl = found.vcsUrl.getValue();
             String foundRevision = found.vcsRevision.getValue();
@@ -464,8 +464,8 @@ public class SharedProject {
                     logIllegalStateException(msg);
                     result = true;
                     add(resource);
-                    if (vcs != null) {
-                        final VCSResourceInfo info = vcs
+                    if (vcsAdapter != null) {
+                        final VCSResourceInfo info = vcsAdapter
                             .getResourceInfo(resource);
                         updateRevision(resource, info.getRevision());
                         updateVcsUrl(resource, info.getURL());

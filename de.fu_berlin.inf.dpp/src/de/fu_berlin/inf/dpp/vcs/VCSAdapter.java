@@ -61,8 +61,8 @@ public abstract class VCSAdapter implements VCSProvider {
      */
     public String getProviderID(IResource resource) {
         IProject project = resource.getProject();
-        RepositoryProvider provider = RepositoryProvider.getProvider(project);
-        String vcsIdentifier = provider.getID();
+        RepositoryProvider currentProvider = RepositoryProvider.getProvider(project);
+        String vcsIdentifier = currentProvider.getID();
 
         return vcsIdentifier;
     }

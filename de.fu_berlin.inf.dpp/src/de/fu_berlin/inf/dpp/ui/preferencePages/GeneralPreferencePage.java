@@ -108,20 +108,15 @@ public final class GeneralPreferencePage extends FieldEditorPreferencePage
      * Creates the account-list, buttons and the 'activeUserLabel'.
      */
     private void createAccountsGroup() {
-        accountGroup = createGroupWithGridLayout(COLUMNS_IN_ACCOUNTGROUP,
-            ACCOUNT_GROUP_TITLE);
+        accountGroup = new Group(parent, SWT.NONE);
+        accountGroup.setLayout(new GridLayout(COLUMNS_IN_ACCOUNTGROUP, false));
+        accountGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
+            false));
+        accountGroup.setText(ACCOUNT_GROUP_TITLE);
+
         createAccountList(accountGroup);
         createAccountListControls(accountGroup);
         createInfoLabel(accountGroup);
-    }
-
-    private Group createGroupWithGridLayout(int numColumns, String title) {
-        Group accountGroup = new Group(parent, SWT.NONE);
-        accountGroup.setLayout(new GridLayout(numColumns, false));
-        accountGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
-            false));
-        accountGroup.setText(title);
-        return accountGroup;
     }
 
     /*

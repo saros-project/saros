@@ -90,8 +90,8 @@ public class IllustratedComposite extends MinSizeComposite {
         this.addPaintListener(new PaintListener() {
             @Override
             public void paintControl(PaintEvent e) {
-                Image image = IllustratedComposite.this.image;
-                if (image == null || image.isDisposed())
+                Image currentImage = IllustratedComposite.this.image;
+                if (currentImage == null || currentImage.isDisposed())
                     return;
 
                 Rectangle clientArea = IllustratedComposite.this.cachedClientArea;
@@ -108,11 +108,11 @@ public class IllustratedComposite extends MinSizeComposite {
                 if (IllustratedComposite.this.getChildren().length == 0) {
                     // If no child elements exist, place the icon in the center
                     // of the canvas
-                    x = (bounds.width - image.getBounds().width) / 2;
-                    y = (bounds.height - image.getBounds().height) / 2;
+                    x = (bounds.width - currentImage.getBounds().width) / 2;
+                    y = (bounds.height - currentImage.getBounds().height) / 2;
                 } else {
-                    x = clientArea.x - image.getBounds().width - getSpacing();
-                    y = (bounds.height - image.getBounds().height) / 2;
+                    x = clientArea.x - currentImage.getBounds().width - getSpacing();
+                    y = (bounds.height - currentImage.getBounds().height) / 2;
                 }
 
                 /*
@@ -123,7 +123,7 @@ public class IllustratedComposite extends MinSizeComposite {
                 } else if ((style & SWT.CENTER) != 0) {
                     // y is already centered
                 } else if ((style & SWT.BOTTOM) != 0) {
-                    y = bounds.height - image.getBounds().height;
+                    y = bounds.height - currentImage.getBounds().height;
                 }
 
                 /*
@@ -133,7 +133,7 @@ public class IllustratedComposite extends MinSizeComposite {
                 if (hBar != null && hBar.isVisible())
                     y -= hBar.getSize().y / 2;
 
-                e.gc.drawImage(image, x, y);
+                e.gc.drawImage(currentImage, x, y);
             }
         });
     }

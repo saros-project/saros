@@ -61,9 +61,9 @@ public class EnterXMPPAccountComposite extends Composite {
         Label jidLabel = new Label(this, SWT.NONE);
         jidLabel.setText(Messages.jid_shortform);
 
-        Combo jidCombo = new Combo(this, SWT.BORDER);
-        jidCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-        this.jidCombo = new JIDCombo(jidCombo);
+        Combo combo = new Combo(this, SWT.BORDER);
+        combo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+        this.jidCombo = new JIDCombo(combo);
 
         /*
          * Row 2: Password

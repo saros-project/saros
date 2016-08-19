@@ -415,7 +415,7 @@ public class AddProjectToSessionWizard extends Wizard {
     private void showCancelMessage(JID jid, String errorMsg,
         CancelLocation cancelLocation) {
 
-        final String peer = jid.getBase();
+        final String peerJid = jid.getBase();
         final Shell shell = SWTUtils.getShell();
 
         if (errorMsg != null) {
@@ -438,7 +438,7 @@ public class AddProjectToSessionWizard extends Wizard {
                         MessageFormat
                             .format(
                                 Messages.AddProjectToSessionWizard_invitation_canceled_text2,
-                                peer, errorMsg));
+                                peerJid, errorMsg));
             }
         } else {
             switch (cancelLocation) {
@@ -452,7 +452,7 @@ public class AddProjectToSessionWizard extends Wizard {
                         MessageFormat
                             .format(
                                 Messages.AddProjectToSessionWizard_invitation_canceled_text3,
-                                peer));
+                                peerJid));
             }
         }
     }

@@ -1086,7 +1086,7 @@ public class EditorManager extends AbstractActivityProducer implements
         LOG.trace(".partInputChanged invoked");
 
         // notice currently followed user before closing the editor
-        User followedUser = getFollowedUser();
+        User currentFollowedUser = getFollowedUser();
 
         if (editorPool.isManaged(editorPart)) {
 
@@ -1104,8 +1104,9 @@ public class EditorManager extends AbstractActivityProducer implements
 
             // restore the previously followed user
             // in case it was set and has changed
-            if (followedUser != null && followedUser != getFollowedUser())
-                setFollowing(followedUser);
+            if (currentFollowedUser != null
+                && currentFollowedUser != getFollowedUser())
+                setFollowing(currentFollowedUser);
         }
     }
 
@@ -1894,9 +1895,9 @@ public class EditorManager extends AbstractActivityProducer implements
             return;
 
         IDocument document = viewer.getDocument();
-        LineRange localViewport = EditorAPI.getViewport(viewer);
+        LineRange viewportOfViewer = EditorAPI.getViewport(viewer);
 
-        if (localViewport == null || document == null)
+        if (viewportOfViewer == null || document == null)
             return;
 
         int lines = document.getNumberOfLines();
@@ -1935,7 +1936,7 @@ public class EditorManager extends AbstractActivityProducer implements
 
         // top line of the new viewport
         int topPosition;
-        int localLines = localViewport.getNumberOfLines();
+        int localLines = viewportOfViewer.getNumberOfLines();
         int remoteLines = rangeBottom - rangeTop;
         int sizeDiff = remoteLines - localLines;
 

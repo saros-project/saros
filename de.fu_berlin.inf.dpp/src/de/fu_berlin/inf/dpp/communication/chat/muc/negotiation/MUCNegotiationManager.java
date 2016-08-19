@@ -87,13 +87,13 @@ public class MUCNegotiationManager {
 
             final String service = settings.get(KEY_SERVICE);
             final String roomname = settings.get(KEY_ROOMNAME);
-            final String password = settings.get(KEY_PASSWORD);
+            final String actualPassword = settings.get(KEY_PASSWORD);
 
-            if (service == null || roomname == null || password == null)
+            if (service == null || roomname == null || actualPassword == null)
                 return;
 
             setSessionPreferences(new MultiUserChatPreferences(service,
-                roomname, password));
+                roomname, actualPassword));
         }
 
         @Override
