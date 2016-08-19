@@ -141,11 +141,14 @@ public class IntelliJProjectImpl implements IProject {
     public void removeFile(File file) {
         if (file.isDirectory()) {
             IFolder folder = new IntelliJFolderImpl(this, file);
-            folderMap.remove(folder);
+            String key = folder.getProjectRelativePath().toString();
+            folderMap.remove(key);
+            resourceMap.remove(folder.getProjectRelativePath());
         }
 
         if (file.isFile()) {
             IFile myFile = new IntelliJFileImpl(this, file);
+            fileMap.remove(myFile.getProjectRelativePath().toString());
             resourceMap.remove(myFile.getProjectRelativePath());
         }
     }
