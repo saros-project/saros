@@ -127,7 +127,7 @@ public class JoinSessionWizard extends Wizard {
             if (cause == null)
                 cause = e;
 
-            showCancelMessageAsync(isn.getPeer(), e.getMessage(),
+            showCancelMessageAsync(isn.getPeer(), cause.getMessage(),
                 CancelLocation.LOCAL);
 
             // give up, close the wizard as we cannot do anything here !
