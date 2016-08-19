@@ -260,7 +260,7 @@ public abstract class BaseResourceSelectionComposite extends
         StringBuilder checkedString = new StringBuilder();
 
         for (Object resource : checked) {
-            if (checkboxTreeViewer.getGrayed(resource) == false) {
+            if (!checkboxTreeViewer.getGrayed(resource)) {
                 checkedString.append(((IResource) resource).getFullPath())
                     .append(SERIALIZATION_SEPARATOR);
             }

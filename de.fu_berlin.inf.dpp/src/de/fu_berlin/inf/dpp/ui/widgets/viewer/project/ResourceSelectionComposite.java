@@ -264,14 +264,14 @@ public class ResourceSelectionComposite extends BaseResourceSelectionComposite {
                 }
 
                 if (savedSelectionNames.contains(theName)
-                    && DialogUtils
+                    && !DialogUtils
                         .openQuestionMessageDialog(
                             getShell(),
                             Messages.ResourceSelectionComposite_overwrite_dialog_title,
                             MessageFormat
                                 .format(
                                     Messages.ResourceSelectionComposite_overwrite_dialog_message,
-                                    theName)) == false) {
+                                    theName))) {
                     return;
                 }
 
@@ -311,14 +311,14 @@ public class ResourceSelectionComposite extends BaseResourceSelectionComposite {
                     return;
                 }
 
-                if (DialogUtils
+                if (!DialogUtils
                     .openQuestionMessageDialog(
                         getShell(),
                         Messages.ResourceSelectionComposite_delete_dialog_title,
                         MessageFormat
                             .format(
                                 Messages.ResourceSelectionComposite_delete_dialog_message,
-                                theName)) == false) {
+                                theName))) {
                     return;
                 }
 

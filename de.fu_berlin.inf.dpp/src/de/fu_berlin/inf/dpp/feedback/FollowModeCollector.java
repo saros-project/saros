@@ -116,7 +116,7 @@ public class FollowModeCollector extends AbstractStatisticCollector {
             .iterator(); iterator.hasNext();) {
             FollowModeToggleEvent currentEntry = iterator.next();
 
-            if (currentEntry.enabled == true) {
+            if (currentEntry.enabled) {
                 timeFollowModeEnabled = currentEntry.time;
             } else {
                 timeInFollowMode += getDiffTime(timeFollowModeEnabled,

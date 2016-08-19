@@ -64,7 +64,7 @@ module.exports = AmpersandState.extend({
             deps: ['connectionState'],
             fn: function() {
 
-                return this.connectionState == CS.CONNECTED;
+                return this.connectionState === CS.CONNECTED;
             }
         },
 
@@ -72,7 +72,7 @@ module.exports = AmpersandState.extend({
             deps: ['connectionState'],
             fn: function() {
 
-                return this.connectionState == CS.CONNECTING || this.connectionState == CS.DISCONNECTING;
+                return this.connectionState === CS.CONNECTING || this.connectionState === CS.DISCONNECTING;
             }
         },
 
@@ -88,7 +88,6 @@ module.exports = AmpersandState.extend({
                 return !this.isBusy;
             }
         },        
-
         activeAccountLabel: {
             deps: ['activeAccount.jid'],
             fn: function() {
@@ -104,15 +103,15 @@ module.exports = AmpersandState.extend({
             deps: ['connectionState'],
             fn: function() {
 
-                if (this.connectionState == CS.DISCONNECTING) {
+                if (this.connectionState === CS.DISCONNECTING) {
                     return dictionary.action.disconnecting;
                 } 
 
-                if (this.connectionState == CS.CONNECTING) {
+                if (this.connectionState === CS.CONNECTING) {
                     return dictionary.action.connecting;
                 } 
 
-                if (this.connectionState == CS.CONNECTED) {
+                if (this.connectionState === CS.CONNECTED) {
                     return dictionary.action.disconnect;
                 }
 
@@ -145,10 +144,10 @@ module.exports = AmpersandState.extend({
     updateConnectionState: function() {
 
         if (this.isConnected) {
-            this.connectionState == CS.DISCONNECTING;
+            this.connectionState === CS.DISCONNECTING;
             SarosApi.disconnect();
         } else {
-            this.connectionState == CS.CONNECTING;
+            this.connectionState === CS.CONNECTING;
             SarosApi.connect(this.activeAccount.toJSON());
         }
     }
