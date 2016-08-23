@@ -458,7 +458,7 @@ public final class ChatControl extends Composite {
 
         switch (type) {
         case MESSAGE:
-            message = element.getMessage().getBody();
+            message = element.getMessage();
             break;
         case JOIN:
             message = Messages.ChatRoomsComposite_joined_the_chat;

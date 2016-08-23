@@ -54,7 +54,7 @@ public class VersionManager {
      */
     private volatile Map<Version, List<Version>> compatibilityChart = new HashMap<Version, List<Version>>();
 
-    private final Version version;
+    private final Version localVersion;
     private final ITransmitter transmitter;
     private final IReceiver receiver;
 
@@ -80,7 +80,7 @@ public class VersionManager {
 
             createResponseData: {
 
-                versionExchangeResponse.set(VERSION_KEY, version.toString());
+                versionExchangeResponse.set(VERSION_KEY, localVersion.toString());
                 versionExchangeResponse.set(COMPATIBILITY_KEY,
                     String.valueOf(Compatibility.UNKNOWN.getCode()));
 
@@ -103,7 +103,7 @@ public class VersionManager {
 
                 versionExchangeResponse.set(
                     COMPATIBILITY_KEY,
-                    String.valueOf(determineCompatibility(version,
+                    String.valueOf(determineCompatibility(localVersion,
                         remoteVersion).getCode()));
 
                 versionExchangeResponse.set(ID_KEY,
@@ -131,9 +131,9 @@ public class VersionManager {
     public VersionManager(@SarosVersion String version,
         final IReceiver receiver, final ITransmitter transmitter) {
 
-        this.version = Version.parseVersion(version);
+        this.localVersion = Version.parseVersion(version);
 
-        if (this.version == Version.INVALID)
+        if (this.localVersion == Version.INVALID)
             throw new IllegalArgumentException("version string is malformed: "
                 + version);
 
@@ -216,7 +216,7 @@ public class VersionManager {
                 LOG.warn("remote compatibility string contains non numerical characters");
             }
 
-            compatibility = determineCompatibility(version, remoteVersion);
+            compatibility = determineCompatibility(localVersion, remoteVersion);
 
             // believe what the remote side told us in case we are too old
             if (compatibility == Compatibility.TOO_OLD
@@ -224,7 +224,7 @@ public class VersionManager {
                 compatibility = Compatibility.OK;
         }
 
-        return new VersionCompatibilityResult(compatibility, version,
+        return new VersionCompatibilityResult(compatibility, localVersion,
             remoteVersion);
     }
 
@@ -243,7 +243,7 @@ public class VersionManager {
      */
     public void setCompatibilityChart(Properties chart) {
 
-        final Map<Version, List<Version>> compatibilityChart = new HashMap<Version, List<Version>>();
+        final Map<Version, List<Version>> newCompatibilityChart = new HashMap<Version, List<Version>>();
 
         if (chart == null)
             chart = new Properties(); // dummy
@@ -269,17 +269,17 @@ public class VersionManager {
             if (!compatibleVersions.contains(version))
                 compatibleVersions.add(version);
 
-            compatibilityChart.put(version, compatibleVersions);
+            newCompatibilityChart.put(version, compatibleVersions);
         }
 
-        final Version currentVersion = version;
+        final Version currentVersion = localVersion;
 
-        List<Version> currentCompatibleVersions = compatibilityChart
+        List<Version> currentCompatibleVersions = newCompatibilityChart
             .get(currentVersion);
 
         if (currentCompatibleVersions == null) {
             currentCompatibleVersions = new ArrayList<Version>();
-            compatibilityChart.put(currentVersion, currentCompatibleVersions);
+            newCompatibilityChart.put(currentVersion, currentCompatibleVersions);
         }
 
         if (!currentCompatibleVersions.contains(currentVersion))
@@ -287,10 +287,10 @@ public class VersionManager {
 
         if (LOG.isTraceEnabled()) {
             LOG.trace("current version compatibility chart: "
-                + compatibilityChart);
+                + newCompatibilityChart);
         }
 
-        this.compatibilityChart = compatibilityChart;
+        this.compatibilityChart = newCompatibilityChart;
     }
 
     private VersionExchangeExtension queryRemoteVersionDetails(final JID rqJID,
@@ -301,7 +301,7 @@ public class VersionManager {
         final String exchangeID = String.valueOf(ID_GENERATOR.nextInt());
         VersionExchangeExtension versionExchangeRequest = new VersionExchangeExtension();
 
-        versionExchangeRequest.set(VERSION_KEY, version.toString());
+        versionExchangeRequest.set(VERSION_KEY, localVersion.toString());
         versionExchangeRequest.set(ID_KEY, String.valueOf(exchangeID));
 
         IQ request = VersionExchangeExtension.PROVIDER

@@ -88,14 +88,14 @@ public class MultiUserChatService extends AbstractChatService {
      * TODO connectMUC should be split into create and join; bkahlert 2010/11/23
      */
     public IChat createChat(MultiUserChatPreferences preferences) {
-        Connection connection = this.connection.get();
+        Connection currentConnection = this.connection.get();
 
-        if (connection == null) {
+        if (currentConnection == null) {
             log.error("Can't join chat: Not connected.");
             return null;
         }
 
-        MultiUserChat chat = new MultiUserChat(connection, preferences);
+        MultiUserChat chat = new MultiUserChat(currentConnection, preferences);
 
         log.debug("Joining MUC...");
 

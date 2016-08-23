@@ -540,13 +540,13 @@ public class ChangeColorManager extends AbstractActivityProducer implements
      */
     private synchronized int getNextAvailableColorID() {
 
-        List<Integer> usedColorIDs = new ArrayList<Integer>(getUsedColorIDs());
+        List<Integer> usedColorIDsAsList = new ArrayList<Integer>(getUsedColorIDs());
 
-        Collections.sort(usedColorIDs);
+        Collections.sort(usedColorIDsAsList);
 
         int unusedColorID = 0;
 
-        for (int usedColorID : usedColorIDs) {
+        for (int usedColorID : usedColorIDsAsList) {
             if (!isValidColorID(usedColorID))
                 continue;
 

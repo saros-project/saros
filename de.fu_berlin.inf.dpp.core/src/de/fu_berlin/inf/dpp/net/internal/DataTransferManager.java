@@ -63,7 +63,7 @@ public class DataTransferManager implements IConnectionListener,
 
     private volatile JID currentLocalJID;
 
-    private Connection connection;
+    private Connection xmppConnection;
 
     private int transportMask = -1;
 
@@ -473,11 +473,11 @@ public class DataTransferManager implements IConnectionListener,
      * Sets up the transports for the given XMPPConnection
      */
     private void prepareConnection(final Connection connection) {
-        assert (this.connection == null);
+        assert (this.xmppConnection == null);
 
         initTransports();
 
-        this.connection = connection;
+        this.xmppConnection = connection;
         this.currentLocalJID = new JID(connection.getUser());
 
         connectionPool.open();
@@ -508,7 +508,7 @@ public class DataTransferManager implements IConnectionListener,
         }
 
         connectionPool.close();
-        connection = null;
+        xmppConnection = null;
     }
 
     @Override
@@ -516,7 +516,7 @@ public class DataTransferManager implements IConnectionListener,
         ConnectionState newState) {
         if (newState == ConnectionState.CONNECTED)
             prepareConnection(connection);
-        else if (this.connection != null)
+        else if (this.xmppConnection != null)
             disposeConnection();
     }
 

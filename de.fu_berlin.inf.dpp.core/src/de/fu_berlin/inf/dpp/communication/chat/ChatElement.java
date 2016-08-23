@@ -134,15 +134,12 @@ public class ChatElement {
     }
 
     /**
-     * Returns a {@link Message} with the {@link ChatElement}s JID and message
-     * body. The body will be <code>null</code> if there is no body to display.
+     * Returns the message of the entry.
      * 
-     * @return a {@link Message} with the {@link ChatElement}s JID and message
-     *         body
+     * @return the message of the entry or <code>null</code> if the entry does
+     *         not contain a message
      */
-    public Message getMessage() {
-        Message message = new Message(jid.toString());
-        message.setBody(this.message);
+    public String getMessage() {
         return message;
     }
 

@@ -241,7 +241,7 @@ public class MultiUserChat extends AbstractChat {
         /*
          * Connect to a room
          */
-        org.jivesoftware.smackx.muc.MultiUserChat muc = new org.jivesoftware.smackx.muc.MultiUserChat(
+        org.jivesoftware.smackx.muc.MultiUserChat newMuc = new org.jivesoftware.smackx.muc.MultiUserChat(
             connection, preferences.getRoom());
 
         boolean joined = false;
@@ -255,15 +255,15 @@ public class MultiUserChat extends AbstractChat {
          * ever necessary.
          */
 
-        String user = connection.getUser();
+        String currentUser = connection.getUser();
 
-        if (user == null)
+        if (currentUser == null)
             throw new XMPPException("not connected to a server");
 
         try {
             log.debug("Trying to create room on server "
                 + this.preferences.getService());
-            muc.create(user);
+            newMuc.create(currentUser);
             createdRoom = true;
             joined = true;
         } catch (XMPPException e) {
@@ -280,15 +280,15 @@ public class MultiUserChat extends AbstractChat {
          */
         if (!joined) {
             try {
-                muc.join(user, preferences.getPassword());
+                newMuc.join(currentUser, preferences.getPassword());
                 joined = true;
             } catch (XMPPException e) {
                 throw exception != null ? exception : e;
             }
         }
 
-        this.muc = muc;
-        this.user = new JID(user);
+        this.muc = newMuc;
+        this.user = new JID(currentUser);
 
         if (createdRoom) {
             configureRoom();

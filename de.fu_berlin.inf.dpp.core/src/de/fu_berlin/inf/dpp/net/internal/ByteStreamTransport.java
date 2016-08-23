@@ -121,14 +121,14 @@ public abstract class ByteStreamTransport implements ITransport {
         String connectionIdentifier, String peer) throws XMPPException,
         IOException, InterruptedException {
 
-        BytestreamManager manager = getManager();
+        BytestreamManager currentManager = getManager();
         IByteStreamConnectionListener listener = getConnectionListener();
 
-        if (manager == null || listener == null)
+        if (currentManager == null || listener == null)
             throw new IOException(this + " transport is not initialized");
 
         return new BinaryChannelConnection(new JID(peer), connectionIdentifier,
-            new XMPPByteStreamAdapter(manager.establishSession(peer,
+            new XMPPByteStreamAdapter(currentManager.establishSession(peer,
                 connectionIdentifier)), getNetTransferMode(), listener);
     }
 

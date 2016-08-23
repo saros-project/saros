@@ -474,7 +474,7 @@ abstract class Negotiation {
 
     // TODO: move to UI
     private synchronized String generateErrorMessage() {
-        String errorMessage = null;
+        String generatedErrorMessage = null;
 
         if (cancellationCause == null)
             return null;
@@ -485,7 +485,7 @@ abstract class Negotiation {
 
         if (cancellationCause instanceof LocalCancellationException) {
             if (exceptionMessage != null) {
-                errorMessage = "Invitation was canceled locally"
+                generatedErrorMessage = "Invitation was canceled locally"
                     + " because of an error: " + exceptionMessage;
                 log.error("canceled negotiation " + this + ", error: "
                     + exceptionMessage);
@@ -496,7 +496,7 @@ abstract class Negotiation {
 
         } else if (cancellationCause instanceof RemoteCancellationException) {
             if (exceptionMessage != null) {
-                errorMessage = "Invitation was canceled by the remote user "
+                generatedErrorMessage = "Invitation was canceled by the remote user "
                     + " because of an error on his/her side: "
                     + exceptionMessage;
 
@@ -514,12 +514,12 @@ abstract class Negotiation {
                 + cancellationCause.getClass().getName(), cancellationCause);
         }
 
-        return errorMessage;
+        return generatedErrorMessage;
     }
 
     private final void notifyCancellationListeners(
         final CancelLocation location, final String message) {
-        for (final CancelListener listener : cancelListeners)
-            listener.canceled(location, message);
+        for (final CancelListener cancelListener : cancelListeners)
+            cancelListener.canceled(location, message);
     }
 }

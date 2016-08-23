@@ -110,9 +110,9 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
                     continue;
                 }
 
-                final IFile file = project.getFile(path);
+                final IFile decompressedFile = project.getFile(path);
 
-                FileSystem.createFolder(file);
+                FileSystem.createFolder(decompressedFile);
 
                 monitor.subTask("decompressing: " + path);
 
@@ -122,10 +122,10 @@ public class DecompressArchiveTask implements IWorkspaceRunnable {
                  * FIXME make it possible to cancel the task during
                  * decompressing large files
                  */
-                if (!file.exists())
-                    file.create(in, false);
+                if (!decompressedFile.exists())
+                    decompressedFile.create(in, false);
                 else
-                    file.setContents(in, false, true);
+                    decompressedFile.setContents(in, false, true);
 
                 monitor.worked(1);
 
