@@ -9,6 +9,7 @@ import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.IViewportListener;
 import org.eclipse.jface.text.TextEvent;
+import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.custom.StyledText;
@@ -22,7 +23,6 @@ import org.eclipse.ui.IEditorPart;
 
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
-import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 
 /**
  * Listener for tracking the selection and viewport of an IEditorPart and
@@ -39,7 +39,7 @@ public class EditorListener {
 
     protected IEditorPart part;
 
-    protected TextSelection lastSelection = TextSelection.emptySelection();
+    protected ITextSelection lastSelection = TextSelection.emptySelection();
 
     private LineRange lastViewport;
 
@@ -203,15 +203,16 @@ public class EditorListener {
     };
 
     protected void generateSelection() {
-        ITextSelection jfaceSelection = (ITextSelection) viewer
+        ITextSelection selection = (ITextSelection) viewer
             .getSelectionProvider().getSelection();
 
-        TextSelection selection = new TextSelection(jfaceSelection.getOffset(),
-            jfaceSelection.getLength());
+        if (!lastSelection.equals(selection)) {
+            lastSelection = selection;
 
-        if (!this.lastSelection.equals(selection)) {
-            this.lastSelection = selection;
-            this.manager.generateSelection(this.part, selection);
+            manager.generateSelection(
+                part,
+                new de.fu_berlin.inf.dpp.editor.text.TextSelection(selection
+                    .getOffset(), selection.getLength()));
         }
     }
 
