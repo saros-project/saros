@@ -395,12 +395,12 @@ public class DiscoveryManager implements Disposable {
                 disco.containsFeature(namespace));
 
             /*
-             * TODO This does not make much sense. Either the two branches
-             * should in fact do different things, or the if-else construction
-             * can be removed.
+             * loop through all presence regardless if we already know that the
+             * feature is supported to notify the listener for every current
+             * presence
              */
-            if (supported != null && !supported)
-                supported = disco.containsFeature(namespace);
+            if (supported != null)
+                supported |= disco.containsFeature(namespace);
             else
                 supported = disco.containsFeature(namespace);
         }
