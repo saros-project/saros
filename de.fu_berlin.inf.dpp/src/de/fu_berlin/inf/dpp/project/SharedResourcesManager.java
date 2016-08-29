@@ -58,6 +58,7 @@ import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
+import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
@@ -178,7 +179,7 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
     public void start() {
         sarosSession.addListener(sessionListener);
         sarosSession.addActivityProducer(this);
-        sarosSession.addActivityConsumer(consumer);
+        sarosSession.addActivityConsumer(consumer, Priority.ACTIVE);
         stopManager.addBlockable(stopManagerListener);
         ResourcesPlugin.getWorkspace().addResourceChangeListener(this,
             INTERESTING_EVENTS);

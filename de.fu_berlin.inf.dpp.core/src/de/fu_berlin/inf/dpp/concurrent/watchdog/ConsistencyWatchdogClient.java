@@ -27,6 +27,7 @@ import de.fu_berlin.inf.dpp.monitoring.remote.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
+import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.UserFormatUtils;
 
@@ -130,7 +131,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer
     public void start() {
         inconsistencyToResolve.setValue(false);
 
-        session.addActivityConsumer(consumer);
+        session.addActivityConsumer(consumer, Priority.ACTIVE);
         session.addActivityProducer(this);
     }
 

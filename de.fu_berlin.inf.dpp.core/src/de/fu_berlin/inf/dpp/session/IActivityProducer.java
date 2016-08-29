@@ -10,9 +10,30 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
  * {@link IActivity} is created and given to the {@link IActivityListener}s.
  * <p>
  * Instead of implementing this interface from scratch, you probably want to
- * subclass {@link AbstractActivityProducer} instead.
+ * extend {@link AbstractActivityProducer} instead.
  */
 public interface IActivityProducer {
+    /**
+     * @JTourBusStop 1, Architecture Overview, ActivityProducers:
+     * 
+     *               Saros observes pretty much everything that happens in the
+     *               local IDE of a session participant. For every important
+     *               event there is a listener that converts local actions of
+     *               the user into activities that can be applied in the remote
+     *               IDEs. Those activity-creating classes are called
+     *               ActivityProducers.
+     */
+
+    /**
+     * @JTourBusStop 1, Activity sending, The IActivityProducer interface:
+     * 
+     *               Activities are used to exchange information about local
+     *               actions or events in a session. A class that creates
+     *               activities must implement this interface. Activities are
+     *               "sent" by invoking IActivityListener.created() on the
+     *               registered listeners.
+     */
+
     /**
      * Registers the given listener, so it will be informed via
      * {@link IActivityListener#created(IActivity)}.
@@ -24,28 +45,4 @@ public interface IActivityProducer {
      * {@link #addActivityListener(IActivityListener)}.
      */
     public void removeActivityListener(IActivityListener listener);
-
-    /**
-     * @JTourBusStop 1, Activity sending, The IActivityProducer interface:
-     * 
-     *               Activities are used to exchange information in a session. A
-     *               class that creates activities must implement this
-     *               interface. Activities are "sent" by invoking
-     *               IActivityListener.created() on the registered listeners.
-     */
-
-    /**
-     * @JTourBusStop 1, Architecture Overview, User Interface -
-     *               ActivityProducers:
-     * 
-     *               The "User Interface"-Component is responsible for managing
-     *               all the visual elements in Saros, listening to changes in
-     *               Eclipse and reacting to actions performed by the local
-     *               user.
-     * 
-     *               Saros internally works with Activities. Activities are
-     *               created by Activity Producers, which take local actions and
-     *               turn them into Activities.
-     * 
-     */
 }

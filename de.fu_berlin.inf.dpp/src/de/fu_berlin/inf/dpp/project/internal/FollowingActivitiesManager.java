@@ -17,6 +17,7 @@ import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
+import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.User;
@@ -102,7 +103,7 @@ public class FollowingActivitiesManager extends AbstractActivityProducer
     public void start() {
         collector.flushFollowModes();
         session.addActivityProducer(this);
-        session.addActivityConsumer(consumer);
+        session.addActivityConsumer(consumer, Priority.ACTIVE);
         session.addListener(sessionListener);
         editor.addSharedEditorListener(followModeListener);
     }

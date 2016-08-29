@@ -73,7 +73,7 @@ public class SarosSessionManager implements ISarosSessionManager {
      * 
      *               While Activities are used to keep a running session
      *               consistent, we use MESSAGES whenever the Session itself is
-     *               modified. This includes adding users or projects to the
+     *               modified. This means adding users or projects to the
      *               session.
      * 
      *               The Invitation Process is managed by the "Invitation
@@ -85,7 +85,6 @@ public class SarosSessionManager implements ISarosSessionManager {
      * 
      *               For more information about the Invitation Process see the
      *               "Invitation Process"-Tour.
-     * 
      */
 
     private static final Logger log = Logger
@@ -385,7 +384,8 @@ public class SarosSessionManager implements ISarosSessionManager {
                     .setRejectSessionNegotiationRequests(true);
 
                 negotiation = new IncomingSessionNegotiation(this, sessionID,
-                    from, version, invitationID, description, applicationContext);
+                    from, version, invitationID, description,
+                    applicationContext);
 
                 negotiation.setNegotiationListener(negotiationListener);
                 currentSessionNegotiations.add(negotiation);

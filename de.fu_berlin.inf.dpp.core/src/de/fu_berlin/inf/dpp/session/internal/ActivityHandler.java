@@ -130,22 +130,24 @@ public final class ActivityHandler implements Startable {
     public synchronized void handleIncomingActivities(List<IActivity> activities) {
 
         if (session.isHost()) {
-
             /**
              * @JTourBusStop 8, Activity sending, Activity Server:
              * 
-             *               This is where the server receives activities. The
-             *               Server may transform activities again if necessary
-             *               and afterward sends them to the correct clients.
+             *               This is where the server (or server-part of the
+             *               host) receives activities. The Server may transform
+             *               activities again if necessary and afterward sends
+             *               them to the correct clients. (Note that the
+             *               callback.send() methods get an actual list of
+             *               recipients.)
              */
 
             TransformationResult result = directServerActivities(activities);
-            activities = result.getLocalActivities();
             for (QueueItem item : result.getSendToPeers()) {
-
                 List<User> recipients = getRecipientsForQueueItem(item);
                 callback.send(recipients, item.activity);
             }
+
+            activities = result.getLocalActivities();
         }
 
         /**
@@ -156,7 +158,6 @@ public final class ActivityHandler implements Startable {
          *               dispatcher. This queue is consumed by the
          *               dispatchThread, which transforms activities again if
          *               necessary, and then forwards it to the SarosSession.
-         * 
          */
 
         if (activities.isEmpty())
@@ -208,19 +209,6 @@ public final class ActivityHandler implements Startable {
     }
 
     /**
-     * @JTourBusStop 6, Activity sending, Transforming the IActivity (Client):
-     * 
-     *               This function will transform activities and then forward
-     *               them to the callback. E.g. this will turn TextEditActivity
-     *               into Jupiter activities.
-     * 
-     *               Saros uses a client-server-architecture. All activities
-     *               will first be send to the server located at the Host. The
-     *               Host himself also acts as a client, but houses an
-     *               additional server-part.
-     */
-
-    /**
      * Transforms and determines the recipients of the activities. The
      * {@linkplain IActivityHandlerCallback callback} will be notified about the
      * results.
@@ -235,6 +223,23 @@ public final class ActivityHandler implements Startable {
      * words, the transformation would be applied to an out-dated state.
      */
     public void handleOutgoingActivities(final List<IActivity> activities) {
+        /**
+         * @JTourBusStop 6, Activity sending, Transforming the IActivity
+         *               (Client):
+         * 
+         *               First, this method will transform activities.
+         *               Transformation has not effect on most activities, but
+         *               it turns TextEditActivity into JupiterActivities. Then,
+         *               they are forward the to the SarosSession. (The callback
+         *               is a level of indirection that improves testability.)
+         * 
+         *               Saros uses a client-server-architecture. All activities
+         *               will first be send to the server located at the Host,
+         *               this is why the only recipient of the result is the
+         *               session's host. Please note: The Host itself has both
+         *               client and server part, so even his activities will be
+         *               "sent" to himself first.
+         */
         synchronizer.syncExec(ThreadUtils.wrapSafe(LOG, new Runnable() {
 
             @Override

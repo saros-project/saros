@@ -31,6 +31,7 @@ import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 
@@ -53,9 +54,8 @@ public interface ISarosSession {
      *               all participants. It functions as the core component in a
      *               running session and directs communication between all other
      *               components. In general this component takes input from the
-     *               User Interface, processes it and afterwards passes the
+     *               User Interface, processes it, and afterwards passes the
      *               result to the Network Layer.
-     * 
      */
 
     /**
@@ -331,10 +331,19 @@ public interface ISarosSession {
      *            this consumer will be called. "Consume" is not meant in a
      *            destructive way: all consumers will be called for every
      *            activity.
+     * @param priority
+     *            Indicates whether this consumer performs actions that have
+     *            visible consequences or just records some state (see
+     *            {@link IActivityConsumer.Priority}). The latter type will be
+     *            notified first.<br>
+     *            Adding the same consumer multiple times with different
+     *            priorities will assume the last one is correct. Use individual
+     *            consumers if you want to get notified multiple times.
      * 
      * @see #removeActivityConsumer(IActivityConsumer)
      */
-    public void addActivityConsumer(IActivityConsumer consumer);
+    public void addActivityConsumer(IActivityConsumer consumer,
+        Priority priority);
 
     /**
      * Removes an {@link IActivityConsumer} from the session
@@ -343,7 +352,7 @@ public interface ISarosSession {
      *            This consumer will no longer be called when an activity is to
      *            be executed locally.
      * 
-     * @see #addActivityConsumer(IActivityConsumer)
+     * @see #addActivityConsumer(IActivityConsumer, Priority)
      */
     public void removeActivityConsumer(IActivityConsumer consumer);
 

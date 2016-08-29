@@ -51,7 +51,8 @@ public class StopManagerTest {
         alicesSession.addActivityProducer(isA(StopManager.class));
         alicesSession.removeActivityProducer(isA(StopManager.class));
 
-        alicesSession.addActivityConsumer(isA(IActivityConsumer.class));
+        alicesSession.addActivityConsumer(isA(IActivityConsumer.class),
+            isA(IActivityConsumer.Priority.class));
         EasyMock.expectLastCall().andStubAnswer(new IAnswer<Object>() {
             @Override
             public Object answer() throws Throwable {
@@ -89,7 +90,8 @@ public class StopManagerTest {
         bobsSession.addActivityProducer(isA(StopManager.class));
         bobsSession.removeActivityProducer(isA(StopManager.class));
 
-        bobsSession.addActivityConsumer(isA(IActivityConsumer.class));
+        bobsSession.addActivityConsumer(isA(IActivityConsumer.class),
+            isA(IActivityConsumer.Priority.class));
         EasyMock.expectLastCall().andStubAnswer(new IAnswer<Object>() {
             @Override
             public Object answer() throws Throwable {
@@ -126,7 +128,8 @@ public class StopManagerTest {
         carlsSession.addActivityProducer(isA(StopManager.class));
         carlsSession.removeActivityProducer(isA(StopManager.class));
 
-        carlsSession.addActivityConsumer(isA(IActivityConsumer.class));
+        carlsSession.addActivityConsumer(isA(IActivityConsumer.class),
+            isA(IActivityConsumer.Priority.class));
         EasyMock.expectLastCall().andStubAnswer(new IAnswer<Object>() {
             @Override
             public Object answer() throws Throwable {
@@ -380,7 +383,8 @@ public class StopManagerTest {
         alicesSession.addActivityProducer(isA(StopManager.class));
         alicesSession.removeActivityProducer(isA(StopManager.class));
 
-        alicesSession.addActivityConsumer(isA(IActivityConsumer.class));
+        alicesSession.addActivityConsumer(isA(IActivityConsumer.class),
+            isA(IActivityConsumer.Priority.class));
         EasyMock.expectLastCall().andStubAnswer(new IAnswer<Object>() {
             @Override
             public Object answer() throws Throwable {

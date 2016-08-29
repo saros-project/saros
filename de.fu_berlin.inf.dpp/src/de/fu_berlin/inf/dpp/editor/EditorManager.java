@@ -65,6 +65,7 @@ import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
+import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
@@ -167,20 +168,24 @@ public class EditorManager extends AbstractActivityProducer implements
     };
 
     private final IActivityConsumer consumer = new AbstractActivityConsumer() {
-        /**
-         * @JTourBusStop 12, Activity sending, More complex example of a second
-         *               dispatch:
-         * 
-         *               The exec() method below is a more complex example of
-         *               the second dispatch: Before letting the activity
-         *               perform the third dispatch (done in super.exec()), this
-         *               specific implementation dispatches the activity to two
-         *               other consumers.
-         */
-
-        /***/
         @Override
         public void exec(IActivity activity) {
+            /**
+             * @JTourBusStop 12, Activity sending, More complex example of a
+             *               second dispatch:
+             * 
+             *               The exec() method below is a more complex example
+             *               of the second dispatch: Before letting the activity
+             *               perform the third dispatch (triggered in
+             *               super.exec()), this specific implementation
+             *               dispatches the activity to another consumer first,
+             *               as this class relies on the other one to be
+             *               up-to-date. (This is an explicit way to ensure the
+             *               dependent classes are up-to-date. An implicit way
+             *               involves the distinction between active and passive
+             *               consumers.)
+             */
+
             assert SWTUtils.isSWT();
 
             User sender = activity.getSource();
@@ -191,9 +196,8 @@ public class EditorManager extends AbstractActivityProducer implements
                 return;
             }
 
-            // First let the remote managers update itself based on the
+            // First let the remote manager update itself based on the
             // Activity
-            remoteEditorManager.exec(activity);
             remoteWriteAccessManager.exec(activity);
 
             super.exec(activity);
@@ -2009,7 +2013,7 @@ public class EditorManager extends AbstractActivityProducer implements
         hasWriteAccess = session.hasWriteAccess();
         session.addListener(sessionListener);
         session.addActivityProducer(this);
-        session.addActivityConsumer(consumer);
+        session.addActivityConsumer(consumer, Priority.ACTIVE);
 
         annotationModelHelper = new AnnotationModelHelper();
         locationAnnotationManager = new LocationAnnotationManager(
@@ -2081,6 +2085,7 @@ public class EditorManager extends AbstractActivityProducer implements
         locationAnnotationManager = null;
         contributionAnnotationManager.dispose();
         contributionAnnotationManager = null;
+        remoteEditorManager.dispose();
         remoteEditorManager = null;
         remoteWriteAccessManager.dispose();
         remoteWriteAccessManager = null;

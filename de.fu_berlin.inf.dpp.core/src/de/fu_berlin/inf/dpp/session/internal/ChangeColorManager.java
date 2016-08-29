@@ -23,6 +23,7 @@ import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
+import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.User;
@@ -160,7 +161,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements
          *               incoming activities, you need to register it on the
          *               session. That's it :)
          */
-        sarosSession.addActivityConsumer(consumer);
+        sarosSession.addActivityConsumer(consumer, Priority.ACTIVE);
         sarosSession.addActivityProducer(this);
         sarosSession.addListener(sessionListener);
     }
@@ -540,7 +541,8 @@ public class ChangeColorManager extends AbstractActivityProducer implements
      */
     private synchronized int getNextAvailableColorID() {
 
-        List<Integer> usedColorIDsAsList = new ArrayList<Integer>(getUsedColorIDs());
+        List<Integer> usedColorIDsAsList = new ArrayList<Integer>(
+            getUsedColorIDs());
 
         Collections.sort(usedColorIDsAsList);
 

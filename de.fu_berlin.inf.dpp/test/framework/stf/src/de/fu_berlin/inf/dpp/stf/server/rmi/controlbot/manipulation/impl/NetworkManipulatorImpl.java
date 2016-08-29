@@ -500,7 +500,7 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
     public void sessionStarting(ISarosSession session) {
         this.session = session;
         this.session.addActivityProducer(this);
-        this.session.addActivityConsumer(this);
+        this.session.addActivityConsumer(this, Priority.ACTIVE);
     }
 
     @Override

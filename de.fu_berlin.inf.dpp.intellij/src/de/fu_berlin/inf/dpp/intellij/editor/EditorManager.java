@@ -38,6 +38,7 @@ import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
+import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
@@ -86,9 +87,8 @@ public class EditorManager extends AbstractActivityProducer
 
         @Override
         public void exec(IActivity activity) {
-            // First let the remote managers update itself based on the
+            // First let the remote manager update itself based on the
             // Activity
-            remoteEditorManager.exec(activity);
             remoteWriteAccessManager.exec(activity);
 
             super.exec(activity);
@@ -237,7 +237,7 @@ public class EditorManager extends AbstractActivityProducer
             //HACK: Editors that are already opened have to be added to the EditorPool
             FileEditorManager fileEditorManager = FileEditorManager.
                 getInstance(project);
-            for (IProject proj : session.getProjects())
+            for (IProject proj : session.getProjects()) {
                 for (VirtualFile file : fileEditorManager.getOpenFiles()) {
                     if (proj.getFullPath().equals(
                         ((IntelliJWorkspaceImpl) workspace)
@@ -245,6 +245,7 @@ public class EditorManager extends AbstractActivityProducer
                         localEditorHandler.openEditor(file);
                     }
                 }
+            }
 
             fireActivity(
                 new EditorActivity(localUser, EditorActivity.Type.ACTIVATED,
@@ -334,7 +335,7 @@ public class EditorManager extends AbstractActivityProducer
             session.addListener(sessionListener);
 
             session.addActivityProducer(EditorManager.this);
-            session.addActivityConsumer(consumer);
+            session.addActivityConsumer(consumer, Priority.ACTIVE);
 
             documentListener.startListening();
 
@@ -362,6 +363,7 @@ public class EditorManager extends AbstractActivityProducer
 
             session = null;
 
+            remoteEditorManager.dispose();
             remoteEditorManager = null;
             remoteWriteAccessManager.dispose();
             remoteWriteAccessManager = null;
@@ -477,7 +479,6 @@ public class EditorManager extends AbstractActivityProducer
         LocalEditorManipulator localEditorManipulator, IWorkspace workspace,
         Project project) {
 
-        remoteEditorManager = new RemoteEditorManager(session);
         sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
         addSharedEditorListener(sharedEditorListener);
         this.localEditorHandler = localEditorHandler;
@@ -513,8 +514,9 @@ public class EditorManager extends AbstractActivityProducer
                 public String compute() {
                     IFile file = path.getFile();
 
-                    if (!file.exists())
+                    if (!file.exists()) {
                         return null;
+                    }
 
                     IPath fullPath = file.getLocation();
                     Document doc = ResourceConverter
@@ -894,8 +896,9 @@ public class EditorManager extends AbstractActivityProducer
             @Override
             public void run() {
 
-                if (remoteEditorManager == null)
+                if (remoteEditorManager == null) {
                     return;
+                }
 
                 final Set<SPath> editorPaths = remoteEditorManager
                     .getRemoteOpenEditors();
@@ -903,8 +906,9 @@ public class EditorManager extends AbstractActivityProducer
                 editorPaths.addAll(locallyOpenEditors);
 
                 for (final SPath path : editorPaths) {
-                    if (project == null || project.equals(path.getProject()))
+                    if (project == null || project.equals(path.getProject())) {
                         saveFile(path);
+                    }
                 }
             }
         });

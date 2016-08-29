@@ -56,10 +56,12 @@ public abstract class AbstractActivityProducer implements IActivityProducer {
      * @JTourBusStop 2, Activity sending, The abstract class to extend:
      * 
      *               But instead of implementing the IActivityProducer interface
-     *               one should extend the AbstractActivityProducer class and
+     *               you should extend the AbstractActivityProducer class and
      *               call the fireActivity() method on newly created activities
      *               to inform all listeners.
      */
+
+    /***/
     protected final void fireActivity(IActivity activity) {
         for (IActivityListener activityListener : activityListeners) {
             activityListener.created(activity);

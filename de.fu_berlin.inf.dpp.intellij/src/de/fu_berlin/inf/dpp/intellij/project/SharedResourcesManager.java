@@ -22,6 +22,7 @@ import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
+import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import org.apache.log4j.Logger;
 import org.picocontainer.Startable;
@@ -62,7 +63,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
             @Override
             public void run() {
                 sarosSession.addActivityProducer(SharedResourcesManager.this);
-                sarosSession.addActivityConsumer(consumer);
+                sarosSession.addActivityConsumer(consumer, Priority.ACTIVE);
                 intelliJWorkspaceImpl.addResourceListener(fileSystemListener);
 
             }
@@ -102,8 +103,9 @@ public class SharedResourcesManager extends AbstractActivityProducer
     private final IActivityConsumer consumer = new AbstractActivityConsumer() {
         @Override
         public void exec(IActivity activity) {
-            if (!(activity instanceof IFileSystemModificationActivity))
+            if (!(activity instanceof IFileSystemModificationActivity)) {
                 return;
+            }
 
         /*
          * FIXME this will lockout everything. File changes made in the
@@ -207,8 +209,9 @@ public class SharedResourcesManager extends AbstractActivityProducer
         FileUtils.mkdirs(activity.getPath().getResource());
         FileUtils.move(newFilePath, oldResource);
 
-        if (activity.getContent() == null)
+        if (activity.getContent() == null) {
             return;
+        }
 
         handleFileCreation(activity);
     }
@@ -269,8 +272,7 @@ public class SharedResourcesManager extends AbstractActivityProducer
 
         try {
             fileSystemListener.setEnabled(false);
-            FileUtils
-                .writeFile(new ByteArrayInputStream(newContent), file);
+            FileUtils.writeFile(new ByteArrayInputStream(newContent), file);
             //HACK: It does not work to disable the fileSystemListener temporarily,
             //because a fileCreated event will be fired asynchronously,
             //so we have to add this file to the filter list

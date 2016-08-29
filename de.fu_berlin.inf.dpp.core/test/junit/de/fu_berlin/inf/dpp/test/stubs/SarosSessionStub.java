@@ -12,6 +12,7 @@ import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
+import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.IActivityProducer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
@@ -270,7 +271,8 @@ public class SarosSessionStub implements ISarosSession {
     }
 
     @Override
-    public void addActivityConsumer(IActivityConsumer consumer) {
+    public void addActivityConsumer(IActivityConsumer consumer,
+        Priority priority) {
         throw new RuntimeException("Unexpected call to Stub");
     }
 

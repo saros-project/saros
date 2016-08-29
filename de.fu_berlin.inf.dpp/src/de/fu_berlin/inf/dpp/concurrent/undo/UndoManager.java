@@ -262,7 +262,7 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
 
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
-            newSarosSession.addActivityConsumer(UndoManager.this);
+            newSarosSession.addActivityConsumer(UndoManager.this, Priority.ACTIVE);
             undoHistory.clear();
             enabled = preferences.isConcurrentUndoActivated();
             eclipseHistory.addOperationApprover(operationBlocker);

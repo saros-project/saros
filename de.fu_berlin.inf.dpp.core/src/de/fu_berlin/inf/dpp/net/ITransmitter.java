@@ -33,7 +33,6 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
  * 
  * @author rdjemili
  */
-
 @Component(module = "net")
 public interface ITransmitter {
 
@@ -44,7 +43,6 @@ public interface ITransmitter {
      *               other participants by sending and receiving messages. This
      *               Interface is the main entrance point for sending packets.
      *               (...)
-     * 
      */
     /**
      * Sends the specified packet to the server.

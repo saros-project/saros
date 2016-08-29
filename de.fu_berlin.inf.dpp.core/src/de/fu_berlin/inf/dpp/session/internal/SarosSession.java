@@ -64,6 +64,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
+import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.IActivityHandlerCallback;
 import de.fu_berlin.inf.dpp.session.IActivityListener;
 import de.fu_berlin.inf.dpp.session.IActivityProducer;
@@ -114,7 +115,8 @@ public final class SarosSession implements ISarosSession {
 
     private final CopyOnWriteArrayList<IActivityProducer> activityProducers = new CopyOnWriteArrayList<IActivityProducer>();
 
-    private final CopyOnWriteArrayList<IActivityConsumer> activityConsumers = new CopyOnWriteArrayList<IActivityConsumer>();
+    private final List<IActivityConsumer> activeActivityConsumers = new CopyOnWriteArrayList<IActivityConsumer>();
+    private final List<IActivityConsumer> passiveActivityConsumers = new CopyOnWriteArrayList<IActivityConsumer>();
 
     /* Instance fields */
     private final User localUser;
@@ -150,15 +152,14 @@ public final class SarosSession implements ISarosSession {
 
     private final Object componentAccessLock = new Object();
 
+    /**
+     * @JTourBusStop 5, Activity sending, Forwarding the IActivity:
+     * 
+     *               This is where the SarosSession will receive the activity.
+     *               This listener it is not part of the ISarosSession interface
+     *               to avoid misuse.
+     */
     private final IActivityListener activityListener = new IActivityListener() {
-
-        /**
-         * @JTourBusStop 5, Activity sending, Forwarding the IActivity:
-         * 
-         *               This is where the SarosSession will receive the
-         *               activity. This listener it is not part of the
-         *               ISarosSession interface to avoid misuse.
-         */
         @Override
         public void created(final IActivity activity) {
             if (activity == null)
@@ -184,9 +185,15 @@ public final class SarosSession implements ISarosSession {
              * 
              *               Afterwards, every registered ActivityConsumer is
              *               informed about the remote activity that should be
-             *               executed locally.
+             *               executed locally. This is the first dispatch: Each
+             *               activity is dispatched to an array of consumers.
              */
-            for (IActivityConsumer consumer : activityConsumers) {
+
+            for (IActivityConsumer consumer : passiveActivityConsumers) {
+                consumer.exec(activity);
+            }
+
+            for (IActivityConsumer consumer : activeActivityConsumers) {
                 consumer.exec(activity);
                 if (activity instanceof IFileSystemModificationActivity)
                     updatePartialSharedResources((IFileSystemModificationActivity) activity);
@@ -728,16 +735,16 @@ public final class SarosSession implements ISarosSession {
         return concurrentDocumentServer;
     }
 
-    /**
-     * @JTourBusStop 7, Activity sending, Incoming activities:
-     * 
-     *               The ActivitySequencer will call this function for
-     *               activities received over the Network Layer.
-     * 
-     */
-
     @Override
     public void exec(List<IActivity> activities) {
+        /**
+         * @JTourBusStop 7, Activity sending, Incoming activities:
+         * 
+         *               Incoming activities will arrive here. The
+         *               ActivitySequencer calls this method for activities
+         *               received over the Network Layer.
+         */
+
         final List<IActivity> valid = new ArrayList<IActivity>();
 
         // Check every incoming activity for validity
@@ -896,13 +903,25 @@ public final class SarosSession implements ISarosSession {
     }
 
     @Override
-    public void addActivityConsumer(IActivityConsumer consumer) {
-        activityConsumers.addIfAbsent(consumer);
+    public void addActivityConsumer(IActivityConsumer consumer,
+        Priority priority) {
+
+        removeActivityConsumer(consumer);
+
+        switch (priority) {
+        case ACTIVE:
+            activeActivityConsumers.add(consumer);
+            break;
+        case PASSIVE:
+            passiveActivityConsumers.add(consumer);
+            break;
+        }
     }
 
     @Override
     public void removeActivityConsumer(IActivityConsumer consumer) {
-        activityConsumers.remove(consumer);
+        activeActivityConsumers.remove(consumer);
+        passiveActivityConsumers.remove(consumer);
     }
 
     @Override
@@ -1100,6 +1119,7 @@ public final class SarosSession implements ISarosSession {
      * @return the size of the internal activity consumer collection
      */
     boolean hasActivityConsumers() {
-        return !activityConsumers.isEmpty();
+        return !activeActivityConsumers.isEmpty()
+            || !passiveActivityConsumers.isEmpty();
     }
 }

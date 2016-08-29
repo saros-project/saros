@@ -16,6 +16,7 @@ import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
+import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
@@ -106,7 +107,7 @@ public class RemoteProgressManager extends AbstractActivityProducer {
         @Override
         public void sessionStarted(ISarosSession session) {
             RemoteProgressManager.this.session = session;
-            session.addActivityConsumer(consumer);
+            session.addActivityConsumer(consumer, Priority.ACTIVE);
             session.addActivityProducer(RemoteProgressManager.this);
             session.addListener(sessionListener);
         }

@@ -25,7 +25,9 @@ import de.fu_berlin.inf.dpp.session.User;
 /**
  * This class contains the state of the editors, viewports and selections of all
  * remote users as we believe it to be by listening to the Activities we
- * receive.
+ * receive. This class is a
+ * {@linkplain de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority#PASSIVE
+ * passive} consumer.
  */
 public class RemoteEditorManager implements IActivityConsumer {
 
@@ -230,6 +232,7 @@ public class RemoteEditorManager implements IActivityConsumer {
 
     public RemoteEditorManager(ISarosSession sarosSession) {
         this.sarosSession = sarosSession;
+        sarosSession.addActivityConsumer(this, Priority.PASSIVE);
     }
 
     public RemoteEditorState getEditorState(User user) {
@@ -239,6 +242,10 @@ public class RemoteEditorManager implements IActivityConsumer {
             editorStates.put(user, result);
         }
         return result;
+    }
+
+    public void dispose() {
+        sarosSession.removeActivityConsumer(this);
     }
 
     @Override

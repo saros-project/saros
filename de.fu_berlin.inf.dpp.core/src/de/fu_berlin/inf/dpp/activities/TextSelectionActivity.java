@@ -92,19 +92,18 @@ public class TextSelectionActivity extends AbstractResourceActivity {
             + length + ", src: " + getSource() + ", path: " + getPath() + ")";
     }
 
-    /**
-     * @JTourBusStop 13, Activity sending, Third dispatch:
-     * 
-     *               Each specific activity implementation does the same simple
-     *               third dispatch: It uses the given receiver to deliver
-     *               itself to it, so the IActivityReceiver implementation gets
-     *               a correctly typed activity without having to use
-     *               "instanceof" constructions.
-     */
-
-    /***/
     @Override
     public void dispatch(IActivityReceiver receiver) {
+        /**
+         * @JTourBusStop 13, Activity sending, Third dispatch:
+         * 
+         *               Each specific activity implementation does the same
+         *               simple third dispatch: It uses the given receiver to
+         *               deliver itself to it, so the IActivityReceiver
+         *               implementation gets a correctly typed activity without
+         *               having to use "instanceof" constructions.
+         */
+
         receiver.receive(this);
     }
 }

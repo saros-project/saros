@@ -26,6 +26,7 @@ import de.fu_berlin.inf.dpp.observables.ObservableValue;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
+import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
@@ -467,8 +468,8 @@ public final class StopManager extends AbstractActivityProducer implements
         /**
          * @JTourBusStop 4, Activity sending, Firing the activity:
          * 
-         *               The following fires the activity and all listeners
-         *               (that includes the session) will be called.
+         *               The following call fires the activity and all listeners
+         *               (including the session) will be notified.
          */
         fireActivity(activity);
     }
@@ -559,7 +560,7 @@ public final class StopManager extends AbstractActivityProducer implements
 
     @Override
     public void start() {
-        sarosSession.addActivityConsumer(consumer);
+        sarosSession.addActivityConsumer(consumer, Priority.ACTIVE);
 
         /**
          * @JTourBusStop 3, Activity sending, An example of an

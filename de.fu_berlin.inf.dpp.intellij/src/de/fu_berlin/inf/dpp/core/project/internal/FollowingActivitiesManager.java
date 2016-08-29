@@ -9,6 +9,7 @@ import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
+import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import org.apache.log4j.Logger;
@@ -54,10 +55,11 @@ public class FollowingActivitiesManager extends AbstractActivityProducer
             final User source = activity.getSource();
             final User target = activity.getFollowedUser();
 
-            if (LOG.isDebugEnabled())
+            if (LOG.isDebugEnabled()) {
                 LOG.debug(
                     "received new follow mode from: " + source + " , followed: "
                         + target);
+            }
 
             collector.setUserFollowing(source, target);
             notifyListeners();
@@ -67,8 +69,9 @@ public class FollowingActivitiesManager extends AbstractActivityProducer
         public void receive(StopFollowingActivity activity) {
             User source = activity.getSource();
 
-            if (LOG.isDebugEnabled())
+            if (LOG.isDebugEnabled()) {
                 LOG.debug("user " + source + " stopped follow mode");
+            }
 
             collector.setUserFollowing(source, null);
             notifyListeners();
@@ -87,7 +90,7 @@ public class FollowingActivitiesManager extends AbstractActivityProducer
     public void start() {
         collector.flushFollowModes();
         session.addActivityProducer(this);
-        session.addActivityConsumer(consumer);
+        session.addActivityConsumer(consumer, Priority.ACTIVE);
         editor.addSharedEditorListener(followModeListener);
     }
 
@@ -100,8 +103,9 @@ public class FollowingActivitiesManager extends AbstractActivityProducer
     }
 
     private void notifyListeners() {
-        for (IFollowModeChangesListener listener : listeners)
+        for (IFollowModeChangesListener listener : listeners) {
             listener.followModeChanged();
+        }
     }
 
     public void addListener(IFollowModeChangesListener listener) {

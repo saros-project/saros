@@ -10,6 +10,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
+import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
@@ -44,7 +45,7 @@ public class PermissionManager extends AbstractActivityProducer implements
     @Override
     public void start() {
         sarosSession.addActivityProducer(this);
-        sarosSession.addActivityConsumer(consumer);
+        sarosSession.addActivityConsumer(consumer, Priority.ACTIVE);
     }
 
     @Override
