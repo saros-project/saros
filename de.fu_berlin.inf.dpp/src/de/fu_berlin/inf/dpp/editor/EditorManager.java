@@ -2022,7 +2022,8 @@ public class EditorManager extends AbstractActivityProducer implements
         contributionAnnotationManager = new ContributionAnnotationManager(
             session, preferenceStore);
 
-        remoteEditorManager = new RemoteEditorManager(session);
+        remoteEditorManager = (RemoteEditorManager) session
+            .getComponent(RemoteEditorManager.class);
         remoteWriteAccessManager = new RemoteWriteAccessManager(session,
             editorAPI);
 
@@ -2085,7 +2086,6 @@ public class EditorManager extends AbstractActivityProducer implements
         locationAnnotationManager = null;
         contributionAnnotationManager.dispose();
         contributionAnnotationManager = null;
-        remoteEditorManager.dispose();
         remoteEditorManager = null;
         remoteWriteAccessManager.dispose();
         remoteWriteAccessManager = null;

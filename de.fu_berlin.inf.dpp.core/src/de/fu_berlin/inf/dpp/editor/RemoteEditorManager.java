@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
@@ -29,7 +30,7 @@ import de.fu_berlin.inf.dpp.session.User;
  * {@linkplain de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority#PASSIVE
  * passive} consumer.
  */
-public class RemoteEditorManager implements IActivityConsumer {
+public class RemoteEditorManager implements IActivityConsumer, Startable {
 
     private static final Logger log = Logger
         .getLogger(RemoteEditorManager.class);
@@ -232,7 +233,6 @@ public class RemoteEditorManager implements IActivityConsumer {
 
     public RemoteEditorManager(ISarosSession sarosSession) {
         this.sarosSession = sarosSession;
-        sarosSession.addActivityConsumer(this, Priority.PASSIVE);
     }
 
     public RemoteEditorState getEditorState(User user) {
@@ -244,7 +244,13 @@ public class RemoteEditorManager implements IActivityConsumer {
         return result;
     }
 
-    public void dispose() {
+    @Override
+    public void start() {
+        sarosSession.addActivityConsumer(this, Priority.PASSIVE);
+    }
+
+    @Override
+    public void stop() {
         sarosSession.removeActivityConsumer(this);
     }
 

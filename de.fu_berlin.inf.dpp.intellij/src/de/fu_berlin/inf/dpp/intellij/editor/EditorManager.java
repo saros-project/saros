@@ -339,7 +339,8 @@ public class EditorManager extends AbstractActivityProducer
 
             documentListener.startListening();
 
-            remoteEditorManager = new RemoteEditorManager(session);
+            remoteEditorManager = (RemoteEditorManager) session
+                .getComponent(RemoteEditorManager.class);
             remoteWriteAccessManager = new RemoteWriteAccessManager(session);
 
             //TODO: Test, whether this leads to problems because it is not called
@@ -363,7 +364,6 @@ public class EditorManager extends AbstractActivityProducer
 
             session = null;
 
-            remoteEditorManager.dispose();
             remoteEditorManager = null;
             remoteWriteAccessManager.dispose();
             remoteWriteAccessManager = null;
