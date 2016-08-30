@@ -3,12 +3,12 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="test/junit"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/de.fu_berlin.inf.dpp.core"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="/de.fu_berlin.inf.dpp.core/test/lib/powermock-easymock-1.5.1-full.jar"/>
 	<classpathentry kind="lib" path="/de.fu_berlin.inf.dpp.core/test/lib/easymock-3.1.jar"/>
 	<classpathentry kind="lib" path="/de.fu_berlin.inf.dpp.core/test/lib/cglib-nodep-2.2.2.jar"/>
 	<classpathentry kind="lib" path="/de.fu_berlin.inf.dpp.core/test/lib/javassist-3.18.0-GA.jar"/>
 	<classpathentry kind="lib" path="/de.fu_berlin.inf.dpp.core/test/lib/objenesis-1.2.jar"/>
+	<classpathentry kind="var" path="INTELLIJ_LIB/junit-4.11.jar"/>
 	<classpathentry kind="var" path="INTELLIJ_LIB/annotations.jar"/>
 	<classpathentry kind="var" path="INTELLIJ_LIB/extensions.jar"/>
 	<classpathentry kind="var" path="INTELLIJ_LIB/idea.jar"/>
