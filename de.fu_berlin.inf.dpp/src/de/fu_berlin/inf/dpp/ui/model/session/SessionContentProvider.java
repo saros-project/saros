@@ -17,6 +17,8 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.editor.FollowModeManager;
+import de.fu_berlin.inf.dpp.editor.IFollowModeListener;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.net.mdns.MDNSService;
 import de.fu_berlin.inf.dpp.net.xmpp.roster.AbstractRosterListener;
@@ -47,8 +49,6 @@ public class SessionContentProvider extends TreeContentProvider {
     private Roster currentRoster;
     private ISarosSession currentSession;
 
-    private FollowingActivitiesManager followingTracker;
-
     @Inject
     private EditorManager editorManager;
 
@@ -63,7 +63,9 @@ public class SessionContentProvider extends TreeContentProvider {
         editorManager.addSharedEditorListener(sharedEditorListener);
     }
 
-    private final IFollowModeChangesListener followModeChangesListener = new IFollowModeChangesListener() {
+    private FollowingActivitiesManager followingTracker;
+
+    private final IFollowModeChangesListener remoteFollowModeChanges = new IFollowModeChangesListener() {
 
         @Override
         public void followModeChanged() {
@@ -73,13 +75,24 @@ public class SessionContentProvider extends TreeContentProvider {
         }
     };
 
-    private final ISharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
+    private FollowModeManager followModeManager;
+
+    private final IFollowModeListener localFollowModeChanges = new IFollowModeListener() {
+
         @Override
-        public void followModeChanged(User target, boolean isFollowed) {
+        public void stoppedFollowing(Reason reason) {
+            ViewerUtils.refresh(viewer, true);
+        }
+
+        @Override
+        public void startedFollowing(User target) {
             ViewerUtils.update(viewer, new UserElement(target, editorManager,
                 collector), null);
         }
 
+    };
+
+    private final ISharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
         @Override
         public void editorActivated(final User user, SPath filePath) {
             SWTUtils.runSafeSWTAsync(null, new Runnable() {
@@ -173,7 +186,10 @@ public class SessionContentProvider extends TreeContentProvider {
         final ISarosSession newSession = currentSession = getSession(newInput);
 
         if (followingTracker != null)
-            followingTracker.removeListener(followModeChangesListener);
+            followingTracker.removeListener(remoteFollowModeChanges);
+
+        if (followModeManager != null)
+            followModeManager.removeListener(localFollowModeChanges);
 
         if (additionalContentProvider != null)
             additionalContentProvider.inputChanged(viewer,
@@ -198,11 +214,17 @@ public class SessionContentProvider extends TreeContentProvider {
         if (newSession != null) {
             newSession.addListener(sessionListener);
 
-            followingTracker = (FollowingActivitiesManager) newSession
+            followingTracker = newSession
                 .getComponent(FollowingActivitiesManager.class);
 
             if (followingTracker != null)
-                followingTracker.addListener(followModeChangesListener);
+                followingTracker.addListener(remoteFollowModeChanges);
+
+            followModeManager = newSession
+                .getComponent(FollowModeManager.class);
+
+            if (followModeManager != null)
+                followModeManager.addListener(localFollowModeChanges);
         }
 
     }
@@ -246,7 +268,10 @@ public class SessionContentProvider extends TreeContentProvider {
         editorManager.removeSharedEditorListener(sharedEditorListener);
 
         if (followingTracker != null)
-            followingTracker.removeListener(followModeChangesListener);
+            followingTracker.removeListener(remoteFollowModeChanges);
+
+        if (followModeManager != null)
+            followModeManager.removeListener(localFollowModeChanges);
 
         if (additionalContentProvider != null)
             additionalContentProvider.dispose();
@@ -259,6 +284,7 @@ public class SessionContentProvider extends TreeContentProvider {
         editorManager = null;
         additionalContentProvider = null;
         followingTracker = null;
+        followModeManager = null;
     }
 
     /**

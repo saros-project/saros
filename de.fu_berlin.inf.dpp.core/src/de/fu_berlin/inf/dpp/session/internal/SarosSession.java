@@ -987,7 +987,7 @@ public final class SarosSession implements ISarosSession {
     }
 
     @Override
-    public Object getComponent(Object key) {
+    public <T> T getComponent(Class<T> key) {
         /*
          * Ensure that we return null when the session is about to start or stop
          * because the MutablePicoContainer#start/stop/dispose method is

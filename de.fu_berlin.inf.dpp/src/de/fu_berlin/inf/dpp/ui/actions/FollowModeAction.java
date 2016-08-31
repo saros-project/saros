@@ -22,9 +22,8 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
+import de.fu_berlin.inf.dpp.editor.FollowModeManager;
+import de.fu_berlin.inf.dpp.editor.IFollowModeListener;
 import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
@@ -94,10 +93,15 @@ public class FollowModeAction extends Action implements IMenuCreator,
 
             session.addListener(sessionListener);
 
+            followModeManager = session.getComponent(FollowModeManager.class);
+            followModeManager.addListener(followModeListener);
+
             SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
 
                 @Override
                 public void run() {
+                    currentlyFollowedUser = followModeManager.getFollowedUser();
+
                     FollowModeAction.this.session = session;
                     currentRemoteSessionUsers.clear();
                     currentRemoteSessionUsers.addAll(session.getRemoteUsers());
@@ -109,7 +113,12 @@ public class FollowModeAction extends Action implements IMenuCreator,
         @Override
         public void sessionEnded(ISarosSession oldSarosSession,
             SessionEndReason reason) {
+
             oldSarosSession.removeListener(sessionListener);
+
+            followModeManager.removeListener(followModeListener);
+            followModeManager = null;
+
             SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
 
                 @Override
@@ -122,20 +131,25 @@ public class FollowModeAction extends Action implements IMenuCreator,
         }
     };
 
-    private ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
+    private IFollowModeListener followModeListener = new IFollowModeListener() {
+
         @Override
-        public void followModeChanged(final User target,
-            final boolean isFollowed) {
-
+        public void stoppedFollowing(Reason reason) {
             SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
+                @Override
+                public void run() {
+                    currentlyFollowedUser = null;
+                    updateEnablement();
+                }
+            });
+        }
 
+        @Override
+        public void startedFollowing(final User target) {
+            SWTUtils.runSafeSWTAsync(LOG, new Runnable() {
                 @Override
                 public void run() {
                     currentlyFollowedUser = target;
-
-                    if (!isFollowed)
-                        currentlyFollowedUser = null;
-
                     updateEnablement();
                 }
             });
@@ -145,8 +159,7 @@ public class FollowModeAction extends Action implements IMenuCreator,
     @Inject
     private ISarosSessionManager sessionManager;
 
-    @Inject
-    private EditorManager editorManager;
+    private FollowModeManager followModeManager;
 
     private ISarosSession session;
 
@@ -182,8 +195,6 @@ public class FollowModeAction extends Action implements IMenuCreator,
         session = sessionManager.getSarosSession();
 
         sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
-        editorManager.addSharedEditorListener(editorListener);
-        currentlyFollowedUser = editorManager.getFollowedUser();
 
         SelectionUtils.getSelectionService().addSelectionListener(
             selectionListener);
@@ -196,7 +207,6 @@ public class FollowModeAction extends Action implements IMenuCreator,
 
     @Override
     public void run() {
-
         if (session == null)
             return;
 
@@ -212,7 +222,6 @@ public class FollowModeAction extends Action implements IMenuCreator,
             followUserMenu.dispose();
 
         sessionManager.removeSessionLifecycleListener(sessionLifecycleListener);
-        editorManager.removeSharedEditorListener(editorListener);
         SelectionUtils.getSelectionService().removeSelectionListener(
             selectionListener);
     }
@@ -257,8 +266,8 @@ public class FollowModeAction extends Action implements IMenuCreator,
     }
 
     private void followUser(User user) {
-        currentlyFollowedUser = user;
-        editorManager.setFollowing(currentlyFollowedUser);
+        if (followModeManager != null)
+            followModeManager.follow(user);
     }
 
     private Action createAction(final User user) {

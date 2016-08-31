@@ -76,7 +76,6 @@ import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.util.Predicate;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
@@ -133,11 +132,6 @@ public class EditorManager extends AbstractActivityProducer implements
     @Inject
     private FileReplacementInProgressObservable fileReplacementInProgressObservable;
 
-    /**
-     * The user that is followed or <code>null</code> if no user is followed.
-     */
-    private User followedUser = null;
-
     private final EditorPool editorPool;
 
     private final IPartListener2 partListener;
@@ -156,6 +150,7 @@ public class EditorManager extends AbstractActivityProducer implements
     private AnnotationModelHelper annotationModelHelper;
     private LocationAnnotationManager locationAnnotationManager;
     private ContributionAnnotationManager contributionAnnotationManager;
+    private FollowModeManager followModeManager;
 
     private final CustomAnnotationManager customAnnotationManager = new CustomAnnotationManager();
 
@@ -214,13 +209,37 @@ public class EditorManager extends AbstractActivityProducer implements
         }
 
         @Override
-        public void receive(TextSelectionActivity textSelectionActivity) {
-            execTextSelection(textSelectionActivity);
+        public void receive(TextSelectionActivity activity) {
+            SPath path = activity.getPath();
+            User user = activity.getSource();
+
+            TextSelection textSelection = new TextSelection(
+                activity.getOffset(), activity.getLength());
+
+            for (IEditorPart editorPart : editorPool.getEditors(path)) {
+                locationAnnotationManager.setSelection(editorPart,
+                    textSelection, user);
+            }
+
+            /*
+             * inform all registered ISharedEditorListeners about a text
+             * selection made
+             */
+            editorListenerDispatch.textSelectionChanged(activity);
         }
 
         @Override
-        public void receive(ViewportActivity viewportActivity) {
-            execViewport(viewportActivity);
+        public void receive(ViewportActivity activity) {
+            SPath path = activity.getPath();
+            User source = activity.getSource();
+
+            LineRange lineRange = new LineRange(activity.getStartLine(),
+                activity.getNumberOfLines());
+
+            for (IEditorPart editorPart : editorPool.getEditors(path)) {
+                locationAnnotationManager.setViewportForUser(source,
+                    editorPart, lineRange);
+            }
         }
     };
 
@@ -307,11 +326,6 @@ public class EditorManager extends AbstractActivityProducer implements
 
         @Override
         public void userLeft(final User user) {
-
-            // If the user left which I am following, then stop following...
-            if (user.equals(followedUser))
-                setFollowing(null);
-
             removeAnnotationsFromAllEditors(new Predicate<Annotation>() {
                 @Override
                 public boolean evaluate(Annotation annotation) {
@@ -414,8 +428,10 @@ public class EditorManager extends AbstractActivityProducer implements
 
     public EditorManager(ISarosSessionManager sessionManager,
         EditorAPI editorAPI, IPreferenceStore preferenceStore) {
+
         this.editorAPI = editorAPI;
         this.preferenceStore = preferenceStore;
+
         editorPool = new EditorPool(this, editorAPI);
         partListener = new SafePartListener2(LOG, new EditorPartListener(this));
 
@@ -749,10 +765,15 @@ public class EditorManager extends AbstractActivityProducer implements
         SPath sPath = editorActivity.getPath();
         switch (editorActivity.getType()) {
         case ACTIVATED:
-            execActivated(sender, sPath);
+            editorListenerDispatch.editorActivated(sender, sPath);
             break;
         case CLOSED:
-            execClosed(sender, sPath);
+            editorListenerDispatch.editorClosed(sender, sPath);
+
+            for (final IEditorPart editorPart : editorPool.getEditors(sPath)) {
+                locationAnnotationManager.clearSelectionForUser(sender,
+                    editorPart);
+            }
             break;
         case SAVED:
             saveEditor(sPath);
@@ -791,6 +812,11 @@ public class EditorManager extends AbstractActivityProducer implements
         editorPool.setDocumentListenerEnabled(true);
 
         /*
+         * TODO Find out whether this is actually necessary. If we receive a
+         * TextSelectionActivity for each cursor movement, then we don't need to
+         * listen for edits as well.
+         */
+        /*
          * If the text edit ends in the visible region of a local editor, set
          * the cursor annotation.
          * 
@@ -812,10 +838,6 @@ public class EditorManager extends AbstractActivityProducer implements
                 TextSelection selection = new TextSelection(cursorOffset, 0);
                 locationAnnotationManager.setSelection(editorPart, selection,
                     user);
-
-                if (user.equals(getFollowedUser())) {
-                    adjustViewport(user, editorPart, selection);
-                }
             }
         }
 
@@ -824,138 +846,36 @@ public class EditorManager extends AbstractActivityProducer implements
             textEdit.getReplacedText(), textEdit.getText());
     }
 
-    private void execTextSelection(TextSelectionActivity selection) {
+    @Override
+    public void adjustViewport(final SPath path, final LineRange range,
+        final TextSelection selection) {
 
-        LOG.trace(".execTextSelection invoked");
+        if (path == null)
+            throw new IllegalArgumentException("path must not be null");
 
-        SPath path = selection.getPath();
-
-        if (path == null) {
-            LOG.error("Received text selection but have no writable editor");
-            return;
-        }
-
-        TextSelection textSelection = new TextSelection(selection.getOffset(),
-            selection.getLength());
-
-        User user = selection.getSource();
-
-        Set<IEditorPart> editors = editorPool.getEditors(path);
-
-        for (IEditorPart editorPart : editors) {
-            locationAnnotationManager.setSelection(editorPart, textSelection,
-                user);
-
-            if (user.equals(getFollowedUser())) {
-                adjustViewport(user, editorPart, textSelection);
+        SWTUtils.runSafeSWTSync(LOG, new Runnable() {
+            @Override
+            public void run() {
+                for (IEditorPart editorPart : editorPool.getEditors(path)) {
+                    adjustViewport(editorPart, range, selection);
+                }
             }
-        }
-
-        /*
-         * inform all registered ISharedEditorListeners about a text selection
-         * made
-         */
-        editorListenerDispatch.textSelectionChanged(selection);
+        });
     }
 
-    private void execViewport(ViewportActivity viewport) {
+    @Override
+    public void closeEditor(final SPath path) {
+        if (path == null)
+            throw new IllegalArgumentException("path must not be null");
 
-        LOG.trace(".execViewport invoked");
-
-        User user = viewport.getSource();
-        boolean following = user.equals(getFollowedUser());
-
-        {
-            /**
-             * Check if the activity source is a followed user with his cursor
-             * is outside the viewport.
-             */
-            TextSelection selection = remoteEditorManager.getSelection(user);
-            /**
-             * selection can be null if the {@link ViewportActivity} came before
-             * the first {@link TextSelectionActivity}
-             */
-            if (selection != null) {
-                // FIXME Find another way to determine the cursor position.
-                // The hard-coded '-1' only reflects the old behavior where
-                // Eclipse JFace's TextSelection() was always created without
-                // a Document and .getEndLine() always returned that value.
-
-                // int cursor = selection.getEndLine()
-                int cursor = -1;
-
-                int top = viewport.getStartLine();
-                int bottom = viewport.getStartLine()
-                    + viewport.getNumberOfLines();
-
-                following = following && (cursor < top || cursor > bottom);
+        SWTUtils.runSafeSWTSync(LOG, new Runnable() {
+            @Override
+            public void run() {
+                for (IEditorPart part : editorPool.getEditors(path)) {
+                    editorAPI.closeEditor(part);
+                }
             }
-        }
-
-        Set<IEditorPart> editors = editorPool.getEditors(viewport.getPath());
-
-        LineRange lineRange = new LineRange(viewport.getStartLine(),
-            viewport.getNumberOfLines());
-
-        for (IEditorPart editorPart : editors) {
-            if (following || user.hasWriteAccess())
-                locationAnnotationManager.setViewportForUser(user, editorPart,
-                    lineRange);
-
-            if (following) {
-                adjustViewport(user, editorPart, lineRange);
-            }
-        }
-    }
-
-    private void execActivated(User user, SPath path) {
-
-        LOG.trace(".execActivated invoked");
-
-        editorListenerDispatch.editorActivated(user, path);
-
-        /**
-         * Path null means this user with {@link User.Permission#WRITE_ACCESS}
-         * has no active editor any more
-         */
-        if (user.equals(getFollowedUser()) && path != null) {
-
-            // open editor but don't change focus
-            editorAPI.openEditor(path, false);
-
-        } else if (user.equals(getFollowedUser()) && path == null) {
-            /*
-             * Changed waldmann 22.01.2012: Since the currently opened file and
-             * the information if no shared files are opened is permanently
-             * shown in the saros view, this is no longer necessary and has
-             * proven to be quite annoying to users too. This should only be
-             * activated again if a preference is added to enable users to
-             * disable this type of notification
-             */
-
-            // SarosView
-            // .showNotification(
-            // "Follow mode paused!",
-            // user.getHumanReadableName()
-            // +
-            // " selected an editor that is not shared. \nFollow mode stays active and follows as soon as possible.");
-        }
-    }
-
-    private void execClosed(User user, SPath path) {
-
-        LOG.trace(".execClosed invoked");
-
-        editorListenerDispatch.editorClosed(user, path);
-
-        for (final IEditorPart editorPart : editorPool.getEditors(path))
-            locationAnnotationManager.clearSelectionForUser(user, editorPart);
-
-        if (user.equals(getFollowedUser())) {
-            for (IEditorPart part : editorPool.getEditors(path)) {
-                editorAPI.closeEditor(part);
-            }
-        }
+        });
     }
 
     /**
@@ -1014,7 +934,8 @@ public class EditorManager extends AbstractActivityProducer implements
 
         LOG.trace(".partActivated invoked");
 
-        // First check for last editor being closed (which is a null editorPart)
+        // First, check for last editor being closed (which is a null
+        // editorPart)
         if (editorPart == null) {
             generateEditorActivated(null);
             return;
@@ -1028,36 +949,7 @@ public class EditorManager extends AbstractActivityProducer implements
             || !session.isShared(ResourceAdapterFactory.create(resource))
             || !editorAPI.getEditorResource(editorPart).isAccessible()) {
             generateEditorActivated(null);
-            // follower switched to another unshared editor or closed followed
-            // editor (not shared editor gets activated)
-            if (isFollowing()) {
-                setFollowing(null);
-                SarosView
-                    .showNotification(
-                        "Follow Mode stopped!",
-                        "You switched to another editor that is not shared \nor closed the followed editor.");
-            }
             return;
-        }
-
-        /*
-         * If the opened editor is not the active editor of the user being
-         * followed, then leave follow mode
-         */
-        if (isFollowing()) {
-            RemoteEditor activeEditor = remoteEditorManager.getEditorState(
-                getFollowedUser()).getActiveEditor();
-
-            if (activeEditor != null
-                && !activeEditor.getPath().equals(
-                    editorAPI.getEditorPath(editorPart))) {
-                setFollowing(null);
-                // follower switched to another shared editor or closed followed
-                // editor (shared editor gets activated)
-                SarosView
-                    .showNotification("Follow Mode stopped!",
-                        "You switched to another editor \nor closed the followed editor.");
-            }
         }
 
         SPath editorPath = editorAPI.getEditorPath(editorPart);
@@ -1067,6 +959,7 @@ public class EditorManager extends AbstractActivityProducer implements
         // Set (and thus send) in this order:
         generateEditorActivated(editorPath);
         generateSelection(editorPart, selection);
+
         if (viewport == null) {
             LOG.warn("Shared Editor does not have a Viewport: " + editorPart);
         } else {
@@ -1083,14 +976,14 @@ public class EditorManager extends AbstractActivityProducer implements
     /**
      * Called if the IEditorInput of the IEditorPart is now something different
      * than before! Probably when renaming. (called by EditorPartListener)
-     * 
      */
     void partInputChanged(IEditorPart editorPart) {
 
         LOG.trace(".partInputChanged invoked");
 
+        // FIXME Get rid of this followModeManager dependency
         // notice currently followed user before closing the editor
-        User currentFollowedUser = getFollowedUser();
+        User oldFollowedUser = followModeManager.getFollowedUser();
 
         if (editorPool.isManaged(editorPart)) {
 
@@ -1108,9 +1001,12 @@ public class EditorManager extends AbstractActivityProducer implements
 
             // restore the previously followed user
             // in case it was set and has changed
-            if (currentFollowedUser != null
-                && currentFollowedUser != getFollowedUser())
-                setFollowing(currentFollowedUser);
+            User newFollowedUser = followModeManager.getFollowedUser();
+            if (oldFollowedUser != null && oldFollowedUser != newFollowedUser) {
+                followModeManager.follow(oldFollowedUser);
+                LOG.debug("Followed user changed from " + oldFollowedUser
+                    + " to " + newFollowedUser + ". Changed it back.");
+            }
         }
     }
 
@@ -1131,33 +1027,13 @@ public class EditorManager extends AbstractActivityProducer implements
     }
 
     private void partClosedOfPath(IEditorPart editorPart, SPath path) {
-
-        // if closing the followed editor, leave follow mode
-        if (getFollowedUser() != null) {
-            RemoteEditor activeEditor = remoteEditorManager.getEditorState(
-                getFollowedUser()).getActiveEditor();
-
-            if (activeEditor != null && activeEditor.getPath().equals(path)) {
-                // follower closed the followed editor (no other editor gets
-                // activated)
-                setFollowing(null);
-                SarosView.showNotification("Follow Mode stopped!",
-                    "You closed the followed editor.");
-            }
-        }
-
         editorPool.remove(editorPart);
+        locallyOpenEditors.remove(path);
 
         ITextViewer viewer = EditorAPI.getViewer(editorPart);
-
         if (viewer instanceof ISourceViewer)
             customAnnotationManager.uninstallPainter((ISourceViewer) viewer,
                 false);
-
-        // Check if the currently active editor is closed
-        boolean newActiveEditor = path.equals(this.locallyActiveEditor);
-
-        locallyOpenEditors.remove(path);
 
         editorListenerDispatch.editorClosed(session.getLocalUser(), path);
 
@@ -1169,6 +1045,8 @@ public class EditorManager extends AbstractActivityProducer implements
          * the shared project scope and a way to deal with closing the active
          * editor
          */
+        // Check if the currently active editor is closed
+        boolean newActiveEditor = path.equals(this.locallyActiveEditor);
         if (newActiveEditor) {
             partActivated(editorAPI.getActiveEditor());
         }
@@ -1495,43 +1373,29 @@ public class EditorManager extends AbstractActivityProducer implements
     }
 
     /**
-     * Returns <code>true</code> if there is currently a {@link User} followed,
-     * otherwise <code>false</code>.
-     */
-    // FIXME misplaced logic
-    public boolean isFollowing() {
-        return getFollowedUser() != null;
-    }
-
-    /**
      * Returns the followed {@link User} or <code>null</code> if currently no
      * user is followed.
+     * 
+     * @deprecated Use the {@link FollowModeManager} instead
      */
-    // FIXME misplaced logic
+    @Deprecated
     public User getFollowedUser() {
-        return followedUser;
+        if (followModeManager == null)
+            return null;
+
+        return followModeManager.getFollowedUser();
     }
 
     /**
      * Sets the {@link User} to follow or <code>null</code> if no user should be
      * followed.
+     * 
+     * @deprecated Use the {@link FollowModeManager} instead
      */
-    // FIXME misplaced logic
+    @Deprecated
     public void setFollowing(User newFollowedUser) {
-        assert newFollowedUser == null
-            || !newFollowedUser.equals(session.getLocalUser()) : "local user cannot follow himself!";
-
-        User oldFollowedUser = this.followedUser;
-        this.followedUser = newFollowedUser;
-
-        if (oldFollowedUser != null && !oldFollowedUser.equals(newFollowedUser)) {
-            editorListenerDispatch.followModeChanged(oldFollowedUser, false);
-        }
-
-        if (newFollowedUser != null) {
-            editorListenerDispatch.followModeChanged(newFollowedUser, true);
-            this.jumpToUser(newFollowedUser);
-        }
+        if (followModeManager != null)
+            followModeManager.follow(newFollowedUser);
     }
 
     private void refreshAnnotations() {
@@ -1590,12 +1454,10 @@ public class EditorManager extends AbstractActivityProducer implements
 
             RemoteEditor remoteEditor = remoteEditorState.getRemoteEditor(path);
 
-            if (user.hasWriteAccess() || user.equals(followedUser)) {
-                LineRange lineRange = remoteEditor.getViewport();
-                if (lineRange != null) {
-                    locationAnnotationManager.setViewportForUser(user,
-                        editorPart, lineRange);
-                }
+            LineRange lineRange = remoteEditor.getViewport();
+            if (lineRange != null) {
+                locationAnnotationManager.setViewportForUser(user, editorPart,
+                    lineRange);
             }
 
             TextSelection selection = remoteEditor.getSelection();
@@ -1613,56 +1475,6 @@ public class EditorManager extends AbstractActivityProducer implements
     @Deprecated
     public RemoteEditorManager getRemoteEditorManager() {
         return this.remoteEditorManager;
-    }
-
-    // FIXME misplaced logic
-    public void jumpToUser(User jumpTo) {
-
-        RemoteEditor activeEditor = remoteEditorManager.getEditorState(jumpTo)
-            .getActiveEditor();
-
-        // you can't follow yourself
-        if (session.getLocalUser().equals(jumpTo))
-            return;
-
-        if (activeEditor == null) {
-            LOG.debug("user " + jumpTo + " has no editor open");
-
-            // changed waldmann, 22.01.2012: this balloon Notification became
-            // annoying as the awareness information, which file is opened is
-            // now shown in the session view all the time (unless the user has
-            // collapsed the tree element)
-
-            // no active editor on target subject
-            // SarosView.showNotification("Following " +
-            // jumpTo.getJID().getBase()
-            // + "!", jumpTo.getJID().getName()
-            // + " has no shared file opened yet.");
-            return;
-        }
-
-        IEditorPart newEditor = this.editorAPI.openEditor(activeEditor
-            .getPath());
-
-        if (newEditor == null) {
-            return;
-        }
-
-        LineRange viewport = activeEditor.getViewport();
-
-        if (viewport == null) {
-            LOG.warn("user " + jumpTo + " has no viewport in editor: "
-                + activeEditor.getPath());
-            return;
-        }
-
-        adjustViewport(jumpTo, newEditor, viewport);
-
-        /*
-         * inform all registered ISharedEditorListeners about this jump
-         * performed
-         */
-        editorListenerDispatch.jumpedToUser(jumpTo);
     }
 
     /**
@@ -1720,48 +1532,23 @@ public class EditorManager extends AbstractActivityProducer implements
         return false;
     }
 
-    /**
-     * Open the editor window of given {@link SPath}.
-     * 
-     * @param path
-     *            Path of the Editor to open.
-     */
-    public void openEditor(SPath path) {
-        checkThreadAccess();
-
-        if (path == null)
-            throw new IllegalArgumentException();
-
-        editorAPI.openEditor(path);
-    }
-
-    /**
-     * Close the editor of given {@link SPath}.
-     * 
-     * @param path
-     *            Path of the file of which the editor should be closed
-     */
-    public void closeEditor(SPath path) {
-        checkThreadAccess();
-
-        if (path == null)
-            throw new IllegalArgumentException("path must not be null");
-
-        for (IEditorPart iEditorPart : EditorAPI.getOpenEditors()) {
-            IResource resource = editorAPI.getEditorResource(iEditorPart);
-
-            if (resource == null)
-                continue;
-
-            if (ResourceAdapterFactory.create(resource).equals(
-                path.getResource()))
-                editorAPI.closeEditor(iEditorPart);
-        }
-    }
-
     /*
      * IEditorManager IMPL start
      */
+
+    @Override
+    public void openEditor(final SPath path, final boolean activate) {
+        if (path == null)
+            throw new IllegalArgumentException();
+
+        SWTUtils.runSafeSWTSync(LOG, new Runnable() {
+            @Override
+            public void run() {
+                editorAPI.openEditor(path, activate);
+            }
+        });
+    }
+
     @Override
     public void saveEditors(final IProject project) {
         SWTUtils.runSafeSWTSync(LOG, new Runnable() {
@@ -1783,6 +1570,60 @@ public class EditorManager extends AbstractActivityProducer implements
                 }
             }
         });
+    }
+
+    @Override
+    public void jumpToUser(final User jumpTo) {
+        // jumping to one's own position does not make much sense
+        if (session.getLocalUser().equals(jumpTo))
+            return;
+
+        final RemoteEditor activeEditor = remoteEditorManager.getEditorState(
+            jumpTo).getActiveEditor();
+
+        if (activeEditor == null) {
+            LOG.debug("user " + jumpTo + " has no editor open");
+
+            // changed waldmann, 22.01.2012: this balloon Notification became
+            // annoying as the awareness information, which file is opened is
+            // now shown in the session view all the time (unless the user has
+            // collapsed the tree element)
+
+            // no active editor on target subject
+            // SarosView.showNotification("Following " +
+            // jumpTo.getJID().getBase()
+            // + "!", jumpTo.getJID().getName()
+            // + " has no shared file opened yet.");
+            return;
+        }
+
+        final SPath path = activeEditor.getPath();
+
+        SWTUtils.runSafeSWTSync(LOG, new Runnable() {
+            @Override
+            public void run() {
+                IEditorPart newEditor = editorAPI.openEditor(path);
+                if (newEditor == null) {
+                    LOG.warn("editor for " + path + " couldn't be opened");
+                    return;
+                }
+
+                LineRange viewport = activeEditor.getViewport();
+                if (viewport == null) {
+                    LOG.warn("user " + jumpTo + " has no viewport in editor: "
+                        + path);
+                    return;
+                }
+
+                adjustViewport(jumpTo, newEditor, viewport);
+            }
+        });
+
+        /*
+         * inform all registered ISharedEditorListeners about this jump
+         * performed
+         */
+        editorListenerDispatch.jumpedToUser(jumpTo);
     }
 
     /*
@@ -1834,27 +1675,6 @@ public class EditorManager extends AbstractActivityProducer implements
             defaultSelectionLayer + SarosAnnotation.SIZE + 1);
         customAnnotationManager.registerDrawingStrategy(
             RemoteCursorAnnotation.TYPE, new RemoteCursorStrategy());
-    }
-
-    /**
-     * Adjusts the viewport in Follow Mode. This function should be called if
-     * the followed user's selection changes.
-     * 
-     * @param followedUser
-     *            User who is followed
-     * @param editorPart
-     *            EditorPart of the open Editor
-     * @param selection
-     *            text selection of the followed user
-     */
-    private void adjustViewport(User followedUser, IEditorPart editorPart,
-        TextSelection selection) {
-        if (selection == null)
-            return;
-
-        // range can be null
-        LineRange range = remoteEditorManager.getViewport(followedUser);
-        adjustViewport(editorPart, range, selection);
     }
 
     /**
@@ -2022,8 +1842,8 @@ public class EditorManager extends AbstractActivityProducer implements
         contributionAnnotationManager = new ContributionAnnotationManager(
             session, preferenceStore);
 
-        remoteEditorManager = (RemoteEditorManager) session
-            .getComponent(RemoteEditorManager.class);
+        followModeManager = session.getComponent(FollowModeManager.class);
+        remoteEditorManager = session.getComponent(RemoteEditorManager.class);
         remoteWriteAccessManager = new RemoteWriteAccessManager(session,
             editorAPI);
 
@@ -2045,8 +1865,6 @@ public class EditorManager extends AbstractActivityProducer implements
      */
     private void uninitialize() {
         checkThreadAccess();
-
-        setFollowing(null);
 
         /*
          * FIXME there can be multiple workbench windows (see Eclipse:
@@ -2091,7 +1909,7 @@ public class EditorManager extends AbstractActivityProducer implements
         remoteWriteAccessManager = null;
         locallyActiveEditor = null;
         locallyOpenEditors.clear();
-
+        followModeManager = null;
     }
 
     private void checkThreadAccess() {

@@ -20,6 +20,7 @@ public abstract class AbstractSharedEditorListener implements
         // Does nothing by default
     }
 
+    @Deprecated
     @Override
     public void followModeChanged(User target, boolean isFollowed) {
         // Does nothing by default

@@ -366,8 +366,7 @@ public class SarosSessionTest {
 
         assertTrue(workspaceListeners.isEmpty());
 
-        StopManager stopManager3 = (StopManager) session
-            .getComponent(StopManager.class);
+        StopManager stopManager3 = session.getComponent(StopManager.class);
 
         assertNull(
             "component must not be available before the session is started",
@@ -380,7 +379,7 @@ public class SarosSessionTest {
 
         assertSame(stopManager1, stopManager2);
 
-        stopManager3 = (StopManager) session.getComponent(StopManager.class);
+        stopManager3 = session.getComponent(StopManager.class);
 
         assertSame(stopManager2, stopManager3);
 
@@ -390,7 +389,7 @@ public class SarosSessionTest {
 
         session.stop();
 
-        stopManager3 = (StopManager) session.getComponent(StopManager.class);
+        stopManager3 = session.getComponent(StopManager.class);
         assertNull(
             "component must not be available after the session is stopped",
             stopManager3);

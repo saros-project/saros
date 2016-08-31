@@ -13,9 +13,8 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
+import de.fu_berlin.inf.dpp.editor.FollowModeManager;
+import de.fu_berlin.inf.dpp.editor.IFollowModeListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
@@ -47,19 +46,34 @@ public class FollowThisPersonAction extends Action implements Disposable {
     protected ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
+
+            followModeManager = newSarosSession
+                .getComponent(FollowModeManager.class);
+            followModeManager.addListener(followModeListener);
+
             updateActionEnablement();
         }
 
         @Override
         public void sessionEnded(ISarosSession oldSarosSession,
             SessionEndReason reason) {
+
+            followModeManager.removeListener(followModeListener);
+            followModeManager = null;
+
             updateActionEnablement();
         }
     };
 
-    protected ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
+    private IFollowModeListener followModeListener = new IFollowModeListener() {
+
         @Override
-        public void followModeChanged(User target, boolean isFollowed) {
+        public void stoppedFollowing(Reason reason) {
+            updateActionEnablement();
+        }
+
+        @Override
+        public void startedFollowing(User target) {
             updateActionEnablement();
         }
     };
@@ -74,8 +88,7 @@ public class FollowThisPersonAction extends Action implements Disposable {
     @Inject
     protected ISarosSessionManager sessionManager;
 
-    @Inject
-    protected EditorManager editorManager;
+    private FollowModeManager followModeManager;
 
     public FollowThisPersonAction() {
         super(Messages.FollowThisPersonAction_follow_title);
@@ -93,7 +106,6 @@ public class FollowThisPersonAction extends Action implements Disposable {
         setId(ACTION_ID);
 
         sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
-        editorManager.addSharedEditorListener(editorListener);
         SelectionUtils.getSelectionService().addSelectionListener(
             selectionListener);
 
@@ -119,10 +131,10 @@ public class FollowThisPersonAction extends Action implements Disposable {
                     return;
                 }
 
-                User toFollow = users.get(0).equals(
-                    editorManager.getFollowedUser()) ? null : users.get(0);
+                User toFollow = followModeManager.isFollowing(users.get(0)) ? null
+                    : users.get(0);
 
-                editorManager.setFollowing(toFollow);
+                followModeManager.follow(toFollow);
             }
         });
     }
@@ -146,7 +158,7 @@ public class FollowThisPersonAction extends Action implements Disposable {
             return;
         }
 
-        if (users.get(0).equals(editorManager.getFollowedUser())) {
+        if (followModeManager.isFollowing(users.get(0))) {
             setText(Messages.FollowThisPersonAction_stop_follow_title);
             setToolTipText(Messages.FollowThisPersonAction_stop_follow_tooltip);
         } else {
@@ -160,8 +172,8 @@ public class FollowThisPersonAction extends Action implements Disposable {
     protected boolean canBeExecuted(List<User> users) {
         ISarosSession sarosSession = sessionManager.getSarosSession();
 
-        return sarosSession != null && users.size() == 1
-            && !users.get(0).isLocal();
+        return sarosSession != null && followModeManager != null
+            && users.size() == 1 && !users.get(0).isLocal();
     }
 
     @Override
@@ -169,6 +181,5 @@ public class FollowThisPersonAction extends Action implements Disposable {
         SelectionUtils.getSelectionService().removeSelectionListener(
             selectionListener);
         sessionManager.removeSessionLifecycleListener(sessionLifecycleListener);
-        editorManager.removeSharedEditorListener(editorListener);
     }
 }

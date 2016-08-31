@@ -8,9 +8,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
-import de.fu_berlin.inf.dpp.editor.IEditorManager;
-import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
+import de.fu_berlin.inf.dpp.editor.FollowModeManager;
+import de.fu_berlin.inf.dpp.editor.IFollowModeListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 
@@ -78,25 +77,35 @@ public class FollowModeCollector extends AbstractStatisticCollector {
     private List<FollowModeToggleEvent> followModeChangeEvents = Collections
         .synchronizedList(new ArrayList<FollowModeToggleEvent>());
 
-    private final IEditorManager editorManager;
+    private FollowModeManager followModeManager;
 
-    private ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
+    private IFollowModeListener followModeListener = new IFollowModeListener() {
 
         @Override
-        public void followModeChanged(User target, boolean isFollowed) {
+        public void stoppedFollowing(Reason reason) {
+            logEvent(false);
+        }
 
+        @Override
+        public void startedFollowing(User target) {
+            logEvent(true);
+        }
+
+        private void logEvent(boolean isFollowed) {
             FollowModeToggleEvent event = new FollowModeToggleEvent(
                 System.currentTimeMillis(), isFollowed);
 
             followModeChangeEvents.add(event);
             ++countFollowModeChanges;
         }
+
     };
 
     public FollowModeCollector(StatisticManager statisticManager,
-        ISarosSession session, IEditorManager editorManager) {
+        ISarosSession session, FollowModeManager followModeManager) {
         super(statisticManager, session);
-        this.editorManager = editorManager;
+
+        this.followModeManager = followModeManager;
     }
 
     @Override
@@ -151,14 +160,16 @@ public class FollowModeCollector extends AbstractStatisticCollector {
     protected void doOnSessionStart(ISarosSession sarosSession) {
         // get starting time of session
         sessionStart = System.currentTimeMillis();
-        editorManager.addSharedEditorListener(editorListener);
+
+        followModeManager.addListener(followModeListener);
     }
 
     @Override
     protected void doOnSessionEnd(ISarosSession sarosSession) {
         // get the time the session ended
         sessionEnd = System.currentTimeMillis();
-        editorManager.removeSharedEditorListener(editorListener);
+
+        followModeManager.removeListener(followModeListener);
     }
 
 }

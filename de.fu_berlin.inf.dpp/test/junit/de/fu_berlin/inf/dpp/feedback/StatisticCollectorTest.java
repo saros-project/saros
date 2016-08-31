@@ -19,6 +19,7 @@ import org.picocontainer.injectors.ConstructorInjection;
 import de.fu_berlin.inf.dpp.ISarosContextBindings;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.editor.FollowModeManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -62,6 +63,7 @@ public class StatisticCollectorTest {
         EasyMock.expect(session.getUsers()).andStubReturn(participants);
         EasyMock.expect(session.getHost()).andStubReturn(bob);
         EasyMock.expect(session.getID()).andStubReturn("0815");
+
         EasyMock.replay(session);
         return session;
     }
@@ -93,6 +95,13 @@ public class StatisticCollectorTest {
         return editorManager;
     }
 
+    private static FollowModeManager createFollowModeManagerMock() {
+        FollowModeManager followModeManager = EasyMock
+            .createNiceMock(FollowModeManager.class);
+        EasyMock.replay(followModeManager);
+        return followModeManager;
+    }
+
     @Test
     public void testCollectorRegistrationAndDestruction() {
 
@@ -111,6 +120,10 @@ public class StatisticCollectorTest {
         final List<Object> editorListeners = new LinkedList<Object>();
         EditorManager editorManager = createEditorManagerMock(editorListeners);
         container.addComponent(EditorManager.class, editorManager);
+
+        // follow mode manager
+        container.addComponent(FollowModeManager.class,
+            createFollowModeManagerMock());
 
         final IPreferenceStore store = new EclipseMemoryPreferenceStore();
         final Preferences preferences = new MemoryPreferences();

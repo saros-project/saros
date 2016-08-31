@@ -7,10 +7,12 @@ import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.editor.FollowModeManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.stf.shared.Constants;
 import de.fu_berlin.inf.dpp.versioning.VersionManager;
@@ -38,6 +40,18 @@ public abstract class StfRemoteObject implements Constants {
     protected DataTransferManager getDataTransferManager() {
         return (DataTransferManager) context
             .getComponent(IConnectionManager.class);
+    }
+
+    /**
+     * @return is <code>null</code> if there is no running session
+     */
+    protected FollowModeManager getFollowModeManager() {
+        ISarosSession sarosSession = getSessionManager().getSarosSession();
+
+        if (sarosSession == null)
+            return null;
+
+        return sarosSession.getComponent(FollowModeManager.class);
     }
 
     protected EditorManager getEditorManager() {

@@ -3,7 +3,10 @@ package de.fu_berlin.inf.dpp.editor;
 import java.util.Set;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.editor.text.LineRange;
+import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.session.User;
 
 /**
  * Tracks and provides access to editors for the set of files shared in the
@@ -11,23 +14,33 @@ import de.fu_berlin.inf.dpp.filesystem.IProject;
  * text file displayed to the user for viewing and editing.
  * <p>
  * Editors are referred to by {@link SPath paths} to the files they are
- * associated with. Whenever possible, <code>IEditorManager</code> will make it
+ * associated with. Whenever possible, {@link IEditorManager} will make it
  * transparent to the caller whether there is actually an open editor for the
  * file; for instance, {@link #getContent(SPath)} automatically falls back to
  * retrieving the content directly from the file instead of from the editor.
  * <p>
- * <code>IEditorManager</code> tracks both locally open editors and editors
- * opened by remote users. Changes to local editors (such as editors getting
- * opened, closed, or their content changed) are reported to remote sites as
+ * {@link IEditorManager} tracks both locally open editors and editors opened by
+ * remote users. Changes to local editors (such as editors getting opened,
+ * closed, or their content changed) are reported to remote sites as
  * {@link de.fu_berlin.inf.dpp.activities.IActivity activities}. Objects can
  * react to both local and remote editor events by installing an
  * {@link ISharedEditorListener}.
  * <p>
- * All methods of <code>IEditorManager</code> automatically take care of any
- * required synchronization with the UI thread and can be safely called from any
- * thread.
+ * All methods of {@link IEditorManager} automatically take care of any required
+ * synchronization with the UI thread and can be safely called from any thread.
  */
 public interface IEditorManager {
+
+    /**
+     * Open the editor window of given {@link SPath}.
+     * 
+     * @param path
+     *            Path of the Editor to open.
+     * @param activate
+     *            Determines whether the newly opened editor should get the
+     *            focus or should be opened in the background.
+     */
+    public void openEditor(SPath path, boolean activate);
 
     /**
      * Returns the paths of all shared files for which an editor is currently
@@ -69,6 +82,39 @@ public interface IEditorManager {
     public void saveEditors(IProject project);
 
     /**
+     * Close the editor of given {@link SPath}.
+     * 
+     * @param path
+     *            Path of the file of which the editor should be closed
+     */
+    public void closeEditor(SPath path);
+
+    /**
+     * Adjusts viewport. Focus is set on the center of the range, but priority
+     * is given to selected lines. Either range or selection can be
+     * <code>null</null>, but
+     * not both.
+     * 
+     * @param path
+     *            Path of the open Editor
+     * @param range
+     *            viewport of the followed user. Can be <code>null</code>.
+     * @param selection
+     *            text selection of the followed user. Can be <code>null</code>.
+     * 
+     */
+    public void adjustViewport(SPath path, LineRange range,
+        TextSelection selection);
+
+    /**
+     * Locally opens the editor that the User {@code target} has currently open,
+     * adjusts the viewport, and calls
+     * {@link ISharedEditorListener#jumpedToUser(User)} to inform the session
+     * participants of the jump.
+     */
+    public void jumpToUser(User target);
+
+    /**
      * Adds an {@link ISharedEditorListener} to listen for changes such as
      * editors getting opened, closed or their content changed.
      * 
@@ -85,4 +131,5 @@ public interface IEditorManager {
      *            editor listener to remove
      */
     public void removeSharedEditorListener(ISharedEditorListener listener);
+
 }

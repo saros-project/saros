@@ -19,6 +19,7 @@ import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.core.editor.RemoteWriteAccessManager;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
+import de.fu_berlin.inf.dpp.editor.FollowModeManager;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.RemoteEditorManager;
@@ -555,7 +556,10 @@ public class EditorManager extends AbstractActivityProducer
     /**
      * Returns the followed {@link User} or <code>null</code> if currently no
      * user is followed.
+     *
+     * @deprecated Use the {@link FollowModeManager} instead.
      */
+    @Deprecated
     public User getFollowedUser() {
         return followedUser;
     }
@@ -587,7 +591,10 @@ public class EditorManager extends AbstractActivityProducer
      * to inform the other participants of the change.
      * <p/>
      * Jumps to the newly followed user.
+     *
+     * @deprecated Use the {@link FollowModeManager} instead.
      */
+    @Deprecated
     public void setFollowing(User newFollowedUser) {
         assert newFollowedUser == null || !newFollowedUser.equals(
             session.getLocalUser()) : "local user cannot follow himself!";
@@ -752,14 +759,20 @@ public class EditorManager extends AbstractActivityProducer
     /**
      * Returns <code>true</code> if there is currently a {@link User} followed,
      * otherwise <code>false</code>.
+     *
+     * @deprecated Use the {@link FollowModeManager} instead.
      */
+    @Deprecated
     boolean isFollowing() {
         return followedUser != null;
     }
 
     /**
      * Returns <code>true</code> if it is currently following user, otherwise <code>false</code>.
+     *
+     * @deprecated Use the {@link FollowModeManager} instead.
      */
+    @Deprecated
     boolean isFollowing(User user) {
         return followedUser != null && followedUser.equals(user);
     }
@@ -769,9 +782,10 @@ public class EditorManager extends AbstractActivityProducer
      * the viewport and calls {@link SharedEditorListenerDispatch#jumpedToUser(User)}
      * to inform the session participants of the jump.
      */
-    void jumpToUser(User jumpTo) {
+    @Override
+    public void jumpToUser(final User jumpTo) {
 
-        RemoteEditorManager.RemoteEditor remoteActiveEditor = remoteEditorManager
+        final RemoteEditorManager.RemoteEditor remoteActiveEditor = remoteEditorManager
             .getEditorState(jumpTo).getActiveEditor();
 
         // you can't follow yourself
@@ -781,32 +795,36 @@ public class EditorManager extends AbstractActivityProducer
 
         if (remoteActiveEditor == null) {
             LOG.info(jumpTo.getJID() + " has no editor open");
-
             return;
         }
 
-        Editor newEditor = localEditorManipulator
-            .openEditor(remoteActiveEditor.getPath());
+        executeInUIThreadSynchronous(new Runnable() {
+            @Override
+            public void run() {
+                Editor newEditor = localEditorManipulator
+                    .openEditor(remoteActiveEditor.getPath());
 
-        if (newEditor == null) {
-            return;
-        }
+                if (newEditor == null) {
+                    return;
+                }
 
-        LineRange viewport = remoteActiveEditor.getViewport();
+                LineRange viewport = remoteActiveEditor.getViewport();
 
-        if (viewport == null) {
-            LOG.warn(jumpTo.getJID() + " has no viewport in editor: "
-                + remoteActiveEditor.getPath());
-            return;
-        }
+                if (viewport == null) {
+                    LOG.warn(jumpTo.getJID() + " has no viewport in editor: "
+                        + remoteActiveEditor.getPath());
+                    return;
+                }
 
-        // selection can be null
-        TextSelection selection = remoteEditorManager
-            .getSelection(followedUser);
-        if (selection != null) {
-            localEditorManipulator
-                .adjustViewport(newEditor, viewport, selection);
-        }
+                // selection can be null
+                TextSelection selection = remoteEditorManager
+                    .getSelection(followedUser);
+                if (selection != null) {
+                    localEditorManipulator
+                        .adjustViewport(newEditor, viewport, selection);
+                }
+            }
+        });
 
         editorListenerDispatch.jumpedToUser(jumpTo);
     }
@@ -910,6 +928,39 @@ public class EditorManager extends AbstractActivityProducer
                         saveFile(path);
                     }
                 }
+            }
+        });
+    }
+
+    @Override
+    public void openEditor(final SPath path, boolean activate) {
+        executeInUIThreadSynchronous(new Runnable() {
+            @Override
+            public void run() {
+                localEditorManipulator.openEditor(path);
+            }
+        });
+    }
+
+    @Override
+    public void closeEditor(final SPath path) {
+        executeInUIThreadSynchronous(new Runnable() {
+            @Override
+            public void run() {
+                localEditorManipulator.closeEditor(path);
+            }
+        });
+    }
+
+    @Override
+    public void adjustViewport(final SPath path, final LineRange range,
+        final TextSelection selection) {
+
+        executeInUIThreadSynchronous(new Runnable() {
+            @Override
+            public void run() {
+                Editor editor = localEditorManipulator.openEditor(path);
+                localEditorManipulator.adjustViewport(editor, range, selection);
             }
         });
     }

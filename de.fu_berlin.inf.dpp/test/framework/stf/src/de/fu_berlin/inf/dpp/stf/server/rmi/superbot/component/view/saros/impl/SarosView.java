@@ -29,7 +29,9 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.hamcrest.Matcher;
 import org.jivesoftware.smack.Roster;
 
+import de.fu_berlin.inf.dpp.editor.FollowModeManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.bot.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.impl.ControlBotImpl;
@@ -403,10 +405,14 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
 
     @Override
     public JID getFollowedUser() {
-        if (getEditorManager().getFollowedUser() != null)
-            return getEditorManager().getFollowedUser().getJID();
-        else
+        FollowModeManager followModeManager = getFollowModeManager();
+
+        if (followModeManager == null)
             return null;
+
+        User followedUser = followModeManager.getFollowedUser();
+
+        return (followedUser != null) ? followedUser.getJID() : null;
     }
 
     @Override

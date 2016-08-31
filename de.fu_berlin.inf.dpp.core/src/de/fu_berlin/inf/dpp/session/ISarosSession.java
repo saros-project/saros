@@ -560,16 +560,16 @@ public interface ISarosSession {
 
     /**
      * Returns the session runtime component with the given key.
+     * <p>
+     * <b>Attention:</b> This method should be used with great care. It is up to
+     * to the caller to ensure that the returned reference can be garbage
+     * collected when the session has stopped, i.e by setting the reference to
+     * <code>null</code>
      * 
      * @param key
      *            the key of the component
      * @return the runtime component or <code>null</code> if the component is
-     *         either not available or does not exists
-     * 
-     * @deprecated This method should be used with great care. It is up to to
-     *             the caller to ensure that the returned reference can be
-     *             garbage collected when the session has stopped
+     *         either not available or does not exist
      */
-    @Deprecated
-    public Object getComponent(Object key);
+    public <T> T getComponent(Class<T> key);
 }

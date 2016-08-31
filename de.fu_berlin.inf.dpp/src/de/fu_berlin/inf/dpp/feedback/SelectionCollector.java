@@ -139,6 +139,12 @@ public class SelectionCollector extends AbstractStatisticCollector {
                 localPath = filePath;
         }
 
+        /**
+         * {@inheritDoc}
+         * <p>
+         * TODO Implement IActivityConsumer instead and delete this method from
+         * the SharedEditorListener (this is the only implementation)
+         */
         @Override
         public void textSelectionChanged(TextSelectionActivity selection) {
             // details of the occurred selection

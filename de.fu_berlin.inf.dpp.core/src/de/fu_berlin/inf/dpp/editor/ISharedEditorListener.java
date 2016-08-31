@@ -44,7 +44,10 @@ public interface ISharedEditorListener {
      * @param isFollowed
      *            <code>true</code> if following has started, <code>false</code>
      *            if it has ended
+     * @deprecated Implement {@link IFollowModeListener} instead and register to
+     *             the {@link FollowModeManager}.
      */
+    @Deprecated
     public void followModeChanged(User target, boolean isFollowed);
 
     /**

@@ -594,7 +594,7 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
         }
 
         if (editorWasOpen && type != FileActivity.Type.REMOVED)
-            editorManager.openEditor(path);
+            editorManager.openEditor(path, true);
     }
 
     /**

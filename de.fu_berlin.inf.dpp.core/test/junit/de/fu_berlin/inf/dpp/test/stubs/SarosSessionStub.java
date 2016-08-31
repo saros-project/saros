@@ -282,7 +282,7 @@ public class SarosSessionStub implements ISarosSession {
     }
 
     @Override
-    public Object getComponent(Object key) {
+    public <T> T getComponent(Class<T> key) {
         throw new RuntimeException("Unexpected call to Stub");
     }
 }

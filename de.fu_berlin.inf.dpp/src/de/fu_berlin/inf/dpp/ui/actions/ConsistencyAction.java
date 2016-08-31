@@ -172,7 +172,7 @@ public class ConsistencyAction extends Action implements Disposable {
         if (currentSession == null)
             return;
 
-        final ConsistencyWatchdogClient watchdogClient = (ConsistencyWatchdogClient) currentSession
+        final ConsistencyWatchdogClient watchdogClient = currentSession
             .getComponent(ConsistencyWatchdogClient.class);
 
         if (watchdogClient == null) {
@@ -255,7 +255,7 @@ public class ConsistencyAction extends Action implements Disposable {
         if (currentSession == null)
             return;
 
-        final ConsistencyWatchdogClient watchdogClient = (ConsistencyWatchdogClient) currentSession
+        final ConsistencyWatchdogClient watchdogClient = currentSession
             .getComponent(ConsistencyWatchdogClient.class);
 
         if (watchdogClient == null) {

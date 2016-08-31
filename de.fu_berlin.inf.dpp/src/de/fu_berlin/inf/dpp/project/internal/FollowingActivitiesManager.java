@@ -10,9 +10,8 @@ import de.fu_berlin.inf.dpp.activities.StartFollowingActivity;
 import de.fu_berlin.inf.dpp.activities.StopFollowingActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
-import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
-import de.fu_berlin.inf.dpp.editor.IEditorManager;
-import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
+import de.fu_berlin.inf.dpp.editor.FollowModeManager;
+import de.fu_berlin.inf.dpp.editor.IFollowModeListener;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
@@ -42,18 +41,19 @@ public class FollowingActivitiesManager extends AbstractActivityProducer
 
     private final AwarenessInformationCollector collector;
 
-    private final IEditorManager editor;
+    private final FollowModeManager followModeManager;
 
-    private final ISharedEditorListener followModeListener = new AbstractSharedEditorListener() {
+    private final IFollowModeListener followModeListener = new IFollowModeListener() {
+
         @Override
-        public void followModeChanged(User target, boolean isFollowed) {
+        public void stoppedFollowing(Reason reason) {
+            fireActivity(new StopFollowingActivity(session.getLocalUser()));
+        }
 
-            if (isFollowed) {
-                fireActivity(new StartFollowingActivity(session.getLocalUser(),
-                    target));
-            } else {
-                fireActivity(new StopFollowingActivity(session.getLocalUser()));
-            }
+        @Override
+        public void startedFollowing(User target) {
+            fireActivity(new StartFollowingActivity(session.getLocalUser(),
+                target));
         }
     };
 
@@ -93,10 +93,10 @@ public class FollowingActivitiesManager extends AbstractActivityProducer
 
     public FollowingActivitiesManager(final ISarosSession session,
         final AwarenessInformationCollector collector,
-        final IEditorManager editor) {
+        final FollowModeManager followModeManager) {
         this.session = session;
         this.collector = collector;
-        this.editor = editor;
+        this.followModeManager = followModeManager;
     }
 
     @Override
@@ -105,7 +105,7 @@ public class FollowingActivitiesManager extends AbstractActivityProducer
         session.addActivityProducer(this);
         session.addActivityConsumer(consumer, Priority.ACTIVE);
         session.addListener(sessionListener);
-        editor.addSharedEditorListener(followModeListener);
+        followModeManager.addListener(followModeListener);
     }
 
     @Override
@@ -113,7 +113,7 @@ public class FollowingActivitiesManager extends AbstractActivityProducer
         session.removeActivityProducer(this);
         session.removeActivityConsumer(consumer);
         session.removeListener(sessionListener);
-        editor.removeSharedEditorListener(followModeListener);
+        followModeManager.removeListener(followModeListener);
         collector.flushFollowModes();
     }
 
