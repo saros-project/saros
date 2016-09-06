@@ -31,6 +31,7 @@ import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
 import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 
 /**
  * @author rdjemili
@@ -57,6 +58,9 @@ public abstract class SessionNegotiation extends Negotiation {
 
     @Inject
     protected SessionNegotiationHookManager hookManager;
+
+    @Inject
+    protected ISarosSessionManager sessionManager;
 
     protected final String description;
 

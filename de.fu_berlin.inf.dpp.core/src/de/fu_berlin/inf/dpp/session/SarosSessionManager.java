@@ -383,9 +383,8 @@ public class SarosSessionManager implements ISarosSessionManager {
                 negotiationPacketLister
                     .setRejectSessionNegotiationRequests(true);
 
-                negotiation = new IncomingSessionNegotiation(this, sessionID,
-                    from, version, invitationID, description,
-                    applicationContext);
+                negotiation = new IncomingSessionNegotiation(sessionID, from,
+                    version, invitationID, description, applicationContext);
 
                 negotiation.setNegotiationListener(negotiationListener);
                 currentSessionNegotiations.add(negotiation);

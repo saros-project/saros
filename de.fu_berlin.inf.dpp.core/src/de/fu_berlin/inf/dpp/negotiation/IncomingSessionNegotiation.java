@@ -23,7 +23,6 @@ import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ColorNegotiationHook;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 
 /*
@@ -34,7 +33,6 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
     private static Logger LOG = Logger
         .getLogger(IncomingSessionNegotiation.class);
 
-    private final ISarosSessionManager sessionManager;
     private final String remoteVersion;
 
     private boolean running;
@@ -47,14 +45,13 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
 
     private final String sessionID;
 
-    public IncomingSessionNegotiation(ISarosSessionManager sessionManager,
-        String sessionID, JID from, String remoteVersion, String invitationID,
-        String description, ISarosContext sarosContext) {
+    public IncomingSessionNegotiation(String sessionID, JID from,
+        String remoteVersion, String invitationID, String description,
+        ISarosContext sarosContext) {
 
         super(invitationID, from, description, sarosContext);
 
         this.sessionID = sessionID;
-        this.sessionManager = sessionManager;
         this.remoteVersion = remoteVersion;
     }
 
