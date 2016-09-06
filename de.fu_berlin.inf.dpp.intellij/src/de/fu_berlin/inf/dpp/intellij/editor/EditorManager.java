@@ -55,6 +55,10 @@ import java.util.Set;
 
 /**
  * IntelliJ implementation of the {@link IEditorManager} interface.
+ * <p/>
+ * FIXME: There are several usages of the "followedUser" field that should have
+ * nothing to do with the follow mode. Search for "FIXME followMode" to find all
+ * instances.
  */
 public class EditorManager extends AbstractActivityProducer
     implements IEditorManager {
@@ -128,6 +132,7 @@ public class EditorManager extends AbstractActivityProducer
 
             switch (editorActivity.getType()) {
             case ACTIVATED:
+                // TODO: Let the FollowModeManager handle this
                 if (isFollowing(user)) {
                     localEditorManipulator.openEditor(path);
                 }
@@ -135,6 +140,7 @@ public class EditorManager extends AbstractActivityProducer
                 break;
 
             case CLOSED:
+                // TODO: Let the FollowModeManager handle this
                 if (isFollowing(user)) {
                     localEditorManipulator.closeEditor(path);
                 }
@@ -281,11 +287,12 @@ public class EditorManager extends AbstractActivityProducer
 
         @Override
         public void userLeft(final User user) {
-
+            // TODO: Let the FollowModeManager handle this
             if (user.equals(followedUser)) {
                 setFollowing(null);
             }
 
+            // TODO: Let the RemoteEditorManager handle this?
             remoteEditorManager.removeUser(user);
         }
     };
@@ -314,6 +321,7 @@ public class EditorManager extends AbstractActivityProducer
 
         @Override
         public void projectResourcesAvailable(String projectID) {
+            // FIXME Why should the follow mode matter here?
             if (!isFollowing()) {
                 return;
             }
@@ -381,6 +389,8 @@ public class EditorManager extends AbstractActivityProducer
               * again everything is going back to normal. To prevent that
               * from happening this method is needed.
               */
+            // FIXME followMode: This should have nothing to do with the
+            // currently followed user
             Set<SPath> remoteOpenEditors = getRemoteEditorManager()
                 .getRemoteOpenEditors(followedUser);
             RemoteEditorManager.RemoteEditor remoteSelectedEditor = getRemoteEditorManager()
@@ -406,6 +416,8 @@ public class EditorManager extends AbstractActivityProducer
                         .getOffset();
                     int length = remoteSelectedEditor.getSelection()
                         .getLength();
+                    // FIXME followMode: This should have nothing to do with the
+                    // currently followed user
                     ColorModel colorModel = ColorManager
                         .getColorModel(followedUser.getColorID());
                     localEditorManipulator
@@ -664,6 +676,7 @@ public class EditorManager extends AbstractActivityProducer
     void generateEditorClosed(SPath path) {
         // if closing the followed editor, leave follow mode
         if (followedUser != null) {
+            // TODO Let the FollowModeManager handle this
             RemoteEditorManager.RemoteEditor activeEditor = remoteEditorManager
                 .getEditorState(followedUser).getActiveEditor();
 
@@ -675,6 +688,9 @@ public class EditorManager extends AbstractActivityProducer
                     "You closed the followed editor.");
             }
         }
+
+        // TODO What about cleaning up (editorPool, locallyOpenEditors, ...)?
+        // TODO What about a editorListenerDispatch.editorClosed() call?
 
         fireActivity(new EditorActivity(session.getLocalUser(),
             EditorActivity.Type.CLOSED, path));
@@ -788,7 +804,7 @@ public class EditorManager extends AbstractActivityProducer
         final RemoteEditorManager.RemoteEditor remoteActiveEditor = remoteEditorManager
             .getEditorState(jumpTo).getActiveEditor();
 
-        // you can't follow yourself
+        // you can't jump to yourself
         if (session.getLocalUser().equals(jumpTo)) {
             return;
         }
@@ -820,6 +836,9 @@ public class EditorManager extends AbstractActivityProducer
                 TextSelection selection = remoteEditorManager
                     .getSelection(followedUser);
                 if (selection != null) {
+                    // FIXME Why are we only jumping if we know the selection,
+                    // but not if there is no selection but a perfectly usable
+                    // viewport?
                     localEditorManipulator
                         .adjustViewport(newEditor, viewport, selection);
                 }

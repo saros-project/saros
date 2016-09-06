@@ -334,6 +334,8 @@ public class EditorManager extends AbstractActivityProducer implements
                             user);
                 }
             });
+
+            // TODO: Let the RemoteEditorManager handle this?
             remoteEditorManager.removeUser(user);
         }
     };
