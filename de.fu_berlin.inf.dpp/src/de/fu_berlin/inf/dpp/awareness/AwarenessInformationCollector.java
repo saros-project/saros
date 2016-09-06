@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.editor.RemoteEditorManager;
+import de.fu_berlin.inf.dpp.editor.remote.UserEditorStateManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.User;
@@ -97,15 +97,17 @@ public class AwarenessInformationCollector {
      *         shared, <code>false</code> otherwise
      */
     public boolean isActiveEditorShared(User user) {
-        boolean editorActive = false;
+        if (user == null)
+            return false;
 
-        RemoteEditorManager rem = editorManager.getRemoteEditorManager();
-        if (rem != null && user != null) {
-            if (user.isLocal() && editorManager.isActiveEditorShared()
-                || rem.isRemoteActiveEditorShared(user)) {
-                editorActive = true;
-            }
-        }
-        return editorActive;
+        if (user.isLocal() && editorManager.isActiveEditorShared())
+            return true;
+
+        UserEditorStateManager mgr = editorManager.getUserEditorStateManager();
+
+        if (mgr != null && mgr.getState(user).getActiveEditorState() != null)
+            return true;
+
+        return false;
     }
 }

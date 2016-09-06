@@ -12,8 +12,8 @@ import org.eclipse.ui.PlatformUI;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.editor.RemoteEditorManager;
-import de.fu_berlin.inf.dpp.editor.RemoteEditorManager.RemoteEditor;
+import de.fu_berlin.inf.dpp.editor.remote.EditorState;
+import de.fu_berlin.inf.dpp.editor.remote.UserEditorStateManager;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.ui.model.TreeElement;
 
@@ -91,12 +91,14 @@ public class AwarenessInformationTreeElement extends TreeElement {
     private List<String> getAwarenessDetails() {
         List<String> details = new ArrayList<String>();
 
-        final RemoteEditorManager rem = editorManager.getRemoteEditorManager();
+        final UserEditorStateManager mgr = editorManager
+            .getUserEditorStateManager();
 
-        if (rem == null)
+        if (mgr == null)
             return details;
 
-        final RemoteEditor activeEditor = rem.getRemoteActiveEditor(user);
+        final EditorState activeEditor = mgr.getState(user)
+            .getActiveEditorState();
         /*
          * The other user has a non-shared editor open, i.e. the remote editor
          * shows a file which is not part of the session.

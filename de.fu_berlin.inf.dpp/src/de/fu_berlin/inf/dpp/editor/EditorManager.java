@@ -40,8 +40,6 @@ import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.RemoteEditorManager.RemoteEditor;
-import de.fu_berlin.inf.dpp.editor.RemoteEditorManager.RemoteEditorState;
 import de.fu_berlin.inf.dpp.editor.annotations.ContributionAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.RemoteCursorAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.RemoteCursorStrategy;
@@ -55,6 +53,9 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.LocationAnnotationManager;
 import de.fu_berlin.inf.dpp.editor.internal.SafePartListener2;
+import de.fu_berlin.inf.dpp.editor.remote.EditorState;
+import de.fu_berlin.inf.dpp.editor.remote.UserEditorState;
+import de.fu_berlin.inf.dpp.editor.remote.UserEditorStateManager;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
@@ -125,7 +126,7 @@ public class EditorManager extends AbstractActivityProducer implements
 
     private final IPreferenceStore preferenceStore;
 
-    private RemoteEditorManager remoteEditorManager;
+    private UserEditorStateManager userEditorStateManager;
 
     private RemoteWriteAccessManager remoteWriteAccessManager;
 
@@ -326,17 +327,16 @@ public class EditorManager extends AbstractActivityProducer implements
 
         @Override
         public void userLeft(final User user) {
-            removeAnnotationsFromAllEditors(new Predicate<Annotation>() {
+            Predicate<Annotation> annotationsOfGoneUser = new Predicate<Annotation>() {
                 @Override
                 public boolean evaluate(Annotation annotation) {
                     return annotation instanceof SarosAnnotation
                         && ((SarosAnnotation) annotation).getSource().equals(
                             user);
                 }
-            });
+            };
 
-            // TODO: Let the RemoteEditorManager handle this?
-            remoteEditorManager.removeUser(user);
+            removeAnnotationsFromAllEditors(annotationsOfGoneUser);
         }
     };
 
@@ -557,8 +557,8 @@ public class EditorManager extends AbstractActivityProducer implements
 
     @Override
     public Set<SPath> getRemotelyOpenEditors() {
-        return remoteEditorManager == null ? Collections.<SPath> emptySet()
-            : remoteEditorManager.getRemoteOpenEditors();
+        return userEditorStateManager == null ? Collections.<SPath> emptySet()
+            : userEditorStateManager.getOpenEditors();
     }
 
     @Override
@@ -1447,14 +1447,10 @@ public class EditorManager extends AbstractActivityProducer implements
                 continue;
             }
 
-            RemoteEditorState remoteEditorState = remoteEditorManager
-                .getEditorState(user);
-            if (!(remoteEditorState.isRemoteOpenEditor(path) && remoteEditorState
-                .isRemoteActiveEditor(path))) {
-                continue;
-            }
+            EditorState remoteEditor = userEditorStateManager.getState(user).getEditorState(path);
 
-            RemoteEditor remoteEditor = remoteEditorState.getRemoteEditor(path);
+            if (remoteEditor == null)
+                continue;
 
             LineRange lineRange = remoteEditor.getViewport();
             if (lineRange != null) {
@@ -1471,12 +1467,11 @@ public class EditorManager extends AbstractActivityProducer implements
     }
 
     /**
-     * @deprecated
-     * @return
+     * @deprecated Use the {@link UserEditorStateManager} component directly
      */
     @Deprecated
-    public RemoteEditorManager getRemoteEditorManager() {
-        return this.remoteEditorManager;
+    public UserEditorStateManager getUserEditorStateManager() {
+        return this.userEditorStateManager;
     }
 
     /**
@@ -1484,10 +1479,12 @@ public class EditorManager extends AbstractActivityProducer implements
      * given user has currently opened (one of them being the active editor).
      * 
      * Returns an empty set if the user has no editors open.
+     * 
+     * TODO: This method is only called for an isEmpty() check
      */
     public Set<SPath> getRemoteOpenEditors(User user) {
-        return remoteEditorManager == null ? Collections.<SPath> emptySet()
-            : remoteEditorManager.getRemoteOpenEditors(user);
+        return userEditorStateManager == null ? Collections.<SPath> emptySet()
+            : userEditorStateManager.getState(user).getOpenEditors();
     }
 
     /**
@@ -1557,12 +1554,16 @@ public class EditorManager extends AbstractActivityProducer implements
 
             @Override
             public void run() {
-
-                if (remoteEditorManager == null)
+                /*
+                 * TODO What's the real reason for not saving in this case? Is
+                 * it because we detected an illegal state? After all, we could
+                 * at least save the locally open editors.
+                 */
+                if (userEditorStateManager == null)
                     return;
 
-                final Set<SPath> editorPaths = remoteEditorManager
-                    .getRemoteOpenEditors();
+                final Set<SPath> editorPaths = userEditorStateManager
+                    .getOpenEditors();
 
                 editorPaths.addAll(locallyOpenEditors);
 
@@ -1580,8 +1581,8 @@ public class EditorManager extends AbstractActivityProducer implements
         if (session.getLocalUser().equals(jumpTo))
             return;
 
-        final RemoteEditor activeEditor = remoteEditorManager.getEditorState(
-            jumpTo).getActiveEditor();
+        final EditorState activeEditor = userEditorStateManager
+            .getState(jumpTo).getActiveEditorState();
 
         if (activeEditor == null) {
             LOG.debug("user " + jumpTo + " has no editor open");
@@ -1692,12 +1693,18 @@ public class EditorManager extends AbstractActivityProducer implements
      */
     private void adjustViewport(User followedUser, IEditorPart editorPart,
         LineRange range) {
+
         if (range == null)
             return;
 
-        // selection can be null
-        TextSelection selection = remoteEditorManager
-            .getSelection(followedUser);
+        EditorState state = userEditorStateManager.getState(followedUser)
+            .getActiveEditorState();
+        TextSelection selection = (state == null) ? null : state.getSelection();
+
+        /*
+         * state.getSelection() can return null, but range cannot be null here,
+         * so it's safe to call this method
+         */
         adjustViewport(editorPart, range, selection);
     }
 
@@ -1845,7 +1852,8 @@ public class EditorManager extends AbstractActivityProducer implements
             session, preferenceStore);
 
         followModeManager = session.getComponent(FollowModeManager.class);
-        remoteEditorManager = session.getComponent(RemoteEditorManager.class);
+        userEditorStateManager = session
+            .getComponent(UserEditorStateManager.class);
         remoteWriteAccessManager = new RemoteWriteAccessManager(session,
             editorAPI);
 
@@ -1906,7 +1914,7 @@ public class EditorManager extends AbstractActivityProducer implements
         locationAnnotationManager = null;
         contributionAnnotationManager.dispose();
         contributionAnnotationManager = null;
-        remoteEditorManager = null;
+        userEditorStateManager = null;
         remoteWriteAccessManager.dispose();
         remoteWriteAccessManager = null;
         locallyActiveEditor = null;

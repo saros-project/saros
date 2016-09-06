@@ -10,6 +10,8 @@
  * 
  * <li>package internal--- manages the editors, their views and the needed listeners</li>
  * 
+ * <li>package remote -- holds the state of the Editors of the other users in the session</li>
+ * 
  * <li>the {@link AbstractSharedEditorListener} is an empty stub</li>
  * 
  * <li>the {@link DirtyStateListener} synchronizes file save events with shared documents.</li>
@@ -19,8 +21,6 @@
  * <li>the {@link EditorPool} manages EditorParts of the local users.</li>
  * 
  * <li>the {@link ISharedEditorListener} is an interface for synchronizing editor tabs</li>
- * 
- * <li>the {@link RemoteEditorManager} holds the state of the Editors of the other users in the session</li>
  * 
  * <li>the {@link RemoteWriteAccessManager} locally executes remote user activities (like editing in an editor or closing it) for open editor views</li>
  * 

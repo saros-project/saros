@@ -12,7 +12,8 @@ import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.editor.IFollowModeListener.Reason;
-import de.fu_berlin.inf.dpp.editor.RemoteEditorManager.RemoteEditor;
+import de.fu_berlin.inf.dpp.editor.remote.EditorState;
+import de.fu_berlin.inf.dpp.editor.remote.UserEditorStateManager;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
@@ -41,7 +42,7 @@ public class FollowModeManager implements Startable {
     private final ISarosSession session;
 
     private final IEditorManager editorManager;
-    private final RemoteEditorManager remoteEditorManager;
+    private final UserEditorStateManager userEditorStateManager;
 
     private User localUser;
     private User currentlyFollowedUser;
@@ -96,8 +97,8 @@ public class FollowModeManager implements Startable {
         }
 
         private void stopIfDiverted(SPath filePath, Reason reason) {
-            RemoteEditor remoteActiveEditor = remoteEditorManager
-                .getRemoteActiveEditor(currentlyFollowedUser);
+            EditorState remoteActiveEditor = userEditorStateManager.getState(
+                currentlyFollowedUser).getActiveEditorState();
 
             if (remoteActiveEditor != null
                 && !remoteActiveEditor.getPath().equals(filePath)) {
@@ -181,11 +182,11 @@ public class FollowModeManager implements Startable {
     };
 
     public FollowModeManager(ISarosSession session,
-        IEditorManager editorManager, RemoteEditorManager remoteEditorManager) {
+        IEditorManager editorManager, UserEditorStateManager userEditorStateManager) {
 
         this.editorManager = editorManager;
         this.session = session;
-        this.remoteEditorManager = remoteEditorManager;
+        this.userEditorStateManager = userEditorStateManager;
     }
 
     @Override

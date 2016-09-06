@@ -22,8 +22,10 @@ import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.FollowModeManager;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
-import de.fu_berlin.inf.dpp.editor.RemoteEditorManager;
 import de.fu_berlin.inf.dpp.editor.SharedEditorListenerDispatch;
+import de.fu_berlin.inf.dpp.editor.remote.EditorState;
+import de.fu_berlin.inf.dpp.editor.remote.UserEditorState;
+import de.fu_berlin.inf.dpp.editor.remote.UserEditorStateManager;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
@@ -291,9 +293,6 @@ public class EditorManager extends AbstractActivityProducer
             if (user.equals(followedUser)) {
                 setFollowing(null);
             }
-
-            // TODO: Let the RemoteEditorManager handle this?
-            remoteEditorManager.removeUser(user);
         }
     };
     private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
@@ -348,8 +347,8 @@ public class EditorManager extends AbstractActivityProducer
 
             documentListener.startListening();
 
-            remoteEditorManager = (RemoteEditorManager) session
-                .getComponent(RemoteEditorManager.class);
+            userEditorStateManager = session
+                .getComponent(UserEditorStateManager.class);
             remoteWriteAccessManager = new RemoteWriteAccessManager(session);
 
             //TODO: Test, whether this leads to problems because it is not called
@@ -373,7 +372,7 @@ public class EditorManager extends AbstractActivityProducer
 
             session = null;
 
-            remoteEditorManager = null;
+            userEditorStateManager = null;
             remoteWriteAccessManager.dispose();
             remoteWriteAccessManager = null;
             activeEditor = null;
@@ -389,17 +388,16 @@ public class EditorManager extends AbstractActivityProducer
               * again everything is going back to normal. To prevent that
               * from happening this method is needed.
               */
+            Set<SPath> localOpenEditors = getLocallyOpenEditors();
+
             // FIXME followMode: This should have nothing to do with the
             // currently followed user
-            Set<SPath> remoteOpenEditors = getRemoteEditorManager()
-                .getRemoteOpenEditors(followedUser);
-            RemoteEditorManager.RemoteEditor remoteSelectedEditor = getRemoteEditorManager()
-                .getRemoteActiveEditor(followedUser);
-            Set<SPath> localOpenEditors = getLocallyOpenEditors();
+            UserEditorState state = userEditorStateManager
+                .getState(followedUser);
 
             // for every open file we act as if we just
             // opened it
-            for (SPath remoteEditorPath : remoteOpenEditors) {
+            for (SPath remoteEditorPath : state.getOpenEditors()) {
                 // Make sure that we open those editors twice
                 // (print a warning)
                 LOG.debug("Remote editor open " + remoteEditorPath);
@@ -407,6 +405,8 @@ public class EditorManager extends AbstractActivityProducer
                     localEditorManipulator.openEditor(remoteEditorPath);
                 }
             }
+
+            EditorState remoteSelectedEditor = state.getActiveEditorState();
 
             if (remoteSelectedEditor != null) {
                 //activate editor
@@ -467,7 +467,7 @@ public class EditorManager extends AbstractActivityProducer
     private Project project;
 
     private final SharedEditorListenerDispatch editorListenerDispatch = new SharedEditorListenerDispatch();
-    private RemoteEditorManager remoteEditorManager;
+    private UserEditorStateManager userEditorStateManager;
     private RemoteWriteAccessManager remoteWriteAccessManager;
     private ISarosSession session;
 
@@ -515,7 +515,7 @@ public class EditorManager extends AbstractActivityProducer
 
     @Override
     public Set<SPath> getRemotelyOpenEditors() {
-        return remoteEditorManager.getRemoteOpenEditors();
+        return userEditorStateManager.getOpenEditors();
     }
 
     @Override
@@ -576,8 +576,12 @@ public class EditorManager extends AbstractActivityProducer
         return followedUser;
     }
 
-    public RemoteEditorManager getRemoteEditorManager() {
-        return remoteEditorManager;
+    /**
+     * @deprecated Use the {@link UserEditorStateManager} component directly.
+     */
+    @Deprecated
+    public UserEditorStateManager getUserEditorStateManager() {
+        return userEditorStateManager;
     }
 
     public boolean isActiveEditorShared() {
@@ -677,8 +681,8 @@ public class EditorManager extends AbstractActivityProducer
         // if closing the followed editor, leave follow mode
         if (followedUser != null) {
             // TODO Let the FollowModeManager handle this
-            RemoteEditorManager.RemoteEditor activeEditor = remoteEditorManager
-                .getEditorState(followedUser).getActiveEditor();
+            EditorState activeEditor = userEditorStateManager
+                .getState(followedUser).getActiveEditorState();
 
             if (activeEditor != null && activeEditor.getPath().equals(path)) {
                 // follower closed the followed editor (no other editor gets
@@ -801,13 +805,13 @@ public class EditorManager extends AbstractActivityProducer
     @Override
     public void jumpToUser(final User jumpTo) {
 
-        final RemoteEditorManager.RemoteEditor remoteActiveEditor = remoteEditorManager
-            .getEditorState(jumpTo).getActiveEditor();
-
         // you can't jump to yourself
         if (session.getLocalUser().equals(jumpTo)) {
             return;
         }
+
+        final EditorState remoteActiveEditor = userEditorStateManager
+            .getState(jumpTo).getActiveEditorState();
 
         if (remoteActiveEditor == null) {
             LOG.info(jumpTo.getJID() + " has no editor open");
@@ -831,10 +835,13 @@ public class EditorManager extends AbstractActivityProducer
                         + remoteActiveEditor.getPath());
                     return;
                 }
-
-                // selection can be null
-                TextSelection selection = remoteEditorManager
-                    .getSelection(followedUser);
+                // FIXME Why are we suddenly interested in the followedUser?
+                EditorState state = userEditorStateManager
+                    .getState(followedUser).getActiveEditorState();
+                
+                TextSelection selection = (state == null) ? null : state.getSelection();
+                
+                // state.getSelection() can return null                
                 if (selection != null) {
                     // FIXME Why are we only jumping if we know the selection,
                     // but not if there is no selection but a perfectly usable
@@ -933,12 +940,12 @@ public class EditorManager extends AbstractActivityProducer
             @Override
             public void run() {
 
-                if (remoteEditorManager == null) {
+                if (userEditorStateManager == null) {
                     return;
                 }
 
-                final Set<SPath> editorPaths = remoteEditorManager
-                    .getRemoteOpenEditors();
+                final Set<SPath> editorPaths = userEditorStateManager
+                    .getOpenEditors();
 
                 editorPaths.addAll(locallyOpenEditors);
 

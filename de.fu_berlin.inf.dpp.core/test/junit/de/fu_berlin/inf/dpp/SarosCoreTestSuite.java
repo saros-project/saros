@@ -18,6 +18,8 @@ de.fu_berlin.inf.dpp.concurrent.jupiter.test.puzzles.TestSuite.class,
 
 de.fu_berlin.inf.dpp.editor.colorstorage.TestSuite.class,
 
+de.fu_berlin.inf.dpp.editor.remote.TestSuite.class,
+
 de.fu_berlin.inf.dpp.filesystem.TestSuite.class,
 
 de.fu_berlin.inf.dpp.misc.xstream.TestSuite.class,
