@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.core.project.internal;
 
 import de.fu_berlin.inf.dpp.intellij.project.SharedResourcesManager;
+import de.fu_berlin.inf.dpp.intellij.project.filesystem.ModuleInitialization;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionContextFactory;
 import de.fu_berlin.inf.dpp.session.SarosCoreSessionContextFactory;
@@ -18,6 +19,9 @@ public class SarosIntellijSessionContextFactory
 
         // Other
         container.addComponent(FollowingActivitiesManager.class);
+        if (!session.isHost()) {
+            container.addComponent(ModuleInitialization.class);
+        }
         container.addComponent(SharedResourcesManager.class);
     }
 
