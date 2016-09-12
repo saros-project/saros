@@ -97,8 +97,7 @@ public class FollowModeManager implements Startable {
         }
 
         private void stopIfDiverted(SPath filePath, Reason reason) {
-            EditorState remoteActiveEditor = userEditorStateManager.getState(
-                currentlyFollowedUser).getActiveEditorState();
+            EditorState remoteActiveEditor = followeeEditor();
 
             if (remoteActiveEditor != null
                 && !remoteActiveEditor.getPath().equals(filePath)) {
@@ -154,14 +153,18 @@ public class FollowModeManager implements Startable {
         public void receive(ViewportActivity activity) {
             LineRange range = new LineRange(activity.getStartLine(),
                 activity.getNumberOfLines());
-            editorManager.adjustViewport(activity.getPath(), range, null);
+
+            editorManager.adjustViewport(activity.getPath(), range,
+                followeeSelection());
         }
 
         @Override
         public void receive(TextSelectionActivity activity) {
             TextSelection selection = new TextSelection(activity.getOffset(),
                 activity.getLength());
-            editorManager.adjustViewport(activity.getPath(), null, selection);
+
+            editorManager.adjustViewport(activity.getPath(), followeeRange(),
+                selection);
         }
 
         /**
@@ -177,12 +180,14 @@ public class FollowModeManager implements Startable {
                 + activity.getText().length();
             TextSelection selection = new TextSelection(cursorOffset, 0);
 
-            editorManager.adjustViewport(activity.getPath(), null, selection);
+            editorManager.adjustViewport(activity.getPath(), followeeRange(),
+                selection);
         }
     };
 
     public FollowModeManager(ISarosSession session,
-        IEditorManager editorManager, UserEditorStateManager userEditorStateManager) {
+        IEditorManager editorManager,
+        UserEditorStateManager userEditorStateManager) {
 
         this.editorManager = editorManager;
         this.session = session;
@@ -318,6 +323,23 @@ public class FollowModeManager implements Startable {
         for (IFollowModeListener listener : listeners) {
             listener.startedFollowing(followee);
         }
+    }
+
+    /* Helper */
+
+    private EditorState followeeEditor() {
+        return userEditorStateManager.getState(currentlyFollowedUser)
+            .getActiveEditorState();
+    }
+
+    private TextSelection followeeSelection() {
+        EditorState editor = followeeEditor();
+        return (editor != null) ? editor.getSelection() : null;
+    }
+
+    private LineRange followeeRange() {
+        EditorState editor = followeeEditor();
+        return (editor != null) ? editor.getViewport() : null;
     }
 
 }
