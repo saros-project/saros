@@ -56,6 +56,15 @@ public abstract class SessionNegotiation extends Negotiation {
         "de.fu_berlin.inf.dpp.negotiation.session.INVITATION_ACCEPTED_TIMEOUT",
         600000L);
 
+    /**
+     * Timeout on how long the session negotiation should wait for the remote
+     * user to connect to the host side.
+     */
+    protected static final long CONNECTION_ESTABLISHED_TIMEOUT = Long
+        .getLong(
+            "de.fu_berlin.inf.dpp.negotiation.session.CONNECTION_ESTABLISHED_TIMEOUT",
+            120000L);
+
     @Inject
     protected SessionNegotiationHookManager hookManager;
 

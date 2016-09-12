@@ -8,6 +8,7 @@ import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.ISarosContext;
+import de.fu_berlin.inf.dpp.communication.extensions.ConnectionEstablishedExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcceptedExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcknowledgedExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationCompletedExtension;
@@ -140,7 +141,9 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
              *               (e.g. chat, color management) with the parameters
              *               as defined by the host.
              * 
-             *               (8) Start the session accordingly, inform the host
+             *               (8) Establish a connection to the host (e.g Socks5)
+             * 
+             *               (9) Start the session accordingly, inform the host
              *               and wait for his final acknowledgement (which
              *               indicates, that this client has been successfully
              *               added to the session and will receive activities
@@ -170,6 +173,8 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
             connectionManager.connect(ISarosSession.SESSION_CONNECTION_ID,
                 getPeer());
 
+            sendConnectionEstablished();
+
             startSession(monitor);
 
             sendInvitationCompleted(monitor);
@@ -183,6 +188,19 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
         }
 
         return terminate(exception);
+    }
+
+    /**
+     * Informs the session host that the user has established a connection (e.g
+     * Socks5) to the host.
+     */
+    private void sendConnectionEstablished() {
+        LOG.debug(this + " : sending connection established confirmation");
+
+        transmitter.sendPacketExtension(getPeer(),
+            ConnectionEstablishedExtension.PROVIDER
+                .create(new ConnectionEstablishedExtension(getID())));
+
     }
 
     /**

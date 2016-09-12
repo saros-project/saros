@@ -10,6 +10,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.SarosConstants;
+import de.fu_berlin.inf.dpp.communication.extensions.ConnectionEstablishedExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcceptedExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcknowledgedExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationCompletedExtension;
@@ -50,6 +51,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
     private PacketCollector invitationAcknowledgedCollector;
     private PacketCollector invitationDataExchangeCollector;
     private PacketCollector invitationCompletedCollector;
+    private PacketCollector invitationConnectionEstablishedCollector;
 
     @Inject
     private VersionManager versionManager;
@@ -151,10 +153,12 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
              * 
              *               (6b, 7, 8) [client side, see subsequent stops]
              * 
-             *               (9) Wait until the client signals the session
+             *               (9) Wait until a connection is established.
+             * 
+             *               (10) Wait until the client signals the session
              *               invitation is complete.
              * 
-             *               (10) Formally add client to the session so he will
+             *               (11) Formally add client to the session so he will
              *               receive activities, then send final acknowledgement
              *               to inform client about this.
              */
@@ -175,6 +179,8 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
             actualSessionParameters = determineSessionParameters(clientSessionPreferences);
 
             sendSessionParameters(actualSessionParameters, monitor);
+
+            awaitConnectionEstablishment(monitor);
 
             awaitCompletion(monitor);
 
@@ -306,6 +312,26 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
         }
 
         log.debug(this + " : negotiation acknowledged");
+    }
+
+    /**
+     * Waits until the remote side successfully connected to the inviter side.
+     */
+    private void awaitConnectionEstablishment(IProgressMonitor monitor)
+        throws SarosCancellationException {
+
+        log.debug(this + " : waiting for peer to establish connection");
+
+        monitor.setTaskName("Waiting for " + getPeer().getBareJID()
+            + " to connect...");
+
+        if (collectPacket(invitationConnectionEstablishedCollector,
+            CONNECTION_ESTABLISHED_TIMEOUT) == null) {
+            throw new LocalCancellationException(
+                "Remote side was unable to connect.", CancelOption.NOTIFY_PEER);
+        }
+
+        log.debug(this + " : connection established");
     }
 
     /**
@@ -524,6 +550,10 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
         invitationCompletedCollector = receiver
             .createCollector(InvitationCompletedExtension.PROVIDER
                 .getPacketFilter(getID()));
+
+        invitationConnectionEstablishedCollector = receiver
+            .createCollector(ConnectionEstablishedExtension.PROVIDER
+                .getPacketFilter(getID()));
     }
 
     private void deleteCollectors() {
@@ -531,6 +561,7 @@ public final class OutgoingSessionNegotiation extends SessionNegotiation {
         invitationAcknowledgedCollector.cancel();
         invitationDataExchangeCollector.cancel();
         invitationCompletedCollector.cancel();
+        invitationConnectionEstablishedCollector.cancel();
     }
 
     @Override

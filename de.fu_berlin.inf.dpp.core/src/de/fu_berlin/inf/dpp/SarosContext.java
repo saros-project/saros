@@ -17,6 +17,7 @@ import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.communication.extensions.ActivitiesExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.CancelProjectNegotiationExtension;
+import de.fu_berlin.inf.dpp.communication.extensions.ConnectionEstablishedExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcceptedExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationAcknowledgedExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.InvitationCompletedExtension;
@@ -117,32 +118,40 @@ public class SarosContext implements ISarosContext {
          */
 
         try {
-            Class.forName(ActivitiesExtension.class.getName());
+            // Version exchange extension used in session negotiation
+            Class.forName(VersionExchangeExtension.class.getName());
+
+            // Session negotiation extensions
             Class.forName(CancelInviteExtension.class.getName());
             Class.forName(InvitationOfferingExtension.class.getName());
             Class.forName(InvitationParameterExchangeExtension.class.getName());
             Class.forName(InvitationAcknowledgedExtension.class.getName());
             Class.forName(InvitationAcceptedExtension.class.getName());
             Class.forName(InvitationCompletedExtension.class.getName());
+            Class.forName(ConnectionEstablishedExtension.class.getName());
+
+            // Project negotiation extensions
             Class.forName(CancelProjectNegotiationExtension.class.getName());
             Class.forName(ProjectNegotiationOfferingExtension.class.getName());
             Class.forName(ProjectNegotiationMissingFilesExtension.class
                 .getName());
+
+            // General session extensions
+            Class.forName(ActivitiesExtension.class.getName());
             Class.forName(KickUserExtension.class.getName());
             Class.forName(UserListExtension.class.getName());
             Class.forName(LeaveSessionExtension.class.getName());
             Class.forName(UserListReceivedExtension.class.getName());
-            Class.forName(PingExtension.class.getName());
-            Class.forName(PongExtension.class.getName());
-
+            Class.forName(StartActivityQueuingRequest.class.getName());
+            Class.forName(StartActivityQueuingResponse.class.getName());
             Class.forName(UserFinishedProjectNegotiationExtension.class
                 .getName());
 
-            Class.forName(StartActivityQueuingRequest.class.getName());
-            Class.forName(StartActivityQueuingResponse.class.getName());
+            // Session extensions for Timeout-Handling during a session
+            Class.forName(PingExtension.class.getName());
+            Class.forName(PongExtension.class.getName());
 
-            Class.forName(VersionExchangeExtension.class.getName());
-
+            // Server extensions
             Class.forName(JoinSessionRequestExtension.class.getName());
             Class.forName(JoinSessionRejectedExtension.class.getName());
             Class.forName(SessionStatusRequestExtension.class.getName());
