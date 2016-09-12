@@ -195,9 +195,19 @@ public final class SarosSession implements ISarosSession {
 
             for (IActivityConsumer consumer : activeActivityConsumers) {
                 consumer.exec(activity);
-                if (activity instanceof IFileSystemModificationActivity)
-                    updatePartialSharedResources((IFileSystemModificationActivity) activity);
             }
+
+            /*
+             * TODO depending if we call this before or after the consumer
+             * dispatch a consumer may see the resource as shared or not. This
+             * is weird as they is NO guideline currently on how
+             * IFileSystemModificationActivity should be treated when it comes
+             * to resource query of the current session, e.g isShared()
+             */
+
+            if (activity instanceof IFileSystemModificationActivity)
+                updatePartialSharedResources((IFileSystemModificationActivity) activity);
+
         }
     };
 
