@@ -54,7 +54,6 @@ import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.LocationAnnotationManager;
 import de.fu_berlin.inf.dpp.editor.internal.SafePartListener2;
 import de.fu_berlin.inf.dpp.editor.remote.EditorState;
-import de.fu_berlin.inf.dpp.editor.remote.UserEditorState;
 import de.fu_berlin.inf.dpp.editor.remote.UserEditorStateManager;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
@@ -1447,7 +1446,8 @@ public class EditorManager extends AbstractActivityProducer implements
                 continue;
             }
 
-            EditorState remoteEditor = userEditorStateManager.getState(user).getEditorState(path);
+            EditorState remoteEditor = userEditorStateManager.getState(user)
+                .getEditorState(path);
 
             if (remoteEditor == null)
                 continue;
@@ -1601,6 +1601,15 @@ public class EditorManager extends AbstractActivityProducer implements
         }
 
         final SPath path = activeEditor.getPath();
+        final LineRange viewport = activeEditor.getViewport();
+        final TextSelection selection = activeEditor.getSelection();
+
+        // TODO So jumping to a user's position based on his/her selection is
+        // not an option?
+        if (viewport == null) {
+            LOG.warn("user " + jumpTo + " has no viewport in editor: " + path);
+            return;
+        }
 
         SWTUtils.runSafeSWTSync(LOG, new Runnable() {
             @Override
@@ -1611,20 +1620,16 @@ public class EditorManager extends AbstractActivityProducer implements
                     return;
                 }
 
-                LineRange viewport = activeEditor.getViewport();
-                if (viewport == null) {
-                    LOG.warn("user " + jumpTo + " has no viewport in editor: "
-                        + path);
-                    return;
-                }
-
-                adjustViewport(jumpTo, newEditor, viewport);
+                /*
+                 * selection() might be null at this point, but viewport cannot,
+                 * so it's safe to call this method
+                 */
+                adjustViewport(newEditor, viewport, selection);
             }
         });
 
         /*
-         * inform all registered ISharedEditorListeners about this jump
-         * performed
+         * inform all registered ISharedEditorListeners about the jump performed
          */
         editorListenerDispatch.jumpedToUser(jumpTo);
     }
@@ -1678,34 +1683,6 @@ public class EditorManager extends AbstractActivityProducer implements
             defaultSelectionLayer + SarosAnnotation.SIZE + 1);
         customAnnotationManager.registerDrawingStrategy(
             RemoteCursorAnnotation.TYPE, new RemoteCursorStrategy());
-    }
-
-    /**
-     * Adjusts the viewport in Follow Mode. This function should be called if
-     * the followed user's viewport changes.
-     * 
-     * @param followedUser
-     *            User who is followed
-     * @param editorPart
-     *            EditorPart of the open Editor
-     * @param range
-     *            viewport of the followed user
-     */
-    private void adjustViewport(User followedUser, IEditorPart editorPart,
-        LineRange range) {
-
-        if (range == null)
-            return;
-
-        EditorState state = userEditorStateManager.getState(followedUser)
-            .getActiveEditorState();
-        TextSelection selection = (state == null) ? null : state.getSelection();
-
-        /*
-         * state.getSelection() can return null, but range cannot be null here,
-         * so it's safe to call this method
-         */
-        adjustViewport(editorPart, range, selection);
     }
 
     /**
