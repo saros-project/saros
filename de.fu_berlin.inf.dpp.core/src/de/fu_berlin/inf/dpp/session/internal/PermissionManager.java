@@ -38,8 +38,12 @@ public class PermissionManager extends AbstractActivityProducer implements
 
     private final ISarosSession sarosSession;
 
-    public PermissionManager(ISarosSession sarosSession) {
+    private final UISynchronizer synchronizer;
+
+    public PermissionManager(ISarosSession sarosSession,
+        UISynchronizer synchronizer) {
         this.sarosSession = sarosSession;
+        this.synchronizer = synchronizer;
     }
 
     @Override
@@ -62,14 +66,9 @@ public class PermissionManager extends AbstractActivityProducer implements
      */
     private void handlePermissionChange(PermissionActivity activity) {
         User user = activity.getAffectedUser();
-        if (!user.isInSession()) {
-            LOG.warn("could not change permissions of user " + user
-                + " because the user is longer part of the session");
-            return;
-        }
-
         Permission permission = activity.getPermission();
-        this.sarosSession.setPermission(user, permission);
+
+        sarosSession.setPermission(user, permission);
     }
 
     /**
@@ -80,46 +79,49 @@ public class PermissionManager extends AbstractActivityProducer implements
      * 
      * @blocking Returning after the {@link Permission} change is complete
      * 
-     * @param user
+     * @param target
      *            The user who's {@link Permission} has to be changed
      * @param newPermission
      *            The new {@link Permission} of the user
-     * @param synchronizer
-     *            An Abstraction of the SWT-Thread
      * 
      * @throws CancellationException
      * @throws InterruptedException
      */
-    public void initiatePermissionChange(final User user,
-        final Permission newPermission, UISynchronizer synchronizer)
-        throws CancellationException, InterruptedException {
+    public void initiatePermissionChange(final User target,
+        final Permission newPermission) throws CancellationException,
+        InterruptedException {
 
         final User localUser = sarosSession.getLocalUser();
+
+        if (!localUser.isHost())
+            throw new IllegalStateException(
+                "only the host can initiate permission changes");
 
         Runnable fireActivityrunnable = new Runnable() {
 
             @Override
             public void run() {
-                fireActivity(new PermissionActivity(localUser, user,
+                fireActivity(new PermissionActivity(localUser, target,
                     newPermission));
 
-                sarosSession.setPermission(user, newPermission);
+                sarosSession.setPermission(target, newPermission);
             }
         };
 
-        if (user.isHost()) {
+        if (target.isHost()) {
             synchronizer.syncExec(ThreadUtils.wrapSafe(LOG,
                 fireActivityrunnable));
         } else {
-            StartHandle startHandle = sarosSession.getStopManager().stop(user,
-                "Permission change");
+            StartHandle startHandle = sarosSession.getStopManager().stop(
+                target, "Permission change");
 
             synchronizer.syncExec(ThreadUtils.wrapSafe(LOG,
                 fireActivityrunnable));
 
             if (!startHandle.start())
-                LOG.error("Didn't unblock. "
-                    + "There still exist unstarted StartHandles.");
+                LOG.error("failed to resume user: "
+                    + target
+                    + ", the user might no longer be able to perform changes in the current session!");
         }
     }
 }

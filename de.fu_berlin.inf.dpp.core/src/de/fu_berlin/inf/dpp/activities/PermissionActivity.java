@@ -19,8 +19,6 @@
  */
 package de.fu_berlin.inf.dpp.activities;
 
-import org.apache.commons.lang.ObjectUtils;
-
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
@@ -35,10 +33,10 @@ import de.fu_berlin.inf.dpp.session.User.Permission;
 public class PermissionActivity extends AbstractActivity {
 
     @XStreamAsAttribute
-    protected final Permission permission;
+    private final Permission permission;
 
     @XStreamAsAttribute
-    protected final User affectedUser;
+    private final User affectedUser;
 
     /**
      * Creates a new {@link PermissionActivity} which indicates that the given
@@ -61,34 +59,6 @@ public class PermissionActivity extends AbstractActivity {
         return super.isValid() && (affectedUser != null);
     }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + ObjectUtils.hashCode(affectedUser);
-        result = prime * result + ObjectUtils.hashCode(permission);
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (!super.equals(obj))
-            return false;
-        if (!(obj instanceof PermissionActivity))
-            return false;
-
-        PermissionActivity other = (PermissionActivity) obj;
-
-        if (this.permission != other.permission)
-            return false;
-        if (!ObjectUtils.equals(this.affectedUser, other.affectedUser))
-            return false;
-
-        return true;
-    }
-
     public User getAffectedUser() {
         return affectedUser;
     }
@@ -100,7 +70,7 @@ public class PermissionActivity extends AbstractActivity {
     @Override
     public String toString() {
         return "PermissionActivity(user: " + getAffectedUser()
-            + ", new permission: " + getPermission() + ")";
+            + ", permission: " + getPermission() + ")";
     }
 
     @Override

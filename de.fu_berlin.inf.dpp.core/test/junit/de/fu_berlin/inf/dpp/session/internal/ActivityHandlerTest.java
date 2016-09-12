@@ -69,6 +69,7 @@ public class ActivityHandlerTest {
 
     private User alice;
     private User bob;
+    private User carl;
     private User dave;
 
     // Needed to compare localActivities
@@ -288,8 +289,8 @@ public class ActivityHandlerTest {
 
     /**
      * Specifies the roles of participants in the session. Should be called at
-     * the start of every Testcase
-     * 
+     * the start of every test case
+     *
      * @param target
      *            The target for targeted Activities
      * @param source
@@ -304,17 +305,15 @@ public class ActivityHandlerTest {
     }
 
     /**
-     * creates the Users used in this Test
+     * creates the Users used in this test
      */
     private void createUsers() {
         // local User
-        alice = EasyMock.createMock(User.class);
-        EasyMock.expect(alice.isLocal()).andStubReturn(true);
-        EasyMock.replay(alice);
+        alice = createUser(true);
 
         // remote users
         bob = createUser(false);
-        User carl = createUser(false);
+        carl = createUser(false);
         // User that can't process IResourceActivities
         dave = createUser(false);
 

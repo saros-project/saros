@@ -369,12 +369,7 @@ public final class SarosSession implements ISarosSession {
         final Permission newPermission) throws CancellationException,
         InterruptedException {
 
-        if (!localUser.isHost())
-            throw new IllegalStateException(
-                "only the host can initiate permission changes");
-
-        permissionManager.initiatePermissionChange(user, newPermission,
-            synchronizer);
+        permissionManager.initiatePermissionChange(user, newPermission);
     }
 
     @Override
