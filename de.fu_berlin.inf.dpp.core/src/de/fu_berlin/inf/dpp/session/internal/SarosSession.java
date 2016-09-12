@@ -190,11 +190,22 @@ public final class SarosSession implements ISarosSession {
              */
 
             for (IActivityConsumer consumer : passiveActivityConsumers) {
-                consumer.exec(activity);
+                try {
+                    consumer.exec(activity);
+                } catch (RuntimeException e) {
+                    log.error(
+                        "error while invoking passive activity consumer: "
+                            + consumer + ", activity: " + activity, e);
+                }
             }
 
             for (IActivityConsumer consumer : activeActivityConsumers) {
-                consumer.exec(activity);
+                try {
+                    consumer.exec(activity);
+                } catch (RuntimeException e) {
+                    log.error("error while invoking active activity consumer: "
+                        + consumer + ", activity: " + activity, e);
+                }
             }
 
             /*
