@@ -4,15 +4,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({
-
-    IntelliJResourceImplTest.class,
-
-    IntelliJFolderImplTest.class,
-
-    IntelliJFileImplTest.class,
-
-    IntelliJPathImplTest.class })
+@Suite.SuiteClasses({ IntelliJFileImplTest.class, IntelliJFolderImplTest.class,
+    IntelliJPathImplTest.class, IntelliJResourceImplTest.class })
 public class TestSuite {
     // the class remains completely empty,
     // being used only as a holder for the above annotations

@@ -20,8 +20,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-@PrepareForTest({ LocalFileSystem.class, ApplicationManager.class,
-    Application.class })
+@PrepareForTest(
+    { LocalFileSystem.class, ApplicationManager.class, Application.class })
 @RunWith(PowerMockRunner.class)
 public class IntelliJFileImplTest extends AbstractResourceTest {
 
@@ -32,7 +32,7 @@ public class IntelliJFileImplTest extends AbstractResourceTest {
         IFile file = new IntelliJFileImpl(getMockProject(),
             new File(TEST_FILE_NAME));
 
-        file.create(new ByteArrayInputStream(new byte[] {}), false);
+        file.create(new ByteArrayInputStream(new byte[] { }), false);
 
         assertTrue(file.exists());
     }

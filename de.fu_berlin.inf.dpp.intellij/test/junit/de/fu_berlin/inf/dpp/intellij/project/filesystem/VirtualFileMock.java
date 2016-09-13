@@ -17,7 +17,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VirtualFileMock extends VirtualFile {
+class VirtualFileMock extends VirtualFile {
 
     private File file;
 

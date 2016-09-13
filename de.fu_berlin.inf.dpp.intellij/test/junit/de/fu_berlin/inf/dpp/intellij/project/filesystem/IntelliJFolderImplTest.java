@@ -16,14 +16,15 @@ import java.io.IOException;
 import static org.fest.assertions.Assertions.assertThat;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ LocalFileSystem.class, ApplicationManager.class,
-    Application.class })
+@PrepareForTest(
+    { LocalFileSystem.class, ApplicationManager.class, Application.class })
 public class IntelliJFolderImplTest extends AbstractResourceTest {
 
     public static final String TEST_FOLDER_NAME = "folder";
     public static final String CHILD_DIRECTORY_NAME = "childDirectory";
     public static final String OTHER_CHILD_DIRECTORY_NAME = "otherChildDirectory";
     public static final String CHILD_FILE_NAME = "childFile.txt";
+
     @Test
     public void testCreate() throws IOException {
         mockApplicationManager();
@@ -47,8 +48,8 @@ public class IntelliJFolderImplTest extends AbstractResourceTest {
                 new File(TEST_FOLDER_NAME + '/' + CHILD_FILE_NAME)),
             new IntelliJFolderImpl(getMockProject(),
                 new File(TEST_FOLDER_NAME + '/' + CHILD_DIRECTORY_NAME)),
-            new IntelliJFolderImpl(getMockProject(),
-                new File(TEST_FOLDER_NAME + '/' + OTHER_CHILD_DIRECTORY_NAME)) };
+            new IntelliJFolderImpl(getMockProject(), new File(
+                TEST_FOLDER_NAME + '/' + OTHER_CHILD_DIRECTORY_NAME)) };
 
         assertThat(folder.members(IResource.NONE)).containsOnly(expected);
     }
