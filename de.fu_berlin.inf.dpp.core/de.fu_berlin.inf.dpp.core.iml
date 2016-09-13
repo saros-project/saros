@@ -31,7 +31,7 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library" exported="" scope="TEST">
+    <orderEntry type="module-library" scope="TEST">
       <library name="easymock-3.1">
         <CLASSES>
           <root url="jar://$MODULE_DIR$/test/lib/easymock-3.1.jar!/" />
@@ -58,7 +58,7 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library" exported="" scope="TEST">
+    <orderEntry type="module-library" scope="TEST">
       <library name="powermock-easymock-1.5.1-full">
         <CLASSES>
           <root url="jar://$MODULE_DIR$/test/lib/powermock-easymock-1.5.1-full.jar!/" />
@@ -69,7 +69,7 @@
         </SOURCES>
       </library>
     </orderEntry>
-    <orderEntry type="module-library" exported="" scope="TEST">
+    <orderEntry type="module-library" scope="TEST">
       <library name="JUnit4">
         <CLASSES>
           <root url="jar://$APPLICATION_HOME_DIR$/lib/junit-4.11.jar!/" />

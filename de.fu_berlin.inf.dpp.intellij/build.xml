@@ -138,7 +138,7 @@
     </path>
 
     <path id="libraries.test.classpath">
-        <fileset dir="${core.basedir}/test/lib"/>
+        <fileset dir="${basedir}/test/lib"/>
     </path>
 
     <!-- Global Libraries -->
