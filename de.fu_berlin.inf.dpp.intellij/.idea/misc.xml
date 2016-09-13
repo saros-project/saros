@@ -7,7 +7,7 @@
     <file url="file://$PROJECT_DIR$/../de.fu_berlin.inf.dpp.core/.classpath" />
     <file url="file://$PROJECT_DIR$/../de.fu_berlin.inf.dpp.core/.project" />
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="IDEA SDK" project-jdk-type="IDEA JDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_7" assert-keyword="true" jdk-15="true" project-jdk-name="IDEA SDK" project-jdk-type="IDEA JDK">
     <output url="file://$PROJECT_DIR$/bin" />
   </component>
 </project>
