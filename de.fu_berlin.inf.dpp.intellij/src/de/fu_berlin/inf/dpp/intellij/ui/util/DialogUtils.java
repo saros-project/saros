@@ -34,7 +34,7 @@ public class DialogUtils {
      */
     public static void showError(Component parent, String title, String msg) {
         JOptionPane
-            .showInternalMessageDialog(notNullOrDefaultParent(parent), msg,
+            .showMessageDialog(notNullOrDefaultParent(parent), msg,
                 title, JOptionPane.ERROR_MESSAGE);
     }
 
