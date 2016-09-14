@@ -46,18 +46,14 @@ import de.fu_berlin.inf.dpp.activities.NOPActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
-import de.fu_berlin.inf.dpp.communication.extensions.ActivitiesExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.KickUserExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.LeaveSessionExtension;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
-import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.misc.xstream.SPathConverter;
-import de.fu_berlin.inf.dpp.misc.xstream.UserConverter;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
@@ -102,8 +98,6 @@ public final class SarosSession implements ISarosSession {
 
     @Inject
     private IConnectionManager connectionManager;
-
-    private final IPathFactory pathFactory;
 
     private final ISarosContext sarosContext;
 
@@ -221,9 +215,6 @@ public final class SarosSession implements ISarosSession {
 
         }
     };
-
-    private SPathConverter pathConverter;
-    private UserConverter userConverter;
 
     // FIXME those parameter passing feels strange, find a better way
     /**
@@ -645,13 +636,6 @@ public final class SarosSession implements ISarosSession {
         for (User user : getRemoteUsers())
             activitySequencer.registerUser(user);
 
-        // TODO Pull that out
-        pathConverter = new SPathConverter(this, pathFactory);
-        ActivitiesExtension.PROVIDER.registerConverter(pathConverter);
-
-        userConverter = new UserConverter(this);
-        ActivitiesExtension.PROVIDER.registerConverter(userConverter);
-
         synchronized (componentAccessLock) {
             started = true;
         }
@@ -699,10 +683,6 @@ public final class SarosSession implements ISarosSession {
         for (User user : getRemoteUsers())
             connectionManager.closeConnection(
                 ISarosSession.SESSION_CONNECTION_ID, user.getJID());
-
-        // TODO Pull that out
-        ActivitiesExtension.PROVIDER.unregisterConverter(pathConverter);
-        ActivitiesExtension.PROVIDER.unregisterConverter(userConverter);
     }
 
     @Override
@@ -1056,8 +1036,6 @@ public final class SarosSession implements ISarosSession {
         int localColorID, int hostColorID) {
 
         context.initComponent(this);
-
-        this.pathFactory = context.getComponent(IPathFactory.class);
 
         this.sessionID = id;
         this.projectMapper = new SharedProjectMapper();
