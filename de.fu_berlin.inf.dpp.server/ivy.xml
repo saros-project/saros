@@ -6,5 +6,6 @@
     <dependencies>
         <dependency org="junit" name="junit" rev="4.11" conf="test->default"/>
         <dependency org="org.easymock" name="easymock" rev="3.1" conf="test->default"/>
+        <dependency org="net.sourceforge.cobertura" name="cobertura" rev="2.1.1" conf="test->default"/>
     </dependencies>
 </ivy-module>
