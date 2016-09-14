@@ -61,7 +61,10 @@
         <exclude name="**/?*.js"/>
     </patternset>
 
-    <!-- JDK definitions -->
+
+    <!-- =================================
+          JDK definitions
+         ================================= -->
 
     <property name="jdk.bin" value="${jdk.home}/bin"/>
     <path id="jdk.classpath">
@@ -81,87 +84,20 @@
     <property name="project.jdk.bin" value="${jdk.bin.idea_sdk}"/>
     <property name="project.jdk.classpath" value="jdk.classpath.idea_sdk"/>
 
+
+    <!-- =================================
+          Directories to use
+         ================================= -->
+
     <property name="build.dir" value="${basedir}/bin"/>
 
-    <macrodef name="compile-java">
-        <attribute name="dest.dir"/>
-        <attribute name="java.executable" default="${jdk.bin}/javac"/>
-        <attribute name="compiler.args" default="${compiler.args}"/>
-        <attribute name="classpath"/>
-        <attribute name="sourcepath"/>
-
-        <sequential>
-            <mkdir dir="@{dest.dir}"/>
-
-            <javac2 destdir="@{dest.dir}" debug="${compiler.debug}"
-                    nowarn="${compiler.generate.no.warnings}"
-                    memorymaximumsize="${compiler.max.memory}" fork="true"
-                    executable="@{java.executable}">
-                <compilerarg line="@{compiler.args}"/>
-                <classpath refid="@{classpath}"/>
-                <src refid="@{sourcepath}"/>
-                <patternset refid="ignored.files"/>
-            </javac2>
-        </sequential>
-    </macrodef>
-
-    <macrodef name="copy-resources">
-        <attribute name="dest.dir"/>
-        <attribute name="src.dir"/>
-        <attribute name="resource-refid" default="compiler.resources"/>
-        <sequential>
-            <copy todir="@{dest.dir}">
-                <fileset dir="@{src.dir}">
-                    <patternset refid="@{resource-refid}"/>
-                    <type type="file"/>
-                </fileset>
-            </copy>
-        </sequential>
-    </macrodef>
-
-    <!-- Project Libraries -->
+    <!-- - - - - - - - - - - - - - - - - -
+          Saros Core
+         - - - - - - - - - - - - - - - - - -->
 
     <property name="core.basedir"
               value="${basedir}/../de.fu_berlin.inf.dpp.core"/>
     <property name="core.libdir" value="${core.basedir}/lib"/>
-    <property name="ui.basedir" value="${basedir}/../de.fu_berlin.inf.dpp.ui"/>
-    <property name="ui.libdir" value="${ui.basedir}/lib" />
-
-    <property name="intellij.libdir" value="${basedir}/lib" />
-
-    <path id="libraries.classpath">
-        <fileset dir="${core.libdir}" includes="*.jar"/>
-        <fileset dir="${ui.libdir}" includes="*.jar" />
-        <fileset dir="${intellij.libdir}" includes="*.jar" />
-        <fileset dir="${eclipse.dir}/plugins" includes="org.eclipse.swt.*.jar"
-                 excludes="org.eclipse.swt.*source*.jar"/>
-    </path>
-
-    <path id="libraries.test.classpath">
-        <fileset dir="${basedir}/test/lib"/>
-    </path>
-
-    <!-- Global Libraries -->
-    <!-- Register Custom Compiler Taskdefs -->
-    <property name="javac2.home" value="${idea.home}/lib"/>
-    <path id="javac2.classpath">
-        <pathelement location="${javac2.home}/javac2.jar"/>
-        <pathelement location="${javac2.home}/jdom.jar"/>
-        <pathelement location="${javac2.home}/asm4-all.jar"/>
-        <pathelement location="${javac2.home}/jgoodies-forms.jar"/>
-    </path>
-    <target name="register.custom.compilers">
-        <taskdef name="javac2" classname="com.intellij.ant.Javac2"
-                 classpathref="javac2.classpath"/>
-        <taskdef name="instrumentIdeaExtensions"
-                 classname="com.intellij.ant.InstrumentIdeaExtensions"
-                 classpathref="javac2.classpath"/>
-    </target>
-
-    <!-- core -->
-
-    <dirname property="core.basedir" file="${ant.file}"/>
-
 
     <property name="core.jdk.home" value="${jdk.home}"/>
     <property name="core.jdk.bin" value="${jdk.bin}"/>
@@ -202,38 +138,16 @@
         </dirset>
     </path>
 
+    <!-- - - - - - - - - - - - - - - - - -
+          Saros UI
+         - - - - - - - - - - - - - - - - - -->
 
-    <target name="compile.core" depends="compile.core.main,compile.core.tests"
-            description="Compile core"/>
+    <property name="ui.basedir" value="${basedir}/../de.fu_berlin.inf.dpp.ui"/>
+    <property name="ui.libdir" value="${ui.basedir}/lib"/>
 
-    <target name="compile.core.main" depends="register.custom.compilers"
-            description="Compile core; main classes">
-        <compile-java dest.dir="${core.output.dir}"
-                      classpath="core.main.classpath"
-                      sourcepath="core.main.sourcepath"/>
-        <copy-resources dest.dir="${core.build.dir}"
-                        src.dir="${core.basedir}/src"/>
-        <copy-resources dest.dir="${core.build.dir}"
-                        src.dir="${core.basedir}/patches"/>
-    </target>
-
-    <target name="compile.core.tests"
-            depends="register.custom.compilers,compile.core.main"
-            description="compile core; test classes" unless="skip.tests">
-        <compile-java dest.dir="${core.testoutput.dir}"
-                      classpath="core.test.classpath"
-                      sourcepath="core.test.sourcepath"/>
-        <copy-resources dest.dir="${core.testoutput.dir}"
-                        src.dir="${core.basedir}/test/junit"/>
-    </target>
-
-    <target name="clean.core" description="cleanup core">
-        <delete dir="${core.output.dir}" failonerror="false"/>
-        <delete dir="${core.testoutput.dir}" failonerror="false"/>
-    </target>
-
-
-    <!-- saros-i -->
+    <!-- - - - - - - - - - - - - - - - - -
+          Saros IntelliJ plugin
+         - - - - - - - - - - - - - - - - - -->
 
     <dirname property="saros-i.basedir" file="${ant.file}"/>
 
@@ -263,13 +177,171 @@
         </dirset>
     </path>
 
+    <path id="saros-i.test.classpath">
+        <path refid="libraries.test.classpath"/>
+        <path refid="saros-i.main.classpath"/>
+        <pathelement location="${saros-i.output.dir}"/>
+        <pathelement location="${core.testoutput.dir}"/>
+    </path>
+
+    <property name="saros-i.test.dir" value="${saros-i.basedir}/test/junit"/>
+
+    <path id="saros-i.test.sourcepath">
+        <dirset dir="${saros-i.test.dir}"/>
+    </path>
+
+    <property name="saros-i.junit.report.dir"
+              value="${saros-i.build.dir}/junit"/>
+
+    <property name="saros-i.plugin.path.jar"
+              value="${saros-i.artifacts.dir}/de.fu_berlin.inf.dpp.intellij.jar"/>
+    <property name="saros-i.bundle.path.zip"
+              value="${saros-i.artifacts.dir}/de.fu_berlin.inf.dpp.intellij.zip"/>
+
+
+    <!-- =================================
+          Libraries
+         ================================= -->
+
+    <!-- - - - - - - - - - - - - - - - - -
+          Project Libraries
+         - - - - - - - - - - - - - - - - - -->
+
+    <property name="intellij.libdir" value="${basedir}/lib"/>
+
+    <path id="libraries.classpath">
+        <fileset dir="${core.libdir}" includes="*.jar"/>
+        <fileset dir="${ui.libdir}" includes="*.jar"/>
+        <fileset dir="${intellij.libdir}" includes="*.jar"/>
+        <fileset dir="${eclipse.dir}/plugins" includes="org.eclipse.swt.*.jar"
+                 excludes="org.eclipse.swt.*source*.jar"/>
+    </path>
+
+    <path id="libraries.test.classpath">
+        <fileset dir="${basedir}/test/lib"/>
+    </path>
+
+    <!-- - - - - - - - - - - - - - - - - -
+          Register Custom Compiler Taskdefs
+         - - - - - - - - - - - - - - - - - -->
+
+    <property name="javac2.home" value="${idea.home}/lib"/>
+    <path id="javac2.classpath">
+        <pathelement location="${javac2.home}/javac2.jar"/>
+        <pathelement location="${javac2.home}/jdom.jar"/>
+        <pathelement location="${javac2.home}/asm4-all.jar"/>
+        <pathelement location="${javac2.home}/jgoodies-forms.jar"/>
+    </path>
+    <target name="register.custom.compilers">
+        <taskdef name="javac2" classname="com.intellij.ant.Javac2"
+                 classpathref="javac2.classpath"/>
+        <taskdef name="instrumentIdeaExtensions"
+                 classname="com.intellij.ant.InstrumentIdeaExtensions"
+                 classpathref="javac2.classpath"/>
+    </target>
+
+
+    <!-- =================================
+          Own macros
+         ================================= -->
+
+    <macrodef name="compile-java">
+        <attribute name="dest.dir"/>
+        <attribute name="java.executable" default="${jdk.bin}/javac"/>
+        <attribute name="compiler.args" default="${compiler.args}"/>
+        <attribute name="classpath"/>
+        <attribute name="sourcepath"/>
+
+        <sequential>
+            <mkdir dir="@{dest.dir}"/>
+
+            <javac2 destdir="@{dest.dir}" debug="${compiler.debug}"
+                    nowarn="${compiler.generate.no.warnings}"
+                    memorymaximumsize="${compiler.max.memory}" fork="true"
+                    executable="@{java.executable}">
+                <compilerarg line="@{compiler.args}"/>
+                <classpath refid="@{classpath}"/>
+                <src refid="@{sourcepath}"/>
+                <patternset refid="ignored.files"/>
+            </javac2>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="copy-resources">
+        <attribute name="dest.dir"/>
+        <attribute name="src.dir"/>
+        <attribute name="resource-refid" default="compiler.resources"/>
+        <sequential>
+            <copy todir="@{dest.dir}">
+                <fileset dir="@{src.dir}">
+                    <patternset refid="@{resource-refid}"/>
+                    <type type="file"/>
+                </fileset>
+            </copy>
+        </sequential>
+    </macrodef>
+
+
+    <!-- =================================
+          Targets: Saros Core, Compilation
+         ================================= -->
+
+    <target name="compile.core" depends="compile.core.main,compile.core.tests"
+            description="Compile core"/>
+
+    <!-- - - - - - - - - - - - - - - - - -
+          Target: Saros Core productive code
+         - - - - - - - - - - - - - - - - - -->
+
+    <target name="compile.core.main" depends="register.custom.compilers"
+            description="Compile core; main classes">
+        <compile-java dest.dir="${core.output.dir}"
+                      classpath="core.main.classpath"
+                      sourcepath="core.main.sourcepath"/>
+        <copy-resources dest.dir="${core.build.dir}"
+                        src.dir="${core.basedir}/src"/>
+        <copy-resources dest.dir="${core.build.dir}"
+                        src.dir="${core.basedir}/patches"/>
+    </target>
+
+    <!-- - - - - - - - - - - - - - - - - -
+          Target: Saros Core test code
+         - - - - - - - - - - - - - - - - - -->
+
+    <target name="compile.core.tests"
+            depends="register.custom.compilers, compile.core.main"
+            description="compile core; test classes" unless="skip.tests">
+        <compile-java dest.dir="${core.testoutput.dir}"
+                      classpath="core.test.classpath"
+                      sourcepath="core.test.sourcepath"/>
+        <copy-resources dest.dir="${core.testoutput.dir}"
+                        src.dir="${core.basedir}/test/junit"/>
+    </target>
+
+    <!-- - - - - - - - - - - - - - - - - -
+          Target: Saros Core cleaning
+         - - - - - - - - - - - - - - - - - -->
+
+    <target name="clean.core" description="cleanup core">
+        <delete dir="${core.output.dir}" failonerror="false"/>
+        <delete dir="${core.testoutput.dir}" failonerror="false"/>
+    </target>
+
+
+    <!-- =================================
+          Targets: Saros IntelliJ plugin, Compilation
+         ================================= -->
 
     <target name="compile.saros-i"
             depends="compile.saros-i.main,compile.saros-i.tests"
             description="Compile saros-i"/>
 
+    <!-- - - - - - - - - - - - - - - - - -
+          Target: Compile Saros IntelliJ productive code
+         - - - - - - - - - - - - - - - - - -->
+
     <target name="compile.saros-i.main"
-            depends="register.custom.compilers,compile.core"
+            depends="register.custom.compilers, compile.core"
             description="Compile saros-i; main classes">
         <compile-java dest.dir="${saros-i.output.dir}"
                       classpath="saros-i.main.classpath"
@@ -284,6 +356,7 @@
                    property="resources.exist"/>
     </target>
 
+    <!-- TODO Who needs this? -->
     <target name="copy-html-resources" depends="check-resources-availability"
             if="resources.exist">
         <copy-resources dest.dir="${saros-i.output.dir}"
@@ -291,8 +364,12 @@
                         resource-refid="html.resources"/>
     </target>
 
+    <!-- - - - - - - - - - - - - - - - - -
+          Target: Compile Saros IntelliJ test code
+         - - - - - - - - - - - - - - - - - -->
+
     <target name="compile.saros-i.tests"
-            depends="register.custom.compilers,compile.saros-i.main"
+            depends="register.custom.compilers, compile.saros-i.main"
             description="compile saros-i; test classes" unless="skip.tests">
         <compile-java dest.dir="${saros-i.testoutput.dir}"
                       classpath="saros-i.test.classpath"
@@ -301,26 +378,18 @@
                         src.dir="${saros-i.basedir}/test/junit"/>
     </target>
 
-
-    <path id="saros-i.test.classpath">
-        <path refid="libraries.test.classpath"/>
-        <path refid="saros-i.main.classpath"/>
-        <pathelement location="${saros-i.output.dir}"/>
-        <pathelement location="${core.testoutput.dir}"/>
-    </path>
-
-    <property name="saros-i.test.dir" value="${saros-i.basedir}/test/junit"/>
-
-    <path id="saros-i.test.sourcepath">
-        <dirset dir="${saros-i.test.dir}"/>
-    </path>
+    <!-- - - - - - - - - - - - - - - - - -
+          Target: Clean Saros IntelliJ output
+         - - - - - - - - - - - - - - - - - -->
 
     <target name="clean.saros-i" description="cleanup saros-i">
         <delete dir="${saros-i.build.dir}" failonerror="false"/>
     </target>
 
-    <property name="saros-i.junit.report.dir"
-              value="${saros-i.build.dir}/junit"/>
+
+    <!-- =================================
+          Targets: Saros IntelliJ plugin, Test Execution
+         ================================= -->
 
     <target name="test" depends="compile.saros-i.tests"
             description="run saros-i unit tests">
@@ -345,10 +414,15 @@
         </junit>
     </target>
 
-    <property name="saros-i.plugin.path.jar"
-              value="${saros-i.artifacts.dir}/de.fu_berlin.inf.dpp.intellij.jar"/>
 
-    <!-- Build archive for plugin 'saros-i' -->
+    <!-- =================================
+          Targets: Saros IntelliJ plugin, Plugin Bundling
+         ================================= -->
+
+    <!-- - - - - - - - - - - - - - - - - -
+          Target: Build archive for Saros IntelliJ plugin
+         - - - - - - - - - - - - - - - - - -->
+
     <target name="plugin.build.jar.saros-i" depends="compile.saros-i"
             description="Build plugin archive for &#39;saros-i&#39;">
         <mkdir dir="${saros-i.artifacts.dir}"/>
@@ -364,10 +438,9 @@
         </jar>
     </target>
 
-    <property name="saros-i.bundle.path.zip"
-              value="${saros-i.artifacts.dir}/de.fu_berlin.inf.dpp.intellij.zip"/>
-
-    <!-- Create bundle with plugin and libs -->
+    <!-- - - - - - - - - - - - - - - - - -
+          Target: Bundle archive ready for installation
+         - - - - - - - - - - - - - - - - - -->
 
     <target name="plugin.bundle.zip.saros-i" depends="plugin.build.jar.saros-i"
             description="Build plugin archive ready for installation">
@@ -379,6 +452,11 @@
                         prefix="de.fu_berlin.inf.dpp.intellij/lib"/>
         </zip>
     </target>
+
+
+    <!-- =================================
+          Targets: Top-Level Targets
+         ================================= -->
 
     <target name="init" description="Build initialization">
         <!-- Perform any build initialization in this target -->
