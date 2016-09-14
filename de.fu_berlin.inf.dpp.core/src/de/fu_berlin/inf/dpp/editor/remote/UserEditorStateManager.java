@@ -39,8 +39,12 @@ public class UserEditorStateManager implements IActivityConsumer, Startable {
     private final ISessionListener setupAndTeardownUserStates = new AbstractSessionListener() {
         @Override
         public void userJoined(User user) {
-            UserEditorState result = new UserEditorState();
-            userEditorStates.put(user, result);
+            /*
+             * We cannot be sure that userJoined() will be called before the
+             * request on getState(), therefore we don't simply "put" an empty
+             * state in the map.
+             */
+            userEditorStates.putIfAbsent(user, new UserEditorState());
         }
 
         @Override
@@ -100,10 +104,15 @@ public class UserEditorStateManager implements IActivityConsumer, Startable {
      */
     public UserEditorState getState(User user) {
         /*
-         * Lazily adding a new state allows to record activities, even if we
-         * somehow missed the userJoined() event.
+         * Lazily adding a new state allows to record activities, in case
+         * someone is interested in the user state before the first activity
+         * arrived.
          */
-        return userEditorStates.putIfAbsent(user, new UserEditorState());
+        UserEditorState initState = new UserEditorState();
+        UserEditorState oldValue = userEditorStates
+            .putIfAbsent(user, initState);
+
+        return oldValue != null ? oldValue : initState;
     }
 
     /**
