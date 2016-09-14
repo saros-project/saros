@@ -157,7 +157,7 @@
 
     <property name="saros-i.compiler.args" value="${compiler.args}"/>
 
-    <property name="saros-i.build.dir" value="${build.dir}/saros-i/"/>
+    <property name="saros-i.build.dir" value="${build.dir}/saros-i"/>
     <property name="saros-i.output.dir" value="${saros-i.build.dir}/main"/>
     <property name="saros-i.testoutput.dir" value="${saros-i.build.dir}/test"/>
     <property name="saros-i.artifacts.dir"
@@ -197,6 +197,13 @@
               value="${saros-i.artifacts.dir}/de.fu_berlin.inf.dpp.intellij.jar"/>
     <property name="saros-i.bundle.path.zip"
               value="${saros-i.artifacts.dir}/de.fu_berlin.inf.dpp.intellij.zip"/>
+
+    <property name="saros-i.instr.dir" value="${saros-i.build.dir}/instr"/>
+
+    <property name="saros-i.cobertura.report.dir"
+              value="${saros-i.build.dir}/cobertura"/>
+    <property name="saros-i.cobertura.datafile"
+              value="${saros-i.cobertura.report.dir}/cobertura.ser"/>
 
 
     <!-- =================================
@@ -239,6 +246,19 @@
                  classname="com.intellij.ant.InstrumentIdeaExtensions"
                  classpathref="javac2.classpath"/>
     </target>
+
+    <!-- - - - - - - - - - - - - - - - - -
+          Cobertura setup
+         - - - - - - - - - - - - - - - - - -->
+
+    <path id="cobertura.classpath">
+        <fileset dir="${cobertura.dir}">
+            <include name="cobertura.jar"/>
+            <include name="lib/**/*.jar"/>
+        </fileset>
+    </path>
+
+    <taskdef classpathref="cobertura.classpath" resource="tasks.properties"/>
 
 
     <!-- =================================
@@ -384,6 +404,7 @@
 
     <target name="clean.saros-i" description="cleanup saros-i">
         <delete dir="${saros-i.build.dir}" failonerror="false"/>
+        <delete dir="${saros-i.instr.dir}" failonerror="false"/>
     </target>
 
 
@@ -391,17 +412,41 @@
           Targets: Saros IntelliJ plugin, Test Execution
          ================================= -->
 
-    <target name="test" depends="compile.saros-i.tests"
+    <target name="instrument">
+        <mkdir dir="${saros-i.instr.dir}"/>
+
+        <cobertura-instrument todir="${saros-i.instr.dir}"
+                              datafile="${saros-i.cobertura.datafile}">
+
+            <fileset dir="${saros-i.output.dir}">
+                <include name="**/*.class"/>
+            </fileset>
+
+            <excludeClasses regex=".*\.stf\..*"/>
+
+            <auxClasspath>
+                <path refid="saros-i.test.classpath"/>
+            </auxClasspath>
+        </cobertura-instrument>
+    </target>
+
+    <target name="test" depends="compile.saros-i.tests, instrument"
             description="run saros-i unit tests">
 
         <mkdir dir="${saros-i.junit.report.dir}"/>
         <junit printsummary="yes" fork="yes" forkmode="once"
                haltonfailure="yes" jvm="${jdk.bin}/java">
 
+            <sysproperty key="net.sourceforge.cobertura.datafile"
+                         value="${saros-i.cobertura.datafile}"/>
+
+            <classpath location="${saros-i.instr.dir}"/>
             <classpath>
                 <path refid="saros-i.test.classpath"/>
                 <pathelement path="${saros-i.testoutput.dir}"/>
             </classpath>
+
+            <classpath refid="cobertura.classpath"/>
 
             <formatter type="xml"/>
 
@@ -412,6 +457,10 @@
                 </fileset>
             </batchtest>
         </junit>
+
+        <cobertura-report format="xml" datafile="${saros-i.cobertura.datafile}"
+                          destdir="${saros-i.cobertura.report.dir}"
+                          srcdir="${saros-i.basedir}/src"/>
     </target>
 
 
