@@ -47,6 +47,7 @@ import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;
 import de.fu_berlin.inf.dpp.feedback.StatisticCollectorTest;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
+import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
@@ -323,6 +324,12 @@ public class SarosSessionTest {
         EasyMock.replay(receiver);
 
         container.addComponent(receiver);
+
+        final IPathFactory pathFactory = EasyMock
+            .createNiceMock(IPathFactory.class);
+
+        EasyMock.replay(pathFactory);
+        container.addComponent(IPathFactory.class, pathFactory);
 
         final ISarosSessionManager sessionManager = EasyMock
             .createNiceMock(ISarosSessionManager.class);

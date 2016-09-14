@@ -9,6 +9,8 @@ import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogHandler;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogServer;
 import de.fu_berlin.inf.dpp.editor.FollowModeManager;
 import de.fu_berlin.inf.dpp.editor.remote.UserEditorStateManager;
+import de.fu_berlin.inf.dpp.misc.xstream.SPathConverter;
+import de.fu_berlin.inf.dpp.misc.xstream.UserConverter;
 import de.fu_berlin.inf.dpp.session.internal.ActivityHandler;
 import de.fu_berlin.inf.dpp.session.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.session.internal.ChangeColorManager;
@@ -56,6 +58,10 @@ public class SarosCoreSessionContextFactory implements
             container.addComponent(ConsistencyWatchdogServer.class);
         else
             container.addComponent(ConsistencyWatchdogClient.class);
+
+        // Session-dependent XStream Converter
+        container.addComponent(SPathConverter.class);
+        container.addComponent(UserConverter.class);
 
         // Other
         container.addComponent(ActivityHandler.class);
