@@ -1,209 +1,191 @@
 <?xml version="1.0"?>
 
-<project name="saros" basedir="." default="build" xmlns:ant4eclipse="antlib:org.ant4eclipse">
+<project name="saros"
+         basedir="."
+         default="build"
+         xmlns:ant4eclipse="antlib:org.ant4eclipse">
 
-	<!-- define ant-contrib macros -->
-	<taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
-	
-	<!-- define ant4eclipse tasks -->
-	<taskdef uri="antlib:org.ant4eclipse" resource="org/ant4eclipse/antlib.xml" />
+    <property name="plugin.name" value="Saros" />
 
-	<!-- import the ant4eclipse pde macros -->
-	<import file="${ant4eclipse.dir}/macros/a4e-pde-macros.xml" />
+    <!-- define ant-contrib macros -->
+    <taskdef resource="net/sf/antcontrib/antcontrib.properties" />
 
-	<!-- define the workspace location here -->
-	<property name="workspaceDirectory" value="${basedir}/.." />
+    <!-- define ant4eclipse tasks -->
+    <taskdef uri="antlib:org.ant4eclipse"
+             resource="org/ant4eclipse/antlib.xml" />
 
-	<property name="src.dir" value="${basedir}/src" />
-	<property name="bin.dir" value="${basedir}/bin" />
-	<property name="src.test.dir" value="${basedir}/test" />
-	<property name="lib.dir" value="${basedir}/lib" />
-	<property name="test.lib.dir" value="${basedir}/test/lib" />
-	<property name="instr.dir" value="${basedir}/instr" />
-	<property name="build.dir" value="${basedir}/build" />
-	<property name="report.dir" value="${basedir}/report" />
-	<property name="junit.report.dir" value="${report.dir}/junit" />
-	<property name="findbugs.report.dir" value="${report.dir}/findbugs" />
-	<property name="findbugs.reportfile" value="${findbugs.report.dir}/findbugs.xml" />
-	<property name="cobertura.report.dir" value="${report.dir}/cobertura" />
-	<property name="cobertura.datafile" value="${cobertura.report.dir}/cobertura.ser" />
-	<property name="pmd.report.dir" value="${report.dir}/pmd" />
-	<property name="pmd.reportfile" value="${pmd.report.dir}/pmd.xml" />
+    <!-- import the ant4eclipse pde macros -->
+    <import file="${ant4eclipse.dir}/macros/a4e-pde-macros.xml" />
 
-	<!-- cobertura setup stuff -->
+    <!-- define the workspace location here -->
+    <property name="workspaceDirectory" value="${basedir}/.." />
 
-	<path id="cobertura.classpath">
-		<fileset dir="${cobertura.dir}">
-			<include name="cobertura.jar" />
-			<include name="lib/**/*.jar" />
-		</fileset>
-	</path>
+    <property name="src.dir" value="${basedir}/src" />
+    <property name="bin.dir" value="${basedir}/bin" />
+    <property name="src.test.dir" value="${basedir}/test/junit" />
+    <property name="lib.dir" value="${basedir}/lib" />
+    <property name="test.lib.dir" value="${basedir}/test/lib" />
+    <property name="instr.dir" value="${basedir}/instr" />
+    <property name="build.dir" value="${basedir}/build" />
+    <property name="report.dir" value="${basedir}/report" />
+    <property name="junit.report.dir" value="${report.dir}/junit" />
+    <property name="cobertura.report.dir" value="${report.dir}/cobertura" />
+    <property name="cobertura.datafile"
+              value="${cobertura.report.dir}/cobertura.ser" />
 
-	<taskdef classpathref="cobertura.classpath" resource="tasks.properties" />
+    <!-- cobertura setup stuff -->
 
-	<!-- cobertura setup stuff end -->
+    <path id="cobertura.classpath">
+        <fileset dir="${cobertura.dir}">
+            <include name="cobertura.jar" />
+            <include name="lib/**/*.jar" />
+        </fileset>
+    </path>
 
+    <taskdef classpathref="cobertura.classpath" resource="tasks.properties" />
 
-	<!-- findbugs setup stuff -->
-	<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask"/>
+    <!-- cobertura setup stuff end -->
 
-	<!-- PMD setup stuff -->
-	<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask"/>
-	
+    <ant4eclipse:jdtClassPathLibrary name="org.eclipse.jdt.junit.JUNIT_CONTAINER/4">
+        <fileset dir="${eclipse.dir}">
+            <include name="**/junit.jar" />
+        </fileset>
+    </ant4eclipse:jdtClassPathLibrary >
 
-	<ant4eclipse:jdtClassPathLibrary name="org.eclipse.jdt.junit.JUNIT_CONTAINER/4">
-		  <fileset dir="${eclipse.dir}">
-			<include name="**/junit.jar"/>
-		  </fileset>
-	</ant4eclipse:jdtClassPathLibrary >
+    <!-- define eclipse.plugin.dir using -D syntax) the target platform location 
+    (can be an Eclipse plugin dir or another set of JARs satisfying the Saros 
+    platform dependencies) -->
+    <ant4eclipse:targetPlatform id="saros.target.platform">
+        <location dir="${eclipse.dir}" />
+        <!-- additional.plugin.dir is auto. expanded to additional.plugin.dir/plugins by this task -->
+        <location dir="${additional.plugin.dir}" />
+    </ant4eclipse:targetPlatform>
 
-	<!-- define eclipse.plugin.dir using -D syntax) the target platform location (can be an Eclipse plugin dir or another set of JARs satisfying the Saros platform dependencies) -->
-	<ant4eclipse:targetPlatform id="saros.target.platform">
-		<location dir="${eclipse.dir}" />
-		<!-- additional.plugin.dir is auto. expanded to additional.plugin.dir/plugins by this task -->
-		<location dir="${additional.plugin.dir}" />
-	</ant4eclipse:targetPlatform>
+    <!-- Targets -->
 
-	<!-- Targets -->
+    <target name="clean">
+        <delete dir="${build.dir}" />
+        <delete dir="${instr.dir}" />
+        <delete dir="${junit.report.dir}" />
+        <delete file="${cobertura.datafile}" />
+        <delete dir="${cobertura.report.dir}" />
+        <delete dir="${report.dir}" />
+    </target>
 
-	<target name="clean">
-		<delete dir="${build.dir}" />
-		<delete dir="${instr.dir}" />
-		<delete dir="${junit.report.dir}" />
-		<delete file="${cobertura.datafile}" />
-		<delete dir="${cobertura.report.dir}" />
-		<delete file="${findbugs.reportfile}" />
-		<delete dir="${findbugs.report.dir}" />
-		<delete file="${pmd.reportfile}" />
-		<delete dir="${pmd.report.dir}" />
-		<delete dir="${report.dir}" />
-	</target>
+    <target name="build">
+        <mkdir dir="${build.dir}" />
+        <buildPlugin workspaceDirectory="${workspaceDirectory}"
+                     projectName="${plugin.name}"
+                     targetplatformid="saros.target.platform"
+                     destination="${build.dir}" />
+    </target>
 
-	<target name="build">
-		<mkdir dir="${build.dir}" />
-		<buildPlugin workspaceDirectory="${workspaceDirectory}" projectName="${plugin.name}" targetplatformid="saros.target.platform" destination="${build.dir}" />
-	</target>
+    <target name="instrument">
+        <mkdir dir="${instr.dir}" />
+        <cobertura-instrument todir="${instr.dir}"
+                              datafile="${cobertura.datafile}">
 
-	<target name="instrument">
-		<mkdir dir="${instr.dir}" />
-		<cobertura-instrument todir="${instr.dir}" datafile="${cobertura.datafile}">
+            <!-- only instrument Saros and Plugins proper code -->
+            <includeClasses regex="de\.fu_berlin\.inf.*" />
 
-			<!-- only instrument Saros and Plugins proper code -->
-			<includeClasses regex="de\.fu_berlin\.inf.*" />
+            <!-- exclude classes ending in Test -->
+            <excludeClasses regex=".*Test" />
 
-			<!-- exclude classes ending in Test -->
-			<excludeClasses regex=".*Test" />
+            <!-- exclude static classes in Test classes -->
+            <excludeClasses regex=".*Test\$.*" />
 
-			<!-- exclude static classes in Test classes -->
-			<excludeClasses regex=".*Test\$.*" />
+            <!-- exclude classes starting with Test -->
+            <excludeClasses regex=".*\.Test.*" />
 
-			<!-- exclude classes starting with Test -->
-			<excludeClasses regex=".*\.Test.*" />
+            <!-- exclude packages container test -->
+            <excludeClasses regex=".*\.test\..*" />
 
-			<!-- exclude packages container test -->
-			<excludeClasses regex=".*\.test\..*" />
+            <!-- exclude classes containing TestSuite -->
+            <excludeClasses regex=".*TestSuite.*" />
 
-			<!-- exclude classes containing TestSuite -->
-			<excludeClasses regex=".*TestSuite.*" />
+            <!-- exclude stf classes  -->
+            <excludeClasses regex=".*\.stf\..*" />
 
-			<!-- exclude stf classes  -->
-			<excludeClasses regex=".*\.stf\..*" />
+            <fileset dir="${build.dir}/plugins">
+                <include name="*.jar" />
+            </fileset>
+        </cobertura-instrument>
+    </target>
 
-			<fileset dir="${build.dir}/plugins">
-				<include name="*.jar" />
-			</fileset>
-		</cobertura-instrument>
-	</target>
+    <target name="test" depends="instrument">
+        <mkdir dir="${junit.report.dir}" />
 
-	<target name="test" depends="instrument">
-		<mkdir dir="${junit.report.dir}" />
+        <junit printsummary="yes" fork="yes" forkmode="once">
 
-		<junit printsummary="yes" fork="yes" forkmode="once">
+            <sysproperty key="net.sourceforge.cobertura.datafile"
+                         value="${cobertura.datafile}" />
+            <classpath>
 
-			<sysproperty key="net.sourceforge.cobertura.datafile" value="${cobertura.datafile}" />
-			<classpath>
-				
-				<!-- must be included first because it contains patches for some third party libraries (see ext-src directory) -->				
-				<fileset dir="${instr.dir}">
-					<include name="*.jar" />
-				</fileset>
+                <!-- must be included first because it contains patches for 
+                some third party libraries (see ext-src directory) -->
+                <fileset dir="${instr.dir}">
+                    <include name="*.jar" />
+                </fileset>
 
-				<!-- include the test lib directory first because of some library issues -->
-				<fileset erroronmissingdir="false" dir="${test.lib.dir}" />
-				<fileset erroronmissingdir="false" dir="${lib.dir}" />
+                <!-- include the test lib directory first because of some library issues -->
+                <fileset erroronmissingdir="false" dir="${test.lib.dir}" />
+                <fileset erroronmissingdir="false" dir="${lib.dir}" />
 
-				<!-- ant4eclipse's buildPlugin-task finds the core jar file automatically in the workspace.
-				However, this does not work for testing, so we amend the classpath accordingly. --> 
-				<fileset dir="${workspaceDirectory}/de.fu_berlin.inf.dpp.core/build/plugins">
-					<include name="*.jar" />
-				</fileset>
+                <!-- ant4eclipse's buildPlugin-task finds the core jar file utomatically
+                in the workspace. However, this does not work for testing, so we amend 
+                the classpath accordingly. -->
+                <fileset dir="${workspaceDirectory}/de.fu_berlin.inf.dpp.core/build/plugins">
+                    <include name="*.jar" />
+                </fileset>
 
-				<!-- The dependency to the ui package is somewhat optional, it is hidden behind a feature
-				toggle. However, It is added if it is present as easy mock reflective feature might inspect
-				the Saros class too closely.
-				ant4eclipse's buildPlugin-task finds the ui jar file automatically in the workspace.
-				However, this does not work for testing, so we amend the classpath accordingly. --> 
-				<fileset erroronmissingdir="false" dir="${workspaceDirectory}/de.fu_berlin.inf.dpp.ui/build/plugins">
-					<include name="*.jar" />
-				</fileset>
-				
-				<!-- HACK: as the normal class loader cannot find jars inside a jar file -->
-				<fileset dir="${workspaceDirectory}/de.fu_berlin.inf.dpp.ui/lib">
-					<include name="*.jar" />
-				</fileset>
-				
-				<!-- HACK: as the normal class loader cannot find jars inside a jar file -->
-				<fileset dir="${workspaceDirectory}/de.fu_berlin.inf.dpp.core/lib">
-					<include name="*.jar" />
-				</fileset>
+                <!-- The dependency to the ui package is somewhat optional, it is hidden 
+                behind a feature toggle. However, It is added if it is present as easy 
+                mock reflective feature might inspect the Saros class too closely.
+                ant4eclipse's buildPlugin-task finds the ui jar file automatically in 
+                the workspace. However, this does not work for testing, so we amend the 
+                classpath accordingly. -->
+                <fileset erroronmissingdir="false"
+                         dir="${workspaceDirectory}/de.fu_berlin.inf.dpp.ui/build/plugins">
+                    <include name="*.jar" />
+                </fileset>
 
-				<!-- as the class files from the junit core folder are not included include them -->
-				<dirset  dir="${workspaceDirectory}/de.fu_berlin.inf.dpp.core/bin_test" />
+                <!-- HACK: as the normal class loader cannot find jars inside a jar file -->
+                <fileset dir="${workspaceDirectory}/de.fu_berlin.inf.dpp.ui/lib">
+                    <include name="*.jar" />
+                </fileset>
 
-				<fileset dir="${eclipse.dir}/plugins">
-					<include name="*.jar" />
-				</fileset>
+                <!-- HACK: as the normal class loader cannot find jars inside a jar file -->
+                <fileset dir="${workspaceDirectory}/de.fu_berlin.inf.dpp.core/lib">
+                    <include name="*.jar" />
+                </fileset>
 
-			</classpath>
-	
-			<classpath refid="cobertura.classpath" />
-			
-			<formatter type="xml" />
-			
-			<batchtest todir="${junit.report.dir}">
-				<fileset dir="${src.test.dir}">
-					<exclude name="**/Abstract*.java"/>
-					<exclude name="**/*PluginTest.java"/>
-					<exclude name="**/stf/**"/>
-					<include name="**/*Test.java"/>
-				</fileset>
-			</batchtest>
-		</junit>
+                <!-- as the class files from the junit core folder are not included include them -->
+                <dirset dir="${workspaceDirectory}/de.fu_berlin.inf.dpp.core/bin_test" />
 
-		<cobertura-report format="xml" datafile="${cobertura.datafile}" destdir="${cobertura.report.dir}" srcdir="${src.dir}" />
-	</target>
+                <fileset dir="${eclipse.dir}/plugins">
+                    <include name="*.jar" />
+                </fileset>
 
-	<target name="analyze" depends="findbugs,pmd" />
+            </classpath>
 
-	<target name="findbugs">
-		<mkdir dir="${findbugs.report.dir}" />
-		<findbugs home="${findbugs.home}" output="xml" outputFile="${findbugs.reportfile}" effort="default" jvmargs="-Xmx256m" >
-			<sourcePath path="${src.dir}" />
-			<class location="${bin.dir}" />
-			</findbugs>
-	</target>
+            <classpath refid="cobertura.classpath" />
 
-	<target name="pmd">
-		<mkdir dir="${pmd.report.dir}" />
-		<pmd rulesetfiles="rulesets/basic.xml,rulesets/unusedcode.xml,rulesets/imports.xml">
-			<formatter type="xml" toFile="${pmd.reportfile}"/>
-			<fileset dir="${src.dir}">
-				<include name="**/*.java"/>
-			</fileset>
-			<classpath>
-				<pathelement location="${bin.dir}"/>
-			</classpath>
-		</pmd>
-	</target>
+            <formatter type="xml" />
+
+            <batchtest todir="${junit.report.dir}">
+                <fileset dir="${src.test.dir}">
+                    <exclude name="**/Abstract*.java" />
+                    <exclude name="**/*PluginTest.java" />
+                    <exclude name="**/stf/**" />
+                    <include name="**/*Test.java" />
+                </fileset>
+            </batchtest>
+        </junit>
+
+        <cobertura-report format="xml"
+                          datafile="${cobertura.datafile}"
+                          destdir="${cobertura.report.dir}"
+                          srcdir="${src.dir}" />
+    </target>
 
 </project>
