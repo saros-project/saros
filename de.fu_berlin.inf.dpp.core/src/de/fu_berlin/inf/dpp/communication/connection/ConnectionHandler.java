@@ -291,7 +291,7 @@ public class ConnectionHandler {
             socks5Candidates = null;
 
         connectionService.configure(SarosConstants.RESOURCE,
-            preferences.isDebugEnabled(),
+            preferences.isSmackDebugModeEnabled(),
             preferences.isLocalSOCKS5ProxyEnabled(),
             preferences.getFileTransferPort(), socks5Candidates,
             preferences.getAutoPortmappingGatewayID(),

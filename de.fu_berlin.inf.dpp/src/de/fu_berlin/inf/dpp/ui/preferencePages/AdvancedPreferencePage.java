@@ -59,7 +59,7 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
             getFieldEditorParent(), true));
 
         if (debugMode) {
-            addField(new BooleanFieldEditor(PreferenceConstants.DEBUG,
+            addField(new BooleanFieldEditor(PreferenceConstants.SMACK_DEBUG_MODE,
                 Messages.AdvancedPreferencePage_show_xmpp_debug,
                 getFieldEditorParent()));
         }

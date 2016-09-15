@@ -20,12 +20,12 @@ public abstract class Preferences {
     }
 
     /**
-     * Returns whether debug is enabled or not.
+     * Returns whether debug mode for SMACK is enabled or not.
      * 
      * @return true if debug is enabled.
      */
-    public boolean isDebugEnabled() {
-        return store.getBoolean(PreferenceConstants.DEBUG);
+    public boolean isSmackDebugModeEnabled() {
+        return store.getBoolean(PreferenceConstants.SMACK_DEBUG_MODE);
     }
 
     /**

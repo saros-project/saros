@@ -20,7 +20,7 @@ public class PreferenceInitializer {
         store.setDefault(PreferenceConstants.AUTO_CONNECT, true);
         store.setDefault(PreferenceConstants.AUTO_PORTMAPPING_DEVICEID, "");
         store.setDefault(PreferenceConstants.SKYPE_USERNAME, "");
-        store.setDefault(PreferenceConstants.DEBUG, false);
+        store.setDefault(PreferenceConstants.SMACK_DEBUG_MODE, false);
         store.setDefault(PreferenceConstants.FILE_TRANSFER_PORT, 7777);
         store.setDefault(PreferenceConstants.USE_NEXT_PORTS_FOR_FILE_TRANSFER,
             true);

@@ -20,7 +20,7 @@ public class PreferenceConstants {
 
     public static final String CONCURRENT_UNDO = "concurrent_undo";
 
-    public static final String DEBUG = "debug";
+    public static final String SMACK_DEBUG_MODE = "smack_debug_mode";
 
     public static final String FILE_TRANSFER_PORT = "port";
 
