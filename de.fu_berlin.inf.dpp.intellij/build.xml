@@ -470,6 +470,7 @@
             <zipfileset dir="${saros-i.output.dir}"/>
             <zipfileset file="${saros-i.basedir}/META-INF/plugin.xml"
                         prefix="META-INF"/>
+            <zipfileset dir="${saros-i.basedir}/resources"/>
             <manifest>
                 <attribute name="Created-By" value="IntelliJ IDEA"/>
                 <attribute name="Manifest-Version" value="1.0"/>
