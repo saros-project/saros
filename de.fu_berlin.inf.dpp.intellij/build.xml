@@ -135,6 +135,7 @@
 
     <property name="ui.basedir" value="${basedir}/../de.fu_berlin.inf.dpp.ui"/>
     <property name="ui.libdir" value="${ui.basedir}/lib"/>
+    <property name="ui.output.dir" value="${ui.basedir}/bin"/>
 
     <!-- - - - - - - - - - - - - - - - - -
           Saros IntelliJ plugin
@@ -151,7 +152,7 @@
 
     <path id="saros-i.main.classpath">
         <pathelement location="${core.output.dir}"/>
-        <pathelement location="${ui.basedir}/bin"/>
+        <pathelement location="${ui.output.dir}"/>
         <path refid="libraries.classpath"/>
         <path refid="jdk.classpath.idea_sdk"/>
     </path>
@@ -465,6 +466,7 @@
         <mkdir dir="${saros-i.artifacts.dir}"/>
         <jar destfile="${saros-i.plugin.path.jar}" duplicate="preserve">
             <zipfileset dir="${core.output.dir}"/>
+            <zipfileset dir="${ui.output.dir}"/>
             <zipfileset dir="${saros-i.output.dir}"/>
             <zipfileset file="${saros-i.basedir}/META-INF/plugin.xml"
                         prefix="META-INF"/>
@@ -482,6 +484,9 @@
     <target name="plugin.bundle.zip.saros-i" depends="plugin.build.jar.saros-i"
             description="Build plugin archive ready for installation">
         <zip destfile="${saros-i.bundle.path.zip}" duplicate="preserve">
+            <zipfileset dir="${ui.libdir}"
+                        prefix="de.fu_berlin.inf.dpp.intellij/lib"
+                        excludes="*-src.zip,*-debug.jar"/>
             <zipfileset dir="${core.libdir}"
                         prefix="de.fu_berlin.inf.dpp.intellij/lib"
                         excludes="*-sources.jar"/>
