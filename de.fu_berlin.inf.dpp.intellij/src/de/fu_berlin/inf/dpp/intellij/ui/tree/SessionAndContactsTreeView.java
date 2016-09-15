@@ -1,12 +1,15 @@
 package de.fu_berlin.inf.dpp.intellij.ui.tree;
-
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.UIUtil;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.account.XMPPAccount;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
+import de.fu_berlin.inf.dpp.net.ConnectionState;
+import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
+import org.jivesoftware.smack.Connection;
+import org.jivesoftware.smack.Roster;
 import org.picocontainer.annotations.Inject;
 
 import javax.swing.JTree;
@@ -73,6 +76,16 @@ public class SessionAndContactsTreeView extends Tree {
 
     };
 
+    private final IConnectionListener connectionStateListener = new IConnectionListener() {
+
+        @Override
+        public void connectionStateChanged(Connection connection,
+            ConnectionState state) {
+            renderConnectionState(state);
+        }
+
+    };
+
     public SessionAndContactsTreeView() {
         super(new SarosTreeRootNode());
         SarosPluginContext.initComponent(this);
@@ -87,6 +100,35 @@ public class SessionAndContactsTreeView extends Tree {
         getSelectionModel()
             .setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         setCellRenderer(renderer);
+
+        connectionService.addListener(connectionStateListener);
+
+        //show correct initial state
+        renderConnectionState(connectionService.getConnectionState());
+    }
+
+    private void renderConnectionState(ConnectionState state) {
+        Roster roster = connectionService.getRoster();
+
+        switch (state) {
+        case CONNECTING:
+            if (roster != null)
+                roster.addRosterListener(contactTreeRootNode);
+            break;
+        case CONNECTED:
+            renderConnected();
+            break;
+        case ERROR:
+        case DISCONNECTING:
+            if (roster != null)
+                roster.removeRosterListener(contactTreeRootNode);
+            break;
+        case NOT_CONNECTED:
+            renderDisconnected();
+            break;
+        default:
+            return;
+        }
     }
 
     /**
@@ -94,21 +136,26 @@ public class SessionAndContactsTreeView extends Tree {
      * <p/>
      * Called after a connection was made.
      */
-    public void renderConnected() {
-        XMPPAccount activeAccount = accountStore.getActiveAccount();
+    private void renderConnected() {
+        UIUtil.invokeLaterIfNeeded(new Runnable() {
+            @Override
+            public void run() {
+                Connection connection = connectionService.getConnection();
+                if (connection == null)
+                    return;
 
-        String rootText =
-            activeAccount.getUsername() + "@" + activeAccount.getDomain()
-                + " (Connected)";
-        getSarosTreeRootNode().setTitle(rootText);
+                String userJID = connection.getUser();
+                String rootText = new JID(userJID).getBareJID().toString();
 
-        //add contacts
-        contactTreeRootNode.createContactNodes();
+                getSarosTreeRootNode().setTitle(rootText);
 
-        //add listener for on-line contacts
-        connectionService.getRoster().addRosterListener(contactTreeRootNode);
+                //add contacts
+                contactTreeRootNode.createContactNodes();
 
-        updateTree();
+                updateTree();
+            }
+        });
+
     }
 
     /**
@@ -116,27 +163,26 @@ public class SessionAndContactsTreeView extends Tree {
      * <p/>
      * Called after a connection was disconnected.
      */
-    public void renderDisconnected() {
-        getSarosTreeRootNode().setTitleDefault();
-
-        contactTreeRootNode.removeContacts();
-        sessionTreeRootNode.removeAllChildren();
-
-        updateTree();
-    }
-
-    public void updateTree() {
-        Runnable updateTreeModel = new Runnable() {
+    private void renderDisconnected() {
+        UIUtil.invokeLaterIfNeeded(new Runnable() {
             @Override
             public void run() {
-                DefaultTreeModel model = (DefaultTreeModel) (getModel());
-                model.reload();
+                getSarosTreeRootNode().setTitleDefault();
 
-                expandRow(2);
+                contactTreeRootNode.removeContacts();
+                sessionTreeRootNode.removeAllChildren();
+
+                updateTree();
             }
-        };
+        });
 
-        UIUtil.invokeAndWaitIfNeeded(updateTreeModel);
+    }
+
+    private void updateTree() {
+        DefaultTreeModel model = (DefaultTreeModel) (getModel());
+        model.reload();
+
+        expandRow(2);
     }
 
     protected ContactTreeRootNode getContactTreeRootNode() {
