@@ -11,7 +11,7 @@
 
     <property name="compiler.debug" value="on"/>
     <property name="compiler.generate.no.warnings" value="off"/>
-    <property name="compiler.args" value=""/>
+    <property name="compiler.args" value="-encoding UTF-8"/>
     <property name="compiler.max.memory" value="256m"/>
 
     <patternset id="ignored.files">
@@ -73,16 +73,14 @@
 
     <property name="jdk.bin.idea_sdk" value="${jdk.bin}"/>
 
-    <property name="idea_sdk.lib.dir" value="${idea.home}/lib"/>
     <path id="jdk.classpath.idea_sdk">
         <fileset dir="${idea.home}"
-                 includes="${jdk.home}/**/*.jar, lib/**/*.jar, plugins/**/*.jar"
-                 excludes="lib/xstream*.jar, lib/picocontainer.jar, plugins/**/smack.jar, plugins/**/smackx.jar, lib/ant/**/*.jar"/>
+                 includes="lib/**/*.jar"
+                 excludes="lib/xstream*.jar, lib/picocontainer.jar, lib/ant/**/*.jar"/>
     </path>
 
     <property name="project.jdk.home" value="${idea.home}"/>
     <property name="project.jdk.bin" value="${jdk.bin.idea_sdk}"/>
-    <property name="project.jdk.classpath" value="jdk.classpath.idea_sdk"/>
 
 
     <!-- =================================
@@ -99,19 +97,12 @@
               value="${basedir}/../de.fu_berlin.inf.dpp.core"/>
     <property name="core.libdir" value="${core.basedir}/lib"/>
 
-    <property name="core.jdk.home" value="${jdk.home}"/>
-    <property name="core.jdk.bin" value="${jdk.bin}"/>
-    <property name="core.jdk.classpath" value="jdk.classpath"/>
-
-    <property name="core.compiler.args" value="${compiler.args}"/>
-
     <property name="core.build.dir" value="${build.dir}/core/"/>
     <property name="core.output.dir" value="${core.build.dir}/main"/>
     <property name="core.testoutput.dir" value="${core.build.dir}/test"/>
 
     <path id="core.main.classpath">
-        <path refid="${core.jdk.classpath}"/>
-        <path refid="libraries.classpath"/>
+        <fileset dir="${core.libdir}" includes="*.jar"/>
     </path>
 
     <path id="core.main.sourcepath">
@@ -150,12 +141,7 @@
          - - - - - - - - - - - - - - - - - -->
 
     <dirname property="saros-i.basedir" file="${ant.file}"/>
-
-    <property name="saros-i.jdk.home" value="${project.jdk.home}"/>
-    <property name="saros-i.jdk.bin" value="${project.jdk.bin}"/>
-    <property name="saros-i.jdk.classpath" value="${project.jdk.classpath}"/>
-
-    <property name="saros-i.compiler.args" value="${compiler.args}"/>
+    <property name="saros-i.libdir" value="${basedir}/lib"/>
 
     <property name="saros-i.build.dir" value="${build.dir}/saros-i"/>
     <property name="saros-i.output.dir" value="${saros-i.build.dir}/main"/>
@@ -164,7 +150,6 @@
               value="${saros-i.build.dir}/artifacts"/>
 
     <path id="saros-i.main.classpath">
-        <path refid="${saros-i.jdk.classpath}"/>
         <pathelement location="${core.output.dir}"/>
         <pathelement location="${ui.basedir}/bin"/>
         <path refid="libraries.classpath"/>
@@ -214,12 +199,10 @@
           Project Libraries
          - - - - - - - - - - - - - - - - - -->
 
-    <property name="intellij.libdir" value="${basedir}/lib"/>
-
     <path id="libraries.classpath">
         <fileset dir="${core.libdir}" includes="*.jar"/>
         <fileset dir="${ui.libdir}" includes="*.jar"/>
-        <fileset dir="${intellij.libdir}" includes="*.jar"/>
+        <fileset dir="${saros-i.libdir}" includes="*.jar"/>
         <fileset dir="${eclipse.dir}/plugins" includes="org.eclipse.swt.*.jar"
                  excludes="org.eclipse.swt.*source*.jar"/>
     </path>
@@ -234,9 +217,14 @@
 
     <property name="javac2.home" value="${idea.home}/lib"/>
     <path id="javac2.classpath">
+        <!-- TODO Upgrade build server to IntelliJ 13.1.7 -->
+        <!-- Newer version of asm, contained in IntelliJ 13.1.7 -->
+        <pathelement location="${javac2.home}/asm-all.jar"/>
+        <!-- Fall-back version, e.g. for IntelliJ 13.1.1 -->
+        <pathelement location="${javac2.home}/asm4-all.jar"/>
+
         <pathelement location="${javac2.home}/javac2.jar"/>
         <pathelement location="${javac2.home}/jdom.jar"/>
-        <pathelement location="${javac2.home}/asm4-all.jar"/>
         <pathelement location="${javac2.home}/jgoodies-forms.jar"/>
     </path>
     <target name="register.custom.compilers">
@@ -513,7 +501,7 @@
 
     <target name="clean" depends="clean.core, clean.saros-i"
             description="cleanup all">
-        <delete dir="${build.dir}"/>
+        <delete dir="${build.dir}" failonerror="false"/>
     </target>
 
     <target name="compile-main"
