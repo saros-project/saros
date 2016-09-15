@@ -121,8 +121,9 @@ public abstract class AbstractSarosLifecycle {
              * by PicoContainer which implement {@link Disposable}.
              */
             sarosContext.dispose();
+            sarosContext = null;
+            isInitialized = false;
         }
 
-        isInitialized = false;
     }
 }
