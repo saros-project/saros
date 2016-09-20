@@ -424,7 +424,7 @@
 
         <mkdir dir="${saros-i.junit.report.dir}"/>
         <junit printsummary="yes" fork="yes" forkmode="once"
-               haltonfailure="yes" jvm="${jdk.bin}/java">
+               jvm="${jdk.bin}/java">
 
             <sysproperty key="net.sourceforge.cobertura.datafile"
                          value="${saros-i.cobertura.datafile}"/>
