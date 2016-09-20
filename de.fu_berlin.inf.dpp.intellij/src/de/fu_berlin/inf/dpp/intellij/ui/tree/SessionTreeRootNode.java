@@ -58,6 +58,17 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
                 }
             });
         }
+
+        @Override
+        public void resourcesAdded(final String projectID, List<IResource> resources) {
+            UIUtil.invokeLaterIfNeeded(new Runnable() {
+                @Override
+                public void run() {
+                    addProjectNode(projectID);
+                }
+            });
+        }
+
     };
 
     private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
@@ -85,15 +96,6 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
             });
         }
 
-        @Override
-        public void projectResourcesAvailable(final String projectID) {
-            UIUtil.invokeLaterIfNeeded(new Runnable() {
-                @Override
-                public void run() {
-                    addProjectNode(projectID);
-                }
-            });
-        }
     };
 
     public SessionTreeRootNode(SessionAndContactsTreeView treeView) {

@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.editor;
 import java.io.FileNotFoundException;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
@@ -337,33 +338,10 @@ public class EditorManager extends AbstractActivityProducer implements
 
             removeAnnotationsFromAllEditors(annotationsOfGoneUser);
         }
-    };
-
-    private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
 
         @Override
-        public void sessionStarted(final ISarosSession session) {
-            SWTUtils.runSafeSWTSync(LOG, new Runnable() {
-                @Override
-                public void run() {
-                    initialize(session);
-                }
-            });
-        }
-
-        @Override
-        public void sessionEnded(final ISarosSession session,
-            SessionEndReason reason) {
-            SWTUtils.runSafeSWTSync(LOG, new Runnable() {
-                @Override
-                public void run() {
-                    uninitialize();
-                }
-            });
-        }
-
-        @Override
-        public void projectResourcesAvailable(String projectID) {
+        public void resourcesAdded(String projectID,
+            List<de.fu_berlin.inf.dpp.filesystem.IResource> resources) {
             SWTUtils.runSafeSWTSync(LOG, new Runnable() {
 
                 /*
@@ -400,6 +378,30 @@ public class EditorManager extends AbstractActivityProducer implements
                         partActivated(activeEditor);
                     }
 
+                }
+            });
+        }
+    };
+
+    private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
+
+        @Override
+        public void sessionStarted(final ISarosSession session) {
+            SWTUtils.runSafeSWTSync(LOG, new Runnable() {
+                @Override
+                public void run() {
+                    initialize(session);
+                }
+            });
+        }
+
+        @Override
+        public void sessionEnded(final ISarosSession session,
+            SessionEndReason reason) {
+            SWTUtils.runSafeSWTSync(LOG, new Runnable() {
+                @Override
+                public void run() {
+                    uninitialize();
                 }
             });
         }

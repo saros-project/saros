@@ -19,7 +19,10 @@
  */
 package de.fu_berlin.inf.dpp.session;
 
+import java.util.List;
+
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 
 /**
@@ -106,13 +109,12 @@ public interface ISessionListener {
      * different set of shared resources (e.g. by sharing a previously unshared
      * folder of a partially shared project).
      * <p>
-     * This method is <i>not</i> called on the UI thread.
+     * This method might <i>not</i> be called on the UI thread.
      * </p>
      * 
      * @param project
      *            the project that was added
      * 
-     * @see ISessionLifecycleListener#projectResourcesAvailable(String)
      */
     public void projectAdded(IProject project);
 
@@ -120,11 +122,24 @@ public interface ISessionListener {
      * Is fired then a project has been removed from the session, meaning it is
      * not shared between the session's users anymore.
      * <p>
-     * This method is <i>not</i> called on the UI thread.
+     * This method might <i>not</i> be called on the UI thread.
      * </p>
      * 
      * @param project
      *            the project that was removed
      */
     public void projectRemoved(IProject project);
+
+    /**
+     * Is fired when resources are added to the current session.
+     * <p>
+     * This method might <i>not</i> be called on the UI thread.
+     * </p>
+     * 
+     * @param resources
+     *            unmodifiable list containing the resources added to the
+     *            current session or <code>null</code> if the project is a
+     *            non-partial project
+     */
+    public void resourcesAdded(String projectID, List<IResource> resources);
 }

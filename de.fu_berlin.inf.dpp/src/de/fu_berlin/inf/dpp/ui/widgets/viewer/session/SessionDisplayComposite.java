@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.ui.widgets.viewer.session;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -16,9 +18,12 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
@@ -60,6 +65,13 @@ public abstract class SessionDisplayComposite extends
     // FIXME the filter must be passed in
     private ViewerFilter filter;
 
+    private final ISessionListener sessionListener = new AbstractSessionListener() {
+        @Override
+        public void resourcesAdded(String projectID, List<IResource> resources) {
+            ViewerUtils.refresh(getViewer(), true);
+        }
+    };
+
     private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
         /*
          * do not use sessionStarting as the context may still start and so we
@@ -67,6 +79,8 @@ public abstract class SessionDisplayComposite extends
          * class !
          */@Override
         public void sessionStarted(final ISarosSession session) {
+            session.addListener(sessionListener);
+
             SWTUtils.runSafeSWTAsync(LOGGER, new Runnable() {
 
                 @Override
@@ -87,6 +101,7 @@ public abstract class SessionDisplayComposite extends
 
         @Override
         public void sessionEnded(ISarosSession session, SessionEndReason reason) {
+            session.removeListener(sessionListener);
             SWTUtils.runSafeSWTAsync(LOGGER, new Runnable() {
 
                 @Override
@@ -103,11 +118,6 @@ public abstract class SessionDisplayComposite extends
                     getViewer().expandAll();
                 }
             });
-        }
-
-        @Override
-        public void projectResourcesAvailable(String projectID) {
-            ViewerUtils.refresh(getViewer(), true);
         }
     };
 

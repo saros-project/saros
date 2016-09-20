@@ -252,7 +252,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 }
 
                 session.addSharedResources(project, projectID, resources);
-                sessionManager.projectResourcesAvailable(projectID);
             }
         } catch (Exception e) {
             exception = e;

@@ -51,11 +51,6 @@ public class NullSessionLifecycleListener implements ISessionLifecycleListener {
     }
 
     @Override
-    public void projectResourcesAvailable(String projectID) {
-        // NOP
-    }
-
-    @Override
     public void postOutgoingInvitationCompleted(ISarosSession session,
         User user, IProgressMonitor monitor) {
         // NOP

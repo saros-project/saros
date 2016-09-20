@@ -31,6 +31,7 @@ import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorManager;
 import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorModel;
@@ -50,9 +51,11 @@ import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
+
 import org.apache.log4j.Logger;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -294,6 +297,20 @@ public class EditorManager extends AbstractActivityProducer
                 setFollowing(null);
             }
         }
+
+        @Override
+        public void resourcesAdded(String projectID, List<IResource> resources) {
+            // FIXME Why should the follow mode matter here?
+            if (!isFollowing()) {
+                return;
+            }
+            executeInUIThreadAsynchronous(new Runnable() {
+                @Override
+                public void run() {
+                    addProject();
+                }
+            });
+        }
     };
     private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
 
@@ -314,20 +331,6 @@ public class EditorManager extends AbstractActivityProducer
                 @Override
                 public void run() {
                     endSession();
-                }
-            });
-        }
-
-        @Override
-        public void projectResourcesAvailable(String projectID) {
-            // FIXME Why should the follow mode matter here?
-            if (!isFollowing()) {
-                return;
-            }
-            executeInUIThreadAsynchronous(new Runnable() {
-                @Override
-                public void run() {
-                    addProject();
                 }
             });
         }
@@ -379,64 +382,6 @@ public class EditorManager extends AbstractActivityProducer
             locallyOpenEditors.clear();
         }
 
-        private void addProject() {
-             /*
-              * When Alice invites Bob to a session with a project and Alice
-              * has some Files of the shared project already open, Bob will
-              * not receive any Actions (Selection, Contribution etc.) for
-              * the open editors. When Alice closes and reopens this Files
-              * again everything is going back to normal. To prevent that
-              * from happening this method is needed.
-              */
-            Set<SPath> localOpenEditors = getLocallyOpenEditors();
-
-            // FIXME followMode: This should have nothing to do with the
-            // currently followed user
-            UserEditorState state = userEditorStateManager
-                .getState(followedUser);
-
-            // for every open file we act as if we just
-            // opened it
-            for (SPath remoteEditorPath : state.getOpenEditors()) {
-                // Make sure that we open those editors twice
-                // (print a warning)
-                LOG.debug("Remote editor open " + remoteEditorPath);
-                if (!localOpenEditors.contains(remoteEditorPath)) {
-                    localEditorManipulator.openEditor(remoteEditorPath);
-                }
-            }
-
-            EditorState remoteSelectedEditor = state.getActiveEditorState();
-
-            if (remoteSelectedEditor != null) {
-                //activate editor
-                SPath remotePath = remoteSelectedEditor.getPath();
-                if (remoteSelectedEditor.getSelection() != null) {
-                    int position = remoteSelectedEditor.getSelection()
-                        .getOffset();
-                    int length = remoteSelectedEditor.getSelection()
-                        .getLength();
-                    // FIXME followMode: This should have nothing to do with the
-                    // currently followed user
-                    ColorModel colorModel = ColorManager
-                        .getColorModel(followedUser.getColorID());
-                    localEditorManipulator
-                        .selectText(remotePath, position, length, colorModel);
-                }
-
-                if (remoteSelectedEditor.getViewport() != null) {
-                    int startLine = remoteSelectedEditor.getViewport()
-                        .getStartLine();
-                    int endLine =
-                        remoteSelectedEditor.getViewport().getStartLine()
-                            + remoteSelectedEditor.getViewport()
-                            .getNumberOfLines();
-                    localEditorManipulator
-                        .setViewPort(remotePath, startLine, endLine);
-                }
-
-            }
-        }
 
     };
 
@@ -838,10 +783,10 @@ public class EditorManager extends AbstractActivityProducer
                 // FIXME Why are we suddenly interested in the followedUser?
                 EditorState state = userEditorStateManager
                     .getState(followedUser).getActiveEditorState();
-                
+
                 TextSelection selection = (state == null) ? null : state.getSelection();
-                
-                // state.getSelection() can return null                
+
+                // state.getSelection() can return null
                 if (selection != null) {
                     // FIXME Why are we only jumping if we know the selection,
                     // but not if there is no selection but a perfectly usable
@@ -990,4 +935,64 @@ public class EditorManager extends AbstractActivityProducer
             }
         });
     }
+
+    private void addProject() {
+        /*
+         * When Alice invites Bob to a session with a project and Alice
+         * has some Files of the shared project already open, Bob will
+         * not receive any Actions (Selection, Contribution etc.) for
+         * the open editors. When Alice closes and reopens this Files
+         * again everything is going back to normal. To prevent that
+         * from happening this method is needed.
+         */
+       Set<SPath> localOpenEditors = getLocallyOpenEditors();
+
+       // FIXME followMode: This should have nothing to do with the
+       // currently followed user
+       UserEditorState state = userEditorStateManager
+           .getState(followedUser);
+
+       // for every open file we act as if we just
+       // opened it
+       for (SPath remoteEditorPath : state.getOpenEditors()) {
+           // Make sure that we open those editors twice
+           // (print a warning)
+           LOG.debug("Remote editor open " + remoteEditorPath);
+           if (!localOpenEditors.contains(remoteEditorPath)) {
+               localEditorManipulator.openEditor(remoteEditorPath);
+           }
+       }
+
+       EditorState remoteSelectedEditor = state.getActiveEditorState();
+
+       if (remoteSelectedEditor != null) {
+           //activate editor
+           SPath remotePath = remoteSelectedEditor.getPath();
+           if (remoteSelectedEditor.getSelection() != null) {
+               int position = remoteSelectedEditor.getSelection()
+                   .getOffset();
+               int length = remoteSelectedEditor.getSelection()
+                   .getLength();
+               // FIXME followMode: This should have nothing to do with the
+               // currently followed user
+               ColorModel colorModel = ColorManager
+                   .getColorModel(followedUser.getColorID());
+               localEditorManipulator
+                   .selectText(remotePath, position, length, colorModel);
+           }
+
+           if (remoteSelectedEditor.getViewport() != null) {
+               int startLine = remoteSelectedEditor.getViewport()
+                   .getStartLine();
+               int endLine =
+                   remoteSelectedEditor.getViewport().getStartLine()
+                       + remoteSelectedEditor.getViewport()
+                       .getNumberOfLines();
+               localEditorManipulator
+                   .setViewPort(remotePath, startLine, endLine);
+           }
+
+       }
+   }
+
 }

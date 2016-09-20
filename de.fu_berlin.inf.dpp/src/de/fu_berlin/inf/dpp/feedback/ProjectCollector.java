@@ -8,10 +8,9 @@ import java.util.Map;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
+import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
-import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
-import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.ISessionListener;
 
 /**
  * A Collector class that collects information for each shared project during a
@@ -27,8 +26,6 @@ public class ProjectCollector extends AbstractStatisticCollector {
     private static final String KEY_PARTIAL_SHARED_PROJECTS = "session.shared.project.partial.count";
     private static final String KEY_PARTIAL_SHARED_PROJECTS_FILES = "session.shared.project.partial.files.count";
 
-    private final ISarosSessionManager sessionManager;
-
     private static class ProjectInformation {
         public boolean isPartial;
         public int files;
@@ -36,9 +33,9 @@ public class ProjectCollector extends AbstractStatisticCollector {
 
     private final Map<String, ProjectInformation> sharedProjects = new HashMap<String, ProjectInformation>();
 
-    private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
+    private final ISessionListener sessionListener = new AbstractSessionListener() {
         @Override
-        public void projectResourcesAvailable(String projectID) {
+        public void resourcesAdded(String projectID, List<IResource> resources) {
             ProjectInformation info = sharedProjects.get(projectID);
 
             if (info == null) {
@@ -79,9 +76,8 @@ public class ProjectCollector extends AbstractStatisticCollector {
     };
 
     public ProjectCollector(StatisticManager statisticManager,
-        ISarosSession session, ISarosSessionManager sessionManager) {
+        ISarosSession session) {
         super(statisticManager, session);
-        this.sessionManager = sessionManager;
     }
 
     @Override
@@ -105,11 +101,11 @@ public class ProjectCollector extends AbstractStatisticCollector {
 
     @Override
     protected void doOnSessionStart(ISarosSession sarosSession) {
-        sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
+        sarosSession.addListener(sessionListener);
     }
 
     @Override
     protected void doOnSessionEnd(ISarosSession sarosSession) {
-        sessionManager.removeSessionLifecycleListener(sessionLifecycleListener);
+        sarosSession.removeListener(sessionListener);
     }
 }

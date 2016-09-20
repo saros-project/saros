@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.session;
 
-import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 
 /**
@@ -71,15 +70,4 @@ public interface ISessionLifecycleListener {
      *            the reason why the session ended
      */
     public void sessionEnded(ISarosSession session, SessionEndReason reason);
-
-    /**
-     * Is fired as soon as all shared resources of a recently-added project in
-     * the current session are available locally.
-     * 
-     * @param projectID
-     *            ID of the project whose shared resources are now available
-     * 
-     * @see ISessionListener#projectAdded(IProject)
-     */
-    public void projectResourcesAvailable(String projectID);
 }

@@ -1,6 +1,9 @@
 package de.fu_berlin.inf.dpp.session;
 
+import java.util.List;
+
 import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IResource;
 
 /**
  * Abstract {@link ISessionListener} that does nothing by default. Clients can
@@ -48,4 +51,10 @@ public abstract class AbstractSessionListener implements ISessionListener {
     public void projectRemoved(IProject project) {
         // Do nothing.
     }
+
+    @Override
+    public void resourcesAdded(String projectID, List<IResource> resources) {
+        // Do nothing.
+    }
+
 }

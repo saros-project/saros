@@ -268,6 +268,15 @@ public final class SarosSession implements ISarosSession {
                 projectMapper.addResources(project, allResources);
             }
         }
+
+        List<IResource> resourcesToAnnounce = null;
+
+        if (allResources != null) {
+            resourcesToAnnounce = Collections
+                .unmodifiableList(new ArrayList<IResource>(allResources));
+        }
+
+        listenerDispatch.resourcesAdded(id, resourcesToAnnounce);
     }
 
     /**

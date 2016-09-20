@@ -15,9 +15,11 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
+import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.ISessionLifecycleListener;
+import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.NullSessionLifecycleListener;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
@@ -66,18 +68,23 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
 
         @Override
         public void sessionStarted(ISarosSession session) {
+            session.addListener(sessionListener);
             SharedProjectDecorator.this.session = session;
         }
 
         @Override
         public void sessionEnded(ISarosSession session, SessionEndReason reason) {
+            session.removeListener(sessionListener);
             SharedProjectDecorator.this.session = null;
             LOG.debug("clearing project decoration for all shared projects");
             updateDecoratorsAsync(null); // update all labels
         }
+    };
 
+    private final ISessionListener sessionListener = new AbstractSessionListener() {
         @Override
-        public void projectResourcesAvailable(String projectID) {
+        public void resourcesAdded(String projectID,
+            List<de.fu_berlin.inf.dpp.filesystem.IResource> resources) {
             LOG.debug("updating project decoration for all shared projects");
             updateDecoratorsAsync(null); // update all labels
         }

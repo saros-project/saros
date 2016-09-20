@@ -145,22 +145,21 @@ public interface ISarosSessionManager {
         List<ProjectNegotiationData> projectInfos, String negotiationID);
 
     /**
-     * Call this as soon as all shared resources of a project in the session are
-     * available.
-     * 
-     * @param projectID
-     *            ID of the project whose shared resources are now available
-     */
-    void projectResourcesAvailable(String projectID);
-
-    /**
      * Call this before a ISarosSession is started.
+     * 
+     * @deprecated the manager should notify its listeners not any other
+     *             component
      */
+    @Deprecated
     void sessionStarting(ISarosSession sarosSession);
 
     /**
      * Call this after a ISarosSession has been started.
+     * 
+     * @deprecated the manager should notify its listeners not any other
+     *             component
      */
+    @Deprecated
     void sessionStarted(ISarosSession sarosSession);
 
     /**
