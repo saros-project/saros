@@ -11,6 +11,7 @@ import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -336,8 +337,8 @@ public class SarosSessionTest {
 
         StopManager stopManager3 = session.getComponent(StopManager.class);
 
-        assertNull(
-            "component must not be available before the session is started",
+        assertNotNull(
+            "component must be available before the session is started",
             stopManager3);
 
         session.start();

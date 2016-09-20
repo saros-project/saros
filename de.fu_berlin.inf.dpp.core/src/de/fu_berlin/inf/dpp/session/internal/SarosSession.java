@@ -137,12 +137,14 @@ public final class SarosSession implements ISarosSession {
     private boolean stopped = false;
 
     private final ActivityQueuer activityQueuer;
+    private boolean starting = false;
+    private boolean stopping = false;
 
     private final Object componentAccessLock = new Object();
 
     /**
      * @JTourBusStop 5, Activity sending, Forwarding the IActivity:
-     * 
+     *
      *               This is where the SarosSession will receive the activity.
      *               This listener it is not part of the ISarosSession interface
      *               to avoid misuse.
@@ -170,7 +172,7 @@ public final class SarosSession implements ISarosSession {
             /**
              * @JTourBusStop 10, Activity sending, Local Execution, first
              *               dispatch:
-             * 
+             *
              *               Afterwards, every registered ActivityConsumer is
              *               informed about the remote activity that should be
              *               executed locally. This is the first dispatch: Each
@@ -275,7 +277,7 @@ public final class SarosSession implements ISarosSession {
 
     /**
      * Recursively get non-shared resources
-     * 
+     *
      * @param resource
      *            of type {@link IResource#FOLDER} or {@link IResource#FILE}
      */
@@ -451,7 +453,7 @@ public final class SarosSession implements ISarosSession {
         }
 
         /*
-         * 
+         *
          * as long as we do not know when something is send to someone this will
          * always produce errors ... swapping synchronizeUserList and userJoined
          * can produce different results
@@ -634,12 +636,17 @@ public final class SarosSession implements ISarosSession {
             throw new IllegalStateException();
         }
 
+        synchronized (componentAccessLock) {
+            starting = true;
+        }
+
         sessionContainer.start();
 
         for (User user : getRemoteUsers())
             activitySequencer.registerUser(user);
 
         synchronized (componentAccessLock) {
+            starting = false;
             started = true;
         }
     }
@@ -647,7 +654,7 @@ public final class SarosSession implements ISarosSession {
     /**
      * Stops this session and performing cleanup as necessary. All remote users
      * will also be notified about the local session stop.
-     * 
+     *
      * @throws IllegalStateException
      *             if the session is already stopped or was not started at all
      */
@@ -658,7 +665,7 @@ public final class SarosSession implements ISarosSession {
         }
 
         synchronized (componentAccessLock) {
-            stopped = true;
+            stopping = true;
         }
 
         sarosContext.removeChildContainer(sessionContainer);
@@ -686,6 +693,11 @@ public final class SarosSession implements ISarosSession {
         for (User user : getRemoteUsers())
             connectionManager.closeConnection(
                 ISarosSession.SESSION_CONNECTION_ID, user.getJID());
+
+        synchronized (componentAccessLock) {
+            stopping = false;
+            stopped = true;
+        }
     }
 
     @Override
@@ -743,7 +755,7 @@ public final class SarosSession implements ISarosSession {
     public void exec(List<IActivity> activities) {
         /**
          * @JTourBusStop 7, Activity sending, Incoming activities:
-         * 
+         *
          *               Incoming activities will arrive here. The
          *               ActivitySequencer calls this method for activities
          *               received over the Network Layer.
@@ -810,7 +822,7 @@ public final class SarosSession implements ISarosSession {
     /**
      * Must be called to update the project mapper when changes on shared files
      * oder folders happened.
-     * 
+     *
      * @param activity
      *            {@link IFileSystemModificationActivity} to handle
      * @return <code>true</code> if the activity should be send to the user,
@@ -987,7 +999,7 @@ public final class SarosSession implements ISarosSession {
          * or stop methods.
          */
         synchronized (componentAccessLock) {
-            if (stopped || !started)
+            if (starting || stopping || stopped)
                 return null;
 
             return sessionContainer.getComponent(key);
@@ -1094,7 +1106,7 @@ public final class SarosSession implements ISarosSession {
     /**
      * This method is only meant to be used by unit tests to verify the cleanup
      * of activity producers and consumers.
-     * 
+     *
      * @return the size of the internal activity producer collection
      */
     boolean hasActivityProducers() {
@@ -1104,7 +1116,7 @@ public final class SarosSession implements ISarosSession {
     /**
      * This method is only meant to be used by unit tests to verify the cleanup
      * of activity producers and consumers.
-     * 
+     *
      * @return the size of the internal activity consumer collection
      */
     boolean hasActivityConsumers() {

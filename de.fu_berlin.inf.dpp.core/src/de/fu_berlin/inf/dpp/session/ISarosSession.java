@@ -208,7 +208,10 @@ public interface ISarosSession {
 
     /**
      * FOR INTERNAL USE ONLY !
+     * 
+     * @deprecated only the session manager should be able to call this
      */
+    @Deprecated
     public void start();
 
     /**
