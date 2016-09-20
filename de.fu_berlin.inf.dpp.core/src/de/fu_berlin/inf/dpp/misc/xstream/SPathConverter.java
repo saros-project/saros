@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.misc.xstream;
 
 import org.apache.log4j.Logger;
-import org.picocontainer.Startable;
 
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
@@ -10,8 +9,6 @@ import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.communication.extensions.ActivitiesExtension;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
@@ -29,8 +26,7 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
  * &lt;SPath i="projA" p="src/Main.java" /&gt;
  * </pre>
  */
-@Component
-public class SPathConverter implements Converter, Startable {
+public class SPathConverter implements Converter {
 
     private static final Logger LOG = Logger.getLogger(SPathConverter.class);
 
@@ -43,16 +39,6 @@ public class SPathConverter implements Converter, Startable {
     public SPathConverter(ISarosSession session, IPathFactory pathFactory) {
         this.session = session;
         this.pathFactory = pathFactory;
-    }
-
-    @Override
-    public void start() {
-        ActivitiesExtension.PROVIDER.registerConverter(this);
-    }
-
-    @Override
-    public void stop() {
-        ActivitiesExtension.PROVIDER.unregisterConverter(this);
     }
 
     @SuppressWarnings("rawtypes")

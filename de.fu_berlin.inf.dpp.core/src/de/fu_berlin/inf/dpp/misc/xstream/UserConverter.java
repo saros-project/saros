@@ -1,11 +1,7 @@
 package de.fu_berlin.inf.dpp.misc.xstream;
 
-import org.picocontainer.Startable;
-
 import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.communication.extensions.ActivitiesExtension;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
@@ -14,24 +10,12 @@ import de.fu_berlin.inf.dpp.session.User;
  * Converts session-dependent User objects to session-independent XML
  * representations, and vice versa.
  */
-@Component
-public class UserConverter extends AbstractSingleValueConverter implements
-    Startable {
+public class UserConverter extends AbstractSingleValueConverter {
 
     private ISarosSession session;
 
     public UserConverter(ISarosSession session) {
         this.session = session;
-    }
-
-    @Override
-    public void start() {
-        ActivitiesExtension.PROVIDER.registerConverter(this);
-    }
-
-    @Override
-    public void stop() {
-        ActivitiesExtension.PROVIDER.unregisterConverter(this);
     }
 
     @SuppressWarnings({ "rawtypes" })
