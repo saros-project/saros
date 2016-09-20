@@ -1,5 +1,14 @@
 package de.fu_berlin.inf.dpp.session.internal;
 
+import static org.easymock.EasyMock.anyInt;
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.createNiceMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.getCurrentArguments;
+import static org.easymock.EasyMock.isA;
+import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -9,7 +18,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IWorkspace;
@@ -38,14 +46,12 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.ISarosContextBindings;
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosCoreContextFactory;
 import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;
-import de.fu_berlin.inf.dpp.feedback.StatisticCollectorTest;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
@@ -53,19 +59,16 @@ import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.BinaryXMPPExtension;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceInitializer;
-import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceStoreAdapter;
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferences;
 import de.fu_berlin.inf.dpp.project.internal.SarosEclipseSessionContextFactory;
 import de.fu_berlin.inf.dpp.session.ISarosSessionContextFactory;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.test.fakes.synchonize.NonUISynchronizer;
-import de.fu_berlin.inf.dpp.test.util.EclipseMemoryPreferenceStore;
-import de.fu_berlin.inf.dpp.test.util.MemoryPreferences;
+import de.fu_berlin.inf.dpp.test.mocks.EclipseMocker;
+import de.fu_berlin.inf.dpp.test.mocks.EditorManagerMock;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ StatisticManager.class, ResourcesPlugin.class })
@@ -110,10 +113,9 @@ public class SarosSessionTest {
     }
 
     private static XMPPConnectionService createConnectionServiceMock() {
-        XMPPConnectionService srv = EasyMock
-            .createNiceMock(XMPPConnectionService.class);
+        XMPPConnectionService srv = createNiceMock(XMPPConnectionService.class);
 
-        EasyMock.expect(srv.getJID()).andStubAnswer(new IAnswer<JID>() {
+        expect(srv.getJID()).andStubAnswer(new IAnswer<JID>() {
 
             @Override
             public JID answer() throws Throwable {
@@ -121,46 +123,22 @@ public class SarosSessionTest {
             }
         });
 
-        EasyMock.replay(srv);
+        replay(srv);
         return srv;
-    }
-
-    public static Saros createSarosMock(IPreferenceStore store,
-        Preferences preferences) {
-
-        Saros saros = EasyMock.createNiceMock(Saros.class);
-
-        saros.getPreferenceStore();
-        EasyMock.expectLastCall().andStubReturn(store);
-
-        saros.getGlobalPreferences();
-        EasyMock.expectLastCall().andStubReturn(preferences);
-
-        EasyMock.replay(saros);
-
-        return saros;
-    }
-
-    public static IConnectionManager createDataTransferManagerMock() {
-        IConnectionManager mock = EasyMock
-            .createNiceMock(DataTransferManager.class);
-
-        EasyMock.replay(mock);
-        return mock;
     }
 
     private static ISarosContext createContextMock(
         final MutablePicoContainer container) {
 
-        final ISarosContext context = EasyMock.createMock(ISarosContext.class);
+        final ISarosContext context = createMock(ISarosContext.class);
 
-        context.initComponent(EasyMock.isA(Object.class));
+        context.initComponent(isA(Object.class));
 
-        EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
+        expectLastCall().andAnswer(new IAnswer<Object>() {
 
             @Override
             public Object answer() throws Throwable {
-                Object session = EasyMock.getCurrentArguments()[0];
+                Object session = getCurrentArguments()[0];
                 MutablePicoContainer dummyContainer = container
                     .makeChildContainer();
                 dummyContainer.addComponent(session.getClass(), session);
@@ -171,30 +149,29 @@ public class SarosSessionTest {
             }
         }).times(2);
 
-        EasyMock.expect(context.getComponent(EasyMock.isA(Class.class)))
-            .andStubAnswer(new IAnswer<Object>() {
+        expect(context.getComponent(isA(Class.class))).andStubAnswer(
+            new IAnswer<Object>() {
 
                 @Override
                 public Object answer() throws Throwable {
-                    return container.getComponent(EasyMock
-                        .getCurrentArguments()[0]);
+                    return container.getComponent(getCurrentArguments()[0]);
                 }
             });
 
         context.createSimpleChildContainer();
-        EasyMock.expectLastCall().andReturn(container.makeChildContainer());
-        context.removeChildContainer(EasyMock.isA(MutablePicoContainer.class));
-        EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
+        expectLastCall().andReturn(container.makeChildContainer());
+        context.removeChildContainer(isA(MutablePicoContainer.class));
+        expectLastCall().andAnswer(new IAnswer<Object>() {
 
             @Override
             public Object answer() throws Throwable {
-                container.removeChildContainer((PicoContainer) EasyMock
-                    .getCurrentArguments()[0]);
+                container
+                    .removeChildContainer((PicoContainer) getCurrentArguments()[0]);
                 return true;
             }
         });
 
-        EasyMock.replay(context);
+        replay(context);
 
         return context;
     }
@@ -202,40 +179,63 @@ public class SarosSessionTest {
     private static IWorkspace createWorkspaceMock(
         final List<Object> workspaceListeners) {
 
-        final IWorkspace workspace = EasyMock.createMock(IWorkspace.class);
+        final IWorkspace workspace = createMock(IWorkspace.class);
 
-        workspace.addResourceChangeListener(
-            EasyMock.isA(IResourceChangeListener.class), EasyMock.anyInt());
+        workspace.addResourceChangeListener(isA(IResourceChangeListener.class),
+            anyInt());
 
-        EasyMock.expectLastCall().andStubAnswer(new IAnswer<Object>() {
+        expectLastCall().andStubAnswer(new IAnswer<Object>() {
 
             @Override
             public Object answer() throws Throwable {
-                workspaceListeners.add(EasyMock.getCurrentArguments()[0]);
+                workspaceListeners.add(getCurrentArguments()[0]);
                 return null;
             }
         });
 
-        workspace.removeResourceChangeListener(EasyMock
-            .isA(IResourceChangeListener.class));
+        workspace
+            .removeResourceChangeListener(isA(IResourceChangeListener.class));
 
-        EasyMock.expectLastCall().andStubAnswer(new IAnswer<Object>() {
+        expectLastCall().andStubAnswer(new IAnswer<Object>() {
 
             @Override
             public Object answer() throws Throwable {
-                workspaceListeners.remove(EasyMock.getCurrentArguments()[0]);
+                workspaceListeners.remove(getCurrentArguments()[0]);
                 return null;
             }
         });
 
-        EasyMock.replay(workspace);
+        replay(workspace);
 
         PowerMock.mockStaticPartial(ResourcesPlugin.class, "getWorkspace");
         ResourcesPlugin.getWorkspace();
-        EasyMock.expectLastCall().andReturn(workspace).anyTimes();
+        expectLastCall().andReturn(workspace).anyTimes();
         PowerMock.replay(ResourcesPlugin.class);
 
         return workspace;
+    }
+
+    private IReceiver createReceiverMock() {
+        countingReceiver = new CountingReceiver();
+
+        IReceiver receiver = createMock(IReceiver.class);
+
+        receiver.addPacketListener(anyObject(PacketListener.class),
+            anyObject(PacketFilter.class));
+
+        expectLastCall().andStubDelegateTo(countingReceiver);
+
+        receiver.removePacketListener(anyObject(PacketListener.class));
+        expectLastCall().andStubDelegateTo(countingReceiver);
+
+        replay(receiver);
+        return receiver;
+    }
+
+    private void addMockedComponent(Class<?> clazz) {
+        Object mock = createNiceMock(clazz);
+        replay(mock);
+        container.addComponent(clazz, mock);
     }
 
     private MutablePicoContainer container;
@@ -248,7 +248,6 @@ public class SarosSessionTest {
 
     @Before
     public void setUp() {
-
         PicoBuilder picoBuilder = new PicoBuilder(new CompositeInjection(
             new ConstructorInjection(), new AnnotatedFieldInjection()))
             .withCaching().withLifecycle();
@@ -271,83 +270,45 @@ public class SarosSessionTest {
         container.addComponent(ISarosSessionContextFactory.class,
             SarosEclipseSessionContextFactory.class);
 
-        final IPreferenceStore store = new EclipseMemoryPreferenceStore();
-        EclipsePreferenceInitializer.setPreferences(store);
-
-        final Preferences preferences = new MemoryPreferences();
-        EclipsePreferenceInitializer.setPreferences(preferences);
-
-        container
-            .addComponent(Saros.class, createSarosMock(store, preferences));
-        container.addComponent(EclipsePreferences.class);
-
-        // Eclipse store interface
-        container.addComponent(store);
-        // Saros core store interface
-        container.addComponent(new EclipsePreferenceStoreAdapter(store));
-
-        container.addComponent(NonUISynchronizer.class);
-        container.addComponent(FeedbackManager.class);
-        container.addComponent(AwarenessInformationCollector.class);
+        final IPreferenceStore store = EclipseMocker.initPreferenceStore(container);
+        final Preferences preferences = EclipseMocker.initPreferences();
 
         // Init Feedback
         FeedbackPreferences.setPreferences(preferences);
 
+        EclipseMocker.mockSarosWithPreferences(container, store, preferences);
+
+        container.addComponent(AwarenessInformationCollector.class);
+        container.addComponent(EclipsePreferences.class);
+        container.addComponent(FeedbackManager.class);
+        container.addComponent(NonUISynchronizer.class);
+
         /*
-         * REPLACEMENTS
+         * Replacements
          */
         container.removeComponent(XMPPConnectionService.class);
-
         container.addComponent(XMPPConnectionService.class,
             createConnectionServiceMock());
 
         container.removeComponent(IConnectionManager.class);
-        container.addComponent(IConnectionManager.class,
-            createDataTransferManagerMock());
+        addMockedComponent(IConnectionManager.class);
 
         container.removeComponent(ITransmitter.class);
-        container.addComponent(ITransmitter.class,
-            EasyMock.createMock(ITransmitter.class));
+        addMockedComponent(ITransmitter.class);
 
-        countingReceiver = new CountingReceiver();
-
-        IReceiver receiver = EasyMock.createMock(IReceiver.class);
-
-        receiver.addPacketListener(EasyMock.anyObject(PacketListener.class),
-            EasyMock.anyObject(PacketFilter.class));
-
-        EasyMock.expectLastCall().andStubDelegateTo(countingReceiver);
-
-        receiver.removePacketListener(EasyMock.anyObject(PacketListener.class));
-        EasyMock.expectLastCall().andStubDelegateTo(countingReceiver);
-
-        EasyMock.replay(receiver);
-
-        container.addComponent(receiver);
-
-        final IPathFactory pathFactory = EasyMock
-            .createNiceMock(IPathFactory.class);
-
-        EasyMock.replay(pathFactory);
-        container.addComponent(IPathFactory.class, pathFactory);
-
-        final ISarosSessionManager sessionManager = EasyMock
-            .createNiceMock(ISarosSessionManager.class);
-
-        EasyMock.replay(sessionManager);
-        container.addComponent(ISarosSessionManager.class, sessionManager);
-
-        final IEditorAPI editorAPI = EasyMock.createNiceMock(IEditorAPI.class);
-
-        EasyMock.replay(editorAPI);
-
-        container.addComponent(IEditorAPI.class, editorAPI);
+        /*
+         * Additional components
+         */
+        container.addComponent(createReceiverMock());
 
         container.addComponent(EditorManager.class,
-            StatisticCollectorTest.createEditorManagerMock(editorListeners));
+            EditorManagerMock.createMock(editorListeners));
+
+        addMockedComponent(IPathFactory.class);
+        addMockedComponent(ISarosSessionManager.class);
+        addMockedComponent(IEditorAPI.class);
 
         container.start();
-
     }
 
     @After

@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.test.mocks;
 
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 
 import org.easymock.EasyMock;
@@ -9,13 +10,18 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 import org.osgi.service.prefs.Preferences;
+import org.picocontainer.MutablePicoContainer;
 import org.powermock.api.easymock.PowerMock;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceInitializer;
+import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceStoreAdapter;
 import de.fu_berlin.inf.dpp.test.util.EclipseMemoryPreferenceStore;
+import de.fu_berlin.inf.dpp.test.util.MemoryPreferences;
 
 public class EclipseMocker {
     /**
@@ -72,5 +78,39 @@ public class EclipseMocker {
         replay(bundle, globalPref, saros);
 
         return saros;
+    }
+
+    public static void mockSarosWithPreferences(MutablePicoContainer container,
+        final IPreferenceStore store, final Preferences preferences) {
+
+        Saros saros = createNiceMock(Saros.class);
+
+        saros.getPreferenceStore();
+        expectLastCall().andStubReturn(store);
+
+        saros.getGlobalPreferences();
+        expectLastCall().andStubReturn(preferences);
+
+        replay(saros);
+
+        container.addComponent(Saros.class, saros);
+    }
+
+    public static IPreferenceStore initPreferenceStore(
+        MutablePicoContainer container) {
+        final IPreferenceStore store = new EclipseMemoryPreferenceStore();
+        EclipsePreferenceInitializer.setPreferences(store);
+
+        // Eclipse store interface
+        container.addComponent(store);
+        // Saros core store interface
+        container.addComponent(new EclipsePreferenceStoreAdapter(store));
+        return store;
+    }
+
+    public static Preferences initPreferences() {
+        final Preferences preferences = new MemoryPreferences();
+        EclipsePreferenceInitializer.setPreferences(preferences);
+        return preferences;
     }
 }

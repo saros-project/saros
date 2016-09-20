@@ -1,5 +1,8 @@
 package de.fu_berlin.inf.dpp.feedback;
 
+import static org.easymock.EasyMock.createNiceMock;
+import static org.easymock.EasyMock.replay;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -7,6 +10,7 @@ import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.osgi.service.prefs.Preferences;
 import org.picocontainer.BindKey;
@@ -17,21 +21,22 @@ import org.picocontainer.injectors.CompositeInjection;
 import org.picocontainer.injectors.ConstructorInjection;
 
 import de.fu_berlin.inf.dpp.ISarosContextBindings;
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.FollowModeManager;
-import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceInitializer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.User;
-import de.fu_berlin.inf.dpp.session.internal.SarosSessionTest;
-import de.fu_berlin.inf.dpp.test.util.EclipseMemoryPreferenceStore;
-import de.fu_berlin.inf.dpp.test.util.MemoryPreferences;
+import de.fu_berlin.inf.dpp.test.mocks.EclipseMocker;
+import de.fu_berlin.inf.dpp.test.mocks.EditorManagerMock;
 
 public class StatisticCollectorTest {
+
+    private MutablePicoContainer container;
+    private List<Object> sessionListeners;
+    private List<Object> editorListeners;
 
     private static ISarosSession createSessionMock(
         final List<Object> sessionListeners) {
@@ -68,78 +73,39 @@ public class StatisticCollectorTest {
         return session;
     }
 
-    public static EditorManager createEditorManagerMock(
-        final List<Object> editorListeners) {
-        EditorManager editorManager = EasyMock.createMock(EditorManager.class);
-        editorManager.addSharedEditorListener(EasyMock
-            .isA(ISharedEditorListener.class));
-        EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
-
-            @Override
-            public Object answer() throws Throwable {
-                editorListeners.add(EasyMock.getCurrentArguments()[0]);
-                return null;
-            }
-        }).anyTimes();
-        editorManager.removeSharedEditorListener(EasyMock
-            .isA(ISharedEditorListener.class));
-        EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
-
-            @Override
-            public Object answer() throws Throwable {
-                editorListeners.remove(EasyMock.getCurrentArguments()[0]);
-                return null;
-            }
-        }).anyTimes();
-        EasyMock.replay(editorManager);
-        return editorManager;
+    private void addMockedComponent(Class<?> key, Class<?> impl) {
+        Object mock = createNiceMock(impl);
+        replay(mock);
+        container.addComponent(key, mock);
     }
 
-    private static FollowModeManager createFollowModeManagerMock() {
-        FollowModeManager followModeManager = EasyMock
-            .createNiceMock(FollowModeManager.class);
-        EasyMock.replay(followModeManager);
-        return followModeManager;
-    }
-
-    @Test
-    public void testCollectorRegistrationAndDestruction() {
-
-        // Create a container
-        final MutablePicoContainer container = new PicoBuilder(
-            new CompositeInjection(new ConstructorInjection(),
-                new AnnotatedFieldInjection())).withCaching().withLifecycle()
-            .build();
+    @Before
+    public void setup() {
+        container = new PicoBuilder(new CompositeInjection(
+            new ConstructorInjection(), new AnnotatedFieldInjection()))
+            .withCaching().withLifecycle().build();
 
         // session
-        final List<Object> sessionListeners = new LinkedList<Object>();
+        sessionListeners = new LinkedList<Object>();
         ISarosSession session = createSessionMock(sessionListeners);
         container.addComponent(ISarosSession.class, session);
 
         // editor
-        final List<Object> editorListeners = new LinkedList<Object>();
-        EditorManager editorManager = createEditorManagerMock(editorListeners);
-        container.addComponent(EditorManager.class, editorManager);
+        editorListeners = new LinkedList<Object>();
+        container.addComponent(EditorManager.class,
+            EditorManagerMock.createMock(editorListeners));
 
         // follow mode manager
-        container.addComponent(FollowModeManager.class,
-            createFollowModeManagerMock());
+        addMockedComponent(FollowModeManager.class, FollowModeManager.class);
 
-        final IPreferenceStore store = new EclipseMemoryPreferenceStore();
-        final Preferences preferences = new MemoryPreferences();
+        IPreferenceStore store = EclipseMocker.initPreferenceStore(container);
+        Preferences preferences = EclipseMocker.initPreferences();
 
-        EclipsePreferenceInitializer.setPreferences(store);
-        EclipsePreferenceInitializer.setPreferences(preferences);
-
-        container.addComponent(Saros.class,
-            SarosSessionTest.createSarosMock(store, preferences));
-
-        container.addComponent(IPreferenceStore.class, store);
+        EclipseMocker.mockSarosWithPreferences(container, store, preferences);
 
         FeedbackPreferences.setPreferences(preferences);
 
-        container.addComponent(IConnectionManager.class,
-            SarosSessionTest.createDataTransferManagerMock());
+        addMockedComponent(IConnectionManager.class, DataTransferManager.class);
 
         // Components we want to create
         container.addComponent(StatisticManager.class);
@@ -161,7 +127,10 @@ public class StatisticCollectorTest {
             ISarosContextBindings.PlatformVersion.class), "4711");
 
         container.getComponents();
+    }
 
+    @Test
+    public void testCollectorRegistrationAndDestruction() {
         // Verify that the collectors are available
         StatisticManager manager = container
             .getComponent(StatisticManager.class);
