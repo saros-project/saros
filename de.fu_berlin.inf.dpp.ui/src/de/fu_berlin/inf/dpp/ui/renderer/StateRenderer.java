@@ -13,6 +13,7 @@ import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.ui.JavaScriptAPI;
 import de.fu_berlin.inf.dpp.ui.model.Account;
@@ -64,8 +65,10 @@ public class StateRenderer extends Renderer {
             switch (connectionState) {
             case CONNECTED:
                 synchronized (StateRenderer.this) {
-                    state = new State(new Account(connection.getUser()),
-                        connection.getRoster(), connectionState);
+                    JID user = new JID(connection.getUser());
+                    state = new State(new Account(user.getName(),
+                        user.getDomain()), connection.getRoster(),
+                        connectionState);
                 }
                 break;
             case CONNECTING:

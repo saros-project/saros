@@ -5,7 +5,7 @@ var tmpl = require('./account-dropdown.jade');
 module.exports = View.extend({
     template: tmpl,
     bindings: {
-        'model.label': '[data-hook=jid]',
+        'model.label': '[data-hook=username]',
         'model.isActive': {
             type: 'booleanClass',
             yes: 'font-bold',

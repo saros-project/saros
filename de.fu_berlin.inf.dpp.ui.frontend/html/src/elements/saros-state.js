@@ -81,7 +81,7 @@ module.exports = AmpersandState.extend({
             fn: function() {
 
                 // Checks whether there is an active account
-                if (!this.activeAccount.jid) {
+                if (!this.activeAccount.username) {
                     return false;
                 }
 
@@ -89,10 +89,13 @@ module.exports = AmpersandState.extend({
             }
         },        
         activeAccountLabel: {
-            deps: ['activeAccount.jid'],
+            deps: ['activeAccount.username'],
             fn: function() {
-                if (this.activeAccount.label) {
-                    return this.activeAccount.label;
+                if (this.activeAccount.username) {
+                    // Return full qualified identifier to show in UI
+                    var name = this.activeAccount.username;
+                    var domain = this.activeAccount.domain;
+                    return name.concat("@",domain);
                 } else {
                     return dictionary.message.noAccount;
                 }

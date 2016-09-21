@@ -9,7 +9,7 @@ public class AccountTest {
     @Test
     public void testGetters() {
 
-        final Account account = new Account("alice@example.org/test");
+        final Account account = new Account("alice", "example.org");
 
         assertEquals("alice", account.getUsername());
         assertEquals("example.org", account.getDomain());

@@ -33,21 +33,6 @@ public class Account {
         jid = new JID(username, domain);
     }
 
-    /**
-     * Creates a new account model from given jid. If jid is nullthis will throw
-     * an IllegalArgumentException.
-     * 
-     * @param jid
-     *            the jid as string
-     * 
-     * @throw IllegalArgumentException if jid is null
-     */
-    public Account(String jid) {
-        this.jid = new JID(jid);
-        username = this.jid.getName();
-        domain = this.jid.getDomain();
-    }
-
     public String getUsername() {
         return username;
     }

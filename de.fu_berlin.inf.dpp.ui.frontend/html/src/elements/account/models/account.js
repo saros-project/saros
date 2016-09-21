@@ -2,7 +2,6 @@ var AmpersandState = require('ampersand-state');
 
 module.exports = AmpersandState.extend({
     props: {
-        jid: ['object'],
         username: ['string', true, ''],
         domain: ['string', true, '']
     },
@@ -10,7 +9,7 @@ module.exports = AmpersandState.extend({
         label: {
             deps: ['username', 'domain'],
             fn: function() {
-                if (this.jid) {
+                if (this.username) {
 
                     return this.username + '@' + this.domain;
                 } else {
