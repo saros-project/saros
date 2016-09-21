@@ -1,9 +1,9 @@
 package de.fu_berlin.inf.dpp.ui.browser_functions;
 
 import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
+import de.fu_berlin.inf.dpp.account.XMPPAccount;
 import de.fu_berlin.inf.dpp.ui.browser_functions.BrowserFunction.Policy;
 import de.fu_berlin.inf.dpp.ui.core_facades.StateFacade;
-import de.fu_berlin.inf.dpp.ui.model.Account;
 
 /**
  * Connect with given Account.
@@ -31,7 +31,7 @@ public class ConnectAccount extends TypedJavascriptFunction {
      * @param account
      */
     @BrowserFunction(Policy.ASYNC)
-    public void connect(final Account account) {
+    public void connect(final XMPPAccount account) {
         stateFacade.connect(account);
     }
 }

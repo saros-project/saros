@@ -11,7 +11,6 @@ import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.net.util.XMPPUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.ui.model.Account;
 
 /**
  * Bundles all backend calls for connecting and for managing the contact list.
@@ -46,11 +45,15 @@ public class StateFacade {
      * @param account
      *            representing an XMPP account
      */
-    public void connect(Account account) {
-        XMPPAccount xmppAccount = accountStore
-            .findAccount(account.getBareJid());
-        accountStore.setAccountActive(xmppAccount);
-        connectionHandler.connect(xmppAccount, false);
+    public void connect(XMPPAccount account) {
+        if (!accountStore.exists(account.getUsername(), account.getDomain(),
+            account.getServer(), account.getPort())) {
+
+            return;
+        }
+
+        accountStore.setAccountActive(account);
+        connectionHandler.connect(account, false);
     }
 
     /**

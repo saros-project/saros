@@ -8,7 +8,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
 import de.fu_berlin.inf.ag_se.browser.IBrowser;
-import de.fu_berlin.inf.dpp.ui.model.Account;
+import de.fu_berlin.inf.dpp.account.XMPPAccount;
 import de.fu_berlin.inf.dpp.ui.model.ProjectTree;
 import de.fu_berlin.inf.dpp.ui.model.State;
 
@@ -84,7 +84,8 @@ public class JavaScriptAPI {
      * @param accounts
      *            a list of Accounts to update the JS model with
      */
-    public static void updateAccounts(IBrowser browser, List<Account> accounts) {
+    public static void updateAccounts(IBrowser browser,
+        List<XMPPAccount> accounts) {
         LOG.debug("Sending list of Account JSONs to browser "
             + browser.getUrl());
         triggerEvent(browser, "updateAccounts", toJson(accounts));

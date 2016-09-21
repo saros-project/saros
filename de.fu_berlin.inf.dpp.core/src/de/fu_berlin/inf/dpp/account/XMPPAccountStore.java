@@ -432,7 +432,7 @@ public final class XMPPAccountStore {
      * @param domain
      *            the domain name of the server
      * @param server
-     *            the server ip / name
+     *            the server ip / hostname
      * @param port
      *            the port of the server
      * @param useTLS

@@ -8,25 +8,24 @@ import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.packet.Presence;
 
+import de.fu_berlin.inf.dpp.account.XMPPAccount;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 
 /**
  * Represents the state of the browser application. It consists of an
- * {@link de.fu_berlin.inf.dpp.ui.model.Account}, a list of
- * {@link de.fu_berlin.inf.dpp.ui.model.Contact}s and the
- * {@link de.fu_berlin.inf.dpp.net.ConnectionState}.
- * <p/>
+ * {@link XMPPAccount}, a list of {@link de.fu_berlin.inf.dpp.ui.model.Contact}s
+ * and the {@link de.fu_berlin.inf.dpp.net.ConnectionState}.
  */
 public class State {
 
     /**
      * Used to avoid null checks in the renderer.
      */
-    public final static State INIT_STATE = new State(null,
+    public static final State INIT_STATE = new State(null,
         Collections.<Contact> emptyList(),
         de.fu_berlin.inf.dpp.net.ConnectionState.NOT_CONNECTED);
 
-    private Account activeAccount;
+    private XMPPAccount activeAccount;
 
     private List<Contact> contactList;
 
@@ -40,7 +39,7 @@ public class State {
      * @param connectionState
      *            the current connection state of the active account
      */
-    public State(Account activeAccount, List<Contact> contactList,
+    public State(XMPPAccount activeAccount, List<Contact> contactList,
         ConnectionState connectionState) {
         this.activeAccount = activeAccount;
         this.contactList = new ArrayList<Contact>(contactList);
@@ -55,7 +54,7 @@ public class State {
      * @param connectionState
      *            the current connection state of the active account
      */
-    public State(Account activeAccount, Roster roster,
+    public State(XMPPAccount activeAccount, Roster roster,
         ConnectionState connectionState) {
         this.activeAccount = activeAccount;
         this.contactList = createListOfContacts(roster);
@@ -83,7 +82,7 @@ public class State {
      * @param activeAccount
      *            the active account or null
      */
-    public void setAccount(Account activeAccount) {
+    public void setAccount(XMPPAccount activeAccount) {
         this.activeAccount = activeAccount;
     }
 
@@ -96,7 +95,7 @@ public class State {
      * 
      * @return the active account or null
      */
-    public Account getActiveAccount() {
+    public XMPPAccount getActiveAccount() {
         return activeAccount;
     }
 

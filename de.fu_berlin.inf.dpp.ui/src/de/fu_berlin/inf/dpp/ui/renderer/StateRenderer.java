@@ -11,12 +11,13 @@ import org.jivesoftware.smack.packet.Presence;
 
 import de.fu_berlin.inf.ag_se.browser.extensions.IJQueryBrowser;
 import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
+import de.fu_berlin.inf.dpp.account.XMPPAccount;
+import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.ui.JavaScriptAPI;
-import de.fu_berlin.inf.dpp.ui.model.Account;
 import de.fu_berlin.inf.dpp.ui.model.Contact;
 import de.fu_berlin.inf.dpp.ui.model.State;
 
@@ -36,6 +37,7 @@ public class StateRenderer extends Renderer {
     private static final Logger LOG = Logger.getLogger(StateRenderer.class);
 
     private final XMPPConnectionService connectionService;
+    private final XMPPAccountStore xmppAccountStore;
 
     private Roster roster;
 
@@ -47,9 +49,11 @@ public class StateRenderer extends Renderer {
      * @param connectionService
      * @see HTMLUIContextFactory
      */
-    public StateRenderer(XMPPConnectionService connectionService) {
+    public StateRenderer(XMPPConnectionService connectionService,
+        XMPPAccountStore xmppAccountStore) {
         this.connectionService = connectionService;
         this.connectionService.addListener(connectionListener);
+        this.xmppAccountStore = xmppAccountStore;
     }
 
     @Override
@@ -66,8 +70,9 @@ public class StateRenderer extends Renderer {
             case CONNECTED:
                 synchronized (StateRenderer.this) {
                     JID user = new JID(connection.getUser());
-                    state = new State(new Account(user.getName(),
-                        user.getDomain()), connection.getRoster(),
+                    XMPPAccount acc = xmppAccountStore.findAccount(user
+                        .getBareJID().toString());
+                    state = new State(acc, connection.getRoster(),
                         connectionState);
                 }
                 break;

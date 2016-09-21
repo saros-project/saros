@@ -91,17 +91,18 @@ module.exports = AmpersandState.extend({
         activeAccountLabel: {
             deps: ['activeAccount.username'],
             fn: function() {
-                if (this.activeAccount.username) {
-                    // Return full qualified identifier to show in UI
+                if (!this.activeAccount.username) {
+                    return dictionary.message.noAccount;
+                } else {
+                    //TODO: This should use JID information instead
+                    //TODO: Server part feature is missing
                     var name = this.activeAccount.username;
                     var domain = this.activeAccount.domain;
-                    return name.concat("@",domain);
-                } else {
-                    return dictionary.message.noAccount;
+                    var accountLabel = name.concat("@",domain);
+                    return accountLabel;
                 }
             }
         },
-
         connectionStateLabel: {
             deps: ['connectionState'],
             fn: function() {
@@ -124,7 +125,7 @@ module.exports = AmpersandState.extend({
     },
 
     // Activates an account.
-    // Use this methond instead of `state.activeAccount = acc;`
+    // Use this method instead of `state.activeAccount = acc;`
     activateAccount: function(account) {
 
         // Only allow to set active account when there is no
