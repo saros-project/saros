@@ -92,7 +92,6 @@ public final class GeneralPreferencePage extends FieldEditorPreferencePage
         layoutParent();
         createAccountsGroup();
         createAutomaticConnectField(parent);
-        createVersionControlPreferences(parent);
         createConcurrentUndoField(parent);
     }
 
@@ -303,13 +302,6 @@ public final class GeneralPreferencePage extends FieldEditorPreferencePage
     private void createAutomaticConnectField(Composite group) {
         addField(new BooleanFieldEditor(PreferenceConstants.AUTO_CONNECT,
             STARTUP_CONNECT_TEXT, group));
-    }
-
-    private void createVersionControlPreferences(Composite group) {
-        BooleanFieldEditor editor = new BooleanFieldEditor(
-            PreferenceConstants.DISABLE_VERSION_CONTROL,
-            DISABLE_VERSION_CONTROL_TEXT, group);
-        addField(editor);
     }
 
     private void createConcurrentUndoField(Composite group) {

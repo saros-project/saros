@@ -26,13 +26,9 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 
@@ -43,7 +39,6 @@ import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.preferencePages.GeneralPreferencePage;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.ui.widgets.wizard.ProjectOptionComposite;
@@ -69,8 +64,6 @@ public class EnterProjectNamePage extends WizardPage {
 
     /** Map containing the current error messages for every project id. */
     private Map<String, String> currentErrors = new HashMap<String, String>();
-
-    private Button disableVCSCheckbox;
 
     private IConnectionManager connectionManager;
 
@@ -115,10 +108,6 @@ public class EnterProjectNamePage extends WizardPage {
      */
     public String getTargetProjectName(String projectID) {
         return projectOptionComposites.get(projectID).getProjectName();
-    }
-
-    public boolean useVersionControl() {
-        return !disableVCSCheckbox.getSelection();
     }
 
     /**
@@ -183,30 +172,6 @@ public class EnterProjectNamePage extends WizardPage {
             projectOptionComposites.put(projectID, tabComposite);
         }
 
-        Composite vcsComposite = new Composite(composite, SWT.NONE);
-        vcsComposite.setLayout(new GridLayout());
-
-        disableVCSCheckbox = new Button(vcsComposite, SWT.CHECK);
-        disableVCSCheckbox
-            .setText(GeneralPreferencePage.DISABLE_VERSION_CONTROL_TEXT);
-        disableVCSCheckbox.setSelection(!preferences.useVersionControl());
-
-        Button explainButton = new Button(vcsComposite, SWT.PUSH);
-        explainButton.setText("Explain");
-
-        final Label explanation = new Label(vcsComposite, SWT.NONE);
-        explanation.setEnabled(false);
-        explanation.setText(Messages.Explain_version_control);
-        explanation.setVisible(false);
-        explainButton.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                explanation.setVisible(true);
-            }
-        });
-        explainButton.pack();
-        explanation.pack();
         updateConnectionStatus();
 
         attachListeners();

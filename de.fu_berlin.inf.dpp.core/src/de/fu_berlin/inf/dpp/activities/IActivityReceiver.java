@@ -62,6 +62,4 @@ public interface IActivityReceiver {
 
     void receive(ViewportActivity viewportActivity);
 
-    void receive(VCSActivity activity);
-
 }

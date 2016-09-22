@@ -63,26 +63,4 @@ public interface Constants {
         + "Change.java";
     public static final String CP2_CHANGE = "test/resources/stf/" + CLS2
         + "Change.java";
-    /** modified in stf_test_project_copy */
-    public static final String SVN_CLS1_REV4 = "2767";
-    /** modified in stf_test_project_copy */
-    public static final String SVN_CLS1_REV3 = "2737";
-    /** copy from stf_test_project to stf_test_project_copy */
-    public static final String SVN_CLS1_REV2 = "2736";
-    /** Initial commit in stf_test_project. */
-    public static final String SVN_CLS1_REV1 = "2735";
-    public static final String SVN_CLS1_SWITCHED_URL = "http://saros-build.imp.fu-berlin.de/svn/saros/stf_tests/stf_test_project_copy/src/pkg/Test.java";
-    public static final String SVN_CLS1_FULL_PATH = "/stf_test_project/src/pkg/Test.java";
-    public static final String SVN_CLS1_SUFFIX = Constants.SVN_CLS1 + ".java";
-    public static final String SVN_CLS1 = "Test";
-    public static final String SVN_PKG = "pkg";
-    public static final String SVN_PROJECT_URL_SWITCHED = Constants.SVN_REPOSITORY_URL
-        + "/stf_tests/stf_test_project_copy";
-    /* SVN infos */
-    public static final String SVN_REPOSITORY_URL = "http://saros-build.imp.fu-berlin.de/svn/saros";
-    public static final String SVN_PROJECT = "stf_test_project";
-    public static final String SVN_PROJECT_COPY = "copy_of_stf_test_project";
-    public static final String SVN_SUFFIX = "[stf_tests/stf_test_project]";
-    public static String SVN_PROJECT_PATH = "stf_tests/stf_test_project";
-    // : "/stf_tests/stf_test_project";
 }

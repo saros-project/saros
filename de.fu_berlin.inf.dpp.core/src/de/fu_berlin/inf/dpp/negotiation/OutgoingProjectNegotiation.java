@@ -38,7 +38,6 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
-import de.fu_berlin.inf.dpp.vcs.VCSProvider;
 
 public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
@@ -446,14 +445,6 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                     CancelOption.DO_NOT_NOTIFY_PEER);
             try {
 
-                VCSProvider vcs = null;
-
-                if (session.useVersionControl() && vcsProviderFactory != null) {
-                    vcs = vcsProviderFactory.getProvider(project);
-                    // TODO how to handle this if no adapter is available ?
-                    // if(vcs == null)
-                }
-
                 /*
                  * force editor buffer flush because we read the files from the
                  * underlying storage
@@ -463,8 +454,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
                 FileList projectFileList = FileListFactory.createFileList(
                     project, session.getSharedResources(project),
-                    checksumCache, vcs, new SubProgressMonitor(monitor,
-                        1 * scale, SubProgressMonitor.SUPPRESS_BEGINTASK
+                    checksumCache, new SubProgressMonitor(monitor, 1 * scale,
+                        SubProgressMonitor.SUPPRESS_BEGINTASK
                             | SubProgressMonitor.SUPPRESS_SETTASKNAME));
 
                 boolean partial = !session.isCompletelyShared(project);

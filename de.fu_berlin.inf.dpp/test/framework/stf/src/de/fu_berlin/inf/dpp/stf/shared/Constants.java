@@ -445,42 +445,11 @@ public interface Constants {
 
     /* *********************************************
      * 
-     * View SVN Respositories
-     * 
-     * ********************************************
-     */
-    public static final String VIEW_SVN_REPOSITORIES_ID = "org.tigris.subversion.subclipse.ui.repository.RepositoriesView";
-    public static final String VIEW_SVN_REPOSITORIES = "SVN Repositories";
-
-    /* *********************************************
-     * 
      * Context Menu Team
      * 
      * ********************************************
      */
-    public static final String SHELL_REVERT = "Revert";
     public static final String SHELL_SHARE_PROJECT = "Share Project";
-    public static final String SHELL_SAROS_RUNNING_VCS_OPERATION = "Saros running VCS operation";
-    public static final String SHELL_CONFIRM_DISCONNECT_FROM_SVN = "Confirm Disconnect from SVN";
-    public static final String SHELL_IMPORT = "Import";
-    public static final String SHELL_SWITCH = "Switch";
-    public static final String SHELL_SVN_SWITCH = "SVN Switch";
-
-    public static final String LABEL_CREATE_A_NEW_REPOSITORY_LOCATION = "Create a new repository location";
-    public static final String LABEL_URL = "Url:";
-    public static final String LABEL_TO_URL = "To URL:";
-    public static final String LABEL_SWITCH_TOHEAD_REVISION = "Switch to HEAD revision";
-    public static final String LABEL_REVISION = "Revision:";
-
-    /* All the sub menus of the context menu "Team" */
-    public static final String CM_REVERT = "Revert...";
-    public static final String CM_DISCONNECT = "Disconnect...";
-    public static final String CM_SHARE_PROJECT_OF_TEAM = "Share Project...";
-    public static final String CM_SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION = "Switch to another Branch/Tag/Revision...";
-    public static final String CM_TEAM = "Team";
-
-    /* table iems of the shell "Share project" of the conext menu "Team" */
-    public static final String TABLE_ITEM_REPOSITORY_TYPE_SVN = "SVN";
 
     /*
      * Invit. / Synch. Monitor Names

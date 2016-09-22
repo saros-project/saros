@@ -29,7 +29,7 @@ public class FileListDiffTest extends AbstractFileListTest {
         resources.add(fileInSubDir1);
 
         FileList list = FileListFactory.createFileList(null, resources, null,
-            null, null);
+            null);
 
         FileListDiff diff = FileListDiff.diff(emptyFileList, list);
 
@@ -43,7 +43,7 @@ public class FileListDiffTest extends AbstractFileListTest {
         resources.add(fileInSubDir1);
 
         FileList list = FileListFactory.createFileList(null, resources, null,
-            null, null);
+            null);
 
         FileListDiff diff = FileListDiff.diff(emptyFileList, list);
 

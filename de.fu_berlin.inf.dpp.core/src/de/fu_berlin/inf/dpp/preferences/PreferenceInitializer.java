@@ -37,7 +37,6 @@ public class PreferenceInitializer {
         store.setDefault(PreferenceConstants.STUN, "stunserver.org");
         store.setDefault(PreferenceConstants.STUN_PORT, 0);
         store.setDefault(PreferenceConstants.CONCURRENT_UNDO, false);
-        store.setDefault(PreferenceConstants.DISABLE_VERSION_CONTROL, false);
 
         store.setDefault(PreferenceConstants.FAVORITE_SESSION_COLOR_ID,
             UserColorID.UNKNOWN);

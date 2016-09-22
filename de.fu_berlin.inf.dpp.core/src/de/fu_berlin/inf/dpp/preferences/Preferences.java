@@ -162,24 +162,6 @@ public abstract class Preferences {
     }
 
     /**
-     * Returns whether version control is enabled or not.
-     * 
-     * @return true if version control is enabled.
-     */
-    public boolean useVersionControl() {
-        return !store.getBoolean(PreferenceConstants.DISABLE_VERSION_CONTROL);
-    }
-
-    /**
-     * Sets the value of useVersionControl
-     * 
-     * @param value
-     */
-    public void setUseVersionControl(boolean value) {
-        store.setValue(PreferenceConstants.DISABLE_VERSION_CONTROL, !value);
-    }
-
-    /**
      * Returns whether local SOCKS5 proxy is enabled or not.
      * 
      * @return true if local SOCKS5 proxy is enabled.

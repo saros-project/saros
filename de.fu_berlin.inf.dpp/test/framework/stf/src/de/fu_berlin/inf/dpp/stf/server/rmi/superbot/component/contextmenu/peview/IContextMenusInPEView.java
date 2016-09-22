@@ -7,7 +7,6 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.IRefactorC;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.IRunAsContextMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.IShareWithC;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.ITeamC;
 
 public interface IContextMenusInPEView extends Remote {
     public IShareWithC shareWith() throws RemoteException;
@@ -17,8 +16,6 @@ public interface IContextMenusInPEView extends Remote {
     public void openWith(String editorType) throws RemoteException;
 
     public void delete() throws RemoteException;
-
-    public ITeamC team() throws RemoteException;
 
     public INewC newC() throws RemoteException;
 

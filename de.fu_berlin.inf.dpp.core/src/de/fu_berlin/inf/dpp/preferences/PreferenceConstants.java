@@ -38,8 +38,6 @@ public class PreferenceConstants {
 
     public static final String STUN_PORT = "stun_server_port";
 
-    public static final String DISABLE_VERSION_CONTROL = "disable_version_control";
-
     /**
      * color ID that should be used in a session if it is not already occupied
      */

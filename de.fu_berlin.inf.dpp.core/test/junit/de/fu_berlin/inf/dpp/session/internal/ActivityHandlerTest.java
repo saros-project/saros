@@ -38,7 +38,6 @@ import de.fu_berlin.inf.dpp.activities.StopActivity;
 import de.fu_berlin.inf.dpp.activities.StopFollowingActivity;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
-import de.fu_berlin.inf.dpp.activities.VCSActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
@@ -392,7 +391,6 @@ public class ActivityHandlerTest {
         activities.add(EasyMock.createNiceMock(JupiterActivity.class));
         activities.add(EasyMock.createNiceMock(ChecksumErrorActivity.class));
         activities.add(EasyMock.createNiceMock(ProgressActivity.class));
-        activities.add(EasyMock.createNiceMock(VCSActivity.class));
         activities.add(EasyMock.createNiceMock(ChangeColorActivity.class));
         activities.add(EasyMock.createNiceMock(StartFollowingActivity.class));
         activities.add(EasyMock.createNiceMock(StopFollowingActivity.class));

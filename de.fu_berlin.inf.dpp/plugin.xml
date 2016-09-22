@@ -468,19 +468,6 @@
       </startup>
    </extension>
    <extension
-         point="org.eclipse.ui.console.consolePatternMatchListeners">
-      <consolePatternMatchListener
-            class="de.fu_berlin.inf.dpp.vcs.SubclipseConsoleListener"
-            id="Saros.consolePatternMatchListener1"
-            regex=".+">
-         <enablement>
-            <test
-                  property="org.eclipse.ui.console.consoleTypeTest"
-                  value="SVN">
-            </test></enablement>
-      </consolePatternMatchListener>
-   </extension>
-   <extension
          point="org.eclipse.ui.commands">
       <command
             id="de.fu_berlin.inf.dpp.ui.commands.Empty"

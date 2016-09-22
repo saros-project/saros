@@ -67,7 +67,6 @@ import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.EnterProjectNamePage;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
-import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 
 public class AddProjectToSessionWizard extends Wizard {
 
@@ -173,8 +172,6 @@ public class AddProjectToSessionWizard extends Wizard {
 
         final Map<String, IProject> targetProjectMapping = getTargetProjectMapping();
 
-        final boolean useVersionControl = namePage.useVersionControl();
-
         final Collection<IEditorPart> openEditors = getOpenEditorsForSharedProjects(targetProjectMapping
             .values());
 
@@ -207,8 +204,7 @@ public class AddProjectToSessionWizard extends Wizard {
         final Map<String, FileListDiff> modifiedResources;
 
         try {
-            modifiedResources = createProjectsAndGetModifiedResources(
-                targetProjectMapping, useVersionControl);
+            modifiedResources = createProjectsAndGetModifiedResources(targetProjectMapping);
         } catch (CoreException e) {
             LOG.error("could not compute local file list", e);
             MessageDialog.openError(getShell(), "Error computing file list",
@@ -225,8 +221,7 @@ public class AddProjectToSessionWizard extends Wizard {
         if (!confirmOverwritingResources(modifiedResources))
             return false;
 
-        triggerProjectNegotiation(targetProjectMapping, useVersionControl,
-            openEditors);
+        triggerProjectNegotiation(targetProjectMapping, openEditors);
 
         return true;
     }
@@ -275,7 +270,6 @@ public class AddProjectToSessionWizard extends Wizard {
 
     private void triggerProjectNegotiation(
         final Map<String, IProject> targetProjectMapping,
-        final boolean useVersionControl,
         final Collection<IEditorPart> editorsToClose) {
 
         final Job job = new Job("Synchronizing") {
@@ -321,8 +315,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
                     final ProjectNegotiation.Status status = negotiation.run(
                         convertedMapping,
-                        ProgressMonitorAdapterFactory.convert(monitor),
-                        useVersionControl);
+                        ProgressMonitorAdapterFactory.convert(monitor));
 
                     if (isAutoBuilding) {
                         description.setAutoBuilding(true);
@@ -481,8 +474,7 @@ public class AddProjectToSessionWizard extends Wizard {
      * current project mapping. Creates non existing projects if necessary.
      */
     private Map<String, FileListDiff> createProjectsAndGetModifiedResources(
-        final Map<String, IProject> projectMapping,
-        final boolean useVersionControl) throws CoreException {
+        final Map<String, IProject> projectMapping) throws CoreException {
 
         final Map<String, IProject> modifiedProjects = getModifiedProjects(projectMapping);
         final Map<String, FileListDiff> result = new HashMap<String, FileListDiff>();
@@ -506,7 +498,7 @@ public class AddProjectToSessionWizard extends Wizard {
                         }
 
                         result.putAll(getModifiedResources(modifiedProjects,
-                            useVersionControl, monitor));
+                            monitor));
                     } catch (CoreException e) {
                         throw new InvocationTargetException(e);
                     } catch (RuntimeException e) {
@@ -539,8 +531,7 @@ public class AddProjectToSessionWizard extends Wizard {
      */
     private Map<String, FileListDiff> getModifiedResources(
         final Map<String, IProject> projectMapping,
-        final boolean includeVCSData, final IProgressMonitor monitor)
-        throws CoreException {
+        final IProgressMonitor monitor) throws CoreException {
 
         final Map<String, FileListDiff> modifiedResources = new HashMap<String, FileListDiff>();
 
@@ -571,14 +562,6 @@ public class AddProjectToSessionWizard extends Wizard {
             if (!session.isShared(adaptedProject))
                 project.refreshLocal(IResource.DEPTH_INFINITE, null);
 
-            final VCSAdapter vcs;
-
-            // FIXME how to handle failure ?
-            if (includeVCSData)
-                vcs = VCSAdapter.getAdapter(project);
-            else
-                vcs = null;
-
             final FileList localFileList;
 
             /*
@@ -588,7 +571,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
             try {
                 localFileList = FileListFactory.createFileList(adaptedProject,
-                    null, checksumCache, vcs, ProgressMonitorAdapterFactory
+                    null, checksumCache, ProgressMonitorAdapterFactory
                         .convert(subMonitor.newChild(1,
                             SubMonitor.SUPPRESS_ALL_LABELS)));
             } catch (IOException e) {

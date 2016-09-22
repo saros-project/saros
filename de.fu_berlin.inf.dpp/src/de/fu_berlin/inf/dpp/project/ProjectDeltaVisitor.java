@@ -37,20 +37,17 @@ import de.fu_berlin.inf.dpp.util.FileUtils;
 public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     private static final Logger log = Logger
         .getLogger(ProjectDeltaVisitor.class);
-    protected final EditorManager editorManager;
 
-    protected final User user;
+    private final EditorManager editorManager;
 
-    protected final ISarosSession sarosSession;
+    private final User user;
 
-    /** The project visited. */
-    protected final SharedProject sharedProject;
+    private final ISarosSession sarosSession;
 
     public ProjectDeltaVisitor(EditorManager editorManager,
-        ISarosSession sarosSession, SharedProject sharedProject) {
+        ISarosSession sarosSession) {
         this.sarosSession = sarosSession;
         this.editorManager = editorManager;
-        this.sharedProject = sharedProject;
         this.user = sarosSession.getLocalUser();
     }
 
@@ -206,7 +203,7 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     }
 
     protected void add(IResource resource) {
-        sharedProject.add(resource);
+
         final SPath spath = new SPath(ResourceAdapterFactory.create(resource));
 
         if (resource.getType() == IResource.FILE) {
@@ -228,7 +225,6 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
 
     protected void move(IResource resource, IPath oldFullPath,
         IProject oldProject, boolean contentChange) throws IOException {
-        sharedProject.move(resource, oldFullPath);
 
         byte[] content = null;
 
@@ -252,7 +248,7 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     }
 
     protected void remove(IResource resource) {
-        sharedProject.remove(resource);
+
         if (resource instanceof IFile) {
             addActivity(FileActivity.removed(user, new SPath(
                 ResourceAdapterFactory.create(resource)), Purpose.ACTIVITY));

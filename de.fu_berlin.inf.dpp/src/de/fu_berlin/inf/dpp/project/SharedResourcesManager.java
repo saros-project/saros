@@ -3,10 +3,8 @@ package de.fu_berlin.inf.dpp.project;
 import static java.text.MessageFormat.format;
 
 import java.io.ByteArrayInputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,16 +22,9 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.jobs.JobChangeAdapter;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.swt.widgets.Shell;
 import org.picocontainer.Startable;
 import org.picocontainer.annotations.Inject;
 
@@ -44,14 +35,11 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IFileSystemModificationActivity;
 import de.fu_berlin.inf.dpp.activities.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.VCSActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFolderImpl;
 import de.fu_berlin.inf.dpp.filesystem.EclipsePathImpl;
-import de.fu_berlin.inf.dpp.filesystem.EclipseProjectImpl;
-import de.fu_berlin.inf.dpp.filesystem.EclipseResourceImpl;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
@@ -63,16 +51,13 @@ import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.FileUtils;
-import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
-import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
 /**
  * This manager is responsible for handling all resource changes that aren't
  * handled by the EditorManager, that is for changes that aren't done by
- * entering text in a text editor. It produces and consumes file, folder, and
- * VCS activities.
+ * entering text in a text editor. It produces and consumes file and folder
+ * activities.
  * <p>
  * TODO Extract AbstractActivityProducer/Consumer functionality in another
  * classes ResourceActivityProducer/Consumer, rename to
@@ -102,7 +87,7 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
      * We might want to add PRE_DELETE if the user deletes our shared project
      * though.
      */
-    static final int INTERESTING_EVENTS = IResourceChangeEvent.POST_CHANGE;
+    private static final int INTERESTING_EVENTS = IResourceChangeEvent.POST_CHANGE;
 
     private static final Logger log = Logger
         .getLogger(SharedResourcesManager.class);
@@ -111,25 +96,50 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
      * If the StopManager has paused the project, the SharedResourcesManager
      * doesn't react to resource changes.
      */
-    protected boolean pause = false;
+    private boolean pause = false;
 
-    protected final ISarosSession sarosSession;
+    private final ISarosSession sarosSession;
 
-    protected final StopManager stopManager;
+    private final StopManager stopManager;
 
-    private final Map<IProject, SharedProject> sharedProjects = Collections
-        .synchronizedMap(new HashMap<IProject, SharedProject>());
     /**
      * Should return <code>true</code> while executing resource changes to avoid
      * an infinite resource event loop.
      */
     @Inject
-    protected FileReplacementInProgressObservable fileReplacementInProgressObservable;
+    private FileReplacementInProgressObservable fileReplacementInProgressObservable;
 
     @Inject
-    protected EditorManager editorManager;
+    private EditorManager editorManager;
 
-    protected Blockable stopManagerListener = new Blockable() {
+    /** map that holds the current open or closed state for every shared project */
+    private final Map<IProject, Boolean> projectStates = new HashMap<IProject, Boolean>();
+
+    private final ISessionListener sessionListener = new AbstractSessionListener() {
+
+        @Override
+        public void projectAdded(
+            de.fu_berlin.inf.dpp.filesystem.IProject project) {
+            synchronized (projectStates) {
+                IProject eclipseProject = (IProject) ResourceAdapterFactory
+                    .convertBack(project);
+                projectStates.put(eclipseProject, eclipseProject.isOpen());
+            }
+        }
+
+        @Override
+        public void projectRemoved(
+            de.fu_berlin.inf.dpp.filesystem.IProject project) {
+            synchronized (projectStates) {
+                IProject eclipseProject = (IProject) ResourceAdapterFactory
+                    .convertBack(project);
+                projectStates.remove(eclipseProject);
+            }
+        }
+
+    };
+
+    private final Blockable stopManagerListener = new Blockable() {
         @Override
         public void unblock() {
             SharedResourcesManager.this.pause = false;
@@ -138,40 +148,6 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
         @Override
         public void block() {
             SharedResourcesManager.this.pause = true;
-        }
-    };
-
-    private ISessionListener sessionListener = new AbstractSessionListener() {
-        /**
-         * Creates a {@link SharedProject} for every project added to the
-         * session.
-         */
-        @Override
-        public void projectAdded(
-            de.fu_berlin.inf.dpp.filesystem.IProject project) {
-
-            synchronized (sharedProjects) {
-                IProject eclipseProject = ((EclipseProjectImpl) project)
-                    .getDelegate();
-                sharedProjects.put(eclipseProject, new SharedProject(
-                    eclipseProject, sarosSession));
-            }
-        }
-
-        /**
-         * Deletes a {@link SharedProject} when the project it represents is
-         * removed from the session.
-         */
-        @Override
-        public void projectRemoved(
-            de.fu_berlin.inf.dpp.filesystem.IProject project) {
-
-            synchronized (sharedProjects) {
-                SharedProject sharedProject = sharedProjects
-                    .remove(((EclipseProjectImpl) project).getDelegate());
-                if (sharedProject != null)
-                    sharedProject.delete();
-            }
         }
     };
 
@@ -188,20 +164,11 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
     @Override
     public void stop() {
         ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
-        sarosSession.removeListener(sessionListener);
+        stopManager.removeBlockable(stopManagerListener);
         sarosSession.removeActivityProducer(this);
         sarosSession.removeActivityConsumer(consumer);
-        stopManager.removeBlockable(stopManagerListener);
+        sarosSession.removeListener(sessionListener);
     }
-
-    private IJobChangeListener jobChangeListener = new JobChangeAdapter() {
-        @Override
-        public void done(IJobChangeEvent event) {
-            Job job = event.getJob();
-            log.trace("Job " + job.getName() + " done");
-            job.removeJobChangeListener(jobChangeListener);
-        }
-    };
 
     private ResourceActivityFilter pendingActivities = new ResourceActivityFilter();
 
@@ -225,14 +192,6 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
             return;
         }
 
-        if (log.isTraceEnabled()) {
-            IJobManager jobManager = Job.getJobManager();
-            Job currentJob = jobManager.currentJob();
-            if (currentJob != null) {
-                currentJob.addJobChangeListener(jobChangeListener);
-                log.trace("currentJob='" + currentJob.getName() + "'");
-            }
-        }
         if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
             // Creations, deletions, modifications of files and folders.
             handlePostChange(event);
@@ -242,56 +201,57 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
         }
     }
 
-    protected void handlePostChange(IResourceChangeEvent event) {
+    private void handlePostChange(IResourceChangeEvent event) {
 
         if (!sarosSession.hasWriteAccess()) {
             return;
         }
 
         IResourceDelta delta = event.getDelta();
-        log.trace(".resourceChanged() - Delta will be processed");
+
+        if (log.isTraceEnabled()) {
+            IJobManager jobManager = Job.getJobManager();
+            Job currentJob = jobManager.currentJob();
+            log.trace("received resource change event caused by job  ='"
+                + currentJob == null ? "N/A" : currentJob.getName() + "'");
+        }
+
         if (delta == null) {
-            log.error("Unexpected empty delta in " + "SharedResourcesManager: "
+            log.error("unexpected empty delta in resource change event: "
                 + event);
             return;
         }
 
         if (log.isTraceEnabled())
-            log.trace("handlePostChange\n" + deltaToString(delta));
+            log.trace("received resource delta contains:\n"
+                + deltaToString(delta));
 
         assert delta.getResource() instanceof IWorkspaceRoot;
 
-        // Iterate over all projects.
         boolean postpone = false;
-        final boolean useVersionControl = sarosSession.useVersionControl();
+
         IResourceDelta[] projectDeltas = delta.getAffectedChildren();
+
         for (IResourceDelta projectDelta : projectDeltas) {
+
             assert projectDelta.getResource() instanceof IProject;
+
             IProject project = (IProject) projectDelta.getResource();
+
             if (!sarosSession.isShared(ResourceAdapterFactory.create(project)))
                 continue;
 
-            if (!checkOpenClosed(project))
+            if (!checkOpenClosed(project)) {
+
+                if (log.isDebugEnabled())
+                    log.debug("ignoring delta changes for project " + project
+                        + " as it was only opened");
+
                 continue;
-
-            if (useVersionControl && !checkVCSConnection(project))
-                continue;
-
-            SharedProject sharedProject = sharedProjects.get(project);
-
-            if (sharedProject == null)
-                continue;
-
-            VCSAdapter vcs = useVersionControl ? VCSAdapter.getAdapter(project)
-                : null;
-            ProjectDeltaVisitor visitor;
-            if (vcs == null) {
-                visitor = new ProjectDeltaVisitor(editorManager, sarosSession,
-                    sharedProject);
-            } else {
-                visitor = vcs.getProjectDeltaVisitor(editorManager,
-                    sarosSession, sharedProject);
             }
+
+            ProjectDeltaVisitor visitor = new ProjectDeltaVisitor(
+                editorManager, sarosSession);
 
             try {
                 /*
@@ -306,20 +266,16 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
             } catch (CoreException e) {
                 // The Eclipse documentation doesn't specify when
                 // CoreExceptions can occur.
-                log.debug(format("ProjectDeltaVisitor of project {0} "
+                log.warn(format("ProjectDeltaVisitor of project {0} "
                     + "failed for some reason.", project.getName()), e);
             }
+
             if (visitor.postponeSending()) {
                 postpone = true;
             }
+
             log.trace("Adding new activities " + visitor.pendingActivities);
             pendingActivities.enterAll(visitor.pendingActivities);
-
-            // if (!postpone)
-            // assert sharedProject.checkIntegrity();
-
-            log.trace("sharedProject.resourceMap: \n"
-                + sharedProject.resourceMap);
         }
         if (!postpone) {
             fireActivities();
@@ -328,108 +284,57 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
         }
     }
 
-    protected boolean checkOpenClosed(IProject project) {
+    private boolean checkOpenClosed(IProject project) {
 
-        SharedProject sharedProject = sharedProjects.get(project);
+        boolean newProjectState = project.isOpen();
 
-        if (sharedProject == null)
-            return false;
+        Boolean oldProjectState;
 
-        boolean isProjectOpen = project.isOpen();
-        if (sharedProject.updateProjectIsOpen(isProjectOpen)) {
-            if (isProjectOpen) {
-                // Since the project was just opened, we would get
-                // a notification that each file in the project was just
-                // added, so we're simply going to ignore this delta. Any
-                // resources that were modified externally would be
-                // out-of-sync anyways, so when the user refreshes them
-                // we'll get notified.
+        synchronized (projectStates) {
+            oldProjectState = projectStates.get(project);
+
+            if (oldProjectState == null)
                 return false;
-            } else {
-                // The project was just closed, what do we do here?
-            }
-        }
-        if (!isProjectOpen)
-            return false;
-        return true;
-    }
 
-    /**
-     * Returns false if the VCS changed.
-     * 
-     * @param project
-     * @return
-     */
-    protected boolean checkVCSConnection(IProject project) {
-
-        SharedProject sharedProject = sharedProjects.get(project);
-
-        if (sharedProject == null)
-            return true;
-
-        VCSAdapter vcs = VCSAdapter.getAdapter(project);
-        VCSAdapter oldVcs = sharedProject.getVCSAdapter();
-
-        if (sharedProject.updateVcs(vcs)) {
-            if (vcs == null) {
-                // Disconnect
-                boolean deleteContent = oldVcs == null
-                    || !oldVcs.hasLocalCache(project);
-                VCSActivity activity = VCSActivity.disconnect(sarosSession,
-                    ResourceAdapterFactory.create(project), deleteContent);
-                pendingActivities.enter(activity);
-                sharedProject.updateRevision(null);
-                sharedProject.updateVcsUrl(null);
-            } else {
-                // Connect
-                VCSResourceInfo info = vcs.getResourceInfo(project);
-                String repositoryString = vcs.getRepositoryString(project);
-                if (repositoryString == null || info.getURL() == null) {
-                    // HACK For some reason, Subclipse returns null values
-                    // here. Pretend the vcs is still null and wait for the
-                    // next time we get here.
-                    sharedProject.updateVcs(null);
-                    return false;
-                }
-
-                String directory = info.getURL().substring(
-                    repositoryString.length());
-                VCSActivity activity = VCSActivity.connect(sarosSession,
-                    ResourceAdapterFactory.create(project), repositoryString,
-                    directory, vcs.getProviderID(project));
-                pendingActivities.enter(activity);
-                sharedProject.updateVcsUrl(info.getURL());
-                sharedProject.updateRevision(info.getRevision());
-
-                log.debug("Connect to VCS");
-            }
-            return false;
+            projectStates.put(project, newProjectState);
         }
 
-        return true;
+        boolean stateChanged = newProjectState != oldProjectState;
+
+        /*
+         * Since the project was just opened, we would get a notification that
+         * each file in the project was just added, so we're simply going to
+         * ignore this delta. Any resources that were modified externally would
+         * be out-of-sync anyways, so when the user refreshes them we'll get
+         * notified.
+         */
+
+        if (stateChanged && /* open */newProjectState)
+            return false;
+
+        /*
+         * TODO report file events in a closed project? Can this happen anyways
+         * ?
+         */
+
+        return newProjectState;
     }
 
     /**
      * Fires the ordered activities. To be run before change event ends.
      */
-    protected void fireActivities() {
+    private void fireActivities() {
         if (pendingActivities.isEmpty())
             return;
+
         final List<IResourceActivity> orderedActivities = pendingActivities
             .retrieveAll();
-        log.trace("Sending activities " + orderedActivities.toString());
-        for (final IActivity activity : orderedActivities) {
-            /*
-             * Make sure we only send a VCSActivity if VC is enabled for this
-             * session.
-             */
-            if (sarosSession.useVersionControl()
-                || !(activity instanceof VCSActivity)) {
-                fireActivity(activity);
-            } else {
-                log.error("Tried to send VCSActivity with VC support disabled.");
-            }
-        }
+
+        if (log.isTraceEnabled())
+            log.trace("Sending activities " + orderedActivities.toString());
+
+        for (final IActivity activity : orderedActivities)
+            fireActivity(activity);
     }
 
     /*
@@ -443,7 +348,7 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
      * fileReplacementInProgressObservable. Also, why add a misleading warning
      * in the first place??
      */
-    protected void logPauseWarning(IResourceChangeEvent event) {
+    private void logPauseWarning(IResourceChangeEvent event) {
         if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
 
             IResourceDelta delta = event.getDelta();
@@ -460,7 +365,7 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
         }
     }
 
-    protected String deltaToString(IResourceDelta delta) {
+    private String deltaToString(IResourceDelta delta) {
         ToStringResourceDeltaVisitor visitor = new ToStringResourceDeltaVisitor();
         try {
             delta.accept(visitor, IContainer.INCLUDE_PHANTOMS
@@ -532,11 +437,6 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
             } catch (CoreException e) {
                 log.error("Failed to execute activity: " + activity, e);
             }
-        }
-
-        @Override
-        public void receive(VCSActivity activity) {
-            handleVCSActivity(activity);
         }
     };
 
@@ -709,76 +609,5 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
 
         if (encoding != null)
             updateFileEncoding(encoding, file);
-    }
-
-    protected void handleVCSActivity(VCSActivity activity) {
-        final VCSActivity.Type activityType = activity.getType();
-        SPath path = activity.getPath();
-
-        final IResource resource = ((EclipseResourceImpl) path.getResource())
-            .getDelegate();
-
-        final IProject project = ((EclipseProjectImpl) path.getProject())
-            .getDelegate();
-
-        final String url = activity.getURL();
-        final String directory = activity.getDirectory();
-        final String revision = activity.getParam1();
-
-        // Connect is special since the project doesn't have a VCSAdapter
-        // yet.
-        final VCSAdapter vcs = activityType == VCSActivity.Type.CONNECT ? VCSAdapter
-            .getAdapter(revision) : VCSAdapter.getAdapter(project);
-        if (vcs == null) {
-            log.warn("Could not execute VCS activity. Do you have the Subclipse plug-in installed?");
-            if (activity.containedActivity.size() > 0) {
-                log.trace("contained activities: "
-                    + activity.containedActivity.toString());
-            }
-            for (IResourceActivity a : activity.containedActivity) {
-                consumer.exec(a);
-            }
-            return;
-        }
-
-        try {
-            // TODO Should these operations run in an IWorkspaceRunnable?
-            Shell shell = SWTUtils.getShell();
-            ProgressMonitorDialog progressMonitorDialog = new ProgressMonitorDialog(
-                shell);
-            progressMonitorDialog.open();
-            Shell pmdShell = progressMonitorDialog.getShell();
-            pmdShell.setText("Saros running VCS operation");
-            log.trace("about to call progressMonitorDialog.run");
-            progressMonitorDialog.run(true, false, new IRunnableWithProgress() {
-                @Override
-                public void run(IProgressMonitor progress)
-
-                throws InvocationTargetException, InterruptedException {
-                    log.trace("progressMonitorDialog.run started");
-                    if (!SWTUtils.isSWT())
-                        log.trace("not in SWT thread");
-                    if (activityType == VCSActivity.Type.CONNECT) {
-                        vcs.connect(project, url, directory, progress);
-                    } else if (activityType == VCSActivity.Type.DISCONNECT) {
-                        vcs.disconnect(project, revision != null, progress);
-                    } else if (activityType == VCSActivity.Type.SWITCH) {
-                        vcs.switch_(resource, url, revision, progress);
-                    } else if (activityType == VCSActivity.Type.UPDATE) {
-                        vcs.update(resource, revision, progress);
-                    } else {
-                        log.error("VCS activity type not implemented yet.");
-                    }
-                    log.trace("progressMonitorDialog.run done");
-                }
-
-            });
-            pmdShell.dispose();
-        } catch (InvocationTargetException e) {
-            // TODO We can't get here, right?
-            throw new IllegalStateException(e);
-        } catch (InterruptedException e) {
-            log.error("Code not designed to be interrupted!");
-        }
     }
 }

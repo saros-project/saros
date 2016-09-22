@@ -12,7 +12,6 @@ import de.fu_berlin.inf.dpp.core.ui.eventhandler.NegotiationHandler;
 import de.fu_berlin.inf.dpp.core.ui.eventhandler.UserStatusChangeHandler;
 import de.fu_berlin.inf.dpp.core.ui.eventhandler.XMPPAuthorizationHandler;
 import de.fu_berlin.inf.dpp.core.util.IntelliJCollaborationUtilsImpl;
-import de.fu_berlin.inf.dpp.core.vcs.NullVCSProviderFactoryImpl;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
@@ -40,7 +39,6 @@ import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.IUIResourceLocator;
 import de.fu_berlin.inf.dpp.ui.util.ICollaborationUtils;
-import de.fu_berlin.inf.dpp.vcs.VCSProviderFactory;
 import org.picocontainer.BindKey;
 import org.picocontainer.MutablePicoContainer;
 
@@ -72,10 +70,6 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
         Component.create(ISarosSessionContextFactory.class,
             SarosIntellijSessionContextFactory.class),
 
-        // VCS (only dummy to satisfy dependencies)
-        Component.create(VCSProviderFactory.class,
-            NullVCSProviderFactoryImpl.class),
-
         // UI handlers
         Component.create(NegotiationHandler.class),
         Component.create(UserStatusChangeHandler.class),
@@ -85,8 +79,8 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
 
         Component.create(UISynchronizer.class, IntelliJSynchronizer.class),
 
-        Component.create(IPreferenceStore.class,
-            PropertiesComponentAdapter.class),
+        Component
+            .create(IPreferenceStore.class, PropertiesComponentAdapter.class),
 
         Component.create(Preferences.class, IntelliJPreferences.class),
 
@@ -95,8 +89,8 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
 
         // IDE-specific classes for the HTML GUI
         Component.create(DialogManager.class, IntelliJDialogManager.class),
-        Component.create(IUIResourceLocator.class,
-            IntelliJUIResourceLocator.class),
+        Component
+            .create(IUIResourceLocator.class, IntelliJUIResourceLocator.class),
 
         Component.create(ICollaborationUtils.class,
             IntelliJCollaborationUtilsImpl.class),
@@ -129,13 +123,12 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
                 component.getImplementation());
         }
 
-        container.addComponent(BindKey
-                .bindKey(String.class, ISarosContextBindings.SarosVersion.class),
+        container.addComponent(BindKey.bindKey(String.class,
+                ISarosContextBindings.SarosVersion.class),
             "14.1.31.DEVEL"); // todo
 
-        container.addComponent(BindKey
-                .bindKey(String.class, ISarosContextBindings.PlatformVersion.class),
-            "4.3.2"); // todo
+        container.addComponent(BindKey.bindKey(String.class,
+                ISarosContextBindings.PlatformVersion.class), "4.3.2"); // todo
 
     }
 }

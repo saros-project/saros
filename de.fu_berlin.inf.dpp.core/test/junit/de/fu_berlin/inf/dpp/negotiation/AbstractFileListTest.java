@@ -93,18 +93,18 @@ public class AbstractFileListTest {
         threeFileList.addAll(resources);
 
         threeEntryList = FileListFactory.createFileList(null, resources, null,
-            null, null);
+            null);
 
         resources.add(fileInSubDir2);
 
         fourEntryList = FileListFactory.createFileList(null, resources, null,
-            null, null);
+            null);
 
         resources.remove(fileInSubDir1);
         resources.add(fileInSubDir1changed);
 
         modifiedFourEntryList = FileListFactory.createFileList(null, resources,
-            null, null, null);
+            null, null);
 
         emptyFileList = new FileList();
     }

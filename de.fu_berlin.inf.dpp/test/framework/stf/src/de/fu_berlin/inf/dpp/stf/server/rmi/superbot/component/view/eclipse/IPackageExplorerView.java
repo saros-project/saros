@@ -168,16 +168,6 @@ public interface IPackageExplorerView extends Remote {
     public String getTitle() throws RemoteException;
 
     /**
-     * 
-     * @param projectName
-     *            the name of the project
-     * @return <tt>true</tt>, if the given project is under SVN control
-     * @throws RemoteException
-     */
-    public boolean isProjectManagedBySVN(String projectName)
-        throws RemoteException;
-
-    /**
      * Tests if the given resource is shared in the current session
      * 
      * @param path
@@ -188,28 +178,6 @@ public interface IPackageExplorerView extends Remote {
      * @throws RemoteException
      */
     public boolean isResourceShared(String path) throws RemoteException;
-
-    /**
-     * 
-     * @param fullPath
-     *            the full path of the local resource, e.g.
-     *            "example_project/src/org/eclipsecon/swtbot/example/MyFirstTest01.java"
-     * @return the revision id of the given resource.
-     * @throws RemoteException
-     */
-    public String getRevision(String fullPath) throws RemoteException;
-
-    /**
-     * @param fullPath
-     *            the full path of the local resource, e.g.
-     *            "example_project/src/org/eclipsecon/swtbot/example/MyFirstTest01.java"
-     * 
-     * @return the VCS specific URL information for the given resource specified
-     *         by the passed parameter"fullPath".
-     * @throws RemoteException
-     */
-    public String getURLOfRemoteResource(String fullPath)
-        throws RemoteException;
 
     /**
      * Wait until the specified folder exists
@@ -311,60 +279,6 @@ public interface IPackageExplorerView extends Remote {
      *            "myFolder", "myFile.xml"}
      */
     public void waitUntilFileNotExists(String... fileNodes)
-        throws RemoteException;
-
-    /**
-     * waits until the window with the title "Saros running VCS operation" is
-     * closed
-     * 
-     * @throws RemoteException
-     */
-    public void waitUntilWindowSarosRunningVCSOperationClosed()
-        throws RemoteException;
-
-    /**
-     * waits until the given project is in SVN control
-     * 
-     * @param projectName
-     *            the name of the project
-     * @throws RemoteException
-     */
-    public void waitUntilProjectInSVN(String projectName)
-        throws RemoteException;
-
-    /**
-     * waits until the given project is not under SVN control
-     * 
-     * @param projectName
-     *            the name of the project
-     * @throws RemoteException
-     */
-    public void waitUntilProjectNotInSVN(String projectName)
-        throws RemoteException;
-
-    /**
-     * 
-     * @param fullPath
-     *            the full path of the local resource, e.g.
-     *            "example_project/src/org/eclipsecon/swtbot/example/MyFirstTest01.java"
-     * @param revisionID
-     *            the expected revision.
-     * @throws RemoteException
-     */
-    public void waitUntilRevisionIsSame(String fullPath, String revisionID)
-        throws RemoteException;
-
-    /**
-     * 
-     * @param fullPath
-     *            the full path of the local resource, e.g.
-     *            "example_project/src/org/eclipsecon/swtbot/example/MyFirstTest01.java"
-     * @param url
-     *            the expected URL of the remote resource, e.g.
-     *            "http://myhost.com/svn/trunk/.../MyFirstTest01.java".
-     * @throws RemoteException
-     */
-    public void waitUntilUrlIsSame(String fullPath, String url)
         throws RemoteException;
 
     /**

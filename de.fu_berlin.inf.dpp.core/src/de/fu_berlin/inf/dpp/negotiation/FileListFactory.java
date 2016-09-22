@@ -17,16 +17,13 @@ import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.NullProgressMonitor;
 import de.fu_berlin.inf.dpp.negotiation.FileList.MetaData;
-import de.fu_berlin.inf.dpp.vcs.VCSProvider;
-import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
 /**
  * Offers two ways to create {@link FileList file lists}.
  * <p>
  * <li>Either an inexpensive one that rescans the whole project to gather meta
  * data:<br>
- * {@link #createFileList(IProject, List, IChecksumCache, VCSProvider, IProgressMonitor)}
- * </li>
+ * {@link #createFileList(IProject, List, IChecksumCache, IProgressMonitor)}</li>
  * <li>Or a cheap one which requires the caller to take care of the validity of
  * input data:<br>
  * {@link #createFileList(List)}</li>
@@ -49,10 +46,10 @@ public class FileListFactory {
 
     public static FileList createFileList(IProject project,
         List<IResource> resources, IChecksumCache checksumCache,
-        VCSProvider provider, IProgressMonitor monitor) throws IOException {
+        IProgressMonitor monitor) throws IOException {
 
         FileListFactory fact = new FileListFactory(checksumCache, monitor);
-        return fact.build(project, resources, provider);
+        return fact.build(project, resources);
     }
 
     /**
@@ -79,8 +76,8 @@ public class FileListFactory {
         return new FileList();
     }
 
-    private FileList build(IProject project, List<IResource> resources,
-        VCSProvider provider) throws IOException {
+    private FileList build(IProject project, List<IResource> resources)
+        throws IOException {
 
         FileList list = new FileList();
 
@@ -89,51 +86,22 @@ public class FileListFactory {
             resources = Arrays.asList(project.members());
         }
 
-        addMembersToList(list, resources, provider);
+        addMembersToList(list, resources);
 
         return list;
     }
 
     private void addMembersToList(final FileList list,
-        final List<IResource> resources, final VCSProvider provider)
-        throws IOException {
+        final List<IResource> resources) throws IOException {
 
         if (resources.size() == 0)
             return;
-
-        IProject project = null;
-
-        if (provider != null) {
-            project = resources.get(0).getProject();
-            String providerID = provider.getID();
-
-            list.setVcsProviderID(providerID);
-            list.setVcsRepositoryRoot(provider.getRepositoryString(project));
-
-            list.setVcsRepositoryRoot(provider.getCurrentResourceInfo(project));
-            /*
-             * FIXME we need to stop querying for VCS revisions the moment we
-             * reach the first exception
-             * 
-             * Caused by:
-             * org.tigris.subversion.svnclientadapter.SVNClientException:
-             * org.apache.subversion.javahl.ClientException: The working copy
-             * needs to be upgraded
-             * 
-             * which will significantly slow down the overall invitation
-             * process. It doesn't make sense to check for other files. If there
-             * is one resource that is not upgraded, this fails overall...
-             */
-        }
 
         Deque<IResource> stack = new LinkedList<IResource>();
 
         stack.addAll(resources);
 
         List<IFile> files = new LinkedList<IFile>();
-
-        if (provider != null)
-            monitor.subTask("Reading SVN revisions for shared files...");
 
         while (!stack.isEmpty()) {
             IResource resource = stack.pop();
@@ -146,28 +114,17 @@ public class FileListFactory {
             if (list.contains(path))
                 continue;
 
-            VCSResourceInfo info = null;
-
-            if (provider != null)
-                info = provider.getCurrentResourceInfo(resource);
-
             MetaData data = null;
 
             switch (resource.getType()) {
             case IResource.FILE:
                 files.add((IFile) resource);
                 data = new MetaData();
-                data.vcsInfo = info;
                 list.addPath(path, data, false);
                 list.addEncoding(((IFile) resource).getCharset());
                 break;
             case IResource.FOLDER:
                 stack.addAll(Arrays.asList(((IFolder) resource).members()));
-
-                if (info != null) {
-                    data = new MetaData();
-                    data.vcsInfo = info;
-                }
                 list.addPath(path, data, true);
                 break;
             }

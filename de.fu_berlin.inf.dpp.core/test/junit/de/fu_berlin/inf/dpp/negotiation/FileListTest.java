@@ -77,7 +77,7 @@ public class FileListTest extends AbstractFileListTest {
     @Test
     public void testEquals() throws IOException {
         FileList sameFileList = FileListFactory.createFileList(null,
-            threeFileList, null, null, null);
+            threeFileList, null, null);
         assertEquals(threeEntryList, sameFileList);
         assertEquals(emptyFileList, emptyFileList);
 

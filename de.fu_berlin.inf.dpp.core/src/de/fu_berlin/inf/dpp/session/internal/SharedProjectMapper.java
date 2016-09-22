@@ -25,13 +25,7 @@ import de.fu_berlin.inf.dpp.session.User;
  * when the local names of shared projects are different. The ID is determined
  * by the project/file-host.
  */
-/*
- * FIXME: the partial sharing stuff should not be handled here but in the
- * SharedProject class
- * 
- * TODO: Make package-private after SarosSession has moved to core
- */
-public class SharedProjectMapper {
+class SharedProjectMapper {
 
     private static final Logger LOG = Logger
         .getLogger(SharedProjectMapper.class);

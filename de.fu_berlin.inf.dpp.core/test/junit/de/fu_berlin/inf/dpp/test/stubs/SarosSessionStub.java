@@ -23,19 +23,9 @@ import de.fu_berlin.inf.dpp.synchronize.StopManager;
 public class SarosSessionStub implements ISarosSession {
 
     private boolean hasWriteAccess;
-    private boolean useVersionControl;
-
-    public void setUseVersionControl(boolean b) {
-        useVersionControl = b;
-    }
 
     public void setWriteAccess(boolean b) {
         hasWriteAccess = b;
-    }
-
-    @Override
-    public boolean useVersionControl() {
-        return useVersionControl;
     }
 
     @Override

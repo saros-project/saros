@@ -58,7 +58,6 @@ import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.IActivityHandlerCallback;
@@ -94,9 +93,6 @@ public final class SarosSession implements ISarosSession {
     private XMPPConnectionService connectionService;
 
     @Inject
-    private Preferences preferences;
-
-    @Inject
     private IConnectionManager connectionManager;
 
     private final ISarosContext sarosContext;
@@ -122,8 +118,6 @@ public final class SarosSession implements ISarosSession {
     private final User hostUser;
 
     private final SharedProjectMapper projectMapper;
-
-    private boolean useVersionControl = true;
 
     private final MutablePicoContainer sessionContainer;
 
@@ -780,10 +774,8 @@ public final class SarosSession implements ISarosSession {
 
         if (activity == null)
             throw new IllegalArgumentException();
-        /*
-         * If we don't have any sharedProjects don't send File-, Folder- or
-         * EditorActivities.
-         */
+
+        // If we don't have any shared projects don't send ResourceActivities
         if (projectMapper.size() == 0
             && (activity instanceof IResourceActivity)) {
             return;
@@ -942,17 +934,6 @@ public final class SarosSession implements ISarosSession {
     @Override
     public List<IResource> getSharedResources() {
         return projectMapper.getPartiallySharedResources();
-    }
-
-    @Override
-    public boolean useVersionControl() {
-        /*
-         * It is not possible to enable version control support during a
-         * session.
-         */
-        if (!useVersionControl)
-            return false;
-        return useVersionControl = preferences.useVersionControl();
     }
 
     @Override

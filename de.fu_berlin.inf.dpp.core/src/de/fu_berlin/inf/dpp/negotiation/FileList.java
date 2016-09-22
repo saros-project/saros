@@ -31,10 +31,6 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
-import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.vcs.VCSProvider;
-import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
-
 /**
  * A FileList is a list of resources -- files and folders -- which belong to the
  * same project. FileLists can be compared to other FileLists. Folders are
@@ -296,11 +292,6 @@ public class FileList {
         @XStreamAlias("crc")
         long checksum;
 
-        /** Identifies the version of this file in the repository. */
-
-        @XStreamAlias("vcs")
-        VCSResourceInfo vcsInfo;
-
         @Override
         public boolean equals(Object o) {
             if (o == this)
@@ -314,8 +305,6 @@ public class FileList {
 
             if (!ObjectUtils.equals(checksum, other.checksum))
                 return false;
-            if (!ObjectUtils.equals(vcsInfo, other.vcsInfo))
-                return false;
 
             return true;
         }
@@ -328,17 +317,9 @@ public class FileList {
         @Override
         public String toString() {
             return "[Checksum: 0x" + Long.toHexString(checksum).toUpperCase()
-                + ", VCS: " + vcsInfo + "]";
+                + "]";
         }
     }
-
-    /** Identifies the VCS used. */
-    private String vcsProviderID;
-
-    /** @see VCSProvider#getRepositoryString(IResource) */
-    private String vcsRepositoryRoot;
-    /** VCS internal information. */
-    private VCSResourceInfo vcsProjectInfo;
 
     /** ID of Project this list of files belong to */
     private String projectID;
@@ -349,30 +330,6 @@ public class FileList {
 
     MetaData getMetaData(String path) {
         return root.getMetaData(path);
-    }
-
-    public String getVCSRevision(String path) {
-        if (path.isEmpty())
-            return vcsProjectInfo.getRevision();
-
-        MetaData metaData = root.getMetaData(path);
-
-        if (metaData == null)
-            return null;
-
-        return metaData.vcsInfo == null ? null : metaData.vcsInfo.getRevision();
-    }
-
-    public String getVCSUrl(String path) {
-        if (path.isEmpty())
-            return vcsProjectInfo.getURL();
-
-        MetaData metaData = root.getMetaData(path);
-
-        if (metaData == null)
-            return null;
-
-        return metaData.vcsInfo == null ? null : metaData.vcsInfo.getURL();
     }
 
     /**
@@ -445,34 +402,6 @@ public class FileList {
 
     public FileListDiff diff(FileList other) {
         return FileListDiff.diff(this, other);
-    }
-
-    public boolean useVersionControl() {
-        return vcsProviderID != null;
-    }
-
-    public String getVcsProviderID() {
-        return vcsProviderID;
-    }
-
-    void setVcsProviderID(String id) {
-        vcsProviderID = id;
-    }
-
-    public VCSResourceInfo getProjectInfo() {
-        return vcsProjectInfo;
-    }
-
-    void setVcsRepositoryRoot(VCSResourceInfo info) {
-        vcsProjectInfo = info;
-    }
-
-    public String getRepositoryRoot() {
-        return vcsRepositoryRoot;
-    }
-
-    void setVcsRepositoryRoot(String repoRoot) {
-        vcsRepositoryRoot = repoRoot;
     }
 
     public String getProjectID() {

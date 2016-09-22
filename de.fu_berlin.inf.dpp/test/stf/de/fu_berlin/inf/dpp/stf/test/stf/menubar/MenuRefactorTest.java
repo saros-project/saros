@@ -1,8 +1,6 @@
 package de.fu_berlin.inf.dpp.stf.test.stf.menubar;
 
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
 
@@ -144,21 +142,4 @@ public class MenuRefactorTest extends StfTestCase {
             .waitUntilFolderExists(Constants.PROJECT2);
     }
 
-    @Test
-    public void testShareProjectWithSVN() throws RemoteException {
-        ALICE.superBot().views().packageExplorerView().tree().newC()
-            .javaProject(Constants.PROJECT1);
-        assertFalse(ALICE.superBot().views().packageExplorerView()
-            .isProjectManagedBySVN(Constants.PROJECT1));
-        ALICE
-            .superBot()
-            .views()
-            .packageExplorerView()
-            .selectProject(Constants.PROJECT1)
-            .team()
-            .shareProjectUsingSpecifiedFolderName(Constants.SVN_REPOSITORY_URL,
-                Constants.SVN_PROJECT_PATH);
-        assertTrue(ALICE.superBot().views().packageExplorerView()
-            .isProjectManagedBySVN(Constants.PROJECT1));
-    }
 }

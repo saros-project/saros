@@ -46,8 +46,6 @@ import de.fu_berlin.inf.dpp.ui.eventhandler.SessionStatusRequestHandler;
 import de.fu_berlin.inf.dpp.ui.eventhandler.SessionViewOpener;
 import de.fu_berlin.inf.dpp.ui.eventhandler.UserStatusChangeHandler;
 import de.fu_berlin.inf.dpp.ui.eventhandler.XMPPAuthorizationHandler;
-import de.fu_berlin.inf.dpp.vcs.EclipseVCSProviderFactoryImpl;
-import de.fu_berlin.inf.dpp.vcs.VCSProviderFactory;
 
 /**
  * Factory used for creating the Saros context when running as Eclipse plugin.
@@ -113,10 +111,6 @@ public class SarosEclipseContextFactory extends AbstractSarosContextFactory {
 
         // SWT EDT support
         Component.create(UISynchronizer.class, SWTSynchronizer.class),
-
-        // VCS (SVN only)
-        Component.create(VCSProviderFactory.class,
-            EclipseVCSProviderFactoryImpl.class),
 
         // Proxy Support for the XMPP server connection
         Component.create(IProxyResolver.class, Socks5ProxyResolver.class),

@@ -213,33 +213,6 @@ public class BasicWidgetTreeTest extends StfTestCase {
     }
 
     @Test
-    public void selectTreeItemWithRegexs() throws Exception {
-        ALICE.superBot().views().packageExplorerView().tree().newC()
-            .javaProject(Constants.SVN_PROJECT_COPY);
-
-        ALICE
-            .superBot()
-            .views()
-            .packageExplorerView()
-            .selectProject(Constants.SVN_PROJECT_COPY)
-            .team()
-            .shareProjectUsingSpecifiedFolderName(Constants.SVN_REPOSITORY_URL,
-                Constants.SVN_PROJECT_PATH);
-
-        IRemoteBotView view = ALICE.remoteBot().view(VIEW_PACKAGE_EXPLORER);
-        Thread.sleep(1000);
-
-        view.show();
-        view.bot()
-            .tree()
-            .selectTreeItemWithRegex(
-                Pattern.quote(Constants.SVN_PROJECT_COPY) + ".*",
-                Pattern.quote(SRC) + ".*",
-                Pattern.quote(Constants.SVN_PKG) + ".*",
-                Pattern.quote(Constants.SVN_CLS1) + ".*");
-    }
-
-    @Test
     public void existsContextOfTreeItemInView() throws RemoteException {
         ALICE.superBot().views().sarosView()
             .connectWith(ALICE.getJID(), ALICE.getPassword(), false);

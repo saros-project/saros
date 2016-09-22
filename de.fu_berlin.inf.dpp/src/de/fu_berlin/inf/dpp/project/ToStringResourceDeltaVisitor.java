@@ -5,21 +5,17 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
-
-import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
-import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
 /**
  * IResourceDeltaVisitor which collects all changes as full paths to the
  * affected resource. Used for debugging.
  */
 public class ToStringResourceDeltaVisitor implements IResourceDeltaVisitor {
-    Map<Integer, String> map = new HashMap<Integer, String>();
+    private static final Map<Integer, String> map = new HashMap<Integer, String>();
     {
         map.put(IResourceDelta.CONTENT, "C");
         map.put(IResourceDelta.MOVED_FROM, "F");
@@ -36,7 +32,7 @@ public class ToStringResourceDeltaVisitor implements IResourceDeltaVisitor {
         // if(Eclipse 3.6) {map.put(IResourceDelta.DERIVED_CHANGED, "d");}
     }
 
-    StringBuilder sb = new StringBuilder();
+    private final StringBuilder sb = new StringBuilder(1024);
 
     @Override
     public boolean visit(IResourceDelta delta) throws CoreException {
@@ -75,22 +71,14 @@ public class ToStringResourceDeltaVisitor implements IResourceDeltaVisitor {
         if (resource != null) {
             if (resource.isDerived())
                 sb.append("* ");
+
             if (resource.isPhantom())
                 sb.append("P ");
+
             if (resource.isHidden())
                 sb.append("H ");
+
             sb.append(resource.getFullPath().toPortableString());
-            IProject project = resource.getProject();
-            if (project != null) {
-                VCSAdapter vcs = VCSAdapter.getAdapter(project);
-                if (vcs != null && vcs.isManaged(resource)) {
-                    VCSResourceInfo info = vcs.getResourceInfo(resource);
-                    if (info.getURL() != null)
-                        sb.append(" " + info.getURL());
-                    if (info.getRevision() != null)
-                        sb.append("@" + info.getRevision());
-                }
-            }
         } else {
             sb.append("No resource");
         }

@@ -47,7 +47,6 @@ import de.fu_berlin.inf.dpp.activities.StartFollowingActivity;
 import de.fu_berlin.inf.dpp.activities.StopActivity;
 import de.fu_berlin.inf.dpp.activities.StopFollowingActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
-import de.fu_berlin.inf.dpp.activities.VCSActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterVectorTime;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
@@ -202,8 +201,6 @@ public class ActivitiesExtension extends SarosSessionPacketExtension {
                 StopFollowingActivity.class,
 
                 TextSelectionActivity.class,
-
-                VCSActivity.class,
 
                 ViewportActivity.class);
         }

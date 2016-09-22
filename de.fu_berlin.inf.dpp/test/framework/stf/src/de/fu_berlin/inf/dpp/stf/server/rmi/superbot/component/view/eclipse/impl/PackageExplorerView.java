@@ -14,7 +14,6 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -34,8 +33,6 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.impl.ContextMenusInPEView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.IPackageExplorerView;
 import de.fu_berlin.inf.dpp.stf.server.util.WidgetUtil;
-import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
-import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
 public final class PackageExplorerView extends StfRemoteObject implements
     IPackageExplorerView {
@@ -187,53 +184,6 @@ public final class PackageExplorerView extends StfRemoteObject implements
     }
 
     @Override
-    public boolean isProjectManagedBySVN(String projectName)
-        throws RemoteException {
-        try {
-            IProject project = ResourcesPlugin.getWorkspace().getRoot()
-                .getProject(projectName);
-            final VCSAdapter vcs = VCSAdapter.getAdapter(project);
-            if (vcs == null)
-                return false;
-            return true;
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return false;
-        }
-    }
-
-    @Override
-    public String getRevision(String fullPath) throws RemoteException {
-        IPath path = new Path(fullPath);
-        IResource resource = ResourcesPlugin.getWorkspace().getRoot()
-            .findMember(path);
-        if (resource == null)
-            throw new RemoteException("resource '" + fullPath + "' not found.");
-        final VCSAdapter vcs = VCSAdapter.getAdapter(resource.getProject());
-        if (vcs == null)
-            return null;
-        VCSResourceInfo info = vcs.getCurrentResourceInfo(resource);
-        String result = info != null ? info.getRevision() : null;
-        return result;
-    }
-
-    @Override
-    public String getURLOfRemoteResource(String fullPath)
-        throws RemoteException {
-        IPath path = new Path(fullPath);
-        IResource resource = ResourcesPlugin.getWorkspace().getRoot()
-            .findMember(path);
-        if (resource == null)
-            throw new RemoteException("resource not found at '" + fullPath
-                + "'");
-        final VCSAdapter vcs = VCSAdapter.getAdapter(resource.getProject());
-        if (vcs == null)
-            return null;
-        final VCSResourceInfo info = vcs.getResourceInfo(resource);
-        return info.getURL();
-    }
-
-    @Override
     public String getFileContent(String... nodes) throws RemoteException,
         IOException, CoreException {
         IPath path = new Path(getPath(nodes));
@@ -323,13 +273,6 @@ public final class PackageExplorerView extends StfRemoteObject implements
     }
 
     @Override
-    public void waitUntilWindowSarosRunningVCSOperationClosed()
-        throws RemoteException {
-        RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed(
-            SHELL_SAROS_RUNNING_VCS_OPERATION);
-    }
-
-    @Override
     public boolean isResourceShared(String path) throws RemoteException {
         IResource resource = ResourcesPlugin.getWorkspace().getRoot()
             .findMember(new Path(path));
@@ -341,34 +284,6 @@ public final class PackageExplorerView extends StfRemoteObject implements
                 "cannot query shared resource status without a running session");
 
         return session.isShared(ResourceAdapterFactory.create(resource));
-    }
-
-    @Override
-    public void waitUntilProjectInSVN(String projectName)
-        throws RemoteException {
-        RemoteWorkbenchBot.getInstance().waitUntil(
-            SarosConditions.isInSVN(projectName));
-    }
-
-    @Override
-    public void waitUntilProjectNotInSVN(String projectName)
-        throws RemoteException {
-        RemoteWorkbenchBot.getInstance().waitUntil(
-            SarosConditions.isNotInSVN(projectName));
-    }
-
-    @Override
-    public void waitUntilRevisionIsSame(String fullPath, String revision)
-        throws RemoteException {
-        RemoteWorkbenchBot.getInstance().waitUntil(
-            SarosConditions.isRevisionSame(fullPath, revision));
-    }
-
-    @Override
-    public void waitUntilUrlIsSame(String fullPath, String url)
-        throws RemoteException {
-        RemoteWorkbenchBot.getInstance().waitUntil(
-            SarosConditions.isUrlSame(fullPath, url));
     }
 
     @Override

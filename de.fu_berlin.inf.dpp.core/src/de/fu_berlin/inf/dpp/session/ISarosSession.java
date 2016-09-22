@@ -413,17 +413,6 @@ public interface ISarosSession {
     public boolean isCompletelyShared(IProject project);
 
     /**
-     * Returns true if VCS support is enabled for this session.<br>
-     * <br>
-     * This setting can be changed in the Preferences. VCS support can be
-     * disabled during a running session, but enabling VCS support doesn't have
-     * any effect.
-     * 
-     * @return true if this session uses Version Control, otherwise false.
-     */
-    public boolean useVersionControl();
-
-    /**
      * Returns the global ID of the project.
      * 
      * @return the global ID of the project or <code>null</code> if this project

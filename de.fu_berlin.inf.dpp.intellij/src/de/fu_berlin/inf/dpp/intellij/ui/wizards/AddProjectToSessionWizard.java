@@ -231,7 +231,7 @@ public class AddProjectToSessionWizard extends Wizard {
             @Override
             public void run() {
                 status = negotiation
-                    .run(localProjects, new NullProgressMonitor(), false);
+                    .run(localProjects, new NullProgressMonitor());
             }
         };
         runTask(job, "Sharing project...");
@@ -386,8 +386,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
                     FileList sharedFileList = FileListFactory
                         .createFileList(project, eclipseResources,
-                            checksumCache, null,
-                            new SubProgressMonitor(monitor, 1,
+                            checksumCache, new SubProgressMonitor(monitor, 1,
                                 SubProgressMonitor.SUPPRESS_SETTASKNAME));
 
                     remoteFileList.getPaths().addAll(sharedFileList.getPaths());
@@ -396,7 +395,7 @@ public class AddProjectToSessionWizard extends Wizard {
                 }
 
                 FileList localFileList = FileListFactory
-                    .createFileList(project, null, checksumCache, null,
+                    .createFileList(project, null, checksumCache,
                         new SubProgressMonitor(monitor, 1,
                             SubProgressMonitor.SUPPRESS_SETTASKNAME));
                 diff = FileListDiff.diff(localFileList, remoteFileList);
