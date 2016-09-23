@@ -15,7 +15,7 @@ public class Account {
     private final String username;
     private final String domain;
 
-    private final JID jid;
+    private JID jid;
 
     /**
      * Creates a new account model from given username and domain. If the
@@ -30,7 +30,6 @@ public class Account {
     public Account(String username, String domain) {
         this.username = username;
         this.domain = domain;
-        jid = new JID(username, domain);
     }
 
     public String getUsername() {
@@ -42,6 +41,9 @@ public class Account {
     }
 
     public String getBareJid() {
+        if (jid == null) {
+            jid = new JID(username, domain);
+        }
         return jid.getBareJID().toString();
     }
 }
