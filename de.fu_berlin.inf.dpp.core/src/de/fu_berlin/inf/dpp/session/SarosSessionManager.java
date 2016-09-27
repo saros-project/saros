@@ -218,6 +218,12 @@ public class SarosSessionManager implements ISarosSessionManager {
                 return;
             }
 
+            if (negotiationPacketLister
+                .isRejectingSessionNegotiationsRequests()) {
+                log.warn("cannot start a session while a session invitation is pending");
+                return;
+            }
+
             sessionStartup = true;
 
             final String sessionID = String.valueOf(SESSION_ID_GENERATOR
