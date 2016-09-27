@@ -213,7 +213,7 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
             IJobManager jobManager = Job.getJobManager();
             Job currentJob = jobManager.currentJob();
             log.trace("received resource change event caused by job  ='"
-                + currentJob == null ? "N/A" : currentJob.getName() + "'");
+                + (currentJob == null ? "N/A" : currentJob.getName()) + "'");
         }
 
         if (delta == null) {
