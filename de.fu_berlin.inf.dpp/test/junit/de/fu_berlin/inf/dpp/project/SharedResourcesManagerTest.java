@@ -31,6 +31,8 @@ import de.fu_berlin.inf.dpp.activities.FileActivity.Type;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.util.FileUtils;
 
@@ -54,7 +56,15 @@ public class SharedResourcesManagerTest {
 
     @BeforeClass
     public static void setup() throws CoreException {
-        manager = new SharedResourcesManager(null, null);
+
+        ISarosSession session = EasyMock.createNiceMock(ISarosSession.class);
+
+        expect(session.getLocalUser()).andStubReturn(
+            new User(new JID("foo@bar"), true, true, 0, 0));
+
+        replay(session);
+
+        manager = new SharedResourcesManager(session, null, null);
 
         IFile file = EasyMock.createMock(IFile.class);
 

@@ -1,9 +1,8 @@
 package de.fu_berlin.inf.dpp.project;
 
-import static java.text.MessageFormat.format;
-
 import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -109,8 +108,9 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
     @Inject
     private FileReplacementInProgressObservable fileReplacementInProgressObservable;
 
-    @Inject
-    private EditorManager editorManager;
+    private final EditorManager editorManager;
+
+    private final ProjectDeltaVisitor projectDeltaVisitor;
 
     /** map that holds the current open or closed state for every shared project */
     private final Map<IProject, Boolean> projectStates = new HashMap<IProject, Boolean>();
@@ -170,12 +170,13 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
         sarosSession.removeListener(sessionListener);
     }
 
-    private ResourceActivityFilter pendingActivities = new ResourceActivityFilter();
-
     public SharedResourcesManager(ISarosSession sarosSession,
-        StopManager stopManager) {
+        EditorManager editorManager, StopManager stopManager) {
         this.sarosSession = sarosSession;
+        this.editorManager = editorManager;
         this.stopManager = stopManager;
+        this.projectDeltaVisitor = new ProjectDeltaVisitor(sarosSession,
+            editorManager);
     }
 
     /**
@@ -196,7 +197,7 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
             // Creations, deletions, modifications of files and folders.
             handlePostChange(event);
         } else {
-            log.error("Unhandled event type in in SharedResourcesManager: "
+            log.error("unhandled event type in in SharedResourcesManager: "
                 + event);
         }
     }
@@ -223,14 +224,14 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
         }
 
         if (log.isTraceEnabled())
-            log.trace("received resource delta contains:\n"
+            log.trace("received resource delta '" + delta + "' contains:\n"
                 + deltaToString(delta));
 
         assert delta.getResource() instanceof IWorkspaceRoot;
 
-        IResourceDelta[] projectDeltas = delta.getAffectedChildren();
+        final List<IResourceActivity> resourceActivities = new ArrayList<IResourceActivity>();
 
-        for (IResourceDelta projectDelta : projectDeltas) {
+        for (IResourceDelta projectDelta : delta.getAffectedChildren()) {
 
             assert projectDelta.getResource() instanceof IProject;
 
@@ -248,9 +249,6 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
                 continue;
             }
 
-            ProjectDeltaVisitor visitor = new ProjectDeltaVisitor(
-                editorManager, sarosSession);
-
             try {
                 /*
                  * There is some magic involved here. The ProjectDeltaVisitor
@@ -260,19 +258,31 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
                  * 
                  * FIXME document this behavior in the ProjectDeltaVisitor !
                  */
-                projectDelta.accept(visitor, IContainer.INCLUDE_HIDDEN);
+                projectDeltaVisitor.reset();
+                projectDelta.accept(projectDeltaVisitor,
+                    IContainer.INCLUDE_HIDDEN);
             } catch (CoreException e) {
-                // The Eclipse documentation doesn't specify when
-                // CoreExceptions can occur.
-                log.warn(format("ProjectDeltaVisitor of project {0} "
-                    + "failed for some reason.", project.getName()), e);
+                // cannot be thrown by our custom visitor
+                log.warn(
+                    "ProjectDeltaVisitor class is not supposed to throw a CoreException",
+                    e);
             }
 
-            log.trace("Adding new activities " + visitor.pendingActivities);
-            pendingActivities.enterAll(visitor.pendingActivities);
+            resourceActivities.addAll(projectDeltaVisitor.getActivities());
         }
 
-        fireActivities();
+        if (log.isTraceEnabled()) {
+            log.trace("generated resource activities for current resource delta '"
+                + delta + "' : " + resourceActivities);
+        }
+
+        /*
+         * TODO for every activity have to synchronize on the GUI thread, maybe
+         * offer a bulk method ?
+         */
+        for (final IActivity activity : resourceActivities)
+            fireActivity(activity);
+
     }
 
     private boolean checkOpenClosed(IProject project) {
@@ -309,23 +319,6 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
          */
 
         return newProjectState;
-    }
-
-    /**
-     * Fires the ordered activities. To be run before change event ends.
-     */
-    private void fireActivities() {
-        if (pendingActivities.isEmpty())
-            return;
-
-        final List<IResourceActivity> orderedActivities = pendingActivities
-            .retrieveAll();
-
-        if (log.isTraceEnabled())
-            log.trace("Sending activities " + orderedActivities.toString());
-
-        for (final IActivity activity : orderedActivities)
-            fireActivity(activity);
     }
 
     /*
