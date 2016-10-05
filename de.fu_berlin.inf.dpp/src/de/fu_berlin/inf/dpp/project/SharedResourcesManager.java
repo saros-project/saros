@@ -228,8 +228,6 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
 
         assert delta.getResource() instanceof IWorkspaceRoot;
 
-        boolean postpone = false;
-
         IResourceDelta[] projectDeltas = delta.getAffectedChildren();
 
         for (IResourceDelta projectDelta : projectDeltas) {
@@ -270,18 +268,11 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
                     + "failed for some reason.", project.getName()), e);
             }
 
-            if (visitor.postponeSending()) {
-                postpone = true;
-            }
-
             log.trace("Adding new activities " + visitor.pendingActivities);
             pendingActivities.enterAll(visitor.pendingActivities);
         }
-        if (!postpone) {
-            fireActivities();
-        } else if (!pendingActivities.isEmpty()) {
-            log.debug("Postponing sending the activities");
-        }
+
+        fireActivities();
     }
 
     private boolean checkOpenClosed(IProject project) {

@@ -59,11 +59,6 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
      */
     private IPath ignoredPath = null;
 
-    /**
-     * Don't send activities yet.
-     */
-    private boolean postponeSending = false;
-
     @Override
     public boolean visit(IResourceDelta delta) {
         IResource resource = delta.getResource();
@@ -333,13 +328,5 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
     protected boolean isContentChange(IResourceDelta delta) {
         return ((delta.getFlags() & IResourceDelta.CONTENT) != 0);
 
-    }
-
-    protected void setPostponeSending(boolean value) {
-        postponeSending = value;
-    }
-
-    public boolean postponeSending() {
-        return postponeSending;
     }
 }
