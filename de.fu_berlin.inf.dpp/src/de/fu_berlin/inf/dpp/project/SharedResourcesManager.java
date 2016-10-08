@@ -1,52 +1,36 @@
 package de.fu_berlin.inf.dpp.project;
 
-import java.io.ByteArrayInputStream;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
 import org.picocontainer.Startable;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.IFileSystemModificationActivity;
 import de.fu_berlin.inf.dpp.activities.IResourceActivity;
-import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
-import de.fu_berlin.inf.dpp.filesystem.EclipsePathImpl;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
-import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
-import de.fu_berlin.inf.dpp.session.IActivityConsumer;
-import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
-import de.fu_berlin.inf.dpp.util.FileUtils;
 
 /**
  * This manager is responsible for handling all resource changes that aren't
@@ -104,8 +88,6 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
     @Inject
     private FileReplacementInProgressObservable fileReplacementInProgressObservable;
 
-    private final EditorManager editorManager;
-
     private final ProjectDeltaVisitor projectDeltaVisitor;
 
     /** map that holds the current open or closed state for every shared project */
@@ -151,7 +133,6 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
     public void start() {
         sarosSession.addListener(sessionListener);
         sarosSession.addActivityProducer(this);
-        sarosSession.addActivityConsumer(consumer, Priority.ACTIVE);
         stopManager.addBlockable(stopManagerListener);
         ResourcesPlugin.getWorkspace().addResourceChangeListener(this,
             INTERESTING_EVENTS);
@@ -162,14 +143,12 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
         ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
         stopManager.removeBlockable(stopManagerListener);
         sarosSession.removeActivityProducer(this);
-        sarosSession.removeActivityConsumer(consumer);
         sarosSession.removeListener(sessionListener);
     }
 
     public SharedResourcesManager(ISarosSession sarosSession,
         EditorManager editorManager, StopManager stopManager) {
         this.sarosSession = sarosSession;
-        this.editorManager = editorManager;
         this.stopManager = stopManager;
         this.projectDeltaVisitor = new ProjectDeltaVisitor(sarosSession,
             editorManager);
@@ -181,6 +160,11 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
     @Override
     public void resourceChanged(IResourceChangeEvent event) {
 
+        /*
+         * FIXME this is REAL GARBAGE ! This is sometimes set by the
+         * IncomingProjectNegotiation. So when it is set every change in an
+         * already shared project is just SILENTLY IGNORED !!!
+         */
         if (fileReplacementInProgressObservable.isReplacementInProgress())
             return;
 
@@ -189,12 +173,11 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
             return;
         }
 
+        // Creations, deletions, modifications of files and folders.
         if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
-            // Creations, deletions, modifications of files and folders.
             handlePostChange(event);
         } else {
-            log.error("unhandled event type in in SharedResourcesManager: "
-                + event);
+            log.warn("cannot handle event type : " + event);
         }
     }
 
@@ -384,203 +367,5 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
             return "";
         }
         return visitor.toString();
-    }
-
-    private final IActivityConsumer consumer = new AbstractActivityConsumer() {
-        @Override
-        public void exec(IActivity activity) {
-            if (!(activity instanceof IFileSystemModificationActivity))
-                return;
-
-            log.trace("execing " + activity);
-
-            try {
-                suspend();
-                super.exec(activity);
-            } finally {
-                resume();
-            }
-            log.trace("done execing " + activity);
-        }
-
-        @Override
-        public void receive(FileActivity activity) {
-            try {
-                handleFileActivity(activity);
-            } catch (CoreException e) {
-                log.error("Failed to execute activity: " + activity, e);
-            }
-        }
-    };
-
-    // package private for testing reasons
-    void handleFileActivity(FileActivity activity) throws CoreException {
-
-        if (activity.isRecovery()) {
-            handleFileRecovery(activity);
-            return;
-        }
-
-        // TODO check if we should open / close existing editors here too
-        switch (activity.getType()) {
-        case CREATED:
-            handleFileCreation(activity);
-            break;
-        case REMOVED:
-            handleFileDeletion(activity);
-            break;
-        case MOVED:
-            handleFileMove(activity);
-            break;
-        }
-    }
-
-    private void handleFileRecovery(FileActivity activity) throws CoreException {
-        SPath path = activity.getPath();
-
-        log.debug("performing recovery for file: "
-            + activity.getPath().getFullPath());
-
-        editorManager.saveLazy(path);
-
-        boolean editorWasOpen = editorManager.isOpenEditor(path);
-
-        if (editorWasOpen)
-            editorManager.closeEditor(path);
-
-        FileActivity.Type type = activity.getType();
-
-        try {
-            if (type == FileActivity.Type.CREATED)
-                handleFileCreation(activity);
-            else if (type == FileActivity.Type.REMOVED)
-                handleFileDeletion(activity);
-            else
-                log.warn("performing recovery for type " + type
-                    + " is not supported");
-        } finally {
-            /*
-             * always reset Jupiter algorithm, because upon receiving that
-             * activity, it was already reset on the host side
-             */
-            sarosSession.getConcurrentDocumentClient().reset(path);
-        }
-
-        if (editorWasOpen && type != FileActivity.Type.REMOVED)
-            editorManager.openEditor(path, true);
-    }
-
-    /**
-     * Updates encoding of a file. A best effort is made to use the inherited
-     * encoding if available. Does nothing if the file does not exist or the
-     * encoding to set is <code>null</code>
-     * 
-     * @param encoding
-     *            the encoding that should be used
-     * @param file
-     *            the file to update
-     * @throws CoreException
-     *             if setting the encoding failed
-     */
-    private void updateFileEncoding(final String encoding, final IFile file)
-        throws CoreException {
-
-        if (encoding == null)
-            return;
-
-        if (!file.exists())
-            return;
-
-        try {
-            Charset.forName(encoding);
-        } catch (Exception e) {
-            log.warn("encoding " + encoding + " for file " + file
-                + " is not available on this platform", e);
-            return;
-        }
-
-        String projectEncoding = null;
-        String fileEncoding = null;
-
-        try {
-            projectEncoding = file.getProject().getDefaultCharset();
-        } catch (CoreException e) {
-            log.warn(
-                "could not determine project encoding for project "
-                    + file.getProject(), e);
-        }
-
-        try {
-            fileEncoding = file.getCharset();
-        } catch (CoreException e) {
-            log.warn("could not determine file encoding for file " + file, e);
-        }
-
-        if (encoding.equals(fileEncoding)) {
-            log.debug("encoding does not need to be changed for file: " + file);
-            return;
-        }
-
-        // use inherited encoding if possible
-        if (encoding.equals(projectEncoding)) {
-            log.debug("changing encoding for file " + file
-                + " to use default project encoding: " + projectEncoding);
-            file.setCharset(null, new NullProgressMonitor());
-            return;
-        }
-
-        log.debug("changing encoding for file " + file + " to encoding: "
-            + encoding);
-
-        file.setCharset(encoding, new NullProgressMonitor());
-    }
-
-    private void handleFileMove(FileActivity activity) throws CoreException {
-        IPath newFilePath = ((EclipsePathImpl) activity.getPath().getFile()
-            .getFullPath()).getDelegate();
-
-        IResource oldResource = ((EclipseFileImpl) activity.getOldPath()
-            .getFile()).getDelegate();
-
-        FileUtils.mkdirs(((EclipseFileImpl) activity.getPath().getFile())
-            .getDelegate());
-        FileUtils.move(newFilePath, oldResource);
-
-        if (activity.getContent() == null)
-            return;
-
-        handleFileCreation(activity);
-    }
-
-    private void handleFileDeletion(FileActivity activity) throws CoreException {
-        IFile file = ((EclipseFileImpl) activity.getPath().getFile())
-            .getDelegate();
-
-        if (file.exists())
-            FileUtils.delete(file);
-        else
-            log.warn("could not delete file " + file
-                + " because it does not exist");
-    }
-
-    private void handleFileCreation(FileActivity activity) throws CoreException {
-        IFile file = ((EclipseFileImpl) activity.getPath().getFile())
-            .getDelegate();
-
-        final String encoding = activity.getEncoding();
-        byte[] newContent = activity.getContent();
-        byte[] actualContent = null;
-
-        if (file.exists())
-            actualContent = FileUtils.getLocalFileContent(file);
-
-        if (!Arrays.equals(newContent, actualContent)) {
-            FileUtils.writeFile(new ByteArrayInputStream(newContent), file);
-        } else {
-            log.debug("FileActivity " + activity + " dropped (same content)");
-        }
-
-        if (encoding != null)
-            updateFileEncoding(encoding, file);
     }
 }

@@ -68,7 +68,7 @@ public final class FolderActivityConsumer extends AbstractActivityConsumer
         try {
             FileUtils.create(folder);
         } catch (CoreException e) {
-            LOG.error("failed to execute activity: " + activity, e);
+            LOG.error("failed to execute folder activity: " + activity, e);
         }
     }
 
@@ -85,7 +85,7 @@ public final class FolderActivityConsumer extends AbstractActivityConsumer
                 FileUtils.delete(folder);
 
         } catch (CoreException e) {
-            LOG.error("failed to execute activity: " + activity, e);
+            LOG.error("failed to execute folder activity: " + activity, e);
         }
     }
 }
