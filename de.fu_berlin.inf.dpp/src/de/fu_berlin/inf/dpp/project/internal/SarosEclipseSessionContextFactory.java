@@ -14,6 +14,7 @@ import de.fu_berlin.inf.dpp.feedback.SelectionCollector;
 import de.fu_berlin.inf.dpp.feedback.SessionDataCollector;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.feedback.TextEditCollector;
+import de.fu_berlin.inf.dpp.project.FolderActivityConsumer;
 import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionContextFactory;
@@ -51,6 +52,9 @@ public class SarosEclipseSessionContextFactory extends
 
         // Other
         container.addComponent(FollowingActivitiesManager.class);
+
+        // file activity related
         container.addComponent(SharedResourcesManager.class);
+        container.addComponent(FolderActivityConsumer.class);
     }
 }

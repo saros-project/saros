@@ -11,7 +11,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -28,8 +27,6 @@ import org.picocontainer.Startable;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.activities.FolderCreatedActivity;
-import de.fu_berlin.inf.dpp.activities.FolderDeletedActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IFileSystemModificationActivity;
 import de.fu_berlin.inf.dpp.activities.IResourceActivity;
@@ -37,7 +34,6 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
-import de.fu_berlin.inf.dpp.filesystem.EclipseFolderImpl;
 import de.fu_berlin.inf.dpp.filesystem.EclipsePathImpl;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
@@ -200,6 +196,34 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
             log.error("unhandled event type in in SharedResourcesManager: "
                 + event);
         }
+    }
+
+    /*
+     * FIXME this will lockout everything. File changes made in the meantime
+     * from another background job are not recognized. See AddMultipleFilesTest
+     * STF test which fails randomly.
+     */
+
+    /**
+     * Suspends every listening to file changes.
+     * 
+     * @deprecated error prone as the Eclipse Workspace can be accessed
+     *             concurrently
+     */
+    @Deprecated
+    void suspend() {
+        fileReplacementInProgressObservable.startReplacement();
+    }
+
+    /**
+     * Resumes every listening to file changes.
+     * 
+     * @deprecated error prone as the Eclipse Workspace can be accessed
+     *             concurrently
+     */
+    @Deprecated
+    void resume() {
+        fileReplacementInProgressObservable.replacementDone();
     }
 
     private void handlePostChange(IResourceChangeEvent event) {
@@ -368,17 +392,14 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
             if (!(activity instanceof IFileSystemModificationActivity))
                 return;
 
-            /*
-             * FIXME this will lockout everything. File changes made in the
-             * meantime from another background job are not recognized. See
-             * AddMultipleFilesTest STF test which fails randomly.
-             */
-            fileReplacementInProgressObservable.startReplacement();
             log.trace("execing " + activity);
 
-            super.exec(activity);
-
-            fileReplacementInProgressObservable.replacementDone();
+            try {
+                suspend();
+                super.exec(activity);
+            } finally {
+                resume();
+            }
             log.trace("done execing " + activity);
         }
 
@@ -390,42 +411,10 @@ public class SharedResourcesManager extends AbstractActivityProducer implements
                 log.error("Failed to execute activity: " + activity, e);
             }
         }
-
-        @Override
-        public void receive(FolderCreatedActivity activity) {
-
-            SPath path = activity.getPath();
-
-            IFolder folder = ((EclipseFolderImpl) path.getProject().getFolder(
-                path.getProjectRelativePath())).getDelegate();
-
-            try {
-                FileUtils.create(folder);
-            } catch (CoreException e) {
-                log.error("Failed to execute activity: " + activity, e);
-            }
-        }
-
-        @Override
-        public void receive(FolderDeletedActivity activity) {
-
-            SPath path = activity.getPath();
-
-            IFolder folder = ((EclipseFolderImpl) path.getProject().getFolder(
-                path.getProjectRelativePath())).getDelegate();
-
-            try {
-                if (folder.exists())
-                    FileUtils.delete(folder);
-
-            } catch (CoreException e) {
-                log.error("Failed to execute activity: " + activity, e);
-            }
-        }
     };
 
-    protected void handleFileActivity(FileActivity activity)
-        throws CoreException {
+    // package private for testing reasons
+    void handleFileActivity(FileActivity activity) throws CoreException {
 
         if (activity.isRecovery()) {
             handleFileRecovery(activity);
