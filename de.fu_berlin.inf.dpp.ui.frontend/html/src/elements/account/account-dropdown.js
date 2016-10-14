@@ -1,6 +1,6 @@
 var app = require('ampersand-app');
 var View = require('ampersand-view');
-var tmpl = require('./account-dropdown.jade');
+var tmpl = require('./account-dropdown.hbs');
 
 module.exports = View.extend({
     template: tmpl,

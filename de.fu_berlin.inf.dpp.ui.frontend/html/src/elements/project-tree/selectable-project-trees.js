@@ -1,6 +1,6 @@
 var AmpersandView = require('ampersand-view');
 var bindAll = require('lodash.bindall');
-var tmpl = require('./selectable-project-trees.jade');
+var tmpl = require('./selectable-project-trees.hbs');
 var ProjectTreeNodeView = require('./project-tree-node');
 var dictionary = require('../../dictionary');
 

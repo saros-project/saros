@@ -1,6 +1,6 @@
 var AmpersandView = require('ampersand-view');
 var bindAll = require('lodash.bindall');
-var tmpl = require('./selectable-contact.jade');
+var tmpl = require('./selectable-contact.hbs');
 var dictionary = require('../../dictionary');
 
 module.exports = AmpersandView.extend({

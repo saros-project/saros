@@ -1,6 +1,6 @@
 var AmpersandView = require('ampersand-view');
 var bindAll = require('lodash.bindall');
-var tmpl = require('./contact.jade');
+var tmpl = require('./contact.hbs');
 var dictionary = require('../../dictionary');
 var RenameContactDialog = require('./rename-contact-dialog');
 var DeleteContactDialog = require('./delete-contact-dialog');

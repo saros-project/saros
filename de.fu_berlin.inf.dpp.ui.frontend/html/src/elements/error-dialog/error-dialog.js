@@ -1,6 +1,6 @@
 /* global $$ */
 var AmpersandView = require('ampersand-view');
-var tmpl = require('./error-dialog.jade');
+var tmpl = require('./error-dialog.hbs');
 var dictionary = require('../../dictionary');
 
 module.exports = AmpersandView.extend({

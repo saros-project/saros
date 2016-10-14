@@ -1,0 +1,18 @@
+<div>
+  <div id="header">
+    <nav class="navbar navbar-default">
+      <p data-hook="active-account" class="navbar-text"></p>
+      <div class="navbar-form btn-group"><button type="button" data-hook="connection-button" class="btn btn-default btn-sm"></button><button data-toggle="dropdown" class="btn btn-default btn-sm dropdown-toggle"><span class="caret"></span><span class="sr-only">toggle</span></button>
+        <ul
+          data-hook="account-list" role="menu" class="accounts dropdown-menu">
+          <li><a href="#" data-hook="manage-accounts">{{d.action.manageAccounts}}</a></li>
+          <li class="divider"></li>
+          </ul>
+      </div>
+      <div class="btn-list"><button type="button" data-hook="add-contact" class="btn btn-default btn-sm add">{{d.action.addContact}}</button><button type="button" data-hook="start-session" class="btn btn-default btn-sm">{{d.action.startSession}}</button></div>
+    </nav>
+  </div>
+  <div class="content-container">
+    <div data-hook="contact-container"></div>
+  </div>
+</div>

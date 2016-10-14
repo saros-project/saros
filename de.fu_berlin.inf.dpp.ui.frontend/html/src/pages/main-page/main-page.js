@@ -1,6 +1,6 @@
 var app = require('ampersand-app');
 var AmpersandView = require('ampersand-view');
-var tmpl = require('./main-page.jade');
+var tmpl = require('./main-page.hbs');
 var AccountsDropdownView = require('../../elements/account/accounts-dropdown');
 var ContactsView = require('../../elements/contact/contacts');
 var AddContactDialog = require('../../elements/contact/add-contact-dialog');

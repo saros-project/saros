@@ -3,7 +3,7 @@ var bindAll = require('lodash.bindall');
 var AmpersandView = require('ampersand-view');
 var AmpersandFormView = require('ampersand-form-view');
 var AmpersandInputView = require('ampersand-input-view');
-var tmpl = require('./rename-contact-dialog.jade');
+var tmpl = require('./rename-contact-dialog.hbs');
 var dictionary = require('../../dictionary');
 var SarosApi = require('../../saros-api');
 

@@ -1,5 +1,5 @@
 var AmpersandView = require('ampersand-view');
-var tmpl = require('./selectable-contacts.jade');
+var tmpl = require('./selectable-contacts.hbs');
 var SelectableContactView = require('./selectable-contact');
 var dictionary = require('../../dictionary');
 
