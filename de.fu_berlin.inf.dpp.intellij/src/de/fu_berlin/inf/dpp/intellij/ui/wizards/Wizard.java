@@ -17,7 +17,9 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Dimension;
 import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -86,15 +88,16 @@ public abstract class Wizard extends JDialog {
      * @param title       window title
      * @param headerPanel
      */
-    public Wizard(String title, HeaderPanel headerPanel) {
-        super(new JFrame(), title);
+    public Wizard(Window parent, String title, HeaderPanel headerPanel) {
+        super(parent, title);
         SarosPluginContext.initComponent(this);
 
         this.headerPanel = headerPanel;
 
         wizardPageModel = new WizardPageModel();
 
-        setSize(600, 400);
+        setMinimumSize(new Dimension(600, 400));
+        setPreferredSize(new Dimension(600, 400));
         setResizable(true);
 
         navigationPanel = new NavigationPanel();
@@ -121,6 +124,10 @@ public abstract class Wizard extends JDialog {
         getContentPane().add(cardPanel, BorderLayout.CENTER);
 
         getContentPane().add(navigationPanel, BorderLayout.SOUTH);
+
+        pack();
+
+        setLocationRelativeTo(getParent());
 
         wizardPageModel.goToFirstPage();
     }

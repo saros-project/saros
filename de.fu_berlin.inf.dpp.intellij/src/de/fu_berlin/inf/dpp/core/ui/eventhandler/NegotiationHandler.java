@@ -1,7 +1,15 @@
 package de.fu_berlin.inf.dpp.core.ui.eventhandler;
 
+import com.intellij.ide.DataManager;
+import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.wm.IdeFrame;
+import com.intellij.openapi.wm.WindowManager;
+import com.intellij.openapi.wm.ex.WindowManagerEx;
+import com.intellij.openapi.wm.impl.IdeFrameImpl;
 import de.fu_berlin.inf.dpp.core.monitoring.IStatus;
 import de.fu_berlin.inf.dpp.core.monitoring.Status;
 import de.fu_berlin.inf.dpp.intellij.SarosComponent;
@@ -26,6 +34,7 @@ import de.fu_berlin.inf.dpp.session.INegotiationHandler;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import org.apache.log4j.Logger;
 
+import java.awt.Window;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,7 +96,7 @@ public class NegotiationHandler implements INegotiationHandler {
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             @Override
             public void run() {
-                JoinSessionWizard wizard = new JoinSessionWizard(negotiation);
+                JoinSessionWizard wizard = new JoinSessionWizard(getWindow(), negotiation);
                 wizard.setModal(true);
                 wizard.open();
             }
@@ -110,7 +119,7 @@ public class NegotiationHandler implements INegotiationHandler {
             public void run() {
 
                 AddProjectToSessionWizard wizard = new AddProjectToSessionWizard(
-                    negotiation, negotiation.getPeer(), fileLists,
+                    getWindow(), negotiation, negotiation.getPeer(), fileLists,
                     negotiation.getProjectNames());
                 wizard.setModal(false);
                 wizard.open();
@@ -119,6 +128,11 @@ public class NegotiationHandler implements INegotiationHandler {
         }, ModalityState.defaultModalityState());
     }
 
+    private static Window getWindow() {
+        DataContext dataContext = DataManager.getInstance().getDataContext();
+        Project project = DataKeys.PROJECT.getData(dataContext);
+        return WindowManager.getInstance().getFrame(project);
+    }
     /**
      * OutgoingInvitationJob wraps the instance of
      * {@link OutgoingSessionNegotiation} and cares about handling the

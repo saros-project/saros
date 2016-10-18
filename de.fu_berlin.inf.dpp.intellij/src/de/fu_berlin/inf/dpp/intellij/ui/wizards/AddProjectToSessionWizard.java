@@ -31,6 +31,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
 
+import java.awt.Window;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -171,10 +172,10 @@ public class AddProjectToSessionWizard extends Wizard {
      * @param fileLists    The list of resources to be shared
      * @param projectNames The names of the projects to be shared
      */
-    public AddProjectToSessionWizard(IncomingProjectNegotiation negotiation,
+    public AddProjectToSessionWizard(Window parent, IncomingProjectNegotiation negotiation,
         JID peer, List<FileList> fileLists, Map<String, String> projectNames) {
 
-        super(Messages.AddProjectToSessionWizard_title,
+        super(parent, Messages.AddProjectToSessionWizard_title,
             new HeaderPanel(Messages.EnterProjectNamePage_title2, ""));
 
         this.negotiation = negotiation;

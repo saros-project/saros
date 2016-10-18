@@ -14,6 +14,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
 import org.apache.log4j.Logger;
 
+import java.awt.Window;
 import java.text.MessageFormat;
 
 import static de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
@@ -55,8 +56,8 @@ public class JoinSessionWizard extends Wizard {
      *
      * @param negotiation The negotiation this wizard displays
      */
-    public JoinSessionWizard(IncomingSessionNegotiation negotiation) {
-        super(Messages.JoinSessionWizard_title,
+    public JoinSessionWizard(Window parent, IncomingSessionNegotiation negotiation) {
+        super(parent, Messages.JoinSessionWizard_title,
             new HeaderPanel(Messages.ShowDescriptionPage_title2,
                 Messages.ShowDescriptionPage_description));
         this.negotiation = negotiation;
