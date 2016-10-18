@@ -31,9 +31,9 @@ public class IntelliJSynchronizer implements UISynchronizer {
         Application application = ApplicationManager.getApplication();
 
         if (async) {
-            application.invokeLater(runnable);
+            application.invokeLater(runnable, ModalityState.any());
         } else {
-            application.invokeAndWait(runnable, ModalityState.NON_MODAL);
+            application.invokeAndWait(runnable, ModalityState.any());
         }
 
     }
