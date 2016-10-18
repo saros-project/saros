@@ -3,14 +3,11 @@ package de.fu_berlin.inf.dpp.intellij.ui.menu;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJFolderImpl;
-import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJProjectImpl;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
@@ -51,7 +48,7 @@ public class SarosFileShareGroup extends ActionGroup {
         AnActionEvent e) {
         // This has to be initialized here, because doing it in the
         // constructor would be too early. The lifecycle is not
-        // running yet when this class is instanciated.
+        // running yet when this class is instantiated.
         // To make the dependency injection work,
         // SarosPluginContext.initComponent has to be called here.
         if (sessionManager == null && connectionService == null) {
@@ -62,73 +59,55 @@ public class SarosFileShareGroup extends ActionGroup {
             return new AnAction[0];
         }
 
-        VirtualFile virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE);
-        Project ideaProject = e.getData(CommonDataKeys.PROJECT);
-        if (virtualFile == null || ideaProject == null) {
-            return new AnAction[0];
-        }
-
-        if (!virtualFile.isDirectory()) {
+        if (!isSharableResource(e)) {
             return new AnAction[0];
         }
 
         Roster roster = connectionService.getRoster();
-        if (roster == null)
-            return new AnAction[0];
-
-        IntelliJProjectImpl project = null;
-        try {
-            project = getProjectFromVirtFile(virtualFile, ideaProject);
-        } catch (UnsupportedOperationException e1) {
+        if (roster == null) {
             return new AnAction[0];
         }
 
-        IntelliJFolderImpl resFolder = new IntelliJFolderImpl(project,
-            new File(virtualFile.getPath()));
-
-        //Holger: This disables partial sharing for the moment, until the need arises
-        if (!isCompleteProject(project, resFolder)) {
-            return new AnAction[0];
-        }
-
-        List<AnAction> list = new ArrayList<AnAction>();
+        List<AnAction> list = new ArrayList<>();
         for (RosterEntry rosterEntry : roster.getEntries()) {
             Presence presence = roster.getPresence(rosterEntry.getUser());
-
             if (presence.getType() == Presence.Type.available) {
                 list.add(
                     new ShareWithUserAction(new JID(rosterEntry.getUser())));
             }
         }
 
-        return list.toArray(new AnAction[] {});
+        return list.toArray(new AnAction[0]);
     }
 
-    static IntelliJProjectImpl getProjectFromVirtFile(VirtualFile virtFile,
-        Project project) {
-        Module module = ProjectFileIndex.SERVICE.getInstance(project)
-            .getModuleForFile(virtFile);
-        String moduleName = null;
-        if (module != null) {
-            moduleName = module.getName();
-        } else {
-            //FIXME: Find way to select moduleName for non-module based IDEAs
-            //(Webstorm)
-            throw new UnsupportedOperationException();
+    private boolean isSharableResource(AnActionEvent e) {
+        // Don't allow to share any file or folder other than a module
+        if (e.getDataContext().getData(DataKeys.MODULE_CONTEXT.getName())
+            == null) {
+            return false;
         }
-        return new IntelliJProjectImpl(project, moduleName);
-    }
 
-    /**
-     * Checks whether a given folder is the project (module) root folder, to allow
-     * only complete modules to be shared.
-     *
-     * @param project
-     * @param resFolder
-     * @return
-     */
-    private boolean isCompleteProject(IntelliJProjectImpl project,
-        IntelliJFolderImpl resFolder) {
-        return resFolder.getLocation().equals(project.getLocation());
+        Project project = e.getData(DataKeys.PROJECT);
+        Module module = e.getData(DataKeys.MODULE);
+
+        if (project == null || module == null)
+            return false;
+
+        // Only allow modules to be shared, that are directly in the project folder
+
+        /*
+            FIXME module.getModuleFile() always returns  null for new created modules
+            Only switching to another Application Window will resolve the issue
+         */
+
+        VirtualFile moduleFile = module.getModuleFile();
+
+        if (moduleFile == null)
+            return false;
+
+        // FIXME do not play with the filesystem here, there should be a better way
+        return project.getName()
+            .equals(moduleFile.getParent().getParent().getName());
+
     }
 }

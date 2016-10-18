@@ -19,6 +19,7 @@ import org.junit.rules.TemporaryFolder;
 import java.io.File;
 import java.io.IOException;
 
+import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.getCurrentArguments;
 import static org.easymock.EasyMock.isA;
@@ -46,12 +47,15 @@ public class AbstractResourceTest {
     }
 
     protected IntelliJProjectImpl getMockProject() {
-        Project project = createNiceMock(Project.class);
-        expect(project.getBasePath())
-            .andReturn(folder.getRoot().getAbsolutePath());
+        Project project = createMock(Project.class);
+        expect(project.getName()).andReturn(TEST_PROJECT_NAME);
+        expect(project.getBasePath()).andReturn(
+            folder.getRoot().getAbsolutePath() + File.separator
+                + TEST_PROJECT_NAME);
+
         replay(project);
 
-        return new IntelliJProjectImpl(project, TEST_PROJECT_NAME);
+        return new IntelliJProjectImpl(project);
     }
 
     protected void mockFileSystem() {

@@ -21,6 +21,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * NOTE: A project is something different in Eclipse and in IntelliJ
+ * Eventhough this is called ProjectImpl, it is actually used to represent
+ * a IntelliJ module, not a project (because of historical reasons)
+ * <p/>
+ * NOTE: An IntelliJ project is a module too. So it is valid to call
+ * this class with a project. There is a difference in behavior:
+ * 1) If called with a project: project contains the project path, including
+ * the project name, and name is again the project name
+ * 2) If called with a module: project contains the path of the parent
+ * project, and name is the module name
+ */
 public class IntelliJProjectImpl implements IProject {
     public static final String DEFAULT_CHARSET = "utf8";
 
@@ -43,26 +55,60 @@ public class IntelliJProjectImpl implements IProject {
     private boolean isAccessible;
     private IResourceAttributes attributes;
 
-    public IntelliJProjectImpl(Project project, String name) {
+    public IntelliJProjectImpl(Project project) {
 
         if (project == null) {
             throw new NullPointerException(
-                "Can not instantiate project with null project.");
+                "project is null");
         }
 
-        if (name == null) {
-            throw new NullPointerException(
-                "Can not instantiate project with null name.");
-        }
+        /*
+         * Case 1) Called for a project
+         * If this is called for the actual project which is a module too,
+         * then the project path already includes the name, so there is no need
+         * to add it.
 
-        File path = new File(project.getBasePath(), name);
-
-        this.name = name;
-        setPath(path);
-        scan(path);
+         */
+        this.name = project.getName();
+        setPath(new File(project.getBasePath()));
+        scan();
     }
 
-    public void setPath(File path) {
+    /**
+     * Creates a core compatible IProject using the given IntelliJ project and
+     * a specific module.
+     * <b>Note:</b> Only top level modules are supported. E.g modules inside
+     * modules cannot be represented.
+     * @param project
+     * @param moduleName
+     */
+    public IntelliJProjectImpl(Project project, String moduleName) {
+
+        if (project == null) {
+            throw new NullPointerException(
+                "project is null");
+        }
+
+        if (moduleName == null) {
+            throw new NullPointerException(
+                "moduleName is null");
+        }
+
+        /*
+         * Case 2) Called for a module
+         * If this is called for a module, the module path is the project
+         * path with the module name added in the end.
+         *
+         */
+        if (project.getName().equals(moduleName))
+            throw new IllegalArgumentException("moduleName cannot be equal to the project name it belongs to");
+
+        this.name = moduleName;
+        setPath(new File(project.getBasePath(), moduleName));
+        scan();
+    }
+
+    private void setPath(File path) {
         this.path = path;
 
         isAccessible = false;
@@ -73,18 +119,20 @@ public class IntelliJProjectImpl implements IProject {
         attributes = new IntelliJResourceAttributesImpl(); //todo
     }
 
-    public void scan(File path) {
+    private void scan() {
         //clear old
         resourceMap.clear();
         fileMap.clear();
         folderMap.clear();
         if (!path.exists()) {
-            path.mkdirs();
+            LOG.warn(
+                "Tries to scan a file that doesn't exist: " + path.toString());
+            isAccessible = false;
         } else {
             addRecursive(path);
+            isAccessible = true;
         }
 
-        isAccessible = true;
     }
 
     protected void addRecursive(File file) {
@@ -206,7 +254,7 @@ public class IntelliJProjectImpl implements IProject {
 
     @Override
     public IResource[] members() {
-        return resourceMap.values().toArray(new IResource[] {});
+        return resourceMap.values().toArray(new IResource[] { });
     }
 
     @Override
@@ -222,7 +270,7 @@ public class IntelliJProjectImpl implements IProject {
             }
         }
 
-        return list.toArray(new IResource[] {});
+        return list.toArray(new IResource[] { });
 
     }
 
@@ -307,7 +355,7 @@ public class IntelliJProjectImpl implements IProject {
 
     @Override
     public void refreshLocal() throws IOException {
-        scan(path);
+        scan();
     }
 
     @Override
