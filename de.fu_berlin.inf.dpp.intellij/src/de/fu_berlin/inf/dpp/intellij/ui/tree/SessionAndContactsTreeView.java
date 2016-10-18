@@ -24,7 +24,7 @@ import java.awt.Component;
 /**
  * Saros tree view for contacts and sessions.
  */
-public class SessionAndContactsTreeView extends Tree {
+public class SessionAndContactsTreeView extends JTree {
 
     private final SessionTreeRootNode sessionTreeRootNode;
     private final ContactTreeRootNode contactTreeRootNode;
@@ -81,7 +81,7 @@ public class SessionAndContactsTreeView extends Tree {
         @Override
         public void connectionStateChanged(Connection connection,
             ConnectionState state) {
-            renderConnectionState(state);
+            renderConnectionState(connection, state);
         }
 
     };
@@ -104,25 +104,16 @@ public class SessionAndContactsTreeView extends Tree {
         connectionService.addListener(connectionStateListener);
 
         //show correct initial state
-        renderConnectionState(connectionService.getConnectionState());
+        renderConnectionState(connectionService.getConnection(), connectionService.getConnectionState());
     }
 
-    private void renderConnectionState(ConnectionState state) {
-        Roster roster = connectionService.getRoster();
+    private void renderConnectionState(Connection connection, ConnectionState state) {
 
         switch (state) {
-        case CONNECTING:
-            if (roster != null)
-                roster.addRosterListener(contactTreeRootNode);
-            break;
         case CONNECTED:
             renderConnected();
             break;
         case ERROR:
-        case DISCONNECTING:
-            if (roster != null)
-                roster.removeRosterListener(contactTreeRootNode);
-            break;
         case NOT_CONNECTED:
             renderDisconnected();
             break;
@@ -148,9 +139,6 @@ public class SessionAndContactsTreeView extends Tree {
                 String rootText = new JID(userJID).getBareJID().toString();
 
                 getSarosTreeRootNode().setTitle(rootText);
-
-                //add contacts
-                contactTreeRootNode.createContactNodes();
 
                 updateTree();
             }

@@ -1,23 +1,25 @@
 package de.fu_berlin.inf.dpp.intellij.ui.tree;
 
-import com.intellij.util.ui.UIUtil;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
-import de.fu_berlin.inf.dpp.net.xmpp.JID;
-import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
-import de.fu_berlin.inf.dpp.net.xmpp.roster.IRosterListener;
-import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.packet.Presence;
-import org.jivesoftware.smack.packet.RosterPacket;
-import org.picocontainer.annotations.Inject;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+
+import org.jivesoftware.smack.Roster;
+import org.jivesoftware.smack.RosterEntry;
+import org.jivesoftware.smack.packet.Presence;
+import org.picocontainer.annotations.Inject;
+
+import com.intellij.util.ui.UIUtil;
+
+import de.fu_berlin.inf.dpp.SarosPluginContext;
+import de.fu_berlin.inf.dpp.intellij.ui.util.IconManager;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.net.xmpp.roster.IRosterListener;
+import de.fu_berlin.inf.dpp.net.xmpp.roster.RosterTracker;
 
 /**
  * Root node for the tree of contacts, that a user has in their contact list.
@@ -25,16 +27,30 @@ import java.util.Map;
  * It registers as {@link IRosterListener} and keeps the displayed
  * contacts in sync with the server.
  */
+
+/* 
+ * TODO the visual representation of the roster has 
+ * the same issue as the Eclipse counterpart, it cannot 
+ * handle multiple JIDs with different resources 
+ */
 public class ContactTreeRootNode extends DefaultMutableTreeNode
     implements IRosterListener {
+
+    private static final long serialVersionUID = 1L;
+
     public static final String TREE_TITLE = "Contacts";
 
     private final SessionAndContactsTreeView treeView;
-    private final Map<String, ContactInfo> contactMap = new HashMap<String, ContactInfo>();
+
+    private final Map<JID, ContactInfo> visibleContactsMap = new HashMap<>();
+    private final Map<JID, ContactInfo> hiddenContactsMap = new HashMap<>();
+
     private final DefaultTreeModel treeModel;
 
     @Inject
-    private XMPPConnectionService connectionService;
+    private RosterTracker rosterTracker;
+
+    private Roster roster;
 
     public ContactTreeRootNode(SessionAndContactsTreeView treeView) {
         super(treeView);
@@ -43,65 +59,80 @@ public class ContactTreeRootNode extends DefaultMutableTreeNode
         this.treeView = treeView;
         treeModel = (DefaultTreeModel) this.treeView.getModel();
         setUserObject(TREE_TITLE);
+
+        rosterTracker.addRosterListener(this);
+        rosterChanged(rosterTracker.getRoster());
     }
 
-    /**
-     * Creates a tree root node and adds a {@link DefaultMutableTreeNode} containing
-     * a {@link de.fu_berlin.inf.dpp.intellij.ui.tree.ContactTreeRootNode.ContactInfo}
-     * as content.
-     */
-    public void createContactNodes() {
-        removeAllChildren();
-        DefaultMutableTreeNode node;
-
-        Roster roster = connectionService.getRoster();
-        //add contacts
-        for (RosterEntry contactEntry : roster.getEntries()) {
-            ContactInfo contactInfo = new ContactInfo(contactEntry);
-            Presence presence = roster.getPresence(contactEntry.getUser());
-
-            if (presence.getType() == Presence.Type.available) {
-                contactInfo.setOnline(true);
-            } else {
-                contactInfo.setOnline(false);
-            }
-
-            node = new DefaultMutableTreeNode(contactInfo);
-
-            add(node);
-
-            contactMap.put(contactInfo.getTitle(), contactInfo);
-        }
-    }
 
     /**
-     * Adds the node of the given contact to the tree model.
+     * Adds the node of the given contact to the tree model. The contact
+     * will be visible.
+     * Does nothing if the contact is already present(either visible, or hidden).
      */
-    public void showContact(final String name) {
-        ContactInfo contactInfo = contactMap.get(name);
-        if (contactInfo == null || !contactInfo.isHidden()) {
+    private void addContact(String jid) {
+        ContactInfo contactInfo = getContact(jid);
+
+        if (contactInfo != null)
             return;
-        }
 
-        contactInfo.setHidden(false);
+        if (roster == null)
+            return;
+
+        // Smack BUG, does not work with RQJIDs
+        RosterEntry entry = roster.getEntry(toBareJID(jid).toString());
+
+        if (entry == null)
+            return;
+
+        contactInfo = new ContactInfo(entry);
+
+        visibleContactsMap.put(toBareJID(jid), contactInfo);
+
+        Presence presence = roster.getPresence(jid);
+
+        contactInfo.setOnline(presence.getType() == Presence.Type.available);
+
         MutableTreeNode node = new DefaultMutableTreeNode(contactInfo);
 
         add(node);
     }
 
-    /**
-     * Removes the node of the given contact from the tree.
-     */
-    public void hideContact(final String name) {
-        ContactInfo contactInfo = contactMap.get(name);
-        if (contactInfo == null || contactInfo.isHidden()) {
-            return;
-        }
+    private ContactInfo getContact(final String jid) {
+        ContactInfo info;
 
-        contactInfo.setHidden(true);
+        info = visibleContactsMap.get(toBareJID(jid));
+
+        if (info == null)
+            info = hiddenContactsMap.get(toBareJID(jid));
+
+        return info;
+    }
+
+    /**
+     * Removes the node of the given contact from the tree. If the contact is
+     * already not visible it will still be removed.
+     *
+     * Does nothing if the contact is not present(either visible, or hidden).
+     */
+    private void removeContact(final String jid) {
+        ContactInfo contactInfo;
+
+        contactInfo = hiddenContactsMap.remove(toBareJID(jid));
+
+        // the info is already not in the tree
+        if (contactInfo != null)
+            return;
+
+        contactInfo = visibleContactsMap.remove(toBareJID(jid));
+
+        if (contactInfo == null)
+            return;
+
         for (int i = 0; i < getChildCount(); i++) {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) getChildAt(
                 i);
+
             if (contactInfo.equals(node.getUserObject())) {
                 treeModel.removeNodeFromParent(node);
                 node.setUserObject(null);
@@ -112,80 +143,135 @@ public class ContactTreeRootNode extends DefaultMutableTreeNode
     }
 
     /**
+     * Shows the contact in the current tree, i.e it is displayed.
+     * @param jid
+     */
+    public void showContact(JID jid) {
+        ContactInfo info = hiddenContactsMap.remove(jid.getBareJID());
+
+        if (info == null)
+            return;
+
+        addContact(jid.toString());
+    }
+
+    /**
+     * Hides the contact in the current tree, i.e it is not displayed.
+     * @param jid
+     */
+    public void hideContact(JID jid) {
+        ContactInfo info = visibleContactsMap.get(jid.getBareJID());
+
+        if (info == null)
+            return;
+
+        removeContact(jid.toString());
+
+        hiddenContactsMap.put(jid.getBareJID(), info);
+    }
+    
+    /**
      * Removes all contacts.
      */
     public void removeContacts() {
         removeAllChildren();
-        contactMap.clear();
+        visibleContactsMap.clear();
+        hiddenContactsMap.clear();
     }
 
     @Override
-    public void rosterChanged(Roster roster) {
-        //NOP
+    public void rosterChanged(final Roster roster) {
+        UIUtil.invokeLaterIfNeeded(new Runnable() {
+            @Override
+            public void run() {
+                ContactTreeRootNode.this.roster = roster;
+
+                if (roster == null) {
+                    removeContacts();
+                    return;
+                }
+
+                for (RosterEntry entry : roster.getEntries())
+                    addContact(entry.getUser());
+
+            }
+        });
     }
 
     @Override
-    public void entriesAdded(Collection<String> addresses) {
-        //NOP
+    public void entriesAdded(final Collection<String> addresses) {
+        UIUtil.invokeLaterIfNeeded(new Runnable() {
+            @Override
+            public void run() {
+                for (String address : addresses)
+                    addContact(address);
+            }
+        });
     }
 
     @Override
     public void entriesUpdated(Collection<String> addresses) {
-        //NOP
+        //TODO
     }
 
     @Override
-    public void entriesDeleted(Collection<String> addresses) {
-        //NOP
+    public void entriesDeleted(final Collection<String> addresses) {
+        UIUtil.invokeLaterIfNeeded(new Runnable() {
+            @Override
+            public void run() {
+                for (String address : addresses)
+                    removeContact(address);
+            }
+        });
     }
 
     /**
      * Updates online / offline status of a contact and updates the tree view.
      */
     @Override
-    public void presenceChanged(Presence presence) {
-        String user = new JID(presence.getFrom()).getBareJID().toString();
+    public void presenceChanged(final Presence presence) {
 
-        ContactInfo info = contactMap.get(user);
-        if (info != null) {
-            if (presence.getType() == Presence.Type.available) {
-                info.setOnline(true);
-            } else {
-                info.setOnline(false);
+        Runnable action = new Runnable() {
+            @Override
+            public void run() {
+
+                String user = presence.getFrom();
+
+                if (user == null)
+                    return;
+
+                ContactInfo info = getContact(user);
+
+                if (info == null)
+                    return;
+
+                info.setOnline(presence.getType() == Presence.Type.available);
+                treeView.collapseRow(2);
+                treeView.expandRow(2);
             }
+        };
 
-            Runnable action = new Runnable() {
-                @Override
-                public void run() {
-                    treeView.collapseRow(2);
-                    treeView.expandRow(2);
-                }
-            };
-
-            UIUtil.invokeAndWaitIfNeeded(action);
-        }
+        UIUtil.invokeLaterIfNeeded(action);
     }
 
     /**
      * Class to keep contact info
      */
-    protected class ContactInfo extends LeafInfo {
+     static class ContactInfo extends LeafInfo {
 
         private final String status;
         private final RosterEntry rosterEntry;
         private boolean isOnline;
-        private boolean isHidden = false;
+
+        private boolean visible = true;
 
         private ContactInfo(RosterEntry rosterEntry) {
             super(rosterEntry.getUser());
             this.rosterEntry = rosterEntry;
+
             status = rosterEntry.getStatus() == null ?
                 null :
                 rosterEntry.getStatus().toString();
-        }
-
-        public RosterPacket.ItemStatus getStatus() {
-            return rosterEntry.getStatus();
         }
 
         public RosterEntry getRosterEntry() {
@@ -196,12 +282,12 @@ public class ContactTreeRootNode extends DefaultMutableTreeNode
             return isOnline;
         }
 
-        public boolean isHidden() {
-            return isHidden;
+        private boolean isVisible() {
+            return visible;
         }
 
-        public void setHidden(boolean isHidden) {
-            this.isHidden = isHidden;
+        private void setVisible(boolean visible) {
+            this.visible = visible;
         }
 
         public void setOnline(boolean isOnline) {
@@ -219,4 +305,7 @@ public class ContactTreeRootNode extends DefaultMutableTreeNode
         }
     }
 
+    private static JID toBareJID(String jid) {
+        return new JID(jid).getBareJID();
+    }
 }

@@ -18,6 +18,7 @@ import org.picocontainer.annotations.Inject;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,8 +27,8 @@ import java.util.Map;
  * Session tree root node.
  */
 public class SessionTreeRootNode extends DefaultMutableTreeNode {
-    public static final String TREE_TITLE = "Sessions";
-    public static final String TREE_TITLE_NO_SESSIONS = "No Sessions Running";
+    public static final String TREE_TITLE = "Session";
+    public static final String TREE_TITLE_NO_SESSIONS = "No Session Running";
 
     private final SessionAndContactsTreeView treeView;
     private final Map<ISarosSession, DefaultMutableTreeNode> sessionNodeList = new HashMap<ISarosSession, DefaultMutableTreeNode>();
@@ -122,9 +123,12 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
 
         setUserObject(TREE_TITLE);
 
+        // userJoined is not fired for the host
         if (!newSarosSession.isHost()) {
-            addUserNode(newSarosSession.getLocalUser());
+            addUserNode(newSarosSession.getHost());
         }
+
+        addUserNode(newSarosSession.getLocalUser());
 
         treeView.expandRow(1);
     }
@@ -177,58 +181,49 @@ public class SessionTreeRootNode extends DefaultMutableTreeNode {
         treeModel.insertNodeInto(nUser, this, getChildCount());
 
         treeView.getContactTreeRootNode()
-            .hideContact(user.getJID().getBareJID().toString());
+            .hideContact(user.getJID());
 
         treeModel.reload(this);
     }
 
     private void removeUserNode(User user) {
-        DefaultMutableTreeNode nUser = userNodeList.get(user);
-        if (nUser != null) {
-            remove(nUser);
-            userNodeList.remove(user);
+        DefaultMutableTreeNode nUser = userNodeList.remove(user);
 
-            treeView.getContactTreeRootNode()
-                .showContact(user.getJID().getBareJID().toString());
+        if (nUser == null)
+            return;
 
-            treeModel.reload();
-        }
-
+        remove(nUser);
+        treeView.getContactTreeRootNode().showContact(user.getJID());
+        treeModel.reload();
     }
 
     private void removeAllUserNodes() {
-        for (DefaultMutableTreeNode nUser : userNodeList.values()) {
-            removeUserNode(((UserInfo) nUser.getUserObject()).getUser());
-        }
+        List<DefaultMutableTreeNode> userNodesToRemove = new ArrayList<>(userNodeList.values());
 
-        userNodeList.clear();
+        for (DefaultMutableTreeNode userNode : userNodesToRemove)
+            removeUserNode(((UserInfo) userNode.getUserObject()).getUser());
+
+        assert userNodeList.isEmpty();
     }
 
     protected class SessionInfo extends LeafInfo {
         private final ISarosSession session;
 
         private SessionInfo(ISarosSession session) {
-            super(ModelFormatUtils.getDisplayName(session.getHost()),
-                IconManager.CONTACT_ONLINE_ICON);
+            super("Shared Modules and Projects");
             this.session = session;
         }
 
         public ISarosSession getSession() {
             return session;
         }
-
-        @Override
-        public String toString() {
-            return "Host " + title;
-        }
-
     }
 
     protected class UserInfo extends LeafInfo {
         private final User user;
 
         public UserInfo(User user) {
-            super(ModelFormatUtils.getDisplayName(user),
+            super((user.isHost() ? "Host " : "") + ModelFormatUtils.getDisplayName(user),
                 IconManager.CONTACT_ONLINE_ICON);
             this.user = user;
         }
