@@ -1,18 +1,13 @@
 package de.fu_berlin.inf.dpp.editor.internal;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
@@ -42,7 +37,6 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.text.LineRange;
 import de.fu_berlin.inf.dpp.editor.text.TextSelection;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
@@ -53,16 +47,12 @@ import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
 /**
- * The central implementation of the IEditorAPI which basically encapsulates the
- * interaction with the TextEditor.
+ * Collection of helper methods to interact with the Eclipse IDE and its
+ * editors.
  * 
  * @swt Pretty much all methods in this class need to be called from SWT
- * 
- * @author rdjemili
- * 
  */
-@Component(module = "core")
-public class EditorAPI implements IEditorAPI {
+public class EditorAPI {
 
     private static final Logger LOG = Logger.getLogger(EditorAPI.class);
 
@@ -81,7 +71,7 @@ public class EditorAPI implements IEditorAPI {
         ITextEditorActionConstants.SHIFT_RIGHT,
         ITextEditorActionConstants.SHIFT_RIGHT_TAB };
 
-    protected final VerifyKeyListener keyVerifier = new VerifyKeyListener() {
+    private static final VerifyKeyListener keyVerifier = new VerifyKeyListener() {
         @Override
         public void verifyKey(VerifyEvent event) {
             if (event.character > 0) {
@@ -103,20 +93,18 @@ public class EditorAPI implements IEditorAPI {
         }
     };
 
+    private static boolean warnOnceExternalEditor = true;
+
     /**
-     * Editors where the user isn't allowed to write
+     * Opens the editor with given path. Needs to be called from an UI thread.
+     * 
+     * @param activate
+     *            <code>true</code>, if editor should get focus, otherwise
+     *            <code>false</code>
+     * @return the opened editor or <code>null</code> if the editor couldn't be
+     *         opened.
      */
-    private final List<IEditorPart> lockedEditors = new ArrayList<IEditorPart>();
-
-    private boolean warnOnceExternalEditor = true;
-
-    @Override
-    public IEditorPart openEditor(SPath path) {
-        return openEditor(path, true);
-    }
-
-    @Override
-    public IEditorPart openEditor(SPath path, boolean activate) {
+    public static IEditorPart openEditor(SPath path, boolean activate) {
         IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
 
         if (!file.exists()) {
@@ -179,8 +167,15 @@ public class EditorAPI implements IEditorAPI {
         return null;
     }
 
-    @Override
-    public boolean openEditor(IEditorPart part) {
+    /**
+     * Opens the given editor part.
+     * 
+     * Needs to be called from an UI thread.
+     * 
+     * @return <code>true</code> if the editor part was successfully opened,
+     *         <code>false</code> otherwise
+     */
+    public static boolean openEditor(IEditorPart part) {
         IWorkbenchWindow window = getActiveWindow();
 
         if (window == null)
@@ -197,14 +192,20 @@ public class EditorAPI implements IEditorAPI {
         return false;
     }
 
-    @Override
-    public void closeEditor(IEditorPart part) {
+    /**
+     * Closes the given editor part.
+     * 
+     * Needs to be called from an UI thread.
+     */
+    public static void closeEditor(IEditorPart part) {
         IWorkbenchWindow window = getActiveWindow();
-        if (window != null) {
-            IWorkbenchPage page = window.getActivePage();
-            page.closeEditor(part, true); // Close AND let user decide if saving
-            // is necessary
-        }
+
+        if (window == null)
+            return;
+
+        IWorkbenchPage page = window.getActivePage();
+        // Close AND let user decide if saving is necessary
+        page.closeEditor(part, true);
     }
 
     /**
@@ -219,40 +220,13 @@ public class EditorAPI implements IEditorAPI {
      * @swt
      */
     public static Set<IEditorPart> getOpenEditors() {
-        return getOpenEditors(true);
-    }
-
-    /**
-     * If <code>restore</code> is <code>true</code>, this method will ask
-     * Eclipse to restore editors which have not been loaded yet, and must be
-     * run in the SWT thread. If false, only editors which are already loaded
-     * are returned.
-     * 
-     * @param restore
-     * @return
-     * @see EditorAPI#getOpenEditors()
-     */
-    private static Set<IEditorPart> getOpenEditors(boolean restore) {
         Set<IEditorPart> editorParts = new HashSet<IEditorPart>();
 
-        IWorkbenchWindow[] windows = getWindows();
-
-        for (IWorkbenchWindow window : windows) {
-            IWorkbenchPage[] pages = window.getPages();
-
-            for (IWorkbenchPage page : pages) {
-                IEditorReference[] editorRefs = page.getEditorReferences();
-
-                for (IEditorReference reference : editorRefs) {
-
+        for (IWorkbenchWindow window : PlatformUI.getWorkbench()
+            .getWorkbenchWindows()) {
+            for (IWorkbenchPage page : window.getPages()) {
+                for (IEditorReference reference : page.getEditorReferences()) {
                     IEditorPart editorPart = reference.getEditor(false);
-
-                    /*
-                     * FIXME calling this with restore = false will always
-                     * return an empty set
-                     */
-                    if (!restore)
-                        continue;
 
                     if (editorPart == null) {
                         LOG.debug("editor part needs to be restored: "
@@ -274,8 +248,10 @@ public class EditorAPI implements IEditorAPI {
         return editorParts;
     }
 
-    @Override
-    public IEditorPart getActiveEditor() {
+    /**
+     * @return the editor that is currently activated.
+     */
+    public static IEditorPart getActiveEditor() {
         final IWorkbenchWindow window = getActiveWindow();
 
         if (window == null)
@@ -286,11 +262,14 @@ public class EditorAPI implements IEditorAPI {
         return page != null ? page.getActiveEditor() : null;
     }
 
-    @Override
-    public IResource getEditorResource(IEditorPart editorPart) {
-
+    /**
+     * Returns the resource currently displayed in the given editorPart.
+     * 
+     * @return Can be <code>null</code>, e.g. if the given editorPart is not
+     *         operating on a resource, or has several resources.
+     */
+    public static IResource getEditorResource(IEditorPart editorPart) {
         IEditorInput input = editorPart.getEditorInput();
-
         IResource resource = ResourceUtil.getResource(input);
 
         if (resource == null) {
@@ -301,9 +280,17 @@ public class EditorAPI implements IEditorAPI {
         return resource;
     }
 
-    @Override
-    public TextSelection getSelection(IEditorPart editorPart) {
-
+    /**
+     * Returns the current text selection for given editor.
+     * 
+     * @param editorPart
+     *            the editorPart for which to get the text selection.
+     * @return the current text selection. Returns
+     *         {@link TextSelection#emptySelection()} if no text selection
+     *         exists.
+     * 
+     */
+    public static TextSelection getSelection(IEditorPart editorPart) {
         if (!(editorPart instanceof ITextEditor)) {
             return TextSelection.emptySelection();
         }
@@ -318,36 +305,28 @@ public class EditorAPI implements IEditorAPI {
 
         ITextSelection jfaceSelection = (ITextSelection) selectionProvider
             .getSelection();
+
         return new TextSelection(jfaceSelection.getOffset(),
             jfaceSelection.getLength());
     }
 
-    @Override
-    public void setEditable(final IEditorPart editorPart,
-        final boolean newIsEditable) {
+    /**
+     * Enables/disables the ability to edit the document in given editor.
+     */
+    public static void setEditable(final IEditorPart editorPart,
+        final boolean isEditable) {
 
-        ITextViewer textViewer = EditorAPI.getViewer(editorPart);
+        ITextViewer textViewer = getViewer(editorPart);
 
         if (textViewer == null)
             return;
 
-        boolean isEditable = !lockedEditors.contains(editorPart);
-
-        // Already as we want it?
-        if (newIsEditable == isEditable)
-            return;
-
-        LOG.trace(editorPart.getEditorInput().getName() + " set to editable: "
-            + newIsEditable);
-
-        updateStatusLine(editorPart, newIsEditable);
-
-        if (newIsEditable) {
-            lockedEditors.remove(editorPart);
+        if (isEditable) {
+            updateStatusLine(editorPart, "");
 
             if (textViewer instanceof ITextViewerExtension)
                 ((ITextViewerExtension) textViewer)
-                    .removeVerifyKeyListener(EditorAPI.this.keyVerifier);
+                    .removeVerifyKeyListener(keyVerifier);
 
             textViewer.setEditable(true);
             setEditorActionState(editorPart, true);
@@ -358,11 +337,11 @@ public class EditorAPI implements IEditorAPI {
                     .setMaximalUndoLevel(200);
 
         } else {
-            lockedEditors.add(editorPart);
+            updateStatusLine(editorPart, "Not editable");
 
             if (textViewer instanceof ITextViewerExtension)
                 ((ITextViewerExtension) textViewer)
-                    .prependVerifyKeyListener(EditorAPI.this.keyVerifier);
+                    .prependVerifyKeyListener(keyVerifier);
 
             textViewer.setEditable(false);
             setEditorActionState(editorPart, false);
@@ -374,7 +353,13 @@ public class EditorAPI implements IEditorAPI {
         }
     }
 
+    /**
+     * @return Return the viewport for viewer, <code>null</code> if no viewer is
+     *         given
+     */
     public static LineRange getViewport(ITextViewer viewer) {
+        if (viewer == null)
+            return null;
 
         int top = viewer.getTopIndex();
         // Have to add +1 because a LineRange should excludes the bottom line
@@ -391,22 +376,14 @@ public class EditorAPI implements IEditorAPI {
         return new LineRange(top, bottom - top);
     }
 
-    @Override
-    public LineRange getViewport(IEditorPart editorPart) {
-
-        ITextViewer textViewer = EditorAPI.getViewer(editorPart);
-        if (textViewer == null)
-            return null;
-
-        return getViewport(textViewer);
-    }
-
-    private void updateStatusLine(IEditorPart editorPart, boolean editable) {
+    public static void updateStatusLine(IEditorPart editorPart, String status) {
         Object adapter = editorPart.getAdapter(IEditorStatusLine.class);
-        if (adapter != null) {
-            IEditorStatusLine statusLine = (IEditorStatusLine) adapter;
-            statusLine.setMessage(false, editable ? "" : "Not editable", null);
-        }
+
+        if (adapter == null)
+            return;
+
+        IEditorStatusLine statusLine = (IEditorStatusLine) adapter;
+        statusLine.setMessage(false, status, null);
     }
 
     /**
@@ -418,13 +395,9 @@ public class EditorAPI implements IEditorAPI {
      *         {@link TextViewer} for the editorPart.
      */
     public static ITextViewer getViewer(IEditorPart editorPart) {
-
         Object viewer = editorPart.getAdapter(ITextOperationTarget.class);
-        if (viewer instanceof ITextViewer) {
-            return (ITextViewer) viewer;
-        } else {
-            return null;
-        }
+
+        return (viewer instanceof ITextViewer) ? (ITextViewer) viewer : null;
     }
 
     /**
@@ -439,84 +412,94 @@ public class EditorAPI implements IEditorAPI {
         try {
             return PlatformUI.getWorkbench().getActiveWorkbenchWindow();
         } catch (Exception e) {
+            LOG.error("could not get active window", e);
             return null;
         }
-    }
-
-    private static IWorkbenchWindow[] getWindows() {
-        return PlatformUI.getWorkbench().getWorkbenchWindows();
     }
 
     /**
-     * Saves the given project and returns true if the operation was successful
-     * or false if the user canceled.
-     * 
-     * TODO Tell the user why we do want to save!
-     * 
-     * @param confirm
-     *            true to ask the user before saving unsaved changes, and false
-     *            to save unsaved changes without asking
+     * @return the path of the file the given editor is displaying or null if
+     *         the given editor is not showing a file or the file is not
+     *         referenced via a path in the project.
      */
-    public static boolean saveProject(final IProject projectToSave,
-        final boolean confirm) {
-        try {
-            Boolean result = true;
-            result = SWTUtils.runSWTSync(new Callable<Boolean>() {
-                @Override
-                public Boolean call() throws Exception {
-                    /**
-                     * TODO saveAllEditors does not save the Documents that we
-                     * are modifying in the background
-                     */
-                    return IDE.saveAllEditors(
-                        new IResource[] { projectToSave }, confirm);
-                }
-            });
-            return result;
-        } catch (Exception e) {
-            // The operation does not throw an exception, thus this is an error.
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public SPath getActiveEditorPath() {
-        IEditorPart newActiveEditor = getActiveEditor();
-        if (newActiveEditor == null)
-            return null;
-
-        return getEditorPath(newActiveEditor);
-    }
-
-    @Override
-    public SPath getEditorPath(IEditorPart editorPart) {
+    public static SPath getEditorPath(IEditorPart editorPart) {
         IResource resource = getEditorResource(editorPart);
-        if (resource == null) {
-            return null;
-        }
 
-        IPath path = resource.getProjectRelativePath();
-
-        if (path == null) {
-            LOG.warn("could not get path from resource " + resource);
-        }
-
-        return new SPath(ResourceAdapterFactory.create(resource));
+        return (resource == null) ? null : new SPath(
+            ResourceAdapterFactory.create(resource));
     }
 
-    @Override
-    public IDocumentProvider getDocumentProvider(final IEditorInput input) {
+    /**
+     * Returns the {@link IDocumentProvider} of the given {@link IEditorInput}.
+     * This method analyzes the file extension of the {@link IFile} associated
+     * with the given {@link IEditorInput}. Depending on the file extension it
+     * returns file-types responsible {@link IDocumentProvider}.
+     * 
+     * @param input
+     *            the {@link IEditorInput} for which {@link IDocumentProvider}
+     *            is needed
+     * 
+     * @return IDocumentProvider of the given input
+     */
+    public static IDocumentProvider getDocumentProvider(final IEditorInput input) {
         return DocumentProviderRegistry.getDefault().getDocumentProvider(input);
     }
 
-    @Override
-    public IDocument getDocument(final IEditorPart editorPart) {
-        final IEditorInput input = editorPart.getEditorInput();
+    /**
+     * Can be called instead of {@link #getDocumentProvider(IEditorInput)} and
+     * {@link IDocumentProvider#connect(Object) provider.connect()} in a
+     * try-catch block. This method logs an error in case of an Exception and
+     * returns <code>null</code>. Otherwise, it returns the connected provider.
+     * <p>
+     * Example usage:
+     * 
+     * <pre>
+     * <code>
+     * IDocumentProvider provider = EditorAPI.connect(editorInput)
+     * 
+     * if (provider == null) {
+     *  doErrorHandling 
+     *  return;
+     * }
+     * 
+     * try {
+     *  doLogic
+     * }
+     * finally {
+     *  provider.disconnect(editorInput);
+     * }
+     * </code>
+     * </pre>
+     */
+    public static IDocumentProvider connect(IEditorInput input) {
+        IDocumentProvider provider = getDocumentProvider(input);
+        try {
+            provider.connect(input);
+        } catch (CoreException e) {
+            LOG.error("could not connect to document provider for file: "
+                + input.getName(), e);
+            return null;
+        }
 
-        return getDocumentProvider(input).getDocument(input);
+        return provider;
     }
 
-    private void setEditorActionState(final IEditorPart editorPart,
+    /**
+     * Can be called instead of {@link #getDocumentProvider(IEditorInput)} and
+     * {@link IDocumentProvider#disconnect(Object) provider.disconnect()}, in
+     * case there is no {@link IDocumentProvider} instance at hand (e.g. if
+     * <code>connect()</code> and <code>disconnect()</code> are called in
+     * different contexts).
+     * 
+     */
+    public static void disconnect(IEditorInput input) {
+        IDocumentProvider documentProvider = EditorAPI
+            .getDocumentProvider(input);
+
+        documentProvider.disconnect(input);
+    }
+
+    private static void setEditorActionState(final IEditorPart editorPart,
         final boolean enabled) {
 
         final ITextEditor editor = (ITextEditor) editorPart

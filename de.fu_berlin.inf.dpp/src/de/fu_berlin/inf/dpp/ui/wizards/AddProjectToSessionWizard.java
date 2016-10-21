@@ -81,9 +81,6 @@ public class AddProjectToSessionWizard extends Wizard {
     private boolean isExceptionCancel;
 
     @Inject
-    private EditorAPI editorAPI;
-
-    @Inject
     private IChecksumCache checksumCache;
 
     @Inject
@@ -284,7 +281,7 @@ public class AddProjectToSessionWizard extends Wizard {
                              * close all editors to avoid any conflicts.
                              */
                             for (final IEditorPart editor : editorsToClose)
-                                editorAPI.closeEditor(editor);
+                                EditorAPI.closeEditor(editor);
 
                         }
                     });
@@ -354,7 +351,7 @@ public class AddProjectToSessionWizard extends Wizard {
                             for (IEditorPart editor : editorsToClose) {
                                 if (((IFileEditorInput) editor.getEditorInput())
                                     .getFile().exists())
-                                    editorAPI.openEditor(editor);
+                                    EditorAPI.openEditor(editor);
                             }
                         }
                     });

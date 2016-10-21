@@ -51,7 +51,6 @@ import de.fu_berlin.inf.dpp.editor.internal.AnnotationModelHelper;
 import de.fu_berlin.inf.dpp.editor.internal.ContributionAnnotationManager;
 import de.fu_berlin.inf.dpp.editor.internal.CustomAnnotationManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.LocationAnnotationManager;
 import de.fu_berlin.inf.dpp.editor.internal.SafePartListener2;
 import de.fu_berlin.inf.dpp.editor.remote.EditorState;
@@ -84,8 +83,7 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
  * Eclipse implementation of the {@link IEditorManager} interface.
  * <p>
  * The EditorManager contains the testable logic. All untestable logic should
- * only appear in a class of the {@link IEditorAPI} type. (CO: This is the
- * theory at least)
+ * only appear in {@link EditorAPI}.
  * 
  * @author rdjemili
  * 
@@ -113,8 +111,6 @@ public class EditorManager extends AbstractActivityProducer implements
      */
 
     private static final Logger LOG = Logger.getLogger(EditorManager.class);
-
-    private final IEditorAPI editorAPI;
 
     boolean hasWriteAccess;
 
@@ -371,13 +367,12 @@ public class EditorManager extends AbstractActivityProducer implements
                             partOpened(editorPart);
                     }
 
-                    IEditorPart activeEditor = editorAPI.getActiveEditor();
-                    if (activeEditor != null) {
-                        locallyActiveEditor = editorAPI
-                            .getEditorPath(activeEditor);
-                        partActivated(activeEditor);
-                    }
+                    IEditorPart activeEditor = EditorAPI.getActiveEditor();
+                    if (activeEditor == null)
+                        return;
 
+                    locallyActiveEditor = EditorAPI.getEditorPath(activeEditor);
+                    partActivated(activeEditor);
                 }
             });
         }
@@ -430,12 +425,11 @@ public class EditorManager extends AbstractActivityProducer implements
     };
 
     public EditorManager(ISarosSessionManager sessionManager,
-        EditorAPI editorAPI, IPreferenceStore preferenceStore) {
+        IPreferenceStore preferenceStore) {
 
-        this.editorAPI = editorAPI;
         this.preferenceStore = preferenceStore;
 
-        editorPool = new EditorPool(this, editorAPI);
+        editorPool = new EditorPool(this);
         partListener = new SafePartListener2(LOG, new EditorPartListener(this));
 
         registerCustomAnnotations();
@@ -459,7 +453,6 @@ public class EditorManager extends AbstractActivityProducer implements
      * 
      */
     void connect(final IFile file) {
-
         if (!file.isAccessible()) {
             LOG.error(".connect(): file " + file + " could not be accessed");
             return;
@@ -472,22 +465,12 @@ public class EditorManager extends AbstractActivityProducer implements
             return;
         }
 
-        FileEditorInput input = new FileEditorInput(file);
-        IDocumentProvider documentProvider = editorAPI
-            .getDocumentProvider(input);
-
-        try {
-            documentProvider.connect(input);
-        } catch (CoreException e) {
-            LOG.error("could not connect to document provider for file: "
-                + file, e);
+        if (EditorAPI.connect(new FileEditorInput(file)) != null) {
+            connectedFiles.add(file);
         }
-
-        connectedFiles.add(file);
     }
 
     void disconnect(final IFile file) {
-
         LOG.trace(".disconnect(" + file + ") invoked");
 
         if (!isManaged(file)) {
@@ -495,13 +478,7 @@ public class EditorManager extends AbstractActivityProducer implements
             return;
         }
 
-        FileEditorInput input = new FileEditorInput(file);
-
-        IDocumentProvider documentProvider = editorAPI
-            .getDocumentProvider(input);
-
-        documentProvider.disconnect(input);
-
+        EditorAPI.disconnect(new FileEditorInput(file));
         connectedFiles.remove(file);
     }
 
@@ -523,30 +500,18 @@ public class EditorManager extends AbstractActivityProducer implements
     private String doGetContent(SPath path) {
         IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
         FileEditorInput input = new FileEditorInput(file);
-        IDocumentProvider provider = null;
-        String content;
 
-        try {
-            provider = editorAPI.getDocumentProvider(input);
-            provider.connect(input);
-            IDocument doc = provider.getDocument(input);
-            content = (doc != null) ? doc.get() : null;
-        } catch (CoreException e) {
-            LOG.warn("Failed to retrieve the content of " + path, e);
-            content = null;
+        IDocumentProvider provider = EditorAPI.connect(input);
 
-            /*
-             * A CoreException means that the provider.connect(input) call
-             * failed. Because the connect() didn't receive, we avoid calling
-             * disconnect() in the finally block by setting the provider
-             * variable to null.
-             */
-            provider = null;
-
-        } finally {
-            if (provider != null)
-                provider.disconnect(input);
+        if (provider == null) {
+            LOG.warn("Failed to retrieve the content of " + path);
+            return null;
         }
+
+        IDocument doc = provider.getDocument(input);
+        String content = (doc != null) ? doc.get() : null;
+
+        provider.disconnect(input);
 
         return content;
     }
@@ -621,7 +586,7 @@ public class EditorManager extends AbstractActivityProducer implements
             return;
         }
 
-        SPath path = editorAPI.getEditorPath(part);
+        SPath path = EditorAPI.getEditorPath(part);
         if (path == null) {
             LOG.warn("Could not find path for editor " + part.getTitle());
             return;
@@ -651,7 +616,7 @@ public class EditorManager extends AbstractActivityProducer implements
      */
     void generateSelection(IEditorPart part, TextSelection newSelection) {
 
-        SPath path = editorAPI.getEditorPath(part);
+        SPath path = EditorAPI.getEditorPath(part);
         if (path == null) {
             LOG.warn("Could not find path for editor " + part.getTitle());
             return;
@@ -700,7 +665,10 @@ public class EditorManager extends AbstractActivityProducer implements
         // FIXME: This is potentially slow and definitely ugly
         // search editor which changed
         for (IEditorPart editor : editorPool.getAllEditors()) {
-            if (ObjectUtils.equals(editorAPI.getDocument(editor), document)) {
+            IEditorInput input = editor.getEditorInput();
+
+            if (ObjectUtils.equals(EditorAPI.getDocumentProvider(input)
+                .getDocument(input), document)) {
                 changedEditor = editor;
                 break;
             }
@@ -711,7 +679,7 @@ public class EditorManager extends AbstractActivityProducer implements
             return;
         }
 
-        SPath path = editorAPI.getEditorPath(changedEditor);
+        SPath path = EditorAPI.getEditorPath(changedEditor);
         if (path == null) {
             LOG.warn("Could not find path for editor "
                 + changedEditor.getTitle());
@@ -758,7 +726,7 @@ public class EditorManager extends AbstractActivityProducer implements
          * TODO Investigate if this is really needed here
          */
         IEditorInput input = changedEditor.getEditorInput();
-        IDocumentProvider provider = editorAPI.getDocumentProvider(input);
+        IDocumentProvider provider = EditorAPI.getDocumentProvider(input);
         IAnnotationModel model = provider.getAnnotationModel(input);
         contributionAnnotationManager.splitAnnotation(model, offset);
     }
@@ -875,7 +843,7 @@ public class EditorManager extends AbstractActivityProducer implements
             @Override
             public void run() {
                 for (IEditorPart part : editorPool.getEditors(path)) {
-                    editorAPI.closeEditor(part);
+                    EditorAPI.closeEditor(part);
                 }
             }
         });
@@ -897,7 +865,7 @@ public class EditorManager extends AbstractActivityProducer implements
          * the editor having been closed (for instance outside of Eclipse).
          * Others might be confused about if they receive this editor from us.
          */
-        final IResource resource = editorAPI.getEditorResource(editorPart);
+        final IResource resource = EditorAPI.getEditorResource(editorPart);
 
         if (!resource.isAccessible()) {
             LOG.warn(".partOpened resource: " + resource + " is not accessible");
@@ -946,22 +914,24 @@ public class EditorManager extends AbstractActivityProducer implements
 
         // Is the new editor part supported by Saros (and inside the project)
         // and the Resource accessible (we don't want to report stale files)?
-        IResource resource = editorAPI.getEditorResource(editorPart);
+        IResource resource = EditorAPI.getEditorResource(editorPart);
 
         if (!isSharedEditor(editorPart)
             || !session.isShared(ResourceAdapterFactory.create(resource))
-            || !editorAPI.getEditorResource(editorPart).isAccessible()) {
+            || !EditorAPI.getEditorResource(editorPart).isAccessible()) {
             generateEditorActivated(null);
             return;
         }
 
-        SPath editorPath = editorAPI.getEditorPath(editorPart);
-        LineRange viewport = editorAPI.getViewport(editorPart);
-        TextSelection selection = editorAPI.getSelection(editorPart);
+        SPath editorPath = EditorAPI.getEditorPath(editorPart);
+        TextSelection selection = EditorAPI.getSelection(editorPart);
 
         // Set (and thus send) in this order:
         generateEditorActivated(editorPath);
         generateSelection(editorPart, selection);
+
+        ITextViewer viewer = EditorAPI.getViewer(editorPart);
+        LineRange viewport = EditorAPI.getViewport(viewer);
 
         if (viewport == null) {
             LOG.warn("Shared Editor does not have a Viewport: " + editorPart);
@@ -969,11 +939,8 @@ public class EditorManager extends AbstractActivityProducer implements
             generateViewport(editorPart, viewport);
         }
 
-        ITextViewer viewer = EditorAPI.getViewer(editorPart);
-
         if (viewer instanceof ISourceViewer)
             customAnnotationManager.installPainter((ISourceViewer) viewer);
-
     }
 
     /**
@@ -1024,7 +991,7 @@ public class EditorManager extends AbstractActivityProducer implements
             return;
         }
 
-        SPath path = editorAPI.getEditorPath(editorPart);
+        SPath path = EditorAPI.getEditorPath(editorPart);
 
         partClosedOfPath(editorPart, path);
     }
@@ -1051,7 +1018,7 @@ public class EditorManager extends AbstractActivityProducer implements
         // Check if the currently active editor is closed
         boolean newActiveEditor = path.equals(this.locallyActiveEditor);
         if (newActiveEditor) {
-            partActivated(editorAPI.getActiveEditor());
+            partActivated(EditorAPI.getActiveEditor());
         }
     }
 
@@ -1078,7 +1045,7 @@ public class EditorManager extends AbstractActivityProducer implements
      */
     public boolean isActiveEditorShared() {
         checkThreadAccess();
-        IEditorPart editorPart = editorAPI.getActiveEditor();
+        IEditorPart editorPart = EditorAPI.getActiveEditor();
         return editorPart == null ? false : isSharedEditor(editorPart);
     }
 
@@ -1099,7 +1066,7 @@ public class EditorManager extends AbstractActivityProducer implements
         if (EditorAPI.getViewer(editorPart) == null)
             return false;
 
-        final IResource resource = editorAPI.getEditorResource(editorPart);
+        final IResource resource = EditorAPI.getEditorResource(editorPart);
 
         if (resource == null)
             return false;
@@ -1134,14 +1101,9 @@ public class EditorManager extends AbstractActivityProducer implements
 
         IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
         FileEditorInput input = new FileEditorInput(file);
-        IDocumentProvider provider = editorAPI.getDocumentProvider(input);
+        IDocumentProvider provider = EditorAPI.connect(input);
 
-        try {
-            provider.connect(input);
-        } catch (CoreException e) {
-            LOG.error(
-                "Could not connect document provider for file: "
-                    + file.toString(), e);
+        if (provider == null) {
             // TODO Trigger a consistency recovery
             return;
         }
@@ -1157,7 +1119,6 @@ public class EditorManager extends AbstractActivityProducer implements
 
             // Check if the replaced text is really there.
             if (LOG.isDebugEnabled()) {
-
                 String is;
                 try {
                     is = doc.get(offset, replacedText.length());
@@ -1194,6 +1155,7 @@ public class EditorManager extends AbstractActivityProducer implements
                         offset, text.length(), source);
                 }
             }
+
             IAnnotationModel model = provider.getAnnotationModel(input);
             contributionAnnotationManager.insertAnnotation(model, offset,
                 text.length(), source);
@@ -1249,7 +1211,7 @@ public class EditorManager extends AbstractActivityProducer implements
 
         FileEditorInput input = new FileEditorInput(file);
 
-        return editorAPI.getDocumentProvider(input).canSaveDocument(input);
+        return EditorAPI.getDocumentProvider(input).canSaveDocument(input);
     }
 
     /**
@@ -1285,7 +1247,10 @@ public class EditorManager extends AbstractActivityProducer implements
         }
 
         FileEditorInput input = new FileEditorInput(file);
-        IDocumentProvider provider = editorAPI.getDocumentProvider(input);
+        IDocumentProvider provider = EditorAPI.connect(input);
+
+        if (provider == null)
+            return;
 
         if (!provider.canSaveDocument(input)) {
             /*
@@ -1294,18 +1259,11 @@ public class EditorManager extends AbstractActivityProducer implements
              */
             LOG.debug(".saveEditor File " + file.getName()
                 + " does not need to be saved");
+            provider.disconnect(input);
             return;
         }
 
         LOG.trace(".saveEditor File " + file.getName() + " will be saved");
-
-        try {
-            provider.connect(input);
-        } catch (CoreException e) {
-            LOG.error("Could not connect to a document provider on file '"
-                + file.toString() + "':", e);
-            return;
-        }
 
         final boolean isConnected = isManaged(file);
 
@@ -1317,35 +1275,33 @@ public class EditorManager extends AbstractActivityProducer implements
         if (!isConnected)
             connect(file);
 
+        IDocument doc = provider.getDocument(input);
+
+        // TODO Why do we need to connect to the annotation model here?
+        IAnnotationModel model = provider.getAnnotationModel(input);
+        if (model != null)
+            model.connect(doc);
+
+        LOG.trace(".saveEditor Annotations on the IDocument are set");
+
+        editorPool.setElementStateListenerEnabled(false);
+
         try {
-            IDocument doc = provider.getDocument(input);
-
-            // TODO Why do we need to connect to the annotation model here?
-            IAnnotationModel model = provider.getAnnotationModel(input);
-            if (model != null)
-                model.connect(doc);
-
-            LOG.trace(".saveEditor Annotations on the IDocument are set");
-
-            editorPool.setElementStateListenerEnabled(false);
-
-            try {
-                provider.saveDocument(new NullProgressMonitor(), input, doc,
-                    true);
-                LOG.debug("Saved document: " + path);
-            } catch (CoreException e) {
-                LOG.error("Failed to save document: " + path, e);
-            }
-
-            editorPool.setElementStateListenerEnabled(true);
-
-            if (model != null)
-                model.disconnect(doc);
-        } finally {
-            provider.disconnect(input);
-            if (!isConnected)
-                disconnect(file);
+            provider.saveDocument(new NullProgressMonitor(), input, doc, true);
+            LOG.debug("Saved document: " + path);
+        } catch (CoreException e) {
+            LOG.error("Failed to save document: " + path, e);
         }
+
+        editorPool.setElementStateListenerEnabled(true);
+
+        if (model != null)
+            model.disconnect(doc);
+
+        provider.disconnect(input);
+
+        if (!isConnected)
+            disconnect(file);
     }
 
     /**
@@ -1416,7 +1372,7 @@ public class EditorManager extends AbstractActivityProducer implements
      */
     private void refreshAnnotations(IEditorPart editorPart) {
 
-        SPath path = editorAPI.getEditorPath(editorPart);
+        SPath path = EditorAPI.getEditorPath(editorPart);
         if (path == null) {
             LOG.warn("Could not find path for editor " + editorPart.getTitle());
             return;
@@ -1520,7 +1476,7 @@ public class EditorManager extends AbstractActivityProducer implements
             throw new IllegalArgumentException("path must not be null");
 
         for (IEditorPart editorPart : EditorAPI.getOpenEditors()) {
-            IResource resource = editorAPI.getEditorResource(editorPart);
+            IResource resource = EditorAPI.getEditorResource(editorPart);
 
             if (resource == null)
                 continue;
@@ -1545,7 +1501,7 @@ public class EditorManager extends AbstractActivityProducer implements
         SWTUtils.runSafeSWTSync(LOG, new Runnable() {
             @Override
             public void run() {
-                editorAPI.openEditor(path, activate);
+                EditorAPI.openEditor(path, activate);
             }
         });
     }
@@ -1616,7 +1572,7 @@ public class EditorManager extends AbstractActivityProducer implements
         SWTUtils.runSafeSWTSync(LOG, new Runnable() {
             @Override
             public void run() {
-                IEditorPart newEditor = editorAPI.openEditor(path);
+                IEditorPart newEditor = EditorAPI.openEditor(path, true);
                 if (newEditor == null) {
                     LOG.warn("editor for " + path + " couldn't be opened");
                     return;
@@ -1833,8 +1789,7 @@ public class EditorManager extends AbstractActivityProducer implements
         followModeManager = session.getComponent(FollowModeManager.class);
         userEditorStateManager = session
             .getComponent(UserEditorStateManager.class);
-        remoteWriteAccessManager = new RemoteWriteAccessManager(session,
-            editorAPI);
+        remoteWriteAccessManager = new RemoteWriteAccessManager(session);
 
         preferenceStore.addPropertyChangeListener(annotationPreferenceListener);
 

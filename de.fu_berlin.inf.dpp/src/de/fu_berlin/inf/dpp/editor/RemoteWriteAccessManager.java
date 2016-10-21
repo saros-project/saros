@@ -8,13 +8,11 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ui.part.FileEditorInput;
-import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
@@ -56,12 +54,8 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
 
     protected ISarosSession sarosSession;
 
-    protected final IEditorAPI editorAPI;
-
-    public RemoteWriteAccessManager(final ISarosSession sarosSession,
-        IEditorAPI editorAPI) {
+    public RemoteWriteAccessManager(final ISarosSession sarosSession) {
         this.sarosSession = sarosSession;
-        this.editorAPI = editorAPI;
         this.sarosSession.addListener(sessionListener);
     }
 
@@ -155,17 +149,9 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
             return;
         }
 
-        FileEditorInput input = new FileEditorInput(file);
-        IDocumentProvider provider = editorAPI.getDocumentProvider(input);
-        try {
-            provider.connect(input);
-        } catch (CoreException e) {
-            log.error("Could not connect to a document provider on file '"
-                + file.toString() + "':", e);
-            return;
+        if (EditorAPI.connect(new FileEditorInput(file)) != null) {
+            connectedUserWithWriteAccessFiles.add(path);
         }
-
-        connectedUserWithWriteAccessFiles.add(path);
     }
 
     /**
@@ -180,9 +166,7 @@ public class RemoteWriteAccessManager extends AbstractActivityConsumer {
         connectedUserWithWriteAccessFiles.remove(path);
 
         IFile file = ((EclipseFileImpl) path.getFile()).getDelegate();
-        FileEditorInput input = new FileEditorInput(file);
-        IDocumentProvider provider = editorAPI.getDocumentProvider(input);
-        provider.disconnect(input);
+        EditorAPI.disconnect(new FileEditorInput(file));
     }
 
     /**

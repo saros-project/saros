@@ -17,7 +17,6 @@ import de.fu_berlin.inf.dpp.communication.connection.Socks5ProxyResolver;
 import de.fu_berlin.inf.dpp.concurrent.undo.UndoManager;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.filesystem.ChecksumCacheImpl;
 import de.fu_berlin.inf.dpp.filesystem.EclipsePathFactory;
 import de.fu_berlin.inf.dpp.filesystem.EclipseWorkspaceImpl;
@@ -65,7 +64,6 @@ public class SarosEclipseContextFactory extends AbstractSarosContextFactory {
      */
     private final Component[] components = new Component[] {
         // Core Managers
-        Component.create(EditorAPI.class),
         Component.create(IEditorManager.class, EditorManager.class),
         // disabled because of privacy violations
         // see

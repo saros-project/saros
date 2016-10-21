@@ -8,7 +8,6 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.FollowModeManager;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
@@ -64,10 +63,6 @@ public abstract class StfRemoteObject implements Constants {
 
     protected VersionManager getVersionManager() {
         return context.getComponent(VersionManager.class);
-    }
-
-    protected EditorAPI getEditorAPI() {
-        return context.getComponent(EditorAPI.class);
     }
 
     protected Preferences getGlobalPreferences() {

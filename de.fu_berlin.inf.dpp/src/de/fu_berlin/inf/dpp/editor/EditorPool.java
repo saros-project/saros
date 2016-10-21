@@ -1,7 +1,9 @@
 package de.fu_berlin.inf.dpp.editor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -20,7 +22,6 @@ import org.eclipse.ui.texteditor.IElementStateListener;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 
@@ -54,7 +55,6 @@ final class EditorPool {
     }
 
     private final EditorManager editorManager;
-    private final IEditorAPI editorAPI;
 
     private final DirtyStateListener dirtyStateListener;
 
@@ -75,9 +75,13 @@ final class EditorPool {
 
     private final Map<IEditorPart, EditorListener> editorListeners = new HashMap<IEditorPart, EditorListener>();
 
-    EditorPool(EditorManager editorManager, IEditorAPI editorAPI) {
+    /**
+     * Editors where the user isn't allowed to write
+     */
+    private final List<IEditorPart> lockedEditors = new ArrayList<IEditorPart>();
+
+    EditorPool(EditorManager editorManager) {
         this.editorManager = editorManager;
-        this.editorAPI = editorAPI;
         this.dirtyStateListener = new DirtyStateListener(editorManager);
         this.documentListener = new StoppableDocumentListener(editorManager);
     }
@@ -104,7 +108,6 @@ final class EditorPool {
      * 
      */
     public void add(final IEditorPart editorPart) {
-
         LOG.trace("adding editor part " + editorPart + " ["
             + editorPart.getTitle() + "]");
 
@@ -141,16 +144,15 @@ final class EditorPool {
          * OMG ... either pull this call out of this class or access the
          * editorManager variables in a better manner
          */
-        editorAPI.setEditable(editorPart, editorManager.hasWriteAccess
+        setEditable(editorPart, editorManager.hasWriteAccess
             && !editorManager.isLocked);
 
-        final IDocumentProvider documentProvider = editorAPI
+        final IDocumentProvider documentProvider = EditorAPI
             .getDocumentProvider(input);
+
         dirtyStateListener.register(documentProvider, input);
-
-        final IDocument document = editorAPI.getDocument(editorPart);
-
-        document.addDocumentListener(documentListener);
+        documentProvider.getDocument(input).addDocumentListener(
+            documentListener);
 
         final SPath path = new SPath(ResourceAdapterFactory.create(file));
 
@@ -168,6 +170,24 @@ final class EditorPool {
         parts.add(editorPart);
     }
 
+    private void setEditable(IEditorPart editorPart, boolean newIsEditable) {
+        boolean isEditable = !lockedEditors.contains(editorPart);
+
+        // Already as we want it?
+        if (newIsEditable == isEditable)
+            return;
+
+        if (newIsEditable)
+            lockedEditors.remove(editorPart);
+        else
+            lockedEditors.add(editorPart);
+
+        LOG.trace(editorPart.getEditorInput().getName() + " set to editable: "
+            + newIsEditable);
+
+        EditorAPI.setEditable(editorPart, newIsEditable);
+    }
+
     /**
      * Returns the {@linkplain SPath path} for the corresponding editor.
      * 
@@ -175,7 +195,6 @@ final class EditorPool {
      *         editor is not managed by this pool
      */
     public SPath getPath(final IEditorPart editorPart) {
-
         if (!isManaged(editorPart))
             return null;
 
@@ -207,7 +226,6 @@ final class EditorPool {
      *            editorPart to be removed
      */
     public void remove(final IEditorPart editorPart) {
-
         LOG.trace("removing editor part " + editorPart + " ["
             + editorPart.getTitle() + "]");
 
@@ -223,11 +241,11 @@ final class EditorPool {
         final IFile file = inputRefs.file;
 
         // Unregister and unhook
-        editorAPI.setEditable(editorPart, true);
+        setEditable(editorPart, true);
 
         editorListeners.remove(editorPart).unbind();
 
-        final IDocumentProvider documentProvider = editorAPI
+        final IDocumentProvider documentProvider = EditorAPI
             .getDocumentProvider(input);
 
         dirtyStateListener.unregister(documentProvider, input);
@@ -258,7 +276,6 @@ final class EditorPool {
      * 
      */
     public Set<IEditorPart> getEditors(final SPath path) {
-
         final HashSet<IEditorPart> result = new HashSet<IEditorPart>();
 
         if (editorParts.containsKey(path))
@@ -274,7 +291,6 @@ final class EditorPool {
      * 
      */
     public Set<IEditorPart> getAllEditors() {
-
         final Set<IEditorPart> result = new HashSet<IEditorPart>();
 
         for (final Set<IEditorPart> parts : editorParts.values())
@@ -287,7 +303,6 @@ final class EditorPool {
      * Removes all {@link IEditorPart} from the EditorPool.
      */
     public void removeAllEditors() {
-
         LOG.trace("removing all editors");
 
         for (final IEditorPart part : new HashSet<IEditorPart>(getAllEditors()))
@@ -300,15 +315,10 @@ final class EditorPool {
 
     /**
      * Changes the editable state of all editors currently managed by this pool.
-     * 
-     * @see IEditorAPI#setEditable(IEditorPart, boolean)
      */
     public void setEditable(final boolean editable) {
-
-        LOG.trace("changing editable state, editable=" + editable);
-
         for (final IEditorPart editorPart : getAllEditors())
-            editorAPI.setEditable(editorPart, editable);
+            setEditable(editorPart, editable);
     }
 
     /**

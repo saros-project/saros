@@ -16,7 +16,6 @@ import org.eclipse.core.commands.operations.IUndoableOperation;
 import org.eclipse.core.commands.operations.OperationHistoryEvent;
 import org.eclipse.core.commands.operations.OperationHistoryFactory;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -45,7 +44,7 @@ import de.fu_berlin.inf.dpp.concurrent.undo.OperationHistory.Type;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
-import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.filesystem.EclipseFileImpl;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
@@ -104,8 +103,6 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
     protected IUndoContext context = IOperationHistory.GLOBAL_UNDO_CONTEXT;
 
     protected EditorManager editorManager;
-
-    protected IEditorAPI editorAPI;
 
     protected SPath currentActiveEditor = null;
 
@@ -262,7 +259,8 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
 
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
-            newSarosSession.addActivityConsumer(UndoManager.this, Priority.ACTIVE);
+            newSarosSession.addActivityConsumer(UndoManager.this,
+                Priority.ACTIVE);
             undoHistory.clear();
             enabled = preferences.isConcurrentUndoActivated();
             eclipseHistory.addOperationApprover(operationBlocker);
@@ -397,7 +395,7 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
     };
 
     public UndoManager(ISarosSessionManager sessionManager,
-        EditorManager editorManager, IEditorAPI editorAPI) {
+        EditorManager editorManager) {
 
         if (log.isDebugEnabled())
             DefaultOperationHistory.DEBUG_OPERATION_HISTORY_APPROVAL = true;
@@ -412,8 +410,6 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
         this.editorManager = editorManager;
 
         editorManager.addSharedEditorListener(sharedEditorListener);
-
-        this.editorAPI = editorAPI;
     }
 
     // just for testing
@@ -543,17 +539,13 @@ public class UndoManager extends AbstractActivityConsumer implements Disposable 
             .getDelegate();
 
         FileEditorInput input = new FileEditorInput(file);
-        IDocumentProvider provider = editorAPI.getDocumentProvider(input);
+        IDocumentProvider provider = EditorAPI.connect(input);
 
-        try {
-            provider.connect(input);
-        } catch (CoreException e) {
-            log.error("Could not connect to a document provider on file '"
-                + file.toString() + "':", e);
+        if (provider == null)
             return;
-        }
 
         try {
+
             IDocument doc = provider.getDocument(input);
             if (doc == null) {
                 log.error("Could not connect to a document provider on file '"

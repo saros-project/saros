@@ -49,7 +49,6 @@ import de.fu_berlin.inf.dpp.ISarosContextBindings;
 import de.fu_berlin.inf.dpp.SarosCoreContextFactory;
 import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
@@ -270,7 +269,9 @@ public class SarosSessionTest {
         container.addComponent(ISarosSessionContextFactory.class,
             SarosEclipseSessionContextFactory.class);
 
-        final IPreferenceStore store = EclipseMocker.initPreferenceStore(container);
+        final IPreferenceStore store = EclipseMocker
+            .initPreferenceStore(container);
+
         final Preferences preferences = EclipseMocker.initPreferences();
 
         // Init Feedback
@@ -306,7 +307,6 @@ public class SarosSessionTest {
 
         addMockedComponent(IPathFactory.class);
         addMockedComponent(ISarosSessionManager.class);
-        addMockedComponent(IEditorAPI.class);
 
         container.start();
     }
