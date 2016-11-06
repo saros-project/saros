@@ -1,8 +1,11 @@
 {
-    "excludeFiles": ["js/vendor/**", "js/templates.js"],
+    "excludeFiles": ["src/elements/bootstrap-contextmenu.js"],
     "disallowMixedSpacesAndTabs": true,
-    "requireCurlyBraces": true,
+    "requireCurlyBraces": {"keywords": [], "allExcept": ["case"] },
     "validateIndentation": 4,
     "disallowTrailingWhitespace": true,
-    "disallowTrailingComma": true
+    "disallowTrailingComma": true,
+    "disallowNewlineBeforeBlockStatements": true,
+    "requireSpaceBeforeBlockStatements": true,
+    "disallowMultipleSpaces": {"allowEOLComments": true}
 }
