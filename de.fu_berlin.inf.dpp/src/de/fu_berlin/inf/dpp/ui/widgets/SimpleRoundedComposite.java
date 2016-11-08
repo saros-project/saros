@@ -5,7 +5,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Layout;
 
@@ -19,21 +18,17 @@ import de.fu_berlin.inf.dpp.ui.util.FontUtils;
  * sufficient.
  * <p>
  * <img src="doc-files/SimpleRoundedComposite-1.png"/>
- * 
+ *
  * @see RoundedComposite
  * @see Composite
  * @author bkahlert
- * 
+ *
  */
 public class SimpleRoundedComposite extends RoundedComposite {
     public static final int MARGIN_WIDTH = 4;
     public static final int MARGIN_HEIGHT = 1;
 
-    /**
-     * Save the argument of the last {@link #setTexts(String[])} call in order
-     * to allow the {@link #refresh()} method to work.
-     */
-    protected String[] usedText;
+    private Label[] textLabels = null;
 
     public SimpleRoundedComposite(Composite parent, int style) {
         super(parent, style);
@@ -46,15 +41,14 @@ public class SimpleRoundedComposite extends RoundedComposite {
      * The added text gets layed out adequately by centering all but the first
      * and last created {@link Label}s.<br/>
      * The first one becomes left wheras the last one becomes right aligned.
-     * 
+     *
      * @param texts
      */
     public void setTexts(String[] texts) {
         disposeChildren();
 
-        if (texts == null)
+        if (texts == null || texts.length == 0)
             return;
-        this.usedText = texts;
 
         /*
          * Sets layout Because the number of grid columns depends on the number
@@ -68,15 +62,14 @@ public class SimpleRoundedComposite extends RoundedComposite {
         gridLayout.marginHeight = MARGIN_HEIGHT;
         super.setLayout(gridLayout);
 
-        /*
-         * Places the labels
-         */
+        textLabels = new Label[texts.length];
+
+        // Places the labels
         for (int i = 0; i < texts.length; i++) {
             String text = texts[i];
 
-            /*
-             * Calculate layout
-             */
+            // Calculate layout
+
             int horizontalAlignment = SWT.CENTER;
             if (texts.length > 1 && i == 0)
                 horizontalAlignment = SWT.LEFT;
@@ -85,8 +78,10 @@ public class SimpleRoundedComposite extends RoundedComposite {
             boolean grabExcessHorizontalSpace = (i == (texts.length - 1));
 
             Label label = new Label(this, SWT.WRAP | horizontalAlignment);
-            label.setForeground(this.getForeground());
-            label.setBackground(this.getBackground());
+            textLabels[i] = label;
+
+            label.setForeground(getForeground());
+            label.setBackground(getBackground());
             label.setText(text);
 
             FontUtils.changeFontSizeBy(label, -1);
@@ -103,7 +98,7 @@ public class SimpleRoundedComposite extends RoundedComposite {
     /**
      * Convenience method call for <code>setTexts</code> in case you only want
      * to provide a single text.
-     * 
+     *
      * @param text
      */
     public void setText(String text) {
@@ -113,29 +108,37 @@ public class SimpleRoundedComposite extends RoundedComposite {
     /**
      * Disposes the direct child controls.
      */
-    protected void disposeChildren() {
-        Control[] children = this.getChildren();
-        for (Control child : children)
-            child.dispose();
-    }
+    private void disposeChildren() {
+        if (textLabels == null)
+            return;
 
-    /**
-     * Recreates this composite's contents.
-     */
-    public void refresh() {
-        this.setTexts(this.usedText);
+        for (Label textLabel : textLabels)
+            textLabel.dispose();
+
+        textLabels = null;
     }
 
     @Override
     public void setForeground(Color color) {
         super.setForeground(color);
-        this.refresh();
+
+        if (textLabels == null)
+            return;
+
+        for (Label textLabel : textLabels)
+            textLabel.setForeground(color);
+
     }
 
     @Override
     public void setBackground(Color color) {
         super.setBackground(color);
-        this.refresh();
+
+        if (textLabels == null)
+            return;
+
+        for (Label textLabel : textLabels)
+            textLabel.setBackground(color);
     }
 
     @Override

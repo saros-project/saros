@@ -21,27 +21,27 @@ import de.fu_berlin.inf.dpp.ui.util.PaintUtils;
  * <p>
  * The composite's content is surrounded by a rounded rectangle if a background
  * is set.
- * 
+ *
  * <dl>
  * <dt><b>Styles:</b></dt>
  * <dd>SEPARATOR, and those supported by Composite excluding NO_BACKGROUND</dd>
  * <dt><b>Events:</b></dt>
  * <dd>(none)</dd>
  * </dl>
- * 
+ *
  * <p>
  * Note: If you use SEPARATOR the content gets right aligned and the generated
  * space filled with a small horizontal line.
  * </p>
- * 
+ *
  * <p>
  * This class may be subclassed by custom control implementors who are building
  * controls that are constructed from aggregates of other controls.
  * </p>
- * 
+ *
  * @see Composite
  * @author bkahlert
- * 
+ *
  */
 public class RoundedComposite extends Canvas {
     /**
@@ -49,7 +49,7 @@ public class RoundedComposite extends Canvas {
      */
     protected static final int STYLES = SWT.SEPARATOR | SWT.BORDER;
 
-    protected int style;
+    protected final int style;
 
     /**
      * Scale by which the background color's lightness should be modified for
@@ -57,7 +57,7 @@ public class RoundedComposite extends Canvas {
      */
     private static final float BORDER_LIGHTNESS_SCALE = 0.85f;
 
-    protected Color border;
+    private Color border;
 
     private final Composite parent;
 
@@ -120,7 +120,13 @@ public class RoundedComposite extends Canvas {
 
     private void createBorder() {
         disposeBorder();
-        border = ColorUtils.scaleColorBy(getBackground(),
+
+        Color backgroundColor = getBackground();
+
+        if (backgroundColor == null)
+            return;
+
+        border = ColorUtils.scaleColorBy(backgroundColor,
             BORDER_LIGHTNESS_SCALE);
     }
 
