@@ -25,8 +25,8 @@ public interface IStreamService {
      * Establishes a {@link IByteStreamConnection connection} to the given JID.
      *
      * @param connectionID
-     *            an ID used to identify this connection on the remote side
-     * @param peer
+     *            an ID used to identify this stream(session)
+     * @param remoteAddress
      *            a <b>resource qualified</b> JID to connect to
      * @throws NullPointerException
      *             if connectionID or peer is <code>null</code>
@@ -36,9 +36,9 @@ public interface IStreamService {
      * @throws IOException
      *             if no connection could be established
      * @throws InterruptedException
-     *             if the connection establishment was interrupted
+     *             if the stream establishment was interrupted
      */
-    public IByteStreamConnection connect(String connectionID, JID peer)
+    public IByteStreamConnection connect(String connectionID, JID remoteAddress)
         throws IOException, InterruptedException;
 
     /**
