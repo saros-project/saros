@@ -125,14 +125,14 @@ public class DataTransferManager implements IConnectionListener,
 
         @Override
         public void connectionChanged(final String connectionID,
-            final JID peer, final IByteStreamConnection connection,
+            final IByteStreamConnection connection,
             final boolean incomingRequest) {
 
             // FIXME init first, than add to pool and finally start the receiver
             // thread !
 
             final String id = toConnectionIDToken(connectionID,
-                incomingRequest ? IN : OUT, peer);
+                incomingRequest ? IN : OUT, connection.getRemoteAddress());
 
             LOG.debug("bytestream connection changed " + connection + ", inc="
                 + incomingRequest + ", pool id=" + id + "]");
@@ -162,9 +162,9 @@ public class DataTransferManager implements IConnectionListener,
         }
 
         @Override
-        public void connectionClosed(String connectionID, JID peer,
+        public void connectionClosed(String connectionID,
             IByteStreamConnection connection) {
-            closeConnection(connectionID, peer);
+            closeConnection(connectionID, connection.getRemoteAddress());
         }
     };
 
@@ -432,7 +432,7 @@ public class DataTransferManager implements IConnectionListener,
 
             if (connection != null) {
                 byteStreamConnectionListener.connectionChanged(connectionID,
-                    peer, connection, false);
+                    connection, false);
 
                 return connection;
             }

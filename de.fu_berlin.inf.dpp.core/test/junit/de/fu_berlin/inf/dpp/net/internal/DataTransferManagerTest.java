@@ -21,8 +21,8 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
-import de.fu_berlin.inf.dpp.net.stream.StreamMode;
 import de.fu_berlin.inf.dpp.net.stream.IStreamService;
+import de.fu_berlin.inf.dpp.net.stream.StreamMode;
 import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
@@ -63,7 +63,7 @@ public class DataTransferManagerTest {
                 listener);
 
             establishedConnections.add(connection);
-            listener.connectionChanged(connectionID, peer, connection, true);
+            listener.connectionChanged(connectionID, connection, true);
         }
 
         @Override
@@ -148,7 +148,7 @@ public class DataTransferManagerTest {
         @Override
         public void close() {
             closed = true;
-            listener.connectionClosed(/* FIMXE */null, to, this);
+            listener.connectionClosed(/* FIMXE */null, this);
         }
 
         @Override
@@ -269,7 +269,8 @@ public class DataTransferManagerTest {
     public void testEstablishConnectionWithMainAndFallbackTransportAndUsingFallback()
         throws Exception {
 
-        IStreamService mainTransport = EasyMock.createMock(IStreamService.class);
+        IStreamService mainTransport = EasyMock
+            .createMock(IStreamService.class);
 
         IStreamService fallbackTransport = new Transport(StreamMode.IBB);
 
@@ -356,8 +357,7 @@ public class DataTransferManagerTest {
 
         dtm.connect(new JID("foo@bar.com"));
 
-        assertEquals("wrong transport mode returned",
-            StreamMode.SOCKS5_DIRECT,
+        assertEquals("wrong transport mode returned", StreamMode.SOCKS5_DIRECT,
             dtm.getTransferMode(new JID("foo@bar.com")));
 
         assertEquals("wrong transport mode returned", StreamMode.NONE,
@@ -432,8 +432,8 @@ public class DataTransferManagerTest {
         nonBlockingConnects.add(new JID("foo@bar.example"));
 
         BlockableTransport mainTransport = new BlockableTransport(
-            nonBlockingConnects, StreamMode.SOCKS5_DIRECT,
-            connectAcknowledge, connectProceed);
+            nonBlockingConnects, StreamMode.SOCKS5_DIRECT, connectAcknowledge,
+            connectProceed);
 
         Transport fallbackTransport = new Transport(StreamMode.IBB);
 
@@ -543,8 +543,8 @@ public class DataTransferManagerTest {
         final CountDownLatch connectProceed = new CountDownLatch(1);
 
         BlockableTransport mainTransport = new BlockableTransport(
-            new HashSet<JID>(), StreamMode.SOCKS5_DIRECT,
-            connectAcknowledge, connectProceed);
+            new HashSet<JID>(), StreamMode.SOCKS5_DIRECT, connectAcknowledge,
+            connectProceed);
 
         Transport fallbackTransport = new Transport(StreamMode.IBB);
 

@@ -83,8 +83,6 @@ public abstract class ByteStreamTransport implements IStreamService {
                 if (connection == null)
                     return;
 
-                JID peer = new JID(request.getFrom());
-
                 IByteStreamConnectionListener listener = getConnectionListener();
 
                 if (listener == null) {
@@ -95,7 +93,7 @@ public abstract class ByteStreamTransport implements IStreamService {
                     return;
                 }
 
-                listener.connectionChanged(connection.getConnectionID(), peer,
+                listener.connectionChanged(connection.getConnectionID(),
                     connection, true);
 
             } catch (InterruptedException e) {

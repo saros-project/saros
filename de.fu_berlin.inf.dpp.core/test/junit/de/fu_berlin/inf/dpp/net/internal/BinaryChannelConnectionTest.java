@@ -68,14 +68,14 @@ public class BinaryChannelConnectionTest {
         IByteStreamConnectionListener {
 
         @Override
-        public void connectionClosed(String connectionIdentifier, JID peer,
+        public void connectionClosed(String connectionIdentifier,
             IByteStreamConnection connection) {
             // NOP
 
         }
 
         @Override
-        public void connectionChanged(String connectionIdentifier, JID peer,
+        public void connectionChanged(String connectionIdentifier,
             IByteStreamConnection connection, boolean incomingRequest) {
             // NOP
         }

@@ -189,7 +189,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
             }
         }
 
-        listener.connectionClosed(connectionID, getRemoteAddress(), this);
+        listener.connectionClosed(connectionID, this);
     }
 
     @Override
