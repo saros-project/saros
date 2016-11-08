@@ -15,7 +15,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import de.fu_berlin.inf.dpp.net.ConnectionMode;
+import de.fu_berlin.inf.dpp.net.stream.ByteStream;
+import de.fu_berlin.inf.dpp.net.stream.ConnectionMode;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 /**

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net.internal;
+package de.fu_berlin.inf.dpp.net.stream;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,7 +31,9 @@ import org.jivesoftware.smackx.bytestreams.socks5.Socks5BytestreamRequest;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5BytestreamSession;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 
-import de.fu_berlin.inf.dpp.net.ConnectionMode;
+import de.fu_berlin.inf.dpp.net.internal.BinaryChannelConnection;
+import de.fu_berlin.inf.dpp.net.internal.IByteStreamConnection;
+import de.fu_berlin.inf.dpp.net.internal.IByteStreamConnectionListener;
 import de.fu_berlin.inf.dpp.net.util.NetworkingUtils;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;

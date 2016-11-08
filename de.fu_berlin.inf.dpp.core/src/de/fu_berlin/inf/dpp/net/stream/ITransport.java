@@ -1,9 +1,11 @@
-package de.fu_berlin.inf.dpp.net.internal;
+package de.fu_berlin.inf.dpp.net.stream;
 
 import java.io.IOException;
 
 import org.jivesoftware.smack.Connection;
 
+import de.fu_berlin.inf.dpp.net.internal.IByteStreamConnection;
+import de.fu_berlin.inf.dpp.net.internal.IByteStreamConnectionListener;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 /**

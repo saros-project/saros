@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.net;
 
+import de.fu_berlin.inf.dpp.net.stream.ConnectionMode;
+
 /**
  * Listener for tracking network traffic. </p><b>Note:</b> It is up to the
  * implementation to do synchronization as the methods offered by this listener

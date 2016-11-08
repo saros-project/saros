@@ -5,9 +5,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.net.ConnectionMode;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.ITransferListener;
+import de.fu_berlin.inf.dpp.net.stream.ConnectionMode;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 
 /**

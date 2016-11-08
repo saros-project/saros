@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net;
+package de.fu_berlin.inf.dpp.net.stream;
 
 public enum ConnectionMode {
     NONE("UNKNOWN"), IBB("IBB"), SOCKS5_MEDIATED("SOCKS5 (M)"), SOCKS5_DIRECT(

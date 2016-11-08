@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.net;
 import java.io.IOException;
 
 import de.fu_berlin.inf.dpp.net.internal.IByteStreamConnection;
+import de.fu_berlin.inf.dpp.net.stream.ConnectionMode;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 // TODO Javadoc

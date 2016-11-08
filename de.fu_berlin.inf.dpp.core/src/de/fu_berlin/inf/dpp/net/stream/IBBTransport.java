@@ -1,10 +1,8 @@
-package de.fu_berlin.inf.dpp.net.internal;
+package de.fu_berlin.inf.dpp.net.stream;
 
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smackx.bytestreams.BytestreamManager;
 import org.jivesoftware.smackx.bytestreams.ibb.InBandBytestreamManager;
-
-import de.fu_berlin.inf.dpp.net.ConnectionMode;
 
 /**
  * Transport class for in-band bytestreams
