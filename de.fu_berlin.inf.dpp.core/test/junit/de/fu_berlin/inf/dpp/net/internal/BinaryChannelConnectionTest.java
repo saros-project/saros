@@ -84,6 +84,10 @@ public class BinaryChannelConnectionTest {
         public abstract void receive(BinaryXMPPExtension extension);
     }
 
+    private final JID aliceJID = new JID("alice@baumeister.de");
+
+    private final JID bobJID = new JID("bob@baumeister.de");
+
     private ByteStream aliceStream;
     private ByteStream bobStream;
 
@@ -111,18 +115,18 @@ public class BinaryChannelConnectionTest {
 
         final CountDownLatch received = new CountDownLatch(2);
 
-        BinaryChannelConnection alice = new BinaryChannelConnection(new JID(
-            "alice@baumeister.de"), "junit", aliceStream,
-            StreamMode.SOCKS5_DIRECT, new StreamConnectionListener() {
+        BinaryChannelConnection alice = new BinaryChannelConnection(aliceJID,
+            bobJID, "junit", aliceStream, StreamMode.SOCKS5_DIRECT,
+            new StreamConnectionListener() {
                 @Override
                 public void receive(final BinaryXMPPExtension extension) {
                     // NOP
                 }
             });
 
-        BinaryChannelConnection bob = new BinaryChannelConnection(new JID(
-            "bob@baumeister.de"), "junit", bobStream,
-            StreamMode.SOCKS5_DIRECT, new StreamConnectionListener() {
+        BinaryChannelConnection bob = new BinaryChannelConnection(bobJID,
+            aliceJID, "junit", bobStream, StreamMode.SOCKS5_DIRECT,
+            new StreamConnectionListener() {
                 @Override
                 public void receive(final BinaryXMPPExtension extension) {
                     extensions.add(extension);
@@ -141,15 +145,11 @@ public class BinaryChannelConnectionTest {
         try {
             description.setNamespace("foo-namespace-0");
             description.setElementName("bar-0");
-            description.setSender(new JID("sender-0@local"));
-            description.setRecipient(new JID("receiver-0@local"));
 
             alice.send(description, bytesToSend);
 
             description.setNamespace("foo-namespace-1");
             description.setElementName("bar-1");
-            description.setSender(new JID("sender-1@local"));
-            description.setRecipient(new JID("receiver-1@local"));
 
             alice.send(description, bytesToSend);
 
@@ -166,10 +166,10 @@ public class BinaryChannelConnectionTest {
         assertEquals("bar-0", extensions.get(0).getTransferDescription()
             .getElementName());
 
-        assertEquals("sender-0@local", extensions.get(0)
+        assertEquals(aliceJID.toString(), extensions.get(0)
             .getTransferDescription().getSender().toString());
 
-        assertEquals("receiver-0@local", extensions.get(0)
+        assertEquals(bobJID.toString(), extensions.get(0)
             .getTransferDescription().getRecipient().toString());
 
         // send packet 1
@@ -179,10 +179,10 @@ public class BinaryChannelConnectionTest {
         assertEquals("bar-1", extensions.get(1).getTransferDescription()
             .getElementName());
 
-        assertEquals("sender-1@local", extensions.get(1)
+        assertEquals(aliceJID.toString(), extensions.get(1)
             .getTransferDescription().getSender().toString());
 
-        assertEquals("receiver-1@local", extensions.get(1)
+        assertEquals(bobJID.toString(), extensions.get(1)
             .getTransferDescription().getRecipient().toString());
 
     }
@@ -192,18 +192,18 @@ public class BinaryChannelConnectionTest {
 
         final CountDownLatch received = new CountDownLatch(1);
 
-        BinaryChannelConnection alice = new BinaryChannelConnection(new JID(
-            "alice@baumeister.de"), "junit", aliceStream,
-            StreamMode.SOCKS5_DIRECT, new StreamConnectionListener() {
+        BinaryChannelConnection alice = new BinaryChannelConnection(aliceJID,
+            bobJID, "junit", aliceStream, StreamMode.SOCKS5_DIRECT,
+            new StreamConnectionListener() {
                 @Override
                 public void receive(final BinaryXMPPExtension extension) {
                     // NOP
                 }
             });
 
-        BinaryChannelConnection bob = new BinaryChannelConnection(new JID(
-            "bob@baumeister.de"), "junit", bobStream,
-            StreamMode.SOCKS5_DIRECT, new StreamConnectionListener() {
+        BinaryChannelConnection bob = new BinaryChannelConnection(bobJID,
+            aliceJID, "junit", bobStream, StreamMode.SOCKS5_DIRECT,
+            new StreamConnectionListener() {
                 @Override
                 public void receive(final BinaryXMPPExtension extension) {
                     receivedBytes = extension.getPayload();
@@ -252,18 +252,18 @@ public class BinaryChannelConnectionTest {
 
         final CountDownLatch received = new CountDownLatch((int) packetsToSend);
 
-        BinaryChannelConnection alice = new BinaryChannelConnection(new JID(
-            "alice@baumeister.de"), "junit", aliceStream,
-            StreamMode.SOCKS5_DIRECT, new StreamConnectionListener() {
+        BinaryChannelConnection alice = new BinaryChannelConnection(aliceJID,
+            bobJID, "junit", aliceStream, StreamMode.SOCKS5_DIRECT,
+            new StreamConnectionListener() {
                 @Override
                 public void receive(final BinaryXMPPExtension extension) {
                     // NOP
                 }
             });
 
-        BinaryChannelConnection bob = new BinaryChannelConnection(new JID(
-            "bob@baumeister.de"), "junit", bobStream,
-            StreamMode.SOCKS5_DIRECT, new StreamConnectionListener() {
+        BinaryChannelConnection bob = new BinaryChannelConnection(bobJID,
+            aliceJID, "junit", bobStream, StreamMode.SOCKS5_DIRECT,
+            new StreamConnectionListener() {
                 @Override
                 public void receive(final BinaryXMPPExtension extension) {
                     receivedBytes = extension.getPayload();
@@ -271,12 +271,13 @@ public class BinaryChannelConnectionTest {
                 }
             });
 
+        alice.initialize();
+        bob.initialize();
+
         TransferDescription description = TransferDescription.newDescription();
 
         description.setNamespace("foo-namespace");
         description.setElementName("bar");
-        description.setSender(new JID("sender@local"));
-        description.setRecipient(new JID("receiver@local"));
 
         byte[] bytesToSend = new byte[(int) packetSize];
 

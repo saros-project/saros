@@ -24,6 +24,8 @@ public abstract class ByteStreamTransport implements IStreamService {
     private BytestreamManager manager;
     private IByteStreamConnectionListener connectionListener;
 
+    private JID localAddress;
+
     @Override
     public IByteStreamConnection connect(final String connectionID,
         final JID peer) throws IOException, InterruptedException {
@@ -112,7 +114,7 @@ public abstract class ByteStreamTransport implements IStreamService {
 
     /**
      * Establishes a IByteStreamConnection to a peer.
-     * 
+     *
      * @param peer
      * @return IByteStreamConnection to peer
      * @throws XMPPException
@@ -129,17 +131,18 @@ public abstract class ByteStreamTransport implements IStreamService {
         if (currentManager == null || listener == null)
             throw new IOException(this + " transport is not initialized");
 
-        return new BinaryChannelConnection(new JID(peer), connectionIdentifier,
-            new XMPPByteStreamAdapter(currentManager.establishSession(peer,
-                connectionIdentifier)), getNetTransferMode(), listener);
+        return new BinaryChannelConnection(getLocalAddress(), new JID(peer),
+            connectionIdentifier, new XMPPByteStreamAdapter(
+                currentManager.establishSession(peer, connectionIdentifier)),
+            getNetTransferMode(), listener);
     }
 
     /**
      * Handles a BytestreamRequest requests and returns a IByteStreamConnection.
      * If null is returned the request is handled in different manner (i.e. see
-     * {#link Socks5StreamService})
-     * 
-     * 
+     * {#link Socks5Transport})
+     *
+     *
      * @param request
      * @return IByteStreamConnection or null if handled in different manner
      * @throws InterruptedException
@@ -154,8 +157,8 @@ public abstract class ByteStreamTransport implements IStreamService {
         if (listener == null)
             throw new IOException(this + " transport is not initialized");
 
-        return new BinaryChannelConnection(new JID(request.getFrom()),
-            request.getSessionID(),
+        return new BinaryChannelConnection(getLocalAddress(), new JID(
+            request.getFrom()), request.getSessionID(),
             new XMPPByteStreamAdapter(request.accept()), getNetTransferMode(),
             listener);
     }
@@ -163,9 +166,14 @@ public abstract class ByteStreamTransport implements IStreamService {
     @Override
     public synchronized void initialize(Connection connection,
         IByteStreamConnectionListener listener) {
-        this.connectionListener = listener;
+        localAddress = new JID(connection.getUser());
+        connectionListener = listener;
         manager = createManager(connection);
         manager.addIncomingBytestreamListener(streamListener);
+    }
+
+    protected final synchronized JID getLocalAddress() {
+        return localAddress;
     }
 
     protected final synchronized BytestreamManager getManager() {

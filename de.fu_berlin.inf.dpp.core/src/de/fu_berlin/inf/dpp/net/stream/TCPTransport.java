@@ -22,6 +22,9 @@ public class TCPTransport implements IStreamService {
     public IByteStreamConnection connect(String connectionID, JID peer)
         throws IOException, InterruptedException {
 
+        if (true)
+            throw new RuntimeException("NYI");
+
         // TODO this should be configurable;
 
         final Socket socket = new Socket(Proxy.NO_PROXY);
@@ -40,8 +43,8 @@ public class TCPTransport implements IStreamService {
         }
 
         final IByteStreamConnection connection = new BinaryChannelConnection(
-            peer, connectionID, new TCPByteStream(socket), StreamMode.TCP,
-            listener);
+            null, peer, connectionID, new TCPByteStream(socket),
+            StreamMode.TCP, listener);
 
         return connection;
     }

@@ -49,7 +49,6 @@ public class BinaryChannelConnection implements IByteStreamConnection {
 
         private static final int NAMESPACE_UPDATE = 0x64;
         private static final int ELEMENT_NAME_UPDATE = 0x65;
-        private static final int JID_UPDATE = 0x66;
     }
 
     /**
@@ -60,7 +59,8 @@ public class BinaryChannelConnection implements IByteStreamConnection {
     private IByteStreamConnectionListener listener;
     private ReceiverThread receiveThread;
 
-    private final JID peer;
+    private final JID remoteAddress;
+    private final JID localAddress;
 
     private final String connectionID;
 
@@ -84,10 +84,6 @@ public class BinaryChannelConnection implements IByteStreamConnection {
     private Map<Integer, String> inElementNameCache = new HashMap<Integer, String>();
     private Map<String, Integer> outElementNameCache = new HashMap<String, Integer>();
 
-    private Map<Integer, String> inJIDCache = new HashMap<Integer, String>();
-    private Map<String, Integer> outJIDCache = new HashMap<String, Integer>();
-
-    private int nextJIDId = 0;
     private int nextNamespaceId = 0;
     private int nextElementNameId = 0;
 
@@ -118,11 +114,12 @@ public class BinaryChannelConnection implements IByteStreamConnection {
         }
     }
 
-    public BinaryChannelConnection(JID peer, String connectionID,
-        ByteStream stream, StreamMode mode,
+    public BinaryChannelConnection(JID localAddress, JID remoteAddress,
+        String connectionID, ByteStream stream, StreamMode mode,
         IByteStreamConnectionListener listener) throws IOException {
         this.listener = listener;
-        this.peer = peer;
+        this.localAddress = localAddress;
+        this.remoteAddress = remoteAddress;
         this.connectionID = connectionID;
         this.stream = stream;
         this.stream.setReadTimeout(0); // keep connection alive
@@ -144,7 +141,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
          * already buffered by SMACK or the OS
          */
         receiveThread = new ReceiverThread();
-        receiveThread.setName("BinaryChannel-" + peer.getName());
+        receiveThread.setName("BinaryChannel-" + remoteAddress.getName());
         receiveThread.start();
         connected = true;
         initialized = true;
@@ -202,7 +199,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
 
     @Override
     public JID getRemoteAddress() {
-        return peer;
+        return remoteAddress;
     }
 
     @Override
@@ -219,53 +216,11 @@ public class BinaryChannelConnection implements IByteStreamConnection {
 
         try {
 
-            Integer localId;
-            Integer remoteId;
             Integer namespaceId;
             Integer elementNameId;
 
             synchronized (this) {
                 boolean sendUpdate = false;
-
-                final String localJID = data.getSender().toString();
-                localId = outJIDCache.get(localJID);
-
-                if (localId == null) {
-                    if (nextJIDId > 255)
-                        throw new IOException("JID cache limit exceeded");
-
-                    localId = Integer.valueOf(nextJIDId++);
-                    outJIDCache.put(localJID, localId);
-
-                    if (LOG.isTraceEnabled())
-                        LOG.trace("updated outgoing JID cache, id: " + localId
-                            + " , jid: " + localJID);
-
-                    outputStream.write(Opcode.JID_UPDATE);
-                    outputStream.write(localId);
-                    outputStream.writeUTF(localJID);
-                    sendUpdate = true;
-                }
-
-                final String remoteJID = data.getRecipient().toString();
-                remoteId = outJIDCache.get(remoteJID);
-
-                if (remoteId == null) {
-                    if (nextJIDId > 255)
-                        throw new IOException("JID cache limit exceeded");
-
-                    remoteId = Integer.valueOf(nextJIDId++);
-                    outJIDCache.put(remoteJID, remoteId);
-
-                    if (LOG.isTraceEnabled())
-                        LOG.trace("updated outgoing JID cache, id: " + remoteId
-                            + " , jid: " + remoteJID);
-
-                    outputStream.write(Opcode.JID_UPDATE);
-                    outputStream.write(remoteId);
-                    outputStream.writeUTF(remoteJID);
-                    sendUpdate = true;
-                }
 
                 final String namespace = data.getNamespace();
                 namespaceId = outNamespaceCache.get(namespace);
@@ -316,8 +271,8 @@ public class BinaryChannelConnection implements IByteStreamConnection {
 
             int chunks = ((content.length - 1) / CHUNKSIZE) + 1;
 
-            sendTransferDescription(fragmentId, chunks, localId, remoteId,
-                namespaceId, elementNameId, data.compressContent());
+            sendTransferDescription(fragmentId, chunks, namespaceId,
+                elementNameId, data.compressContent());
 
             splitAndSend(content, chunks, fragmentId);
         } catch (IOException e) {
@@ -362,17 +317,9 @@ public class BinaryChannelConnection implements IByteStreamConnection {
                         + " [TFD]: id=" + fragmentId + ", chunks=" + chunks);
                 }
 
-                final int localId = inputStream.readUnsignedByte();
-                final int remoteId = inputStream.readUnsignedByte();
                 final int namespaceId = inputStream.readUnsignedByte();
                 final int elementNameId = inputStream.readUnsignedShort();
                 final int compressed = inputStream.readUnsignedByte();
-
-                final String localJID = inJIDCache
-                    .get(Integer.valueOf(localId));
-
-                final String remoteJID = inJIDCache.get(Integer
-                    .valueOf(remoteId));
 
                 final String namespace = inNamespaceCache.get(Integer
                     .valueOf(namespaceId));
@@ -383,8 +330,8 @@ public class BinaryChannelConnection implements IByteStreamConnection {
                 final TransferDescription transferDescription = TransferDescription
                     .newDescription();
 
-                transferDescription.setSender(new JID(localJID));
-                transferDescription.setRecipient(new JID(remoteJID));
+                transferDescription.setSender(remoteAddress);
+                transferDescription.setRecipient(localAddress);
                 transferDescription.setNamespace(namespace);
                 transferDescription.setElementName(elementName);
                 transferDescription.setCompressContent(compressed == 1);
@@ -477,23 +424,6 @@ public class BinaryChannelConnection implements IByteStreamConnection {
 
                 break;
 
-            case Opcode.JID_UPDATE:
-
-                if (LOG.isTraceEnabled()) {
-                    LOG.trace("processing opcode 0x"
-                        + Integer.toHexString(opcode).toUpperCase() + " [JIDU]");
-                }
-
-                id = inputStream.readUnsignedByte();
-                name = inputStream.readUTF();
-                inJIDCache.put(Integer.valueOf(id), name);
-
-                if (LOG.isTraceEnabled())
-                    LOG.trace("updated incoming JID cache, id: " + id
-                        + " , jid: " + name);
-
-                break;
-
             default:
                 close();
                 throw new ProtocolException("unknown opcode: 0x"
@@ -523,8 +453,8 @@ public class BinaryChannelConnection implements IByteStreamConnection {
     }
 
     private synchronized void sendTransferDescription(int fragmentId,
-        int chunks, int localId, int remoteId, int namespaceId,
-        int elementNameId, boolean compress) throws IOException {
+        int chunks, int namespaceId, int elementNameId, boolean compress)
+        throws IOException {
 
         if (LOG.isTraceEnabled()) {
             LOG.trace("sending transfer description: id=" + fragmentId);
@@ -533,8 +463,6 @@ public class BinaryChannelConnection implements IByteStreamConnection {
         outputStream.write(Opcode.TRANSFERDESCRIPTION);
         outputStream.writeShort(fragmentId);
         outputStream.writeInt(chunks);
-        outputStream.write(localId);
-        outputStream.write(remoteId);
         outputStream.write(namespaceId);
         outputStream.writeShort(elementNameId);
         outputStream.write(compress ? 1 : 0);
@@ -562,7 +490,8 @@ public class BinaryChannelConnection implements IByteStreamConnection {
 
     @Override
     public String toString() {
-        return "[mode=" + getMode() + ", id=" + connectionID + "]" + " " + peer;
+        return "[mode=" + getMode() + ", id=" + connectionID + "]" + " "
+            + remoteAddress;
     }
 
     static class IDPool {

@@ -44,15 +44,15 @@ import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
  * used to distinguish connect requests and response requests. If there is a
  * direct connection, we keep it, the other one discarded. If the is no one, a
  * SMACK will establish a mediated connection by the server.
- * 
+ *
  * Are both connection direct, we use the one of the connect request (same for
  * mediated).
- * 
+ *
  * However, still there might be a server that only supports unidirectional
  * SOCKS5 bytestreams (i.e. OpenFire). In that case both mediated unidirectional
  * connections are wrapped into a bidirectional one. (see {#link
  * WrappedBidirectionalSocks5BytestreamSession})
- * 
+ *
  * @author jurke
  */
 public class Socks5Transport extends ByteStreamTransport {
@@ -116,7 +116,7 @@ public class Socks5Transport extends ByteStreamTransport {
     /**
      * Starts a new thread that waits until the connection is established to
      * close it correctly.
-     * 
+     *
      * @param future
      */
     protected void waitToCloseResponse(
@@ -174,9 +174,9 @@ public class Socks5Transport extends ByteStreamTransport {
      * returns it if bidirectional or tries to wrap two unidirectional streams
      * if possible. Else an exception is thrown. The testing order is defined by
      * the boolean preferInSession.
-     * 
+     *
      * @pre inSession!=null || outSession!=null
-     * 
+     *
      * @param inSession
      * @param outSession
      * @param preferInSession
@@ -230,7 +230,7 @@ public class Socks5Transport extends ByteStreamTransport {
     /**
      * Sends and receives an INT to distinguish between bidirectional and
      * unidirectional streams.
-     * 
+     *
      * @param session
      * @param sendFirst
      * @return whether a stream is bidirectional
@@ -299,9 +299,9 @@ public class Socks5Transport extends ByteStreamTransport {
 
     /**
      * Handles a response request.
-     * 
+     *
      * The session is exchanged to the connecting thread.
-     * 
+     *
      * @param request
      * @throws XMPPException
      * @throws InterruptedException
@@ -346,17 +346,17 @@ public class Socks5Transport extends ByteStreamTransport {
 
     /**
      * Accepts a Request and returns an established IByteStreamConnection.
-     * 
+     *
      * Immediately tries to establish a second session to the requesting peer
      * but also accepts this request to achieve a direct connection although one
      * peer might be behind a NAT.
-     * 
+     *
      * A direct connection is used, the other discarded where the requesting
      * session is preferred.
-     * 
+     *
      * In case of unidirectional connections both sessions a wrapped into a
      * bidirectional one.
-     * 
+     *
      * @param request
      * @return established BinaryChannel
      * @throws XMPPException
@@ -402,9 +402,9 @@ public class Socks5Transport extends ByteStreamTransport {
                 waitToCloseResponse(responseFuture);
                 configureSocks5Socket(inSession);
 
-                return new BinaryChannelConnection(new JID(peer),
-                    connectionIdentifier, new XMPPByteStreamAdapter(inSession),
-                    StreamMode.SOCKS5_DIRECT, listener);
+                return new BinaryChannelConnection(getLocalAddress(), new JID(
+                    peer), connectionIdentifier, new XMPPByteStreamAdapter(
+                    inSession), StreamMode.SOCKS5_DIRECT, listener);
             } else {
                 LOG.debug(prefix() + "incoming connection is mediated.");
             }
@@ -427,10 +427,9 @@ public class Socks5Transport extends ByteStreamTransport {
                 closeQuietly(inSession);
                 configureSocks5Socket(outSession);
 
-                return new BinaryChannelConnection(new JID(peer),
-                    connectionIdentifier,
-                    new XMPPByteStreamAdapter(outSession),
-                    StreamMode.SOCKS5_DIRECT, listener);
+                return new BinaryChannelConnection(getLocalAddress(), new JID(
+                    peer), connectionIdentifier, new XMPPByteStreamAdapter(
+                    outSession), StreamMode.SOCKS5_DIRECT, listener);
             }
 
         } catch (IOException e) {
@@ -451,15 +450,15 @@ public class Socks5Transport extends ByteStreamTransport {
         BytestreamSession session = testAndGetMediatedBidirectionalBytestream(
             inSession, outSession, true);
 
-        return new BinaryChannelConnection(new JID(peer), connectionIdentifier,
-            new XMPPByteStreamAdapter(session), StreamMode.SOCKS5_MEDIATED,
-            listener);
+        return new BinaryChannelConnection(getLocalAddress(), new JID(peer),
+            connectionIdentifier, new XMPPByteStreamAdapter(session),
+            StreamMode.SOCKS5_MEDIATED, listener);
     }
 
     /**
      * Handles the SOCKS5Bytestream Request and distinguishes between connect
      * requests and response requests.
-     * 
+     *
      * see handleResponse() and acceptNewRequest()
      */
     @Override
@@ -515,9 +514,10 @@ public class Socks5Transport extends ByteStreamTransport {
 
                 if (outSession.isDirect()) {
                     configureSocks5Socket(outSession);
-                    return new BinaryChannelConnection(new JID(peer),
-                        connectionIdentifier, new XMPPByteStreamAdapter(
-                            outSession), StreamMode.SOCKS5_DIRECT, listener);
+                    return new BinaryChannelConnection(getLocalAddress(),
+                        new JID(peer), connectionIdentifier,
+                        new XMPPByteStreamAdapter(outSession),
+                        StreamMode.SOCKS5_DIRECT, listener);
                 }
 
                 LOG.debug(prefix()
@@ -581,9 +581,10 @@ public class Socks5Transport extends ByteStreamTransport {
                     closeQuietly(outSession);
                     configureSocks5Socket(inSession);
 
-                    return new BinaryChannelConnection(new JID(peer),
-                        connectionIdentifier, new XMPPByteStreamAdapter(
-                            inSession), StreamMode.SOCKS5_DIRECT, listener);
+                    return new BinaryChannelConnection(getLocalAddress(),
+                        new JID(peer), connectionIdentifier,
+                        new XMPPByteStreamAdapter(inSession),
+                        StreamMode.SOCKS5_DIRECT, listener);
                 }
 
             } catch (TimeoutException e) {
@@ -603,9 +604,9 @@ public class Socks5Transport extends ByteStreamTransport {
             BytestreamSession session = testAndGetMediatedBidirectionalBytestream(
                 inSession, outSession, false);
 
-            return new BinaryChannelConnection(new JID(peer),
-                connectionIdentifier, new XMPPByteStreamAdapter(session),
-                StreamMode.SOCKS5_MEDIATED, listener);
+            return new BinaryChannelConnection(getLocalAddress(),
+                new JID(peer), connectionIdentifier, new XMPPByteStreamAdapter(
+                    session), StreamMode.SOCKS5_MEDIATED, listener);
 
         } finally {
             runningRemoteConnects.remove(sessionID);
@@ -613,7 +614,7 @@ public class Socks5Transport extends ByteStreamTransport {
     }
 
     /**
-     * 
+     *
      * @param peer
      * @return a BytestreamSession with a response ID
      * @throws XMPPException
