@@ -12,9 +12,9 @@ import de.fu_berlin.inf.dpp.net.internal.IByteStreamConnection;
 import de.fu_berlin.inf.dpp.net.internal.IByteStreamConnectionListener;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
-// TODO rewrite ITransport interface
+// TODO rewrite IStreamService interface
 
-public class TCPTransport implements ITransport {
+public class TCPTransport implements IStreamService {
 
     private volatile IByteStreamConnectionListener currentListener;
 
@@ -40,7 +40,7 @@ public class TCPTransport implements ITransport {
         }
 
         final IByteStreamConnection connection = new BinaryChannelConnection(
-            peer, connectionID, new TCPByteStream(socket), ConnectionMode.TCP,
+            peer, connectionID, new TCPByteStream(socket), StreamMode.TCP,
             listener);
 
         return connection;

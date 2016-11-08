@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
-import de.fu_berlin.inf.dpp.net.stream.ConnectionMode;
+import de.fu_berlin.inf.dpp.net.stream.StreamMode;
 
 public final class BinaryXMPPExtension {
 
@@ -11,9 +11,9 @@ public final class BinaryXMPPExtension {
     private long uncompressedSize;
     private byte[] payload;
     private long transferDuration;
-    private ConnectionMode transferMode;
+    private StreamMode transferMode;
 
-    public BinaryXMPPExtension(ConnectionMode transferMode,
+    public BinaryXMPPExtension(StreamMode transferMode,
         TransferDescription transferDescription, int chunkCount) {
         this.transferMode = transferMode;
         this.transferDescription = transferDescription;
@@ -41,10 +41,10 @@ public final class BinaryXMPPExtension {
 
     /**
      * 
-     * Returns the {@link ConnectionMode} that was used to receive theXMPP
+     * Returns the {@link StreamMode} that was used to receive theXMPP
      * packet extension.
      */
-    ConnectionMode getTransferMode() {
+    StreamMode getTransferMode() {
         return transferMode;
     }
 

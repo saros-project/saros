@@ -42,14 +42,14 @@ public interface ISarosContextBindings {
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ ElementType.FIELD, ElementType.PARAMETER })
     @Bind
-    public @interface IBBTransport {
+    public @interface IBBStreamService {
         // marker interface
     }
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ ElementType.FIELD, ElementType.PARAMETER })
     @Bind
-    public @interface Socks5Transport {
+    public @interface Socks5StreamService {
         // marker interface
     }
 

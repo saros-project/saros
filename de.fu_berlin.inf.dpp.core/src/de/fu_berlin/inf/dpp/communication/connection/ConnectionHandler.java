@@ -302,9 +302,9 @@ public class ConnectionHandler {
 
             if (preferences.forceIBBTransport())
                 connectionManager
-                    .setTransport(IConnectionManager.IBB_TRANSPORT);
+                    .setServices(IConnectionManager.IBB_SERVICE);
             else
-                connectionManager.setTransport(/* use all */-1);
+                connectionManager.setServices(/* use all */-1);
 
             connectionService.connect(
                 createConnectionConfiguration(domain, server, port, useTLS,

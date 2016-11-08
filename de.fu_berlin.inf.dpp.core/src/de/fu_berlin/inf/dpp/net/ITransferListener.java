@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.net;
 
-import de.fu_berlin.inf.dpp.net.stream.ConnectionMode;
+import de.fu_berlin.inf.dpp.net.stream.StreamMode;
 
 /**
  * Listener for tracking network traffic. </p><b>Note:</b> It is up to the
@@ -14,7 +14,7 @@ public interface ITransferListener {
      * send is the compressed size.
      * 
      * @param mode
-     *            the {@link ConnectionMode mode} used for sending
+     *            the {@link StreamMode mode} used for sending
      * @param sizeCompressed
      *            the compressed size of the data
      * @param sizeUncompressed
@@ -22,7 +22,7 @@ public interface ITransferListener {
      * @param duration
      *            time in milliseconds it took to send the data
      */
-    public void sent(ConnectionMode mode, long sizeCompressed,
+    public void sent(StreamMode mode, long sizeCompressed,
         long sizeUncompressed, long duration);
 
     /**
@@ -31,7 +31,7 @@ public interface ITransferListener {
      * 
      * 
      * @param mode
-     *            the {@link ConnectionMode mode} used for receiving
+     *            the {@link StreamMode mode} used for receiving
      * @param sizeCompressed
      *            the compressed size of the data
      * @param sizeUncompressed
@@ -39,6 +39,6 @@ public interface ITransferListener {
      * @param duration
      *            time in milliseconds it took to receive the data
      */
-    public void received(ConnectionMode mode, long sizeCompressed,
+    public void received(StreamMode mode, long sizeCompressed,
         long sizeUncompressed, long duration);
 }

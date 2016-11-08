@@ -20,16 +20,16 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
 import org.picocontainer.annotations.Nullable;
 
-import de.fu_berlin.inf.dpp.ISarosContextBindings.IBBTransport;
-import de.fu_berlin.inf.dpp.ISarosContextBindings.Socks5Transport;
+import de.fu_berlin.inf.dpp.ISarosContextBindings.IBBStreamService;
+import de.fu_berlin.inf.dpp.ISarosContextBindings.Socks5StreamService;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.IPacketInterceptor;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransferListener;
-import de.fu_berlin.inf.dpp.net.stream.ConnectionMode;
-import de.fu_berlin.inf.dpp.net.stream.ITransport;
+import de.fu_berlin.inf.dpp.net.stream.IStreamService;
+import de.fu_berlin.inf.dpp.net.stream.StreamMode;
 import de.fu_berlin.inf.dpp.net.xmpp.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
@@ -37,7 +37,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 /**
  * This class is responsible for handling all transfers of binary data. It
  * maintains a map of established connections and tries to reuse them.
- * 
+ *
  * @author srossbach
  * @author coezbek
  * @author jurke
@@ -66,13 +66,13 @@ public class DataTransferManager implements IConnectionListener,
 
     private Connection xmppConnection;
 
-    private int transportMask = -1;
+    private int serviceMask = -1;
 
     private final IReceiver receiver;
 
-    private final ITransport mainTransport;
+    private final IStreamService mainService;
 
-    private final ITransport fallbackTransport;
+    private final IStreamService fallbackService;
 
     private final Lock connectLock = new ReentrantLock();
 
@@ -80,7 +80,7 @@ public class DataTransferManager implements IConnectionListener,
 
     private final Set<String> currentOutgoingConnectionEstablishments = new HashSet<String>();
 
-    private final List<ITransport> availableTransports = new CopyOnWriteArrayList<ITransport>();
+    private final List<IStreamService> streamServices = new CopyOnWriteArrayList<IStreamService>();
 
     private final IByteStreamConnectionListener byteStreamConnectionListener = new IByteStreamConnectionListener() {
 
@@ -170,13 +170,13 @@ public class DataTransferManager implements IConnectionListener,
 
     public DataTransferManager(XMPPConnectionService connectionService,
         IReceiver receiver,
-        @Nullable @Socks5Transport ITransport mainTransport,
-        @Nullable @IBBTransport ITransport fallbackTransport) {
+        @Nullable @Socks5StreamService IStreamService mainService,
+        @Nullable @IBBStreamService IStreamService fallbackService) {
 
         this.receiver = receiver;
-        this.fallbackTransport = fallbackTransport;
-        this.mainTransport = mainTransport;
-        this.initTransports();
+        this.fallbackService = fallbackService;
+        this.mainService = mainService;
+        this.setStreamServices();
 
         connectionService.addListener(this);
     }
@@ -301,7 +301,7 @@ public class DataTransferManager implements IConnectionListener,
     /**
      * @deprecated Disconnects {@link IByteStreamConnection} with the specified
      *             peer
-     * 
+     *
      * @param peer
      *            {@link JID} of the peer to disconnect the
      *            {@link IByteStreamConnection}
@@ -341,14 +341,15 @@ public class DataTransferManager implements IConnectionListener,
     }
 
     /**
-     * {@inheritDoc} The transports will be used on the next successful
-     * connection to a XMPP server and will not affect the transports that are
-     * currently used.
-     * 
+     * {@inheritDoc} The services will be used on the next successful connection
+     * to a XMPP server and will not affect the transports that are currently
+     * used.
+     *
      */
     @Override
-    public synchronized void setTransport(int transportMask) {
-        this.transportMask = transportMask;
+    public synchronized void setServices(int transportMask) {
+        this.serviceMask = transportMask;
+        setStreamServices();
     }
 
     /**
@@ -356,15 +357,15 @@ public class DataTransferManager implements IConnectionListener,
      */
     @Override
     @Deprecated
-    public ConnectionMode getTransferMode(JID jid) {
+    public StreamMode getTransferMode(JID jid) {
         return getTransferMode(null, jid);
     }
 
     @Override
-    public ConnectionMode getTransferMode(String connectionID, JID jid) {
+    public StreamMode getTransferMode(String connectionID, JID jid) {
         IByteStreamConnection connection = getCurrentConnection(connectionID,
             jid);
-        return connection == null ? ConnectionMode.NONE : connection.getMode();
+        return connection == null ? StreamMode.NONE : connection.getMode();
     }
 
     private IByteStreamConnection connectInternal(String connectionID, JID peer)
@@ -403,29 +404,29 @@ public class DataTransferManager implements IConnectionListener,
             if (connectionJID == null)
                 throw new IOException("not connected to a XMPP server");
 
-            final ArrayList<ITransport> transportModesToUse = new ArrayList<ITransport>(
-                availableTransports);
+            final ArrayList<IStreamService> currentStreamServices = new ArrayList<IStreamService>(
+                streamServices);
 
-            for (ITransport transport : transportModesToUse) {
+            for (IStreamService streamService : currentStreamServices) {
                 LOG.info("establishing connection to " + peer + " from "
-                    + connectionJID + " using transport " + transport);
+                    + connectionJID + " using stream service " + streamService);
                 try {
-                    connection = transport.connect(connectionID, peer);
+                    connection = streamService.connect(connectionID, peer);
                     break;
                 } catch (IOException e) {
                     LOG.warn("failed to connect to " + peer
-                        + " using transport: " + transport, e);
+                        + " using stream service: " + streamService, e);
                 } catch (InterruptedException e) {
                     LOG.warn("interrupted while connecting to " + peer
-                        + " using transport: " + transport);
+                        + " using stream service: " + streamService);
                     IOException io = new InterruptedIOException(
                         "connection establishment to " + peer + " aborted");
                     io.initCause(e);
                     throw io;
                 } catch (Exception e) {
                     LOG.error("failed to connect to " + peer
-                        + " due to an internal error in transport: "
-                        + transport, e);
+                        + " due to an internal error in stream service: "
+                        + streamService, e);
                 }
             }
 
@@ -437,8 +438,8 @@ public class DataTransferManager implements IConnectionListener,
             }
 
             throw new IOException("could not connect to " + peer
-                + ", exhausted all available transport modes: "
-                + transportModesToUse);
+                + ", exhausted all available stream services: "
+                + currentStreamServices);
         } finally {
             synchronized (currentOutgoingConnectionEstablishments) {
                 currentOutgoingConnectionEstablishments
@@ -448,44 +449,42 @@ public class DataTransferManager implements IConnectionListener,
         }
     }
 
-    private void initTransports() {
+    private void setStreamServices() {
         boolean useIBB;
         boolean useSocks5;
 
         synchronized (this) {
-            useIBB = (transportMask & IBB_TRANSPORT) != 0;
-            useSocks5 = (transportMask & SOCKS5_TRANSPORT) != 0;
+            useIBB = (serviceMask & IBB_SERVICE) != 0;
+            useSocks5 = (serviceMask & SOCKS5_SERVICE) != 0;
         }
 
-        availableTransports.clear();
+        streamServices.clear();
 
-        if (useSocks5 && mainTransport != null)
-            availableTransports.add(mainTransport);
+        if (useSocks5 && mainService != null)
+            streamServices.add(mainService);
 
-        if (useIBB && fallbackTransport != null)
-            availableTransports.add(fallbackTransport);
+        if (useIBB && fallbackService != null)
+            streamServices.add(fallbackService);
 
-        LOG.debug("used transport order for the current XMPP connection: "
-            + Arrays.toString(availableTransports.toArray()));
+        LOG.debug("used stream service order for the current XMPP connection: "
+            + Arrays.toString(streamServices.toArray()));
 
     }
 
     /**
-     * Sets up the transports for the given XMPPConnection
+     * Sets up the stream services for the given XMPPConnection
      */
     private void prepareConnection(final Connection connection) {
-        assert (this.xmppConnection == null);
+        assert xmppConnection == null;
 
-        initTransports();
-
-        this.xmppConnection = connection;
-        this.currentLocalJID = new JID(connection.getUser());
+        xmppConnection = connection;
+        currentLocalJID = new JID(connection.getUser());
 
         connectionPool.open();
 
-        for (ITransport transport : availableTransports) {
-            transport.initialize(connection, byteStreamConnectionListener);
-        }
+        for (IStreamService streamService : streamServices)
+            streamService.initialize(xmppConnection,
+                byteStreamConnectionListener);
     }
 
     private void disposeConnection() {
@@ -501,8 +500,8 @@ public class DataTransferManager implements IConnectionListener,
         }
 
         try {
-            for (ITransport transport : availableTransports)
-                transport.uninitialize();
+            for (IStreamService streamService : streamServices)
+                streamService.uninitialize();
         } finally {
             if (acquired)
                 connectLock.unlock();
@@ -533,7 +532,7 @@ public class DataTransferManager implements IConnectionListener,
 
     /**
      * Left over and <b>MUST</b> only used by the STF
-     * 
+     *
      * @param extension
      * @deprecated
      */
@@ -546,7 +545,7 @@ public class DataTransferManager implements IConnectionListener,
      * Returns the current connection for the remote side. If the local side is
      * connected to the remote side as well as the remote side is connected to
      * the local side the local to remote connection will be returned.
-     * 
+     *
      * @param connectionID
      *            identifier for the connection to retrieve or <code>null</code>
      *            to retrieve the default one
@@ -578,7 +577,7 @@ public class DataTransferManager implements IConnectionListener,
         return connectionIdentifier + ":" + mode + ":" + jid.toString();
     }
 
-    private void notifyDataSent(final ConnectionMode mode,
+    private void notifyDataSent(final StreamMode mode,
         final long sizeCompressed, final long sizeUncompressed,
         final long duration) {
 
@@ -592,7 +591,7 @@ public class DataTransferManager implements IConnectionListener,
         }
     }
 
-    private void notifyDataReceived(final ConnectionMode mode,
+    private void notifyDataReceived(final StreamMode mode,
         final long sizeCompressed, final long sizeUncompressed,
         final long duration) {
 

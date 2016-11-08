@@ -3,25 +3,25 @@ package de.fu_berlin.inf.dpp.net;
 import java.io.IOException;
 
 import de.fu_berlin.inf.dpp.net.internal.IByteStreamConnection;
-import de.fu_berlin.inf.dpp.net.stream.ConnectionMode;
+import de.fu_berlin.inf.dpp.net.stream.StreamMode;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 // TODO Javadoc
 
 public interface IConnectionManager {
 
-    public static final int IBB_TRANSPORT = 1;
+    public static final int IBB_SERVICE = 1;
 
-    public static final int SOCKS5_TRANSPORT = 2;
+    public static final int SOCKS5_SERVICE = 2;
 
     /**
-     * Sets the transport that should be used to establish direct connections.
-     * 
-     * @param transportMask
-     *            bit wise OR mask that contain the transport to use, -1 for all
-     *            available transports or 0 for no transport at all
+     * Sets the services that should be used to establish direct connections.
+     *
+     * @param serviceMask
+     *            bit wise OR mask that contain the service to use, -1 for all
+     *            available services or 0 for no service at all
      */
-    public void setTransport(int transportMask);
+    public void setServices(int serviceMask);
 
     public void addTransferListener(ITransferListener listener);
 
@@ -38,7 +38,7 @@ public interface IConnectionManager {
     /**
      * @deprecated Disconnects {@link IByteStreamConnection} with the specified
      *             peer
-     * 
+     *
      * @param peer
      *            {@link JID} of the peer to disconnect the
      *            {@link IByteStreamConnection}
@@ -52,8 +52,8 @@ public interface IConnectionManager {
      * @deprecated
      */
     @Deprecated
-    public ConnectionMode getTransferMode(JID jid);
+    public StreamMode getTransferMode(JID jid);
 
-    public ConnectionMode getTransferMode(String connectionID, JID jid);
+    public StreamMode getTransferMode(String connectionID, JID jid);
 
 }

@@ -16,20 +16,20 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.net.stream.ByteStream;
-import de.fu_berlin.inf.dpp.net.stream.ConnectionMode;
+import de.fu_berlin.inf.dpp.net.stream.StreamMode;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 /**
  * BinaryChannelConnection is a class that encapsulates a bidirectional
  * communication channel between two participants.
- * 
+ *
  * The threading requirements of this class are the following:
- * 
+ *
  * send() is a reentrant method for sending data. Any number of threads can call
  * it in parallel. </p> <b>Note:</b> The maximum number of concurrent threads is
  * 32 !
- * 
- * 
+ *
+ *
  * @author sszuecs
  * @author coezbek
  * @author srossbach
@@ -74,7 +74,9 @@ public class BinaryChannelConnection implements IByteStreamConnection {
 
     private DataInputStream inputStream;
     private DataOutputStream outputStream;
+
     private ByteStream stream;
+    private StreamMode mode;
 
     private Map<Integer, String> inNamespaceCache = new HashMap<Integer, String>();
     private Map<String, Integer> outNamespaceCache = new HashMap<String, Integer>();
@@ -88,12 +90,6 @@ public class BinaryChannelConnection implements IByteStreamConnection {
     private int nextJIDId = 0;
     private int nextNamespaceId = 0;
     private int nextElementNameId = 0;
-
-    /**
-     * NetTransferMode to identify the transport method of the underlying socket
-     * connection.
-     */
-    private ConnectionMode transferMode;
 
     private class ReceiverThread extends Thread {
 
@@ -123,14 +119,14 @@ public class BinaryChannelConnection implements IByteStreamConnection {
     }
 
     public BinaryChannelConnection(JID peer, String connectionID,
-        ByteStream stream, ConnectionMode mode,
+        ByteStream stream, StreamMode mode,
         IByteStreamConnectionListener listener) throws IOException {
         this.listener = listener;
         this.peer = peer;
         this.connectionID = connectionID;
         this.stream = stream;
         this.stream.setReadTimeout(0); // keep connection alive
-        this.transferMode = mode;
+        this.mode = mode;
 
         outputStream = new DataOutputStream(new BufferedOutputStream(
             stream.getOutputStream()));
@@ -200,8 +196,8 @@ public class BinaryChannelConnection implements IByteStreamConnection {
     }
 
     @Override
-    public ConnectionMode getMode() {
-        return transferMode;
+    public StreamMode getMode() {
+        return mode;
     }
 
     @Override
@@ -334,9 +330,9 @@ public class BinaryChannelConnection implements IByteStreamConnection {
 
     /**
      * Reads the next XMPP extension.
-     * 
+     *
      * @return returns the next incoming transfer object
-     * 
+     *
      * @throws IOException
      *             If the associated socket broke, while reading or if the
      *             socket has already been disposed.
@@ -394,7 +390,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
                 transferDescription.setCompressContent(compressed == 1);
 
                 BinaryXMPPExtension oldTransferObject = pendingXMPPExtensions
-                    .put(fragmentId, new BinaryXMPPExtension(transferMode,
+                    .put(fragmentId, new BinaryXMPPExtension(mode,
                         transferDescription, chunks));
 
                 if (oldTransferObject != null)
@@ -566,8 +562,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
 
     @Override
     public String toString() {
-        return "[mode=" + getMode().toString() + ", id=" + connectionID + "]"
-            + " " + peer;
+        return "[mode=" + getMode() + ", id=" + connectionID + "]" + " " + peer;
     }
 
     static class IDPool {

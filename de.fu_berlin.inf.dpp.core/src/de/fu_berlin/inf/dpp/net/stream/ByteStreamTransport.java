@@ -17,7 +17,7 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 /**
  * Abstract skeleton for different transport methods.
  */
-public abstract class ByteStreamTransport implements ITransport {
+public abstract class ByteStreamTransport implements IStreamService {
 
     private static final Logger LOG = Logger.getLogger(Socks5Transport.class);
 
@@ -39,10 +39,10 @@ public abstract class ByteStreamTransport implements ITransport {
                 "connection id must not be empty");
 
         if (connectionID.contains(String
-            .valueOf(ITransport.SESSION_ID_DELIMITER)))
+            .valueOf(IStreamService.SESSION_ID_DELIMITER)))
             throw new IllegalArgumentException(
                 "connection id must not contain '"
-                    + ITransport.SESSION_ID_DELIMITER + "'");
+                    + IStreamService.SESSION_ID_DELIMITER + "'");
 
         LOG.debug("establishing bytestream connection to " + peer);
 
@@ -137,7 +137,7 @@ public abstract class ByteStreamTransport implements ITransport {
     /**
      * Handles a BytestreamRequest requests and returns a IByteStreamConnection.
      * If null is returned the request is handled in different manner (i.e. see
-     * {#link Socks5Transport})
+     * {#link Socks5StreamService})
      * 
      * 
      * @param request
@@ -183,5 +183,5 @@ public abstract class ByteStreamTransport implements ITransport {
      */
     abstract protected BytestreamManager createManager(Connection connection);
 
-    abstract protected ConnectionMode getNetTransferMode();
+    abstract protected StreamMode getNetTransferMode();
 }

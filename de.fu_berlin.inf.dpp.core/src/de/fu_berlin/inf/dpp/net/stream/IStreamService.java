@@ -9,10 +9,11 @@ import de.fu_berlin.inf.dpp.net.internal.IByteStreamConnectionListener;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 /**
- * This interface is used to define various transport methods (probably only XEP
- * 65 SOCKS5, XEP 47 in-band bytestream and XEP 16x Jingle.
+ * This interface is used to define various services (probably only XEP 65
+ * SOCKS5, XEP 47 in-band bytestreams) that offer the possibility to establish
+ * network connections/sessions.
  */
-public interface ITransport {
+public interface IStreamService {
 
     /**
      * Delimiter that must be used to encode various arguments into a session
@@ -22,7 +23,7 @@ public interface ITransport {
 
     /**
      * Establishes a {@link IByteStreamConnection connection} to the given JID.
-     * 
+     *
      * @param connectionID
      *            an ID used to identify this connection on the remote side
      * @param peer
@@ -41,9 +42,9 @@ public interface ITransport {
         throws IOException, InterruptedException;
 
     /**
-     * Initializes the transport. After initialization the transport is able to
+     * Initializes the service. After initialization the service is able to
      * establish connections via {@link #connect}.
-     * 
+     *
      * @param connection
      * @param listener
      */
@@ -51,8 +52,8 @@ public interface ITransport {
         IByteStreamConnectionListener listener);
 
     /**
-     * Un-initializes the transport. After un-initialization the transport is
-     * not able to establish connections via {@link #connect}.
+     * Un-initializes the service. After un-initialization the service is not
+     * able to establish connections via {@link #connect}.
      */
     public void uninitialize();
 }

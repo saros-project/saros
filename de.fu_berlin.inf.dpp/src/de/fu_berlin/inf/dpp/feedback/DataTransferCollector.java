@@ -7,12 +7,12 @@ import java.util.Map.Entry;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.ITransferListener;
-import de.fu_berlin.inf.dpp.net.stream.ConnectionMode;
+import de.fu_berlin.inf.dpp.net.stream.StreamMode;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 
 /**
  * Collects information about the amount of data transfered with the different
- * {@link ConnectionMode}s
+ * {@link StreamMode}s
  * 
  * @author Christopher Oezbek
  */
@@ -39,15 +39,15 @@ public class DataTransferCollector extends AbstractStatisticCollector {
         private int count;
     }
 
-    private final Map<ConnectionMode, TransferStatisticHolder> statistic = new EnumMap<ConnectionMode, TransferStatisticHolder>(
-        ConnectionMode.class);
+    private final Map<StreamMode, TransferStatisticHolder> statistic = new EnumMap<StreamMode, TransferStatisticHolder>(
+        StreamMode.class);
 
     private final IConnectionManager connectionManager;
 
     private final ITransferListener dataTransferlistener = new ITransferListener() {
 
         @Override
-        public void sent(final ConnectionMode mode, final long sizeCompressed,
+        public void sent(final StreamMode mode, final long sizeCompressed,
             final long sizeUncompressed, final long duration) {
             // see processGatheredData
             synchronized (DataTransferCollector.this) {
@@ -67,7 +67,7 @@ public class DataTransferCollector extends AbstractStatisticCollector {
         }
 
         @Override
-        public void received(final ConnectionMode mode,
+        public void received(final StreamMode mode,
             final long sizeCompressed, final long sizeUncompressed,
             final long duration) {
             // TODO differentiate the traffic
@@ -85,10 +85,10 @@ public class DataTransferCollector extends AbstractStatisticCollector {
     @Override
     protected synchronized void processGatheredData() {
 
-        for (final Entry<ConnectionMode, TransferStatisticHolder> entry : statistic
+        for (final Entry<StreamMode, TransferStatisticHolder> entry : statistic
             .entrySet()) {
 
-            final ConnectionMode mode = entry.getKey();
+            final StreamMode mode = entry.getKey();
             final TransferStatisticHolder holder = entry.getValue();
 
             storeTransferStatisticForMode(mode.toString(), holder.count,

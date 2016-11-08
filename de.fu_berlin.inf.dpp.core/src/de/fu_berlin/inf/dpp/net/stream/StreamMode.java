@@ -1,12 +1,12 @@
 package de.fu_berlin.inf.dpp.net.stream;
 
-public enum ConnectionMode {
+public enum StreamMode {
     NONE("UNKNOWN"), IBB("IBB"), SOCKS5_MEDIATED("SOCKS5 (M)"), SOCKS5_DIRECT(
         "SOCKS5 (D)"), TCP("TCP");
 
     private final String name;
 
-    ConnectionMode(String name) {
+    StreamMode(String name) {
         this.name = name;
     }
 

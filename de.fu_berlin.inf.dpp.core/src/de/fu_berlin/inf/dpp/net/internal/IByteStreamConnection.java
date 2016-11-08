@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.net.internal;
 
 import java.io.IOException;
 
-import de.fu_berlin.inf.dpp.net.stream.ConnectionMode;
+import de.fu_berlin.inf.dpp.net.stream.StreamMode;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 /**
@@ -44,5 +44,5 @@ public interface IByteStreamConnection {
      */
     public String getConnectionID();
 
-    public ConnectionMode getMode();
+    public StreamMode getMode();
 }

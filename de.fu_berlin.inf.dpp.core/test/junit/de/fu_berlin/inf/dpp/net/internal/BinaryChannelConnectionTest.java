@@ -20,7 +20,7 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.net.internal.BinaryChannelConnection.IDPool;
 import de.fu_berlin.inf.dpp.net.stream.ByteStream;
-import de.fu_berlin.inf.dpp.net.stream.ConnectionMode;
+import de.fu_berlin.inf.dpp.net.stream.StreamMode;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 public class BinaryChannelConnectionTest {
@@ -113,7 +113,7 @@ public class BinaryChannelConnectionTest {
 
         BinaryChannelConnection alice = new BinaryChannelConnection(new JID(
             "alice@baumeister.de"), "junit", aliceStream,
-            ConnectionMode.SOCKS5_DIRECT, new StreamConnectionListener() {
+            StreamMode.SOCKS5_DIRECT, new StreamConnectionListener() {
                 @Override
                 public void receive(final BinaryXMPPExtension extension) {
                     // NOP
@@ -122,7 +122,7 @@ public class BinaryChannelConnectionTest {
 
         BinaryChannelConnection bob = new BinaryChannelConnection(new JID(
             "bob@baumeister.de"), "junit", bobStream,
-            ConnectionMode.SOCKS5_DIRECT, new StreamConnectionListener() {
+            StreamMode.SOCKS5_DIRECT, new StreamConnectionListener() {
                 @Override
                 public void receive(final BinaryXMPPExtension extension) {
                     extensions.add(extension);
@@ -194,7 +194,7 @@ public class BinaryChannelConnectionTest {
 
         BinaryChannelConnection alice = new BinaryChannelConnection(new JID(
             "alice@baumeister.de"), "junit", aliceStream,
-            ConnectionMode.SOCKS5_DIRECT, new StreamConnectionListener() {
+            StreamMode.SOCKS5_DIRECT, new StreamConnectionListener() {
                 @Override
                 public void receive(final BinaryXMPPExtension extension) {
                     // NOP
@@ -203,7 +203,7 @@ public class BinaryChannelConnectionTest {
 
         BinaryChannelConnection bob = new BinaryChannelConnection(new JID(
             "bob@baumeister.de"), "junit", bobStream,
-            ConnectionMode.SOCKS5_DIRECT, new StreamConnectionListener() {
+            StreamMode.SOCKS5_DIRECT, new StreamConnectionListener() {
                 @Override
                 public void receive(final BinaryXMPPExtension extension) {
                     receivedBytes = extension.getPayload();
@@ -254,7 +254,7 @@ public class BinaryChannelConnectionTest {
 
         BinaryChannelConnection alice = new BinaryChannelConnection(new JID(
             "alice@baumeister.de"), "junit", aliceStream,
-            ConnectionMode.SOCKS5_DIRECT, new StreamConnectionListener() {
+            StreamMode.SOCKS5_DIRECT, new StreamConnectionListener() {
                 @Override
                 public void receive(final BinaryXMPPExtension extension) {
                     // NOP
@@ -263,7 +263,7 @@ public class BinaryChannelConnectionTest {
 
         BinaryChannelConnection bob = new BinaryChannelConnection(new JID(
             "bob@baumeister.de"), "junit", bobStream,
-            ConnectionMode.SOCKS5_DIRECT, new StreamConnectionListener() {
+            StreamMode.SOCKS5_DIRECT, new StreamConnectionListener() {
                 @Override
                 public void receive(final BinaryXMPPExtension extension) {
                     receivedBytes = extension.getPayload();

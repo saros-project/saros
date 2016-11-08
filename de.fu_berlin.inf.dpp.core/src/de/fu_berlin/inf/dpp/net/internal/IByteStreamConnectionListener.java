@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.net.internal;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 /**
- * Listener interface used by ITransport and IBytestreamConnection to notify
+ * Listener interface used by IStreamService and IBytestreamConnection to notify
  * about established or changed connections and incoming XMPP extensions.
  * 
  * @author jurke
