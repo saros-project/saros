@@ -141,7 +141,7 @@ public class DataTransferManagerTest {
         }
 
         @Override
-        public JID getPeer() {
+        public JID getRemoteAddress() {
             return to;
         }
 

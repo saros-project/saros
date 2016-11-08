@@ -192,7 +192,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
             }
         }
 
-        listener.connectionClosed(connectionID, getPeer(), this);
+        listener.connectionClosed(connectionID, getRemoteAddress(), this);
     }
 
     @Override
@@ -201,7 +201,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
     }
 
     @Override
-    public JID getPeer() {
+    public JID getRemoteAddress() {
         return peer;
     }
 

@@ -6,11 +6,11 @@ import de.fu_berlin.inf.dpp.net.stream.StreamMode;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 /**
- * A IConnection is responsible for sending data to a particular user
+ * A IByteStreamConnection is responsible for sending data to a particular user
  */
 public interface IByteStreamConnection {
 
-    public JID getPeer();
+    public JID getRemoteAddress();
 
     public void close();
 
@@ -26,7 +26,7 @@ public interface IByteStreamConnection {
     /**
      * If this call returns the data has been send successfully, otherwise an
      * IOException is thrown with the reason why the transfer failed.
-     * 
+     *
      * @param data
      *            The data to be sent.
      * @throws IOException
@@ -38,7 +38,7 @@ public interface IByteStreamConnection {
 
     /**
      * Returns the connection id of this connection.
-     * 
+     *
      * @return the connection id or <code>null</code> if the connection has no
      *         id
      */
