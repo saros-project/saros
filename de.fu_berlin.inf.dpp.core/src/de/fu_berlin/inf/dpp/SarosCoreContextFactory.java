@@ -24,7 +24,7 @@ import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.mdns.MDNSService;
 import de.fu_berlin.inf.dpp.net.stream.IBBStreamService;
 import de.fu_berlin.inf.dpp.net.stream.IStreamService;
-import de.fu_berlin.inf.dpp.net.stream.Socks5Transport;
+import de.fu_berlin.inf.dpp.net.stream.Socks5StreamService;
 import de.fu_berlin.inf.dpp.net.stun.IStunService;
 import de.fu_berlin.inf.dpp.net.stun.internal.StunServiceImpl;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPAccess;
@@ -89,7 +89,7 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
         Component
             .create(BindKey.bindKey(IStreamService.class,
                 ISarosContextBindings.Socks5StreamService.class),
-                Socks5Transport.class),
+                Socks5StreamService.class),
 
         Component.create(RosterTracker.class),
         Component.create(XMPPConnectionService.class),

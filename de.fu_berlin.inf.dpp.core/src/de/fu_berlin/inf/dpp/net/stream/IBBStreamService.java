@@ -25,7 +25,7 @@ public class IBBStreamService implements IStreamService, BytestreamListener {
 
     private final static Logger LOG = Logger.getLogger(IBBStreamService.class);
 
-    private volatile BytestreamManager manager;
+    private volatile InBandBytestreamManager manager;
     private volatile IByteStreamConnectionListener connectionListener;
     private JID localAddress;
 
