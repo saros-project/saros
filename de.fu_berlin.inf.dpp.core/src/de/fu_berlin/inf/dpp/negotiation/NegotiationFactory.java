@@ -37,7 +37,8 @@ public final class NegotiationFactory {
      */
     private final DiscoveryManager discoveryManager;
 
-    private final IEditorManager editorManager;
+    // private final IEditorManager editorManager;
+    private final ISarosContext applicationContext;
 
     private final FileReplacementInProgressObservable fileReplacementInProgressObservable;
 
@@ -75,8 +76,7 @@ public final class NegotiationFactory {
         this.discoveryManager = discoveryManager;
 
         // this.editorManager = editorManager;
-        this.editorManager = applicationContext
-            .getComponent(IEditorManager.class);
+        this.applicationContext = applicationContext;
 
         this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
 
@@ -114,8 +114,9 @@ public final class NegotiationFactory {
         final ISarosSessionManager sessionManager, final ISarosSession session) {
 
         return new OutgoingProjectNegotiation(remoteAddress, resources,
-            sessionManager, session, editorManager, workspace, checksumCache,
-            connectionService, transmitter, receiver);
+            sessionManager, session, /* editorManager */
+            applicationContext.getComponent(IEditorManager.class), workspace,
+            checksumCache, connectionService, transmitter, receiver);
     }
 
     public IncomingProjectNegotiation newIncomingProjectNegotiation(
