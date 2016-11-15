@@ -92,7 +92,7 @@ public final class SharedProjectDecorator implements ILightweightLabelDecorator 
 
     public SharedProjectDecorator() {
         SarosPluginContext.initComponent(this);
-        session = sessionManager.getSarosSession();
+        session = sessionManager.getSession();
         sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
     }
 

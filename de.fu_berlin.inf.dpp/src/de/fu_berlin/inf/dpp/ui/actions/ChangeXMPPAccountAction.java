@@ -167,7 +167,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator,
 
     private void connectWithThisAccount(final XMPPAccount account) {
 
-        if (sarosSessionManager.getSarosSession() == null) {
+        if (sarosSessionManager.getSession() == null) {
             connect(account);
             return;
         }

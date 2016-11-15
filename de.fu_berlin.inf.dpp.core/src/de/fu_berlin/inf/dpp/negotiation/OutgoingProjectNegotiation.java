@@ -260,7 +260,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     @Override
     protected void executeCancellation() {
         if (session.getRemoteUsers().isEmpty())
-            sessionManager.stopSarosSession(SessionEndReason.LOCAL_USER_LEFT);
+            sessionManager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
     }
 
     private List<StartHandle> stopUsers(IProgressMonitor monitor) {

@@ -140,7 +140,7 @@ public abstract class SessionDisplayComposite extends
 
         sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
 
-        final ISarosSession session = sessionManager.getSarosSession();
+        final ISarosSession session = sessionManager.getSession();
 
         if (session != null) {
             filter = new HideContactsInSessionFilter(session);

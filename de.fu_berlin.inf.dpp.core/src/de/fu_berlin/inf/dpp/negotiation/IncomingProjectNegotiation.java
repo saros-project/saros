@@ -373,7 +373,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         // The session might have been stopped already, if not we will stop it.
         if (session.getProjectResourcesMapping().keySet().isEmpty()
             || session.getRemoteUsers().isEmpty())
-            sessionManager.stopSarosSession(SessionEndReason.LOCAL_USER_LEFT);
+            sessionManager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
     }
 
     @Override

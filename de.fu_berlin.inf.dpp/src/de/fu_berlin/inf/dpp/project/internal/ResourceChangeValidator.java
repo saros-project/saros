@@ -124,7 +124,7 @@ public class ResourceChangeValidator extends ModelProvider {
                     sarosSession = null;
                 }
             });
-        sarosSession = sessionManager.getSarosSession();
+        sarosSession = sessionManager.getSession();
     }
 
     @Override

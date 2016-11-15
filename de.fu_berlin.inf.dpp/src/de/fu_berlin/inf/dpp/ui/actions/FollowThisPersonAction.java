@@ -170,7 +170,7 @@ public class FollowThisPersonAction extends Action implements Disposable {
     }
 
     protected boolean canBeExecuted(List<User> users) {
-        ISarosSession sarosSession = sessionManager.getSarosSession();
+        ISarosSession sarosSession = sessionManager.getSession();
 
         return sarosSession != null && followModeManager != null
             && users.size() == 1 && !users.get(0).isLocal();

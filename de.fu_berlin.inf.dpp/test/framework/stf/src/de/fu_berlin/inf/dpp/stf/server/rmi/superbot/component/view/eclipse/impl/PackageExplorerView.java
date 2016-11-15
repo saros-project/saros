@@ -277,7 +277,7 @@ public final class PackageExplorerView extends StfRemoteObject implements
         IResource resource = ResourcesPlugin.getWorkspace().getRoot()
             .findMember(new Path(path));
 
-        ISarosSession session = getSessionManager().getSarosSession();
+        ISarosSession session = getSessionManager().getSession();
 
         if (session == null)
             throw new IllegalStateException(

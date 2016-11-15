@@ -128,7 +128,7 @@ public class ConsistencyAction extends Action implements Disposable {
 
         sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
 
-        setSession(sessionManager.getSarosSession());
+        setSession(sessionManager.getSession());
     }
 
     private void setSession(ISarosSession newSession) {

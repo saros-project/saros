@@ -133,7 +133,7 @@ public class DeleteContactAction extends Action implements Disposable {
 
         if (sessionManager != null) {
             // Is the chosen user currently in the session?
-            ISarosSession sarosSession = sessionManager.getSarosSession();
+            ISarosSession sarosSession = sessionManager.getSession();
             String entryJid = rosterEntry.getUser();
 
             if (sarosSession != null) {

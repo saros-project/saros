@@ -70,7 +70,7 @@ public class AwarenessInformationCollector {
     public User getFollowedUser(User user) {
         assert user != null;
 
-        final ISarosSession session = sessionManager.getSarosSession();
+        final ISarosSession session = sessionManager.getSession();
 
         // should not be called outside of a running session
         if (session == null)

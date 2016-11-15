@@ -64,7 +64,7 @@ public class TreeClickListener extends MouseAdapter {
                     .getUserObject();
                 User user = userInfo.getUser();
                 if (!user
-                    .equals(sessionManager.getSarosSession().getLocalUser())) {
+                    .equals(sessionManager.getSession().getLocalUser())) {
                     SessionPopMenu menu = new SessionPopMenu(user);
                     menu.show(e.getComponent(), e.getX(), e.getY());
                 }

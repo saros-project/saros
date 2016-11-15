@@ -192,7 +192,7 @@ public class FollowModeAction extends Action implements IMenuCreator,
         setText(Messages.FollowModeAction_enter_followmode);
         setMenuCreator(this);
 
-        session = sessionManager.getSarosSession();
+        session = sessionManager.getSession();
 
         sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
 

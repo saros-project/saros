@@ -114,7 +114,7 @@ abstract class SessionTimeoutHandler implements Startable {
                     @Override
                     public void run() {
                         sessionManager
-                            .stopSarosSession(SessionEndReason.CONNECTION_LOST);
+                            .stopSession(SessionEndReason.CONNECTION_LOST);
                     }
                 });
         }

@@ -493,7 +493,7 @@ public abstract class BaseResourceSelectionComposite extends
         @Override
         public boolean select(Viewer viewer, Object parentElement,
             Object element) {
-            ISarosSession sarosSession = sessionManager.getSarosSession();
+            ISarosSession sarosSession = sessionManager.getSession();
             if (sarosSession != null) {
                 if (element instanceof IFile || element instanceof IFolder) {
                     return !sarosSession.isShared(ResourceAdapterFactory

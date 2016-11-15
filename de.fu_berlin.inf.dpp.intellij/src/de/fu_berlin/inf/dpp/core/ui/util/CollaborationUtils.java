@@ -87,7 +87,7 @@ public class CollaborationUtils {
 
                     monitor.worked(50);
 
-                    ISarosSession session = sessionManager.getSarosSession();
+                    ISarosSession session = sessionManager.getSession();
 
                     if (session == null) {
                         return Status.CANCEL_STATUS;
@@ -119,7 +119,7 @@ public class CollaborationUtils {
      */
     public static void leaveSession() {
 
-        ISarosSession sarosSession = sessionManager.getSarosSession();
+        ISarosSession sarosSession = sessionManager.getSession();
 
         if (sarosSession == null) {
             LOG.warn("cannot leave a non-running session");
@@ -151,7 +151,7 @@ public class CollaborationUtils {
             @Override
             public void run() {
                 sessionManager
-                    .stopSarosSession(SessionEndReason.LOCAL_USER_LEFT);
+                    .stopSession(SessionEndReason.LOCAL_USER_LEFT);
             }
         });
     }
@@ -165,7 +165,7 @@ public class CollaborationUtils {
      */
     public static void addResourcesToSession(List<IResource> resourcesToAdd) {
 
-        final ISarosSession sarosSession = sessionManager.getSarosSession();
+        final ISarosSession sarosSession = sessionManager.getSession();
 
         if (sarosSession == null) {
             LOG.warn("cannot add resources to a non-running session");
@@ -205,7 +205,7 @@ public class CollaborationUtils {
      */
     public static void addContactsToSession(final List<JID> contacts) {
 
-        final ISarosSession sarosSession = sessionManager.getSarosSession();
+        final ISarosSession sarosSession = sessionManager.getSession();
 
         if (sarosSession == null) {
             LOG.warn("cannot add contacts to a non-running session");

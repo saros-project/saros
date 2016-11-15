@@ -74,7 +74,7 @@ public class EclipseSarosLifecycle extends AbstractSarosLifecycle {
 
     @Override
     protected void finalizeContext(final SarosContext sarosContext) {
-        sarosContext.getComponent(SarosSessionManager.class).stopSarosSession(
+        sarosContext.getComponent(SarosSessionManager.class).stopSession(
             SessionEndReason.LOCAL_USER_LEFT);
         sarosContext.getComponent(ConnectionHandler.class).disconnect();
     }

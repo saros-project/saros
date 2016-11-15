@@ -117,6 +117,6 @@ public final class XMPPSessionDisplayComposite extends SessionDisplayComposite {
             cachedRoster = roster;
 
         getViewer().setInput(
-            new SessionInput(sessionManager.getSarosSession(), cachedRoster));
+            new SessionInput(sessionManager.getSession(), cachedRoster));
     }
 }

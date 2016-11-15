@@ -177,7 +177,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
         sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
         editorManager.addSharedEditorListener(editorListener);
 
-        ISarosSession session = sessionManager.getSarosSession();
+        ISarosSession session = sessionManager.getSession();
 
         if (session != null)
             sessionLifecycleListener.sessionStarting(session);

@@ -70,7 +70,7 @@ public class LeaveSessionAction extends Action implements Disposable {
     }
 
     private void updateEnablement() {
-        ISarosSession session = sessionManager.getSarosSession();
+        ISarosSession session = sessionManager.getSession();
 
         if (session == null) {
             setEnabled(false);

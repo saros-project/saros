@@ -67,10 +67,10 @@ public class JumpToUserWithWriteAccessPositionAction extends Action implements
         try {
             List<User> participants = SelectionRetrieverFactory
                 .getSelectionRetriever(User.class).getSelection();
-            setEnabled(sessionManager.getSarosSession() != null
+            setEnabled(sessionManager.getSession() != null
                 && participants.size() == 1
                 && !participants.get(0).equals(
-                    sessionManager.getSarosSession().getLocalUser()));
+                    sessionManager.getSession().getLocalUser()));
         } catch (NullPointerException e) {
             this.setEnabled(false);
         } catch (Exception e) {

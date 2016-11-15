@@ -30,7 +30,7 @@ public class ProjectPropertyTester extends PropertyTester {
         if (!(receiver instanceof IResource))
             return false;
 
-        final ISarosSession session = sessionManager.getSarosSession();
+        final ISarosSession session = sessionManager.getSession();
 
         if (session == null)
             return false;

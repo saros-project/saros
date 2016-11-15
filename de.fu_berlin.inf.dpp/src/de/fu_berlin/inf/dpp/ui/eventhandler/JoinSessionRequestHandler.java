@@ -66,7 +66,7 @@ public final class JoinSessionRequestHandler {
     private void handleInvitationRequest(JID from,
         JoinSessionRequestExtension extension) {
 
-        ISarosSession session = sessionManager.getSarosSession();
+        ISarosSession session = sessionManager.getSession();
 
         if (session != null && !session.isHost())
             return;

@@ -507,7 +507,7 @@ public class SarosView extends ViewPart {
 
                 boolean isHost = false;
 
-                ISarosSession session = sarosSessionManager.getSarosSession();
+                ISarosSession session = sarosSessionManager.getSession();
 
                 if (session != null)
                     isHost = session.isHost();

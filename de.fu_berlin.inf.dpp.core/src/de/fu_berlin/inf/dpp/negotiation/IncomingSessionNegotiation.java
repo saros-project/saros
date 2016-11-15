@@ -112,7 +112,7 @@ public class IncomingSessionNegotiation extends SessionNegotiation {
          * until we explicitly call this method even if we do not start any
          * session at all !
          */
-        sessionManager.stopSarosSession(SessionEndReason.LOCAL_USER_LEFT);
+        sessionManager.stopSession(SessionEndReason.LOCAL_USER_LEFT);
     }
 
     /**

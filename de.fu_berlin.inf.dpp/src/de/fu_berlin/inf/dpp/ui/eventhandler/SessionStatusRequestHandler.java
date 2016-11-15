@@ -64,7 +64,7 @@ public final class SessionStatusRequestHandler {
             .getBoolean(EclipsePreferenceConstants.SERVER_ACTIVATED))
             return;
 
-        ISarosSession session = sessionManager.getSarosSession();
+        ISarosSession session = sessionManager.getSession();
         SessionStatusResponseExtension response;
 
         if (session == null) {

@@ -82,7 +82,7 @@ public class RemoveUserAction extends Action {
             selectionListener);
 
         sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
-        session = sessionManager.getSarosSession();
+        session = sessionManager.getSession();
 
         updateEnablement();
     }

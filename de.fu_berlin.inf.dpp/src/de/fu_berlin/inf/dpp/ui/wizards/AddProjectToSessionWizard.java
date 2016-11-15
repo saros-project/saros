@@ -150,7 +150,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
     @Override
     public void addPages() {
-        ISarosSession session = sessionManager.getSarosSession();
+        ISarosSession session = sessionManager.getSession();
 
         if (session == null)
             return;
@@ -532,7 +532,7 @@ public class AddProjectToSessionWizard extends Wizard {
 
         final Map<String, FileListDiff> modifiedResources = new HashMap<String, FileListDiff>();
 
-        final ISarosSession session = sessionManager.getSarosSession();
+        final ISarosSession session = sessionManager.getSession();
 
         // FIXME the wizard should handle the case that the session may stop in
         // the meantime !

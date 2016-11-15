@@ -120,7 +120,7 @@ public class MUCNegotiationManager {
     public MultiUserChatPreferences getOwnPreferences() {
 
         // TODO if no session is present return null
-        final ISarosSession session = sessionManager.getSarosSession();
+        final ISarosSession session = sessionManager.getSession();
 
         return new MultiUserChatPreferences(getMUCService(), "SAROS_"
             + (session != null ? session.getID() : NOT_IN_SESSION), password);

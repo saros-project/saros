@@ -120,7 +120,7 @@ public class LeaveAndKickHandler implements Startable {
         ThreadUtils.runSafeAsync("dpp-stop-host", LOG, new Runnable() {
             @Override
             public void run() {
-                sessionManager.stopSarosSession(reason);
+                sessionManager.stopSession(reason);
             }
         });
     }

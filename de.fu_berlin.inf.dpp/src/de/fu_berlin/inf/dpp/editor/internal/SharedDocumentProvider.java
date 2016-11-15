@@ -80,7 +80,7 @@ public final class SharedDocumentProvider extends TextFileDocumentProvider {
 
         SarosPluginContext.initComponent(this);
 
-        final ISarosSession currentSession = sessionManager.getSarosSession();
+        final ISarosSession currentSession = sessionManager.getSession();
 
         if (currentSession != null)
             sessionLifecycleListener.sessionStarted(currentSession);

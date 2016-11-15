@@ -382,7 +382,7 @@ public final class ChatControl extends Composite {
         this.chat.addChatListener(chatListener);
 
         synchronized (this) {
-            this.session = sessionManager.getSarosSession();
+            this.session = sessionManager.getSession();
             this.sessionManager
                 .addSessionLifecycleListener(sessionLifecycleListener);
 

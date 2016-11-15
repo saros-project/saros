@@ -92,7 +92,7 @@ public class SarosSourceProvider extends AbstractSourceProvider {
 
     @Override
     public Map<Object, Object> getCurrentState() {
-        Object session = sessionManager.getSarosSession();
+        Object session = sessionManager.getSession();
 
         if (session == null)
             session = IEvaluationContext.UNDEFINED_VARIABLE;

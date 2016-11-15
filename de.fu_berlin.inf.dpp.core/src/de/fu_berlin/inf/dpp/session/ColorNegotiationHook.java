@@ -46,7 +46,7 @@ public class ColorNegotiationHook implements ISessionNegotiationHook {
         if (input == null)
             return null;
 
-        String hostColor = Integer.toString(sessionManager.getSarosSession()
+        String hostColor = Integer.toString(sessionManager.getSession()
             .getLocalUser().getColorID());
 
         String hostFavoriteColor = Integer.toString(preferences

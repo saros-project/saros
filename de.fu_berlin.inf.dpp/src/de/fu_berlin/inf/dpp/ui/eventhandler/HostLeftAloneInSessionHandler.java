@@ -58,7 +58,7 @@ public class HostLeftAloneInSessionHandler {
         @Override
         public void userLeft(User user) {
 
-            ISarosSession session = sessionManager.getSarosSession();
+            ISarosSession session = sessionManager.getSession();
 
             if (session == null || !session.isHost()
                 || !session.getRemoteUsers().isEmpty())

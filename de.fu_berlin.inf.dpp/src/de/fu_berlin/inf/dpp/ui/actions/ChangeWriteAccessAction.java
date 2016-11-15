@@ -130,9 +130,9 @@ public class ChangeWriteAccessAction extends Action implements Disposable {
          * manually. If the permissionListener is not added to the session and
          * the action enablement cannot be updated.
          */
-        if (sessionManager.getSarosSession() != null) {
+        if (sessionManager.getSession() != null) {
             sessionLifecycleListener.sessionStarted(sessionManager
-                .getSarosSession());
+                .getSession());
         }
 
         sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
@@ -145,7 +145,7 @@ public class ChangeWriteAccessAction extends Action implements Disposable {
         List<User> participants = SelectionRetrieverFactory
             .getSelectionRetriever(User.class).getSelection();
 
-        boolean sessionRunning = (sessionManager.getSarosSession() != null);
+        boolean sessionRunning = (sessionManager.getSession() != null);
         boolean selectedOneWithOppositePermission = (participants.size() == 1 && participants
             .get(0).getPermission() != permission);
 
@@ -164,7 +164,7 @@ public class ChangeWriteAccessAction extends Action implements Disposable {
         ThreadUtils.runSafeSync(LOG, new Runnable() {
             @Override
             public void run() {
-                ISarosSession session = sessionManager.getSarosSession();
+                ISarosSession session = sessionManager.getSession();
 
                 if (session == null)
                     return;

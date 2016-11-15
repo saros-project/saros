@@ -74,7 +74,7 @@ public abstract class SarosPermissionsGraphicalEditor extends
      */
     @Override
     protected void initializeGraphicalViewer() {
-        ISarosSession session = sessionManager.getSarosSession();
+        ISarosSession session = sessionManager.getSession();
         if (session != null) {
             setEnabled(session.getLocalUser().hasWriteAccess());
         }

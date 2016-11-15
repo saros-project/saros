@@ -45,7 +45,7 @@ public abstract class StfRemoteObject implements Constants {
      * @return is <code>null</code> if there is no running session
      */
     protected FollowModeManager getFollowModeManager() {
-        ISarosSession sarosSession = getSessionManager().getSarosSession();
+        ISarosSession sarosSession = getSessionManager().getSession();
 
         if (sarosSession == null)
             return null;

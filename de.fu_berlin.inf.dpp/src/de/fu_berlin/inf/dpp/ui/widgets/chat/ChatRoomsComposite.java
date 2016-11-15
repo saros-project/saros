@@ -437,7 +437,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         connectionHandler.addConnectionStateListener(connectionStateListener);
         preferenceStore.addPropertyChangeListener(propertyChangeListener);
 
-        ISarosSession session = sessionManager.getSarosSession();
+        ISarosSession session = sessionManager.getSession();
         if (session != null) {
             session.addListener(sessionListener);
         }
@@ -467,7 +467,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
             @Override
             public void widgetDisposed(DisposeEvent e) {
 
-                ISarosSession session = sessionManager.getSarosSession();
+                ISarosSession session = sessionManager.getSession();
                 if (session != null) {
                     session.removeListener(sessionListener);
                 }

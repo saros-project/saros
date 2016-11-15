@@ -141,7 +141,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             ConnectionState state) {
 
             if (state == ConnectionState.DISCONNECTING) {
-                stopSarosSession(SessionEndReason.CONNECTION_LOST);
+                stopSession(SessionEndReason.CONNECTION_LOST);
             }
         }
     };
@@ -284,7 +284,7 @@ public class SarosSessionManager implements ISarosSessionManager {
      * @nonSWT
      */
     @Override
-    public void stopSarosSession(SessionEndReason reason) {
+    public void stopSession(SessionEndReason reason) {
 
         try {
             if (!startStopSessionLock.tryLock(LOCK_TIMEOUT,
@@ -359,7 +359,7 @@ public class SarosSessionManager implements ISarosSessionManager {
      */
     @Override
     @Deprecated
-    public ISarosSession getSarosSession() {
+    public ISarosSession getSession() {
         return session;
     }
 

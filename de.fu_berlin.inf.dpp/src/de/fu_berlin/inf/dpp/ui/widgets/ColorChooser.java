@@ -145,7 +145,7 @@ public class ColorChooser extends Composite {
      * its color.
      */
     public void updateColorEnablement() {
-        ISarosSession session = sessionManager.getSarosSession();
+        ISarosSession session = sessionManager.getSession();
 
         Set<Integer> unavailableColors = session != null ? session
             .getUnavailableColors() : new HashSet<Integer>();

@@ -55,7 +55,7 @@ public class SarosFileShareGroup extends ActionGroup {
             SarosPluginContext.initComponent(this);
         }
 
-        if (e == null || sessionManager.getSarosSession() != null) {
+        if (e == null || sessionManager.getSession() != null) {
             return new AnAction[0];
         }
 

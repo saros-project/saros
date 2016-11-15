@@ -104,7 +104,7 @@ public class ConsistencyButton extends ToolbarButton {
             IN_SYNC_ICON_PATH, "Files are consistent");
         SarosPluginContext.initComponent(this);
 
-        setSarosSession(sessionManager.getSarosSession());
+        setSarosSession(sessionManager.getSession());
         sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
 
         addActionListener(actionListener);

@@ -65,7 +65,7 @@ public final class ChangeColorAction extends Action implements Disposable {
         List<User> participants = SelectionRetrieverFactory
             .getSelectionRetriever(User.class).getSelection();
 
-        ISarosSession session = sessionManager.getSarosSession();
+        ISarosSession session = sessionManager.getSession();
 
         setEnabled(session != null && participants.size() == 1
             && participants.get(0).equals(session.getLocalUser()));
@@ -85,7 +85,7 @@ public final class ChangeColorAction extends Action implements Disposable {
         if (dialog.open() != Window.OK)
             return;
 
-        ISarosSession session = sessionManager.getSarosSession();
+        ISarosSession session = sessionManager.getSession();
 
         if (session == null)
             return;
