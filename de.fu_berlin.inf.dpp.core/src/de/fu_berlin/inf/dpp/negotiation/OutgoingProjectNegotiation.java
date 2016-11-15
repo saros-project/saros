@@ -13,9 +13,7 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
-import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.communication.extensions.ProjectNegotiationMissingFilesExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.ProjectNegotiationOfferingExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingRequest;
@@ -32,9 +30,13 @@ import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.SubProgressMonitor;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
+import de.fu_berlin.inf.dpp.net.IReceiver;
+import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
@@ -46,42 +48,39 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
     private List<IProject> projects;
 
-    private final ISarosSession session;
-
     private static final Random NEGOTIATION_ID_GENERATOR = new Random();
 
-    @Inject
-    private IWorkspace workspace;
-
-    @Inject
-    private IEditorManager editorManager;
-
-    @Inject
-    private IChecksumCache checksumCache;
+    private final IEditorManager editorManager;
 
     private PacketCollector remoteFileListResponseCollector;
 
     private PacketCollector startActivityQueuingResponseCollector;
 
-    /**
-     * Initializes an OutgoingProjectNegotiation.
-     * 
-     * @param peer
-     *            JID of the peer to negotiate with
-     * @param session
-     *            current Saros session
-     * @param projects
-     *            projects to share
-     * @param sarosContext
-     *            Saros dependency injection context
-     */
-    public OutgoingProjectNegotiation(JID peer, ISarosSession session,
-        List<IProject> projects, ISarosContext sarosContext) {
-        super(String.valueOf(NEGOTIATION_ID_GENERATOR.nextLong()), peer,
-            session.getID(), sarosContext);
+    public OutgoingProjectNegotiation( //
+        final JID peer, //
+        final List<IProject> projects, //
 
-        this.session = session;
+        final ISarosSessionManager sessionManager, //
+        final ISarosSession session, //
+
+        final IEditorManager editorManager, //
+
+        final IWorkspace workspace, //
+        final IChecksumCache checksumCache, //
+
+        final XMPPConnectionService connectionService, //
+        final ITransmitter transmitter, //
+        final IReceiver receiver//
+    )
+
+    {
+        super(String.valueOf(NEGOTIATION_ID_GENERATOR.nextLong()), peer,
+            sessionManager, session, workspace, checksumCache,
+            connectionService, transmitter, receiver);
+
         this.projects = projects;
+
+        this.editorManager = editorManager;
     }
 
     public Status run(IProgressMonitor monitor) {
@@ -104,7 +103,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
              * inside a Workspace Runnable with file locks !. There is a small
              * gap between saving editors and entering the file lock but it will
              * almost never matter in a real execution environment.
-             * 
+             *
              * Do not save the editors inside the runnable as this may not work
              * depending on the IEditorManager implementation, i.e this thread
              * holds the lock, but saving editors is performed in another thread
@@ -135,7 +134,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 /*
                  * inform all listeners that the peer has started queuing and
                  * can therefore process IResourceActivities now
-                 * 
+                 *
                  * TODO this needs a review as this is called inside the
                  * "blocked" section and so it is not allowed to send resource
                  * activities at this time. Maybe change the description of the
@@ -214,7 +213,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     /**
      * Retrieve the peer's partial file list and remember which files need to be
      * sent to that user
-     * 
+     *
      * @param monitor
      * @throws IOException
      * @throws SarosCancellationException
@@ -270,9 +269,9 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
          * TODO: Make sure that all users are fully registered when stopping
          * them, otherwise failures might occur while a user is currently
          * joining and has not fully initialized yet.
-         * 
+         *
          * See also OutgoingSessionNegotiation#completeInvitation
-         * 
+         *
          * srossbach: This may already be the case ... just review this
          */
 
@@ -488,7 +487,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     /**
      * Sends an activity queuing request to the remote side and awaits the
      * confirmation of the request.
-     * 
+     *
      * @param monitor
      */
     private void sendAndAwaitActivityQueueingActivation(IProgressMonitor monitor)

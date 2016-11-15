@@ -6,13 +6,14 @@ import org.powermock.mockpolicies.MockPolicyInterceptionSettings;
 
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.editor.colorstorage.ColorIDSetStorage;
+import de.fu_berlin.inf.dpp.negotiation.NegotiationFactory;
 
 /**
  * This policy can be used to avoid reiterating which core components need to be
  * prepared by PowerMock because they are final.
  * <p>
  * Usage:
- * 
+ *
  * <pre>
  * {@literal @}RunWith(PowerMockRunner.class)
  * {@literal @}MockPolicy( { PrepareFinalCoreComponents.class } )
@@ -22,18 +23,31 @@ import de.fu_berlin.inf.dpp.editor.colorstorage.ColorIDSetStorage;
  * </pre>
  */
 public class PrepareCoreComponents implements PowerMockPolicy {
+
+    private final static Class<?>[] finalClasses =
+    // Add more final classes here, if need be
+    { NegotiationFactory.class, XMPPAccountStore.class, ColorIDSetStorage.class };
+
     @Override
     public void applyClassLoadingPolicy(MockPolicyClassLoadingSettings settings) {
-        // Add more final classes here, if need be
-        String[] classes = { XMPPAccountStore.class.getName(),
-            ColorIDSetStorage.class.getName() };
 
         settings
-            .addFullyQualifiedNamesOfClassesToLoadByMockClassloader(classes);
+            .addFullyQualifiedNamesOfClassesToLoadByMockClassloader(toClassNames(finalClasses));
     }
 
     @Override
     public void applyInterceptionPolicy(MockPolicyInterceptionSettings settings) {
         // nothing to do here
+    }
+
+    private static String[] toClassNames(Class<?>[] classes) {
+        String[] classNames = new String[classes.length];
+
+        int i = 0;
+
+        for (Class<?> clazz : classes)
+            classNames[i++] = clazz.getName();
+
+        return classNames;
     }
 }

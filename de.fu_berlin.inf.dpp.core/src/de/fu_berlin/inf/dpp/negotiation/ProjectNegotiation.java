@@ -8,17 +8,19 @@ import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smackx.filetransfer.FileTransfer;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
-import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.communication.extensions.CancelProjectNegotiationExtension;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
+import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
+import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.MonitorableFileTransfer;
 import de.fu_berlin.inf.dpp.monitoring.MonitorableFileTransfer.TransferStatus;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
+import de.fu_berlin.inf.dpp.net.IReceiver;
+import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -52,10 +54,15 @@ public abstract class ProjectNegotiation extends Negotiation {
     protected static final long PACKET_TIMEOUT = Long.getLong(
         "de.fu_berlin.inf.dpp.negotiation.project.PACKET_TIMEOUT", 30000L);
 
-    @Inject
-    protected XMPPConnectionService connectionService;
+    protected final ISarosSessionManager sessionManager;
+
+    protected final ISarosSession session;
 
     private final String sessionID;
+
+    protected final IWorkspace workspace;
+
+    protected final IChecksumCache checksumCache;
 
     /**
      * The file transfer manager can be <code>null</code> if no connection was
@@ -63,28 +70,19 @@ public abstract class ProjectNegotiation extends Negotiation {
      */
     protected FileTransferManager fileTransferManager;
 
-    @Inject
-    protected ISarosSessionManager sessionManager;
+    public ProjectNegotiation(final String id, final JID peer,
+        final ISarosSessionManager sessionManager, final ISarosSession session,
+        final IWorkspace workspace, final IChecksumCache checksumCache,
+        final XMPPConnectionService connectionService,
+        final ITransmitter transmitter, final IReceiver receiver) {
+        super(id, peer, transmitter, receiver);
 
-    /**
-     * Initializes a ProjectNegotiation.
-     * 
-     * @param negotiationID
-     *            unique ID of the negotiation
-     * @param peer
-     *            JID of the peer to negotiate with
-     * @param sessionID
-     *            ID of the current Saros session
-     * @param sarosContext
-     *            Saros dependency injection context
-     */
-    public ProjectNegotiation(final String negotiationID, final JID peer,
-        final String sessionID, ISarosContext sarosContext) {
-        super(negotiationID, peer, sarosContext);
+        this.sessionManager = sessionManager;
+        this.session = session;
+        this.sessionID = session.getID();
 
-        this.sessionID = sessionID;
-        sarosContext.initComponent(this);
-
+        this.workspace = workspace;
+        this.checksumCache = checksumCache;
         Connection connection = connectionService.getConnection();
 
         if (connection != null)
@@ -92,7 +90,7 @@ public abstract class ProjectNegotiation extends Negotiation {
     }
 
     /**
-     * 
+     *
      * @return the names of the projects that are shared by the peer. projectID
      *         => projectName
      */
@@ -101,7 +99,7 @@ public abstract class ProjectNegotiation extends Negotiation {
     /**
      * Returns the {@linkplain ISarosSession session} id this negotiation
      * belongs to.
-     * 
+     *
      * @return the id of the current session this negotiations belongs to
      */
     public final String getSessionID() {
@@ -137,7 +135,7 @@ public abstract class ProjectNegotiation extends Negotiation {
     /**
      * Monitors a {@link FileTransfer} and waits until it is completed or
      * aborted.
-     * 
+     *
      * @param transfer
      *            the transfer to monitor
      * @param monitor
@@ -147,7 +145,7 @@ public abstract class ProjectNegotiation extends Negotiation {
      *            given monitor. Accepts <code>null</code>, indicating that no
      *            progress should be reported and that the operation cannot be
      *            canceled.
-     * 
+     *
      * @throws SarosCancellationException
      *             if the transfer was aborted either on local side or remote
      *             side, see also {@link LocalCancellationException} and

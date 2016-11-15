@@ -21,14 +21,14 @@ package de.fu_berlin.inf.dpp.negotiation;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.packet.PacketExtension;
-import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.communication.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
 import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
+import de.fu_berlin.inf.dpp.net.IReceiver;
+import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
@@ -65,22 +65,23 @@ public abstract class SessionNegotiation extends Negotiation {
             "de.fu_berlin.inf.dpp.negotiation.session.CONNECTION_ESTABLISHED_TIMEOUT",
             120000L);
 
-    @Inject
-    protected SessionNegotiationHookManager hookManager;
+    protected final SessionNegotiationHookManager hookManager;
 
-    @Inject
-    protected ISarosSessionManager sessionManager;
+    protected final ISarosSessionManager sessionManager;
 
     protected final String description;
 
     protected ISarosSession sarosSession;
 
     public SessionNegotiation(final String id, final JID peer,
-        final String description, final ISarosContext sarosContext) {
-        super(id, peer, sarosContext);
+        final String description, final ISarosSessionManager sessionManager,
+        final SessionNegotiationHookManager hookManager,
+        final ITransmitter transmitter, final IReceiver receiver) {
+        super(id, peer, transmitter, receiver);
 
+        this.sessionManager = sessionManager;
+        this.hookManager = hookManager;
         this.description = description;
-        sarosContext.initComponent(this);
     }
 
     /**

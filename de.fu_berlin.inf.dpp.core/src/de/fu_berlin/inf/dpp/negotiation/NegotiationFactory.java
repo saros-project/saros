@@ -1,0 +1,131 @@
+package de.fu_berlin.inf.dpp.negotiation;
+
+import java.util.List;
+
+import de.fu_berlin.inf.dpp.ISarosContext;
+import de.fu_berlin.inf.dpp.editor.IEditorManager;
+import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
+import de.fu_berlin.inf.dpp.filesystem.IProject;
+import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
+import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
+import de.fu_berlin.inf.dpp.net.IConnectionManager;
+import de.fu_berlin.inf.dpp.net.IReceiver;
+import de.fu_berlin.inf.dpp.net.ITransmitter;
+import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
+import de.fu_berlin.inf.dpp.net.xmpp.discovery.DiscoveryManager;
+import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
+import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.versioning.VersionManager;
+
+public final class NegotiationFactory {
+
+    private final VersionManager versionManager;
+    private final SessionNegotiationHookManager hookManager;
+
+    // TODO remove, do not use Smack Filetransfer
+    private final XMPPConnectionService connectionService;
+    /*
+     * TODO is this really needed ? The only usage is to obtain the RQJID via
+     * the discoveryManager which is already not a good practice, also there is
+     * no need to check the support here as the negotiation will fail if the
+     * remote side does not support Saros. Checking the support should be done
+     * before the negotiation is started, and if we want to check the support it
+     * should be made using our own protocol and not some handy and dandy XMPP
+     * stuff which can be faked anyway, the request may timeout, etc.
+     */
+    private final DiscoveryManager discoveryManager;
+
+    private final IEditorManager editorManager;
+
+    private final FileReplacementInProgressObservable fileReplacementInProgressObservable;
+
+    private final IWorkspace workspace;
+    private final IChecksumCache checksumCache;
+
+    private final IConnectionManager connectionManager;
+    private final ITransmitter transmitter;
+    private final IReceiver receiver;
+
+    public NegotiationFactory(final VersionManager versionManager, //
+        final SessionNegotiationHookManager hookManager, //
+        final DiscoveryManager discoveryManager, //
+        // final IEditorManager editorManager, //
+        final FileReplacementInProgressObservable fileReplacementInProgressObservable, //
+        final IWorkspace workspace, //
+        final IChecksumCache checksumCache, //
+        final XMPPConnectionService connectionService, //
+        final IConnectionManager connectionManager, //
+        final ITransmitter transmitter, //
+        final IReceiver receiver, //
+
+        /*
+         * FIXME HACK for now to avoid cyclic dependencies between this class,
+         * the SessionManager and IEditorManager implementations which are using
+         * the SessionManager as well.
+         */
+        final ISarosContext applicationContext //
+    )
+
+    {
+
+        this.versionManager = versionManager;
+        this.hookManager = hookManager;
+        this.discoveryManager = discoveryManager;
+
+        // this.editorManager = editorManager;
+        this.editorManager = applicationContext
+            .getComponent(IEditorManager.class);
+
+        this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
+
+        this.workspace = workspace;
+        this.checksumCache = checksumCache;
+
+        this.connectionService = connectionService;
+
+        this.connectionManager = connectionManager;
+        this.transmitter = transmitter;
+        this.receiver = receiver;
+    }
+
+    public OutgoingSessionNegotiation newOutgoingSessionNegotiation(
+        final JID remoteAddress, final ISarosSessionManager sessionManager,
+        final ISarosSession session, final String description) {
+
+        return new OutgoingSessionNegotiation(remoteAddress, description,
+            sessionManager, session, hookManager, versionManager,
+            discoveryManager, transmitter, receiver);
+    }
+
+    public IncomingSessionNegotiation newIncomingSessionNegotiation(
+        final JID remoteAddress, final String negotiationID,
+        final String sessionID, final String remoteVersion,
+        final ISarosSessionManager sessionManager, final String description) {
+
+        return new IncomingSessionNegotiation(remoteAddress, negotiationID,
+            sessionID, remoteVersion, description, sessionManager, hookManager,
+            connectionManager, transmitter, receiver);
+    }
+
+    public OutgoingProjectNegotiation newOutgoingProjectNegotiation(
+        final JID remoteAddress, final List<IProject> resources,
+        final ISarosSessionManager sessionManager, final ISarosSession session) {
+
+        return new OutgoingProjectNegotiation(remoteAddress, resources,
+            sessionManager, session, editorManager, workspace, checksumCache,
+            connectionService, transmitter, receiver);
+    }
+
+    public IncomingProjectNegotiation newIncomingProjectNegotiation(
+        final JID remoteAddress, final String negotiationID,
+        final List<ProjectNegotiationData> projectNegotiationData,
+        final ISarosSessionManager sessionManager, final ISarosSession session) {
+
+        return new IncomingProjectNegotiation(remoteAddress, negotiationID,
+            projectNegotiationData, sessionManager, session,
+            fileReplacementInProgressObservable, workspace, checksumCache,
+            connectionService, transmitter, receiver);
+    }
+}

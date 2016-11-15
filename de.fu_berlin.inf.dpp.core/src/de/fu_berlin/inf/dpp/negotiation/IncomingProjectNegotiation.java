@@ -15,9 +15,7 @@ import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smackx.filetransfer.FileTransferListener;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
-import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.communication.extensions.ProjectNegotiationMissingFilesExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingRequest;
 import de.fu_berlin.inf.dpp.communication.extensions.StartActivityQueuingResponse;
@@ -32,10 +30,14 @@ import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 import de.fu_berlin.inf.dpp.monitoring.SubProgressMonitor;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationTools.CancelOption;
+import de.fu_berlin.inf.dpp.net.IReceiver;
+import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.PacketCollector;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
+import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
+import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.util.CoreUtils;
 
@@ -49,14 +51,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     private final List<ProjectNegotiationData> projectNegotiationData;
 
-    @Inject
-    private IWorkspace workspace;
-
-    @Inject
-    private IChecksumCache checksumCache;
-
-    @Inject
-    private FileReplacementInProgressObservable fileReplacementInProgressObservable;
+    private final FileReplacementInProgressObservable fileReplacementInProgressObservable;
 
     /*
      * FIXME remove this field, it is used as global access variable throughout
@@ -64,34 +59,35 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      */
     private Map<String, IProject> localProjectMapping;
 
-    private final ISarosSession session;
-
     private boolean running;
 
     private PacketCollector startActivityQueuingRequestCollector;
 
-    /**
-     * Initializes an IncomingProjectNegotiation.
-     * 
-     * @param negotiationID
-     *            unique ID of the negotiation
-     * @param peer
-     *            JID of the peer to negotiate with
-     * @param session
-     *            current Saros session
-     * @param projectInfos
-     *            information about the projects shared by the peer
-     * @param sarosContext
-     *            Saros dependency injection context
-     */
-    public IncomingProjectNegotiation(String negotiationID, JID peer,
-        ISarosSession session, List<ProjectNegotiationData> projectInfos,
-        ISarosContext sarosContext) {
-        super(negotiationID, peer, session.getID(), sarosContext);
+    public IncomingProjectNegotiation(
+        final JID peer, //
+        final String negotiationID, //
+        final List<ProjectNegotiationData> projectNegotiationData, //
 
-        this.session = session;
-        this.projectNegotiationData = projectInfos;
+        final ISarosSessionManager sessionManager, //
+        final ISarosSession session, //
+
+        final FileReplacementInProgressObservable fileReplacementInProgressObservable, //
+        final IWorkspace workspace, //
+        final IChecksumCache checksumCache, //
+
+        final XMPPConnectionService connectionService, //
+        final ITransmitter transmitter, //
+        final IReceiver receiver //
+    )
+
+    {
+        super(negotiationID, peer, sessionManager, session, workspace,
+            checksumCache, connectionService, transmitter, receiver);
+
+        this.projectNegotiationData = projectNegotiationData;
         this.localProjectMapping = new HashMap<String, IProject>();
+
+        this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
     }
 
     @Override
@@ -104,7 +100,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     }
 
     /**
-     * 
+     *
      * @param projectID
      * @return The {@link FileList fileList} which belongs to the project with
      *         the ID <code>projectID</code> from inviter <br />
@@ -126,10 +122,10 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * actions are performed to avoid unintended data loss, i.e this method will
      * do a best effort to backup altered data but no guarantee can be made in
      * doing so!
-     * 
+     *
      * @param projectMapping
      *            mapping from remote project ids to the target local projects
-     * 
+     *
      * @throws IllegalArgumentException
      *             if either a project id is not valid or the referenced project
      *             for that id does not exist
@@ -296,7 +292,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     /**
      * calculates all the files the host/inviter has to send for synchronization
-     * 
+     *
      * @param projectMapping
      *            projectID => projectName (in local workspace)
      */
@@ -407,11 +403,11 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * Computes the list of files that should be requested from the host because
      * they are either missing in the target project or are containing different
      * data.
-     * 
+     *
      * @param project
      * @param remoteFileList
      * @param monitor
-     * 
+     *
      * @return The list of files that we need from the host.
      * @throws LocalCancellationException
      *             If the user requested a cancel.
@@ -450,7 +446,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     /**
      * Determines the missing resources.
-     * 
+     *
      * @param localFileList
      *            The file list of the local project.
      * @param remoteFileList
@@ -562,7 +558,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     /**
      * Waits for the activity queuing request from the remote side.
-     * 
+     *
      * @param monitor
      */
     private void awaitActivityQueueingActivation(IProgressMonitor monitor)

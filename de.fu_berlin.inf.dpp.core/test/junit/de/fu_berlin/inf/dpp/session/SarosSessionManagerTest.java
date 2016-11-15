@@ -109,7 +109,7 @@ public class SarosSessionManagerTest {
 
         PowerMock.replayAll();
 
-        manager = new SarosSessionManager(context, network, transmitter,
+        manager = new SarosSessionManager(context, null, network, transmitter,
             receiver, preferences);
     }
 

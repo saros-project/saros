@@ -12,6 +12,7 @@ import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
 import de.fu_berlin.inf.dpp.editor.colorstorage.ColorIDSetStorage;
 import de.fu_berlin.inf.dpp.monitoring.remote.RemoteProgressManager;
+import de.fu_berlin.inf.dpp.negotiation.NegotiationFactory;
 import de.fu_berlin.inf.dpp.negotiation.hooks.SessionNegotiationHookManager;
 import de.fu_berlin.inf.dpp.net.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
@@ -44,7 +45,7 @@ import de.fu_berlin.inf.dpp.versioning.VersionManager;
  * This is the basic core factory for Saros. All components that are created by
  * this factory <b>must</b> be working on any platform the application is
  * running on.
- * 
+ *
  * @author srossbach
  */
 public class SarosCoreContextFactory extends AbstractSarosContextFactory {
@@ -52,7 +53,7 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
     /**
      * Must not be static in order to avoid heavy work during class
      * initialization
-     * 
+     *
      * @see <a
      *      href="https://github.com/saros-project/saros/commit/237daca">commit&nbsp;237daca</a>
      */
@@ -72,7 +73,10 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
         Component.create(XMPPAccountStore.class),
         Component.create(ColorIDSetStorage.class),
 
-        // Invitation hooks
+        // Negotiation
+        Component.create(NegotiationFactory.class),
+
+        // Negotiation hooks
         Component.create(SessionNegotiationHookManager.class),
         Component.create(ColorNegotiationHook.class),
 
@@ -84,12 +88,12 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
         Component.create(DiscoveryManager.class),
 
         Component.create(BindKey.bindKey(IStreamService.class,
-            ISarosContextBindings.IBBStreamService.class), IBBStreamService.class),
+            ISarosContextBindings.IBBStreamService.class),
+            IBBStreamService.class),
 
-        Component
-            .create(BindKey.bindKey(IStreamService.class,
-                ISarosContextBindings.Socks5StreamService.class),
-                Socks5StreamService.class),
+        Component.create(BindKey.bindKey(IStreamService.class,
+            ISarosContextBindings.Socks5StreamService.class),
+            Socks5StreamService.class),
 
         Component.create(RosterTracker.class),
         Component.create(XMPPConnectionService.class),

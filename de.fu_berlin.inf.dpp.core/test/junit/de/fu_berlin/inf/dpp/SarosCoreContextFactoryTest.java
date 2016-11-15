@@ -9,6 +9,9 @@ import org.picocontainer.BindKey;
 import org.picocontainer.MutablePicoContainer;
 
 import de.fu_berlin.inf.dpp.communication.connection.IProxyResolver;
+import de.fu_berlin.inf.dpp.editor.IEditorManager;
+import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
+import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.monitoring.remote.IRemoteProgressIndicatorFactory;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceStore;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
@@ -30,7 +33,8 @@ public class SarosCoreContextFactoryTest {
         // an IDE plugin)
         Class<?>[] dependencies = { IProxyResolver.class,
             IRemoteProgressIndicatorFactory.class, ISarosContext.class,
-            Preferences.class };
+            Preferences.class, IWorkspace.class, IEditorManager.class,
+            IChecksumCache.class };
 
         ContextMocker.addMocks(container, Arrays.asList(dependencies));
 
