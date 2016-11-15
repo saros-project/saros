@@ -831,36 +831,40 @@ public class Socks5StreamService implements IStreamService, BytestreamListener {
 
     private void configureSocks5Socket(Socks5BytestreamSession session) {
 
-        Field socket = null;
+        Field socketField = null;
+        Socket socket;
 
         try {
-            socket = Socks5BytestreamSession.class.getDeclaredField("socket");
-            socket.setAccessible(true);
+            socketField = Socks5BytestreamSession.class
+                .getDeclaredField("socket");
+            socketField.setAccessible(true);
+            socket = (Socket) socketField.get(session);
         } catch (Exception e) {
             LOG.warn("Smack API has changed, cannot access socket options", e);
             return;
         }
 
         try {
-            ((Socket) socket.get(session)).setTcpNoDelay(TCP_NODELAY);
+            socket.setTcpNoDelay(TCP_NODELAY);
             LOG.debug("nagle algorithm for socket disabled: " + TCP_NODELAY);
         } catch (Exception e) {
             LOG.warn("could not modifiy TCP_NODELAY socket option", e);
         }
 
         /*
-         * HACK to ensure that all pending data is written on socket close, see
-         * SarosSession.stop()
+         * avoid lingering to long (is this needed at all, Saros is not a high
+         * performance server application at all
          */
-        final int lingerTimeout = 10000;
 
-        try {
-            ((Socket) socket.get(session)).setSoLinger(true, lingerTimeout);
-            LOG.debug("socket is configured with SO_LINGER timeout: "
-                + lingerTimeout + " ms");
-        } catch (Exception e) {
-            LOG.warn("could not modify SO_LINGER socket option", e);
-        }
+        // final int lingerTimeout = 10; // seconds
+        //
+        // try {
+        // socket.setSoLinger(true, lingerTimeout);
+        // LOG.debug("socket is configured with SO_LINGER timeout: "
+        // + socket.getSoLinger() + " s");
+        // } catch (Exception e) {
+        // LOG.warn("could not modify SO_LINGER socket option", e);
+        // }
 
     }
 
