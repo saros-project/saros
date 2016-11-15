@@ -165,7 +165,7 @@ final class NegotiationPacketListener {
 
     /**
      * Allows to reject incoming session negotiation requests.
-     * 
+     *
      * @param reject
      *            <code>true</code> if requests should be rejected,
      *            <code>false</code> otherwise
@@ -177,7 +177,7 @@ final class NegotiationPacketListener {
     /**
      * Determines if incoming session negotiations requests are currently
      * rejected.
-     * 
+     *
      * @return <code>true</code> if requests are rejected, <code>false</code>
      *         otherwise
      */
@@ -257,8 +257,8 @@ final class NegotiationPacketListener {
          * SessionManager will set rejectSessionNegotiationRequests to true in
          * this call
          */
-        sessionManager.invitationReceived(sender, sessionID, negotiationID,
-            remoteVersion, description);
+        sessionManager.sessionNegotiationRequestReceived(sender, sessionID,
+            negotiationID, remoteVersion, description);
     }
 
     private void projectNegotiationCanceled(final JID sender,
@@ -285,7 +285,7 @@ final class NegotiationPacketListener {
         LOG.info("received project negotiation from " + sender
             + " with negotiation id: " + negotiationID);
 
-        sessionManager.incomingProjectReceived(sender, projectNegotiationData,
-            negotiationID);
+        sessionManager.projectNegotiationRequestReceived(sender,
+            projectNegotiationData, negotiationID);
     }
 }

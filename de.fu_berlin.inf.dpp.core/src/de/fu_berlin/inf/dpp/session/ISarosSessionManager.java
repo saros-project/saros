@@ -7,8 +7,6 @@ import java.util.Map;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.negotiation.FileList;
-import de.fu_berlin.inf.dpp.negotiation.ProjectNegotiationData;
 import de.fu_berlin.inf.dpp.net.xmpp.JID;
 
 /**
@@ -71,25 +69,6 @@ public interface ISarosSessionManager {
         ISessionLifecycleListener listener);
 
     /**
-     * Handles the negotiation for a received invitation.
-     *
-     * @param from
-     *            the sender of this invitation
-     * @param sessionID
-     *            the unique session ID of the inviter side
-     * @param invitationID
-     *            a unique identifier for the negotiation
-     * @param version
-     *            remote Saros version of the inviter side
-     * @param description
-     *            what this session invitation is about
-     * @deprecated will be removed from the interface - do not use in new code
-     */
-    @Deprecated
-    public void invitationReceived(JID from, String sessionID,
-        String invitationID, String version, String description);
-
-    /**
      * Starts sharing all projects of the current session with the given session
      * user. This should be called after the user joined the current session.
      *
@@ -124,20 +103,6 @@ public interface ISarosSessionManager {
      */
     public void addResourcesToSession(
         Map<IProject, List<IResource>> projectResourcesMapping);
-
-    /**
-     * This method is called when a new project was added to the session
-     *
-     * @param from
-     *            The one who added the project.
-     * @param projectInfos
-     *            what projects where added ({@link FileList}, projectName etc.)
-     *            see: {@link ProjectNegotiationData}
-     * @param negotiationID
-     *            ID of the negotiation
-     */
-    public void incomingProjectReceived(JID from,
-        List<ProjectNegotiationData> projectInfos, String negotiationID);
 
     /**
      * Call this before a ISarosSession is started.

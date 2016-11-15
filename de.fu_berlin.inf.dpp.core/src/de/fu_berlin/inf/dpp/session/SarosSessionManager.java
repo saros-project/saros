@@ -38,7 +38,6 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
-import de.fu_berlin.inf.dpp.negotiation.FileList;
 import de.fu_berlin.inf.dpp.negotiation.IncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.negotiation.NegotiationFactory;
@@ -363,8 +362,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         return session;
     }
 
-    @Override
-    public void invitationReceived(JID from, String sessionID,
+    void sessionNegotiationRequestReceived(JID remoteAddress, String sessionID,
         String negotiationID, String version, String description) {
 
         INegotiationHandler handler = negotiationHandler;
@@ -395,7 +393,8 @@ public class SarosSessionManager implements ISarosSessionManager {
                     .setRejectSessionNegotiationRequests(true);
 
                 negotiation = negotiationFactory.newIncomingSessionNegotiation(
-                    from, negotiationID, sessionID, version, this, description);
+                    remoteAddress, negotiationID, sessionID, version, this,
+                    description);
 
                 negotiation.setNegotiationListener(negotiationListener);
                 currentSessionNegotiations.add(negotiation);
@@ -408,19 +407,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     }
 
-    /**
-     * This method is called when a new project was added to the session
-     *
-     * @param from
-     *            The one who added the project.
-     * @param projectNegotiationData
-     *            what projects where added ({@link FileList}, projectName etc.)
-     *            see: {@link ProjectNegotiationData}
-     * @param negotiationID
-     *            ID of the negotiation
-     */
-    @Override
-    public void incomingProjectReceived(JID from,
+    void projectNegotiationRequestReceived(JID remoteAddress,
         List<ProjectNegotiationData> projectNegotiationData,
         String negotiationID) {
 
@@ -441,7 +428,8 @@ public class SarosSessionManager implements ISarosSessionManager {
 
             try {
                 negotiation = negotiationFactory.newIncomingProjectNegotiation(
-                    from, negotiationID, projectNegotiationData, this, session);
+                    remoteAddress, negotiationID, projectNegotiationData, this,
+                    session);
 
                 negotiation.setNegotiationListener(negotiationListener);
                 currentProjectNegotiations.add(negotiation);
