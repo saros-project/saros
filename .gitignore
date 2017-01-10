@@ -4,6 +4,8 @@ bin_test/
 */.idea/tasks.xml
 */.idea/workspace.xml
 */.idea/inspectionProfiles/
+*/.idea/copyright/
+*/.idea/dictionaries/
 /de.fu_berlin.inf.dpp.intellij/build.properties
 /de.fu_berlin.inf.dpp.server/lib/
 /de.fu_berlin.inf.dpp.server/instr/

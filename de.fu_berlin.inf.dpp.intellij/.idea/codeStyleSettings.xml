@@ -9,9 +9,6 @@
           <value />
         </option>
         <option name="RIGHT_MARGIN" value="80" />
-        <JavaCodeStyleSettings>
-          <option name="CLASS_NAMES_IN_JAVADOC" value="3" />
-        </JavaCodeStyleSettings>
         <XML>
           <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
         </XML>
@@ -50,3 +47,4 @@
     <option name="USE_PER_PROJECT_SETTINGS" value="true" />
   </component>
 </project>
+
