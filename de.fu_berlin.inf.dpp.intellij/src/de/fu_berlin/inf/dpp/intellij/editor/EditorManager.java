@@ -54,6 +54,7 @@ import de.fu_berlin.inf.dpp.synchronize.Blockable;
 
 import org.apache.log4j.Logger;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -460,7 +461,9 @@ public class EditorManager extends AbstractActivityProducer
 
     @Override
     public Set<SPath> getRemotelyOpenEditors() {
-        return userEditorStateManager.getOpenEditors();
+        return userEditorStateManager == null ?
+            Collections.<SPath>emptySet() :
+            userEditorStateManager.getOpenEditors();
     }
 
     @Override
