@@ -87,7 +87,7 @@ module.exports = AmpersandState.extend({
 
                 return !this.isBusy;
             }
-        },        
+        },
         activeAccountLabel: {
             deps: ['activeAccount.username'],
             fn: function() {
@@ -108,11 +108,11 @@ module.exports = AmpersandState.extend({
 
                 if (this.connectionState === CS.DISCONNECTING) {
                     return dictionary.action.disconnecting;
-                } 
+                }
 
                 if (this.connectionState === CS.CONNECTING) {
                     return dictionary.action.connecting;
-                } 
+                }
 
                 if (this.connectionState === CS.CONNECTED) {
                     return dictionary.action.disconnect;

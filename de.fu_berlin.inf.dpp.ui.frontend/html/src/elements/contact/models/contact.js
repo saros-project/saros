@@ -3,7 +3,7 @@ var dictionary = require('../../../dictionary');
 var SarosApi = require('../../../saros-api');
 
 module.exports = AmpersandState.extend({
-    
+
     props: {
         jid: ['string', true],
         displayName: ['string', true],
@@ -43,5 +43,5 @@ module.exports = AmpersandState.extend({
     create: function() {
 
         SarosApi.addContact(this.jid, this.displayName);
-    }    
+    }
 });

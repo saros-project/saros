@@ -1,4 +1,3 @@
-/* global $$ */
 var bindAll = require('lodash.bindall');
 var AmpersandView = require('ampersand-view');
 var AmpersandFormView = require('ampersand-form-view');
@@ -20,7 +19,7 @@ module.exports = AmpersandView.extend({
         bindAll(this, 'updateValidity', 'addContact', 'handleEnter');
     },
     props: {
-        valid: 'boolean',
+        valid: 'boolean'
     },
     bindings: {
         'valid': {
@@ -60,7 +59,7 @@ module.exports = AmpersandView.extend({
                     // this one takes an array of tests
                     tests: [
                         function(val) {
-                            
+
                             var validationResult = SarosApi.validateJid(val);
 
                             if (!validationResult.valid) {
@@ -96,10 +95,9 @@ module.exports = AmpersandView.extend({
         // submit button disabled/enabled w.r.t. to the validity.
         this.valid = valid;
     },
-    addContact: function(contact) {
+    addContact: function(contactInfo) {
 
-        //SarosApi.addContact(contact.jid, contact.displayName);
-        var contact  = new Contact(contact);
+        var contact = new Contact(contactInfo);
         contact.create();
         $$(this.el).modal('hide');
     },

@@ -1,5 +1,5 @@
+/* globals SarosApi */
 var app = require('ampersand-app');
-var bindAll = require('lodash.bindall');
 var WizardView = require('../../elements/wizard-view');
 var tmpl = require('./start-session-wizard.hbs');
 var SelectableProjectTreesView = require('../../elements/project-tree/selectable-project-trees');

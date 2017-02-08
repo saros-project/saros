@@ -25,9 +25,9 @@ module.exports = AmpersandView.extend({
     events: {
         'click': 'toggleSelect'
     },
-    toggleSelect: function(event) {
+    toggleSelect: function() {
 
-        if(this.model.isAvailable){
+        if(this.model.isAvailable) {
             this.model.isSelected = !this.model.isSelected;
         }
     }

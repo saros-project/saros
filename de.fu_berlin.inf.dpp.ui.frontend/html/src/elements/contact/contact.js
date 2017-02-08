@@ -17,7 +17,7 @@ module.exports = AmpersandView.extend({
     },
     session: {
         // This property is necessary to bind the current `li` element
-        // to its specific context-menu element since every `li` 
+        // to its specific context-menu element since every `li`
         // element has its own.
         contextMenuBinding: 'string'
     },
@@ -55,5 +55,5 @@ module.exports = AmpersandView.extend({
         new DeleteContactDialog({
             model: this.model
         });
-    },    
+    }
 });

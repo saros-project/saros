@@ -2,7 +2,7 @@
  * Saros API Documentation
  *
  * In addition to the methods listed below you can trigger and listen
- * to events on the SarosAPI object. 
+ * to events on the SarosAPI object.
  *
  * To trigger an event do:
  * `SarosApi.trigger('eventName' [, data]);`
@@ -62,20 +62,20 @@ var SarosApi = BackboneEvents.mixin({
         return JSON.parse(__java_validateJid(jid)); // jshint ignore:line
     },
 
-     showStartSessionWizard: function() {
+    showStartSessionWizard: function() {
 
-         __java_showSessionWizard(); // jshint ignore:line
-     },
+        __java_showSessionWizard(); // jshint ignore:line
+    },
 
-     closeStartSessionWizard: function() {
+    closeStartSessionWizard: function() {
 
         __java_closeStartSessionWizard(); // jshint ignore:line
-     },
+    },
 
-     sendInvitation: function(projectTrees, contacts) {
+    sendInvitation: function(projectTrees, contacts) {
 
         __java_sendInvitation(JSON.stringify(projectTrees), JSON.stringify(contacts)); //jshint ignore:line
-     }
+    }
 });
 
 // For debugging purposes

@@ -1,6 +1,10 @@
 {
 	"boss":      		true,
 	"node":      		true,
+	"globals": {
+		"$$":			false,
+		"app":			false
+	},
 	"eqeqeq":    		true,
 	"strict":    		false,
 	"undef":     		true,

@@ -43,7 +43,7 @@ module.exports = AmpersandView.extend({
     isValid: function() {
 
         // You to select at least one node...
-        return $$(this.queryByHook('jstree')).jstree('get_selected') != 0;
+        return $$(this.queryByHook('jstree')).jstree('get_selected') > 0;
     },
     // Recursively, visit the given `node` and its `members`-nodes and mark
     // each as selected/unselecte with respect to the given `selected`
@@ -74,7 +74,7 @@ module.exports = AmpersandView.extend({
         // Currently, there is no other way to check that.
         app.projectTrees.each(function(projectTree) {
 
-                this.markProjectTreeNodes(projectTree.root, selected);
+            this.markProjectTreeNodes(projectTree.root, selected);
         }, this);
 
         return this.collection;

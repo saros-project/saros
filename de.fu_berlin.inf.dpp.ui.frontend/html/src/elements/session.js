@@ -1,6 +1,5 @@
 var AmpersandState = require('ampersand-state');
 var Contacts = require('./contact/contacts');
-var SarosApi = require('../saros-api');
 
 module.exports = AmpersandState.extend({
 
@@ -9,7 +8,7 @@ module.exports = AmpersandState.extend({
             type: Contacts,
             default: function() {
 
-                return new Contacts()
+                return new Contacts();
             }
         }
     },

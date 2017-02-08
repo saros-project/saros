@@ -1,10 +1,10 @@
+/* globals SarosApi */
 var app = require('ampersand-app');
 var AmpersandView = require('ampersand-view');
 var tmpl = require('./main-page.hbs');
 var AccountsDropdownView = require('../../elements/account/accounts-dropdown');
 var ContactsView = require('../../elements/contact/contacts');
 var AddContactDialog = require('../../elements/contact/add-contact-dialog');
-var SarosApi = require('../../saros-api');
 var dictionary = require('../../dictionary');
 
 module.exports = AmpersandView.extend({
@@ -32,7 +32,7 @@ module.exports = AmpersandView.extend({
                     collection: app.state.contactList
                 });
             }
-        }        
+        }
     },
     events: {
         'click [data-hook=connection-button]': 'toggleConnect',
@@ -94,4 +94,3 @@ module.exports = AmpersandView.extend({
         SarosApi.showStartSessionWizard();
     }
 });
-

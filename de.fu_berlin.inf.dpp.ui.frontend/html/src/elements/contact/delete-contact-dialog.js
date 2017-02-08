@@ -1,11 +1,8 @@
 /* global $$ */
 var bindAll = require('lodash.bindall');
 var AmpersandView = require('ampersand-view');
-var AmpersandFormView = require('ampersand-form-view');
-var AmpersandInputView = require('ampersand-input-view');
 var tmpl = require('./delete-contact-dialog.hbs');
 var dictionary = require('../../dictionary');
-var SarosApi = require('../../saros-api');
 
 module.exports = AmpersandView.extend({
     template: tmpl,

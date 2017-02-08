@@ -1,6 +1,5 @@
 /* global jQuery */
 var bindAll = require('lodash.bindall');
-var forEach = require('lodash.foreach');
 var AmpersandView = require('ampersand-view');
 
 var errorPrefix = 'WizardView: ';
@@ -53,7 +52,7 @@ module.exports = AmpersandView.extend({
             deps: ['_currentIndex'],
             fn: function() {
 
-                if (this._currentIndex == 0) {
+                if (this._currentIndex === 0) {
 
                     return false;
                 }
