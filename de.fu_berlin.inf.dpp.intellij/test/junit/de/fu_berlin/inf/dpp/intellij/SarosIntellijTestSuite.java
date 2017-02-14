@@ -10,8 +10,6 @@ import org.junit.runners.Suite;
 
     de.fu_berlin.inf.dpp.intellij.editor.TestSuite.class,
 
-    de.fu_berlin.inf.dpp.intellij.preferences.TestSuite.class,
-
     de.fu_berlin.inf.dpp.intellij.project.filesystem.TestSuite.class,
 
     de.fu_berlin.inf.dpp.intellij.ui.swt_browser.TestSuite.class, })
