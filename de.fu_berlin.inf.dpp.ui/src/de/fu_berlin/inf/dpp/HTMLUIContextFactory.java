@@ -2,8 +2,6 @@ package de.fu_berlin.inf.dpp;
 
 import static de.fu_berlin.inf.dpp.AbstractSarosContextFactory.Component.create;
 
-import java.util.Arrays;
-
 import org.picocontainer.MutablePicoContainer;
 
 import de.fu_berlin.inf.dpp.ui.browser_functions.AddContact;
@@ -11,15 +9,17 @@ import de.fu_berlin.inf.dpp.ui.browser_functions.BrowserFunctions;
 import de.fu_berlin.inf.dpp.ui.browser_functions.CloseAccountWizard;
 import de.fu_berlin.inf.dpp.ui.browser_functions.CloseSessionInvitationWizard;
 import de.fu_berlin.inf.dpp.ui.browser_functions.ConnectAccount;
+import de.fu_berlin.inf.dpp.ui.browser_functions.DeleteAccount;
 import de.fu_berlin.inf.dpp.ui.browser_functions.DeleteContact;
 import de.fu_berlin.inf.dpp.ui.browser_functions.DisconnectAccount;
+import de.fu_berlin.inf.dpp.ui.browser_functions.EditAccount;
 import de.fu_berlin.inf.dpp.ui.browser_functions.GetValidJID;
 import de.fu_berlin.inf.dpp.ui.browser_functions.RenameContact;
 import de.fu_berlin.inf.dpp.ui.browser_functions.SaveAccount;
 import de.fu_berlin.inf.dpp.ui.browser_functions.SendInvitation;
+import de.fu_berlin.inf.dpp.ui.browser_functions.SetActiveAccount;
 import de.fu_berlin.inf.dpp.ui.browser_functions.ShowAccountPage;
 import de.fu_berlin.inf.dpp.ui.browser_functions.ShowSessionWizard;
-import de.fu_berlin.inf.dpp.ui.core_facades.AccountStoreFacade;
 import de.fu_berlin.inf.dpp.ui.core_facades.StateFacade;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.BrowserCreator;
 import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
@@ -57,43 +57,27 @@ public class HTMLUIContextFactory extends AbstractSarosContextFactory {
 
     private void createBrowserfunctions() {
         // please use alphabetic order
-        add(new Component[] { 
-            create(AddContact.class), 
-            create(BrowserFunctions.class), // List of all BFs
-            create(CloseAccountWizard.class),
-            create(CloseSessionInvitationWizard.class),
-            create(ConnectAccount.class),
-            // create(DeleteAccount.class), //TODO: Will be added
-            create(DeleteContact.class), 
-            create(DisconnectAccount.class),
-            // create(EditAccount.class), //TODO: Will be added
-            create(GetValidJID.class), 
-            create(RenameContact.class),
-            create(SaveAccount.class), 
-            create(SendInvitation.class),
-            // create(SetActiveAccount.class), //TODO: Will be added
-            create(ShowAccountPage.class), 
-            create(ShowSessionWizard.class) });
+        add(AddContact.class,
+            BrowserFunctions.class, // List of all BFs
+            CloseAccountWizard.class, CloseSessionInvitationWizard.class,
+            ConnectAccount.class, DeleteAccount.class, DeleteContact.class,
+            DisconnectAccount.class, EditAccount.class, GetValidJID.class,
+            RenameContact.class, SaveAccount.class, SendInvitation.class,
+            SetActiveAccount.class, ShowAccountPage.class,
+            ShowSessionWizard.class);
     }
 
     private void createPages() {
-        add(new Component[] { 
-            create(AccountPage.class),
-            create(MainPage.class), 
-            create(SessionWizardPage.class) });
+        add(AccountPage.class, MainPage.class, SessionWizardPage.class);
     }
 
     private void createRenderer() {
-        add(new Component[] { 
-            create(AccountRenderer.class),
-            create(StateRenderer.class), 
-            create(ProjectListRenderer.class) });
+        add(AccountRenderer.class, StateRenderer.class,
+            ProjectListRenderer.class);
     }
 
     private void createFacades() {
-        add(new Component[] { 
-            create(AccountStoreFacade.class),
-            create(StateFacade.class) });
+        add(StateFacade.class);
     }
 
     /**
@@ -101,20 +85,19 @@ public class HTMLUIContextFactory extends AbstractSarosContextFactory {
      */
     private void createMisc() {
         // TODO: Dodgy naming
-        add(new Component[] { 
-            create(BrowserCreator.class),
-            create(BrowserManager.class), 
-            create(ProjectListManager.class) });
+        add(BrowserCreator.class, BrowserManager.class,
+            ProjectListManager.class);
     }
 
     /**
      * Add the components to the container
      * 
-     * @param components
+     * @param classes
      *            to add
      */
-    private void add(Component[] components) {
-        for (Component component : Arrays.asList(components)) {
+    private void add(Class<?>... classes) {
+        for (Class<?> clazz : classes) {
+            Component component = create(clazz);
             container.addComponent(component.getBindKey(),
                 component.getImplementation());
         }

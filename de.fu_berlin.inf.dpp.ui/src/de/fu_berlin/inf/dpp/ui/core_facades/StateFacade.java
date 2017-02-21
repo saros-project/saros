@@ -18,6 +18,7 @@ import de.fu_berlin.inf.dpp.ui.model.Account;
  */
 public class StateFacade {
 
+    private static final String CONNECTION_STATE_FAILURE = "Invalide state, connection might be lost.";
     private final ConnectionHandler connectionHandler;
 
     private final XMPPConnectionService connectionService;
@@ -71,8 +72,7 @@ public class StateFacade {
             XMPPUtils.removeFromRoster(connectionService.getConnection(),
                 getEntry(jid));
         } catch (IllegalStateException e) {
-            throw new XMPPException("Invalide state, connection might be lost",
-                e);
+            throw new XMPPException(CONNECTION_STATE_FAILURE, e);
         }
     }
 
@@ -95,8 +95,7 @@ public class StateFacade {
         try {
             getEntry(jid).setName(name);
         } catch (IllegalStateException e) {
-            throw new XMPPException("Invalide state, connection might be lost",
-                e);
+            throw new XMPPException(CONNECTION_STATE_FAILURE, e);
         }
 
     }
@@ -113,8 +112,7 @@ public class StateFacade {
         try {
             getRoster().createEntry(jid.getBase(), nickname, null);
         } catch (IllegalStateException e) {
-            throw new XMPPException("Invalide state, connection might be lost",
-                e);
+            throw new XMPPException(CONNECTION_STATE_FAILURE, e);
         }
 
     }
@@ -149,7 +147,7 @@ public class StateFacade {
     private Roster getRoster() throws XMPPException {
         Roster roster = connectionService.getRoster();
         if (roster == null) {
-            throw new XMPPException("No connection is established");
+            throw new XMPPException(CONNECTION_STATE_FAILURE);
         }
 
         return roster;
