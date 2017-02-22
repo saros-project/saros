@@ -61,7 +61,7 @@ public class EditAccount extends TypedJavascriptFunction {
             accountRenderer.render();
         } catch (IllegalArgumentException e) {
             LOG.error("Couldn't edit account " + e.getMessage(), e);
-            JavaScriptAPI.showError(browser, HTMLUIStrings.EDIT_ACCOUNT_FAILED);
+            JavaScriptAPI.showError(browser, HTMLUIStrings.ERR_ACCOUNT_EDIT_FAILED);
         }
     }
 

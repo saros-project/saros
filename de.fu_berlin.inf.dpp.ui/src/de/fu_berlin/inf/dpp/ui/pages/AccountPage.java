@@ -18,7 +18,7 @@ public class AccountPage extends AbstractBrowserPage {
      * @see HTMLUIContextFactory
      */
     public AccountPage() {
-        super(HTML_DOC_NAME, HTMLUIStrings.ADD_ACCOUNT_PAGE_TITLE);
+        super(HTML_DOC_NAME, HTMLUIStrings.TITLE_ADD_ACCOUNT_PAGE);
         // No renderer used, so let renderers list be empty
     }
 }

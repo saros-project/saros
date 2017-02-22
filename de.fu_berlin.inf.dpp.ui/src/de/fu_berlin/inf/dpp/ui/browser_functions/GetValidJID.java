@@ -34,7 +34,7 @@ public class GetValidJID extends TypedJavascriptFunction {
         String message = "";
 
         if (!valid) {
-            message = HTMLUIStrings.INVALID_JID;
+            message = HTMLUIStrings.ERR_CONTACT_INVALID_JID;
         }
 
         return new ValidationResult(valid, message);

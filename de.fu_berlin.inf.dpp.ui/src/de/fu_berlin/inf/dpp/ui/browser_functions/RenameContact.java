@@ -56,7 +56,7 @@ public class RenameContact extends TypedJavascriptFunction {
         } catch (XMPPException e) {
             LOG.error("Error while renaming contact", e);
             JavaScriptAPI.showError(browser,
-                HTMLUIStrings.RENAME_CONTACT_FAILED);
+                HTMLUIStrings.ERR_CONTACT_RENAME_FAILED);
         }
 
     }

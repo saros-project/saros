@@ -56,7 +56,7 @@ public class ProjectListRenderer extends Renderer {
         } catch (IOException e) {
             LOG.error("Failed to load workspace resources: ", e);
             JavaScriptAPI.showError(browser,
-                HTMLUIStrings.PROJECT_LIST_IOEXCEPTION);
+                HTMLUIStrings.ERR_SESSION_PROJECT_LIST_IOEXCEPTION);
         }
 
         // FIXME: Workspaces with a big number of files cause massive

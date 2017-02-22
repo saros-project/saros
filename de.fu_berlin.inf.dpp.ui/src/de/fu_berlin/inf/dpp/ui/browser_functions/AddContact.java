@@ -61,7 +61,7 @@ public class AddContact extends TypedJavascriptFunction {
             stateFacade.addContact(newContact, nickname);
         } catch (XMPPException e) {
             LOG.error("Error while adding contact", e);
-            JavaScriptAPI.showError(browser, HTMLUIStrings.ADD_CONTACT_FAILED);
+            JavaScriptAPI.showError(browser, HTMLUIStrings.ERR_CONTACT_ADD_FAILED);
         }
     }
 }

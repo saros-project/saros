@@ -18,7 +18,7 @@ public class MainPage extends AbstractBrowserPage {
      * @see HTMLUIContextFactory
      */
     public MainPage(AccountRenderer accountRenderer, StateRenderer stateRenderer) {
-        super(HTML_DOC_NAME, HTMLUIStrings.MAIN_PAGE_TITLE);
+        super(HTML_DOC_NAME, HTMLUIStrings.TITLE_MAIN_PAGE);
         this.addRenderer(stateRenderer, accountRenderer);
     }
 

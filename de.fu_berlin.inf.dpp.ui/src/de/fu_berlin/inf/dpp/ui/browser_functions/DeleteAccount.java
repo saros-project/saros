@@ -57,11 +57,11 @@ public class DeleteAccount extends TypedJavascriptFunction {
         } catch (IllegalStateException e) {
             LOG.error("Couldn't delete account: " + e.getMessage(), e);
             JavaScriptAPI.showError(browser,
-                HTMLUIStrings.ERR_DELETE_ACTIVE_ACCOUNT);
+                HTMLUIStrings.ERR_ACCOUNT_DELETE_ACTIVE);
         } catch (IllegalArgumentException e) {
             LOG.error("Couldn't delete account: " + e.getMessage(), e);
             JavaScriptAPI.showError(browser,
-                HTMLUIStrings.ERR_DELETE_ACTIVE_ACCOUNT);
+                HTMLUIStrings.ERR_ACCOUNT_DELETE_ACTIVE);
         }
     }
 

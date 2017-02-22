@@ -57,7 +57,7 @@ public class SetActiveAccount extends TypedJavascriptFunction {
             LOG.error("Couldn't activate account " + account.toString()
                 + ". Error:" + e.getMessage(), e);
             JavaScriptAPI.showError(browser,
-                HTMLUIStrings.SET_ACTIVE_ACCOUNT_FAILED);
+                HTMLUIStrings.ERR_ACCOUNT_SET_ACTIVE_FAILED);
         }
     }
 }

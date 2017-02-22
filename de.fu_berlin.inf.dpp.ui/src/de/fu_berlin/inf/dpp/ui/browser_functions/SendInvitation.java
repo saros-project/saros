@@ -66,7 +66,7 @@ public class SendInvitation extends TypedJavascriptFunction {
             if (!JID.isValid(contactJID)) {
                 LOG.error("Received jid is invalid");
                 JavaScriptAPI.showError(browser,
-                    HTMLUIStrings.START_SESSION_CANCELED);
+                    HTMLUIStrings.ERR_SESSION_START_CANCELED);
                 return;
             }
             usersToInvite.add(contactJID);

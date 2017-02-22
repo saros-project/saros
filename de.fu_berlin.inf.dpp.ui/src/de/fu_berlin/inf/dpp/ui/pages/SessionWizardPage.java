@@ -20,7 +20,7 @@ public class SessionWizardPage extends AbstractBrowserPage {
      */
     public SessionWizardPage(StateRenderer stateRenderer,
         ProjectListRenderer projectListRenderer) {
-        super(HTML_DOC_NAME, HTMLUIStrings.START_SESSION_WIZARD_TITLE);
+        super(HTML_DOC_NAME, HTMLUIStrings.TITLE_START_SESSION_WIZARD);
         this.addRenderer(stateRenderer, projectListRenderer);
     }
 }

@@ -54,7 +54,7 @@ public class DeleteContact extends TypedJavascriptFunction {
         } catch (XMPPException e) {
             LOG.error("Error while deleting contact", e);
             JavaScriptAPI.showError(browser,
-                HTMLUIStrings.DELETE_CONTACT_FAILED);
+                HTMLUIStrings.ERR_CONTACT_DELETE_FAILED);
         }
     }
 }

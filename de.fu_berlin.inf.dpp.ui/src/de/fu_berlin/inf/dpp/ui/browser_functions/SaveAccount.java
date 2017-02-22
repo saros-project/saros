@@ -58,7 +58,7 @@ public class SaveAccount extends TypedJavascriptFunction {
             acc.getServer(), acc.getPort())) {
             LOG.debug("Account " + acc.getUsername() + " already present");
             JavaScriptAPI.showError(browser,
-                HTMLUIStrings.SAVE_ACCOUNT_ALREADY_PRESENT);
+                HTMLUIStrings.ERR_ACCOUNT_ALREADY_PRESENT);
         } else {
             accountStore.createAccount(acc.getUsername(), acc.getPassword(),
                 acc.getDomain(), acc.getServer(), acc.getPort(), acc.useTLS(),
