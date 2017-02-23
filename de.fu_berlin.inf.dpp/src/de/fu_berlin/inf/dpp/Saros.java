@@ -57,7 +57,7 @@ public class Saros extends AbstractUIPlugin {
 
     private static boolean isInitialized;
 
-    private EclipseSarosLifecycle lifecycle;
+    private EclipsePluginLifecycle lifecycle;
 
     /**
      * @JTourBusStop 2, Some Basics:
@@ -108,7 +108,7 @@ public class Saros extends AbstractUIPlugin {
 
         setInitialized(false);
 
-        lifecycle = EclipseSarosLifecycle.getInstance(this);
+        lifecycle = EclipsePluginLifecycle.getInstance(this);
     }
 
     private static void setInitialized(boolean initialized) {

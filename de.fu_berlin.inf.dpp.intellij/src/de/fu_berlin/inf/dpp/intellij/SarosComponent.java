@@ -32,7 +32,7 @@ public class SarosComponent
             KeyStroke.getKeyStroke(KeyEvent.VK_F11,
                 java.awt.event.InputEvent.ALT_DOWN_MASK), null));
 
-        IntellijSarosLifecycle.getInstance(project).start();
+        IntellijProjectLifecycle.getInstance(project).start();
     }
 
     public static boolean isSwtBrowserEnabled() {

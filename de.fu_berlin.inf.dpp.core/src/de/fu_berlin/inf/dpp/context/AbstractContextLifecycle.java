@@ -1,31 +1,30 @@
-package de.fu_berlin.inf.dpp;
+package de.fu_berlin.inf.dpp.context;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import de.fu_berlin.inf.dpp.context.IContextFactory;
-import de.fu_berlin.inf.dpp.context.ContainerContext;
-import de.fu_berlin.inf.dpp.context.CoreContextFactory;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 
 /**
  * Abstract superclass which specifies and allows customization of the Saros
  * startup and shutdown process. It takes care of creating and disposing the
- * application context. Each platform that runs Saros (like IDE plug-ins or the
- * server) instantiates {@link CoreContextFactory the same core components}
- * . But also platform specific components.
- * 
- * When the platform is ready to create the application context (e.g. the
- * plug-in is loading up), {@link #start()} has to be called. Override
+ * context. Each platform that runs Saros (like IDE plug-ins or the server)
+ * instantiates {@link CoreContextFactory the same core components} . But also
+ * platform specific components.
+ * <p>
+ * When the platform is ready to create the context (e.g. the plug-in is loading
+ * up), {@link #start()} has to be called. Override
  * {@link #additionalContextFactories()} to determine which platform specific
- * context factories will be added. You may override
- * {@link #initializeContext(ContainerContext)} to perform additional init logic
- * <b>before</b> the context is instantiated.
- * 
+ * context factories will be added.
+ * <p>
+ * You may override {@link #initializeContext(ContainerContext)} to perform
+ * additional initialization logic <b>before</b> the context is instantiated.
+ * <p>
  * To shut down Saros the method {@link #stop()} has to be called.
  * {@link #finalizeContext(ContainerContext)} may be overwritten for that, too.
  */
-public abstract class AbstractSarosLifecycle {
+public abstract class AbstractContextLifecycle {
 
     private boolean isInitialized;
 
@@ -35,10 +34,10 @@ public abstract class AbstractSarosLifecycle {
      * The implementation must return a collection of Saros context factories
      * which are needed for the specific platform. These will be added to the
      * Saros context in the {@link #start() start method}.
-     * 
+     * <p>
      * It may contain additional initialization logic like setting up other
      * components before its context factories are returned.
-     * 
+     *
      * @return a collection of platform specific context factories.
      */
     protected abstract Collection<IContextFactory> additionalContextFactories();
@@ -48,7 +47,7 @@ public abstract class AbstractSarosLifecycle {
      * {@link #start start method}. The call happens <b>after</b>
      * {@link ContainerContext#initialize()} and <b>before</b>
      * {@link SarosPluginContext#setSarosContext(IContainerContext)}.
-     * 
+     * <p>
      * This method can be overwritten by the platform specific subclass but does
      * nothing by default.
      */
@@ -60,7 +59,7 @@ public abstract class AbstractSarosLifecycle {
      * Performs additional finalization logic which will be called in the
      * {@link #stop() stop method}. The call happens <b>before</b>
      * {@link ContainerContext#dispose()}.
-     * 
+     * <p>
      * This method can be overwritten by the platform specific subclass but does
      * nothing by default.
      */
@@ -75,8 +74,7 @@ public abstract class AbstractSarosLifecycle {
      */
     public final ContainerContext getSarosContext() {
         if (!isInitialized || containerContext == null)
-            throw new IllegalStateException(
-                "The ContainerContext is not initialized yet.");
+            throw new IllegalStateException("context is not initialized yet");
 
         return containerContext;
     }
@@ -86,7 +84,7 @@ public abstract class AbstractSarosLifecycle {
      * will create a {@link CoreContextFactory} plus each context factory
      * {@link #additionalContextFactories()} returns. Additional initialization
      * logic will be called here.
-     * 
+     *
      * @see #initializeContext
      */
     public final void start() {
@@ -111,9 +109,9 @@ public abstract class AbstractSarosLifecycle {
 
     /**
      * Disposes all (disposable) components created by the
-     * {@link IContextFactory context factories}. Additional finalization
-     * logic will be called here.
-     * 
+     * {@link IContextFactory context factories}. Additional finalization logic
+     * will be called here.
+     *
      * @see #finalizeContext
      */
     public final void stop() {

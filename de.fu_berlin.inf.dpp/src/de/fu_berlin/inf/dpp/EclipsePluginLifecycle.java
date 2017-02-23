@@ -7,6 +7,7 @@ import java.util.List;
 import org.eclipse.core.runtime.Platform;
 
 import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
+import de.fu_berlin.inf.dpp.context.AbstractContextLifecycle;
 import de.fu_berlin.inf.dpp.context.IContextFactory;
 import de.fu_berlin.inf.dpp.context.ContainerContext;
 import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;
@@ -15,14 +16,14 @@ import de.fu_berlin.inf.dpp.session.SessionEndReason;
 import de.fu_berlin.inf.dpp.ui.browser.EclipseHTMLUIContextFactory;
 
 /**
- * Extends the {@link AbstractSarosLifecycle} for an Eclipse plug-in. It
+ * Extends the {@link AbstractContextLifecycle} for an Eclipse plug-in. It
  * contains additional Eclipse specific fields and methods.
  * 
  * This class is a singleton.
  */
-public class EclipseSarosLifecycle extends AbstractSarosLifecycle {
+public class EclipsePluginLifecycle extends AbstractContextLifecycle {
 
-    private static EclipseSarosLifecycle instance;
+    private static EclipsePluginLifecycle instance;
 
     /**
      * Feature toggle for displaying Saros in a web browser in an additional
@@ -30,7 +31,7 @@ public class EclipseSarosLifecycle extends AbstractSarosLifecycle {
      * 
      * @return true if this feature is enabled, false otherwise
      */
-    private static boolean isSwtBrowserEnabled() {
+    private static boolean isSWTBrowserEnabled() {
         // TODO store constant string elsewhere
         return Platform.getBundle("de.fu_berlin.inf.dpp.ui") != null
             && Boolean.getBoolean("saros.swtbrowser");
@@ -39,18 +40,18 @@ public class EclipseSarosLifecycle extends AbstractSarosLifecycle {
     /**
      * @param saros
      *            A reference to the Saros/E plug-in class.
-     * @return the EclipseSarosLifecycle singleton instance.
+     * @return the EclipsePluginLifecycle singleton instance.
      */
-    public static synchronized EclipseSarosLifecycle getInstance(Saros saros) {
+    public static synchronized EclipsePluginLifecycle getInstance(Saros saros) {
         if (instance == null) {
-            instance = new EclipseSarosLifecycle(saros);
+            instance = new EclipsePluginLifecycle(saros);
         }
         return instance;
     }
 
     private Saros saros;
 
-    private EclipseSarosLifecycle(Saros saros) {
+    private EclipsePluginLifecycle(Saros saros) {
         this.saros = saros;
     }
 
@@ -60,7 +61,7 @@ public class EclipseSarosLifecycle extends AbstractSarosLifecycle {
 
         nonCoreFactories.add(new SarosEclipseContextFactory(saros));
 
-        if (isSwtBrowserEnabled()) {
+        if (isSWTBrowserEnabled()) {
             nonCoreFactories.add(new HTMLUIContextFactory());
             nonCoreFactories.add(new EclipseHTMLUIContextFactory());
         }
