@@ -106,9 +106,9 @@ public class HostLeftAloneInSessionHandler {
              * 
              * DEBUG 16:49:09,402 [Worker-6] (FileUtils.java:205) File written to disk: .project
              * DEBUG 16:49:09,402 [Worker-6] (FileUtils.java:209) Unpacked archive in 0 s
-             * TRACE 16:49:09,402 [Worker-6] (ChecksumCacheImpl.java:74) invalidating checksum for existing file: /java/.classpath [0x8F53373DCA77CBCA9383FE23E0132271]
-             * TRACE 16:49:09,402 [Worker-6] (ChecksumCacheImpl.java:74) invalidating checksum for existing file: /java/.project [0x5A01062F55D09CDA404237A34113627E]
-             * TRACE 16:49:09,402 [Worker-6] (ChecksumCacheImpl.java:74) invalidating checksum for existing file: /java/src/de/alice/HelloWorld.java [0xCC20B91A3A971472D6482719A2540DA5]
+             * TRACE 16:49:09,402 [Worker-6] (FileSystemChecksumCache.java:74) invalidating checksum for existing file: /java/.classpath [0x8F53373DCA77CBCA9383FE23E0132271]
+             * TRACE 16:49:09,402 [Worker-6] (FileSystemChecksumCache.java:74) invalidating checksum for existing file: /java/.project [0x5A01062F55D09CDA404237A34113627E]
+             * TRACE 16:49:09,402 [Worker-6] (FileSystemChecksumCache.java:74) invalidating checksum for existing file: /java/src/de/alice/HelloWorld.java [0xCC20B91A3A971472D6482719A2540DA5]
              * TRACE 16:49:09,453 [main] (EditorPool.java:278) EditorPool.getAllEditors invoked
              * DEBUG 16:49:09,455 [Worker-6] (SharedProjectDecorator.java:80) PROJECT ADDED: 1212967801
              * ERROR 16:49:09,455 [Worker-6] (SarosSessionManager.java:782) Internal error in notifying listener of an added project: java.lang.NullPointerException

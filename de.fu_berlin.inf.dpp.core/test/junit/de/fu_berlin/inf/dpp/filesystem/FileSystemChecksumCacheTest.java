@@ -8,7 +8,7 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ChecksumCacheTest {
+public class FileSystemChecksumCacheTest {
 
     private IFile collidingA0;
     private IFile collidingA1;
@@ -25,7 +25,7 @@ public class ChecksumCacheTest {
         @Override
         public void addFileContentChangedListener(
             IFileContentChangedListener listener) {
-            ChecksumCacheTest.this.listener = listener;
+            FileSystemChecksumCacheTest.this.listener = listener;
         }
 
         @Override
@@ -47,7 +47,7 @@ public class ChecksumCacheTest {
 
     @Test
     public void testGetChecksumOfNonExistingEntry() {
-        IChecksumCache cache = new ChecksumCacheImpl(notifier);
+        IChecksumCache cache = new FileSystemChecksumCache(notifier);
 
         // add a colliding entry increase branch coverage
         // has someone 3 different strings that have the same hashcode ? :P
@@ -59,14 +59,14 @@ public class ChecksumCacheTest {
 
     @Test
     public void testSingleNewInsert() {
-        IChecksumCache cache = new ChecksumCacheImpl(notifier);
+        IChecksumCache cache = new FileSystemChecksumCache(notifier);
         assertFalse(cache.addChecksum(collidingA0, 5L));
         assertEquals(Long.valueOf(5), cache.getChecksum(collidingA0));
     }
 
     @Test
     public void testNonCollidingNewInserts() {
-        IChecksumCache cache = new ChecksumCacheImpl(notifier);
+        IChecksumCache cache = new FileSystemChecksumCache(notifier);
         assertFalse(cache.addChecksum(collidingA0, 5L));
         assertFalse(cache.addChecksum(collidingB0, 6L));
 
@@ -78,7 +78,7 @@ public class ChecksumCacheTest {
     @Test
     public void testInsertCollidingPathes() {
 
-        IChecksumCache cache = new ChecksumCacheImpl(notifier);
+        IChecksumCache cache = new FileSystemChecksumCache(notifier);
 
         cache.addChecksum(collidingA0, 5L);
         cache.addChecksum(collidingA1, 6L);
@@ -95,7 +95,7 @@ public class ChecksumCacheTest {
 
     @Test
     public void testChecksumInvalidationOnExistingChecksums() {
-        IChecksumCache cache = new ChecksumCacheImpl(notifier);
+        IChecksumCache cache = new FileSystemChecksumCache(notifier);
 
         cache.addChecksum(collidingB0, 5L);
         cache.addChecksum(collidingA0, 5L);
@@ -112,7 +112,7 @@ public class ChecksumCacheTest {
 
     @Test
     public void testaddChecksumsAfterFileContentChanged() {
-        IChecksumCache cache = new ChecksumCacheImpl(notifier);
+        IChecksumCache cache = new FileSystemChecksumCache(notifier);
 
         listener.fileContentChanged(collidingB0);
         listener.fileContentChanged(collidingA0);
@@ -130,7 +130,7 @@ public class ChecksumCacheTest {
 
     @Test
     public void testUpdateChecksum() {
-        IChecksumCache cache = new ChecksumCacheImpl(notifier);
+        IChecksumCache cache = new FileSystemChecksumCache(notifier);
         cache.addChecksum(nonColliding, 5L);
         cache.addChecksum(collidingA0, 5L);
         cache.addChecksum(collidingA1, 6L);

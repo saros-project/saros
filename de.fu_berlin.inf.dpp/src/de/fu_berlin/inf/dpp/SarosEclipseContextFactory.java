@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.context.AbstractContextFactory;
 import de.fu_berlin.inf.dpp.context.IContextKeyBindings;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
-import de.fu_berlin.inf.dpp.filesystem.ChecksumCacheImpl;
+import de.fu_berlin.inf.dpp.filesystem.FileSystemChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.EclipsePathFactory;
 import de.fu_berlin.inf.dpp.filesystem.EclipseWorkspaceImpl;
 import de.fu_berlin.inf.dpp.filesystem.EclipseWorkspaceRootImpl;
@@ -94,7 +94,7 @@ public class SarosEclipseContextFactory extends AbstractContextFactory {
              * if we are the delegate and depends on components that are only
              * available after we added all our context stuff or vice versa
              */
-            Component.create(IChecksumCache.class, new ChecksumCacheImpl(
+            Component.create(IChecksumCache.class, new FileSystemChecksumCache(
                 new FileContentNotifierBridge())),
 
             Component.create(IWorkspace.class, new EclipseWorkspaceImpl(

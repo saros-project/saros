@@ -10,11 +10,28 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 /**
+ * Default implementation of the checksum cache {@link IChecksumCache interface}
+ * .
+ * <p>
+ * The implementation is optimized in regards to memory consumption. Affected
+ * files are identified by using two different hash functions based on the path
+ * it points to rather than storing the concrete path.
+ * <p>
+ * In order to use this implementation a concrete file change
+ * {@link IFileContentChangedNotifier notifier} has to be provided that tracks
+ * file changes in the currently used file system.
+ * <p>
+ * <b>Note:</b> This implementation is <b>NOT</b> capable of handling hash
+ * collisions.
+ *
  * @author Stefan Rossbach
  */
-public final class ChecksumCacheImpl implements IChecksumCache {
+// TODO add probability of hash collisions, lower bound should be 1 / (2^32 *
+// 2^128)
+public final class FileSystemChecksumCache implements IChecksumCache {
 
-    private static final Logger LOG = Logger.getLogger(ChecksumCacheImpl.class);
+    private static final Logger LOG = Logger
+        .getLogger(FileSystemChecksumCache.class);
 
     private static final int SEED = 0xDEADBEEF;
 
@@ -63,7 +80,7 @@ public final class ChecksumCacheImpl implements IChecksumCache {
 
         @Override
         public void fileContentChanged(IFile file) {
-            synchronized (ChecksumCacheImpl.this) {
+            synchronized (FileSystemChecksumCache.this) {
 
                 final String path = file.getFullPath().toOSString();
 
@@ -90,7 +107,7 @@ public final class ChecksumCacheImpl implements IChecksumCache {
 
     private Map<Integer, Object> cache = new HashMap<Integer, Object>();
 
-    public ChecksumCacheImpl(
+    public FileSystemChecksumCache(
         IFileContentChangedNotifier fileContentChangedNotifier) {
         fileContentChangedNotifier
             .addFileContentChangedListener(fileContentChangedListener);
