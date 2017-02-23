@@ -2,9 +2,9 @@ package de.fu_berlin.inf.dpp.feedback;
 
 import java.util.Date;
 
-import de.fu_berlin.inf.dpp.ISarosContextBindings.PlatformVersion;
-import de.fu_berlin.inf.dpp.ISarosContextBindings.SarosVersion;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.context.IContextKeyBindings.PlatformVersion;
+import de.fu_berlin.inf.dpp.context.IContextKeyBindings.SarosVersion;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 
 /**

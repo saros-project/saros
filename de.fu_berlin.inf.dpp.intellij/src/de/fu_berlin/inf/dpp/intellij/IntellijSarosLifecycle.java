@@ -1,9 +1,10 @@
 package de.fu_berlin.inf.dpp.intellij;
 
 import com.intellij.openapi.project.Project;
+
 import de.fu_berlin.inf.dpp.AbstractSarosLifecycle;
 import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
-import de.fu_berlin.inf.dpp.ISarosContextFactory;
+import de.fu_berlin.inf.dpp.context.IContextFactory;
 import de.fu_berlin.inf.dpp.intellij.context.SarosIntellijContextFactory;
 import de.fu_berlin.inf.dpp.intellij.ui.swt_browser.SwtLibLoader;
 
@@ -42,8 +43,8 @@ public class IntellijSarosLifecycle extends AbstractSarosLifecycle {
     }
 
     @Override
-    protected Collection<ISarosContextFactory> additionalContextFactories() {
-        List<ISarosContextFactory> nonCoreFactories = new ArrayList<ISarosContextFactory>();
+    protected Collection<IContextFactory> additionalContextFactories() {
+        List<IContextFactory> nonCoreFactories = new ArrayList<IContextFactory>();
 
         nonCoreFactories.add(new SarosIntellijContextFactory(project));
 

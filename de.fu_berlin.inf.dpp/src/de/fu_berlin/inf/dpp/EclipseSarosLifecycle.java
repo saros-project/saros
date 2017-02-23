@@ -7,6 +7,8 @@ import java.util.List;
 import org.eclipse.core.runtime.Platform;
 
 import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
+import de.fu_berlin.inf.dpp.context.IContextFactory;
+import de.fu_berlin.inf.dpp.context.ContainerContext;
 import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;
 import de.fu_berlin.inf.dpp.session.SarosSessionManager;
 import de.fu_berlin.inf.dpp.session.SessionEndReason;
@@ -53,8 +55,8 @@ public class EclipseSarosLifecycle extends AbstractSarosLifecycle {
     }
 
     @Override
-    protected Collection<ISarosContextFactory> additionalContextFactories() {
-        List<ISarosContextFactory> nonCoreFactories = new ArrayList<ISarosContextFactory>();
+    protected Collection<IContextFactory> additionalContextFactories() {
+        List<IContextFactory> nonCoreFactories = new ArrayList<IContextFactory>();
 
         nonCoreFactories.add(new SarosEclipseContextFactory(saros));
 
@@ -67,15 +69,15 @@ public class EclipseSarosLifecycle extends AbstractSarosLifecycle {
     }
 
     @Override
-    protected void initializeContext(final SarosContext sarosContext) {
-        FeedbackPreferences.setPreferences(sarosContext
+    protected void initializeContext(final ContainerContext containerContext) {
+        FeedbackPreferences.setPreferences(containerContext
             .getComponent(org.osgi.service.prefs.Preferences.class));
     }
 
     @Override
-    protected void finalizeContext(final SarosContext sarosContext) {
-        sarosContext.getComponent(SarosSessionManager.class).stopSession(
+    protected void finalizeContext(final ContainerContext containerContext) {
+        containerContext.getComponent(SarosSessionManager.class).stopSession(
             SessionEndReason.LOCAL_USER_LEFT);
-        sarosContext.getComponent(ConnectionHandler.class).disconnect();
+        containerContext.getComponent(ConnectionHandler.class).disconnect();
     }
 }

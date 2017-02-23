@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp;
+package de.fu_berlin.inf.dpp.context;
 
 import java.util.Arrays;
 
@@ -48,7 +48,7 @@ import de.fu_berlin.inf.dpp.versioning.VersionManager;
  *
  * @author srossbach
  */
-public class SarosCoreContextFactory extends AbstractSarosContextFactory {
+public class CoreContextFactory extends AbstractContextFactory {
 
     /**
      * Must not be static in order to avoid heavy work during class
@@ -88,11 +88,11 @@ public class SarosCoreContextFactory extends AbstractSarosContextFactory {
         Component.create(DiscoveryManager.class),
 
         Component.create(BindKey.bindKey(IStreamService.class,
-            ISarosContextBindings.IBBStreamService.class),
+            IContextKeyBindings.IBBStreamService.class),
             IBBStreamService.class),
 
         Component.create(BindKey.bindKey(IStreamService.class,
-            ISarosContextBindings.Socks5StreamService.class),
+            IContextKeyBindings.Socks5StreamService.class),
             Socks5StreamService.class),
 
         Component.create(RosterTracker.class),

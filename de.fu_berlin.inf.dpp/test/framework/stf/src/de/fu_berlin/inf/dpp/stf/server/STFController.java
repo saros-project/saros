@@ -22,8 +22,8 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
 
-import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
+import de.fu_berlin.inf.dpp.context.IContainerContext;
 import de.fu_berlin.inf.dpp.preferences.EclipsePreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.impl.ControlBotImpl;
@@ -94,7 +94,7 @@ public class STFController {
 
     private static Registry registry;
 
-    public static void start(int port, ISarosContext context)
+    public static void start(int port, IContainerContext context)
         throws RemoteException {
 
         Thread

@@ -35,7 +35,6 @@ import org.apache.log4j.Logger;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.FolderCreatedActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
@@ -50,6 +49,7 @@ import de.fu_berlin.inf.dpp.communication.extensions.KickUserExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.LeaveSessionExtension;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
+import de.fu_berlin.inf.dpp.context.IContainerContext;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
@@ -95,7 +95,7 @@ public final class SarosSession implements ISarosSession {
     @Inject
     private IConnectionManager connectionManager;
 
-    private final ISarosContext sarosContext;
+    private final IContainerContext containerContext;
 
     private final ConcurrentDocumentClient concurrentDocumentClient;
 
@@ -216,8 +216,8 @@ public final class SarosSession implements ISarosSession {
     /**
      * Constructor for host.
      */
-    public SarosSession(final String id, int colorID, ISarosContext sarosContext) {
-        this(id, sarosContext, /* unused */null, colorID, /* unused */
+    public SarosSession(final String id, int colorID, IContainerContext containerContext) {
+        this(id, containerContext, /* unused */null, colorID, /* unused */
         -1);
     }
 
@@ -225,9 +225,9 @@ public final class SarosSession implements ISarosSession {
      * Constructor for client.
      */
     public SarosSession(final String id, JID hostJID, int clientColorID,
-        int hostColorID, ISarosContext sarosContext) {
+        int hostColorID, IContainerContext containerContext) {
 
-        this(id, sarosContext, hostJID, clientColorID, hostColorID);
+        this(id, containerContext, hostJID, clientColorID, hostColorID);
     }
 
     @Override
@@ -668,7 +668,7 @@ public final class SarosSession implements ISarosSession {
             stopping = true;
         }
 
-        sarosContext.removeChildContainer(sessionContainer);
+        containerContext.removeChildContainer(sessionContainer);
         sessionContainer.stop();
         sessionContainer.dispose();
 
@@ -1034,7 +1034,7 @@ public final class SarosSession implements ISarosSession {
             localUser, localUser, 0));
     }
 
-    private SarosSession(final String id, ISarosContext context, JID host,
+    private SarosSession(final String id, IContainerContext context, JID host,
         int localColorID, int hostColorID) {
 
         context.initComponent(this);
@@ -1042,7 +1042,7 @@ public final class SarosSession implements ISarosSession {
         this.sessionID = id;
         this.projectMapper = new SharedProjectMapper();
         this.activityQueuer = new ActivityQueuer();
-        this.sarosContext = context;
+        this.containerContext = context;
 
         // FIXME that should be passed in !
         JID localUserJID = connectionService.getJID();
@@ -1064,7 +1064,7 @@ public final class SarosSession implements ISarosSession {
             participants.put(localUser.getJID(), localUser);
         }
 
-        sessionContainer = context.createSimpleChildContainer();
+        sessionContainer = context.createChildContainer();
         sessionContainer.addComponent(ISarosSession.class, this);
         sessionContainer.addComponent(IActivityHandlerCallback.class,
             activityCallback);

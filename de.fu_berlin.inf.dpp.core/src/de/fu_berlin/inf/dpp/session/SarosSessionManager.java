@@ -33,8 +33,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
 
-import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.context.IContainerContext;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
@@ -100,7 +100,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     private final Preferences preferences;
 
-    private final ISarosContext applicationContext;
+    private final IContainerContext context;
 
     private final NegotiationFactory negotiationFactory;
 
@@ -145,12 +145,12 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
     };
 
-    public SarosSessionManager(ISarosContext applicationContext,
+    public SarosSessionManager(IContainerContext context,
         NegotiationFactory negotiationFactory,
         XMPPConnectionService connectionService, ITransmitter transmitter,
         IReceiver receiver, Preferences preferences) {
 
-        this.applicationContext = applicationContext;
+        this.context = context;
         this.connectionService = connectionService;
         this.currentSessionNegotiations = new SessionNegotiationObservable();
         this.currentProjectNegotiations = new ProjectNegotiationObservable();
@@ -238,7 +238,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
             // FIXME should be passed in (colorID)
             session = new SarosSession(sessionID,
-                preferences.getFavoriteColorID(), applicationContext);
+                preferences.getFavoriteColorID(), context);
 
             sessionStarting(session);
             session.start();
@@ -272,7 +272,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         assert session == null;
 
         session = new SarosSession(id, host, clientColor, hostColor,
-            applicationContext);
+            context);
 
         log.info("joined uninitialized Saros session");
 

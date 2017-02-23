@@ -14,7 +14,7 @@ import org.picocontainer.injectors.CompositeInjection;
 import org.picocontainer.injectors.ConstructorInjection;
 import org.powermock.api.easymock.PowerMock;
 
-import de.fu_berlin.inf.dpp.ISarosContextFactory;
+import de.fu_berlin.inf.dpp.context.IContextFactory;
 
 /**
  * Facilitates integration tests by offering multiple ways to create a
@@ -23,7 +23,7 @@ import de.fu_berlin.inf.dpp.ISarosContextFactory;
  * This class does not take care of duplicate keys -- it's up to users of this
  * class to make sure no duplicates are entered in the container.
  * "Bulk operations" with
- * {@link #addMocksFromFactory(MutablePicoContainer, ISarosContextFactory)
+ * {@link #addMocksFromFactory(MutablePicoContainer, IContextFactory)
  * addMocksFromFactory()} calls should be done first; use
  * {@link #addMock(MutablePicoContainer, Class) addMock()} or
  * {@link #addMocks(MutablePicoContainer, List) addMocks()} to add missing
@@ -37,7 +37,7 @@ public class ContextMocker {
      * 
      * @see #addMock(MutablePicoContainer, Class)
      * @see #addMocks(MutablePicoContainer, List)
-     * @see #addMocksFromFactory(MutablePicoContainer, ISarosContextFactory)
+     * @see #addMocksFromFactory(MutablePicoContainer, IContextFactory)
      * 
      * @return empty PicoContainer
      */
@@ -100,7 +100,7 @@ public class ContextMocker {
      *            this nor through the other add methods).
      */
     public static void addMocksFromFactory(MutablePicoContainer container,
-        ISarosContextFactory factory) {
+        IContextFactory factory) {
 
         // prepare extraction of the dependency mapping keys from the factory
         CollectingPicoContainer collector = new CollectingPicoContainer();

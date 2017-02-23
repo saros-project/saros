@@ -4,13 +4,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.picocontainer.Startable;
 
-import de.fu_berlin.inf.dpp.ISarosContextFactory;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
+import de.fu_berlin.inf.dpp.context.IContextFactory;
 import de.fu_berlin.inf.dpp.editor.IFollowModeListener.Reason;
 import de.fu_berlin.inf.dpp.editor.remote.EditorState;
 import de.fu_berlin.inf.dpp.editor.remote.UserEditorStateManager;
@@ -36,7 +36,7 @@ import de.fu_berlin.inf.dpp.session.User;
  * TODO Move this class to the UI package as this feature does not make any
  * sense without a graphical user interface. (Precondition: The
  * {@link ISarosSessionContextFactory}s need to switch from a inheritance-based
- * to a composition-based style, just like the {@link ISarosContextFactory}s.)
+ * to a composition-based style, just like the {@link IContextFactory}s.)
  */
 public class FollowModeManager implements Startable {
     private final ISarosSession session;

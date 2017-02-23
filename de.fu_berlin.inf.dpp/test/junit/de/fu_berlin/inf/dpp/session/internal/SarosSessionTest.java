@@ -45,10 +45,10 @@ import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import de.fu_berlin.inf.dpp.ISarosContext;
-import de.fu_berlin.inf.dpp.ISarosContextBindings;
-import de.fu_berlin.inf.dpp.SarosCoreContextFactory;
 import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
+import de.fu_berlin.inf.dpp.context.IContainerContext;
+import de.fu_berlin.inf.dpp.context.IContextKeyBindings;
+import de.fu_berlin.inf.dpp.context.CoreContextFactory;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;
@@ -127,10 +127,10 @@ public class SarosSessionTest {
         return srv;
     }
 
-    private static ISarosContext createContextMock(
+    private static IContainerContext createContextMock(
         final MutablePicoContainer container) {
 
-        final ISarosContext context = createMock(ISarosContext.class);
+        final IContainerContext context = createMock(IContainerContext.class);
 
         context.initComponent(isA(Object.class));
 
@@ -158,7 +158,7 @@ public class SarosSessionTest {
                 }
             });
 
-        context.createSimpleChildContainer();
+        context.createChildContainer();
         expectLastCall().andReturn(container.makeChildContainer());
         context.removeChildContainer(isA(MutablePicoContainer.class));
         expectLastCall().andAnswer(new IAnswer<Object>() {
@@ -254,7 +254,7 @@ public class SarosSessionTest {
 
         container = picoBuilder.build();
 
-        new SarosCoreContextFactory().createComponents(container);
+        new CoreContextFactory().createComponents(container);
 
         /*
          * components needed for runtime but currently not present or not
@@ -262,10 +262,10 @@ public class SarosSessionTest {
          */
 
         container.addComponent(BindKey.bindKey(String.class,
-            ISarosContextBindings.SarosVersion.class), "0815");
+            IContextKeyBindings.SarosVersion.class), "0815");
 
         container.addComponent(BindKey.bindKey(String.class,
-            ISarosContextBindings.PlatformVersion.class), "4711");
+            IContextKeyBindings.PlatformVersion.class), "4711");
 
         container.addComponent(ISarosSessionContextFactory.class,
             SarosEclipseSessionContextFactory.class);
@@ -324,7 +324,7 @@ public class SarosSessionTest {
 
         createWorkspaceMock(workspaceListeners);
 
-        final ISarosContext context = createContextMock(container);
+        final IContainerContext context = createContextMock(container);
 
         // Test creating, starting and stopping the session.
         SarosSession session = new SarosSession(SAROS_SESSION_ID, 0, context);

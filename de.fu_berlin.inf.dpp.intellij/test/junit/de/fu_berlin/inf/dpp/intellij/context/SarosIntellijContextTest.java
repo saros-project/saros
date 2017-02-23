@@ -6,11 +6,13 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
+
 import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
-import de.fu_berlin.inf.dpp.ISarosContext;
-import de.fu_berlin.inf.dpp.ISarosContextFactory;
-import de.fu_berlin.inf.dpp.SarosCoreContextFactory;
+import de.fu_berlin.inf.dpp.context.IContainerContext;
+import de.fu_berlin.inf.dpp.context.IContextFactory;
+import de.fu_berlin.inf.dpp.context.CoreContextFactory;
 import de.fu_berlin.inf.dpp.test.mocks.ContextMocker;
+
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
@@ -51,17 +53,17 @@ public class SarosIntellijContextTest {
         EasyMock.replay(project);
 
         // mock Saros environment
-        ContextMocker.addMock(container, ISarosContext.class);
+        ContextMocker.addMock(container, IContainerContext.class);
     }
 
     @Test
     public void createComponentsWithoutSWT() {
-        List<ISarosContextFactory> factories = new ArrayList<ISarosContextFactory>();
+        List<IContextFactory> factories = new ArrayList<IContextFactory>();
 
         factories.add(new SarosIntellijContextFactory(project));
-        factories.add(new SarosCoreContextFactory());
+        factories.add(new CoreContextFactory());
 
-        for (ISarosContextFactory factory : factories) {
+        for (IContextFactory factory : factories) {
             factory.createComponents(container);
         }
 
@@ -70,13 +72,13 @@ public class SarosIntellijContextTest {
 
     @Test
     public void createComponentsWithSWT() {
-        List<ISarosContextFactory> factories = new ArrayList<ISarosContextFactory>();
+        List<IContextFactory> factories = new ArrayList<IContextFactory>();
 
         factories.add(new SarosIntellijContextFactory(project));
-        factories.add(new SarosCoreContextFactory());
+        factories.add(new CoreContextFactory());
         factories.add(new HTMLUIContextFactory());
 
-        for (ISarosContextFactory factory : factories) {
+        for (IContextFactory factory : factories) {
             factory.createComponents(container);
         }
 

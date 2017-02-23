@@ -15,6 +15,8 @@ import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCNegotiationMan
 import de.fu_berlin.inf.dpp.communication.connection.IProxyResolver;
 import de.fu_berlin.inf.dpp.communication.connection.Socks5ProxyResolver;
 import de.fu_berlin.inf.dpp.concurrent.undo.UndoManager;
+import de.fu_berlin.inf.dpp.context.AbstractContextFactory;
+import de.fu_berlin.inf.dpp.context.IContextKeyBindings;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.filesystem.ChecksumCacheImpl;
@@ -51,7 +53,7 @@ import de.fu_berlin.inf.dpp.ui.eventhandler.XMPPAuthorizationHandler;
  * 
  * @author srossbach
  */
-public class SarosEclipseContextFactory extends AbstractSarosContextFactory {
+public class SarosEclipseContextFactory extends AbstractContextFactory {
 
     private final Saros saros;
 
@@ -137,11 +139,11 @@ public class SarosEclipseContextFactory extends AbstractSarosContextFactory {
         container.addComponent(Bundle.class, saros.getBundle());
 
         container.addComponent(BindKey.bindKey(String.class,
-            ISarosContextBindings.SarosVersion.class), saros.getBundle()
+            IContextKeyBindings.SarosVersion.class), saros.getBundle()
             .getVersion().toString());
 
         container.addComponent(BindKey.bindKey(String.class,
-            ISarosContextBindings.PlatformVersion.class),
+            IContextKeyBindings.PlatformVersion.class),
             Platform.getBundle("org.eclipse.core.runtime").getVersion()
                 .toString());
 

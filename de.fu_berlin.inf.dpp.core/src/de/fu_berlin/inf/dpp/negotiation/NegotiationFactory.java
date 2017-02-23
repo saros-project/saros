@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.negotiation;
 
 import java.util.List;
 
-import de.fu_berlin.inf.dpp.ISarosContext;
+import de.fu_berlin.inf.dpp.context.IContainerContext;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
@@ -38,7 +38,7 @@ public final class NegotiationFactory {
     private final DiscoveryManager discoveryManager;
 
     // private final IEditorManager editorManager;
-    private final ISarosContext applicationContext;
+    private final IContainerContext context;
 
     private final FileReplacementInProgressObservable fileReplacementInProgressObservable;
 
@@ -66,7 +66,7 @@ public final class NegotiationFactory {
          * the SessionManager and IEditorManager implementations which are using
          * the SessionManager as well.
          */
-        final ISarosContext applicationContext //
+        final IContainerContext context //
     )
 
     {
@@ -76,7 +76,7 @@ public final class NegotiationFactory {
         this.discoveryManager = discoveryManager;
 
         // this.editorManager = editorManager;
-        this.applicationContext = applicationContext;
+        this.context = context;
 
         this.fileReplacementInProgressObservable = fileReplacementInProgressObservable;
 
@@ -115,7 +115,7 @@ public final class NegotiationFactory {
 
         return new OutgoingProjectNegotiation(remoteAddress, resources,
             sessionManager, session, /* editorManager */
-            applicationContext.getComponent(IEditorManager.class), workspace,
+            context.getComponent(IEditorManager.class), workspace,
             checksumCache, connectionService, transmitter, receiver);
     }
 

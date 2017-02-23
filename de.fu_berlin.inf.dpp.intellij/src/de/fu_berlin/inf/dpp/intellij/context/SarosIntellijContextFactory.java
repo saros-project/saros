@@ -1,10 +1,11 @@
 package de.fu_berlin.inf.dpp.intellij.context;
 
 import com.intellij.openapi.project.Project;
-import de.fu_berlin.inf.dpp.AbstractSarosContextFactory;
-import de.fu_berlin.inf.dpp.ISarosContextBindings;
+
 import de.fu_berlin.inf.dpp.communication.connection.IProxyResolver;
 import de.fu_berlin.inf.dpp.connection.NullProxyResolver;
+import de.fu_berlin.inf.dpp.context.AbstractContextFactory;
+import de.fu_berlin.inf.dpp.context.IContextKeyBindings;
 import de.fu_berlin.inf.dpp.core.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.core.monitoring.remote.IntelliJRemoteProgressIndicatorFactoryImpl;
 import de.fu_berlin.inf.dpp.core.project.internal.SarosIntellijSessionContextFactory;
@@ -39,6 +40,7 @@ import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.DialogManager;
 import de.fu_berlin.inf.dpp.ui.ide_embedding.IUIResourceLocator;
 import de.fu_berlin.inf.dpp.ui.util.ICollaborationUtils;
+
 import org.picocontainer.BindKey;
 import org.picocontainer.MutablePicoContainer;
 
@@ -47,7 +49,7 @@ import java.util.Arrays;
 /**
  * IntelliJ related context
  */
-public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
+public class SarosIntellijContextFactory extends AbstractContextFactory {
 
     /**
      * Must not be static in order to avoid heavy work during class
@@ -124,11 +126,11 @@ public class SarosIntellijContextFactory extends AbstractSarosContextFactory {
         }
 
         container.addComponent(BindKey.bindKey(String.class,
-                ISarosContextBindings.SarosVersion.class),
+                IContextKeyBindings.SarosVersion.class),
             "14.1.31.DEVEL"); // todo
 
         container.addComponent(BindKey.bindKey(String.class,
-                ISarosContextBindings.PlatformVersion.class), "4.3.2"); // todo
+                IContextKeyBindings.PlatformVersion.class), "4.3.2"); // todo
 
     }
 }

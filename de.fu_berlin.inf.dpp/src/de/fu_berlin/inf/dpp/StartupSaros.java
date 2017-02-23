@@ -14,6 +14,7 @@ import de.fu_berlin.inf.dpp.account.XMPPAccount;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
+import de.fu_berlin.inf.dpp.context.IContainerContext;
 import de.fu_berlin.inf.dpp.feedback.FeedbackPreferences;
 import de.fu_berlin.inf.dpp.preferences.Preferences;
 import de.fu_berlin.inf.dpp.stf.server.STFController;
@@ -36,7 +37,7 @@ public class StartupSaros implements IStartup {
     private static final Logger LOG = Logger.getLogger(StartupSaros.class);
 
     @Inject
-    private ISarosContext context;
+    private IContainerContext context;
 
     @Inject
     private IPreferenceStore preferenceStore;

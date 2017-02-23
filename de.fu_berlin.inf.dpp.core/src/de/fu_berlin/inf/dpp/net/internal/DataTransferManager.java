@@ -20,9 +20,9 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
 import org.picocontainer.annotations.Nullable;
 
-import de.fu_berlin.inf.dpp.ISarosContextBindings.IBBStreamService;
-import de.fu_berlin.inf.dpp.ISarosContextBindings.Socks5StreamService;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.context.IContextKeyBindings.IBBStreamService;
+import de.fu_berlin.inf.dpp.context.IContextKeyBindings.Socks5StreamService;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
 import de.fu_berlin.inf.dpp.net.IPacketInterceptor;

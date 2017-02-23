@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp;
+package de.fu_berlin.inf.dpp.context;
 
 import java.io.File;
 import java.util.List;
@@ -44,36 +44,41 @@ import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
 
 /**
  * @JTourBusStop 5, Some Basics:
- * 
+ *
  *               If you haven't already read about PicoContainer, stop and
  *               do so now (http://picocontainer.com/introduction.html).
- * 
+ *
  *               Saros uses PicoContainer to manage dependencies on our
- *               behalf. The SarosContext class encapsulates our usage of
+ *               behalf. The ContainerContext class encapsulates our usage of
  *               PicoContainer. It's a well documented class, so take a look
  *               at it.
  */
 
 /**
- * Represents the application context. All components that are created and
- * initialized in this context are tied to the lifetime of the application, i.e
- * the components are only created once.
+ * Represents the default context. It is up to the client to decide the lifetime
+ * of this context.
+ * <p>
+ * All components that are created and initialized in this context are only
+ * created once.
  * <p>
  * <b>Note:</b> The <code>create</code> and <code>dispose</code> methods are not
  * thread safe.
- * 
+ * <p>
+ * <b>Restriction:</b> Instantiating the context <b>multiple</b> times is only
+ * allowed by using different class loaders !
+ *
  * @author pcordes
  * @author srossbach
  */
-public class SarosContext implements ISarosContext {
+public class ContainerContext implements IContainerContext {
 
-    private static final Logger LOG = Logger.getLogger(SarosContext.class);
+    private static final Logger LOG = Logger.getLogger(ContainerContext.class);
 
     private static final String SAROS_DATA_DIRECTORY = ".saros";
 
     private static final String SAROS_XMPP_ACCOUNT_FILE = "config.dat";
 
-    private final List<ISarosContextFactory> factories;
+    private final List<IContextFactory> factories;
     /**
      * A caching container which holds all the singletons in Saros.
      */
@@ -82,7 +87,7 @@ public class SarosContext implements ISarosContext {
     private boolean initialized;
     private boolean disposed;
 
-    public SarosContext(final List<ISarosContextFactory> factories,
+    public ContainerContext(final List<IContextFactory> factories,
         final ComponentMonitor componentMonitor) {
         this.factories = factories;
 
@@ -105,10 +110,10 @@ public class SarosContext implements ISarosContext {
     private void installPacketExtensionProviders() {
 
         /* *
-         * 
+         *
          * @JTourBusStop 6, Creating custom network messages, Installing the
          * provider:
-         * 
+         *
          * This should be straight forward. Follow the code pattern below.
          */
 
@@ -164,7 +169,7 @@ public class SarosContext implements ISarosContext {
     /**
      * Initialize this context and instantiates all components created by the
      * context factories. Does nothing if called more than once.
-     * 
+     *
      * @see #dispose()
      */
     public void initialize() {
@@ -172,12 +177,12 @@ public class SarosContext implements ISarosContext {
         if (initialized)
             return;
 
-        LOG.info("initializing application context...");
+        LOG.info("initializing context...");
 
-        for (ISarosContextFactory factory : factories)
+        for (IContextFactory factory : factories)
             factory.createComponents(container);
 
-        container.addComponent(ISarosContext.class, this);
+        container.addComponent(IContainerContext.class, this);
 
         initAccountStore(container.getComponent(XMPPAccountStore.class));
 
@@ -202,7 +207,7 @@ public class SarosContext implements ISarosContext {
 
         initialized = true;
 
-        LOG.info("successfully initialized application context");
+        LOG.info("successfully initialized context");
     }
 
     /**
@@ -215,10 +220,10 @@ public class SarosContext implements ISarosContext {
         if (!initialized || disposed)
             return;
 
-        LOG.info("disposing application context...");
+        LOG.info("disposing context...");
         disposed = true;
         container.dispose();
-        LOG.info("successfully disposed application context");
+        LOG.info("successfully disposed context");
     }
 
     private void initAccountStore(XMPPAccountStore store) {
@@ -292,7 +297,7 @@ public class SarosContext implements ISarosContext {
     }
 
     @Override
-    public MutablePicoContainer createSimpleChildContainer() {
+    public MutablePicoContainer createChildContainer() {
         return container.makeChildContainer();
     }
 }

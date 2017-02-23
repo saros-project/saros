@@ -3,9 +3,9 @@ package de.fu_berlin.inf.dpp.stf.server;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.osgi.service.prefs.Preferences;
 
-import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
+import de.fu_berlin.inf.dpp.context.IContainerContext;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.FollowModeManager;
 import de.fu_berlin.inf.dpp.net.IConnectionManager;
@@ -18,9 +18,9 @@ import de.fu_berlin.inf.dpp.versioning.VersionManager;
 
 public abstract class StfRemoteObject implements Constants {
 
-    private static ISarosContext context;
+    private static IContainerContext context;
 
-    static void setContext(ISarosContext context) {
+    static void setContext(IContainerContext context) {
         StfRemoteObject.context = context;
     }
 

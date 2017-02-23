@@ -17,7 +17,7 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package de.fu_berlin.inf.dpp;
+package de.fu_berlin.inf.dpp.context;
 
 import org.picocontainer.MutablePicoContainer;
 
@@ -25,7 +25,7 @@ import org.picocontainer.MutablePicoContainer;
  * Interface for implementing context factories depending on the current
  * platform Saros is running on.
  */
-public interface ISarosContextFactory {
+public interface IContextFactory {
 
     /**
      * Creates the runtime components for the Saros application. It is up to the

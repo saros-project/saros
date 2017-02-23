@@ -12,6 +12,9 @@ import org.powermock.core.classloader.annotations.MockPolicy;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import de.fu_berlin.inf.dpp.context.IContainerContext;
+import de.fu_berlin.inf.dpp.context.IContextFactory;
+import de.fu_berlin.inf.dpp.context.CoreContextFactory;
 import de.fu_berlin.inf.dpp.test.mocks.ContextMocker;
 import de.fu_berlin.inf.dpp.test.mocks.EclipseMocker;
 import de.fu_berlin.inf.dpp.test.mocks.PrepareEclipseComponents;
@@ -39,17 +42,17 @@ public class SarosEclipseContextTest {
         // mock Saros environment
         saros = EclipseMocker.mockSaros();
 
-        ContextMocker.addMock(container, ISarosContext.class);
+        ContextMocker.addMock(container, IContainerContext.class);
     }
 
     @Test
     public void createComponentsWithoutSWT() {
-        List<ISarosContextFactory> factories = new ArrayList<ISarosContextFactory>();
+        List<IContextFactory> factories = new ArrayList<IContextFactory>();
 
         factories.add(new SarosEclipseContextFactory(saros));
-        factories.add(new SarosCoreContextFactory());
+        factories.add(new CoreContextFactory());
 
-        for (ISarosContextFactory factory : factories) {
+        for (IContextFactory factory : factories) {
             factory.createComponents(container);
         }
 
@@ -58,14 +61,14 @@ public class SarosEclipseContextTest {
 
     @Test
     public void createComponentsWithSWT() {
-        List<ISarosContextFactory> factories = new ArrayList<ISarosContextFactory>();
+        List<IContextFactory> factories = new ArrayList<IContextFactory>();
 
         factories.add(new SarosEclipseContextFactory(saros));
-        factories.add(new SarosCoreContextFactory());
+        factories.add(new CoreContextFactory());
         factories.add(new HTMLUIContextFactory());
         factories.add(new EclipseHTMLUIContextFactory());
 
-        for (ISarosContextFactory factory : factories) {
+        for (IContextFactory factory : factories) {
             factory.createComponents(container);
         }
 

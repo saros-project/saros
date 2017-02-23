@@ -1,15 +1,15 @@
 package de.fu_berlin.inf.dpp.stf.server;
 
-import de.fu_berlin.inf.dpp.ISarosContext;
+import de.fu_berlin.inf.dpp.context.IContainerContext;
 import de.fu_berlin.inf.dpp.ui.manager.BrowserManager;
 
 /**
  * This is the base class for all remote object of the HTML GUI test framework.
- * It contains methods to acquire components from the {@link ISarosContext}
+ * It contains methods to acquire components from the {@link IContainerContext}
  */
 public abstract class HTMLSTFRemoteObject {
 
-    private static ISarosContext context;
+    private static IContainerContext context;
 
     /**
      * This method must be called at the start of the test framework in order
@@ -18,11 +18,11 @@ public abstract class HTMLSTFRemoteObject {
      * @param context
      *            the Saros context to use for the GUI tests
      */
-    static void setContext(ISarosContext context) {
+    static void setContext(IContainerContext context) {
         HTMLSTFRemoteObject.context = context;
     }
 
-    protected ISarosContext getContext() {
+    protected IContainerContext getContext() {
         return context;
     }
 

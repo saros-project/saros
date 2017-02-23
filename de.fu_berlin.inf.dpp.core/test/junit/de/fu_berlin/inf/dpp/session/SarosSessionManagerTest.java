@@ -15,7 +15,7 @@ import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import de.fu_berlin.inf.dpp.ISarosContext;
+import de.fu_berlin.inf.dpp.context.IContainerContext;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.net.IReceiver;
@@ -101,11 +101,11 @@ public class SarosSessionManagerTest {
 
         Preferences preferences = PowerMock.createNiceMock(Preferences.class);
 
-        ISarosContext context = PowerMock.createNiceMock(ISarosContext.class);
+        IContainerContext context = PowerMock.createNiceMock(IContainerContext.class);
 
         PowerMock.expectNew(SarosSession.class,
             EasyMock.anyObject(String.class), EasyMock.anyInt(),
-            EasyMock.anyObject(ISarosContext.class)).andStubReturn(session);
+            EasyMock.anyObject(IContainerContext.class)).andStubReturn(session);
 
         PowerMock.replayAll();
 

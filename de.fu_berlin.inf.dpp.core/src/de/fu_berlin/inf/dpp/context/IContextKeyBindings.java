@@ -17,7 +17,7 @@
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package de.fu_berlin.inf.dpp;
+package de.fu_berlin.inf.dpp.context;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -38,7 +38,7 @@ import org.picocontainer.annotations.Bind;
  *      org.picocontainer.Parameter...)
  * @see BindKey#bindKey(Class, Class)
  */
-public interface ISarosContextBindings {
+public interface IContextKeyBindings {
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ ElementType.FIELD, ElementType.PARAMETER })
     @Bind

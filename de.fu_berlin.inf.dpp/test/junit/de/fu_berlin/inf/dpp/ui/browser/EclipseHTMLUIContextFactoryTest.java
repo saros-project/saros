@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.picocontainer.MutablePicoContainer;
 
 import de.fu_berlin.inf.dpp.HTMLUIContextFactory;
-import de.fu_berlin.inf.dpp.ISarosContextFactory;
+import de.fu_berlin.inf.dpp.context.IContextFactory;
 import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.test.mocks.ContextMocker;
 
@@ -31,7 +31,7 @@ public class EclipseHTMLUIContextFactoryTest {
 
     @Test
     public void testCreateComponents() {
-        ISarosContextFactory factory = new EclipseHTMLUIContextFactory();
+        IContextFactory factory = new EclipseHTMLUIContextFactory();
 
         factory.createComponents(container);
         Assert.assertNotNull(container.getComponents());

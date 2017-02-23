@@ -9,6 +9,10 @@ import org.picocontainer.BindKey;
 import org.picocontainer.MutablePicoContainer;
 
 import de.fu_berlin.inf.dpp.communication.connection.IProxyResolver;
+import de.fu_berlin.inf.dpp.context.IContainerContext;
+import de.fu_berlin.inf.dpp.context.IContextFactory;
+import de.fu_berlin.inf.dpp.context.IContextKeyBindings;
+import de.fu_berlin.inf.dpp.context.CoreContextFactory;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
@@ -19,7 +23,7 @@ import de.fu_berlin.inf.dpp.test.mocks.ContextMocker;
 import de.fu_berlin.inf.dpp.test.util.MemoryPreferenceStore;
 
 /**
- * Check the {@link SarosCoreContextFactory} for internal integrity.
+ * Check the {@link CoreContextFactory} for internal integrity.
  */
 public class SarosCoreContextFactoryTest {
 
@@ -32,7 +36,7 @@ public class SarosCoreContextFactoryTest {
         // mock dependencies normally provided by the surrounding system (e.g.
         // an IDE plugin)
         Class<?>[] dependencies = { IProxyResolver.class,
-            IRemoteProgressIndicatorFactory.class, ISarosContext.class,
+            IRemoteProgressIndicatorFactory.class, IContainerContext.class,
             Preferences.class, IWorkspace.class, IEditorManager.class,
             IChecksumCache.class };
 
@@ -40,7 +44,7 @@ public class SarosCoreContextFactoryTest {
 
         // nice mocks aren't clever enough here
         container.addComponent(BindKey.bindKey(String.class,
-            ISarosContextBindings.SarosVersion.class), "1.0.0.dummy");
+            IContextKeyBindings.SarosVersion.class), "1.0.0.dummy");
 
         // nice mocks aren't clever enough here
         container.addComponent(IPreferenceStore.class,
@@ -49,7 +53,7 @@ public class SarosCoreContextFactoryTest {
 
     @Test
     public void testCreateComponents() {
-        ISarosContextFactory factory = new SarosCoreContextFactory();
+        IContextFactory factory = new CoreContextFactory();
         factory.createComponents(container);
 
         Assert.assertNotNull(container.getComponents());

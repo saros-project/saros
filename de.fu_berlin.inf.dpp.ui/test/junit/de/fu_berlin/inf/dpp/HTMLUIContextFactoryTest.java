@@ -10,6 +10,8 @@ import org.picocontainer.MutablePicoContainer;
 import org.powermock.core.classloader.annotations.MockPolicy;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import de.fu_berlin.inf.dpp.context.IContextFactory;
+import de.fu_berlin.inf.dpp.context.CoreContextFactory;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRoot;
 import de.fu_berlin.inf.dpp.test.mocks.ContextMocker;
 import de.fu_berlin.inf.dpp.test.mocks.PrepareCoreComponents;
@@ -32,7 +34,7 @@ public class HTMLUIContextFactoryTest {
 
         // mock Saros/Core components
         ContextMocker.addMocksFromFactory(container,
-            new SarosCoreContextFactory());
+            new CoreContextFactory());
 
         // mock dependencies normally provided by the IDE plugin
         Class<?>[] dependencies = { DialogManager.class,
@@ -44,7 +46,7 @@ public class HTMLUIContextFactoryTest {
 
     @Test
     public void testCreateComponents() {
-        ISarosContextFactory factory = new HTMLUIContextFactory();
+        IContextFactory factory = new HTMLUIContextFactory();
 
         factory.createComponents(container);
         Assert.assertNotNull(container.getComponents());

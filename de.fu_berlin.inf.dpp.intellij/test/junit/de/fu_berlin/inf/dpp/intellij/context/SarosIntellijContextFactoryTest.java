@@ -6,10 +6,12 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
-import de.fu_berlin.inf.dpp.ISarosContextFactory;
-import de.fu_berlin.inf.dpp.SarosCoreContextFactory;
+
+import de.fu_berlin.inf.dpp.context.IContextFactory;
+import de.fu_berlin.inf.dpp.context.CoreContextFactory;
 import de.fu_berlin.inf.dpp.test.mocks.ContextMocker;
 import de.fu_berlin.inf.dpp.test.mocks.PrepareCoreComponents;
+
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
@@ -40,7 +42,7 @@ public class SarosIntellijContextFactoryTest {
 
         // mock Saros/Core dependencies
         ContextMocker
-            .addMocksFromFactory(container, new SarosCoreContextFactory());
+            .addMocksFromFactory(container, new CoreContextFactory());
 
         // mock IntelliJ dependencies
         mockStaticGetInstance(CommandProcessor.class, null);
@@ -55,7 +57,7 @@ public class SarosIntellijContextFactoryTest {
 
     @Test
     public void testCreateComponents() {
-        ISarosContextFactory factory = new SarosIntellijContextFactory(project);
+        IContextFactory factory = new SarosIntellijContextFactory(project);
 
         factory.createComponents(container);
         Assert.assertNotNull(container.getComponents());

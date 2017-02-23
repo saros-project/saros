@@ -16,9 +16,9 @@ import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Packet;
 
-import de.fu_berlin.inf.dpp.ISarosContextBindings.SarosVersion;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.extensions.VersionExchangeExtension;
+import de.fu_berlin.inf.dpp.context.IContextKeyBindings.SarosVersion;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.PacketCollector;

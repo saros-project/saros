@@ -3,18 +3,20 @@ package de.fu_berlin.inf.dpp;
 import org.picocontainer.PicoCompositionException;
 import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.context.IContainerContext;
+
 /**
  * Provides the possibility to initialize a component with the components hold
- * in the given {@link de.fu_berlin.inf.dpp.ISarosContext}.
+ * in the given {@link de.fu_berlin.inf.dpp.context.IContainerContext}.
  * 
  * Typically this is the context created by Saros while it's initialization.
  */
 public class SarosPluginContext {
 
-    private static ISarosContext sarosContext;
+    private static IContainerContext containerContext;
 
-    public static void setSarosContext(ISarosContext sarosContext) {
-        SarosPluginContext.sarosContext = sarosContext;
+    public static void setSarosContext(IContainerContext containerContext) {
+        SarosPluginContext.containerContext = containerContext;
     }
 
     /**
@@ -28,6 +30,6 @@ public class SarosPluginContext {
      *             if the initialization fails
      */
     public static void initComponent(Object instance) {
-        sarosContext.initComponent(instance);
+        containerContext.initComponent(instance);
     }
 }

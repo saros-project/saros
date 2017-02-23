@@ -16,18 +16,17 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp;
+package de.fu_berlin.inf.dpp.context;
 
 /**
  * Abstract base class that only offers syntactic sugar for handling component
  * creation.
- * 
+ *
  * @author srossbach
  */
-public abstract class AbstractSarosContextFactory implements
-    ISarosContextFactory {
+public abstract class AbstractContextFactory implements IContextFactory {
 
-    protected static class Component {
+    public static class Component {
         private Class<?> clazz;
         private Object instance;
         private Object bindKey;
