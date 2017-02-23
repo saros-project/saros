@@ -207,8 +207,6 @@ public class Messages extends NLS {
     public static String JumpToUserWithWriteAccessPositionAction_tooltip;
     public static String LeaveSessionAction_leave_session_tooltip;
     public static String LeaveSessionAction_stop_session_tooltip;
-    public static String LocalPresenceTracker_eclipse_active;
-    public static String LocalPresenceTracker_eclipse_background;
 
     public static String RemoteProgress_observing_progress_for;
 

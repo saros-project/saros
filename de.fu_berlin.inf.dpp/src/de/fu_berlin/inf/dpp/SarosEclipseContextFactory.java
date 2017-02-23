@@ -68,11 +68,6 @@ public class SarosEclipseContextFactory extends AbstractContextFactory {
         return new Component[] {
             // Core Managers
             Component.create(IEditorManager.class, EditorManager.class),
-            // disabled because of privacy violations
-            // see
-            // http://opus.haw-hamburg.de/volltexte/2011/1391/pdf/ba_krassmann_online.pdf
-            // page 47
-            // Component.create(LocalPresenceTracker.class),
 
             Component.create(
                 de.fu_berlin.inf.dpp.preferences.Preferences.class,
