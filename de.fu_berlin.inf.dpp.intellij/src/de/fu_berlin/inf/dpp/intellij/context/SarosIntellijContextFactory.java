@@ -6,6 +6,7 @@ import de.fu_berlin.inf.dpp.communication.connection.IProxyResolver;
 import de.fu_berlin.inf.dpp.connection.NullProxyResolver;
 import de.fu_berlin.inf.dpp.context.AbstractContextFactory;
 import de.fu_berlin.inf.dpp.context.IContextKeyBindings;
+import de.fu_berlin.inf.dpp.context.AbstractContextFactory.Component;
 import de.fu_berlin.inf.dpp.core.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.core.monitoring.remote.IntelliJRemoteProgressIndicatorFactoryImpl;
 import de.fu_berlin.inf.dpp.core.project.internal.SarosIntellijSessionContextFactory;
@@ -57,8 +58,8 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
      *
      * @see <a href="https://github.com/saros-project/saros/commit/237daca">commit&nbsp;237daca</a>
      */
-    private final Component[] components = new Component[] {
-
+    private final Component[] getContextComponents() {
+        return new Component[] {
         // Core Managers
 
         Component.create(EditorAPI.class),
@@ -104,6 +105,7 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
         Component.create(AwarenessInformationCollector.class)
 
     };
+    }
 
     private Project project;
 
@@ -120,7 +122,7 @@ public class SarosIntellijContextFactory extends AbstractContextFactory {
         container.addComponent(Project.class, project);
         container.addComponent(IWorkspace.class, IntelliJWorkspaceImpl.class);
 
-        for (Component component : Arrays.asList(components)) {
+        for (Component component : Arrays.asList(getContextComponents())) {
             container.addComponent(component.getBindKey(),
                 component.getImplementation());
         }

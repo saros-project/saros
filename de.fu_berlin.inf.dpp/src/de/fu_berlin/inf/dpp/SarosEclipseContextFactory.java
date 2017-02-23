@@ -50,7 +50,7 @@ import de.fu_berlin.inf.dpp.ui.eventhandler.XMPPAuthorizationHandler;
 
 /**
  * Factory used for creating the Saros context when running as Eclipse plugin.
- * 
+ *
  * @author srossbach
  */
 public class SarosEclipseContextFactory extends AbstractContextFactory {
@@ -60,69 +60,73 @@ public class SarosEclipseContextFactory extends AbstractContextFactory {
     /**
      * Must not be static in order to avoid heavy work during class
      * initialization
-     * 
+     *
      * @see <a
      *      href="https://github.com/saros-project/saros/commit/237daca">commit&nbsp;237daca</a>
      */
-    private final Component[] components = new Component[] {
-        // Core Managers
-        Component.create(IEditorManager.class, EditorManager.class),
-        // disabled because of privacy violations
-        // see
-        // http://opus.haw-hamburg.de/volltexte/2011/1391/pdf/ba_krassmann_online.pdf
-        // page 47
-        // Component.create(LocalPresenceTracker.class),
+    private final Component[] getContextComponents() {
+        return new Component[] {
+            // Core Managers
+            Component.create(IEditorManager.class, EditorManager.class),
+            // disabled because of privacy violations
+            // see
+            // http://opus.haw-hamburg.de/volltexte/2011/1391/pdf/ba_krassmann_online.pdf
+            // page 47
+            // Component.create(LocalPresenceTracker.class),
 
-        Component.create(de.fu_berlin.inf.dpp.preferences.Preferences.class,
-            EclipsePreferences.class),
-        Component.create(SessionViewOpener.class),
-        Component.create(UndoManager.class),
+            Component.create(
+                de.fu_berlin.inf.dpp.preferences.Preferences.class,
+                EclipsePreferences.class),
+            Component.create(SessionViewOpener.class),
+            Component.create(UndoManager.class),
 
-        Component.create(ISarosSessionContextFactory.class,
-            SarosEclipseSessionContextFactory.class),
+            Component.create(ISarosSessionContextFactory.class,
+                SarosEclipseSessionContextFactory.class),
 
-        // UI handlers
-        Component.create(HostLeftAloneInSessionHandler.class),
-        Component.create(NegotiationHandler.class),
-        Component.create(UserStatusChangeHandler.class),
-        Component.create(JoinSessionRequestHandler.class),
-        Component.create(JoinSessionRejectedHandler.class),
-        Component.create(ServerPreferenceHandler.class),
-        Component.create(SessionStatusRequestHandler.class),
-        Component.create(XMPPAuthorizationHandler.class),
-        Component.create(ConnectingFailureHandler.class),
-        // Cache support
-        /*
-         * TODO avoid direct creation as this will become tricky especially if
-         * we are the delegate and depends on components that are only available
-         * after we added all our context stuff or vice versa
-         */
-        Component.create(IChecksumCache.class, new ChecksumCacheImpl(
-            new FileContentNotifierBridge())),
+            // UI handlers
+            Component.create(HostLeftAloneInSessionHandler.class),
+            Component.create(NegotiationHandler.class),
+            Component.create(UserStatusChangeHandler.class),
+            Component.create(JoinSessionRequestHandler.class),
+            Component.create(JoinSessionRejectedHandler.class),
+            Component.create(ServerPreferenceHandler.class),
+            Component.create(SessionStatusRequestHandler.class),
+            Component.create(XMPPAuthorizationHandler.class),
+            Component.create(ConnectingFailureHandler.class),
+            // Cache support
+            /*
+             * TODO avoid direct creation as this will become tricky especially
+             * if we are the delegate and depends on components that are only
+             * available after we added all our context stuff or vice versa
+             */
+            Component.create(IChecksumCache.class, new ChecksumCacheImpl(
+                new FileContentNotifierBridge())),
 
-        Component.create(IWorkspace.class, new EclipseWorkspaceImpl(
-            ResourcesPlugin.getWorkspace())),
+            Component.create(IWorkspace.class, new EclipseWorkspaceImpl(
+                ResourcesPlugin.getWorkspace())),
 
-        Component.create(IWorkspaceRoot.class, new EclipseWorkspaceRootImpl(
-            ResourcesPlugin.getWorkspace().getRoot())),
+            Component.create(IWorkspaceRoot.class,
+                new EclipseWorkspaceRootImpl(ResourcesPlugin.getWorkspace()
+                    .getRoot())),
 
-        // Saros Core Path Support
-        Component.create(IPathFactory.class, EclipsePathFactory.class),
+            // Saros Core Path Support
+            Component.create(IPathFactory.class, EclipsePathFactory.class),
 
-        // SWT EDT support
-        Component.create(UISynchronizer.class, SWTSynchronizer.class),
+            // SWT EDT support
+            Component.create(UISynchronizer.class, SWTSynchronizer.class),
 
-        // Proxy Support for the XMPP server connection
-        Component.create(IProxyResolver.class, Socks5ProxyResolver.class),
+            // Proxy Support for the XMPP server connection
+            Component.create(IProxyResolver.class, Socks5ProxyResolver.class),
 
-        // Remote progress indication
-        Component.create(IRemoteProgressIndicatorFactory.class,
-            EclipseRemoteProgressIndicatorFactoryImpl.class),
+            // Remote progress indication
+            Component.create(IRemoteProgressIndicatorFactory.class,
+                EclipseRemoteProgressIndicatorFactoryImpl.class),
 
-        Component.create(MUCNegotiationManager.class),
-        Component.create(SkypeManager.class),
+            Component.create(MUCNegotiationManager.class),
+            Component.create(SkypeManager.class),
 
-        Component.create(AwarenessInformationCollector.class) };
+            Component.create(AwarenessInformationCollector.class) };
+    }
 
     public SarosEclipseContextFactory(Saros saros) {
         this.saros = saros;
@@ -130,7 +134,7 @@ public class SarosEclipseContextFactory extends AbstractContextFactory {
 
     @Override
     public void createComponents(MutablePicoContainer container) {
-        for (Component component : Arrays.asList(components))
+        for (Component component : Arrays.asList(getContextComponents()))
             container.addComponent(component.getBindKey(),
                 component.getImplementation());
 

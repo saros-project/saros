@@ -57,66 +57,70 @@ public class CoreContextFactory extends AbstractContextFactory {
      * @see <a
      *      href="https://github.com/saros-project/saros/commit/237daca">commit&nbsp;237daca</a>
      */
-    private final Component[] components = new Component[] {
+    private final Component[] getContextComponents() {
+        return new Component[] {
 
-        // Facades
-        Component.create(ConnectionHandler.class),
+            // Facades
+            Component.create(ConnectionHandler.class),
 
-        // Version support
-        Component.create(VersionManager.class),
+            // Version support
+            Component.create(VersionManager.class),
 
-        Component.create(MultiUserChatService.class),
-        Component.create(SingleUserChatService.class),
+            Component.create(MultiUserChatService.class),
+            Component.create(SingleUserChatService.class),
 
-        Component.create(SarosSessionManager.class),
+            Component.create(SarosSessionManager.class),
 
-        Component.create(XMPPAccountStore.class),
-        Component.create(ColorIDSetStorage.class),
+            Component.create(XMPPAccountStore.class),
+            Component.create(ColorIDSetStorage.class),
 
-        // Negotiation
-        Component.create(NegotiationFactory.class),
+            // Negotiation
+            Component.create(NegotiationFactory.class),
 
-        // Negotiation hooks
-        Component.create(SessionNegotiationHookManager.class),
-        Component.create(ColorNegotiationHook.class),
+            // Negotiation hooks
+            Component.create(SessionNegotiationHookManager.class),
+            Component.create(ColorNegotiationHook.class),
 
-        // Network
-        Component.create(DispatchThreadContext.class),
+            // Network
+            Component.create(DispatchThreadContext.class),
 
-        Component.create(IConnectionManager.class, DataTransferManager.class),
+            Component.create(IConnectionManager.class,
+                DataTransferManager.class),
 
-        Component.create(DiscoveryManager.class),
+            Component.create(DiscoveryManager.class),
 
-        Component.create(BindKey.bindKey(IStreamService.class,
-            IContextKeyBindings.IBBStreamService.class),
-            IBBStreamService.class),
+            Component.create(BindKey.bindKey(IStreamService.class,
+                IContextKeyBindings.IBBStreamService.class),
+                IBBStreamService.class),
 
-        Component.create(BindKey.bindKey(IStreamService.class,
-            IContextKeyBindings.Socks5StreamService.class),
-            Socks5StreamService.class),
+            Component.create(BindKey.bindKey(IStreamService.class,
+                IContextKeyBindings.Socks5StreamService.class),
+                Socks5StreamService.class),
 
-        Component.create(RosterTracker.class),
-        Component.create(XMPPConnectionService.class),
-        Component.create(MDNSService.class), Component.create(TCPServer.class),
+            Component.create(RosterTracker.class),
+            Component.create(XMPPConnectionService.class),
+            Component.create(MDNSService.class),
+            Component.create(TCPServer.class),
 
-        Component.create(IStunService.class, StunServiceImpl.class),
+            Component.create(IStunService.class, StunServiceImpl.class),
 
-        Component.create(SubscriptionHandler.class),
+            Component.create(SubscriptionHandler.class),
 
-        Component.create(IUPnPService.class, UPnPServiceImpl.class),
-        Component.create(IUPnPAccess.class, UPnPAccessImpl.class),
-        Component.create(IReceiver.class, XMPPReceiver.class),
-        Component.create(ITransmitter.class, XMPPTransmitter.class),
+            Component.create(IUPnPService.class, UPnPServiceImpl.class),
+            Component.create(IUPnPAccess.class, UPnPAccessImpl.class),
+            Component.create(IReceiver.class, XMPPReceiver.class),
+            Component.create(ITransmitter.class, XMPPTransmitter.class),
 
-        Component.create(RemoteProgressManager.class),
+            Component.create(RemoteProgressManager.class),
 
-        // Observables
-        Component.create(FileReplacementInProgressObservable.class),
-        Component.create(IsInconsistentObservable.class) };
+            // Observables
+            Component.create(FileReplacementInProgressObservable.class),
+            Component.create(IsInconsistentObservable.class) };
+    }
 
     @Override
     public void createComponents(MutablePicoContainer container) {
-        for (Component component : Arrays.asList(components))
+        for (Component component : Arrays.asList(getContextComponents()))
             container.addComponent(component.getBindKey(),
                 component.getImplementation());
     }
