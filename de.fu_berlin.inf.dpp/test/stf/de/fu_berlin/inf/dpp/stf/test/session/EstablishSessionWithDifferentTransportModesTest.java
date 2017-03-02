@@ -18,6 +18,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
@@ -59,6 +60,7 @@ public class EstablishSessionWithDifferentTransportModesTest extends
     }
 
     @Test
+    @Ignore("saros-con.imp.fu-berlin.de currently does not support that feature")
     public void testSessionWithSocks5Mediated() throws Exception {
         activateTransportMode("mediated");
         connectTesters();
