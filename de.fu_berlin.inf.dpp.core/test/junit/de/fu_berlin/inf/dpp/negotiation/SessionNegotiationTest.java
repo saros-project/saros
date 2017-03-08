@@ -183,7 +183,13 @@ public class SessionNegotiationTest {
 
         final CountDownLatch bobNegotiationStart = new CountDownLatch(1);
 
-        Thread negotiationAwaitThread = new Thread(new Runnable() {
+        /*
+         * The logic here is normally done by the SessionManager and
+         * NegotiationPackerListener. As stubs cannot be used here (because this
+         * should still be a unit test rather than an integration test),
+         * re-implement it here (as easy/dirty as possible).
+         */
+        final Thread negotiationAwaitThread = new Thread(new Runnable() {
 
             @Override
             public void run() {
