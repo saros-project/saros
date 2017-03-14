@@ -60,8 +60,9 @@ public class LocalEditorHandler {
         if (path == null)
             return;
 
-        editorPool.add(path, projectAPI.getActiveEditor());
-        manager.startEditor(projectAPI.getActiveEditor());
+        Editor editor = projectAPI.openEditor(virtualFile);
+        editorPool.add(path, editor);
+        manager.startEditor(editor);
     }
 
     /**

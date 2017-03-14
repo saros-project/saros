@@ -250,6 +250,7 @@ public class EditorManager extends AbstractActivityProducer
             //HACK: Editors that are already opened have to be added to the EditorPool
             FileEditorManager fileEditorManager = FileEditorManager.
                 getInstance(project);
+            VirtualFile[] currentlyActiveFiles=fileEditorManager.getSelectedFiles();
             for (IProject proj : session.getProjects()) {
                 for (VirtualFile file : fileEditorManager.getOpenFiles()) {
                     if (proj.getFullPath().equals(
@@ -258,6 +259,11 @@ public class EditorManager extends AbstractActivityProducer
                         localEditorHandler.openEditor(file);
                     }
                 }
+            }
+            //TODO consider duplicated open editors during screen splitting
+            //activate editors that were last selected before session start
+            for(int i = currentlyActiveFiles.length-1; i >= 0; i--) {
+                localEditorHandler.openEditor(currentlyActiveFiles[i]);
             }
 
             fireActivity(
