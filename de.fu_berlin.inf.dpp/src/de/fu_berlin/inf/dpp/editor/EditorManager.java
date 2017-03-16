@@ -135,7 +135,7 @@ public class EditorManager extends AbstractActivityProducer implements
 
     private SPath locallyActiveEditor;
 
-    private Set<SPath> locallyOpenEditors = new HashSet<SPath>();
+    private Set<SPath> openEditorPaths = new HashSet<SPath>();
 
     private TextSelection localSelection;
 
@@ -285,7 +285,7 @@ public class EditorManager extends AbstractActivityProducer implements
 
             // TODO The user should be able to ask for this
             User localUser = session.getLocalUser();
-            for (SPath path : getLocallyOpenEditors()) {
+            for (SPath path : getOpenEditors()) {
                 fireActivity(new EditorActivity(localUser, Type.ACTIVATED, path));
             }
 
@@ -517,14 +517,8 @@ public class EditorManager extends AbstractActivityProducer implements
     }
 
     @Override
-    public Set<SPath> getLocallyOpenEditors() {
-        return locallyOpenEditors;
-    }
-
-    @Override
-    public Set<SPath> getRemotelyOpenEditors() {
-        return userEditorStateManager == null ? Collections.<SPath> emptySet()
-            : userEditorStateManager.getOpenEditors();
+    public Set<SPath> getOpenEditors() {
+        return openEditorPaths;
     }
 
     @Override
@@ -551,7 +545,7 @@ public class EditorManager extends AbstractActivityProducer implements
         this.locallyActiveEditor = path;
 
         if (path != null && session.isShared(path.getResource()))
-            locallyOpenEditors.add(path);
+            openEditorPaths.add(path);
 
         editorListenerDispatch.editorActivated(session.getLocalUser(), path);
 
@@ -998,7 +992,7 @@ public class EditorManager extends AbstractActivityProducer implements
 
     private void partClosedOfPath(IEditorPart editorPart, SPath path) {
         editorPool.remove(editorPart);
-        locallyOpenEditors.remove(path);
+        openEditorPaths.remove(path);
 
         ITextViewer viewer = EditorAPI.getViewer(editorPart);
         if (viewer instanceof ISourceViewer)
@@ -1523,7 +1517,7 @@ public class EditorManager extends AbstractActivityProducer implements
                 final Set<SPath> editorPaths = userEditorStateManager
                     .getOpenEditors();
 
-                editorPaths.addAll(locallyOpenEditors);
+                editorPaths.addAll(openEditorPaths);
 
                 for (final SPath path : editorPaths) {
                     if (project == null || project.equals(path.getProject()))
@@ -1852,7 +1846,7 @@ public class EditorManager extends AbstractActivityProducer implements
         remoteWriteAccessManager.dispose();
         remoteWriteAccessManager = null;
         locallyActiveEditor = null;
-        locallyOpenEditors.clear();
+        openEditorPaths.clear();
         followModeManager = null;
     }
 

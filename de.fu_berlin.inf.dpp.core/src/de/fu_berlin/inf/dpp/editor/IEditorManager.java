@@ -19,12 +19,11 @@ import de.fu_berlin.inf.dpp.session.User;
  * file; for instance, {@link #getContent(SPath)} automatically falls back to
  * retrieving the content directly from the file instead of from the editor.
  * <p>
- * {@link IEditorManager} tracks both locally open editors and editors opened by
- * remote users. Changes to local editors (such as editors getting opened,
- * closed, or their content changed) are reported to remote sites as
- * {@link de.fu_berlin.inf.dpp.activities.IActivity activities}. Objects can
- * react to both local and remote editor events by installing an
- * {@link ISharedEditorListener}.
+ * {@link IEditorManager} tracks locally open editors. Changes to local editors
+ * (such as editors getting opened, closed, or their content changed) are
+ * reported to remote sites as {@link de.fu_berlin.inf.dpp.activities.IActivity
+ * activities}. Objects can react to both local and remote editor events by
+ * installing an {@link ISharedEditorListener}.
  * <p>
  * All methods of {@link IEditorManager} automatically take care of any required
  * synchronization with the UI thread and can be safely called from any thread.
@@ -48,15 +47,7 @@ public interface IEditorManager {
      * 
      * @return paths of locally open shared files
      */
-    public Set<SPath> getLocallyOpenEditors();
-
-    /**
-     * Returns the paths of all shared files for which an editor is currently
-     * open at a remote site.
-     * 
-     * @return paths of remotely open shared files
-     */
-    public Set<SPath> getRemotelyOpenEditors();
+    public Set<SPath> getOpenEditors();
 
     /**
      * Returns the text content of the local editor associated with the

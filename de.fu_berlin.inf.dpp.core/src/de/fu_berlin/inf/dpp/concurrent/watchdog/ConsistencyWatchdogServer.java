@@ -19,6 +19,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.IEditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
+import de.fu_berlin.inf.dpp.editor.remote.UserEditorStateManager;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
@@ -50,6 +51,7 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
 
     private final ISarosSession session;
     private final IEditorManager editorManager;
+    private final UserEditorStateManager userEditorStateManager;
     private final StopManager stopManager;
     private final UISynchronizer synchronizer;
 
@@ -108,14 +110,18 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
      *            {@link StopManager} to listen to for (un)block requests
      * @param synchronizer
      *            {@link UISynchronizer} to use
+     * @param userEditorStateManager
+     *            {@link UserEditorStateManager} to get remote editors
      */
     public ConsistencyWatchdogServer(ISarosSession session,
         IEditorManager editorManager, StopManager stopManager,
-        UISynchronizer synchronizer) {
+        UISynchronizer synchronizer,
+        UserEditorStateManager userEditorStateManager) {
         this.session = session;
         this.editorManager = editorManager;
         this.stopManager = stopManager;
         this.synchronizer = synchronizer;
+        this.userEditorStateManager = userEditorStateManager;
     }
 
     @Override
@@ -205,8 +211,8 @@ public class ConsistencyWatchdogServer extends AbstractActivityProducer
     }
 
     private void calculateChecksums() {
-        Set<SPath> localEditors = editorManager.getLocallyOpenEditors();
-        Set<SPath> remoteEditors = editorManager.getRemotelyOpenEditors();
+        Set<SPath> localEditors = editorManager.getOpenEditors();
+        Set<SPath> remoteEditors = userEditorStateManager.getOpenEditors();
 
         Set<SPath> allEditors = new HashSet<SPath>();
         allEditors.addAll(localEditors);

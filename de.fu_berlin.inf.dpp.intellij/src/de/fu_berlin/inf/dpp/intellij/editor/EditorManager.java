@@ -241,7 +241,7 @@ public class EditorManager extends AbstractActivityProducer
 
             // Send awareness-information
             User localUser = session.getLocalUser();
-            for (SPath path : getLocallyOpenEditors()) {
+            for (SPath path : getOpenEditors()) {
                 fireActivity(
                     new EditorActivity(localUser, EditorActivity.Type.ACTIVATED,
                         path));
@@ -380,7 +380,7 @@ public class EditorManager extends AbstractActivityProducer
             remoteWriteAccessManager.dispose();
             remoteWriteAccessManager = null;
             activeEditor = null;
-            locallyOpenEditors.clear();
+            openEditorPaths.clear();
         }
 
 
@@ -397,7 +397,7 @@ public class EditorManager extends AbstractActivityProducer
             }
 
             // Clear all viewport annotations of this user.
-            for (SPath editorPath : getLocallyOpenEditors()) {
+            for (SPath editorPath : getOpenEditors()) {
                 localEditorManipulator.clearSelection(editorPath);
             }
         }
@@ -428,7 +428,7 @@ public class EditorManager extends AbstractActivityProducer
     private User followedUser = null;
     private boolean hasWriteAccess;
     private boolean isLocked;
-    private final Set<SPath> locallyOpenEditors = new HashSet<SPath>();
+    private final Set<SPath> openEditorPaths = new HashSet<SPath>();
     private SelectionEvent localSelection;
     private LineRange localViewport;
     private SPath activeEditor;
@@ -455,15 +455,8 @@ public class EditorManager extends AbstractActivityProducer
     }
 
     @Override
-    public Set<SPath> getLocallyOpenEditors() {
+    public Set<SPath> getOpenEditors() {
         return editorPool.getFiles();
-    }
-
-    @Override
-    public Set<SPath> getRemotelyOpenEditors() {
-        return userEditorStateManager == null ?
-            Collections.<SPath>emptySet() :
-            userEditorStateManager.getOpenEditors();
     }
 
     @Override
@@ -610,7 +603,7 @@ public class EditorManager extends AbstractActivityProducer
         activeEditor = path;
 
         if (path != null && session.isShared(path.getResource())) {
-            locallyOpenEditors.add(path);
+            openEditorPaths.add(path);
         }
 
         editorListenerDispatch.editorActivated(session.getLocalUser(), path);
@@ -641,7 +634,7 @@ public class EditorManager extends AbstractActivityProducer
             }
         }
 
-        // TODO What about cleaning up (editorPool, locallyOpenEditors, ...)?
+        // TODO What about cleaning up (editorPool, currentlyOpenEditors, ...)?
         // TODO What about a editorListenerDispatch.editorClosed() call?
 
         fireActivity(new EditorActivity(session.getLocalUser(),
@@ -895,7 +888,7 @@ public class EditorManager extends AbstractActivityProducer
                 final Set<SPath> editorPaths = userEditorStateManager
                     .getOpenEditors();
 
-                editorPaths.addAll(locallyOpenEditors);
+                editorPaths.addAll(openEditorPaths);
 
                 for (final SPath path : editorPaths) {
                     if (project == null || project.equals(path.getProject())) {
@@ -948,7 +941,7 @@ public class EditorManager extends AbstractActivityProducer
          * again everything is going back to normal. To prevent that
          * from happening this method is needed.
          */
-       Set<SPath> localOpenEditors = getLocallyOpenEditors();
+       Set<SPath> localOpenEditors = getOpenEditors();
 
        // FIXME followMode: This should have nothing to do with the
        // currently followed user
