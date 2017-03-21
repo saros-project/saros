@@ -137,8 +137,29 @@ public class ProjectAPI {
         closeEditor(file);
     }
 
+    /**
+     * Returns an array containing the files of all currently open editors.
+     * It is sorted by the order of the editor tabs.
+     *
+     * @return
+     */
+    public VirtualFile[] getOpenFiles(){
+        return editorFileManager.getOpenFiles();
+    }
+
     public Editor getActiveEditor() {
         return editorFileManager.getSelectedTextEditor();
+    }
+
+    /**
+     * Returns an array containing the files of all currently active editors.
+     * It is sorted by time of last activation, starting with the most recent
+     * one.
+     *
+     * @return
+     */
+    public VirtualFile[] getSelectedFiles(){
+        return editorFileManager.getSelectedFiles();
     }
 
     /**

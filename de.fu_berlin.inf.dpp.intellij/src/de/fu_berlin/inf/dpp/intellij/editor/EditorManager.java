@@ -5,8 +5,6 @@ import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.event.SelectionEvent;
-import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -32,10 +30,8 @@ import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorManager;
 import de.fu_berlin.inf.dpp.intellij.editor.colorstorage.ColorModel;
-import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJWorkspaceImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.ResourceConverter;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
@@ -54,7 +50,6 @@ import de.fu_berlin.inf.dpp.synchronize.Blockable;
 
 import org.apache.log4j.Logger;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -247,30 +242,6 @@ public class EditorManager extends AbstractActivityProducer
                         path));
             }
 
-            //TODO move to projectAdded
-            /*
-             * Editors that are already open during session initialization have
-             * to be added to the EditorPool
-             */
-            //TODO handle this through ProjectAPI
-            FileEditorManager fileEditorManager = FileEditorManager.
-                getInstance(project);
-            VirtualFile[] currentlyActiveFiles=fileEditorManager.getSelectedFiles();
-            for (IProject proj : session.getProjects()) {
-                for (VirtualFile file : fileEditorManager.getOpenFiles()) {
-                    if (proj.getFullPath().equals(
-                        ((IntelliJWorkspaceImpl) workspace)
-                            .getProjectForPath(file.getPath()).getFullPath())) {
-                        localEditorHandler.openEditor(file,false);
-                    }
-                }
-            }
-            //TODO consider duplicated open editors during screen splitting
-            //activate editors that were last selected before session start
-            for(int i = currentlyActiveFiles.length-1; i >= 0; i--) {
-                localEditorHandler.openEditor(currentlyActiveFiles[i],true);
-            }
-
             fireActivity(
                 new EditorActivity(localUser, EditorActivity.Type.ACTIVATED,
                     activeEditor));
@@ -311,7 +282,15 @@ public class EditorManager extends AbstractActivityProducer
         }
 
         @Override
-        public void resourcesAdded(String projectID, List<IResource> resources) {
+        public void resourcesAdded(final String projectID, List<IResource> resources) {
+            ApplicationManager.getApplication().invokeAndWait(
+                new Runnable(){
+                    @Override
+                    public void run(){
+                        addProjectResources(projectID);
+                    }
+                }, ModalityState.any());
+
             // FIXME Why should the follow mode matter here?
             if (!isFollowing()) {
                 return;
@@ -324,6 +303,38 @@ public class EditorManager extends AbstractActivityProducer
             });
         }
     };
+
+    /**
+     * Adds all currently open editors belonging to the passed project to the pool of open
+     * editors.
+     *
+     * @param projectID ID of the added project
+     */
+    private void addProjectResources(String projectID) {
+        IProject project = session.getProject(projectID);
+        if (project == null) {
+            LOG.error("project " + projectID +
+                " of added resources does not exist");
+            return;
+        }
+        VirtualFile[] openFiles = projectAPI.getOpenFiles();
+        VirtualFile[] activeFiles = projectAPI.getSelectedFiles();
+        for(VirtualFile openFile: openFiles){
+            IResource resource = project.getFile(openFile.getPath());
+            if(resource.exists() && session.isShared(resource)){
+                localEditorHandler.openEditor(openFile,false);
+                LOG.debug("editor for " + openFile + " opened");
+            }
+        }
+
+        //TODO consider duplicated open editors during screen splitting
+        //activate editors that were last selected before session start
+        for(int i = activeFiles.length-1; i >= 0; i--) {
+            localEditorHandler.openEditor(activeFiles[i],true);
+        }
+
+    }
+
     private final ISessionLifecycleListener sessionLifecycleListener = new NullSessionLifecycleListener() {
 
         @Override
@@ -419,10 +430,6 @@ public class EditorManager extends AbstractActivityProducer
 
     private final EditorPool editorPool = new EditorPool();
 
-    private IWorkspace workspace;
-
-    private Project project;
-
     private final SharedEditorListenerDispatch editorListenerDispatch = new SharedEditorListenerDispatch();
     private UserEditorStateManager userEditorStateManager;
     private RemoteWriteAccessManager remoteWriteAccessManager;
@@ -443,18 +450,16 @@ public class EditorManager extends AbstractActivityProducer
     private SelectionEvent localSelection;
     private LineRange localViewport;
     private SPath activeEditor;
+    private ProjectAPI projectAPI;
 
     public EditorManager(ISarosSessionManager sessionManager,
         LocalEditorHandler localEditorHandler,
-        LocalEditorManipulator localEditorManipulator, IWorkspace workspace,
-        Project project) {
+        LocalEditorManipulator localEditorManipulator, ProjectAPI projectAPI) {
 
         sessionManager.addSessionLifecycleListener(sessionLifecycleListener);
         addSharedEditorListener(sharedEditorListener);
         this.localEditorHandler = localEditorHandler;
         this.localEditorManipulator = localEditorManipulator;
-        this.workspace = workspace;
-        this.project = project;
 
         documentListener = new StoppableDocumentListener(this);
         fileListener = new StoppableEditorFileListener(this);
@@ -463,6 +468,8 @@ public class EditorManager extends AbstractActivityProducer
 
         localEditorHandler.initialize(this);
         localEditorManipulator.initialize(this);
+
+        this.projectAPI=projectAPI;
     }
 
     @Override
