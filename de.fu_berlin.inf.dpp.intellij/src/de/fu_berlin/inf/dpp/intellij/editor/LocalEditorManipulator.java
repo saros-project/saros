@@ -51,16 +51,17 @@ public class LocalEditorManipulator {
     /**
      * Opens an editor for the given path, if it exists.
      *
-     * @param path
+     * @param path path of the file to open
+     * @param activate activate editor after opening
      * @return the editor for the given path,
      * or <code>null</code> if the file does not exist
      */
-    public Editor openEditor(SPath path) {
+    public Editor openEditor(SPath path, boolean activate) {
 
         VirtualFile virtualFile = ResourceConverter.toVirtualFile(path);
         if (virtualFile.exists()) {
             //todo: in case it is already open, need to activate only, not open
-            Editor editor = projectAPI.openEditor(virtualFile);
+            Editor editor = projectAPI.openEditor(virtualFile,activate);
             manager.startEditor(editor);
             editorPool.add(path, editor);
             return editor;

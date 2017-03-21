@@ -7,6 +7,7 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.ui.UIUtil;
@@ -21,7 +22,9 @@ public class ProjectAPI {
     private Application application;
     private FileDocumentManager fileDocumentManager;
 
+    private Project project;
     private FileEditorManager editorFileManager;
+
 
     private class WriteAction implements Runnable {
         Runnable action;
@@ -53,6 +56,7 @@ public class ProjectAPI {
      * Creates an ProjectAPI with the current Project and initializes Fields.
      */
     public ProjectAPI(Project project) {
+        this.project = project;
         this.editorFileManager = FileEditorManager.getInstance(project);
 
         this.application = ApplicationManager.getApplication();
@@ -83,23 +87,22 @@ public class ProjectAPI {
     /**
      * Opens an editor for the given path in the UI thread.
      *
-     * @param path
-     * @return
+     * @param path path of the file to open
+     * @param activate activate editor after opening
+     * @return Editor managing the passed file
      */
-    public Editor openEditor(final VirtualFile path) {
-
-        final AtomicReference<Editor> result = new AtomicReference<Editor>();
+    public Editor openEditor(final VirtualFile path, final boolean activate){
+        final AtomicReference<Editor> result = new AtomicReference<>();
 
         UIUtil.invokeAndWaitIfNeeded(new ReadAction(new Runnable() {
             @Override
             public void run() {
-                editorFileManager.openFile(path, true);
-                result.set(editorFileManager.getSelectedTextEditor());
+                result.set(editorFileManager.openTextEditor(
+                    new OpenFileDescriptor(project,path), activate));
             }
         }));
 
         return result.get();
-
     }
 
     /**

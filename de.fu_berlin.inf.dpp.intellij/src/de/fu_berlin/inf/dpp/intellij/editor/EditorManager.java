@@ -140,7 +140,7 @@ public class EditorManager extends AbstractActivityProducer
             case ACTIVATED:
                 // TODO: Let the FollowModeManager handle this
                 if (isFollowing(user)) {
-                    localEditorManipulator.openEditor(path);
+                    localEditorManipulator.openEditor(path,false);
                 }
                 editorListenerDispatch.editorActivated(user, path);
                 break;
@@ -247,7 +247,12 @@ public class EditorManager extends AbstractActivityProducer
                         path));
             }
 
-            //HACK: Editors that are already opened have to be added to the EditorPool
+            //TODO move to projectAdded
+            /*
+             * Editors that are already open during session initialization have
+             * to be added to the EditorPool
+             */
+            //TODO handle this through ProjectAPI
             FileEditorManager fileEditorManager = FileEditorManager.
                 getInstance(project);
             VirtualFile[] currentlyActiveFiles=fileEditorManager.getSelectedFiles();
@@ -256,14 +261,14 @@ public class EditorManager extends AbstractActivityProducer
                     if (proj.getFullPath().equals(
                         ((IntelliJWorkspaceImpl) workspace)
                             .getProjectForPath(file.getPath()).getFullPath())) {
-                        localEditorHandler.openEditor(file);
+                        localEditorHandler.openEditor(file,false);
                     }
                 }
             }
             //TODO consider duplicated open editors during screen splitting
             //activate editors that were last selected before session start
             for(int i = currentlyActiveFiles.length-1; i >= 0; i--) {
-                localEditorHandler.openEditor(currentlyActiveFiles[i]);
+                localEditorHandler.openEditor(currentlyActiveFiles[i],true);
             }
 
             fireActivity(
@@ -769,7 +774,7 @@ public class EditorManager extends AbstractActivityProducer
             @Override
             public void run() {
                 Editor newEditor = localEditorManipulator
-                    .openEditor(remoteActiveEditor.getPath());
+                    .openEditor(remoteActiveEditor.getPath(),true);
 
                 if (newEditor == null) {
                     return;
@@ -906,11 +911,11 @@ public class EditorManager extends AbstractActivityProducer
     }
 
     @Override
-    public void openEditor(final SPath path, boolean activate) {
+    public void openEditor(final SPath path, final boolean activate) {
         executeInUIThreadSynchronous(new Runnable() {
             @Override
             public void run() {
-                localEditorManipulator.openEditor(path);
+                localEditorManipulator.openEditor(path,activate);
             }
         });
     }
@@ -932,7 +937,7 @@ public class EditorManager extends AbstractActivityProducer
         executeInUIThreadSynchronous(new Runnable() {
             @Override
             public void run() {
-                Editor editor = localEditorManipulator.openEditor(path);
+                Editor editor = localEditorManipulator.openEditor(path,false);
                 localEditorManipulator.adjustViewport(editor, range, selection);
             }
         });
@@ -961,7 +966,7 @@ public class EditorManager extends AbstractActivityProducer
            // (print a warning)
            LOG.debug("Remote editor open " + remoteEditorPath);
            if (!localOpenEditors.contains(remoteEditorPath)) {
-               localEditorManipulator.openEditor(remoteEditorPath);
+               localEditorManipulator.openEditor(remoteEditorPath,false);
            }
        }
 

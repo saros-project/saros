@@ -17,7 +17,7 @@ public class StoppableEditorFileListener extends AbstractStoppableListener
     }
 
     /**
-     * Calls {@link LocalEditorHandler#openEditor(VirtualFile)}.
+     * Calls {@link LocalEditorHandler#openEditor(VirtualFile,boolean)}.
      *
      * @param fileEditorManager
      * @param virtualFile
@@ -32,7 +32,7 @@ public class StoppableEditorFileListener extends AbstractStoppableListener
             return;
         }
 
-        editorManager.getLocalEditorHandler().openEditor(virtualFile);
+        editorManager.getLocalEditorHandler().openEditor(virtualFile,true);
     }
 
     /**

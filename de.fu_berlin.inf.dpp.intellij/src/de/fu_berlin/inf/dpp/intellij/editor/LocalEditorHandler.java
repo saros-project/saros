@@ -49,18 +49,19 @@ public class LocalEditorHandler {
     }
 
     /**
-     * Adds the opened file to the editorPool and calls
-     * {@link EditorManager#startEditor(Editor)}
-     * on the opened Editor.
+     * Opens an editor for the passed virtualFile, adds it to the pool of
+     * currently open editors and calls
+     * {@link EditorManager#startEditor(Editor)} with it.
      *
-     * @param virtualFile
+     * @param virtualFile path of the file to open
+     * @param activate activate editor after opening
      */
-    public void openEditor(VirtualFile virtualFile) {
+    public void openEditor(VirtualFile virtualFile, boolean activate) {
         SPath path = toPath(virtualFile);
         if (path == null)
             return;
 
-        Editor editor = projectAPI.openEditor(virtualFile);
+        Editor editor = projectAPI.openEditor(virtualFile, activate);
         editorPool.add(path, editor);
         manager.startEditor(editor);
     }
