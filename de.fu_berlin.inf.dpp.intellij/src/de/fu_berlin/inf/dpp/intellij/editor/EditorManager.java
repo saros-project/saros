@@ -506,7 +506,7 @@ public class EditorManager extends AbstractActivityProducer
     }
 
     public boolean isOpenedInEditor(SPath path) {
-        return editorPool.getEditor(path) == null;
+        return editorPool.getEditor(path) != null;
     }
 
     public void removeAllEditorsForPath(SPath path) {
