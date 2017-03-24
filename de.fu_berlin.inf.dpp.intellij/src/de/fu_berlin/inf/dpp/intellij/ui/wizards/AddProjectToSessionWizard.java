@@ -1,6 +1,20 @@
 package de.fu_berlin.inf.dpp.intellij.ui.wizards;
 
+import java.awt.Window;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.picocontainer.annotations.Inject;
+
+import com.intellij.openapi.progress.PerformInBackgroundOption;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
 import com.intellij.util.ui.UIUtil;
+
 import de.fu_berlin.inf.dpp.filesystem.IChecksumCache;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
@@ -8,8 +22,8 @@ import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJProjectImpl;
 import de.fu_berlin.inf.dpp.intellij.ui.Messages;
 import de.fu_berlin.inf.dpp.intellij.ui.util.DialogUtils;
-import de.fu_berlin.inf.dpp.intellij.ui.util.JobWithStatus;
 import de.fu_berlin.inf.dpp.intellij.ui.util.NotificationPanel;
+import de.fu_berlin.inf.dpp.intellij.ui.widgets.progress.ProgessMonitorAdapter;
 import de.fu_berlin.inf.dpp.intellij.ui.wizards.pages.HeaderPanel;
 import de.fu_berlin.inf.dpp.intellij.ui.wizards.pages.PageActionListener;
 import de.fu_berlin.inf.dpp.intellij.ui.wizards.pages.SelectProjectPage;
@@ -28,14 +42,6 @@ import de.fu_berlin.inf.dpp.net.xmpp.JID;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.ThreadUtils;
-import org.apache.log4j.Logger;
-import org.picocontainer.annotations.Inject;
-
-import java.awt.Window;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Wizard for adding projects to a session.
@@ -66,6 +72,8 @@ public class AddProjectToSessionWizard extends Wizard {
     private final JID peer;
     private final List<FileList> fileLists;
 
+    private boolean triggered = false;
+    
     /**
      * projectID => Project
      */
@@ -212,8 +220,15 @@ public class AddProjectToSessionWizard extends Wizard {
         UIUtil.invokeLaterIfNeeded(new Runnable() {
             @Override
             public void run() {
-                DialogUtils.showInfo(AddProjectToSessionWizard.this, message,
+                
+                /*
+                 *  if we already triggered the negotiation the message will 
+                 *  be displayed in the trigger logic, so do not popup another dialog here
+                 */
+                if (!triggered)
+                    DialogUtils.showInfo(AddProjectToSessionWizard.this, message,
                     message + (errorMsg != null ? "\n\n" + errorMsg : ""));
+                
                 close();
             }
         });
@@ -227,22 +242,41 @@ public class AddProjectToSessionWizard extends Wizard {
      * On success, a success notification is displayed, on error, a dialog is shown.
      */
     private void triggerProjectNegotiation() {
+    
+        if (triggered)
+            return;
+        
+        triggered = true;
+        
+        ProgressManager.getInstance()
+        .run(new Task.Backgroundable(project, "Sharing project...", true, PerformInBackgroundOption.DEAF){
 
-        JobWithStatus job = new JobWithStatus() {
             @Override
-            public void run() {
-                status = negotiation
-                    .run(localProjects, new NullProgressMonitor());
-            }
-        };
-        runTask(job, "Sharing project...");
-        if (job.status != ProjectNegotiation.Status.OK) {
-            DialogUtils.showError(null, "Error during project negotiation",
-                "The project could not be shared");
-        } else {
-            NotificationPanel.showNotification("Project shared",
-                "Project successfully shared");
-        }
+            public void run(ProgressIndicator indicator) {
+                final ProjectNegotiation.Status status = negotiation
+                    .run(localProjects, new ProgessMonitorAdapter(indicator));
+                
+                indicator.stop();
+                
+                UIUtil.invokeLaterIfNeeded(new Runnable(){
+
+                    @Override
+                    public void run() {
+                        if (status == ProjectNegotiation.Status.ERROR) {
+                            DialogUtils.showError(null, "Error during project negotiation",
+                                "The project could not be shared: " + negotiation.getErrorMessage());
+                        } else if (status == ProjectNegotiation.Status.OK){
+                            NotificationPanel.showNotification("Project shared",
+                                "Project successfully shared");
+                        }
+                        else
+                            DialogUtils.showError(null, "Project negotiation aborted", "Project negotiation was canceled");
+                        }
+                    }
+                );
+            }            
+        });
+                
         close();
     }
 
