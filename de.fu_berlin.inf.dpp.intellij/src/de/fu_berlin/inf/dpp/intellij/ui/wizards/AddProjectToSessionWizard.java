@@ -73,7 +73,7 @@ public class AddProjectToSessionWizard extends Wizard {
     private final List<FileList> fileLists;
 
     private boolean triggered = false;
-    
+
     /**
      * projectID => Project
      */
@@ -180,8 +180,9 @@ public class AddProjectToSessionWizard extends Wizard {
      * @param fileLists    The list of resources to be shared
      * @param projectNames The names of the projects to be shared
      */
-    public AddProjectToSessionWizard(Window parent, IncomingProjectNegotiation negotiation,
-        JID peer, List<FileList> fileLists, Map<String, String> projectNames) {
+    public AddProjectToSessionWizard(Window parent,
+        IncomingProjectNegotiation negotiation, JID peer,
+        List<FileList> fileLists, Map<String, String> projectNames) {
 
         super(parent, Messages.AddProjectToSessionWizard_title,
             new HeaderPanel(Messages.EnterProjectNamePage_title2, ""));
@@ -226,9 +227,12 @@ public class AddProjectToSessionWizard extends Wizard {
                  *  be displayed in the trigger logic, so do not popup another dialog here
                  */
                 if (!triggered)
-                    DialogUtils.showInfo(AddProjectToSessionWizard.this, message,
-                    message + (errorMsg != null ? "\n\n" + errorMsg : ""));
-                
+                    DialogUtils
+                        .showInfo(AddProjectToSessionWizard.this, message,
+                            message + (errorMsg != null ?
+                                "\n\n" + errorMsg :
+                                ""));
+
                 close();
             }
         });
@@ -242,41 +246,45 @@ public class AddProjectToSessionWizard extends Wizard {
      * On success, a success notification is displayed, on error, a dialog is shown.
      */
     private void triggerProjectNegotiation() {
-    
+
         if (triggered)
             return;
-        
+
         triggered = true;
-        
-        ProgressManager.getInstance()
-        .run(new Task.Backgroundable(project, "Sharing project...", true, PerformInBackgroundOption.DEAF){
 
-            @Override
-            public void run(ProgressIndicator indicator) {
-                final ProjectNegotiation.Status status = negotiation
-                    .run(localProjects, new ProgessMonitorAdapter(indicator));
-                
-                indicator.stop();
-                
-                UIUtil.invokeLaterIfNeeded(new Runnable(){
+        ProgressManager.getInstance().run(
+            new Task.Backgroundable(project, "Sharing project...", true,
+                PerformInBackgroundOption.DEAF) {
 
-                    @Override
-                    public void run() {
-                        if (status == ProjectNegotiation.Status.ERROR) {
-                            DialogUtils.showError(null, "Error during project negotiation",
-                                "The project could not be shared: " + negotiation.getErrorMessage());
-                        } else if (status == ProjectNegotiation.Status.OK){
-                            NotificationPanel.showNotification("Project shared",
-                                "Project successfully shared");
+                @Override
+                public void run(ProgressIndicator indicator) {
+                    final ProjectNegotiation.Status status = negotiation
+                        .run(localProjects,
+                            new ProgessMonitorAdapter(indicator));
+
+                    indicator.stop();
+
+                    UIUtil.invokeLaterIfNeeded(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (status == ProjectNegotiation.Status.ERROR) {
+                                DialogUtils.showError(null,
+                                    "Error during project negotiation",
+                                    "The project could not be shared: "
+                                        + negotiation.getErrorMessage());
+                            } else if (status == ProjectNegotiation.Status.OK) {
+                                NotificationPanel
+                                    .showNotification("Project shared",
+                                        "Project successfully shared");
+                            } else
+                                DialogUtils.showError(null,
+                                    "Project negotiation aborted",
+                                    "Project negotiation was canceled");
                         }
-                        else
-                            DialogUtils.showError(null, "Project negotiation aborted", "Project negotiation was canceled");
-                        }
-                    }
-                );
-            }            
-        });
-                
+                    });
+                }
+            });
+
         close();
     }
 

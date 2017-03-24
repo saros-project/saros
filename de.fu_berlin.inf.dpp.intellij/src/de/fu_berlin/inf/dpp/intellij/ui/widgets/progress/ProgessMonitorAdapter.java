@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.intellij.ui.widgets.progress;
 
 import com.intellij.openapi.progress.ProgressIndicator;
-
 import de.fu_berlin.inf.dpp.monitoring.IProgressMonitor;
 
 /**
@@ -47,7 +46,7 @@ public final class ProgessMonitorAdapter implements IProgressMonitor {
     @Override
     public void worked(final int amount) {
         assert amount >= 0;
-        
+
         if (totalWork < 0)
             return;
 
@@ -55,9 +54,9 @@ public final class ProgessMonitorAdapter implements IProgressMonitor {
 
         if (worked > totalWork)
             worked = totalWork;
-        
+
         double fraction = (worked + 0.0D) / totalWork;
-        int currentPercent = (int)Math.round(fraction * 100D);
+        int currentPercent = (int) Math.round(fraction * 100D);
 
         if (percentCompleted == currentPercent)
             return;
