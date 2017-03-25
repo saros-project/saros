@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.filesystem;
 
 import java.io.IOException;
-import java.net.URI;
 
 /**
  * This interface is under development. It currently equals its Eclipse
@@ -37,7 +36,7 @@ public interface IResource {
     /**
      * Equivalent to the Eclipse call <code>IResource#isDerived(checkAncestors ?
      * IResource#CHECK_ANCESTORS : IResource#NONE)</code>
-     * 
+     *
      * @param checkAncestors
      * @return
      */
@@ -69,8 +68,6 @@ public interface IResource {
         throws IOException;
 
     public IPath getLocation();
-
-    public URI getLocationURI();
 
     public Object getAdapter(Class<? extends IResource> clazz);
 

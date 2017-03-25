@@ -380,17 +380,6 @@ public class IntelliJProjectImpl implements IProject {
     }
 
     @Override
-    public URI getLocationURI() {
-        try {
-            return new URI(fullPath.toString());
-        } catch (URISyntaxException e) {
-            LOG.error("invalid URI syntax", e);
-
-            return null;
-        }
-    }
-
-    @Override
     public Object getAdapter(Class<? extends IResource> clazz) {
         if (clazz.isInstance(this)) {
             return this;

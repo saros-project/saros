@@ -286,8 +286,7 @@ public class FileUtils {
 
                     totalFileSize += filesize;
                 } catch (Exception e) {
-                    LOG.warn("failed to retrieve file size of file " + resource
-                            .getLocationURI(), e);
+                    LOG.warn("failed to retrieve file size of file " + resource, e);
                 }
                 break;
             case IResource.PROJECT:

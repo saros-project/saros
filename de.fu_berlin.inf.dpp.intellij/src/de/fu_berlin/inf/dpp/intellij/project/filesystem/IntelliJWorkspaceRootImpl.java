@@ -128,11 +128,6 @@ public class IntelliJWorkspaceRootImpl implements IWorkspaceRoot {
     }
 
     @Override
-    public URI getLocationURI() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public Object getAdapter(Class<? extends IResource> clazz) {
         return null;
     }

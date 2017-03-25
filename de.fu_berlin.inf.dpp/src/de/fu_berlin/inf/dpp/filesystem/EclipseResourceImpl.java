@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.filesystem;
 
 import java.io.IOException;
-import java.net.URI;
 
 import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
@@ -176,11 +175,6 @@ public class EclipseResourceImpl implements IResource {
     }
 
     @Override
-    public URI getLocationURI() {
-        return delegate.getLocationURI();
-    }
-
-    @Override
     public Object getAdapter(Class<? extends IResource> clazz) {
         return delegate.getAdapter(clazz);
     }
@@ -188,7 +182,7 @@ public class EclipseResourceImpl implements IResource {
     /**
      * Returns the original {@link org.eclipse.core.resources.IResource
      * IResource} object.
-     * 
+     *
      * @return
      */
     public org.eclipse.core.resources.IResource getDelegate() {

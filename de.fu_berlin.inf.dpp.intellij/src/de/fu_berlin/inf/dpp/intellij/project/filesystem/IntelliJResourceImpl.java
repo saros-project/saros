@@ -124,11 +124,6 @@ public abstract class IntelliJResourceImpl implements IResource {
         return project.getLocation().append(projectRelativePath);
     }
 
-    @Override
-    public URI getLocationURI() {
-        return getLocation().toFile().toURI();
-    }
-
     /**
      * Return the {@link File} representation of the absolute path to this resource.
      */

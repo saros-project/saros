@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.server.filesystem;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -63,11 +62,6 @@ public abstract class ServerResourceImpl implements IResource {
     @Override
     public IPath getLocation() {
         return workspace.getLocation().append(path);
-    }
-
-    @Override
-    public URI getLocationURI() {
-        return toNioPath().toUri();
     }
 
     @Override
