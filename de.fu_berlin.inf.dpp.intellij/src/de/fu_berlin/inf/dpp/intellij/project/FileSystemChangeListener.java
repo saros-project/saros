@@ -24,7 +24,6 @@ import de.fu_berlin.inf.dpp.intellij.editor.StoppableDocumentListener;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJFileImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJPathImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJProjectImpl;
-import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJWorkspaceImpl;
 import de.fu_berlin.inf.dpp.session.User;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -49,7 +48,6 @@ public class FileSystemChangeListener extends AbstractStoppableListener
     private static final Logger LOG = Logger
         .getLogger(FileSystemChangeListener.class);
     private final SharedResourcesManager resourceManager;
-    private IntelliJWorkspaceImpl intelliJWorkspaceImpl;
 
     //HACK: This list is used to filter events for files that were created from
     //remote, because we can not disable the listener for them
@@ -152,10 +150,10 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         @NotNull
         VirtualFileEvent virtualFileEvent) {
         VirtualFile virtualFile = virtualFileEvent.getFile();
-        IntelliJProjectImpl project = intelliJWorkspaceImpl
-            .getProjectForPath(virtualFile.getPath());
+        IntelliJProjectImpl project = getProjectForResource(
+            IntelliJPathImpl.fromString(virtualFile.getPath()));
 
-        if (!isValidProject(project)) {
+        if (project == null || !isValidProject(project)) {
             return;
         }
 
@@ -204,10 +202,9 @@ public class FileSystemChangeListener extends AbstractStoppableListener
 
         File file = convertVirtualFileEventToFile(virtualFileEvent);
         IPath path = IntelliJPathImpl.fromString(file.getPath());
-        IntelliJProjectImpl project = intelliJWorkspaceImpl
-            .getProjectForPath(file.getPath());
+        IntelliJProjectImpl project = getProjectForResource(path);
 
-        if (!isValidProject(project)) {
+        if (project == null || !isValidProject(project)) {
             return;
         }
 
@@ -268,10 +265,10 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         }
 
         IPath path = IntelliJPathImpl.fromString(file.getPath());
-        IntelliJProjectImpl project = intelliJWorkspaceImpl
-            .getProjectForPath(file.getPath());
+        IntelliJProjectImpl project = getProjectForResource(path);
 
-        if (!isValidProject(project) || !isCompletelyShared(project)) {
+        if (project == null || !isValidProject(project) ||
+            !isCompletelyShared(project)) {
             return;
         }
 
@@ -308,10 +305,10 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         }
 
         IPath path = IntelliJPathImpl.fromString(newFile.getPath());
-        IntelliJProjectImpl project = intelliJWorkspaceImpl
-            .getProjectForPath(newFile.getPath());
+        IntelliJProjectImpl project = getProjectForResource(path);
 
-        if (!isValidProject(project) || !isCompletelyShared(project)) {
+        if (project == null || !isValidProject(project) ||
+            !isCompletelyShared(project)) {
             return;
         }
 
@@ -322,8 +319,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         IPath oldParent = IntelliJPathImpl
             .fromString(virtualFileMoveEvent.getOldParent().getPath());
         IPath oldPath = oldParent.append(virtualFileMoveEvent.getFileName());
-        IProject oldProject = intelliJWorkspaceImpl
-            .getProjectForPath(oldPath.toPortableString());
+        IProject oldProject = getProjectForResource(oldPath);
 
         oldPath = makeAbsolutePathProjectRelative(oldPath, project);
         SPath oldSPath = new SPath(oldProject, oldPath);
@@ -362,10 +358,9 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         }
 
         IPath oldPath = IntelliJPathImpl.fromString(oldFile.getPath());
-        IntelliJProjectImpl project = intelliJWorkspaceImpl
-            .getProjectForPath(newFile.getPath());
+        IntelliJProjectImpl project = getProjectForResource(oldPath);
 
-        if (!isValidProject(project)) {
+        if (project == null || !isValidProject(project)) {
             return;
         }
 
@@ -400,10 +395,10 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         }
 
         IPath path = IntelliJPathImpl.fromString(newFile.getPath());
-        IntelliJProjectImpl project = intelliJWorkspaceImpl
-            .getProjectForPath(newFile.getPath());
+        IntelliJProjectImpl project = getProjectForResource(path);
 
-        if (!isValidProject(project) || !isCompletelyShared(project)) {
+        if (project == null || !isValidProject(project) ||
+            !isCompletelyShared(project)) {
             return;
         }
 
@@ -467,10 +462,6 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         //Do nothing
     }
 
-    public void setWorkspace(IntelliJWorkspaceImpl intelliJWorkspaceImpl) {
-        this.intelliJWorkspaceImpl = intelliJWorkspaceImpl;
-    }
-
     /**
      * Adds a file to the filter list for incoming files (for which no activities
      * should be generated).
@@ -512,5 +503,26 @@ public class FileSystemChangeListener extends AbstractStoppableListener
 
     private boolean isValidProject(IntelliJProjectImpl project) {
         return project != null && project.exists();
+    }
+
+    /**
+     * Searches for a resource with the passed path in the resources of all
+     * currently with the session registered projects.
+     *
+     * @param path path to the resource
+     * @return project with which the passed resources is registered or
+     * <b>null</b> if no such project exists
+     */
+    private IntelliJProjectImpl getProjectForResource(IPath path){
+        for(IProject sessionProject: resourceManager.getSession().getProjects()){
+
+            IntelliJProjectImpl project = (IntelliJProjectImpl)sessionProject;
+
+            if(project.isMember(path)){
+                return project;
+            }
+        }
+        
+        return null;
     }
 }

@@ -248,6 +248,26 @@ public class IntelliJProjectImpl implements IProject {
         return resourceMap.containsKey(path);
     }
 
+    /**
+     * Returns <b>true</b> if the resource the passed path is pointing to
+     * belongs to this project, <b>false</b> otherwise.
+     *
+     * @param resourcePath path to the resource
+     * @return
+     */
+    public boolean isMember(IPath resourcePath) {
+        if(resourceMap.containsKey(resourcePath)){
+            return true;
+        }
+
+        if(fullPath.isPrefixOf(resourcePath)){
+            return resourceMap.containsKey(
+                resourcePath.removeFirstSegments(fullPath.segmentCount()));
+        }
+
+        return false;
+    }
+
     @Override
     public IResource[] members() {
         return resourceMap.values().toArray(new IResource[] { });

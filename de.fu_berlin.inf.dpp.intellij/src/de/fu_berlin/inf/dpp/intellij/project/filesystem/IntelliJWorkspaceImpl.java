@@ -45,35 +45,16 @@ public class IntelliJWorkspaceImpl implements IWorkspace {
         return new IntelliJProjectImpl(project, projectName);
     }
 
-    /**
-     * Returns a handle to the project for the given path.
-     */
-    public IntelliJProjectImpl getProjectForPath(String path) {
-        IPath filePath = IntelliJPathImpl.fromString(path);
-        IPath projectPath = IntelliJPathImpl.fromString(project.getBasePath());
-
-        if (!projectPath.isPrefixOf(filePath)) {
-            return null;
-        }
-
-        IPath relativePath = filePath
-            .removeFirstSegments(projectPath.segmentCount());
-
-        return new IntelliJProjectImpl(project, relativePath.segment(0));
-    }
-
     @Override
     public IPath getLocation() {
         return IntelliJPathImpl.fromString(project.getBasePath());
     }
 
     public void addResourceListener(FileSystemChangeListener listener) {
-        listener.setWorkspace(this);
         fileSystem.addVirtualFileListener(listener);
     }
 
     public void removeResourceListener(FileSystemChangeListener listener) {
-        listener.setWorkspace(this);
         fileSystem.removeVirtualFileListener(listener);
     }
 }
