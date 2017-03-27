@@ -93,6 +93,7 @@ public class EditorPool {
             Document doc = documents.remove(oldPath);
 
             if (doc != null) {
+                documents.put(newPath, doc);
                 files.put(doc, newPath);
             }
         }
