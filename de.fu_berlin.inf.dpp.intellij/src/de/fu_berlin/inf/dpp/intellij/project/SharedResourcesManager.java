@@ -13,10 +13,11 @@ import de.fu_berlin.inf.dpp.core.util.FileUtils;
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
-import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.intellij.editor.EditorManager;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorHandler;
 import de.fu_berlin.inf.dpp.intellij.editor.LocalEditorManipulator;
+import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJFileImpl;
+import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJProjectImpl;
 import de.fu_berlin.inf.dpp.intellij.project.filesystem.IntelliJWorkspaceImpl;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
@@ -201,19 +202,27 @@ public class SharedResourcesManager extends AbstractActivityProducer
     }
 
     private void handleFileMove(FileActivity activity) throws IOException {
-        //FIXME: This only works by accident because ProjectImpl.getFullPath is broken
-        //this will come in the net patch
-        IPath newFilePath = activity.getPath().getFullPath();
-        IResource oldResource = activity.getOldPath().getResource();
+        SPath oldPath = activity.getOldPath();
+        SPath newPath = activity.getPath();
 
-        FileUtils.mkdirs(activity.getPath().getResource());
-        FileUtils.move(newFilePath, oldResource);
+        IntelliJProjectImpl oldProject =
+            (IntelliJProjectImpl) oldPath.getProject();
+        IntelliJProjectImpl newProject =
+            (IntelliJProjectImpl) newPath.getProject();
 
-        if (activity.getContent() == null) {
-            return;
-        }
+        IPath newFilePath = newPath.getFullPath();
 
-        handleFileCreation(activity);
+        localEditorHandler.saveFile(oldPath);
+        localEditorHandler.removeEditor(oldPath);
+        localEditorManipulator.closeEditor(oldPath);
+
+        FileUtils.mkdirs(new IntelliJFileImpl(newProject,newFilePath.toFile()));
+        FileUtils.move(newFilePath, oldPath.getResource());
+
+        oldProject.removeResource(oldPath.getProjectRelativePath());
+        newProject.addFile(newFilePath.toFile());
+
+        localEditorManipulator.openEditor(newPath,false);
     }
 
     private void handleFileDeletion(FileActivity activity) throws IOException {

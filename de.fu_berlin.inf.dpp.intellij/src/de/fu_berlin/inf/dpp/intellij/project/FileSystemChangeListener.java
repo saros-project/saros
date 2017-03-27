@@ -99,7 +99,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
         resourceManager.internalFireActivity(removeActivity);
 
         project.addFile(newSPath.getFile().getLocation().toFile());
-        project.removeFile(oldSPath.getFile().getLocation().toFile());
+        project.removeResource(oldSPath.getProjectRelativePath());
     }
 
     private void generateFileMove(SPath oldSPath, SPath newSPath,
@@ -112,28 +112,28 @@ public class FileSystemChangeListener extends AbstractStoppableListener
 
         IFile file;
 
+        project.addFile(newSPath.getFile().getLocation().toFile());
+
+        //TODO what happens if the other participant is working on the now renamed file
         if (before) {
             file = oldProject.getFile(oldSPath.getFullPath());
             editorManager.saveFile(oldSPath);
+
+            editorManager.replaceAllEditorsForPath(oldSPath, newSPath);
         } else {
+            editorManager.replaceAllEditorsForPath(oldSPath, newSPath);
+
             file = project.getFile(newSPath.getFullPath());
             editorManager.saveFile(newSPath);
         }
 
-        if (file == null) {
-            return;
-        }
+        oldProject.removeResource(oldSPath.getProjectRelativePath());
 
         byte[] bytes = FileUtils.getLocalFileContent(file);
-
         String charset = getEncoding(file);
-
         IActivity activity = new FileActivity(user, FileActivity.Type.MOVED,
             newSPath, oldSPath, bytes, charset, FileActivity.Purpose.ACTIVITY);
-        editorManager.replaceAllEditorsForPath(oldSPath, newSPath);
 
-        project.addFile(newSPath.getFile().getLocation().toFile());
-        oldProject.removeFile(oldSPath.getFile().getLocation().toFile());
         resourceManager.internalFireActivity(activity);
     }
 
@@ -169,6 +169,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
 
         SPath spath = new SPath(project, file.getProjectRelativePath());
 
+        //FIXME does not work as it takes the file content, which has the wrong line separators
         //Files created from templates have initial content and are opened in
         // an editor, but do not have a DocumentListener. Their initial content
         // is transferred here, because the DocumentListener is added after
@@ -287,7 +288,7 @@ public class FileSystemChangeListener extends AbstractStoppableListener
                 .removed(user, spath, FileActivity.Purpose.ACTIVITY);
         }
 
-        project.removeFile(file);
+        project.removeResource(path);
         editorManager.removeAllEditorsForPath(spath);
 
         resourceManager.internalFireActivity(activity);

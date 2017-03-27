@@ -186,18 +186,21 @@ public class IntelliJProjectImpl implements IProject {
         }
     }
 
-    public void removeFile(File file) {
-        if (file.isDirectory()) {
-            IFolder folder = new IntelliJFolderImpl(this, file);
-            String key = folder.getProjectRelativePath().toString();
-            folderMap.remove(key);
-            resourceMap.remove(folder.getProjectRelativePath());
+    /**
+     * Removes the resource with the given path from the project mappings.
+     *
+     * @param resourcePath relative path to the resource
+     */
+    public void removeResource(IPath resourcePath){
+        IResource resource = resourceMap.remove(resourcePath);
+        if(resource == null) {
+            return;
         }
-
-        if (file.isFile()) {
-            IFile myFile = new IntelliJFileImpl(this, file);
-            fileMap.remove(myFile.getProjectRelativePath().toString());
-            resourceMap.remove(myFile.getProjectRelativePath());
+        String key = resourcePath.toString();
+        if(resource.getType() == IResource.FILE) {
+            fileMap.remove(key);
+        }else if(resource.getType()==IResource.FOLDER) {
+            folderMap.remove(key);
         }
     }
 
@@ -215,7 +218,6 @@ public class IntelliJProjectImpl implements IProject {
             file = new IntelliJFileImpl(this,
                 new File(this.path + File.separator + name));
         }
-        addResource(file);
         return file;
     }
 

@@ -3,10 +3,14 @@ package de.fu_berlin.inf.dpp.intellij.editor;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.vfs.VirtualFile;
+
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
+
 import org.apache.log4j.Logger;
+
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Class for handling activities on local editors and transforming them to calls to
@@ -78,6 +82,15 @@ public class LocalEditorHandler {
             editorPool.removeEditor(path);
             manager.generateEditorClosed(path);
         }
+    }
+
+    /**
+     * Removes the resource belonging to the given path from the editor pool
+     *
+     * @param path path
+     */
+    public void removeEditor(@NotNull SPath path){
+        editorPool.removeAll(path);
     }
 
     /**

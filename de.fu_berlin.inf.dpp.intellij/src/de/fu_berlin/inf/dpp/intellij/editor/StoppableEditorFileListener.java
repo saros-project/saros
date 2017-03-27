@@ -32,7 +32,7 @@ public class StoppableEditorFileListener extends AbstractStoppableListener
             return;
         }
 
-        editorManager.getLocalEditorHandler().openEditor(virtualFile,true);
+        editorManager.getLocalEditorHandler().openEditor(virtualFile,false);
     }
 
     /**
