@@ -1,7 +1,13 @@
 package de.fu_berlin.inf.dpp.intellij.ui.actions;
 
+import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
 import de.fu_berlin.inf.dpp.net.xmpp.XMPPConnectionService;
+
 import org.picocontainer.annotations.Inject;
+
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
 
 /**
  * Disconnects from XMPP/Jabber server
@@ -10,7 +16,7 @@ public class DisconnectServerAction extends AbstractSarosAction {
     public static final String NAME = "disconnect";
 
     @Inject
-    private XMPPConnectionService connectionService;
+    private ConnectionHandler connectionHandler;
 
     @Override
     public String getActionName() {
@@ -19,7 +25,27 @@ public class DisconnectServerAction extends AbstractSarosAction {
 
     @Override
     public void execute() {
-        connectionService.disconnect();
-        actionPerformed();
+
+        // FIXME use the project from the action event !
+        // AnActionEvent.getDataContext().getData(DataConstants.PROJECT)
+        ProgressManager.getInstance()
+            .run(new Task.Modal(project, "Disconnecting...", false) {
+
+                @Override
+                public void run(ProgressIndicator indicator) {
+
+                    LOG.info(
+                        "Disconnecting current connection: " + connectionHandler
+                            .getConnectionID());
+
+                    indicator.setIndeterminate(true);
+
+                    try {
+                        connectionHandler.disconnect();
+                    } finally {
+                        indicator.stop();
+                    }
+                }
+            });
     }
 }

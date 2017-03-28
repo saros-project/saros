@@ -45,12 +45,7 @@ public class ConnectButton extends ToolbarButton {
         SarosPluginContext.initComponent(this);
         disconnectAction = new DisconnectServerAction();
         connectAction = new ConnectServerAction();
-        connectAction.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent action) {
-                createMenuItems();
-            }
-        });
+
         configureAccounts = new NotImplementedAction("configure accounts");
 
         createDisconnectMenuItem();
@@ -160,6 +155,8 @@ public class ConnectButton extends ToolbarButton {
         if (password.isEmpty()) {
             return null;
         }
+
+        // TODO query port
         String server = SafeDialogUtils.showInputDialog(
             "XMPP server (optional, not necessary in most cases)", "",
             "Server");
@@ -175,10 +172,5 @@ public class ConnectButton extends ToolbarButton {
                     .getMessage(), "Error");
         }
         return null;
-    }
-
-    public void addActionListenerToActions(ActionListener listener) {
-        disconnectAction.addActionListener(listener);
-        connectAction.addActionListener(listener);
     }
 }

@@ -1,8 +1,13 @@
 package de.fu_berlin.inf.dpp.intellij.ui.actions;
 
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
+
 import de.fu_berlin.inf.dpp.account.XMPPAccount;
 import de.fu_berlin.inf.dpp.account.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.communication.connection.ConnectionHandler;
+
 import org.picocontainer.annotations.Inject;
 
 import javax.swing.JOptionPane;
@@ -31,7 +36,6 @@ public class ConnectServerAction extends AbstractSarosAction {
         XMPPAccount account = accountStore.findAccount(user);
         accountStore.setAccountActive(account);
         connectAccount(account);
-        actionPerformed();
     }
 
     /**
@@ -41,27 +45,35 @@ public class ConnectServerAction extends AbstractSarosAction {
     public void execute() {
         XMPPAccount account = accountStore.getActiveAccount();
         connectAccount(account);
-        actionPerformed();
     }
 
     /**
-     * Connects an Account tothe XMPPService and sets it as active.
+     * Connects an Account to the XMPPService and sets it as active.
      *
      * @param account
      */
-    private void connectAccount(XMPPAccount account) {
-        LOG.info("Connecting server: [" + account.getUsername() + "@" + account
-            .getServer() + "]");
+    private void connectAccount(final XMPPAccount account) {
 
-        try {
-            // TODO don't block UI
-            connectionHandler.connect(account, false);
-        } catch (RuntimeException e) {
-            // TODO display user notification in connection listener
-            JOptionPane.showMessageDialog(null,
-                "An unexpected error occured: " + e.getMessage(),
-                "Connection Error", JOptionPane.ERROR_MESSAGE);
-            LOG.error("Could not connect " + account, e);
-        }
+        // FIXME use the project from the action event !
+        // AnActionEvent.getDataContext().getData(DataConstants.PROJECT)
+        ProgressManager.getInstance()
+            .run(new Task.Modal(project, "Connecting...", false) {
+
+                @Override
+                public void run(ProgressIndicator indicator) {
+
+                    LOG.info(
+                        "Connecting server: [" + account.getUsername() + "@"
+                            + account.getServer() + "]");
+
+                    indicator.setIndeterminate(true);
+
+                    try {
+                        connectionHandler.connect(account, false);
+                    } finally {
+                        indicator.stop();
+                    }
+                }
+            });
     }
 }
