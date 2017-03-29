@@ -1,13 +1,9 @@
 package de.fu_berlin.inf.dpp.server.filesystem;
 
-import static de.fu_berlin.inf.dpp.server.filesystem.FileSystemTestUtils.createFile;
-import static de.fu_berlin.inf.dpp.server.filesystem.FileSystemTestUtils.createFolder;
 import static de.fu_berlin.inf.dpp.server.filesystem.FileSystemTestUtils.createWorkspaceFolder;
 import static de.fu_berlin.inf.dpp.server.filesystem.FileSystemTestUtils.path;
 import static org.easymock.EasyMock.expect;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
 
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMockSupport;
@@ -49,26 +45,6 @@ public class ServerProjectImplTest extends EasyMockSupport {
     @Test
     public void defaultCharsetUTF8() throws Exception {
         assertEquals("UTF-8", project.getDefaultCharset());
-    }
-
-    @Test
-    public void findMember() throws Exception {
-        createFolder(workspace, "project");
-        createFolder(workspace, "project/folder");
-        createFile(workspace, "project/folder/file");
-
-        IResource folder = project.findMember(path("folder"));
-        IResource file = project.findMember(path("folder/file"));
-        IResource nonExistent = project.findMember(path("non/existent"));
-
-        assertEquals(IResource.FOLDER, folder.getType());
-        assertEquals(IResource.FILE, file.getType());
-        assertNull(nonExistent);
-    }
-
-    @Test
-    public void findMemberAtEmptyPath() throws Exception {
-        assertSame(project, project.findMember(path("")));
     }
 
     @Test
