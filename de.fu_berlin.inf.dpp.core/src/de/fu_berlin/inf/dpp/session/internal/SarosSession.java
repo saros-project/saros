@@ -40,11 +40,8 @@ import de.fu_berlin.inf.dpp.activities.FolderCreatedActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IFileSystemModificationActivity;
 import de.fu_berlin.inf.dpp.activities.IResourceActivity;
-import de.fu_berlin.inf.dpp.activities.JupiterActivity;
 import de.fu_berlin.inf.dpp.activities.NOPActivity;
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
-import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.communication.extensions.KickUserExtension;
 import de.fu_berlin.inf.dpp.communication.extensions.LeaveSessionExtension;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
@@ -216,7 +213,8 @@ public final class SarosSession implements ISarosSession {
     /**
      * Constructor for host.
      */
-    public SarosSession(final String id, int colorID, IContainerContext containerContext) {
+    public SarosSession(final String id, int colorID,
+        IContainerContext containerContext) {
         this(id, containerContext, /* unused */null, colorID, /* unused */
         -1);
     }
@@ -453,7 +451,7 @@ public final class SarosSession implements ISarosSession {
         }
 
         /*
-         *
+         * 
          * as long as we do not know when something is send to someone this will
          * always produce errors ... swapping synchronizeUserList and userJoined
          * can produce different results
@@ -791,16 +789,6 @@ public final class SarosSession implements ISarosSession {
         if (projectMapper.size() == 0
             && (activity instanceof IResourceActivity)) {
             return;
-        }
-
-        // avoid sending of unwanted editor related activities
-
-        if (activity instanceof IResourceActivity
-            && (activity instanceof TextSelectionActivity
-                || activity instanceof ViewportActivity || activity instanceof JupiterActivity)) {
-            IResourceActivity resActivity = (IResourceActivity) activity;
-            if (!isShared(resActivity.getPath().getResource()))
-                return;
         }
 
         boolean send = true;
