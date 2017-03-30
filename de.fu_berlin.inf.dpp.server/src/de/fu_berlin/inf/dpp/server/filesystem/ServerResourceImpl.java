@@ -132,6 +132,32 @@ public abstract class ServerResourceImpl implements IResource {
         return clazz.isInstance(this) ? this : null;
     }
 
+    @Override
+    public final boolean equals(Object obj) {
+
+        if (this == obj)
+            return true;
+
+        if (!(obj instanceof ServerResourceImpl))
+            return false;
+
+        ServerResourceImpl other = (ServerResourceImpl) obj;
+
+        return getType() == other.getType()
+            && getWorkspace().equals(other.getWorkspace())
+            && getFullPath().equals(other.getFullPath());
+    }
+
+    @Override
+    public final int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + getType();
+        result = prime * result + path.hashCode();
+        result = prime * result + workspace.hashCode();
+        return result;
+    }
+
     /**
      * Returns the resource's location as a {@link java.nio.files.Path}. This is
      * for internal use in conjunction with the utility methods of the
