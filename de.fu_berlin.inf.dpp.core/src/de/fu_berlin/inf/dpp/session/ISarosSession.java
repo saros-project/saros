@@ -246,12 +246,6 @@ public interface ISarosSession {
     public User getLocalUser();
 
     /**
-     * @return true, if there is exactly one user with
-     *         {@link Permission#WRITE_ACCESS}, false otherwise.
-     */
-    public boolean hasExclusiveWriteAccess();
-
-    /**
      * the concurrent document manager is responsible for all jupiter controlled
      * documents
      *
@@ -338,42 +332,6 @@ public interface ISarosSession {
      * @see #addActivityConsumer(IActivityConsumer, Priority)
      */
     public void removeActivityConsumer(IActivityConsumer consumer);
-
-    /**
-     * Returns a list of all users in this session which have
-     * {@link Permission#WRITE_ACCESS} right now.
-     *
-     * @snapshot This is a snapshot copy. This list does not change if users'
-     *           {@link Permission} change.
-     *
-     *           There is no guarantee that the users in this list will be part
-     *           of the project after you exit the SWT thread context.
-     */
-    public List<User> getUsersWithWriteAccess();
-
-    /**
-     * Returns a list of all users in this session have
-     * {@link Permission#READONLY_ACCESS} right now.
-     *
-     * @snapshot This is a snapshot copy. This list does not change if users'
-     *           {@link Permission} change.
-     *
-     *           There is no guarantee that the users in this list will be part
-     *           of the project after you exit the SWT thread context.
-     */
-    public List<User> getUsersWithReadOnlyAccess();
-
-    /**
-     * Returns all users in this project which are both remotely and have
-     * {@link Permission#READONLY_ACCESS} right now.
-     *
-     * @snapshot This is a snapshot copy. This list does not change if users'
-     *           {@link Permission} change.
-     *
-     *           There is no guarantee that the users in this list will be part
-     *           of the project after you exit the SWT thread context.
-     */
-    public List<User> getRemoteUsersWithReadOnlyAccess();
 
     /**
      * Checks if the user is ready to process {@link IResourceActivity}s for a

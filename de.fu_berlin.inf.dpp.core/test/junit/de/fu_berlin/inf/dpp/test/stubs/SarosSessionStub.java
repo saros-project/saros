@@ -54,11 +54,6 @@ public class SarosSessionStub implements ISarosSession {
     }
 
     @Override
-    public boolean hasExclusiveWriteAccess() {
-        throw new RuntimeException("Unexpected call to Stub");
-    }
-
-    @Override
     public boolean hasWriteAccess() {
         return hasWriteAccess;
     }
@@ -85,11 +80,6 @@ public class SarosSessionStub implements ISarosSession {
     }
 
     @Override
-    public List<User> getRemoteUsersWithReadOnlyAccess() {
-        throw new RuntimeException("Unexpected call to Stub");
-    }
-
-    @Override
     public Set<IProject> getProjects() {
         throw new RuntimeException("Unexpected call to Stub");
     }
@@ -110,22 +100,12 @@ public class SarosSessionStub implements ISarosSession {
     }
 
     @Override
-    public List<User> getUsersWithReadOnlyAccess() {
-        throw new RuntimeException("Unexpected call to Stub");
-    }
-
-    @Override
     public User getLocalUser() {
         throw new RuntimeException("Unexpected call to Stub");
     }
 
     @Override
     public User getHost() {
-        throw new RuntimeException("Unexpected call to Stub");
-    }
-
-    @Override
-    public List<User> getUsersWithWriteAccess() {
         throw new RuntimeException("Unexpected call to Stub");
     }
 

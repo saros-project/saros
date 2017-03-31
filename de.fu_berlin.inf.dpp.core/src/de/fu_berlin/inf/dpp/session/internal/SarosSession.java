@@ -307,49 +307,6 @@ public final class SarosSession implements ISarosSession {
     }
 
     @Override
-    public List<User> getRemoteUsersWithReadOnlyAccess() {
-        List<User> result = new ArrayList<User>();
-        for (User user : getUsers()) {
-            if (user.isLocal())
-                continue;
-            if (user.hasReadOnlyAccess())
-                result.add(user);
-        }
-        return result;
-    }
-
-    @Override
-    public List<User> getUsersWithReadOnlyAccess() {
-        List<User> result = new ArrayList<User>();
-        for (User user : getUsers()) {
-            if (user.hasReadOnlyAccess())
-                result.add(user);
-        }
-        return result;
-    }
-
-    @Override
-    public List<User> getUsersWithWriteAccess() {
-        List<User> result = new ArrayList<User>();
-        for (User user : getUsers()) {
-            if (user.hasWriteAccess())
-                result.add(user);
-        }
-        return result;
-    }
-
-    public List<User> getRemoteUsersWithWriteAccess() {
-        List<User> result = new ArrayList<User>();
-        for (User user : getUsers()) {
-            if (user.isLocal())
-                continue;
-            if (user.hasWriteAccess())
-                result.add(user);
-        }
-        return result;
-    }
-
-    @Override
     public List<User> getRemoteUsers() {
         List<User> result = new ArrayList<User>();
         for (User user : getUsers()) {
@@ -407,19 +364,6 @@ public final class SarosSession implements ISarosSession {
         return localUser.hasWriteAccess();
     }
 
-    @Override
-    public boolean hasExclusiveWriteAccess() {
-        if (!hasWriteAccess()) {
-            return false;
-        }
-        for (User user : getUsers()) {
-            if (user.isRemote() && user.hasWriteAccess()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     /*
      * FIXME only accept a JID or create a method session.createUser to ensure
      * proper initialization etc. of User objects !
@@ -444,7 +388,7 @@ public final class SarosSession implements ISarosSession {
         }
 
         /*
-         *
+         * 
          * as long as we do not know when something is send to someone this will
          * always produce errors ... swapping synchronizeUserList and userJoined
          * can produce different results

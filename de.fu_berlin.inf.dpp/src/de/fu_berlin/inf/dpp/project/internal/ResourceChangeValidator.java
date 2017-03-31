@@ -1,11 +1,9 @@
 package de.fu_berlin.inf.dpp.project.internal;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
-import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.mapping.ModelProvider;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -14,7 +12,6 @@ import org.eclipse.core.runtime.Status;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.filesystem.ResourceAdapterFactory;
 import de.fu_berlin.inf.dpp.project.Messages;
 import de.fu_berlin.inf.dpp.session.ISarosSession;
@@ -32,7 +29,11 @@ import de.fu_berlin.inf.dpp.session.User.Permission;
  * activities as a user with {@link Permission#READONLY_ACCESS}, and deletion of
  * a shared project.
  */
-@Component(module = "core")
+/*
+ * FIXME there are several deltas that report changes which do not affect the
+ * file system. As this class did not work until Eclipse 4.x ??? nobody ever
+ * realized this
+ */
 public class ResourceChangeValidator extends ModelProvider {
     private static final Logger log = Logger
         .getLogger(ResourceChangeValidator.class.getName());
@@ -50,40 +51,45 @@ public class ResourceChangeValidator extends ModelProvider {
         IStatus.ERROR, "de.fu_berlin.inf.dpp", ERROR_CODE,
         DELETE_PROJECT_ERROR_TEXT, null);
 
+    @Inject
+    private ISarosSessionManager sessionManager;
+
     /** the currently running shared project */
-    private ISarosSession sarosSession;
+    private volatile ISarosSession session;
 
     /**
      * Check each resource delta whether it is in a shared project. If we are
      * not the exclusive user with {@link Permission#WRITE_ACCESS} set the
      * appropriate flag.
      */
-    private class ResourceDeltaVisitor implements IResourceDeltaVisitor {
+    private static class ResourceDeltaVisitor implements IResourceDeltaVisitor {
 
         private boolean isAffectingSharedProjectFiles = false;
 
         private boolean isDeletingSharedProject = false;
 
+        private final ISarosSession session;
+
+        private ResourceDeltaVisitor(final ISarosSession session) {
+            assert session != null;
+            this.session = session;
+        }
+
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.eclipse.core.resources.IResourceDeltaVisitor
          */
         @Override
         public boolean visit(IResourceDelta delta) throws CoreException {
 
-            // We already check this in validateChange
-            assert sarosSession != null;
-
             IResource resource = delta.getResource();
 
-            if (resource instanceof IWorkspaceRoot) {
+            if (resource.getType() == IResource.ROOT)
                 return true;
-            }
 
-            if (resource instanceof IProject) {
-                if (!sarosSession.isShared(ResourceAdapterFactory
-                    .create(resource)))
+            if (resource.getType() == IResource.PROJECT) {
+                if (!session.isShared(ResourceAdapterFactory.create(resource)))
                     return false;
 
                 if (delta.getKind() == IResourceDelta.REMOVED) {
@@ -91,9 +97,6 @@ public class ResourceChangeValidator extends ModelProvider {
                     return false;
                 }
 
-                if (sarosSession.hasExclusiveWriteAccess()) {
-                    return false;
-                }
                 return true;
             }
 
@@ -101,9 +104,6 @@ public class ResourceChangeValidator extends ModelProvider {
             return false;
         }
     }
-
-    @Inject
-    protected ISarosSessionManager sessionManager;
 
     @Override
     protected void initialize() {
@@ -114,28 +114,29 @@ public class ResourceChangeValidator extends ModelProvider {
             .addSessionLifecycleListener(new NullSessionLifecycleListener() {
                 @Override
                 public void sessionStarted(ISarosSession newSarosSession) {
-                    sarosSession = newSarosSession;
+                    session = newSarosSession;
                 }
 
                 @Override
                 public void sessionEnded(ISarosSession oldSarosSession,
                     SessionEndReason reason) {
-                    assert sarosSession == oldSarosSession;
-                    sarosSession = null;
+                    assert session == oldSarosSession;
+                    session = null;
                 }
             });
-        sarosSession = sessionManager.getSession();
+        session = sessionManager.getSession();
     }
 
     @Override
     public IStatus validateChange(IResourceDelta delta, IProgressMonitor pm) {
 
+        final ISarosSession currentSession = session;
         // If we are currently not sharing a project, we don't have to prevent
         // any file operations
-        if (sarosSession == null)
+        if (currentSession == null)
             return Status.OK_STATUS;
 
-        ResourceDeltaVisitor visitor = new ResourceDeltaVisitor();
+        ResourceDeltaVisitor visitor = new ResourceDeltaVisitor(currentSession);
 
         try {
             delta.accept(visitor);
@@ -143,13 +144,15 @@ public class ResourceChangeValidator extends ModelProvider {
             log.error("Could not run visitor: ", e);
         }
 
-        if (!sarosSession.hasWriteAccess()
+        if (!currentSession.hasWriteAccess()
             && visitor.isAffectingSharedProjectFiles) {
             return ERROR_STATUS;
         }
+
         if (visitor.isDeletingSharedProject) {
             return DELETE_PROJECT_ERROR_STATUS;
         }
+
         return Status.OK_STATUS;
     }
 }
