@@ -151,6 +151,12 @@ public class IntelliJProjectImpl implements IProject {
         return files != null ? files : new File[0];
     }
 
+    @Override
+    public IResource findMember(IPath path) {
+
+        return resourceMap.get(path);
+    }
+
     protected void addResource(IResource res) {
         resourceMap.put(res.getProjectRelativePath(), res);
     }

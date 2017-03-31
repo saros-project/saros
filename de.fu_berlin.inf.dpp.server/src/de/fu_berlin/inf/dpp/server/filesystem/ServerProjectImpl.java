@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.server.filesystem;
 
+import java.io.File;
+
 import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
@@ -35,6 +37,24 @@ public class ServerProjectImpl extends ServerContainerImpl implements IProject {
     public String getDefaultCharset() {
         // TODO: Read default character set from the project metadata files.
         return DEFAULT_CHARSET;
+    }
+
+    @Override
+    public IResource findMember(IPath path) {
+        if (path.segmentCount() == 0) {
+            return this;
+        }
+
+        IPath memberLocation = getLocation().append(path);
+        File memberFile = memberLocation.toFile();
+
+        if (memberFile.isFile()) {
+            return new ServerFileImpl(getWorkspace(), getFullMemberPath(path));
+        } else if (memberFile.isDirectory()) {
+            return new ServerFolderImpl(getWorkspace(), getFullMemberPath(path));
+        } else {
+            return null;
+        }
     }
 
     @Override

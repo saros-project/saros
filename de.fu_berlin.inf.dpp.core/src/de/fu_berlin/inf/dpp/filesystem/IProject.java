@@ -28,6 +28,8 @@ package de.fu_berlin.inf.dpp.filesystem;
  */
 public interface IProject extends IContainer {
 
+    public IResource findMember(IPath path);
+
     public IFile getFile(String name);
 
     public IFile getFile(IPath path);
