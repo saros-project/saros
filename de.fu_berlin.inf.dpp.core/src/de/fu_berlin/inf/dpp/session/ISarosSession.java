@@ -511,17 +511,16 @@ public interface ISarosSession {
      *            the project for which project-related activities should be
      *            queued
      *
-     * @see #disableQueuing()
+     * @see #disableQueuing
      */
     public void enableQueuing(IProject project);
 
     /**
      * FOR INTERNAL USE ONLY !
      * <p>
-     * Disables queuing for all shared projects and flushes all queued
-     * activities.
+     * Disables queuing for the given project and flushes all queued activities.
      */
-    public void disableQueuing();
+    public void disableQueuing(IProject project);
 
     /**
      * Returns the id of the current session.

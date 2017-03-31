@@ -238,7 +238,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
              * TODO Move disable queuing responsibility to SarosSession (see
              * todo above in for loop).
              */
-            session.disableQueuing();
+            for (IProject project : localProjectMapping.values())
+                session.disableQueuing(project);
 
             if (fileTransferManager != null)
                 fileTransferManager
@@ -359,7 +360,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
         /*
          * Remove the entries from the mapping in the SarosSession.
-         * 
+         *
          * Stefan Rossbach 28.12.2012: This will not gain you anything because
          * the project is marked as shared on the remote side and so will never
          * be able to be shared again to us. Again the whole architecture does

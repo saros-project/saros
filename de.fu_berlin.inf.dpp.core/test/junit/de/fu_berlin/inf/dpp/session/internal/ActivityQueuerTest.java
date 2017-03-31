@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.session.internal;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -15,6 +16,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
+import de.fu_berlin.inf.dpp.activities.FolderCreatedActivity;
+import de.fu_berlin.inf.dpp.activities.FolderDeletedActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.JupiterActivity;
 import de.fu_berlin.inf.dpp.activities.NOPActivity;
@@ -109,7 +112,7 @@ public class ActivityQueuerTest {
         // flush queue
         IActivity nopActivity = new NOPActivity(ALICE, ALICE, 0);
 
-        activityQueuer.disableQueuing();
+        activityQueuer.disableQueuing(NOT_SHARED_PROJECT);
 
         processedActivities.addAll(activityQueuer.process(Collections
             .singletonList(nopActivity)));
@@ -145,6 +148,56 @@ public class ActivityQueuerTest {
 
     }
 
+    @Test
+    public void testInternalFushCounter() {
+        activityQueuer.enableQueuing(NOT_SHARED_PROJECT);
+        activityQueuer.enableQueuing(NOT_SHARED_PROJECT);
+
+        IActivity firstActivityToBeQueued = new FolderCreatedActivity(BOB,
+            PATH_TO_NOT_SHARED_PROJECT);
+
+        List<IActivity> result;
+
+        result = activityQueuer.process(Collections
+            .singletonList(firstActivityToBeQueued));
+
+        assertEquals("activity was not queued", 0, result.size());
+
+        IActivity secondActivityToBeQueued = new FolderDeletedActivity(ALICE,
+            PATH_TO_NOT_SHARED_PROJECT);
+
+        activityQueuer.disableQueuing(NOT_SHARED_PROJECT);
+
+        result = activityQueuer.process(Collections
+            .singletonList(secondActivityToBeQueued));
+
+        assertEquals("activity was not queued", 0, result.size());
+
+        activityQueuer.disableQueuing(NOT_SHARED_PROJECT);
+
+        result = activityQueuer.process(Collections.<IActivity> emptyList());
+
+        assertEquals("not all activities were flushed", 2, result.size());
+
+        assertSame("wrong flushing order", firstActivityToBeQueued,
+            result.get(0));
+
+        assertSame("wrong flushing order", secondActivityToBeQueued,
+            result.get(1));
+
+        IActivity activityNotToBeQueued = new FolderDeletedActivity(ALICE,
+            PATH_TO_NOT_SHARED_PROJECT);
+
+        result = activityQueuer.process(Collections
+            .singletonList(activityNotToBeQueued));
+
+        assertEquals("activities were queued", 1, result.size());
+
+        assertSame("wrong activitiy return", activityNotToBeQueued,
+            result.get(0));
+
+    }
+
     // http://sourceforge.net/p/dpp/bugs/808/
     @Test
     public void testHackForBug808() {
@@ -176,7 +229,7 @@ public class ActivityQueuerTest {
         activityQueuer.enableQueuing(SHARED_PROJECT);
 
         activityQueuer.process(Collections.singletonList(fooJupiterADO));
-        activityQueuer.disableQueuing();
+        activityQueuer.disableQueuing(SHARED_PROJECT);
 
         activities = activityQueuer.process(flush);
 
@@ -197,7 +250,7 @@ public class ActivityQueuerTest {
         activityQueuer.enableQueuing(SHARED_PROJECT);
 
         activityQueuer.process(Collections.singletonList(fooClosedEditorADO));
-        activityQueuer.disableQueuing();
+        activityQueuer.disableQueuing(SHARED_PROJECT);
 
         activities = activityQueuer.process(flush);
 
@@ -214,7 +267,7 @@ public class ActivityQueuerTest {
         activityQueuer.enableQueuing(SHARED_PROJECT);
 
         activityQueuer.process(Collections.singletonList(fooSavedEditorADO));
-        activityQueuer.disableQueuing();
+        activityQueuer.disableQueuing(SHARED_PROJECT);
 
         activities = activityQueuer.process(flush);
 
@@ -232,7 +285,7 @@ public class ActivityQueuerTest {
 
         activityQueuer.process(Arrays.asList(fooJupiterADO, fooSavedEditorADO,
             fooClosedEditorADO));
-        activityQueuer.disableQueuing();
+        activityQueuer.disableQueuing(SHARED_PROJECT);
 
         activities = activityQueuer.process(flush);
 
@@ -250,7 +303,7 @@ public class ActivityQueuerTest {
         activityQueuer.enableQueuing(SHARED_PROJECT);
 
         activityQueuer.process(Arrays.asList(fooJupiterADO, barJupiterADO));
-        activityQueuer.disableQueuing();
+        activityQueuer.disableQueuing(SHARED_PROJECT);
 
         activities = activityQueuer.process(flush);
 
@@ -284,7 +337,7 @@ public class ActivityQueuerTest {
         activityQueuer.enableQueuing(SHARED_PROJECT);
 
         activityQueuer.process(Arrays.asList(aliceJupiterADO, bobJupiterADO));
-        activityQueuer.disableQueuing();
+        activityQueuer.disableQueuing(SHARED_PROJECT);
 
         activities = activityQueuer.process(flush);
 

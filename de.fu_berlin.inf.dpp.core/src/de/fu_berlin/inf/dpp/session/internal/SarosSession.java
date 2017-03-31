@@ -444,7 +444,7 @@ public final class SarosSession implements ISarosSession {
         }
 
         /*
-         * 
+         *
          * as long as we do not know when something is send to someone this will
          * always produce errors ... swapping synchronizeUserList and userJoined
          * can produce different results
@@ -1007,8 +1007,8 @@ public final class SarosSession implements ISarosSession {
     }
 
     @Override
-    public void disableQueuing() {
-        activityQueuer.disableQueuing();
+    public void disableQueuing(IProject project) {
+        activityQueuer.disableQueuing(project);
         // send us a dummy activity to ensure the queues get flushed
         sendActivity(Collections.singletonList(localUser), new NOPActivity(
             localUser, localUser, 0));

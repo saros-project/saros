@@ -2,10 +2,8 @@ package de.fu_berlin.inf.dpp.session.internal;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
@@ -22,38 +20,167 @@ import de.fu_berlin.inf.dpp.session.User;
  */
 public class ActivityQueuer {
 
-    private final List<IResourceActivity> activityQueue;
+    private static class ProjectQueue {
+        private final IProject project;
+        private final List<IResourceActivity> buffer;
+        private int readyToFlush;
 
-    private final Set<IProject> projectsThatShouldBeQueued;
+        private ProjectQueue(IProject project) {
+            this.project = project;
+            buffer = new ArrayList<IResourceActivity>();
+            readyToFlush = 1;
+        }
+    }
 
-    private boolean stopQueuing;
+    private final List<ProjectQueue> projectQueues;
 
     public ActivityQueuer() {
-        activityQueue = new ArrayList<IResourceActivity>();
-        projectsThatShouldBeQueued = new HashSet<IProject>();
-        stopQueuing = false;
+        projectQueues = new ArrayList<ProjectQueue>();
     }
 
     /**
      * Processes the incoming {@linkplain IActivity activities} and decides
      * which activities should be queued. All {@linkplain IResourceActivity
      * resource related activities} which relate to a project that is configured
-     * for queuing using {@link #enableQueuing(IProject)} will be queued. The
-     * method returns all other activities which should not be queued.
-     * 
+     * for queuing using {@link #enableQueuing} will be queued. The method
+     * returns all other activities which should not be queued.
+     * <p>
      * If a flushing of the queue was previously requested by calling
-     * {@link #disableQueuing()} than the method will return a list of all
-     * queued activities.
-     * 
+     * {@link #disableQueuing} than the method will return a list of all queued
+     * activities.
+     *
      * @param activities
      * @return the activities that are not queued
      */
-    public synchronized List<IActivity> process(List<IActivity> activities) {
-        List<IActivity> activitiesThatWillBeExecuted = new ArrayList<IActivity>();
+    public synchronized List<IActivity> process(final List<IActivity> activities) {
 
-        if (stopQueuing) {
-            if (activityQueue.isEmpty())
-                return activities;
+        if (projectQueues.isEmpty())
+            return activities;
+
+        final List<IActivity> activitiesToExecute = new ArrayList<IActivity>();
+
+        flushQueues(activitiesToExecute);
+        queueActivities(activitiesToExecute, activities);
+
+        return activitiesToExecute;
+    }
+
+    /**
+     * Enables the queuing of {@link IActivity activities} related to the given
+     * project.
+     * <p>
+     * {@link #enableQueuing} and {@link #disableQueuing} can be called
+     * multiples time for a given project, increasing or decreasing the internal
+     * counter. Activities can be flushed when the counter reaches zero.
+     *
+     *
+     * @param project
+     */
+    public synchronized void enableQueuing(final IProject project) {
+        for (final ProjectQueue projectQueue : projectQueues) {
+
+            if (projectQueue.project.equals(project)) {
+
+                projectQueue.readyToFlush++;
+                return;
+            }
+        }
+
+        projectQueues.add(new ProjectQueue(project));
+    }
+
+    /**
+     * Disables the queuing for all projects. Currently queued activities will
+     * be flushed after the next invocation of {@link #process} if the project
+     * is marked as flush-able.
+     * <p>
+     * {@link #enableQueuing} and {@link #disableQueuing} can be called
+     * multiples time for a given project, increasing or decreasing the internal
+     * counter. Activities can be flushed when the counter reaches zero.
+     * <p>
+     * <b>Note: </b> This method <b>MUST</b> be called at the end of an
+     * invitation process because it stops the queuing for the given project
+     * which at least releases the queued activities to prevent memory leaks.
+     *
+     * @param project
+     */
+    public synchronized void disableQueuing(final IProject project) {
+        for (final ProjectQueue projectQueue : projectQueues) {
+
+            if (projectQueue.project.equals(project)) {
+
+                if (projectQueue.readyToFlush > 0)
+                    projectQueue.readyToFlush--;
+
+                return;
+            }
+        }
+    }
+
+    private boolean alreadyRememberedEditorActivity(
+        final Map<SPath, List<User>> editorActivities, final SPath spath,
+        final User user) {
+
+        final List<User> users = editorActivities.get(spath);
+        return users != null && users.contains(user);
+    }
+
+    private void rememberEditorActivity(
+        final Map<SPath, List<User>> editorActivities, final SPath spath,
+        final User user) {
+
+        List<User> users = editorActivities.get(spath);
+
+        if (users == null) {
+            users = new ArrayList<User>();
+            editorActivities.put(spath, users);
+        }
+
+        if (!users.contains(user))
+            users.add(user);
+    }
+
+    private void queueActivities(final List<IActivity> activitiesToExecute,
+        final List<IActivity> activities) {
+
+        ProjectQueue projectQueue = null;
+
+        for (final IActivity activity : activities) {
+            if (activity instanceof IResourceActivity) {
+
+                IResourceActivity resourceActivity = (IResourceActivity) activity;
+
+                SPath path = resourceActivity.getPath();
+
+                // can't queue activities without path
+                if (path != null) {
+
+                    // try to reuse the queue as lookup is O(n)
+                    if (projectQueue == null
+                        || !projectQueue.project.equals(path.getProject())) {
+                        projectQueue = getProjectQueue(path.getProject());
+                    }
+
+                    if (projectQueue != null) {
+                        projectQueue.buffer.add(resourceActivity);
+                        continue;
+                    }
+
+                }
+            }
+
+            activitiesToExecute.add(activity);
+        }
+
+    }
+
+    private void flushQueues(final List<IActivity> activities) {
+        final List<ProjectQueue> projectQueuesToRemove = new ArrayList<ProjectQueue>();
+
+        for (final ProjectQueue projectQueue : projectQueues) {
+
+            if (projectQueue.readyToFlush > 0)
+                continue;
 
             /*
              * HACK: ensure that an editor activated activity is included for
@@ -67,20 +194,20 @@ public class ActivityQueuer {
 
             final Map<SPath, List<User>> editorActivities = new HashMap<SPath, List<User>>();
 
-            for (IResourceActivity resourceActivity : activityQueue) {
+            for (final IResourceActivity resourceActivity : projectQueue.buffer) {
 
                 // path cannot be null, see for-loop below
-                SPath path = resourceActivity.getPath();
-                User source = resourceActivity.getSource();
+                final SPath path = resourceActivity.getPath();
+                final User source = resourceActivity.getSource();
 
                 if (resourceActivity instanceof EditorActivity) {
 
-                    EditorActivity ea = (EditorActivity) resourceActivity;
+                    final EditorActivity ea = (EditorActivity) resourceActivity;
 
                     if (!alreadyRememberedEditorActivity(editorActivities,
                         path, source) && ea.getType() != Type.ACTIVATED) {
-                        activitiesThatWillBeExecuted.add(new EditorActivity(ea
-                            .getSource(), Type.ACTIVATED, path));
+                        activities.add(new EditorActivity(ea.getSource(),
+                            Type.ACTIVATED, path));
                     }
 
                     rememberEditorActivity(editorActivities, path, source);
@@ -88,84 +215,29 @@ public class ActivityQueuer {
                     && !alreadyRememberedEditorActivity(editorActivities, path,
                         source)) {
 
-                    activitiesThatWillBeExecuted.add(new EditorActivity(
-                        resourceActivity.getSource(), Type.ACTIVATED, path));
+                    activities.add(new EditorActivity(resourceActivity
+                        .getSource(), Type.ACTIVATED, path));
 
                     rememberEditorActivity(editorActivities, path, source);
                 }
-                activitiesThatWillBeExecuted.add(resourceActivity);
+
+                activities.add(resourceActivity);
             }
 
-            activitiesThatWillBeExecuted.addAll(activities);
-            projectsThatShouldBeQueued.clear();
-            activityQueue.clear();
-            return activitiesThatWillBeExecuted;
+            projectQueuesToRemove.add(projectQueue);
         }
 
-        for (IActivity activity : activities) {
-            if (activity instanceof IResourceActivity) {
-                IResourceActivity resourceActivity = (IResourceActivity) activity;
+        for (final ProjectQueue projectQueue : projectQueuesToRemove)
+            projectQueues.remove(projectQueue);
+    }
 
-                SPath path = resourceActivity.getPath();
+    private ProjectQueue getProjectQueue(final IProject project) {
 
-                // can't queue activities without path
-                if (path != null
-                    && projectsThatShouldBeQueued.contains(path.getProject())) {
-                    activityQueue.add(resourceActivity);
-                    continue;
-                }
-            }
-
-            activitiesThatWillBeExecuted.add(activity);
+        for (final ProjectQueue projectQueue : projectQueues) {
+            if (projectQueue.project.equals(project))
+                return projectQueue;
         }
 
-        return activitiesThatWillBeExecuted;
-    }
-
-    /**
-     * Enables the queuing of {@link IActivity serialized activities} related to
-     * the given project.
-     * 
-     * @param project
-     */
-    public synchronized void enableQueuing(IProject project) {
-        projectsThatShouldBeQueued.add(project);
-        stopQueuing = false;
-    }
-
-    /**
-     * Disables the queuing for all projects. Currently queued activities will
-     * be flushed after the next invocation of {@link #process(List)}.
-     * 
-     * @Note This method <b>MUST</b> be called at the end of an invitation
-     *       process because it stops the queuing for all projects which at
-     *       least releases the queued activities to prevent memory leaks. At
-     *       the moment stopping the queuing for each project separately is not
-     *       needed, since the projects are added after the invitation process
-     *       at the same time. When multiple invitations at the same moment will
-     *       be possible, this implementation needs to be changed.
-     */
-    public synchronized void disableQueuing() {
-        stopQueuing = true;
-    }
-
-    private boolean alreadyRememberedEditorActivity(
-        Map<SPath, List<User>> editorActivities, SPath spath, User user) {
-
-        List<User> users = editorActivities.get(spath);
-        return users != null && users.contains(user);
-    }
-
-    private void rememberEditorActivity(
-        Map<SPath, List<User>> editorActivities, SPath spath, User user) {
-        List<User> users = editorActivities.get(spath);
-
-        if (users == null) {
-            users = new ArrayList<User>();
-            editorActivities.put(spath, users);
-        }
-
-        if (!users.contains(user))
-            users.add(user);
+        return null;
     }
 }

@@ -216,7 +216,7 @@ public class SarosSessionStub implements ISarosSession {
     }
 
     @Override
-    public void disableQueuing() {
+    public void disableQueuing(IProject project) {
         throw new RuntimeException("Unexpected call to Stub");
     }
 
