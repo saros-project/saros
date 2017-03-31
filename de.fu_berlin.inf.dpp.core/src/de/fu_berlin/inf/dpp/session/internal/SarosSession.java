@@ -365,14 +365,12 @@ public final class SarosSession implements ISarosSession {
     }
 
     @Override
-    public void initiatePermissionChange(final User user,
-        final Permission newPermission) throws CancellationException,
-        InterruptedException {
+    public void changePermission(final User user, final Permission newPermission)
+        throws CancellationException, InterruptedException {
 
-        permissionManager.initiatePermissionChange(user, newPermission);
+        permissionManager.changePermission(user, newPermission);
     }
 
-    @Override
     public void setPermission(final User user, final Permission permission) {
 
         if (user == null || permission == null)
@@ -386,7 +384,7 @@ public final class SarosSession implements ISarosSession {
             }
         }));
 
-        log.info("user " + user + " is now a " + permission);
+        log.info("user " + user + " permission changed: " + permission);
     }
 
     @Override
@@ -525,7 +523,6 @@ public final class SarosSession implements ISarosSession {
         }
     }
 
-    @Override
     public void userColorChanged(User user) {
         listenerDispatch.userColorChanged(user);
     }

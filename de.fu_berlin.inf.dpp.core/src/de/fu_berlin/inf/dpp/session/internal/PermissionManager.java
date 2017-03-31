@@ -11,7 +11,6 @@ import de.fu_berlin.inf.dpp.session.AbstractActivityConsumer;
 import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.User;
 import de.fu_berlin.inf.dpp.session.User.Permission;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
@@ -21,7 +20,7 @@ import de.fu_berlin.inf.dpp.util.ThreadUtils;
 /**
  * This manager is responsible for handling {@link Permission} changes. It both
  * produces and consumes activities.
- * 
+ *
  * @author rdjemili
  */
 @Component(module = "core")
@@ -36,62 +35,65 @@ public class PermissionManager extends AbstractActivityProducer implements
         }
     };
 
-    private final ISarosSession sarosSession;
+    private final SarosSession session;
 
     private final UISynchronizer synchronizer;
 
-    public PermissionManager(ISarosSession sarosSession,
-        UISynchronizer synchronizer) {
-        this.sarosSession = sarosSession;
+    public PermissionManager(SarosSession session, UISynchronizer synchronizer) {
+        this.session = session;
         this.synchronizer = synchronizer;
     }
 
     @Override
     public void start() {
-        sarosSession.addActivityProducer(this);
-        sarosSession.addActivityConsumer(consumer, Priority.ACTIVE);
+        session.addActivityProducer(this);
+        session.addActivityConsumer(consumer, Priority.ACTIVE);
     }
 
     @Override
     public void stop() {
-        sarosSession.removeActivityProducer(this);
-        sarosSession.removeActivityConsumer(consumer);
+        session.removeActivityProducer(this);
+        session.removeActivityConsumer(consumer);
     }
 
     /**
      * This method is responsible for handling incoming permission changes from
      * other clients
-     * 
+     *
      * @param activity
      */
     private void handlePermissionChange(PermissionActivity activity) {
         User user = activity.getAffectedUser();
         Permission permission = activity.getPermission();
 
-        sarosSession.setPermission(user, permission);
+        session.setPermission(user, permission);
     }
 
     /**
      * Initiates a {@link Permission} change for a specific user.
-     * 
-     * @host This method may only called by the host.
-     * @noSWT This method mustn't be called from the SWT UI thread
-     * 
-     * @blocking Returning after the {@link Permission} change is complete
-     * 
+     *
      * @param target
      *            The user who's {@link Permission} has to be changed
-     * @param newPermission
+     * @param permission
      *            The new {@link Permission} of the user
-     * 
+     *
      * @throws CancellationException
      * @throws InterruptedException
+     * @throws IllegalStateException
+     *             if called inside the application/session thread
+     * @throws IllegalStateException
+     *             if the local user is not the host of the session
+     *
      */
-    public void initiatePermissionChange(final User target,
-        final Permission newPermission) throws CancellationException,
-        InterruptedException {
+    public void changePermission(final User target, final Permission permission)
+        throws CancellationException, InterruptedException {
 
-        final User localUser = sarosSession.getLocalUser();
+        if (synchronizer.isUIThread())
+            throw new IllegalStateException(
+                "cannot change permission, illegal thread access: "
+                    + Thread.currentThread().getName());
+
+        final User localUser = session.getLocalUser();
 
         if (!localUser.isHost())
             throw new IllegalStateException(
@@ -102,9 +104,9 @@ public class PermissionManager extends AbstractActivityProducer implements
             @Override
             public void run() {
                 fireActivity(new PermissionActivity(localUser, target,
-                    newPermission));
+                    permission));
 
-                sarosSession.setPermission(target, newPermission);
+                session.setPermission(target, permission);
             }
         };
 
@@ -112,8 +114,8 @@ public class PermissionManager extends AbstractActivityProducer implements
             synchronizer.syncExec(ThreadUtils.wrapSafe(LOG,
                 fireActivityrunnable));
         } else {
-            StartHandle startHandle = sarosSession.getStopManager().stop(
-                target, "Permission change");
+            StartHandle startHandle = session.getStopManager().stop(target,
+                "Permission change");
 
             synchronizer.syncExec(ThreadUtils.wrapSafe(LOG,
                 fireActivityrunnable));

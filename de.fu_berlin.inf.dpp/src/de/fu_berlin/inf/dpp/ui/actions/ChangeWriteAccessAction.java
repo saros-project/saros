@@ -204,7 +204,7 @@ public class ChangeWriteAccessAction extends Action implements Disposable {
                         monitor.beginTask(Messages.SarosUI_permission_change,
                             IProgressMonitor.UNKNOWN);
 
-                        session.initiatePermissionChange(user, newPermission);
+                        session.changePermission(user, newPermission);
                         /*
                          * FIXME run this at least 2 times and if this still
                          * does not succeed kick the user

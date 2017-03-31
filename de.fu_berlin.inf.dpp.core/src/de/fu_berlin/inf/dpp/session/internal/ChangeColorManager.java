@@ -24,14 +24,13 @@ import de.fu_berlin.inf.dpp.session.AbstractActivityProducer;
 import de.fu_berlin.inf.dpp.session.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer;
 import de.fu_berlin.inf.dpp.session.IActivityConsumer.Priority;
-import de.fu_berlin.inf.dpp.session.ISarosSession;
 import de.fu_berlin.inf.dpp.session.ISessionListener;
 import de.fu_berlin.inf.dpp.session.User;
 
 /**
  * This manager is responsible for handling color changes and managing the
  * currently available colors. It both produces and consumes activities.
- * 
+ *
  * @author Stefan Rossbach
  */
 /*
@@ -44,7 +43,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements
     private static final Logger LOG = Logger
         .getLogger(ChangeColorManager.class);
 
-    private final ISarosSession sarosSession;
+    private final SarosSession session;
     private final ColorIDSetStorage colorIDSetStorage;
 
     private final Map<User, Integer> favoriteUserColors = new LinkedHashMap<User, Integer>();
@@ -59,12 +58,12 @@ public class ChangeColorManager extends AbstractActivityProducer implements
     /**
      * @JTourBusStop 7, Creating a new Activity type, Waiting for incoming
      *               activities:
-     * 
+     *
      *               All you have to do on the receiver's side, is to create a
      *               new IActivityReceiver (or amend an existing one), provide
      *               it with an receive() method of your newly created flavor,
      *               and react on the incoming activity.
-     * 
+     *
      *               However, the Saros Session from which we get all incoming
      *               activities, expects an IActivityConsumer (which is, in
      *               contrast to IActivityReceiver not aware of different
@@ -92,7 +91,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements
                 currentUsers.addAll(favoriteUserColors.keySet());
             }
 
-            if (!sarosSession.isHost()) {
+            if (!session.isHost()) {
                 // just remove the color, the host will send the correction
                 removeColorIdFromPool(user.getColorID());
                 return;
@@ -111,7 +110,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements
                 currentUsers.addAll(favoriteUserColors.keySet());
             }
 
-            if (!sarosSession.isHost()) {
+            if (!session.isHost()) {
                 addColorIdToPool(user.getColorID());
                 return;
             }
@@ -120,9 +119,9 @@ public class ChangeColorManager extends AbstractActivityProducer implements
         }
     };
 
-    public ChangeColorManager(ISarosSession sarosSession,
+    public ChangeColorManager(SarosSession session,
         ColorIDSetStorage colorIDSetStorage) {
-        this.sarosSession = sarosSession;
+        this.session = session;
         this.colorIDSetStorage = colorIDSetStorage;
     }
 
@@ -132,15 +131,15 @@ public class ChangeColorManager extends AbstractActivityProducer implements
         /*
          * If the host does not know its color ID, just assign him one
          */
-        if (sarosSession.isHost()) {
-            int colorID = sarosSession.getLocalUser().getColorID();
+        if (session.isHost()) {
+            int colorID = session.getLocalUser().getColorID();
 
-            favoriteUserColors.put(sarosSession.getLocalUser(), sarosSession
+            favoriteUserColors.put(session.getLocalUser(), session
                 .getLocalUser().getFavoriteColorID());
 
             if (!isValidColorID(colorID)) {
                 colorID = getNextAvailableColorID();
-                sarosSession.getLocalUser().setColorID(colorID);
+                session.getLocalUser().setColorID(colorID);
             } else
                 removeColorIdFromPool(colorID);
         } else {
@@ -148,7 +147,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements
              * Just remove the (maybe not valid) color ids, the host will
              * correct it later
              */
-            for (User user : sarosSession.getUsers()) {
+            for (User user : session.getUsers()) {
                 favoriteUserColors.put(user, user.getFavoriteColorID());
                 removeColorIdFromPool(user.getColorID());
             }
@@ -156,26 +155,26 @@ public class ChangeColorManager extends AbstractActivityProducer implements
         }
         /**
          * @JTourBusStop 8, Creating a new Activity type, Arming your consumer:
-         * 
+         *
          *               To ensure your newly created consumer actually receives
          *               incoming activities, you need to register it on the
          *               session. That's it :)
          */
-        sarosSession.addActivityConsumer(consumer, Priority.ACTIVE);
-        sarosSession.addActivityProducer(this);
-        sarosSession.addListener(sessionListener);
+        session.addActivityConsumer(consumer, Priority.ACTIVE);
+        session.addActivityProducer(this);
+        session.addListener(sessionListener);
     }
 
     @Override
     public synchronized void stop() {
-        sarosSession.removeActivityConsumer(consumer);
-        sarosSession.removeActivityProducer(this);
-        sarosSession.removeListener(sessionListener);
+        session.removeActivityConsumer(consumer);
+        session.removeActivityProducer(this);
+        session.removeListener(sessionListener);
     }
 
     /**
      * Returns a snapshot of the currently in use color IDs.
-     * 
+     *
      * @return
      */
     public synchronized Set<Integer> getUsedColorIDs() {
@@ -186,7 +185,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements
      * Changes the color id for the current local user. The change is done
      * asynchronously and may not be available immediately. Negative color id
      * values will result in the next available color id.
-     * 
+     *
      * @param colorID
      *            the new color ID for the current session
      */
@@ -195,13 +194,13 @@ public class ChangeColorManager extends AbstractActivityProducer implements
         /**
          * @JTourBusStop 6, Creating a new Activity type, Create activity
          *               instances of your new type:
-         * 
+         *
          *               Now you are prepared to make use of your new activity
          *               type: Find a place in the business logic where to react
          *               on the events you want to send as an Activity to the
          *               other session participants. However, it is not unusual
          *               to create that piece of business logic anew.
-         * 
+         *
          *               Anyway, once you found a place where to wait for
          *               certain things to happen, you can create new activity
          *               instances of your type there and hand them over to
@@ -210,8 +209,8 @@ public class ChangeColorManager extends AbstractActivityProducer implements
          *               for the sender's side.
          */
         ChangeColorActivity activity = new ChangeColorActivity(
-            sarosSession.getLocalUser(), sarosSession.getHost(),
-            sarosSession.getLocalUser(), colorID);
+            session.getLocalUser(), session.getHost(), session.getLocalUser(),
+            colorID);
 
         fireActivity(activity);
     }
@@ -237,7 +236,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements
                 + activity.getColorID() + "]");
 
             // host send us an update for a user
-            if (source.isHost() && !sarosSession.isHost()) {
+            if (source.isHost() && !session.isHost()) {
 
                 addColorIdToPool(affected.getColorID());
                 removeColorIdFromPool(colorID);
@@ -246,7 +245,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements
                 affected.setColorID(colorID);
             } else {
 
-                assert sarosSession.isHost() : "only the session host can assign a color id";
+                assert session.isHost() : "only the session host can assign a color id";
 
                 if (!isColorIDAvailable(colorID))
                     colorID = getNextAvailableColorID();
@@ -266,22 +265,22 @@ public class ChangeColorManager extends AbstractActivityProducer implements
         }
 
         updateColorSet(currentUsers);
-        sarosSession.userColorChanged(affected);
+        session.userColorChanged(affected);
     }
 
     /*
      * original algorithm by: fzieris and pschlott, modified and integrated by
      * srossbach
-     * 
+     *
      * it ensures one invariant: favorite colors are optimally distributed
-     * 
+     *
      * it assumes following invariants: if a colorIdSet exists, it contains no
      * color collisions (except when a colorIdSet is created for the first time,
      * then all colors are UserColorId.UNKNOWN)
      */
     private void reassignSessionColorIDs(List<User> currentUsers, User user,
         boolean joined) {
-        assert sarosSession.isHost() : "only the session host can assign a color id";
+        assert session.isHost() : "only the session host can assign a color id";
 
         LOG.debug("reassigning color IDs for the current session users");
 
@@ -387,7 +386,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements
             broadcastColorIDChange(currentUser, currentUsers,
                 currentUser.getColorID());
 
-            sarosSession.userColorChanged(currentUser);
+            session.userColorChanged(currentUser);
         }
     }
 
@@ -404,14 +403,14 @@ public class ChangeColorManager extends AbstractActivityProducer implements
     }
 
     /**
-     * Proofs the if the invariant for optimal color assignment holds true. Here
-     * we take this invariant to be:
+     * Proofs if the invariant for optimal color assignment holds true. Here we
+     * take this invariant to be:
      * <ul>
      * <li>Each favorite color is used in the final assignment</li>
      * <li>The assignment is valid (i.e each color is unique, and none of the
      * colors is UserColorId.UNKNOWN</li>
      * </ul>
-     * 
+     *
      * @param assignedColors
      * @return
      */
@@ -444,7 +443,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements
      * <li>their favorite color</li>
      * <li>a color from a previous session</li>
      * </ul>
-     * 
+     *
      * @param assignedColors
      */
     private synchronized void autoAssignColors(Map<User, Integer> assignedColors) {
@@ -481,7 +480,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements
     /**
      * creates a color assignment, which assumes the favorite colors of the
      * users in the session don't collide
-     * 
+     *
      * @param currentUsers
      * @return
      */
@@ -518,14 +517,14 @@ public class ChangeColorManager extends AbstractActivityProducer implements
     private void broadcastColorIDChange(User affected, List<User> recipients,
         int colorID) {
 
-        assert sarosSession.isHost() : "only the session host can broadcast color id changes";
+        assert session.isHost() : "only the session host can broadcast color id changes";
 
         for (User user : recipients) {
             if (user.isHost())
                 continue;
 
-            fireActivity(new ChangeColorActivity(sarosSession.getLocalUser(),
-                user, affected, colorID));
+            fireActivity(new ChangeColorActivity(session.getLocalUser(), user,
+                affected, colorID));
         }
     }
 
@@ -648,7 +647,7 @@ public class ChangeColorManager extends AbstractActivityProducer implements
              * leaving the color set in a dirty state
              */
             if (!colorIDSet.isAvailable(user.getColorID())) {
-                assert !sarosSession.isHost() : "invalid color state on host side";
+                assert !session.isHost() : "invalid color state on host side";
                 break;
             }
 

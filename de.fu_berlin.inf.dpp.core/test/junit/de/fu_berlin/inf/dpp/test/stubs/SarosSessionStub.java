@@ -34,11 +34,6 @@ public class SarosSessionStub implements ISarosSession {
     }
 
     @Override
-    public void setPermission(User user, Permission permission) {
-        throw new RuntimeException("Unexpected call to Stub");
-    }
-
-    @Override
     public void removeUser(User user) {
         throw new RuntimeException("Unexpected call to Stub");
     }
@@ -69,7 +64,7 @@ public class SarosSessionStub implements ISarosSession {
     }
 
     @Override
-    public void initiatePermissionChange(User user, Permission newPermission)
+    public void changePermission(User user, Permission newPermission)
         throws CancellationException, InterruptedException {
         throw new RuntimeException("Unexpected call to Stub");
     }
@@ -232,11 +227,6 @@ public class SarosSessionStub implements ISarosSession {
 
     @Override
     public void userFinishedProjectNegotiation(User user) {
-        throw new RuntimeException("Unexpected call to Stub");
-    }
-
-    @Override
-    public void userColorChanged(User user) {
         throw new RuntimeException("Unexpected call to Stub");
     }
 
