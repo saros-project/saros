@@ -160,7 +160,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer
      * The <strong>cancellation</strong> of this method is <strong>not
      * implemented</strong>, so canceling the given monitor does not have any
      * effect.
-     * 
+     *
      * @noSWT This method should not be called from SWT
      * @blocking This method returns after the recovery has finished
      * @client Can only be called on the client!
@@ -271,22 +271,37 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer
 
         final SPath path = checksum.getPath();
 
-        final String editorContent = editorManager.getContent(path);
+        final boolean existsFileLocally = path.getFile().exists();
 
-        if (!checksum.existsFile()) {
+        if (!checksum.existsFile() && existsFileLocally) {
             /*
              * If the checksum tells us that the file does not exist at the
              * host, check whether we still have it. If it exists, we do have an
              * inconsistency
              */
-            return editorContent != null;
+            LOG.debug("Inconsistency detected -> resource found that does not exist on host side: "
+                + path);
+
+            return true;
         }
 
-        if (editorContent == null) {
+        if (checksum.existsFile() && !existsFileLocally) {
             /*
              * If the checksum tells us that the file exists, but we do not have
              * it, it is an inconsistency as well
              */
+            LOG.debug("Inconsistency detected -> no resource found that does exist on host side: "
+                + path);
+
+            return true;
+        }
+
+        final String editorContent = editorManager.getContent(path);
+
+        if (editorContent == null) {
+            LOG.debug("Inconsistency detected -> no editor content found for resource: "
+                + path);
+
             return true;
         }
 
@@ -294,7 +309,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProducer
             || (editorContent.hashCode() != checksum.getHash())) {
 
             LOG.debug(String.format(
-                "Inconsistency detected: %s L(%d %s %d) H(%x %s %x)",
+                "Inconsistency detected -> %s L(%d %s %d) H(%x %s %x)",
                 path.toString(), editorContent.length(),
                 editorContent.length() == checksum.getLength() ? "==" : "!=",
                 checksum.getLength(), editorContent.hashCode(),
