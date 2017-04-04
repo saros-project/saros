@@ -88,47 +88,35 @@ public class SPath {
     }
 
     /**
-     * Returns the IFile represented by this SPath.
+     * Returns a handle for an IFile represented by this SPath.
      *
      * @return the IFile contained in the associated IProject for the given
      *         project relative path
-     *
-     * @throws IllegalStateException
-     *             if the resource referenced by this SPath is not a file
-     *
      */
     public IFile getFile() {
-        if (projectRelativePath.hasTrailingSeparator())
-            throw new IllegalStateException("not a file: "
-                + projectRelativePath);
-
         return project.getFile(projectRelativePath);
     }
 
     /**
      * Returns the IResource represented by this SPath.
+     * <p>
+     * <b>Note:</b> This operation might perform disk I/O.
      *
-     * @return the resource represented by this SPath
+     * @return the resource represented by this SPath or <code>null</code> if
+     *         such or resource does not exist
      */
     public IResource getResource() {
-        return projectRelativePath.hasTrailingSeparator() ? getFolder()
-            : getFile();
+        return project.findMember(projectRelativePath);
     }
 
     /**
-     * Returns the IFolder represented by this SPath.
+     * Returns a handle for an IFolder represented by this SPath.
      *
      * @return the IFolder contained in the associated IProject for the given
      *         project relative path
      *
-     * @throws IllegalStateException
-     *             if the resource referenced by this SPath is not a folder
      */
     public IFolder getFolder() {
-        if (!projectRelativePath.hasTrailingSeparator())
-            throw new IllegalStateException("not a folder: "
-                + projectRelativePath);
-
         return project.getFolder(projectRelativePath);
     }
 
