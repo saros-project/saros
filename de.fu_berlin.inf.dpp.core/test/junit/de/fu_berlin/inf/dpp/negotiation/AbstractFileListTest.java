@@ -164,7 +164,8 @@ public class AbstractFileListTest {
         EasyMock.expect(folderMock.isDerived()).andStubReturn(false);
         EasyMock.expect(folderMock.exists()).andStubReturn(true);
         EasyMock.expect(folderMock.getType()).andStubReturn(IResource.FOLDER);
-        EasyMock.expect(folderMock.getName()).andStubReturn(p.lastSegment());
+        // only used for UI feedback
+        EasyMock.expect(folderMock.getName()).andStubReturn("");
         EasyMock.expect(folderMock.getFullPath()).andStubReturn(f);
 
         try {
