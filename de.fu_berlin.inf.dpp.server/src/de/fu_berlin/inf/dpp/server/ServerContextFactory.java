@@ -6,9 +6,11 @@ import java.nio.file.Path;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.picocontainer.BindKey;
 import org.picocontainer.MutablePicoContainer;
 
 import de.fu_berlin.inf.dpp.context.CoreContextFactory;
+import de.fu_berlin.inf.dpp.context.IContextKeyBindings;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IPathFactory;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
@@ -47,8 +49,8 @@ public class ServerContextFactory extends CoreContextFactory {
     }
 
     private void addVersionString(MutablePicoContainer c) {
-        // c.addComponent(BindKey.bindKey(String.class,
-        // IContextKeyBindings.SarosVersion.class), SarosServer.SAROS_VERSION);
+        c.addComponent(BindKey.bindKey(String.class,
+            IContextKeyBindings.SarosVersion.class), SarosServer.SAROS_VERSION);
     }
 
     private void addCoreInterfaceImplementations(MutablePicoContainer c) {
