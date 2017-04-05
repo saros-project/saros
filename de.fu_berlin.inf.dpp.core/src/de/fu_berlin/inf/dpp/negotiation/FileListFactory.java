@@ -54,11 +54,12 @@ public class FileListFactory {
 
     /**
      * Creates a new file list from given paths. It does not compute checksums
-     * or location information.
+     * or location information. Every path is treated as a file. It is
+     * <b>not</b> possible to add directories.
      * <p>
      * <b>Note:</b> This method does not check the input. The caller is
      * <b>responsible</b> for the <b>correct</b> input !
-     * 
+     *
      * @param paths
      *            a list of paths that <b>refers</b> to <b>files</b> that should
      *            be added to this file list.
