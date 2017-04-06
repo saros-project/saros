@@ -37,9 +37,9 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
  * denoted by a trailing separator. Instances of this class are immutable. No
  * further modification is allowed after creation. Instances should be created
  * using the methods provided by the {@link FileListFactory}.
- * 
- * @author rdjemili
  */
+
+// FIXME remove the projectID stuff, as it is mutable !
 @XStreamAlias("FILELIST")
 public class FileList {
 
@@ -49,6 +49,14 @@ public class FileList {
      */
     public static final String DIR_SEPARATOR = "/";
 
+    /*
+     * Do NOT optimize this code in regards to understandability. This class IS
+     * optimized in regards to memory consumption, i.e serializing / marshaling
+     * an instance of this class will consume as less memory as possible.
+     * 
+     * This class only stores segments differences, i.e foo/bar/foo.txt, and
+     * foo/bar/foobar.txt will be stored as foo, bar, foo.txt, and foobar.txt
+     */
     @XStreamAlias("f")
     private static class File {
 
@@ -101,15 +109,15 @@ public class FileList {
         /**
          * Converts the content of this file node and its sub nodes to full
          * paths.<br/>
-         * 
+         *
          * e.g:<br/>
-         * 
+         *
          * <pre>
          * DIR   FILES
          * a/b/[a,b,c,d]
          *  -> [a/b/a, a/b/b, a/b/c, a/b/d]
          * </pre>
-         * 
+         *
          * @return the list containing the full paths
          */
         public List<String> toList() {
@@ -121,7 +129,7 @@ public class FileList {
         /**
          * Will be called recursively to reach all leaves of this file node, and
          * will put all entries into the given list.
-         * 
+         *
          * @param base
          *            the path of the parent node
          * @param paths
@@ -204,7 +212,7 @@ public class FileList {
         /**
          * Inserts a new path into this File structure. Missing intermediate
          * folder nodes will be created.
-         * 
+         *
          * @param path
          *            not <code>null</code>
          * @param metaData
@@ -342,7 +350,7 @@ public class FileList {
     /**
      * Returns all encodings (e.g UTF-8, US-ASCII) that are used by the files
      * contained in this file list.
-     * 
+     *
      * @return used encodings which may be empty if the encodings are not known
      */
     public Set<String> getEncodings() {
@@ -369,13 +377,13 @@ public class FileList {
     }
 
     @XStreamOmitField
-    private List<String> cachedList = null;
+    private volatile List<String> cachedList = null;
 
     /**
-     * Returns a list of all paths in this FileList.
+     * Returns an immutable list of all paths in this FileList.
      * <p>
      * Example: In case the FileList looks like this:
-     * 
+     *
      * <pre>
      * / A
      *   / A1.java
@@ -384,24 +392,24 @@ public class FileList {
      *   / B3.java
      * / C
      * </pre>
-     * 
+     *
      * then this method returns:
      * <code>[A/A1.java, B/B2.java, B/B3.java, C/]</code>
-     * 
+     *
      * @return Returns only the leaves of the tree, i.e. folders are only
      *         included if they don't contain anything. The paths are sorted by
      *         their character length.
      */
     public List<String> getPaths() {
+
         if (cachedList != null)
             return cachedList;
 
-        cachedList = root.toList();
-        return cachedList;
-    }
+        final List<String> inflated = Collections.unmodifiableList(root
+            .toList());
 
-    public FileListDiff diff(FileList other) {
-        return FileListDiff.diff(this, other);
+        cachedList = inflated;
+        return inflated;
     }
 
     public String getProjectID() {
