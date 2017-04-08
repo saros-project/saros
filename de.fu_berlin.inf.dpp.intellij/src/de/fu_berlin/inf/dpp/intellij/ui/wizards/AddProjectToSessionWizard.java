@@ -310,21 +310,25 @@ public class AddProjectToSessionWizard extends Wizard {
             .entrySet()) {
             fileListPage.addLine("Project [" + key.getKey() + "]:");
             FileListDiff diff = modifiedResources.get(key.getKey());
-            for (String path : diff.getAlteredPaths()) {
+            
+            /// TODO folders
+            
+            for (String path : diff.getAlteredFiles()) {
                 fileListPage.addLine("changed: " + path);
                 empty = false;
             }
 
-            for (String path : diff.getRemovedPaths()) {
+            for (String path : diff.getRemovedFiles()) {
                 fileListPage.addLine("removed: " + path);
                 empty = false;
             }
 
-            for (String path : diff.getAddedPaths()) {
+            for (String path : diff.getAddedFiles()) {
                 fileListPage.addLine("added: " + path);
                 empty = false;
             }
         }
+        
         if (empty) {
             fileListPage.addLine("No files have to be modified.");
         }

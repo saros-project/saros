@@ -360,7 +360,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
         /*
          * Remove the entries from the mapping in the SarosSession.
-         * 
+         *
          * Stefan Rossbach 28.12.2012: This will not gain you anything because
          * the project is marked as shared on the remote side and so will never
          * be able to be shared again to us. Again the whole architecture does
@@ -469,18 +469,22 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
         LOG.debug(this + " : computing file list difference");
 
+        final boolean isPartialShared = isPartialRemoteProject(projectID);
+
         final FileListDiff diff = FileListDiff.diff(localFileList,
-            remoteFileList, isPartialRemoteProject(projectID));
+            remoteFileList, isPartialShared);
 
-        if (!isPartialRemoteProject(projectID)) {
+        final List<String> resourcesToDelete = new ArrayList<String>(diff
+            .getRemovedFiles().size() + diff.getRemovedFolders().size());
 
-            /*
-             * FIXME run inside Workspace and
-             */
+        resourcesToDelete.addAll(diff.getRemovedFiles());
+        resourcesToDelete.addAll(diff.getRemovedFolders());
 
-            deleteResources(project, diff.getRemovedPathsSanitized());
+        if (isPartialShared && !resourcesToDelete.isEmpty())
+            throw new IllegalStateException(
+                "partial sharing cannot delete existing resources");
 
-        }
+        deleteResources(project, resourcesToDelete);
 
         for (final String path : diff.getAddedFolders()) {
             final IFolder folder = project.getFolder(path);

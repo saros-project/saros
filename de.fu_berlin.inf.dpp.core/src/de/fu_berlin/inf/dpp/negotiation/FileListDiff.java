@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.negotiation;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -37,20 +36,6 @@ public class FileListDiff {
 
     private final List<String> unalteredFolders = new ArrayList<String>();
 
-    // OLD
-
-    private final List<String> added = new ArrayList<String>();
-
-    private final List<String> removed = new ArrayList<String>();
-
-    private final List<String> altered = new ArrayList<String>();
-
-    private final List<String> unaltered = new ArrayList<String>();
-
-    public static FileListDiff diff(final FileList base, final FileList target) {
-        return diff(base, target, false);
-    }
-
     /**
      * Returns a new {@link FileListDiff diff} which contains the difference of
      * the two {@link FileList}s.
@@ -76,57 +61,11 @@ public class FileListDiff {
      */
     public static FileListDiff diff(final FileList base, final FileList target,
         final boolean excludeRemoved) {
+
         FileListDiff result = new FileListDiff();
 
         if (base == null || target == null)
             return result;
-
-        computeDiff(result, base, target, excludeRemoved);
-
-        /*
-         * we have to copy the set because we should not work on references when
-         * deleting
-         */
-        Set<String> baseEntries = new HashSet<String>(base.getPaths());
-        Set<String> targetEntries = new HashSet<String>(target.getPaths());
-
-        /* determine the paths that don't match the target to delete them */
-        baseEntries.removeAll(targetEntries);
-        result.removed.addAll(baseEntries);
-
-        /* determine the paths that are not already present in base set */
-        baseEntries = new HashSet<String>(base.getPaths());
-        targetEntries.removeAll(baseEntries);
-        result.added.addAll(targetEntries);
-
-        /* determine for all matching paths if files are altered */
-        targetEntries = new HashSet<String>(target.getPaths());
-        baseEntries.retainAll(targetEntries);
-
-        for (String path : baseEntries) {
-            /* folders cannot be altered */
-            if (path.endsWith(FileList.DIR_SEPARATOR)) {
-                result.unaltered.add(path);
-                continue;
-            }
-
-            MetaData baseData = base.getMetaData(path);
-            MetaData targetData = target.getMetaData(path);
-
-            if ((baseData == null && targetData == null)
-                || (baseData != null && targetData != null)
-                && (baseData.checksum == targetData.checksum)) {
-                result.unaltered.add(path);
-            } else {
-                result.altered.add(path);
-            }
-        }
-
-        return result;
-    }
-
-    private static void computeDiff(final FileListDiff diff,
-        final FileList base, final FileList target, final boolean excludeRemoved) {
 
         final Set<String> baseFolders = new HashSet<String>();
         final Set<String> baseFiles = new HashSet<String>();
@@ -150,12 +89,12 @@ public class FileListDiff {
                 targetFiles.add(path);
         }
 
-        diff.addedFiles.addAll(targetFiles);
-        diff.addedFiles.removeAll(baseFiles);
+        result.addedFiles.addAll(targetFiles);
+        result.addedFiles.removeAll(baseFiles);
 
         if (!excludeRemoved) {
-            diff.removedFiles.addAll(baseFiles);
-            diff.removedFiles.removeAll(targetFiles);
+            result.removedFiles.addAll(baseFiles);
+            result.removedFiles.removeAll(targetFiles);
         }
 
         final Set<String> filesIntersection = new HashSet<String>();
@@ -171,18 +110,18 @@ public class FileListDiff {
             if ((baseData == null && targetData == null)
                 || (baseData != null && targetData != null)
                 && (baseData.checksum == targetData.checksum)) {
-                diff.unalteredFiles.add(path);
+                result.unalteredFiles.add(path);
             } else {
-                diff.alteredFiles.add(path);
+                result.alteredFiles.add(path);
             }
         }
 
-        diff.addedFolders.addAll(targetFolders);
-        diff.addedFiles.removeAll(baseFolders);
+        result.addedFolders.addAll(targetFolders);
+        result.addedFolders.removeAll(baseFolders);
 
         if (!excludeRemoved) {
-            diff.removedFolders.addAll(baseFolders);
-            diff.removedFolders.removeAll(targetFolders);
+            result.removedFolders.addAll(baseFolders);
+            result.removedFolders.removeAll(targetFolders);
         }
 
         final Set<String> foldersIntersection = new HashSet<String>();
@@ -190,8 +129,9 @@ public class FileListDiff {
         foldersIntersection.addAll(targetFolders);
         foldersIntersection.retainAll(baseFolders);
 
-        diff.unalteredFolders.addAll(foldersIntersection);
+        result.unalteredFolders.addAll(foldersIntersection);
 
+        return result;
     }
 
     /**
@@ -244,7 +184,7 @@ public class FileListDiff {
      *
      * @return an unmodifiable list containing the folders that must be added.
      */
-    public List<String> getAddedFoldersV2() {
+    public List<String> getAddedFolders() {
         return Collections.unmodifiableList(addedFolders);
     }
 
@@ -270,127 +210,51 @@ public class FileListDiff {
         return Collections.unmodifiableList(unalteredFolders);
     }
 
-    /**
-     * Subset of {@link FileList#getPaths() target.getPaths()}: All entries that
-     * do not exist in <code>base</code>.
-     *
-     * @return Same format as {@link FileList#getPaths()}. It is safe to
-     *         manipulate the returned list; this diff won't be affected.
-     */
-    public List<String> getAddedPaths() {
-        return new ArrayList<String>(added);
-    }
-
-    /**
-     * Subset of {@link FileList#getPaths() target.getPaths()}: All empty
-     * folders that do not exist in <code>base</code>.
-     *
-     * @return Same format as {@link FileList#getPaths()}. It is safe to
-     *         manipulate the returned list; this diff won't be affected.
-     */
-    public List<String> getAddedFolders() {
-        List<String> addedFolders = new ArrayList<String>();
-
-        for (String path : added) {
-            if (path.endsWith(FileList.DIR_SEPARATOR)) {
-                addedFolders.add(path);
-            }
-        }
-
-        return addedFolders;
-    }
-
-    /**
-     * Subset of {@link FileList#getPaths() base.getPaths()}: All entries that
-     * do not exist in <code>target</code>.
-     *
-     * @return Same format as {@link FileList#getPaths()}. It is safe to
-     *         manipulate the returned list; this diff won't be affected.
-     */
-    public List<String> getRemovedPaths() {
-        return new ArrayList<String>(removed);
-    }
-
-    /**
-     * Subset of {@link FileList#getPaths() base.getPaths()}: All entries that
-     * do not exist in <code>target</code>, except folders that contain
-     * unaltered entries.
-     *
-     * @return Same format as {@link FileList#getPaths()}. It is safe to
-     *         manipulate the returned list; this diff won't be affected.
-     */
-    public List<String> getRemovedPathsSanitized() {
-        List<String> sanitized = getRemovedPaths();
-
-        for (String path : unaltered) {
-            String previous = path;
-            while (previous.indexOf(FileList.DIR_SEPARATOR) > -1) {
-                previous = path.substring(0,
-                    previous.lastIndexOf(FileList.DIR_SEPARATOR));
-                sanitized.remove(previous);
-            }
-        }
-
-        return sanitized;
-    }
-
-    /**
-     * Subset of the intersection of {@link FileList#getPaths() base.getPaths()}
-     * and {@link FileList#getPaths() target.getPaths()}: All entries that have
-     * not been changed.
-     *
-     * @return Same format as {@link FileList#getPaths()}. It is safe to
-     *         manipulate the returned list; this diff won't be affected.
-     */
-    public List<String> getUnalteredPaths() {
-        return new ArrayList<String>(unaltered);
-    }
-
-    /**
-     * Subset of the intersection of {@link FileList#getPaths() base.getPaths()}
-     * and {@link FileList#getPaths() target.getPaths()}: All entries that have
-     * been changed.
-     *
-     * @return Same format as {@link FileList#getPaths()}. It is safe to
-     *         manipulate the returned list; this diff won't be affected.
-     */
-    public List<String> getAlteredPaths() {
-        return new ArrayList<String>(altered);
-    }
-
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + added.hashCode();
-        result = prime * result + altered.hashCode();
-        result = prime * result + removed.hashCode();
-        result = prime * result + unaltered.hashCode();
+
+        result = prime * result + addedFiles.hashCode();
+        result = prime * result + addedFolders.hashCode();
+        result = prime * result + alteredFiles.hashCode();
+        result = prime * result + removedFiles.hashCode();
+        result = prime * result + removedFolders.hashCode();
+        result = prime * result + unalteredFiles.hashCode();
+        result = prime * result + unalteredFolders.hashCode();
+
         return result;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
+        if (this == obj)
             return true;
-        }
 
-        if (!(obj instanceof FileListDiff)) {
+        if (obj == null)
             return false;
-        }
+
+        if (getClass() != obj.getClass())
+            return false;
 
         FileListDiff other = (FileListDiff) obj;
-        return this.added.equals(other.added)
-            && this.removed.equals(other.removed)
-            && this.altered.equals(other.altered)
-            && this.unaltered.equals(other.unaltered);
+
+        return addedFiles.equals(other.addedFiles)
+            && addedFolders.equals(other.addedFolders)
+            && alteredFiles.equals(other.alteredFiles)
+            && removedFiles.equals(other.removedFiles)
+            && removedFolders.equals(other.removedFolders)
+            && unalteredFiles.equals(other.unalteredFiles)
+            && unalteredFolders.equals(other.unalteredFolders);
     }
 
     @Override
     public String toString() {
-        return MessageFormat.format(
-            "added {0}, removed {1}, altered {2}, unaltered {3}", added,
-            removed, altered, unaltered);
+        return "FileListDiff [addedFiles=" + addedFiles + ", removedFiles="
+            + removedFiles + ", alteredFiles=" + alteredFiles
+            + ", unalteredFiles=" + unalteredFiles + ", addedFolders="
+            + addedFolders + ", removedFolders=" + removedFolders
+            + ", unalteredFolders=" + unalteredFolders + "]";
     }
 
     private static boolean isFolder(final String path) {
