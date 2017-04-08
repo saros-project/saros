@@ -372,28 +372,29 @@ public class AddProjectToSessionWizard extends Wizard {
 
         MultiStatus info = new MultiStatus(pluginID, 1, message, null);
 
+        // TODO include folder information
+
         for (String projectName : modifiedResources.keySet()) {
+
             FileListDiff diff = modifiedResources.get(projectName);
+
             info.add(new Status(IStatus.INFO, pluginID, 1, MessageFormat
                 .format(Messages.AddProjectToSessionWizard_files_affected,
                     projectName), null));
-            for (String path : diff.getRemovedPaths()) {
+
+            for (String path : diff.getRemovedFiles()) {
                 info.add(new Status(IStatus.WARNING, pluginID, 1, MessageFormat
                     .format(Messages.AddProjectToSessionWizard_file_toRemove,
                         path), null));
             }
-            for (String path : diff.getAlteredPaths()) {
+
+            for (String path : diff.getAlteredFiles()) {
                 info.add(new Status(IStatus.WARNING, pluginID, 1, MessageFormat
                     .format(
                         Messages.AddProjectToSessionWizard_file_overwritten,
                         path), null));
             }
-            for (String path : diff.getAddedPaths()) {
-                info.add(new Status(IStatus.INFO, pluginID, 1,
-                    MessageFormat.format(
-                        Messages.AddProjectToSessionWizard_file_added, path),
-                    null));
-            }
+
             info.add(new Status(IStatus.INFO, pluginID, 1, "", null)); //$NON-NLS-1$
         }
 
@@ -583,13 +584,12 @@ public class AddProjectToSessionWizard extends Wizard {
             }
 
             final FileListDiff diff = FileListDiff.diff(localFileList,
-                negotiation.getRemoteFileList(projectID));
+                negotiation.getRemoteFileList(projectID),
+                negotiation.isPartialRemoteProject(projectID));
 
-            if (negotiation.isPartialRemoteProject(projectID))
-                diff.clearRemovedPaths();
-
-            if (!diff.getRemovedPaths().isEmpty()
-                || !diff.getAlteredPaths().isEmpty()) {
+            if (!diff.getRemovedFolders().isEmpty()
+                || !diff.getRemovedFiles().isEmpty()
+                || !diff.getAlteredFiles().isEmpty()) {
                 modifiedResources.put(project.getName(), diff);
             }
         }

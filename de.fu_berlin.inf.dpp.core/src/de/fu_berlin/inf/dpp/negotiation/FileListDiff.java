@@ -47,6 +47,10 @@ public class FileListDiff {
 
     private final List<String> unaltered = new ArrayList<String>();
 
+    public static FileListDiff diff(final FileList base, final FileList target) {
+        return diff(base, target, false);
+    }
+
     /**
      * Returns a new {@link FileListDiff diff} which contains the difference of
      * the two {@link FileList}s.
@@ -63,17 +67,21 @@ public class FileListDiff {
      *            The base {@link FileList}.
      * @param target
      *            The {@link FileList} to compare to.
+     * @param excludeRemoved
+     *            if <code>true</code> removed files and folders are not
+     *            included in the result
      *
      * @return a new {@link FileListDiff} which contains the difference
      *         information of the two {@link FileList}s.
      */
-    public static FileListDiff diff(FileList base, FileList target) {
+    public static FileListDiff diff(final FileList base, final FileList target,
+        final boolean excludeRemoved) {
         FileListDiff result = new FileListDiff();
 
         if (base == null || target == null)
             return result;
 
-        computeDiff(result, base, target);
+        computeDiff(result, base, target, excludeRemoved);
 
         /*
          * we have to copy the set because we should not work on references when
@@ -118,7 +126,7 @@ public class FileListDiff {
     }
 
     private static void computeDiff(final FileListDiff diff,
-        final FileList base, final FileList target) {
+        final FileList base, final FileList target, final boolean excludeRemoved) {
 
         final Set<String> baseFolders = new HashSet<String>();
         final Set<String> baseFiles = new HashSet<String>();
@@ -145,8 +153,10 @@ public class FileListDiff {
         diff.addedFiles.addAll(targetFiles);
         diff.addedFiles.removeAll(baseFiles);
 
-        diff.removedFiles.addAll(baseFiles);
-        diff.removedFiles.removeAll(targetFiles);
+        if (!excludeRemoved) {
+            diff.removedFiles.addAll(baseFiles);
+            diff.removedFiles.removeAll(targetFiles);
+        }
 
         final Set<String> filesIntersection = new HashSet<String>();
 
@@ -170,8 +180,10 @@ public class FileListDiff {
         diff.addedFolders.addAll(targetFolders);
         diff.addedFiles.removeAll(baseFolders);
 
-        diff.removedFolders.addAll(baseFolders);
-        diff.removedFolders.removeAll(targetFolders);
+        if (!excludeRemoved) {
+            diff.removedFolders.addAll(baseFolders);
+            diff.removedFolders.removeAll(targetFolders);
+        }
 
         final Set<String> foldersIntersection = new HashSet<String>();
 

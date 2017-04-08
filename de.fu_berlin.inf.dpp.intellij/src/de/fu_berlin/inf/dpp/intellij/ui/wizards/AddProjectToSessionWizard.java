@@ -409,7 +409,8 @@ public class AddProjectToSessionWizard extends Wizard {
         }
 
         SubProgressMonitor subMonitor = new SubProgressMonitor(monitor,
-            projectMapping.size() * 2);
+            projectMapping.size());
+        
         subMonitor
             .setTaskName("\"Searching for files that will be modified...\",");
 
@@ -418,40 +419,26 @@ public class AddProjectToSessionWizard extends Wizard {
             String projectID = entry.getKey();
             IProject project = entry.getValue();
 
-            FileListDiff diff;
-
-            FileList remoteFileList = negotiation.getRemoteFileList(projectID);
-
             try {
-                if (session.isShared(project)) {
-                    List<IResource> eclipseResources = session
-                        .getSharedResources(project);
-
-                    FileList sharedFileList = FileListFactory
-                        .createFileList(project, eclipseResources,
-                            checksumCache, new SubProgressMonitor(monitor, 1,
-                                SubProgressMonitor.SUPPRESS_SETTASKNAME));
-
-                    remoteFileList.getPaths().addAll(sharedFileList.getPaths());
-                } else {
-                    subMonitor.worked(1);
-                }
+                
+                if (negotiation.isPartialRemoteProject(projectID)) 
+                    throw new IllegalStateException("partial sharing is not supported");
 
                 FileList localFileList = FileListFactory
                     .createFileList(project, null, checksumCache,
                         new SubProgressMonitor(monitor, 1,
                             SubProgressMonitor.SUPPRESS_SETTASKNAME));
-                diff = FileListDiff.diff(localFileList, remoteFileList);
+               
+                final FileListDiff diff = FileListDiff.diff(localFileList,
+                    negotiation.getRemoteFileList(projectID),
+                    false);
 
-                if (negotiation.isPartialRemoteProject(projectID)) {
-                    diff.clearRemovedPaths();
-                }
-
-                if (!diff.getRemovedPaths().isEmpty() || !diff.getAlteredPaths()
-                    .isEmpty()) {
+                if (!diff.getRemovedFolders().isEmpty()
+                    || !diff.getRemovedFiles().isEmpty()
+                    || !diff.getAlteredFiles().isEmpty()) {
                     modifiedResources.put(project.getName(), diff);
                 }
-
+                
             } catch (IOException e) {
                 LOG.warn("could not refresh project: " + project, e);
             }
