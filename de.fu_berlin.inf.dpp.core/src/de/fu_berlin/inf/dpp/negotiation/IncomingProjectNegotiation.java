@@ -360,7 +360,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
         /*
          * Remove the entries from the mapping in the SarosSession.
-         *
+         * 
          * Stefan Rossbach 28.12.2012: This will not gain you anything because
          * the project is marked as shared on the remote side and so will never
          * be able to be shared again to us. Again the whole architecture does
@@ -428,19 +428,19 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             remoteFileList, project, projectID);
 
         List<String> missingFiles = new ArrayList<String>();
-        missingFiles.addAll(filesToSynchronize.getAddedPaths());
-        missingFiles.addAll(filesToSynchronize.getAlteredPaths());
 
-        /*
-         * We send an empty file list to the host as a notification that we do
-         * not need any files.
-         */
+        missingFiles.addAll(filesToSynchronize.getAddedFiles());
+        missingFiles.addAll(filesToSynchronize.getAlteredFiles());
 
         monitor.done();
 
         LOG.debug(this + " : " + missingFiles.size()
             + " file(s) must be synchronized");
 
+        /*
+         * We send an empty file list to the host as a notification that we do
+         * not need any files.
+         */
         return missingFiles.isEmpty() ? FileListFactory.createEmptyFileList()
             : FileListFactory.createFileList(missingFiles);
     }
@@ -470,7 +470,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         LOG.debug(this + " : computing file list difference");
 
         final FileListDiff diff = FileListDiff.diff(localFileList,
-            remoteFileList);
+            remoteFileList, isPartialRemoteProject(projectID));
 
         if (!isPartialRemoteProject(projectID)) {
 
@@ -480,7 +480,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
             deleteResources(project, diff.getRemovedPathsSanitized());
 
-            diff.clearRemovedPaths();
         }
 
         for (final String path : diff.getAddedFolders()) {
@@ -490,8 +489,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 FileSystem.createFolder(folder);
 
         }
-
-        diff.clearAddedFolders();
 
         return diff;
     }

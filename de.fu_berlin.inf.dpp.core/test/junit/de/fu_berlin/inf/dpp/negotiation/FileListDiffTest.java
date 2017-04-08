@@ -1,11 +1,7 @@
 package de.fu_berlin.inf.dpp.negotiation;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.filesystem.IResource;
 import de.fu_berlin.inf.dpp.negotiation.FileList.MetaData;
 
 public class FileListDiffTest extends AbstractFileListTest {
@@ -95,32 +91,6 @@ public class FileListDiffTest extends AbstractFileListTest {
         assertPaths(diff.getRemovedPaths(), FOLDER_B);
         assertPaths(diff.getUnalteredPaths());
         assertPaths(diff.getRemovedPathsSanitized(), FOLDER_B);
-
-        diff.clearAddedFolders();
-        assertPaths(diff.getUnalteredPaths());
-
-    }
-
-    @Test
-    public void clearAddedFolders() throws Exception {
-        List<IResource> resources = new ArrayList<IResource>();
-        resources.add(createFolderMock("subdir2/"));
-        resources.add(fileInSubDir1);
-
-        FileList list = FileListFactory.createFileList(null, resources, null,
-            null);
-
-        FileListDiff diff = FileListDiff.diff(emptyFileList, list);
-
-        diff.clearAddedFolders();
-
-        assertPaths(diff.getAddedFolders());
-
-        /* everything else should be unchanged */
-        assertPaths(diff.getAddedPaths(), SUBDIR_FILE1);
-        assertPaths(diff.getRemovedPaths());
-        assertPaths(diff.getAlteredPaths());
-        assertPaths(diff.getUnalteredPaths());
     }
 
     @Test
@@ -130,18 +100,6 @@ public class FileListDiffTest extends AbstractFileListTest {
         /* Same as addedOne(), but removed and added are switched */
         assertPaths(diff.getAddedPaths());
         assertPaths(diff.getRemovedPaths(), SUBDIR_FILE2);
-        assertPaths(diff.getAlteredPaths());
-        assertPaths(diff.getUnalteredPaths(), ROOT1, ROOT2, SUBDIR_FILE1);
-    }
-
-    @Test
-    public void clearRemoved() {
-        FileListDiff diff = FileListDiff.diff(fourEntryList, threeEntryList);
-
-        diff.clearRemovedPaths();
-
-        assertPaths(diff.getAddedPaths());
-        assertPaths(diff.getRemovedPaths());
         assertPaths(diff.getAlteredPaths());
         assertPaths(diff.getUnalteredPaths(), ROOT1, ROOT2, SUBDIR_FILE1);
     }

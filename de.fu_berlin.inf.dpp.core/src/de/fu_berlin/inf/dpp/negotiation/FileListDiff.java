@@ -301,13 +301,6 @@ public class FileListDiff {
     }
 
     /**
-     * Excludes all added empty folders from this diff.
-     */
-    public void clearAddedFolders() {
-        added.removeAll(getAddedFolders());
-    }
-
-    /**
      * Subset of {@link FileList#getPaths() base.getPaths()}: All entries that
      * do not exist in <code>target</code>.
      *
@@ -339,13 +332,6 @@ public class FileListDiff {
         }
 
         return sanitized;
-    }
-
-    /**
-     * Excludes all removed paths from this diff.
-     */
-    public void clearRemovedPaths() {
-        removed.clear();
     }
 
     /**
