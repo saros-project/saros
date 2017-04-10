@@ -31,8 +31,6 @@ public interface IResource {
 
     public int getType();
 
-    public boolean isAccessible();
-
     /**
      * Equivalent to the Eclipse call <code>IResource#isDerived(checkAncestors ?
      * IResource#CHECK_ANCESTORS : IResource#NONE)</code>

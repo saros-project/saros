@@ -14,7 +14,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URI;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -91,11 +90,6 @@ public abstract class IntelliJResourceImpl implements IResource {
     @Override
     public int getType() {
         return NONE;
-    }
-
-    @Override
-    public boolean isAccessible() {
-        return getLocation().toFile().canRead();
     }
 
     @Override

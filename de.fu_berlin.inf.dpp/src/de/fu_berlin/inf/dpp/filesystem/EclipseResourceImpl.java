@@ -93,11 +93,6 @@ public class EclipseResourceImpl implements IResource {
     }
 
     @Override
-    public boolean isAccessible() {
-        return delegate.isAccessible();
-    }
-
-    @Override
     public boolean isDerived(boolean checkAncestors) {
         if (!checkAncestors)
             return delegate.isDerived();
@@ -182,7 +177,7 @@ public class EclipseResourceImpl implements IResource {
     /**
      * Returns the original {@link org.eclipse.core.resources.IResource
      * IResource} object.
-     *
+     * 
      * @return
      */
     public org.eclipse.core.resources.IResource getDelegate() {

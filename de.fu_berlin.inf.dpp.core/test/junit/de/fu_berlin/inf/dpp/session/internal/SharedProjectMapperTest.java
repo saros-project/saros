@@ -362,7 +362,6 @@ public class SharedProjectMapperTest {
      */
     private IProject createProjectMock() {
         IProject projectMock = EasyMock.createNiceMock(IProject.class);
-        EasyMock.expect(projectMock.isAccessible()).andStubReturn(true);
         EasyMock.expect(projectMock.getType()).andStubReturn(IResource.PROJECT);
         EasyMock.replay(projectMock);
         return projectMock;

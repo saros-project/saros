@@ -205,12 +205,6 @@ public class FileUtils {
         LOG.trace(".move(" + destination.toOSString() + " , " + source.getName()
                 + ")");
 
-        if (!source.isAccessible()) {
-            LOG.warn(".move Source file can not be accessed  " + source
-                    .getFullPath());
-            return;
-        }
-
         IPath absDestination = destination.makeAbsolute();
 
         source.move(absDestination, false);

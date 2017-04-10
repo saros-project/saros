@@ -122,13 +122,6 @@ public class ServerResourceImplTest extends EasyMockSupport {
     }
 
     @Test
-    public void isAccessible() throws Exception {
-        assertFalse(resource.isAccessible());
-        createFileForResource();
-        assertTrue(resource.isAccessible());
-    }
-
-    @Test
     public void isNeverDerived() throws Exception {
         assertFalse(resource.isDerived());
         assertFalse(resource.isDerived(true));

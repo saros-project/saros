@@ -8,7 +8,6 @@ import de.fu_berlin.inf.dpp.filesystem.IResourceAttributes;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRoot;
 
 import java.io.IOException;
-import java.net.URI;
 
 /**
  * IntelliJ implementation of {@link IWorkspaceRoot}.
@@ -79,11 +78,6 @@ public class IntelliJWorkspaceRootImpl implements IWorkspaceRoot {
     @Override
     public int getType() {
         return IResource.ROOT;
-    }
-
-    @Override
-    public boolean isAccessible() {
-        return true;
     }
 
     @Override

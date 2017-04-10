@@ -14,8 +14,6 @@ import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,7 +50,6 @@ public class IntelliJProjectImpl implements IProject {
     private IPath fullPath;
     private IPath relativePath;
     private IContainer parent;
-    private boolean isAccessible;
     private IResourceAttributes attributes;
 
     public IntelliJProjectImpl(Project project) {
@@ -111,8 +108,6 @@ public class IntelliJProjectImpl implements IProject {
     private void setPath(File path) {
         this.path = path;
 
-        isAccessible = false;
-
         fullPath = IntelliJPathImpl.fromString(path.getAbsolutePath());
         relativePath = IntelliJPathImpl.fromString(path.getPath());
 
@@ -127,10 +122,8 @@ public class IntelliJProjectImpl implements IProject {
         if (!path.exists()) {
             LOG.warn(
                 "Tries to scan a file that doesn't exist: " + path.toString());
-            isAccessible = false;
         } else {
             addRecursive(path);
-            isAccessible = true;
         }
 
     }
@@ -354,15 +347,6 @@ public class IntelliJProjectImpl implements IProject {
     @Override
     public int getType() {
         return IResource.PROJECT;
-    }
-
-    @Override
-    public boolean isAccessible() {
-        return isAccessible;
-    }
-
-    public void setAccessible(boolean accessible) {
-        isAccessible = accessible;
     }
 
     @Override

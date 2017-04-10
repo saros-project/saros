@@ -84,11 +84,6 @@ public abstract class ServerResourceImpl implements IResource {
     }
 
     @Override
-    public boolean isAccessible() {
-        return exists();
-    }
-
-    @Override
     public boolean isDerived() {
         return false;
     }

@@ -75,13 +75,6 @@ public class IntelliJResourceImplTest extends AbstractResourceTest {
     }
 
     @Test
-    public void testIsAccessible() throws Exception {
-        IResource resource = createTestResourceWithFile();
-
-        assertTrue(resource.isAccessible());
-    }
-
-    @Test
     public void testGetFullPath() throws Exception {
         IResource resource = getTestResource();
 
