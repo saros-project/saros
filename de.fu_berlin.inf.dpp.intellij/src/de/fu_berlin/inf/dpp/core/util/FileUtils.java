@@ -5,18 +5,28 @@ import de.fu_berlin.inf.dpp.filesystem.IFile;
 import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.filesystem.IResourceAttributes;
 import de.fu_berlin.inf.dpp.util.Pair;
 import de.fu_berlin.inf.dpp.util.StackTrace;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.AccessDeniedException;
 import java.util.Arrays;
 import java.util.Collection;
 
 // TODO: as done in 3adb19a193, stop force update of read-only flags.
+/*
+ * FIXME: needs a general overhaul
+ * All of these methods need to be checked for correct behavior, which is
+ * currently not possible as they are used in the SharedResourcesManager while
+ * dealing with changes in the file structure. This is currently not completely
+ * implemented or debugged.
+ */
 public class FileUtils {
 
     private static Logger LOG = Logger.getLogger(FileUtils.class);
@@ -26,40 +36,41 @@ public class FileUtils {
     }
 
     /**
-     * Makes the given file read-only (</code>readOnly == true</code>) or
+     * Makes the given resource read-only (</code>readOnly == true</code>) or
      * writable (<code>readOnly == false</code>).
      *
-     * @param file     the resource whose read-only attribute is to be set or removed
+     * @param resource     the resource whose read-only attribute is to be set or removed
      * @param readOnly <code>true</code> to set the given file to be read-only,
      *                 <code>false</code> to make writable
      * @return The state before setting read-only to the given value.
      */
-    public static boolean setReadOnly(IResource file, boolean readOnly) {
+    public static boolean setReadOnly(IResource resource, boolean readOnly) throws IOException{
 
-        IResourceAttributes attributes = file.getResourceAttributes();
+        File file = resource.getLocation().toFile();
 
-        if (attributes == null) {
-            // TODO Throw a FileNotFoundException and deal with it everywhere!
-            LOG.error("File does not exist for setting readOnly == " + readOnly
-                    + ": " + file, new StackTrace());
-            return false;
-        }
-        boolean result = attributes.isReadOnly();
+        if(!file.exists()){
 
-        // Already in desired state
-        if (result == readOnly) {
-            return result;
+            throw new FileNotFoundException("file for the resource " +
+                resource + " could not be found.");
         }
 
-        attributes.setReadOnly(readOnly);
-        try {
-            file.setResourceAttributes(attributes);
-        } catch (IOException e) {
-            // failure is not an option
-            LOG.warn("Failed to set resource readonly == " + readOnly + ": "
-                    + file);
+        boolean currentState = file.canWrite();
+
+        if (currentState == readOnly) {
+
+            return currentState;
         }
-        return result;
+
+        boolean operationSucceeded = file.setWritable(!readOnly);
+
+        if(!operationSucceeded){
+
+            throw new AccessDeniedException("current user does not have " +
+                "permission to change the access permission of the resource " +
+                resource);
+        }
+
+        return currentState;
     }
 
     /**
@@ -104,11 +115,15 @@ public class FileUtils {
             wasReadOnly = setReadOnly(parent, false);
         }
 
-        file.create(input, true);
+        try {
 
-        // Reset permissions on parent
-        if (parent != null && wasReadOnly) {
-            setReadOnly(parent, true);
+            file.create(input, true);
+
+        }finally {
+
+            if (parent != null && wasReadOnly) {
+                setReadOnly(parent, true);
+            }
         }
 
     }
@@ -180,10 +195,6 @@ public class FileUtils {
             return;
         }
 
-        if (resource.getResourceAttributes() == null) {
-            return;
-        }
-
         setReadOnly(resource, false);
 
         resource.delete(IResource.FORCE | IResource.KEEP_HISTORY);
@@ -214,7 +225,7 @@ public class FileUtils {
      * Makes sure that the parent directories of the given IResource exist,
      * possibly removing write protection.
      */
-    public static boolean mkdirs(IResource resource) {
+    public static boolean mkdirs(IResource resource) throws IOException{
 
         if (resource == null) {
             return true;
@@ -236,11 +247,11 @@ public class FileUtils {
         boolean wasReadOnly = FileUtils.setReadOnly(root, false);
 
         try {
+
             create(parent);
-        } catch (IOException e) {
-            LOG.error("Could not create Dir: " + parent.getFullPath());
-            return false;
+
         } finally {
+
             if (wasReadOnly) {
                 FileUtils.setReadOnly(root, true);
             }

@@ -4,7 +4,6 @@ import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.filesystem.IResourceAttributes;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspaceRoot;
 
 import java.io.IOException;
@@ -102,17 +101,6 @@ public class IntelliJWorkspaceRootImpl implements IWorkspaceRoot {
 
     @Override
     public void move(IPath destination, boolean force) throws IOException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public IResourceAttributes getResourceAttributes() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setResourceAttributes(IResourceAttributes attributes)
-        throws IOException {
         throw new UnsupportedOperationException();
     }
 

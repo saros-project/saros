@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.filesystem;
 
 import java.io.IOException;
 
-import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.OperationCanceledException;
 
@@ -135,30 +134,6 @@ public class EclipseResourceImpl implements IResource {
         } catch (CoreException e) {
             throw new IOException(e);
         } catch (OperationCanceledException e) {
-            throw new IOException(e);
-        }
-    }
-
-    @Override
-    public IResourceAttributes getResourceAttributes() {
-        ResourceAttributes attributes = delegate.getResourceAttributes();
-
-        if (attributes == null)
-            return null;
-
-        return new EclipseResourceAttributesImpl(attributes);
-    }
-
-    @Override
-    public void setResourceAttributes(IResourceAttributes attributes)
-        throws IOException {
-
-        ResourceAttributes attr = ((EclipseResourceAttributesImpl) attributes)
-            .getDelegate();
-
-        try {
-            delegate.setResourceAttributes(attr);
-        } catch (CoreException e) {
             throw new IOException(e);
         }
     }

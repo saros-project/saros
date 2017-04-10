@@ -10,7 +10,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
@@ -24,7 +23,6 @@ import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.filesystem.IResourceAttributes;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 
 public class ServerResourceImplTest extends EasyMockSupport {
@@ -125,44 +123,6 @@ public class ServerResourceImplTest extends EasyMockSupport {
     public void isNeverDerived() throws Exception {
         assertFalse(resource.isDerived());
         assertFalse(resource.isDerived(true));
-    }
-
-    @Test
-    public void getResourceAttributes() throws Exception {
-        createFileForResource();
-
-        resource.getLocation().toFile().setWritable(false);
-        assertTrue(resource.getResourceAttributes().isReadOnly());
-        resource.getLocation().toFile().setWritable(true);
-        assertFalse(resource.getResourceAttributes().isReadOnly());
-    }
-
-    @Test
-    public void getResourceAttributesOfNonExistentFile() throws Exception {
-        assertNull(resource.getResourceAttributes());
-    }
-
-    @Test
-    public void setResourceAttributes() throws Exception {
-        createFileForResource();
-        IPath resourceLocation = resource.getLocation();
-
-        IResourceAttributes attributes = new ServerResourceAttributesImpl();
-
-        attributes.setReadOnly(true);
-        resource.setResourceAttributes(attributes);
-        assertFalse(resourceLocation.toFile().canWrite());
-
-        attributes.setReadOnly(false);
-        resource.setResourceAttributes(attributes);
-        assertTrue(resourceLocation.toFile().canWrite());
-    }
-
-    @Test(expected = FileNotFoundException.class)
-    public void setResourceAttributesOfNonExistentFile() throws Exception {
-        IResourceAttributes attributes = new ServerResourceAttributesImpl();
-        attributes.setReadOnly(true);
-        resource.setResourceAttributes(attributes);
     }
 
     @Test

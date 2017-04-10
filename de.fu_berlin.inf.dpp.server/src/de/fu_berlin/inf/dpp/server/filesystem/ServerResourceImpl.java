@@ -1,7 +1,5 @@
 package de.fu_berlin.inf.dpp.server.filesystem;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,7 +8,6 @@ import de.fu_berlin.inf.dpp.filesystem.IContainer;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.filesystem.IResourceAttributes;
 import de.fu_berlin.inf.dpp.filesystem.IWorkspace;
 
 /**
@@ -96,30 +93,6 @@ public abstract class ServerResourceImpl implements IResource {
     @Override
     public void refreshLocal() throws IOException {
         // Nothing to do
-    }
-
-    @Override
-    public IResourceAttributes getResourceAttributes() {
-        File file = getLocation().toFile();
-        if (!file.exists()) {
-            return null;
-        }
-
-        IResourceAttributes attributes = new ServerResourceAttributesImpl();
-        attributes.setReadOnly(!file.canWrite());
-        return attributes;
-    }
-
-    @Override
-    public void setResourceAttributes(IResourceAttributes attributes)
-        throws IOException {
-
-        File file = getLocation().toFile();
-        if (!file.exists()) {
-            throw new FileNotFoundException(getLocation().toOSString());
-        }
-
-        file.setWritable(!attributes.isReadOnly());
     }
 
     @Override

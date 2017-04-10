@@ -60,11 +60,6 @@ public interface IResource {
      */
     public void move(IPath destination, boolean force) throws IOException;
 
-    public IResourceAttributes getResourceAttributes();
-
-    public void setResourceAttributes(IResourceAttributes attributes)
-        throws IOException;
-
     public IPath getLocation();
 
     public Object getAdapter(Class<? extends IResource> clazz);

@@ -8,7 +8,6 @@ import de.fu_berlin.inf.dpp.filesystem.IFolder;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IProject;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.filesystem.IResourceAttributes;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
@@ -50,7 +49,6 @@ public class IntelliJProjectImpl implements IProject {
     private IPath fullPath;
     private IPath relativePath;
     private IContainer parent;
-    private IResourceAttributes attributes;
 
     public IntelliJProjectImpl(Project project) {
 
@@ -110,8 +108,6 @@ public class IntelliJProjectImpl implements IProject {
 
         fullPath = IntelliJPathImpl.fromString(path.getAbsolutePath());
         relativePath = IntelliJPathImpl.fromString(path.getPath());
-
-        attributes = new IntelliJResourceAttributesImpl(); //todo
     }
 
     private void scan() {
@@ -372,17 +368,6 @@ public class IntelliJProjectImpl implements IProject {
     @Override
     public void move(IPath destination, boolean force) throws IOException {
         path.renameTo(destination.toFile());
-    }
-
-    @Override
-    public IResourceAttributes getResourceAttributes() {
-        return attributes;
-    }
-
-    @Override
-    public void setResourceAttributes(IResourceAttributes attributes)
-        throws IOException {
-        this.attributes = attributes;
     }
 
     @Override

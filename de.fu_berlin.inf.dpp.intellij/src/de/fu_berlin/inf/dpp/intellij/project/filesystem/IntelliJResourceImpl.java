@@ -8,7 +8,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.filesystem.IPath;
 import de.fu_berlin.inf.dpp.filesystem.IResource;
-import de.fu_berlin.inf.dpp.filesystem.IResourceAttributes;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -24,7 +23,6 @@ public abstract class IntelliJResourceImpl implements IResource {
 
     protected IntelliJProjectImpl project;
     protected IPath projectRelativePath;
-    private IResourceAttributes attributes;
 
     protected IntelliJResourceImpl(IntelliJProjectImpl project,
         File file) {
@@ -44,7 +42,6 @@ public abstract class IntelliJResourceImpl implements IResource {
                 .fromString(file.getPath());
         }
         this.project = project;
-        this.attributes = new IntelliJFileResourceAttributesImpl(file);
     }
 
     public String getDefaultCharset() {
@@ -101,16 +98,6 @@ public abstract class IntelliJResourceImpl implements IResource {
     public boolean isDerived() {
         //TODO: Query ModuleRootManager.getExcludedRoots whether this is ignored
         return false;
-    }
-
-    @Override
-    public IResourceAttributes getResourceAttributes() {
-        return attributes;
-    }
-
-    @Override
-    public void setResourceAttributes(IResourceAttributes attributes) {
-        this.attributes = attributes;
     }
 
     @Override
